@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, Map } from 'lucide-react';
+import { AlertTriangle, Map, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
@@ -10,6 +10,7 @@ import { SimulationDashboard } from '@/components/builder/step5/SimulationDashbo
 import { loadTemplateById } from '@/lib/templates/unifiedTemplateService';
 import { DCFacilityMap } from '@/components/dc-ui/DCFacilityMap';
 import { DCCard } from '@/components/dc-ui/DCCard';
+import { DCSimulationPanel } from '@/components/simulation/DCSimulationPanel';
 
 export function Step5Simulation() {
   const {
@@ -94,8 +95,12 @@ export function Step5Simulation() {
 
       {/* View Toggle */}
       <Tabs value={activeView} onValueChange={(v) => setActiveView(v as 'simulation' | 'facility')} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-dc-surface">
-          <TabsTrigger value="simulation">Simulation Dashboard</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-dc-surface">
+          <TabsTrigger value="simulation" className="flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            DC Simulation
+          </TabsTrigger>
+          <TabsTrigger value="legacy">Legacy Dashboard</TabsTrigger>
           <TabsTrigger value="facility" className="flex items-center gap-2">
             <Map className="h-4 w-4" />
             Facility Map
@@ -103,6 +108,10 @@ export function Step5Simulation() {
         </TabsList>
 
         <TabsContent value="simulation" className="mt-4">
+          <DCSimulationPanel compact />
+        </TabsContent>
+
+        <TabsContent value="legacy" className="mt-4">
           <div className="flex-1 min-h-0">
             <SimulationDashboard
               template={template}

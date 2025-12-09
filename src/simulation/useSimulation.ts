@@ -22,6 +22,20 @@ import type {
   CustomScenarioConfig,
 } from './types';
 
+// Default baseline KPIs for Data Centre simulation
+const DEFAULT_BASELINE_KPIS: Record<string, number> = {
+  pue: 1.38,
+  gpuUtilization: 72,
+  thermalStabilityScore: 94,
+  powerReliabilityScore: 98,
+  sovereignComplianceScore: 100,
+  emissionsVsTarget: 8,
+  coolingEfficiencyIndex: 87,
+  networkIntegrityScore: 99,
+  environmentalSafetyScore: 96,
+  avgUpsRuntime: 45,
+};
+
 export interface UseSimulationReturn {
   // State
   status: SimulationStatus;
@@ -62,16 +76,16 @@ export function useSimulation(): UseSimulationReturn {
     activeScenarioId: null,
     events: [],
     kpiSnapshots: [],
-    baselineKpis: {},
-    currentKpis: {},
+    baselineKpis: DEFAULT_BASELINE_KPIS,
+    currentKpis: { ...DEFAULT_BASELINE_KPIS },
   });
   
   const [customScenarios, setCustomScenarios] = useState<ScenarioDefinition[]>([]);
   const presetScenarios = PRESET_SCENARIOS;
   
-  // Initialize engine
+  // Initialize engine with baseline KPIs
   useEffect(() => {
-    engineRef.current = getSimulationEngine();
+    engineRef.current = getSimulationEngine(DEFAULT_BASELINE_KPIS);
     
     const unsubscribe = engineRef.current.subscribe((event) => {
       if (event.type === 'state-change' || event.type === 'tick') {

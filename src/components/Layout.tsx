@@ -8,22 +8,18 @@ import {
   LayoutDashboard,
   Wrench,
   BarChart3,
-  Plug,
   Shield,
   Users,
-  Store,
-  Activity,
   HelpCircle,
   Menu,
   X,
   Command,
-  Sparkles,
   LogOut,
-  Bot,
+  Server,
+  Activity,
 } from "lucide-react";
 import { User } from '@supabase/supabase-js';
 import GlobalSearchBar from "@/components/search/GlobalSearchBar";
-import { CoPilotDrawer } from "@/components/CoPilotDrawer";
 import { CoPilotPanel } from "@/components/copilot/CoPilotPanel";
 import { CoPilotBubble } from "@/components/copilot/CoPilotBubble";
 import { useCoPilot } from "@/contexts/CoPilotContext";
@@ -39,15 +35,14 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
-// All navigation items visible in header
+// Data Centre Twin Studio navigation
 const allNavigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Build AI System", href: "/builder", icon: Wrench },
-  { name: "Manage Agents", href: "/app/agents", icon: Bot },
-  { name: "Intelligence", href: "/intelligence", icon: BarChart3 },
-  { name: "Compliance", href: "/compliance", icon: Shield },
+  { name: "Data Centre Command", href: "/", icon: LayoutDashboard },
+  { name: "Build Data Centre Twin", href: "/builder", icon: Wrench },
+  { name: "Subsystem Agents", href: "/app/agents", icon: Server },
+  { name: "Telemetry & Analytics", href: "/intelligence", icon: BarChart3 },
+  { name: "Sovereignty & Safety Audit", href: "/compliance", icon: Shield },
   { name: "Teams", href: "/teams", icon: Users },
-  { name: "Marketplace", href: "/marketplace", icon: Store },
   { name: "Help", href: "/help", icon: HelpCircle },
 ];
 
@@ -63,7 +58,6 @@ const getGreeting = () => {
 const getFirstName = (user: User | null): string => {
   if (!user) return "there";
   
-  // Try user_metadata.full_name or first_name
   if (user.user_metadata?.full_name) {
     return user.user_metadata.full_name.split(' ')[0];
   }
@@ -71,7 +65,6 @@ const getFirstName = (user: User | null): string => {
     return user.user_metadata.first_name;
   }
   
-  // Fallback to email username
   if (user.email) {
     const username = user.email.split('@')[0];
     return username.charAt(0).toUpperCase() + username.slice(1).split(/[._-]/)[0];
@@ -90,7 +83,6 @@ export function Layout({ children }: LayoutProps) {
   const [greeting, setGreeting] = useState(getGreeting());
   const headerRef = useRef<HTMLElement>(null);
 
-  // Get current user
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
@@ -103,11 +95,10 @@ export function Layout({ children }: LayoutProps) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Update greeting every minute
   useEffect(() => {
     const interval = setInterval(() => {
       setGreeting(getGreeting());
-    }, 60000); // Update every minute
+    }, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -122,14 +113,12 @@ export function Layout({ children }: LayoutProps) {
     }
   };
 
-  // Listen for global copilot toggle event
   useEffect(() => {
     const handleToggle = () => setIsOpen(!isOpen);
     window.addEventListener('toggle-copilot', handleToggle);
     return () => window.removeEventListener('toggle-copilot', handleToggle);
   }, [isOpen, setIsOpen]);
 
-  // Track scroll for sticky header shadow
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 8);
@@ -139,20 +128,17 @@ export function Layout({ children }: LayoutProps) {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <GlobalSearchBar />
       
-      {/* Top Navigation Bar - Sticky with Priority+ Pattern */}
+      {/* Top Navigation Bar */}
       <header 
         ref={headerRef}
         className={`sticky top-0 z-50 border-b bg-card/95 backdrop-blur-xl supports-[backdrop-filter]:backdrop-blur transition-shadow ${
-          isScrolled ? 'shadow-lg shadow-purple-500/5' : ''
+          isScrolled ? 'shadow-md' : ''
         }`}
         role="navigation"
         aria-label="Primary navigation"
-        style={{
-          borderColor: 'rgba(0, 0, 0, 0.08)'
-        }}
       >
         <div className="mx-auto max-w-[1920px] flex items-center justify-between px-[clamp(16px,4vw,32px)] py-3">
           {/* Logo and Greeting */}
@@ -160,7 +146,7 @@ export function Layout({ children }: LayoutProps) {
             <Link to="/" className="flex items-center flex-shrink-0 group">
               <img 
                 src={m2mLogo} 
-                alt="AURA" 
+                alt="Data Centre Twin Studio" 
                 className="h-9 w-9 lg:h-10 lg:w-10 object-contain transition-transform group-hover:scale-105"
               />
             </Link>
@@ -182,7 +168,7 @@ export function Layout({ children }: LayoutProps) {
                           variant={isActive ? "secondary" : "ghost"}
                           size="sm"
                           className={`gap-2 transition-smooth min-h-[44px] ${
-                            isActive ? "glow-purple" : ""
+                            isActive ? "bg-primary/10 text-primary" : ""
                           }`}
                           aria-current={isActive ? "page" : undefined}
                         >
@@ -221,7 +207,7 @@ export function Layout({ children }: LayoutProps) {
               <UserMenu />
             </div>
 
-            {/* Mobile Menu Toggle - Modern Thin Icon */}
+            {/* Mobile Menu Toggle */}
             <Button
               variant="ghost"
               size="sm"
@@ -252,7 +238,7 @@ export function Layout({ children }: LayoutProps) {
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
               <img src={m2mLogo} alt="" className="h-8 w-8" aria-hidden="true" />
-              <span>AURA</span>
+              <span>Data Centre Twin Studio</span>
             </SheetTitle>
           </SheetHeader>
 
@@ -260,9 +246,9 @@ export function Layout({ children }: LayoutProps) {
             {/* Platform Section */}
             <div className="pb-4">
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Platform
+                Data Centre
               </h3>
-              {allNavigation.slice(0, 3).map((item) => {
+              {allNavigation.slice(0, 4).map((item) => {
                 const isActive = location.pathname === item.href;
                 return (
                   <Link
@@ -289,7 +275,7 @@ export function Layout({ children }: LayoutProps) {
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Teams & Compliance
               </h3>
-              {allNavigation.slice(3, 6).map((item) => {
+              {allNavigation.slice(4, 6).map((item) => {
                 const isActive = location.pathname === item.href;
                 return (
                   <Link
@@ -311,10 +297,10 @@ export function Layout({ children }: LayoutProps) {
               })}
             </div>
 
-            {/* Additional Section */}
+            {/* Help Section */}
             <div className="pb-4 border-t border-border pt-4">
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                More
+                Support
               </h3>
               {allNavigation.slice(6).map((item) => {
                 const isActive = location.pathname === item.href;
@@ -341,7 +327,6 @@ export function Layout({ children }: LayoutProps) {
 
           {/* Mobile Sheet Footer - Sign Out */}
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border bg-card">
-            {/* Sign Out Button */}
             <Button
               variant="outline"
               className="w-full justify-start gap-3 min-h-[44px] text-red-600 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
@@ -357,7 +342,7 @@ export function Layout({ children }: LayoutProps) {
         </SheetContent>
       </Sheet>
 
-      {/* Main Content - Fluid Container */}
+      {/* Main Content */}
       <main className="flex-1 w-full mx-auto max-w-[1680px] px-[clamp(8px,2vw,16px)] sm:px-[clamp(12px,3vw,20px)] md:px-[clamp(16px,4vw,24px)] lg:px-[clamp(20px,5vw,32px)]">
         {children}
       </main>
@@ -368,7 +353,7 @@ export function Layout({ children }: LayoutProps) {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
               <p className="text-sm text-muted-foreground">
-                © 2025 AURA — Adaptive Unified Resource Assistant
+                © 2025 Data Centre Digital Twin Studio
               </p>
               <BuildVersion />
             </div>
@@ -387,10 +372,8 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </footer>
 
-      {/* AURA Co-Pilot Floating Assistant */}
+      {/* Data Centre Co-Pilot */}
       <CoPilotPanel />
-
-      {/* Floating AURA Co-Pilot Button - Safe Area Aware */}
       <CoPilotBubble position="bottom-right" />
     </div>
   );

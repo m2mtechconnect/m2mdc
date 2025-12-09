@@ -101,7 +101,7 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
       <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30">
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold">AURA Co-Pilot</h2>
+          <h2 className="text-lg font-semibold">Data Centre Co-Pilot</h2>
         </div>
         <Button
           variant="ghost"
@@ -132,7 +132,7 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
           {messages.length === 0 && !isStreaming && (
             <div className="text-center py-8 text-muted-foreground">
               <Sparkles className="h-10 w-10 mx-auto mb-3 text-primary/50" />
-              <p className="text-sm mb-3">Ask me about your data centre operations.</p>
+              <p className="text-sm mb-3">Ask me about PUE, thermals, workloads, sovereignty, or carbon metrics.</p>
               <div className="space-y-2 text-left max-w-xs mx-auto">
                 {[
                   { label: 'Cooling adequacy', query: 'Is cooling adequate for current GPU load?' },

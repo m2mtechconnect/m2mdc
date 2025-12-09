@@ -35,6 +35,7 @@ import DataTable, { Column } from '@/components/shared/DataTable';
 import { useBlueprint } from '@/hooks/useBlueprint';
 import { useBlueprintScenarios } from '@/hooks/useBlueprintScenarios';
 import { useBlueprintKPIs } from '@/hooks/useBlueprintKPIs';
+import { DcToolsStrip } from '@/components/dc-tools';
 
 interface System {
   id: string;
@@ -229,6 +230,13 @@ export default function IntelligenceDashboard() {
                 </SelectContent>
               </Select>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Tools Strip */}
+        <Card className="mb-6">
+          <CardContent className="py-3">
+            <DcToolsStrip twinId="default" />
           </CardContent>
         </Card>
 

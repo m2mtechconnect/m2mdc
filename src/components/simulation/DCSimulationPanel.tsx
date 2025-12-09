@@ -18,6 +18,7 @@ import { DCEventTimeline } from './DCEventTimeline';
 import { DCKPIDeltas, defaultKPIs } from './DCKPIDeltas';
 import { CustomScenarioBuilder } from './CustomScenarioBuilder';
 import { createCustomScenario } from '@/simulation/customScenarioBuilder';
+import { DcToolsRow } from '@/components/dc-tools';
 import type { CustomScenarioConfig } from '@/simulation/types';
 
 interface DCSimulationPanelProps {
@@ -184,6 +185,19 @@ export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSim
           />
         </TabsContent>
       </Tabs>
+      
+      {/* Tools for this Simulation */}
+      <DcToolsRow
+        twinId={twinId}
+        title="Tools for this Simulation"
+        subtitle="Launch domain-specific views with simulation context"
+        simulationMode
+        simulationContext={{
+          scenarioId: activeScenarioId || undefined,
+          currentTime,
+        }}
+        compact
+      />
       
       {/* Custom Scenario Builder Dialog */}
       <Dialog open={showCustomBuilder} onOpenChange={setShowCustomBuilder}>

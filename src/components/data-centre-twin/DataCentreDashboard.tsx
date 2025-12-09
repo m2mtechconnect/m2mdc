@@ -29,6 +29,7 @@ import { FinancialDomainView } from './domains/FinancialDomainView';
 import { AlertsPanel } from './AlertsPanel';
 import { DCSimulationPanel } from '@/components/simulation/DCSimulationPanel';
 import { useBlueprint } from '@/hooks/useBlueprint';
+import { DcToolsRow } from '@/components/dc-tools';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 interface DataCentreDashboardProps {
@@ -308,6 +309,13 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
 
         <TabsContent value="overview" className="space-y-6">
           <KPICockpit facility={facility} twinId={twinId} />
+          
+          {/* Data Centre Tools Row */}
+          <DcToolsRow 
+            twinId={twinId} 
+            title="Data Centre Tools"
+            subtitle="Quick access to specialized monitoring and analysis tools"
+          />
           
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2 space-y-6">

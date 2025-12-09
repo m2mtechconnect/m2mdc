@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, Map, Activity } from 'lucide-react';
+import { AlertTriangle, Map, Activity, FileText, Download, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
@@ -11,6 +11,8 @@ import { loadTemplateById } from '@/lib/templates/unifiedTemplateService';
 import { DCFacilityMap } from '@/components/dc-ui/DCFacilityMap';
 import { DCCard } from '@/components/dc-ui/DCCard';
 import { DCSimulationPanel } from '@/components/simulation/DCSimulationPanel';
+import { useBlueprint } from '@/hooks/useBlueprint';
+import { Badge } from '@/components/ui/badge';
 
 export function Step5Simulation() {
   const {
@@ -25,14 +27,30 @@ export function Step5Simulation() {
   } = useWizardBuilderStore();
   
   const { currentBlueprint } = useBlueprintStore();
+  const { blueprint, summary } = useBlueprint('default');
 
   const [validation, setValidation] = useState<ValidationResult>({ isValid: true, errors: [] });
   const [isValidating, setIsValidating] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
   const [template, setTemplate] = useState<any>(null);
   const [selectedRackId, setSelectedRackId] = useState<string | undefined>();
-  const [activeView, setActiveView] = useState<'simulation' | 'facility'>('simulation');
+  const [activeView, setActiveView] = useState<'simulation' | 'facility' | 'blueprint'>('simulation');
   const navigate = useNavigate();
+
+  // Download blueprint as JSON
+  const handleDownloadBlueprint = () => {
+    if (!blueprint) return;
+    const json = JSON.stringify(blueprint, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${blueprint.name.replace(/\s+/g, '-').toLowerCase()}-blueprint.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   // Load template if available
   useEffect(() => {
@@ -94,8 +112,8 @@ export function Step5Simulation() {
       )}
 
       {/* View Toggle */}
-      <Tabs value={activeView} onValueChange={(v) => setActiveView(v as 'simulation' | 'facility')} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-dc-surface">
+      <Tabs value={activeView} onValueChange={(v) => setActiveView(v as 'simulation' | 'facility' | 'blueprint')} className="w-full">
+        <TabsList className="grid w-full grid-cols-4 bg-dc-surface">
           <TabsTrigger value="simulation" className="flex items-center gap-2">
             <Activity className="h-4 w-4" />
             DC Simulation
@@ -104,6 +122,10 @@ export function Step5Simulation() {
           <TabsTrigger value="facility" className="flex items-center gap-2">
             <Map className="h-4 w-4" />
             Facility Map
+          </TabsTrigger>
+          <TabsTrigger value="blueprint" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Blueprint
           </TabsTrigger>
         </TabsList>
 
@@ -144,6 +166,91 @@ export function Step5Simulation() {
               selectedRackId={selectedRackId}
               onRackSelect={(rackId) => setSelectedRackId(rackId)}
             />
+          </DCCard>
+        </TabsContent>
+
+        <TabsContent value="blueprint" className="mt-4">
+          <DCCard 
+            title="System Blueprint Review" 
+            subtitle="Complete configuration snapshot for audit and deployment" 
+            icon={<FileText className="h-4 w-4" />}
+          >
+            <div className="space-y-6">
+              {/* Summary Stats */}
+              {summary && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-3 bg-dc-surface rounded-lg border border-dc-border">
+                    <div className="text-xs text-dc-text-muted">Domains</div>
+                    <div className="text-lg font-semibold text-dc-text">{summary.enabledDomains}/{summary.totalDomains}</div>
+                  </div>
+                  <div className="p-3 bg-dc-surface rounded-lg border border-dc-border">
+                    <div className="text-xs text-dc-text-muted">Agents</div>
+                    <div className="text-lg font-semibold text-dc-text">{summary.totalAgents}</div>
+                  </div>
+                  <div className="p-3 bg-dc-surface rounded-lg border border-dc-border">
+                    <div className="text-xs text-dc-text-muted">KPIs</div>
+                    <div className="text-lg font-semibold text-dc-text">{summary.totalKpis}</div>
+                  </div>
+                  <div className="p-3 bg-dc-surface rounded-lg border border-dc-border">
+                    <div className="text-xs text-dc-text-muted">Scenarios</div>
+                    <div className="text-lg font-semibold text-dc-text">{summary.totalScenarios}</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Blueprint Details */}
+              {blueprint && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium text-dc-text">{blueprint.name}</h4>
+                      <p className="text-sm text-dc-text-muted">{blueprint.location} • {blueprint.tier} • {blueprint.capacityKw}kW</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs">v{blueprint.version}</Badge>
+                    </div>
+                  </div>
+
+                  {/* Quick Lists */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-3 bg-dc-surface rounded-lg border border-dc-border">
+                      <h5 className="text-xs font-medium text-dc-text-muted mb-2">Active Agents</h5>
+                      <div className="flex flex-wrap gap-1">
+                        {blueprint.agents.filter(a => a.status === 'active').slice(0, 5).map(a => (
+                          <Badge key={a.id} variant="secondary" className="text-xs">{a.name}</Badge>
+                        ))}
+                        {blueprint.agents.filter(a => a.status === 'active').length > 5 && (
+                          <Badge variant="outline" className="text-xs">+{blueprint.agents.filter(a => a.status === 'active').length - 5}</Badge>
+                        )}
+                      </div>
+                    </div>
+                    <div className="p-3 bg-dc-surface rounded-lg border border-dc-border">
+                      <h5 className="text-xs font-medium text-dc-text-muted mb-2">Enabled Workflows</h5>
+                      <div className="flex flex-wrap gap-1">
+                        {blueprint.workflows.filter(w => w.enabled).slice(0, 5).map(w => (
+                          <Badge key={w.id} variant="secondary" className="text-xs">{w.name}</Badge>
+                        ))}
+                        {blueprint.workflows.filter(w => w.enabled).length > 5 && (
+                          <Badge variant="outline" className="text-xs">+{blueprint.workflows.filter(w => w.enabled).length - 5}</Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex items-center gap-3 pt-4 border-t border-dc-border">
+                <Button variant="outline" onClick={handleDownloadBlueprint} className="gap-2">
+                  <Download className="h-4 w-4" />
+                  Download JSON
+                </Button>
+                <Button variant="outline" onClick={() => navigate('/blueprint/default')} className="gap-2">
+                  <Eye className="h-4 w-4" />
+                  View Full Blueprint
+                </Button>
+              </div>
+            </div>
           </DCCard>
         </TabsContent>
       </Tabs>

@@ -15,6 +15,7 @@ import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { ModernFileUploadWizard } from '@/components/dashboard/ModernFileUploadWizard';
 import { toast } from 'sonner';
 import { DCCard, DCSectionHeader } from '@/components/dc-ui';
+import { BuilderToolsPanel } from '@/components/dc-tools';
 
 export function Step2Intelligence() {
   const { modelConfig, setModelConfig, builderId } = useWizardBuilderStore();
@@ -536,6 +537,22 @@ export function Step2Intelligence() {
             </DCCard>
           </TabsContent>
         </Tabs>
+
+        {/* Recommended DC Tools */}
+        <div className="mt-6">
+          <DCSectionHeader
+            title="Recommended Tools"
+            subtitle="Tools available based on your configured integrations"
+            icon={<Settings className="h-5 w-5" />}
+          />
+          <div className="mt-4">
+            <BuilderToolsPanel 
+              onConfigureIntegration={(integration) => {
+                toast.info(`Configure ${integration} in the Integrations section`);
+              }}
+            />
+          </div>
+        </div>
       </div>
 
       <ModernFileUploadWizard

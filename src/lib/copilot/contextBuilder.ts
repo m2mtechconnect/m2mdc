@@ -7,6 +7,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { generateDefaultBlueprint } from '@/data/defaultBlueprint';
+import { dcToolRegistry, type DcToolDefinition } from '@/data/dcToolRegistry';
 
 export interface SimulationTemplateContext {
   title: string;
@@ -114,6 +115,15 @@ export interface CoPilotContext {
     headline?: string;
     benefits?: string[];
   };
+  
+  // Available DC Tools for CoPilot awareness
+  availableTools?: Array<{
+    id: string;
+    name: string;
+    description: string;
+    domain: string;
+    tabTarget?: string;
+  }>;
 }
 
 /**
@@ -216,6 +226,15 @@ export async function enrichWithBlueprint(
       },
     };
     
+    // Add DC tools to context for CoPilot awareness
+    const availableTools = dcToolRegistry.map(tool => ({
+      id: tool.id,
+      name: tool.name,
+      description: tool.description,
+      domain: tool.domain,
+      tabTarget: tool.tabTarget,
+    }));
+    
     return {
       ...context,
       agentName: blueprint.name,
@@ -223,6 +242,7 @@ export async function enrichWithBlueprint(
       twinContext,
       workflowsCount: blueprint.workflows.length,
       integrationsCount: blueprint.integrations.length,
+      availableTools,
     };
   } catch (error) {
     console.error('Failed to enrich context with blueprint:', error);

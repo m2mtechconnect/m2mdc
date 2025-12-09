@@ -1,6 +1,6 @@
 /**
  * Step 5 - Deployment Review & Readiness Gate
- * Enterprise-grade deployment review with full configuration validation
+ * Data Centre Digital Twin deployment with preflight checks
  */
 
 import { useState, useCallback, useEffect } from 'react';
@@ -8,10 +8,12 @@ import { useNavigate } from 'react-router-dom';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageCircle, Sparkles, Loader2 } from 'lucide-react';
+import { MessageCircle, Sparkles, Loader2, Rocket, CheckCircle2, AlertTriangle, Server, Cloud, Shield, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { DCCard, DCSectionHeader, DCKPITile, DCStatusBadge } from '@/components/dc-ui';
 
 import {
   ReadinessChecklist,
@@ -50,13 +52,11 @@ export function Step5Deploy() {
     webhooks: []
   };
 
-  // Load simulation history from backend on mount
   useEffect(() => {
     if (!builderId) return;
     
     const loadHistory = async () => {
       try {
-        // Load simulation history (agent_runs with run_type = 'simulation')
         const { data: runs } = await supabase
           .from('agent_runs')
           .select('*')
@@ -77,7 +77,6 @@ export function Step5Deploy() {
           })));
         }
 
-        // Load version history
         const { data: versions } = await supabase
           .from('agent_versions')
           .select('*')
@@ -105,7 +104,6 @@ export function Step5Deploy() {
     loadHistory();
   }, [builderId]);
 
-  // Calculate readiness score
   const calculateReadinessScore = useCallback(() => {
     let score = 0;
     if (modelConfig?.model) score += 20;
@@ -133,15 +131,11 @@ export function Step5Deploy() {
     setIsSimulationRunning(true);
     
     try {
-      // Create a simulation run in the database
       const { data: session } = await supabase.auth.getSession();
       if (!session.session?.user) {
         throw new Error('Not authenticated');
       }
 
-      const startTime = Date.now();
-      
-      // Insert simulation run
       const { data: run, error } = await supabase
         .from('agent_runs')
         .insert({
@@ -157,7 +151,6 @@ export function Step5Deploy() {
 
       if (error) throw error;
 
-      // Update local state
       setSimulationHistory(prev => [{
         id: run.id,
         scenario,
@@ -197,7 +190,6 @@ export function Step5Deploy() {
 
       const newVersionNum = `1.0.${versionHistory.length}`;
       
-      // Create version in database
       const { data: version, error } = await supabase
         .from('agent_versions')
         .insert({
@@ -242,10 +234,8 @@ export function Step5Deploy() {
     setDeployingTo(environment);
     
     try {
-      // Create version snapshot first
       await handleCreateSnapshot(`Deploy to ${environment}`);
       
-      // Use the store's deploy function for production
       if (environment === 'production') {
         const result = await deployBuilder();
         
@@ -256,7 +246,6 @@ export function Step5Deploy() {
           toast.error(result.message || 'Deployment failed');
         }
       } else {
-        // For dev/staging, just update status
         const { error } = await supabase
           .from('agents')
           .update({ 
@@ -278,13 +267,49 @@ export function Step5Deploy() {
   };
 
   const copilotQuestions = [
-    { label: 'Review deployment', question: `Review this deployment configuration for ${goal || 'my agent'}. Is it ready for production?` },
-    { label: 'Explain risks', question: `What are the potential risks of deploying ${goal || 'this agent'} to production?` },
-    { label: 'Suggest improvements', question: `What improvements should I make to ${goal || 'this agent'} before deploying to production?` },
+    { label: 'Review config', question: `Review this DC twin deployment configuration. Is it ready for production?` },
+    { label: 'Identify risks', question: `What are the potential risks of deploying this data centre twin to production?` },
+    { label: 'Optimize PUE', question: `Suggest PUE optimization strategies for this deployment.` },
   ];
 
   return (
-    <div className="h-full flex flex-col gap-4 overflow-auto">
+    <div className="space-y-6 max-w-[920px] mx-auto">
+      <DCSectionHeader
+        title="Deployment Readiness"
+        subtitle="Pre-flight checks and environment deployment pipeline"
+        icon={<Rocket className="h-5 w-5" />}
+      />
+
+      {/* Readiness Score */}
+      <div className="grid gap-4 grid-cols-4">
+        <DCKPITile
+          label="Readiness Score"
+          value={`${readinessScore}%`}
+          status={readinessScore >= 80 ? 'normal' : readinessScore >= 50 ? 'warning' : 'critical'}
+          icon={<CheckCircle2 className="h-4 w-4" />}
+        />
+        <DCKPITile
+          label="Simulations"
+          value={String(simulationHistory.length)}
+          sublabel="completed"
+          status={simulationHistory.length > 0 ? 'normal' : 'warning'}
+          icon={<Zap className="h-4 w-4" />}
+        />
+        <DCKPITile
+          label="Version"
+          value={currentVersion}
+          sublabel="current"
+          status="info"
+          icon={<Server className="h-4 w-4" />}
+        />
+        <DCKPITile
+          label="Governance"
+          value={governanceConfig.auditEnabled ? 'Enabled' : 'Disabled'}
+          status={governanceConfig.auditEnabled ? 'normal' : 'warning'}
+          icon={<Shield className="h-4 w-4" />}
+        />
+      </div>
+
       {/* Deployment Warnings */}
       <DeploymentWarnings
         builderState={builderState}
@@ -302,12 +327,12 @@ export function Step5Deploy() {
       />
 
       {/* Main Content Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-        <TabsList className="grid grid-cols-4 w-full max-w-lg">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="simulation">Simulation</TabsTrigger>
-          <TabsTrigger value="version">Version</TabsTrigger>
-          <TabsTrigger value="governance">Governance</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-4 w-full bg-dc-surface">
+          <TabsTrigger value="overview" className="data-[state=active]:bg-dc-primary/10">Overview</TabsTrigger>
+          <TabsTrigger value="simulation" className="data-[state=active]:bg-dc-primary/10">Simulation</TabsTrigger>
+          <TabsTrigger value="version" className="data-[state=active]:bg-dc-primary/10">Versions</TabsTrigger>
+          <TabsTrigger value="governance" className="data-[state=active]:bg-dc-primary/10">Governance</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4 mt-4">
@@ -347,30 +372,75 @@ export function Step5Deploy() {
       </Tabs>
 
       {/* Deployment Pipeline */}
-      <DeploymentEnvironmentPipeline
-        onDeploy={handleDeploy}
-        isDeploying={isDeploying}
-        deployingTo={deployingTo}
-        readinessScore={readinessScore}
-      />
+      <DCCard title="Deployment Pipeline" icon={<Cloud className="h-4 w-4" />}>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {(['dev', 'staging', 'production'] as const).map((env) => {
+            const isActive = deployingTo === env;
+            const envConfig = {
+              dev: { label: 'Development', icon: Server, color: 'dc-info' },
+              staging: { label: 'Staging', icon: Cloud, color: 'dc-warning' },
+              production: { label: 'Production', icon: Rocket, color: 'dc-success' },
+            }[env];
+            const EnvIcon = envConfig.icon;
+            
+            return (
+              <div 
+                key={env}
+                className={`p-4 rounded-lg border transition-all ${
+                  isActive ? 'border-dc-primary bg-dc-primary/10' : 'border-dc-border bg-dc-surface'
+                }`}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`w-10 h-10 rounded-lg bg-${envConfig.color}/10 flex items-center justify-center`}>
+                    <EnvIcon className={`h-5 w-5 text-${envConfig.color}`} />
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm">{envConfig.label}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{env} environment</p>
+                  </div>
+                </div>
+                <Button
+                  className="w-full"
+                  variant={env === 'production' ? 'default' : 'outline'}
+                  onClick={() => handleDeploy(env)}
+                  disabled={isDeploying || (env === 'production' && readinessScore < 50)}
+                >
+                  {isActive ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Deploying...
+                    </>
+                  ) : (
+                    `Deploy to ${envConfig.label}`
+                  )}
+                </Button>
+              </div>
+            );
+          })}
+        </div>
+      </DCCard>
 
       {/* Co-Pilot Integration */}
-      <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 border">
-        <Sparkles className="h-4 w-4 text-primary" />
-        <span className="text-sm text-muted-foreground">Ask Co-Pilot:</span>
-        {copilotQuestions.map((q, idx) => (
-          <Button
-            key={idx}
-            variant="ghost"
-            size="sm"
-            onClick={() => openWithQuestion(q.question)}
-            className="text-xs"
-          >
-            <MessageCircle className="h-3 w-3 mr-1" />
-            {q.label}
-          </Button>
-        ))}
-      </div>
+      <DCCard className="bg-dc-surface/50">
+        <div className="flex items-center gap-3">
+          <Sparkles className="h-4 w-4 text-dc-primary" />
+          <span className="text-sm text-muted-foreground">Ask Co-Pilot:</span>
+          <div className="flex flex-wrap gap-2">
+            {copilotQuestions.map((q, idx) => (
+              <Button
+                key={idx}
+                variant="ghost"
+                size="sm"
+                onClick={() => openWithQuestion(q.question)}
+                className="text-xs bg-dc-surface hover:bg-dc-surface/80"
+              >
+                <MessageCircle className="h-3 w-3 mr-1" />
+                {q.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </DCCard>
     </div>
   );
 }

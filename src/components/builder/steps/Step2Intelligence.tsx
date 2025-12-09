@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Brain, BookOpen, MessageSquare, Settings, Upload, Link2, Database, Info, Sparkles, Search, Users, Zap } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Brain, BookOpen, MessageSquare, Settings, Upload, Link2, Database, Info, Sparkles, Search, Users, Zap, Thermometer, Shield, Cpu, Activity } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
@@ -10,36 +9,32 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
 import { useBlueprintStore } from '@/stores/blueprintStore';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { ModernFileUploadWizard } from '@/components/dashboard/ModernFileUploadWizard';
 import { toast } from 'sonner';
+import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 
 export function Step2Intelligence() {
   const { modelConfig, setModelConfig, builderId } = useWizardBuilderStore();
   const { currentBlueprint, updateBlueprint } = useBlueprintStore();
   const { openWithQuestion } = useCoPilotContext();
   
-  // Intelligence config state
   const [temperature, setTemperature] = useState([modelConfig?.rag?.temperature ?? 0.7]);
   const [topK, setTopK] = useState(50);
   const [topP, setTopP] = useState(0.95);
   const [memoryType, setMemoryType] = useState<'none' | 'short' | 'long'>('short');
   
-  // Agent modes
   const [supervisorEnabled, setSupervisorEnabled] = useState(false);
   const [deepResearchEnabled, setDeepResearchEnabled] = useState(false);
   
-  // Behavior state
   const [systemPrompt, setSystemPrompt] = useState('');
   const [persona, setPersona] = useState('professional');
   const [formalTone, setFormalTone] = useState(false);
   const [useEmojis, setUseEmojis] = useState(false);
   const [detailedExplanations, setDetailedExplanations] = useState(true);
   
-  // Safety state
   const [hallucinationPrevention, setHallucinationPrevention] = useState(true);
   const [knowledgeRestrictions, setKnowledgeRestrictions] = useState(true);
   const [requireCitations, setRequireCitations] = useState(false);
@@ -48,7 +43,6 @@ export function Step2Intelligence() {
   const [urlInput, setUrlInput] = useState('');
   const [isAddingUrl, setIsAddingUrl] = useState(false);
   
-  // Load initial state from blueprint
   useEffect(() => {
     if (currentBlueprint?.behavior?.systemPrompt) {
       setSystemPrompt(currentBlueprint.behavior.systemPrompt);
@@ -61,17 +55,12 @@ export function Step2Intelligence() {
     }
   }, [currentBlueprint]);
 
-  // Debounced save to backend
   const saveIntelligenceConfig = useCallback(async (updates: Record<string, any>) => {
-    console.log('[Builder:Step2] Saving intelligence config', updates);
     try {
       await setModelConfig({
         ...modelConfig,
         ...updates,
-        rag: {
-          ...modelConfig?.rag,
-          ...updates.rag,
-        },
+        rag: { ...modelConfig?.rag, ...updates.rag },
         policies: {
           ...modelConfig?.policies,
           supervisorEnabled,
@@ -87,20 +76,15 @@ export function Step2Intelligence() {
   }, [modelConfig, setModelConfig, supervisorEnabled, deepResearchEnabled, hallucinationPrevention, knowledgeRestrictions, requireCitations]);
 
   const handleModelChange = async (model: string) => {
-    console.log('[Builder:Step2] Model changed:', model);
     await setModelConfig({ model, provider: model.split('/')[0] });
     toast.success(`Model updated to ${model.split('/')[1]}`);
   };
 
   const handleSystemPromptChange = (value: string) => {
     setSystemPrompt(value);
-    // Update blueprint
     if (currentBlueprint) {
       updateBlueprint({
-        behavior: {
-          ...currentBlueprint.behavior,
-          systemPrompt: value,
-        },
+        behavior: { ...currentBlueprint.behavior, systemPrompt: value },
       });
     }
   };
@@ -111,24 +95,18 @@ export function Step2Intelligence() {
 
   const handleSupervisorToggle = async (enabled: boolean) => {
     setSupervisorEnabled(enabled);
-    console.log('[Builder:Step2] Supervisor Agent toggled:', enabled);
     await saveIntelligenceConfig({ supervisorEnabled: enabled });
     if (currentBlueprint) {
-      updateBlueprint({
-        model: { ...currentBlueprint.model, supervisorEnabled: enabled },
-      });
+      updateBlueprint({ model: { ...currentBlueprint.model, supervisorEnabled: enabled } });
     }
     toast.success(enabled ? 'Supervisor Agent enabled' : 'Supervisor Agent disabled');
   };
 
   const handleDeepResearchToggle = async (enabled: boolean) => {
     setDeepResearchEnabled(enabled);
-    console.log('[Builder:Step2] Deep Research Agent toggled:', enabled);
     await saveIntelligenceConfig({ deepResearchEnabled: enabled });
     if (currentBlueprint) {
-      updateBlueprint({
-        model: { ...currentBlueprint.model, deepResearchEnabled: enabled },
-      });
+      updateBlueprint({ model: { ...currentBlueprint.model, deepResearchEnabled: enabled } });
     }
     toast.success(enabled ? 'Deep Research Agent enabled' : 'Deep Research Agent disabled');
   };
@@ -136,10 +114,7 @@ export function Step2Intelligence() {
   const handleAddUrl = async () => {
     if (!urlInput.trim()) return;
     setIsAddingUrl(true);
-    console.log('[Builder:Step2] Adding URL to knowledge:', urlInput);
-    
     try {
-      // TODO: Call backend to index URL
       toast.success(`URL added to knowledge base: ${urlInput}`);
       setUrlInput('');
     } catch (error) {
@@ -151,15 +126,9 @@ export function Step2Intelligence() {
 
   const handleSafetyToggle = async (key: string, value: boolean) => {
     switch (key) {
-      case 'hallucination':
-        setHallucinationPrevention(value);
-        break;
-      case 'knowledge':
-        setKnowledgeRestrictions(value);
-        break;
-      case 'citations':
-        setRequireCitations(value);
-        break;
+      case 'hallucination': setHallucinationPrevention(value); break;
+      case 'knowledge': setKnowledgeRestrictions(value); break;
+      case 'citations': setRequireCitations(value); break;
     }
     await saveIntelligenceConfig({
       policies: {
@@ -170,439 +139,305 @@ export function Step2Intelligence() {
     });
   };
 
+  // DC-specific subsystems that intelligence monitors
+  const dcSubsystems = [
+    { id: 'thermal', label: 'Thermal Management', icon: Thermometer, enabled: true },
+    { id: 'power', label: 'Power & PUE', icon: Zap, enabled: true },
+    { id: 'gpu', label: 'GPU Workloads', icon: Cpu, enabled: true },
+    { id: 'sovereignty', label: 'Sovereignty Compliance', icon: Shield, enabled: false },
+  ];
+
   return (
     <>
-    <div className="space-y-8 max-w-[880px] mx-auto">
-      <div>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-                Intelligence Setup
-                <Info className="h-5 w-5 text-muted-foreground" />
-              </h1>
-            </TooltipTrigger>
-            <TooltipContent className="max-w-sm">
-              <p>Configure how your agent thinks: select AI model, add knowledge sources, define behavior and personality, and fine-tune advanced parameters.</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <p className="text-muted-foreground mt-2">
-          Configure AI model, knowledge, behavior, and reasoning
-        </p>
-      </div>
+      <div className="space-y-6 max-w-[920px] mx-auto">
+        <DCSectionHeader
+          title="Intelligence Configuration"
+          subtitle="Configure AI model, knowledge sources, and monitoring behavior"
+          icon={<Brain className="h-5 w-5" />}
+        />
 
-      {/* Agent Modes - Supervisor & Deep Research */}
-      <Card className="border-primary/50 bg-primary/5">
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" />
-            Agent Modes
-          </CardTitle>
-          <CardDescription>
-            Enable advanced capabilities for complex reasoning and research tasks
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                <Users className="h-5 w-5 text-purple-500" />
+        {/* Agent Modes */}
+        <DCCard
+          title="Agent Modes"
+          subtitle="Enable advanced capabilities for complex reasoning"
+          icon={<Sparkles className="h-4 w-4" />}
+          className="border-dc-primary/30"
+        >
+          <div className="space-y-3">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-dc-surface border border-dc-border">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                  <Users className="h-4 w-4 text-purple-400" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm">Supervisor Agent</p>
+                  <p className="text-xs text-muted-foreground">Orchestrates sub-agents for multi-step DC operations</p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium text-sm">Supervisor Agent</p>
-                <p className="text-xs text-muted-foreground">
-                  Orchestrates multiple sub-agents for complex multi-step tasks
-                </p>
-              </div>
+              <Switch checked={supervisorEnabled} onCheckedChange={handleSupervisorToggle} />
             </div>
-            <Switch 
-              checked={supervisorEnabled} 
-              onCheckedChange={handleSupervisorToggle}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                <Search className="h-5 w-5 text-blue-500" />
+            
+            <div className="flex items-center justify-between p-3 rounded-lg bg-dc-surface border border-dc-border">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                  <Search className="h-4 w-4 text-blue-400" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm">Deep Research Agent</p>
+                  <p className="text-xs text-muted-foreground">Performs thorough analysis and synthesizes findings</p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium text-sm">Deep Research Agent</p>
-                <p className="text-xs text-muted-foreground">
-                  Performs thorough web research and synthesizes findings
-                </p>
-              </div>
+              <Switch checked={deepResearchEnabled} onCheckedChange={handleDeepResearchToggle} />
             </div>
-            <Switch 
-              checked={deepResearchEnabled} 
-              onCheckedChange={handleDeepResearchToggle}
-            />
           </div>
-        </CardContent>
-      </Card>
+        </DCCard>
 
-      <Tabs defaultValue="model" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="model" className="flex items-center gap-2">
-            <Brain className="h-4 w-4" />
-            <span className="hidden sm:inline">Model</span>
-          </TabsTrigger>
-          <TabsTrigger value="knowledge" className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4" />
-            <span className="hidden sm:inline">Knowledge</span>
-          </TabsTrigger>
-          <TabsTrigger value="behavior" className="flex items-center gap-2">
-            <MessageSquare className="h-4 w-4" />
-            <span className="hidden sm:inline">Behavior</span>
-          </TabsTrigger>
-          <TabsTrigger value="advanced" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            <span className="hidden sm:inline">Advanced</span>
-          </TabsTrigger>
-        </TabsList>
-
-        {/* MODEL TAB */}
-        <TabsContent value="model" className="space-y-4 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Brain className="h-4 w-4" />
-                AI Model Selection
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Model</Label>
-                <Select value={modelConfig.model} onValueChange={handleModelChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a model" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="google/gemini-3-pro-preview">Gemini 3.0 Pro Preview (Latest)</SelectItem>
-                    <SelectItem value="google/gemini-2.5-flash">Gemini 2.5 Flash (Default)</SelectItem>
-                    <SelectItem value="google/gemini-2.5-pro">Gemini 2.5 Pro</SelectItem>
-                    <SelectItem value="openai/gpt-5">GPT-5</SelectItem>
-                    <SelectItem value="openai/gpt-5-mini">GPT-5 Mini</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid gap-3 p-4 bg-muted/50 rounded-lg">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Context Window:</span>
-                  <span className="font-medium">128K tokens</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Pricing:</span>
-                  <span className="font-medium">$0.15 / 1M tokens</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Reasoning Mode:</span>
-                  <Badge variant="secondary">Fast & Balanced</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* KNOWLEDGE TAB */}
-        <TabsContent value="knowledge" className="space-y-4 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <BookOpen className="h-4 w-4" />
-                Knowledge Sources (RAG)
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Upload Documents */}
-              <div className="space-y-2">
-                <Label>Upload Documents</Label>
+        {/* Subsystems Monitored */}
+        <DCCard
+          title="Monitored Subsystems"
+          subtitle="Select which DC subsystems this intelligence governs"
+          icon={<Activity className="h-4 w-4" />}
+        >
+          <div className="grid grid-cols-2 gap-3">
+            {dcSubsystems.map((sys) => {
+              const IconComp = sys.icon;
+              return (
                 <div 
-                  onClick={() => setShowUploadWizard(true)}
-                  className="border-2 border-dashed rounded-lg p-6 text-center hover:bg-muted/50 transition-colors cursor-pointer"
+                  key={sys.id}
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors cursor-pointer ${
+                    sys.enabled 
+                      ? 'bg-dc-primary/10 border-dc-primary/30' 
+                      : 'bg-dc-surface border-dc-border hover:border-dc-primary/30'
+                  }`}
                 >
-                  <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">
-                    Drop files here or click to browse
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    PDF, DOCX, TXT, MD (Max 50MB)
-                  </p>
+                  <IconComp className={`h-4 w-4 ${sys.enabled ? 'text-dc-primary' : 'text-muted-foreground'}`} />
+                  <span className="text-sm font-medium">{sys.label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </DCCard>
+
+        <Tabs defaultValue="model" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 bg-dc-surface">
+            <TabsTrigger value="model" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
+              <Brain className="h-4 w-4" />
+              <span className="hidden sm:inline">Model</span>
+            </TabsTrigger>
+            <TabsTrigger value="knowledge" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
+              <BookOpen className="h-4 w-4" />
+              <span className="hidden sm:inline">Knowledge</span>
+            </TabsTrigger>
+            <TabsTrigger value="behavior" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
+              <MessageSquare className="h-4 w-4" />
+              <span className="hidden sm:inline">Behavior</span>
+            </TabsTrigger>
+            <TabsTrigger value="advanced" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
+              <Settings className="h-4 w-4" />
+              <span className="hidden sm:inline">Advanced</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="model" className="space-y-4 mt-6">
+            <DCCard title="AI Model Selection" icon={<Brain className="h-4 w-4" />}>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Model</Label>
+                  <Select value={modelConfig.model} onValueChange={handleModelChange}>
+                    <SelectTrigger className="bg-dc-surface border-dc-border">
+                      <SelectValue placeholder="Select a model" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="google/gemini-3-pro-preview">Gemini 3.0 Pro Preview (Latest)</SelectItem>
+                      <SelectItem value="google/gemini-2.5-flash">Gemini 2.5 Flash (Default)</SelectItem>
+                      <SelectItem value="google/gemini-2.5-pro">Gemini 2.5 Pro</SelectItem>
+                      <SelectItem value="openai/gpt-5">GPT-5</SelectItem>
+                      <SelectItem value="openai/gpt-5-mini">GPT-5 Mini</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid gap-3 p-4 bg-dc-surface rounded-lg border border-dc-border">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Context Window:</span>
+                    <span className="font-mono">128K tokens</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Pricing:</span>
+                    <span className="font-mono">$0.15 / 1M tokens</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Reasoning Mode:</span>
+                    <Badge className="bg-dc-success/10 text-dc-success border-dc-success/30">Fast & Balanced</Badge>
+                  </div>
                 </div>
               </div>
+            </DCCard>
+          </TabsContent>
 
-              {/* URL Ingestion */}
-              <div className="space-y-2">
-                <Label>Ingest URLs</Label>
-                <div className="flex gap-2">
-                  <Input 
-                    placeholder="https://example.com/docs" 
-                    value={urlInput}
-                    onChange={(e) => setUrlInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAddUrl()}
+          <TabsContent value="knowledge" className="space-y-4 mt-6">
+            <DCCard title="Knowledge Sources (RAG)" icon={<BookOpen className="h-4 w-4" />}>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Upload DC Documentation</Label>
+                  <div 
+                    onClick={() => setShowUploadWizard(true)}
+                    className="border-2 border-dashed border-dc-border rounded-lg p-6 text-center hover:bg-dc-surface/50 transition-colors cursor-pointer"
+                  >
+                    <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">Drop DCIM docs, thermal specs, or runbooks</p>
+                    <p className="text-xs text-muted-foreground mt-1">PDF, DOCX, TXT, MD (Max 50MB)</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Ingest URLs</Label>
+                  <div className="flex gap-2">
+                    <Input 
+                      placeholder="https://docs.datacentre.example.com" 
+                      value={urlInput}
+                      onChange={(e) => setUrlInput(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleAddUrl()}
+                      className="bg-dc-surface border-dc-border"
+                    />
+                    <Button variant="outline" onClick={handleAddUrl} disabled={isAddingUrl} className="border-dc-border">
+                      <Link2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Connect Infrastructure Sources</Label>
+                  <div className="grid gap-2">
+                    <Button variant="outline" className="justify-start bg-dc-surface border-dc-border hover:bg-dc-surface/80">
+                      <Database className="h-4 w-4 mr-2" />
+                      Connect DCIM System
+                    </Button>
+                    <Button variant="outline" className="justify-start bg-dc-surface border-dc-border hover:bg-dc-surface/80">
+                      <Database className="h-4 w-4 mr-2" />
+                      Connect Prometheus
+                    </Button>
+                    <Button variant="outline" className="justify-start bg-dc-surface border-dc-border hover:bg-dc-surface/80">
+                      <Database className="h-4 w-4 mr-2" />
+                      Connect Asset Database
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-dc-surface rounded-lg border border-dc-border space-y-3">
+                  <h4 className="text-sm font-medium">RAG Quality Score</h4>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Retrieval Accuracy</span>
+                    <Badge className="bg-dc-success/10 text-dc-success border-dc-success/30">85%</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Sources Indexed</span>
+                    <Badge variant="outline">0 documents</Badge>
+                  </div>
+                </div>
+              </div>
+            </DCCard>
+          </TabsContent>
+
+          <TabsContent value="behavior" className="space-y-4 mt-6">
+            <DCCard title="System Behavior" icon={<MessageSquare className="h-4 w-4" />}>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>System Prompt</Label>
+                  <Textarea
+                    placeholder="You are a Data Centre operations AI specialized in thermal management, power optimization, and workload scheduling..."
+                    value={systemPrompt}
+                    onChange={(e) => handleSystemPromptChange(e.target.value)}
+                    onBlur={handleSystemPromptBlur}
+                    rows={6}
+                    className="resize-none font-mono text-sm bg-dc-surface border-dc-border"
                   />
-                  <Button variant="outline" onClick={handleAddUrl} disabled={isAddingUrl}>
-                    <Link2 className="h-4 w-4" />
-                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    Define DC-specific behavior, monitoring priorities, and operational constraints.
+                  </p>
                 </div>
-              </div>
 
-              {/* Cloud Drives */}
-              <div className="space-y-2">
-                <Label>Connect Cloud Drives</Label>
-                <div className="grid gap-2">
-                  <Button variant="outline" className="justify-start">
-                    <Database className="h-4 w-4 mr-2" />
-                    Connect Notion
-                  </Button>
-                  <Button variant="outline" className="justify-start">
-                    <Database className="h-4 w-4 mr-2" />
-                    Connect Google Drive
-                  </Button>
-                  <Button variant="outline" className="justify-start">
-                    <Database className="h-4 w-4 mr-2" />
-                    Connect Confluence
-                  </Button>
+                <div className="space-y-2">
+                  <Label>Operational Mode</Label>
+                  <Select value={persona} onValueChange={setPersona}>
+                    <SelectTrigger className="bg-dc-surface border-dc-border">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="professional">NOC Operations Mode</SelectItem>
+                      <SelectItem value="friendly">Collaborative Mode</SelectItem>
+                      <SelectItem value="technical">Engineering Debug Mode</SelectItem>
+                      <SelectItem value="executive">Executive Summary Mode</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </div>
 
-              {/* RAG Settings */}
-              <div className="p-4 bg-muted/50 rounded-lg space-y-3">
-                <h4 className="text-sm font-medium">RAG Quality Score</h4>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Retrieval Accuracy</span>
-                  <Badge variant="secondary">85%</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Sources Indexed</span>
-                  <Badge variant="secondary">0 documents</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* BEHAVIOR TAB */}
-        <TabsContent value="behavior" className="space-y-4 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <MessageSquare className="h-4 w-4" />
-                System Behavior
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* System Prompt */}
-              <div className="space-y-2">
-                <Label>System Prompt</Label>
-                <Textarea
-                  placeholder="You are a helpful AI assistant specialized in..."
-                  value={systemPrompt}
-                  onChange={(e) => handleSystemPromptChange(e.target.value)}
-                  onBlur={handleSystemPromptBlur}
-                  rows={6}
-                  className="resize-none font-mono text-sm"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Define how your agent behaves, its role, personality, and constraints.
-                  {currentBlueprint && ' (Pre-filled from template)'}
-                </p>
-              </div>
-
-              {/* Persona Templates */}
-              <div className="space-y-2">
-                <Label>Persona Template</Label>
-                <Select value={persona} onValueChange={setPersona}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="professional">Professional Assistant</SelectItem>
-                    <SelectItem value="friendly">Friendly & Casual</SelectItem>
-                    <SelectItem value="technical">Technical Expert</SelectItem>
-                    <SelectItem value="concise">Concise & Direct</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Tone & Style */}
-              <div className="space-y-2">
-                <Label>Communication Style</Label>
-                <div className="grid gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Formal Tone</span>
-                    <Switch checked={formalTone} onCheckedChange={setFormalTone} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Use Emojis</span>
-                    <Switch checked={useEmojis} onCheckedChange={setUseEmojis} />
-                  </div>
-                  <div className="flex items-center justify-between">
+                <div className="grid gap-3">
+                  <div className="flex items-center justify-between p-3 bg-dc-surface rounded-lg border border-dc-border">
                     <span className="text-sm">Detailed Explanations</span>
                     <Switch checked={detailedExplanations} onCheckedChange={setDetailedExplanations} />
                   </div>
-                </div>
-              </div>
-
-              {/* Safety Constraints */}
-              <div className="space-y-2">
-                <Label>Safety & Restrictions</Label>
-                <div className="grid gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Hallucination Prevention</span>
-                    <Switch 
-                      checked={hallucinationPrevention} 
-                      onCheckedChange={(v) => handleSafetyToggle('hallucination', v)} 
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Knowledge-Based Restrictions</span>
-                    <Switch 
-                      checked={knowledgeRestrictions} 
-                      onCheckedChange={(v) => handleSafetyToggle('knowledge', v)} 
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Require Citations</span>
-                    <Switch 
-                      checked={requireCitations} 
-                      onCheckedChange={(v) => handleSafetyToggle('citations', v)} 
-                    />
+                  <div className="flex items-center justify-between p-3 bg-dc-surface rounded-lg border border-dc-border">
+                    <span className="text-sm">Formal Technical Tone</span>
+                    <Switch checked={formalTone} onCheckedChange={setFormalTone} />
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </DCCard>
+          </TabsContent>
 
-        {/* ADVANCED TAB */}
-        <TabsContent value="advanced" className="space-y-4 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                Advanced Settings
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Temperature */}
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <Label>Temperature</Label>
-                  <span className="text-sm text-muted-foreground">{temperature[0]}</span>
+          <TabsContent value="advanced" className="space-y-4 mt-6">
+            <DCCard title="Safety & Thresholds" icon={<Shield className="h-4 w-4" />}>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-dc-surface rounded-lg border border-dc-border">
+                  <div>
+                    <p className="text-sm font-medium">Hallucination Prevention</p>
+                    <p className="text-xs text-muted-foreground">Only respond from verified DC knowledge</p>
+                  </div>
+                  <Switch checked={hallucinationPrevention} onCheckedChange={(v) => handleSafetyToggle('hallucination', v)} />
                 </div>
-                <Slider
-                  value={temperature}
-                  onValueChange={setTemperature}
-                  min={0}
-                  max={2}
-                  step={0.1}
-                  className="w-full"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Lower = more focused, Higher = more creative
-                </p>
-              </div>
 
-              {/* Top-K and Top-P */}
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Top-K</Label>
-                  <Input 
-                    type="number" 
-                    value={topK} 
-                    onChange={(e) => setTopK(Number(e.target.value))} 
+                <div className="flex items-center justify-between p-3 bg-dc-surface rounded-lg border border-dc-border">
+                  <div>
+                    <p className="text-sm font-medium">Knowledge Restrictions</p>
+                    <p className="text-xs text-muted-foreground">Limit to indexed sources only</p>
+                  </div>
+                  <Switch checked={knowledgeRestrictions} onCheckedChange={(v) => handleSafetyToggle('knowledge', v)} />
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-dc-surface rounded-lg border border-dc-border">
+                  <div>
+                    <p className="text-sm font-medium">Require Citations</p>
+                    <p className="text-xs text-muted-foreground">Always cite data sources in responses</p>
+                  </div>
+                  <Switch checked={requireCitations} onCheckedChange={(v) => handleSafetyToggle('citations', v)} />
+                </div>
+
+                <div className="space-y-3 pt-4 border-t border-dc-border">
+                  <Label>Temperature (Creativity): {temperature[0]}</Label>
+                  <Slider
+                    value={temperature}
+                    onValueChange={setTemperature}
+                    max={1}
+                    min={0}
+                    step={0.1}
+                    className="w-full"
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label>Top-P</Label>
-                  <Input 
-                    type="number" 
-                    value={topP} 
-                    onChange={(e) => setTopP(Number(e.target.value))} 
-                    step="0.01" 
-                  />
+                  <p className="text-xs text-muted-foreground">
+                    Lower = more deterministic (0.3 for ops), Higher = more creative
+                  </p>
                 </div>
               </div>
+            </DCCard>
+          </TabsContent>
+        </Tabs>
+      </div>
 
-              {/* Memory Settings */}
-              <div className="space-y-2">
-                <Label>Memory Settings</Label>
-                <Select value={memoryType} onValueChange={(v) => setMemoryType(v as any)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">No Memory</SelectItem>
-                    <SelectItem value="short">Short-term (Session)</SelectItem>
-                    <SelectItem value="long">Long-term (Persistent)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Context Window Override */}
-              <div className="space-y-2">
-                <Label>Context Window Override</Label>
-                <Input type="number" placeholder="128000" />
-                <p className="text-xs text-muted-foreground">
-                  Leave empty to use model default
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* Co-Pilot Integration */}
-      <Card className="bg-muted/50">
-        <CardContent className="pt-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">Ask Co-Pilot:</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-xs"
-              onClick={() => openWithQuestion('What models are configured for this agent and what are their capabilities?')}
-            >
-              Explain models
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-xs"
-              onClick={() => openWithQuestion("What's the difference between Supervisor Agent and Deep Research Agent?")}
-            >
-              Compare agent modes
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-xs"
-              onClick={() => openWithQuestion('Generate an optimal system prompt for this agent based on its industry and use case.')}
-            >
-              Generate system prompt
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-    
-    {/* Unified Upload Wizard Modal */}
-    <ModernFileUploadWizard 
-      open={showUploadWizard} 
-      onOpenChange={setShowUploadWizard}
-      source="builder"
-      agentId={builderId || 'draft'}
-      onAnalysisComplete={(result) => {
-        console.log('[Builder:Step2] Document analysis complete:', result);
-        toast.success('Document added to knowledge base');
-      }}
-    />
+      <ModernFileUploadWizard
+        open={showUploadWizard}
+        onOpenChange={setShowUploadWizard}
+        agentId={builderId}
+      />
     </>
   );
 }

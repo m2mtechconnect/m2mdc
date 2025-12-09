@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Plug, Link2, Code, Check, Info, Sparkles, Trash2, Loader2, Zap, Wind, Cpu, Thermometer, Network, Calculator, Leaf, Shield, Database, Layers, BarChart, Activity, Flame, FileCheck, DollarSign } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useWizardBuilderStore, BuilderTool } from '@/stores/wizardBuilderStore';
 import { useBlueprintStore } from '@/stores/blueprintStore';
 import { ConnectStep } from '@/components/builder/ConnectStep';
 import { toast } from 'sonner';
+import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 
 const INTEGRATIONS = [
   { id: 'gmail', name: 'Gmail', category: 'Communication' },
@@ -27,9 +26,8 @@ const INTEGRATIONS = [
   { id: 'github', name: 'GitHub', category: 'Development' },
 ];
 
-// Data Centre specific tools
 const DATA_CENTRE_TOOLS = [
-  { id: 'power-telemetry', name: 'Power Telemetry', category: 'Telemetry', icon: Zap, description: 'Real-time power consumption, PDU metrics, UPS status' },
+  { id: 'power-telemetry', name: 'Power Telemetry', category: 'Telemetry', icon: Zap, description: 'PDU metrics, UPS status, power consumption' },
   { id: 'cooling-telemetry', name: 'Cooling Telemetry', category: 'Telemetry', icon: Wind, description: 'CRAH/CRAC units, chiller status, zone temps' },
   { id: 'gpu-metrics', name: 'GPU Metrics', category: 'Telemetry', icon: Cpu, description: 'GPU utilization, memory, workload distribution' },
   { id: 'thermal-sensors', name: 'Thermal Sensors', category: 'Telemetry', icon: Thermometer, description: 'Rack temps, hotspot detection, airflow' },
@@ -51,7 +49,6 @@ export function Step3Tools() {
   const { currentBlueprint } = useBlueprintStore();
   const [hasInitialized, setHasInitialized] = useState(false);
   
-  // API connector form state
   const [apiForm, setApiForm] = useState({
     name: '',
     endpoint: '',
@@ -61,7 +58,6 @@ export function Step3Tools() {
   });
   const [isAddingApi, setIsAddingApi] = useState(false);
 
-  // Initialize tools from blueprint on first load
   useEffect(() => {
     if (hasInitialized || tools.length > 0) return;
     
@@ -90,25 +86,21 @@ export function Step3Tools() {
     setHasInitialized(true);
   }, [currentBlueprint, hasInitialized, tools.length, setTools]);
 
-  const recommendedTools = currentBlueprint?.tools?.recommendedIntegrations?.slice(0, 3) || ['Slack', 'HubSpot', 'Jira'];
+  const toggleTool = async (toolId: string, toolList: typeof DATA_CENTRE_TOOLS | typeof INTEGRATIONS) => {
+    const tool = toolList.find(t => t.id === toolId);
+    if (!tool) return;
 
-  const toggleIntegration = async (integrationId: string) => {
-    const integration = INTEGRATIONS.find(int => int.id === integrationId);
-    if (!integration) return;
-
-    const existingTool = tools.find(t => t.id === integrationId);
+    const existingTool = tools.find(t => t.id === toolId);
     
     let updatedTools: BuilderTool[];
     if (existingTool) {
-      // Remove tool
-      updatedTools = tools.filter(t => t.id !== integrationId);
+      updatedTools = tools.filter(t => t.id !== toolId);
     } else {
-      // Add tool
       updatedTools = [...tools, {
-        id: integrationId,
+        id: toolId,
         type: 'integration' as const,
-        name: integration.name,
-        category: integration.category,
+        name: tool.name,
+        category: tool.category,
         enabled: true,
         connected: false,
         config: {}
@@ -117,9 +109,9 @@ export function Step3Tools() {
     
     try {
       await setTools(updatedTools);
-      toast.success(existingTool ? `Disconnected ${integration.name}` : `Connected ${integration.name}`);
+      toast.success(existingTool ? `Disabled ${tool.name}` : `Enabled ${tool.name}`);
     } catch (err) {
-      toast.error('Failed to update integration');
+      toast.error('Failed to update tool');
     }
   };
 
@@ -169,423 +161,240 @@ export function Step3Tools() {
   };
 
   const connectedIntegrations = new Set(tools.filter(t => t.type === 'integration').map(t => t.id));
+  const enabledDCTools = tools.filter(t => DATA_CENTRE_TOOLS.some(dt => dt.id === t.id)).length;
+
+  const renderToolCard = (tool: typeof DATA_CENTRE_TOOLS[0], isEnabled: boolean) => {
+    const IconComponent = tool.icon;
+    return (
+      <div
+        key={tool.id}
+        className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+          isEnabled 
+            ? 'bg-dc-primary/10 border-dc-primary/30' 
+            : 'bg-dc-surface border-dc-border hover:border-dc-primary/20'
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+            isEnabled ? 'bg-dc-primary text-dc-primary-foreground' : 'bg-dc-surface-elevated'
+          }`}>
+            <IconComponent className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="font-medium text-sm">{tool.name}</p>
+            <p className="text-xs text-muted-foreground">{tool.description}</p>
+          </div>
+        </div>
+        <Button
+          variant={isEnabled ? "outline" : "default"}
+          size="sm"
+          onClick={() => toggleTool(tool.id, DATA_CENTRE_TOOLS)}
+          disabled={isLoading}
+          className={isEnabled ? 'border-dc-primary/30' : ''}
+        >
+          {isEnabled ? 'Disable' : 'Enable'}
+        </Button>
+      </div>
+    );
+  };
 
   return (
-    <div className="space-y-8 max-w-[880px] mx-auto">
-      <div>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-                Tools, Integrations & MCP
-                <Info className="h-5 w-5 text-muted-foreground" />
-              </h1>
-            </TooltipTrigger>
-            <TooltipContent className="max-w-sm">
-              <p>Connect external capabilities to extend your agent: business systems, MCP servers for specialized actions, and custom APIs.</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <p className="text-muted-foreground mt-2">
-          Connect external systems and extend capabilities
-        </p>
-      </div>
+    <div className="space-y-6 max-w-[920px] mx-auto">
+      <DCSectionHeader
+        title="Tools & Integrations"
+        subtitle="Connect telemetry, models, and infrastructure systems"
+        icon={<Plug className="h-5 w-5" />}
+      />
 
       <Tabs defaultValue="datacentre" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="datacentre" className="flex items-center gap-2">
+        <TabsList className="grid w-full grid-cols-4 bg-dc-surface">
+          <TabsTrigger value="datacentre" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
             <Cpu className="h-4 w-4" />
-            <span className="hidden sm:inline">Data Centre</span>
+            <span className="hidden sm:inline">DC Tools</span>
+            {enabledDCTools > 0 && <Badge className="ml-1 bg-dc-primary/20 text-dc-primary">{enabledDCTools}</Badge>}
           </TabsTrigger>
-          <TabsTrigger value="integrations" className="flex items-center gap-2">
+          <TabsTrigger value="integrations" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
             <Link2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Integrations</span>
-            {connectedIntegrations.size > 0 && (
-              <Badge variant="secondary" className="ml-1">{connectedIntegrations.size}</Badge>
-            )}
+            <span className="hidden sm:inline">Apps</span>
+            {connectedIntegrations.size > 0 && <Badge variant="secondary" className="ml-1">{connectedIntegrations.size}</Badge>}
           </TabsTrigger>
-          <TabsTrigger value="mcp" className="flex items-center gap-2">
+          <TabsTrigger value="mcp" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
             <Plug className="h-4 w-4" />
-            <span className="hidden sm:inline">MCP Servers</span>
+            <span className="hidden sm:inline">MCP</span>
           </TabsTrigger>
-          <TabsTrigger value="api" className="flex items-center gap-2">
+          <TabsTrigger value="api" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
             <Code className="h-4 w-4" />
             <span className="hidden sm:inline">API</span>
-            {apiConnectors.length > 0 && (
-              <Badge variant="secondary" className="ml-1">{apiConnectors.length}</Badge>
-            )}
+            {apiConnectors.length > 0 && <Badge variant="secondary" className="ml-1">{apiConnectors.length}</Badge>}
           </TabsTrigger>
         </TabsList>
 
-        {/* DATA CENTRE TOOLS TAB */}
         <TabsContent value="datacentre" className="space-y-4 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Cpu className="h-4 w-4" />
-                Data Centre Tools & Models
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {/* Info Banner */}
-                <div className="p-4 border-2 border-primary/20 bg-primary/5 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    <h4 className="text-sm font-medium">Recommended for Data Centre Twin</h4>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    These tools are pre-configured for power, cooling, GPU, and sovereignty monitoring.
-                  </p>
-                </div>
+          {/* Telemetry Tools */}
+          <DCCard 
+            title="Telemetry Tools" 
+            subtitle="Real-time data collection from infrastructure"
+            icon={<Activity className="h-4 w-4 text-dc-info" />}
+          >
+            <div className="space-y-3">
+              {DATA_CENTRE_TOOLS.filter(t => t.category === 'Telemetry').map((tool) => 
+                renderToolCard(tool, tools.some(t => t.id === tool.id))
+              )}
+            </div>
+          </DCCard>
 
-                {/* Telemetry Tools */}
-                <div>
-                  <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-blue-500" />
-                    Telemetry
-                  </h4>
-                  <div className="grid gap-3">
-                    {DATA_CENTRE_TOOLS.filter(t => t.category === 'Telemetry').map((tool) => {
-                      const IconComponent = tool.icon;
-                      const isEnabled = tools.some(t => t.id === tool.id);
-                      return (
-                        <div
-                          key={tool.id}
-                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                              <IconComponent className="h-5 w-5" />
-                            </div>
-                            <div>
-                              <p className="font-medium text-sm">{tool.name}</p>
-                              <p className="text-xs text-muted-foreground">{tool.description}</p>
-                            </div>
-                          </div>
-                          <Button
-                            variant={isEnabled ? "outline" : "default"}
-                            size="sm"
-                            onClick={() => toggleIntegration(tool.id)}
-                            disabled={isLoading}
-                          >
-                            {isEnabled ? 'Disable' : 'Enable'}
-                          </Button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+          {/* Model Tools */}
+          <DCCard 
+            title="Analytics Models" 
+            subtitle="PUE, thermal prediction, and financial analysis"
+            icon={<Calculator className="h-4 w-4 text-dc-success" />}
+          >
+            <div className="space-y-3">
+              {DATA_CENTRE_TOOLS.filter(t => t.category === 'Model').map((tool) => 
+                renderToolCard(tool, tools.some(t => t.id === tool.id))
+              )}
+            </div>
+          </DCCard>
 
-                {/* Model Tools */}
-                <div>
-                  <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <Calculator className="h-4 w-4 text-green-500" />
-                    Models & Analytics
-                  </h4>
-                  <div className="grid gap-3">
-                    {DATA_CENTRE_TOOLS.filter(t => t.category === 'Model').map((tool) => {
-                      const IconComponent = tool.icon;
-                      const isEnabled = tools.some(t => t.id === tool.id);
-                      return (
-                        <div
-                          key={tool.id}
-                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                              <IconComponent className="h-5 w-5" />
-                            </div>
-                            <div>
-                              <p className="font-medium text-sm">{tool.name}</p>
-                              <p className="text-xs text-muted-foreground">{tool.description}</p>
-                            </div>
-                          </div>
-                          <Button
-                            variant={isEnabled ? "outline" : "default"}
-                            size="sm"
-                            onClick={() => toggleIntegration(tool.id)}
-                            disabled={isLoading}
-                          >
-                            {isEnabled ? 'Disable' : 'Enable'}
-                          </Button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+          {/* Compliance Tools */}
+          <DCCard 
+            title="Compliance & Governance" 
+            subtitle="Sovereignty validation and audit logging"
+            icon={<Shield className="h-4 w-4 text-dc-sovereignty" />}
+          >
+            <div className="space-y-3">
+              {DATA_CENTRE_TOOLS.filter(t => t.category === 'Compliance').map((tool) => 
+                renderToolCard(tool, tools.some(t => t.id === tool.id))
+              )}
+            </div>
+          </DCCard>
 
-                {/* Compliance Tools */}
-                <div>
-                  <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-purple-500" />
-                    Compliance & Governance
-                  </h4>
-                  <div className="grid gap-3">
-                    {DATA_CENTRE_TOOLS.filter(t => t.category === 'Compliance').map((tool) => {
-                      const IconComponent = tool.icon;
-                      const isEnabled = tools.some(t => t.id === tool.id);
-                      return (
-                        <div
-                          key={tool.id}
-                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                              <IconComponent className="h-5 w-5" />
-                            </div>
-                            <div>
-                              <p className="font-medium text-sm">{tool.name}</p>
-                              <p className="text-xs text-muted-foreground">{tool.description}</p>
-                            </div>
-                          </div>
-                          <Button
-                            variant={isEnabled ? "outline" : "default"}
-                            size="sm"
-                            onClick={() => toggleIntegration(tool.id)}
-                            disabled={isLoading}
-                          >
-                            {isEnabled ? 'Disable' : 'Enable'}
-                          </Button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Integration Tools */}
-                <div>
-                  <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <Database className="h-4 w-4 text-orange-500" />
-                    Infrastructure Integrations
-                  </h4>
-                  <div className="grid gap-3">
-                    {DATA_CENTRE_TOOLS.filter(t => t.category === 'Integration').map((tool) => {
-                      const IconComponent = tool.icon;
-                      const isEnabled = tools.some(t => t.id === tool.id);
-                      return (
-                        <div
-                          key={tool.id}
-                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                              <IconComponent className="h-5 w-5" />
-                            </div>
-                            <div>
-                              <p className="font-medium text-sm">{tool.name}</p>
-                              <p className="text-xs text-muted-foreground">{tool.description}</p>
-                            </div>
-                          </div>
-                          <Button
-                            variant={isEnabled ? "outline" : "default"}
-                            size="sm"
-                            onClick={() => toggleIntegration(tool.id)}
-                            disabled={isLoading}
-                          >
-                            {isEnabled ? 'Disable' : 'Enable'}
-                          </Button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Integration Tools */}
+          <DCCard 
+            title="Infrastructure Integrations" 
+            subtitle="DCIM, orchestration, and monitoring platforms"
+            icon={<Database className="h-4 w-4 text-dc-power" />}
+          >
+            <div className="space-y-3">
+              {DATA_CENTRE_TOOLS.filter(t => t.category === 'Integration').map((tool) => 
+                renderToolCard(tool, tools.some(t => t.id === tool.id))
+              )}
+            </div>
+          </DCCard>
         </TabsContent>
 
-        {/* INTEGRATIONS TAB */}
         <TabsContent value="integrations" className="space-y-4 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Link2 className="h-4 w-4" />
-                Business System Integrations
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {/* Connected Count */}
-                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                  <span className="text-sm font-medium">Connected Integrations</span>
-                  <Badge variant="secondary">{connectedIntegrations.size} / {INTEGRATIONS.length}</Badge>
-                </div>
-
-                {/* Recommended Tools Widget */}
-                {connectedIntegrations.size === 0 && (
-                  <div className="p-4 border-2 border-primary/20 bg-primary/5 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Sparkles className="h-4 w-4 text-primary" />
-                      <h4 className="text-sm font-medium">Recommended for Your Agent</h4>
-                      {currentBlueprint && (
-                        <Badge variant="secondary" className="text-xs">From Template</Badge>
-                      )}
+          <DCCard title="Business Applications" icon={<Link2 className="h-4 w-4" />}>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {INTEGRATIONS.map((integration) => {
+                const isConnected = connectedIntegrations.has(integration.id);
+                return (
+                  <div
+                    key={integration.id}
+                    className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
+                      isConnected ? 'bg-dc-primary/10 border-dc-primary/30' : 'bg-dc-surface border-dc-border'
+                    }`}
+                  >
+                    <div>
+                      <p className="font-medium text-sm">{integration.name}</p>
+                      <p className="text-xs text-muted-foreground">{integration.category}</p>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {recommendedTools.map((tool, idx) => (
-                        <Badge key={idx} variant="outline">{tool}</Badge>
-                      ))}
-                    </div>
+                    <Button
+                      variant={isConnected ? "outline" : "default"}
+                      size="sm"
+                      onClick={() => toggleTool(integration.id, INTEGRATIONS)}
+                      disabled={isLoading}
+                    >
+                      {isConnected ? <Check className="h-4 w-4" /> : 'Connect'}
+                    </Button>
                   </div>
-                )}
-
-                {/* Integration Grid */}
-                <div className="grid gap-3">
-                  {INTEGRATIONS.map((integration) => {
-                    const isConnected = connectedIntegrations.has(integration.id);
-                    return (
-                      <div
-                        key={integration.id}
-                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isConnected ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                            {isConnected ? <Check className="h-5 w-5" /> : <Link2 className="h-5 w-5" />}
-                          </div>
-                          <div>
-                            <p className="font-medium text-sm">{integration.name}</p>
-                            <p className="text-xs text-muted-foreground">{integration.category}</p>
-                          </div>
-                        </div>
-                        <Button
-                          variant={isConnected ? "outline" : "default"}
-                          size="sm"
-                          onClick={() => toggleIntegration(integration.id)}
-                          disabled={isLoading}
-                        >
-                          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : isConnected ? 'Disconnect' : 'Connect'}
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                );
+              })}
+            </div>
+          </DCCard>
         </TabsContent>
 
-        {/* MCP SERVERS TAB */}
-        <TabsContent value="mcp" className="space-y-4 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Plug className="h-4 w-4" />
-                MCP Servers (Machine Control Protocol)
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ConnectStep systemId={builderId} />
-            </CardContent>
-          </Card>
+        <TabsContent value="mcp" className="mt-6">
+          <DCCard title="MCP Servers" subtitle="Model Context Protocol servers for extended capabilities" icon={<Plug className="h-4 w-4" />}>
+            <ConnectStep systemId={builderId || ''} />
+          </DCCard>
         </TabsContent>
 
-        {/* API CONNECTORS TAB */}
         <TabsContent value="api" className="space-y-4 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Code className="h-4 w-4" />
-                Custom API Connectors
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-4">
+          <DCCard title="Custom API Connectors" icon={<Code className="h-4 w-4" />}>
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>API Name *</Label>
+                  <Label>API Name</Label>
                   <Input 
-                    placeholder="My Custom API" 
+                    placeholder="e.g., DCIM API" 
                     value={apiForm.name}
-                    onChange={e => setApiForm(f => ({ ...f, name: e.target.value }))}
+                    onChange={(e) => setApiForm(f => ({ ...f, name: e.target.value }))}
+                    className="bg-dc-surface border-dc-border"
                   />
                 </div>
-
                 <div className="space-y-2">
-                  <Label>Endpoint URL *</Label>
+                  <Label>Endpoint URL</Label>
                   <Input 
                     placeholder="https://api.example.com/v1" 
                     value={apiForm.endpoint}
-                    onChange={e => setApiForm(f => ({ ...f, endpoint: e.target.value }))}
+                    onChange={(e) => setApiForm(f => ({ ...f, endpoint: e.target.value }))}
+                    className="bg-dc-surface border-dc-border"
                   />
                 </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label>Method</Label>
-                    <Select value={apiForm.method} onValueChange={v => setApiForm(f => ({ ...f, method: v }))}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="GET">GET</SelectItem>
-                        <SelectItem value="POST">POST</SelectItem>
-                        <SelectItem value="PUT">PUT</SelectItem>
-                        <SelectItem value="DELETE">DELETE</SelectItem>
-                        <SelectItem value="PATCH">PATCH</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Auth Type</Label>
-                    <Select value={apiForm.authType} onValueChange={v => setApiForm(f => ({ ...f, authType: v }))}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Bearer Token">Bearer Token</SelectItem>
-                        <SelectItem value="API Key">API Key</SelectItem>
-                        <SelectItem value="Basic Auth">Basic Auth</SelectItem>
-                        <SelectItem value="None">None</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
                 <div className="space-y-2">
-                  <Label>Headers (JSON)</Label>
-                  <Input 
-                    placeholder='{"Authorization": "Bearer TOKEN"}' 
-                    value={apiForm.headers}
-                    onChange={e => setApiForm(f => ({ ...f, headers: e.target.value }))}
-                  />
+                  <Label>Method</Label>
+                  <Select value={apiForm.method} onValueChange={(v) => setApiForm(f => ({ ...f, method: v }))}>
+                    <SelectTrigger className="bg-dc-surface border-dc-border">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="GET">GET</SelectItem>
+                      <SelectItem value="POST">POST</SelectItem>
+                      <SelectItem value="PUT">PUT</SelectItem>
+                      <SelectItem value="DELETE">DELETE</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-
-                <Button 
-                  className="w-full" 
-                  onClick={handleAddApiConnector}
-                  disabled={isAddingApi || !apiForm.name || !apiForm.endpoint}
-                >
-                  {isAddingApi ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plug className="h-4 w-4 mr-2" />}
-                  Add API Connector
-                </Button>
+                <div className="space-y-2">
+                  <Label>Auth Type</Label>
+                  <Select value={apiForm.authType} onValueChange={(v) => setApiForm(f => ({ ...f, authType: v }))}>
+                    <SelectTrigger className="bg-dc-surface border-dc-border">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Bearer Token">Bearer Token</SelectItem>
+                      <SelectItem value="API Key">API Key</SelectItem>
+                      <SelectItem value="Basic Auth">Basic Auth</SelectItem>
+                      <SelectItem value="OAuth2">OAuth2</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
+              
+              <Button onClick={handleAddApiConnector} disabled={isAddingApi} className="w-full">
+                {isAddingApi ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Code className="h-4 w-4 mr-2" />}
+                Add API Connector
+              </Button>
 
-              {/* Existing API Connectors */}
-              {apiConnectors.length > 0 ? (
-                <div className="mt-6 space-y-3">
-                  <h4 className="text-sm font-medium">Configured APIs</h4>
-                  {apiConnectors.map((connector) => (
-                    <div key={connector.id} className="flex items-center justify-between p-3 border rounded-lg">
+              {apiConnectors.length > 0 && (
+                <div className="space-y-2 pt-4 border-t border-dc-border">
+                  <Label>Configured APIs</Label>
+                  {apiConnectors.map((api) => (
+                    <div key={api.id} className="flex items-center justify-between p-3 bg-dc-surface rounded-lg border border-dc-border">
                       <div>
-                        <p className="font-medium text-sm">{connector.name}</p>
-                        <p className="text-xs text-muted-foreground">{connector.method} {connector.endpoint}</p>
+                        <p className="font-medium text-sm">{api.name}</p>
+                        <p className="text-xs text-muted-foreground font-mono">{api.endpoint}</p>
                       </div>
-                      <Button variant="ghost" size="sm" onClick={() => handleRemoveApiConnector(connector.id)}>
+                      <Button variant="ghost" size="sm" onClick={() => handleRemoveApiConnector(api.id)}>
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </div>
                   ))}
                 </div>
-              ) : (
-                <div className="mt-6 p-6 border-2 border-dashed rounded-lg text-center">
-                  <Code className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">
-                    No custom APIs configured yet
-                  </p>
-                </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </DCCard>
         </TabsContent>
       </Tabs>
     </div>

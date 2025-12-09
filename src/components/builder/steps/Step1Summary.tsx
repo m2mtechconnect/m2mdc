@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Building2, Briefcase, Bot, TrendingUp, Clock, Zap, Info, Target, FileText, Shield, Pencil, RefreshCw } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Building2, Briefcase, Bot, TrendingUp, Clock, Zap, Info, Target, FileText, Shield, Pencil, RefreshCw, Server, Thermometer, Globe, Cpu } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +12,8 @@ import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
 import { useBlueprintStore } from '@/stores/blueprintStore';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { toast } from 'sonner';
+import { DCCard, DCSectionHeader } from '@/components/dc-ui';
+import { DCKPITile } from '@/components/dc-ui';
 
 export function Step1Summary() {
   const { 
@@ -33,7 +34,7 @@ export function Step1Summary() {
   const [editDepartment, setEditDepartment] = useState('');
   const [editType, setEditType] = useState<'agent' | 'process_twin' | '3d_twin'>('agent');
 
-  // ALWAYS use blueprint data when available - no generic fallbacks for template-sourced data
+  // ALWAYS use blueprint data when available
   const agentName = currentBlueprint?.name || 
                     template || 
                     `${type === 'agent' ? 'AI Agent' : type === '3d_twin' ? '3D Digital Twin' : 'Process Twin'}${department ? ` for ${department}` : ''}`;
@@ -46,7 +47,6 @@ export function Step1Summary() {
   const timeSaved = currentBlueprint?.timeSavedPerWeek || '20+ hrs/week';
   const efficiencyGain = currentBlueprint?.efficiencyGain || '3-5x faster';
 
-  // Helper to safely extract string from any value
   const toStringValue = (item: any): string => {
     if (typeof item === 'string') return item;
     if (item && typeof item === 'object') {
@@ -55,21 +55,18 @@ export function Step1Summary() {
     return String(item);
   };
 
-  // Derive capabilities from blueprint/workflow
   const capabilities = currentBlueprint?.workflow?.actions?.length > 0
     ? currentBlueprint.workflow.actions.slice(0, 5).map(toStringValue)
     : workflow?.actions?.length > 0 
     ? workflow.actions.slice(0, 5).map(toStringValue)
-    : ['API Integration', 'Event Monitoring', 'Data Processing', 'Automated Workflows', 'Real-time Analysis'];
+    : ['GPU Telemetry', 'Thermal Monitoring', 'PUE Optimization', 'Workload Scheduling', 'Sovereignty Validation'];
 
-  // Derive tools from blueprint integrations
   const recommendedTools = currentBlueprint?.tools?.recommendedIntegrations?.length > 0
     ? currentBlueprint.tools.recommendedIntegrations.slice(0, 4).map(toStringValue)
     : workflow?.integrations?.length > 0
     ? workflow.integrations.slice(0, 4).map(toStringValue)
-    : ['CRM Integration', 'Email Automation', 'Slack Notifications', 'Database Access'];
+    : ['DCIM Integration', 'Prometheus', 'Kubernetes/Slurm', 'Energy Grid API'];
 
-  // Show workflow structure if available
   const buildWorkflowSummary = () => {
     const triggers = currentBlueprint?.workflow?.triggers || workflow?.triggers || [];
     const actions = currentBlueprint?.workflow?.actions || workflow?.actions || [];
@@ -84,14 +81,13 @@ export function Step1Summary() {
     }
     
     return [
-      'Trigger Detection → Analysis → Action',
-      'Data Ingestion → Processing → Reporting',
+      'Thermal Alert → Cooling Adjustment → Notification',
+      'GPU Load Spike → Workload Rebalance → PUE Update',
     ];
   };
   
   const workflowSummary = buildWorkflowSummary();
 
-  // Open edit modal with current values
   const handleOpenEdit = () => {
     setEditName(agentName);
     setEditDescription(currentBlueprint?.description || goal || '');
@@ -101,18 +97,14 @@ export function Step1Summary() {
     setIsEditOpen(true);
   };
 
-  // Save edits to backend
   const handleSaveEdit = async () => {
     setIsSaving(true);
-    console.log('[Builder:Step1] Saving summary edits', { editName, editDescription, editIndustry, editDepartment, editType });
     
     try {
-      // Update wizard store (which persists to backend)
       await setGoal(editDescription);
       await setIndustryDepartment(editIndustry, editDepartment);
       await setType(editType);
       
-      // Update blueprint store
       if (currentBlueprint) {
         updateBlueprint({
           name: editName,
@@ -133,109 +125,66 @@ export function Step1Summary() {
     }
   };
 
-  // Co-Pilot integration
   const handleAskCoPilot = (prompt: string) => {
     openWithQuestion(prompt);
   };
 
-  return (
-    <div className="space-y-8 max-w-[880px] mx-auto">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 space-y-3">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-                  Agent/Twin Summary
-                  <Info className="h-5 w-5 text-muted-foreground" />
-                </h1>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-sm">
-                <p>This step reviews the recommended agent or digital twin. Confirm objectives and expectations before configuring intelligence, data, tools, and workflows.</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <p className="text-muted-foreground">
-            Confirm objectives and expectations before setup
-          </p>
-          
-          {/* Template Source Indicator */}
-          {currentBlueprint?.source === 'template' && currentBlueprint?.templateName && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Badge 
-                    variant="secondary" 
-                    className="gap-2 px-3 py-1.5 cursor-help hover:bg-secondary/80 transition-colors"
-                  >
-                    <FileText className="h-3.5 w-3.5" />
-                    <span className="text-xs font-medium">Started from template: {currentBlueprint.templateName}</span>
-                    {currentBlueprint.certified && (
-                      <Shield className="h-3.5 w-3.5 text-green-500" />
-                    )}
-                  </Badge>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-md">
-                  <div className="space-y-2 text-xs">
-                    <p className="font-semibold text-sm">{currentBlueprint.templateName}</p>
-                    {currentBlueprint.sourceEntry && (
-                      <p className="text-muted-foreground">
-                        Selected from: <span className="font-medium capitalize">{currentBlueprint.sourceEntry}</span>
-                      </p>
-                    )}
-                    {currentBlueprint.certified && (
-                      <p className="text-green-600 flex items-center gap-1">
-                        <Shield className="h-3 w-3" />
-                        <span className="font-medium">Certified Template</span>
-                      </p>
-                    )}
-                    <p className="text-muted-foreground">
-                      Pre-configured with industry best practices. All settings can be customized.
-                    </p>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-        </div>
-      </div>
+  // Determine if this is a DC twin
+  const isDataCentreTwin = industry?.toLowerCase().includes('data') || 
+                            department?.toLowerCase().includes('infrastructure') ||
+                            type === '3d_twin' ||
+                            template?.toLowerCase().includes('data centre');
 
-      {/* Agent/Twin Overview */}
-      <Card className="border-primary bg-primary/5">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-              <Bot className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div>
-              <p className="text-lg">{agentName}</p>
-              <p className="text-sm font-normal text-muted-foreground">
-                {type === 'agent' ? 'Agentic AI' : type === '3d_twin' ? '3D Digital Twin' : 'Process Twin'}
-              </p>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+  return (
+    <div className="space-y-6 max-w-[920px] mx-auto">
+      {/* Header */}
+      <DCSectionHeader
+        title="System Configuration"
+        subtitle="Data Centre Digital Twin specification and objectives"
+        icon={<Server className="h-5 w-5" />}
+      />
+
+      {/* Template Source Badge */}
+      {currentBlueprint?.source === 'template' && currentBlueprint?.templateName && (
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="gap-2 px-3 py-1.5 border-dc-primary/30 bg-dc-primary/5">
+            <FileText className="h-3.5 w-3.5 text-dc-primary" />
+            <span className="text-xs">Template: {currentBlueprint.templateName}</span>
+            {currentBlueprint.certified && (
+              <Shield className="h-3.5 w-3.5 text-dc-success" />
+            )}
+          </Badge>
+        </div>
+      )}
+
+      {/* Main Twin Overview Card */}
+      <DCCard 
+        title={agentName}
+        subtitle={type === 'agent' ? 'Agentic Intelligence' : type === '3d_twin' ? '3D Digital Twin' : 'Process Twin'}
+        icon={<Bot className="h-5 w-5" />}
+        status={currentBlueprint ? 'normal' : 'warning'}
+        className="border-dc-primary/30"
+      >
+        <div className="space-y-4">
           <div>
-            <h3 className="text-sm font-medium mb-2">Purpose & Description</h3>
-            <p className="text-sm text-muted-foreground">
+            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Purpose</h4>
+            <p className="text-sm">
               {currentBlueprint?.description || 
                goal || 
-               `Automate and optimize ${department || 'business'} operations with AI-powered decision making and task execution.`}
+               `Automate and optimize ${department || 'data centre'} operations with AI-powered monitoring and decision making.`}
             </p>
           </div>
 
-          {/* Goals */}
           {goals.length > 0 && (
             <div>
-              <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
-                <Target className="h-4 w-4" />
-                Key Goals
-              </h3>
+              <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
+                <Target className="h-3 w-3" />
+                Key Objectives
+              </h4>
               <div className="space-y-1">
                 {goals.map((goalItem, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span className="w-1 h-1 rounded-full bg-primary" />
+                  <div key={idx} className="flex items-center gap-2 text-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-dc-primary" />
                     {goalItem}
                   </div>
                 ))}
@@ -244,168 +193,155 @@ export function Step1Summary() {
           )}
 
           <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <Building2 className="h-3 w-3" />
-              {industry || 'Not specified'}
+            <Badge className="bg-dc-thermal/10 text-dc-thermal border-dc-thermal/30">
+              <Building2 className="h-3 w-3 mr-1" />
+              {industry || 'Data Centre'}
             </Badge>
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <Briefcase className="h-3 w-3" />
-              {department || 'Not specified'}
+            <Badge className="bg-dc-power/10 text-dc-power border-dc-power/30">
+              <Briefcase className="h-3 w-3 mr-1" />
+              {department || 'Infrastructure'}
             </Badge>
-            {currentBlueprint?.level && (
-              <Badge variant="outline">{currentBlueprint.level}</Badge>
+            {isDataCentreTwin && (
+              <Badge className="bg-dc-sovereignty/10 text-dc-sovereignty border-dc-sovereignty/30">
+                <Globe className="h-3 w-3 mr-1" />
+                Sovereign Compute
+              </Badge>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </DCCard>
 
-      {/* Expected ROI */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              Expected ROI
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{expectedRoi}</p>
-            <p className="text-xs text-muted-foreground mt-1">Cost reduction</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Clock className="h-4 w-4 text-blue-500" />
-              Time Saved
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{timeSaved}</p>
-            <p className="text-xs text-muted-foreground mt-1">Per week</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Zap className="h-4 w-4 text-yellow-500" />
-              Efficiency Gain
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{efficiencyGain}</p>
-            <p className="text-xs text-muted-foreground mt-1">Faster processing</p>
-          </CardContent>
-        </Card>
+      {/* Expected Outcomes KPIs */}
+      <div className="grid gap-4 grid-cols-3">
+        <DCKPITile
+          label="Expected ROI"
+          value={expectedRoi}
+          sublabel="Cost reduction"
+          status="normal"
+          icon={<TrendingUp className="h-4 w-4" />}
+          trend="up"
+        />
+        <DCKPITile
+          label="Time Saved"
+          value={timeSaved}
+          sublabel="Per week"
+          status="normal"
+          icon={<Clock className="h-4 w-4" />}
+          trend="up"
+        />
+        <DCKPITile
+          label="Efficiency Gain"
+          value={efficiencyGain}
+          sublabel="Processing speed"
+          status="normal"
+          icon={<Zap className="h-4 w-4" />}
+          trend="up"
+        />
       </div>
 
       {/* Capabilities Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Capabilities Summary</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <DCCard title="System Capabilities" icon={<Cpu className="h-4 w-4" />}>
+        <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-medium mb-2">Core Capabilities</h4>
+            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Core Functions</h4>
             <div className="flex flex-wrap gap-2">
               {capabilities.map((capability, idx) => (
-                <Badge key={idx} variant="outline">{capability}</Badge>
+                <Badge key={idx} variant="outline" className="bg-background/50">{capability}</Badge>
               ))}
             </div>
           </div>
 
           <div>
-            <h4 className="text-sm font-medium mb-2">Recommended Tools</h4>
+            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Infrastructure Tools</h4>
             <div className="flex flex-wrap gap-2">
               {recommendedTools.map((tool, idx) => (
-                <Badge key={idx} variant="secondary">{tool}</Badge>
+                <Badge key={idx} className="bg-dc-gpu/10 text-dc-gpu border-dc-gpu/30">{tool}</Badge>
               ))}
             </div>
           </div>
 
           <div>
-            <h4 className="text-sm font-medium mb-2">Recommended Workflows</h4>
+            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Workflow Pipeline</h4>
             <div className="space-y-2">
               {workflowSummary.map((workflowItem, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span className="w-1 h-1 rounded-full bg-primary" />
+                <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground font-mono">
+                  <span className="w-1.5 h-1.5 rounded-full bg-dc-success" />
                   {workflowItem}
                 </div>
               ))}
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </DCCard>
 
       {/* Actions */}
-      <Card className="bg-muted/50">
-        <CardContent className="pt-6">
-          <p className="text-sm text-muted-foreground mb-4">
-            Ready to configure this agent? Click "Next" to set up intelligence, tools, and workflows.
+      <DCCard className="bg-dc-surface/50">
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Ready to configure this system? Click "Next" to set up intelligence, tools, and workflows.
           </p>
           <div className="flex gap-3">
             <Button variant="outline" className="flex-1" onClick={handleOpenEdit}>
               <Pencil className="h-4 w-4 mr-2" />
-              Edit Summary
+              Edit Configuration
             </Button>
             <Button variant="outline" className="flex-1" onClick={() => setIsSwitchOpen(true)}>
               <RefreshCw className="h-4 w-4 mr-2" />
-              Switch Agent
+              Switch Template
             </Button>
           </div>
           
           {/* Co-Pilot Quick Actions */}
-          <div className="mt-4 pt-4 border-t">
+          <div className="pt-4 border-t border-border/50">
             <p className="text-xs text-muted-foreground mb-2">Ask Co-Pilot:</p>
             <div className="flex flex-wrap gap-2">
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="text-xs"
-                onClick={() => handleAskCoPilot(`Rewrite this summary for a ${industry || 'business'} executive.`)}
+                className="text-xs bg-dc-surface hover:bg-dc-surface/80"
+                onClick={() => handleAskCoPilot(`Suggest PUE optimization strategies for this data centre twin.`)}
               >
-                Rewrite for executive
+                PUE Optimization
               </Button>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="text-xs"
-                onClick={() => handleAskCoPilot(`Suggest 3 KPI ideas for this ${type || 'agent'} in ${industry || 'this industry'}.`)}
+                className="text-xs bg-dc-surface hover:bg-dc-surface/80"
+                onClick={() => handleAskCoPilot(`What thermal monitoring KPIs should I track for ${agentName}?`)}
               >
-                Suggest KPIs
+                Thermal KPIs
               </Button>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="text-xs"
-                onClick={() => handleAskCoPilot(`What are the key risks for deploying ${agentName}?`)}
+                className="text-xs bg-dc-surface hover:bg-dc-surface/80"
+                onClick={() => handleAskCoPilot(`What are the key sovereignty compliance requirements for this data centre?`)}
               >
-                Identify risks
+                Sovereignty Checks
               </Button>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </DCCard>
 
       {/* Edit Summary Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg bg-dc-background border-dc-border">
           <DialogHeader>
-            <DialogTitle>Edit Agent/Twin Summary</DialogTitle>
+            <DialogTitle>Edit System Configuration</DialogTitle>
             <DialogDescription>
-              Update the name, description, and classification for this agent.
+              Update the name, description, and classification for this digital twin.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-name">Name</Label>
+              <Label htmlFor="edit-name">System Name</Label>
               <Input 
                 id="edit-name" 
                 value={editName} 
                 onChange={(e) => setEditName(e.target.value)}
-                placeholder="Agent name"
+                placeholder="Data Centre Twin name"
+                className="bg-dc-surface border-dc-border"
               />
             </div>
             <div className="space-y-2">
@@ -414,8 +350,9 @@ export function Step1Summary() {
                 id="edit-description" 
                 value={editDescription} 
                 onChange={(e) => setEditDescription(e.target.value)}
-                placeholder="What does this agent do?"
+                placeholder="What does this system monitor and control?"
                 rows={3}
+                className="bg-dc-surface border-dc-border"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -425,7 +362,8 @@ export function Step1Summary() {
                   id="edit-industry" 
                   value={editIndustry} 
                   onChange={(e) => setEditIndustry(e.target.value)}
-                  placeholder="e.g. Banking"
+                  placeholder="e.g. Data Centre"
+                  className="bg-dc-surface border-dc-border"
                 />
               </div>
               <div className="space-y-2">
@@ -434,19 +372,20 @@ export function Step1Summary() {
                   id="edit-department" 
                   value={editDepartment} 
                   onChange={(e) => setEditDepartment(e.target.value)}
-                  placeholder="e.g. Operations"
+                  placeholder="e.g. Infrastructure"
+                  className="bg-dc-surface border-dc-border"
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-type">Type</Label>
-              <Select value={editType} onValueChange={(v) => setEditType(v as any)}>
-                <SelectTrigger>
-                  <SelectValue />
+              <Label>System Type</Label>
+              <Select value={editType} onValueChange={(val: 'agent' | 'process_twin' | '3d_twin') => setEditType(val)}>
+                <SelectTrigger className="bg-dc-surface border-dc-border">
+                  <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="agent">AI Agent</SelectItem>
-                  <SelectItem value="process_twin">Process Twin</SelectItem>
+                  <SelectItem value="agent">Agentic AI</SelectItem>
+                  <SelectItem value="process_twin">Process Digital Twin</SelectItem>
                   <SelectItem value="3d_twin">3D Digital Twin</SelectItem>
                 </SelectContent>
               </Select>
@@ -461,45 +400,36 @@ export function Step1Summary() {
         </DialogContent>
       </Dialog>
 
-      {/* Switch Agent Dialog */}
+      {/* Switch Template Dialog */}
       <Dialog open={isSwitchOpen} onOpenChange={setIsSwitchOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg bg-dc-background border-dc-border">
           <DialogHeader>
-            <DialogTitle>Switch Agent/Template</DialogTitle>
+            <DialogTitle>Switch Template</DialogTitle>
             <DialogDescription>
-              Start fresh with a different template or create a new agent from scratch.
+              Choose a different data centre template to start from.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <Button 
-              variant="outline" 
-              className="w-full justify-start"
-              onClick={() => {
-                setIsSwitchOpen(false);
-                window.location.href = '/marketplace';
-              }}
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Browse Template Marketplace
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full justify-start"
-              onClick={() => {
-                setIsSwitchOpen(false);
-                window.location.href = '/builder';
-              }}
-            >
-              <Bot className="h-4 w-4 mr-2" />
-              Create New Agent from Scratch
-            </Button>
+          <div className="py-4 space-y-3">
+            {['Sovereign Green AI Data Center Twin', 'HPC Cluster Optimization Twin', 'Energy & Cooling Efficiency Twin', 'GPU Workload Scheduler Twin'].map((tpl) => (
+              <Button 
+                key={tpl} 
+                variant="outline" 
+                className="w-full justify-start bg-dc-surface border-dc-border hover:bg-dc-surface/80"
+                onClick={() => {
+                  toast.info(`Switching to: ${tpl}`);
+                  setIsSwitchOpen(false);
+                }}
+              >
+                <Server className="h-4 w-4 mr-2 text-dc-primary" />
+                {tpl}
+              </Button>
+            ))}
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setIsSwitchOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setIsSwitchOpen(false)}>Cancel</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   );
 }
-

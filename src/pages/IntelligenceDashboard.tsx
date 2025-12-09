@@ -18,6 +18,7 @@ import {
   Filter,
   CheckCircle2,
   XCircle,
+  BarChart3,
 } from "lucide-react";
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +26,8 @@ import { Line, LineChart, Bar, BarChart, Area, AreaChart, ResponsiveContainer, X
 import { Badge } from '@/components/ui/badge';
 import KpiCard from '@/components/shared/KpiCard';
 import DataTable, { Column } from '@/components/shared/DataTable';
+import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
+import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 
 interface System {
   id: string;
@@ -194,96 +197,91 @@ export default function IntelligenceDashboard() {
   const events = eventsData?.events || [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-dc-bg-primary">
       <div className="container mx-auto px-4 py-6 max-w-[1600px]">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-4xl font-display font-bold mb-2 text-gradient-hero">
-              AI Systems Intelligence Dashboard
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              Unified monitoring for Digital Twins, Agents, and Automation Systems
-            </p>
-          </div>
-          <Button className="gap-2 glow-yellow">
+          <DCSectionHeader
+            title="AI Systems Intelligence Dashboard"
+            subtitle="Unified monitoring for Digital Twins, Agents, and Automation Systems"
+            icon={<BarChart3 className="h-6 w-6" />}
+          />
+          <Button className="gap-2">
             <Download className="h-4 w-4" />
             Export Report
           </Button>
         </div>
 
         {/* Intelligence Filters */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Filters:</span>
-              </div>
-              
-              <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Last 24h</SelectItem>
-                  <SelectItem value="7">Last 7 days</SelectItem>
-                  <SelectItem value="30">Last 30 days</SelectItem>
-                </SelectContent>
-              </Select>
+        <DCCard 
+          title="Filters" 
+          icon={<Filter className="h-5 w-5" />}
+          status="info"
+          className="mb-6"
+        >
+          <div className="flex items-center gap-4 flex-wrap">
+            <Select value={dateRange} onValueChange={setDateRange}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">Last 24h</SelectItem>
+                <SelectItem value="7">Last 7 days</SelectItem>
+                <SelectItem value="30">Last 30 days</SelectItem>
+              </SelectContent>
+            </Select>
 
-              <Select value={department} onValueChange={setDepartment}>
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Department" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Departments</SelectItem>
-                  <SelectItem value="operations">Operations</SelectItem>
-                  <SelectItem value="finance">Finance</SelectItem>
-                  <SelectItem value="sales">Sales</SelectItem>
-                  <SelectItem value="supply_chain">Supply Chain</SelectItem>
-                </SelectContent>
-              </Select>
+            <Select value={department} onValueChange={setDepartment}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Department" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Departments</SelectItem>
+                <SelectItem value="operations">Operations</SelectItem>
+                <SelectItem value="finance">Finance</SelectItem>
+                <SelectItem value="sales">Sales</SelectItem>
+                <SelectItem value="supply_chain">Supply Chain</SelectItem>
+              </SelectContent>
+            </Select>
 
-              <Select value={aiType} onValueChange={setAiType}>
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="AI Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="agent">Agent</SelectItem>
-                  <SelectItem value="process_twin">Process Twin</SelectItem>
-                  <SelectItem value="3d_twin">3D Twin</SelectItem>
-                </SelectContent>
-              </Select>
+            <Select value={aiType} onValueChange={setAiType}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="AI Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="agent">Agent</SelectItem>
+                <SelectItem value="process_twin">Process Twin</SelectItem>
+                <SelectItem value="3d_twin">3D Twin</SelectItem>
+              </SelectContent>
+            </Select>
 
-              <Select value={environment} onValueChange={setEnvironment}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Environment" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Envs</SelectItem>
-                  <SelectItem value="production">Production</SelectItem>
-                  <SelectItem value="staging">Staging</SelectItem>
-                  <SelectItem value="dev">Development</SelectItem>
-                </SelectContent>
-              </Select>
+            <Select value={environment} onValueChange={setEnvironment}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Environment" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Envs</SelectItem>
+                <SelectItem value="production">Production</SelectItem>
+                <SelectItem value="staging">Staging</SelectItem>
+                <SelectItem value="dev">Development</SelectItem>
+              </SelectContent>
+            </Select>
 
-              <Select value={industry} onValueChange={setIndustry}>
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Industry" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Industries</SelectItem>
-                  <SelectItem value="healthcare">Healthcare</SelectItem>
-                  <SelectItem value="finance">Finance</SelectItem>
-                  <SelectItem value="manufacturing">Manufacturing</SelectItem>
-                  <SelectItem value="retail">Retail</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
+            <Select value={industry} onValueChange={setIndustry}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Industry" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Industries</SelectItem>
+                <SelectItem value="healthcare">Healthcare</SelectItem>
+                <SelectItem value="finance">Finance</SelectItem>
+                <SelectItem value="manufacturing">Manufacturing</SelectItem>
+                <SelectItem value="retail">Retail</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </DCCard>
 
         {/* Global KPI Strip */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-5 gap-4 mb-6">

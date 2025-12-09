@@ -13,15 +13,8 @@ interface FacilityDomainViewProps {
 }
 
 export function FacilityDomainView({ facility }: FacilityDomainViewProps) {
-  // Mock facility safety data
-  const safetyMetrics = {
-    waterLeakSensors: { total: 24, alarmed: 0 },
-    smokeDetectors: { total: 48, alarmed: 0 },
-    fireSuppression: { status: 'armed', lastTest: '2024-01-15' },
-    hydrogenSensors: { total: 8, maxPpm: 12 },
-    pm25: 8.5,
-    pm10: 15.2,
-  };
+  const facilityTwin = facility.facilitySafety;
+  const triggeredSensors = facilityTwin.safetySensors.filter(s => s.triggered);
   
   return (
     <div className="space-y-6">
@@ -29,172 +22,125 @@ export function FacilityDomainView({ facility }: FacilityDomainViewProps) {
       <div className="grid gap-4 md:grid-cols-4">
         <MetricCard
           title="Safety Score"
-          value="96%"
-          status="good"
+          value={`${facilityTwin.kpis.environmentalSafetyScore.toFixed(0)}%`}
+          status={facilityTwin.kpis.environmentalSafetyScore > 90 ? 'good' : 'warning'}
           icon={Shield}
         />
         <MetricCard
           title="Water Leak Status"
-          value={`${safetyMetrics.waterLeakSensors.alarmed}/${safetyMetrics.waterLeakSensors.total}`}
+          value={`${triggeredSensors.filter(s => s.type === 'water_leak').length}/${facilityTwin.safetySensors.filter(s => s.type === 'water_leak').length}`}
           subtitle="sensors clear"
-          status={safetyMetrics.waterLeakSensors.alarmed === 0 ? 'good' : 'critical'}
+          status={triggeredSensors.filter(s => s.type === 'water_leak').length === 0 ? 'good' : 'critical'}
           icon={Droplets}
         />
         <MetricCard
-          title="Air Quality (PM2.5)"
-          value={`${safetyMetrics.pm25} µg/m³`}
-          status={safetyMetrics.pm25 < 12 ? 'good' : safetyMetrics.pm25 < 35 ? 'warning' : 'critical'}
+          title="Air Quality"
+          value={`${facilityTwin.kpis.airQualityIndex.toFixed(0)}`}
+          status={facilityTwin.kpis.airQualityIndex < 50 ? 'good' : 'warning'}
           icon={Wind}
         />
         <MetricCard
           title="Fire Suppression"
-          value={safetyMetrics.fireSuppression.status}
+          value={`${facilityTwin.fireSuppressionSystems.filter(s => s.status === 'armed').length}/${facilityTwin.fireSuppressionSystems.length}`}
+          subtitle="systems armed"
           status="good"
           icon={Flame}
         />
       </div>
 
-      {/* Sensor Grid */}
+      {/* Environmental Zones */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Environmental Zones</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {facilityTwin.environmentalZones.map((zone) => (
+              <div key={zone.id} className="p-4 rounded-lg bg-muted/30 border">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-medium text-sm">{zone.name}</span>
+                  <Badge variant={zone.status === 'normal' ? 'default' : 'secondary'}>
+                    {zone.type}
+                  </Badge>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Temperature</span>
+                    <span>{zone.tempC.toFixed(1)}°C</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Humidity</span>
+                    <span>{zone.humidityPct.toFixed(0)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">PM2.5</span>
+                    <span>{zone.pm25.toFixed(1)} µg/m³</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Safety Sensors */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Water Leak Sensors */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <Droplets className="h-4 w-4 text-blue-500" />
-              Water Leak Detection
+              Safety Sensors
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-6 gap-2">
-              {Array.from({ length: safetyMetrics.waterLeakSensors.total }).map((_, i) => (
+            <div className="grid grid-cols-4 gap-2">
+              {facilityTwin.safetySensors.slice(0, 16).map((sensor) => (
                 <div 
-                  key={i}
-                  className="aspect-square rounded-lg bg-green-500/20 border border-green-500/40 flex items-center justify-center"
-                  title={`Sensor ${i + 1}: OK`}
+                  key={sensor.id}
+                  className={`aspect-square rounded-lg ${sensor.triggered ? 'bg-destructive/20 border-destructive/40' : 'bg-green-500/20 border-green-500/40'} border flex items-center justify-center`}
+                  title={`${sensor.type}: ${sensor.triggered ? 'ALARM' : 'OK'}`}
                 >
-                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  {sensor.triggered ? (
+                    <AlertTriangle className="h-4 w-4 text-destructive" />
+                  ) : (
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                  )}
                 </div>
               ))}
             </div>
             <p className="text-xs text-muted-foreground mt-3">
-              All {safetyMetrics.waterLeakSensors.total} sensors operational • Last check: Just now
+              {facilityTwin.safetySensors.length - triggeredSensors.length} sensors operational • {triggeredSensors.length} alarms
             </p>
           </CardContent>
         </Card>
 
-        {/* Smoke Detectors */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <Flame className="h-4 w-4 text-orange-500" />
-              Smoke Detection
+              Fire Suppression
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-8 gap-2">
-              {Array.from({ length: safetyMetrics.smokeDetectors.total }).map((_, i) => (
-                <div 
-                  key={i}
-                  className="aspect-square rounded-lg bg-green-500/20 border border-green-500/40 flex items-center justify-center"
-                  title={`Detector ${i + 1}: OK`}
-                >
-                  <div className="w-2 h-2 rounded-full bg-green-500" />
+            <div className="space-y-3">
+              {facilityTwin.fireSuppressionSystems.map((system) => (
+                <div key={system.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                  <div>
+                    <p className="text-sm font-medium">{system.zone}</p>
+                    <p className="text-xs text-muted-foreground">{system.type}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Progress value={(system.tankPressurePsi / system.targetPressurePsi) * 100} className="w-16 h-2" />
+                    <Badge variant={system.status === 'armed' ? 'default' : 'secondary'}>
+                      {system.status}
+                    </Badge>
+                  </div>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground mt-3">
-              All {safetyMetrics.smokeDetectors.total} detectors operational
-            </p>
           </CardContent>
         </Card>
       </div>
-
-      {/* Environmental Monitoring */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Environmental Monitoring</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="p-4 rounded-lg bg-muted/30 border">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium">Particulate Matter</span>
-                <Badge variant="default">Good</Badge>
-              </div>
-              <div className="space-y-2">
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span>PM2.5</span>
-                    <span>{safetyMetrics.pm25} µg/m³</span>
-                  </div>
-                  <Progress value={(safetyMetrics.pm25 / 35) * 100} className="h-2" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span>PM10</span>
-                    <span>{safetyMetrics.pm10} µg/m³</span>
-                  </div>
-                  <Progress value={(safetyMetrics.pm10 / 50) * 100} className="h-2" />
-                </div>
-              </div>
-            </div>
-            
-            <div className="p-4 rounded-lg bg-muted/30 border">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium">Hydrogen Detection</span>
-                <Badge variant="default">Safe</Badge>
-              </div>
-              <div className="space-y-2">
-                <div className="text-center py-4">
-                  <p className="text-3xl font-bold text-green-500">{safetyMetrics.hydrogenSensors.maxPpm}</p>
-                  <p className="text-xs text-muted-foreground">ppm (max across {safetyMetrics.hydrogenSensors.total} sensors)</p>
-                </div>
-                <p className="text-xs text-center text-muted-foreground">
-                  Threshold: 1000 ppm
-                </p>
-              </div>
-            </div>
-            
-            <div className="p-4 rounded-lg bg-muted/30 border">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium">Fire Suppression</span>
-                <Badge className="bg-green-500/10 text-green-600">Armed</Badge>
-              </div>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">System Type</span>
-                  <span>Novec 1230</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Last Test</span>
-                  <span>{safetyMetrics.fireSuppression.lastTest}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Zones Covered</span>
-                  <span>{facility.coolingZones.length}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Active Alerts */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4" />
-            Safety Alerts
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-            <CheckCircle className="h-12 w-12 text-green-500 mb-3" />
-            <p className="text-lg font-medium">All Systems Normal</p>
-            <p className="text-sm">No active safety alerts</p>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

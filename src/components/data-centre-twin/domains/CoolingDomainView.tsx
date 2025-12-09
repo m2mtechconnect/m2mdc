@@ -13,9 +13,16 @@ interface CoolingDomainViewProps {
 }
 
 export function CoolingDomainView({ facility }: CoolingDomainViewProps) {
-  const avgSupplyTemp = facility.coolingZones.reduce((acc, z) => acc + z.supplyAirTempC, 0) / facility.coolingZones.length;
-  const avgReturnTemp = facility.coolingZones.reduce((acc, z) => acc + z.returnAirTempC, 0) / facility.coolingZones.length;
-  const avgHumidity = facility.coolingZones.reduce((acc, z) => acc + z.humidityPercent, 0) / facility.coolingZones.length;
+  const coolingZones = facility.cooling.zones;
+  const avgSupplyTemp = coolingZones.length > 0 
+    ? coolingZones.reduce((acc, z) => acc + z.ambientTempC, 0) / coolingZones.length
+    : 0;
+  const avgReturnTemp = coolingZones.length > 0
+    ? coolingZones.reduce((acc, z) => acc + z.ambientTempC + 10, 0) / coolingZones.length
+    : 0;
+  const avgHumidity = coolingZones.length > 0
+    ? coolingZones.reduce((acc, z) => acc + z.humidityPct, 0) / coolingZones.length
+    : 0;
   
   return (
     <div className="space-y-6">
@@ -54,12 +61,12 @@ export function CoolingDomainView({ facility }: CoolingDomainViewProps) {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {facility.coolingZones.map((zone) => (
+            {coolingZones.map((zone) => (
               <div key={zone.id} className="p-4 rounded-lg bg-muted/30 border">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="font-medium text-sm">{zone.id}</span>
-                  <Badge variant={zone.status === 'operational' ? 'default' : 'secondary'}>
-                    {zone.cracUnits} CRACs
+                  <span className="font-medium text-sm">{zone.name}</span>
+                  <Badge variant={zone.status === 'normal' ? 'default' : 'secondary'}>
+                    {zone.units.length} Units
                   </Badge>
                 </div>
                 
@@ -67,17 +74,17 @@ export function CoolingDomainView({ facility }: CoolingDomainViewProps) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Wind className="h-4 w-4 text-blue-500" />
-                      <span className="text-xs">Supply</span>
+                      <span className="text-xs">Ambient</span>
                     </div>
-                    <span className="text-sm font-medium">{zone.supplyAirTempC.toFixed(1)}°C</span>
+                    <span className="text-sm font-medium">{zone.ambientTempC.toFixed(1)}°C</span>
                   </div>
                   
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Thermometer className="h-4 w-4 text-orange-500" />
-                      <span className="text-xs">Return</span>
+                      <span className="text-xs">Target</span>
                     </div>
-                    <span className="text-sm font-medium">{zone.returnAirTempC.toFixed(1)}°C</span>
+                    <span className="text-sm font-medium">{zone.targetTempC.toFixed(1)}°C</span>
                   </div>
                   
                   <div className="flex items-center justify-between">
@@ -85,18 +92,15 @@ export function CoolingDomainView({ facility }: CoolingDomainViewProps) {
                       <Droplets className="h-4 w-4 text-cyan-500" />
                       <span className="text-xs">Humidity</span>
                     </div>
-                    <span className="text-sm font-medium">{zone.humidityPercent.toFixed(0)}%</span>
+                    <span className="text-sm font-medium">{zone.humidityPct.toFixed(0)}%</span>
                   </div>
                   
                   <div className="pt-2 border-t">
                     <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                      <span>ΔT</span>
-                      <span>{(zone.returnAirTempC - zone.supplyAirTempC).toFixed(1)}°C</span>
+                      <span>Airflow</span>
+                      <span>{zone.airflowCfm.toFixed(0)} CFM</span>
                     </div>
-                    <Progress 
-                      value={Math.min(((zone.returnAirTempC - zone.supplyAirTempC) / 15) * 100, 100)} 
-                      className="h-1.5" 
-                    />
+                    <Progress value={Math.min((zone.airflowCfm / 5000) * 100, 100)} className="h-1.5" />
                   </div>
                 </div>
               </div>
@@ -116,19 +120,19 @@ export function CoolingDomainView({ facility }: CoolingDomainViewProps) {
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>Overall Cooling Efficiency</span>
-                  <span className="font-medium">{Math.round((1 - (facility.pue - 1)) * 100)}%</span>
+                  <span className="font-medium">{facility.cooling.kpis.coolingEfficiencyIndex.toFixed(0)}%</span>
                 </div>
-                <Progress value={Math.round((1 - (facility.pue - 1)) * 100)} className="h-3" />
+                <Progress value={facility.cooling.kpis.coolingEfficiencyIndex} className="h-3" />
               </div>
               
               <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                 <div>
-                  <p className="text-xs text-muted-foreground">Cooling Cost/kW IT</p>
-                  <p className="text-lg font-bold">${((facility.pue - 1) * facility.costPerKwh).toFixed(3)}</p>
+                  <p className="text-xs text-muted-foreground">Cooling Cost/kW</p>
+                  <p className="text-lg font-bold">${facility.cooling.kpis.coolingCostPerKw.toFixed(3)}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Total Cooling Load</p>
-                  <p className="text-lg font-bold">{Math.round(facility.currentPowerDrawKw * (facility.pue - 1))} kW</p>
+                  <p className="text-lg font-bold">{facility.cooling.kpis.activeCoolingLoadKw.toFixed(0)} kW</p>
                 </div>
               </div>
             </div>
@@ -155,14 +159,6 @@ export function CoolingDomainView({ facility }: CoolingDomainViewProps) {
                   <p className="text-xs text-muted-foreground">Isolated return air</p>
                 </div>
                 <Badge variant="secondary">Active</Badge>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                <div>
-                  <p className="text-sm font-medium">Free Cooling Hours</p>
-                  <p className="text-xs text-muted-foreground">Last 24h</p>
-                </div>
-                <span className="text-lg font-bold">8.5h</span>
               </div>
             </div>
           </CardContent>

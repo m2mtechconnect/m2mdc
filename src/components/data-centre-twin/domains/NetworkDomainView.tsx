@@ -13,18 +13,22 @@ interface NetworkDomainViewProps {
 }
 
 export function NetworkDomainView({ facility }: NetworkDomainViewProps) {
-  const avgPortUtil = facility.networkSwitches.reduce((acc, s) => acc + s.portUtilizationPercent, 0) / facility.networkSwitches.length;
-  const totalErrors = facility.networkSwitches.reduce((acc, s) => acc + s.packetErrorsPerSec + s.crcErrorsPerHour, 0);
-  const avgLatency = facility.networkSwitches.reduce((acc, s) => acc + s.latencyMs, 0) / facility.networkSwitches.length;
+  const switches = facility.network.switches;
+  const avgPortUtil = switches.length > 0
+    ? switches.reduce((acc, s) => acc + s.cpuUtilization, 0) / switches.length
+    : 0;
+  const totalErrors = switches.reduce((acc, s) => 
+    acc + s.ports.reduce((sum, p) => sum + p.packetErrors + p.crcErrors, 0), 0);
+  const avgLatency = facility.network.kpis.avgLatencyMs;
   
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <MetricCard
-          title="Port Utilization"
-          value={`${avgPortUtil.toFixed(0)}%`}
-          status={avgPortUtil < 60 ? 'good' : avgPortUtil < 80 ? 'warning' : 'critical'}
+          title="Network Integrity"
+          value={`${facility.network.kpis.networkIntegrityScore.toFixed(0)}%`}
+          status={facility.network.kpis.networkIntegrityScore > 90 ? 'good' : 'warning'}
           icon={Network}
         />
         <MetricCard
@@ -34,14 +38,14 @@ export function NetworkDomainView({ facility }: NetworkDomainViewProps) {
           icon={Activity}
         />
         <MetricCard
-          title="Total Errors/hr"
-          value={`${totalErrors.toFixed(0)}`}
+          title="Total Errors"
+          value={`${totalErrors}`}
           status={totalErrors < 10 ? 'good' : totalErrors < 100 ? 'warning' : 'critical'}
           icon={AlertTriangle}
         />
         <MetricCard
           title="Active Switches"
-          value={`${facility.networkSwitches.length}`}
+          value={`${switches.length}`}
           status="good"
           icon={Wifi}
         />
@@ -54,14 +58,14 @@ export function NetworkDomainView({ facility }: NetworkDomainViewProps) {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {facility.networkSwitches.map((sw) => (
+            {switches.map((sw) => (
               <div key={sw.id} className="p-4 rounded-lg bg-muted/30 border">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Network className={`h-4 w-4 ${sw.status === 'active' ? 'text-green-500' : 'text-yellow-500'}`} />
-                    <span className="font-mono text-sm">{sw.id}</span>
+                    <Network className={`h-4 w-4 ${sw.status === 'normal' ? 'text-green-500' : 'text-yellow-500'}`} />
+                    <span className="font-mono text-sm">{sw.name}</span>
                   </div>
-                  <Badge variant={sw.status === 'active' ? 'default' : 'secondary'}>
+                  <Badge variant={sw.status === 'normal' ? 'default' : 'secondary'}>
                     {sw.type}
                   </Badge>
                 </div>
@@ -69,40 +73,30 @@ export function NetworkDomainView({ facility }: NetworkDomainViewProps) {
                 <div className="space-y-3">
                   <div>
                     <div className="flex justify-between text-xs mb-1">
-                      <span>Port Utilization</span>
-                      <span>{sw.portUtilizationPercent}%</span>
+                      <span>CPU Utilization</span>
+                      <span>{sw.cpuUtilization.toFixed(0)}%</span>
                     </div>
-                    <Progress 
-                      value={sw.portUtilizationPercent} 
-                      className="h-2"
-                    />
+                    <Progress value={sw.cpuUtilization} className="h-2" />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="p-2 rounded bg-background">
-                      <p className="text-muted-foreground">Latency</p>
-                      <p className="font-medium">{sw.latencyMs.toFixed(2)}ms</p>
+                      <p className="text-muted-foreground">Memory</p>
+                      <p className="font-medium">{sw.memoryUtilization.toFixed(0)}%</p>
                     </div>
                     <div className="p-2 rounded bg-background">
-                      <p className="text-muted-foreground">Throughput</p>
-                      <p className="font-medium">{sw.throughputGbps.toFixed(1)} Gbps</p>
+                      <p className="text-muted-foreground">Ports</p>
+                      <p className="font-medium">{sw.ports.length}</p>
                     </div>
                     <div className="p-2 rounded bg-background">
-                      <p className="text-muted-foreground">Pkt Errors/s</p>
-                      <p className="font-medium">{sw.packetErrorsPerSec}</p>
+                      <p className="text-muted-foreground">Temp</p>
+                      <p className="font-medium">{sw.temperature.toFixed(0)}°C</p>
                     </div>
                     <div className="p-2 rounded bg-background">
-                      <p className="text-muted-foreground">CRC/hr</p>
-                      <p className="font-medium">{sw.crcErrorsPerHour}</p>
+                      <p className="text-muted-foreground">Uptime</p>
+                      <p className="font-medium">{Math.round(sw.uptime / 3600)}h</p>
                     </div>
                   </div>
-                  
-                  {sw.linkFlapsLast24h > 0 && (
-                    <div className="flex items-center gap-2 p-2 rounded bg-yellow-500/10 text-yellow-600 text-xs">
-                      <AlertTriangle className="h-3 w-3" />
-                      <span>{sw.linkFlapsLast24h} link flaps (24h)</span>
-                    </div>
-                  )}
                 </div>
               </div>
             ))}
@@ -110,21 +104,24 @@ export function NetworkDomainView({ facility }: NetworkDomainViewProps) {
         </CardContent>
       </Card>
 
-      {/* Bandwidth Distribution */}
+      {/* Throughput */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Bandwidth Distribution</CardTitle>
+          <CardTitle className="text-base">Network Throughput</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {facility.networkSwitches.map((sw) => (
-              <div key={sw.id} className="flex items-center gap-4">
-                <div className="w-32 text-sm font-mono">{sw.id}</div>
+            {facility.network.fabrics.map((fabric) => (
+              <div key={fabric.id} className="flex items-center gap-4 p-3 rounded-lg bg-muted/30">
+                <div className="w-32 font-mono text-sm">{fabric.name}</div>
                 <div className="flex-1">
-                  <Progress value={(sw.throughputGbps / 100) * 100} className="h-4" />
-                </div>
-                <div className="w-24 text-right text-sm">
-                  {sw.throughputGbps.toFixed(1)} Gbps
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm">{fabric.type}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {fabric.throughputGbps.toFixed(0)} / {fabric.maxThroughputGbps} Gbps
+                    </span>
+                  </div>
+                  <Progress value={(fabric.throughputGbps / fabric.maxThroughputGbps) * 100} className="h-2" />
                 </div>
               </div>
             ))}

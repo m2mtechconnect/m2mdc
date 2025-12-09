@@ -6,15 +6,36 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Thermometer, Cpu, Fan, AlertTriangle } from 'lucide-react';
-import type { DataCentreFacility, RackUnit } from '@/types/dataCenterTwin';
+import type { DataCentreFacility, RackThermal } from '@/types/dataCenterTwin';
 
 interface ThermalDomainViewProps {
   facility: DataCentreFacility;
 }
 
 export function ThermalDomainView({ facility }: ThermalDomainViewProps) {
-  const hotRacks = facility.racks.filter(r => r.avgInletTempC > 27);
-  const avgTemp = facility.racks.reduce((acc, r) => acc + r.avgInletTempC, 0) / facility.racks.length;
+  const racks = facility.thermalHardware.racks;
+  const hotRacks = racks.filter(r => r.outletTempC > 35);
+  const avgTemp = racks.length > 0 
+    ? racks.reduce((acc, r) => acc + r.inletTempC, 0) / racks.length
+    : 0;
+  
+  // Get GPU temp from clusters
+  const gpuClusters = facility.workloadGpu.clusters;
+  const avgGpuTemp = gpuClusters.length > 0
+    ? gpuClusters.reduce((acc, c) => {
+        const clusterAvgTemp = c.nodes.reduce((sum, n) => {
+          const nodeAvgTemp = n.gpuTempC.reduce((s, t) => s + t, 0) / n.gpuTempC.length;
+          return sum + nodeAvgTemp;
+        }, 0) / c.nodes.length;
+        return acc + clusterAvgTemp;
+      }, 0) / gpuClusters.length
+    : 0;
+  
+  // Get cooling delta from zones
+  const coolingZones = facility.cooling.zones;
+  const avgDeltaT = coolingZones.length > 0
+    ? coolingZones.reduce((acc, z) => acc + (z.ambientTempC - z.targetTempC), 0) / coolingZones.length
+    : 0;
   
   return (
     <div className="space-y-6">
@@ -29,19 +50,19 @@ export function ThermalDomainView({ facility }: ThermalDomainViewProps) {
         <MetricCard
           title="Hot Racks"
           value={`${hotRacks.length}`}
-          subtitle={`of ${facility.racks.length} total`}
+          subtitle={`of ${racks.length} total`}
           status={hotRacks.length === 0 ? 'good' : hotRacks.length < 3 ? 'warning' : 'critical'}
           icon={AlertTriangle}
         />
         <MetricCard
           title="GPU Temps"
-          value={`${Math.round(facility.gpuClusters.reduce((acc, c) => acc + c.avgGpuTempC, 0) / facility.gpuClusters.length)}°C`}
-          status="good"
+          value={`${avgGpuTemp.toFixed(0)}°C`}
+          status={avgGpuTemp < 75 ? 'good' : avgGpuTemp < 85 ? 'warning' : 'critical'}
           icon={Cpu}
         />
         <MetricCard
           title="Cooling Delta"
-          value={`${(facility.coolingZones.reduce((acc, z) => acc + (z.returnAirTempC - z.supplyAirTempC), 0) / facility.coolingZones.length).toFixed(1)}°C`}
+          value={`${Math.abs(avgDeltaT).toFixed(1)}°C`}
           status="good"
           icon={Fan}
         />
@@ -53,8 +74,8 @@ export function ThermalDomainView({ facility }: ThermalDomainViewProps) {
           <CardTitle className="text-base">Rack Thermal Map</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.ceil(Math.sqrt(facility.racks.length))}, 1fr)` }}>
-            {facility.racks.map((rack) => (
+          <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.ceil(Math.sqrt(racks.length))}, 1fr)` }}>
+            {racks.map((rack) => (
               <RackThermalTile key={rack.id} rack={rack} />
             ))}
           </div>
@@ -86,21 +107,18 @@ export function ThermalDomainView({ facility }: ThermalDomainViewProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {facility.racks.slice(0, 10).map((rack) => (
+            {racks.slice(0, 10).map((rack) => (
               <div key={rack.id} className="flex items-center gap-4 p-3 rounded-lg bg-muted/30">
-                <div className="w-24 font-mono text-sm">{rack.id}</div>
+                <div className="w-24 font-mono text-sm">{rack.name}</div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm">{rack.avgInletTempC.toFixed(1)}°C inlet</span>
+                    <span className="text-sm">{rack.inletTempC.toFixed(1)}°C inlet</span>
                     <span className="text-sm text-muted-foreground">{rack.powerDrawKw.toFixed(1)} kW</span>
                   </div>
-                  <Progress 
-                    value={(rack.avgInletTempC / 35) * 100} 
-                    className="h-2"
-                  />
+                  <Progress value={(rack.inletTempC / 35) * 100} className="h-2" />
                 </div>
-                <Badge variant={rack.avgInletTempC < 25 ? 'default' : rack.avgInletTempC < 28 ? 'secondary' : 'destructive'}>
-                  {rack.serverCount} servers
+                <Badge variant={rack.inletTempC < 25 ? 'default' : rack.inletTempC < 28 ? 'secondary' : 'destructive'}>
+                  {rack.servers.length} servers
                 </Badge>
               </div>
             ))}
@@ -147,7 +165,7 @@ function MetricCard({ title, value, subtitle, status, icon: Icon }: MetricCardPr
 }
 
 interface RackThermalTileProps {
-  rack: RackUnit;
+  rack: RackThermal;
 }
 
 function RackThermalTile({ rack }: RackThermalTileProps) {
@@ -160,10 +178,10 @@ function RackThermalTile({ rack }: RackThermalTileProps) {
 
   return (
     <div 
-      className={`aspect-square rounded-lg ${getTempColor(rack.avgInletTempC)} flex items-center justify-center text-white text-xs font-mono hover:ring-2 hover:ring-primary transition-all cursor-pointer`}
-      title={`${rack.id}: ${rack.avgInletTempC.toFixed(1)}°C`}
+      className={`aspect-square rounded-lg ${getTempColor(rack.inletTempC)} flex items-center justify-center text-white text-xs font-mono hover:ring-2 hover:ring-primary transition-all cursor-pointer`}
+      title={`${rack.name}: ${rack.inletTempC.toFixed(1)}°C`}
     >
-      {rack.avgInletTempC.toFixed(0)}°
+      {rack.inletTempC.toFixed(0)}°
     </div>
   );
 }

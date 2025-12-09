@@ -46,6 +46,12 @@ export function DataCentreDashboard({ facility, onScenarioSelect }: DataCentreDa
   const activeAlerts = facility.alerts.filter(a => a.status === 'active');
   const criticalAlerts = activeAlerts.filter(a => a.severity === 'critical');
   
+  // Calculate GPU utilization from workloadGpu domain
+  const gpuClusters = facility.workloadGpu.clusters;
+  const avgGpuUtilization = gpuClusters.length > 0 
+    ? gpuClusters.reduce((acc, c) => acc + c.avgUtilization, 0) / gpuClusters.length
+    : 0;
+  
   return (
     <div className="space-y-6">
       {/* Header with facility status */}
@@ -61,7 +67,7 @@ export function DataCentreDashboard({ facility, onScenarioSelect }: DataCentreDa
             )}
           </div>
           <p className="text-sm text-muted-foreground">
-            {facility.location.city}, {facility.location.region} • {facility.totalRacks} Racks • {facility.totalPowerCapacityKw.toLocaleString()} kW Capacity
+            {facility.location.city}, {facility.location.country} • {facility.totalRacks} Racks • {facility.totalPowerCapacityKw.toLocaleString()} kW Capacity
           </p>
         </div>
         
@@ -102,7 +108,7 @@ export function DataCentreDashboard({ facility, onScenarioSelect }: DataCentreDa
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <StatCard 
                       label="GPU Utilization" 
-                      value={`${Math.round(facility.gpuClusters.reduce((acc, c) => acc + c.utilizationPercent, 0) / facility.gpuClusters.length)}%`}
+                      value={`${Math.round(avgGpuUtilization)}%`}
                       trend="up"
                     />
                     <StatCard 

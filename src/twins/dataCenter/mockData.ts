@@ -771,6 +771,12 @@ function generateFinancialCarbonTwin(): FinancialCarbonTwin {
 export function generateDataCentreFacility(id: string, name: string, region: Jurisdiction = 'CA-QC'): DataCentreFacility {
   const thermalHardware = generateThermalHardwareTwin();
   const powerUps = generatePowerUpsTwin(thermalHardware);
+  const cooling = generateCoolingTwin();
+  const financialCarbon = generateFinancialCarbonTwin();
+  
+  const totalPowerCapacityKw = 12000; // 12 MW
+  const currentPowerDrawKw = powerUps.kpis.totalPowerDrawMw * 1000;
+  const pue = financialCarbon.kpis.effectivePue;
   
   return {
     id,
@@ -780,14 +786,31 @@ export function generateDataCentreFacility(id: string, name: string, region: Jur
     tier: 4,
     totalCapacityMw: 12,
     currentLoadMw: powerUps.kpis.totalPowerDrawMw,
+    
+    // Extended UI properties
+    location: { 
+      city: region === 'CA-QC' ? 'Montreal' : region === 'CA-AB' ? 'Calgary' : 'Toronto', 
+      country: 'Canada' 
+    },
+    status: 'operational',
+    totalRacks: thermalHardware.racks.length,
+    totalPowerCapacityKw,
+    currentPowerDrawKw,
+    pue,
+    carbonIntensityGCo2Kwh: financialCarbon.carbonMetrics.carbonIntensityKgPerMwh,
+    costPerKwh: 0.065,
+    renewablePercent: Math.round(financialCarbon.carbonMetrics.renewableEnergyPct),
+    alerts: [], // Will be populated by simulation
+    
+    // Domain Twins
     thermalHardware,
     powerUps,
-    cooling: generateCoolingTwin(),
+    cooling,
     network: generateNetworkTwin(),
     facilitySafety: generateFacilitySafetyTwin(),
     workloadGpu: generateWorkloadGpuTwin(),
     sovereignty: generateSovereigntyTwin(),
-    financialCarbon: generateFinancialCarbonTwin(),
+    financialCarbon,
     createdAt: new Date(),
     updatedAt: new Date(),
   };

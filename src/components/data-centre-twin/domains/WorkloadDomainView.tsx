@@ -5,7 +5,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Cpu, Clock, Users, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Cpu, Clock, Users, AlertTriangle } from 'lucide-react';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 interface WorkloadDomainViewProps {
@@ -13,9 +13,11 @@ interface WorkloadDomainViewProps {
 }
 
 export function WorkloadDomainView({ facility }: WorkloadDomainViewProps) {
-  const totalGpus = facility.gpuClusters.reduce((acc, c) => acc + c.totalGpus, 0);
-  const avgUtilization = facility.gpuClusters.reduce((acc, c) => acc + c.utilizationPercent, 0) / facility.gpuClusters.length;
-  const totalQueueDepth = facility.gpuClusters.reduce((acc, c) => acc + c.queueDepth, 0);
+  const workloadTwin = facility.workloadGpu;
+  const gpuClusters = workloadTwin.clusters;
+  const totalGpus = workloadTwin.kpis.totalGpuCount;
+  const avgUtilization = workloadTwin.kpis.avgGpuUtilization;
+  const totalQueueDepth = workloadTwin.kpis.queueDepth;
   
   return (
     <div className="space-y-6">
@@ -40,8 +42,8 @@ export function WorkloadDomainView({ facility }: WorkloadDomainViewProps) {
           icon={Clock}
         />
         <MetricCard
-          title="Active Tenants"
-          value="12"
+          title="Active Jobs"
+          value={`${workloadTwin.activeJobs.length}`}
           status="good"
           icon={Users}
         />
@@ -54,14 +56,14 @@ export function WorkloadDomainView({ facility }: WorkloadDomainViewProps) {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2">
-            {facility.gpuClusters.map((cluster) => (
+            {gpuClusters.map((cluster) => (
               <div key={cluster.id} className="p-4 rounded-lg bg-muted/30 border">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h4 className="font-medium">{cluster.id}</h4>
-                    <p className="text-xs text-muted-foreground">{cluster.gpuModel}</p>
+                    <h4 className="font-medium">{cluster.name}</h4>
+                    <p className="text-xs text-muted-foreground">{cluster.nodes[0]?.gpuModel || 'GPU'}</p>
                   </div>
-                  <Badge variant={cluster.status === 'operational' ? 'default' : 'secondary'}>
+                  <Badge variant="default">
                     {cluster.totalGpus} GPUs
                   </Badge>
                 </div>
@@ -70,38 +72,27 @@ export function WorkloadDomainView({ facility }: WorkloadDomainViewProps) {
                   <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span>Utilization</span>
-                      <span className="font-medium">{cluster.utilizationPercent}%</span>
+                      <span className="font-medium">{cluster.avgUtilization.toFixed(0)}%</span>
                     </div>
-                    <Progress value={cluster.utilizationPercent} className="h-3" />
+                    <Progress value={cluster.avgUtilization} className="h-3" />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <div className="p-2 rounded bg-background">
-                      <p className="text-muted-foreground">Avg GPU Temp</p>
-                      <p className="font-medium text-lg">{cluster.avgGpuTempC}°C</p>
+                      <p className="text-muted-foreground">Active GPUs</p>
+                      <p className="font-medium text-lg">{cluster.activeGpus}</p>
                     </div>
                     <div className="p-2 rounded bg-background">
-                      <p className="text-muted-foreground">Power Draw</p>
-                      <p className="font-medium text-lg">{cluster.powerDrawKw} kW</p>
+                      <p className="text-muted-foreground">Workload</p>
+                      <p className="font-medium text-lg capitalize">{cluster.workloadType}</p>
                     </div>
                     <div className="p-2 rounded bg-background">
-                      <p className="text-muted-foreground">Queue Depth</p>
-                      <p className="font-medium text-lg">{cluster.queueDepth} jobs</p>
+                      <p className="text-muted-foreground">Scheduler</p>
+                      <p className="font-medium text-lg capitalize">{cluster.scheduler}</p>
                     </div>
                     <div className="p-2 rounded bg-background">
-                      <p className="text-muted-foreground">Avg Wait</p>
-                      <p className="font-medium text-lg">{cluster.avgQueueTimeMin} min</p>
-                    </div>
-                  </div>
-                  
-                  <div className="pt-3 border-t">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-muted-foreground">Training</span>
-                      <span>{cluster.trainingJobsActive} active</span>
-                    </div>
-                    <div className="flex justify-between text-xs mt-1">
-                      <span className="text-muted-foreground">Inference</span>
-                      <span>{cluster.inferenceJobsActive} active</span>
+                      <p className="text-muted-foreground">Region</p>
+                      <p className="font-medium text-lg">{cluster.region}</p>
                     </div>
                   </div>
                 </div>
@@ -125,7 +116,7 @@ export function WorkloadDomainView({ facility }: WorkloadDomainViewProps) {
                   <span>Training Jobs</span>
                 </div>
                 <span className="font-bold">
-                  {facility.gpuClusters.reduce((acc, c) => acc + c.trainingJobsActive, 0)}
+                  {workloadTwin.activeJobs.filter(j => j.type === 'training').length}
                 </span>
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
@@ -134,7 +125,7 @@ export function WorkloadDomainView({ facility }: WorkloadDomainViewProps) {
                   <span>Inference Jobs</span>
                 </div>
                 <span className="font-bold">
-                  {facility.gpuClusters.reduce((acc, c) => acc + c.inferenceJobsActive, 0)}
+                  {workloadTwin.activeJobs.filter(j => j.type === 'inference').length}
                 </span>
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
@@ -142,7 +133,7 @@ export function WorkloadDomainView({ facility }: WorkloadDomainViewProps) {
                   <div className="w-3 h-3 rounded-full bg-yellow-500" />
                   <span>Queued Jobs</span>
                 </div>
-                <span className="font-bold">{totalQueueDepth}</span>
+                <span className="font-bold">{workloadTwin.queuedJobs.length}</span>
               </div>
             </div>
           </CardContent>
@@ -157,21 +148,23 @@ export function WorkloadDomainView({ facility }: WorkloadDomainViewProps) {
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>GPU Fairness Index</span>
-                  <span className="font-medium text-green-500">0.94</span>
+                  <span className="font-medium text-green-500">{workloadTwin.kpis.gpuFairnessIndex.toFixed(2)}</span>
                 </div>
-                <Progress value={94} className="h-2" />
+                <Progress value={workloadTwin.kpis.gpuFairnessIndex} className="h-2" />
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>SLA Compliance</span>
-                  <span className="font-medium text-green-500">99.2%</span>
+                  <span className="font-medium text-green-500">{(100 - workloadTwin.kpis.slaBreachRate).toFixed(1)}%</span>
                 </div>
-                <Progress value={99.2} className="h-2" />
+                <Progress value={100 - workloadTwin.kpis.slaBreachRate} className="h-2" />
               </div>
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-500/10 text-yellow-600 text-sm">
-                <AlertTriangle className="h-4 w-4" />
-                <span>2 jobs approaching SLA breach</span>
-              </div>
+              {workloadTwin.kpis.slaBreachRate > 0 && (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-500/10 text-yellow-600 text-sm">
+                  <AlertTriangle className="h-4 w-4" />
+                  <span>{workloadTwin.activeJobs.filter(j => j.slaBreached).length} jobs at risk of SLA breach</span>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -186,19 +179,19 @@ export function WorkloadDomainView({ facility }: WorkloadDomainViewProps) {
           <div className="grid gap-4 md:grid-cols-4">
             <div className="p-4 rounded-lg bg-muted/30 text-center">
               <p className="text-xs text-muted-foreground mb-1">Cost per GPU-hour</p>
-              <p className="text-2xl font-bold">${(facility.costPerKwh * facility.pue * 0.5).toFixed(2)}</p>
+              <p className="text-2xl font-bold">${workloadTwin.kpis.costPerGpuHour.toFixed(2)}</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/30 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Daily Compute Cost</p>
-              <p className="text-2xl font-bold">${Math.round(facility.currentPowerDrawKw * 24 * facility.costPerKwh)}</p>
+              <p className="text-xs text-muted-foreground mb-1">Avg Queue Time</p>
+              <p className="text-2xl font-bold">{workloadTwin.kpis.avgQueueTimeMinutes.toFixed(0)} min</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/30 text-center">
-              <p className="text-xs text-muted-foreground mb-1">$/TFLOP</p>
-              <p className="text-2xl font-bold">$0.0012</p>
+              <p className="text-xs text-muted-foreground mb-1">Training Throughput</p>
+              <p className="text-2xl font-bold">{(workloadTwin.kpis.trainingThroughput / 1000).toFixed(1)}K tok/s</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/30 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Efficiency Score</p>
-              <p className="text-2xl font-bold text-green-500">A+</p>
+              <p className="text-xs text-muted-foreground mb-1">Inference Throughput</p>
+              <p className="text-2xl font-bold">{workloadTwin.kpis.inferenceThroughput.toFixed(0)} req/s</p>
             </div>
           </div>
         </CardContent>

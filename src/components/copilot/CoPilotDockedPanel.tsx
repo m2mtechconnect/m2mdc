@@ -130,10 +130,28 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
           )}
 
           {messages.length === 0 && !isStreaming && (
-            <div className="text-center py-12 text-muted-foreground">
-              <Sparkles className="h-12 w-12 mx-auto mb-4 text-primary/50" />
-              <p className="text-sm">Ask me anything about your agents, workflows, or the platform.</p>
-              <p className="text-xs mt-2">Try: "How do I add a workflow?" or "Generate a simulation"</p>
+            <div className="text-center py-8 text-muted-foreground">
+              <Sparkles className="h-10 w-10 mx-auto mb-3 text-primary/50" />
+              <p className="text-sm mb-3">Ask me about your data centre operations.</p>
+              <div className="space-y-2 text-left max-w-xs mx-auto">
+                {[
+                  { label: 'Cooling adequacy', query: 'Is cooling adequate for current GPU load?' },
+                  { label: 'Thermal hotspots', query: 'Identify thermal hotspots in the data center.' },
+                  { label: 'Carbon impact', query: 'What is the carbon impact today?' },
+                  { label: 'Sovereignty routing', query: 'Has sovereignty routing failed recently?' },
+                  { label: 'PUE drift prediction', query: 'Predict next PUE drift event.' },
+                  { label: 'Reduce power draw', query: 'How can we reduce power draw?' },
+                ].map((suggestion) => (
+                  <button
+                    key={suggestion.label}
+                    type="button"
+                    onClick={() => handleFollowUp(suggestion.query)}
+                    className="w-full text-xs px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground transition-all text-left"
+                  >
+                    {suggestion.label}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 

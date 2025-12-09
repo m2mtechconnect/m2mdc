@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
 import { useBlueprintStore } from '@/stores/blueprintStore';
 import { validateBuilderForDeploy, ValidationResult } from '@/lib/validation/builderValidation';
 import { SimulationDashboard } from '@/components/builder/step5/SimulationDashboard';
 import { loadTemplateById } from '@/lib/templates/unifiedTemplateService';
+import { DCFacilityMap } from '@/components/dc-ui/DCFacilityMap';
+import { DCCard } from '@/components/dc-ui/DCCard';
 
 export function Step5Simulation() {
   const {
@@ -26,6 +29,8 @@ export function Step5Simulation() {
   const [isValidating, setIsValidating] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
   const [template, setTemplate] = useState<any>(null);
+  const [selectedRackId, setSelectedRackId] = useState<string | undefined>();
+  const [activeView, setActiveView] = useState<'simulation' | 'facility'>('simulation');
   const navigate = useNavigate();
 
   // Load template if available
@@ -87,31 +92,52 @@ export function Step5Simulation() {
         </div>
       )}
 
-      {/* Simulation Dashboard */}
-      <div className="flex-1 min-h-0">
-        <SimulationDashboard
-          template={template}
-          builderState={{
-            name: currentBlueprint?.name || goal,
-            goal,
-            industry,
-            department,
-            type,
-            workflow,
-            modelConfig,
-            config: {
-              workflows: workflow?.actions ? [{ 
-                id: 'workflow-1',
-                name: 'Primary Workflow',
-                actions: workflow.actions 
-              }] : []
-            }
-          }}
-          mode="builder"
-          onDeploy={handleDeploy}
-          isDeploying={isDeploying}
-        />
-      </div>
+      {/* View Toggle */}
+      <Tabs value={activeView} onValueChange={(v) => setActiveView(v as 'simulation' | 'facility')} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 bg-dc-surface">
+          <TabsTrigger value="simulation">Simulation Dashboard</TabsTrigger>
+          <TabsTrigger value="facility" className="flex items-center gap-2">
+            <Map className="h-4 w-4" />
+            Facility Map
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="simulation" className="mt-4">
+          <div className="flex-1 min-h-0">
+            <SimulationDashboard
+              template={template}
+              builderState={{
+                name: currentBlueprint?.name || goal,
+                goal,
+                industry,
+                department,
+                type,
+                workflow,
+                modelConfig,
+                config: {
+                  workflows: workflow?.actions ? [{ 
+                    id: 'workflow-1',
+                    name: 'Primary Workflow',
+                    actions: workflow.actions 
+                  }] : []
+                }
+              }}
+              mode="builder"
+              onDeploy={handleDeploy}
+              isDeploying={isDeploying}
+            />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="facility" className="mt-4">
+          <DCCard title="Data Centre Facility Map" subtitle="Visual rack heatmap and zone layout" icon={<Map className="h-4 w-4" />}>
+            <DCFacilityMap 
+              selectedRackId={selectedRackId}
+              onRackSelect={(rackId) => setSelectedRackId(rackId)}
+            />
+          </DCCard>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

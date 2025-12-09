@@ -18,3 +18,9 @@ export type { RackServer, RackData } from './DCRackVisualization';
 export { DCSearchBar } from './DCSearchBar';
 export { DCEventTimeline } from './DCEventTimeline';
 export { DCSimulationControls } from './DCSimulationControls';
+
+// New DC-specific components
+export { DCFacilityMap } from './DCFacilityMap';
+export { DCQuickChips, DC_QUICK_CHIPS } from './DCQuickChips';
+export type { DCQuickChip } from './DCQuickChips';
+export { DCArchitectureDiagram } from './DCArchitectureDiagram';

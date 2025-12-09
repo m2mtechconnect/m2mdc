@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Shield,
   AlertTriangle,
@@ -9,155 +10,115 @@ import {
   Eye,
   GitBranch,
   Target,
-  Sparkles,
-  Brain,
-  Wrench,
-  AlertOctagon,
-  BookOpen,
-  ExternalLink,
+  Thermometer,
+  Zap,
+  Globe,
+  Server,
+  Activity,
 } from "lucide-react";
 import { useState } from "react";
 import { DecisionReplayModal } from "@/components/rag/DecisionReplayModal";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
-import { DCKPITile } from "@/components/dc-ui/DCKPITile";
-import { DCStatusBadge } from "@/components/dc-ui/DCStatusBadge";
 
-// AI-specific audit timeline
+// DC-specific audit timeline
 const auditTimeline = [
   {
     time: "09:41 AM",
-    eventType: "Tool Invocation",
-    action: "Salesforce CRM Update",
-    system: "Sales Agent",
+    eventType: "Sovereignty Check",
+    action: "Data Routing Verified",
+    system: "Thermal Guardian",
     risk: "Low",
-    details: "Successfully updated 3 customer records via Salesforce API",
+    details: "All workload data confirmed within Canadian jurisdiction",
     decisionPath: true,
   },
   {
     time: "10:15 AM",
-    eventType: "RAG Retrieval",
-    action: "Low Confidence Warning",
-    system: "Customer Support Twin",
+    eventType: "Thermal Alert",
+    action: "Zone Temperature Warning",
+    system: "Thermal Guardian",
     risk: "Medium",
-    details: "Query returned confidence score of 62% - Response blocked by safety filter",
+    details: "Hot Aisle B exceeded 28°C threshold - cooling boost activated",
     decisionPath: true,
   },
   {
     time: "11:30 AM",
-    eventType: "Human Approval",
-    action: "Checkpoint Triggered",
-    system: "Finance Report Agent",
+    eventType: "Power Event",
+    action: "UPS Battery Check",
+    system: "Power Stability Monitor",
     risk: "Low",
-    details: "Workflow paused for human review before sending quarterly report",
+    details: "Scheduled battery health assessment completed - 98% capacity",
     decisionPath: true,
   },
   {
     time: "01:45 PM",
-    eventType: "Safety Block",
-    action: "Policy Violation Detected",
-    system: "Marketing Campaign Agent",
+    eventType: "Compliance Violation",
+    action: "Sovereignty Routing Alert",
+    system: "Sovereignty Sentinel",
     risk: "High",
-    details: "Attempted to send email to unverified contacts - Action blocked",
+    details: "Attempted data transfer to non-sovereign region blocked",
     decisionPath: true,
   },
   {
     time: "02:30 PM",
-    eventType: "MCP Server Call",
-    action: "GitHub Integration",
-    system: "DevOps Twin",
+    eventType: "Workload Optimization",
+    action: "GPU Cluster Rebalance",
+    system: "Workload Orchestrator",
     risk: "Low",
-    details: "Created 2 pull requests and updated 5 issues via GitHub MCP",
+    details: "Redistributed training jobs across 4 GPU clusters for efficiency",
     decisionPath: true,
   },
   {
     time: "03:20 PM",
-    eventType: "Drift Alert",
-    action: "Behavior Change Detected",
-    system: "Inventory Optimization Agent",
+    eventType: "PUE Drift",
+    action: "Efficiency Alert",
+    system: "Cooling Optimization Agent",
     risk: "Medium",
-    details: "Agent output pattern deviates 18% from baseline - Review recommended",
+    details: "PUE increased to 1.42 - investigating cooling inefficiency",
     decisionPath: true,
   },
 ];
 
-// AI-specific risk categories
-const aiRiskCategories = [
+// DC-specific risk categories
+const dcRiskCategories = [
   { 
-    name: "Hallucination Risk", 
-    score: 92, 
-    issues: 2, 
-    trend: "down",
-    lastIssue: "Low confidence response blocked",
-    description: "Risk of AI generating unfaithful or ungrounded responses"
+    name: "Sovereign Compliance Score", 
+    score: 98, 
+    issues: 1, 
+    trend: "up",
+    lastIssue: "Routing violation blocked",
+    description: "Data residency and sovereignty compliance across all workloads"
   },
   { 
-    name: "Incorrect Action Risk", 
-    score: 96, 
+    name: "Thermal Safety Events", 
+    score: 94, 
+    issues: 3, 
+    trend: "down",
+    lastIssue: "Zone B temperature spike",
+    description: "Thermal threshold violations and cooling efficiency"
+  },
+  { 
+    name: "Power/UPS Stability", 
+    score: 99, 
     issues: 0, 
     trend: "neutral",
     lastIssue: "None in 30 days",
-    description: "Risk of agent performing wrong tool invocations or API calls"
+    description: "Power redundancy and UPS health status"
   },
   { 
-    name: "Automation Drift Risk", 
-    score: 88, 
-    issues: 3, 
+    name: "Policy Violations", 
+    score: 96, 
+    issues: 2, 
     trend: "up",
-    lastIssue: "Output pattern deviation detected",
-    description: "Risk of agent behavior changing unexpectedly over time"
+    lastIssue: "Workload scheduling policy",
+    description: "Operational policy and SLA compliance"
   },
   { 
-    name: "Data Exposure Risk", 
-    score: 98, 
-    issues: 0, 
-    trend: "neutral",
-    lastIssue: "None in 90 days",
-    description: "Risk of sensitive data leaking through responses or logs"
-  },
-  { 
-    name: "Tool Misuse Risk", 
-    score: 94, 
+    name: "Carbon Target Compliance", 
+    score: 92, 
     issues: 1, 
     trend: "down",
-    lastIssue: "Unauthorized API scope attempted",
-    description: "Risk of tools/MCP servers being invoked incorrectly or unsafely"
-  },
-];
-
-// RAG citation data
-const ragCitations = [
-  {
-    query: "Customer refund policy Canada",
-    docs: 3,
-    fidelity: 95,
-    model: "gemini-2.5-pro",
-    confidence: 98,
-    sources: ["refund-policy-2024.pdf", "customer-service-guide.docx", "legal-terms.pdf"],
-  },
-  {
-    query: "Product pricing tier comparison",
-    docs: 5,
-    fidelity: 88,
-    model: "gpt-5-mini",
-    confidence: 92,
-    sources: ["pricing-sheet-q4.xlsx", "competitor-analysis.pdf", "product-catalog.pdf"],
-  },
-  {
-    query: "Supply chain lead times Asia",
-    docs: 2,
-    fidelity: 93,
-    model: "gemini-2.5-flash",
-    confidence: 89,
-    sources: ["logistics-data-2024.csv", "supplier-contracts.pdf"],
-  },
-  {
-    query: "Compliance requirements GDPR",
-    docs: 4,
-    fidelity: 97,
-    model: "gpt-5",
-    confidence: 99,
-    sources: ["gdpr-guide.pdf", "legal-compliance.docx", "privacy-policy.pdf", "audit-log-2024.xlsx"],
+    lastIssue: "Monthly emissions exceeded target",
+    description: "Carbon emissions against sustainability targets"
   },
 ];
 
@@ -171,13 +132,7 @@ export default function Compliance() {
   };
 
   const handleRiskClick = (riskName: string) => {
-    // Navigate to detailed risk analysis
     console.log("View risk details:", riskName);
-  };
-
-  const handleCitationClick = (sources: string[]) => {
-    // Navigate to document context
-    console.log("View sources:", sources);
   };
 
   return (
@@ -192,77 +147,80 @@ export default function Compliance() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-4xl font-display font-bold mb-2 text-gradient-hero">
-                Compliance & Audit
+              <h1 className="text-2xl font-semibold mb-2 flex items-center gap-3">
+                <Shield className="h-6 w-6 text-primary" />
+                Sovereignty & Safety Audit
               </h1>
-              <p className="text-muted-foreground text-lg">
-                AI Governance, Explainability, and Decision Transparency
+              <p className="text-muted-foreground">
+                Data Centre compliance, thermal safety, and operational governance
               </p>
             </div>
+            <Button variant="outline">
+              <Download className="h-4 w-4 mr-2" />
+              Export Audit Report
+            </Button>
           </div>
 
-          {/* A. Compliance Summary - AI-Specific KPIs */}
+          {/* DC-Specific KPIs */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <DCKPITile
-              label="Explainability Score"
-              value="96"
-              unit="%"
-              status="normal"
-              trend="up"
-              delta="+2.3%"
-              icon={<Brain className="h-5 w-5" />}
-            />
-            <DCKPITile
-              label="RAG Grounding Fidelity"
-              value="93"
-              unit="%"
-              status="normal"
-              trend="up"
-              delta="+1.8%"
-              icon={<BookOpen className="h-5 w-5" />}
-            />
-            <DCKPITile
-              label="Tool Accuracy"
-              value="97"
-              unit="%"
-              status="normal"
-              trend="stable"
-              icon={<Wrench className="h-5 w-5" />}
-            />
-            <DCKPITile
-              label="Safety Events"
-              value="6"
-              subtitle="Last 30 days"
-              status="warning"
-              trend="down"
-              delta="-3"
-              icon={<AlertOctagon className="h-5 w-5" />}
-            />
+            <Card className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Globe className="h-4 w-4 text-blue-500" />
+                <span className="text-xs text-muted-foreground uppercase">Sovereign Compliance</span>
+              </div>
+              <div className="text-2xl font-bold">98%</div>
+              <div className="text-xs text-green-600">+1.2% this month</div>
+            </Card>
+            
+            <Card className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Thermometer className="h-4 w-4 text-orange-500" />
+                <span className="text-xs text-muted-foreground uppercase">Thermal Safety</span>
+              </div>
+              <div className="text-2xl font-bold">3</div>
+              <div className="text-xs text-amber-600">Events this week</div>
+            </Card>
+            
+            <Card className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="h-4 w-4 text-yellow-500" />
+                <span className="text-xs text-muted-foreground uppercase">Power Warnings</span>
+              </div>
+              <div className="text-2xl font-bold">0</div>
+              <div className="text-xs text-green-600">All systems nominal</div>
+            </Card>
+            
+            <Card className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="h-4 w-4 text-red-500" />
+                <span className="text-xs text-muted-foreground uppercase">Policy Violations</span>
+              </div>
+              <div className="text-2xl font-bold">2</div>
+              <div className="text-xs text-muted-foreground">Last 30 days</div>
+            </Card>
           </div>
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* B. Audit Timeline - Left Column (2/3 width) */}
+            {/* Audit Timeline */}
             <div className="lg:col-span-2 space-y-6">
-              <DCCard
-                title="Audit Timeline"
-                subtitle="Chronological view of agent executions, safety events, and tool calls"
-                icon={<Clock className="h-5 w-5" />}
-                status="operational"
-                headerAction={
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" size="sm">
-                        <Clock className="h-4 w-4 mr-2" />
-                        Last 24h
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Filter events by time range</p>
-                    </TooltipContent>
-                  </Tooltip>
-                }
-              >
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Clock className="h-5 w-5" />
+                      Audit Timeline
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Subsystem events, safety checks, and compliance actions
+                    </p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    <Clock className="h-4 w-4 mr-2" />
+                    Last 24h
+                  </Button>
+                </CardHeader>
+                <CardContent>
                   <div className="space-y-4">
                     {auditTimeline.map((event, idx) => {
                       const isHighRisk = event.risk === "High";
@@ -270,11 +228,11 @@ export default function Compliance() {
                       return (
                         <div
                           key={idx}
-                          className={`p-4 rounded-lg border transition-smooth hover:border-secondary/50 cursor-pointer ${
+                          className={`p-4 rounded-lg border transition-colors hover:bg-muted/50 cursor-pointer ${
                             isHighRisk
                               ? "border-destructive/50 bg-destructive/5"
                               : isMediumRisk
-                              ? "border-primary/30 bg-primary/5"
+                              ? "border-amber-500/30 bg-amber-500/5"
                               : "border-border"
                           }`}
                           onClick={() => handleReplayOpen(event.details)}
@@ -284,7 +242,7 @@ export default function Compliance() {
                               <div className="flex flex-col items-center">
                                 <div
                                   className={`h-2 w-2 rounded-full ${
-                                    isHighRisk ? "bg-destructive" : isMediumRisk ? "bg-primary" : "bg-secondary"
+                                    isHighRisk ? "bg-destructive" : isMediumRisk ? "bg-amber-500" : "bg-green-500"
                                   }`}
                                 />
                                 {idx < auditTimeline.length - 1 && (
@@ -301,8 +259,8 @@ export default function Compliance() {
                                     variant={isHighRisk ? "destructive" : "outline"}
                                     className={`text-xs ${
                                       !isHighRisk && isMediumRisk
-                                        ? "border-primary text-primary"
-                                        : !isHighRisk ? "border-secondary text-secondary" : ""
+                                        ? "border-amber-500 text-amber-600"
+                                        : !isHighRisk ? "border-green-500 text-green-600" : ""
                                     }`}
                                   >
                                     {event.risk} Risk
@@ -319,44 +277,18 @@ export default function Compliance() {
                           </div>
                           <p className="text-sm pl-7 mb-3">{event.details}</p>
                           <div className="flex gap-2 pl-7">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-8"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleReplayOpen(event.details);
-                                  }}
-                                >
-                                  <Eye className="h-3 w-3 mr-2" />
-                                  View Details
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>View full event details and context</p>
-                              </TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-8"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleReplayOpen(event.details);
-                                  }}
-                                >
-                                  <GitBranch className="h-3 w-3 mr-2" />
-                                  Decision Replay
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Replay the full reasoning and action sequence</p>
-                              </TooltipContent>
-                            </Tooltip>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleReplayOpen(event.details);
+                              }}
+                            >
+                              <Eye className="h-3 w-3 mr-2" />
+                              View Details
+                            </Button>
                           </div>
                         </div>
                       );
@@ -368,26 +300,32 @@ export default function Compliance() {
                       Load More History
                     </Button>
                   </div>
-                </DCCard>
+                </CardContent>
+              </Card>
             </div>
 
-            {/* Right Column (1/3 width) */}
+            {/* Right Column */}
             <div className="space-y-6">
-              {/* C. Risk Overview - AI-Specific Risks */}
-              <DCCard
-                title="Risk Overview"
-                subtitle="AI-specific risk indicators for reasoning, actions, and tool usage"
-                icon={<Shield className="h-5 w-5" />}
-                status="operational"
-              >
+              {/* Risk Overview */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Risk Overview
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Data Centre operational risk indicators
+                  </p>
+                </CardHeader>
+                <CardContent>
                   <div className="space-y-4">
-                    {aiRiskCategories.map((risk) => {
+                    {dcRiskCategories.map((risk) => {
                       const isHighRisk = risk.score < 90;
                       return (
                         <Tooltip key={risk.name}>
                           <TooltipTrigger asChild>
                             <div 
-                              className="cursor-pointer hover:bg-accent/50 p-3 rounded-lg transition-smooth border border-transparent hover:border-secondary/30"
+                              className="cursor-pointer hover:bg-muted/50 p-3 rounded-lg transition-colors border border-transparent hover:border-border"
                               onClick={() => handleRiskClick(risk.name)}
                             >
                               <div className="flex items-center justify-between mb-2">
@@ -398,8 +336,8 @@ export default function Compliance() {
                                       variant="outline"
                                       className={`text-xs ${
                                         isHighRisk
-                                          ? "border-primary text-primary"
-                                          : "border-secondary text-secondary"
+                                          ? "border-amber-500 text-amber-600"
+                                          : "border-green-500 text-green-600"
                                       }`}
                                     >
                                       {risk.issues > 0 ? `${risk.issues} issues` : "Clean"}
@@ -415,8 +353,8 @@ export default function Compliance() {
                               </div>
                               <div className="h-2 bg-muted rounded-full overflow-hidden">
                                 <div
-                                  className={`h-full transition-smooth ${
-                                    isHighRisk ? "bg-primary" : "bg-secondary"
+                                  className={`h-full transition-all ${
+                                    isHighRisk ? "bg-amber-500" : "bg-green-500"
                                   }`}
                                   style={{ width: `${risk.score}%` }}
                                 />
@@ -430,183 +368,36 @@ export default function Compliance() {
                       );
                     })}
                   </div>
-              </DCCard>
+                </CardContent>
+              </Card>
 
-              {/* D. Decision Replay (Explainability Mode) */}
-              <DCCard
-                title="Decision Replay"
-                subtitle="View full reasoning and action sequences for any agent run"
-                icon={<Sparkles className="h-5 w-5" />}
-                status="operational"
-              >
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => handleReplayOpen("Sample decision replay")}
-                      >
-                        <GitBranch className="h-4 w-4 mr-2" />
-                        Replay Execution
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Open decision replay viewer with reasoning trace, workflow paths, and tool calls</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <div className="mt-4 space-y-2 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Target className="h-3 w-3" />
-                      <span>Reasoning trace</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <GitBranch className="h-3 w-3" />
-                      <span>Workflow paths</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Wrench className="h-3 w-3" />
-                      <span>Tool & MCP calls</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <BookOpen className="h-3 w-3" />
-                      <span>RAG citations</span>
-                    </div>
-                  </div>
-              </DCCard>
-
-              {/* E. RAG Citations */}
-              <DCCard
-                title="RAG Citations"
-                subtitle="Trace responses back to source documents"
-                icon={<BookOpen className="h-5 w-5" />}
-                status="operational"
-              >
-                  <div className="space-y-3">
-                    {ragCitations.map((item, idx) => (
-                      <Tooltip key={idx}>
-                        <TooltipTrigger asChild>
-                          <div
-                            className="p-3 rounded-lg border border-border hover:border-secondary/50 transition-smooth text-sm cursor-pointer"
-                            onClick={() => handleCitationClick(item.sources)}
-                          >
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="font-medium text-xs line-clamp-1">{item.query}</span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 w-6 p-0"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleCitationClick(item.sources);
-                                }}
-                              >
-                                <ExternalLink className="h-3 w-3" />
-                              </Button>
-                            </div>
-                            <div className="flex gap-3 text-xs text-muted-foreground mb-2">
-                              <span>
-                                Docs: <span className="text-foreground font-medium">{item.docs}</span>
-                              </span>
-                              <span>
-                                Fidelity:{" "}
-                                <span className="text-secondary font-semibold">
-                                  {item.fidelity}%
-                                </span>
-                              </span>
-                              <span>
-                                Confidence:{" "}
-                                <span className="text-secondary font-semibold">
-                                  {item.confidence}%
-                                </span>
-                              </span>
-                            </div>
-                            <div className="text-xs font-mono text-muted-foreground">
-                              {item.model}
-                            </div>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent side="left" className="max-w-xs">
-                          <p className="font-semibold mb-2">Source Documents:</p>
-                          <ul className="space-y-1">
-                            {item.sources.map((source, i) => (
-                              <li key={i} className="text-xs">• {source}</li>
-                            ))}
-                          </ul>
-                        </TooltipContent>
-                      </Tooltip>
-                    ))}
-                  </div>
-              </DCCard>
-
-              {/* F. Exportable Compliance Reports */}
-              <DCCard
-                title="Export Reports"
-                subtitle="Download compliance documents for audits and governance"
-                icon={<FileText className="h-5 w-5" />}
-                status="operational"
-              >
-                  <div className="space-y-2">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-full justify-start">
-                          <Download className="h-3 w-3 mr-2" />
-                          Decision Replay Report
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="left">
-                        <p>Detailed reasoning traces and decision paths</p>
-                      </TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-full justify-start">
-                          <Download className="h-3 w-3 mr-2" />
-                          Tool & MCP Invocation Log
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="left">
-                        <p>Complete log of all tool and MCP server calls</p>
-                      </TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-full justify-start">
-                          <Download className="h-3 w-3 mr-2" />
-                          RAG Usage Report
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="left">
-                        <p>RAG fidelity scores, citations, and source documents</p>
-                      </TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-full justify-start">
-                          <Download className="h-3 w-3 mr-2" />
-                          Safety Events Log
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="left">
-                        <p>All safety blocks, policy violations, and risk events</p>
-                      </TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-full justify-start">
-                          <Download className="h-3 w-3 mr-2" />
-                          Drift Analysis Summary
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="left">
-                        <p>Agent behavior changes and pattern deviations</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-              </DCCard>
+              {/* Quick Actions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Compliance Reports
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <Button variant="outline" className="w-full justify-start">
+                    <Download className="h-4 w-4 mr-2" />
+                    Sovereignty Audit Report
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Download className="h-4 w-4 mr-2" />
+                    Thermal Safety Summary
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Download className="h-4 w-4 mr-2" />
+                    Carbon Emissions Report
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Download className="h-4 w-4 mr-2" />
+                    Power Stability Log
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

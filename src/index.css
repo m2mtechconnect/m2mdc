@@ -3,9 +3,8 @@
 @tailwind utilities;
 
 /* ============================================================
-   DATA CENTRE DIGITAL TWIN DESIGN SYSTEM
-   Enterprise-grade NOC / DCIM aesthetic
-   Inspired by: Datadog, Grafana, NVIDIA Base Command, Schneider EcoStruxure
+   DATA CENTRE DIGITAL TWIN STUDIO - DESIGN SYSTEM
+   Light theme global + NOC dark theme for DC-specific modules
    ============================================================ */
 
 @keyframes spin-slow {
@@ -31,71 +30,71 @@
 
 @layer base {
   :root {
-    /* ============ Data Centre Status Palette ============ */
-    --dc-green: 142 76% 36%;          /* Operational / Efficient */
+    /* ============ Data Centre Status Palette (shared) ============ */
+    --dc-green: 142 76% 36%;
     --dc-green-light: 142 76% 46%;
-    --dc-amber: 38 92% 50%;           /* Warning / Approaching limit */
+    --dc-amber: 38 92% 50%;
     --dc-amber-light: 45 93% 47%;
-    --dc-red: 0 84% 60%;              /* Critical / At threshold */
+    --dc-red: 0 84% 60%;
     --dc-red-light: 0 84% 70%;
-    --dc-blue: 210 100% 56%;          /* Sovereign / Compliant / Info */
+    --dc-blue: 210 100% 56%;
     --dc-blue-light: 210 100% 66%;
-    --dc-cyan: 186 100% 42%;          /* Cooling / Network */
-    --dc-purple: 262 83% 58%;         /* GPU / Compute */
+    --dc-cyan: 186 100% 42%;
+    --dc-purple: 262 83% 58%;
     --dc-purple-light: 262 83% 68%;
     
-    /* ============ NOC Dark Theme (Primary) ============ */
-    --noc-bg-deep: 222 47% 5%;        /* Deepest background */
-    --noc-bg: 222 47% 8%;             /* Main background */
-    --noc-surface: 222 40% 11%;       /* Cards, panels */
+    /* ============ NOC Dark Theme Variables (for DC modules) ============ */
+    --noc-bg-deep: 222 47% 5%;
+    --noc-bg: 222 47% 8%;
+    --noc-surface: 222 40% 11%;
     --noc-surface-elevated: 222 35% 14%;
     --noc-border: 222 30% 18%;
     --noc-border-subtle: 222 25% 22%;
     
-    /* ============ Typography ============ */
+    /* ============ Light Theme (Global Default) ============ */
+    --background: 0 0% 98%;
+    --foreground: 222 47% 11%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    
+    --primary: 222 47% 25%;
+    --primary-foreground: 0 0% 98%;
+    
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 11%;
+    
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    
+    --accent: 262 83% 58%;
+    --accent-foreground: 0 0% 98%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 47% 11%;
+    
+    --info: 210 100% 56%;
+    --info-foreground: 0 0% 98%;
+    
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 222 47% 25%;
+    
+    --radius: 0.5rem;
+    
+    /* ============ Text Colors ============ */
     --text-primary: 0 0% 98%;
     --text-secondary: 222 15% 70%;
     --text-muted: 222 10% 50%;
-    
-    /* ============ Semantic Tokens (Dark Mode Default) ============ */
-    --background: var(--noc-bg);
-    --foreground: var(--text-primary);
-    
-    --card: var(--noc-surface);
-    --card-foreground: var(--text-primary);
-    
-    --popover: var(--noc-surface-elevated);
-    --popover-foreground: var(--text-primary);
-    
-    --primary: var(--dc-cyan);
-    --primary-foreground: 222 47% 5%;
-    
-    --secondary: var(--noc-surface-elevated);
-    --secondary-foreground: var(--text-primary);
-    
-    --muted: var(--noc-surface);
-    --muted-foreground: var(--text-secondary);
-    
-    --accent: var(--dc-purple);
-    --accent-foreground: var(--text-primary);
-    
-    --destructive: var(--dc-red);
-    --destructive-foreground: var(--text-primary);
-    
-    --success: var(--dc-green);
-    --success-foreground: var(--text-primary);
-    
-    --warning: var(--dc-amber);
-    --warning-foreground: 222 47% 5%;
-    
-    --info: var(--dc-blue);
-    --info-foreground: var(--text-primary);
-    
-    --border: var(--noc-border);
-    --input: var(--noc-surface-elevated);
-    --ring: var(--dc-cyan);
-    
-    --radius: 0.5rem;
     
     /* ============ DC-Specific Semantic Colors ============ */
     --thermal-hot: var(--dc-red);
@@ -117,7 +116,7 @@
     --gpu-normal: var(--dc-green);
     --gpu-idle: var(--text-muted);
     
-    /* ============ Gradients ============ */
+    /* ============ Gradients (for DC modules) ============ */
     --gradient-noc: linear-gradient(180deg, hsl(var(--noc-bg-deep)) 0%, hsl(var(--noc-bg)) 100%);
     --gradient-card: linear-gradient(135deg, hsl(var(--noc-surface)) 0%, hsl(var(--noc-surface-elevated)) 100%);
     --gradient-thermal: linear-gradient(90deg, hsl(var(--dc-cyan)) 0%, hsl(var(--dc-green)) 25%, hsl(var(--dc-amber)) 75%, hsl(var(--dc-red)) 100%);
@@ -133,8 +132,8 @@
     --glow-purple: 0 0 20px hsla(var(--dc-purple), 0.4);
     --glow-blue: 0 0 20px hsla(var(--dc-blue), 0.4);
     
-    --shadow-card: 0 4px 24px hsla(0, 0%, 0%, 0.3);
-    --shadow-elevated: 0 8px 32px hsla(0, 0%, 0%, 0.4);
+    --shadow-card: 0 1px 3px hsla(0, 0%, 0%, 0.1), 0 1px 2px hsla(0, 0%, 0%, 0.06);
+    --shadow-elevated: 0 4px 6px hsla(0, 0%, 0%, 0.1), 0 2px 4px hsla(0, 0%, 0%, 0.06);
     
     /* ============ Animation Timing ============ */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -145,18 +144,27 @@
     --wizard-bottom-safe-area: 96px;
   }
 
-  /* Light mode (for accessibility/preference) */
-  .light {
-    --background: 0 0% 98%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --muted: 222 20% 94%;
-    --muted-foreground: 222 15% 45%;
-    --border: 222 20% 88%;
-    --input: 222 20% 94%;
+  /* Dark mode (user preference) */
+  .dark {
+    --background: 222 47% 8%;
+    --foreground: 0 0% 98%;
+    --card: 222 40% 11%;
+    --card-foreground: 0 0% 98%;
+    --popover: 222 35% 14%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 186 100% 42%;
+    --primary-foreground: 222 47% 5%;
+    --secondary: 222 35% 14%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 222 40% 11%;
+    --muted-foreground: 222 15% 70%;
+    --accent: 262 83% 58%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 222 30% 18%;
+    --input: 222 35% 14%;
+    --ring: 186 100% 42%;
   }
 }
 
@@ -177,7 +185,7 @@
     font-weight: 400;
   }
 
-  /* Enterprise NOC Typography */
+  /* Typography */
   h1, .text-h1 {
     font-family: 'Inter', sans-serif;
     font-weight: 600;
@@ -213,7 +221,7 @@
 
   /* Focus states for accessibility */
   *:focus-visible {
-    outline: 2px solid hsl(var(--dc-cyan));
+    outline: 2px solid hsl(var(--ring));
     outline-offset: 2px;
   }
 
@@ -221,6 +229,34 @@
   button, a, [role="button"], [role="link"] {
     min-height: 36px;
   }
+}
+
+/* ============================================================
+   NOC DARK THEME - For Data Centre specific modules only
+   Apply .noc-theme class to DC components that need dark styling
+   ============================================================ */
+
+.noc-theme {
+  --background: var(--noc-bg);
+  --foreground: var(--text-primary);
+  --card: var(--noc-surface);
+  --card-foreground: var(--text-primary);
+  --popover: var(--noc-surface-elevated);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--dc-cyan);
+  --primary-foreground: 222 47% 5%;
+  --secondary: var(--noc-surface-elevated);
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--noc-surface);
+  --muted-foreground: var(--text-secondary);
+  --accent: var(--dc-purple);
+  --accent-foreground: var(--text-primary);
+  --border: var(--noc-border);
+  --input: var(--noc-surface-elevated);
+  --ring: var(--dc-cyan);
+  
+  background: hsl(var(--noc-bg));
+  color: hsl(var(--text-primary));
 }
 
 /* ============================================================
@@ -247,7 +283,7 @@
   .border-status-critical { border-color: hsl(var(--dc-red) / 0.3); }
   .border-status-info { border-color: hsl(var(--dc-blue) / 0.3); }
 
-  /* NOC Card styles */
+  /* NOC Card styles (for DC modules only) */
   .noc-card {
     background: hsl(var(--noc-surface));
     border: 1px solid hsl(var(--noc-border));
@@ -287,7 +323,7 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: hsl(var(--text-secondary));
+    color: hsl(var(--muted-foreground));
   }
   
   .kpi-delta {
@@ -300,7 +336,7 @@
   
   .kpi-delta.positive { color: hsl(var(--dc-green)); }
   .kpi-delta.negative { color: hsl(var(--dc-red)); }
-  .kpi-delta.neutral { color: hsl(var(--text-muted)); }
+  .kpi-delta.neutral { color: hsl(var(--muted-foreground)); }
 
   /* Thermal gradient bar */
   .thermal-gradient {
@@ -378,8 +414,15 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+  
+  .text-gradient-hero {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-  /* Background patterns */
+  /* Background patterns (for NOC modules) */
   .bg-grid-pattern {
     background-image: 
       linear-gradient(hsl(var(--noc-border) / 0.3) 1px, transparent 1px),
@@ -417,18 +460,19 @@
   .transition-fast { transition: all var(--transition-fast); }
   .transition-base { transition: all var(--transition-base); }
   .transition-slow { transition: all var(--transition-slow); }
+  .transition-smooth { transition: all var(--transition-base); }
 
   /* Glass morphism */
   .glass-panel {
-    background: hsl(var(--noc-surface) / 0.8);
+    background: hsl(var(--card) / 0.8);
     backdrop-filter: blur(12px);
-    border: 1px solid hsl(var(--noc-border));
+    border: 1px solid hsl(var(--border));
   }
 
   /* Scrollbar styling */
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: hsl(var(--noc-border-subtle)) transparent;
+    scrollbar-color: hsl(var(--border)) transparent;
   }
   
   .scrollbar-thin::-webkit-scrollbar {
@@ -441,7 +485,7 @@
   }
   
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: hsl(var(--noc-border-subtle));
+    background: hsl(var(--border));
     border-radius: 3px;
   }
 
@@ -499,20 +543,23 @@
   .dc-grid {
     display: grid;
     gap: 1rem;
-    grid-template-columns: 1fr;
-  }
-  
-  @media (min-width: 640px) {
-    .dc-grid-2 { grid-template-columns: repeat(2, 1fr); }
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
   
   @media (min-width: 1024px) {
-    .dc-grid-3 { grid-template-columns: repeat(3, 1fr); }
-    .dc-grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .dc-grid {
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+  }
+
+  /* Card gap utility */
+  .gap-card-gap {
+    gap: 1rem;
   }
   
-  @media (min-width: 1280px) {
-    .dc-grid-5 { grid-template-columns: repeat(5, 1fr); }
-    .dc-grid-6 { grid-template-columns: repeat(6, 1fr); }
+  @media (min-width: 768px) {
+    .gap-card-gap {
+      gap: 1.5rem;
+    }
   }
 }

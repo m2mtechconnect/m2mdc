@@ -404,7 +404,32 @@ export default function Compliance() {
                 </CardContent>
               </Card>
 
-              {/* Simulation Stress Test Card */}
+              {/* System Blueprint Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Server className="h-5 w-5" />
+                    System Blueprint
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    View the complete Data Centre configuration and compliance mapping.
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => navigate('/blueprint/default')}
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Blueprint
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download Blueprint JSON
+                  </Button>
+                </CardContent>
+              </Card>
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">

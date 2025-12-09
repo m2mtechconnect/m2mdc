@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Building2, Briefcase, Bot, TrendingUp, Clock, Zap, Info, Target, FileText, Shield, Pencil, RefreshCw, Server, Thermometer, Globe, Cpu, Wind } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,8 +15,10 @@ import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { toast } from 'sonner';
 import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 import { DCKPITile } from '@/components/dc-ui';
+import { BlueprintSnapshotCard } from '@/components/blueprint';
 
 export function Step1Summary() {
+  const navigate = useNavigate();
   const { 
     goal, industry, department, type, template, workflow, modelConfig,
     setGoal, setIndustryDepartment, setType, builderId 
@@ -337,6 +340,12 @@ export function Step1Summary() {
           </div>
         </div>
       </DCCard>
+
+      {/* Blueprint Snapshot */}
+      <BlueprintSnapshotCard 
+        twinId="default"
+        onOpenFullBlueprint={() => window.open('/blueprint/default', '_blank')}
+      />
 
       {/* Actions */}
       <DCCard className="bg-dc-surface/50">

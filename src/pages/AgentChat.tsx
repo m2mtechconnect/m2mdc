@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -14,6 +13,7 @@ import { CustomQuestionsManager } from "@/components/agent-chat/CustomQuestionsM
 import { TypingIndicator } from "@/components/ui/typing-indicator";
 import { format } from "date-fns";
 import { ConversationHistory } from "@/components/agent-chat/ConversationHistory";
+import { DCCard } from "@/components/dc-ui";
 import {
   Sheet,
   SheetContent,
@@ -394,8 +394,8 @@ When asked "what do you do" or similar, give a concise outline of your capabilit
         ) : agent ? (
           <div className="space-y-3">
             {/* Agent Header Card */}
-            <Card className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/10">
-              <div className="flex items-start justify-between gap-4">
+            <DCCard className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/10" noPadding>
+              <div className="p-4 flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -428,7 +428,7 @@ When asked "what do you do" or similar, give a concise outline of your capabilit
               </div>
 
               {/* Quick Actions */}
-              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
+              <div className="flex items-center gap-2 mt-3 pt-3 px-4 pb-4 border-t border-border/50">
                 <Collapsible open={aboutOpen} onOpenChange={setAboutOpen}>
                   <CollapsibleTrigger asChild>
                     <Button variant="ghost" size="sm" className="h-8 text-xs gap-2">
@@ -466,7 +466,7 @@ When asked "what do you do" or similar, give a concise outline of your capabilit
 
               {/* Collapsible Content */}
               <Collapsible open={aboutOpen} onOpenChange={setAboutOpen}>
-                <CollapsibleContent className="mt-3">
+                <CollapsibleContent className="mt-3 px-4 pb-4">
                   <div className="p-3 rounded-lg bg-background/50 border space-y-3 text-sm">
                     <div className="grid grid-cols-2 gap-3">
                       <div>
@@ -489,16 +489,16 @@ When asked "what do you do" or similar, give a concise outline of your capabilit
                   </div>
                 </CollapsibleContent>
               </Collapsible>
-            </Card>
+            </DCCard>
 
             {/* Draft Warning */}
             {agent.status === 'draft' && (
-              <Card className="p-3 bg-amber-500/5 border-amber-500/20">
-                <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-2">
+              <DCCard status="warning" className="bg-amber-500/5 border-amber-500/20" noPadding>
+                <p className="p-3 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-2">
                   <Info className="h-3 w-3" />
                   This agent is in draft mode. Deploy it to enable full functionality.
                 </p>
-              </Card>
+              </DCCard>
             )}
           </div>
         ) : (
@@ -509,7 +509,7 @@ When asked "what do you do" or similar, give a concise outline of your capabilit
         )}
       </div>
 
-      <Card className="flex-1 flex flex-col overflow-hidden shadow-lg">
+      <DCCard className="flex-1 flex flex-col overflow-hidden shadow-lg" noPadding>
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.length === 0 && agent && (
             <div className="text-center py-8 md:py-12 space-y-6">
@@ -648,7 +648,7 @@ When asked "what do you do" or similar, give a concise outline of your capabilit
             </div>
           </div>
         </div>
-      </Card>
+      </DCCard>
     </div>
   );
 }

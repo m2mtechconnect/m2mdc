@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, Bot } from 'lucide-react';
@@ -46,6 +47,7 @@ export function AgentsGrid({
   onRetry,
   mode = 'manage',
 }: AgentsGridProps) {
+  const navigate = useNavigate();
   const [filters, setFilters] = useState<StandardFiltersState>({
     searchQuery: '',
     industryFilter: 'all',
@@ -63,6 +65,11 @@ export function AgentsGrid({
   const handleTestScenario = (agent: Agent) => {
     setSelectedAgentForScenario(agent);
     setScenarioModalOpen(true);
+  };
+
+  const handleViewBlueprint = (agent: Agent) => {
+    // Navigate to blueprint page with agents tab and agent highlighted
+    navigate(`/blueprint/default?tab=agents&highlight=${agent.id}`);
   };
 
   // Apply filters
@@ -222,6 +229,7 @@ export function AgentsGrid({
               onManage={() => onManage(agent)}
               onDelete={onDelete ? () => onDelete(agent) : undefined}
               onTestScenario={() => handleTestScenario(agent)}
+              onViewBlueprint={() => handleViewBlueprint(agent)}
               animationDelay={index * 30}
             />
           );

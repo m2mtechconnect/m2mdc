@@ -21,10 +21,14 @@ export interface TwinContext {
   currentTab: string;
   mockDataEnabled: boolean;
   blueprint?: {
+    name?: string;
     agents: string[];
     dataSources: string[];
     integrations: string[];
     workflowCount: number;
+    kpiCount: number;
+    scenarioCount: number;
+    humanRoles: string[];
   };
   kpis?: {
     definitions: any[];

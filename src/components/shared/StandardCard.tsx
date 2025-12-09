@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, Download, TrendingUp, Eye, Play, Settings, Trash2, Activity, Clock, Shield, Beaker } from 'lucide-react';
+import { Star, Download, TrendingUp, Eye, Play, Settings, Trash2, Activity, Clock, Shield, Beaker, FileText } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -52,6 +52,7 @@ interface StandardCardProps {
   onManage?: () => void;
   onDelete?: () => void;
   onTestScenario?: () => void;
+  onViewBlueprint?: () => void;
   animationDelay?: number;
   showActions?: boolean;
 }
@@ -65,6 +66,7 @@ export function StandardCard({
   onManage,
   onDelete,
   onTestScenario,
+  onViewBlueprint,
   animationDelay = 0,
   showActions = true,
 }: StandardCardProps) {
@@ -483,6 +485,25 @@ export function StandardCard({
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Test Scenario</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+                {onViewBlueprint && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={onViewBlueprint}
+                          className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        >
+                          <FileText className="h-3 w-3" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>View in Blueprint</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

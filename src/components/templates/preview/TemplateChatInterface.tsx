@@ -133,10 +133,14 @@ export function TemplateChatInterface({
         
         // Blueprint summary
         blueprint: {
+          name: blueprintJson.name || template.name,
           agents: blueprintJson.agents?.map((a: any) => a.name) || [],
           dataSources: blueprintJson.data_sources?.map((d: any) => d.name) || [],
           integrations: blueprintJson.integrations?.map((i: any) => i.name) || [],
           workflowCount: (config.workflows || []).length,
+          kpiCount: (kpiBlock.kpis || []).length,
+          scenarioCount: blueprintJson.simulation_scenarios?.length || 0,
+          humanRoles: blueprintJson.human_roles?.map((r: any) => r.name) || [],
         },
         
         // KPIs with current values from mock data

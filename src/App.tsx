@@ -38,6 +38,7 @@ import FundingIntakeDemo from "./pages/FundingIntakeDemo";
 import ManageAgents from "./pages/ManageAgents";
 import SystemManage from "./pages/SystemManage";
 import TwinManage from "./pages/TwinManage";
+import DataCentreTwin from "./pages/DataCentreTwin";
 import Profile from "./pages/account/Profile";
 import Settings from "./pages/account/Settings";
 import AccessControl from "./pages/account/AccessControl";
@@ -151,6 +152,8 @@ function AuthenticatedApp() {
         <Route path="/auth" element={<Navigate to="/" replace />} />
         <Route path="/playbook" element={<Playbook />} />
         <Route path="/pilot" element={<Pilot />} />
+        {/* Data Centre Twin */}
+        <Route path="/data-centre-twin" element={<DataCentreTwin />} />
         {/* Redirect old digital-twins routes to dashboard */}
         <Route path="/digital-twins" element={<Navigate to="/" replace />} />
         <Route path="/digital-twins/:slug" element={<Navigate to="/" replace />} />

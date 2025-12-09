@@ -48,6 +48,31 @@ export interface Alert {
   resolvedAt?: Date;
 }
 
+// Facility Alert for UI display
+export interface FacilityAlert {
+  id: string;
+  title: string;
+  description: string;
+  severity: 'critical' | 'warning' | 'info';
+  domain: DomainType;
+  status: 'active' | 'acknowledged' | 'resolved';
+  triggeredAt: Date;
+  acknowledgedAt?: Date;
+  resolvedAt?: Date;
+}
+
+// KPI Value for display
+export interface KPIValue {
+  key: string;
+  name: string;
+  value: number;
+  unit: string;
+  status: 'good' | 'warning' | 'critical';
+  trend: 'up' | 'down' | 'stable';
+  target: number;
+  domain: DomainType;
+}
+
 // ============================================================================
 // DOMAIN 1: THERMAL & HARDWARE TWIN
 // ============================================================================
@@ -645,6 +670,18 @@ export interface DataCentreFacility {
   tier: 1 | 2 | 3 | 4;
   totalCapacityMw: number;
   currentLoadMw: number;
+  
+  // Extended properties for UI
+  location: { city: string; country: string };
+  status: 'operational' | 'degraded' | 'critical' | 'maintenance';
+  totalRacks: number;
+  totalPowerCapacityKw: number;
+  currentPowerDrawKw: number;
+  pue: number;
+  carbonIntensityGCo2Kwh: number;
+  costPerKwh: number;
+  renewablePercent: number;
+  alerts: FacilityAlert[];
   
   // Domain Twins
   thermalHardware: ThermalHardwareTwin;

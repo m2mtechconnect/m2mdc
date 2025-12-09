@@ -15,7 +15,7 @@ export function templateToBlueprint(
 ): AgentBlueprint {
   const config = template.default_config as any || {};
   
-  // Handle workflows - can be in config.workflows (YVR) or config.workflow (legacy)
+  // Handle workflows - can be in config.workflows (Data Centre) or config.workflow (legacy)
   const workflowsArray = Array.isArray(config.workflows) ? config.workflows : [];
   const workflowLegacy = config.workflow || { triggers: [], actions: [], integrations: [] };
   
@@ -35,7 +35,7 @@ export function templateToBlueprint(
     || config.day_in_life 
     || '';
 
-  // Get industries and departments (handle arrays from YVR template)
+  // Get industries and departments (handle arrays from Data Centre template)
   const industries = Array.isArray(config.industries) ? config.industries : (template.industry ? [template.industry] : []);
   const departments = Array.isArray(config.departments) ? config.departments : (template.department ? [template.department] : []);
   const primaryIndustry = industries[0] || template.industry || null;
@@ -70,7 +70,7 @@ export function templateToBlueprint(
   let integrations: string[] = [];
   
   if (workflowsArray.length > 0) {
-    // Extract from workflows array (YVR template structure)
+    // Extract from workflows array (Data Centre template structure)
     workflowsArray.forEach((wf: any) => {
       if (wf.trigger) {
         triggers.push({

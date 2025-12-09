@@ -46,6 +46,22 @@ export function getSimulationSuggestions(agent: {
   const description = agent.description?.toLowerCase() || '';
   const templateId = agent.template_id?.toLowerCase() || '';
   
+  // Data Centre specific suggestions
+  const isDataCentre = templateId.includes('data_centre') || templateId.includes('data_center') ||
+                       name.includes('data cent') || name.includes('datacent') ||
+                       description.includes('data cent') || description.includes('pue') ||
+                       description.includes('gpu') || description.includes('cooling');
+  
+  if (isDataCentre) {
+    return [
+      'Simulate a GPU cluster thermal spike and cooling response',
+      'Show power chain failover from grid to UPS to generator',
+      'Analyze carbon price shock impact on operational costs',
+      'Model sovereignty violation from cross-border data transfer',
+      'Simulate cooling system failure cascade across zones',
+    ];
+  }
+  
   // Transport Canada specific suggestions
   const isTransportCanada = templateId.includes('transport_canada') || 
                             name.includes('transport canada') ||
@@ -54,7 +70,7 @@ export function getSimulationSuggestions(agent: {
   
   if (isTransportCanada) {
     return [
-      'Simulate a coastal storm impacting YVR and Port of Vancouver',
+      'Simulate a coastal storm impacting major airports and ports',
       'Show derailment risk for western freight corridors',
       'Analyze border crossing delays at Windsor-Detroit',
       'Model CO₂ reduction from freight modal shift to rail',

@@ -219,22 +219,22 @@ async function convertToBlueprint(payload: UnifiedIntakePayload): Promise<AgentB
         const siteName = snapshot.title || new URL(payload.urlInput).hostname;
         const siteDescription = snapshot.description || `AI assistant for ${payload.urlInput}`;
         
-        // Check if captured content suggests aviation/airport
+        // Check if captured content suggests data centre / infrastructure
         const recommendations = recommendTemplatesFromContent({
           text: snapshot.content,
           keywords: captureData?.keywords || [],
           url: payload.urlInput,
         });
         
-        const yvrRecommendation = recommendations.find(r => r.templateId === 'YVR_AIRPORT_DIGITAL_TWIN');
-        if (yvrRecommendation && yvrRecommendation.confidence > 0.6) {
-          console.log(`[UnifiedIntake] URL content suggests YVR template (confidence: ${yvrRecommendation.confidence})`);
-          const yvrTemplate = await loadTemplateById('YVR_AIRPORT_DIGITAL_TWIN');
-          if (yvrTemplate) {
-            const yvrBlueprint = templateToBlueprint(yvrTemplate, 'marketplace');
-            yvrBlueprint.knowledge.urls.push(payload.urlInput);
-            yvrBlueprint.knowledge.summary = `Website content analyzed from ${payload.urlInput}: ${snapshot.description}`;
-            return yvrBlueprint;
+        const dcRecommendation = recommendations.find(r => r.templateId === 'DATA_CENTRE_DIGITAL_TWIN');
+        if (dcRecommendation && dcRecommendation.confidence > 0.6) {
+          console.log(`[UnifiedIntake] URL content suggests Data Centre template (confidence: ${dcRecommendation.confidence})`);
+          const dcTemplate = await loadTemplateById('DATA_CENTRE_DIGITAL_TWIN');
+          if (dcTemplate) {
+            const dcBlueprint = templateToBlueprint(dcTemplate, 'marketplace');
+            dcBlueprint.knowledge.urls.push(payload.urlInput);
+            dcBlueprint.knowledge.summary = `Website content analyzed from ${payload.urlInput}: ${snapshot.description}`;
+            return dcBlueprint;
           }
         }
         

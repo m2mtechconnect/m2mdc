@@ -5,7 +5,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Globe, Shield, MapPin, AlertTriangle, CheckCircle, FileText } from 'lucide-react';
+import { Globe, Shield, MapPin, CheckCircle, FileText } from 'lucide-react';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 interface SovereigntyDomainViewProps {
@@ -13,18 +13,19 @@ interface SovereigntyDomainViewProps {
 }
 
 export function SovereigntyDomainView({ facility }: SovereigntyDomainViewProps) {
-  // Mock sovereignty data
+  const sovereigntyTwin = facility.sovereignty;
+  const riskScore = sovereigntyTwin.kpis.sovereigntyRiskScore;
+  
   const sovereigntyData = {
     primaryJurisdiction: facility.location.country,
-    dataResidency: 'Compliant',
-    crossBorderFlows: 0,
+    dataResidency: sovereigntyTwin.kpis.dataFlowViolations === 0 ? 'Compliant' : 'Violations Detected',
+    crossBorderFlows: sovereigntyTwin.kpis.crossBorderTransfers,
     complianceFrameworks: ['SOC 2 Type II', 'ISO 27001', 'PIPEDA', 'GDPR-adequate'],
-    lastAudit: '2024-01-15',
-    riskScore: 8,
+    riskScore,
     dataClassifications: {
-      sovereign: 45,
-      sensitive: 30,
-      public: 25,
+      sovereign: Math.round(sovereigntyTwin.kpis.sovereignComputeRatioPct),
+      sensitive: Math.round((100 - sovereigntyTwin.kpis.sovereignComputeRatioPct) * 0.7),
+      public: Math.round((100 - sovereigntyTwin.kpis.sovereignComputeRatioPct) * 0.3),
     },
   };
   
@@ -34,14 +35,14 @@ export function SovereigntyDomainView({ facility }: SovereigntyDomainViewProps) 
       <div className="grid gap-4 md:grid-cols-4">
         <MetricCard
           title="Sovereignty Score"
-          value={`${100 - sovereigntyData.riskScore}%`}
-          status={sovereigntyData.riskScore < 10 ? 'good' : sovereigntyData.riskScore < 25 ? 'warning' : 'critical'}
+          value={`${(100 - riskScore).toFixed(0)}%`}
+          status={riskScore < 10 ? 'good' : riskScore < 25 ? 'warning' : 'critical'}
           icon={Shield}
         />
         <MetricCard
           title="Data Residency"
           value={sovereigntyData.dataResidency}
-          status="good"
+          status={sovereigntyTwin.kpis.dataFlowViolations === 0 ? 'good' : 'critical'}
           icon={MapPin}
         />
         <MetricCard
@@ -78,7 +79,7 @@ export function SovereigntyDomainView({ facility }: SovereigntyDomainViewProps) 
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Location</span>
-                    <span>{facility.location.city}, {facility.location.region}</span>
+                    <span>{facility.location.city}, {facility.location.country}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Legal Entity</span>
@@ -91,14 +92,18 @@ export function SovereigntyDomainView({ facility }: SovereigntyDomainViewProps) 
                 </div>
               </div>
               
-              <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+              <div className={`p-4 rounded-lg ${sovereigntyTwin.kpis.dataFlowViolations === 0 ? 'bg-green-500/10 border-green-500/20' : 'bg-destructive/10 border-destructive/20'} border`}>
                 <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <span className="font-medium text-green-600">Fully Sovereign</span>
+                  <CheckCircle className={`h-5 w-5 ${sovereigntyTwin.kpis.dataFlowViolations === 0 ? 'text-green-500' : 'text-destructive'}`} />
+                  <span className={`font-medium ${sovereigntyTwin.kpis.dataFlowViolations === 0 ? 'text-green-600' : 'text-destructive'}`}>
+                    {sovereigntyTwin.kpis.dataFlowViolations === 0 ? 'Fully Sovereign' : 'Violations Detected'}
+                  </span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  All data processing and storage occurs within {sovereigntyData.primaryJurisdiction} jurisdiction.
-                  No cross-border data transfers detected.
+                  {sovereigntyTwin.kpis.dataFlowViolations === 0 
+                    ? `All data processing and storage occurs within ${sovereigntyData.primaryJurisdiction} jurisdiction.`
+                    : `${sovereigntyTwin.kpis.dataFlowViolations} data flow violations detected.`
+                  }
                 </p>
               </div>
             </div>
@@ -161,7 +166,7 @@ export function SovereigntyDomainView({ facility }: SovereigntyDomainViewProps) 
             ))}
           </div>
           <p className="text-xs text-muted-foreground mt-4">
-            Last compliance audit: {sovereigntyData.lastAudit} • Next audit scheduled: 2024-07-15
+            Audit Readiness Score: {sovereigntyTwin.kpis.auditReadinessScore.toFixed(0)}%
           </p>
         </CardContent>
       </Card>
@@ -174,19 +179,25 @@ export function SovereigntyDomainView({ facility }: SovereigntyDomainViewProps) 
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8">
             <div className="relative">
-              <div className="w-32 h-32 rounded-full border-4 border-green-500 flex items-center justify-center">
+              <div className={`w-32 h-32 rounded-full border-4 ${sovereigntyTwin.kpis.dataFlowViolations === 0 ? 'border-green-500' : 'border-destructive'} flex items-center justify-center`}>
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-green-500">0</p>
+                  <p className={`text-3xl font-bold ${sovereigntyTwin.kpis.dataFlowViolations === 0 ? 'text-green-500' : 'text-destructive'}`}>
+                    {sovereigntyTwin.kpis.dataFlowViolations}
+                  </p>
                   <p className="text-xs text-muted-foreground">violations</p>
                 </div>
               </div>
               <div className="absolute -top-2 -right-2">
-                <Badge variant="default" className="bg-green-500">Clean</Badge>
+                <Badge variant="default" className={sovereigntyTwin.kpis.dataFlowViolations === 0 ? 'bg-green-500' : 'bg-destructive'}>
+                  {sovereigntyTwin.kpis.dataFlowViolations === 0 ? 'Clean' : 'Alert'}
+                </Badge>
               </div>
             </div>
             <p className="mt-4 text-sm text-muted-foreground text-center max-w-md">
-              No unauthorized cross-border data transfers detected in the last 30 days.
-              All data flows comply with configured sovereignty policies.
+              {sovereigntyTwin.dataFlows.length} data flows monitored. 
+              {sovereigntyTwin.kpis.dataFlowViolations === 0 
+                ? ' All flows comply with configured sovereignty policies.'
+                : ' Review and remediate detected violations.'}
             </p>
           </div>
         </CardContent>

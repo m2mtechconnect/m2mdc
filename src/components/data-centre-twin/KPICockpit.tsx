@@ -10,14 +10,20 @@ import {
   Thermometer, Zap, Wind, Network, Shield, Cpu, 
   Globe, DollarSign, TrendingUp, TrendingDown, Minus
 } from 'lucide-react';
-import type { DataCentreFacility, KPIValue } from '@/types/dataCenterTwin';
+import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 interface KPICockpitProps {
   facility: DataCentreFacility;
 }
 
+interface KPIData {
+  value: number;
+  unit: string;
+  status: 'good' | 'warning' | 'critical';
+  trend: 'up' | 'down' | 'stable';
+}
+
 export function KPICockpit({ facility }: KPICockpitProps) {
-  // Calculate KPIs from facility data
   const kpis = calculateKPIs(facility);
   
   return (
@@ -30,7 +36,6 @@ export function KPICockpit({ facility }: KPICockpitProps) {
       </div>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {/* Thermal KPIs */}
         <KPICard
           title="Thermal Stability"
           icon={Thermometer}
@@ -41,7 +46,6 @@ export function KPICockpit({ facility }: KPICockpitProps) {
           ]}
         />
         
-        {/* Power KPIs */}
         <KPICard
           title="Power Reliability"
           icon={Zap}
@@ -52,7 +56,6 @@ export function KPICockpit({ facility }: KPICockpitProps) {
           ]}
         />
         
-        {/* Cooling KPIs */}
         <KPICard
           title="Cooling Efficiency"
           icon={Wind}
@@ -63,7 +66,6 @@ export function KPICockpit({ facility }: KPICockpitProps) {
           ]}
         />
         
-        {/* Network KPIs */}
         <KPICard
           title="Network Health"
           icon={Network}
@@ -74,7 +76,6 @@ export function KPICockpit({ facility }: KPICockpitProps) {
           ]}
         />
         
-        {/* Facility KPIs */}
         <KPICard
           title="Facility Safety"
           icon={Shield}
@@ -85,7 +86,6 @@ export function KPICockpit({ facility }: KPICockpitProps) {
           ]}
         />
         
-        {/* Workload KPIs */}
         <KPICard
           title="Workload Performance"
           icon={Cpu}
@@ -96,7 +96,6 @@ export function KPICockpit({ facility }: KPICockpitProps) {
           ]}
         />
         
-        {/* Sovereignty KPIs */}
         <KPICard
           title="Data Sovereignty"
           icon={Globe}
@@ -107,7 +106,6 @@ export function KPICockpit({ facility }: KPICockpitProps) {
           ]}
         />
         
-        {/* Financial KPIs */}
         <KPICard
           title="Financial Health"
           icon={DollarSign}
@@ -154,10 +152,7 @@ function KPICard({ title, icon: Icon, iconColor, kpis }: KPICardProps) {
                 {kpi.value.toFixed(kpi.unit === '%' ? 0 : 2)}{kpi.unit}
               </span>
             </div>
-            <Progress 
-              value={Math.min(kpi.value, 100)} 
-              className="h-1.5"
-            />
+            <Progress value={Math.min(kpi.value, 100)} className="h-1.5" />
           </div>
         ))}
       </CardContent>
@@ -173,35 +168,48 @@ function getStatusColor(status: 'good' | 'warning' | 'critical'): string {
   }
 }
 
-function calculateKPIs(facility: DataCentreFacility): Record<string, KPIValue> {
-  // Calculate thermal KPIs
-  const avgTemp = facility.racks.reduce((acc, r) => acc + r.avgInletTempC, 0) / facility.racks.length;
-  const thermalStability = Math.max(0, 100 - (Math.abs(avgTemp - 22) * 5));
-  const hotspotRisk = facility.racks.filter(r => r.avgInletTempC > 27).length / facility.racks.length * 100;
+function calculateKPIs(facility: DataCentreFacility): Record<string, KPIData> {
+  // Use nested domain twin properties
+  const thermalTwin = facility.thermalHardware;
+  const powerTwin = facility.powerUps;
+  const coolingTwin = facility.cooling;
+  const networkTwin = facility.network;
+  const workloadTwin = facility.workloadGpu;
+  const sovereigntyTwin = facility.sovereignty;
+  const financialTwin = facility.financialCarbon;
+  const facilityTwin = facility.facilitySafety;
   
-  // Calculate power KPIs
+  // Thermal KPIs
+  const thermalStability = thermalTwin.kpis.thermalStabilityScore;
+  const hotspotRisk = thermalTwin.kpis.hotspotRiskProbability;
+  
+  // Power KPIs
   const powerUtilization = (facility.currentPowerDrawKw / facility.totalPowerCapacityKw) * 100;
-  const powerReliability = powerUtilization < 80 ? 98 : powerUtilization < 90 ? 85 : 70;
-  const upsHealth = facility.upsBanks.reduce((acc, u) => acc + u.batteryHealthPercent, 0) / facility.upsBanks.length;
+  const powerReliability = powerTwin.kpis.powerReliabilityScore;
+  const upsHealth = powerTwin.kpis.upsHealthIndex;
   
-  // Calculate cooling KPIs
-  const coolingEfficiency = Math.max(0, 100 - ((facility.pue - 1) * 100));
+  // Cooling KPIs
+  const coolingEfficiency = coolingTwin.kpis.coolingEfficiencyIndex;
   
-  // Calculate network KPIs
-  const networkIntegrity = facility.networkSwitches.reduce((acc, s) => acc + (100 - s.portUtilizationPercent), 0) / facility.networkSwitches.length;
-  const fabricSaturation = facility.networkSwitches.reduce((acc, s) => acc + s.portUtilizationPercent, 0) / facility.networkSwitches.length;
+  // Network KPIs
+  const networkIntegrity = networkTwin.kpis.networkIntegrityScore;
+  const fabricSaturation = networkTwin.kpis.fabricSaturationIndex;
   
-  // Calculate GPU/workload KPIs
-  const gpuUtilization = facility.gpuClusters.reduce((acc, c) => acc + c.utilizationPercent, 0) / facility.gpuClusters.length;
-  const queueEfficiency = 100 - (facility.gpuClusters.reduce((acc, c) => acc + c.queueDepth, 0) / facility.gpuClusters.length * 10);
+  // GPU/workload KPIs
+  const gpuUtilization = workloadTwin.kpis.avgGpuUtilization;
+  const queueEfficiency = 100 - Math.min(workloadTwin.kpis.avgQueueTimeMinutes, 100);
   
-  // Calculate sovereignty KPIs (from facility metadata)
-  const sovereigntyRisk = facility.jurisdictions?.length > 1 ? 25 : 5;
-  const complianceScore = 95;
+  // Sovereignty KPIs
+  const sovereigntyRisk = sovereigntyTwin.kpis.sovereigntyRiskScore;
+  const complianceScore = sovereigntyTwin.kpis.policyComplianceRate;
   
-  // Calculate financial KPIs
-  const costPerGpuHour = facility.costPerKwh * facility.pue * 0.5; // Simplified calculation
+  // Financial KPIs
+  const costPerGpuHour = workloadTwin.kpis.costPerGpuHour;
   const carbonEfficiency = Math.max(0, 100 - (facility.carbonIntensityGCo2Kwh / 5));
+  
+  // Facility KPIs
+  const environmentalSafety = facilityTwin.kpis.environmentalSafetyScore;
+  const earlyWarning = facilityTwin.kpis.earlyWarningIndex;
   
   return {
     thermalStability: { value: thermalStability, unit: '%', status: thermalStability > 80 ? 'good' : thermalStability > 60 ? 'warning' : 'critical', trend: 'stable' },
@@ -212,13 +220,13 @@ function calculateKPIs(facility: DataCentreFacility): Record<string, KPIValue> {
     pue: { value: facility.pue, unit: '', status: facility.pue < 1.4 ? 'good' : facility.pue < 1.6 ? 'warning' : 'critical', trend: 'stable' },
     networkIntegrity: { value: networkIntegrity, unit: '%', status: networkIntegrity > 80 ? 'good' : networkIntegrity > 60 ? 'warning' : 'critical', trend: 'stable' },
     fabricSaturation: { value: fabricSaturation, unit: '%', status: fabricSaturation < 60 ? 'good' : fabricSaturation < 80 ? 'warning' : 'critical', trend: 'up' },
-    environmentalSafety: { value: 96, unit: '%', status: 'good', trend: 'stable' },
-    earlyWarning: { value: 98, unit: '%', status: 'good', trend: 'stable' },
+    environmentalSafety: { value: environmentalSafety, unit: '%', status: environmentalSafety > 90 ? 'good' : environmentalSafety > 70 ? 'warning' : 'critical', trend: 'stable' },
+    earlyWarning: { value: earlyWarning, unit: '%', status: earlyWarning > 90 ? 'good' : earlyWarning > 70 ? 'warning' : 'critical', trend: 'stable' },
     gpuUtilization: { value: gpuUtilization, unit: '%', status: gpuUtilization > 70 ? 'good' : gpuUtilization > 50 ? 'warning' : 'critical', trend: 'up' },
     queueEfficiency: { value: queueEfficiency, unit: '%', status: queueEfficiency > 80 ? 'good' : queueEfficiency > 60 ? 'warning' : 'critical', trend: 'stable' },
     sovereigntyRisk: { value: sovereigntyRisk, unit: '%', status: sovereigntyRisk < 10 ? 'good' : sovereigntyRisk < 30 ? 'warning' : 'critical', trend: 'stable' },
     complianceScore: { value: complianceScore, unit: '%', status: complianceScore > 90 ? 'good' : complianceScore > 75 ? 'warning' : 'critical', trend: 'stable' },
-    costPerGpuHour: { value: costPerGpuHour, unit: '$', status: costPerGpuHour < 0.5 ? 'good' : costPerGpuHour < 1 ? 'warning' : 'critical', trend: 'down' },
+    costPerGpuHour: { value: costPerGpuHour, unit: '$', status: costPerGpuHour < 3 ? 'good' : costPerGpuHour < 5 ? 'warning' : 'critical', trend: 'down' },
     carbonEfficiency: { value: carbonEfficiency, unit: '%', status: carbonEfficiency > 80 ? 'good' : carbonEfficiency > 60 ? 'warning' : 'critical', trend: 'up' },
   };
 }

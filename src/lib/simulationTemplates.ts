@@ -277,7 +277,7 @@ export const SIMULATION_TEMPLATES: Record<TwinIndustry | 'generic', SimulationTe
     industry: 'government_transport',
     title: 'National Multimodal Transport Operations',
     description: 'Real-time monitoring of Canada\'s transportation network across Aviation, Marine, Rail, and Road with safety analytics and regulatory oversight',
-    defaultQuery: 'Simulate a coastal storm impacting YVR, YXX, and Port of Vancouver. Show cascading effects on aviation delays, marine vessel holds, and highway closures.',
+    defaultQuery: 'Simulate a coastal storm impacting major West Coast airports and Port of Vancouver. Show cascading effects on aviation delays, marine vessel holds, and highway closures.',
     scenarioSummary: 'Transport Canada twin monitoring national multimodal operations with incident prediction and compliance automation',
     kpis: [
       { code: 'on_time_performance', label: 'On-Time Performance', unit: '%', baseline: 78, simulated: 91 },
@@ -288,7 +288,7 @@ export const SIMULATION_TEMPLATES: Record<TwinIndustry | 'generic', SimulationTe
     ],
     events: [
       { timestampOffsetMin: 0, type: 'weather_alert', severity: 'high', label: 'Storm warning issued', details: { region: 'BC South Coast', visibility: '2km', wind: '45kts', precip: 'rain' } },
-      { timestampOffsetMin: 5, type: 'aviation_impact', severity: 'critical', label: 'Ground stops at YVR', details: { flights_delayed: 23, avg_delay: 45, runway_closures: 1 } },
+      { timestampOffsetMin: 5, type: 'aviation_impact', severity: 'critical', label: 'Ground stops at major airports', details: { flights_delayed: 23, avg_delay: 45, runway_closures: 1 } },
       { timestampOffsetMin: 10, type: 'marine_impact', severity: 'high', label: 'Vessel holds at Vancouver Port', details: { vessels_waiting: 8, berth_availability: '35%', eta_delays: '6-12h' } },
       { timestampOffsetMin: 15, type: 'road_impact', severity: 'medium', label: 'Highway advisories issued', details: { segments_affected: 4, closures: 1, travel_time_increase: '45min' } },
       { timestampOffsetMin: 25, type: 'coordination', severity: 'low', label: 'Regional ops center activated', details: { agencies: 5, resources_deployed: 12, status: 'monitoring' } },

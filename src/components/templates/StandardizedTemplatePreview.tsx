@@ -78,7 +78,7 @@ export function StandardizedTemplatePreview({
   
   const config = template.default_config as any || {};
   
-  // Extract preview sections first (YVR/Sovereign DC template structure)
+  // Extract preview sections first (Data Centre template structure)
   const previewSections = config.preview_sections || {};
   
   // Blueprint extraction: check multiple locations for backwards compatibility

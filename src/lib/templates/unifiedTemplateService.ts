@@ -283,11 +283,11 @@ export async function loadAllTemplates(): Promise<ValidatedTemplate[]> {
       validatedTemplates.push(result.template);
     }
     
-    // Sort: YVR first, then by rating, then by downloads
+    // Sort: Data Centre first, then by rating, then by downloads
     validatedTemplates.sort((a, b) => {
-      // YVR always first
-      if (a.id === 'YVR_AIRPORT_DIGITAL_TWIN') return -1;
-      if (b.id === 'YVR_AIRPORT_DIGITAL_TWIN') return 1;
+      // Data Centre always first
+      if (a.id === 'DATA_CENTRE_DIGITAL_TWIN') return -1;
+      if (b.id === 'DATA_CENTRE_DIGITAL_TWIN') return 1;
       
       // Then by rating
       if (a.rating !== b.rating) return b.rating - a.rating;
@@ -296,7 +296,7 @@ export async function loadAllTemplates(): Promise<ValidatedTemplate[]> {
       return b.downloads - a.downloads;
     });
     
-    console.log(`[TemplateService] Returning ${validatedTemplates.length} validated templates (YVR featured first)`);
+    console.log(`[TemplateService] Returning ${validatedTemplates.length} validated templates (Data Centre featured first)`);
     
     return validatedTemplates;
   } catch (error) {

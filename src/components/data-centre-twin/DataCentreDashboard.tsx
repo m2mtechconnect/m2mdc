@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { 
   Thermometer, Zap, Wind, Network, Shield, Cpu, 
-  Globe, DollarSign, AlertTriangle, Activity, Server
+  Globe, DollarSign, AlertTriangle, Activity, Server, PlayCircle
 } from 'lucide-react';
 import { 
   DCCard, 
@@ -29,6 +29,7 @@ import { WorkloadDomainView } from './domains/WorkloadDomainView';
 import { SovereigntyDomainView } from './domains/SovereigntyDomainView';
 import { FinancialDomainView } from './domains/FinancialDomainView';
 import { AlertsPanel } from './AlertsPanel';
+import { DCSimulationPanel } from '@/components/simulation/DCSimulationPanel';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 interface DataCentreDashboardProps {
@@ -38,6 +39,7 @@ interface DataCentreDashboardProps {
 
 const domainTabs = [
   { id: 'overview', label: 'Overview', icon: Activity },
+  { id: 'simulation', label: 'Simulation', icon: PlayCircle },
   { id: 'thermal', label: 'Thermal', icon: Thermometer },
   { id: 'power', label: 'Power', icon: Zap },
   { id: 'cooling', label: 'Cooling', icon: Wind },
@@ -278,6 +280,10 @@ export function DataCentreDashboard({ facility, onScenarioSelect }: DataCentreDa
               </DCCard>
             </div>
           </div>
+        </TabsContent>
+
+        <TabsContent value="simulation">
+          <DCSimulationPanel />
         </TabsContent>
 
         <TabsContent value="thermal">

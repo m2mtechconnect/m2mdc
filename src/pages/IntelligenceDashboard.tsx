@@ -23,6 +23,8 @@ import {
   Cpu,
   Globe,
   Flame,
+  FileText,
+  Eye,
 } from "lucide-react";
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -30,6 +32,9 @@ import { Line, LineChart, Bar, BarChart, Area, AreaChart, ResponsiveContainer, X
 import { Badge } from '@/components/ui/badge';
 import KpiCard from '@/components/shared/KpiCard';
 import DataTable, { Column } from '@/components/shared/DataTable';
+import { useBlueprint } from '@/hooks/useBlueprint';
+import { useBlueprintScenarios } from '@/hooks/useBlueprintScenarios';
+import { useBlueprintKPIs } from '@/hooks/useBlueprintKPIs';
 
 interface System {
   id: string;
@@ -54,6 +59,11 @@ export default function IntelligenceDashboard() {
   const [facility, setFacility] = useState('all');
   const [subsystem, setSubsystem] = useState('all');
   const [region, setRegion] = useState('all');
+
+  // Blueprint data for KPIs and scenarios
+  const { blueprint, summary } = useBlueprint('default');
+  const { scenarios, scenarioCount } = useBlueprintScenarios('default');
+  const { totalKpis, kpisByDomain } = useBlueprintKPIs('default');
 
   // Use real KPI hooks
   const roiKpi = useKpi('roi_growth');
@@ -151,10 +161,17 @@ export default function IntelligenceDashboard() {
             </h1>
             <p className="text-muted-foreground">Data Centre performance monitoring and insights</p>
           </div>
-          <Button className="gap-2">
-            <Download className="h-4 w-4" />
-            Export Report
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" className="gap-2" onClick={() => navigate('/blueprint/default')}>
+              <FileText className="h-4 w-4" />
+              Blueprint
+              <Badge variant="secondary" className="text-[10px]">{totalKpis} KPIs</Badge>
+            </Button>
+            <Button className="gap-2">
+              <Download className="h-4 w-4" />
+              Export Report
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}
@@ -410,11 +427,23 @@ export default function IntelligenceDashboard() {
 
           {/* Simulation Replay Tab */}
           <TabsContent value="simulation-replay" className="space-y-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold">Recent Simulation Runs</h3>
+                <p className="text-sm text-muted-foreground">
+                  {scenarioCount} scenarios available from Blueprint
+                </p>
+              </div>
+              <Button variant="outline" onClick={() => navigate('/data-centre-twin?view=simulation')}>
+                <Activity className="h-4 w-4 mr-2" />
+                Run New Simulation
+              </Button>
+            </div>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Activity className="h-5 w-5" />
-                  Recent Simulation Runs
+                  Simulation History
                 </CardTitle>
               </CardHeader>
               <CardContent>

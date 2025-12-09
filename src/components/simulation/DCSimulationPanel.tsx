@@ -2,6 +2,7 @@
  * DC Simulation Panel Component
  * Main simulation interface combining all simulation components
  * Uses Studio design system tokens
+ * Now wired to Blueprint for scenarios
  */
 
 import { useState, useCallback, useMemo } from 'react';
@@ -10,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Activity, Clock, Sparkles } from 'lucide-react';
 import { useSimulation } from '@/simulation/useSimulation';
+import { useBlueprint } from '@/hooks/useBlueprint';
 import { DCScenarioSelector } from './DCScenarioSelector';
 import { DCSimulationControls } from './DCSimulationControls';
 import { DCEventTimeline } from './DCEventTimeline';
@@ -20,11 +22,15 @@ import type { CustomScenarioConfig } from '@/simulation/types';
 
 interface DCSimulationPanelProps {
   compact?: boolean;
+  twinId?: string;
 }
 
-export function DCSimulationPanel({ compact = false }: DCSimulationPanelProps) {
+export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSimulationPanelProps) {
   const [showCustomBuilder, setShowCustomBuilder] = useState(false);
   const [activeTab, setActiveTab] = useState<'scenarios' | 'timeline' | 'kpis'>('scenarios');
+  
+  // Get Blueprint scenarios
+  const { blueprint } = useBlueprint(twinId);
   
   const {
     status,
@@ -36,7 +42,9 @@ export function DCSimulationPanel({ compact = false }: DCSimulationPanelProps) {
     currentKpis,
     baselineKpis,
     presetScenarios,
+    blueprintScenarios,
     customScenarios,
+    allScenarios,
     activeScenario,
     startScenario,
     pause,
@@ -47,7 +55,9 @@ export function DCSimulationPanel({ compact = false }: DCSimulationPanelProps) {
     progress,
     remainingTime,
     elapsedTime,
-  } = useSimulation();
+  } = useSimulation({ 
+    blueprintScenarios: blueprint?.simulationScenarios 
+  });
   
   // Build KPI deltas from current state
   const kpiDeltas = useMemo(() => {
@@ -150,7 +160,7 @@ export function DCSimulationPanel({ compact = false }: DCSimulationPanelProps) {
         
         <TabsContent value="scenarios" className="mt-4">
           <DCScenarioSelector
-            presetScenarios={presetScenarios}
+            presetScenarios={[...presetScenarios, ...blueprintScenarios]}
             customScenarios={customScenarios}
             activeScenarioId={activeScenarioId}
             onSelectScenario={handleSelectScenario}

@@ -19,7 +19,7 @@ export { SimulationEngine, getSimulationEngine, resetSimulationEngine } from './
 export { createCustomScenario } from './customScenarioBuilder';
 
 // React Hook
-export { useSimulation, type UseSimulationReturn } from './useSimulation';
+export { useSimulation, type UseSimulationReturn, type UseSimulationOptions } from './useSimulation';
 
 // Components
 export { SimulationPreviewModal } from '@/components/simulation/SimulationPreviewModal';

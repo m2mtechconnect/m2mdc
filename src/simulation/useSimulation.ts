@@ -1,9 +1,10 @@
 /**
  * useSimulation React Hook
  * Provides reactive access to the Data Centre Simulation Engine
+ * Now supports Blueprint scenarios as authoritative source
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { 
   SimulationEngine, 
   getSimulationEngine, 
@@ -11,8 +12,10 @@ import {
 import { 
   getScenarioById, 
   PRESET_SCENARIOS,
+  registerScenario,
 } from './scenarioRegistry';
 import { createCustomScenario } from './customScenarioBuilder';
+import { convertAllBlueprintScenarios } from './blueprintScenarioAdapter';
 import type { 
   SimulationState, 
   SimulationEvent, 
@@ -21,6 +24,7 @@ import type {
   ScenarioDefinition,
   CustomScenarioConfig,
 } from './types';
+import type { SimulationScenarioBlueprint } from '@/types/dataCentreBlueprint';
 
 // Default baseline KPIs for Data Centre simulation
 const DEFAULT_BASELINE_KPIS: Record<string, number> = {
@@ -36,6 +40,11 @@ const DEFAULT_BASELINE_KPIS: Record<string, number> = {
   avgUpsRuntime: 45,
 };
 
+export interface UseSimulationOptions {
+  /** Blueprint scenarios to merge with presets */
+  blueprintScenarios?: SimulationScenarioBlueprint[];
+}
+
 export interface UseSimulationReturn {
   // State
   status: SimulationStatus;
@@ -49,7 +58,9 @@ export interface UseSimulationReturn {
   
   // Scenarios
   presetScenarios: ScenarioDefinition[];
+  blueprintScenarios: ScenarioDefinition[];
   customScenarios: ScenarioDefinition[];
+  allScenarios: ScenarioDefinition[];
   activeScenario: ScenarioDefinition | null;
   
   // Actions
@@ -67,7 +78,9 @@ export interface UseSimulationReturn {
   elapsedTime: number; // seconds
 }
 
-export function useSimulation(): UseSimulationReturn {
+export function useSimulation(options: UseSimulationOptions = {}): UseSimulationReturn {
+  const { blueprintScenarios: blueprintScenariosRaw = [] } = options;
+  
   const engineRef = useRef<SimulationEngine | null>(null);
   const [state, setState] = useState<SimulationState>({
     status: 'idle',
@@ -82,6 +95,27 @@ export function useSimulation(): UseSimulationReturn {
   
   const [customScenarios, setCustomScenarios] = useState<ScenarioDefinition[]>([]);
   const presetScenarios = PRESET_SCENARIOS;
+  
+  // Convert Blueprint scenarios to Simulation format
+  const blueprintScenarios = useMemo(() => {
+    return convertAllBlueprintScenarios(blueprintScenariosRaw);
+  }, [blueprintScenariosRaw]);
+  
+  // Register Blueprint scenarios with the engine
+  useEffect(() => {
+    blueprintScenarios.forEach(scenario => {
+      registerScenario(scenario);
+    });
+  }, [blueprintScenarios]);
+  
+  // Combine all scenarios
+  const allScenarios = useMemo(() => {
+    const combined = [...presetScenarios, ...blueprintScenarios, ...customScenarios];
+    // Deduplicate by ID (Blueprint scenarios override presets with same ID)
+    const uniqueMap = new Map<string, ScenarioDefinition>();
+    combined.forEach(s => uniqueMap.set(s.id, s));
+    return Array.from(uniqueMap.values());
+  }, [presetScenarios, blueprintScenarios, customScenarios]);
   
   // Initialize engine with baseline KPIs
   useEffect(() => {
@@ -98,9 +132,9 @@ export function useSimulation(): UseSimulationReturn {
     };
   }, []);
   
-  // Get active scenario
+  // Get active scenario from all available scenarios
   const activeScenario = state.activeScenarioId 
-    ? getScenarioById(state.activeScenarioId) || customScenarios.find(s => s.id === state.activeScenarioId) || null
+    ? allScenarios.find(s => s.id === state.activeScenarioId) || null
     : null;
   
   // Calculate progress
@@ -161,7 +195,9 @@ export function useSimulation(): UseSimulationReturn {
     
     // Scenarios
     presetScenarios,
+    blueprintScenarios,
     customScenarios,
+    allScenarios,
     activeScenario,
     
     // Actions

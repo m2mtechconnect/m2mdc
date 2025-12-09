@@ -1,4 +1,3 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -375,17 +374,12 @@ export default function Compliance() {
             {/* Right Column (1/3 width) */}
             <div className="space-y-6">
               {/* C. Risk Overview - AI-Specific Risks */}
-              <Card className="glass-panel">
-                <CardHeader>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Shield className="h-5 w-5 text-primary" />
-                    <CardTitle className="text-2xl font-display">Risk Overview</CardTitle>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    AI-specific risk indicators for reasoning, actions, and tool usage
-                  </p>
-                </CardHeader>
-                <CardContent>
+              <DCCard
+                title="Risk Overview"
+                subtitle="AI-specific risk indicators for reasoning, actions, and tool usage"
+                icon={<Shield className="h-5 w-5" />}
+                status="operational"
+              >
                   <div className="space-y-4">
                     {aiRiskCategories.map((risk) => {
                       const isHighRisk = risk.score < 90;
@@ -436,21 +430,15 @@ export default function Compliance() {
                       );
                     })}
                   </div>
-                </CardContent>
-              </Card>
+              </DCCard>
 
               {/* D. Decision Replay (Explainability Mode) */}
-              <Card className="glass-panel">
-                <CardHeader>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    <CardTitle className="font-display">Decision Replay</CardTitle>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    View full reasoning and action sequences for any agent run
-                  </p>
-                </CardHeader>
-                <CardContent>
+              <DCCard
+                title="Decision Replay"
+                subtitle="View full reasoning and action sequences for any agent run"
+                icon={<Sparkles className="h-5 w-5" />}
+                status="operational"
+              >
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
@@ -484,21 +472,15 @@ export default function Compliance() {
                       <span>RAG citations</span>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+              </DCCard>
 
               {/* E. RAG Citations */}
-              <Card className="glass-panel">
-                <CardHeader>
-                  <div className="flex items-center gap-2 mb-2">
-                    <BookOpen className="h-5 w-5 text-secondary" />
-                    <CardTitle className="font-display">RAG Citations</CardTitle>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Trace responses back to source documents
-                  </p>
-                </CardHeader>
-                <CardContent>
+              <DCCard
+                title="RAG Citations"
+                subtitle="Trace responses back to source documents"
+                icon={<BookOpen className="h-5 w-5" />}
+                status="operational"
+              >
                   <div className="space-y-3">
                     {ragCitations.map((item, idx) => (
                       <Tooltip key={idx}>
@@ -554,21 +536,15 @@ export default function Compliance() {
                       </Tooltip>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+              </DCCard>
 
               {/* F. Exportable Compliance Reports */}
-              <Card className="glass-panel">
-                <CardHeader>
-                  <div className="flex items-center gap-2 mb-2">
-                    <FileText className="h-5 w-5 text-secondary" />
-                    <CardTitle className="font-display">Export Reports</CardTitle>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Download compliance documents for audits and governance
-                  </p>
-                </CardHeader>
-                <CardContent>
+              <DCCard
+                title="Export Reports"
+                subtitle="Download compliance documents for audits and governance"
+                icon={<FileText className="h-5 w-5" />}
+                status="operational"
+              >
                   <div className="space-y-2">
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -630,8 +606,7 @@ export default function Compliance() {
                       </TooltipContent>
                     </Tooltip>
                   </div>
-                </CardContent>
-              </Card>
+              </DCCard>
             </div>
           </div>
         </div>

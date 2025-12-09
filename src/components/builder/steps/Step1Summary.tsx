@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building2, Briefcase, Bot, TrendingUp, Clock, Zap, Info, Target, FileText, Shield, Pencil, RefreshCw, Server, Thermometer, Globe, Cpu } from 'lucide-react';
+import { Building2, Briefcase, Bot, TrendingUp, Clock, Zap, Info, Target, FileText, Shield, Pencil, RefreshCw, Server, Thermometer, Globe, Cpu, Wind } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,6 +33,16 @@ export function Step1Summary() {
   const [editIndustry, setEditIndustry] = useState('');
   const [editDepartment, setEditDepartment] = useState('');
   const [editType, setEditType] = useState<'agent' | 'process_twin' | '3d_twin'>('agent');
+
+  // DC Metadata state - defaults for Data Centre twins
+  const [dcMetadata] = useState({
+    facilityLocation: 'CA-ON (Toronto)',
+    gpuFleet: 'NVIDIA H100 x 256, A100 x 128',
+    coolingType: 'Liquid + Chilled Water',
+    powerTopology: 'N+1 Redundancy',
+    renewablePercent: '85%',
+    sovereignCompliance: 'Yes',
+  });
 
   // ALWAYS use blueprint data when available
   const agentName = currentBlueprint?.name || 
@@ -210,6 +220,60 @@ export function Step1Summary() {
           </div>
         </div>
       </DCCard>
+
+      {/* DC-Specific Metadata - Only visible for DC twins */}
+      {isDataCentreTwin && (
+        <DCCard 
+          title="Facility Specifications" 
+          subtitle="Data Centre infrastructure metadata"
+          icon={<Server className="h-4 w-4" />}
+        >
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+              <div className="flex items-center gap-2 mb-1">
+                <Globe className="h-3.5 w-3.5 text-dc-sovereignty" />
+                <p className="text-xs text-muted-foreground">Facility Location</p>
+              </div>
+              <p className="text-sm font-medium">{dcMetadata.facilityLocation}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+              <div className="flex items-center gap-2 mb-1">
+                <Cpu className="h-3.5 w-3.5 text-dc-gpu" />
+                <p className="text-xs text-muted-foreground">GPU Fleet</p>
+              </div>
+              <p className="text-sm font-medium">{dcMetadata.gpuFleet}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+              <div className="flex items-center gap-2 mb-1">
+                <Wind className="h-3.5 w-3.5 text-dc-cooling" />
+                <p className="text-xs text-muted-foreground">Cooling Type</p>
+              </div>
+              <p className="text-sm font-medium">{dcMetadata.coolingType}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+              <div className="flex items-center gap-2 mb-1">
+                <Zap className="h-3.5 w-3.5 text-dc-power" />
+                <p className="text-xs text-muted-foreground">Power Topology</p>
+              </div>
+              <p className="text-sm font-medium">{dcMetadata.powerTopology}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+              <div className="flex items-center gap-2 mb-1">
+                <Zap className="h-3.5 w-3.5 text-dc-success" />
+                <p className="text-xs text-muted-foreground">Renewable %</p>
+              </div>
+              <p className="text-sm font-medium">{dcMetadata.renewablePercent}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+              <div className="flex items-center gap-2 mb-1">
+                <Shield className="h-3.5 w-3.5 text-dc-sovereignty" />
+                <p className="text-xs text-muted-foreground">Sovereign Compliance</p>
+              </div>
+              <p className="text-sm font-medium">{dcMetadata.sovereignCompliance}</p>
+            </div>
+          </div>
+        </DCCard>
+      )}
 
       {/* Expected Outcomes KPIs */}
       <div className="grid gap-4 grid-cols-3">

@@ -688,6 +688,117 @@ export default function Deploy() {
         </div>
       </div>
 
+      {/* DC-Specific Deployment Recommendations */}
+      <div className="mt-8 grid gap-6 lg:grid-cols-3">
+        {/* AWS Recommendations */}
+        <DCCard 
+          title="AWS Recommendations" 
+          icon={<Server className="h-4 w-4" />}
+          status="info"
+        >
+          <div className="space-y-3">
+            <div className="text-sm space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-dc-success" />
+                <span>EKS for container orchestration</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-dc-success" />
+                <span>EC2 Trn1/Inf2 for GPU workloads</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-dc-success" />
+                <span>CloudWatch for metrics collection</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-dc-success" />
+                <span>Kinesis for real-time streaming</span>
+              </div>
+            </div>
+            <div className="pt-3 border-t border-dc-border">
+              <Badge className="bg-dc-success/10 text-dc-success border-dc-success/30">
+                GPU Autoscaling Ready
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              ca-central-1 region recommended for Canadian data sovereignty
+            </p>
+          </div>
+        </DCCard>
+
+        {/* Azure Recommendations */}
+        <DCCard 
+          title="Azure Recommendations" 
+          icon={<Cpu className="h-4 w-4" />}
+          status="info"
+        >
+          <div className="space-y-3">
+            <div className="text-sm space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-dc-info" />
+                <span>AKS for Kubernetes workloads</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-dc-info" />
+                <span>Azure ML for model hosting</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-dc-info" />
+                <span>Azure Monitor for telemetry</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-dc-info" />
+                <span>NDv5 SKUs for AI/DC workloads</span>
+              </div>
+            </div>
+            <div className="pt-3 border-t border-dc-border">
+              <Badge className="bg-dc-info/10 text-dc-info border-dc-info/30">
+                DC/AI Optimized SKUs
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Canada Central region for sovereignty compliance
+            </p>
+          </div>
+        </DCCard>
+
+        {/* GCP Recommendations */}
+        <DCCard 
+          title="GCP Recommendations" 
+          icon={<Zap className="h-4 w-4" />}
+          status="info"
+        >
+          <div className="space-y-3">
+            <div className="text-sm space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-dc-power" />
+                <span>Vertex AI for model serving</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-dc-power" />
+                <span>GKE for container workloads</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-dc-power" />
+                <span>BigQuery for analytics</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-dc-power" />
+                <span>Cloud Functions for automation</span>
+              </div>
+            </div>
+            <div className="pt-3 border-t border-dc-border">
+              <Badge className="bg-dc-success/10 text-dc-success border-dc-success/30">
+                Carbon-Smart Regions
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              northamerica-northeast1 for low-carbon operations
+            </p>
+          </div>
+        </DCCard>
+      </div>
+
       {/* AI Recommendations Section */}
       <div className="mt-8">
         <GroundedRecommendationsCard systemId={systemId!} />

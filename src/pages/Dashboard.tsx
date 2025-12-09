@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { DCCard } from "@/components/dc-ui";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Wrench, Bot, AlertCircle, ArrowUpRight, Sparkles, Server, Cpu, Thermometer, Globe, Zap as ZapIcon, Activity } from "lucide-react";
@@ -438,7 +439,7 @@ export default function Dashboard() {
         {/* Quick Link to DC Twin */}
         <div className="mb-8">
           <Link to="/data-centre-twin">
-            <Card className="p-4 cursor-pointer group bg-dc-surface border-dc-border hover:border-dc-primary/50 transition-all">
+            <DCCard className="p-4 cursor-pointer group bg-dc-surface border-dc-border hover:border-dc-primary/50 transition-all">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-lg bg-dc-primary/20">
@@ -455,7 +456,7 @@ export default function Dashboard() {
                 </div>
                 <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-dc-primary transition-colors" />
               </div>
-            </Card>
+            </DCCard>
           </Link>
         </div>
 

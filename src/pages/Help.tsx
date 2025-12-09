@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -182,13 +181,11 @@ export default function Help() {
             </DCCard>
 
             {/* Section 2: Guides & Templates */}
-            <Card className="glass-panel p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-primary">
-                  <BookOpen className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <h3 className="font-display font-bold text-lg">📘 User Guides</h3>
-              </div>
+            <DCCard 
+              title="📘 User Guides" 
+              icon={<BookOpen className="h-5 w-5" />}
+              status="operational"
+            >
               <ul className="space-y-3 mb-4">
                 {helpSections[1].items.map((item, idx) => (
                   <li key={idx}>
@@ -224,20 +221,15 @@ export default function Help() {
               <Button variant="outline" size="sm" className="w-full">
                 View All Resources
               </Button>
-            </Card>
+            </DCCard>
 
             {/* Section 3: ROI Calculator */}
-            <Card className="glass-panel p-6">
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-primary/20 mb-3">
-                  <Calculator className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-display font-bold text-xl mb-1">ROI Calculator</h3>
-                <p className="text-xs text-muted-foreground">
-                  Estimate your AI automation ROI in real-time
-                </p>
-              </div>
-
+            <DCCard 
+              title="ROI Calculator"
+              subtitle="Estimate your AI automation ROI in real-time"
+              icon={<Calculator className="h-5 w-5" />}
+              status="operational"
+            >
               <div className="space-y-5">
                 {/* Manual Hours */}
                 <div>
@@ -378,20 +370,15 @@ export default function Help() {
                   </div>
                 </div>
               </div>
-            </Card>
+            </DCCard>
 
             {/* Section 4: Expert Consultation */}
-            <Card className="glass-panel p-6">
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-primary/20 mb-3">
-                  <Headphones className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-display font-bold text-xl mb-1">🤝 Need Expert Guidance?</h3>
-                <p className="text-xs text-muted-foreground">
-                  Book a consultation with our AI specialists
-                </p>
-              </div>
-
+            <DCCard 
+              title="🤝 Need Expert Guidance?"
+              subtitle="Book a consultation with our AI specialists"
+              icon={<Headphones className="h-5 w-5" />}
+              status="operational"
+            >
               <form onSubmit={handleContactSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">
@@ -452,7 +439,7 @@ export default function Help() {
                   </Button>
                 </div>
               </form>
-            </Card>
+            </DCCard>
           </div>
         </div>
       </div>

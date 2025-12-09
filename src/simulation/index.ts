@@ -9,6 +9,9 @@ export * from './types';
 // Scenario Registry
 export * from './scenarioRegistry';
 
+// Blueprint Scenario Adapter
+export * from './blueprintScenarioAdapter';
+
 // Simulation Engine
 export { SimulationEngine, getSimulationEngine, resetSimulationEngine } from './SimulationEngine';
 

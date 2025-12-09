@@ -299,9 +299,10 @@ export const PRESET_SCENARIOS: ScenarioDefinition[] = [
 // ============================================================================
 
 let customScenarios: ScenarioDefinition[] = [];
+let registeredScenarios: ScenarioDefinition[] = [];
 
 export function getAllScenarios(): ScenarioDefinition[] {
-  return [...PRESET_SCENARIOS, ...customScenarios];
+  return [...PRESET_SCENARIOS, ...registeredScenarios, ...customScenarios];
 }
 
 export function getScenarioById(id: string): ScenarioDefinition | undefined {
@@ -330,6 +331,27 @@ export function getCustomScenarios(): ScenarioDefinition[] {
 
 export function clearCustomScenarios(): void {
   customScenarios = [];
+}
+
+/**
+ * Register a scenario from Blueprint or external source
+ * These scenarios are available to the simulation engine
+ */
+export function registerScenario(scenario: ScenarioDefinition): void {
+  const existingIndex = registeredScenarios.findIndex(s => s.id === scenario.id);
+  if (existingIndex >= 0) {
+    registeredScenarios[existingIndex] = scenario;
+  } else {
+    registeredScenarios.push(scenario);
+  }
+}
+
+export function getRegisteredScenarios(): ScenarioDefinition[] {
+  return registeredScenarios;
+}
+
+export function clearRegisteredScenarios(): void {
+  registeredScenarios = [];
 }
 
 export const DOMAIN_ICONS: Record<DomainType, string> = {

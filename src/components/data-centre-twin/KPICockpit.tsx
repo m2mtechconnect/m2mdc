@@ -1,6 +1,7 @@
 /**
  * KPI Cockpit - Central KPI display for Data Centre Twin
  * Uses Studio design system (light theme)
+ * Now Blueprint-aware for KPI labels/units
  */
 
 import { Badge } from '@/components/ui/badge';
@@ -10,9 +11,11 @@ import {
   Globe, DollarSign, Activity, TrendingUp, TrendingDown
 } from 'lucide-react';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
+import { useBlueprintKPIs } from '@/hooks/useBlueprintKPIs';
 
 interface KPICockpitProps {
   facility: DataCentreFacility;
+  twinId?: string;
 }
 
 interface KPIData {
@@ -114,8 +117,9 @@ function DomainCard({
   );
 }
 
-export function KPICockpit({ facility }: KPICockpitProps) {
+export function KPICockpit({ facility, twinId = 'default' }: KPICockpitProps) {
   const kpis = calculateKPIs(facility);
+  const { getKpiById, totalKpis } = useBlueprintKPIs(twinId);
   
   return (
     <div className="space-y-4">
@@ -124,7 +128,12 @@ export function KPICockpit({ facility }: KPICockpitProps) {
           <div className="p-2 rounded-lg bg-primary/10">
             <Activity className="h-5 w-5 text-primary" />
           </div>
-          <h2 className="text-lg font-semibold text-foreground">KPI Cockpit</h2>
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">KPI Cockpit</h2>
+            {totalKpis > 0 && (
+              <span className="text-xs text-muted-foreground">{totalKpis} KPIs from Blueprint</span>
+            )}
+          </div>
         </div>
         <Badge variant="outline" className="font-mono text-xs text-success border-success/30">
           <span className="relative flex h-2 w-2 mr-2">

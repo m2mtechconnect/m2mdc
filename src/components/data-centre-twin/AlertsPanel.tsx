@@ -1,12 +1,12 @@
 /**
  * Alerts Panel - Shows active alerts for the facility
- * Uses DC UI components for consistent NOC aesthetics
+ * Uses Studio design system (light theme)
  */
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { DCCard, DCStatusBadge, DCEventBadge } from '@/components/dc-ui';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, Bell, CheckCircle, Clock, XCircle } from 'lucide-react';
 import type { FacilityAlert } from '@/types/dataCenterTwin';
 
@@ -19,46 +19,56 @@ export function AlertsPanel({ alerts, maxHeight = '400px' }: AlertsPanelProps) {
   const activeAlerts = alerts.filter(a => a.status === 'active');
   const acknowledgedAlerts = alerts.filter(a => a.status === 'acknowledged');
 
+  const statusBorder = activeAlerts.some(a => a.severity === 'critical') 
+    ? 'border-destructive/30' 
+    : activeAlerts.length > 0 
+      ? 'border-warning/30' 
+      : 'border-border';
+
   return (
-    <DCCard
-      title="Active Alerts"
-      icon={<Bell className="h-4 w-4" />}
-      status={activeAlerts.some(a => a.severity === 'critical') ? 'critical' : activeAlerts.length > 0 ? 'warning' : 'normal'}
-      headerAction={
-        <Badge variant="outline" className="font-mono text-xs">
-          {activeAlerts.length} Active
-        </Badge>
-      }
-    >
-      <ScrollArea style={{ height: maxHeight }}>
-        <div className="space-y-2">
-          {activeAlerts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-              <div className="p-3 rounded-full bg-dc-success/20 mb-3">
-                <CheckCircle className="h-6 w-6 text-dc-success" />
-              </div>
-              <p className="text-sm font-medium">No active alerts</p>
-              <p className="text-xs text-muted-foreground">All systems operational</p>
-            </div>
-          ) : (
-            activeAlerts.map((alert) => (
-              <AlertItem key={alert.id} alert={alert} />
-            ))
-          )}
-          
-          {acknowledgedAlerts.length > 0 && (
-            <>
-              <div className="text-xs text-muted-foreground pt-4 pb-2 font-medium border-t border-dc-border mt-4">
-                Acknowledged ({acknowledgedAlerts.length})
-              </div>
-              {acknowledgedAlerts.slice(0, 3).map((alert) => (
-                <AlertItem key={alert.id} alert={alert} muted />
-              ))}
-            </>
-          )}
+    <Card className={`bg-card ${statusBorder}`}>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Bell className="h-4 w-4 text-primary" />
+            Active Alerts
+          </CardTitle>
+          <Badge variant="outline" className="font-mono text-xs">
+            {activeAlerts.length} Active
+          </Badge>
         </div>
-      </ScrollArea>
-    </DCCard>
+      </CardHeader>
+      <CardContent>
+        <ScrollArea style={{ height: maxHeight }}>
+          <div className="space-y-2">
+            {activeAlerts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                <div className="p-3 rounded-full bg-success/10 mb-3">
+                  <CheckCircle className="h-6 w-6 text-success" />
+                </div>
+                <p className="text-sm font-medium">No active alerts</p>
+                <p className="text-xs text-muted-foreground">All systems operational</p>
+              </div>
+            ) : (
+              activeAlerts.map((alert) => (
+                <AlertItem key={alert.id} alert={alert} />
+              ))
+            )}
+            
+            {acknowledgedAlerts.length > 0 && (
+              <>
+                <div className="text-xs text-muted-foreground pt-4 pb-2 font-medium border-t border-border mt-4">
+                  Acknowledged ({acknowledgedAlerts.length})
+                </div>
+                {acknowledgedAlerts.slice(0, 3).map((alert) => (
+                  <AlertItem key={alert.id} alert={alert} muted />
+                ))}
+              </>
+            )}
+          </div>
+        </ScrollArea>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -70,36 +80,33 @@ interface AlertItemProps {
 function AlertItem({ alert, muted }: AlertItemProps) {
   const getSeverityIcon = (severity: FacilityAlert['severity']) => {
     switch (severity) {
-      case 'critical': return <XCircle className="h-4 w-4 text-dc-critical" />;
-      case 'warning': return <AlertTriangle className="h-4 w-4 text-dc-warning" />;
-      case 'info': return <Bell className="h-4 w-4 text-dc-sovereignty" />;
+      case 'critical': return <XCircle className="h-4 w-4 text-destructive" />;
+      case 'warning': return <AlertTriangle className="h-4 w-4 text-warning" />;
+      case 'info': return <Bell className="h-4 w-4 text-info" />;
     }
   };
 
-  const mapDomainToEventType = (domain: string): 'thermal' | 'power' | 'cooling' | 'network' | 'security' | 'gpu' | 'sovereignty' => {
-    const domainMap: Record<string, 'thermal' | 'power' | 'cooling' | 'network' | 'security' | 'gpu' | 'sovereignty'> = {
-      'thermal': 'thermal',
-      'power': 'power',
-      'cooling': 'cooling',
-      'network': 'network',
-      'facility': 'security',
-      'workload': 'gpu',
-      'sovereignty': 'sovereignty',
-      'financial': 'power',
-    };
-    return domainMap[domain.toLowerCase()] || 'security';
+  const domainColors: Record<string, string> = {
+    thermal: 'bg-destructive/10 text-destructive border-destructive/20',
+    power: 'bg-warning/10 text-warning border-warning/20',
+    cooling: 'bg-info/10 text-info border-info/20',
+    network: 'bg-info/10 text-info border-info/20',
+    facility: 'bg-accent/10 text-accent border-accent/20',
+    workload: 'bg-accent/10 text-accent border-accent/20',
+    sovereignty: 'bg-primary/10 text-primary border-primary/20',
+    financial: 'bg-success/10 text-success border-success/20',
   };
 
   return (
     <div 
       className={`p-3 rounded-lg border transition-all duration-200 ${
         muted 
-          ? 'bg-dc-surface/30 opacity-60 border-dc-border/50' 
+          ? 'bg-muted/30 opacity-60 border-border/50' 
           : alert.severity === 'critical'
-            ? 'bg-dc-critical/5 border-dc-critical/30 hover:border-dc-critical/50'
+            ? 'bg-destructive/5 border-destructive/30 hover:border-destructive/50'
             : alert.severity === 'warning'
-              ? 'bg-dc-warning/5 border-dc-warning/30 hover:border-dc-warning/50'
-              : 'bg-dc-surface border-dc-border hover:border-dc-primary/30'
+              ? 'bg-warning/5 border-warning/30 hover:border-warning/50'
+              : 'bg-card border-border hover:border-primary/30'
       }`}
     >
       <div className="flex items-start gap-3">
@@ -108,13 +115,15 @@ function AlertItem({ alert, muted }: AlertItemProps) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="font-medium text-sm truncate">{alert.title}</span>
+            <span className="font-medium text-sm truncate text-card-foreground">{alert.title}</span>
           </div>
           <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
             {alert.description}
           </p>
           <div className="flex items-center gap-2 flex-wrap">
-            <DCEventBadge type={mapDomainToEventType(alert.domain)} />
+            <Badge variant="outline" className={`text-[10px] ${domainColors[alert.domain.toLowerCase()] || 'bg-muted'}`}>
+              {alert.domain}
+            </Badge>
             <span className="text-xs text-muted-foreground flex items-center gap-1 font-mono">
               <Clock className="h-3 w-3" />
               {formatTimeAgo(alert.triggeredAt)}
@@ -125,7 +134,7 @@ function AlertItem({ alert, muted }: AlertItemProps) {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="shrink-0 h-7 px-2 text-xs hover:bg-dc-primary/20 hover:text-dc-primary"
+            className="shrink-0 h-7 px-2 text-xs hover:bg-primary/10 hover:text-primary"
           >
             Ack
           </Button>

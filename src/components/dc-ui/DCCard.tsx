@@ -5,15 +5,14 @@
 
 import { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { LucideIcon } from 'lucide-react';
 
-export type CardStatus = 'operational' | 'warning' | 'critical' | 'info' | 'neutral';
+export type CardStatus = 'operational' | 'warning' | 'critical' | 'info' | 'neutral' | 'normal';
 
 interface DCCardProps {
   children: ReactNode;
   title?: string;
   subtitle?: string;
-  icon?: LucideIcon;
+  icon?: ReactNode;
   status?: CardStatus;
   showStatusDot?: boolean;
   elevated?: boolean;
@@ -28,7 +27,7 @@ export function DCCard({
   children,
   title,
   subtitle,
-  icon: Icon,
+  icon,
   status = 'neutral',
   showStatusDot = false,
   elevated = false,
@@ -38,6 +37,9 @@ export function DCCard({
   onClick,
   className,
 }: DCCardProps) {
+  // Map 'normal' to 'operational'
+  const normalizedStatus = status === 'normal' ? 'operational' : status;
+  
   const statusColors = {
     operational: 'border-l-dc-green',
     warning: 'border-l-dc-amber',
@@ -68,7 +70,7 @@ export function DCCard({
       className={cn(
         'rounded-lg border transition-all',
         elevated ? 'noc-card-elevated' : 'noc-card',
-        status !== 'neutral' && `border-l-4 ${statusColors[status]}`,
+        normalizedStatus !== 'neutral' && `border-l-4 ${statusColors[normalizedStatus]}`,
         onClick && 'cursor-pointer hover:border-primary/50',
         className
       )}
@@ -78,10 +80,12 @@ export function DCCard({
         <div className={cn('flex items-center justify-between gap-3', noPadding ? 'p-4 pb-0' : 'p-4 border-b border-border')}>
           <div className="flex items-center gap-3 min-w-0">
             {showStatusDot && (
-              <span className={cn('h-2 w-2 rounded-full flex-shrink-0', dotColors[status])} />
+              <span className={cn('h-2 w-2 rounded-full flex-shrink-0', dotColors[normalizedStatus])} />
             )}
-            {Icon && (
-              <Icon className={cn('h-5 w-5 flex-shrink-0', iconColors[status])} />
+            {icon && (
+              <div className={cn('flex-shrink-0', iconColors[normalizedStatus])}>
+                {icon}
+              </div>
             )}
             <div className="min-w-0">
               {title && (
@@ -115,7 +119,7 @@ export function DCCard({
 interface DCSectionHeaderProps {
   title: string;
   subtitle?: string;
-  icon?: LucideIcon;
+  icon?: ReactNode;
   action?: ReactNode;
   metrics?: Array<{ label: string; value: string | number }>;
   className?: string;
@@ -124,7 +128,7 @@ interface DCSectionHeaderProps {
 export function DCSectionHeader({
   title,
   subtitle,
-  icon: Icon,
+  icon,
   action,
   metrics,
   className,
@@ -132,9 +136,9 @@ export function DCSectionHeader({
   return (
     <div className={cn('flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6', className)}>
       <div className="flex items-center gap-3">
-        {Icon && (
+        {icon && (
           <div className="p-2 rounded-lg bg-primary/10">
-            <Icon className="h-5 w-5 text-primary" />
+            {icon}
           </div>
         )}
         <div>

@@ -10,7 +10,7 @@ export interface RackServer {
   id: string;
   slot: number;
   name: string;
-  status: 'operational' | 'warning' | 'critical' | 'offline';
+  status: 'operational' | 'warning' | 'critical' | 'offline' | 'normal';
   temperature: number;
   powerDraw: number;
   gpuCount?: number;
@@ -20,11 +20,14 @@ export interface RackServer {
 export interface RackData {
   id: string;
   name: string;
-  totalSlots: number;
-  servers: RackServer[];
-  avgTemperature: number;
-  totalPowerDraw: number;
-  status: 'operational' | 'warning' | 'critical';
+  totalSlots?: number;
+  servers?: RackServer[];
+  avgTemperature?: number;
+  totalPowerDraw?: number;
+  status: 'operational' | 'warning' | 'critical' | 'normal';
+  // Simplified props for quick overview
+  powerKw?: number;
+  thermalLoad?: 'low' | 'medium' | 'high';
 }
 
 interface DCRackVisualizationProps {
@@ -44,6 +47,7 @@ export function DCRackVisualization({
 }: DCRackVisualizationProps) {
   const statusColors = {
     operational: 'bg-dc-green/30 border-dc-green/50',
+    normal: 'bg-dc-green/30 border-dc-green/50',
     warning: 'bg-dc-amber/30 border-dc-amber/50',
     critical: 'bg-dc-red/40 border-dc-red/60 animate-pulse-glow',
     offline: 'bg-muted/30 border-muted',
@@ -55,6 +59,22 @@ export function DCRackVisualization({
     if (temp >= 60) return 'bg-dc-green';
     return 'bg-dc-cyan';
   };
+
+  // Handle racks without servers array
+  if (!rack.servers || !rack.totalSlots) {
+    return (
+      <div className={cn('flex flex-col gap-2', className)}>
+        <div className="flex items-center justify-between px-2">
+          <span className="text-xs font-semibold">{rack.name}</span>
+        </div>
+        <div className={cn('noc-card p-2 h-16 flex items-center justify-center', statusColors[rack.status])}>
+          <span className="text-xs text-muted-foreground">
+            {rack.powerKw ? `${rack.powerKw.toFixed(1)} kW` : 'No data'}
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   // Create slot map
   const slotMap = new Map<number, RackServer>();
@@ -68,7 +88,7 @@ export function DCRackVisualization({
       <div className="flex items-center justify-between px-2">
         <span className="text-xs font-semibold">{rack.name}</span>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          {showTemperature && (
+          {showTemperature && rack.avgTemperature && (
             <span className={cn(
               'font-mono',
               rack.avgTemperature >= 70 ? 'text-dc-amber' : 
@@ -77,7 +97,7 @@ export function DCRackVisualization({
               {rack.avgTemperature}°C
             </span>
           )}
-          {showPower && (
+          {showPower && rack.totalPowerDraw && (
             <span className="font-mono">{rack.totalPowerDraw}W</span>
           )}
         </div>
@@ -98,6 +118,8 @@ export function DCRackVisualization({
               );
             }
 
+            const serverStatus = server.status === 'normal' ? 'operational' : server.status;
+
             return (
               <Tooltip key={slotNum}>
                 <TooltipTrigger asChild>
@@ -105,7 +127,7 @@ export function DCRackVisualization({
                     onClick={() => onServerClick?.(server)}
                     className={cn(
                       'h-2 rounded-sm border cursor-pointer transition-all hover:opacity-80',
-                      statusColors[server.status]
+                      statusColors[serverStatus]
                     )}
                   >
                     {showTemperature && (
@@ -130,11 +152,11 @@ export function DCRackVisualization({
                     )}
                     <div className={cn(
                       'capitalize',
-                      server.status === 'operational' ? 'text-dc-green' :
-                      server.status === 'warning' ? 'text-dc-amber' :
-                      server.status === 'critical' ? 'text-dc-red' : 'text-muted-foreground'
+                      serverStatus === 'operational' ? 'text-dc-green' :
+                      serverStatus === 'warning' ? 'text-dc-amber' :
+                      serverStatus === 'critical' ? 'text-dc-red' : 'text-muted-foreground'
                     )}>
-                      {server.status}
+                      {serverStatus}
                     </div>
                   </div>
                 </TooltipContent>
@@ -167,15 +189,22 @@ export function DCRackVisualization({
 interface DCRackGridProps {
   racks: RackData[];
   columns?: number;
-  onRackClick?: (rack: RackData) => void;
+  onRackClick?: (rackId: string) => void;
   className?: string;
 }
 
 export function DCRackGrid({ racks, columns = 4, onRackClick, className }: DCRackGridProps) {
   const statusBg = {
     operational: 'bg-dc-green/20 border-dc-green/30',
+    normal: 'bg-dc-green/20 border-dc-green/30',
     warning: 'bg-dc-amber/20 border-dc-amber/30',
     critical: 'bg-dc-red/20 border-dc-red/30',
+  };
+
+  const thermalColors = {
+    low: 'bg-dc-green/60',
+    medium: 'bg-dc-amber/60',
+    high: 'bg-dc-red/60',
   };
 
   return (
@@ -188,30 +217,45 @@ export function DCRackGrid({ racks, columns = 4, onRackClick, className }: DCRac
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                onClick={() => onRackClick?.(rack)}
+                onClick={() => onRackClick?.(rack.id)}
                 className={cn(
                   'aspect-square rounded border-2 p-1 transition-all hover:scale-105',
                   statusBg[rack.status]
                 )}
               >
                 <div className="h-full w-full rounded bg-noc-surface flex flex-col justify-end p-0.5 gap-0.5">
-                  {rack.servers.slice(0, 8).map((server, i) => (
-                    <div
-                      key={i}
-                      className={cn(
-                        'h-0.5 rounded-full',
-                        server.status === 'critical' ? 'bg-dc-red' :
-                        server.status === 'warning' ? 'bg-dc-amber' : 'bg-dc-green/60'
-                      )}
-                    />
-                  ))}
+                  {rack.servers ? (
+                    rack.servers.slice(0, 8).map((server, i) => {
+                      const serverStatus = server.status === 'normal' ? 'operational' : server.status;
+                      return (
+                        <div
+                          key={i}
+                          className={cn(
+                            'h-0.5 rounded-full',
+                            serverStatus === 'critical' ? 'bg-dc-red' :
+                            serverStatus === 'warning' ? 'bg-dc-amber' : 'bg-dc-green/60'
+                          )}
+                        />
+                      );
+                    })
+                  ) : (
+                    // Simplified view for racks without detailed server data
+                    <div className={cn(
+                      'h-full rounded',
+                      rack.thermalLoad ? thermalColors[rack.thermalLoad] : 'bg-dc-green/40'
+                    )} />
+                  )}
                 </div>
               </button>
             </TooltipTrigger>
             <TooltipContent>
               <div className="text-xs">
                 <div className="font-semibold">{rack.name}</div>
-                <div>{rack.servers.length} servers • {rack.avgTemperature}°C</div>
+                <div>
+                  {rack.servers ? `${rack.servers.length} servers` : 'Rack'} 
+                  {rack.avgTemperature ? ` • ${rack.avgTemperature}°C` : ''}
+                  {rack.powerKw ? ` • ${rack.powerKw.toFixed(1)} kW` : ''}
+                </div>
               </div>
             </TooltipContent>
           </Tooltip>

@@ -39,24 +39,40 @@ const categoryColors = {
   security: 'text-dc-red bg-dc-red/10 border-dc-red/20',
 };
 
-interface DCSearchBarProps {
+export interface DCSearchBarProps {
+  value?: string;
+  onChange?: (value: string) => void;
   onSearch?: (query: string) => void;
   onCoPilotQuery?: (query: string) => void;
+  onChipClick?: (chip: string) => void;
   placeholder?: string;
   className?: string;
 }
 
 export function DCSearchBar({
+  value: externalValue,
+  onChange: externalOnChange,
   onSearch,
   onCoPilotQuery,
+  onChipClick,
   placeholder = 'Ask about thermals, power, GPUs, sovereignty...',
   className,
 }: DCSearchBarProps) {
-  const [query, setQuery] = useState('');
+  const [internalQuery, setInternalQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Use external value if provided, otherwise use internal state
+  const query = externalValue !== undefined ? externalValue : internalQuery;
+  const setQuery = (value: string) => {
+    if (externalOnChange) {
+      externalOnChange(value);
+    } else {
+      setInternalQuery(value);
+    }
+  };
 
   // Filter suggestions based on query
   const filteredSuggestions = query.length > 0
@@ -80,6 +96,7 @@ export function DCSearchBar({
     e.preventDefault();
     if (query.trim()) {
       onCoPilotQuery?.(query);
+      onSearch?.(query);
       setQuery('');
       setShowSuggestions(false);
     }
@@ -87,8 +104,19 @@ export function DCSearchBar({
 
   const handleSuggestionClick = (suggestion: Suggestion) => {
     onCoPilotQuery?.(suggestion.query);
+    onSearch?.(suggestion.query);
     setQuery('');
     setShowSuggestions(false);
+  };
+
+  const handleChipClick = (chip: string) => {
+    if (onChipClick) {
+      onChipClick(chip);
+    } else {
+      setQuery(chip);
+      inputRef.current?.focus();
+      setShowSuggestions(true);
+    }
   };
 
   return (
@@ -167,11 +195,7 @@ export function DCSearchBar({
           {['PUE', 'GPU Load', 'Thermals', 'Cooling', 'Power', 'Sovereignty'].map((chip) => (
             <button
               key={chip}
-              onClick={() => {
-                setQuery(chip);
-                inputRef.current?.focus();
-                setShowSuggestions(true);
-              }}
+              onClick={() => handleChipClick(chip)}
               className="px-3 py-1 text-xs rounded-full border border-noc-border bg-noc-surface hover:border-primary hover:text-primary transition-colors"
             >
               {chip}

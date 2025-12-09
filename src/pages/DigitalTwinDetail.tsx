@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Box } from "lucide-react";
 import { toast } from "sonner";
 import type { DigitalTwin, DigitalTwinStatus, DigitalTwinConfig } from "@/types/digitalTwin";
 import { TwinOverviewTab } from "@/components/digital-twin/TwinOverviewTab";
 import { TwinWorkflowTab } from "@/components/digital-twin/TwinWorkflowTab";
 import { TwinEntitiesEventsTab } from "@/components/digital-twin/TwinEntitiesEventsTab";
 import { TwinRunsTab } from "@/components/digital-twin/TwinRunsTab";
+import { DCCard, DCSectionHeader } from "@/components/dc-ui";
 
 export default function DigitalTwinDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -65,16 +65,16 @@ export default function DigitalTwinDetail() {
     }
   }
 
-  function getStatusColor(status: string) {
+  function getStatusVariant(status: string): "operational" | "warning" | "critical" | "neutral" {
     switch (status) {
       case "active":
-        return "bg-green-500/10 text-green-700 dark:text-green-400";
+        return "operational";
       case "draft":
-        return "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400";
+        return "warning";
       case "archived":
-        return "bg-gray-500/10 text-gray-700 dark:text-gray-400";
+        return "neutral";
       default:
-        return "bg-gray-500/10 text-gray-700 dark:text-gray-400";
+        return "neutral";
     }
   }
 
@@ -99,22 +99,23 @@ export default function DigitalTwinDetail() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold tracking-tight">{twin.name}</h1>
-              <Badge className={getStatusColor(twin.status)}>{twin.status}</Badge>
-            </div>
-            <p className="text-muted-foreground mt-1">
-              <code className="text-xs bg-muted px-2 py-1 rounded">{twin.slug}</code>
-            </p>
-          </div>
+          <DCSectionHeader
+            title={twin.name}
+            subtitle={twin.slug}
+            icon={<Box className="h-5 w-5 text-dc-cyan" />}
+            action={
+              <Badge variant={getStatusVariant(twin.status) === "operational" ? "default" : "secondary"}>
+                {twin.status}
+              </Badge>
+            }
+          />
         </div>
       </div>
 
       {/* Tabs */}
-      <Card>
+      <DCCard noPadding>
         <Tabs defaultValue="overview" className="w-full">
-          <div className="border-b px-6">
+          <div className="border-b border-border/50 px-6">
             <TabsList className="bg-transparent border-0">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="workflow">Workflow</TabsTrigger>
@@ -139,7 +140,7 @@ export default function DigitalTwinDetail() {
             <TwinRunsTab twinId={twin.id} twinSlug={twin.slug} />
           </TabsContent>
         </Tabs>
-      </Card>
+      </DCCard>
     </div>
   );
 }

@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, RefreshCw, AlertCircle, CheckCircle, Clock, Database } from "lucide-react";
+import { Search, RefreshCw, AlertCircle, CheckCircle, Clock, Database, Activity } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { SectionHeader } from "@/components/ui/section-header";
+import { DCCard, DCSectionHeader } from "@/components/dc-ui";
+import { DCKPITile } from "@/components/dc-ui";
 import SyncTable from "@/components/connect/SyncTable";
 import JobDetailsDrawer from "@/components/connect/JobDetailsDrawer";
 import JobMonitor from "@/components/connect/JobMonitor";
@@ -49,59 +48,52 @@ export default function ConnectMonitor() {
     <div className="min-h-screen bg-background section-padding-lg">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <SectionHeader
+        <DCSectionHeader
           title="Sync Monitor"
-          description="Real-time status of all data connections and background jobs."
-          action={{
-            label: "View Health",
-            onClick: () => navigate("/connect/health"),
-            variant: "outline"
-          }}
+          subtitle="Real-time status of all data connections and background jobs."
+          icon={<Activity className="h-5 w-5 text-dc-cyan" />}
+          action={
+            <Button variant="outline" onClick={() => navigate("/connect/health")}>
+              View Health
+            </Button>
+          }
         />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <Clock className="h-8 w-8 text-secondary" />
-              <div>
-                <div className="text-2xl font-bold">{stats.running}</div>
-                <div className="text-xs text-muted-foreground">Running</div>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <CheckCircle className="h-8 w-8 text-primary" />
-              <div>
-                <div className="text-2xl font-bold">{stats.success}</div>
-                <div className="text-xs text-muted-foreground">Succeeded</div>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="h-8 w-8 text-destructive" />
-              <div>
-                <div className="text-2xl font-bold">{stats.failed}</div>
-                <div className="text-xs text-muted-foreground">Failed</div>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <Database className="h-8 w-8 text-primary" />
-              <div>
-                <div className="text-2xl font-bold">12.4k</div>
-                <div className="text-xs text-muted-foreground">Total Docs</div>
-              </div>
-            </div>
-          </Card>
+          <DCKPITile
+            label="Running"
+            value={stats.running}
+            icon={<Clock className="h-4 w-4" />}
+            status="info"
+            size="sm"
+          />
+          <DCKPITile
+            label="Succeeded"
+            value={stats.success}
+            icon={<CheckCircle className="h-4 w-4" />}
+            status="normal"
+            size="sm"
+          />
+          <DCKPITile
+            label="Failed"
+            value={stats.failed}
+            icon={<AlertCircle className="h-4 w-4" />}
+            status={stats.failed > 0 ? "critical" : "normal"}
+            size="sm"
+          />
+          <DCKPITile
+            label="Total Docs"
+            value="12.4k"
+            icon={<Database className="h-4 w-4" />}
+            status="normal"
+            size="sm"
+          />
         </div>
 
         {/* Filters */}
-        <Card className="p-4">
-          <div className="flex gap-4 items-center">
+        <DCCard title="Filters" icon={<Search className="h-4 w-4 text-dc-cyan" />} noPadding>
+          <div className="flex gap-4 items-center p-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -126,7 +118,7 @@ export default function ConnectMonitor() {
               <RefreshCw className="h-4 w-4" />
             </Button>
           </div>
-        </Card>
+        </DCCard>
 
         {/* Job Monitor */}
         <JobMonitor />

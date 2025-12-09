@@ -2,15 +2,19 @@
  * Data Centre Digital Twin Dashboard
  * Enterprise dashboard with domain tabs and KPI cockpit
  * Uses Studio design system (light theme)
+ * Blueprint-aware for system configuration
  */
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { 
   Thermometer, Zap, Wind, Network, Shield, Cpu, 
-  Globe, DollarSign, AlertTriangle, Activity, Server, PlayCircle
+  Globe, DollarSign, AlertTriangle, Activity, Server, PlayCircle,
+  FileText, Eye
 } from 'lucide-react';
 import { DCSearchBar } from '@/components/dc-ui';
 import { KPICockpit } from './KPICockpit';
@@ -24,10 +28,12 @@ import { SovereigntyDomainView } from './domains/SovereigntyDomainView';
 import { FinancialDomainView } from './domains/FinancialDomainView';
 import { AlertsPanel } from './AlertsPanel';
 import { DCSimulationPanel } from '@/components/simulation/DCSimulationPanel';
+import { useBlueprint } from '@/hooks/useBlueprint';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 interface DataCentreDashboardProps {
   facility: DataCentreFacility;
+  twinId?: string;
   onScenarioSelect?: (scenarioId: string) => void;
 }
 
@@ -149,10 +155,13 @@ function EventTimeline({ events }: { events: Array<{ id: string; title: string; 
   );
 }
 
-export function DataCentreDashboard({ facility, onScenarioSelect }: DataCentreDashboardProps) {
+export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSelect }: DataCentreDashboardProps) {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
   
+  // Get Blueprint for system configuration
+  const { blueprint, summary } = useBlueprint(twinId);
   const activeAlerts = facility.alerts.filter(a => a.status === 'active');
   const criticalAlerts = activeAlerts.filter(a => a.severity === 'critical');
   
@@ -218,6 +227,20 @@ export function DataCentreDashboard({ facility, onScenarioSelect }: DataCentreDa
               </span>
             </div>
           )}
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => navigate(`/blueprint/${twinId}`)}
+            className="gap-2"
+          >
+            <FileText className="h-4 w-4" />
+            Blueprint
+            {summary && (
+              <Badge variant="secondary" className="text-[10px] h-4 px-1">
+                {summary.totalAgents} agents
+              </Badge>
+            )}
+          </Button>
           <Badge variant="outline" className="font-mono text-xs">
             LIVE • {new Date().toLocaleTimeString()}
           </Badge>
@@ -284,7 +307,7 @@ export function DataCentreDashboard({ facility, onScenarioSelect }: DataCentreDa
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <KPICockpit facility={facility} />
+          <KPICockpit facility={facility} twinId={twinId} />
           
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2 space-y-6">
@@ -361,7 +384,7 @@ export function DataCentreDashboard({ facility, onScenarioSelect }: DataCentreDa
         </TabsContent>
 
         <TabsContent value="simulation">
-          <DCSimulationPanel />
+          <DCSimulationPanel twinId={twinId} />
         </TabsContent>
 
         <TabsContent value="thermal">

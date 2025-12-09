@@ -16,7 +16,7 @@ export interface UnifiedItem {
   totalRuns: number;
   successRate: number;
   version: string;
-  type: 'system' | 'agent';
+  type: 'system' | 'agent' | 'twin';
 }
 
 interface UnifiedItemCardProps {

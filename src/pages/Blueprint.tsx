@@ -3,7 +3,7 @@
  * Central source of truth for Data Centre Twin configuration
  */
 
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useBlueprint } from '@/hooks/useBlueprint';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -21,7 +21,7 @@ import {
   MessageCircle,
   Sparkles
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 
 // Blueprint Tab Components
@@ -36,9 +36,21 @@ import { BlueprintScenariosTab } from '@/components/blueprint/tabs/BlueprintScen
 export default function Blueprint() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { openWithQuestion } = useCoPilotContext();
   const { blueprint, summary, isLoading, downloadBlueprint } = useBlueprint(id || 'default');
-  const [activeTab, setActiveTab] = useState('overview');
+  
+  // Read tab and highlight from query params
+  const tabParam = searchParams.get('tab');
+  const highlightParam = searchParams.get('highlight');
+  const [activeTab, setActiveTab] = useState(tabParam || 'overview');
+  
+  // Switch tab when query param changes
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
 
   if (isLoading || !blueprint) {
     return (
@@ -238,7 +250,7 @@ export default function Blueprint() {
               <BlueprintOverviewTab blueprint={blueprint} summary={summary} />
             </TabsContent>
             <TabsContent value="agents" className="m-0">
-              <BlueprintAgentsTab agents={blueprint.agents} domains={blueprint.domains} />
+              <BlueprintAgentsTab agents={blueprint.agents} domains={blueprint.domains} highlightAgentId={highlightParam || undefined} />
             </TabsContent>
             <TabsContent value="data" className="m-0">
               <BlueprintDataTab dataSources={blueprint.dataSources} integrations={blueprint.integrations} />

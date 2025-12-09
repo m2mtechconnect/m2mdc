@@ -90,6 +90,19 @@ export const SOVEREIGN_DC_COPILOT_CHIPS = [
     label: 'Sovereignty compliance',
     question: 'What steps ensure data never leaves Canadian jurisdiction for PIPEDA compliance?',
   },
+  // Blueprint-aware chips
+  {
+    label: 'Blueprint agents',
+    question: 'Which agents are defined in the system blueprint and what domains do they cover?',
+  },
+  {
+    label: 'Blueprint workflows',
+    question: 'Show all workflows in the blueprint related to thermal and UPS failures.',
+  },
+  {
+    label: 'KPI ownership',
+    question: 'What KPIs relate to carbon and cost, and who is responsible for them?',
+  },
 ] as const;
 
 /**

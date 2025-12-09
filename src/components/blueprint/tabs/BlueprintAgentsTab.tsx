@@ -29,9 +29,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-interface BlueprintAgentsTabProps {
+export interface BlueprintAgentsTabProps {
   agents: AgentBlueprint[];
   domains: Record<string, DomainSection>;
+  highlightAgentId?: string;
 }
 
 const domainIcons: Record<string, React.ReactNode> = {
@@ -59,7 +60,7 @@ const typeBadgeColors: Record<string, string> = {
   incident: 'bg-red-500/10 text-red-600 border-red-500/30',
 };
 
-export function BlueprintAgentsTab({ agents, domains }: BlueprintAgentsTabProps) {
+export function BlueprintAgentsTab({ agents, domains, highlightAgentId }: BlueprintAgentsTabProps) {
   // Group agents by domain
   const agentsByDomain = agents.reduce((acc, agent) => {
     const domain = agent.domain;
@@ -109,7 +110,10 @@ export function BlueprintAgentsTab({ agents, domains }: BlueprintAgentsTabProps)
             </TableHeader>
             <TableBody>
               {agents.map((agent) => (
-                <TableRow key={agent.id}>
+                <TableRow 
+                  key={agent.id} 
+                  className={highlightAgentId === agent.id ? 'bg-primary/10 border-l-2 border-l-primary' : ''}
+                >
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Bot className="h-4 w-4 text-muted-foreground" />

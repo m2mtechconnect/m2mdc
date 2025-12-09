@@ -5,7 +5,7 @@
  * AUTH: user (requires valid JWT token)
  * 
  * REQUEST:
- * - tab: 'all' | 'systems' | 'agents' | 'favorites' | 'archived'
+ * - tab: 'all' | 'systems' | 'agents' | 'twins' | 'favorites' | 'archived'
  * - search: string (optional)
  * - department: string (optional)
  * - type: string[] (optional)
@@ -29,7 +29,7 @@ import { createHandler } from "../_shared/handler.ts";
 
 // Input validation schema
 const InputSchema = z.object({
-  tab: z.enum(['all', 'systems', 'agents', 'favorites', 'archived']).default('all'),
+  tab: z.enum(['all', 'systems', 'agents', 'twins', 'favorites', 'archived']).default('all'),
   search: z.string().default(''),
   department: z.string().default(''),
   type: z.array(z.string()).default([]),
@@ -93,11 +93,11 @@ serve(createHandler({
       agentsQuery = agentsQuery.in('status', ['active', 'deployed']);
       twinsQuery = twinsQuery.in('status', ['active', 'deployed']);
       log('All tab - filtering for active/deployed status');
-    } else if (tab === 'systems') {
+    } else if (tab === 'systems' || tab === 'twins') {
       // Twins only: show active/deployed twins
       agentsQuery = agentsQuery.limit(0); // Don't fetch agents
       twinsQuery = twinsQuery.in('status', ['active', 'deployed']);
-      log('Systems tab - showing twins only');
+      log('Systems/Twins tab - showing twins only');
     } else if (tab === 'agents') {
       // Agents only: show active/deployed agents
       twinsQuery = twinsQuery.limit(0); // Don't fetch twins

@@ -26,6 +26,7 @@ export interface DCKPITileProps {
   sparklineData?: number[];
   icon?: ReactNode;
   subtitle?: string;
+  sublabel?: string; // Alias for subtitle
   onClick?: () => void;
   className?: string;
   compact?: boolean;
@@ -44,11 +45,14 @@ export function DCKPITile({
   sparklineData,
   icon,
   subtitle,
+  sublabel,
   onClick,
   className,
   compact = false,
   size = 'md',
 }: DCKPITileProps) {
+  // Use sublabel as fallback for subtitle
+  const displaySubtitle = subtitle || sublabel;
   const statusColors = {
     normal: 'border-l-dc-green',
     warning: 'border-l-dc-amber',
@@ -139,8 +143,8 @@ export function DCKPITile({
       )}
 
       {/* Subtitle */}
-      {subtitle && (
-        <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
+      {displaySubtitle && (
+        <p className="text-xs text-muted-foreground mt-1">{displaySubtitle}</p>
       )}
 
       {/* Threshold Bar */}

@@ -11,6 +11,14 @@ export { SovereigntyEngine, getSovereigntyEngine, resetSovereigntyEngine } from 
 // React Hook
 export { useSovereignty } from './useSovereignty';
 
+// CoPilot Awareness
+export { 
+  buildSovereigntyCoPilotContext, 
+  generateSovereigntyResponse, 
+  SOVEREIGNTY_COPILOT_CHIPS,
+  type SovereigntyCoPilotContext 
+} from './copilotAwareness';
+
 // Mock Data
 export {
   mockDataAssets,

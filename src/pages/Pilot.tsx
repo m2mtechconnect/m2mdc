@@ -239,8 +239,7 @@ export default function Pilot() {
                 Our team will review your pilot request and reach out within 24 hours to discuss next steps
               </p>
             </form>
-          </DCCard>
-        </div>
+        </DCCard>
       </div>
     </div>
   );

@@ -25,6 +25,9 @@ import { DecisionReplayModal } from "@/components/rag/DecisionReplayModal";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useBlueprint } from "@/hooks/useBlueprint";
 import { useBlueprintScenarios } from "@/hooks/useBlueprintScenarios";
+import { useSovereignty } from "@/sovereignty";
+import { SovereigntyAuditTimeline } from "@/components/compliance/SovereigntyAuditTimeline";
+import { SovereigntyRiskOverview } from "@/components/compliance/SovereigntyRiskOverview";
 
 // DC-specific audit timeline
 const auditTimeline = [
@@ -138,6 +141,9 @@ export default function Compliance() {
   const { blueprint, summary, downloadBlueprint } = useBlueprint('default');
   const { scenarios } = useBlueprintScenarios('default');
   
+  // Get sovereignty engine data
+  const sovereignty = useSovereignty();
+  
   // Get compliance-relevant scenarios (sovereignty, facility_safety, financial)
   const complianceScenarios = useMemo(() => {
     return scenarios.filter(s => 
@@ -198,42 +204,46 @@ export default function Compliance() {
             </Button>
           </div>
 
-          {/* DC-Specific KPIs */}
+          {/* DC-Specific KPIs - Now powered by Sovereignty Engine */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <Card className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Globe className="h-4 w-4 text-blue-500" />
                 <span className="text-xs text-muted-foreground uppercase">Sovereign Compliance</span>
               </div>
-              <div className="text-2xl font-bold">98%</div>
-              <div className="text-xs text-green-600">+1.2% this month</div>
+              <div className="text-2xl font-bold">{sovereignty.sovereigntyScore}%</div>
+              <div className={`text-xs ${sovereignty.sovereigntyScore >= 95 ? 'text-green-600' : 'text-amber-600'}`}>
+                {sovereignty.riskLevel === 'low' ? 'Excellent' : sovereignty.riskLevel === 'medium' ? 'Good' : 'Needs attention'}
+              </div>
             </Card>
             
             <Card className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Thermometer className="h-4 w-4 text-orange-500" />
-                <span className="text-xs text-muted-foreground uppercase">Thermal Safety</span>
+                <Shield className="h-4 w-4 text-purple-500" />
+                <span className="text-xs text-muted-foreground uppercase">Cross-Border Flows</span>
               </div>
-              <div className="text-2xl font-bold">3</div>
-              <div className="text-xs text-amber-600">Events this week</div>
+              <div className="text-2xl font-bold">{sovereignty.crossBorderFlows}</div>
+              <div className="text-xs text-muted-foreground">Monitored flows</div>
             </Card>
             
             <Card className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Zap className="h-4 w-4 text-yellow-500" />
-                <span className="text-xs text-muted-foreground uppercase">Power Warnings</span>
+                <Target className="h-4 w-4 text-green-500" />
+                <span className="text-xs text-muted-foreground uppercase">Audit Readiness</span>
               </div>
-              <div className="text-2xl font-bold">0</div>
-              <div className="text-xs text-green-600">All systems nominal</div>
+              <div className="text-2xl font-bold">{sovereignty.auditReadinessScore}%</div>
+              <div className="text-xs text-green-600">{sovereignty.certifiedFrameworks} certified</div>
             </Card>
             
             <Card className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <AlertTriangle className="h-4 w-4 text-red-500" />
-                <span className="text-xs text-muted-foreground uppercase">Policy Violations</span>
+                <span className="text-xs text-muted-foreground uppercase">Violations</span>
               </div>
-              <div className="text-2xl font-bold">2</div>
-              <div className="text-xs text-muted-foreground">Last 30 days</div>
+              <div className="text-2xl font-bold">{sovereignty.violationCount}</div>
+              <div className={`text-xs ${sovereignty.violationCount === 0 ? 'text-green-600' : 'text-amber-600'}`}>
+                {sovereignty.violationCount === 0 ? 'All clear' : 'Active violations'}
+              </div>
             </Card>
           </div>
 
@@ -343,7 +353,7 @@ export default function Compliance() {
 
             {/* Right Column */}
             <div className="space-y-6">
-              {/* Risk Overview */}
+              {/* Risk Overview - Now powered by Sovereignty Engine */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -351,60 +361,14 @@ export default function Compliance() {
                     Risk Overview
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Data Centre operational risk indicators
+                    Sovereignty and compliance risk indicators
                   </p>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {dcRiskCategories.map((risk) => {
-                      const isHighRisk = risk.score < 90;
-                      return (
-                        <Tooltip key={risk.name}>
-                          <TooltipTrigger asChild>
-                            <div 
-                              className="cursor-pointer hover:bg-muted/50 p-3 rounded-lg transition-colors border border-transparent hover:border-border"
-                              onClick={() => handleRiskClick(risk.name)}
-                            >
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <span className="font-medium text-sm">{risk.name}</span>
-                                    <Badge
-                                      variant="outline"
-                                      className={`text-xs ${
-                                        isHighRisk
-                                          ? "border-amber-500 text-amber-600"
-                                          : "border-green-500 text-green-600"
-                                      }`}
-                                    >
-                                      {risk.issues > 0 ? `${risk.issues} issues` : "Clean"}
-                                    </Badge>
-                                  </div>
-                                  <p className="text-xs text-muted-foreground">
-                                    {risk.lastIssue}
-                                  </p>
-                                </div>
-                                <span className="font-mono text-sm font-semibold ml-2">
-                                  {risk.score}%
-                                </span>
-                              </div>
-                              <div className="h-2 bg-muted rounded-full overflow-hidden">
-                                <div
-                                  className={`h-full transition-all ${
-                                    isHighRisk ? "bg-amber-500" : "bg-green-500"
-                                  }`}
-                                  style={{ width: `${risk.score}%` }}
-                                />
-                              </div>
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent side="left" className="max-w-xs">
-                            <p>{risk.description}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      );
-                    })}
-                  </div>
+                  <SovereigntyRiskOverview 
+                    result={sovereignty.result} 
+                    onClick={() => navigate('/data-centre-twin?tab=sovereignty')}
+                  />
                 </CardContent>
               </Card>
 

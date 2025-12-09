@@ -292,6 +292,52 @@ export const PRESET_SCENARIOS: ScenarioDefinition[] = [
       { at: 180, type: 'END', kpiDeltas: {}, eventTitle: 'Scenario Complete', eventDescription: 'Thermal runaway scenario completed', severity: 'low', domain: 'thermal_hardware' },
     ],
   },
+
+  // 13. Sovereignty Policy Tightening
+  {
+    id: 'sovereignty_policy_tightening',
+    name: 'Policy Tightening - New Restrictions',
+    description: 'New sovereignty policy blocks previously allowed cross-border routes.',
+    durationSeconds: 240, // 4 minutes
+    domainsInvolved: ['sovereignty'],
+    severity: 'warning',
+    category: 'sovereignty',
+    tags: ['Compliance', 'Policy', 'PIPEDA'],
+    timeline: [
+      { at: 0, type: 'START', kpiDeltas: {}, eventTitle: 'Scenario Started', eventDescription: 'Policy tightening simulation initiated', severity: 'low', domain: 'sovereignty' },
+      { at: 20, type: 'INFO', kpiDeltas: {}, eventTitle: 'Policy Update Announced', eventDescription: 'New data residency requirements published', severity: 'medium', domain: 'sovereignty' },
+      { at: 45, type: 'TRIGGER', kpiDeltas: { policyComplianceRate: -15 }, eventTitle: 'Flows Re-evaluated', eventDescription: 'Existing data flows being checked against new policy', severity: 'medium', domain: 'sovereignty' },
+      { at: 70, type: 'ALERT', kpiDeltas: { sovereigntyRiskScore: 15, dataFlowViolations: 3 }, eventTitle: 'New Violations Found', eventDescription: '3 previously-compliant flows now violate new policy', severity: 'high', domain: 'sovereignty' },
+      { at: 100, type: 'MITIGATION', kpiDeltas: { dataFlowViolations: -1 }, eventTitle: 'Route Migration 1', eventDescription: 'First flow rerouted to compliant region', severity: 'medium', domain: 'sovereignty' },
+      { at: 140, type: 'MITIGATION', kpiDeltas: { dataFlowViolations: -1 }, eventTitle: 'Route Migration 2', eventDescription: 'Second flow rerouted to compliant region', severity: 'medium', domain: 'sovereignty' },
+      { at: 180, type: 'MITIGATION', kpiDeltas: { dataFlowViolations: -1, policyComplianceRate: 10 }, eventTitle: 'Route Migration 3', eventDescription: 'Final flow rerouted - all compliant', severity: 'low', domain: 'sovereignty' },
+      { at: 210, type: 'RECOVERY', kpiDeltas: { sovereigntyRiskScore: -10, auditReadinessScore: 5 }, eventTitle: 'Compliance Restored', eventDescription: 'All flows now compliant with new policy', severity: 'low', domain: 'sovereignty' },
+      { at: 240, type: 'END', kpiDeltas: {}, eventTitle: 'Scenario Complete', eventDescription: 'Policy tightening scenario completed', severity: 'low', domain: 'sovereignty' },
+    ],
+  },
+
+  // 14. Region Migration - Sovereignty Improvement
+  {
+    id: 'sovereignty_region_migration',
+    name: 'Region Migration - Sovereignty Improvement',
+    description: 'Migrate workloads from foreign to Canadian jurisdiction to improve sovereignty score.',
+    durationSeconds: 300, // 5 minutes
+    domainsInvolved: ['sovereignty', 'workload_gpu'],
+    severity: 'warning',
+    category: 'sovereignty',
+    tags: ['Migration', 'Compliance', 'Canada'],
+    timeline: [
+      { at: 0, type: 'START', kpiDeltas: {}, eventTitle: 'Scenario Started', eventDescription: 'Region migration simulation initiated', severity: 'low', domain: 'sovereignty' },
+      { at: 20, type: 'INFO', kpiDeltas: {}, eventTitle: 'Migration Planned', eventDescription: 'Workloads identified for sovereignty-compliant migration', severity: 'low', domain: 'sovereignty' },
+      { at: 50, type: 'TRIGGER', kpiDeltas: { avgGpuUtilization: -5 }, eventTitle: 'Migration Phase 1', eventDescription: 'First batch of workloads paused for migration', severity: 'medium', domain: 'workload_gpu' },
+      { at: 90, type: 'MITIGATION', kpiDeltas: { sovereignComputeRatioPct: 5, sovereigntyRiskScore: -5 }, eventTitle: 'Batch 1 Complete', eventDescription: 'First workload batch now in Canadian region', severity: 'low', domain: 'sovereignty' },
+      { at: 130, type: 'TRIGGER', kpiDeltas: { avgGpuUtilization: -3 }, eventTitle: 'Migration Phase 2', eventDescription: 'Second batch of workloads migrating', severity: 'medium', domain: 'workload_gpu' },
+      { at: 180, type: 'MITIGATION', kpiDeltas: { sovereignComputeRatioPct: 8, sovereigntyRiskScore: -8 }, eventTitle: 'Batch 2 Complete', eventDescription: 'Second batch now sovereign-compliant', severity: 'low', domain: 'sovereignty' },
+      { at: 220, type: 'RECOVERY', kpiDeltas: { avgGpuUtilization: 8, policyComplianceRate: 10 }, eventTitle: 'Workloads Resumed', eventDescription: 'All migrated workloads running at full capacity', severity: 'low', domain: 'workload_gpu' },
+      { at: 260, type: 'RECOVERY', kpiDeltas: { auditReadinessScore: 8 }, eventTitle: 'Compliance Improved', eventDescription: 'Sovereignty score significantly improved', severity: 'low', domain: 'sovereignty' },
+      { at: 300, type: 'END', kpiDeltas: {}, eventTitle: 'Scenario Complete', eventDescription: 'Region migration scenario completed', severity: 'low', domain: 'sovereignty' },
+    ],
+  },
 ];
 
 // ============================================================================

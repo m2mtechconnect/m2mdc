@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
-import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { invokeEdgeFunction } from "@/hooks/useEdgeFunction";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Shield, Database, CheckCircle, XCircle, Loader } from "lucide-react";
+import { Sparkles, Shield, Database, CheckCircle, XCircle, Loader, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { DCCard, DCSectionHeader } from "@/components/dc-ui";
 
 const DEFAULT_SYSTEM_PROMPT = `You are M2M Co-Pilot inside an enterprise control center.
 Be concise and business-ready.
@@ -123,17 +123,17 @@ export default function AISettings() {
   return (
     <Layout>
       <div className="container mx-auto py-8 px-4 space-y-8">
-        <div>
-          <h1 className="text-3xl font-display font-bold mb-2">AI Engine Settings</h1>
-          <p className="text-muted-foreground">Configure Google Gemini (Vertex AI) for M2M Co-Pilot</p>
-        </div>
+        <DCSectionHeader
+          title="AI Engine Settings"
+          subtitle="Configure Google Gemini (Vertex AI) for M2M Co-Pilot"
+          icon={<Settings className="h-5 w-5 text-dc-cyan" />}
+        />
 
-        <Card className="p-6 space-y-6">
-          <div className="flex items-center gap-2 pb-4 border-b">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <h2 className="text-xl font-semibold">Google Cloud Configuration</h2>
-          </div>
-
+        <DCCard
+          title="Google Cloud Configuration"
+          icon={<Sparkles className="h-5 w-5 text-dc-cyan" />}
+          status="operational"
+        >
           <div className="grid gap-6">
             <div className="space-y-2">
               <Label>Google Cloud Project ID</Label>
@@ -171,15 +171,14 @@ export default function AISettings() {
               </Select>
             </div>
           </div>
-        </Card>
+        </DCCard>
 
-        <Card className="p-6 space-y-6">
-          <div className="flex items-center gap-2 pb-4 border-b">
-            <Database className="h-5 w-5 text-secondary" />
-            <h2 className="text-xl font-semibold">Vertex AI Search & Grounding</h2>
-          </div>
-
-          <div className="flex items-center justify-between">
+        <DCCard
+          title="Vertex AI Search & Grounding"
+          icon={<Database className="h-5 w-5 text-dc-cyan" />}
+          status="info"
+        >
+          <div className="flex items-center justify-between mb-6">
             <div className="space-y-0.5">
               <Label>Enable Grounding</Label>
               <p className="text-xs text-muted-foreground">Connect to your Vertex AI Search data store</p>
@@ -188,7 +187,7 @@ export default function AISettings() {
           </div>
 
           {groundingEnabled && (
-            <div className="space-y-6 pl-4 border-l-2 border-secondary/20">
+            <div className="space-y-6 pl-4 border-l-2 border-dc-cyan/20">
               <div className="space-y-2">
                 <Label>Data Store / Index ID</Label>
                 <Input 
@@ -201,7 +200,7 @@ export default function AISettings() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <Label>Top-K Documents</Label>
-                  <span className="text-sm font-mono text-secondary">{topK}</span>
+                  <span className="text-sm font-mono text-dc-cyan">{topK}</span>
                 </div>
                 <Slider value={[topK]} onValueChange={([v]) => setTopK(v)} min={5} max={50} step={5} />
                 <p className="text-xs text-muted-foreground">Initial documents to retrieve</p>
@@ -217,14 +216,13 @@ export default function AISettings() {
               </div>
             </div>
           )}
-        </Card>
+        </DCCard>
 
-        <Card className="p-6 space-y-6">
-          <div className="flex items-center gap-2 pb-4 border-b">
-            <Shield className="h-5 w-5 text-primary" />
-            <h2 className="text-xl font-semibold">Generation Parameters</h2>
-          </div>
-
+        <DCCard
+          title="Generation Parameters"
+          icon={<Shield className="h-5 w-5 text-dc-cyan" />}
+          status="operational"
+        >
           <div className="space-y-6">
             <div className="space-y-2">
               <div className="flex justify-between">
@@ -253,7 +251,7 @@ export default function AISettings() {
               />
             </div>
           </div>
-        </Card>
+        </DCCard>
 
         <div className="flex gap-4">
           <Button onClick={handleSave} size="lg" className="flex-1">
@@ -266,9 +264,10 @@ export default function AISettings() {
         </div>
 
         {healthStatus && (
-          <Card className="p-6 space-y-4">
-            <h3 className="font-semibold text-lg">Health Check Results</h3>
-            
+          <DCCard
+            title="Health Check Results"
+            status={healthStatus.gemini.status === 'ok' ? 'operational' : 'critical'}
+          >
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                 <div className="flex items-center gap-3">
@@ -315,7 +314,7 @@ export default function AISettings() {
                 <Badge variant="secondary">{healthStatus.region}</Badge>
               </div>
             </div>
-          </Card>
+          </DCCard>
         )}
       </div>
     </Layout>

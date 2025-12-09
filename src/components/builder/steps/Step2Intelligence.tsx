@@ -147,6 +147,14 @@ export function Step2Intelligence() {
     { id: 'sovereignty', label: 'Sovereignty Compliance', icon: Shield, enabled: false },
   ];
 
+  // DC-specific threshold states
+  const [gpuUtilThreshold, setGpuUtilThreshold] = useState([85]);
+  const [cpuThermalLimit, setCpuThermalLimit] = useState([75]);
+  const [gpuThermalLimit, setGpuThermalLimit] = useState([80]);
+  const [pueDriftThreshold, setPueDriftThreshold] = useState([0.1]);
+  const [carbonThreshold, setCarbonThreshold] = useState([400]);
+  const [sovereigntyLevel, setSovereigntyLevel] = useState<'low' | 'medium' | 'high'>('medium');
+
   return (
     <>
       <div className="space-y-6 max-w-[920px] mx-auto">
@@ -215,6 +223,103 @@ export function Step2Intelligence() {
                 </div>
               );
             })}
+          </div>
+        </DCCard>
+
+        {/* DC Threshold Sliders */}
+        <DCCard
+          title="Data Centre Thresholds"
+          subtitle="Set alert thresholds for DC-specific metrics"
+          icon={<Activity className="h-4 w-4" />}
+        >
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <Label>GPU Utilization Threshold</Label>
+                <span className="text-sm font-mono text-dc-gpu">{gpuUtilThreshold[0]}%</span>
+              </div>
+              <Slider
+                value={gpuUtilThreshold}
+                onValueChange={setGpuUtilThreshold}
+                max={100}
+                step={5}
+                className="[&>span]:bg-dc-gpu"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <Label>CPU Thermal Limit</Label>
+                <span className="text-sm font-mono text-dc-thermal">{cpuThermalLimit[0]}°C</span>
+              </div>
+              <Slider
+                value={cpuThermalLimit}
+                onValueChange={setCpuThermalLimit}
+                max={100}
+                min={50}
+                step={5}
+                className="[&>span]:bg-dc-thermal"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <Label>GPU Thermal Limit</Label>
+                <span className="text-sm font-mono text-dc-thermal">{gpuThermalLimit[0]}°C</span>
+              </div>
+              <Slider
+                value={gpuThermalLimit}
+                onValueChange={setGpuThermalLimit}
+                max={100}
+                min={60}
+                step={5}
+                className="[&>span]:bg-dc-thermal"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <Label>PUE Drift Alert Threshold</Label>
+                <span className="text-sm font-mono text-dc-power">{pueDriftThreshold[0].toFixed(2)}</span>
+              </div>
+              <Slider
+                value={pueDriftThreshold}
+                onValueChange={setPueDriftThreshold}
+                max={0.5}
+                min={0.01}
+                step={0.01}
+                className="[&>span]:bg-dc-power"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <Label>Carbon Intensity Alert (gCO₂e/kWh)</Label>
+                <span className="text-sm font-mono text-dc-success">{carbonThreshold[0]}</span>
+              </div>
+              <Slider
+                value={carbonThreshold}
+                onValueChange={setCarbonThreshold}
+                max={800}
+                min={100}
+                step={50}
+                className="[&>span]:bg-dc-success"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Sovereignty Violation Sensitivity</Label>
+              <Select value={sovereigntyLevel} onValueChange={(val: 'low' | 'medium' | 'high') => setSovereigntyLevel(val)}>
+                <SelectTrigger className="bg-dc-surface border-dc-border">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low - Critical violations only</SelectItem>
+                  <SelectItem value="medium">Medium - Violations & warnings</SelectItem>
+                  <SelectItem value="high">High - All routing anomalies</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </DCCard>
 

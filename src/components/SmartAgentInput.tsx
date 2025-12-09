@@ -328,34 +328,67 @@ export function SmartAgentInput({
                     type="button"
                     onClick={() => {
                       if (onCoPilotQuery) {
-                        onCoPilotQuery("Scan my website and suggest 3 digital twins we could deploy.");
+                        onCoPilotQuery("Explain the current PUE drift pattern in our data center. What factors are contributing to the drift?");
                       }
                     }}
                     className="text-xs px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground transition-all text-left"
                   >
-                    💡 Scan my website
+                    ⚡ Explain PUE drift
                   </button>
                   <button
                     type="button"
                     onClick={() => {
                       if (onCoPilotQuery) {
-                        onCoPilotQuery("Design a compliance co-pilot for financial services.");
+                        onCoPilotQuery("Provide a forecast for GPU saturation over the next 24 hours. Identify any clusters at risk.");
                       }
                     }}
                     className="text-xs px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground transition-all text-left"
                   >
-                    🤖 Design a compliance co-pilot
+                    🔥 GPU saturation forecast
                   </button>
                   <button
                     type="button"
                     onClick={() => {
                       if (onCoPilotQuery) {
-                        onCoPilotQuery("Map AI opportunities in operations and prioritize by ROI.");
+                        onCoPilotQuery("Diagnose the current cooling efficiency across all zones. Identify any thermal imbalances.");
                       }
                     }}
                     className="text-xs px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground transition-all text-left"
                   >
-                    🎯 Map AI in operations
+                    ❄️ Cooling efficiency diagnosis
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (onCoPilotQuery) {
+                        onCoPilotQuery("Analyze the carbon intensity trend for our data center. What is the gCO₂e/kWh?");
+                      }
+                    }}
+                    className="text-xs px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground transition-all text-left"
+                  >
+                    🌱 Carbon intensity trend
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (onCoPilotQuery) {
+                        onCoPilotQuery("Check the current UPS battery runtime status across all banks.");
+                      }
+                    }}
+                    className="text-xs px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground transition-all text-left"
+                  >
+                    🔋 UPS battery runtime check
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (onCoPilotQuery) {
+                        onCoPilotQuery("Audit the current sovereign data routing. Are there any jurisdiction violations?");
+                      }
+                    }}
+                    className="text-xs px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground transition-all text-left"
+                  >
+                    🛡️ Sovereign routing audit
                   </button>
                 </div>
               </div>

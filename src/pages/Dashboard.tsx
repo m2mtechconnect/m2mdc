@@ -361,12 +361,18 @@ export default function Dashboard() {
             { label: 'Cooling incidents today', query: 'List all cooling incidents that occurred today.' },
             { label: 'Sovereign compute ratio', query: 'What is the current sovereign compute ratio?' },
             { label: 'Carbon cost forecast', query: 'Forecast carbon costs for the next 7 days.' },
-          ].map((chip) => (
+            { label: 'Run a scenario', isSimulation: true },
+          ].map((chip: { label: string; query?: string; isSimulation?: boolean }) => (
             <button
               key={chip.label}
-              onClick={() => askCoPilot(chip.query)}
-              className="text-xs px-3 py-1.5 rounded-full border border-border bg-muted/50 hover:bg-primary/10 hover:border-primary/50 text-muted-foreground hover:text-foreground transition-all"
+              onClick={() => chip.isSimulation ? navigate('/data-centre-twin?view=simulation') : askCoPilot(chip.query || '')}
+              className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
+                chip.isSimulation 
+                  ? 'border-primary/50 bg-primary/10 text-primary hover:bg-primary/20' 
+                  : 'border-border bg-muted/50 hover:bg-primary/10 hover:border-primary/50 text-muted-foreground hover:text-foreground'
+              }`}
             >
+              {chip.isSimulation && <Activity className="h-3 w-3 inline mr-1" />}
               {chip.label}
             </button>
           ))}
@@ -445,7 +451,21 @@ export default function Dashboard() {
                     </p>
                   </div>
                 </div>
-                <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                <div className="flex items-center gap-3">
+                  <Button 
+                    variant="secondary" 
+                    size="sm"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate('/data-centre-twin?view=simulation');
+                    }}
+                    className="gap-2"
+                  >
+                    <Activity className="h-4 w-4" />
+                    Run Simulation
+                  </Button>
+                  <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
               </div>
             </Card>
           </Link>

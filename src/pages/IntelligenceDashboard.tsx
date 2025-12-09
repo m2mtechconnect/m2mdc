@@ -278,6 +278,7 @@ export default function IntelligenceDashboard() {
             <TabsTrigger value="thermal">Thermal Analysis</TabsTrigger>
             <TabsTrigger value="power">Power & Energy</TabsTrigger>
             <TabsTrigger value="workload">GPU & Workload</TabsTrigger>
+            <TabsTrigger value="simulation-replay">Simulation Replay</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -404,6 +405,65 @@ export default function IntelligenceDashboard() {
               <Button className="mt-4" onClick={() => navigate('/data-centre-twin')}>
                 Open DC Twin Dashboard
               </Button>
+            </Card>
+          </TabsContent>
+
+          {/* Simulation Replay Tab */}
+          <TabsContent value="simulation-replay" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Recent Simulation Runs
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left py-3 px-4 font-medium">Scenario Name</th>
+                        <th className="text-left py-3 px-4 font-medium">Run Time</th>
+                        <th className="text-left py-3 px-4 font-medium">Duration</th>
+                        <th className="text-left py-3 px-4 font-medium">Status</th>
+                        <th className="text-left py-3 px-4 font-medium">Triggered By</th>
+                        <th className="text-right py-3 px-4 font-medium">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { id: 'run-001', scenario: 'GPU Spike - Training Job', time: '2 hours ago', duration: '5m 12s', status: 'completed', triggeredBy: 'Manual' },
+                        { id: 'run-002', scenario: 'CRAH Failure - Hot Aisle', time: '5 hours ago', duration: '6m 45s', status: 'completed', triggeredBy: 'Scheduled' },
+                        { id: 'run-003', scenario: 'UPS Battery Degradation', time: '1 day ago', duration: '4m 30s', status: 'completed', triggeredBy: 'Manual' },
+                        { id: 'run-004', scenario: 'Cross-Border Data Violation', time: '2 days ago', duration: '3m 15s', status: 'completed', triggeredBy: 'Alert Trigger' },
+                        { id: 'run-005', scenario: 'Grid Outage - Generator Failover', time: '3 days ago', duration: '7m 00s', status: 'completed', triggeredBy: 'Scheduled' },
+                      ].map((run) => (
+                        <tr key={run.id} className="border-b hover:bg-muted/50 transition-colors">
+                          <td className="py-3 px-4 font-medium">{run.scenario}</td>
+                          <td className="py-3 px-4 text-muted-foreground">{run.time}</td>
+                          <td className="py-3 px-4 font-mono text-muted-foreground">{run.duration}</td>
+                          <td className="py-3 px-4">
+                            <Badge variant="outline" className="border-green-500 text-green-600">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              {run.status}
+                            </Badge>
+                          </td>
+                          <td className="py-3 px-4 text-muted-foreground">{run.triggeredBy}</td>
+                          <td className="py-3 px-4 text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => navigate(`/data-centre-twin?view=simulation&runId=${run.id}`)}
+                            >
+                              Open in Simulation
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
             </Card>
           </TabsContent>
         </Tabs>

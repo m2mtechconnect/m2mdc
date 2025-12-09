@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Shield,
   AlertTriangle,
@@ -15,8 +16,10 @@ import {
   Globe,
   Server,
   Activity,
+  PlayCircle,
 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { DecisionReplayModal } from "@/components/rag/DecisionReplayModal";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -123,8 +126,10 @@ const dcRiskCategories = [
 ];
 
 export default function Compliance() {
+  const navigate = useNavigate();
   const [replayModalOpen, setReplayModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+  const [selectedStressScenario, setSelectedStressScenario] = useState<string>('');
 
   const handleReplayOpen = (eventDetails: string) => {
     setSelectedEvent(eventDetails);
@@ -395,6 +400,40 @@ export default function Compliance() {
                   <Button variant="outline" className="w-full justify-start">
                     <Download className="h-4 w-4 mr-2" />
                     Power Stability Log
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Simulation Stress Test Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <PlayCircle className="h-5 w-5" />
+                    Simulation Stress Test
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Run a data residency or thermal safety scenario to see potential impact on compliance.
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Select value={selectedStressScenario} onValueChange={setSelectedStressScenario}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose scenario..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sovereignty_routing_violation">Cross-border routing attempt</SelectItem>
+                      <SelectItem value="carbon_price_shock">Carbon target breach</SelectItem>
+                      <SelectItem value="fire_suppression_discharge">Thermal safety incident</SelectItem>
+                      <SelectItem value="water_leak_corridor_sensor">Water leak emergency</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button 
+                    className="w-full gap-2"
+                    disabled={!selectedStressScenario}
+                    onClick={() => navigate(`/data-centre-twin?view=simulation&scenarioId=${selectedStressScenario}`)}
+                  >
+                    <Activity className="h-4 w-4" />
+                    Open Simulation
                   </Button>
                 </CardContent>
               </Card>

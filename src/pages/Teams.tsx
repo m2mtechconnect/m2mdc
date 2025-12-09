@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { UserAvatar } from "@/components/ui/user-avatar";
@@ -33,6 +32,8 @@ import MemberProfileModal from "@/components/teams/MemberProfileModal";
 import InviteTeamMemberModal from "@/components/teams/InviteTeamMemberModal";
 import RoleBreakdownSection from "@/components/teams/RoleBreakdownSection";
 import ActivityFeed from "@/components/teams/ActivityFeed";
+import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
+import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 
 const roleIcons: Record<string, any> = {
   executive: Crown,
@@ -322,131 +323,58 @@ export default function Teams() {
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Card className="glass-panel p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
-                        Total Members
-                        <HelpCircle className="h-3 w-3" />
-                      </p>
-                      <p className="text-3xl font-display font-bold">{totalMembers}</p>
-                    </div>
-                    <Users className="h-10 w-10 text-primary" />
-                  </div>
-                </Card>
-              </TooltipTrigger>
-              <TooltipContent>All members including pending invitations</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Card className="glass-panel p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
-                        Active Now
-                        <HelpCircle className="h-3 w-3" />
-                      </p>
-                      <p className="text-3xl font-display font-bold text-secondary">
-                        {activeNow}
-                      </p>
-                    </div>
-                    <CheckCircle2 className="h-10 w-10 text-secondary" />
-                  </div>
-                </Card>
-              </TooltipTrigger>
-              <TooltipContent>Members currently online</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Card className="glass-panel p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
-                        Systems
-                        <HelpCircle className="h-3 w-3" />
-                      </p>
-                      <p className="text-3xl font-display font-bold">{totalSystems}</p>
-                    </div>
-                    <Wrench className="h-10 w-10 text-muted-foreground" />
-                  </div>
-                </Card>
-              </TooltipTrigger>
-              <TooltipContent>Total active digital twins or agents managed by your team</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Card className="glass-panel p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
-                        Pending
-                        <HelpCircle className="h-3 w-3" />
-                      </p>
-                      <p className="text-3xl font-display font-bold text-primary">
-                        {pendingInvitesCount}
-                      </p>
-                    </div>
-                    <Clock className="h-10 w-10 text-primary" />
-                  </div>
-                </Card>
-              </TooltipTrigger>
-              <TooltipContent>Pending team invitations awaiting acceptance</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Card className="glass-panel p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
-                        Roles
-                        <HelpCircle className="h-3 w-3" />
-                      </p>
-                      <p className="text-3xl font-display font-bold">{rolesCount}</p>
-                    </div>
-                    <Shield className="h-10 w-10 text-purple-600" />
-                  </div>
-                </Card>
-              </TooltipTrigger>
-              <TooltipContent>Number of distinct roles defined in your workspace</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Card className="glass-panel p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1 flex items-center gap-1">
-                        Departments
-                        <HelpCircle className="h-3 w-3" />
-                      </p>
-                      <p className="text-3xl font-display font-bold">{rolesCount}</p>
-                    </div>
-                    <Building2 className="h-10 w-10 text-blue-600" />
-                  </div>
-                </Card>
-              </TooltipTrigger>
-              <TooltipContent>Organizational units within your workspace</TooltipContent>
-            </Tooltip>
+            <DCKPITile
+              label="Total Members"
+              value={totalMembers.toString()}
+              status="normal"
+              icon={<Users className="h-5 w-5" />}
+            />
+            <DCKPITile
+              label="Active Now"
+              value={activeNow.toString()}
+              status="normal"
+              icon={<CheckCircle2 className="h-5 w-5" />}
+            />
+            <DCKPITile
+              label="Systems"
+              value={totalSystems.toString()}
+              status="normal"
+              icon={<Wrench className="h-5 w-5" />}
+            />
+            <DCKPITile
+              label="Pending"
+              value={pendingInvitesCount.toString()}
+              status={pendingInvitesCount > 0 ? "warning" : "normal"}
+              icon={<Clock className="h-5 w-5" />}
+            />
+            <DCKPITile
+              label="Roles"
+              value={rolesCount.toString()}
+              status="normal"
+              icon={<Shield className="h-5 w-5" />}
+            />
+            <DCKPITile
+              label="Departments"
+              value={rolesCount.toString()}
+              status="normal"
+              icon={<Building2 className="h-5 w-5" />}
+            />
           </div>
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column - Team Members Table */}
             <div className="lg:col-span-2 space-y-6">
-              <Card className="glass-panel p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-display font-bold">Team Members</h2>
+              <DCCard
+                title="Team Members"
+                icon={<Users className="h-5 w-5" />}
+                status="operational"
+                headerAction={
                   <Badge variant="secondary" className="text-sm">
                     {filteredMembers.length} of {activeMembersCount}
                   </Badge>
-                </div>
-
+                }
+              >
                 {/* Filters */}
                 <div className="flex flex-wrap gap-3 mb-6">
                   <div className="flex-1 min-w-[200px]">
@@ -456,7 +384,7 @@ export default function Teams() {
                         placeholder="Search members..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10"
+                        className="pl-10 bg-dc-bg-card border-dc-border"
                       />
                     </div>
                   </div>
@@ -555,7 +483,7 @@ export default function Teams() {
                     </div>
                   )}
                 </div>
-              </Card>
+              </DCCard>
             </div>
 
             {/* Right Column - Role Breakdown & Activity */}

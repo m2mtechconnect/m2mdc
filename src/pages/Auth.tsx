@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { DCCard } from "@/components/dc-ui";
 import { Label } from "@/components/ui/label";
 
 import { toast } from "sonner";
@@ -171,83 +171,84 @@ export default function Auth() {
         <div className="absolute top-0 left-3/4 w-px h-full bg-gradient-to-b from-transparent via-blue-500/30 to-transparent animate-data-stream" style={{ animationDelay: '2s' }} />
       </div>
 
-      <Card className="max-w-md w-full p-8 shadow-2xl border-white/20 backdrop-blur-xl bg-white/90 dark:bg-card/90 relative z-10 ring-1 ring-white/30">
-        <div className="mb-8 text-center">
-          <img 
-            src={m2mLogo} 
-            alt="M2M Logo" 
-            className="h-16 mx-auto mb-6"
-          />
-          <h1 className="text-3xl font-bold mb-2 text-foreground">
-            Welcome to AURA
-          </h1>
-          <p className="text-muted-foreground">
-            {isSignUp ? "Create your account to get started" : "Building autonomous AI systems for enterprise"}
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <Label htmlFor="signin-email" className="text-sm font-semibold">Email Address</Label>
-            <Input
-              id="signin-email"
-              type="email"
-              placeholder="you@company.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value.trim().slice(0, 255))}
-              required
-              disabled={loading}
-              className="mt-2 h-12"
-              maxLength={255}
+      <DCCard className="max-w-md w-full shadow-2xl border-white/20 backdrop-blur-xl bg-white/90 dark:bg-card/90 relative z-10 ring-1 ring-white/30">
+        <div className="p-8">
+          <div className="mb-8 text-center">
+            <img 
+              src={m2mLogo} 
+              alt="M2M Logo" 
+              className="h-16 mx-auto mb-6"
             />
-          </div>
-
-          <div>
-            <Label htmlFor="signin-password" className="text-sm font-semibold">Password</Label>
-            <Input
-              id="signin-password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value.slice(0, 128))}
-              required
-              disabled={loading}
-              className="mt-2 h-12"
-              minLength={6}
-              maxLength={128}
-            />
-            <p className="text-xs text-muted-foreground mt-2">
-              Minimum 6 characters
+            <h1 className="text-3xl font-bold mb-2 text-foreground">
+              Welcome to AURA
+            </h1>
+            <p className="text-muted-foreground">
+              {isSignUp ? "Create your account to get started" : "Building autonomous AI systems for enterprise"}
             </p>
           </div>
 
-          <Button 
-            type="submit" 
-            className="w-full h-12 text-base font-semibold" 
-            disabled={loading}
-            size="lg"
-          >
-            {loading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
-            {isSignUp ? "Sign Up" : "Sign In"}
-          </Button>
-        </form>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <Label htmlFor="signin-email" className="text-sm font-semibold">Email Address</Label>
+              <Input
+                id="signin-email"
+                type="email"
+                placeholder="you@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value.trim().slice(0, 255))}
+                required
+                disabled={loading}
+                className="mt-2 h-12"
+                maxLength={255}
+              />
+            </div>
 
-        <div className="mt-6 text-center">
-          <button
-            type="button"
-            onClick={() => {
-              setIsSignUp(!isSignUp);
-              setPassword("");
-            }}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {isSignUp 
-              ? "Already have an account? Sign in" 
-              : "Don't have an account? Sign up"}
-          </button>
+            <div>
+              <Label htmlFor="signin-password" className="text-sm font-semibold">Password</Label>
+              <Input
+                id="signin-password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value.slice(0, 128))}
+                required
+                disabled={loading}
+                className="mt-2 h-12"
+                minLength={6}
+                maxLength={128}
+              />
+              <p className="text-xs text-muted-foreground mt-2">
+                Minimum 6 characters
+              </p>
+            </div>
+
+            <Button 
+              type="submit" 
+              className="w-full h-12 text-base font-semibold" 
+              disabled={loading}
+              size="lg"
+            >
+              {loading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
+              {isSignUp ? "Sign Up" : "Sign In"}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <button
+              type="button"
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setPassword("");
+              }}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {isSignUp 
+                ? "Already have an account? Sign in" 
+                : "Don't have an account? Sign up"}
+            </button>
+          </div>
         </div>
-
-      </Card>
+      </DCCard>
     </div>
   );
 }

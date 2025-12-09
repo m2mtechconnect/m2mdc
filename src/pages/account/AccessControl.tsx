@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserPermissions } from '@/hooks/useUserPermissions';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -149,131 +149,115 @@ export default function AccessControl() {
   if (!isGlobalAdmin) {
     return (
       <div className="container mx-auto p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Access Denied
-            </CardTitle>
-            <CardDescription>
-              You need global admin permissions to access this page.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <DCCard 
+          title="Access Denied" 
+          subtitle="You need global admin permissions to access this page."
+          icon={<Shield className="h-5 w-5 text-dc-cyan" />}
+        >
+          <div />
+        </DCCard>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Shield className="h-8 w-8" />
-            Access Control & RBAC
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Manage user roles and permissions across the platform
-          </p>
-        </div>
+      <DCSectionHeader
+        title="Access Control & RBAC"
+        subtitle="Manage user roles and permissions across the platform"
+        icon={<Shield className="h-5 w-5 text-dc-cyan" />}
+        action={
+          <Dialog open={isGrantDialogOpen} onOpenChange={setIsGrantDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <UserPlus className="h-4 w-4 mr-2" />
+                Grant Role
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Grant User Role</DialogTitle>
+                <DialogDescription>
+                  Assign a role to a user with optional scope restrictions
+                </DialogDescription>
+              </DialogHeader>
 
-        <Dialog open={isGrantDialogOpen} onOpenChange={setIsGrantDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <UserPlus className="h-4 w-4 mr-2" />
-              Grant Role
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Grant User Role</DialogTitle>
-              <DialogDescription>
-                Assign a role to a user with optional scope restrictions
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">User Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="user@example.com"
-                  value={userEmail}
-                  onChange={(e) => setUserEmail(e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="role">Role</Label>
-                <Select value={role} onValueChange={(v) => setRole(v as any)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="viewer">Viewer (Read-only)</SelectItem>
-                    <SelectItem value="operator">Operator (Run agents)</SelectItem>
-                    <SelectItem value="admin">Admin (Full control)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="scope">Scope</Label>
-                <Select value={scope} onValueChange={(v) => setScope(v as any)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="global">Global (All agents)</SelectItem>
-                    <SelectItem value="agent">Specific Agent</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {scope === 'agent' && (
+              <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="agent">Agent</Label>
-                  <Select value={agentId} onValueChange={setAgentId}>
+                  <Label htmlFor="email">User Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="user@example.com"
+                    value={userEmail}
+                    onChange={(e) => setUserEmail(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="role">Role</Label>
+                  <Select value={role} onValueChange={(v) => setRole(v as any)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select an agent" />
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {agents?.map((agent) => (
-                        <SelectItem key={agent.id} value={agent.id}>
-                          {agent.name}
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="viewer">Viewer (Read-only)</SelectItem>
+                      <SelectItem value="operator">Operator (Run agents)</SelectItem>
+                      <SelectItem value="admin">Admin (Full control)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-              )}
-            </div>
 
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsGrantDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button 
-                onClick={() => grantRoleMutation.mutate()}
-                disabled={!userEmail || (scope === 'agent' && !agentId) || grantRoleMutation.isPending}
-              >
-                {grantRoleMutation.isPending ? 'Granting...' : 'Grant Role'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
+                <div className="space-y-2">
+                  <Label htmlFor="scope">Scope</Label>
+                  <Select value={scope} onValueChange={(v) => setScope(v as any)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="global">Global (All agents)</SelectItem>
+                      <SelectItem value="agent">Specific Agent</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {scope === 'agent' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="agent">Agent</Label>
+                    <Select value={agentId} onValueChange={setAgentId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an agent" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {agents?.map((agent) => (
+                          <SelectItem key={agent.id} value={agent.id}>
+                            {agent.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsGrantDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={() => grantRoleMutation.mutate()}
+                  disabled={!userEmail || (scope === 'agent' && !agentId) || grantRoleMutation.isPending}
+                >
+                  {grantRoleMutation.isPending ? 'Granting...' : 'Grant Role'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        }
+      />
 
       {/* Role Descriptions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Info className="h-5 w-5" />
-            Role Permissions
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <DCCard title="Role Permissions" icon={<Info className="h-4 w-4 text-dc-cyan" />}>
           <div className="grid md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Badge variant="secondary">Viewer</Badge>
@@ -302,18 +286,13 @@ export default function AccessControl() {
               </p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+      </DCCard>
 
       {/* User Roles Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Current User Roles</CardTitle>
-          <CardDescription>
-            {userRoles?.length || 0} role assignments across the platform
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <DCCard 
+        title="Current User Roles" 
+        subtitle={`${userRoles?.length || 0} role assignments across the platform`}
+      >
           {rolesLoading ? (
             <div className="flex justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -420,8 +399,7 @@ export default function AccessControl() {
               </TableBody>
             </Table>
           )}
-        </CardContent>
-      </Card>
+      </DCCard>
     </div>
   );
 }

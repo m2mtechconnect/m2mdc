@@ -77,6 +77,27 @@ export default {
           cyan: "hsl(var(--dc-cyan))",
           purple: "hsl(var(--dc-purple))",
           "purple-light": "hsl(var(--dc-purple-light))",
+          // Domain-specific semantic colors
+          thermal: "hsl(var(--dc-red))",
+          cooling: "hsl(var(--dc-cyan))",
+          power: "hsl(var(--dc-amber))",
+          gpu: "hsl(var(--dc-purple))",
+          sovereignty: "hsl(var(--dc-blue))",
+          network: "hsl(var(--dc-cyan))",
+          // Status colors
+          primary: "hsl(var(--dc-cyan))",
+          success: "hsl(var(--dc-green))",
+          warning: "hsl(var(--dc-amber))",
+          critical: "hsl(var(--dc-red))",
+          info: "hsl(var(--dc-blue))",
+          // Surface colors
+          background: "hsl(var(--noc-bg))",
+          surface: "hsl(var(--noc-surface))",
+          "surface-elevated": "hsl(var(--noc-surface-elevated))",
+          border: "hsl(var(--noc-border))",
+          "bg-primary": "hsl(var(--noc-bg))",
+          "bg-secondary": "hsl(var(--noc-surface))",
+          "primary-foreground": "hsl(var(--text-primary))",
         },
         // NOC Surface Colors
         noc: {

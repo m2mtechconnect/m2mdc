@@ -31,7 +31,9 @@ import {
   Sparkles,
   Activity,
   Settings,
-  Info
+  Info,
+  Cpu,
+  Zap
 } from 'lucide-react';
 import {
   Tooltip,
@@ -53,6 +55,9 @@ import {
 import { AgentPlayground } from './AgentPlayground';
 import { QuickRecommendations } from './shared/QuickRecommendations';
 import { AgentMCPServers } from './agent-chat/AgentMCPServers';
+import { DCCard } from '@/components/dc-ui/DCCard';
+import { DCSectionHeader } from '@/components/dc-ui/DCSectionHeader';
+import { DCKPITile } from '@/components/dc-ui/DCKPITile';
 
 interface SystemDetailsDrawerProps {
   systemId: string | null;

@@ -19,8 +19,10 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { DecisionReplayModal } from "@/components/rag/DecisionReplayModal";
-import KpiCard from '@/components/shared/KpiCard';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
+import { DCKPITile } from "@/components/dc-ui/DCKPITile";
+import { DCStatusBadge } from "@/components/dc-ui/DCStatusBadge";
 
 // AI-specific audit timeline
 const auditTimeline = [
@@ -202,37 +204,40 @@ export default function Compliance() {
 
           {/* A. Compliance Summary - AI-Specific KPIs */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <KpiCard
+            <DCKPITile
               label="Explainability Score"
-              value="96%"
-              icon={Brain}
+              value="96"
+              unit="%"
+              status="normal"
               trend="up"
-              tooltip="Percentage of agent actions with full step-by-step reasoning available for review."
-              onClick={() => console.log("Navigate to explainability details")}
+              delta="+2.3%"
+              icon={<Brain className="h-5 w-5" />}
             />
-            <KpiCard
+            <DCKPITile
               label="RAG Grounding Fidelity"
-              value="93%"
-              icon={BookOpen}
+              value="93"
+              unit="%"
+              status="normal"
               trend="up"
-              tooltip="How faithfully the agent uses approved knowledge sources when generating responses."
-              onClick={() => console.log("Navigate to RAG fidelity report")}
+              delta="+1.8%"
+              icon={<BookOpen className="h-5 w-5" />}
             />
-            <KpiCard
-              label="Tool Invocation Accuracy"
-              value="97%"
-              icon={Wrench}
-              trend="neutral"
-              tooltip="How often tools and MCP servers were invoked correctly and safely."
-              onClick={() => console.log("Navigate to tool accuracy analysis")}
+            <DCKPITile
+              label="Tool Accuracy"
+              value="97"
+              unit="%"
+              status="normal"
+              trend="stable"
+              icon={<Wrench className="h-5 w-5" />}
             />
-            <KpiCard
-              label="Safety Events (30d)"
+            <DCKPITile
+              label="Safety Events"
               value="6"
-              icon={AlertOctagon}
+              subtitle="Last 30 days"
+              status="warning"
               trend="down"
-              tooltip="Number of policy blocks, redactions, unsafe requests, and hallucination-prevention events."
-              onClick={() => console.log("Navigate to safety events log")}
+              delta="-3"
+              icon={<AlertOctagon className="h-5 w-5" />}
             />
           </div>
 
@@ -240,17 +245,12 @@ export default function Compliance() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* B. Audit Timeline - Left Column (2/3 width) */}
             <div className="lg:col-span-2 space-y-6">
-              <Card className="glass-panel">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                  <div>
-                    <CardTitle className="text-2xl font-display flex items-center gap-2">
-                      <Clock className="h-5 w-5 text-primary" />
-                      Audit Timeline
-                    </CardTitle>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Chronological view of agent executions, safety events, and tool calls
-                    </p>
-                  </div>
+              <DCCard
+                title="Audit Timeline"
+                subtitle="Chronological view of agent executions, safety events, and tool calls"
+                icon={<Clock className="h-5 w-5" />}
+                status="operational"
+                headerAction={
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button variant="outline" size="sm">
@@ -262,8 +262,8 @@ export default function Compliance() {
                       <p>Filter events by time range</p>
                     </TooltipContent>
                   </Tooltip>
-                </CardHeader>
-                <CardContent>
+                }
+              >
                   <div className="space-y-4">
                     {auditTimeline.map((event, idx) => {
                       const isHighRisk = event.risk === "High";
@@ -369,8 +369,7 @@ export default function Compliance() {
                       Load More History
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
+                </DCCard>
             </div>
 
             {/* Right Column (1/3 width) */}

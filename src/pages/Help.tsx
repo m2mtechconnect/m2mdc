@@ -20,7 +20,10 @@ import {
   Info,
   DollarSign,
   Headphones,
+  GraduationCap,
 } from "lucide-react";
+import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
+import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 
 // Validation Schema
 const contactSchema = z.object({
@@ -126,50 +129,40 @@ export default function Help() {
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           {/* Header */}
-          <div className="mb-8 text-center">
-            <h1 className="text-4xl font-display font-bold mb-2 text-gradient-hero">
-              Learning Hub
-            </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Resources, tutorials, and expert support to accelerate your AI transformation
-            </p>
-          </div>
+          <DCSectionHeader
+            title="Learning Hub"
+            subtitle="Resources, tutorials, and expert support to accelerate your AI transformation"
+            icon={<GraduationCap className="h-6 w-6" />}
+          />
 
           {/* Featured Quickstart */}
-          <Card className="glass-panel p-6 md:p-8 mb-8">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary/20 mb-4">
-                <PlayCircle className="h-8 w-8 text-primary" />
-              </div>
-              <h2 className="text-2xl md:text-3xl font-display font-bold mb-2">
-                🎓 Build Your First AI System
-              </h2>
-              <p className="text-muted-foreground mb-6">
-                5-minute quickstart guide to deploying your first AI workflow
-              </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-3">
-                <Button className="glow-yellow font-semibold">
-                  <PlayCircle className="h-4 w-4 mr-2" />
-                  Watch Tutorial
-                </Button>
-                <Button variant="outline">
-                  <FileText className="h-4 w-4 mr-2" />
-                  View Documentation
-                </Button>
-              </div>
+          <DCCard
+            title="🎓 Build Your First AI System"
+            subtitle="5-minute quickstart guide to deploying your first AI workflow"
+            icon={<PlayCircle className="h-6 w-6" />}
+            status="operational"
+            className="mb-8"
+          >
+            <div className="flex flex-col sm:flex-row justify-center gap-3">
+              <Button className="glow-yellow font-semibold">
+                <PlayCircle className="h-4 w-4 mr-2" />
+                Watch Tutorial
+              </Button>
+              <Button variant="outline">
+                <FileText className="h-4 w-4 mr-2" />
+                View Documentation
+              </Button>
             </div>
-          </Card>
+          </DCCard>
 
           {/* 4-Section Grid Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Section 1: Quickstart & Tutorials */}
-            <Card className="glass-panel p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-primary">
-                  <PlayCircle className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <h3 className="font-display font-bold text-lg">Getting Started</h3>
-              </div>
+            <DCCard
+              title="Getting Started"
+              icon={<PlayCircle className="h-5 w-5" />}
+              status="operational"
+            >
               <ul className="space-y-3 mb-4">
                 {helpSections[0].items.map((item, idx) => (
                   <li key={idx}>
@@ -186,7 +179,7 @@ export default function Help() {
               <Button variant="outline" size="sm" className="w-full">
                 View All Tutorials
               </Button>
-            </Card>
+            </DCCard>
 
             {/* Section 2: Guides & Templates */}
             <Card className="glass-panel p-6">

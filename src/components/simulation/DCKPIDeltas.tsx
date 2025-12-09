@@ -95,10 +95,10 @@ function KPICard({
   
   return (
     <Card className={cn(
-      'bg-card border-border transition-all duration-300',
+      'bg-card border-border transition-all duration-300 overflow-hidden',
       isRunning && !isNeutral && 'border-primary/50'
     )}>
-      <CardContent className="p-4">
+      <CardContent className="p-4 min-w-0">
         <div className="flex items-start justify-between mb-2">
           <div className="p-2 rounded-lg bg-primary/10">
             <Icon className="h-4 w-4 text-primary" />
@@ -119,12 +119,12 @@ function KPICard({
           )}
         </div>
         
-        <div className="space-y-1">
-          <p className="text-2xl font-bold font-mono text-card-foreground">
+        <div className="space-y-1 min-w-0">
+          <p className="text-2xl font-bold font-mono text-card-foreground truncate">
             {formattedValue}
             <span className="text-sm text-muted-foreground ml-1">{kpi.unit}</span>
           </p>
-          <p className="text-xs text-muted-foreground">{kpi.label}</p>
+          <p className="text-xs text-muted-foreground truncate">{kpi.label}</p>
         </div>
         
         {/* Baseline comparison */}

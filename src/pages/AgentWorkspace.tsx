@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SectionHeader } from "@/components/ui/section-header";
 import { AgentChat } from "@/components/builder/AgentChat";
 import { supabase } from "@/integrations/supabase/client";
 import { invokeEdgeFunction } from "@/hooks/useEdgeFunction";
@@ -18,8 +16,12 @@ import {
   CheckCircle2,
   FileText,
   Loader2,
+  Server,
+  Cpu,
 } from "lucide-react";
-import KpiCard from "@/components/shared/KpiCard";
+import { DCCard } from "@/components/dc-ui/DCCard";
+import { DCSectionHeader } from "@/components/dc-ui/DCSectionHeader";
+import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 
 export default function AgentWorkspace() {
   const { id } = useParams<{ id: string }>();
@@ -109,18 +111,18 @@ export default function AgentWorkspace() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen bg-dc-bg-primary flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-dc-cyan" />
       </div>
     );
   }
 
   if (!agent) {
     return (
-      <div className="min-h-screen bg-background section-padding-lg">
+      <div className="min-h-screen bg-dc-bg-primary section-padding-lg">
         <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-h2 mb-4">Agent not found</h2>
-          <Button onClick={() => navigate('/dashboard')}>
+          <h2 className="text-2xl font-semibold mb-4 text-foreground">Agent not found</h2>
+          <Button onClick={() => navigate('/dashboard')} className="bg-dc-cyan hover:bg-dc-cyan/80 text-dc-bg-primary">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Dashboard
           </Button>
@@ -130,8 +132,8 @@ export default function AgentWorkspace() {
   }
 
   return (
-    <div className="min-h-screen bg-background section-padding-lg">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-dc-bg-primary section-padding-lg">
+      <div className="max-w-7xl mx-auto space-y-6 px-4">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -139,21 +141,26 @@ export default function AgentWorkspace() {
               variant="ghost"
               size="sm"
               onClick={() => navigate('/dashboard')}
-              className="mb-4"
+              className="mb-4 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Dashboard
             </Button>
-            <SectionHeader
-              title={agent.name}
-              description={agent.description || "AI Agent Workspace"}
-            />
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-dc-cyan/10 border border-dc-cyan/30">
+                <Cpu className="h-6 w-6 text-dc-cyan" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-semibold text-foreground">{agent.name}</h1>
+                <p className="text-sm text-muted-foreground">{agent.description || "AI Agent Workspace"}</p>
+              </div>
+            </div>
             <div className="flex gap-2 mt-2">
-              <Badge variant={agent.status === 'deployed' ? 'default' : 'secondary'}>
+              <Badge className={agent.status === 'deployed' ? 'bg-dc-green/20 text-dc-green border-dc-green/30' : 'bg-muted text-muted-foreground'}>
                 {agent.status}
               </Badge>
               {template && (
-                <Badge variant="outline">
+                <Badge variant="outline" className="border-dc-border">
                   {template.icon} {template.name}
                 </Badge>
               )}
@@ -162,6 +169,7 @@ export default function AgentWorkspace() {
           <Button
             variant="outline"
             onClick={() => navigate(`/builder?id=${id}`)}
+            className="border-dc-border hover:bg-dc-bg-secondary"
           >
             <Settings className="mr-2 h-4 w-4" />
             Configure
@@ -169,44 +177,52 @@ export default function AgentWorkspace() {
         </div>
 
         {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <KpiCard
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <DCKPITile
             label="Total Runs"
-            value={stats.totalRuns}
-            icon={Activity}
+            value={stats.totalRuns.toString()}
+            sublabel="Executions"
+            status="info"
+            icon={<Activity className="h-4 w-4" />}
             trend={stats.totalRuns > 0 ? 'up' : undefined}
           />
-          <KpiCard
+          <DCKPITile
             label="Success Rate"
             value={`${stats.successRate.toFixed(1)}%`}
-            icon={CheckCircle2}
-            trend="up"
+            sublabel="Reliability index"
+            status={stats.successRate >= 90 ? 'normal' : stats.successRate >= 70 ? 'warning' : 'critical'}
+            icon={<CheckCircle2 className="h-4 w-4" />}
+            thresholdValue={stats.successRate}
+            threshold={{ value: stats.successRate, max: 100, showBar: true }}
           />
-          <KpiCard
+          <DCKPITile
             label="Avg Response"
             value={`${stats.avgResponseTime}ms`}
-            icon={Clock}
-            trend={stats.avgResponseTime < 2000 ? 'up' : 'down'}
+            sublabel="Latency"
+            status={stats.avgResponseTime < 2000 ? 'normal' : stats.avgResponseTime < 5000 ? 'warning' : 'critical'}
+            icon={<Clock className="h-4 w-4" />}
           />
-          <KpiCard
+          <DCKPITile
             label="Last Run"
             value={stats.lastRun ? new Date(stats.lastRun).toLocaleDateString() : 'Never'}
-            icon={TrendingUp}
+            sublabel="Most recent"
+            status="info"
+            icon={<TrendingUp className="h-4 w-4" />}
           />
         </div>
 
         {/* Main Content */}
         <Tabs defaultValue="chat" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="chat">
+          <TabsList className="bg-dc-bg-secondary border border-dc-border">
+            <TabsTrigger value="chat" className="data-[state=active]:bg-dc-cyan/20 data-[state=active]:text-dc-cyan">
               <Activity className="mr-2 h-4 w-4" />
               Chat
             </TabsTrigger>
-            <TabsTrigger value="analytics">
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-dc-cyan/20 data-[state=active]:text-dc-cyan">
               <TrendingUp className="mr-2 h-4 w-4" />
               Analytics
             </TabsTrigger>
-            <TabsTrigger value="history">
+            <TabsTrigger value="history" className="data-[state=active]:bg-dc-cyan/20 data-[state=active]:text-dc-cyan">
               <FileText className="mr-2 h-4 w-4" />
               History
             </TabsTrigger>
@@ -221,41 +237,49 @@ export default function AgentWorkspace() {
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-4">
-            <Card className="p-6">
-              <h3 className="text-h3 mb-4">Performance Analytics</h3>
-              <div className="space-y-4">
+            <DCCard status="info" className="p-6">
+              <DCSectionHeader
+                title="Performance Analytics"
+                subtitle="Agent execution metrics and performance indicators"
+                icon={<TrendingUp className="h-5 w-5 text-dc-cyan" />}
+              />
+              <div className="space-y-4 mt-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-caption text-muted-foreground">Total Conversations</p>
-                    <p className="text-h2">{stats.totalRuns}</p>
+                  <div className="p-4 bg-dc-bg-secondary rounded-lg border border-dc-border">
+                    <p className="text-xs text-muted-foreground mb-1">Total Conversations</p>
+                    <p className="text-2xl font-semibold text-foreground">{stats.totalRuns}</p>
                   </div>
-                  <div>
-                    <p className="text-caption text-muted-foreground">Success Rate</p>
-                    <p className="text-h2">{stats.successRate.toFixed(1)}%</p>
+                  <div className="p-4 bg-dc-bg-secondary rounded-lg border border-dc-border">
+                    <p className="text-xs text-muted-foreground mb-1">Success Rate</p>
+                    <p className="text-2xl font-semibold text-dc-green">{stats.successRate.toFixed(1)}%</p>
                   </div>
                 </div>
                 {template?.kpi_definitions && template.kpi_definitions.length > 0 && (
                   <div>
-                    <h4 className="text-h4 mb-2">Template KPIs</h4>
+                    <h4 className="text-sm font-medium mb-2 text-foreground">Template KPIs</h4>
                     <div className="grid grid-cols-2 gap-4">
                       {template.kpi_definitions.map((kpi: any, idx: number) => (
-                        <div key={idx} className="p-3 bg-muted rounded-lg">
-                          <p className="text-caption text-muted-foreground">{kpi.label}</p>
-                          <p className="text-h4">Target: {kpi.target}{kpi.type === 'percentage' ? '%' : ''}</p>
+                        <div key={idx} className="p-3 bg-dc-bg-secondary rounded-lg border border-dc-border">
+                          <p className="text-xs text-muted-foreground">{kpi.label}</p>
+                          <p className="text-sm font-medium text-foreground">Target: {kpi.target}{kpi.type === 'percentage' ? '%' : ''}</p>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
               </div>
-            </Card>
+            </DCCard>
           </TabsContent>
 
           <TabsContent value="history" className="space-y-4">
-            <Card className="p-6">
-              <h3 className="text-h3 mb-4">Run History</h3>
-              <p className="text-muted-foreground">Run history details will appear here</p>
-            </Card>
+            <DCCard status="info" className="p-6">
+              <DCSectionHeader
+                title="Run History"
+                subtitle="Execution logs and historical data"
+                icon={<FileText className="h-5 w-5 text-dc-cyan" />}
+              />
+              <p className="text-muted-foreground mt-4">Run history details will appear here</p>
+            </DCCard>
           </TabsContent>
         </Tabs>
       </div>

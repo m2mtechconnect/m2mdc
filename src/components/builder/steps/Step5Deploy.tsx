@@ -14,6 +14,7 @@ import { MessageCircle, Sparkles, Loader2, Rocket, CheckCircle2, AlertTriangle, 
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { DCCard, DCSectionHeader, DCKPITile, DCStatusBadge } from '@/components/dc-ui';
+import { BlueprintReviewSection } from '@/components/blueprint';
 
 import {
   ReadinessChecklist,
@@ -328,8 +329,9 @@ export function Step5Deploy() {
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-4 w-full bg-dc-surface">
+        <TabsList className="grid grid-cols-5 w-full bg-dc-surface">
           <TabsTrigger value="overview" className="data-[state=active]:bg-dc-primary/10">Overview</TabsTrigger>
+          <TabsTrigger value="blueprint" className="data-[state=active]:bg-dc-primary/10">Blueprint</TabsTrigger>
           <TabsTrigger value="simulation" className="data-[state=active]:bg-dc-primary/10">Simulation</TabsTrigger>
           <TabsTrigger value="version" className="data-[state=active]:bg-dc-primary/10">Versions</TabsTrigger>
           <TabsTrigger value="governance" className="data-[state=active]:bg-dc-primary/10">Governance</TabsTrigger>
@@ -345,6 +347,13 @@ export function Step5Deploy() {
             industry={industry}
             existingKPIs={localKPIs}
             onAddKPIs={handleAddKPIs}
+          />
+        </TabsContent>
+
+        <TabsContent value="blueprint" className="mt-4">
+          <BlueprintReviewSection 
+            twinId="default"
+            onOpenBlueprint={() => window.open('/blueprint/default', '_blank')}
           />
         </TabsContent>
 

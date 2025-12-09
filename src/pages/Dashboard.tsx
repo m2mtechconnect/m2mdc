@@ -453,6 +453,18 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center gap-3">
                   <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate('/blueprint/default');
+                    }}
+                    className="gap-2"
+                  >
+                    <Server className="h-4 w-4" />
+                    View Blueprint
+                  </Button>
+                  <Button 
                     variant="secondary" 
                     size="sm"
                     onClick={(e) => {

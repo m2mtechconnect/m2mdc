@@ -19,9 +19,10 @@ export interface TimelineEvent {
   resolvedAt?: Date | string;
 }
 
-interface DCEventTimelineProps {
+export interface DCEventTimelineProps {
   events: TimelineEvent[];
   maxEvents?: number;
+  maxItems?: number;
   showTimestamp?: boolean;
   showRelativeTime?: boolean;
   onEventClick?: (event: TimelineEvent) => void;
@@ -53,12 +54,15 @@ const domainColors = {
 export function DCEventTimeline({
   events,
   maxEvents = 10,
+  maxItems,
   showTimestamp = true,
   showRelativeTime = true,
   onEventClick,
   className,
 }: DCEventTimelineProps) {
-  const displayEvents = events.slice(0, maxEvents);
+  // Support both maxEvents and maxItems props
+  const limit = maxItems ?? maxEvents;
+  const displayEvents = events.slice(0, limit);
 
   if (displayEvents.length === 0) {
     return (

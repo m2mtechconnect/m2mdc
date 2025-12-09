@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 export type KPIStatus = 'normal' | 'warning' | 'critical' | 'info';
 export type KPITrend = 'up' | 'down' | 'stable';
 
-interface DCKPITileProps {
+export interface DCKPITileProps {
   label: string;
   value: string | number;
   unit?: string;
@@ -22,12 +22,14 @@ interface DCKPITileProps {
     max: number;
     showBar?: boolean;
   };
+  thresholdValue?: number;
   sparklineData?: number[];
   icon?: ReactNode;
   subtitle?: string;
   onClick?: () => void;
   className?: string;
   compact?: boolean;
+  size?: 'sm' | 'md' | 'lg';
 }
 
 export function DCKPITile({
@@ -38,12 +40,14 @@ export function DCKPITile({
   trend = 'stable',
   status = 'normal',
   threshold,
+  thresholdValue,
   sparklineData,
   icon,
   subtitle,
   onClick,
   className,
   compact = false,
+  size = 'md',
 }: DCKPITileProps) {
   const statusColors = {
     normal: 'border-l-dc-green',
@@ -65,11 +69,26 @@ export function DCKPITile({
     stable: 'text-muted-foreground',
   };
 
+  const sizeClasses = {
+    sm: 'p-2',
+    md: 'p-3',
+    lg: 'p-4',
+  };
+
+  const valueSizes = {
+    sm: 'text-lg',
+    md: 'text-xl',
+    lg: 'text-2xl',
+  };
+
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
 
-  const thresholdPercentage = threshold 
-    ? Math.min((threshold.value / threshold.max) * 100, 100) 
-    : 0;
+  // Calculate threshold percentage from either threshold object or thresholdValue prop
+  const thresholdPercentage = thresholdValue !== undefined 
+    ? Math.min(thresholdValue, 100)
+    : threshold 
+      ? Math.min((threshold.value / threshold.max) * 100, 100) 
+      : 0;
 
   const thresholdColor = thresholdPercentage > 90 
     ? 'bg-dc-red' 
@@ -84,13 +103,13 @@ export function DCKPITile({
         'noc-card border-l-4 transition-all',
         statusColors[status],
         onClick && 'cursor-pointer hover:border-l-primary',
-        compact ? 'p-3' : 'p-4',
+        compact ? 'p-2' : sizeClasses[size],
         className
       )}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-2">
-        <span className="kpi-label truncate">{label}</span>
+        <span className="kpi-label truncate text-xs">{label}</span>
         {icon && (
           <div className={cn('flex-shrink-0', valueColors[status])}>
             {icon}
@@ -100,7 +119,7 @@ export function DCKPITile({
 
       {/* Value */}
       <div className="flex items-baseline gap-1 mb-1">
-        <span className={cn('kpi-value', valueColors[status], compact && 'text-xl')}>
+        <span className={cn('kpi-value font-bold', valueColors[status], compact ? 'text-lg' : valueSizes[size])}>
           {value}
         </span>
         {unit && (
@@ -113,9 +132,9 @@ export function DCKPITile({
 
       {/* Delta */}
       {delta !== undefined && (
-        <div className={cn('kpi-delta', deltaColors[trend])}>
+        <div className={cn('kpi-delta flex items-center gap-1 text-xs', deltaColors[trend])}>
           <TrendIcon className="h-3 w-3" />
-          <span>{delta}</span>
+          <span>{typeof delta === 'number' ? `${delta > 0 ? '+' : ''}${delta}%` : delta}</span>
         </div>
       )}
 
@@ -125,12 +144,14 @@ export function DCKPITile({
       )}
 
       {/* Threshold Bar */}
-      {threshold?.showBar && (
+      {(threshold?.showBar || thresholdValue !== undefined) && (
         <div className="mt-3">
-          <div className="flex justify-between text-xs text-muted-foreground mb-1">
-            <span>{threshold.value}</span>
-            <span>{threshold.max}</span>
-          </div>
+          {threshold?.showBar && (
+            <div className="flex justify-between text-xs text-muted-foreground mb-1">
+              <span>{threshold.value}</span>
+              <span>{threshold.max}</span>
+            </div>
+          )}
           <div className="h-1.5 bg-noc-surface-elevated rounded-full overflow-hidden">
             <div
               className={cn('h-full rounded-full transition-all', thresholdColor)}
@@ -141,7 +162,7 @@ export function DCKPITile({
       )}
 
       {/* Sparkline */}
-      {sparklineData && sparklineData.length > 0 && (
+      {sparklineData && sparklineData.length > 0 && !compact && (
         <div className="mt-3 h-8">
           <Sparkline data={sparklineData} status={status} />
         </div>

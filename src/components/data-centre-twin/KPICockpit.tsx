@@ -1,14 +1,14 @@
 /**
  * KPI Cockpit - Central KPI display for Data Centre Twin
- * Shows all domain KPIs with drill-down capability
+ * Enterprise NOC-style dashboard with drill-down capability
+ * Uses DC UI components for consistent DCIM aesthetics
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { DCCard, DCKPITile } from '@/components/dc-ui';
 import { 
   Thermometer, Zap, Wind, Network, Shield, Cpu, 
-  Globe, DollarSign, TrendingUp, TrendingDown, Minus
+  Globe, DollarSign, Activity
 } from 'lucide-react';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
@@ -19,153 +19,304 @@ interface KPICockpitProps {
 interface KPIData {
   value: number;
   unit: string;
-  status: 'good' | 'warning' | 'critical';
+  status: 'normal' | 'warning' | 'critical';
   trend: 'up' | 'down' | 'stable';
+  delta?: number;
 }
 
 export function KPICockpit({ facility }: KPICockpitProps) {
   const kpis = calculateKPIs(facility);
   
+  // Generate sparkline data helper
+  const generateSparkline = (base: number, variance: number = 5) => {
+    return Array.from({ length: 12 }, () => Math.max(0, Math.min(100, base + (Math.random() - 0.5) * variance)));
+  };
+  
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">KPI Cockpit</h2>
-        <Badge variant="outline" className="font-mono">
-          Live • Updated {new Date().toLocaleTimeString()}
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-dc-primary/20">
+            <Activity className="h-5 w-5 text-dc-primary" />
+          </div>
+          <h2 className="text-lg font-display font-semibold">KPI Cockpit</h2>
+        </div>
+        <Badge variant="outline" className="font-mono text-xs border-dc-success/30 text-dc-success animate-status-blink">
+          <span className="relative flex h-2 w-2 mr-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-dc-success opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-dc-success"></span>
+          </span>
+          LIVE • {new Date().toLocaleTimeString()}
         </Badge>
       </div>
       
+      {/* Domain KPI Cards - 4 column grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <KPICard
-          title="Thermal Stability"
-          icon={Thermometer}
-          iconColor="text-red-500"
-          kpis={[
-            { name: 'Stability Score', ...kpis.thermalStability },
-            { name: 'Hotspot Risk', ...kpis.hotspotRisk },
-          ]}
-        />
+        {/* Thermal Domain */}
+        <DCCard 
+          title="Thermal Stability" 
+          icon={<Thermometer className="h-4 w-4" />}
+          status={kpis.thermalStability.status === 'normal' ? 'normal' : kpis.thermalStability.status}
+          className="hover:border-dc-thermal/50 transition-colors"
+        >
+          <div className="space-y-3">
+            <DCKPITile
+              label="Stability Score"
+              value={kpis.thermalStability.value}
+              unit="%"
+              status={kpis.thermalStability.status}
+              trend={kpis.thermalStability.trend}
+              delta={kpis.thermalStability.delta}
+              sparklineData={generateSparkline(kpis.thermalStability.value)}
+              thresholdValue={kpis.thermalStability.value}
+              size="sm"
+              compact
+            />
+            <DCKPITile
+              label="Hotspot Risk"
+              value={kpis.hotspotRisk.value}
+              unit="%"
+              status={kpis.hotspotRisk.status}
+              trend={kpis.hotspotRisk.trend}
+              sparklineData={generateSparkline(kpis.hotspotRisk.value, 8)}
+              size="sm"
+              compact
+            />
+          </div>
+        </DCCard>
         
-        <KPICard
-          title="Power Reliability"
-          icon={Zap}
-          iconColor="text-yellow-500"
-          kpis={[
-            { name: 'Reliability Score', ...kpis.powerReliability },
-            { name: 'UPS Health', ...kpis.upsHealth },
-          ]}
-        />
+        {/* Power Domain */}
+        <DCCard 
+          title="Power Reliability" 
+          icon={<Zap className="h-4 w-4" />}
+          status={kpis.powerReliability.status === 'normal' ? 'normal' : kpis.powerReliability.status}
+          className="hover:border-dc-power/50 transition-colors"
+        >
+          <div className="space-y-3">
+            <DCKPITile
+              label="Reliability Score"
+              value={kpis.powerReliability.value}
+              unit="%"
+              status={kpis.powerReliability.status}
+              trend={kpis.powerReliability.trend}
+              sparklineData={generateSparkline(kpis.powerReliability.value, 3)}
+              thresholdValue={kpis.powerReliability.value}
+              size="sm"
+              compact
+            />
+            <DCKPITile
+              label="UPS Health"
+              value={kpis.upsHealth.value}
+              unit="%"
+              status={kpis.upsHealth.status}
+              trend={kpis.upsHealth.trend}
+              delta={kpis.upsHealth.delta}
+              sparklineData={generateSparkline(kpis.upsHealth.value, 5)}
+              size="sm"
+              compact
+            />
+          </div>
+        </DCCard>
         
-        <KPICard
-          title="Cooling Efficiency"
-          icon={Wind}
-          iconColor="text-blue-500"
-          kpis={[
-            { name: 'Efficiency Index', ...kpis.coolingEfficiency },
-            { name: 'PUE', ...kpis.pue },
-          ]}
-        />
+        {/* Cooling Domain */}
+        <DCCard 
+          title="Cooling Efficiency" 
+          icon={<Wind className="h-4 w-4" />}
+          status={kpis.coolingEfficiency.status === 'normal' ? 'normal' : kpis.coolingEfficiency.status}
+          className="hover:border-dc-cooling/50 transition-colors"
+        >
+          <div className="space-y-3">
+            <DCKPITile
+              label="Efficiency Index"
+              value={kpis.coolingEfficiency.value}
+              unit="%"
+              status={kpis.coolingEfficiency.status}
+              trend={kpis.coolingEfficiency.trend}
+              delta={kpis.coolingEfficiency.delta}
+              sparklineData={generateSparkline(kpis.coolingEfficiency.value, 4)}
+              thresholdValue={kpis.coolingEfficiency.value}
+              size="sm"
+              compact
+            />
+            <DCKPITile
+              label="PUE"
+              value={kpis.pue.value}
+              unit=""
+              status={kpis.pue.status}
+              trend={kpis.pue.trend}
+              sparklineData={generateSparkline(kpis.pue.value * 60, 3)}
+              size="sm"
+              compact
+            />
+          </div>
+        </DCCard>
         
-        <KPICard
-          title="Network Health"
-          icon={Network}
-          iconColor="text-purple-500"
-          kpis={[
-            { name: 'Integrity Score', ...kpis.networkIntegrity },
-            { name: 'Fabric Saturation', ...kpis.fabricSaturation },
-          ]}
-        />
+        {/* Network Domain */}
+        <DCCard 
+          title="Network Health" 
+          icon={<Network className="h-4 w-4" />}
+          status={kpis.networkIntegrity.status === 'normal' ? 'normal' : kpis.networkIntegrity.status}
+          className="hover:border-dc-network/50 transition-colors"
+        >
+          <div className="space-y-3">
+            <DCKPITile
+              label="Integrity Score"
+              value={kpis.networkIntegrity.value}
+              unit="%"
+              status={kpis.networkIntegrity.status}
+              trend={kpis.networkIntegrity.trend}
+              sparklineData={generateSparkline(kpis.networkIntegrity.value, 2)}
+              thresholdValue={kpis.networkIntegrity.value}
+              size="sm"
+              compact
+            />
+            <DCKPITile
+              label="Fabric Saturation"
+              value={kpis.fabricSaturation.value}
+              unit="%"
+              status={kpis.fabricSaturation.status}
+              trend={kpis.fabricSaturation.trend}
+              delta={kpis.fabricSaturation.delta}
+              sparklineData={generateSparkline(kpis.fabricSaturation.value, 6)}
+              size="sm"
+              compact
+            />
+          </div>
+        </DCCard>
         
-        <KPICard
-          title="Facility Safety"
-          icon={Shield}
-          iconColor="text-green-500"
-          kpis={[
-            { name: 'Safety Score', ...kpis.environmentalSafety },
-            { name: 'Early Warning', ...kpis.earlyWarning },
-          ]}
-        />
+        {/* Facility Safety Domain */}
+        <DCCard 
+          title="Facility Safety" 
+          icon={<Shield className="h-4 w-4" />}
+          status={kpis.environmentalSafety.status === 'normal' ? 'normal' : kpis.environmentalSafety.status}
+          className="hover:border-dc-success/50 transition-colors"
+        >
+          <div className="space-y-3">
+            <DCKPITile
+              label="Safety Score"
+              value={kpis.environmentalSafety.value}
+              unit="%"
+              status={kpis.environmentalSafety.status}
+              trend={kpis.environmentalSafety.trend}
+              sparklineData={generateSparkline(kpis.environmentalSafety.value, 2)}
+              thresholdValue={kpis.environmentalSafety.value}
+              size="sm"
+              compact
+            />
+            <DCKPITile
+              label="Early Warning"
+              value={kpis.earlyWarning.value}
+              unit="%"
+              status={kpis.earlyWarning.status}
+              trend={kpis.earlyWarning.trend}
+              sparklineData={generateSparkline(kpis.earlyWarning.value, 3)}
+              size="sm"
+              compact
+            />
+          </div>
+        </DCCard>
         
-        <KPICard
-          title="Workload Performance"
-          icon={Cpu}
-          iconColor="text-orange-500"
-          kpis={[
-            { name: 'GPU Utilization', ...kpis.gpuUtilization },
-            { name: 'Queue Efficiency', ...kpis.queueEfficiency },
-          ]}
-        />
+        {/* Workload/GPU Domain */}
+        <DCCard 
+          title="Workload Performance" 
+          icon={<Cpu className="h-4 w-4" />}
+          status={kpis.gpuUtilization.status === 'normal' ? 'normal' : kpis.gpuUtilization.status}
+          className="hover:border-dc-gpu/50 transition-colors"
+        >
+          <div className="space-y-3">
+            <DCKPITile
+              label="GPU Utilization"
+              value={kpis.gpuUtilization.value}
+              unit="%"
+              status={kpis.gpuUtilization.status}
+              trend={kpis.gpuUtilization.trend}
+              delta={kpis.gpuUtilization.delta}
+              sparklineData={generateSparkline(kpis.gpuUtilization.value, 8)}
+              thresholdValue={kpis.gpuUtilization.value}
+              size="sm"
+              compact
+            />
+            <DCKPITile
+              label="Queue Efficiency"
+              value={kpis.queueEfficiency.value}
+              unit="%"
+              status={kpis.queueEfficiency.status}
+              trend={kpis.queueEfficiency.trend}
+              sparklineData={generateSparkline(kpis.queueEfficiency.value, 5)}
+              size="sm"
+              compact
+            />
+          </div>
+        </DCCard>
         
-        <KPICard
-          title="Data Sovereignty"
-          icon={Globe}
-          iconColor="text-cyan-500"
-          kpis={[
-            { name: 'Risk Score', ...kpis.sovereigntyRisk },
-            { name: 'Compliance', ...kpis.complianceScore },
-          ]}
-        />
+        {/* Sovereignty Domain */}
+        <DCCard 
+          title="Data Sovereignty" 
+          icon={<Globe className="h-4 w-4" />}
+          status={kpis.sovereigntyRisk.status === 'normal' ? 'normal' : kpis.sovereigntyRisk.status}
+          className="hover:border-dc-sovereignty/50 transition-colors"
+        >
+          <div className="space-y-3">
+            <DCKPITile
+              label="Risk Score"
+              value={kpis.sovereigntyRisk.value}
+              unit="%"
+              status={kpis.sovereigntyRisk.status}
+              trend={kpis.sovereigntyRisk.trend}
+              sparklineData={generateSparkline(kpis.sovereigntyRisk.value, 4)}
+              size="sm"
+              compact
+            />
+            <DCKPITile
+              label="Compliance"
+              value={kpis.complianceScore.value}
+              unit="%"
+              status={kpis.complianceScore.status}
+              trend={kpis.complianceScore.trend}
+              sparklineData={generateSparkline(kpis.complianceScore.value, 2)}
+              thresholdValue={kpis.complianceScore.value}
+              size="sm"
+              compact
+            />
+          </div>
+        </DCCard>
         
-        <KPICard
-          title="Financial Health"
-          icon={DollarSign}
-          iconColor="text-emerald-500"
-          kpis={[
-            { name: 'Cost/GPU-hr', ...kpis.costPerGpuHour },
-            { name: 'Carbon Efficiency', ...kpis.carbonEfficiency },
-          ]}
-        />
+        {/* Financial/Carbon Domain */}
+        <DCCard 
+          title="Financial Health" 
+          icon={<DollarSign className="h-4 w-4" />}
+          status={kpis.costPerGpuHour.status === 'normal' ? 'normal' : kpis.costPerGpuHour.status}
+          className="hover:border-dc-carbon/50 transition-colors"
+        >
+          <div className="space-y-3">
+            <DCKPITile
+              label="Cost/GPU-hr"
+              value={kpis.costPerGpuHour.value}
+              unit="$"
+              status={kpis.costPerGpuHour.status}
+              trend={kpis.costPerGpuHour.trend}
+              delta={kpis.costPerGpuHour.delta}
+              sparklineData={generateSparkline(kpis.costPerGpuHour.value * 20, 10)}
+              size="sm"
+              compact
+            />
+            <DCKPITile
+              label="Carbon Efficiency"
+              value={kpis.carbonEfficiency.value}
+              unit="%"
+              status={kpis.carbonEfficiency.status}
+              trend={kpis.carbonEfficiency.trend}
+              delta={kpis.carbonEfficiency.delta}
+              sparklineData={generateSparkline(kpis.carbonEfficiency.value, 4)}
+              thresholdValue={kpis.carbonEfficiency.value}
+              size="sm"
+              compact
+            />
+          </div>
+        </DCCard>
       </div>
     </div>
   );
-}
-
-interface KPICardProps {
-  title: string;
-  icon: React.ElementType;
-  iconColor: string;
-  kpis: Array<{ name: string; value: number; unit: string; status: 'good' | 'warning' | 'critical'; trend: 'up' | 'down' | 'stable' }>;
-}
-
-function KPICard({ title, icon: Icon, iconColor, kpis }: KPICardProps) {
-  return (
-    <Card className="hover:border-primary/50 transition-colors">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium flex items-center gap-2">
-          <Icon className={`h-4 w-4 ${iconColor}`} />
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {kpis.map((kpi, idx) => (
-          <div key={idx} className="space-y-1">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">{kpi.name}</span>
-              <div className="flex items-center gap-1">
-                {kpi.trend === 'up' && <TrendingUp className="h-3 w-3 text-green-500" />}
-                {kpi.trend === 'down' && <TrendingDown className="h-3 w-3 text-destructive" />}
-                {kpi.trend === 'stable' && <Minus className="h-3 w-3 text-muted-foreground" />}
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className={`text-lg font-bold ${getStatusColor(kpi.status)}`}>
-                {kpi.value.toFixed(kpi.unit === '%' ? 0 : 2)}{kpi.unit}
-              </span>
-            </div>
-            <Progress value={Math.min(kpi.value, 100)} className="h-1.5" />
-          </div>
-        ))}
-      </CardContent>
-    </Card>
-  );
-}
-
-function getStatusColor(status: 'good' | 'warning' | 'critical'): string {
-  switch (status) {
-    case 'good': return 'text-green-500';
-    case 'warning': return 'text-yellow-500';
-    case 'critical': return 'text-destructive';
-  }
 }
 
 function calculateKPIs(facility: DataCentreFacility): Record<string, KPIData> {
@@ -176,7 +327,6 @@ function calculateKPIs(facility: DataCentreFacility): Record<string, KPIData> {
   const networkTwin = facility.network;
   const workloadTwin = facility.workloadGpu;
   const sovereigntyTwin = facility.sovereignty;
-  const financialTwin = facility.financialCarbon;
   const facilityTwin = facility.facilitySafety;
   
   // Thermal KPIs
@@ -184,7 +334,6 @@ function calculateKPIs(facility: DataCentreFacility): Record<string, KPIData> {
   const hotspotRisk = thermalTwin.kpis.hotspotRiskProbability;
   
   // Power KPIs
-  const powerUtilization = (facility.currentPowerDrawKw / facility.totalPowerCapacityKw) * 100;
   const powerReliability = powerTwin.kpis.powerReliabilityScore;
   const upsHealth = powerTwin.kpis.upsHealthIndex;
   
@@ -212,21 +361,108 @@ function calculateKPIs(facility: DataCentreFacility): Record<string, KPIData> {
   const earlyWarning = facilityTwin.kpis.earlyWarningIndex;
   
   return {
-    thermalStability: { value: thermalStability, unit: '%', status: thermalStability > 80 ? 'good' : thermalStability > 60 ? 'warning' : 'critical', trend: 'stable' },
-    hotspotRisk: { value: hotspotRisk, unit: '%', status: hotspotRisk < 10 ? 'good' : hotspotRisk < 25 ? 'warning' : 'critical', trend: 'stable' },
-    powerReliability: { value: powerReliability, unit: '%', status: powerReliability > 95 ? 'good' : powerReliability > 85 ? 'warning' : 'critical', trend: 'stable' },
-    upsHealth: { value: upsHealth, unit: '%', status: upsHealth > 80 ? 'good' : upsHealth > 60 ? 'warning' : 'critical', trend: 'down' },
-    coolingEfficiency: { value: coolingEfficiency, unit: '%', status: coolingEfficiency > 70 ? 'good' : coolingEfficiency > 50 ? 'warning' : 'critical', trend: 'up' },
-    pue: { value: facility.pue, unit: '', status: facility.pue < 1.4 ? 'good' : facility.pue < 1.6 ? 'warning' : 'critical', trend: 'stable' },
-    networkIntegrity: { value: networkIntegrity, unit: '%', status: networkIntegrity > 80 ? 'good' : networkIntegrity > 60 ? 'warning' : 'critical', trend: 'stable' },
-    fabricSaturation: { value: fabricSaturation, unit: '%', status: fabricSaturation < 60 ? 'good' : fabricSaturation < 80 ? 'warning' : 'critical', trend: 'up' },
-    environmentalSafety: { value: environmentalSafety, unit: '%', status: environmentalSafety > 90 ? 'good' : environmentalSafety > 70 ? 'warning' : 'critical', trend: 'stable' },
-    earlyWarning: { value: earlyWarning, unit: '%', status: earlyWarning > 90 ? 'good' : earlyWarning > 70 ? 'warning' : 'critical', trend: 'stable' },
-    gpuUtilization: { value: gpuUtilization, unit: '%', status: gpuUtilization > 70 ? 'good' : gpuUtilization > 50 ? 'warning' : 'critical', trend: 'up' },
-    queueEfficiency: { value: queueEfficiency, unit: '%', status: queueEfficiency > 80 ? 'good' : queueEfficiency > 60 ? 'warning' : 'critical', trend: 'stable' },
-    sovereigntyRisk: { value: sovereigntyRisk, unit: '%', status: sovereigntyRisk < 10 ? 'good' : sovereigntyRisk < 30 ? 'warning' : 'critical', trend: 'stable' },
-    complianceScore: { value: complianceScore, unit: '%', status: complianceScore > 90 ? 'good' : complianceScore > 75 ? 'warning' : 'critical', trend: 'stable' },
-    costPerGpuHour: { value: costPerGpuHour, unit: '$', status: costPerGpuHour < 3 ? 'good' : costPerGpuHour < 5 ? 'warning' : 'critical', trend: 'down' },
-    carbonEfficiency: { value: carbonEfficiency, unit: '%', status: carbonEfficiency > 80 ? 'good' : carbonEfficiency > 60 ? 'warning' : 'critical', trend: 'up' },
+    thermalStability: { 
+      value: thermalStability, 
+      unit: '%', 
+      status: thermalStability > 80 ? 'normal' : thermalStability > 60 ? 'warning' : 'critical', 
+      trend: 'stable',
+      delta: 1.2
+    },
+    hotspotRisk: { 
+      value: hotspotRisk, 
+      unit: '%', 
+      status: hotspotRisk < 10 ? 'normal' : hotspotRisk < 25 ? 'warning' : 'critical', 
+      trend: 'stable' 
+    },
+    powerReliability: { 
+      value: powerReliability, 
+      unit: '%', 
+      status: powerReliability > 95 ? 'normal' : powerReliability > 85 ? 'warning' : 'critical', 
+      trend: 'stable' 
+    },
+    upsHealth: { 
+      value: upsHealth, 
+      unit: '%', 
+      status: upsHealth > 80 ? 'normal' : upsHealth > 60 ? 'warning' : 'critical', 
+      trend: 'down',
+      delta: -2.1
+    },
+    coolingEfficiency: { 
+      value: coolingEfficiency, 
+      unit: '%', 
+      status: coolingEfficiency > 70 ? 'normal' : coolingEfficiency > 50 ? 'warning' : 'critical', 
+      trend: 'up',
+      delta: 3.4
+    },
+    pue: { 
+      value: facility.pue, 
+      unit: '', 
+      status: facility.pue < 1.4 ? 'normal' : facility.pue < 1.6 ? 'warning' : 'critical', 
+      trend: 'stable' 
+    },
+    networkIntegrity: { 
+      value: networkIntegrity, 
+      unit: '%', 
+      status: networkIntegrity > 80 ? 'normal' : networkIntegrity > 60 ? 'warning' : 'critical', 
+      trend: 'stable' 
+    },
+    fabricSaturation: { 
+      value: fabricSaturation, 
+      unit: '%', 
+      status: fabricSaturation < 60 ? 'normal' : fabricSaturation < 80 ? 'warning' : 'critical', 
+      trend: 'up',
+      delta: 4.2
+    },
+    environmentalSafety: { 
+      value: environmentalSafety, 
+      unit: '%', 
+      status: environmentalSafety > 90 ? 'normal' : environmentalSafety > 70 ? 'warning' : 'critical', 
+      trend: 'stable' 
+    },
+    earlyWarning: { 
+      value: earlyWarning, 
+      unit: '%', 
+      status: earlyWarning > 90 ? 'normal' : earlyWarning > 70 ? 'warning' : 'critical', 
+      trend: 'stable' 
+    },
+    gpuUtilization: { 
+      value: gpuUtilization, 
+      unit: '%', 
+      status: gpuUtilization > 70 ? 'normal' : gpuUtilization > 50 ? 'warning' : 'critical', 
+      trend: 'up',
+      delta: 5.8
+    },
+    queueEfficiency: { 
+      value: queueEfficiency, 
+      unit: '%', 
+      status: queueEfficiency > 80 ? 'normal' : queueEfficiency > 60 ? 'warning' : 'critical', 
+      trend: 'stable' 
+    },
+    sovereigntyRisk: { 
+      value: sovereigntyRisk, 
+      unit: '%', 
+      status: sovereigntyRisk < 10 ? 'normal' : sovereigntyRisk < 30 ? 'warning' : 'critical', 
+      trend: 'stable' 
+    },
+    complianceScore: { 
+      value: complianceScore, 
+      unit: '%', 
+      status: complianceScore > 90 ? 'normal' : complianceScore > 75 ? 'warning' : 'critical', 
+      trend: 'stable' 
+    },
+    costPerGpuHour: { 
+      value: costPerGpuHour, 
+      unit: '$', 
+      status: costPerGpuHour < 3 ? 'normal' : costPerGpuHour < 5 ? 'warning' : 'critical', 
+      trend: 'down',
+      delta: -0.15
+    },
+    carbonEfficiency: { 
+      value: carbonEfficiency, 
+      unit: '%', 
+      status: carbonEfficiency > 80 ? 'normal' : carbonEfficiency > 60 ? 'warning' : 'critical', 
+      trend: 'up',
+      delta: 2.3
+    },
   };
 }

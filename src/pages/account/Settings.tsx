@@ -9,15 +9,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Building2, Shield, Bell, CreditCard, Info, Lock } from "lucide-react";
+import { Building2, Shield, Bell, CreditCard, Info, Lock, Settings as SettingsIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DCCard, DCSectionHeader } from "@/components/dc-ui";
 
 interface OrganizationData {
   id: string;
@@ -155,10 +155,10 @@ export default function Settings() {
       <div className="container mx-auto py-8 max-w-4xl">
         <div className="space-y-6">
           <Skeleton className="h-8 w-48" />
-          <Card className="p-6">
+          <DCCard>
             <Skeleton className="h-32 w-full mb-4" />
             <Skeleton className="h-10 w-full" />
-          </Card>
+          </DCCard>
         </div>
       </div>
     );
@@ -168,22 +168,23 @@ export default function Settings() {
     <div className="container mx-auto py-8 max-w-4xl">
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Workspace Settings</h1>
-          <p className="text-muted-foreground">
-            Manage workspace configuration and team defaults
-          </p>
-          {!isAdmin && (
-            <Badge variant="secondary" className="mt-2">
-              <Lock className="mr-1 h-3 w-3" />
-              Admin access required to modify settings
-            </Badge>
-          )}
-        </div>
+        <DCSectionHeader
+          title="Workspace Settings"
+          subtitle="Manage workspace configuration and team defaults"
+          icon={<SettingsIcon className="h-5 w-5 text-dc-cyan" />}
+          action={
+            !isAdmin ? (
+              <Badge variant="secondary">
+                <Lock className="mr-1 h-3 w-3" />
+                Admin access required
+              </Badge>
+            ) : undefined
+          }
+        />
 
         {!organization ? (
-          <Card className="p-6">
-            <div className="text-center space-y-4">
+          <DCCard status="neutral">
+            <div className="text-center space-y-4 py-8">
               <Building2 className="mx-auto h-12 w-12 text-muted-foreground" />
               <div>
                 <h3 className="text-lg font-semibold mb-2">No Workspace Found</h3>
@@ -195,7 +196,7 @@ export default function Settings() {
                 </Button>
               </div>
             </div>
-          </Card>
+          </DCCard>
         ) : (
           <Tabs defaultValue="general" className="space-y-6">
             <TabsList className="grid w-full grid-cols-3">
@@ -215,171 +216,157 @@ export default function Settings() {
 
             {/* General Tab */}
             <TabsContent value="general" className="space-y-6">
-              <Card className="p-6">
-                <div className="space-y-6">
-                  <h2 className="text-xl font-semibold">Workspace Information</h2>
+              <DCCard title="Workspace Information" icon={<Building2 className="h-4 w-4 text-dc-cyan" />}>
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="workspace_name">Workspace Name</Label>
+                    <Input
+                      id="workspace_name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      disabled={!isAdmin}
+                      placeholder="My Organization"
+                    />
+                  </div>
 
-                  <div className="grid gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="workspace_name">Workspace Name</Label>
-                      <Input
-                        id="workspace_name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        disabled={!isAdmin}
-                        placeholder="My Organization"
-                      />
-                    </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="domain">Primary Domain</Label>
+                    <Input
+                      id="domain"
+                      value={formData.domain}
+                      onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
+                      disabled={!isAdmin}
+                      placeholder="company.com"
+                    />
+                  </div>
 
-                    <div className="grid gap-2">
-                      <Label htmlFor="domain">Primary Domain</Label>
-                      <Input
-                        id="domain"
-                        value={formData.domain}
-                        onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
-                        disabled={!isAdmin}
-                        placeholder="company.com"
-                      />
-                    </div>
-
-                    <div className="grid gap-2">
-                      <Label htmlFor="industry">Industry</Label>
-                      <Select
-                        value={formData.industry}
-                        onValueChange={(value) => setFormData({ ...formData, industry: value })}
-                        disabled={!isAdmin}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select industry" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {industries.map(industry => (
-                            <SelectItem key={industry} value={industry.toLowerCase()}>
-                              {industry}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="industry">Industry</Label>
+                    <Select
+                      value={formData.industry}
+                      onValueChange={(value) => setFormData({ ...formData, industry: value })}
+                      disabled={!isAdmin}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select industry" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {industries.map(industry => (
+                          <SelectItem key={industry} value={industry.toLowerCase()}>
+                            {industry}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-              </Card>
+              </DCCard>
 
-              <Card className="p-6">
-                <div className="space-y-6">
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-xl font-semibold">Team Defaults</h2>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>These settings apply to new team members</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-
-                  <div className="grid gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="default_role">Default Role for New Members</Label>
-                      <Select
-                        value={formData.default_role}
-                        onValueChange={(value) => setFormData({ ...formData, default_role: value })}
-                        disabled={!isAdmin}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {defaultRoles.map(role => (
-                            <SelectItem key={role.value} value={role.value}>
-                              {role.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+              <DCCard
+                title="Team Defaults"
+                headerAction={
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>These settings apply to new team members</p>
+                    </TooltipContent>
+                  </Tooltip>
+                }
+              >
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="default_role">Default Role for New Members</Label>
+                    <Select
+                      value={formData.default_role}
+                      onValueChange={(value) => setFormData({ ...formData, default_role: value })}
+                      disabled={!isAdmin}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {defaultRoles.map(role => (
+                          <SelectItem key={role.value} value={role.value}>
+                            {role.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-              </Card>
+              </DCCard>
             </TabsContent>
 
             {/* Security Tab */}
             <TabsContent value="security" className="space-y-6">
-              <Card className="p-6">
-                <div className="space-y-6">
-                  <h2 className="text-xl font-semibold">Access & Security</h2>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <Label>Multi-Factor Authentication (MFA)</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Require MFA for all team members
-                        </p>
-                      </div>
-                      <Switch
-                        checked={organization.mfa_enabled}
-                        disabled
-                      />
+              <DCCard title="Access & Security" icon={<Shield className="h-4 w-4 text-dc-cyan" />}>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <Label>Multi-Factor Authentication (MFA)</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Require MFA for all team members
+                      </p>
                     </div>
+                    <Switch
+                      checked={organization.mfa_enabled}
+                      disabled
+                    />
+                  </div>
 
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <Label>Single Sign-On (SSO)</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Enable SSO authentication
-                        </p>
-                      </div>
-                      <Switch
-                        checked={organization.sso_enabled}
-                        disabled
-                      />
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <Label>Single Sign-On (SSO)</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Enable SSO authentication
+                      </p>
                     </div>
+                    <Switch
+                      checked={organization.sso_enabled}
+                      disabled
+                    />
+                  </div>
 
-                    <div className="text-sm text-muted-foreground flex items-center gap-2 mt-4">
-                      <Info className="h-4 w-4" />
-                      <span>Contact your administrator to modify security settings</span>
-                    </div>
+                  <div className="text-sm text-muted-foreground flex items-center gap-2 mt-4">
+                    <Info className="h-4 w-4" />
+                    <span>Contact your administrator to modify security settings</span>
                   </div>
                 </div>
-              </Card>
+              </DCCard>
             </TabsContent>
 
             {/* Notifications Tab */}
             <TabsContent value="notifications" className="space-y-6">
-              <Card className="p-6">
-                <div className="space-y-6">
-                  <h2 className="text-xl font-semibold">Notification Preferences</h2>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <Label>System Alerts</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Receive notifications about system updates
-                        </p>
-                      </div>
-                      <Switch disabled />
+              <DCCard title="Notification Preferences" icon={<Bell className="h-4 w-4 text-dc-cyan" />}>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <Label>System Alerts</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Receive notifications about system updates
+                      </p>
                     </div>
+                    <Switch disabled />
+                  </div>
 
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <Label>Team Activity</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Get notified about team member activity
-                        </p>
-                      </div>
-                      <Switch disabled />
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <Label>Team Activity</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Get notified about team member activity
+                      </p>
                     </div>
+                    <Switch disabled />
+                  </div>
 
-                    <div className="text-sm text-muted-foreground flex items-center gap-2 mt-4">
-                      <Info className="h-4 w-4" />
-                      <span>Notification settings coming soon</span>
-                    </div>
+                  <div className="text-sm text-muted-foreground flex items-center gap-2 mt-4">
+                    <Info className="h-4 w-4" />
+                    <span>Notification settings coming soon</span>
                   </div>
                 </div>
-              </Card>
+              </DCCard>
             </TabsContent>
           </Tabs>
         )}

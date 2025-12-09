@@ -2,10 +2,11 @@
  * Co-Pilot Context Builder
  * 
  * Builds rich context objects for Co-Pilot from current page state,
- * agent metadata, and user activity.
+ * agent metadata, user activity, and blueprint data.
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { generateDefaultBlueprint } from '@/data/defaultBlueprint';
 
 export interface SimulationTemplateContext {
   title: string;
@@ -68,7 +69,8 @@ export interface CoPilotContext {
     | 'url_scanner'
     | 'recommendations'
     | 'playbook'
-    | 'twin_chat';
+    | 'twin_chat'
+    | 'data_centre_twin';
   
   // Agent context
   agentId?: string;
@@ -183,6 +185,52 @@ export async function buildCoPilotContext(
 }
 
 /**
+ * Enrich context with blueprint data for DC twin pages
+ */
+export async function enrichWithBlueprint(
+  context: CoPilotContext,
+  twinId: string
+): Promise<CoPilotContext> {
+  try {
+    const blueprint = generateDefaultBlueprint(twinId);
+    
+    // Build twin context with blueprint data
+    const twinContext: TwinContext = {
+      templateId: blueprint.id,
+      templateName: blueprint.name,
+      templateType: 'data_centre',
+      currentTab: context.activeTab || 'overview',
+      mockDataEnabled: true,
+      blueprint: {
+        name: blueprint.name,
+        agents: blueprint.agents.map(a => a.name),
+        dataSources: blueprint.dataSources.map(ds => ds.name),
+        integrations: blueprint.integrations.map(i => i.name),
+        workflowCount: blueprint.workflows.length,
+        kpiCount: blueprint.kpis.length,
+        scenarioCount: blueprint.simulationScenarios.length,
+        humanRoles: blueprint.humanRoles.map(r => r.name),
+      },
+      simulation: {
+        availableScenarios: blueprint.simulationScenarios.map(s => s.name),
+      },
+    };
+    
+    return {
+      ...context,
+      agentName: blueprint.name,
+      agentType: 'digital_twin',
+      twinContext,
+      workflowsCount: blueprint.workflows.length,
+      integrationsCount: blueprint.integrations.length,
+    };
+  } catch (error) {
+    console.error('Failed to enrich context with blueprint:', error);
+    return context;
+  }
+}
+
+/**
  * Format context for display (context chips)
  */
 export function formatContextChips(context: CoPilotContext): Array<{ label: string; value: string }> {
@@ -218,6 +266,14 @@ export function formatContextChips(context: CoPilotContext): Array<{ label: stri
     chips.push({ label: 'Source', value: 'URL Scan' });
   } else if (context.sourceType === 'template') {
     chips.push({ label: 'Source', value: 'Template' });
+  }
+
+  // Add blueprint-specific chips for DC twin pages
+  if (context.twinContext?.blueprint) {
+    const bp = context.twinContext.blueprint;
+    chips.push({ label: 'KPIs', value: String(bp.kpiCount) });
+    chips.push({ label: 'Agents', value: String(bp.agents.length) });
+    chips.push({ label: 'Scenarios', value: String(bp.scenarioCount) });
   }
 
   return chips;

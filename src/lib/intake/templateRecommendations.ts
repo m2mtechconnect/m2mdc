@@ -1,7 +1,7 @@
 /**
  * Template Recommendation Engine
  * Routes users to appropriate templates based on their input
- * YVR Airport Operations Digital Twin is the flagship template
+ * Sovereign Data Centre Digital Twin is the flagship template
  */
 
 export interface TemplateRecommendation {
@@ -12,7 +12,7 @@ export interface TemplateRecommendation {
 
 /**
  * Analyze content and recommend templates
- * Priority: YVR for aviation/airport use cases
+ * Priority: Data Centre for infrastructure/compute use cases
  */
 export function recommendTemplatesFromContent(content: {
   text?: string;
@@ -31,39 +31,43 @@ export function recommendTemplatesFromContent(content: {
   // Combine all text for analysis
   const allText = [text, ...keywords, industry, department, url].join(' ').toLowerCase();
   
-  // YVR Airport template - High priority for aviation/airport/transportation
-  const aviationKeywords = [
-    'airport', 'aviation', 'flight', 'airline', 'runway', 'terminal', 
-    'passenger', 'baggage', 'gate', 'aircraft', 'airside', 'landside',
-    'departure', 'arrival', 'boarding', 'check-in', 'security screening',
-    'air traffic', 'ground operations', 'ramp', 'tarmac', 'hangar',
-    'cargo', 'freight', 'customs', 'immigration', 'TSA', 'FAA',
-    'ICAO', 'IATA', 'tower', 'apron', 'taxiway', 'jet bridge'
+  // Data Centre template - High priority for infrastructure/compute use cases
+  const dataCentreKeywords = [
+    'data centre', 'data center', 'datacenter', 'datacentre',
+    'gpu', 'compute', 'hpc', 'high-performance', 'server', 'rack',
+    'cooling', 'pue', 'power usage', 'energy efficiency',
+    'carbon', 'emissions', 'sustainability', 'green energy',
+    'sovereign', 'sovereignty', 'data residency', 'compliance',
+    'colocation', 'colo', 'hyperscale', 'edge computing',
+    'ups', 'power distribution', 'thermal', 'crac', 'crah',
+    'infrastructure', 'facilities', 'noc', 'operations center',
+    'ai training', 'machine learning', 'inference', 'workload',
+    'kubernetes', 'slurm', 'cluster', 'orchestration'
   ];
   
-  const aviationScore = aviationKeywords.filter(kw => allText.includes(kw)).length;
+  const dataCentreScore = dataCentreKeywords.filter(kw => allText.includes(kw)).length;
   
-  if (aviationScore > 0) {
+  if (dataCentreScore > 0) {
     recommendations.push({
-      templateId: 'YVR_AIRPORT_DIGITAL_TWIN',
-      confidence: Math.min(0.9, 0.4 + (aviationScore * 0.1)),
-      reason: `Detected aviation/airport terminology (${aviationScore} relevant keywords). YVR Airport Operations Digital Twin is optimized for real-time flight operations, baggage handling, passenger flow, and weather-aware scheduling.`
+      templateId: 'sovereign-data-center-twin',
+      confidence: Math.min(0.95, 0.4 + (dataCentreScore * 0.1)),
+      reason: `Detected data centre/infrastructure terminology (${dataCentreScore} relevant keywords). Sovereign Data Centre Digital Twin optimizes energy efficiency, carbon footprint, GPU workloads, and sovereignty compliance.`
     });
   }
   
-  // Transportation hub detection (also routes to YVR)
-  const transportKeywords = [
-    'transportation hub', 'transit', 'logistics hub', 'distribution center',
-    'intermodal', 'smart infrastructure', 'traffic management'
+  // Energy/utilities detection (also routes to Data Centre)
+  const energyKeywords = [
+    'energy management', 'power monitoring', 'grid', 'renewable',
+    'carbon footprint', 'emissions tracking', 'esg', 'net zero'
   ];
   
-  const transportScore = transportKeywords.filter(kw => allText.includes(kw)).length;
+  const energyScore = energyKeywords.filter(kw => allText.includes(kw)).length;
   
-  if (transportScore > 0 && aviationScore === 0) {
+  if (energyScore > 0 && dataCentreScore === 0) {
     recommendations.push({
-      templateId: 'YVR_AIRPORT_DIGITAL_TWIN',
-      confidence: Math.min(0.7, 0.3 + (transportScore * 0.15)),
-      reason: `Detected transportation/logistics terminology. YVR template's multi-system coordination and real-time optimization patterns are applicable to transportation hubs.`
+      templateId: 'sovereign-data-center-twin',
+      confidence: Math.min(0.7, 0.3 + (energyScore * 0.15)),
+      reason: `Detected energy/sustainability terminology. Data Centre template's carbon tracking and energy optimization patterns are applicable to energy-intensive operations.`
     });
   }
   
@@ -90,45 +94,47 @@ export function recommendTemplatesFromQuestionnaire(answers: {
   const department = answers.department?.toLowerCase() || '';
   const useCase = answers.useCase?.toLowerCase() || '';
   
-  // YVR for Aviation industry
+  // Data Centre for Technology/Infrastructure industry
   if (
-    industry.includes('aviation') ||
-    industry.includes('airport') ||
-    industry.includes('airline') ||
-    industry.includes('transportation')
+    industry.includes('data cent') ||
+    industry.includes('technology') ||
+    industry.includes('infrastructure') ||
+    industry.includes('cloud') ||
+    industry.includes('computing')
   ) {
     recommendations.push({
-      templateId: 'YVR_AIRPORT_DIGITAL_TWIN',
+      templateId: 'sovereign-data-center-twin',
       confidence: 0.95,
-      reason: 'Aviation/Airport industry selected. YVR Airport Operations Digital Twin provides comprehensive real-time operational intelligence.'
+      reason: 'Technology/Infrastructure industry selected. Sovereign Data Centre Digital Twin provides comprehensive real-time operational intelligence for compute facilities.'
     });
   }
   
-  // YVR for Operations departments dealing with complex coordination
+  // Data Centre for Operations departments dealing with infrastructure
   if (
     department.includes('operations') &&
     (answers.realTimeNeeds || (answers.integrationCount && answers.integrationCount > 5))
   ) {
     recommendations.push({
-      templateId: 'YVR_AIRPORT_DIGITAL_TWIN',
+      templateId: 'sovereign-data-center-twin',
       confidence: 0.75,
-      reason: 'Complex operations with real-time coordination needs. YVR template demonstrates multi-system orchestration patterns.'
+      reason: 'Complex operations with real-time coordination needs. Data Centre template demonstrates multi-system orchestration patterns for infrastructure.'
     });
   }
   
   // Use case analysis
   if (
-    useCase.includes('passenger') ||
-    useCase.includes('baggage') ||
-    useCase.includes('scheduling') ||
-    useCase.includes('capacity') ||
-    useCase.includes('delay') ||
-    useCase.includes('throughput')
+    useCase.includes('gpu') ||
+    useCase.includes('compute') ||
+    useCase.includes('cooling') ||
+    useCase.includes('power') ||
+    useCase.includes('energy') ||
+    useCase.includes('carbon') ||
+    useCase.includes('pue')
   ) {
     recommendations.push({
-      templateId: 'YVR_AIRPORT_DIGITAL_TWIN',
+      templateId: 'sovereign-data-center-twin',
       confidence: 0.85,
-      reason: 'Use case aligns with YVR template capabilities (scheduling, capacity optimization, delay management).'
+      reason: 'Use case aligns with Data Centre template capabilities (GPU optimization, cooling, power management, carbon tracking).'
     });
   }
   
@@ -159,8 +165,8 @@ export function recommendTemplatesFromDocument(analysis: {
  */
 export function getDefaultRecommendation(): TemplateRecommendation {
   return {
-    templateId: 'YVR_AIRPORT_DIGITAL_TWIN',
+    templateId: 'sovereign-data-center-twin',
     confidence: 0.3,
-    reason: 'YVR Airport Operations Digital Twin serves as a reference implementation for complex multi-system orchestration. You can adapt its patterns to your use case.'
+    reason: 'Sovereign Data Centre Digital Twin serves as a reference implementation for complex infrastructure orchestration. You can adapt its patterns to your use case.'
   };
 }

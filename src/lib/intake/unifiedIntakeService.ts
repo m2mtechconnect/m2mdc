@@ -71,7 +71,7 @@ async function convertToBlueprint(payload: UnifiedIntakePayload): Promise<AgentB
 
       const analysisResult = analysisJob.result as any;
       
-      // Check if document analysis suggests aviation/airport use case
+      // Check if document analysis suggests data centre use case
       const recommendations = recommendTemplatesFromDocument({
         industry: analysisResult.detected_industry,
         department: analysisResult.detected_department,
@@ -79,22 +79,22 @@ async function convertToBlueprint(payload: UnifiedIntakePayload): Promise<AgentB
         summary: analysisResult.summary,
       });
       
-      // If YVR is recommended with high confidence, use it instead
-      const yvrRecommendation = recommendations.find(r => r.templateId === 'YVR_AIRPORT_DIGITAL_TWIN');
-      if (yvrRecommendation && yvrRecommendation.confidence > 0.7) {
-        console.log(`[UnifiedIntake] Document analysis suggests YVR template (confidence: ${yvrRecommendation.confidence})`);
-        console.log(`[UnifiedIntake] Reason: ${yvrRecommendation.reason}`);
+      // If Data Centre is recommended with high confidence, use it instead
+      const dcRecommendation = recommendations.find(r => r.templateId === 'sovereign-data-center-twin');
+      if (dcRecommendation && dcRecommendation.confidence > 0.7) {
+        console.log(`[UnifiedIntake] Document analysis suggests Data Centre template (confidence: ${dcRecommendation.confidence})`);
+        console.log(`[UnifiedIntake] Reason: ${dcRecommendation.reason}`);
         
-        // Load YVR template and enrich with document data
-        const yvrTemplate = await loadTemplateById('YVR_AIRPORT_DIGITAL_TWIN');
-        if (yvrTemplate) {
-          const yvrBlueprint = templateToBlueprint(yvrTemplate, 'dashboard');
+        // Load Data Centre template and enrich with document data
+        const dcTemplate = await loadTemplateById('sovereign-data-center-twin');
+        if (dcTemplate) {
+          const dcBlueprint = templateToBlueprint(dcTemplate, 'dashboard');
           
           // Enrich with document-specific data
-          yvrBlueprint.knowledge.documents = [analysisJob.file_name];
-          yvrBlueprint.knowledge.summary = analysisResult.summary;
+          dcBlueprint.knowledge.documents = [analysisJob.file_name];
+          dcBlueprint.knowledge.summary = analysisResult.summary;
           
-          return yvrBlueprint;
+          return dcBlueprint;
         }
       }
       
@@ -116,21 +116,22 @@ async function convertToBlueprint(payload: UnifiedIntakePayload): Promise<AgentB
 
       console.log('[UnifiedIntake] Analyzing URL:', payload.urlInput);
       
-      // Quick keyword check for aviation/airport sites
+      // Quick keyword check for data centre sites
       const urlLower = payload.urlInput.toLowerCase();
-      const isAviationSite = urlLower.includes('airport') || 
-                             urlLower.includes('aviation') || 
-                             urlLower.includes('airline') ||
-                             urlLower.includes('flight') ||
-                             urlLower.includes('yvr.ca');
+      const isDataCentreSite = urlLower.includes('datacent') || 
+                               urlLower.includes('data-cent') ||
+                               urlLower.includes('colocation') ||
+                               urlLower.includes('cloud') ||
+                               urlLower.includes('compute') ||
+                               urlLower.includes('gpu');
       
-      if (isAviationSite) {
-        console.log('[UnifiedIntake] Aviation-related URL detected, loading YVR template');
-        const yvrTemplate = await loadTemplateById('YVR_AIRPORT_DIGITAL_TWIN');
-        if (yvrTemplate) {
-          const yvrBlueprint = templateToBlueprint(yvrTemplate, 'dashboard');
-          yvrBlueprint.knowledge.urls.push(payload.urlInput);
-          return yvrBlueprint;
+      if (isDataCentreSite) {
+        console.log('[UnifiedIntake] Data centre-related URL detected, loading DC template');
+        const dcTemplate = await loadTemplateById('sovereign-data-center-twin');
+        if (dcTemplate) {
+          const dcBlueprint = templateToBlueprint(dcTemplate, 'dashboard');
+          dcBlueprint.knowledge.urls.push(payload.urlInput);
+          return dcBlueprint;
         }
       }
       

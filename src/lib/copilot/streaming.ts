@@ -6,6 +6,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import type { CoPilotContext } from './contextBuilder';
+import { buildDataCentreSystemPrompt, isDataCentreContext } from './dataCentreContext';
 
 interface StreamOptions {
   query: string;
@@ -43,12 +44,20 @@ export async function streamCoPilotResponse(options: StreamOptions): Promise<voi
     console.log('[CoPilot Streaming] Calling:', url);
     console.log('[CoPilot Streaming] Payload:', { query, sessionId, contextKeys: Object.keys(context), authenticated: !!session });
 
+    // Build domain-specific system prompt enhancement
+    const domainPrompt = buildDataCentreSystemPrompt(context);
+    const enhancedContext = {
+      ...context,
+      domainSystemPrompt: domainPrompt || undefined,
+      isDataCentreDomain: isDataCentreContext(context),
+    };
+
     const response = await fetch(url, {
       method: 'POST',
       headers,
       body: JSON.stringify({
         query,
-        context,
+        context: enhancedContext,
         sessionId,
       }),
       signal,

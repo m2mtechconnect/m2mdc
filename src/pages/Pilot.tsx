@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Play, Send, Calendar, Users, Target } from "lucide-react";
+import { ArrowLeft, Play, Send, Calendar, Users, Target, Rocket } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
 
 export default function Pilot() {
   const [searchParams] = useSearchParams();
@@ -44,8 +45,6 @@ export default function Pilot() {
         <Button 
           variant="ghost" 
           onClick={() => {
-            // Navigate back to the main AI Workspace where recommendations are displayed
-            // The Zustand store will restore the recommendations state and scroll position
             navigate('/');
           }}
           className="mb-6"
@@ -54,19 +53,17 @@ export default function Pilot() {
           Back to Recommendations
         </Button>
 
-        <Card className="border-primary/20">
-          <CardHeader>
-            <div className="flex items-center gap-2 mb-2">
-              <Play className="h-6 w-6 text-primary" />
-              <Badge variant="outline">Pilot Program Setup</Badge>
-            </div>
-            <CardTitle className="text-3xl mb-2">Launch Pilot Program</CardTitle>
-            <CardDescription>
-              Start a small-scale pilot to validate {initiativeTitle} before full deployment
-            </CardDescription>
-          </CardHeader>
+        <DCSectionHeader
+          title="Launch Pilot Program"
+          subtitle={`Start a small-scale pilot to validate ${initiativeTitle} before full deployment`}
+          icon={<Rocket className="h-6 w-6" />}
+        />
 
-          <CardContent>
+        <DCCard
+          title="Pilot Program Setup"
+          icon={<Play className="h-5 w-5" />}
+          status="operational"
+        >
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Project Info */}
               <section className="space-y-4">
@@ -242,8 +239,8 @@ export default function Pilot() {
                 Our team will review your pilot request and reach out within 24 hours to discuss next steps
               </p>
             </form>
-          </CardContent>
-        </Card>
+          </DCCard>
+        </div>
       </div>
     </div>
   );

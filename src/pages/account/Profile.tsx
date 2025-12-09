@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -17,6 +16,7 @@ import { Upload, User, Info, Camera } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { useProfileUpload } from "@/hooks/use-profile-upload";
+import { DCCard, DCSectionHeader } from "@/components/dc-ui";
 
 interface ProfileData {
   user_id: string;
@@ -228,11 +228,11 @@ export default function Profile() {
       <div className="container mx-auto py-8 max-w-4xl">
         <div className="space-y-6">
           <Skeleton className="h-8 w-48" />
-          <Card className="p-6">
+          <DCCard>
             <Skeleton className="h-32 w-full mb-4" />
             <Skeleton className="h-10 w-full mb-4" />
             <Skeleton className="h-10 w-full" />
-          </Card>
+          </DCCard>
         </div>
       </div>
     );
@@ -241,9 +241,9 @@ export default function Profile() {
   if (!profile) {
     return (
       <div className="container mx-auto py-8 max-w-4xl">
-        <Card className="p-6">
+        <DCCard>
           <p className="text-center text-muted-foreground">Profile not found</p>
-        </Card>
+        </DCCard>
       </div>
     );
   }
@@ -256,213 +256,199 @@ export default function Profile() {
     <div className="container mx-auto py-8 max-w-4xl">
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Profile</h1>
-          <p className="text-muted-foreground">
-            Manage your personal account settings and preferences
-          </p>
-        </div>
+        <DCSectionHeader
+          title="Profile"
+          subtitle="Manage your personal account settings and preferences"
+          icon={<User className="h-5 w-5 text-dc-cyan" />}
+        />
 
         {/* Profile Picture */}
-        <Card className="p-6">
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Profile Picture</h2>
-            <div className="flex items-center gap-6">
-              <div className="relative group">
-                <UserAvatar
-                  profileImageUrl={profile.avatar_url}
-                  initials={profile.avatar_initials}
-                  bgColor={profile.avatar_bg_color}
-                  size="xl"
-                  className="h-24 w-24"
-                />
-                <button
-                  onClick={triggerFileInput}
-                  disabled={uploading}
-                  className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                >
-                  <Camera className="h-6 w-6 text-white" />
-                </button>
-              </div>
-              <div className="space-y-2">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/gif,image/webp"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                />
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={triggerFileInput}
-                  disabled={uploading}
-                >
-                  {uploading ? (
-                    <>Uploading...</>
-                  ) : (
-                    <>
-                      <Upload className="mr-2 h-4 w-4" />
-                      Upload Photo
-                    </>
-                  )}
-                </Button>
-                <p className="text-xs text-muted-foreground">
-                  JPG, PNG, GIF, or WebP. Max 2MB.
-                </p>
-              </div>
+        <DCCard title="Profile Picture" icon={<Camera className="h-4 w-4 text-dc-cyan" />}>
+          <div className="flex items-center gap-6">
+            <div className="relative group">
+              <UserAvatar
+                profileImageUrl={profile.avatar_url}
+                initials={profile.avatar_initials}
+                bgColor={profile.avatar_bg_color}
+                size="xl"
+                className="h-24 w-24"
+              />
+              <button
+                onClick={triggerFileInput}
+                disabled={uploading}
+                className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              >
+                <Camera className="h-6 w-6 text-white" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={triggerFileInput}
+                disabled={uploading}
+              >
+                {uploading ? (
+                  <>Uploading...</>
+                ) : (
+                  <>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload Photo
+                  </>
+                )}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                JPG, PNG, GIF, or WebP. Max 2MB.
+              </p>
             </div>
           </div>
-        </Card>
+        </DCCard>
 
         {/* Personal Information */}
-        <Card className="p-6">
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold">Personal Information</h2>
-
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    id="email"
-                    type="email"
-                    value={profile.email}
-                    disabled
-                    className="bg-muted"
-                  />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Email is managed by your authentication provider</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="full_name">Full Name</Label>
+        <DCCard title="Personal Information">
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <div className="flex items-center gap-2">
                 <Input
-                  id="full_name"
-                  value={formData.full_name}
-                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                  placeholder="John Doe"
+                  id="email"
+                  type="email"
+                  value={profile.email}
+                  disabled
+                  className="bg-muted"
                 />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="job_title">Job Title</Label>
-                <Input
-                  id="job_title"
-                  value={formData.job_title}
-                  onChange={(e) => setFormData({ ...formData, job_title: e.target.value })}
-                  placeholder="Senior Engineer"
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="+1 (555) 000-0000"
-                />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Email is managed by your authentication provider</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="full_name">Full Name</Label>
+              <Input
+                id="full_name"
+                value={formData.full_name}
+                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                placeholder="John Doe"
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="job_title">Job Title</Label>
+              <Input
+                id="job_title"
+                value={formData.job_title}
+                onChange={(e) => setFormData({ ...formData, job_title: e.target.value })}
+                placeholder="Senior Engineer"
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="+1 (555) 000-0000"
+              />
+            </div>
           </div>
-        </Card>
+        </DCCard>
 
         {/* Role & Department (Read-only) */}
-        <Card className="p-6">
-          <div className="space-y-6">
-            <div className="flex items-center gap-2">
-              <h2 className="text-xl font-semibold">Organization</h2>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="h-4 w-4 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Roles and departments are managed by your administrator</p>
-                </TooltipContent>
-              </Tooltip>
+        <DCCard
+          title="Organization"
+          headerAction={
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-4 w-4 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Roles and departments are managed by your administrator</p>
+              </TooltipContent>
+            </Tooltip>
+          }
+        >
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label>Role</Label>
+              <Input
+                value={profile.role ? profile.role.replace(/_/g, ' ').toUpperCase() : 'Not assigned'}
+                disabled
+                className="bg-muted"
+              />
             </div>
 
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label>Role</Label>
-                <Input
-                  value={profile.role ? profile.role.replace(/_/g, ' ').toUpperCase() : 'Not assigned'}
-                  disabled
-                  className="bg-muted"
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label>Department</Label>
-                <Input
-                  value={
-                    profile.department_id
-                      ? departments.find(d => d.id === profile.department_id)?.name || 'Unknown'
-                      : 'Not assigned'
-                  }
-                  disabled
-                  className="bg-muted"
-                />
-              </div>
+            <div className="grid gap-2">
+              <Label>Department</Label>
+              <Input
+                value={
+                  profile.department_id
+                    ? departments.find(d => d.id === profile.department_id)?.name || 'Unknown'
+                    : 'Not assigned'
+                }
+                disabled
+                className="bg-muted"
+              />
             </div>
           </div>
-        </Card>
+        </DCCard>
 
         {/* Localization */}
-        <Card className="p-6">
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold">Localization</h2>
+        <DCCard title="Localization">
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="locale">Language</Label>
+              <Select
+                value={formData.locale}
+                onValueChange={(value) => setFormData({ ...formData, locale: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {locales.map(locale => (
+                    <SelectItem key={locale.value} value={locale.value}>
+                      {locale.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="locale">Language</Label>
-                <Select
-                  value={formData.locale}
-                  onValueChange={(value) => setFormData({ ...formData, locale: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {locales.map(locale => (
-                      <SelectItem key={locale.value} value={locale.value}>
-                        {locale.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="timezone">Timezone</Label>
-                <Select
-                  value={formData.timezone}
-                  onValueChange={(value) => setFormData({ ...formData, timezone: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {timezones.map(tz => (
-                      <SelectItem key={tz.value} value={tz.value}>
-                        {tz.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="grid gap-2">
+              <Label htmlFor="timezone">Timezone</Label>
+              <Select
+                value={formData.timezone}
+                onValueChange={(value) => setFormData({ ...formData, timezone: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {timezones.map(tz => (
+                    <SelectItem key={tz.value} value={tz.value}>
+                      {tz.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
-        </Card>
+        </DCCard>
 
         {/* Actions */}
         <div className="flex justify-end gap-3">

@@ -7,7 +7,7 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { buildCoPilotContext, type CoPilotContext as CoPilotContextType } from '@/lib/copilot/contextBuilder';
+import { buildCoPilotContext, type CoPilotContext as CoPilotContextType, enrichWithBlueprint } from '@/lib/copilot/contextBuilder';
 import { streamCoPilotResponse } from '@/lib/copilot/streaming';
 import { logCoPilotEvent } from '@/lib/copilot/analytics';
 import { supabase } from '@/integrations/supabase/client';
@@ -135,10 +135,29 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
         else if (path.includes('/governance')) additionalContext.activeTab = 'governance';
       } else if (path === '/app/agents') {
         pageName = 'manage_agents';
+      } else if (path.includes('/data-centre-twin')) {
+        pageName = 'data_centre_twin';
+        const twinId = path.match(/\/data-centre-twin\/([^\/]+)/)?.[1] || 'default';
+        additionalContext.agentId = twinId;
+        
+        // Detect view from query params
+        const view = searchParams.get('view');
+        if (view === 'simulation') additionalContext.activeTab = 'simulation';
+      } else if (path.includes('/blueprint')) {
+        pageName = 'blueprint';
+        const blueprintId = path.match(/\/blueprint\/([^\/]+)/)?.[1] || 'default';
+        additionalContext.agentId = blueprintId;
       }
   
       // Build rich context
-      const newContext = await buildCoPilotContext(pageName, agentId, additionalContext);
+      let newContext = await buildCoPilotContext(pageName, agentId, additionalContext);
+      
+      // Enrich with blueprint data for DC pages
+      if (pageName === 'data_centre_twin' || pageName === 'blueprint') {
+        const twinId = additionalContext.agentId || 'default';
+        newContext = await enrichWithBlueprint(newContext, twinId);
+      }
+      
       setContext(newContext);
     };
 

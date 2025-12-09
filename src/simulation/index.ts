@@ -13,4 +13,7 @@ export * from './scenarioRegistry';
 export { SimulationEngine, getSimulationEngine, resetSimulationEngine } from './SimulationEngine';
 
 // Custom Scenario Builder utilities
-export { createCustomScenario } from './customScenarioBuilder';
+export { createCustomScenario, type CustomScenarioConfig } from './customScenarioBuilder';
+
+// React Hook
+export { useSimulation, type UseSimulationReturn } from './useSimulation';

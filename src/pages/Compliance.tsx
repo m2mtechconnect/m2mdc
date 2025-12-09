@@ -17,11 +17,14 @@ import {
   Server,
   Activity,
   PlayCircle,
+  Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { DecisionReplayModal } from "@/components/rag/DecisionReplayModal";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useBlueprint } from "@/hooks/useBlueprint";
+import { useBlueprintScenarios } from "@/hooks/useBlueprintScenarios";
 
 // DC-specific audit timeline
 const auditTimeline = [
@@ -130,6 +133,35 @@ export default function Compliance() {
   const [replayModalOpen, setReplayModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [selectedStressScenario, setSelectedStressScenario] = useState<string>('');
+  
+  // Get Blueprint data for workflows, roles, and scenarios
+  const { blueprint, summary, downloadBlueprint } = useBlueprint('default');
+  const { scenarios } = useBlueprintScenarios('default');
+  
+  // Get compliance-relevant scenarios (sovereignty, facility_safety, financial)
+  const complianceScenarios = useMemo(() => {
+    return scenarios.filter(s => 
+      s.domainsInvolved.some(d => 
+        ['sovereignty', 'facility_safety', 'financial_carbon'].includes(d)
+      )
+    );
+  }, [scenarios]);
+  
+  // Get workflows from Blueprint relevant to compliance
+  const complianceWorkflows = useMemo(() => {
+    if (!blueprint) return [];
+    return blueprint.workflows.filter(w => 
+      ['sovereignty', 'facility_safety', 'financial_carbon'].includes(w.domain)
+    );
+  }, [blueprint]);
+  
+  // Get human roles responsible for compliance
+  const complianceRoles = useMemo(() => {
+    if (!blueprint) return [];
+    return blueprint.humanRoles.filter(r => 
+      r.domains.some(d => ['sovereignty', 'facility_safety', 'financial_carbon'].includes(d))
+    );
+  }, [blueprint]);
 
   const handleReplayOpen = (eventDetails: string) => {
     setSelectedEvent(eventDetails);
@@ -412,19 +444,31 @@ export default function Compliance() {
                     System Blueprint
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    View the complete Data Centre configuration and compliance mapping.
+                    {summary ? `${summary.totalWorkflows} workflows, ${summary.totalRoles} roles defined` : 'Loading...'}
                   </p>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <Button 
                     variant="outline" 
                     className="w-full justify-start"
-                    onClick={() => navigate('/blueprint/default')}
+                    onClick={() => navigate('/blueprint/default?tab=workflows')}
                   >
                     <Eye className="h-4 w-4 mr-2" />
-                    View Blueprint
+                    View Workflows ({complianceWorkflows.length} compliance)
                   </Button>
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => navigate('/blueprint/default?tab=roles')}
+                  >
+                    <Users className="h-4 w-4 mr-2" />
+                    View Roles ({complianceRoles.length} compliance)
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={downloadBlueprint}
+                  >
                     <Download className="h-4 w-4 mr-2" />
                     Download Blueprint JSON
                   </Button>
@@ -446,12 +490,16 @@ export default function Compliance() {
                       <SelectValue placeholder="Choose scenario..." />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="sovereignty_routing_violation">Cross-border routing attempt</SelectItem>
-                      <SelectItem value="carbon_price_shock">Carbon target breach</SelectItem>
-                      <SelectItem value="fire_suppression_discharge">Thermal safety incident</SelectItem>
-                      <SelectItem value="water_leak_corridor_sensor">Water leak emergency</SelectItem>
+                      {complianceScenarios.map(scenario => (
+                        <SelectItem key={scenario.id} value={scenario.id}>
+                          {scenario.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
+                  <div className="text-xs text-muted-foreground">
+                    {complianceScenarios.length} compliance scenarios from Blueprint
+                  </div>
                   <Button 
                     className="w-full gap-2"
                     disabled={!selectedStressScenario}

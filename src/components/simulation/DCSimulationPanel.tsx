@@ -1,6 +1,7 @@
 /**
  * DC Simulation Panel Component
  * Main simulation interface combining all simulation components
+ * Uses Studio design system tokens
  */
 
 import { useState, useCallback, useMemo } from 'react';
@@ -79,10 +80,10 @@ export function DCSimulationPanel({ compact = false }: DCSimulationPanelProps) {
   
   if (compact) {
     return (
-      <Card className="bg-dc-surface border-dc-border">
+      <Card className="bg-card border-border">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <Activity className="h-4 w-4 text-dc-primary" />
+            <Activity className="h-4 w-4 text-primary" />
             Simulation
           </CardTitle>
         </CardHeader>
@@ -132,7 +133,7 @@ export function DCSimulationPanel({ compact = false }: DCSimulationPanelProps) {
       
       {/* Main content tabs */}
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
-        <TabsList className="bg-dc-surface">
+        <TabsList>
           <TabsTrigger value="scenarios" className="gap-1">
             <Sparkles className="h-3.5 w-3.5" />
             Scenarios

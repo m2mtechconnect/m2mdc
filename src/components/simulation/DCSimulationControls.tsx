@@ -1,6 +1,7 @@
 /**
  * DC Simulation Controls Component
  * Play/Pause/Reset controls with speed selector and progress bar
+ * Uses Studio design system tokens
  */
 
 import { Button } from '@/components/ui/button';
@@ -59,18 +60,18 @@ const statusConfig: Record<SimulationStatus, {
   },
   running: { 
     label: 'Running', 
-    color: 'bg-dc-success/20 text-dc-success border-dc-success/30', 
+    color: 'bg-success/10 text-success border-success/30', 
     icon: Activity,
     pulse: true
   },
   paused: { 
     label: 'Paused', 
-    color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30', 
+    color: 'bg-warning/10 text-warning border-warning/30', 
     icon: Pause 
   },
   completed: { 
     label: 'Completed', 
-    color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', 
+    color: 'bg-info/10 text-info border-info/30', 
     icon: CheckCircle2 
   },
 };
@@ -103,11 +104,11 @@ export function DCSimulationControls({
   };
   
   return (
-    <div className="bg-dc-surface border border-dc-border rounded-lg p-4 space-y-4">
+    <div className="bg-card border border-border rounded-lg p-4 space-y-4">
       {/* Header row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h3 className="font-medium text-sm">
+          <h3 className="font-medium text-sm text-card-foreground">
             {scenarioName || 'Simulation Controls'}
           </h3>
           <Badge 
@@ -135,7 +136,7 @@ export function DCSimulationControls({
       <div className="space-y-1">
         <Progress 
           value={progress} 
-          className="h-2 bg-dc-border"
+          className="h-2"
         />
         <div className="flex justify-between text-[10px] text-muted-foreground">
           <span>0%</span>
@@ -194,7 +195,7 @@ export function DCSimulationControls({
             onValueChange={(v) => onTimeScaleChange(parseInt(v) as 1 | 2 | 5 | 10)}
             disabled={disabled}
           >
-            <SelectTrigger className="w-[80px] h-8 text-xs bg-dc-background">
+            <SelectTrigger className="w-[80px] h-8 text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

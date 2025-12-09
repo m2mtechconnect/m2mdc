@@ -1,6 +1,7 @@
 /**
  * Custom Scenario Builder Component
  * UI for creating custom simulation scenarios
+ * Uses Studio design system tokens
  */
 
 import { useState } from 'react';
@@ -113,10 +114,10 @@ export function CustomScenarioBuilder({ onSave, onCancel }: CustomScenarioBuilde
   const isValid = name.trim().length > 0 && selectedDomains.length > 0;
   
   return (
-    <Card className="bg-dc-surface border-dc-border max-w-2xl mx-auto">
+    <Card className="bg-card border-border max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Sparkles className="h-5 w-5 text-dc-primary" />
+        <CardTitle className="flex items-center gap-2 text-lg text-card-foreground">
+          <Sparkles className="h-5 w-5 text-primary" />
           Create Custom Scenario
         </CardTitle>
       </CardHeader>
@@ -133,7 +134,6 @@ export function CustomScenarioBuilder({ onSave, onCancel }: CustomScenarioBuilde
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g., Custom Cooling Failure"
-                  className="bg-dc-background"
                 />
               </div>
               
@@ -144,7 +144,7 @@ export function CustomScenarioBuilder({ onSave, onCancel }: CustomScenarioBuilde
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Describe what this scenario simulates..."
-                  className="bg-dc-background resize-none"
+                  className="resize-none"
                   rows={2}
                 />
               </div>
@@ -177,8 +177,8 @@ export function CustomScenarioBuilder({ onSave, onCancel }: CustomScenarioBuilde
                     className={cn(
                       'flex flex-col items-center gap-1 p-3 rounded-lg border transition-all',
                       selectedDomains.includes(id)
-                        ? 'bg-dc-primary/20 border-dc-primary text-dc-primary'
-                        : 'bg-dc-background border-dc-border hover:border-dc-primary/50'
+                        ? 'bg-primary/10 border-primary text-primary'
+                        : 'bg-card border-border hover:border-primary/50 text-muted-foreground'
                     )}
                   >
                     <Icon className="h-4 w-4" />
@@ -195,7 +195,7 @@ export function CustomScenarioBuilder({ onSave, onCancel }: CustomScenarioBuilde
                 {kpiOptions.slice(0, 4).map(kpi => (
                   <div key={kpi.id} className="space-y-1">
                     <div className="flex items-center justify-between text-sm">
-                      <span>{kpi.label}</span>
+                      <span className="text-muted-foreground">{kpi.label}</span>
                       <Badge variant="outline" className="font-mono text-xs">
                         {(initialKpiOffsets[kpi.id] || 0) >= 0 ? '+' : ''}
                         {initialKpiOffsets[kpi.id] || 0}
@@ -231,7 +231,7 @@ export function CustomScenarioBuilder({ onSave, onCancel }: CustomScenarioBuilde
               
               <div className="space-y-3">
                 {timelineSteps.map((step, index) => (
-                  <Card key={step.id} className="bg-dc-background border-dc-border">
+                  <Card key={step.id} className="bg-muted/50 border-border">
                     <CardContent className="p-3 space-y-3">
                       <div className="flex items-center justify-between">
                         <Badge variant="outline" className="text-xs">
@@ -253,7 +253,7 @@ export function CustomScenarioBuilder({ onSave, onCancel }: CustomScenarioBuilde
                           value={step.eventTitle}
                           onChange={(e) => handleStepChange(step.id, 'eventTitle', e.target.value)}
                           placeholder="Event title"
-                          className="h-8 text-sm bg-dc-surface"
+                          className="h-8 text-sm"
                         />
                         
                         <div className="flex gap-2">
@@ -269,7 +269,7 @@ export function CustomScenarioBuilder({ onSave, onCancel }: CustomScenarioBuilde
                           <select
                             value={step.severity}
                             onChange={(e) => handleStepChange(step.id, 'severity', e.target.value)}
-                            className="text-xs bg-dc-surface border border-dc-border rounded px-2"
+                            className="text-xs bg-card border border-border rounded px-2"
                           >
                             <option value="low">Low</option>
                             <option value="medium">Medium</option>
@@ -287,7 +287,7 @@ export function CustomScenarioBuilder({ onSave, onCancel }: CustomScenarioBuilde
         </ScrollArea>
       </CardContent>
       
-      <CardFooter className="flex justify-end gap-2 border-t border-dc-border pt-4">
+      <CardFooter className="flex justify-end gap-2 border-t border-border pt-4">
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>

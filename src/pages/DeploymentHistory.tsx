@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,8 +31,13 @@ import {
   Calendar,
   Rocket,
   ArrowUpDown,
+  Server,
+  Activity
 } from "lucide-react";
 import { format } from "date-fns";
+import { DCCard } from "@/components/dc-ui/DCCard";
+import { DCSectionHeader } from "@/components/dc-ui/DCSectionHeader";
+import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 
 interface Deployment {
   id: string;
@@ -201,69 +205,55 @@ export default function DeploymentHistory() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-[1600px]">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Rocket className="h-8 w-8 text-primary" />
-          <h1 className="text-4xl font-bold">Deployment History</h1>
+    <div className="min-h-screen bg-dc-bg-primary">
+      <div className="container mx-auto p-6 max-w-[1600px]">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-dc-cyan/10 border border-dc-cyan/30">
+              <Rocket className="h-6 w-6 text-dc-cyan" />
+            </div>
+            <h1 className="text-2xl font-semibold text-foreground">Deployment History</h1>
+          </div>
+          <p className="text-muted-foreground text-sm">
+            Complete audit trail of all system deployments
+          </p>
         </div>
-        <p className="text-muted-foreground text-lg">
-          Complete audit trail of all system deployments
-        </p>
-      </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card className="glass-panel p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Total Deployments</p>
-              <p className="text-2xl font-bold">{deployments.length}</p>
-            </div>
-            <Rocket className="h-8 w-8 text-primary opacity-50" />
-          </div>
-        </Card>
-        
-        <Card className="glass-panel p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Active</p>
-              <p className="text-2xl font-bold text-green-500">
-                {deployments.filter(d => d.status === 'active').length}
-              </p>
-            </div>
-            <CheckCircle2 className="h-8 w-8 text-green-500 opacity-50" />
-          </div>
-        </Card>
-        
-        <Card className="glass-panel p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Failed</p>
-              <p className="text-2xl font-bold text-destructive">
-                {deployments.filter(d => d.status === 'failed').length}
-              </p>
-            </div>
-            <XCircle className="h-8 w-8 text-destructive opacity-50" />
-          </div>
-        </Card>
-        
-        <Card className="glass-panel p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Pending</p>
-              <p className="text-2xl font-bold text-yellow-500">
-                {deployments.filter(d => d.status === 'pending').length}
-              </p>
-            </div>
-            <Clock className="h-8 w-8 text-yellow-500 opacity-50" />
-          </div>
-        </Card>
-      </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          <DCKPITile
+            label="Total Deployments"
+            value={deployments.length.toString()}
+            sublabel="All time"
+            status="info"
+            icon={<Rocket className="h-4 w-4" />}
+          />
+          <DCKPITile
+            label="Active"
+            value={deployments.filter(d => d.status === 'active').length.toString()}
+            sublabel="Running systems"
+            status="normal"
+            icon={<CheckCircle2 className="h-4 w-4" />}
+          />
+          <DCKPITile
+            label="Failed"
+            value={deployments.filter(d => d.status === 'failed').length.toString()}
+            sublabel="Requires attention"
+            status={deployments.filter(d => d.status === 'failed').length > 0 ? 'critical' : 'normal'}
+            icon={<XCircle className="h-4 w-4" />}
+          />
+          <DCKPITile
+            label="Pending"
+            value={deployments.filter(d => d.status === 'pending').length.toString()}
+            sublabel="In progress"
+            status={deployments.filter(d => d.status === 'pending').length > 0 ? 'warning' : 'normal'}
+            icon={<Clock className="h-4 w-4" />}
+          />
+        </div>
 
-      {/* Filters */}
-      <Card className="glass-panel p-6 mb-6">
+        {/* Filters */}
+        <DCCard status="info" className="p-6 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -311,11 +301,11 @@ export default function DeploymentHistory() {
             {sortOrder === 'desc' ? 'Newest First' : 'Oldest First'}
           </Button>
         </div>
-      </Card>
+        </DCCard>
 
-      {/* Deployments Table */}
-      <Card className="glass-panel">
-        <div className="overflow-x-auto">
+        {/* Deployments Table */}
+        <DCCard status="info" className="overflow-hidden">
+          <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -419,12 +409,13 @@ export default function DeploymentHistory() {
               )}
             </TableBody>
           </Table>
-        </div>
-      </Card>
+          </div>
+        </DCCard>
 
-      {/* Footer Summary */}
-      <div className="mt-6 text-center text-sm text-muted-foreground">
-        Showing {filteredDeployments.length} of {deployments.length} deployments
+        {/* Footer Summary */}
+        <div className="mt-6 text-center text-sm text-muted-foreground">
+          Showing {filteredDeployments.length} of {deployments.length} deployments
+        </div>
       </div>
     </div>
   );

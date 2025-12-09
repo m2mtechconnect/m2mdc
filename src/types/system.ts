@@ -8,7 +8,7 @@ export interface DeployedSystem {
   description: string;
   department: string;
   category: string;
-  type: 'system' | 'agent';
+  type: 'system' | 'agent' | 'twin';
   status: 'active' | 'draft' | 'paused' | 'archived';
   version: string;
   

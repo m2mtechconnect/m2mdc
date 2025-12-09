@@ -16,6 +16,7 @@ import { ModernFileUploadWizard } from '@/components/dashboard/ModernFileUploadW
 import { toast } from 'sonner';
 import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 import { BuilderToolsPanel } from '@/components/dc-tools';
+import { SovereigntyConfigSection } from '@/components/builder/SovereigntyConfigSection';
 
 export function Step2Intelligence() {
   const { modelConfig, setModelConfig, builderId } = useWizardBuilderStore();
@@ -323,6 +324,15 @@ export function Step2Intelligence() {
             </div>
           </div>
         </DCCard>
+
+        {/* Sovereignty Configuration Section */}
+        <SovereigntyConfigSection 
+          onConfigChange={(config) => {
+            // Log sovereignty config for now - can be persisted to wizard store
+            console.log('[Builder:Step2] Sovereignty config updated:', config);
+            toast.success('Sovereignty configuration updated');
+          }}
+        />
 
         <Tabs defaultValue="model" className="w-full">
           <TabsList className="grid w-full grid-cols-4 bg-dc-surface">

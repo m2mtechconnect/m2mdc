@@ -36,6 +36,7 @@ import { useBlueprint } from '@/hooks/useBlueprint';
 import { useBlueprintScenarios } from '@/hooks/useBlueprintScenarios';
 import { useBlueprintKPIs } from '@/hooks/useBlueprintKPIs';
 import { DcToolsStrip } from '@/components/dc-tools';
+import { SovereigntyAnalyticsTab } from '@/components/telemetry/SovereigntyAnalyticsTab';
 
 interface System {
   id: string;
@@ -303,6 +304,7 @@ export default function IntelligenceDashboard() {
             <TabsTrigger value="thermal">Thermal Analysis</TabsTrigger>
             <TabsTrigger value="power">Power & Energy</TabsTrigger>
             <TabsTrigger value="workload">GPU & Workload</TabsTrigger>
+            <TabsTrigger value="sovereignty">Sovereignty</TabsTrigger>
             <TabsTrigger value="simulation-replay">Simulation Replay</TabsTrigger>
           </TabsList>
 
@@ -431,6 +433,11 @@ export default function IntelligenceDashboard() {
                 Open DC Twin Dashboard
               </Button>
             </Card>
+          </TabsContent>
+
+          {/* Sovereignty Tab */}
+          <TabsContent value="sovereignty" className="space-y-6">
+            <SovereigntyAnalyticsTab />
           </TabsContent>
 
           {/* Simulation Replay Tab */}

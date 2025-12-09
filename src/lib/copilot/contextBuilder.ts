@@ -8,6 +8,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { generateDefaultBlueprint } from '@/data/defaultBlueprint';
 import { dcToolRegistry, type DcToolDefinition } from '@/data/dcToolRegistry';
+import { getSovereigntyEngine, mockDataAssets, mockDataFlows, mockSovereigntyPolicies, mockComplianceFrameworks } from '@/sovereignty';
 
 export interface SimulationTemplateContext {
   title: string;
@@ -124,6 +125,17 @@ export interface CoPilotContext {
     domain: string;
     tabTarget?: string;
   }>;
+  
+  // Sovereignty context for CoPilot awareness
+  sovereigntyContext?: {
+    sovereigntyScore: number;
+    violationCount: number;
+    crossBorderFlows: number;
+    certifiedFrameworks: number;
+    auditReadinessScore: number;
+    riskLevel: string;
+    primaryJurisdiction: string;
+  };
 }
 
 /**
@@ -235,6 +247,26 @@ export async function enrichWithBlueprint(
       tabTarget: tool.tabTarget,
     }));
     
+    // Add sovereignty context for CoPilot awareness
+    const engine = getSovereigntyEngine();
+    const sovereigntyResult = engine.evaluate(
+      mockDataFlows,
+      mockDataAssets,
+      mockSovereigntyPolicies,
+      mockComplianceFrameworks,
+      'CA-QC'
+    );
+    
+    const sovereigntyContext = {
+      sovereigntyScore: sovereigntyResult.sovereigntyScore,
+      violationCount: sovereigntyResult.violations.length,
+      crossBorderFlows: sovereigntyResult.crossBorderFlowCount,
+      certifiedFrameworks: sovereigntyResult.frameworkSummary.certified,
+      auditReadinessScore: sovereigntyResult.auditReadinessScore,
+      riskLevel: sovereigntyResult.riskLevel,
+      primaryJurisdiction: 'CA-QC',
+    };
+    
     return {
       ...context,
       agentName: blueprint.name,
@@ -243,6 +275,7 @@ export async function enrichWithBlueprint(
       workflowsCount: blueprint.workflows.length,
       integrationsCount: blueprint.integrations.length,
       availableTools,
+      sovereigntyContext,
     };
   } catch (error) {
     console.error('Failed to enrich context with blueprint:', error);

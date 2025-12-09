@@ -24,42 +24,42 @@ const INDUSTRY_KPI_TEMPLATES: Record<string, Array<{
   thresholds: KPIThresholds;
   baselineGenerator: () => number;
 }>> = {
-  'transport-canada': [
+  'data-centre': [
     {
-      label: 'Aviation Delay Index',
-      unit: 'min',
-      thresholds: { critical: 45, warning: 30, target: 15, direction: 'lower' },
-      baselineGenerator: () => 20 + Math.random() * 10
+      label: 'Power Usage Effectiveness (PUE)',
+      unit: '',
+      thresholds: { critical: 1.8, warning: 1.5, target: 1.2, direction: 'lower' },
+      baselineGenerator: () => 1.3 + Math.random() * 0.2
     },
     {
-      label: 'Weather-Driven Delay Minutes',
-      unit: 'min',
-      thresholds: { critical: 120, warning: 60, target: 30, direction: 'lower' },
-      baselineGenerator: () => 45 + Math.random() * 30
-    },
-    {
-      label: 'Rail Safety Risk Score',
+      label: 'GPU Utilization',
       unit: '%',
-      thresholds: { critical: 80, warning: 60, target: 40, direction: 'lower' },
-      baselineGenerator: () => 35 + Math.random() * 20
+      thresholds: { critical: 30, warning: 50, target: 85, direction: 'higher' },
+      baselineGenerator: () => 70 + Math.random() * 20
     },
     {
-      label: 'Highway Closure Impact Index',
-      unit: 'km',
-      thresholds: { critical: 500, warning: 200, target: 50, direction: 'lower' },
-      baselineGenerator: () => 75 + Math.random() * 50
+      label: 'Thermal Stability Index',
+      unit: '',
+      thresholds: { critical: 50, warning: 70, target: 90, direction: 'higher' },
+      baselineGenerator: () => 80 + Math.random() * 15
     },
     {
-      label: 'Border Wait-Time Index',
-      unit: 'min',
-      thresholds: { critical: 90, warning: 45, target: 20, direction: 'lower' },
-      baselineGenerator: () => 25 + Math.random() * 15
+      label: 'Carbon Intensity',
+      unit: 'gCO₂/kWh',
+      thresholds: { critical: 400, warning: 200, target: 50, direction: 'lower' },
+      baselineGenerator: () => 80 + Math.random() * 60
     },
     {
-      label: 'Operational Efficiency',
+      label: 'Sovereign Compute Ratio',
       unit: '%',
-      thresholds: { critical: 70, warning: 80, target: 95, direction: 'higher' },
-      baselineGenerator: () => 85 + Math.random() * 10
+      thresholds: { critical: 60, warning: 80, target: 95, direction: 'higher' },
+      baselineGenerator: () => 88 + Math.random() * 10
+    },
+    {
+      label: 'Cooling Efficiency',
+      unit: '%',
+      thresholds: { critical: 50, warning: 70, target: 90, direction: 'higher' },
+      baselineGenerator: () => 75 + Math.random() * 15
     }
   ],
   'aviation': [

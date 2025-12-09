@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plug, Link2, Code, Check, Info, Sparkles, Trash2, Loader2 } from 'lucide-react';
+import { Plug, Link2, Code, Check, Info, Sparkles, Trash2, Loader2, Zap, Wind, Cpu, Thermometer, Network, Calculator, Leaf, Shield, Database, Layers, BarChart, Activity, Flame, FileCheck, DollarSign } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,25 @@ const INTEGRATIONS = [
   { id: 'airtable', name: 'Airtable', category: 'Database' },
   { id: 'jira', name: 'Jira', category: 'Development' },
   { id: 'github', name: 'GitHub', category: 'Development' },
+];
+
+// Data Centre specific tools
+const DATA_CENTRE_TOOLS = [
+  { id: 'power-telemetry', name: 'Power Telemetry', category: 'Telemetry', icon: Zap, description: 'Real-time power consumption, PDU metrics, UPS status' },
+  { id: 'cooling-telemetry', name: 'Cooling Telemetry', category: 'Telemetry', icon: Wind, description: 'CRAH/CRAC units, chiller status, zone temps' },
+  { id: 'gpu-metrics', name: 'GPU Metrics', category: 'Telemetry', icon: Cpu, description: 'GPU utilization, memory, workload distribution' },
+  { id: 'thermal-sensors', name: 'Thermal Sensors', category: 'Telemetry', icon: Thermometer, description: 'Rack temps, hotspot detection, airflow' },
+  { id: 'network-fabric', name: 'Network Fabric', category: 'Telemetry', icon: Network, description: 'Switch utilization, InfiniBand, latency' },
+  { id: 'pue-model', name: 'PUE Calculator', category: 'Model', icon: Calculator, description: 'Real-time PUE calculation and forecasting' },
+  { id: 'carbon-model', name: 'Carbon Footprint', category: 'Model', icon: Leaf, description: 'gCO₂e/kWh tracking, emissions per GPU-hour' },
+  { id: 'thermal-model', name: 'Thermal Prediction', category: 'Model', icon: Flame, description: 'Hotspot prediction, thermal runaway detection' },
+  { id: 'financial-model', name: 'Financial Model', category: 'Model', icon: DollarSign, description: 'Cost per GPU-hour, energy cost forecasting' },
+  { id: 'sovereignty-checker', name: 'Sovereignty Compliance', category: 'Compliance', icon: Shield, description: 'Data residency validation, jurisdiction tagging' },
+  { id: 'audit-logger', name: 'Audit Logger', category: 'Compliance', icon: FileCheck, description: 'Immutable audit trail for SOC2, ISO 27001' },
+  { id: 'dcim-integration', name: 'DCIM Integration', category: 'Integration', icon: Database, description: 'Data Centre Infrastructure Management' },
+  { id: 'k8s-integration', name: 'Kubernetes/Slurm', category: 'Integration', icon: Layers, description: 'Container and HPC job orchestration' },
+  { id: 'prometheus-integration', name: 'Prometheus/Grafana', category: 'Integration', icon: BarChart, description: 'Metrics collection and visualization' },
+  { id: 'energy-api', name: 'Energy Grid API', category: 'Integration', icon: Activity, description: 'Real-time carbon intensity and pricing' },
 ];
 
 export function Step3Tools() {
@@ -172,8 +191,12 @@ export function Step3Tools() {
         </p>
       </div>
 
-      <Tabs defaultValue="integrations" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+      <Tabs defaultValue="datacentre" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="datacentre" className="flex items-center gap-2">
+            <Cpu className="h-4 w-4" />
+            <span className="hidden sm:inline">Data Centre</span>
+          </TabsTrigger>
           <TabsTrigger value="integrations" className="flex items-center gap-2">
             <Link2 className="h-4 w-4" />
             <span className="hidden sm:inline">Integrations</span>
@@ -187,12 +210,190 @@ export function Step3Tools() {
           </TabsTrigger>
           <TabsTrigger value="api" className="flex items-center gap-2">
             <Code className="h-4 w-4" />
-            <span className="hidden sm:inline">API Connectors</span>
+            <span className="hidden sm:inline">API</span>
             {apiConnectors.length > 0 && (
               <Badge variant="secondary" className="ml-1">{apiConnectors.length}</Badge>
             )}
           </TabsTrigger>
         </TabsList>
+
+        {/* DATA CENTRE TOOLS TAB */}
+        <TabsContent value="datacentre" className="space-y-4 mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Cpu className="h-4 w-4" />
+                Data Centre Tools & Models
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Info Banner */}
+                <div className="p-4 border-2 border-primary/20 bg-primary/5 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    <h4 className="text-sm font-medium">Recommended for Data Centre Twin</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    These tools are pre-configured for power, cooling, GPU, and sovereignty monitoring.
+                  </p>
+                </div>
+
+                {/* Telemetry Tools */}
+                <div>
+                  <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-blue-500" />
+                    Telemetry
+                  </h4>
+                  <div className="grid gap-3">
+                    {DATA_CENTRE_TOOLS.filter(t => t.category === 'Telemetry').map((tool) => {
+                      const IconComponent = tool.icon;
+                      const isEnabled = tools.some(t => t.id === tool.id);
+                      return (
+                        <div
+                          key={tool.id}
+                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                              <IconComponent className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-sm">{tool.name}</p>
+                              <p className="text-xs text-muted-foreground">{tool.description}</p>
+                            </div>
+                          </div>
+                          <Button
+                            variant={isEnabled ? "outline" : "default"}
+                            size="sm"
+                            onClick={() => toggleIntegration(tool.id)}
+                            disabled={isLoading}
+                          >
+                            {isEnabled ? 'Disable' : 'Enable'}
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Model Tools */}
+                <div>
+                  <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                    <Calculator className="h-4 w-4 text-green-500" />
+                    Models & Analytics
+                  </h4>
+                  <div className="grid gap-3">
+                    {DATA_CENTRE_TOOLS.filter(t => t.category === 'Model').map((tool) => {
+                      const IconComponent = tool.icon;
+                      const isEnabled = tools.some(t => t.id === tool.id);
+                      return (
+                        <div
+                          key={tool.id}
+                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                              <IconComponent className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-sm">{tool.name}</p>
+                              <p className="text-xs text-muted-foreground">{tool.description}</p>
+                            </div>
+                          </div>
+                          <Button
+                            variant={isEnabled ? "outline" : "default"}
+                            size="sm"
+                            onClick={() => toggleIntegration(tool.id)}
+                            disabled={isLoading}
+                          >
+                            {isEnabled ? 'Disable' : 'Enable'}
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Compliance Tools */}
+                <div>
+                  <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-purple-500" />
+                    Compliance & Governance
+                  </h4>
+                  <div className="grid gap-3">
+                    {DATA_CENTRE_TOOLS.filter(t => t.category === 'Compliance').map((tool) => {
+                      const IconComponent = tool.icon;
+                      const isEnabled = tools.some(t => t.id === tool.id);
+                      return (
+                        <div
+                          key={tool.id}
+                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                              <IconComponent className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-sm">{tool.name}</p>
+                              <p className="text-xs text-muted-foreground">{tool.description}</p>
+                            </div>
+                          </div>
+                          <Button
+                            variant={isEnabled ? "outline" : "default"}
+                            size="sm"
+                            onClick={() => toggleIntegration(tool.id)}
+                            disabled={isLoading}
+                          >
+                            {isEnabled ? 'Disable' : 'Enable'}
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Integration Tools */}
+                <div>
+                  <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                    <Database className="h-4 w-4 text-orange-500" />
+                    Infrastructure Integrations
+                  </h4>
+                  <div className="grid gap-3">
+                    {DATA_CENTRE_TOOLS.filter(t => t.category === 'Integration').map((tool) => {
+                      const IconComponent = tool.icon;
+                      const isEnabled = tools.some(t => t.id === tool.id);
+                      return (
+                        <div
+                          key={tool.id}
+                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                              <IconComponent className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-sm">{tool.name}</p>
+                              <p className="text-xs text-muted-foreground">{tool.description}</p>
+                            </div>
+                          </div>
+                          <Button
+                            variant={isEnabled ? "outline" : "default"}
+                            size="sm"
+                            onClick={() => toggleIntegration(tool.id)}
+                            disabled={isLoading}
+                          >
+                            {isEnabled ? 'Disable' : 'Enable'}
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* INTEGRATIONS TAB */}
         <TabsContent value="integrations" className="space-y-4 mt-6">

@@ -3,14 +3,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Bot, Wrench, ArrowLeft } from 'lucide-react';
+import { Bot, Wrench, ArrowLeft, Server, Activity, Zap, TrendingUp, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { AgentsGrid, Agent } from '@/components/agents/AgentsGrid';
 import { SystemDetailsDrawer } from '@/components/SystemDetailsDrawer';
 import { SystemDeleteDialog } from '@/components/SystemDeleteDialog';
 import { useToast } from '@/hooks/use-toast';
 import { AOCIntroCard } from '@/components/aoc/AOCIntroCard';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
+import { DCCard } from '@/components/dc-ui/DCCard';
+import { DCSectionHeader } from '@/components/dc-ui/DCSectionHeader';
+import { DCKPITile } from '@/components/dc-ui/DCKPITile';
 
 export default function ManageAgents() {
   const navigate = useNavigate();
@@ -179,8 +181,11 @@ export default function ManageAgents() {
     setDeleteAgentStatus('');
   };
 
+  const stats = agentsData?.stats || { total: 0, active: 0, draft: 0, archived: 0, avgRoi: 0 };
+  const healthPercentage = stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-dc-bg-primary">
       <div className="container mx-auto py-6 sm:py-8 max-w-7xl px-4">
         {/* AOC Introduction Card */}
         <AOCIntroCard />
@@ -190,7 +195,7 @@ export default function ManageAgents() {
           <Button
             variant="ghost"
             onClick={() => navigate('/')}
-            className="mb-4 -ml-2"
+            className="mb-4 -ml-2 text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
@@ -198,75 +203,91 @@ export default function ManageAgents() {
           
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold mb-2 flex items-center gap-3">
-                <Bot className="h-8 w-8 text-primary" />
-                Manage Agents
+              <h1 className="text-2xl font-semibold mb-2 flex items-center gap-3 text-foreground">
+                <div className="p-2 rounded-lg bg-dc-cyan/10 border border-dc-cyan/30">
+                  <Server className="h-6 w-6 text-dc-cyan" />
+                </div>
+                Agent Control Center
               </h1>
               <p className="text-sm text-muted-foreground">
-                View and manage all your AI agents and digital twins
+                Manage AI agents and digital twin subsystems
               </p>
             </div>
             <Button
               onClick={() => navigate('/builder?source=manage-agents&template=blank')}
-              className="glow-purple"
+              className="bg-dc-cyan hover:bg-dc-cyan/80 text-dc-bg-primary font-medium"
             >
               <Wrench className="h-4 w-4 mr-2" />
-              Create New Agent
+              Deploy New Agent
             </Button>
           </div>
         </div>
 
-        {/* Stats Cards */}
-        {agentsData && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <Card className="p-4">
-              <div className="space-y-1">
-                <p className="text-sm text-body">Total Agents</p>
-                <p className="text-2xl font-display font-bold text-foreground">
-                  {agentsData.stats.total}
-                </p>
-              </div>
-            </Card>
-            <Card className="p-4">
-              <div className="space-y-1">
-                <p className="text-sm text-body">Active</p>
-                <p className="text-2xl font-display font-bold text-success">
-                  {agentsData.stats.active}
-                </p>
-              </div>
-            </Card>
-            <Card className="p-4">
-              <div className="space-y-1">
-                <p className="text-sm text-body">Draft</p>
-                <p className="text-2xl font-display font-bold text-muted-foreground">
-                  {agentsData.stats.draft}
-                </p>
-              </div>
-            </Card>
-            <Card className="p-4">
-              <div className="space-y-1">
-                <p className="text-sm text-body">Avg ROI</p>
-                <p className="text-2xl font-display font-bold text-accent">
-                  {agentsData.stats.avgRoi}%
-                </p>
-              </div>
-            </Card>
-          </div>
-        )}
+        {/* DC-Style Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-8">
+          <DCKPITile
+            label="Total Agents"
+            value={stats.total.toString()}
+            sublabel="Registered subsystems"
+            status="info"
+            icon={<Bot className="h-4 w-4" />}
+          />
+          <DCKPITile
+            label="Active"
+            value={stats.active.toString()}
+            sublabel="Running systems"
+            status="normal"
+            icon={<CheckCircle2 className="h-4 w-4" />}
+            trend="up"
+          />
+          <DCKPITile
+            label="Draft"
+            value={stats.draft.toString()}
+            sublabel="In development"
+            status={stats.draft > 5 ? 'warning' : 'info'}
+            icon={<Activity className="h-4 w-4" />}
+          />
+          <DCKPITile
+            label="Fleet Health"
+            value={`${healthPercentage}%`}
+            sublabel="Active ratio"
+            status={healthPercentage >= 80 ? 'normal' : healthPercentage >= 50 ? 'warning' : 'critical'}
+            icon={<Zap className="h-4 w-4" />}
+            thresholdValue={healthPercentage}
+            threshold={{ value: healthPercentage, max: 100, showBar: true }}
+          />
+          <DCKPITile
+            label="Avg ROI"
+            value={`${stats.avgRoi}%`}
+            sublabel="Performance index"
+            status={stats.avgRoi >= 10 ? 'normal' : 'warning'}
+            icon={<TrendingUp className="h-4 w-4" />}
+            trend={stats.avgRoi > 0 ? 'up' : 'stable'}
+          />
+        </div>
 
         {/* Agents Grid */}
-        <Card className="p-6">
-          <AgentsGrid
-            agents={agentsData?.items || []}
-            isLoading={isLoading}
-            error={error instanceof Error ? error.message : null}
-            onRun={handleRun}
-            onManage={handleManage}
-            onDelete={handleDelete}
-            onRetry={() => queryClient.invalidateQueries({ queryKey: ['manage-agents'] })}
-            mode="manage"
-          />
-        </Card>
+        <DCCard status="info" className="p-0 overflow-hidden">
+          <div className="p-4 border-b border-dc-border bg-dc-bg-secondary">
+            <DCSectionHeader 
+              title="Agent Registry"
+              subtitle="Active and draft subsystems in your data centre"
+              icon={<Bot className="h-5 w-5 text-dc-cyan" />}
+            />
+          </div>
+          <div className="p-6 bg-dc-bg-primary">
+            <AgentsGrid
+              agents={agentsData?.items || []}
+              isLoading={isLoading}
+              error={error instanceof Error ? error.message : null}
+              onRun={handleRun}
+              onManage={handleManage}
+              onDelete={handleDelete}
+              onRetry={() => queryClient.invalidateQueries({ queryKey: ['manage-agents'] })}
+              mode="manage"
+            />
+          </div>
+        </DCCard>
       </div>
 
       {/* Drawers & Dialogs */}

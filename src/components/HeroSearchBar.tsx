@@ -233,7 +233,7 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
               </button>
             </TooltipTrigger>
             <TooltipContent>
-              Upload docs, spreadsheets, or slides to auto-generate a twin/agent plan
+              Upload facility specs, floor plans, or configuration files
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -252,7 +252,7 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
               </button>
             </TooltipTrigger>
             <TooltipContent>
-              Describe your use case in plain language. We'll design the twin/agent for you
+              Describe your data centre use case. We'll design the twin for you
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -271,7 +271,7 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
               </button>
             </TooltipTrigger>
             <TooltipContent>
-              Pick a pre-built Digital Twin or Agent from the Template Marketplace
+              Pick a pre-built Data Centre Twin or Subsystem Agent
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

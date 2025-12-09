@@ -353,6 +353,25 @@ export default function Dashboard() {
           }}
         />
 
+        {/* DC Quick Chips */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mt-6 mb-4">
+          {[
+            { label: 'PUE trend (24h)', query: 'What is the PUE trend over the last 24 hours?' },
+            { label: 'GPU saturation hotspots', query: 'Identify GPU saturation hotspots across all clusters.' },
+            { label: 'Cooling incidents today', query: 'List all cooling incidents that occurred today.' },
+            { label: 'Sovereign compute ratio', query: 'What is the current sovereign compute ratio?' },
+            { label: 'Carbon cost forecast', query: 'Forecast carbon costs for the next 7 days.' },
+          ].map((chip) => (
+            <button
+              key={chip.label}
+              onClick={() => askCoPilot(chip.query)}
+              className="text-xs px-3 py-1.5 rounded-full border border-border bg-muted/50 hover:bg-primary/10 hover:border-primary/50 text-muted-foreground hover:text-foreground transition-all"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
+
         {/* DC-Specific KPI Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 mb-8">
           <Card className="p-4 border hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/data-centre-twin')}>
@@ -571,7 +590,7 @@ export default function Dashboard() {
 
             <TabsContent value="archived" className="mt-0 px-4 pb-4">
               <div className="text-center py-12 text-muted-foreground">
-                No archived systems.
+                No archived data centre twins.
               </div>
             </TabsContent>
           </Tabs>

@@ -259,7 +259,7 @@ export function SmartAgentInput({
                 setShowSuggestions(false);
               }, 300);
             }}
-            placeholder="Paste a URL or ask Co-Pilot what twin to build..."
+            placeholder="Ask Co-Pilot about PUE, cooling, GPU saturation, carbon, or sovereignty…"
             className="w-full h-14 sm:h-16 pl-12 sm:pl-16 pr-24 sm:pr-48 bg-card backdrop-blur-sm border-2 border-border rounded-xl sm:rounded-2xl text-base sm:text-lg placeholder:text-muted-foreground focus:border-secondary focus:ring-4 focus:ring-secondary/20 transition-all outline-none shadow-sm hover:shadow-md min-w-[260px]"
             disabled={isAnalyzing}
             style={{ fontSize: 'clamp(14px, 3vw, 16px)' }}

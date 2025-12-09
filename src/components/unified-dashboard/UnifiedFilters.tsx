@@ -27,11 +27,12 @@ interface UnifiedFiltersProps {
 export function UnifiedFilters({ filters, onFiltersChange, viewMode, onViewModeChange }: UnifiedFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const departments = ['All', 'Legal', 'Operations', 'Finance', 'Marketing', 'Human Resources', 'Engineering'];
+  // DC-specific filter options
+  const departments = ['All', 'Thermal', 'Power', 'Cooling', 'Network', 'Workload', 'Sovereignty', 'Facility'];
   const sortOptions = [
     { value: 'updated_at', label: 'Last Activity' },
     { value: 'name', label: 'Alphabetical' },
-    { value: 'roi', label: 'ROI' },
+    { value: 'roi', label: 'PUE Impact' },
     { value: 'created_at', label: 'Created Date' },
   ];
 

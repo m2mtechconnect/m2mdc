@@ -39,6 +39,7 @@ import ManageAgents from "./pages/ManageAgents";
 import SystemManage from "./pages/SystemManage";
 import TwinManage from "./pages/TwinManage";
 import DataCentreTwin from "./pages/DataCentreTwin";
+import Blueprint from "./pages/Blueprint";
 import Profile from "./pages/account/Profile";
 import Settings from "./pages/account/Settings";
 import AccessControl from "./pages/account/AccessControl";
@@ -142,6 +143,10 @@ function AuthenticatedApp() {
         <Route path="/app/agents/:agentId/operations" element={<AgentOperationsRedirect />} />
         <Route path="/twins/:instanceId/manage" element={<TwinManageRedirect />} />
         <Route path="/studio/systems/:systemId/manage" element={<SystemManage />} />
+        
+        {/* Blueprint Routes */}
+        <Route path="/data-centre-twin/:id/blueprint" element={<Blueprint />} />
+        <Route path="/blueprint/:id" element={<Blueprint />} />
         
         <Route path="/help" element={<Help />} />
         <Route path="/connect/monitor" element={<ConnectMonitor />} />

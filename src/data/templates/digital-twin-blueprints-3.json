@@ -1,0 +1,108 @@
+[
+  {
+    "id": "government_permit_processing",
+    "name": "Building Permit Application Processing Twin",
+    "industry": "Government & Public Sector",
+    "department": "Operations",
+    "twin_type": "operational",
+    "description": "Automates building permit review, checks compliance with zoning codes, routes applications to appropriate departments, and generates approval/rejection notifications.",
+    "short_description": "Automated permit review and approval workflow",
+    "badges": ["Public Sector", "Efficiency"],
+    "difficulty": "intermediate",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Permit application intake, compliance check, departmental review, approval/rejection",
+      "event_triggers": ["Application submitted", "Document uploaded", "Review completed", "Appeal filed"],
+      "data_sources": ["Permit Management System", "GIS Zoning Database", "Building Code Library", "Inspector Schedules"],
+      "workflow_steps": [
+        { "id": "intake", "type": "process", "label": "Process application and extract data" },
+        { "id": "compliance_check", "type": "rule_engine", "label": "Check zoning and code compliance" },
+        { "id": "route", "type": "decision", "label": "Route to appropriate departments" },
+        { "id": "review", "type": "human", "label": "Department specialist review" },
+        { "id": "approve", "type": "action", "label": "Issue approval or request corrections" },
+        { "id": "schedule", "type": "action", "label": "Schedule inspections" }
+      ],
+      "human_approval_points": ["Variance requests", "Complex structures", "Appeals"],
+      "kpis": [
+        { "name": "Average Processing Time", "metric": "days", "target": 7 },
+        { "name": "First-Time Approval Rate", "metric": "percentage", "target": 72 },
+        { "name": "Citizen Satisfaction", "metric": "score", "target": 4.0 }
+      ],
+      "integrations": ["Tyler Energov", "Esri ArcGIS", "Accela Civic Platform"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 7,
+      "top_n": 4,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "permit-codes",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "temperature": 0.2,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "building_codes", "ref": "ibc_2021" },
+      { "type": "zoning_regulations", "ref": "municipal_zoning" }
+    ],
+    "connectors": [
+      { "id": "permit_system_connector", "mode": "read_write" },
+      { "id": "gis_connector", "mode": "read" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Application Received" },
+        { "id": "extract_info", "type": "ocr", "label": "Extract Application Data" },
+        { "id": "check_compliance", "type": "rule_engine", "label": "Automated Compliance Check" },
+        { "id": "llm_review", "type": "llm", "label": "AI Review of Plans" },
+        { "id": "route_to_dept", "type": "decision", "label": "Route to Departments" },
+        { "id": "human_review", "type": "human", "label": "Specialist Review" },
+        { "id": "issue_decision", "type": "integration", "label": "Issue Permit or Request Corrections" },
+        { "id": "log", "type": "audit", "label": "Audit Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "extract_info" },
+        { "from": "extract_info", "to": "check_compliance" },
+        { "from": "check_compliance", "to": "llm_review" },
+        { "from": "llm_review", "to": "route_to_dept" },
+        { "from": "route_to_dept", "to": "human_review" },
+        { "from": "human_review", "to": "issue_decision" },
+        { "from": "issue_decision", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are a Building Permit Processing Twin for a municipal government. Your role is to review permit applications, check compliance with zoning codes and building regulations, route applications to appropriate departments, and expedite approvals where possible. Always explain compliance issues clearly and provide actionable feedback to applicants. Flag complex cases requiring specialist human review.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 180,
+      "runs_per_week": 45,
+      "loaded_cost_per_hour": 65,
+      "accuracy_improvement_pct": 35,
+      "cost_per_error": 1200
+    },
+    "roi_hint": 220,
+    "rating": 4.4,
+    "downloads": 421,
+    "simulation_scripts": [
+      {
+        "scenario": "Standard Residential Addition",
+        "inputs": { "property_type": "residential", "project_type": "addition", "square_feet": 450, "zoning": "R-1" },
+        "expected_outputs": { "compliance": "pass", "routing": ["building_dept"], "estimated_approval_days": 5 }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Building Permit Processing Twin. I streamline permit reviews and ensure code compliance.",
+      "capabilities": ["Automated code checking", "Intelligent routing", "Document extraction", "Approval workflow"],
+      "limitations": ["Cannot override building codes", "Requires human review for variances", "Limited to configured jurisdictions"]
+    },
+    "twin_score": {
+      "overall": 84,
+      "explainability": 87,
+      "reliability": 83,
+      "efficiency": 83
+    }
+  }
+]

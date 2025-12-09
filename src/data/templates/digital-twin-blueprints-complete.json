@@ -1,0 +1,204 @@
+[
+  {
+    "id": "construction_safety_monitoring",
+    "name": "Construction Site Safety Monitoring Twin",
+    "industry": "Construction",
+    "department": "Operations",
+    "twin_type": "operational",
+    "description": "Monitors construction site safety in real-time using IoT sensors, computer vision, and wearables. Detects safety violations, alerts supervisors, and generates compliance reports.",
+    "short_description": "Real-time construction safety monitoring and compliance",
+    "badges": ["Safety", "IoT", "Computer Vision"],
+    "difficulty": "advanced",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Safety monitoring, violation detection, alert generation, compliance reporting",
+      "event_triggers": ["Safety violation detected", "Worker entering restricted zone", "Equipment malfunction", "Environmental hazard"],
+      "data_sources": ["IoT Sensors", "Camera Feeds", "Wearable Devices", "Equipment Telemetry"],
+      "workflow_steps": [
+        { "id": "monitor", "type": "monitor", "label": "Continuous monitoring of site conditions" },
+        { "id": "detect", "type": "ai_vision", "label": "AI detection of safety violations" },
+        { "id": "alert", "type": "notification", "label": "Immediate alert to supervisors" },
+        { "id": "log", "type": "audit", "label": "Log incident for compliance" },
+        { "id": "investigate", "type": "human", "label": "Safety manager investigation" }
+      ],
+      "human_approval_points": ["Critical violations", "Site shutdowns"],
+      "kpis": [
+        { "name": "Incident Detection Time", "metric": "seconds", "target": 5 },
+        { "name": "False Alarm Rate", "metric": "percentage", "target": 3 },
+        { "name": "OSHA Compliance Score", "metric": "score", "target": 98 }
+      ],
+      "integrations": ["Procore", "SafetyCulture", "BIM 360", "IoT Platform"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 5,
+      "top_n": 3,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "construction-safety",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "temperature": 0.2,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "safety_regulations", "ref": "osha_standards" },
+      { "type": "site_plans", "ref": "construction_plans" }
+    ],
+    "connectors": [
+      { "id": "iot_connector", "mode": "read" },
+      { "id": "procore_connector", "mode": "read_write" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Safety Event Detected" },
+        { "id": "analyze", "type": "ai_vision", "label": "Analyze Violation" },
+        { "id": "classify", "type": "llm", "label": "Classify Severity" },
+        { "id": "alert_team", "type": "notification", "label": "Alert Safety Team" },
+        { "id": "log_incident", "type": "audit", "label": "Log to Compliance System" }
+      ],
+      "edges": [
+        { "from": "start", "to": "analyze" },
+        { "from": "analyze", "to": "classify" },
+        { "from": "classify", "to": "alert_team" },
+        { "from": "alert_team", "to": "log_incident" }
+      ]
+    },
+    "system_prompt": "You are a Construction Site Safety Twin. Monitor site conditions 24/7, detect safety violations using computer vision and IoT data, and immediately alert supervisors. Prioritize worker safety and OSHA compliance. Provide clear explanations of detected violations and recommend corrective actions.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 20,
+      "runs_per_week": 350,
+      "loaded_cost_per_hour": 85,
+      "accuracy_improvement_pct": 75,
+      "cost_per_error": 15000
+    },
+    "roi_hint": 450,
+    "rating": 4.8,
+    "downloads": 732,
+    "simulation_scripts": [
+      {
+        "scenario": "Worker Without PPE",
+        "inputs": { "violation_type": "missing_ppe", "location": "zone_3", "worker_id": "W1245" },
+        "expected_outputs": { "severity": "high", "alert_sent": true, "compliance_logged": true }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Construction Safety Twin. I keep your site safe and compliant 24/7.",
+      "capabilities": ["Real-time monitoring", "Violation detection", "Instant alerts", "Compliance reporting"],
+      "limitations": ["Cannot physically intervene", "Depends on camera coverage", "Requires reliable connectivity"]
+    },
+    "twin_score": {
+      "overall": 93,
+      "explainability": 94,
+      "reliability": 95,
+      "efficiency": 90
+    }
+  },
+  {
+    "id": "food_quality_control",
+    "name": "Food Manufacturing Quality Control Twin",
+    "industry": "Food Processing",
+    "department": "Manufacturing",
+    "twin_type": "operational",
+    "description": "Monitors food production lines for quality defects, contamination risks, and regulatory compliance. Uses AI vision, sensor data, and lab results to ensure product safety.",
+    "short_description": "AI-powered food safety and quality assurance",
+    "badges": ["FDA Compliant", "Quality", "Safety"],
+    "difficulty": "advanced",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Quality inspection, contamination detection, batch approval, regulatory reporting",
+      "event_triggers": ["Quality defect detected", "Contamination risk", "Temperature deviation", "Batch completion"],
+      "data_sources": ["Vision Systems", "IoT Sensors", "LIMS", "MES"],
+      "workflow_steps": [
+        { "id": "inspect", "type": "ai_vision", "label": "AI visual inspection of products" },
+        { "id": "test", "type": "sensor", "label": "Sensor-based quality testing" },
+        { "id": "analyze", "type": "llm", "label": "Analyze test results" },
+        { "id": "approve", "type": "human", "label": "Quality manager batch approval" },
+        { "id": "report", "type": "audit", "label": "FDA compliance reporting" }
+      ],
+      "human_approval_points": ["Batch release", "Deviation handling", "Recall decisions"],
+      "kpis": [
+        { "name": "Defect Detection Rate", "metric": "percentage", "target": 99.5 },
+        { "name": "False Reject Rate", "metric": "percentage", "target": 1.2 },
+        { "name": "Compliance Score", "metric": "score", "target": 100 }
+      ],
+      "integrations": ["AVEVA MES", "LabWare LIMS", "Rockwell PlantPAx"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 7,
+      "top_n": 4,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "food-quality",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5",
+      "temperature": 0.1,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "fda_regulations", "ref": "fsma_rules" },
+      { "type": "quality_standards", "ref": "haccp_plans" }
+    ],
+    "connectors": [
+      { "id": "mes_connector", "mode": "read" },
+      { "id": "lims_connector", "mode": "read_write" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Production Batch" },
+        { "id": "vision_inspect", "type": "ai_vision", "label": "AI Visual Inspection" },
+        { "id": "sensor_check", "type": "sensor", "label": "Sensor Quality Check" },
+        { "id": "risk_assess", "type": "llm", "label": "Risk Assessment" },
+        { "id": "qm_review", "type": "human", "label": "QM Review" },
+        { "id": "release", "type": "action", "label": "Batch Release or Hold" },
+        { "id": "fda_log", "type": "audit", "label": "FDA Compliance Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "vision_inspect" },
+        { "from": "vision_inspect", "to": "sensor_check" },
+        { "from": "sensor_check", "to": "risk_assess" },
+        { "from": "risk_assess", "to": "qm_review" },
+        { "from": "qm_review", "to": "release" },
+        { "from": "release", "to": "fda_log" }
+      ]
+    },
+    "system_prompt": "You are a Food Manufacturing Quality Control Twin. Monitor production lines for defects, contamination risks, and compliance issues. Use AI vision and sensor data to ensure food safety. Provide detailed quality reports and flag critical issues requiring human review. Maintain FDA and HACCP compliance at all times.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 45,
+      "runs_per_week": 200,
+      "loaded_cost_per_hour": 95,
+      "accuracy_improvement_pct": 65,
+      "cost_per_error": 50000
+    },
+    "roi_hint": 520,
+    "rating": 4.9,
+    "downloads": 512,
+    "simulation_scripts": [
+      {
+        "scenario": "Foreign Object Detection",
+        "inputs": { "defect_type": "foreign_object", "batch_size": 5000, "location": "line_2" },
+        "expected_outputs": { "batch_hold": true, "investigation_required": true, "fda_report": true }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Food Quality Control Twin. I ensure every product meets safety and quality standards.",
+      "capabilities": ["AI visual inspection", "Contamination detection", "Real-time monitoring", "FDA reporting"],
+      "limitations": ["Cannot override QM decisions", "Requires calibrated sensors", "Limited to configured parameters"]
+    },
+    "twin_score": {
+      "overall": 96,
+      "explainability": 97,
+      "reliability": 98,
+      "efficiency": 93
+    }
+  }
+]

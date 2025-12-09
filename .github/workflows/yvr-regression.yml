@@ -1,0 +1,144 @@
+name: YVR Template Regression Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/lib/templates/**'
+      - 'src/lib/intake/**'
+      - 'src/lib/builder/**'
+      - 'src/stores/**'
+      - 'src/components/templates/**'
+      - 'tests/unit/yvr-*'
+      - 'tests/integration/yvr-*'
+      - 'tests/e2e/yvr-*'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'src/lib/templates/**'
+      - 'src/lib/intake/**'
+      - 'src/lib/builder/**'
+      - 'src/stores/**'
+      - 'src/components/templates/**'
+
+jobs:
+  yvr-unit-tests:
+    name: YVR Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run YVR Backend Integrity Tests
+        run: npm run test -- tests/unit/yvr-template-integrity.test.ts
+
+      - name: Run YVR Analytics Tests
+        run: npm run test -- tests/unit/yvr-analytics-events.test.ts
+
+  yvr-integration-tests:
+    name: YVR Integration Tests
+    runs-on: ubuntu-latest
+    needs: yvr-unit-tests
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run YVR Builder Wiring Tests
+        run: npm run test -- tests/integration/yvr-builder-wiring.test.ts
+
+      - name: Run YVR Intake Flows Tests
+        run: npm run test -- tests/integration/yvr-intake-flows.test.ts
+
+  yvr-e2e-tests:
+    name: YVR E2E Tests
+    runs-on: ubuntu-latest
+    needs: [yvr-unit-tests, yvr-integration-tests]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run YVR Marketplace E2E Tests
+        run: npm run test:e2e -- tests/e2e/yvr-marketplace-flow.spec.ts
+
+      - name: Run YVR Builder Deploy E2E Tests
+        run: npm run test:e2e -- tests/e2e/yvr-builder-deploy.spec.ts
+
+      - name: Upload test artifacts
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+  yvr-regression-summary:
+    name: YVR Regression Summary
+    runs-on: ubuntu-latest
+    needs: [yvr-unit-tests, yvr-integration-tests, yvr-e2e-tests]
+    if: always()
+
+    steps:
+      - name: Check test results
+        run: |
+          if [ "${{ needs.yvr-unit-tests.result }}" != "success" ] || \
+             [ "${{ needs.yvr-integration-tests.result }}" != "success" ] || \
+             [ "${{ needs.yvr-e2e-tests.result }}" != "success" ]; then
+            echo "❌ YVR REGRESSION TESTS FAILED"
+            echo "One or more test suites failed. Check the logs above."
+            exit 1
+          else
+            echo "✅ YVR REGRESSION TESTS PASSED"
+            echo "All YVR template tests are passing!"
+          fi
+
+  block-on-failure:
+    name: Block Merge on YVR Regression Failure
+    runs-on: ubuntu-latest
+    needs: yvr-regression-summary
+    if: failure()
+
+    steps:
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.name,
+              body: '## ❌ YVR Template Regression Tests Failed\n\nThe YVR Airport Operations Digital Twin template tests are failing. This PR cannot be merged until all tests pass.\n\n**Failed Components:**\n- Check the workflow logs for specific test failures\n\n**What to do:**\n1. Review the test failures in the workflow logs\n2. Fix the issues affecting YVR template functionality\n3. Push your fixes and wait for tests to re-run\n\n**Why this matters:**\nYVR is the reference template for the entire system. Breaking changes to YVR can affect all other templates and intake flows.'
+            })
+
+      - name: Fail the workflow
+        run: exit 1

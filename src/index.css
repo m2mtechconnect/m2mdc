@@ -1,0 +1,494 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* M2M Tech Brand Colors - Enterprise SaaS Standard */
+    --signal-gold: 51 100% 50%;       /* #FFD700 - Signal Gold for CTAs & hover */
+    --m2m-yellow: 51 100% 50%;        /* #FFD700 - Primary CTAs */
+    --m2m-purple: 250 75% 60%;        /* Purple gradient start */
+    --m2m-purple-deep: 256 60% 55%;   /* Purple gradient end */
+    --electric-blue: 227 100% 65%;    /* Light blue-purple */
+    --carbon-black: 0 0% 8%;          /* #141414 - Dark sections */
+    --graphite-gray: 0 0% 12%;        /* #1F1F1F - Panels, cards */
+    --pure-white: 0 0% 100%;          /* #FFFFFF - Text */
+    --light-gray: 0 0% 70%;           /* #B3B3B3 - Secondary text */
+    --surface-light: 0 0% 98%;        /* #FAFAFA - Light backgrounds */
+    
+    /* Enterprise Typography Colors - Light Mode */
+    --title-light: 0 0% 7%;           /* #111111 - Titles in light mode */
+    --subtitle-light: 0 0% 33%;       /* #555555 - Subtitles/body in light mode */
+    
+    /* Semantic tokens mapped to M2M brand */
+    --background: var(--surface-light);
+    --foreground: var(--title-light);
+
+    --card: var(--pure-white);
+    --card-foreground: var(--title-light);
+
+    --popover: var(--pure-white);
+    --popover-foreground: var(--title-light);
+
+    --primary: var(--signal-gold);
+    --primary-foreground: 0 0% 10%;
+
+    --secondary: var(--m2m-purple);
+    --secondary-foreground: var(--pure-white);
+
+    --muted: 0 0% 94%;
+    --muted-foreground: var(--subtitle-light);
+
+    --accent: var(--electric-blue);
+    --accent-foreground: var(--pure-white);
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: var(--pure-white);
+
+    --border: 0 0% 88%;
+    --input: 0 0% 90%;
+    --ring: var(--signal-gold);
+
+    --radius: 0.75rem;
+
+    /* Icon colors - auto-adjusting with text */
+    --icon-color: var(--title-light);
+    --icon-muted: var(--subtitle-light);
+
+    /* M2M Gradient definitions - inspired by website hero */
+    --gradient-hero: linear-gradient(135deg, hsl(var(--electric-blue)) 0%, hsl(var(--m2m-purple)) 50%, hsl(var(--m2m-purple-deep)) 100%);
+    --gradient-cta: linear-gradient(90deg, hsl(var(--signal-gold)) 0%, hsl(51 100% 45%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--surface-light)) 0%, hsl(0 0% 96%) 100%);
+    
+    /* Glow effects */
+    --glow-gold: 0 4px 24px hsla(var(--signal-gold), 0.4);
+    --glow-purple: 0 4px 24px hsla(var(--m2m-purple), 0.3);
+    --glow-blue: 0 4px 24px hsla(var(--electric-blue), 0.3);
+    
+    /* Status colors using M2M brand palette */
+    --success: var(--electric-blue);      /* Use electric blue for success/complete */
+    --success-foreground: var(--pure-white);
+    
+    /* Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Safe areas for wizard */
+    --wizard-bottom-safe-area: 96px;
+  }
+
+  .dark {
+    /* Dark mode - maintains professional dark aesthetic */
+    /* Enterprise Typography Colors - Dark Mode */
+    --title-dark: 0 0% 100%;          /* #FFFFFF - Titles in dark mode */
+    --subtitle-dark: 0 0% 80%;        /* #CCCCCC - Subtitles/body in dark mode */
+    
+    --background: 0 0% 6%;
+    --foreground: var(--title-dark);
+
+    --card: var(--graphite-gray);
+    --card-foreground: var(--title-dark);
+
+    --popover: var(--graphite-gray);
+    --popover-foreground: var(--title-dark);
+
+    --primary: var(--signal-gold);
+    --primary-foreground: 0 0% 10%;
+
+    --secondary: var(--m2m-purple);
+    --secondary-foreground: var(--pure-white);
+
+    --muted: 0 0% 15%;
+    --muted-foreground: var(--subtitle-dark);
+
+    --accent: var(--electric-blue);
+    --accent-foreground: var(--pure-white);
+
+    --border: 0 0% 20%;
+    --input: 0 0% 15%;
+    --ring: var(--signal-gold);
+
+    /* Icon colors - auto-adjusting with text */
+    --icon-color: var(--title-dark);
+    --icon-muted: var(--subtitle-dark);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  /* Enterprise Typography Scale - Poppins Bold for Titles, Inter Regular for Body */
+  h1, .text-h1 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: clamp(28px, 4vw, 32px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: hsl(var(--foreground));
+  }
+
+  h2, .text-h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: clamp(22px, 3.5vw, 24px);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: hsl(var(--foreground));
+  }
+
+  h3, .text-h3 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: clamp(18px, 3vw, 20px);
+    line-height: 1.4;
+    color: hsl(var(--foreground));
+  }
+
+  h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+  }
+
+  p, .text-body {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.6;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .text-caption, small {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.5;
+    color: hsl(var(--muted-foreground));
+  }
+
+  code, pre, .font-mono {
+    font-family: 'Inter', monospace;
+  }
+
+  /* Focus Ring - AA+ Accessibility with Signal Gold */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--signal-gold));
+    outline-offset: 2px;
+    box-shadow: var(--glow-gold);
+  }
+
+  /* Minimum touch target - AA+ Accessibility */
+  button, a, [role="button"], [role="link"] {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* Custom utility classes for M2M branding - Website inspired */
+@layer utilities {
+  /* Gradient Text Utilities */
+  .text-gradient-hero {
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-cta {
+    background: var(--gradient-cta);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text {
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Background Gradients */
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .bg-gradient-cta {
+    background: var(--gradient-cta);
+  }
+
+  .bg-gradient-subtle {
+    background: var(--gradient-subtle);
+  }
+
+  /* Glow Effects */
+  .glow-gold {
+    box-shadow: var(--glow-gold);
+  }
+
+  .glow-yellow {
+    box-shadow: var(--glow-gold);
+  }
+
+  .glow-purple {
+    box-shadow: var(--glow-purple);
+  }
+
+  .glow-blue {
+    box-shadow: var(--glow-blue);
+  }
+
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  /* Glass Panel - Modern SaaS Style */
+  .glass-panel {
+    background: hsla(var(--card), 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border));
+  }
+
+  /* Card Styles - M2M Website Standard */
+  .card-m2m {
+    border-radius: 16px;
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--card));
+    transition: var(--transition-smooth);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .card-m2m:hover {
+    border-color: hsl(var(--m2m-purple) / 0.5);
+    box-shadow: var(--glow-purple);
+    transform: translateY(-2px);
+  }
+
+  /* Hero Section Utility */
+  .hero-gradient {
+    background: var(--gradient-hero);
+    position: relative;
+  }
+
+  .hero-gradient::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 50%, hsla(51, 100%, 50%, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, hsla(227, 100%, 65%, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  /* Spacing Utilities - 8px Base */
+  .section-padding {
+    padding: 24px;
+  }
+
+  .section-padding-lg {
+    padding: 32px;
+  }
+
+  .card-gap {
+    gap: 16px;
+  }
+
+  /* Empty State */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+  }
+
+  /* Hover Effects - Signal Gold Emphasis */
+  .card-hover {
+    @apply transition-smooth hover:border-primary hover:shadow-lg;
+  }
+
+  /* Icon Utilities - Auto-adjusting colors */
+  .icon-default {
+    color: hsl(var(--icon-color));
+  }
+
+  .icon-muted {
+    color: hsl(var(--icon-muted));
+  }
+
+  .icon-hover-gold {
+    @apply transition-smooth hover:text-primary;
+  }
+
+  /* Animation Delays */
+  .delay-1000 {
+    animation-delay: 1000ms;
+  }
+
+  /* Responsive Spacing Utilities */
+  .spacing-xs { padding: 8px; }
+  .spacing-sm { padding: 12px; }
+  .spacing-md { padding: 16px; }
+  .spacing-lg { padding: 20px; }
+  .spacing-xl { padding: 24px; }
+
+  /* Fluid Typography - Mobile First */
+  @media (max-width: 640px) {
+    h1, .text-h1 {
+      font-size: clamp(24px, 6vw, 28px);
+    }
+    h2, .text-h2 {
+      font-size: clamp(20px, 5vw, 22px);
+    }
+  }
+
+  /* Responsive Grid System */
+  .grid-responsive {
+    display: grid;
+    gap: clamp(12px, 3vw, 16px);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 641px) {
+    .grid-responsive-md-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .grid-responsive-lg-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .grid-responsive-lg-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  /* AI/ML Background Animations */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0) translateX(0);
+      opacity: 0.6;
+    }
+    25% {
+      transform: translateY(-20px) translateX(10px);
+      opacity: 0.8;
+    }
+    50% {
+      transform: translateY(-40px) translateX(-10px);
+      opacity: 1;
+    }
+    75% {
+      transform: translateY(-20px) translateX(10px);
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes data-stream {
+    0% {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-data-stream {
+    animation: data-stream 4s linear infinite;
+  }
+
+  /* Motion: Respect user preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    
+    /* Disable AI background animations */
+    .animate-float,
+    .animate-data-stream {
+      animation: none !important;
+    }
+    
+    svg animate {
+      display: none;
+    }
+  }
+
+  /* Toast positioning - safe area for wizard */
+  .toaster {
+    z-index: 920 !important;
+  }
+
+  /* When wizard is active, adjust toast position */
+  body:has([data-wizard-active="true"]) .toaster {
+    bottom: var(--wizard-bottom-safe-area, 96px) !important;
+  }
+
+  @media (max-width: 768px) {
+    body:has([data-wizard-active="true"]) .toaster {
+      top: 1rem !important;
+      bottom: auto !important;
+    }
+  }
+
+  /* Accessibility Helpers */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}

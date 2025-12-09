@@ -1,0 +1,211 @@
+[
+  {
+    "id": "automotive_predictive_maintenance",
+    "name": "Automotive Predictive Maintenance Twin",
+    "industry": "Automotive",
+    "department": "Manufacturing",
+    "twin_type": "predictive",
+    "description": "Predicts vehicle component failures using IoT sensor data, maintenance history, and ML models. Optimizes maintenance schedules and reduces warranty costs.",
+    "short_description": "AI-powered predictive maintenance for automotive production",
+    "badges": ["Certified", "IoT", "Predictive Analytics"],
+    "difficulty": "advanced",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Vehicle component health monitoring, failure prediction, maintenance scheduling",
+      "event_triggers": ["Sensor anomaly detected", "Mileage threshold", "Component age limit", "Performance degradation"],
+      "data_sources": ["Telematics System", "Maintenance Records", "IoT Sensors", "Warranty Database"],
+      "workflow_steps": [
+        { "id": "monitor", "type": "monitor", "label": "Monitor vehicle sensor data" },
+        { "id": "predict", "type": "ml_model", "label": "Predict component failures" },
+        { "id": "schedule", "type": "decision", "label": "Generate maintenance schedule" },
+        { "id": "approve", "type": "human", "label": "Service manager approval" },
+        { "id": "notify", "type": "action", "label": "Notify customer and schedule service" }
+      ],
+      "human_approval_points": ["Expensive repairs", "Warranty claims", "Fleet-wide campaigns"],
+      "kpis": [
+        { "name": "Unplanned Downtime Reduction", "metric": "percentage", "target": 45 },
+        { "name": "Warranty Cost Reduction", "metric": "percentage", "target": 28 },
+        { "name": "Maintenance Prediction Accuracy", "metric": "percentage", "target": 89 }
+      ],
+      "integrations": ["Siemens Teamcenter", "SAP PM", "AWS IoT", "PTC ThingWorx"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 5,
+      "top_n": 3,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "automotive-maintenance",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "temperature": 0.2,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "maintenance_manuals", "ref": "oem_manuals" },
+      { "type": "failure_history", "ref": "warranty_claims_db" }
+    ],
+    "connectors": [
+      { "id": "telematics_connector", "mode": "read" },
+      { "id": "sap_pm_connector", "mode": "read_write" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Sensor Alert" },
+        { "id": "fetch_data", "type": "integration", "label": "Fetch Vehicle Data" },
+        { "id": "ml_predict", "type": "ml_model", "label": "Predict Failure" },
+        { "id": "schedule_maint", "type": "llm", "label": "Generate Schedule" },
+        { "id": "manager_review", "type": "human", "label": "Manager Approval" },
+        { "id": "notify_customer", "type": "notification", "label": "Customer Notification" },
+        { "id": "log", "type": "audit", "label": "Audit Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "fetch_data" },
+        { "from": "fetch_data", "to": "ml_predict" },
+        { "from": "ml_predict", "to": "schedule_maint" },
+        { "from": "schedule_maint", "to": "manager_review" },
+        { "from": "manager_review", "to": "notify_customer" },
+        { "from": "notify_customer", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are an Automotive Predictive Maintenance Twin. Monitor vehicle sensor data, predict component failures before they occur, and optimize maintenance schedules. Prioritize safety-critical systems and minimize customer inconvenience. Explain predictions clearly and flag warranty implications.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 40,
+      "runs_per_week": 180,
+      "loaded_cost_per_hour": 95,
+      "accuracy_improvement_pct": 50,
+      "cost_per_error": 8500
+    },
+    "roi_hint": 380,
+    "rating": 4.7,
+    "downloads": 923,
+    "simulation_scripts": [
+      {
+        "scenario": "Transmission Failure Prediction",
+        "inputs": { "component": "transmission", "vibration_level": 8.2, "temperature": 215, "miles": 87000 },
+        "expected_outputs": { "failure_probability": 0.82, "recommended_action": "schedule_service", "urgency": "high" }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Automotive Predictive Maintenance Twin. I predict vehicle failures before they happen.",
+      "capabilities": ["Sensor monitoring", "Failure prediction", "Maintenance optimization", "Warranty analysis"],
+      "limitations": ["Cannot predict accidents", "Depends on sensor quality", "Requires historical data"]
+    },
+    "twin_score": {
+      "overall": 91,
+      "explainability": 93,
+      "reliability": 90,
+      "efficiency": 90
+    }
+  },
+  {
+    "id": "automotive_supply_chain_twin",
+    "name": "Automotive Supply Chain Resilience Twin",
+    "industry": "Automotive",
+    "department": "Supply Chain",
+    "twin_type": "supply_chain",
+    "description": "Monitors global supply chain for disruptions, predicts shortages, and recommends alternative sourcing strategies to maintain production continuity.",
+    "short_description": "Supply chain risk monitoring and resilience planning",
+    "badges": ["Supply Chain", "Risk Management"],
+    "difficulty": "advanced",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Supply chain monitoring, risk detection, alternative sourcing, production impact analysis",
+      "event_triggers": ["Supplier delay", "Geopolitical event", "Port congestion", "Quality issue"],
+      "data_sources": ["ERP System", "Supplier Portal", "Logistics Tracking", "Market Intelligence"],
+      "workflow_steps": [
+        { "id": "monitor", "type": "monitor", "label": "Monitor supply chain signals" },
+        { "id": "detect_risk", "type": "anomaly", "label": "Detect disruption risks" },
+        { "id": "analyze_impact", "type": "compute", "label": "Analyze production impact" },
+        { "id": "recommend", "type": "decision", "label": "Recommend mitigation actions" },
+        { "id": "approve", "type": "human", "label": "Procurement director approval" },
+        { "id": "execute", "type": "action", "label": "Implement sourcing changes" }
+      ],
+      "human_approval_points": ["New supplier qualification", "High-value orders", "Production line changes"],
+      "kpis": [
+        { "name": "Production Continuity", "metric": "percentage", "target": 98 },
+        { "name": "Supply Risk Reduction", "metric": "percentage", "target": 35 },
+        { "name": "Inventory Optimization", "metric": "days", "target": 12 }
+      ],
+      "integrations": ["SAP ERP", "Oracle SCM", "Resilinc", "LexisNexis Risk"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 7,
+      "top_n": 4,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "automotive-supply-chain",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5",
+      "temperature": 0.2,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "supplier_contracts", "ref": "procurement_db" },
+      { "type": "market_intelligence", "ref": "risk_feeds" }
+    ],
+    "connectors": [
+      { "id": "sap_connector", "mode": "read_write" },
+      { "id": "supplier_portal_connector", "mode": "read" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Supply Chain Event" },
+        { "id": "fetch_context", "type": "integration", "label": "Fetch Supply Data" },
+        { "id": "risk_analysis", "type": "llm", "label": "Analyze Risk" },
+        { "id": "impact_assessment", "type": "compute", "label": "Production Impact" },
+        { "id": "mitigation", "type": "decision", "label": "Mitigation Options" },
+        { "id": "approval", "type": "human", "label": "Director Approval" },
+        { "id": "execute", "type": "integration", "label": "Execute Changes" },
+        { "id": "log", "type": "audit", "label": "Audit Trail" }
+      ],
+      "edges": [
+        { "from": "start", "to": "fetch_context" },
+        { "from": "fetch_context", "to": "risk_analysis" },
+        { "from": "risk_analysis", "to": "impact_assessment" },
+        { "from": "impact_assessment", "to": "mitigation" },
+        { "from": "mitigation", "to": "approval" },
+        { "from": "approval", "to": "execute" },
+        { "from": "execute", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are an Automotive Supply Chain Resilience Twin. Monitor global supply chain for disruptions, predict production impacts, and recommend alternative sourcing strategies. Prioritize production continuity and cost efficiency. Provide clear risk assessments with data-backed recommendations.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 120,
+      "runs_per_week": 65,
+      "loaded_cost_per_hour": 110,
+      "accuracy_improvement_pct": 42,
+      "cost_per_error": 125000
+    },
+    "roi_hint": 420,
+    "rating": 4.8,
+    "downloads": 634,
+    "simulation_scripts": [
+      {
+        "scenario": "Semiconductor Shortage",
+        "inputs": { "component": "ECU_chip", "lead_time_weeks": 26, "production_impact": "high", "alternative_suppliers": 2 },
+        "expected_outputs": { "risk_level": "critical", "mitigation": "dual_sourcing", "cost_increase_pct": 15 }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Supply Chain Resilience Twin. I protect your production from supply disruptions.",
+      "capabilities": ["Risk monitoring", "Impact analysis", "Alternative sourcing", "Production planning"],
+      "limitations": ["Cannot predict all geopolitical events", "Depends on supplier data quality", "Limited to configured suppliers"]
+    },
+    "twin_score": {
+      "overall": 93,
+      "explainability": 94,
+      "reliability": 93,
+      "efficiency": 92
+    }
+  }
+]

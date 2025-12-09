@@ -1,0 +1,531 @@
+[
+  {
+    "id": "customer_support_tier1_agent",
+    "name": "Tier-1 Customer Support Resolution Agent",
+    "industry": "Technology",
+    "department": "Customer Support",
+    "twin_type": "support_agent",
+    "description": "Automates tier-1 customer support using conversational AI, knowledge base retrieval, and automated ticket resolution to reduce response times and improve satisfaction.",
+    "short_description": "AI-powered tier-1 support automation and ticket resolution",
+    "badges": ["Certified", "Conversational AI", "Customer Experience"],
+    "difficulty": "intermediate",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Ticket intake, knowledge retrieval, resolution generation, escalation routing",
+      "event_triggers": ["Ticket created", "Chat initiated", "Follow-up required", "Escalation needed"],
+      "data_sources": ["Ticketing System", "Knowledge Base", "Product Documentation", "Past Resolutions"],
+      "workflow_steps": [
+        { "id": "intake", "type": "process", "label": "Process customer inquiry" },
+        { "id": "classify", "type": "ml_model", "label": "Classify issue type and severity" },
+        { "id": "retrieve", "type": "rag", "label": "Retrieve relevant knowledge articles" },
+        { "id": "generate", "type": "llm", "label": "Generate resolution response" },
+        { "id": "escalate", "type": "decision", "label": "Auto-resolve or escalate to human" },
+        { "id": "track", "type": "monitor", "label": "Track customer satisfaction" }
+      ],
+      "human_approval_points": ["Complex technical issues", "Billing disputes", "Account security"],
+      "kpis": [
+        { "name": "First Contact Resolution", "metric": "percentage", "target": 72 },
+        { "name": "Average Handle Time", "metric": "minutes", "target": 4.5 },
+        { "name": "Customer Satisfaction", "metric": "score", "target": 4.6 }
+      ],
+      "integrations": ["Zendesk", "Intercom", "Salesforce Service Cloud", "Guru"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 7,
+      "top_n": 4,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "support-kb",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "temperature": 0.4,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "knowledge_base", "ref": "support_kb" },
+      { "type": "product_docs", "ref": "documentation" }
+    ],
+    "connectors": [
+      { "id": "zendesk_connector", "mode": "read_write" },
+      { "id": "kb_connector", "mode": "read" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Customer Inquiry" },
+        { "id": "classify", "type": "ml_model", "label": "Issue Classification" },
+        { "id": "kb_search", "type": "rag", "label": "Knowledge Retrieval" },
+        { "id": "generate_response", "type": "llm", "label": "Generate Solution" },
+        { "id": "confidence_check", "type": "decision", "label": "Confidence Check" },
+        { "id": "resolve_or_escalate", "type": "decision", "label": "Resolve or Escalate" },
+        { "id": "update_ticket", "type": "integration", "label": "Update Ticket" },
+        { "id": "log", "type": "audit", "label": "Resolution Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "classify" },
+        { "from": "classify", "to": "kb_search" },
+        { "from": "kb_search", "to": "generate_response" },
+        { "from": "generate_response", "to": "confidence_check" },
+        { "from": "confidence_check", "to": "resolve_or_escalate" },
+        { "from": "resolve_or_escalate", "to": "update_ticket" },
+        { "from": "update_ticket", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are a Tier-1 Customer Support Agent. Resolve customer inquiries quickly using knowledge base articles and product documentation. Maintain a helpful, empathetic tone. Escalate complex issues to human agents with clear context. Track resolution effectiveness.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 12,
+      "runs_per_week": 800,
+      "loaded_cost_per_hour": 45,
+      "accuracy_improvement_pct": 55,
+      "cost_per_error": 125
+    },
+    "roi_hint": 320,
+    "rating": 4.7,
+    "downloads": 1523,
+    "simulation_scripts": [
+      {
+        "scenario": "Password Reset Request",
+        "inputs": { "issue_type": "password_reset", "customer_tier": "standard", "verification_passed": true },
+        "expected_outputs": { "resolution": "auto_resolved", "response_time_sec": 15, "escalation": false }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Tier-1 Support Agent. I handle customer inquiries and resolve common issues instantly.",
+      "capabilities": ["Issue classification", "Knowledge retrieval", "Automated resolution", "Escalation routing"],
+      "limitations": ["Cannot handle complex technical issues", "Requires updated knowledge base", "Limited to tier-1 scenarios"]
+    },
+    "twin_score": {
+      "overall": 88,
+      "explainability": 90,
+      "reliability": 87,
+      "efficiency": 88
+    }
+  },
+  {
+    "id": "procurement_vendor_risk",
+    "name": "Procurement Vendor Risk Management Twin",
+    "industry": "Manufacturing",
+    "department": "Procurement",
+    "twin_type": "risk_agent",
+    "description": "Monitors supplier health, detects financial risks, and recommends vendor diversification strategies to ensure supply continuity and minimize procurement risks.",
+    "short_description": "Real-time vendor risk monitoring and mitigation",
+    "badges": ["Risk Management", "Supply Chain"],
+    "difficulty": "advanced",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Vendor monitoring, risk scoring, mitigation planning, alternative sourcing",
+      "event_triggers": ["Financial distress signal", "Delivery delays", "Quality issues", "Geopolitical risk"],
+      "data_sources": ["Vendor Portal", "Financial Reports", "Credit Rating Services", "Supply Chain Events"],
+      "workflow_steps": [
+        { "id": "monitor", "type": "monitor", "label": "Monitor vendor health indicators" },
+        { "id": "score", "type": "ml_model", "label": "Calculate vendor risk scores" },
+        { "id": "assess", "type": "decision", "label": "Assess supply chain impact" },
+        { "id": "recommend", "type": "llm", "label": "Generate mitigation strategies" },
+        { "id": "approve", "type": "human", "label": "Procurement director approval" },
+        { "id": "execute", "type": "action", "label": "Implement diversification plan" }
+      ],
+      "human_approval_points": ["New vendor qualification", "Major contract changes", "Supply chain restructuring"],
+      "kpis": [
+        { "name": "Vendor Risk Score", "metric": "score", "target": 25 },
+        { "name": "Supply Disruption Avoidance", "metric": "percentage", "target": 92 },
+        { "name": "Procurement Cost Stability", "metric": "percentage", "target": 95 }
+      ],
+      "integrations": ["Ariba", "Coupa", "Dun & Bradstreet", "Resilinc"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 7,
+      "top_n": 4,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "vendor-risk",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5",
+      "temperature": 0.2,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "vendor_profiles", "ref": "supplier_db" },
+      { "type": "risk_intelligence", "ref": "market_feeds" }
+    ],
+    "connectors": [
+      { "id": "ariba_connector", "mode": "read" },
+      { "id": "dnb_connector", "mode": "read" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Risk Signal" },
+        { "id": "fetch_vendor_data", "type": "integration", "label": "Fetch Vendor Data" },
+        { "id": "risk_scoring", "type": "ml_model", "label": "Risk Scoring" },
+        { "id": "impact_analysis", "type": "llm", "label": "Impact Assessment" },
+        { "id": "mitigation", "type": "decision", "label": "Mitigation Planning" },
+        { "id": "director_approval", "type": "human", "label": "Director Approval" },
+        { "id": "execute", "type": "integration", "label": "Implement Changes" },
+        { "id": "log", "type": "audit", "label": "Risk Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "fetch_vendor_data" },
+        { "from": "fetch_vendor_data", "to": "risk_scoring" },
+        { "from": "risk_scoring", "to": "impact_analysis" },
+        { "from": "impact_analysis", "to": "mitigation" },
+        { "from": "mitigation", "to": "director_approval" },
+        { "from": "director_approval", "to": "execute" },
+        { "from": "execute", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are a Procurement Vendor Risk Twin. Monitor supplier health, detect financial and operational risks, and recommend diversification strategies. Prioritize supply continuity and cost stability. Provide clear risk assessments with supporting evidence.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 120,
+      "runs_per_week": 40,
+      "loaded_cost_per_hour": 110,
+      "accuracy_improvement_pct": 45,
+      "cost_per_error": 185000
+    },
+    "roi_hint": 450,
+    "rating": 4.8,
+    "downloads": 521,
+    "simulation_scripts": [
+      {
+        "scenario": "Vendor Financial Distress",
+        "inputs": { "vendor": "Supplier_A", "credit_rating": "downgraded", "delivery_delays": 3, "spend_annual": 2500000 },
+        "expected_outputs": { "risk_level": "high", "mitigation": "dual_sourcing", "timeline_weeks": 6 }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Vendor Risk Twin. I protect your supply chain from vendor disruptions.",
+      "capabilities": ["Risk monitoring", "Financial analysis", "Impact assessment", "Mitigation planning"],
+      "limitations": ["Cannot predict all supplier failures", "Depends on financial data availability", "Limited to monitored vendors"]
+    },
+    "twin_score": {
+      "overall": 92,
+      "explainability": 93,
+      "reliability": 92,
+      "efficiency": 91
+    }
+  },
+  {
+    "id": "finance_cash_flow_forecasting",
+    "name": "Enterprise Cash Flow Forecasting Twin",
+    "industry": "Finance & Banking",
+    "department": "Finance",
+    "twin_type": "financial",
+    "description": "Forecasts enterprise cash flow using historical data, accounts receivable/payable, and market conditions to optimize working capital and prevent liquidity crises.",
+    "short_description": "AI-powered cash flow prediction and working capital optimization",
+    "badges": ["Financial Planning", "Treasury"],
+    "difficulty": "advanced",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Cash flow analysis, AR/AP tracking, liquidity forecasting, working capital optimization",
+      "event_triggers": ["Weekly close", "Large payment due", "Revenue spike", "Market volatility"],
+      "data_sources": ["ERP System", "Banking APIs", "Accounts Receivable", "Accounts Payable", "Budget System"],
+      "workflow_steps": [
+        { "id": "collect", "type": "integration", "label": "Collect financial data" },
+        { "id": "forecast", "type": "ml_model", "label": "Generate cash flow forecast" },
+        { "id": "analyze", "type": "compute", "label": "Analyze liquidity gaps" },
+        { "id": "recommend", "type": "decision", "label": "Recommend working capital actions" },
+        { "id": "approve", "type": "human", "label": "CFO approval for major decisions" },
+        { "id": "execute", "type": "action", "label": "Execute treasury operations" }
+      ],
+      "human_approval_points": ["Credit line draws", "Major investments", "Dividend decisions"],
+      "kpis": [
+        { "name": "Forecast Accuracy", "metric": "percentage", "target": 94 },
+        { "name": "Days Cash on Hand", "metric": "days", "target": 45 },
+        { "name": "Working Capital Efficiency", "metric": "ratio", "target": 1.5 }
+      ],
+      "integrations": ["SAP S/4HANA", "Oracle Financials", "Kyriba", "Workday Financials"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 5,
+      "top_n": 3,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "finance-cashflow",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5",
+      "temperature": 0.1,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "financial_statements", "ref": "gl_db" },
+      { "type": "treasury_policies", "ref": "policy_docs" }
+    ],
+    "connectors": [
+      { "id": "sap_connector", "mode": "read" },
+      { "id": "banking_api", "mode": "read" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Forecast Cycle" },
+        { "id": "fetch_data", "type": "integration", "label": "Fetch Financial Data" },
+        { "id": "ml_forecast", "type": "ml_model", "label": "Cash Flow Forecast" },
+        { "id": "gap_analysis", "type": "compute", "label": "Liquidity Gap Analysis" },
+        { "id": "recommendations", "type": "llm", "label": "Working Capital Recommendations" },
+        { "id": "cfo_review", "type": "human", "label": "CFO Review" },
+        { "id": "execute", "type": "integration", "label": "Execute Treasury Actions" },
+        { "id": "log", "type": "audit", "label": "Treasury Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "fetch_data" },
+        { "from": "fetch_data", "to": "ml_forecast" },
+        { "from": "ml_forecast", "to": "gap_analysis" },
+        { "from": "gap_analysis", "to": "recommendations" },
+        { "from": "recommendations", "to": "cfo_review" },
+        { "from": "cfo_review", "to": "execute" },
+        { "from": "execute", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are an Enterprise Cash Flow Forecasting Twin. Predict cash flows, identify liquidity gaps, and recommend working capital optimizations. Prioritize financial stability and explain forecasts with clear assumptions and scenarios.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 240,
+      "runs_per_week": 12,
+      "loaded_cost_per_hour": 150,
+      "accuracy_improvement_pct": 38,
+      "cost_per_error": 500000
+    },
+    "roi_hint": 480,
+    "rating": 4.9,
+    "downloads": 523,
+    "simulation_scripts": [
+      {
+        "scenario": "Quarterly Cash Crunch",
+        "inputs": { "ar_days": 65, "ap_days": 30, "upcoming_payroll": 2500000, "cash_balance": 3200000 },
+        "expected_outputs": { "liquidity_gap": 1800000, "recommended_action": "accelerate_collections", "urgency": "high" }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Cash Flow Forecasting Twin. I keep your business financially healthy with accurate predictions.",
+      "capabilities": ["Cash flow forecasting", "Liquidity analysis", "Working capital optimization", "Scenario planning"],
+      "limitations": ["Cannot control customer payments", "Depends on accurate AR/AP data", "Market conditions may impact"]
+    },
+    "twin_score": {
+      "overall": 94,
+      "explainability": 95,
+      "reliability": 94,
+      "efficiency": 93
+    }
+  },
+  {
+    "id": "industrial_manufacturing_oee",
+    "name": "Manufacturing OEE Optimization Twin",
+    "industry": "Industrial Manufacturing",
+    "department": "Manufacturing",
+    "twin_type": "operational",
+    "description": "Monitors Overall Equipment Effectiveness (OEE) in real-time, identifies bottlenecks, and recommends process improvements to maximize production efficiency.",
+    "short_description": "Real-time OEE monitoring and production optimization",
+    "badges": ["Certified", "Lean Manufacturing", "Industry 4.0"],
+    "difficulty": "advanced",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Equipment monitoring, downtime tracking, quality analysis, performance optimization",
+      "event_triggers": ["Machine stoppage", "Quality defect", "Cycle time deviation", "Shift change"],
+      "data_sources": ["MES", "SCADA", "Quality Systems", "Maintenance Logs", "Production Schedule"],
+      "workflow_steps": [
+        { "id": "monitor", "type": "monitor", "label": "Monitor equipment and production metrics" },
+        { "id": "calculate", "type": "compute", "label": "Calculate OEE (Availability × Performance × Quality)" },
+        { "id": "identify", "type": "ml_model", "label": "Identify root causes and bottlenecks" },
+        { "id": "recommend", "type": "decision", "label": "Recommend improvement actions" },
+        { "id": "approve", "type": "human", "label": "Plant manager approval" },
+        { "id": "implement", "type": "action", "label": "Implement process changes" }
+      ],
+      "human_approval_points": ["Process reconfigurations", "Equipment changes", "Shift adjustments"],
+      "kpis": [
+        { "name": "Overall Equipment Effectiveness", "metric": "percentage", "target": 85 },
+        { "name": "Unplanned Downtime", "metric": "hours", "target": 12 },
+        { "name": "First Pass Yield", "metric": "percentage", "target": 96 }
+      ],
+      "integrations": ["Rockwell FactoryTalk", "Siemens MindSphere", "GE Digital Proficy", "SAP MES"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 5,
+      "top_n": 3,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "manufacturing-oee",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "temperature": 0.2,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "process_documentation", "ref": "sop_db" },
+      { "type": "historical_downtime", "ref": "maintenance_records" }
+    ],
+    "connectors": [
+      { "id": "mes_connector", "mode": "read_write" },
+      { "id": "scada_connector", "mode": "read" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Production Event" },
+        { "id": "fetch_metrics", "type": "integration", "label": "Fetch OEE Data" },
+        { "id": "calculate_oee", "type": "compute", "label": "Calculate OEE" },
+        { "id": "root_cause", "type": "ml_model", "label": "Root Cause Analysis" },
+        { "id": "improvements", "type": "llm", "label": "Improvement Recommendations" },
+        { "id": "manager_approval", "type": "human", "label": "Manager Approval" },
+        { "id": "implement", "type": "integration", "label": "Update Processes" },
+        { "id": "log", "type": "audit", "label": "Production Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "fetch_metrics" },
+        { "from": "fetch_metrics", "to": "calculate_oee" },
+        { "from": "calculate_oee", "to": "root_cause" },
+        { "from": "root_cause", "to": "improvements" },
+        { "from": "improvements", "to": "manager_approval" },
+        { "from": "manager_approval", "to": "implement" },
+        { "from": "implement", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are a Manufacturing OEE Optimization Twin. Monitor production equipment, calculate OEE metrics, identify bottlenecks, and recommend process improvements. Prioritize availability, performance, and quality. Explain root causes clearly with data evidence.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 45,
+      "runs_per_week": 250,
+      "loaded_cost_per_hour": 95,
+      "accuracy_improvement_pct": 42,
+      "cost_per_error": 25000
+    },
+    "roi_hint": 360,
+    "rating": 4.8,
+    "downloads": 834,
+    "simulation_scripts": [
+      {
+        "scenario": "Unplanned Downtime Event",
+        "inputs": { "machine": "CNC_5", "downtime_min": 45, "availability_target": 95, "current_oee": 78 },
+        "expected_outputs": { "root_cause": "tool_wear", "recommendation": "preventive_maintenance", "oee_impact_pct": -5 }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the OEE Optimization Twin. I maximize your production efficiency through continuous monitoring.",
+      "capabilities": ["OEE calculation", "Bottleneck identification", "Root cause analysis", "Process optimization"],
+      "limitations": ["Cannot fix equipment physically", "Depends on sensor accuracy", "Requires process documentation"]
+    },
+    "twin_score": {
+      "overall": 91,
+      "explainability": 92,
+      "reliability": 91,
+      "efficiency": 90
+    }
+  },
+  {
+    "id": "apparel_inventory_allocation",
+    "name": "Fashion Retail Inventory Allocation Twin",
+    "industry": "Apparel & Fashion",
+    "department": "Supply Chain",
+    "twin_type": "operational",
+    "description": "Optimizes inventory allocation across stores and online channels using demand forecasting, trend analysis, and real-time sales velocity to minimize markdowns.",
+    "short_description": "AI-powered fashion inventory allocation and markdown optimization",
+    "badges": ["Retail", "Demand Planning", "Fashion"],
+    "difficulty": "intermediate",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Demand forecasting, inventory allocation, replenishment, markdown optimization",
+      "event_triggers": ["Sales velocity change", "Size/color stockout", "Season transition", "Trend shift"],
+      "data_sources": ["POS System", "E-commerce Platform", "Social Media Trends", "Weather Data", "Fashion Forecasts"],
+      "workflow_steps": [
+        { "id": "analyze", "type": "ml_model", "label": "Analyze sales trends and fashion signals" },
+        { "id": "forecast", "type": "compute", "label": "Forecast demand by SKU and location" },
+        { "id": "allocate", "type": "decision", "label": "Optimize inventory allocation" },
+        { "id": "approve", "type": "human", "label": "Merchandising manager approval" },
+        { "id": "execute", "type": "action", "label": "Execute transfers and replenishment" }
+      ],
+      "human_approval_points": ["Major reallocations", "Early markdowns", "New store openings"],
+      "kpis": [
+        { "name": "Sell-Through Rate", "metric": "percentage", "target": 82 },
+        { "name": "Markdown Reduction", "metric": "percentage", "target": 18 },
+        { "name": "Stockout Reduction", "metric": "percentage", "target": 35 }
+      ],
+      "integrations": ["Oracle Retail", "Manhattan Active Omni", "Edited Fashion Intelligence", "Stylescape"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 5,
+      "top_n": 3,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "fashion-inventory",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "temperature": 0.3,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "historical_sales", "ref": "sales_db" },
+      { "type": "fashion_trends", "ref": "trend_feeds" }
+    ],
+    "connectors": [
+      { "id": "oracle_retail_connector", "mode": "read_write" },
+      { "id": "pos_connector", "mode": "read" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Daily Refresh" },
+        { "id": "fetch_sales", "type": "integration", "label": "Fetch Sales Data" },
+        { "id": "trend_analysis", "type": "ml_model", "label": "Trend Analysis" },
+        { "id": "demand_forecast", "type": "compute", "label": "SKU Demand Forecast" },
+        { "id": "allocation_plan", "type": "decision", "label": "Allocation Optimization" },
+        { "id": "merchandiser_review", "type": "human", "label": "Merchandiser Approval" },
+        { "id": "execute", "type": "integration", "label": "Execute Transfers" },
+        { "id": "log", "type": "audit", "label": "Allocation Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "fetch_sales" },
+        { "from": "fetch_sales", "to": "trend_analysis" },
+        { "from": "trend_analysis", "to": "demand_forecast" },
+        { "from": "demand_forecast", "to": "allocation_plan" },
+        { "from": "allocation_plan", "to": "merchandiser_review" },
+        { "from": "merchandiser_review", "to": "execute" },
+        { "from": "execute", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are a Fashion Retail Inventory Allocation Twin. Analyze sales trends, social signals, and weather to forecast demand by SKU and location. Optimize allocations to maximize sell-through and minimize markdowns. Explain allocation logic clearly.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 90,
+      "runs_per_week": 85,
+      "loaded_cost_per_hour": 85,
+      "accuracy_improvement_pct": 32,
+      "cost_per_error": 18000
+    },
+    "roi_hint": 290,
+    "rating": 4.6,
+    "downloads": 612,
+    "simulation_scripts": [
+      {
+        "scenario": "Viral Product Trend",
+        "inputs": { "sku": "SKU-8765", "social_mentions": 15000, "current_inventory": 850, "projected_demand": 3200 },
+        "expected_outputs": { "reorder_qty": 2500, "allocation": "prioritize_flagship_stores", "markdown_risk": "low" }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Fashion Inventory Twin. I optimize your inventory allocation based on trends and demand.",
+      "capabilities": ["Trend analysis", "Demand forecasting", "Allocation optimization", "Markdown prevention"],
+      "limitations": ["Cannot predict all fashion trends", "Depends on accurate sales data", "Limited by physical inventory"]
+    },
+    "twin_score": {
+      "overall": 87,
+      "explainability": 88,
+      "reliability": 86,
+      "efficiency": 87
+    }
+  }
+]

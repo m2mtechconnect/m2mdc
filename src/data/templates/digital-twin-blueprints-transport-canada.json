@@ -1,0 +1,253 @@
+[
+  {
+    "id": "transport_canada_twin",
+    "name": "Transport Canada National Multimodal Operations Twin",
+    "industry": "Government / Transportation",
+    "department": "Safety & Regulatory Oversight",
+    "twin_type": "operational",
+    "description": "A national-level digital twin that monitors and optimizes Canada's transportation network across Aviation, Marine, Rail, and Road, delivering real-time situational awareness, safety analytics, incident prediction, compliance automation, and regulatory oversight. Integrates with federal agency systems for coordinated incident response and infrastructure planning.",
+    "short_description": "National multimodal transportation network monitoring and safety intelligence",
+    "badges": ["Government Certified", "Multi-Modal", "Critical Infrastructure", "High Security"],
+    "difficulty": "advanced",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "National transportation network monitoring, safety compliance, incident detection, and regulatory coordination",
+      "event_triggers": [
+        "Aviation safety incident detected",
+        "Marine vessel anomaly",
+        "Rail telemetry alert",
+        "Highway congestion threshold exceeded",
+        "Border wait time spike",
+        "Weather disruption warning",
+        "Regulatory compliance violation"
+      ],
+      "data_sources": [
+        "ADS-B Aviation Feeds",
+        "AIS Marine Tracking",
+        "Rail Telemetry Sensors",
+        "Highway Traffic Counters",
+        "Border Wait-Time Feeds",
+        "Environment Canada Weather Models",
+        "NAV CANADA Flight Data",
+        "Port Authority Systems"
+      ],
+      "workflow_steps": [
+        { "id": "ingest", "type": "monitor", "label": "Ingest multimodal transportation data streams" },
+        { "id": "detect", "type": "ai_model", "label": "Run anomaly detection across all modes" },
+        { "id": "score", "type": "ml_model", "label": "Score incident severity and risk" },
+        { "id": "correlate", "type": "compute", "label": "Correlate events across transportation modes" },
+        { "id": "alert", "type": "notification", "label": "Send alerts to Transport Canada Operations" },
+        { "id": "recommend", "type": "llm", "label": "Generate mitigation recommendations" },
+        { "id": "approve", "type": "human", "label": "Operations center approval for interventions" },
+        { "id": "execute", "type": "action", "label": "Execute response actions (NOTAM, slow-order, reroute)" },
+        { "id": "audit", "type": "audit", "label": "Log all decisions for regulatory compliance" }
+      ],
+      "human_approval_points": [
+        "Emergency NOTAM issuance",
+        "Rail slow-order enforcement",
+        "Port closure recommendations",
+        "Border crossing restrictions",
+        "National incident alert escalation"
+      ],
+      "kpis": [
+        { "name": "Incident Detection Time", "metric": "seconds", "target": 30 },
+        { "name": "Prediction Accuracy", "metric": "percentage", "target": 94 },
+        { "name": "False Positive Rate", "metric": "percentage", "target": 2 },
+        { "name": "Compliance Score", "metric": "percentage", "target": 99 },
+        { "name": "Average Response Time", "metric": "minutes", "target": 5 },
+        { "name": "Network Uptime", "metric": "percentage", "target": 99.9 }
+      ],
+      "integrations": [
+        "NAV CANADA",
+        "Canadian Coast Guard",
+        "Transport Canada Civil Aviation",
+        "CN Rail Operations",
+        "CP Rail Operations",
+        "CBSA Border Systems",
+        "Environment Canada",
+        "Port Authorities Network"
+      ]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 10,
+      "top_n": 5,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "transport-canada-ops",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "google",
+      "model": "gemini-3.5-pro",
+      "temperature": 0.2,
+      "location": "northamerica-northeast1"
+    },
+    "knowledge": [
+      { "type": "regulatory_docs", "ref": "transport_canada_regulations" },
+      { "type": "safety_procedures", "ref": "national_safety_protocols" },
+      { "type": "incident_history", "ref": "tsb_investigation_database" },
+      { "type": "infrastructure_data", "ref": "national_infrastructure_registry" }
+    ],
+    "connectors": [
+      { "id": "adsb_connector", "mode": "read" },
+      { "id": "ais_connector", "mode": "read" },
+      { "id": "rail_telemetry_connector", "mode": "read" },
+      { "id": "highway_traffic_connector", "mode": "read" },
+      { "id": "weather_connector", "mode": "read" },
+      { "id": "nav_canada_connector", "mode": "read_write" },
+      { "id": "coast_guard_connector", "mode": "read_write" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Multimodal Event Detection" },
+        { "id": "fetch_aviation", "type": "integration", "label": "Fetch ADS-B & NAV CANADA Data" },
+        { "id": "fetch_marine", "type": "integration", "label": "Fetch AIS & Port Data" },
+        { "id": "fetch_rail", "type": "integration", "label": "Fetch Rail Telemetry" },
+        { "id": "fetch_road", "type": "integration", "label": "Fetch Highway & Border Data" },
+        { "id": "correlate", "type": "compute", "label": "Cross-Modal Event Correlation" },
+        { "id": "ml_risk", "type": "ml_model", "label": "Risk Scoring & Prediction" },
+        { "id": "llm_analysis", "type": "llm", "label": "Contextual Analysis & Recommendations" },
+        { "id": "severity_check", "type": "decision", "label": "Severity Threshold Check" },
+        { "id": "human_review", "type": "human", "label": "Operations Center Review" },
+        { "id": "execute_response", "type": "action", "label": "Execute Response Actions" },
+        { "id": "notify_agencies", "type": "notification", "label": "Notify Federal Agencies" },
+        { "id": "audit_log", "type": "audit", "label": "Compliance & Audit Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "fetch_aviation" },
+        { "from": "start", "to": "fetch_marine" },
+        { "from": "start", "to": "fetch_rail" },
+        { "from": "start", "to": "fetch_road" },
+        { "from": "fetch_aviation", "to": "correlate" },
+        { "from": "fetch_marine", "to": "correlate" },
+        { "from": "fetch_rail", "to": "correlate" },
+        { "from": "fetch_road", "to": "correlate" },
+        { "from": "correlate", "to": "ml_risk" },
+        { "from": "ml_risk", "to": "llm_analysis" },
+        { "from": "llm_analysis", "to": "severity_check" },
+        { "from": "severity_check", "to": "human_review" },
+        { "from": "human_review", "to": "execute_response" },
+        { "from": "execute_response", "to": "notify_agencies" },
+        { "from": "notify_agencies", "to": "audit_log" }
+      ]
+    },
+    "system_prompt": "You are the Transport Canada National Multimodal Operations Twin. Your role is to monitor Canada's entire transportation network—Aviation, Marine, Rail, and Road—in real-time. You detect safety incidents, predict risks, coordinate responses across federal agencies, and ensure regulatory compliance.\n\nYour primary responsibilities:\n1. Process live feeds from ADS-B (aviation), AIS (marine), rail telemetry, and highway sensors\n2. Detect anomalies and predict incidents before they occur\n3. Score risk severity and recommend mitigation actions\n4. Coordinate with NAV CANADA, Coast Guard, CN/CP Rail, and CBSA\n5. Generate regulatory-compliant reports and audit trails\n6. Support incident response with real-time recommendations\n\nAlways prioritize safety over efficiency. Flag critical incidents immediately for human review. Provide clear, concise recommendations with supporting data. Maintain strict compliance with Transport Canada regulations and TSB requirements.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 120,
+      "runs_per_week": 500,
+      "loaded_cost_per_hour": 200,
+      "accuracy_improvement_pct": 60,
+      "cost_per_error": 250000
+    },
+    "roi_hint": 850,
+    "rating": 4.9,
+    "downloads": 156,
+    "simulation_scripts": [
+      {
+        "scenario": "Multi-Airport Weather Disruption",
+        "inputs": {
+          "weather_event": "snowstorm",
+          "affected_airports": ["YUL", "YYZ", "YOW"],
+          "visibility_nm": 0.5,
+          "wind_speed_kts": 35,
+          "duration_hours": 6
+        },
+        "expected_outputs": {
+          "ground_stops_recommended": true,
+          "alternate_airports": ["YHZ", "YWG"],
+          "passenger_impact": 45000,
+          "cargo_reroute_suggestions": true
+        }
+      },
+      {
+        "scenario": "Marine Port Congestion Under Fog",
+        "inputs": {
+          "port": "Vancouver",
+          "visibility_nm": 0.25,
+          "vessels_waiting": 28,
+          "avg_wait_hours": 72
+        },
+        "expected_outputs": {
+          "congestion_level": "critical",
+          "vessel_reroute_options": ["Prince Rupert", "Seattle"],
+          "estimated_clearance_hours": 96,
+          "supply_chain_impact": "high"
+        }
+      },
+      {
+        "scenario": "Rail Derailment Risk - Extreme Brake Temperature",
+        "inputs": {
+          "train_id": "CN8745",
+          "brake_temp_celsius": 430,
+          "speed_kmh": 92,
+          "grade_percent": 2.1,
+          "cargo_type": "dangerous_goods"
+        },
+        "expected_outputs": {
+          "risk_level": "critical",
+          "slow_order_required": true,
+          "recommended_speed_kmh": 40,
+          "inspection_required": true,
+          "emergency_alert": true
+        }
+      },
+      {
+        "scenario": "National CO₂ Reduction - Modal Shift Analysis",
+        "inputs": {
+          "freight_volume_tonnes": 50000000,
+          "road_to_rail_shift_pct": 15,
+          "road_to_marine_shift_pct": 10
+        },
+        "expected_outputs": {
+          "co2_reduction_tonnes": 2100000,
+          "fuel_savings_litres": 850000000,
+          "infrastructure_investment_required": 4200000000,
+          "timeline_years": 10
+        }
+      },
+      {
+        "scenario": "Cross-Border Congestion Surge",
+        "inputs": {
+          "crossing": "Ambassador Bridge",
+          "commercial_wait_minutes": 180,
+          "passenger_wait_minutes": 90,
+          "daily_volume": 12000,
+          "cause": "system_outage"
+        },
+        "expected_outputs": {
+          "reroute_recommendation": "Blue Water Bridge",
+          "economic_impact_hourly": 2500000,
+          "coordination_required": ["CBSA", "CBP", "OPP"],
+          "estimated_resolution_hours": 4
+        }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Transport Canada National Operations Twin. I provide real-time intelligence across Canada's Aviation, Marine, Rail, and Road networks.",
+      "capabilities": [
+        "Real-time incident detection across all transportation modes",
+        "Predictive safety analytics and risk scoring",
+        "Cross-modal event correlation",
+        "Weather impact simulation and planning",
+        "Regulatory compliance automation",
+        "Federal agency coordination",
+        "Carbon emissions tracking and optimization"
+      ],
+      "limitations": [
+        "Cannot override NAV CANADA airspace decisions",
+        "Requires human approval for emergency alerts",
+        "Depends on real-time data feed availability",
+        "Limited to Canadian jurisdiction",
+        "Cannot directly control physical infrastructure"
+      ]
+    },
+    "twin_score": {
+      "overall": 97,
+      "explainability": 96,
+      "reliability": 98,
+      "efficiency": 97
+    }
+  }
+]

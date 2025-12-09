@@ -1,0 +1,317 @@
+[
+  {
+    "id": "insurance_claims_processing",
+    "name": "Auto Insurance Claims Processing Twin",
+    "industry": "Insurance",
+    "department": "Operations",
+    "twin_type": "operational",
+    "description": "Automates end-to-end auto insurance claims processing from FNOL through adjudication, leveraging AI for damage assessment, fraud detection, and settlement calculation.",
+    "short_description": "Automated claims intake, assessment, and settlement",
+    "badges": ["Certified", "High Throughput"],
+    "difficulty": "intermediate",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Claims intake, damage assessment, fraud check, approval, payment",
+      "event_triggers": ["FNOL submission", "Photo upload", "Repair estimate received", "Fraud flag"],
+      "data_sources": ["Claims Management System", "Photo Analysis AI", "Fraud Detection Engine", "Policy Database"],
+      "workflow_steps": [
+        { "id": "intake", "type": "process", "label": "Process FNOL and gather initial data" },
+        { "id": "assess", "type": "ai_vision", "label": "AI assessment of damage photos" },
+        { "id": "fraud_check", "type": "ml_model", "label": "Run fraud detection algorithms" },
+        { "id": "calculate", "type": "compute", "label": "Calculate settlement amount" },
+        { "id": "approve", "type": "human", "label": "Adjuster approval for complex cases" },
+        { "id": "pay", "type": "action", "label": "Issue payment" }
+      ],
+      "human_approval_points": ["Claims over $25k", "Total loss determinations", "Fraud suspicion"],
+      "kpis": [
+        { "name": "Claims Processing Time", "metric": "hours", "target": 24 },
+        { "name": "Straight-Through Processing Rate", "metric": "percentage", "target": 65 },
+        { "name": "Customer Satisfaction", "metric": "score", "target": 4.2 }
+      ],
+      "integrations": ["Guidewire ClaimCenter", "Tractable AI", "ISO ClaimSearch"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 5,
+      "top_n": 3,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "insurance-claims",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "temperature": 0.2,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "policy_docs", "ref": "auto_policy_db" },
+      { "type": "repair_costs", "ref": "mitchell_database" }
+    ],
+    "connectors": [
+      { "id": "guidewire_connector", "mode": "read_write" },
+      { "id": "payment_connector", "mode": "write" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "FNOL Received" },
+        { "id": "extract_data", "type": "integration", "label": "Extract Claim Data" },
+        { "id": "ai_assessment", "type": "ai_vision", "label": "AI Damage Assessment" },
+        { "id": "fraud_check", "type": "ml_model", "label": "Fraud Detection" },
+        { "id": "calculate_settlement", "type": "llm", "label": "Calculate Settlement" },
+        { "id": "adjuster_review", "type": "human", "label": "Adjuster Review (if needed)" },
+        { "id": "issue_payment", "type": "integration", "label": "Issue Payment" },
+        { "id": "log", "type": "audit", "label": "Audit Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "extract_data" },
+        { "from": "extract_data", "to": "ai_assessment" },
+        { "from": "ai_assessment", "to": "fraud_check" },
+        { "from": "fraud_check", "to": "calculate_settlement" },
+        { "from": "calculate_settlement", "to": "adjuster_review" },
+        { "from": "adjuster_review", "to": "issue_payment" },
+        { "from": "issue_payment", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are an Auto Insurance Claims Processing Twin. Your role is to streamline claims from first notice of loss through payment. You assess damage using AI vision, detect fraud patterns, calculate accurate settlements, and route complex cases to human adjusters. Always explain your settlement calculations clearly and flag any inconsistencies that require human review.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 90,
+      "runs_per_week": 300,
+      "loaded_cost_per_hour": 95,
+      "accuracy_improvement_pct": 40,
+      "cost_per_error": 3500
+    },
+    "roi_hint": 340,
+    "rating": 4.7,
+    "downloads": 1124,
+    "simulation_scripts": [
+      {
+        "scenario": "Minor Fender Bender",
+        "inputs": { "damage_severity": "minor", "repair_estimate": 2800, "fraud_score": 15 },
+        "expected_outputs": { "approval": "auto", "settlement": 2800, "processing_time_hours": 4 }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Claims Processing Twin. I handle auto insurance claims from start to finish.",
+      "capabilities": ["FNOL processing", "AI damage assessment", "Fraud detection", "Settlement calculation"],
+      "limitations": ["Cannot override policy terms", "Requires adjuster review for complex cases", "Depends on quality photo submissions"]
+    },
+    "twin_score": {
+      "overall": 89,
+      "explainability": 91,
+      "reliability": 88,
+      "efficiency": 88
+    }
+  },
+  {
+    "id": "pharma_gmp_compliance",
+    "name": "GMP Compliance & Deviation Management Twin",
+    "industry": "Pharmaceuticals",
+    "department": "Compliance & Risk",
+    "twin_type": "compliance",
+    "description": "Monitors manufacturing processes for GMP compliance, detects deviations in real-time, initiates CAPA workflows, and generates audit-ready reports for FDA inspections.",
+    "short_description": "Real-time GMP compliance monitoring and deviation management",
+    "badges": ["Certified", "FDA Compliant", "Pharmaceutical Grade"],
+    "difficulty": "advanced",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Manufacturing process monitoring, deviation detection, CAPA initiation, audit trail",
+      "event_triggers": ["Parameter out of spec", "Equipment malfunction", "Environmental alert", "Batch review trigger"],
+      "data_sources": ["Manufacturing Execution System", "Environmental Monitoring", "LIMS", "QMS"],
+      "workflow_steps": [
+        { "id": "monitor", "type": "monitor", "label": "Continuous monitoring of critical parameters" },
+        { "id": "detect", "type": "anomaly", "label": "Detect deviations from specifications" },
+        { "id": "classify", "type": "decision", "label": "Classify deviation severity" },
+        { "id": "initiate_capa", "type": "process", "label": "Initiate CAPA workflow" },
+        { "id": "investigate", "type": "human", "label": "Quality engineer investigation" },
+        { "id": "report", "type": "audit", "label": "Generate compliance report" }
+      ],
+      "human_approval_points": ["Critical deviation classification", "Batch disposition decision", "CAPA closure"],
+      "kpis": [
+        { "name": "Deviation Detection Time", "metric": "minutes", "target": 5 },
+        { "name": "CAPA Closure Rate", "metric": "percentage", "target": 95 },
+        { "name": "Audit Readiness Score", "metric": "score", "target": 98 }
+      ],
+      "integrations": ["Siemens Opcenter", "TrackWise CAPA", "Waters LIMS"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 8,
+      "top_n": 4,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "gmp-compliance",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5",
+      "temperature": 0.1,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "regulatory_docs", "ref": "21cfr210_211" },
+      { "type": "sops", "ref": "manufacturing_sops" },
+      { "type": "historical_deviations", "ref": "deviation_db" }
+    ],
+    "connectors": [
+      { "id": "mes_connector", "mode": "read" },
+      { "id": "qms_connector", "mode": "read_write" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Parameter Alert" },
+        { "id": "fetch_context", "type": "integration", "label": "Fetch Batch & Equipment Data" },
+        { "id": "classify_deviation", "type": "llm", "label": "Classify Deviation Severity" },
+        { "id": "initiate_capa", "type": "integration", "label": "Create CAPA Record" },
+        { "id": "notify_qe", "type": "notification", "label": "Notify Quality Engineer" },
+        { "id": "track_investigation", "type": "monitor", "label": "Track Investigation Progress" },
+        { "id": "audit_log", "type": "audit", "label": "FDA Audit Trail" }
+      ],
+      "edges": [
+        { "from": "start", "to": "fetch_context" },
+        { "from": "fetch_context", "to": "classify_deviation" },
+        { "from": "classify_deviation", "to": "initiate_capa" },
+        { "from": "initiate_capa", "to": "notify_qe" },
+        { "from": "notify_qe", "to": "track_investigation" },
+        { "from": "track_investigation", "to": "audit_log" }
+      ]
+    },
+    "system_prompt": "You are a GMP Compliance Twin for pharmaceutical manufacturing. Your role is to continuously monitor critical process parameters, detect deviations from specifications, classify their severity, and initiate appropriate CAPA workflows. You must maintain complete audit trails for FDA inspections and provide clear, evidence-based justifications for all classification decisions. Always prioritize patient safety and regulatory compliance.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 120,
+      "runs_per_week": 85,
+      "loaded_cost_per_hour": 140,
+      "accuracy_improvement_pct": 60,
+      "cost_per_error": 75000
+    },
+    "roi_hint": 380,
+    "rating": 4.9,
+    "downloads": 687,
+    "simulation_scripts": [
+      {
+        "scenario": "Temperature Excursion",
+        "inputs": { "parameter": "temperature", "target": 25, "actual": 28.5, "duration_min": 45 },
+        "expected_outputs": { "severity": "major", "capa_initiated": true, "batch_hold": true, "notification_sent": true }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the GMP Compliance Twin. I monitor your manufacturing processes 24/7 and ensure FDA compliance.",
+      "capabilities": ["Real-time parameter monitoring", "Deviation classification", "CAPA workflow automation", "Audit trail generation"],
+      "limitations": ["Cannot approve batch release", "Requires QA engineer for final disposition", "Limited to configured parameters"]
+    },
+    "twin_score": {
+      "overall": 95,
+      "explainability": 97,
+      "reliability": 96,
+      "efficiency": 93
+    }
+  },
+  {
+    "id": "logistics_route_optimization",
+    "name": "Dynamic Fleet Route Optimization Twin",
+    "industry": "Transportation & Logistics",
+    "department": "Operations",
+    "twin_type": "operational",
+    "description": "Optimizes delivery routes in real-time based on traffic, weather, vehicle capacity, and customer time windows. Reduces fuel costs and improves on-time delivery rates.",
+    "short_description": "AI-powered dynamic route optimization for delivery fleets",
+    "badges": ["Popular", "Sustainability", "Cost Savings"],
+    "difficulty": "intermediate",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Route planning, dispatch, real-time rerouting, delivery confirmation",
+      "event_triggers": ["New order received", "Traffic incident", "Vehicle breakdown", "Delivery completed"],
+      "data_sources": ["TMS", "GPS Telematics", "Traffic API", "Weather API", "Customer Portal"],
+      "workflow_steps": [
+        { "id": "plan", "type": "compute", "label": "Generate optimal route plan" },
+        { "id": "assign", "type": "decision", "label": "Assign routes to vehicles" },
+        { "id": "dispatch", "type": "action", "label": "Dispatch drivers with route instructions" },
+        { "id": "monitor", "type": "monitor", "label": "Monitor GPS and traffic conditions" },
+        { "id": "reroute", "type": "decision", "label": "Dynamic rerouting when needed" },
+        { "id": "confirm", "type": "action", "label": "Confirm delivery and update status" }
+      ],
+      "human_approval_points": ["High-cost rerouting decisions", "Customer escalations"],
+      "kpis": [
+        { "name": "On-Time Delivery Rate", "metric": "percentage", "target": 96 },
+        { "name": "Fuel Cost Reduction", "metric": "percentage", "target": 18 },
+        { "name": "Miles per Delivery", "metric": "ratio", "target": 8.2 }
+      ],
+      "integrations": ["Oracle TMS", "Samsara Telematics", "Google Maps API"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 5,
+      "top_n": 3,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "logistics-routes",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "temperature": 0.3,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "historical_routes", "ref": "route_history_db" },
+      { "type": "customer_preferences", "ref": "customer_db" }
+    ],
+    "connectors": [
+      { "id": "tms_connector", "mode": "read_write" },
+      { "id": "telematics_connector", "mode": "read" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Order Batch Ready" },
+        { "id": "fetch_data", "type": "integration", "label": "Fetch Orders, Vehicles, Traffic" },
+        { "id": "optimize_routes", "type": "compute", "label": "Generate Optimal Routes" },
+        { "id": "assign_drivers", "type": "decision", "label": "Assign Routes to Drivers" },
+        { "id": "monitor_fleet", "type": "monitor", "label": "Monitor Real-Time Progress" },
+        { "id": "reroute_if_needed", "type": "decision", "label": "Dynamic Rerouting" },
+        { "id": "log", "type": "audit", "label": "Log Performance Metrics" }
+      ],
+      "edges": [
+        { "from": "start", "to": "fetch_data" },
+        { "from": "fetch_data", "to": "optimize_routes" },
+        { "from": "optimize_routes", "to": "assign_drivers" },
+        { "from": "assign_drivers", "to": "monitor_fleet" },
+        { "from": "monitor_fleet", "to": "reroute_if_needed" },
+        { "from": "reroute_if_needed", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are a Fleet Route Optimization Twin. Your role is to create and continuously optimize delivery routes that minimize fuel costs, respect customer time windows, and maximize on-time delivery rates. You monitor real-time traffic and weather conditions and make dynamic rerouting decisions. Always explain the reasoning behind route changes and flag when human approval is needed for costly reroutes.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 35,
+      "runs_per_week": 120,
+      "loaded_cost_per_hour": 75,
+      "accuracy_improvement_pct": 30,
+      "cost_per_error": 450
+    },
+    "roi_hint": 265,
+    "rating": 4.6,
+    "downloads": 1456,
+    "simulation_scripts": [
+      {
+        "scenario": "Traffic Incident Reroute",
+        "inputs": { "active_routes": 12, "incident_location": "I-95 mile 42", "affected_vehicles": 3 },
+        "expected_outputs": { "reroute_count": 3, "avg_delay_min": 8, "fuel_cost_increase": 45 }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Fleet Route Optimization Twin. I plan and optimize delivery routes for your entire fleet.",
+      "capabilities": ["Multi-stop route planning", "Real-time traffic monitoring", "Dynamic rerouting", "Fuel cost optimization"],
+      "limitations": ["Cannot override driver safety rules", "Depends on accurate GPS data", "Requires traffic API access"]
+    },
+    "twin_score": {
+      "overall": 88,
+      "explainability": 89,
+      "reliability": 87,
+      "efficiency": 89
+    }
+  }
+]

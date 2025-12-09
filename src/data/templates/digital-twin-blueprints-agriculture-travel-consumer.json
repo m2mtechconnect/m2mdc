@@ -1,0 +1,318 @@
+[
+  {
+    "id": "agriculture_crop_yield_optimization",
+    "name": "Precision Agriculture Yield Optimization Twin",
+    "industry": "Agriculture",
+    "department": "Operations",
+    "twin_type": "predictive",
+    "description": "Optimizes crop yields using IoT sensors, weather data, soil analysis, and satellite imagery to recommend precise irrigation, fertilization, and harvest timing.",
+    "short_description": "AI-powered precision agriculture and yield optimization",
+    "badges": ["Certified", "Sustainability", "IoT"],
+    "difficulty": "advanced",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Field monitoring, yield prediction, resource optimization, harvest planning",
+      "event_triggers": ["Weather change", "Soil moisture alert", "Growth stage transition", "Pest detection"],
+      "data_sources": ["IoT Sensors", "Weather API", "Satellite Imagery", "Soil Analysis", "Historical Yields"],
+      "workflow_steps": [
+        { "id": "monitor", "type": "monitor", "label": "Monitor field conditions via IoT" },
+        { "id": "analyze", "type": "ml_model", "label": "Analyze crop health and predict yield" },
+        { "id": "optimize", "type": "decision", "label": "Generate optimization recommendations" },
+        { "id": "approve", "type": "human", "label": "Agronomist approval for major changes" },
+        { "id": "execute", "type": "action", "label": "Execute irrigation/fertilization plan" }
+      ],
+      "human_approval_points": ["Major chemical applications", "Harvest timing changes", "Experimental treatments"],
+      "kpis": [
+        { "name": "Yield Increase", "metric": "percentage", "target": 18 },
+        { "name": "Water Usage Reduction", "metric": "percentage", "target": 25 },
+        { "name": "Fertilizer Efficiency", "metric": "percentage", "target": 30 }
+      ],
+      "integrations": ["John Deere Operations Center", "Climate FieldView", "AWS IoT", "Planet Labs"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 5,
+      "top_n": 3,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "agriculture-crop",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "temperature": 0.3,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "agronomic_data", "ref": "crop_research_db" },
+      { "type": "historical_yields", "ref": "farm_records" }
+    ],
+    "connectors": [
+      { "id": "jd_operations_connector", "mode": "read_write" },
+      { "id": "iot_sensor_connector", "mode": "read" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Field Event" },
+        { "id": "fetch_data", "type": "integration", "label": "Fetch Sensor & Satellite Data" },
+        { "id": "ml_analysis", "type": "ml_model", "label": "Crop Health Analysis" },
+        { "id": "yield_predict", "type": "llm", "label": "Yield Prediction" },
+        { "id": "optimize", "type": "decision", "label": "Resource Optimization" },
+        { "id": "agronomist_review", "type": "human", "label": "Agronomist Approval" },
+        { "id": "execute", "type": "integration", "label": "Execute Plan" },
+        { "id": "log", "type": "audit", "label": "Operations Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "fetch_data" },
+        { "from": "fetch_data", "to": "ml_analysis" },
+        { "from": "ml_analysis", "to": "yield_predict" },
+        { "from": "yield_predict", "to": "optimize" },
+        { "from": "optimize", "to": "agronomist_review" },
+        { "from": "agronomist_review", "to": "execute" },
+        { "from": "execute", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are a Precision Agriculture Twin. Monitor field conditions, predict crop yields, and optimize resource usage (water, fertilizer, pesticides). Prioritize sustainability and profitability. Explain recommendations with data-backed rationale.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 60,
+      "runs_per_week": 85,
+      "loaded_cost_per_hour": 75,
+      "accuracy_improvement_pct": 40,
+      "cost_per_error": 15000
+    },
+    "roi_hint": 320,
+    "rating": 4.7,
+    "downloads": 634,
+    "simulation_scripts": [
+      {
+        "scenario": "Drought Conditions",
+        "inputs": { "soil_moisture_pct": 18, "temperature_f": 95, "days_since_rain": 12 },
+        "expected_outputs": { "irrigation_recommended": true, "water_amount_inches": 1.2, "timing": "early_morning" }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Precision Agriculture Twin. I optimize your crop yields using AI and real-time field data.",
+      "capabilities": ["Yield prediction", "Resource optimization", "Weather integration", "Pest monitoring"],
+      "limitations": ["Cannot control weather", "Depends on sensor accuracy", "Requires agronomic validation"]
+    },
+    "twin_score": {
+      "overall": 90,
+      "explainability": 91,
+      "reliability": 89,
+      "efficiency": 90
+    }
+  },
+  {
+    "id": "travel_revenue_optimization",
+    "name": "Airline Revenue Management Twin",
+    "industry": "Travel & Transportation",
+    "department": "Finance",
+    "twin_type": "financial",
+    "description": "Optimizes airline ticket pricing and seat inventory using demand forecasting, competitor analysis, and dynamic pricing algorithms to maximize revenue per flight.",
+    "short_description": "Dynamic pricing and revenue optimization for airlines",
+    "badges": ["Revenue Management", "Dynamic Pricing"],
+    "difficulty": "advanced",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Demand forecasting, pricing optimization, inventory allocation, revenue tracking",
+      "event_triggers": ["Booking activity surge", "Competitor price change", "Seasonal shift", "Flight schedule change"],
+      "data_sources": ["Reservation System", "Pricing Engine", "Competitor Fares", "Market Demand Data"],
+      "workflow_steps": [
+        { "id": "forecast", "type": "ml_model", "label": "Forecast demand by route and date" },
+        { "id": "analyze", "type": "compute", "label": "Analyze competitor pricing" },
+        { "id": "optimize", "type": "decision", "label": "Calculate optimal pricing strategy" },
+        { "id": "approve", "type": "human", "label": "Revenue manager approval for major changes" },
+        { "id": "execute", "type": "action", "label": "Update pricing across channels" }
+      ],
+      "human_approval_points": ["Major fare changes", "Capacity adjustments", "Promotional campaigns"],
+      "kpis": [
+        { "name": "Revenue per Available Seat Mile", "metric": "dollars", "target": 0.14 },
+        { "name": "Load Factor", "metric": "percentage", "target": 84 },
+        { "name": "Yield Improvement", "metric": "percentage", "target": 12 }
+      ],
+      "integrations": ["Amadeus Altea", "Sabre AirVision", "PROS Revenue Management", "OAG Schedules"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 7,
+      "top_n": 4,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "airline-revenue",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5",
+      "temperature": 0.2,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "historical_bookings", "ref": "reservation_db" },
+      { "type": "market_intelligence", "ref": "competitor_feeds" }
+    ],
+    "connectors": [
+      { "id": "amadeus_connector", "mode": "read_write" },
+      { "id": "pricing_engine_connector", "mode": "write" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Market Event" },
+        { "id": "fetch_data", "type": "integration", "label": "Fetch Booking & Market Data" },
+        { "id": "demand_forecast", "type": "ml_model", "label": "Demand Forecasting" },
+        { "id": "competitor_analysis", "type": "integration", "label": "Competitor Price Analysis" },
+        { "id": "price_optimization", "type": "compute", "label": "Price Optimization" },
+        { "id": "manager_review", "type": "human", "label": "Manager Approval" },
+        { "id": "update_pricing", "type": "integration", "label": "Update Fares" },
+        { "id": "log", "type": "audit", "label": "Pricing Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "fetch_data" },
+        { "from": "fetch_data", "to": "demand_forecast" },
+        { "from": "demand_forecast", "to": "competitor_analysis" },
+        { "from": "competitor_analysis", "to": "price_optimization" },
+        { "from": "price_optimization", "to": "manager_review" },
+        { "from": "manager_review", "to": "update_pricing" },
+        { "from": "update_pricing", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are an Airline Revenue Management Twin. Forecast demand, analyze competitors, and optimize pricing to maximize revenue per flight. Balance load factors with yield targets. Explain pricing strategies clearly and flag market anomalies.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 90,
+      "runs_per_week": 200,
+      "loaded_cost_per_hour": 135,
+      "accuracy_improvement_pct": 28,
+      "cost_per_error": 95000
+    },
+    "roi_hint": 420,
+    "rating": 4.8,
+    "downloads": 432,
+    "simulation_scripts": [
+      {
+        "scenario": "Peak Season Pricing",
+        "inputs": { "route": "JFK-LAX", "days_to_departure": 14, "current_load_factor": 67, "competitor_avg_price": 425 },
+        "expected_outputs": { "recommended_price": 445, "expected_load_factor": 82, "revenue_impact": 12500 }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Revenue Management Twin. I optimize your airline pricing for maximum profitability.",
+      "capabilities": ["Demand forecasting", "Dynamic pricing", "Competitor analysis", "Yield optimization"],
+      "limitations": ["Cannot guarantee load factors", "Market conditions may override", "Requires accurate demand data"]
+    },
+    "twin_score": {
+      "overall": 92,
+      "explainability": 90,
+      "reliability": 93,
+      "efficiency": 93
+    }
+  },
+  {
+    "id": "consumer_goods_demand_forecasting",
+    "name": "CPG Demand Forecasting & Replenishment Twin",
+    "industry": "Consumer Goods",
+    "department": "Supply Chain",
+    "twin_type": "supply_chain",
+    "description": "Forecasts consumer demand using point-of-sale data, weather patterns, social media trends, and promotional calendars to optimize production and distribution.",
+    "short_description": "AI demand forecasting for consumer packaged goods",
+    "badges": ["Demand Planning", "Supply Chain"],
+    "difficulty": "intermediate",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Demand sensing, forecast generation, production planning, distribution optimization",
+      "event_triggers": ["POS data refresh", "Promotional event", "Weather shift", "Social trend spike"],
+      "data_sources": ["Retailer POS Data", "Weather API", "Social Media Analytics", "Promotional Calendar", "Inventory System"],
+      "workflow_steps": [
+        { "id": "collect", "type": "integration", "label": "Collect POS and market signals" },
+        { "id": "forecast", "type": "ml_model", "label": "Generate demand forecast" },
+        { "id": "plan", "type": "decision", "label": "Create production and distribution plan" },
+        { "id": "approve", "type": "human", "label": "Supply chain director approval" },
+        { "id": "execute", "type": "action", "label": "Update production schedules" }
+      ],
+      "human_approval_points": ["Major production changes", "New product launches", "Supply chain disruptions"],
+      "kpis": [
+        { "name": "Forecast Accuracy", "metric": "percentage", "target": 88 },
+        { "name": "Stock-Out Reduction", "metric": "percentage", "target": 40 },
+        { "name": "Inventory Days", "metric": "days", "target": 18 }
+      ],
+      "integrations": ["SAP IBP", "Oracle Demantra", "Nielsen IQ", "IBM Watson"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 5,
+      "top_n": 3,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "cpg-demand",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "temperature": 0.3,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "historical_sales", "ref": "sales_db" },
+      { "type": "promotional_impact", "ref": "marketing_calendar" }
+    ],
+    "connectors": [
+      { "id": "sap_ibp_connector", "mode": "read_write" },
+      { "id": "pos_data_connector", "mode": "read" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Forecast Cycle" },
+        { "id": "fetch_pos", "type": "integration", "label": "Fetch POS Data" },
+        { "id": "fetch_signals", "type": "integration", "label": "Fetch Market Signals" },
+        { "id": "ml_forecast", "type": "ml_model", "label": "Demand Forecast" },
+        { "id": "production_plan", "type": "decision", "label": "Production Planning" },
+        { "id": "director_approval", "type": "human", "label": "Director Approval" },
+        { "id": "update_systems", "type": "integration", "label": "Update ERP & MES" },
+        { "id": "log", "type": "audit", "label": "Planning Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "fetch_pos" },
+        { "from": "start", "to": "fetch_signals" },
+        { "from": "fetch_pos", "to": "ml_forecast" },
+        { "from": "fetch_signals", "to": "ml_forecast" },
+        { "from": "ml_forecast", "to": "production_plan" },
+        { "from": "production_plan", "to": "director_approval" },
+        { "from": "director_approval", "to": "update_systems" },
+        { "from": "update_systems", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are a CPG Demand Forecasting Twin. Analyze point-of-sale data, weather patterns, social trends, and promotional calendars to predict consumer demand. Optimize production and distribution to minimize stock-outs and excess inventory. Explain forecast drivers clearly.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 120,
+      "runs_per_week": 52,
+      "loaded_cost_per_hour": 95,
+      "accuracy_improvement_pct": 32,
+      "cost_per_error": 45000
+    },
+    "roi_hint": 340,
+    "rating": 4.6,
+    "downloads": 723,
+    "simulation_scripts": [
+      {
+        "scenario": "Summer Beverage Demand",
+        "inputs": { "product": "sports_drink", "temp_forecast": 92, "promotional_event": true, "last_year_sales": 125000 },
+        "expected_outputs": { "forecasted_demand": 168000, "confidence": 0.88, "production_increase_pct": 34 }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the CPG Demand Forecasting Twin. I predict consumer demand and optimize your supply chain.",
+      "capabilities": ["Demand sensing", "ML forecasting", "Production planning", "Distribution optimization"],
+      "limitations": ["Cannot predict black swan events", "Depends on POS data timeliness", "Promotional impacts may vary"]
+    },
+    "twin_score": {
+      "overall": 88,
+      "explainability": 89,
+      "reliability": 87,
+      "efficiency": 88
+    }
+  }
+]

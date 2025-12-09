@@ -1,0 +1,428 @@
+[
+  {
+    "id": "hr_workforce_planning",
+    "name": "Workforce Capacity Planning Twin",
+    "industry": "Healthcare",
+    "department": "HR & Workforce",
+    "twin_type": "workforce",
+    "description": "Optimizes staffing levels using patient volume forecasts, seasonal patterns, and staff availability to ensure adequate coverage while controlling labor costs.",
+    "short_description": "AI-powered workforce planning and shift optimization",
+    "badges": ["Workforce Analytics", "Healthcare"],
+    "difficulty": "intermediate",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Demand forecasting, staffing optimization, shift scheduling, cost management",
+      "event_triggers": ["Volume forecast update", "Staff availability change", "Sick call", "Census spike"],
+      "data_sources": ["EHR System", "Staff Scheduling", "Payroll", "Patient Census", "Historical Patterns"],
+      "workflow_steps": [
+        { "id": "forecast", "type": "ml_model", "label": "Forecast patient volume by department" },
+        { "id": "calculate", "type": "compute", "label": "Calculate required staff hours" },
+        { "id": "schedule", "type": "decision", "label": "Optimize shift assignments" },
+        { "id": "approve", "type": "human", "label": "Nurse manager approval" },
+        { "id": "publish", "type": "action", "label": "Publish schedule and notify staff" }
+      ],
+      "human_approval_points": ["Mandatory overtime", "Float pool usage", "Agency staff requests"],
+      "kpis": [
+        { "name": "Staffing Efficiency", "metric": "percentage", "target": 92 },
+        { "name": "Overtime Cost Reduction", "metric": "percentage", "target": 22 },
+        { "name": "Staff Satisfaction", "metric": "score", "target": 4.1 }
+      ],
+      "integrations": ["Kronos Workforce", "API Healthcare", "Epic EHR", "Workday"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 5,
+      "top_n": 3,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "workforce-planning",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "temperature": 0.3,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "staffing_policies", "ref": "hr_policies" },
+      { "type": "historical_volumes", "ref": "census_db" }
+    ],
+    "connectors": [
+      { "id": "kronos_connector", "mode": "read_write" },
+      { "id": "ehr_connector", "mode": "read" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Scheduling Cycle" },
+        { "id": "fetch_census", "type": "integration", "label": "Fetch Census Data" },
+        { "id": "demand_forecast", "type": "ml_model", "label": "Volume Forecast" },
+        { "id": "staff_calc", "type": "compute", "label": "Staffing Calculation" },
+        { "id": "optimization", "type": "decision", "label": "Schedule Optimization" },
+        { "id": "manager_review", "type": "human", "label": "Manager Approval" },
+        { "id": "publish", "type": "integration", "label": "Publish Schedule" },
+        { "id": "log", "type": "audit", "label": "Staffing Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "fetch_census" },
+        { "from": "fetch_census", "to": "demand_forecast" },
+        { "from": "demand_forecast", "to": "staff_calc" },
+        { "from": "staff_calc", "to": "optimization" },
+        { "from": "optimization", "to": "manager_review" },
+        { "from": "manager_review", "to": "publish" },
+        { "from": "publish", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are a Workforce Capacity Planning Twin. Forecast patient volume, calculate optimal staffing levels, and generate efficient schedules. Balance cost control with quality care. Explain staffing decisions clearly and flag potential coverage gaps.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 180,
+      "runs_per_week": 52,
+      "loaded_cost_per_hour": 85,
+      "accuracy_improvement_pct": 32,
+      "cost_per_error": 12000
+    },
+    "roi_hint": 280,
+    "rating": 4.6,
+    "downloads": 734,
+    "simulation_scripts": [
+      {
+        "scenario": "Flu Season Surge",
+        "inputs": { "expected_census_increase_pct": 25, "available_staff": 85, "required_staff": 108 },
+        "expected_outputs": { "staffing_gap": 23, "recommended_action": "float_pool", "overtime_required_hours": 92 }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Workforce Planning Twin. I optimize your staffing for patient demand and cost efficiency.",
+      "capabilities": ["Volume forecasting", "Staffing optimization", "Schedule generation", "Cost management"],
+      "limitations": ["Cannot predict sudden surges", "Depends on historical patterns", "Staff preferences may conflict"]
+    },
+    "twin_score": {
+      "overall": 88,
+      "explainability": 89,
+      "reliability": 87,
+      "efficiency": 88
+    }
+  },
+  {
+    "id": "sales_sdr_outreach_agent",
+    "name": "SDR Outreach & Lead Qualification Agent",
+    "industry": "SaaS/Software",
+    "department": "Sales & CRM",
+    "twin_type": "sales_agent",
+    "description": "Automates SDR outreach, lead qualification, and meeting scheduling using AI to analyze prospect signals and personalize messaging at scale.",
+    "short_description": "AI-powered SDR automation and lead qualification",
+    "badges": ["Sales Development", "Lead Gen"],
+    "difficulty": "intermediate",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Lead scoring, outreach sequencing, response handling, meeting scheduling, handoff to AE",
+      "event_triggers": ["New lead created", "Email reply", "Website activity", "Demo request"],
+      "data_sources": ["CRM", "Marketing Automation", "Web Analytics", "Intent Data", "Email Platform"],
+      "workflow_steps": [
+        { "id": "score", "type": "ml_model", "label": "Score lead quality and intent" },
+        { "id": "research", "type": "integration", "label": "Enrich lead with company data" },
+        { "id": "personalize", "type": "llm", "label": "Generate personalized outreach" },
+        { "id": "sequence", "type": "decision", "label": "Determine outreach sequence" },
+        { "id": "qualify", "type": "llm", "label": "Qualify responses and schedule meetings" },
+        { "id": "handoff", "type": "action", "label": "Hand off qualified leads to AE" }
+      ],
+      "human_approval_points": ["Enterprise accounts", "Custom messaging", "Strategic accounts"],
+      "kpis": [
+        { "name": "Lead Qualification Rate", "metric": "percentage", "target": 32 },
+        { "name": "Meeting Booking Rate", "metric": "percentage", "target": 18 },
+        { "name": "Response Rate", "metric": "percentage", "target": 24 }
+      ],
+      "integrations": ["Salesforce", "Outreach.io", "ZoomInfo", "Clearbit", "6sense"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 5,
+      "top_n": 3,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "sdr-outreach",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "temperature": 0.4,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "sales_playbooks", "ref": "outreach_templates" },
+      { "type": "competitive_intelligence", "ref": "battlecards" }
+    ],
+    "connectors": [
+      { "id": "salesforce_connector", "mode": "read_write" },
+      { "id": "outreach_connector", "mode": "read_write" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "New Lead" },
+        { "id": "score", "type": "ml_model", "label": "Lead Scoring" },
+        { "id": "enrich", "type": "integration", "label": "Data Enrichment" },
+        { "id": "personalize", "type": "llm", "label": "Personalized Messaging" },
+        { "id": "outreach", "type": "integration", "label": "Execute Sequence" },
+        { "id": "monitor", "type": "monitor", "label": "Monitor Engagement" },
+        { "id": "qualify", "type": "llm", "label": "Qualification" },
+        { "id": "schedule", "type": "action", "label": "Schedule Meeting" },
+        { "id": "handoff", "type": "notification", "label": "Handoff to AE" },
+        { "id": "log", "type": "audit", "label": "Activity Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "score" },
+        { "from": "score", "to": "enrich" },
+        { "from": "enrich", "to": "personalize" },
+        { "from": "personalize", "to": "outreach" },
+        { "from": "outreach", "to": "monitor" },
+        { "from": "monitor", "to": "qualify" },
+        { "from": "qualify", "to": "schedule" },
+        { "from": "schedule", "to": "handoff" },
+        { "from": "handoff", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are an SDR Outreach Agent. Score leads, personalize outreach, qualify prospects, and schedule meetings. Maintain a helpful, value-focused tone. Hand off qualified leads to AEs with clear context. Track outreach effectiveness.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 25,
+      "runs_per_week": 400,
+      "loaded_cost_per_hour": 65,
+      "accuracy_improvement_pct": 40,
+      "cost_per_error": 250
+    },
+    "roi_hint": 380,
+    "rating": 4.7,
+    "downloads": 1123,
+    "simulation_scripts": [
+      {
+        "scenario": "Inbound Demo Request",
+        "inputs": { "lead_source": "website", "company_size": "mid_market", "intent_signal": "pricing_page_visit" },
+        "expected_outputs": { "qualification_status": "qualified", "meeting_booked": true, "handoff_to": "AE_Sarah" }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the SDR Outreach Agent. I qualify leads and book meetings for your sales team.",
+      "capabilities": ["Lead scoring", "Personalized outreach", "Qualification", "Meeting scheduling"],
+      "limitations": ["Cannot replace human relationship building", "Depends on CRM data quality", "Complex deals need human touch"]
+    },
+    "twin_score": {
+      "overall": 87,
+      "explainability": 88,
+      "reliability": 86,
+      "efficiency": 87
+    }
+  },
+  {
+    "id": "executive_kpi_dashboard",
+    "name": "Executive KPI Monitoring & Alert Twin",
+    "industry": "Manufacturing",
+    "department": "Executive",
+    "twin_type": "operational",
+    "description": "Monitors enterprise KPIs in real-time, detects anomalies, and alerts executives to critical business issues requiring immediate attention.",
+    "short_description": "Real-time executive dashboard with intelligent alerting",
+    "badges": ["Business Intelligence", "Executive"],
+    "difficulty": "intermediate",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "KPI aggregation, anomaly detection, executive alerting, drill-down analysis",
+      "event_triggers": ["KPI threshold breach", "Trend deviation", "Critical incident", "Board meeting prep"],
+      "data_sources": ["ERP", "CRM", "Financial Systems", "HR Systems", "Operations Platforms"],
+      "workflow_steps": [
+        { "id": "aggregate", "type": "integration", "label": "Aggregate KPIs from multiple systems" },
+        { "id": "analyze", "type": "ml_model", "label": "Detect anomalies and trends" },
+        { "id": "prioritize", "type": "decision", "label": "Prioritize alerts by business impact" },
+        { "id": "alert", "type": "notification", "label": "Alert executives with context" },
+        { "id": "drill", "type": "action", "label": "Enable drill-down analysis" }
+      ],
+      "human_approval_points": ["Crisis responses", "Major announcements", "Board presentations"],
+      "kpis": [
+        { "name": "Alert Accuracy", "metric": "percentage", "target": 94 },
+        { "name": "Mean Time to Detection", "metric": "minutes", "target": 15 },
+        { "name": "Executive Time Saved", "metric": "hours_per_week", "target": 8 }
+      ],
+      "integrations": ["Tableau", "Power BI", "Looker", "SAP Analytics Cloud", "Domo"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 5,
+      "top_n": 3,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "executive-kpi",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "temperature": 0.2,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "kpi_definitions", "ref": "metrics_catalog" },
+      { "type": "historical_performance", "ref": "data_warehouse" }
+    ],
+    "connectors": [
+      { "id": "tableau_connector", "mode": "read" },
+      { "id": "erp_connector", "mode": "read" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Data Refresh" },
+        { "id": "fetch_kpis", "type": "integration", "label": "Fetch KPIs" },
+        { "id": "anomaly_detect", "type": "ml_model", "label": "Anomaly Detection" },
+        { "id": "impact_assess", "type": "llm", "label": "Business Impact Assessment" },
+        { "id": "priority", "type": "decision", "label": "Alert Prioritization" },
+        { "id": "executive_alert", "type": "notification", "label": "Executive Alert" },
+        { "id": "log", "type": "audit", "label": "Alert Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "fetch_kpis" },
+        { "from": "fetch_kpis", "to": "anomaly_detect" },
+        { "from": "anomaly_detect", "to": "impact_assess" },
+        { "from": "impact_assess", "to": "priority" },
+        { "from": "priority", "to": "executive_alert" },
+        { "from": "executive_alert", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are an Executive KPI Monitoring Twin. Aggregate business metrics, detect anomalies, and alert executives to critical issues. Prioritize by business impact. Provide clear context and drill-down paths for each alert.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 60,
+      "runs_per_week": 120,
+      "loaded_cost_per_hour": 250,
+      "accuracy_improvement_pct": 38,
+      "cost_per_error": 500000
+    },
+    "roi_hint": 520,
+    "rating": 4.8,
+    "downloads": 423,
+    "simulation_scripts": [
+      {
+        "scenario": "Revenue Miss Alert",
+        "inputs": { "kpi": "monthly_revenue", "target": 15000000, "actual": 13500000, "variance_pct": -10 },
+        "expected_outputs": { "alert_severity": "high", "root_cause_hypothesis": "sales_pipeline_slowdown", "action_recommended": "pipeline_review" }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Executive KPI Twin. I keep you informed of critical business metrics and anomalies.",
+      "capabilities": ["KPI aggregation", "Anomaly detection", "Impact analysis", "Intelligent alerting"],
+      "limitations": ["Cannot fix root causes", "Depends on data integration", "Context requires executive judgment"]
+    },
+    "twin_score": {
+      "overall": 90,
+      "explainability": 92,
+      "reliability": 89,
+      "efficiency": 90
+    }
+  },
+  {
+    "id": "manufacturing_quality_predictive",
+    "name": "Manufacturing Quality Prediction Twin",
+    "industry": "Industrial Manufacturing",
+    "department": "Manufacturing",
+    "twin_type": "predictive",
+    "description": "Predicts product quality defects before they occur using real-time sensor data, process parameters, and historical patterns to enable proactive corrections.",
+    "short_description": "Predictive quality control and defect prevention",
+    "badges": ["Quality", "Predictive", "Six Sigma"],
+    "difficulty": "advanced",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Process monitoring, quality prediction, proactive adjustment, defect prevention",
+      "event_triggers": ["Parameter drift", "Tool wear detected", "Environmental change", "Shift change"],
+      "data_sources": ["MES", "Quality Systems", "IoT Sensors", "SPC Charts", "Maintenance Records"],
+      "workflow_steps": [
+        { "id": "monitor", "type": "monitor", "label": "Monitor process parameters in real-time" },
+        { "id": "predict", "type": "ml_model", "label": "Predict quality defect probability" },
+        { "id": "recommend", "type": "decision", "label": "Recommend process adjustments" },
+        { "id": "approve", "type": "human", "label": "Quality engineer approval" },
+        { "id": "adjust", "type": "action", "label": "Adjust process parameters" },
+        { "id": "verify", "type": "monitor", "label": "Verify quality improvement" }
+      ],
+      "human_approval_points": ["Major parameter changes", "Production stops", "Process deviations"],
+      "kpis": [
+        { "name": "Defect Rate Reduction", "metric": "percentage", "target": 42 },
+        { "name": "First Pass Yield", "metric": "percentage", "target": 97 },
+        { "name": "Cost of Poor Quality", "metric": "dollars", "target": 125000 }
+      ],
+      "integrations": ["Rockwell FactoryTalk", "Siemens Opcenter", "Hexagon Q-DAS", "Minitab"]
+    },
+    "rag": {
+      "provider": "pinecone",
+      "hybrid_search": true,
+      "top_k": 5,
+      "top_n": 3,
+      "embedding_model": "text-embedding-3-large",
+      "vector_dim": 1536,
+      "index_name": "quality-prediction",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "temperature": 0.2,
+      "location": "us-central1"
+    },
+    "knowledge": [
+      { "type": "process_specs", "ref": "engineering_docs" },
+      { "type": "defect_history", "ref": "quality_db" }
+    ],
+    "connectors": [
+      { "id": "mes_connector", "mode": "read_write" },
+      { "id": "spc_connector", "mode": "read" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "start", "type": "trigger", "label": "Parameter Change" },
+        { "id": "fetch_data", "type": "integration", "label": "Fetch Process Data" },
+        { "id": "ml_predict", "type": "ml_model", "label": "Quality Prediction" },
+        { "id": "risk_assess", "type": "llm", "label": "Risk Assessment" },
+        { "id": "recommendations", "type": "decision", "label": "Adjustment Recommendations" },
+        { "id": "qe_approval", "type": "human", "label": "QE Approval" },
+        { "id": "adjust", "type": "integration", "label": "Adjust Parameters" },
+        { "id": "verify", "type": "monitor", "label": "Verify Results" },
+        { "id": "log", "type": "audit", "label": "Quality Log" }
+      ],
+      "edges": [
+        { "from": "start", "to": "fetch_data" },
+        { "from": "fetch_data", "to": "ml_predict" },
+        { "from": "ml_predict", "to": "risk_assess" },
+        { "from": "risk_assess", "to": "recommendations" },
+        { "from": "recommendations", "to": "qe_approval" },
+        { "from": "qe_approval", "to": "adjust" },
+        { "from": "adjust", "to": "verify" },
+        { "from": "verify", "to": "log" }
+      ]
+    },
+    "system_prompt": "You are a Manufacturing Quality Prediction Twin. Predict quality defects before they occur using real-time sensor data. Recommend proactive process adjustments. Prioritize defect prevention and cost reduction. Explain predictions with confidence scores and supporting data.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 30,
+      "runs_per_week": 300,
+      "loaded_cost_per_hour": 95,
+      "accuracy_improvement_pct": 52,
+      "cost_per_error": 15000
+    },
+    "roi_hint": 420,
+    "rating": 4.8,
+    "downloads": 612,
+    "simulation_scripts": [
+      {
+        "scenario": "Temperature Drift Detected",
+        "inputs": { "process": "injection_molding", "temperature_c": 238, "target_c": 235, "defect_probability": 0.68 },
+        "expected_outputs": { "adjustment_recommended": true, "new_temperature_c": 235, "defect_reduction_pct": 45 }
+      }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm the Quality Prediction Twin. I prevent defects before they happen.",
+      "capabilities": ["Defect prediction", "Parameter monitoring", "Process adjustment", "SPC analysis"],
+      "limitations": ["Cannot fix equipment issues", "Depends on sensor calibration", "Limited to monitored parameters"]
+    },
+    "twin_score": {
+      "overall": 92,
+      "explainability": 93,
+      "reliability": 92,
+      "efficiency": 91
+    }
+  }
+]

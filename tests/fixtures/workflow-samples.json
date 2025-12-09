@@ -1,0 +1,205 @@
+{
+  "demoOpsNotifier": {
+    "name": "Demo Ops Notifier",
+    "status": "draft",
+    "nodes": [
+      {
+        "id": "an1",
+        "type": "analyze",
+        "x": 120,
+        "y": 160,
+        "config": {
+          "model": "google/gemini-2.5-pro",
+          "grounding": true,
+          "topK": 20,
+          "topN": 6,
+          "temperature": 0.3,
+          "promptTemplate": "Analyze the following content: {{input}}"
+        }
+      },
+      {
+        "id": "cl1",
+        "type": "classify",
+        "x": 380,
+        "y": 160,
+        "config": {
+          "labels": ["incident", "info", "urgent"],
+          "threshold": 0.55,
+          "fallbackLabel": "unclassified"
+        }
+      },
+      {
+        "id": "nt1",
+        "type": "notify_teams",
+        "x": 640,
+        "y": 160,
+        "config": {
+          "channel": "#ops",
+          "template": "New {{label}} detected: {{summary}}",
+          "mentions": [],
+          "attachments": false
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "from_node_id": "an1",
+        "from_port": "output",
+        "to_node_id": "cl1",
+        "to_port": "input"
+      },
+      {
+        "id": "e2",
+        "from_node_id": "cl1",
+        "from_port": "output",
+        "to_node_id": "nt1",
+        "to_port": "input"
+      }
+    ]
+  },
+  "jiraTicketCreator": {
+    "name": "Jira Ticket Creator",
+    "status": "draft",
+    "nodes": [
+      {
+        "id": "an2",
+        "type": "analyze",
+        "x": 100,
+        "y": 180,
+        "config": {
+          "model": "google/gemini-2.5-flash",
+          "grounding": false,
+          "topK": 10,
+          "topN": 3,
+          "temperature": 0.2
+        }
+      },
+      {
+        "id": "cl2",
+        "type": "classify",
+        "x": 340,
+        "y": 180,
+        "config": {
+          "labels": ["bug", "feature", "question"],
+          "threshold": 0.6
+        }
+      },
+      {
+        "id": "jira1",
+        "type": "create_ticket_jira",
+        "x": 580,
+        "y": 180,
+        "config": {
+          "project": "PROJ",
+          "issueType": "Task",
+          "summaryTemplate": "{{label}}: {{summary}}",
+          "descriptionTemplate": "{{content}}",
+          "labels": ["auto-created"],
+          "assignee": null
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e3",
+        "from_node_id": "an2",
+        "from_port": "output",
+        "to_node_id": "cl2",
+        "to_port": "input"
+      },
+      {
+        "id": "e4",
+        "from_node_id": "cl2",
+        "from_port": "output",
+        "to_node_id": "jira1",
+        "to_port": "input"
+      }
+    ]
+  },
+  "salesforceLeadProcessor": {
+    "name": "Salesforce Lead Processor",
+    "status": "draft",
+    "nodes": [
+      {
+        "id": "an3",
+        "type": "analyze",
+        "x": 120,
+        "y": 200,
+        "config": {
+          "model": "google/gemini-2.5-flash",
+          "grounding": true,
+          "topK": 15,
+          "topN": 5,
+          "temperature": 0.25
+        }
+      },
+      {
+        "id": "sf1",
+        "type": "write_salesforce",
+        "x": 400,
+        "y": 200,
+        "config": {
+          "object": "Lead",
+          "fieldMapping": {
+            "FirstName": "{{firstName}}",
+            "LastName": "{{lastName}}",
+            "Company": "{{company}}",
+            "Email": "{{email}}",
+            "Description": "{{summary}}"
+          },
+          "upsertKey": "Email"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e5",
+        "from_node_id": "an3",
+        "from_port": "output",
+        "to_node_id": "sf1",
+        "to_port": "input"
+      }
+    ]
+  },
+  "reportGenerator": {
+    "name": "Report Generator",
+    "status": "draft",
+    "nodes": [
+      {
+        "id": "an4",
+        "type": "analyze",
+        "x": 140,
+        "y": 220,
+        "config": {
+          "model": "google/gemini-2.5-pro",
+          "grounding": true,
+          "topK": 25,
+          "topN": 8,
+          "temperature": 0.4
+        }
+      },
+      {
+        "id": "rpt1",
+        "type": "generate_report",
+        "x": 420,
+        "y": 220,
+        "config": {
+          "format": "PDF",
+          "sections": ["summary", "details", "recommendations"],
+          "includeCitations": true,
+          "delivery": "download"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e6",
+        "from_node_id": "an4",
+        "from_port": "output",
+        "to_node_id": "rpt1",
+        "to_port": "input"
+      }
+    ]
+  }
+}

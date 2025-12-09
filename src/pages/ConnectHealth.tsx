@@ -1,13 +1,13 @@
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Database, Zap } from "lucide-react";
+import { ArrowLeft, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Database, Zap, Activity } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { SectionHeader } from "@/components/ui/section-header";
 import { AccordionSection } from "@/components/ui/accordion-section";
 import DataHealthKPI from "@/components/connect/DataHealthKPI";
 import ZapRunLog from "@/components/connect/ZapRunLog";
+import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
+import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 
 const healthMetrics = [
   { source: "Google Drive", health: 98, issues: 0, lastSync: "2 min ago", docs: 3420, status: "healthy" },
@@ -28,58 +28,58 @@ export default function ConnectHealth() {
   const warningCount = healthMetrics.filter(m => m.status === "warning").length;
 
   return (
-    <div className="min-h-screen bg-background section-padding-lg">
+    <div className="min-h-screen bg-dc-bg-primary section-padding-lg">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <SectionHeader
-          title="Data Health"
-          description="Monitor quality, freshness, and issues across all data sources."
-          action={{
-            label: "Back to Monitor",
-            onClick: () => navigate("/connect/monitor"),
-            variant: "outline"
-          }}
-        />
+        <div className="flex items-center justify-between">
+          <DCSectionHeader
+            title="Data Health"
+            subtitle="Monitor quality, freshness, and issues across all data sources"
+            icon={<Activity className="h-6 w-6" />}
+          />
+          <Button variant="outline" onClick={() => navigate("/connect/monitor")}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Monitor
+          </Button>
+        </div>
 
         {/* Overall Health Card */}
-        <Card className="p-6 bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/20">
+        <DCCard
+          title="Overall System Health"
+          subtitle="Aggregate health score across all data sources"
+          icon={<CheckCircle className="h-5 w-5" />}
+          status={overallHealth >= 90 ? "operational" : overallHealth >= 70 ? "warning" : "critical"}
+        >
           <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold mb-1">Overall System Health</h2>
-              <p className="text-muted-foreground">Aggregate health score across all data sources</p>
-            </div>
             <div className="text-right">
-              <div className="text-5xl font-bold gradient-text">{overallHealth}%</div>
-              <div className="flex items-center gap-1 text-primary text-sm mt-1">
+              <div className="text-5xl font-bold text-dc-cyan">{overallHealth}%</div>
+              <div className="flex items-center gap-1 text-dc-green text-sm mt-1">
                 <TrendingUp className="h-4 w-4" />
                 +2.3% from yesterday
               </div>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-4">
-            <div className="flex items-center gap-3 p-4 bg-card rounded-lg">
-              <CheckCircle className="h-8 w-8 text-primary" />
-              <div>
-                <div className="text-2xl font-bold">{healthMetrics.length - criticalCount - warningCount}</div>
-                <div className="text-xs text-muted-foreground">Healthy Sources</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-4 bg-card rounded-lg">
-              <AlertTriangle className="h-8 w-8 text-secondary" />
-              <div>
-                <div className="text-2xl font-bold">{warningCount}</div>
-                <div className="text-xs text-muted-foreground">Warnings</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-4 bg-card rounded-lg">
-              <AlertTriangle className="h-8 w-8 text-destructive" />
-              <div>
-                <div className="text-2xl font-bold">{criticalCount}</div>
-                <div className="text-xs text-muted-foreground">Critical Issues</div>
-              </div>
-            </div>
+            <DCKPITile
+              label="Healthy Sources"
+              value={(healthMetrics.length - criticalCount - warningCount).toString()}
+              status="normal"
+              icon={<CheckCircle className="h-4 w-4" />}
+            />
+            <DCKPITile
+              label="Warnings"
+              value={warningCount.toString()}
+              status={warningCount > 0 ? "warning" : "normal"}
+              icon={<AlertTriangle className="h-4 w-4" />}
+            />
+            <DCKPITile
+              label="Critical Issues"
+              value={criticalCount.toString()}
+              status={criticalCount > 0 ? "critical" : "normal"}
+              icon={<AlertTriangle className="h-4 w-4" />}
+            />
           </div>
-        </Card>
+        </DCCard>
 
         {/* KPI Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -118,35 +118,26 @@ export default function ConnectHealth() {
         >
           <div className="space-y-3">
             {healthMetrics.map((metric) => (
-              <Card key={metric.source} className="section-padding">
+              <DCCard 
+                key={metric.source} 
+                title={metric.source}
+                icon={metric.source.includes("Zapier") ? <Zap className="h-5 w-5" /> : <Database className="h-5 w-5" />}
+                status={metric.status === "healthy" ? "operational" : metric.status === "warning" ? "warning" : "critical"}
+              >
                 <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center card-gap">
-                    <div className={`h-12 w-12 rounded-lg flex items-center justify-center ${
-                      metric.source.includes("Zapier") ? "bg-primary/10" : "bg-secondary/10"
-                    }`}>
-                      {metric.source.includes("Zapier") ? (
-                        <Zap className="h-6 w-6 text-primary" />
-                      ) : (
-                        <Database className="h-6 w-6 text-secondary" />
-                      )}
-                    </div>
-                    <div>
-                      <h3 className="text-h3">{metric.source}</h3>
-                      <div className="flex gap-2 mt-1">
-                        <Badge variant={
-                          metric.status === "healthy" ? "outline" :
-                          metric.status === "warning" ? "secondary" : "destructive"
-                        } className="text-caption">
-                          {metric.status}
-                        </Badge>
-                        <span className="text-caption text-muted-foreground">
-                          {metric.docs.toLocaleString()} docs
-                        </span>
-                      </div>
-                    </div>
+                  <div className="flex gap-2">
+                    <Badge variant={
+                      metric.status === "healthy" ? "outline" :
+                      metric.status === "warning" ? "secondary" : "destructive"
+                    } className="text-caption">
+                      {metric.status}
+                    </Badge>
+                    <span className="text-caption text-muted-foreground">
+                      {metric.docs.toLocaleString()} docs
+                    </span>
                   </div>
                   <div className="text-right">
-                    <div className="text-h1 gradient-text mb-1">{metric.health}%</div>
+                    <div className="text-2xl font-bold text-dc-cyan mb-1">{metric.health}%</div>
                     <div className="text-caption text-muted-foreground">Health Score</div>
                   </div>
                 </div>
@@ -162,7 +153,7 @@ export default function ConnectHealth() {
                     </div>
                   )}
                 </div>
-              </Card>
+              </DCCard>
             ))}
           </div>
         </AccordionSection>

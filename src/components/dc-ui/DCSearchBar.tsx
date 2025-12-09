@@ -1,6 +1,7 @@
 /**
  * Data Centre Search Bar Component
  * Command console-style search with DC-specific suggestions
+ * Uses Studio design system (light theme)
  */
 
 import { useState, useRef, useEffect } from 'react';
@@ -29,14 +30,14 @@ const dcSuggestions: Suggestion[] = [
 ];
 
 const categoryColors = {
-  thermal: 'text-dc-red bg-dc-red/10 border-dc-red/20',
-  power: 'text-dc-amber bg-dc-amber/10 border-dc-amber/20',
-  gpu: 'text-dc-purple bg-dc-purple/10 border-dc-purple/20',
-  sovereignty: 'text-dc-blue bg-dc-blue/10 border-dc-blue/20',
-  carbon: 'text-dc-green bg-dc-green/10 border-dc-green/20',
-  cooling: 'text-dc-cyan bg-dc-cyan/10 border-dc-cyan/20',
-  network: 'text-dc-blue bg-dc-blue/10 border-dc-blue/20',
-  security: 'text-dc-red bg-dc-red/10 border-dc-red/20',
+  thermal: 'text-destructive bg-destructive/10 border-destructive/20',
+  power: 'text-warning bg-warning/10 border-warning/20',
+  gpu: 'text-accent bg-accent/10 border-accent/20',
+  sovereignty: 'text-info bg-info/10 border-info/20',
+  carbon: 'text-success bg-success/10 border-success/20',
+  cooling: 'text-info bg-info/10 border-info/20',
+  network: 'text-info bg-info/10 border-info/20',
+  security: 'text-destructive bg-destructive/10 border-destructive/20',
 };
 
 export interface DCSearchBarProps {
@@ -64,7 +65,6 @@ export function DCSearchBar({
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Use external value if provided, otherwise use internal state
   const query = externalValue !== undefined ? externalValue : internalQuery;
   const setQuery = (value: string) => {
     if (externalOnChange) {
@@ -74,7 +74,6 @@ export function DCSearchBar({
     }
   };
 
-  // Filter suggestions based on query
   const filteredSuggestions = query.length > 0
     ? dcSuggestions.filter(s => 
         s.query.toLowerCase().includes(query.toLowerCase()) ||
@@ -124,8 +123,8 @@ export function DCSearchBar({
       <form onSubmit={handleSubmit}>
         <div
           className={cn(
-            'relative flex items-center gap-3 rounded-lg border bg-noc-surface transition-all',
-            isFocused ? 'border-primary shadow-glow-cyan' : 'border-noc-border hover:border-noc-border-subtle'
+            'relative flex items-center gap-3 rounded-lg border bg-card transition-all',
+            isFocused ? 'border-primary shadow-md' : 'border-border hover:border-primary/50'
           )}
         >
           <Search className="absolute left-4 h-5 w-5 text-muted-foreground" />
@@ -138,7 +137,7 @@ export function DCSearchBar({
             onFocus={() => { setIsFocused(true); setShowSuggestions(true); }}
             onBlur={() => setIsFocused(false)}
             placeholder={placeholder}
-            className="flex-1 bg-transparent py-4 pl-12 pr-4 text-sm outline-none placeholder:text-muted-foreground"
+            className="flex-1 bg-transparent py-4 pl-12 pr-4 text-sm outline-none placeholder:text-muted-foreground text-card-foreground"
           />
           
           <Button
@@ -155,26 +154,26 @@ export function DCSearchBar({
 
       {/* Suggestions dropdown */}
       {showSuggestions && filteredSuggestions.length > 0 && (
-        <div className="absolute z-50 w-full mt-2 rounded-lg border border-noc-border bg-noc-surface-elevated shadow-elevated overflow-hidden">
-          <div className="p-2 border-b border-noc-border">
+        <div className="absolute z-50 w-full mt-2 rounded-lg border border-border bg-popover shadow-lg overflow-hidden">
+          <div className="p-2 border-b border-border">
             <span className="text-xs text-muted-foreground uppercase tracking-wide">
               Quick commands
             </span>
           </div>
-          <div className="max-h-80 overflow-y-auto scrollbar-thin">
+          <div className="max-h-80 overflow-y-auto">
             {filteredSuggestions.map((suggestion) => {
               const Icon = suggestion.icon;
               return (
                 <button
                   key={suggestion.id}
                   onClick={() => handleSuggestionClick(suggestion)}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-noc-surface transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted transition-colors"
                 >
                   <div className={cn('p-1.5 rounded border', categoryColors[suggestion.category])}>
                     <Icon className="h-4 w-4" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm truncate">{suggestion.query}</p>
+                    <p className="text-sm truncate text-popover-foreground">{suggestion.query}</p>
                   </div>
                   <span className={cn(
                     'text-[10px] uppercase px-1.5 py-0.5 rounded border',
@@ -196,7 +195,7 @@ export function DCSearchBar({
             <button
               key={chip}
               onClick={() => handleChipClick(chip)}
-              className="px-3 py-1 text-xs rounded-full border border-noc-border bg-noc-surface hover:border-primary hover:text-primary transition-colors"
+              className="px-3 py-1 text-xs rounded-full border border-border bg-card hover:border-primary hover:text-primary transition-colors"
             >
               {chip}
             </button>

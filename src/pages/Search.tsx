@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search as SearchIcon, Clock } from "lucide-react";
-import { SectionHeader } from "@/components/ui/section-header";
+import { Search as SearchIcon, Clock, FileSearch } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 import SearchResultsList from "@/components/search/SearchResultsList";
 import SearchFilters from "@/components/search/SearchFilters";
+import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
+import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 
 const mockSearchResults = [
   {
@@ -77,44 +77,61 @@ export default function Search() {
   return (
     <div className="min-h-screen bg-background section-padding-lg">
       <div className="max-w-7xl mx-auto">
-        <SectionHeader
+        <DCSectionHeader
           title="Search"
-          description="Find documents, pages, and apps across all your connected sources."
+          subtitle="Find documents, pages, and apps across all your connected sources."
+          icon={<FileSearch className="h-5 w-5" />}
         />
+
+        {/* Search Stats */}
+        {searchLatency && showResults && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <DCKPITile
+              label="Latency"
+              value={searchLatency.toString()}
+              unit="ms"
+              status={searchLatency < 200 ? "normal" : searchLatency < 400 ? "warning" : "critical"}
+              icon={<Clock className="h-4 w-4" />}
+              compact
+            />
+            <DCKPITile
+              label="Results Found"
+              value={filteredResults.length.toString()}
+              status="normal"
+              icon={<SearchIcon className="h-4 w-4" />}
+              compact
+            />
+            <DCKPITile
+              label="Sources Searched"
+              value="3"
+              status="normal"
+              compact
+            />
+          </div>
+        )}
 
         {/* Search Bar */}
         <form onSubmit={handleSearch} className="mb-8">
-          <Card className="section-padding">
-            <div className="flex gap-3">
-              <div className="relative flex-1">
-                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value.slice(0, 500))}
-                  placeholder="Search across all sources..."
-                  className="pl-12 h-12 text-body"
-                  maxLength={500}
-                />
+          <DCCard noPadding>
+            <div className="p-4">
+              <div className="flex gap-3">
+                <div className="relative flex-1">
+                  <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value.slice(0, 500))}
+                    placeholder="Search across all sources..."
+                    className="pl-12 h-12 text-body bg-dc-bg-card border-dc-border"
+                    maxLength={500}
+                  />
+                </div>
+                <Button type="submit" className="glow-yellow h-12 min-w-[120px]">
+                  Search
+                </Button>
               </div>
-              <Button type="submit" className="glow-yellow h-12 min-w-[120px]">
-                Search
-              </Button>
             </div>
-
-            {/* Search Stats */}
-            {searchLatency && showResults && (
-              <div className="flex items-center gap-4 mt-4 pt-4 border-t border-border">
-                <div className="flex items-center gap-2 text-caption text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>{searchLatency}ms</span>
-                </div>
-                <div className="text-caption text-muted-foreground">
-                  {filteredResults.length} result{filteredResults.length !== 1 ? 's' : ''}
-                </div>
-              </div>
-            )}
-          </Card>
+          </DCCard>
         </form>
 
         {/* Filters */}

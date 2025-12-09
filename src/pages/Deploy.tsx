@@ -3,7 +3,6 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useRBAC } from "@/contexts/RBACContext";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -15,7 +14,11 @@ import {
   XCircle, 
   AlertTriangle, 
   Rocket,
-  ArrowLeft 
+  ArrowLeft,
+  Server,
+  Cpu,
+  Zap,
+  Activity
 } from "lucide-react";
 import {
   Dialog,
@@ -24,6 +27,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { DCCard } from "@/components/dc-ui/DCCard";
+import { DCSectionHeader } from "@/components/dc-ui/DCSectionHeader";
+import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 
 interface SystemSummary {
   name: string;
@@ -467,32 +473,72 @@ export default function Deploy() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate(`/builder?id=${systemId}&step=6`)}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Builder
-        </Button>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold">Final Review & Deploy</h1>
-          <p className="text-muted-foreground">Review your configuration and deploy to production</p>
+    <div className="min-h-screen bg-dc-bg-primary">
+      <div className="container mx-auto p-6 max-w-7xl">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(`/builder?id=${systemId}&step=6`)}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Builder
+          </Button>
+          <div className="flex-1">
+            <h1 className="text-2xl font-semibold flex items-center gap-3 text-foreground">
+              <div className="p-2 rounded-lg bg-dc-cyan/10 border border-dc-cyan/30">
+                <Rocket className="h-6 w-6 text-dc-cyan" />
+              </div>
+              Final Review & Deploy
+            </h1>
+            <p className="text-muted-foreground text-sm mt-1">Review configuration and deploy to production</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/deployments')}
+            className="border-dc-border hover:bg-dc-bg-secondary"
+          >
+            View History
+          </Button>
+          <Badge variant={canDeploy ? "default" : "secondary"} className="bg-dc-cyan/20 text-dc-cyan border-dc-cyan/30">
+            {role || 'user'}
+          </Badge>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate('/deployments')}
-        >
-          View History
-        </Button>
-        <Badge variant={canDeploy ? "default" : "secondary"}>
-          {role || 'user'}
-        </Badge>
-      </div>
+
+        {/* DC KPI Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+          <DCKPITile
+            label="System"
+            value={summary?.name || 'Loading...'}
+            sublabel={summary?.department || 'Subsystem'}
+            status="info"
+            icon={<Server className="h-4 w-4" />}
+          />
+          <DCKPITile
+            label="AI Model"
+            value={summary?.model?.split('/')[1] || 'Not Set'}
+            sublabel={summary?.grounding ? 'Grounded' : 'Standard'}
+            status={summary?.model ? 'normal' : 'warning'}
+            icon={<Cpu className="h-4 w-4" />}
+          />
+          <DCKPITile
+            label="Integrations"
+            value={summary?.connectedTools?.toString() || '0'}
+            sublabel="Connected tools"
+            status={summary?.connectedTools && summary.connectedTools > 0 ? 'normal' : 'info'}
+            icon={<Zap className="h-4 w-4" />}
+          />
+          <DCKPITile
+            label="Validation"
+            value={validationIssues.filter(i => i.severity === 'error').length === 0 ? 'Passed' : 'Issues'}
+            sublabel={`${validationIssues.length} items`}
+            status={validationIssues.filter(i => i.severity === 'error').length === 0 ? 'normal' : 'critical'}
+            icon={<Activity className="h-4 w-4" />}
+          />
+        </div>
 
       {/* Validation Issues - Errors */}
       {validationIssues.filter(i => i.severity === 'error').length > 0 && (
@@ -548,7 +594,7 @@ export default function Deploy() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Summary */}
-        <Card className="glass-panel p-6">
+        <DCCard status="info" className="p-6">
           <h2 className="text-xl font-semibold mb-4">System Configuration</h2>
           
           <div className="space-y-4">
@@ -629,7 +675,7 @@ export default function Deploy() {
               Only managers and executives can deploy systems
             </p>
           )}
-        </Card>
+        </DCCard>
 
         {/* Right: ROI Calculator */}
         <div className="space-y-4">
@@ -680,6 +726,7 @@ export default function Deploy() {
           </div>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }

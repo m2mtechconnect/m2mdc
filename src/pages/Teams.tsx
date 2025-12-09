@@ -22,6 +22,7 @@ import {
   Search,
   Building2,
   HelpCircle,
+  Activity,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -486,7 +487,7 @@ export default function Teams() {
               </DCCard>
             </div>
 
-            {/* Right Column - Role Breakdown & Activity */}
+            {/* Right Column - Role Breakdown, Activity & Simulation Runs */}
             <div className="space-y-6">
               <RoleBreakdownSection 
                 roleBreakdown={roleBreakdown} 
@@ -496,6 +497,32 @@ export default function Teams() {
                 activities={activityLog || []} 
                 onViewAll={() => navigate("/compliance")}
               />
+              
+              {/* Recent Simulation Runs */}
+              <DCCard
+                title="Recent Simulation Runs"
+                icon={<Activity className="h-5 w-5" />}
+                status="operational"
+              >
+                <div className="space-y-3">
+                  {[
+                    { scenario: 'GPU Spike - Training Job', user: 'Sarah Chen', time: '2 hours ago', runId: 'run-001' },
+                    { scenario: 'CRAH Failure - Hot Aisle', user: 'Michael Wong', time: '5 hours ago', runId: 'run-002' },
+                    { scenario: 'Cross-Border Data Violation', user: 'Alex Johnson', time: '1 day ago', runId: 'run-003' },
+                  ].map((run, idx) => (
+                    <div 
+                      key={idx}
+                      className="p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
+                      onClick={() => navigate(`/data-centre-twin?view=simulation&runId=${run.runId}`)}
+                    >
+                      <div className="font-medium text-sm">{run.scenario}</div>
+                      <div className="text-xs text-muted-foreground">
+                        Run by {run.user} – {run.time}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </DCCard>
             </div>
           </div>
         </div>

@@ -20,7 +20,9 @@ import {
   DollarSign,
   Headphones,
   GraduationCap,
+  Activity,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
 import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 
@@ -65,6 +67,7 @@ const helpSections = [
 ];
 
 export default function Help() {
+  const navigate = useNavigate();
   // ROI Calculator State
   const [manualHours, setManualHours] = useState(40);
   const [hourlyCost, setHourlyCost] = useState(75);
@@ -155,6 +158,34 @@ export default function Help() {
           </DCCard>
 
           {/* 4-Section Grid Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Simulation Tutorial Card */}
+            <DCCard
+              title="How to Use the Data Centre Simulation"
+              subtitle="Learn how to run scenarios and interpret KPI deltas"
+              icon={<Activity className="h-5 w-5" />}
+              status="operational"
+              className="lg:col-span-2"
+            >
+              <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Master the simulation engine to test cooling failures, GPU spikes, sovereignty violations, and more. 
+                  Understand how KPI deltas help you evaluate the impact of different scenarios on your data centre operations.
+                </p>
+                <div className="flex gap-2 flex-shrink-0">
+                  <Button onClick={() => navigate('/data-centre-twin?view=simulation&mode=guided')} className="gap-2">
+                    <PlayCircle className="h-4 w-4" />
+                    Open Simulation
+                  </Button>
+                  <Button variant="outline">
+                    Read Documentation
+                  </Button>
+                </div>
+              </div>
+            </DCCard>
+          </div>
+
+          {/* Original 4-Section Grid Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Section 1: Quickstart & Tutorials */}
             <DCCard

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle, Bot } from 'lucide-react';
 import { StandardCard, StandardCardData } from '@/components/shared/StandardCard';
 import { StandardFilters, StandardFiltersState } from '@/components/shared/StandardFilters';
+import { AgentScenarioModal } from './AgentScenarioModal';
 
 export interface Agent {
   id: string;
@@ -54,6 +55,15 @@ export function AgentsGrid({
     statusFilter: 'all',
     showRecommended: false,
   });
+  
+  // Scenario modal state
+  const [scenarioModalOpen, setScenarioModalOpen] = useState(false);
+  const [selectedAgentForScenario, setSelectedAgentForScenario] = useState<Agent | null>(null);
+
+  const handleTestScenario = (agent: Agent) => {
+    setSelectedAgentForScenario(agent);
+    setScenarioModalOpen(true);
+  };
 
   // Apply filters
   const filteredAgents = agents.filter(agent => {
@@ -185,7 +195,6 @@ export function AgentsGrid({
         </p>
       </div>
 
-      {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredAgents.map((agent, index) => {
           const cardData: StandardCardData = {
@@ -212,11 +221,22 @@ export function AgentsGrid({
               onRun={() => onRun(agent)}
               onManage={() => onManage(agent)}
               onDelete={onDelete ? () => onDelete(agent) : undefined}
+              onTestScenario={() => handleTestScenario(agent)}
               animationDelay={index * 30}
             />
           );
         })}
       </div>
+      
+      {/* Agent Scenario Modal */}
+      {selectedAgentForScenario && (
+        <AgentScenarioModal
+          open={scenarioModalOpen}
+          onOpenChange={setScenarioModalOpen}
+          agentId={selectedAgentForScenario.id}
+          agentName={selectedAgentForScenario.name}
+        />
+      )}
     </div>
   );
 }

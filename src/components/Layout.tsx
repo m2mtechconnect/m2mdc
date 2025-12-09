@@ -41,6 +41,7 @@ const allNavigation = [
   { name: "Build Data Centre Twin", href: "/builder", icon: Wrench },
   { name: "Subsystem Agents", href: "/app/agents", icon: Server },
   { name: "Telemetry & Analytics", href: "/intelligence", icon: BarChart3 },
+  { name: "Simulation", href: "/data-centre-twin?view=simulation", icon: Activity },
   { name: "Sovereignty & Safety Audit", href: "/compliance", icon: Shield },
   { name: "Teams", href: "/teams", icon: Users },
   { name: "Help", href: "/help", icon: HelpCircle },

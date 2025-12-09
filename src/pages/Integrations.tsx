@@ -8,14 +8,16 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, Plus, Mail, Database, Activity, TrendingUp, CheckCircle2, AlertTriangle, ShieldAlert } from "lucide-react";
+import { Search, Plus, Mail, Database, Activity, TrendingUp, CheckCircle2, AlertTriangle, ShieldAlert, Plug, Server, Zap } from "lucide-react";
 import { IntegrationCard, IntegrationState, IntegrationCTA } from "@/components/integrations/IntegrationCard";
 import { ZapierConnectModal } from "@/components/integrations/ZapierConnectModal";
 import { IntegrationDrawer } from "@/components/integrations/IntegrationDrawer";
-import KpiCard from '@/components/shared/KpiCard';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useDebounce } from "@/hooks/useDebounce";
+import { DCCard } from "@/components/dc-ui/DCCard";
+import { DCSectionHeader } from "@/components/dc-ui/DCSectionHeader";
+import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 
 type CategoryKey = "all" | "ai_llm" | "rag" | "storage" | "knowledge" | "web" | "crm" | "erp" | "pm" | "comms" | "itsm" | "cloud" | "marketing" | "support" | "analytics";
 type StatusFilter = "all" | "connected" | "not_connected" | "errors";
@@ -707,33 +709,38 @@ export default function Integrations({
         )}
 
         {/* Unified Metrics Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-fade-in">
-          <KpiCard
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 animate-fade-in">
+          <DCKPITile
             label="Active Connections"
-            value={stats.activeConnections}
-            icon={Activity}
+            value={stats.activeConnections.toString()}
+            sublabel="Connected systems"
+            status="normal"
+            icon={<Activity className="h-4 w-4" />}
             trend="up"
-            change="+2"
           />
-          <KpiCard
+          <DCKPITile
             label="Documents Synced"
             value={`${(stats.documentsSynced / 1000).toFixed(1)}k`}
-            icon={Database}
+            sublabel="Data indexed"
+            status="info"
+            icon={<Database className="h-4 w-4" />}
             trend="up"
-            change="+1.2k"
           />
-          <KpiCard
+          <DCKPITile
             label="Sync Success Rate"
             value={`${stats.syncSuccessRate}%`}
-            icon={TrendingUp}
-            trend="up"
-            change="+0.8%"
+            sublabel="Reliability index"
+            status={stats.syncSuccessRate >= 95 ? "normal" : stats.syncSuccessRate >= 80 ? "warning" : "critical"}
+            icon={<TrendingUp className="h-4 w-4" />}
+            thresholdValue={stats.syncSuccessRate}
+            threshold={{ value: stats.syncSuccessRate, max: 100, showBar: true }}
           />
-          <KpiCard
-            label="Last Sync"
+          <DCKPITile
+            label="System Status"
             value={stats.lastSync}
-            icon={CheckCircle2}
-            subtext="All systems operational"
+            sublabel="All systems operational"
+            status="normal"
+            icon={<CheckCircle2 className="h-4 w-4" />}
           />
         </div>
 

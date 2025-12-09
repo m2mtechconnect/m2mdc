@@ -5,6 +5,7 @@ import { IntegrationMarketplace } from "@/components/integrations/IntegrationMar
 import { Integration } from "@/types/integrations";
 import { ZapierConnectModal } from "@/components/integrations/ZapierConnectModal";
 import { toast } from "sonner";
+import { Server, Plug, Zap, CheckCircle2 } from "lucide-react";
 import { 
   Dialog,
   DialogContent,
@@ -12,6 +13,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { DCCard } from "@/components/dc-ui/DCCard";
+import { DCSectionHeader } from "@/components/dc-ui/DCSectionHeader";
+import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 
 // Featured integrations catalog
 const FEATURED_INTEGRATIONS: Omit<Integration, "id" | "status" | "connected">[] = [
@@ -139,6 +143,9 @@ export default function IntegrationHub() {
     };
   });
 
+  const connectedCount = integrations.filter(i => i.connected).length;
+  const availableCount = integrations.filter(i => !i.connected).length;
+
   const handleConnect = async (integration: Integration) => {
     console.log("Connecting to:", integration.name);
     
@@ -180,63 +187,124 @@ export default function IntegrationHub() {
   };
 
   return (
-    <div className="container max-w-[1400px] mx-auto py-8 px-4">
-      <IntegrationMarketplace
-        integrations={integrations}
-        onConnect={handleConnect}
-        onDisconnect={handleDisconnect}
-        onConfigure={handleConfigure}
-        onViewDetails={handleViewDetails}
-      />
-
-      {/* Zapier Connect Modal */}
-      {selectedIntegration && (
-        <ZapierConnectModal
-          open={zapierModalOpen}
-          onOpenChange={(open) => {
-            setZapierModalOpen(open);
-            if (!open) {
-              setSelectedIntegration(null);
-              refetch();
-            }
-          }}
-          appName={selectedIntegration.name}
-          appIcon={selectedIntegration.icon || "🔌"}
-        />
-      )}
-
-      {/* Integration Details Dialog */}
-      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <span className="text-2xl">{selectedIntegration?.icon}</span>
-              {selectedIntegration?.name}
-            </DialogTitle>
-            <DialogDescription>
-              {selectedIntegration?.description}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <h4 className="font-medium mb-2">Category</h4>
-              <p className="text-sm text-muted-foreground">{selectedIntegration?.category}</p>
-            </div>
-            <div>
-              <h4 className="font-medium mb-2">Type</h4>
-              <p className="text-sm text-muted-foreground capitalize">{selectedIntegration?.type}</p>
-            </div>
-            {selectedIntegration?.type === "zapier" && (
-              <div>
-                <h4 className="font-medium mb-2">Capabilities</h4>
-                <p className="text-sm text-muted-foreground">
-                  {selectedIntegration.triggers} triggers • {selectedIntegration.actions} actions
-                </p>
+    <div className="min-h-screen bg-dc-bg-primary">
+      <div className="container max-w-[1400px] mx-auto py-8 px-4 space-y-6">
+        {/* DC Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold mb-2 flex items-center gap-3 text-foreground">
+              <div className="p-2 rounded-lg bg-dc-cyan/10 border border-dc-cyan/30">
+                <Plug className="h-6 w-6 text-dc-cyan" />
               </div>
-            )}
+              Integration Hub
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Connect external systems to your data centre digital twin
+            </p>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+
+        {/* DC-Style Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <DCKPITile
+            label="Connected"
+            value={connectedCount.toString()}
+            sublabel="Active integrations"
+            status="normal"
+            icon={<CheckCircle2 className="h-4 w-4" />}
+          />
+          <DCKPITile
+            label="Available"
+            value={availableCount.toString()}
+            sublabel="Ready to connect"
+            status="info"
+            icon={<Plug className="h-4 w-4" />}
+          />
+          <DCKPITile
+            label="Zapier Apps"
+            value="6,000+"
+            sublabel="Ecosystem access"
+            status="info"
+            icon={<Zap className="h-4 w-4" />}
+          />
+          <DCKPITile
+            label="System Status"
+            value="Online"
+            sublabel="All services operational"
+            status="normal"
+            icon={<Server className="h-4 w-4" />}
+          />
+        </div>
+
+        {/* Marketplace wrapped in DC Card */}
+        <DCCard status="info" className="p-0 overflow-hidden">
+          <div className="p-4 border-b border-dc-border bg-dc-bg-secondary">
+            <DCSectionHeader 
+              title="Integration Marketplace"
+              subtitle="Connect enterprise tools and data sources"
+              icon={<Plug className="h-5 w-5 text-dc-cyan" />}
+            />
+          </div>
+          <div className="p-6 bg-dc-bg-primary">
+            <IntegrationMarketplace
+              integrations={integrations}
+              onConnect={handleConnect}
+              onDisconnect={handleDisconnect}
+              onConfigure={handleConfigure}
+              onViewDetails={handleViewDetails}
+            />
+          </div>
+        </DCCard>
+
+        {/* Zapier Connect Modal */}
+        {selectedIntegration && (
+          <ZapierConnectModal
+            open={zapierModalOpen}
+            onOpenChange={(open) => {
+              setZapierModalOpen(open);
+              if (!open) {
+                setSelectedIntegration(null);
+                refetch();
+              }
+            }}
+            appName={selectedIntegration.name}
+            appIcon={selectedIntegration.icon || "🔌"}
+          />
+        )}
+
+        {/* Integration Details Dialog */}
+        <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+          <DialogContent className="bg-dc-bg-secondary border-dc-border">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-foreground">
+                <span className="text-2xl">{selectedIntegration?.icon}</span>
+                {selectedIntegration?.name}
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground">
+                {selectedIntegration?.description}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div>
+                <h4 className="font-medium mb-2 text-foreground">Category</h4>
+                <p className="text-sm text-muted-foreground">{selectedIntegration?.category}</p>
+              </div>
+              <div>
+                <h4 className="font-medium mb-2 text-foreground">Type</h4>
+                <p className="text-sm text-muted-foreground capitalize">{selectedIntegration?.type}</p>
+              </div>
+              {selectedIntegration?.type === "zapier" && (
+                <div>
+                  <h4 className="font-medium mb-2 text-foreground">Capabilities</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedIntegration.triggers} triggers • {selectedIntegration.actions} actions
+                  </p>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }

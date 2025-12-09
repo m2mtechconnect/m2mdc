@@ -1,6 +1,7 @@
 /**
  * Simulation Checklist Component
  * For Deploy page - tracks simulation readiness
+ * Uses Studio design system tokens
  */
 
 import { useState, useEffect } from 'react';
@@ -8,8 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, XCircle, PlayCircle, ChevronDown, ChevronUp, Clock, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { DCCard } from '@/components/dc-ui/DCCard';
 
 interface SimulationRun {
   id: string;
@@ -26,7 +27,6 @@ export function SimulationChecklist() {
   const [isComplete, setIsComplete] = useState(false);
   
   useEffect(() => {
-    // Check localStorage for last simulation run
     const storedRun = localStorage.getItem('lastSimulationRun');
     if (storedRun) {
       try {
@@ -36,10 +36,7 @@ export function SimulationChecklist() {
         const hoursDiff = (now.getTime() - runDate.getTime()) / (1000 * 60 * 60);
         
         if (hoursDiff < 24) {
-          setLastRun({
-            ...parsed,
-            runAt: runDate,
-          });
+          setLastRun({ ...parsed, runAt: runDate });
           setIsComplete(true);
         }
       } catch (e) {
@@ -53,33 +50,32 @@ export function SimulationChecklist() {
   };
   
   return (
-    <DCCard 
-      title="Simulation Verification" 
-      icon={<Activity className="h-4 w-4" />}
-      status={isComplete ? 'normal' : 'warning'}
-      className="p-4"
-    >
-      <div className="space-y-3">
-        {/* Status Row */}
+    <Card className={`bg-card border ${isComplete ? 'border-success/30' : 'border-warning/30'}`}>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm flex items-center gap-2">
+          <Activity className="h-4 w-4 text-primary" />
+          Simulation Verification
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {isComplete ? (
-              <CheckCircle2 className="h-5 w-5 text-green-500" />
+              <CheckCircle2 className="h-5 w-5 text-success" />
             ) : (
-              <XCircle className="h-5 w-5 text-amber-500" />
+              <XCircle className="h-5 w-5 text-warning" />
             )}
-            <span className="font-medium">
+            <span className="font-medium text-card-foreground">
               {isComplete ? 'Simulation Run Complete' : 'Simulation Run Required'}
             </span>
           </div>
           <Badge variant={isComplete ? 'default' : 'secondary'} className={
-            isComplete ? 'bg-green-500/20 text-green-500 border-green-500/30' : ''
+            isComplete ? 'bg-success/10 text-success border-success/30' : ''
           }>
             {isComplete ? 'Passed' : 'Pending'}
           </Badge>
         </div>
         
-        {/* Description */}
         <p className="text-sm text-muted-foreground">
           {isComplete 
             ? `Last simulation ran ${formatTimeAgo(lastRun?.runAt)}. Results validated for deployment.`
@@ -87,7 +83,6 @@ export function SimulationChecklist() {
           }
         </p>
         
-        {/* Action Button or Last Run Summary */}
         {!isComplete ? (
           <Button onClick={handleRunSimulation} className="w-full gap-2">
             <PlayCircle className="h-4 w-4" />
@@ -115,33 +110,7 @@ export function SimulationChecklist() {
                     <span className="text-muted-foreground">Duration</span>
                     <span className="font-medium">{formatDuration(lastRun.duration)}</span>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Run Time</span>
-                    <span className="font-medium">{formatTimeAgo(lastRun.runAt)}</span>
-                  </div>
-                  
-                  {lastRun.kpiImpacts.length > 0 && (
-                    <div className="pt-2 border-t border-border">
-                      <div className="text-xs text-muted-foreground mb-1">KPI Impacts</div>
-                      <div className="grid grid-cols-2 gap-1">
-                        {lastRun.kpiImpacts.slice(0, 4).map((impact, idx) => (
-                          <div key={idx} className="text-xs flex justify-between">
-                            <span>{impact.label}</span>
-                            <span className={impact.delta > 0 ? 'text-green-500' : 'text-red-500'}>
-                              {impact.delta > 0 ? '+' : ''}{impact.delta.toFixed(1)}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="w-full mt-2"
-                    onClick={handleRunSimulation}
-                  >
+                  <Button variant="ghost" size="sm" className="w-full mt-2" onClick={handleRunSimulation}>
                     Run New Simulation
                   </Button>
                 </div>
@@ -149,28 +118,21 @@ export function SimulationChecklist() {
             </CollapsibleContent>
           </Collapsible>
         )}
-      </div>
-    </DCCard>
+      </CardContent>
+    </Card>
   );
 }
 
 function formatTimeAgo(date?: Date): string {
   if (!date) return 'Never';
-  
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
+  const diffMs = new Date().getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMins / 60);
-  
   if (diffMins < 1) return 'Just now';
   if (diffMins < 60) return `${diffMins} min ago`;
-  if (diffHours < 24) return `${diffHours} hours ago`;
-  return date.toLocaleDateString();
+  return `${Math.floor(diffMins / 60)} hours ago`;
 }
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}m ${secs}s`;
+  return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
 }

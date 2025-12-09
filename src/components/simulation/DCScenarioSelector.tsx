@@ -1,6 +1,7 @@
 /**
  * DC Scenario Selector Component
  * Carousel/grid of simulation scenarios with domain badges and severity indicators
+ * Uses Studio design system tokens
  */
 
 import { useState } from 'react';
@@ -37,21 +38,21 @@ const domainIcons: Record<string, React.ElementType> = {
 };
 
 const domainColors: Record<string, string> = {
-  thermal: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-  power: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  cooling: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
-  network: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  facility: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-  workload: 'bg-green-500/20 text-green-400 border-green-500/30',
-  sovereignty: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
-  financial: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+  thermal: 'bg-destructive/10 text-destructive border-destructive/30',
+  power: 'bg-warning/10 text-warning border-warning/30',
+  cooling: 'bg-info/10 text-info border-info/30',
+  network: 'bg-info/10 text-info border-info/30',
+  facility: 'bg-accent/10 text-accent border-accent/30',
+  workload: 'bg-success/10 text-success border-success/30',
+  sovereignty: 'bg-primary/10 text-primary border-primary/30',
+  financial: 'bg-success/10 text-success border-success/30',
 };
 
 const severityColors: Record<string, string> = {
-  low: 'bg-blue-500/20 text-blue-400',
-  medium: 'bg-yellow-500/20 text-yellow-400',
-  high: 'bg-orange-500/20 text-orange-400',
-  critical: 'bg-red-500/20 text-red-400',
+  low: 'bg-info/10 text-info',
+  medium: 'bg-warning/10 text-warning',
+  high: 'bg-destructive/10 text-destructive',
+  critical: 'bg-destructive/20 text-destructive',
 };
 
 function formatDuration(seconds: number): string {
@@ -78,8 +79,8 @@ function ScenarioCard({
     <Card 
       className={cn(
         'min-w-[280px] max-w-[320px] cursor-pointer transition-all duration-200 hover:scale-[1.02]',
-        'bg-dc-surface border-dc-border hover:border-dc-primary/50',
-        isActive && 'border-dc-primary ring-2 ring-dc-primary/20'
+        'bg-card border-border hover:border-primary/50',
+        isActive && 'border-primary ring-2 ring-primary/20'
       )}
       onClick={onSelect}
     >
@@ -91,7 +92,7 @@ function ScenarioCard({
               <PrimaryIcon className="h-4 w-4" />
             </div>
             <div>
-              <h4 className="font-medium text-sm leading-tight">{scenario.name}</h4>
+              <h4 className="font-medium text-sm leading-tight text-card-foreground">{scenario.name}</h4>
               {scenario.isCustom && (
                 <Badge variant="outline" className="text-[10px] h-4 mt-1">
                   <Sparkles className="h-2 w-2 mr-1" />
@@ -133,7 +134,7 @@ function ScenarioCard({
         </div>
         
         {/* Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-dc-border">
+        <div className="flex items-center justify-between pt-2 border-t border-border">
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Clock className="h-3 w-3" />
             {formatDuration(scenario.durationSeconds)}
@@ -175,7 +176,7 @@ export function DCScenarioSelector({
       {/* Filter tabs */}
       <div className="flex items-center justify-between">
         <Tabs value={filter} onValueChange={(v) => setFilter(v as any)}>
-          <TabsList className="h-8 bg-dc-surface">
+          <TabsList className="h-8">
             <TabsTrigger value="all" className="text-xs h-6 px-3">
               All ({allScenarios.length})
             </TabsTrigger>

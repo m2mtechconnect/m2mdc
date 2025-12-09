@@ -1,6 +1,7 @@
 /**
  * DC KPI Deltas Component
  * Shows current KPI values with delta from baseline during simulation
+ * Uses Studio design system tokens
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,7 +62,7 @@ function KPICard({
   const trendColor = isNeutral 
     ? 'text-muted-foreground' 
     : isGoodDelta 
-      ? 'text-dc-success' 
+      ? 'text-success' 
       : 'text-destructive';
   
   const formattedValue = kpi.format ? kpi.format(kpi.value) : kpi.value.toFixed(1);
@@ -70,7 +71,7 @@ function KPICard({
   if (compact) {
     return (
       <div className={cn(
-        'flex items-center justify-between p-2 rounded-lg bg-dc-surface border border-dc-border',
+        'flex items-center justify-between p-2 rounded-lg bg-card border border-border',
         isRunning && 'animate-pulse-subtle'
       )}>
         <div className="flex items-center gap-2">
@@ -78,7 +79,7 @@ function KPICard({
           <span className="text-xs text-muted-foreground">{kpi.label}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm font-mono font-medium">
+          <span className="text-sm font-mono font-medium text-card-foreground">
             {formattedValue}{kpi.unit}
           </span>
           {!isNeutral && (
@@ -94,13 +95,13 @@ function KPICard({
   
   return (
     <Card className={cn(
-      'bg-dc-surface border-dc-border transition-all duration-300',
-      isRunning && !isNeutral && 'border-dc-primary/50'
+      'bg-card border-border transition-all duration-300',
+      isRunning && !isNeutral && 'border-primary/50'
     )}>
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-2">
-          <div className="p-2 rounded-lg bg-dc-primary/10">
-            <Icon className="h-4 w-4 text-dc-primary" />
+          <div className="p-2 rounded-lg bg-primary/10">
+            <Icon className="h-4 w-4 text-primary" />
           </div>
           {!isNeutral && (
             <Badge 
@@ -108,7 +109,7 @@ function KPICard({
               className={cn(
                 'text-xs gap-1',
                 isGoodDelta 
-                  ? 'bg-dc-success/10 text-dc-success border-dc-success/30' 
+                  ? 'bg-success/10 text-success border-success/30' 
                   : 'bg-destructive/10 text-destructive border-destructive/30'
               )}
             >
@@ -119,7 +120,7 @@ function KPICard({
         </div>
         
         <div className="space-y-1">
-          <p className="text-2xl font-bold font-mono">
+          <p className="text-2xl font-bold font-mono text-card-foreground">
             {formattedValue}
             <span className="text-sm text-muted-foreground ml-1">{kpi.unit}</span>
           </p>
@@ -127,20 +128,20 @@ function KPICard({
         </div>
         
         {/* Baseline comparison */}
-        <div className="mt-3 pt-3 border-t border-dc-border flex items-center justify-between text-xs">
+        <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs">
           <span className="text-muted-foreground">Baseline</span>
-          <span className="font-mono">
+          <span className="font-mono text-card-foreground">
             {kpi.format ? kpi.format(kpi.baseline) : kpi.baseline.toFixed(1)}{kpi.unit}
           </span>
         </div>
         
         {/* Delta bar */}
         {!isNeutral && (
-          <div className="mt-2 h-1.5 bg-dc-border rounded-full overflow-hidden">
+          <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
             <div 
               className={cn(
                 'h-full rounded-full transition-all duration-500',
-                isGoodDelta ? 'bg-dc-success' : 'bg-destructive'
+                isGoodDelta ? 'bg-success' : 'bg-destructive'
               )}
               style={{ 
                 width: `${Math.min(100, Math.abs(deltaPercent))}%`,
@@ -170,15 +171,15 @@ export function DCKPIDeltas({
   }
   
   return (
-    <Card className="bg-dc-surface border-dc-border">
+    <Card className="bg-card border-border">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <Activity className="h-4 w-4 text-dc-primary" />
+            <Activity className="h-4 w-4 text-primary" />
             KPI Impact
           </CardTitle>
           {isRunning && (
-            <Badge variant="outline" className="text-[10px] animate-pulse bg-dc-success/10 text-dc-success">
+            <Badge variant="outline" className="text-[10px] animate-pulse bg-success/10 text-success">
               LIVE
             </Badge>
           )}

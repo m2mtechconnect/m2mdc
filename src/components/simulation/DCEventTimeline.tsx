@@ -1,6 +1,7 @@
 /**
  * DC Event Timeline Component
  * Chronological display of simulation events with severity markers
+ * Uses Studio design system tokens
  */
 
 import { useRef, useEffect } from 'react';
@@ -43,38 +44,38 @@ const severityConfig: Record<string, {
 }> = {
   low: { 
     icon: Info, 
-    color: 'text-blue-400', 
-    bgColor: 'bg-blue-500/10',
-    borderColor: 'border-blue-500/30'
+    color: 'text-info', 
+    bgColor: 'bg-info/10',
+    borderColor: 'border-info/30'
   },
   medium: { 
     icon: AlertCircle, 
-    color: 'text-yellow-400', 
-    bgColor: 'bg-yellow-500/10',
-    borderColor: 'border-yellow-500/30'
+    color: 'text-warning', 
+    bgColor: 'bg-warning/10',
+    borderColor: 'border-warning/30'
   },
   high: { 
     icon: AlertTriangle, 
-    color: 'text-orange-400', 
-    bgColor: 'bg-orange-500/10',
-    borderColor: 'border-orange-500/30'
+    color: 'text-destructive', 
+    bgColor: 'bg-destructive/10',
+    borderColor: 'border-destructive/30'
   },
   critical: { 
     icon: AlertTriangle, 
-    color: 'text-red-400', 
-    bgColor: 'bg-red-500/10',
-    borderColor: 'border-red-500/30'
+    color: 'text-destructive', 
+    bgColor: 'bg-destructive/15',
+    borderColor: 'border-destructive/40'
   },
 };
 
 const eventTypeConfig: Record<string, { label: string; color: string }> = {
-  ALERT: { label: 'Alert', color: 'bg-red-500/20 text-red-400' },
-  INFO: { label: 'Info', color: 'bg-blue-500/20 text-blue-400' },
-  RECOVERY: { label: 'Recovery', color: 'bg-green-500/20 text-green-400' },
-  TRIGGER: { label: 'Trigger', color: 'bg-yellow-500/20 text-yellow-400' },
-  MITIGATION: { label: 'Mitigation', color: 'bg-purple-500/20 text-purple-400' },
-  START: { label: 'Start', color: 'bg-cyan-500/20 text-cyan-400' },
-  END: { label: 'End', color: 'bg-gray-500/20 text-gray-400' },
+  ALERT: { label: 'Alert', color: 'bg-destructive/10 text-destructive' },
+  INFO: { label: 'Info', color: 'bg-info/10 text-info' },
+  RECOVERY: { label: 'Recovery', color: 'bg-success/10 text-success' },
+  TRIGGER: { label: 'Trigger', color: 'bg-warning/10 text-warning' },
+  MITIGATION: { label: 'Mitigation', color: 'bg-accent/10 text-accent' },
+  START: { label: 'Start', color: 'bg-info/10 text-info' },
+  END: { label: 'End', color: 'bg-muted text-muted-foreground' },
 };
 
 function formatTimestamp(seconds: number): string {
@@ -105,7 +106,7 @@ function EventItem({
         'group relative flex gap-3 p-3 rounded-lg border transition-all duration-200 cursor-pointer',
         severity.bgColor,
         severity.borderColor,
-        isHighlighted && 'ring-2 ring-dc-primary scale-[1.02]',
+        isHighlighted && 'ring-2 ring-primary scale-[1.02]',
         'hover:scale-[1.01]'
       )}
       onMouseEnter={onHover}
@@ -121,7 +122,7 @@ function EventItem({
         )}>
           <SeverityIcon className={cn('h-3.5 w-3.5', severity.color)} />
         </div>
-        <div className="flex-1 w-px bg-dc-border/50 my-1" />
+        <div className="flex-1 w-px bg-border/50 my-1" />
       </div>
       
       {/* Content */}
@@ -130,7 +131,7 @@ function EventItem({
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
             <DomainIcon className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-sm font-medium truncate">{event.title}</span>
+            <span className="text-sm font-medium truncate text-card-foreground">{event.title}</span>
           </div>
           <div className="flex items-center gap-1.5 flex-shrink-0">
             <Badge variant="outline" className={cn('text-[10px] h-5', eventType.color)}>
@@ -195,11 +196,11 @@ export function DCEventTimeline({
   const sortedEvents = [...events].sort((a, b) => a.timestamp - b.timestamp);
   
   return (
-    <Card className="bg-dc-surface border-dc-border">
+    <Card className="bg-card border-border">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <Clock className="h-4 w-4 text-dc-primary" />
+            <Clock className="h-4 w-4 text-primary" />
             Event Timeline
           </CardTitle>
           <Badge variant="outline" className="text-[10px]">

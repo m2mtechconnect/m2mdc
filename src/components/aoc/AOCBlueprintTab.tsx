@@ -1,16 +1,23 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Cpu, Database, Zap, Brain, Wind, Network, Shield, GitBranch, ArrowRight } from 'lucide-react';
+import { Cpu, Database, Zap, Brain, Wind, Network, Shield, GitBranch, ArrowRight, PlayCircle } from 'lucide-react';
 import type { DeployedSystem } from '@/types/system';
 import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 import { DCArchitectureDiagram } from '@/components/dc-ui/DCArchitectureDiagram';
+import { SimulationPreviewModal } from '@/components/simulation/SimulationPreviewModal';
 
 interface AOCBlueprintTabProps {
   instance: DeployedSystem;
 }
 
 export function AOCBlueprintTab({ instance }: AOCBlueprintTabProps) {
+  const navigate = useNavigate();
+  const [showSimPreview, setShowSimPreview] = useState(false);
+  
   const { data: intelligence } = useQuery({
     queryKey: ['intelligence-settings', instance.id],
     queryFn: async () => {
@@ -57,6 +64,34 @@ export function AOCBlueprintTab({ instance }: AOCBlueprintTabProps) {
       >
         <div className="text-sm text-muted-foreground">
           This blueprint defines the operational topology and data flow for the Data Centre Digital Twin.
+        </div>
+      </DCCard>
+
+      {/* Simulation Preview Card */}
+      <DCCard 
+        title="Simulation Preview" 
+        subtitle="Test scenarios before deployment"
+        icon={<PlayCircle className="h-4 w-4" />}
+        status="info"
+      >
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Run a quick simulation to validate this blueprint's behavior under various scenarios.
+          </p>
+          <div className="flex gap-2">
+            <Button onClick={() => setShowSimPreview(true)} className="gap-2">
+              <PlayCircle className="h-4 w-4" />
+              Open Simulation Preview
+            </Button>
+            <Button 
+              variant="outline" 
+              className="gap-2"
+              onClick={() => navigate('/data-centre-twin?view=simulation')}
+            >
+              Full Simulation
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </DCCard>
 
@@ -177,6 +212,17 @@ export function AOCBlueprintTab({ instance }: AOCBlueprintTabProps) {
           </div>
         </div>
       </DCCard>
+      
+      {/* Simulation Preview Modal */}
+      <SimulationPreviewModal
+        isOpen={showSimPreview}
+        onClose={() => setShowSimPreview(false)}
+        title={`Simulation Preview - ${instance.name}`}
+        onUseInDeployment={() => {
+          setShowSimPreview(false);
+          navigate(`/deploy?id=${instance.id}`);
+        }}
+      />
     </div>
   );
 }

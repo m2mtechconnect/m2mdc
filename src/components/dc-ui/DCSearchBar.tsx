@@ -18,14 +18,14 @@ interface Suggestion {
 const dcSuggestions: Suggestion[] = [
   { id: '1', query: 'Explain current PUE trajectory', category: 'power', icon: Zap },
   { id: '2', query: 'Show GPU cluster saturation risk', category: 'gpu', icon: Cpu },
-  { id: '3', query: 'Simulate carbon price shock impact', category: 'carbon', icon: DollarSign },
-  { id: '4', query: 'Detect cooling inefficiency zones', category: 'cooling', icon: Wind },
-  { id: '5', query: 'Analyze rack thermal distribution', category: 'thermal', icon: Thermometer },
-  { id: '6', query: 'Check sovereignty compliance status', category: 'sovereignty', icon: Globe },
-  { id: '7', query: 'Monitor network latency hotspots', category: 'network', icon: Network },
-  { id: '8', query: 'Predict power demand next 24h', category: 'power', icon: Zap },
-  { id: '9', query: 'Optimize workload placement', category: 'gpu', icon: Cpu },
-  { id: '10', query: 'Review security perimeter status', category: 'security', icon: Shield },
+  { id: '3', query: 'Simulate cooling failure scenario', category: 'cooling', icon: Wind },
+  { id: '4', query: 'Run GPU spike simulation', category: 'gpu', icon: Cpu },
+  { id: '5', query: 'Simulate UPS failure impact', category: 'power', icon: Zap },
+  { id: '6', query: 'Analyze rack thermal distribution', category: 'thermal', icon: Thermometer },
+  { id: '7', query: 'Check sovereignty compliance status', category: 'sovereignty', icon: Globe },
+  { id: '8', query: 'Simulate grid outage scenario', category: 'power', icon: Zap },
+  { id: '9', query: 'What happens if carbon price spikes', category: 'carbon', icon: DollarSign },
+  { id: '10', query: 'Run thermal safety simulation', category: 'thermal', icon: Thermometer },
 ];
 
 const categoryColors = {
@@ -192,7 +192,7 @@ export function DCSearchBar({
       {/* Quick chips */}
       {!showSuggestions && (
         <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
-          {['PUE', 'GPU Load', 'Thermals', 'Cooling', 'Power', 'Sovereignty'].map((chip) => (
+          {['PUE', 'GPU Load', 'Thermals', 'Cooling', 'Simulation', 'Sovereignty'].map((chip) => (
             <button
               key={chip}
               onClick={() => handleChipClick(chip)}

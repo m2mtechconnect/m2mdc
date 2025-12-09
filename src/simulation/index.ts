@@ -17,3 +17,7 @@ export { createCustomScenario } from './customScenarioBuilder';
 
 // React Hook
 export { useSimulation, type UseSimulationReturn } from './useSimulation';
+
+// Components
+export { SimulationPreviewModal } from '@/components/simulation/SimulationPreviewModal';
+export { SimulationChecklist } from '@/components/simulation/SimulationChecklist';

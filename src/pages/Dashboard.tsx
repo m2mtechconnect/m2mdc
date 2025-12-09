@@ -2,8 +2,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Wrench, Bot, AlertCircle, ArrowUpRight, Sparkles } from "lucide-react";
+import { Loader2, Wrench, Bot, AlertCircle, ArrowUpRight, Sparkles, Server, Cpu, Thermometer, Globe, Zap as ZapIcon, Activity } from "lucide-react";
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { UnifiedIntakeModal } from '@/components/dashboard/UnifiedIntakeModal';
@@ -22,6 +23,7 @@ import { UnifiedTableView } from '@/components/unified-dashboard/UnifiedTableVie
 import { DepartmentGroup } from '@/components/unified-dashboard/DepartmentGroup';
 import { TrendingUp, Clock, CheckCircle2, Zap } from "lucide-react";
 import { trackKPIClick, trackAnalytics } from '@/lib/analytics/analyticsService';
+import { DCKPITile } from '@/components/dc-ui';
 
 interface Metrics {
   roi: number;
@@ -355,35 +357,117 @@ export default function Dashboard() {
   const quickActions = [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-dc-background">
       <div className="container mx-auto py-6 sm:py-8 max-w-7xl">
-        {/* Header */}
+        {/* NOC-Style Header */}
         <div className="mb-6 sm:mb-8 text-center px-4">
-          <h1 className="text-h1 font-display mb-3 text-gradient-hero">
-            Welcome to AURA
-          </h1>
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="p-2 rounded-lg bg-dc-primary/20">
+              <Server className="h-6 w-6 text-dc-primary" />
+            </div>
+            <h1 className="text-h1 font-display text-gradient-hero">
+              Data Centre Command
+            </h1>
+            <Badge variant="outline" className="font-mono text-xs border-dc-success/30 text-dc-success animate-status-blink hidden sm:flex">
+              <span className="relative flex h-2 w-2 mr-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-dc-success opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-dc-success"></span>
+              </span>
+              LIVE
+            </Badge>
+          </div>
           <p className="text-body text-lg sm:text-xl max-w-3xl mx-auto">
-            Powering enterprise-grade digital twins and autonomous AI agents.
+            Enterprise-grade AI/HPC facility monitoring, simulation, and autonomous optimization.
           </p>
         </div>
 
-      {/* Hero Search Bar */}
-      <HeroSearchBar 
-        onCoPilotQuery={(query) => {
-          console.log('[Dashboard] Hero Co-Pilot query:', query);
-          askCoPilot(query);
-        }}
-      />
+        {/* Hero Search Bar */}
+        <HeroSearchBar 
+          onCoPilotQuery={(query) => {
+            console.log('[Dashboard] Hero Co-Pilot query:', query);
+            askCoPilot(query);
+          }}
+        />
 
-        {/* KPI Cards - Dashboard Summary - Fully Responsive */}
+        {/* Hero KPI Row - Data Centre Metrics */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 mb-8">
+          <DCKPITile
+            label="Global PUE Average"
+            value={1.38}
+            unit=""
+            status="normal"
+            trend="down"
+            delta={-2.1}
+            sparklineData={[142, 140, 139, 141, 138, 137, 139, 138, 137, 136, 138, 138]}
+            icon={<ZapIcon className="h-4 w-4" />}
+            onClick={() => navigate('/data-centre-twin')}
+          />
+          <DCKPITile
+            label="GPU Saturation Risk"
+            value={23}
+            unit="%"
+            status="normal"
+            trend="up"
+            delta={4.2}
+            sparklineData={[18, 19, 20, 22, 21, 23, 24, 22, 23, 25, 24, 23]}
+            icon={<Cpu className="h-4 w-4" />}
+            onClick={() => navigate('/data-centre-twin')}
+          />
+          <DCKPITile
+            label="Thermal Stability"
+            value={94}
+            unit="%"
+            status="normal"
+            trend="stable"
+            sparklineData={[93, 94, 93, 95, 94, 94, 93, 94, 95, 94, 94, 94]}
+            icon={<Thermometer className="h-4 w-4" />}
+            onClick={() => navigate('/data-centre-twin')}
+          />
+          <DCKPITile
+            label="Sovereign Compute"
+            value={98}
+            unit="%"
+            status="info"
+            trend="stable"
+            sparklineData={[97, 98, 98, 97, 98, 98, 99, 98, 98, 98, 98, 98]}
+            icon={<Globe className="h-4 w-4" />}
+            onClick={() => navigate('/data-centre-twin')}
+          />
+        </div>
+
+        {/* Quick Link to DC Twin */}
+        <div className="mb-8">
+          <Link to="/data-centre-twin">
+            <Card className="p-4 cursor-pointer group bg-dc-surface border-dc-border hover:border-dc-primary/50 transition-all">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-lg bg-dc-primary/20">
+                    <Activity className="h-6 w-6 text-dc-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-semibold group-hover:text-dc-primary transition-colors">
+                      Open Data Centre Twin Dashboard
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Full NOC view with 8 domain twins, real-time telemetry, and simulation controls
+                    </p>
+                  </div>
+                </div>
+                <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-dc-primary transition-colors" />
+              </div>
+            </Card>
+          </Link>
+        </div>
+
+        {/* Legacy KPI Cards */}
         {isEmpty && (
           <div className="mb-6 p-4 rounded-lg bg-muted/50 border border-border">
             <p className="text-sm text-center text-muted-foreground">
-              💡 <strong>No analytics data yet.</strong> Deploy your first digital twin or agent to start tracking ROI, time savings, and compliance metrics. Click any card below to explore the analytics dashboard.
+              Deploy your first digital twin or agent to start tracking ROI, time savings, and compliance metrics.
             </p>
           </div>
         )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-card-gap mb-8 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-card-gap mb-8">
           {kpis.map((kpi) => (
             <KpiCard
               key={kpi.key}
@@ -427,20 +511,24 @@ export default function Dashboard() {
         )}
 
         {/* Unified AI Systems & Agents Dashboard */}
-        <Card className="p-6 mb-8">
+        <Card className="p-6 mb-8 bg-dc-surface border-dc-border">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <div>
-              <h2 className="text-h2 font-display mb-1 flex items-center gap-2">
-                <Bot className="h-6 w-6 text-primary" />
-                Digital Twins & Agents Dashboard
-              </h2>
-              <p className="text-sm text-body">
-                Unified view of your digital twins, agents, and automation systems.
-              </p>
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-dc-primary/20">
+                <Bot className="h-5 w-5 text-dc-primary" />
+              </div>
+              <div>
+                <h2 className="text-h2 font-display mb-1">
+                  Digital Twins & Agents
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Unified view of your AI systems and automation twins.
+                </p>
+              </div>
             </div>
             <Button 
               onClick={() => setShowIntakeModal(true)}
-              className="glow-gold font-semibold min-h-[44px]"
+              className="bg-dc-primary hover:bg-dc-primary/90 font-semibold min-h-[44px]"
             >
               <Sparkles className="h-4 w-4 mr-2" />
               Start Your Twin/Agent Intake

@@ -54,22 +54,22 @@ export function DCKPITile({
   // Use sublabel as fallback for subtitle
   const displaySubtitle = subtitle || sublabel;
   const statusColors = {
-    normal: 'border-l-dc-green',
-    warning: 'border-l-dc-amber',
-    critical: 'border-l-dc-red',
-    info: 'border-l-dc-blue',
+    normal: 'border-l-success',
+    warning: 'border-l-warning',
+    critical: 'border-l-destructive',
+    info: 'border-l-info',
   };
 
   const valueColors = {
     normal: 'text-foreground',
-    warning: 'text-dc-amber',
-    critical: 'text-dc-red',
-    info: 'text-dc-blue',
+    warning: 'text-warning',
+    critical: 'text-destructive',
+    info: 'text-info',
   };
 
   const deltaColors = {
-    up: 'text-dc-green',
-    down: 'text-dc-red',
+    up: 'text-success',
+    down: 'text-destructive',
     stable: 'text-muted-foreground',
   };
 
@@ -95,18 +95,18 @@ export function DCKPITile({
       : 0;
 
   const thresholdColor = thresholdPercentage > 90 
-    ? 'bg-dc-red' 
+    ? 'bg-destructive' 
     : thresholdPercentage > 70 
-      ? 'bg-dc-amber' 
-      : 'bg-dc-green';
+      ? 'bg-warning' 
+      : 'bg-success';
 
   return (
     <div
       onClick={onClick}
       className={cn(
-        'noc-card border-l-4 transition-all',
+        'bg-card border rounded-lg border-l-4 transition-all shadow-card',
         statusColors[status],
-        onClick && 'cursor-pointer hover:border-l-primary',
+        onClick && 'cursor-pointer hover:border-l-primary hover:shadow-elevated',
         compact ? 'p-2' : sizeClasses[size],
         className
       )}
@@ -130,7 +130,7 @@ export function DCKPITile({
           <span className="text-sm text-muted-foreground font-medium">{unit}</span>
         )}
         {status === 'critical' && (
-          <AlertTriangle className="h-4 w-4 text-dc-red ml-1 animate-pulse-glow" />
+          <AlertTriangle className="h-4 w-4 text-destructive ml-1 animate-pulse" />
         )}
       </div>
 
@@ -156,7 +156,7 @@ export function DCKPITile({
               <span>{threshold.max}</span>
             </div>
           )}
-          <div className="h-1.5 bg-noc-surface-elevated rounded-full overflow-hidden">
+          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
             <div
               className={cn('h-full rounded-full transition-all', thresholdColor)}
               style={{ width: `${thresholdPercentage}%` }}
@@ -194,10 +194,10 @@ function Sparkline({ data, status }: SparklineProps) {
     .join(' ');
 
   const strokeColor = {
-    normal: 'hsl(var(--dc-green))',
-    warning: 'hsl(var(--dc-amber))',
-    critical: 'hsl(var(--dc-red))',
-    info: 'hsl(var(--dc-cyan))',
+    normal: 'hsl(var(--success))',
+    warning: 'hsl(var(--warning))',
+    critical: 'hsl(var(--destructive))',
+    info: 'hsl(var(--info))',
   }[status];
 
   return (

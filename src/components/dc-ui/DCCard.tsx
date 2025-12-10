@@ -41,26 +41,26 @@ export function DCCard({
   const normalizedStatus = status === 'normal' ? 'operational' : status;
   
   const statusColors = {
-    operational: 'border-l-dc-green',
-    warning: 'border-l-dc-amber',
-    critical: 'border-l-dc-red',
-    info: 'border-l-dc-blue',
+    operational: 'border-l-success',
+    warning: 'border-l-warning',
+    critical: 'border-l-destructive',
+    info: 'border-l-info',
     neutral: 'border-l-transparent',
   };
 
   const dotColors = {
-    operational: 'bg-dc-green shadow-glow-green',
-    warning: 'bg-dc-amber shadow-glow-amber',
-    critical: 'bg-dc-red shadow-glow-red animate-status-blink',
-    info: 'bg-dc-blue shadow-glow-blue',
+    operational: 'bg-success',
+    warning: 'bg-warning',
+    critical: 'bg-destructive animate-pulse',
+    info: 'bg-info',
     neutral: 'bg-muted-foreground',
   };
 
   const iconColors = {
-    operational: 'text-dc-green',
-    warning: 'text-dc-amber',
-    critical: 'text-dc-red',
-    info: 'text-dc-blue',
+    operational: 'text-success',
+    warning: 'text-warning',
+    critical: 'text-destructive',
+    info: 'text-info',
     neutral: 'text-muted-foreground',
   };
 
@@ -68,8 +68,8 @@ export function DCCard({
     <div
       onClick={onClick}
       className={cn(
-        'rounded-lg border transition-all',
-        elevated ? 'noc-card-elevated' : 'noc-card',
+        'rounded-lg border bg-card transition-all',
+        elevated ? 'shadow-elevated' : 'shadow-card',
         normalizedStatus !== 'neutral' && `border-l-4 ${statusColors[normalizedStatus]}`,
         onClick && 'cursor-pointer hover:border-primary/50',
         className
@@ -107,7 +107,7 @@ export function DCCard({
 
       {/* Footer */}
       {footer && (
-        <div className="px-4 py-3 border-t border-border bg-noc-surface/50">
+        <div className="px-4 py-3 border-t border-border bg-muted/50">
           {footer}
         </div>
       )}

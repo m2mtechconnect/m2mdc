@@ -160,11 +160,11 @@ export function Step1Summary() {
       {/* Template Source Badge */}
       {currentBlueprint?.source === 'template' && currentBlueprint?.templateName && (
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="gap-2 px-3 py-1.5 border-dc-primary/30 bg-dc-primary/5">
-            <FileText className="h-3.5 w-3.5 text-dc-primary" />
+          <Badge variant="outline" className="gap-2 px-3 py-1.5 border-primary/30 bg-primary/5">
+            <FileText className="h-3.5 w-3.5 text-primary" />
             <span className="text-xs">Template: {currentBlueprint.templateName}</span>
             {currentBlueprint.certified && (
-              <Shield className="h-3.5 w-3.5 text-dc-success" />
+              <Shield className="h-3.5 w-3.5 text-success" />
             )}
           </Badge>
         </div>
@@ -176,7 +176,7 @@ export function Step1Summary() {
         subtitle={type === 'agent' ? 'Agentic Intelligence' : type === '3d_twin' ? '3D Digital Twin' : 'Process Twin'}
         icon={<Bot className="h-5 w-5" />}
         status={currentBlueprint ? 'normal' : 'warning'}
-        className="border-dc-primary/30"
+        className="border-primary/30"
       >
         <div className="space-y-4">
           <div>
@@ -197,7 +197,7 @@ export function Step1Summary() {
               <div className="space-y-1">
                 {goals.map((goalItem, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-dc-primary" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                     {goalItem}
                   </div>
                 ))}
@@ -206,16 +206,16 @@ export function Step1Summary() {
           )}
 
           <div className="flex flex-wrap gap-2">
-            <Badge className="bg-dc-thermal/10 text-dc-thermal border-dc-thermal/30">
+            <Badge className="bg-destructive/10 text-destructive border-destructive/30">
               <Building2 className="h-3 w-3 mr-1" />
               {industry || 'Data Centre'}
             </Badge>
-            <Badge className="bg-dc-power/10 text-dc-power border-dc-power/30">
+            <Badge className="bg-warning/10 text-warning border-warning/30">
               <Briefcase className="h-3 w-3 mr-1" />
               {department || 'Infrastructure'}
             </Badge>
             {isDataCentreTwin && (
-              <Badge className="bg-dc-sovereignty/10 text-dc-sovereignty border-dc-sovereignty/30">
+              <Badge className="bg-info/10 text-info border-info/30">
                 <Globe className="h-3 w-3 mr-1" />
                 Sovereign Compute
               </Badge>
@@ -232,44 +232,44 @@ export function Step1Summary() {
           icon={<Server className="h-4 w-4" />}
         >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+            <div className="p-3 rounded-lg bg-muted/50 border border-border">
               <div className="flex items-center gap-2 mb-1">
-                <Globe className="h-3.5 w-3.5 text-dc-sovereignty" />
+                <Globe className="h-3.5 w-3.5 text-info" />
                 <p className="text-xs text-muted-foreground">Facility Location</p>
               </div>
               <p className="text-sm font-medium">{dcMetadata.facilityLocation}</p>
             </div>
-            <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+            <div className="p-3 rounded-lg bg-muted/50 border border-border">
               <div className="flex items-center gap-2 mb-1">
-                <Cpu className="h-3.5 w-3.5 text-dc-gpu" />
+                <Cpu className="h-3.5 w-3.5 text-accent" />
                 <p className="text-xs text-muted-foreground">GPU Fleet</p>
               </div>
               <p className="text-sm font-medium">{dcMetadata.gpuFleet}</p>
             </div>
-            <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+            <div className="p-3 rounded-lg bg-muted/50 border border-border">
               <div className="flex items-center gap-2 mb-1">
-                <Wind className="h-3.5 w-3.5 text-dc-cooling" />
+                <Wind className="h-3.5 w-3.5 text-info" />
                 <p className="text-xs text-muted-foreground">Cooling Type</p>
               </div>
               <p className="text-sm font-medium">{dcMetadata.coolingType}</p>
             </div>
-            <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+            <div className="p-3 rounded-lg bg-muted/50 border border-border">
               <div className="flex items-center gap-2 mb-1">
-                <Zap className="h-3.5 w-3.5 text-dc-power" />
+                <Zap className="h-3.5 w-3.5 text-warning" />
                 <p className="text-xs text-muted-foreground">Power Topology</p>
               </div>
               <p className="text-sm font-medium">{dcMetadata.powerTopology}</p>
             </div>
-            <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+            <div className="p-3 rounded-lg bg-muted/50 border border-border">
               <div className="flex items-center gap-2 mb-1">
-                <Zap className="h-3.5 w-3.5 text-dc-success" />
+                <Zap className="h-3.5 w-3.5 text-success" />
                 <p className="text-xs text-muted-foreground">Renewable %</p>
               </div>
               <p className="text-sm font-medium">{dcMetadata.renewablePercent}</p>
             </div>
-            <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+            <div className="p-3 rounded-lg bg-muted/50 border border-border">
               <div className="flex items-center gap-2 mb-1">
-                <Shield className="h-3.5 w-3.5 text-dc-sovereignty" />
+                <Shield className="h-3.5 w-3.5 text-info" />
                 <p className="text-xs text-muted-foreground">Sovereign Compliance</p>
               </div>
               <p className="text-sm font-medium">{dcMetadata.sovereignCompliance}</p>
@@ -322,7 +322,7 @@ export function Step1Summary() {
             <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Infrastructure Tools</h4>
             <div className="flex flex-wrap gap-2">
               {recommendedTools.map((tool, idx) => (
-                <Badge key={idx} className="bg-dc-gpu/10 text-dc-gpu border-dc-gpu/30">{tool}</Badge>
+                <Badge key={idx} className="bg-accent/10 text-accent border-accent/30">{tool}</Badge>
               ))}
             </div>
           </div>
@@ -332,7 +332,7 @@ export function Step1Summary() {
             <div className="space-y-2">
               {workflowSummary.map((workflowItem, idx) => (
                 <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground font-mono">
-                  <span className="w-1.5 h-1.5 rounded-full bg-dc-success" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-success" />
                   {workflowItem}
                 </div>
               ))}
@@ -348,7 +348,7 @@ export function Step1Summary() {
       />
 
       {/* Actions */}
-      <DCCard className="bg-dc-surface/50">
+      <DCCard className="bg-muted/30">
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
             Ready to configure this system? Click "Next" to set up intelligence, tools, and workflows.
@@ -371,7 +371,7 @@ export function Step1Summary() {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="text-xs bg-dc-surface hover:bg-dc-surface/80"
+                className="text-xs bg-muted hover:bg-muted/80"
                 onClick={() => handleAskCoPilot(`Suggest PUE optimization strategies for this data centre twin.`)}
               >
                 PUE Optimization
@@ -379,7 +379,7 @@ export function Step1Summary() {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="text-xs bg-dc-surface hover:bg-dc-surface/80"
+                className="text-xs bg-muted hover:bg-muted/80"
                 onClick={() => handleAskCoPilot(`What thermal monitoring KPIs should I track for ${agentName}?`)}
               >
                 Thermal KPIs
@@ -387,7 +387,7 @@ export function Step1Summary() {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="text-xs bg-dc-surface hover:bg-dc-surface/80"
+                className="text-xs bg-muted hover:bg-muted/80"
                 onClick={() => handleAskCoPilot(`What are the key sovereignty compliance requirements for this data centre?`)}
               >
                 Sovereignty Checks
@@ -399,7 +399,7 @@ export function Step1Summary() {
 
       {/* Edit Summary Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-lg bg-dc-background border-dc-border">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Edit System Configuration</DialogTitle>
             <DialogDescription>
@@ -414,7 +414,7 @@ export function Step1Summary() {
                 value={editName} 
                 onChange={(e) => setEditName(e.target.value)}
                 placeholder="Data Centre Twin name"
-                className="bg-dc-surface border-dc-border"
+                className=""
               />
             </div>
             <div className="space-y-2">
@@ -425,7 +425,7 @@ export function Step1Summary() {
                 onChange={(e) => setEditDescription(e.target.value)}
                 placeholder="What does this system monitor and control?"
                 rows={3}
-                className="bg-dc-surface border-dc-border"
+                className=""
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -436,7 +436,7 @@ export function Step1Summary() {
                   value={editIndustry} 
                   onChange={(e) => setEditIndustry(e.target.value)}
                   placeholder="e.g. Data Centre"
-                  className="bg-dc-surface border-dc-border"
+                  className=""
                 />
               </div>
               <div className="space-y-2">
@@ -446,14 +446,14 @@ export function Step1Summary() {
                   value={editDepartment} 
                   onChange={(e) => setEditDepartment(e.target.value)}
                   placeholder="e.g. Infrastructure"
-                  className="bg-dc-surface border-dc-border"
+                  className=""
                 />
               </div>
             </div>
             <div className="space-y-2">
               <Label>System Type</Label>
               <Select value={editType} onValueChange={(val: 'agent' | 'process_twin' | '3d_twin') => setEditType(val)}>
-                <SelectTrigger className="bg-dc-surface border-dc-border">
+                <SelectTrigger>
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -475,7 +475,7 @@ export function Step1Summary() {
 
       {/* Switch Template Dialog */}
       <Dialog open={isSwitchOpen} onOpenChange={setIsSwitchOpen}>
-        <DialogContent className="sm:max-w-lg bg-dc-background border-dc-border">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Switch Template</DialogTitle>
             <DialogDescription>
@@ -487,13 +487,13 @@ export function Step1Summary() {
               <Button 
                 key={tpl} 
                 variant="outline" 
-                className="w-full justify-start bg-dc-surface border-dc-border hover:bg-dc-surface/80"
+                className="w-full justify-start"
                 onClick={() => {
                   toast.info(`Switching to: ${tpl}`);
                   setIsSwitchOpen(false);
                 }}
               >
-                <Server className="h-4 w-4 mr-2 text-dc-primary" />
+                <Server className="h-4 w-4 mr-2 text-primary" />
                 {tpl}
               </Button>
             ))}

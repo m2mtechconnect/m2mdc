@@ -69,6 +69,25 @@ export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onO
   const enabledScenarios = scenarios.filter(s => s.enabled);
   const primaryIndustry = overview.industries[0] || 'Enterprise';
   
+  // Extract domain name from URL for fallback
+  const extractDomainName = (url: string | undefined): string | null => {
+    if (!url) return null;
+    try {
+      const hostname = url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+      const domainPart = hostname.split('.')[0];
+      return domainPart.charAt(0).toUpperCase() + domainPart.slice(1);
+    } catch {
+      return null;
+    }
+  };
+  
+  // Safe customer name with fallback chain
+  const safeCustomerName = 
+    overview.customerName || 
+    extractDomainName(overview.siteUrl) || 
+    overview.twinName?.replace(' Sovereign Green AI Data Centre Twin', '') ||
+    'This Organization';
+  
   // Get KPI values from builder
   const pueKpi = kpis.find(k => k.id === 'effective-ai-pue');
   const sovereigntyKpi = kpis.find(k => k.id === 'sovereign-compute-ratio');
@@ -168,7 +187,7 @@ export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onO
             </div>
             <p className="text-sm text-muted-foreground">
               Automatically generated for{" "}
-              <span className="font-semibold text-foreground">{overview.customerName || overview.twinName.replace(' Sovereign Green AI Data Centre Twin', '')}</span>
+              <span className="font-semibold text-foreground">{safeCustomerName}</span>
               {overview.industry && (
                 <span className="ml-1">({industryLabels[overview.industry] || overview.industry})</span>
               )}

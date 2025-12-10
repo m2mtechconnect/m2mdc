@@ -23,6 +23,7 @@ import { UnifiedTableView } from '@/components/unified-dashboard/UnifiedTableVie
 import { DepartmentGroup } from '@/components/unified-dashboard/DepartmentGroup';
 import { TrendingUp, Clock, CheckCircle2, Zap } from "lucide-react";
 import { trackKPIClick, trackAnalytics } from '@/lib/analytics/analyticsService';
+import { useBlueprintAgents } from '@/hooks/useBlueprintAgents';
 
 // DC-specific imports
 import { DCKPITile } from '@/components/dc-ui';
@@ -135,6 +136,9 @@ export default function Dashboard() {
   const timeSavedKpi = useKpi('time_saved');
   const complianceKpi = useKpi('compliance_accuracy');
   const agentsKpi = useKpi('agents_deployed');
+  
+  // Get blueprint agents (source of truth for subsystem agents)
+  const { unifiedItems: blueprintAgents } = useBlueprintAgents();
 
   // Fetch unified systems and agents
   const { data: unifiedData, isLoading: systemsLoading, isError: systemsError, error: systemsErrorDetails } = useQuery({
@@ -547,20 +551,20 @@ export default function Dashboard() {
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
-              ) : unifiedData?.items.length === 0 ? (
-                <div className="text-center py-12 border rounded-lg">
-                  <Server className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-lg font-semibold mb-2">No Data Centre Twins configured yet.</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Configure your first Data Centre Twin to start monitoring.
-                  </p>
-                  <Button onClick={() => navigate('/builder?template=data-centre-twin')}>
-                    Configure Your First Data Centre Twin
-                  </Button>
-                </div>
               ) : viewMode === 'card' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {unifiedData?.items.map((item) => (
+                  {/* Show blueprint agents as the source of truth */}
+                  {blueprintAgents.map((item) => (
+                    <UnifiedItemCard
+                      key={item.id}
+                      item={item}
+                      onRun={handleRun}
+                      onManage={handleManage}
+                      onDelete={handleDelete}
+                    />
+                  ))}
+                  {/* Show twins from database (if any) */}
+                  {unifiedData?.items.filter(i => i.type === 'twin').map((item) => (
                     <UnifiedItemCard
                       key={item.id}
                       item={item}
@@ -572,7 +576,7 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <UnifiedTableView
-                  items={unifiedData?.items || []}
+                  items={[...blueprintAgents, ...(unifiedData?.items.filter(i => i.type === 'twin') || [])]}
                   onRun={handleRun}
                   onManage={handleManage}
                   onDelete={handleDelete}
@@ -584,6 +588,17 @@ export default function Dashboard() {
               {systemsLoading ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : unifiedData?.items.filter(i => i.type === 'twin').length === 0 ? (
+                <div className="text-center py-12 border rounded-lg">
+                  <Server className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold mb-2">No Data Centre Twins configured yet.</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Configure your first Data Centre Twin to start monitoring.
+                  </p>
+                  <Button onClick={() => navigate('/builder?template=data-centre-twin')}>
+                    Configure Your First Data Centre Twin
+                  </Button>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -601,23 +616,17 @@ export default function Dashboard() {
             </TabsContent>
 
             <TabsContent value="agents" className="mt-0 px-4 pb-4">
-              {systemsLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {unifiedData?.items.filter(i => i.type === 'agent').map((item) => (
-                    <UnifiedItemCard
-                      key={item.id}
-                      item={item}
-                      onRun={handleRun}
-                      onManage={handleManage}
-                      onDelete={handleDelete}
-                    />
-                  ))}
-                </div>
-              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {blueprintAgents.map((item) => (
+                  <UnifiedItemCard
+                    key={item.id}
+                    item={item}
+                    onRun={handleRun}
+                    onManage={handleManage}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </div>
             </TabsContent>
 
             <TabsContent value="archived" className="mt-0 px-4 pb-4">

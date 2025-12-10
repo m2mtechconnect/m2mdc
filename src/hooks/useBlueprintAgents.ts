@@ -7,6 +7,7 @@ import { useMemo } from 'react';
 import { generateDefaultBlueprint } from '@/data/defaultBlueprint';
 import type { AgentBlueprint } from '@/types/dataCentreBlueprint';
 import type { Agent } from '@/components/agents/AgentsGrid';
+import type { UnifiedItem } from '@/components/unified-dashboard/UnifiedItemCard';
 
 // Map domain types to department display names
 const domainToDepartment: Record<string, string> = {
@@ -39,8 +40,8 @@ function transformBlueprintAgent(agent: AgentBlueprint): Agent {
     department: domainToDepartment[agent.domain] || agent.domain,
     category: typeToCategory[agent.type] || agent.type,
     status: agent.status || 'active',
-    grounding: true, // Blueprint agents are grounded by default
-    roi: 0, // Will be calculated from real data
+    grounding: true,
+    roi: 0,
     lastActivity: new Date().toISOString(),
     totalRuns: 0,
     successRate: 100,
@@ -50,8 +51,30 @@ function transformBlueprintAgent(agent: AgentBlueprint): Agent {
   };
 }
 
+/**
+ * Transform blueprint agents to UnifiedItem format for Dashboard
+ */
+function transformToUnifiedItem(agent: AgentBlueprint): UnifiedItem {
+  return {
+    id: agent.id,
+    name: agent.name,
+    description: agent.description,
+    department: domainToDepartment[agent.domain] || agent.domain,
+    category: typeToCategory[agent.type] || agent.type,
+    status: agent.status || 'active',
+    grounding: true,
+    roi: 0,
+    lastActivity: new Date().toISOString(),
+    totalRuns: 0,
+    successRate: 100,
+    version: '1.0.0',
+    type: 'agent',
+  };
+}
+
 export interface BlueprintAgentsResult {
   agents: Agent[];
+  unifiedItems: UnifiedItem[];
   stats: {
     total: number;
     active: number;
@@ -69,19 +92,17 @@ export interface BlueprintAgentsResult {
 export function useBlueprintAgents(twinId?: string): BlueprintAgentsResult {
   const result = useMemo(() => {
     try {
-      // Generate the default blueprint (or fetch by twinId in future)
       const blueprint = generateDefaultBlueprint(twinId || 'default');
-      
-      // Transform blueprint agents to grid-compatible format
       const agents = blueprint.agents.map(transformBlueprintAgent);
+      const unifiedItems = blueprint.agents.map(transformToUnifiedItem);
       
-      // Calculate stats
       const activeCount = agents.filter(a => a.status === 'active').length;
       const draftCount = agents.filter(a => a.status === 'draft').length;
       const archivedCount = agents.filter(a => a.status === 'archived').length;
       
       return {
         agents,
+        unifiedItems,
         stats: {
           total: agents.length,
           active: activeCount,
@@ -95,6 +116,7 @@ export function useBlueprintAgents(twinId?: string): BlueprintAgentsResult {
     } catch (error) {
       return {
         agents: [],
+        unifiedItems: [],
         stats: { total: 0, active: 0, draft: 0, archived: 0, avgRoi: 0 },
         isLoading: false,
         error: error instanceof Error ? error.message : 'Failed to load blueprint agents',

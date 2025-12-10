@@ -2,46 +2,66 @@
  * Workload & GPU Scheduler Domain View
  */
 
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Cpu, Clock, Users, AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Cpu, Clock, Users, AlertTriangle, Filter } from 'lucide-react';
+import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
+import { SummaryCard } from '@/components/shared/SummaryCard';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 interface WorkloadDomainViewProps {
   facility: DataCentreFacility;
 }
 
+type WorkloadType = 'all' | 'training' | 'inference';
+
 export function WorkloadDomainView({ facility }: WorkloadDomainViewProps) {
+  const [workloadFilter, setWorkloadFilter] = useState<WorkloadType>('all');
+  
   const workloadTwin = facility.workloadGpu;
   const gpuClusters = workloadTwin.clusters;
+  
+  const filteredClusters = gpuClusters.filter(c => {
+    if (workloadFilter === 'all') return true;
+    return c.workloadType === workloadFilter;
+  });
+  
   const totalGpus = workloadTwin.kpis.totalGpuCount;
   const avgUtilization = workloadTwin.kpis.avgGpuUtilization;
   const totalQueueDepth = workloadTwin.kpis.queueDepth;
+  
+  const workloadCounts = {
+    all: gpuClusters.length,
+    training: gpuClusters.filter(c => c.workloadType === 'training').length,
+    inference: gpuClusters.filter(c => c.workloadType === 'inference').length,
+  };
   
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <MetricCard
+        <SummaryCard
           title="GPU Utilization"
           value={`${avgUtilization.toFixed(0)}%`}
           status={avgUtilization > 70 ? 'good' : avgUtilization > 50 ? 'warning' : 'critical'}
           icon={Cpu}
         />
-        <MetricCard
+        <SummaryCard
           title="Total GPUs"
           value={`${totalGpus}`}
           status="good"
           icon={Cpu}
         />
-        <MetricCard
+        <SummaryCard
           title="Queue Depth"
           value={`${totalQueueDepth} jobs`}
           status={totalQueueDepth < 50 ? 'good' : totalQueueDepth < 100 ? 'warning' : 'critical'}
           icon={Clock}
         />
-        <MetricCard
+        <SummaryCard
           title="Active Jobs"
           value={`${workloadTwin.activeJobs.length}`}
           status="good"
@@ -50,13 +70,40 @@ export function WorkloadDomainView({ facility }: WorkloadDomainViewProps) {
       </div>
 
       {/* GPU Clusters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">GPU Clusters</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <CollapsibleSection title="GPU Clusters" badge={`${filteredClusters.length} clusters`}>
+        {/* Filters */}
+        <div className="flex items-center gap-4 mb-4 pb-4 border-b border-border/50">
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">Workload:</span>
+            <div className="flex gap-1">
+              {[
+                { key: 'all' as const, label: 'All', color: '' },
+                { key: 'training' as const, label: 'Training', color: 'border-purple-500/30 text-purple-500' },
+                { key: 'inference' as const, label: 'Inference', color: 'border-blue-500/30 text-blue-500' },
+              ].map(({ key, label, color }) => (
+                <Button
+                  key={key}
+                  variant={workloadFilter === key ? 'default' : 'outline'}
+                  size="sm"
+                  className={`h-7 text-xs ${workloadFilter !== key && color ? color : ''}`}
+                  onClick={() => setWorkloadFilter(key)}
+                >
+                  {label}
+                  <span className="ml-1 opacity-70">({workloadCounts[key]})</span>
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        {filteredClusters.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            No clusters match the current filter
+          </div>
+        ) : (
           <div className="grid gap-4 md:grid-cols-2">
-            {gpuClusters.map((cluster) => (
+            {filteredClusters.map((cluster) => (
               <div key={cluster.id} className="p-4 rounded-lg bg-muted/30 border">
                 <div className="flex items-center justify-between mb-4">
                   <div>
@@ -99,136 +146,88 @@ export function WorkloadDomainView({ facility }: WorkloadDomainViewProps) {
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        )}
+      </CollapsibleSection>
 
       {/* Workload Metrics */}
       <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Job Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-purple-500" />
-                  <span>Training Jobs</span>
-                </div>
-                <span className="font-bold">
-                  {workloadTwin.activeJobs.filter(j => j.type === 'training').length}
-                </span>
+        <CollapsibleSection title="Job Distribution">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-purple-500" />
+                <span>Training Jobs</span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-blue-500" />
-                  <span>Inference Jobs</span>
-                </div>
-                <span className="font-bold">
-                  {workloadTwin.activeJobs.filter(j => j.type === 'inference').length}
-                </span>
-              </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <span>Queued Jobs</span>
-                </div>
-                <span className="font-bold">{workloadTwin.queuedJobs.length}</span>
-              </div>
+              <span className="font-bold">
+                {workloadTwin.activeJobs.filter(j => j.type === 'training').length}
+              </span>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-blue-500" />
+                <span>Inference Jobs</span>
+              </div>
+              <span className="font-bold">
+                {workloadTwin.activeJobs.filter(j => j.type === 'inference').length}
+              </span>
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-amber-500" />
+                <span>Queued Jobs</span>
+              </div>
+              <span className="font-bold">{workloadTwin.queuedJobs.length}</span>
+            </div>
+          </div>
+        </CollapsibleSection>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">SLA & Performance</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>GPU Fairness Index</span>
-                  <span className="font-medium text-green-500">{workloadTwin.kpis.gpuFairnessIndex.toFixed(2)}</span>
-                </div>
-                <Progress value={workloadTwin.kpis.gpuFairnessIndex} className="h-2" />
+        <CollapsibleSection title="SLA & Performance">
+          <div className="space-y-4">
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span>GPU Fairness Index</span>
+                <span className="font-medium text-emerald-500">{workloadTwin.kpis.gpuFairnessIndex.toFixed(2)}</span>
               </div>
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>SLA Compliance</span>
-                  <span className="font-medium text-green-500">{(100 - workloadTwin.kpis.slaBreachRate).toFixed(1)}%</span>
-                </div>
-                <Progress value={100 - workloadTwin.kpis.slaBreachRate} className="h-2" />
-              </div>
-              {workloadTwin.kpis.slaBreachRate > 0 && (
-                <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-500/10 text-yellow-600 text-sm">
-                  <AlertTriangle className="h-4 w-4" />
-                  <span>{workloadTwin.activeJobs.filter(j => j.slaBreached).length} jobs at risk of SLA breach</span>
-                </div>
-              )}
+              <Progress value={workloadTwin.kpis.gpuFairnessIndex} className="h-2" />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span>SLA Compliance</span>
+                <span className="font-medium text-emerald-500">{(100 - workloadTwin.kpis.slaBreachRate).toFixed(1)}%</span>
+              </div>
+              <Progress value={100 - workloadTwin.kpis.slaBreachRate} className="h-2" />
+            </div>
+            {workloadTwin.kpis.slaBreachRate > 0 && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 text-amber-600 text-sm">
+                <AlertTriangle className="h-4 w-4" />
+                <span>{workloadTwin.activeJobs.filter(j => j.slaBreached).length} jobs at risk of SLA breach</span>
+              </div>
+            )}
+          </div>
+        </CollapsibleSection>
       </div>
 
       {/* Cost Metrics */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Cost Analysis</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
-            <div className="p-4 rounded-lg bg-muted/30 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Cost per GPU-hour</p>
-              <p className="text-2xl font-bold">${workloadTwin.kpis.costPerGpuHour.toFixed(2)}</p>
-            </div>
-            <div className="p-4 rounded-lg bg-muted/30 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Avg Queue Time</p>
-              <p className="text-2xl font-bold">{workloadTwin.kpis.avgQueueTimeMinutes.toFixed(0)} min</p>
-            </div>
-            <div className="p-4 rounded-lg bg-muted/30 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Training Throughput</p>
-              <p className="text-2xl font-bold">{(workloadTwin.kpis.trainingThroughput / 1000).toFixed(1)}K tok/s</p>
-            </div>
-            <div className="p-4 rounded-lg bg-muted/30 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Inference Throughput</p>
-              <p className="text-2xl font-bold">{workloadTwin.kpis.inferenceThroughput.toFixed(0)} req/s</p>
-            </div>
+      <CollapsibleSection title="Cost Analysis">
+        <div className="grid gap-4 md:grid-cols-4">
+          <div className="p-4 rounded-lg bg-muted/30 text-center">
+            <p className="text-xs text-muted-foreground mb-1">Cost per GPU-hour</p>
+            <p className="text-2xl font-bold">${workloadTwin.kpis.costPerGpuHour.toFixed(2)}</p>
           </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-interface MetricCardProps {
-  title: string;
-  value: string;
-  status: 'good' | 'warning' | 'critical';
-  icon: React.ElementType;
-}
-
-function MetricCard({ title, value, status, icon: Icon }: MetricCardProps) {
-  const getStatusColor = () => {
-    switch (status) {
-      case 'good': return 'text-green-500';
-      case 'warning': return 'text-yellow-500';
-      case 'critical': return 'text-destructive';
-    }
-  };
-
-  return (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg bg-muted ${getStatusColor()}`}>
-            <Icon className="h-5 w-5" />
+          <div className="p-4 rounded-lg bg-muted/30 text-center">
+            <p className="text-xs text-muted-foreground mb-1">Avg Queue Time</p>
+            <p className="text-2xl font-bold">{workloadTwin.kpis.avgQueueTimeMinutes.toFixed(0)} min</p>
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground">{title}</p>
-            <p className={`text-xl font-bold ${getStatusColor()}`}>{value}</p>
+          <div className="p-4 rounded-lg bg-muted/30 text-center">
+            <p className="text-xs text-muted-foreground mb-1">Training Throughput</p>
+            <p className="text-2xl font-bold">{(workloadTwin.kpis.trainingThroughput / 1000).toFixed(1)}K tok/s</p>
+          </div>
+          <div className="p-4 rounded-lg bg-muted/30 text-center">
+            <p className="text-xs text-muted-foreground mb-1">Inference Throughput</p>
+            <p className="text-2xl font-bold">{workloadTwin.kpis.inferenceThroughput.toFixed(0)} req/s</p>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </CollapsibleSection>
+    </div>
   );
 }

@@ -1,9 +1,11 @@
 /**
  * DataCentreSelector - Global Twin Selection Dropdown
  * Appears in the top navigation for switching between data centre twins
+ * Uses ActiveTwinContext as single source of truth
  */
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Select, 
   SelectContent, 
@@ -33,141 +35,136 @@ import {
   Shield,
   Loader2
 } from 'lucide-react';
-import { useTwinContext } from '@/contexts/TwinContext';
-import { CANADIAN_REGIONS, getRegionByCode, getRegionCarbonClass } from '@/data/regions';
-import { useToast } from '@/hooks/use-toast';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { toast } from 'sonner';
+
+// Region data for new twin creation
+const REGIONS = [
+  { code: 'ca-central-1', name: 'Montreal', province: 'Quebec', carbonIntensity: 25 },
+  { code: 'ca-west-1', name: 'Vancouver', province: 'BC', carbonIntensity: 12 },
+  { code: 'canada-central', name: 'Toronto', province: 'Ontario', carbonIntensity: 40 },
+  { code: 'canada-east', name: 'Quebec City', province: 'Quebec', carbonIntensity: 20 },
+];
 
 export function DataCentreSelector() {
+  const navigate = useNavigate();
   const { 
-    twinId, 
-    setTwinId, 
+    activeTwinId, 
+    setActiveTwin, 
     twins, 
     twin, 
+    locations,
     isLoading, 
+    createLocation,
     createTwin,
-    hydrateDashboard,
-    hydrateBlueprint,
-    hydrateSimulation,
-    hydrateAgents,
-    hydrateSovereignty,
-    hydrateCarbon,
-    hydrateFinancial,
-  } = useTwinContext();
+  } = useActiveTwin();
   
-  const { toast } = useToast();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [newTwinData, setNewTwinData] = useState({
     name: '',
-    city: '',
     region_code: 'ca-central-1',
     tier: 'Tier III',
     capacity_kw: 5000,
   });
 
   const handleTwinChange = (value: string) => {
-    setTwinId(value);
-    
-    // Trigger global hydration for all components
-    hydrateDashboard();
-    hydrateBlueprint();
-    hydrateSimulation();
-    hydrateAgents();
-    hydrateSovereignty();
-    hydrateCarbon();
-    hydrateFinancial();
-    
-    toast({
-      title: "Data Centre Switched",
-      description: `Now viewing: ${twins.find(t => t.id === value)?.name || 'Unknown'}`,
-    });
+    setActiveTwin(value);
+    const selectedTwin = twins.find(t => t.id === value);
+    toast.success(`Switched to: ${selectedTwin?.name || 'Unknown'}`);
   };
 
   const handleCreateTwin = async () => {
     if (!newTwinData.name.trim()) {
-      toast({
-        title: "Name Required",
-        description: "Please enter a name for the data centre twin.",
-        variant: "destructive",
-      });
+      toast.error('Please enter a name for the data centre twin.');
       return;
     }
 
     setIsCreating(true);
     try {
-      const region = getRegionByCode(newTwinData.region_code);
+      const region = REGIONS.find(r => r.code === newTwinData.region_code);
       
-      const created = await createTwin({
+      // Create location first
+      const location = await createLocation({
+        name: `${newTwinData.name} - ${region?.name || 'Unknown'}`,
+        city: region?.name || 'Montreal',
+        province: region?.province,
+        country: 'Canada',
+        cloud_region: newTwinData.region_code,
+        provider_type: 'Hybrid',
+        industry: 'cloud_saas',
+        capacity_kw: newTwinData.capacity_kw,
+        tier: newTwinData.tier,
+        tags: [],
+      });
+
+      if (!location) {
+        throw new Error('Failed to create location');
+      }
+
+      // Create twin linked to location
+      const created = await createTwin(location.id, {
         name: newTwinData.name,
-        city: region?.city || newTwinData.city || 'Montreal',
+        city: region?.name || 'Montreal',
         region_code: newTwinData.region_code,
         tier: newTwinData.tier,
         capacity_kw: newTwinData.capacity_kw,
-        pue_target: region?.default_pue || 1.3,
-        renewable_target_pct: region?.energy_mix.renewable || 80,
-        carbon_intensity: region?.carbon_intensity || 30,
-        sovereignty_level: region?.sovereignty_profile.level || 'standard',
+        pue_target: 1.3,
+        renewable_target_pct: 80,
+        carbon_intensity: region?.carbonIntensity || 30,
+        sovereignty_level: 'standard',
         metadata: {
           created_from: 'selector',
-          region_profile: region,
         },
       });
 
       if (created) {
-        toast({
-          title: "Twin Created",
-          description: `${created.name} has been created successfully.`,
-        });
+        toast.success(`${created.name} has been created successfully.`);
         setIsCreateOpen(false);
         setNewTwinData({
           name: '',
-          city: '',
           region_code: 'ca-central-1',
           tier: 'Tier III',
           capacity_kw: 5000,
         });
+        // Navigate to builder for this new twin
+        navigate(`/builder?twinId=${created.id}`);
       }
     } catch (error) {
-      toast({
-        title: "Creation Failed",
-        description: error instanceof Error ? error.message : "Failed to create twin",
-        variant: "destructive",
-      });
+      toast.error(error instanceof Error ? error.message : 'Failed to create twin');
     } finally {
       setIsCreating(false);
     }
   };
 
-  const getCarbonBadgeVariant = (intensity: number) => {
-    const carbonClass = getRegionCarbonClass(intensity);
-    switch (carbonClass) {
-      case 'ultra-low': return 'default';
-      case 'low': return 'secondary';
-      case 'medium': return 'outline';
-      case 'high': return 'destructive';
-    }
+  const getCarbonBadgeVariant = (intensity: number | null) => {
+    if (!intensity) return 'outline';
+    if (intensity < 20) return 'default';
+    if (intensity < 50) return 'secondary';
+    if (intensity < 200) return 'outline';
+    return 'destructive';
   };
 
   if (isLoading) {
     return (
       <div className="flex items-center gap-2 px-3 py-2">
         <Loader2 className="h-4 w-4 animate-spin" />
-        <span className="text-sm text-muted-foreground">Loading twins...</span>
+        <span className="text-sm text-muted-foreground">Loading...</span>
       </div>
     );
   }
 
   return (
     <div className="flex items-center gap-2">
-      <Building2 className="h-4 w-4 text-muted-foreground" />
+      <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
       
-      <Select value={twinId || ''} onValueChange={handleTwinChange}>
-        <SelectTrigger className="w-[280px] bg-background">
-          <SelectValue placeholder="Select Data Centre Twin">
+      <Select value={activeTwinId || ''} onValueChange={handleTwinChange}>
+        <SelectTrigger className="w-[220px] lg:w-[260px] bg-background">
+          <SelectValue placeholder="Select Data Centre">
             {twin && (
               <div className="flex items-center gap-2">
                 <span className="truncate">{twin.name}</span>
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="outline" className="text-xs hidden sm:inline-flex">
                   {twin.tier}
                 </Badge>
               </div>
@@ -183,7 +180,7 @@ export function DataCentreSelector() {
             </div>
           ) : (
             twins.map((t) => {
-              const region = getRegionByCode(t.region_code);
+              const twinLocation = locations.find(l => l.id === t.location_id);
               return (
                 <SelectItem key={t.id} value={t.id}>
                   <div className="flex items-center gap-3 py-1">
@@ -198,16 +195,16 @@ export function DataCentreSelector() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
-                      {region && (
+                      {t.carbon_intensity && (
                         <Badge 
-                          variant={getCarbonBadgeVariant(region.carbon_intensity)}
+                          variant={getCarbonBadgeVariant(t.carbon_intensity)}
                           className="text-xs"
                         >
                           <Leaf className="h-3 w-3 mr-1" />
-                          {region.carbon_intensity}g
+                          {t.carbon_intensity}g
                         </Badge>
                       )}
-                      {t.sovereignty_level === 'federal' && (
+                      {t.sovereignty_level === 'sovereign' && (
                         <Shield className="h-4 w-4 text-primary" />
                       )}
                     </div>
@@ -221,7 +218,7 @@ export function DataCentreSelector() {
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" className="flex-shrink-0">
             <Plus className="h-4 w-4" />
           </Button>
         </DialogTrigger>
@@ -229,7 +226,7 @@ export function DataCentreSelector() {
           <DialogHeader>
             <DialogTitle>Create New Data Centre Twin</DialogTitle>
             <DialogDescription>
-              Create a new data centre twin for a specific region or custom site.
+              Create a new data centre twin for a specific region.
             </DialogDescription>
           </DialogHeader>
           
@@ -248,31 +245,21 @@ export function DataCentreSelector() {
               <Label htmlFor="region">Region</Label>
               <Select 
                 value={newTwinData.region_code} 
-                onValueChange={(value) => {
-                  const region = getRegionByCode(value);
-                  setNewTwinData(prev => ({ 
-                    ...prev, 
-                    region_code: value,
-                    city: region?.city || prev.city,
-                  }));
-                }}
+                onValueChange={(value) => setNewTwinData(prev => ({ ...prev, region_code: value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select region" />
                 </SelectTrigger>
                 <SelectContent>
-                  {CANADIAN_REGIONS.map((region) => (
-                    <SelectItem key={region.id} value={region.region_code}>
+                  {REGIONS.map((region) => (
+                    <SelectItem key={region.code} value={region.code}>
                       <div className="flex items-center gap-2">
-                        <span>{region.name}</span>
-                        <Badge variant="outline" className="text-xs">
-                          {region.provider.toUpperCase()}
-                        </Badge>
+                        <span>{region.name}, {region.province}</span>
                         <Badge 
-                          variant={getCarbonBadgeVariant(region.carbon_intensity)}
+                          variant={getCarbonBadgeVariant(region.carbonIntensity)}
                           className="text-xs"
                         >
-                          {region.carbon_intensity}g CO₂/kWh
+                          {region.carbonIntensity}g CO₂/kWh
                         </Badge>
                       </div>
                     </SelectItem>

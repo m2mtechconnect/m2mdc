@@ -167,11 +167,15 @@ export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onO
               <CardTitle className="text-xl">Green Data Centre Twin Recommendation</CardTitle>
             </div>
             <p className="text-sm text-muted-foreground">
-              Automatically generated for <span className="font-medium text-foreground">{overview.twinName}</span>
+              Automatically generated for{" "}
+              <span className="font-semibold text-foreground">{overview.customerName || overview.twinName.replace(' Sovereign Green AI Data Centre Twin', '')}</span>
+              {overview.industry && (
+                <span className="ml-1">({industryLabels[overview.industry] || overview.industry})</span>
+              )}
             </p>
           </div>
           <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/30">
-            {industryLabels[primaryIndustry] || primaryIndustry}
+            {industryLabels[overview.industry || primaryIndustry] || primaryIndustry}
           </Badge>
         </div>
 

@@ -19,6 +19,10 @@ export interface DCTwinOverview {
   description: string;
   siteUrl?: string; // Source URL from scanner
   
+  // Customer identification (from scanner)
+  customerName?: string; // Clean company name (e.g., "Walmart", "Chase Bank")
+  industry?: string; // Normalized industry ID (e.g., "retail", "financial_services")
+  
   // Classification
   industries: string[];
   primaryUseCases: string[];

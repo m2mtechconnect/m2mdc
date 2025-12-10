@@ -1,5 +1,5 @@
 /**
- * Blueprint Overview Tab - Summary view of the entire blueprint
+ * Blueprint Overview Tab - Summary view with executive insights
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +19,10 @@ import {
   Activity
 } from 'lucide-react';
 import type { DataCentreBlueprint, BlueprintSummary } from '@/types/dataCentreBlueprint';
+import { ExecutiveSummaryBlock } from '../ExecutiveSummaryBlock';
+import { DomainHealthMap } from '../DomainHealthMap';
+import { DependencyGraph } from '../DependencyGraph';
+import { ChangeLogPanel } from '../ChangeLogPanel';
 
 interface BlueprintOverviewTabProps {
   blueprint: DataCentreBlueprint;
@@ -52,6 +56,15 @@ export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTa
 
   return (
     <div className="space-y-6">
+      {/* Executive Summary */}
+      <ExecutiveSummaryBlock />
+
+      {/* Domain Health + Dependency Graph Row */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        <DomainHealthMap />
+        <DependencyGraph />
+      </div>
+
       {/* Facility Summary */}
       <Card>
         <CardHeader>
@@ -197,6 +210,9 @@ export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTa
           </div>
         </CardContent>
       </Card>
+
+      {/* Change Log */}
+      <ChangeLogPanel />
     </div>
   );
 }

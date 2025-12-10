@@ -38,6 +38,11 @@ const defaultKPIs: Omit<KPIDelta, 'value' | 'baseline'>[] = [
   { id: 'emissionsVsTarget', label: 'Emissions vs Target', unit: '%', icon: Wind },
   { id: 'coolingEfficiencyIndex', label: 'Cooling Efficiency', unit: '%', icon: Wind },
   { id: 'avgUpsRuntime', label: 'UPS Runtime', unit: 'min', icon: Battery },
+  // Carbon & Financial KPIs
+  { id: 'carbonEfficiencyScore', label: 'Carbon Efficiency', unit: '%', icon: Wind },
+  { id: 'costPerGpuHour', label: 'Cost/GPU-Hour', unit: '', icon: DollarSign, format: (v) => `$${v.toFixed(2)}`, invertDelta: true },
+  { id: 'financialHealthScore', label: 'Financial Health', unit: '%', icon: DollarSign },
+  { id: 'dailyEmissionsKg', label: 'Daily Emissions', unit: 'kg', icon: Wind, invertDelta: true },
 ];
 
 function KPICard({ 

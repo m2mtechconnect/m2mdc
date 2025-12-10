@@ -2,16 +2,19 @@
  * KPI Cockpit - Central KPI display for Data Centre Twin
  * Uses Studio design system (light theme)
  * Now Blueprint-aware for KPI labels/units
+ * Integrates Carbon and Financial engines for real-time metrics
  */
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   Thermometer, Zap, Wind, Network, Shield, Cpu, 
-  Globe, DollarSign, Activity, TrendingUp, TrendingDown
+  Globe, DollarSign, Activity, TrendingUp, TrendingDown, Leaf
 } from 'lucide-react';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 import { useBlueprintKPIs } from '@/hooks/useBlueprintKPIs';
+import { useCarbonEngine } from '@/hooks/useCarbonEngine';
+import { useFinancialEngine } from '@/hooks/useFinancialEngine';
 
 interface KPICockpitProps {
   facility: DataCentreFacility;
@@ -121,6 +124,10 @@ export function KPICockpit({ facility, twinId = 'default' }: KPICockpitProps) {
   const kpis = calculateKPIs(facility);
   const { getKpiById, totalKpis } = useBlueprintKPIs(twinId);
   
+  // Use real engine calculations
+  const { metrics: carbonMetrics, regionalFeed } = useCarbonEngine(facility);
+  const { metrics: financialMetrics } = useFinancialEngine(facility);
+  
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -212,10 +219,45 @@ export function KPICockpit({ facility, twinId = 'default' }: KPICockpitProps) {
         <DomainCard 
           title="Financial Health" 
           icon={<DollarSign className="h-4 w-4 text-primary" />}
-          status={kpis.costPerGpuHour.status}
+          status={financialMetrics.financialHealthScore > 70 ? 'normal' : financialMetrics.financialHealthScore > 50 ? 'warning' : 'critical'}
         >
-          <KPITile label="Cost/GPU-hr" value={`$${kpis.costPerGpuHour.value.toFixed(2)}`} unit="" status={kpis.costPerGpuHour.status} delta={kpis.costPerGpuHour.delta} compact />
-          <KPITile label="Carbon Efficiency" value={kpis.carbonEfficiency.value} unit="%" status={kpis.carbonEfficiency.status} delta={kpis.carbonEfficiency.delta} compact />
+          <KPITile 
+            label="Cost/GPU-hr" 
+            value={`$${financialMetrics.costPerGpuHour.toFixed(2)}`} 
+            unit="" 
+            status={financialMetrics.costPerGpuHour < 3 ? 'normal' : financialMetrics.costPerGpuHour < 5 ? 'warning' : 'critical'} 
+            delta={-2.1} 
+            compact 
+          />
+          <KPITile 
+            label="Financial Health" 
+            value={financialMetrics.financialHealthScore.toFixed(0)} 
+            unit="%" 
+            status={financialMetrics.financialHealthScore > 70 ? 'normal' : financialMetrics.financialHealthScore > 50 ? 'warning' : 'critical'} 
+            compact 
+          />
+        </DomainCard>
+        
+        <DomainCard 
+          title="Carbon & Sustainability" 
+          icon={<Leaf className="h-4 w-4 text-primary" />}
+          status={carbonMetrics.carbonEfficiencyScore > 70 ? 'normal' : carbonMetrics.carbonEfficiencyScore > 50 ? 'warning' : 'critical'}
+        >
+          <KPITile 
+            label="Carbon Efficiency" 
+            value={carbonMetrics.carbonEfficiencyScore.toFixed(0)} 
+            unit="%" 
+            status={carbonMetrics.carbonEfficiencyScore > 70 ? 'normal' : carbonMetrics.carbonEfficiencyScore > 50 ? 'warning' : 'critical'} 
+            delta={3.2} 
+            compact 
+          />
+          <KPITile 
+            label="Emissions/Day" 
+            value={carbonMetrics.dailyEmissionsKg.toFixed(0)} 
+            unit=" kg" 
+            status={carbonMetrics.dailyEmissionsKg < 5000 ? 'normal' : carbonMetrics.dailyEmissionsKg < 15000 ? 'warning' : 'critical'} 
+            compact 
+          />
         </DomainCard>
       </div>
     </div>

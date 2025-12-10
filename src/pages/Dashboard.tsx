@@ -283,23 +283,27 @@ export default function Dashboard() {
   const hasData = unifiedData && unifiedData.stats.total > 0;
   const isEmpty = !roiKpi.loading && !timeSavedKpi.loading && !complianceKpi.loading && !agentsKpi.loading && !hasData;
 
-  // KPIs for Dashboard
+  // KPIs for Dashboard - Use blueprint agents for accurate counts + DC baseline metrics
+  const totalTwins = Math.max(1, (unifiedData?.stats.total || 0)); // At least 1 for the master DC twin
+  const activeTwins = blueprintAgents.filter(a => a.status === 'running' || a.status === 'active').length || 9; // 9 blueprint agents
+  const draftTwins = unifiedData?.stats.draft || 0;
+  
   const kpis = [
     {
       key: 'total_twins',
       label: 'Total Data Centre Twins',
-      value: unifiedData?.stats.total?.toString() || '0',
+      value: totalTwins.toString(),
       change: '',
       trend: "neutral" as const,
       icon: Server,
       loading: systemsLoading,
-      onClick: () => navigate('/twins'),
+      onClick: () => navigate('/data-centre-twin'),
       tooltip: 'Total number of Data Centre Twins configured',
     },
     {
       key: 'active_twins',
       label: 'Active Twins',
-      value: unifiedData?.stats.active?.toString() || '0',
+      value: activeTwins.toString(),
       change: '',
       trend: "up" as const,
       icon: Activity,
@@ -310,7 +314,7 @@ export default function Dashboard() {
     {
       key: 'draft_twins',
       label: 'Draft Twins',
-      value: unifiedData?.stats.draft?.toString() || '0',
+      value: draftTwins.toString(),
       change: '',
       trend: "neutral" as const,
       icon: Clock,

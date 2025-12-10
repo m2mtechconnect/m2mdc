@@ -8,6 +8,7 @@ import { Layout } from "@/components/Layout";
 import { RBACProvider } from "@/contexts/RBACContext";
 import { CoPilotProvider } from "@/contexts/CoPilotContext";
 import { CoPilotCommandProvider } from "@/contexts/CoPilotCommandContext";
+import { TwinProvider } from "@/contexts/TwinContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemeProvider } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,6 +43,7 @@ import TwinManage from "./pages/TwinManage";
 import DataCentreTwin from "./pages/DataCentreTwin";
 import Blueprint from "./pages/Blueprint";
 import AgentDetail from "./pages/AgentDetail";
+import TwinDebug from "./pages/TwinDebug";
 import Profile from "./pages/account/Profile";
 import Settings from "./pages/account/Settings";
 import AccessControl from "./pages/account/AccessControl";
@@ -163,6 +165,9 @@ function AuthenticatedApp() {
         <Route path="/pilot" element={<Pilot />} />
         {/* Data Centre Twin */}
         <Route path="/data-centre-twin" element={<DataCentreTwin />} />
+        <Route path="/data-centre-twin/:id" element={<DataCentreTwin />} />
+        {/* Twin Debug Page */}
+        <Route path="/twin-debug" element={<TwinDebug />} />
         {/* Redirect old digital-twins routes to dashboard */}
         <Route path="/digital-twins" element={<Navigate to="/" replace />} />
         <Route path="/digital-twins/:slug" element={<Navigate to="/" replace />} />
@@ -181,13 +186,15 @@ const App = () => (
         <TooltipProvider>
           <RBACProvider>
             <BrowserRouter>
-              <CoPilotProvider>
-                <CoPilotCommandProvider>
-                  <Toaster />
-                  <Sonner />
-                  <AuthenticatedApp />
-                </CoPilotCommandProvider>
-              </CoPilotProvider>
+              <TwinProvider>
+                <CoPilotProvider>
+                  <CoPilotCommandProvider>
+                    <Toaster />
+                    <Sonner />
+                    <AuthenticatedApp />
+                  </CoPilotCommandProvider>
+                </CoPilotProvider>
+              </TwinProvider>
             </BrowserRouter>
           </RBACProvider>
         </TooltipProvider>

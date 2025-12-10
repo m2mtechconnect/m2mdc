@@ -30,6 +30,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AOCQuickAccessButton } from "@/components/aoc/AOCQuickAccessButton";
+import { DataCentreSelector } from "@/components/twin-selector";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -163,6 +164,11 @@ export function Layout({ children }: LayoutProps) {
             {/* Dynamic Greeting */}
             <div className="hidden md:flex items-center text-sm text-muted-foreground">
               {greeting}, <span className="ml-1 font-medium text-foreground">{getFirstName(user)}</span>
+            </div>
+
+            {/* Data Centre Twin Selector */}
+            <div className="hidden lg:block">
+              <DataCentreSelector />
             </div>
 
             {/* Desktop Navigation */}

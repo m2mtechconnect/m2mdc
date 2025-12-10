@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-
 import { Layout } from "@/components/Layout";
 import { RBACProvider } from "@/contexts/RBACContext";
 import { CoPilotProvider } from "@/contexts/CoPilotContext";
+import { CoPilotCommandProvider } from "@/contexts/CoPilotCommandContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemeProvider } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
@@ -178,9 +179,11 @@ const App = () => (
           <RBACProvider>
             <BrowserRouter>
               <CoPilotProvider>
-                <Toaster />
-                <Sonner />
-                <AuthenticatedApp />
+                <CoPilotCommandProvider>
+                  <Toaster />
+                  <Sonner />
+                  <AuthenticatedApp />
+                </CoPilotCommandProvider>
               </CoPilotProvider>
             </BrowserRouter>
           </RBACProvider>

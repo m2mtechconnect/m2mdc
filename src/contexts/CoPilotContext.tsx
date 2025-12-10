@@ -3,6 +3,7 @@
  * 
  * Manages global Co-Pilot state with rich context tracking across all pages
  * and centralized streaming chat state with persistent memory.
+ * Now integrated with DC Domain Context for data centre intelligence.
  */
 
 import { createContext, useContext, useState, ReactNode, useEffect, useCallback, useRef } from 'react';
@@ -12,6 +13,7 @@ import { streamCoPilotResponse } from '@/lib/copilot/streaming';
 import { logCoPilotEvent } from '@/lib/copilot/analytics';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { getDCDomainContext, type DCDomainContext } from '@/lib/copilot/dcDomainContext';
 
 export type CoPilotMessage = {
   role: 'user' | 'assistant';
@@ -27,7 +29,9 @@ export type CoPilotMessage = {
 
 interface CoPilotContextValue {
   context: CoPilotContextType;
+  dcContext: DCDomainContext | null;
   updateContext: (updates: Partial<CoPilotContextType>) => void;
+  updateDCContext: (updates: Partial<DCDomainContext>) => void;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   initialMessage?: string;
@@ -44,6 +48,7 @@ interface CoPilotContextValue {
   clearMemory: () => Promise<void>;
   memoryEnabled: boolean;
   setMemoryEnabled: (enabled: boolean) => void;
+  isDCPage: boolean;
 }
 
 const CoPilotContext = createContext<CoPilotContextValue | undefined>(undefined);
@@ -54,6 +59,8 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
   const [context, setContext] = useState<CoPilotContextType>({
     activePage: 'dashboard',
   });
+  const [dcContext, setDCContext] = useState<DCDomainContext | null>(null);
+  const [isDCPage, setIsDCPage] = useState(false);
 
   const [messages, setMessages] = useState<CoPilotMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -152,10 +159,25 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
       // Build rich context
       let newContext = await buildCoPilotContext(pageName, agentId, additionalContext);
       
+      // Determine if this is a DC page
+      const isDataCentrePage = pageName === 'data_centre_twin' || 
+                               pageName === 'blueprint' || 
+                               pageName === 'builder';
+      setIsDCPage(isDataCentrePage);
+      
       // Enrich with blueprint data for DC pages
       if (pageName === 'data_centre_twin' || pageName === 'blueprint') {
         const twinId = additionalContext.agentId || 'default';
         newContext = await enrichWithBlueprint(newContext, twinId);
+      }
+      
+      // Build DC domain context for DC pages
+      if (isDataCentrePage) {
+        const twinId = additionalContext.agentId || 'default';
+        const dcCtx = getDCDomainContext(twinId, additionalContext.activeTab || 'overview', pageName);
+        setDCContext(dcCtx);
+      } else {
+        setDCContext(null);
       }
       
       setContext(newContext);
@@ -167,6 +189,10 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
   const updateContext = (updates: Partial<CoPilotContextType>) => {
     setContext(prev => ({ ...prev, ...updates }));
   };
+
+  const updateDCContext = useCallback((updates: Partial<DCDomainContext>) => {
+    setDCContext(prev => prev ? { ...prev, ...updates } : null);
+  }, []);
 
   // Memory helpers
   const saveMemory = useCallback(async (key: string, value: any) => {
@@ -363,7 +389,9 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
     <CoPilotContext.Provider 
       value={{ 
         context,
+        dcContext,
         updateContext,
+        updateDCContext,
         isOpen,
         setIsOpen,
         initialMessage,
@@ -380,6 +408,7 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
         clearMemory,
         memoryEnabled,
         setMemoryEnabled,
+        isDCPage,
       }}
     >
       {children}

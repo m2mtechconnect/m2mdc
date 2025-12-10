@@ -6,6 +6,8 @@
  * (B) Insights
  * (C) Recommended Next Steps
  * (D) Follow-Up Questions
+ * 
+ * Now supports command execution for DC-specific actions.
  */
 
 import { Button } from '@/components/ui/button';
@@ -18,7 +20,18 @@ import {
   ExternalLink,
   Lightbulb,
   ListChecks,
-  MessageCircle
+  MessageCircle,
+  Pause,
+  RotateCcw,
+  Thermometer,
+  Zap,
+  Wind,
+  Network,
+  Globe,
+  DollarSign,
+  Cpu,
+  Map,
+  Activity
 } from 'lucide-react';
 
 interface StructuredResponseData {
@@ -34,12 +47,24 @@ interface CoPilotStructuredResponseProps {
   onFollowUpClick: (question: string) => void;
 }
 
+// Extended icon map for DC domain actions
 const iconMap: Record<string, any> = {
   wrench: Wrench,
   play: PlayCircle,
   plus: Plus,
   settings: Settings,
   external: ExternalLink,
+  pause: Pause,
+  reset: RotateCcw,
+  thermal: Thermometer,
+  power: Zap,
+  cooling: Wind,
+  network: Network,
+  sovereignty: Globe,
+  financial: DollarSign,
+  workload: Cpu,
+  navigate: Map,
+  activity: Activity,
 };
 
 export function CoPilotStructuredResponse({

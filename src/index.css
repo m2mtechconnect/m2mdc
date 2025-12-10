@@ -91,10 +91,15 @@
     
     --radius: 0.5rem;
     
-    /* ============ Text Colors ============ */
+    /* ============ Studio Text Colors (Light Theme) ============ */
+    --text-heading: 222 47% 11%;    /* #111827 equivalent - primary headings */
+    --text-body: 220 13% 26%;        /* #374151 equivalent - body text */
+    --text-muted: 217 10% 35%;       /* #4B5563 equivalent - muted/secondary */
+    --text-subtle: 220 9% 46%;       /* Subtle text for placeholders */
+    
+    /* Legacy aliases for backwards compatibility */
     --text-primary: 0 0% 98%;
     --text-secondary: 222 15% 70%;
-    --text-muted: 222 10% 50%;
     
     /* ============ DC-Specific Semantic Colors ============ */
     --thermal-hot: var(--dc-red);
@@ -264,6 +269,21 @@
    ============================================================ */
 
 @layer utilities {
+  /* ============ Studio Text Utilities (WCAG Compliant) ============ */
+  /* Use these for proper contrast on light backgrounds */
+  .text-studio-heading { color: hsl(var(--text-heading)); }
+  .text-studio-body { color: hsl(var(--text-body)); }
+  .text-studio-muted { color: hsl(var(--text-muted)); }
+  .text-studio-subtle { color: hsl(var(--text-subtle)); }
+  
+  /* Accent text colors (for icons and highlights) */
+  .text-accent-green { color: hsl(142 76% 36%); }
+  .text-accent-blue { color: hsl(217 91% 60%); }
+  .text-accent-amber { color: hsl(38 92% 50%); }
+  .text-accent-purple { color: hsl(262 83% 58%); }
+  .text-accent-orange { color: hsl(25 95% 53%); }
+  .text-accent-cyan { color: hsl(186 100% 42%); }
+  
   /* Status indicator colors */
   .status-operational { color: hsl(var(--dc-green)); }
   .status-warning { color: hsl(var(--dc-amber)); }

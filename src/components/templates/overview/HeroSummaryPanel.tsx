@@ -33,29 +33,29 @@ export function HeroSummaryPanel({
   isDeploying = false
 }: HeroSummaryPanelProps) {
   return (
-    <Card className="p-6 bg-[#FFF7E6] border-[#E5E7EB]">
+    <Card className="p-6 bg-amber-50 border-border">
       <div className="space-y-4">
         {/* Header Row */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-4 flex-1">
             <div className="text-5xl shrink-0">{icon}</div>
             <div className="flex-1">
-              <h1 className="text-[32px] font-bold leading-[1.2] mb-2 text-[#111827]">{name}</h1>
-              <p className="text-[#4B5563] text-[14px] leading-relaxed mb-3">{description}</p>
+              <h1 className="text-[32px] font-bold leading-[1.2] mb-2 text-foreground">{name}</h1>
+              <p className="text-studio-muted text-[14px] leading-relaxed mb-3">{description}</p>
               
               {/* Chips */}
               <div className="flex flex-wrap gap-2">
                 {certified && (
-                  <Badge className="bg-[#FDE68A] text-[#111827] border-[#F59E0B]">
+                  <Badge className="bg-amber-200 text-foreground border-warning">
                     <Shield className="h-3 w-3 mr-1" />
                     Certified
                   </Badge>
                 )}
                 {industries.map((industry: string) => (
-                  <Badge key={industry} variant="outline" className="text-[#111827]">{industry}</Badge>
+                  <Badge key={industry} variant="outline" className="text-foreground">{industry}</Badge>
                 ))}
                 {departments.map((dept: string) => (
-                  <Badge key={dept} variant="outline" className="text-[#111827]">{dept}</Badge>
+                  <Badge key={dept} variant="outline" className="text-foreground">{dept}</Badge>
                 ))}
               </div>
             </div>
@@ -71,34 +71,34 @@ export function HeroSummaryPanel({
         </div>
         
         {/* KPI Summary Row */}
-        <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[#E5E7EB]">
+        <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[#FDE68A]">
-              <TrendingUp className="h-5 w-5 text-[#F59E0B]" />
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-200">
+              <TrendingUp className="h-5 w-5 text-warning" />
             </div>
             <div>
-              <p className="text-[12px] text-[#6B7280]">ROI</p>
-              <p className="text-[20px] font-bold text-[#111827]">{roiPct}%</p>
+              <p className="text-xs text-studio-muted">ROI</p>
+              <p className="text-xl font-bold text-foreground">{roiPct}%</p>
             </div>
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[#FDE68A]">
-              <Clock className="h-5 w-5 text-[#F59E0B]" />
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-200">
+              <Clock className="h-5 w-5 text-warning" />
             </div>
             <div>
-              <p className="text-[12px] text-[#6B7280]">Time Saved</p>
-              <p className="text-[20px] font-bold text-[#111827]">{timeSaved}</p>
+              <p className="text-xs text-studio-muted">Time Saved</p>
+              <p className="text-xl font-bold text-foreground">{timeSaved}</p>
             </div>
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[#FDE68A]">
-              <Download className="h-5 w-5 text-[#F59E0B]" />
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-200">
+              <Download className="h-5 w-5 text-warning" />
             </div>
             <div>
-              <p className="text-[12px] text-[#6B7280]">Downloads</p>
-              <p className="text-[20px] font-bold text-[#111827]">{downloads}</p>
+              <p className="text-xs text-studio-muted">Downloads</p>
+              <p className="text-xl font-bold text-foreground">{downloads}</p>
             </div>
           </div>
         </div>

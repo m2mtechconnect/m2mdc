@@ -109,8 +109,8 @@ export function Step6Review() {
   return (
     <div className="space-y-6 max-w-[880px] mx-auto">
       <div>
-        <h2 className="text-3xl font-bold">Review & Deploy</h2>
-        <p className="text-muted-foreground mt-2">
+        <h2 className="text-3xl font-bold text-foreground">Review & Deploy</h2>
+        <p className="text-studio-muted mt-2">
           Verify all fields before deployment
         </p>
       </div>
@@ -175,9 +175,9 @@ export function Step6Review() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-studio-body">
             {validation.isValid 
-              ? 'All required fields verified' 
+              ? 'All required fields verified'
               : `${validation.errors.length} field${validation.errors.length !== 1 ? 's' : ''} missing`
             }
           </p>

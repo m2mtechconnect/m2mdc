@@ -28,7 +28,7 @@ export default function KpiCard({
   tooltip,
   onClick,
 }: KpiCardProps) {
-  const trendColor = trend === 'up' ? 'text-secondary' : trend === 'down' ? 'text-primary' : 'text-muted-foreground';
+  const trendColor = trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-studio-muted';
   const TrendIcon = trend === 'up' ? ArrowUpRight : trend === 'down' ? ArrowDownRight : null;
 
   const cardContent = (
@@ -54,12 +54,12 @@ export default function KpiCard({
           onClick && "group-hover:bg-secondary/20"
         )}>
           <Icon className={cn(
-            "h-5 w-5 icon-default transition-transform",
+            "h-5 w-5 text-primary transition-transform",
             onClick && "group-hover:scale-110"
           )} />
         </div>
         {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin icon-muted" />
+          <Loader2 className="h-4 w-4 animate-spin text-studio-muted" />
         ) : change ? (
           <span className={cn("flex items-center gap-1 text-xs font-mono", trendColor)}>
             {TrendIcon && <TrendIcon className="h-3 w-3" />}
@@ -68,22 +68,22 @@ export default function KpiCard({
         ) : null}
       </div>
       <div>
-        <p className="text-sm text-body mb-2 flex items-center gap-2">
+        <p className="text-sm text-studio-muted mb-2 flex items-center gap-2">
           {label}
           {onClick && (
-            <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
+            <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-studio-muted" />
           )}
         </p>
-        <p className="text-3xl sm:text-4xl font-display font-bold" style={{ fontSize: 'clamp(28px, 5vw, 36px)' }}>
+        <p className="text-3xl sm:text-4xl font-bold text-foreground" style={{ fontSize: 'clamp(28px, 5vw, 36px)' }}>
           {value}
         </p>
         {subtext && (
-          <p className="text-xs text-caption mt-1">{subtext}</p>
+          <p className="text-xs text-studio-subtle mt-1">{subtext}</p>
         )}
       </div>
       {onClick && !tooltip && (
         <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+          <ArrowUpRight className="h-4 w-4 text-studio-muted" />
         </div>
       )}
     </Card>

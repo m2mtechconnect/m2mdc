@@ -36,6 +36,11 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        // Studio Text Colors (WCAG compliant for light backgrounds)
+        "studio-heading": "hsl(var(--text-heading))",
+        "studio-body": "hsl(var(--text-body))",
+        "studio-muted": "hsl(var(--text-muted))",
+        "studio-subtle": "hsl(var(--text-subtle))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",

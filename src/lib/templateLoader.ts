@@ -1,5 +1,5 @@
-// Template loader utility for Industry Marketplace
-// Phase 1: Cleaned - ready for new Digital Twin Blueprint format
+// Template loader utility for Digital Twin Studio
+// SINGLE TEMPLATE: Data Centre Digital Twin Master Template
 
 export interface DigitalTwinBlueprint {
   id: string;
@@ -120,40 +120,12 @@ export interface DigitalTwinBlueprint {
   };
 }
 
-// Phase 3: Load templates from JSON files
-import blueprints1 from '@/data/templates/digital-twin-blueprints.json';
-import blueprints2 from '@/data/templates/digital-twin-blueprints-2.json';
-import blueprints3 from '@/data/templates/digital-twin-blueprints-3.json';
-import blueprintsComplete from '@/data/templates/digital-twin-blueprints-complete.json';
-import blueprintsAutomotive from '@/data/templates/digital-twin-blueprints-automotive.json';
-import blueprintsEnergy from '@/data/templates/digital-twin-blueprints-energy.json';
-import blueprintsTelecomEduRE from '@/data/templates/digital-twin-blueprints-telecom-edu-realestate.json';
-import blueprintsAgriTravelConsumer from '@/data/templates/digital-twin-blueprints-agriculture-travel-consumer.json';
-import blueprintsHRSalesMarketing from '@/data/templates/digital-twin-blueprints-hr-sales-marketing.json';
-import blueprintsSupportProcFinance from '@/data/templates/digital-twin-blueprints-support-procurement-finance.json';
-import blueprintsAdditional from '@/data/templates/digital-twin-blueprints-additional-industries.json';
-import blueprintsExtended from '@/data/templates/digital-twin-blueprints-extended-coverage.json';
-import blueprintsFashionIndustrial from '@/data/templates/digital-twin-blueprints-fashion-industrial.json';
-import blueprintsTransportCanada from '@/data/templates/digital-twin-blueprints-transport-canada.json';
+// Load ONLY the Data Centre Master Template
+import dataCentreTemplate from '@/data/templates/data-centre-master.json';
 
-const allBlueprints = [
-  ...blueprints1, 
-  ...blueprints2, 
-  ...blueprints3, 
-  ...blueprintsComplete,
-  ...blueprintsAutomotive,
-  ...blueprintsEnergy,
-  ...blueprintsTelecomEduRE,
-  ...blueprintsAgriTravelConsumer,
-  ...blueprintsHRSalesMarketing,
-  ...blueprintsSupportProcFinance,
-  ...blueprintsAdditional,
-  ...blueprintsExtended,
-  ...blueprintsFashionIndustrial,
-  ...blueprintsTransportCanada
-] as DigitalTwinBlueprint[];
+const allBlueprints = dataCentreTemplate as DigitalTwinBlueprint[];
 
-console.log('[templateLoader] Loaded', allBlueprints.length, 'blueprints from JSON files');
+console.log('[templateLoader] Data Centre Master Template loaded');
 
 const templates: Record<string, DigitalTwinBlueprint> = {};
 
@@ -163,7 +135,7 @@ allBlueprints.forEach(template => {
 });
 
 export function loadAllTemplates(): DigitalTwinBlueprint[] {
-  console.log('[templateLoader] loadAllTemplates called, returning', allBlueprints.length, 'templates');
+  console.log('[templateLoader] loadAllTemplates called, returning Data Centre template');
   return allBlueprints;
 }
 

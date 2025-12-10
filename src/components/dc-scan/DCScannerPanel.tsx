@@ -179,7 +179,7 @@ export function DCScannerPanel() {
         });
         
         // Navigate to the builder with the new twin
-        navigate(`/app/build?twinId=${newTwin.id}&from=scanner`);
+        navigate(`/builder?twinId=${newTwin.id}&fromScanner=true`);
       }
     } catch (error) {
       console.error("Create twin error:", error);
@@ -201,7 +201,7 @@ export function DCScannerPanel() {
     setCurrentStep(1);
     
     // Navigate to builder with pre-filled data
-    navigate("/app/build", {
+    navigate("/builder?fromScanner=true", {
       state: {
         fromRecommendation: true,
         recommendation,

@@ -89,18 +89,18 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
 
         {/* Quick chips */}
         <div className="flex flex-wrap gap-2 pt-2">
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="secondary" className="text-xs text-foreground bg-secondary">
             <Building2 className="h-3 w-3 mr-1" />
             {capacityLabels[rec.capacityTier]}
           </Badge>
           {rec.regions.map(r => (
-            <Badge key={r} variant="secondary" className="text-xs">
+            <Badge key={r} variant="secondary" className="text-xs text-foreground bg-secondary">
               <Globe className="h-3 w-3 mr-1" />
               {r}
             </Badge>
           ))}
           {rec.detectedConstraints?.slice(0, 3).map(c => (
-            <Badge key={c} variant="outline" className="text-xs">
+            <Badge key={c} variant="outline" className="text-xs text-foreground border-border">
               <Shield className="h-3 w-3 mr-1" />
               {c}
             </Badge>
@@ -164,7 +164,7 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
           <CollapsibleContent className="pt-2">
             <div className="flex flex-wrap gap-2">
               {rec.agents.map(agentId => (
-                <Badge key={agentId} variant="secondary" className="text-xs">
+                <Badge key={agentId} variant="secondary" className="text-xs text-foreground bg-secondary">
                   {AGENT_DISPLAY_NAMES[agentId] || agentId}
                 </Badge>
               ))}

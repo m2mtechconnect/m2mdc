@@ -34,11 +34,18 @@ export function KPIThresholdEditor({ kpi, onUpdate }: KPIThresholdEditorProps) {
               <span className="font-medium text-sm">{kpi.name}</span>
               <Badge variant="outline" className="text-xs">{kpi.unit}</Badge>
               <Tooltip>
-                <TooltipTrigger>
-                  <DirectionIcon className={`h-3 w-3 ${isLowerBetter ? 'text-green-600' : 'text-blue-600'}`} />
+                <TooltipTrigger asChild>
+                  <button type="button" className="inline-flex items-center justify-center rounded-full bg-muted/50 hover:bg-muted h-4 w-4 text-xs">
+                    <DirectionIcon className={`h-3 w-3 ${isLowerBetter ? 'text-green-600' : 'text-blue-600'}`} />
+                  </button>
                 </TooltipTrigger>
-                <TooltipContent>
-                  {isLowerBetter ? 'Lower values are better' : 'Higher values are better'}
+                <TooltipContent side="top" className="max-w-xs">
+                  <p className="font-medium">{isLowerBetter ? 'Lower is better' : 'Higher is better'}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {isLowerBetter 
+                      ? 'Set your target below your current average. Reducing this metric improves performance.'
+                      : 'Set your target above your current baseline. Increasing this metric improves performance.'}
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </div>

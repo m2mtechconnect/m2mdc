@@ -14,8 +14,19 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 export function FinancialAssumptionsCard() {
   const { financial, updateFinancial, overview } = useDCTwinBuilderStore();
   
-  const isRetail = overview.industry === 'retail' || 
-    overview.industries.some(i => i.toLowerCase().includes('retail'));
+  // Check for retail industry using multiple signals
+  const isRetail = 
+    overview.industry?.toLowerCase().includes('retail') ||
+    overview.industries.some(i => i.toLowerCase().includes('retail')) ||
+    overview.industries.some(i => i.toLowerCase().includes('supply chain')) ||
+    overview.industries.some(i => i.toLowerCase().includes('logistics'));
+  
+  // Only show retail fields if we have retail-specific data
+  const hasRetailData = isRetail && (
+    (financial.annualColdChainEnergyCostUsd !== undefined && financial.annualColdChainEnergyCostUsd > 0) ||
+    (financial.multiStoreAggregationCount !== undefined && financial.multiStoreAggregationCount > 0) ||
+    (financial.annualEdgeComputeEnergyCostUsd !== undefined && financial.annualEdgeComputeEnergyCostUsd > 0)
+  );
 
   // Format currency for display
   const formatCurrency = (value: number) => {
@@ -153,12 +164,12 @@ export function FinancialAssumptionsCard() {
           </p>
         </div>
 
-        {/* Retail-Specific Fields */}
-        {isRetail && (
+        {/* Retail-Specific Fields - Only show when relevant */}
+        {hasRetailData && (
           <div className="pt-4 border-t space-y-4">
             <div className="flex items-center gap-2">
               <Store className="h-4 w-4 text-primary" />
-              <h4 className="font-medium text-sm">Retail-Specific Costs</h4>
+              <h4 className="font-medium text-sm">Retail & Supply Chain Costs</h4>
               <Badge variant="secondary" className="text-xs">Industry-specific</Badge>
             </div>
             

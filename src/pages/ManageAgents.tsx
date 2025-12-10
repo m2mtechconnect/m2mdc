@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -11,17 +11,19 @@ import { SystemDeleteDialog } from '@/components/SystemDeleteDialog';
 import { useToast } from '@/hooks/use-toast';
 import { AOCIntroCard } from '@/components/aoc/AOCIntroCard';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
+import { useBlueprintAgents } from '@/hooks/useBlueprintAgents';
 
 export default function ManageAgents() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const { updateContext } = useCoPilotContext();
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
   const [deleteAgentId, setDeleteAgentId] = useState<string | null>(null);
   const [deleteAgentName, setDeleteAgentName] = useState<string>('');
   const [deleteAgentStatus, setDeleteAgentStatus] = useState<string>('');
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
+  // Get agents from blueprint (source of truth)
+  const { agents: blueprintAgents, stats, isLoading, error } = useBlueprintAgents();
 
   // Update Co-Pilot context
   useEffect(() => {
@@ -30,18 +32,13 @@ export default function ManageAgents() {
     });
   }, [updateContext]);
 
-  // Check authentication
+  // Check authentication - redirect if not logged in
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
-      
       if (error || !session) {
-        console.warn('Authentication check failed:', error?.message || 'No session');
         navigate('/auth', { replace: true });
-        return;
       }
-      
-      setIsAuthenticated(true);
     };
     
     checkAuth();
@@ -49,70 +46,12 @@ export default function ManageAgents() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session) {
         navigate('/auth', { replace: true });
-      } else {
-        setIsAuthenticated(!!session);
       }
     });
     
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  // Fetch agents (draft + active)
-  const { data: agentsData, isLoading, error } = useQuery({
-    queryKey: ['manage-agents'],
-    queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('ai-systems-unified', {
-        body: {
-          tab: 'agents',
-          page: 1,
-          pageSize: 100,
-          sortBy: 'updated_at',
-          sortOrder: 'desc',
-        }
-      });
-      
-      if (error) throw error;
-      
-      let result = data;
-      if (data && typeof data === 'object' && 'success' in data && 'data' in data) {
-        const envelope = data as { success: boolean; data: any };
-        if (!envelope.success) {
-          throw new Error('API returned error');
-        }
-        result = envelope.data;
-      }
-      
-      return result as {
-        items: Agent[];
-        stats: { total: number; active: number; draft: number; archived: number; avgRoi: number };
-      };
-    },
-    enabled: isAuthenticated,
-    refetchInterval: 30000,
-    retry: 2,
-  });
-
-  // Real-time updates
-  useEffect(() => {
-    const channel = supabase
-      .channel('agents-manage-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'agents'
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['manage-agents'] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
 
   // Delete mutation
   const deleteMutation = useMutation({
@@ -134,7 +73,6 @@ export default function ManageAgents() {
       return result;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['manage-agents'] });
       setDeleteAgentId(null);
       toast({
         title: '✅ Agent deleted successfully',
@@ -176,7 +114,6 @@ export default function ManageAgents() {
     setDeleteAgentStatus('');
   };
 
-  const stats = agentsData?.stats || { total: 0, active: 0, draft: 0, archived: 0, avgRoi: 0 };
   const healthPercentage = stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0;
 
   // DC-specific agent types
@@ -297,13 +234,13 @@ export default function ManageAgents() {
           </div>
           <div className="p-6">
             <AgentsGrid
-              agents={agentsData?.items || []}
+              agents={blueprintAgents}
               isLoading={isLoading}
-              error={error instanceof Error ? error.message : null}
+              error={error}
               onRun={handleRun}
               onManage={handleManage}
               onDelete={handleDelete}
-              onRetry={() => queryClient.invalidateQueries({ queryKey: ['manage-agents'] })}
+              onRetry={() => {}}
               mode="manage"
             />
           </div>

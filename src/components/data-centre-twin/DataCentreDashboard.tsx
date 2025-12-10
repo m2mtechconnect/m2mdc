@@ -28,10 +28,16 @@ import { WorkloadDomainView } from './domains/WorkloadDomainView';
 import { SovereigntyDomainView } from './domains/SovereigntyDomainView';
 import { CarbonDomainView } from './domains/CarbonDomainView';
 import { FinancialDomainView } from './domains/FinancialDomainView';
-import { AlertsPanel } from './AlertsPanel';
 import { DCSimulationPanel } from '@/components/simulation/DCSimulationPanel';
 import { useBlueprint } from '@/hooks/useBlueprint';
-import { DcToolsRow } from '@/components/dc-tools';
+import { 
+  EnhancedKPICockpit, 
+  AIInsightsPanel, 
+  EnhancedRackOverview, 
+  EnhancedAlertsPanel, 
+  EnhancedEventTimeline,
+  EnhancedDCToolsPanel 
+} from './overview';
 import { useCoPilotCommands } from '@/contexts/CoPilotCommandContext';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useSimulation } from '@/simulation/useSimulation';
@@ -379,85 +385,24 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <KPICockpit facility={facility} twinId={twinId} />
-          
-          {/* Data Centre Tools Row */}
-          <DcToolsRow 
-            twinId={twinId} 
-            title="Data Centre Tools"
-            subtitle="Quick access to specialized monitoring and analysis tools"
-          />
-          
-          <div className="grid gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-2 space-y-6">
-              <Card className="bg-card border-border">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <Server className="h-4 w-4 text-primary" />
-                    Rack Status Overview
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <RackGrid
-                    racks={facility.thermalHardware.racks.slice(0, 12).map(rack => ({
-                      id: rack.id,
-                      name: rack.name,
-                      status: rack.servers.some(s => s.cpuTempC > 85) ? 'critical' 
-                            : rack.servers.some(s => s.cpuTempC > 75) ? 'warning' 
-                            : 'normal',
-                      powerKw: rack.servers.reduce((acc, s) => acc + s.powerDrawW, 0) / 1000,
-                    }))}
-                    onRackClick={(rackId) => console.log('Rack clicked:', rackId)}
-                  />
-                </CardContent>
-              </Card>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <KPITile
-                  label="Power Draw"
-                  value={facility.currentPowerDrawKw}
-                  unit="kW"
-                  status={facility.currentPowerDrawKw / facility.totalPowerCapacityKw < 0.8 ? 'normal' : 'warning'}
-                  delta={2.1}
-                  icon={<Zap className="h-4 w-4 text-primary" />}
-                />
-                <KPITile
-                  label="Cooling Load"
-                  value={facility.cooling.kpis.coolingEfficiencyIndex}
-                  unit="%"
-                  status={facility.cooling.kpis.coolingEfficiencyIndex > 70 ? 'normal' : 'warning'}
-                  icon={<Wind className="h-4 w-4 text-primary" />}
-                />
-                <KPITile
-                  label="Network Integrity"
-                  value={facility.network.kpis.networkIntegrityScore}
-                  unit="%"
-                  status={facility.network.kpis.networkIntegrityScore > 90 ? 'normal' : 'warning'}
-                  icon={<Network className="h-4 w-4 text-primary" />}
-                />
-                <KPITile
-                  label="Facility Safety"
-                  value={facility.facilitySafety.kpis.environmentalSafetyScore}
-                  unit="%"
-                  status={facility.facilitySafety.kpis.environmentalSafetyScore > 90 ? 'normal' : 'warning'}
-                  icon={<Shield className="h-4 w-4 text-primary" />}
-                />
-              </div>
+          {/* 3-Column NOC Layout */}
+          <div className="grid gap-6 lg:grid-cols-12">
+            {/* Column 1 — Core KPIs */}
+            <div className="lg:col-span-4 space-y-4">
+              <EnhancedKPICockpit facility={facility} twinId={twinId} />
             </div>
             
-            <div className="space-y-6">
-              <AlertsPanel alerts={facility.alerts} maxHeight="250px" />
-              <Card className="bg-card border-border">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-primary" />
-                    Event Timeline
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <EventTimeline events={timelineEvents} />
-                </CardContent>
-              </Card>
+            {/* Column 2 — AI Insights + Alerts */}
+            <div className="lg:col-span-4 space-y-4">
+              <AIInsightsPanel facility={facility} />
+              <EnhancedAlertsPanel alerts={facility.alerts} />
+            </div>
+            
+            {/* Column 3 — DC Tools + Rack + Timeline */}
+            <div className="lg:col-span-4 space-y-4">
+              <EnhancedDCToolsPanel twinId={twinId} />
+              <EnhancedRackOverview facility={facility} />
+              <EnhancedEventTimeline events={timelineEvents} />
             </div>
           </div>
         </TabsContent>

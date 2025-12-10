@@ -3,10 +3,12 @@
  * 
  * Right-side docked assistant panel with streaming responses,
  * context chips, and structured 4-section layout.
+ * Now integrated with DC domain context and quick chips.
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { X, Send, StopCircle, Sparkles, Loader2 } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -14,7 +16,9 @@ import { cn } from '@/lib/utils';
 import { CoPilotContextChips } from './CoPilotContextChips';
 import { CoPilotStructuredResponse } from './CoPilotStructuredResponse';
 import { CoPilotFormattedContent } from './CoPilotFormattedContent';
+import { DCCoPilotChips } from './DCCoPilotChips';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
+import { useCoPilotCommands } from '@/contexts/CoPilotCommandContext';
 import { logCoPilotEvent } from '@/lib/copilot/analytics';
 import { getModelDisplayName, getModelVersion } from '@/lib/copilot/copilotConfig';
 
@@ -23,11 +27,61 @@ interface CoPilotDockedPanelProps {
   onClose: () => void;
 }
 
+// Detect if we're on a DC-related page
+function useDCPageContext() {
+  const location = useLocation();
+  const path = location.pathname;
+  const searchParams = new URLSearchParams(location.search);
+  
+  const isDCPage = path.includes('/data-centre-twin') || 
+                   path.includes('/blueprint') ||
+                   path.includes('/builder');
+  
+  // Determine active tab from path or query
+  let activeTab = 'overview';
+  if (path.includes('/simulation') || searchParams.get('view') === 'simulation') {
+    activeTab = 'simulation';
+  } else if (path.includes('/thermal')) {
+    activeTab = 'thermal';
+  } else if (path.includes('/power')) {
+    activeTab = 'power';
+  } else if (path.includes('/cooling')) {
+    activeTab = 'cooling';
+  } else if (path.includes('/network')) {
+    activeTab = 'network';
+  } else if (path.includes('/workload')) {
+    activeTab = 'workload';
+  } else if (path.includes('/sovereignty')) {
+    activeTab = 'sovereignty';
+  } else if (path.includes('/financial')) {
+    activeTab = 'financial';
+  } else if (path.includes('/builder')) {
+    activeTab = 'builder';
+  } else if (path.includes('/blueprint')) {
+    activeTab = 'blueprint';
+  }
+  
+  // Determine page context
+  let pageContext = 'dashboard';
+  if (path.includes('/data-centre-twin')) {
+    pageContext = 'dashboard';
+  } else if (path.includes('/blueprint')) {
+    pageContext = 'blueprint';
+  } else if (path.includes('/builder')) {
+    pageContext = 'builder';
+  }
+  
+  return { isDCPage, activeTab, pageContext };
+}
+
 export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps) {
   const [input, setInput] = useState('');
   const [sessionId] = useState(() => crypto.randomUUID());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  const { isDCPage, activeTab, pageContext } = useDCPageContext();
+  const { executeCommand } = useCoPilotCommands();
   
   const { 
     context, 
@@ -48,10 +102,10 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
   // Focus input when opened
   useEffect(() => {
     if (isOpen && inputRef.current) {
-      console.log('[CoPilot] Panel opened, context:', context);
+      console.log('[CoPilot] Panel opened, context:', context, 'isDCPage:', isDCPage);
       setTimeout(() => inputRef.current?.focus(), 100);
     }
-  }, [isOpen, context]);
+  }, [isOpen, context, isDCPage]);
 
   const handleSend = useCallback(async (overrideMessage?: string) => {
     const text = (overrideMessage ?? input).trim();
@@ -75,6 +129,12 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
   };
 
   const handleActionClick = async (action: any) => {
+    // Check if this is a command action
+    if (action.handler && action.handler.startsWith('cmd:')) {
+      const [, commandName, ...args] = action.handler.split(':');
+      executeCommand(commandName, args.join(':') || undefined);
+    }
+    
     // Lightweight analytics for action clicks
     await logCoPilotEvent({
       sessionId,
@@ -86,6 +146,11 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
     });
 
     console.log('Action clicked:', action);
+  };
+  
+  // Handler for DC quick chip clicks
+  const handleDCChipClick = (query: string) => {
+    handleSend(query);
   };
 
   return (
@@ -117,8 +182,17 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
         </Button>
       </div>
 
-      {/* Context Chips */}
-      <CoPilotContextChips context={context} />
+      {/* Context Chips - Show DC chips when on DC pages */}
+      {isDCPage ? (
+        <DCCoPilotChips 
+          pageContext={pageContext}
+          activeTab={activeTab}
+          onChipClick={handleDCChipClick}
+          maxChips={6}
+        />
+      ) : (
+        <CoPilotContextChips context={context} />
+      )}
 
       {/* Messages */}
       <ScrollArea className="flex-1 px-4 py-4">

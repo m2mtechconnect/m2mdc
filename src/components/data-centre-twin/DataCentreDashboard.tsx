@@ -3,9 +3,10 @@
  * Enterprise dashboard with domain tabs and KPI cockpit
  * Uses Studio design system (light theme)
  * Blueprint-aware for system configuration
+ * CoPilot command-aware for voice/text control
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -30,6 +31,10 @@ import { AlertsPanel } from './AlertsPanel';
 import { DCSimulationPanel } from '@/components/simulation/DCSimulationPanel';
 import { useBlueprint } from '@/hooks/useBlueprint';
 import { DcToolsRow } from '@/components/dc-tools';
+import { useCoPilotCommands } from '@/contexts/CoPilotCommandContext';
+import { useCoPilotContext } from '@/contexts/CoPilotContext';
+import { useSimulation } from '@/simulation/useSimulation';
+import { cn } from '@/lib/utils';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 interface DataCentreDashboardProps {
@@ -160,9 +165,70 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
+  const [highlightedKPILocal, setHighlightedKPILocal] = useState<string | null>(null);
   
   // Get Blueprint for system configuration
   const { blueprint, summary } = useBlueprint(twinId);
+  
+  // CoPilot command integration
+  const { registerCommands, highlightedKPI } = useCoPilotCommands();
+  const { updateDCContext } = useCoPilotContext();
+  
+  // Simulation controls - get from hook
+  const simulation = useSimulation();
+  const simulationRef = useRef(simulation);
+  simulationRef.current = simulation;
+  
+  // Register CoPilot commands
+  useEffect(() => {
+    registerCommands({
+      navigateToTab: (tabName: string) => {
+        console.log('[Dashboard] CoPilot navigateToTab:', tabName);
+        const validTabs = ['overview', 'simulation', 'thermal', 'power', 'cooling', 'network', 'facility', 'workload', 'sovereignty', 'financial'];
+        const normalizedTab = tabName.toLowerCase();
+        if (validTabs.includes(normalizedTab)) {
+          setActiveTab(normalizedTab);
+        }
+      },
+      runSimulation: (scenarioId?: string) => {
+        console.log('[Dashboard] CoPilot runSimulation:', scenarioId);
+        setActiveTab('simulation');
+        // Use ref to get latest simulation state
+        if (scenarioId && simulationRef.current.startScenario) {
+          simulationRef.current.startScenario(scenarioId);
+        } else if (simulationRef.current.resume) {
+          simulationRef.current.resume();
+        }
+      },
+      pauseSimulation: () => {
+        console.log('[Dashboard] CoPilot pauseSimulation');
+        if (simulationRef.current.pause) {
+          simulationRef.current.pause();
+        }
+      },
+      resetSimulation: () => {
+        console.log('[Dashboard] CoPilot resetSimulation');
+        if (simulationRef.current.reset) {
+          simulationRef.current.reset();
+        }
+      },
+      highlightKPI: (kpiId: string) => {
+        console.log('[Dashboard] CoPilot highlightKPI:', kpiId);
+        setHighlightedKPILocal(kpiId);
+        setTimeout(() => setHighlightedKPILocal(null), 5000);
+      },
+      toggleDomain: (domainName: string) => {
+        console.log('[Dashboard] CoPilot toggleDomain:', domainName);
+        setActiveTab(domainName.toLowerCase());
+      },
+    });
+  }, [registerCommands]);
+  
+  // Update DC context when tab changes
+  useEffect(() => {
+    updateDCContext({ domainTabActive: activeTab });
+  }, [activeTab, updateDCContext]);
+  
   const activeAlerts = facility.alerts.filter(a => a.status === 'active');
   const criticalAlerts = activeAlerts.filter(a => a.severity === 'critical');
   
@@ -179,6 +245,9 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
     title: alert.title,
     description: alert.description,
   }));
+  
+  // Combined highlight state
+  const currentHighlight = highlightedKPILocal || highlightedKPI;
 
   const handleSearch = (query: string) => {
     console.log('Search query:', query);

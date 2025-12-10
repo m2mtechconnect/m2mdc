@@ -28,7 +28,7 @@ import { useBlueprintScenarios } from "@/hooks/useBlueprintScenarios";
 import { useSovereignty } from "@/sovereignty";
 import { SovereigntyAuditTimeline } from "@/components/compliance/SovereigntyAuditTimeline";
 import { SovereigntyRiskOverview } from "@/components/compliance/SovereigntyRiskOverview";
-import { useTwinContext } from "@/contexts/TwinContext";
+import { useActiveTwin } from "@/context/ActiveTwinContext";
 import { useTwinSovereigntyEvents } from "@/hooks/useTwinData";
 
 // DC-specific audit timeline
@@ -140,7 +140,7 @@ export default function Compliance() {
   const [selectedStressScenario, setSelectedStressScenario] = useState<string>('');
   
   // Twin context for scoped data
-  const { twin, twinId } = useTwinContext();
+  const { twin, activeTwinId: twinId } = useActiveTwin();
   const { data: sovereigntyEvents } = useTwinSovereigntyEvents({ limit: 50 });
   
   // Get Blueprint data for workflows, roles, and scenarios - use twin's blueprint if available

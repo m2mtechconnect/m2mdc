@@ -37,7 +37,7 @@ import { useBlueprintScenarios } from '@/hooks/useBlueprintScenarios';
 import { useBlueprintKPIs } from '@/hooks/useBlueprintKPIs';
 import { DcToolsStrip } from '@/components/dc-tools';
 import { SovereigntyAnalyticsTab } from '@/components/telemetry/SovereigntyAnalyticsTab';
-import { useTwinContext } from '@/contexts/TwinContext';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useTwinTelemetry, useTwinKPIs } from '@/hooks/useTwinData';
 
 interface System {
@@ -65,7 +65,7 @@ export default function IntelligenceDashboard() {
   const [region, setRegion] = useState('all');
 
   // Twin context for scoped data
-  const { twin, twinId, twins } = useTwinContext();
+  const { twin, activeTwinId: twinId, twins } = useActiveTwin();
   
   // Twin-scoped telemetry and KPIs
   const { data: twinTelemetry } = useTwinTelemetry();

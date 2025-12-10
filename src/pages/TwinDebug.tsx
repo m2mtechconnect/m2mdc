@@ -26,7 +26,7 @@ import {
   Copy,
   CheckCircle2
 } from 'lucide-react';
-import { useTwinContext } from '@/contexts/TwinContext';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { 
   useTwinTelemetry, 
   useTwinKPIs, 
@@ -50,7 +50,7 @@ interface QueryLog {
 }
 
 export default function TwinDebug() {
-  const { twinId, twin, twins, refreshTwins } = useTwinContext();
+  const { activeTwinId: twinId, twin, twins, refreshTwins } = useActiveTwin();
   const { toast } = useToast();
   const [queryLogs, setQueryLogs] = useState<QueryLog[]>([]);
 

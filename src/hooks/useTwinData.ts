@@ -5,11 +5,11 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useTwinContext } from '@/contexts/TwinContext';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
 
 // Twin Telemetry
 export function useTwinTelemetry(domain?: string) {
-  const { twinId } = useTwinContext();
+  const { activeTwinId: twinId } = useActiveTwin();
   
   return useQuery({
     queryKey: ['twin-telemetry', twinId, domain],
@@ -37,7 +37,7 @@ export function useTwinTelemetry(domain?: string) {
 
 // Twin KPI Snapshots
 export function useTwinKPIs(kpiKeys?: string[]) {
-  const { twinId } = useTwinContext();
+  const { activeTwinId: twinId } = useActiveTwin();
   
   return useQuery({
     queryKey: ['twin-kpis', twinId, kpiKeys],
@@ -64,7 +64,7 @@ export function useTwinKPIs(kpiKeys?: string[]) {
 
 // Twin Simulation Runs
 export function useTwinSimulations() {
-  const { twinId } = useTwinContext();
+  const { activeTwinId: twinId } = useActiveTwin();
   
   return useQuery({
     queryKey: ['twin-simulations', twinId],
@@ -86,7 +86,7 @@ export function useTwinSimulations() {
 
 // Create Simulation Run
 export function useCreateSimulationRun() {
-  const { twinId } = useTwinContext();
+  const { activeTwinId: twinId } = useActiveTwin();
   const queryClient = useQueryClient();
   
   return useMutation({
@@ -119,7 +119,7 @@ export function useCreateSimulationRun() {
 
 // Twin Sovereignty Events
 export function useTwinSovereigntyEvents(options?: { severity?: string; limit?: number }) {
-  const { twinId } = useTwinContext();
+  const { activeTwinId: twinId } = useActiveTwin();
   
   return useQuery({
     queryKey: ['twin-sovereignty', twinId, options],
@@ -150,7 +150,7 @@ export function useTwinSovereigntyEvents(options?: { severity?: string; limit?: 
 
 // Twin Carbon Emissions
 export function useTwinCarbonEmissions(options?: { days?: number }) {
-  const { twinId } = useTwinContext();
+  const { activeTwinId: twinId } = useActiveTwin();
   const days = options?.days || 30;
   
   return useQuery({
@@ -177,7 +177,7 @@ export function useTwinCarbonEmissions(options?: { days?: number }) {
 
 // Twin Financial Records
 export function useTwinFinancials(options?: { type?: string; days?: number }) {
-  const { twinId } = useTwinContext();
+  const { activeTwinId: twinId } = useActiveTwin();
   
   return useQuery({
     queryKey: ['twin-financials', twinId, options],
@@ -210,7 +210,7 @@ export function useTwinFinancials(options?: { type?: string; days?: number }) {
 
 // Twin Agents
 export function useTwinAgents() {
-  const { twinId } = useTwinContext();
+  const { activeTwinId: twinId } = useActiveTwin();
   
   return useQuery({
     queryKey: ['twin-agents', twinId],
@@ -232,7 +232,7 @@ export function useTwinAgents() {
 
 // Twin Agent Runs
 export function useTwinAgentRuns(agentId?: string) {
-  const { twinId } = useTwinContext();
+  const { activeTwinId: twinId } = useActiveTwin();
   
   return useQuery({
     queryKey: ['twin-agent-runs', twinId, agentId],
@@ -260,7 +260,7 @@ export function useTwinAgentRuns(agentId?: string) {
 
 // Insert Telemetry
 export function useInsertTelemetry() {
-  const { twinId } = useTwinContext();
+  const { activeTwinId: twinId } = useActiveTwin();
   const queryClient = useQueryClient();
   
   return useMutation({
@@ -295,7 +295,7 @@ export function useInsertTelemetry() {
 
 // Insert KPI Snapshot
 export function useInsertKPI() {
-  const { twinId } = useTwinContext();
+  const { activeTwinId: twinId } = useActiveTwin();
   const queryClient = useQueryClient();
   
   return useMutation({

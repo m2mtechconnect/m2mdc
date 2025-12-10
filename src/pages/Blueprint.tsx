@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
-import { useTwinContext } from '@/contexts/TwinContext';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useToast } from '@/hooks/use-toast';
 
 // Blueprint Tab Components
@@ -39,7 +39,7 @@ import { BlueprintScenariosTab } from '@/components/blueprint/tabs/BlueprintScen
 
 // Create Twin from Blueprint Button Component
 function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: any }) {
-  const { createTwin } = useTwinContext();
+  const { createTwin } = useActiveTwin();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isCreating, setIsCreating] = useState(false);
@@ -47,7 +47,7 @@ function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: any }) {
   const handleCreate = async () => {
     setIsCreating(true);
     try {
-      const newTwin = await createTwin({
+      const newTwin = await createTwin(null, {
         name: blueprint.name || 'Montreal Sovereign AI DC',
         city: 'Montreal',
         region_code: 'QC',
@@ -104,7 +104,7 @@ export default function Blueprint() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { openWithQuestion } = useCoPilotContext();
-  const { twin, twinId } = useTwinContext();
+  const { twin, activeTwinId: twinId } = useActiveTwin();
   
   // Use twin's blueprint_id if available, otherwise use URL param or 'default'
   const blueprintId = twin?.blueprint_id || id || 'default';

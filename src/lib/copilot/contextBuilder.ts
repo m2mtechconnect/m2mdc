@@ -82,6 +82,28 @@ export interface CoPilotContext {
   agentType?: 'digital_twin' | 'agent';
   agentStatus?: string;
   
+  // Multi-tenant twin context
+  twinId?: string;
+  twin?: {
+    name: string;
+    city: string;
+    region: string;
+    tier: string;
+    capacity_kw: number;
+    industry: string | null;
+    sovereignty_level: string | null;
+    pue_target: number | null;
+  };
+  location?: {
+    name: string;
+    city: string;
+    province: string | null;
+    country: string;
+    cloud_region: string | null;
+    provider_type: string;
+    industry: string;
+  };
+  
   // Organization context
   industry?: string;
   department?: string;

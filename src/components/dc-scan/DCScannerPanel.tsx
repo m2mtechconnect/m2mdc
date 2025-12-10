@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useTwinContext } from "@/contexts/TwinContext";
+import { useActiveTwin } from "@/context/ActiveTwinContext";
 import { getRegionByCode } from "@/data/regions";
 import { 
   useLastScanSession, 
@@ -33,7 +33,7 @@ import type { DCRecommendation, DCBlueprintProfile } from "@/types/dcScan";
 export function DCScannerPanel() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { createTwin, setTwinId, refreshTwins } = useTwinContext();
+  const { createTwin, setActiveTwin, refreshTwins } = useActiveTwin();
   
   const [url, setUrl] = useState("");
   const [isScanning, setIsScanning] = useState(false);
@@ -137,8 +137,8 @@ export function DCScannerPanel() {
       const regionCode = 'ca-central-1';
       const region = getRegionByCode(regionCode);
       
-      // Create twin using TwinContext
-      const newTwin = await createTwin({
+      // Create twin using ActiveTwinContext (null locationId for legacy behavior)
+      const newTwin = await createTwin(null, {
         name: recommendation.blueprintName,
         city: region?.city || 'Montreal',
         region_code: regionCode,

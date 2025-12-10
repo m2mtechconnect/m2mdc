@@ -120,74 +120,97 @@ export default function Auth() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* AI/ML Animated Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Base gradient glow orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-        
-        {/* Neural network grid pattern */}
-        <svg className="absolute inset-0 w-full h-full opacity-20" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="neural-grid" width="100" height="100" patternUnits="userSpaceOnUse">
-              <circle cx="50" cy="50" r="1.5" fill="#8b5cf6" opacity="0.4">
-                <animate attributeName="opacity" values="0.4;0.8;0.4" dur="4s" repeatCount="indefinite" />
-              </circle>
-              <line x1="50" y1="50" x2="100" y2="50" stroke="#8b5cf6" strokeWidth="0.5" opacity="0.3">
-                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite" />
-              </line>
-              <line x1="50" y1="50" x2="50" y2="100" stroke="#3b82f6" strokeWidth="0.5" opacity="0.3">
-                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3.5s" repeatCount="indefinite" />
-              </line>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#neural-grid)" />
-        </svg>
+    <div className="min-h-screen flex">
+      {/* Left Panel - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] relative overflow-hidden items-center justify-center">
+        {/* AI/ML Animated Background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Base gradient glow orbs */}
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+          
+          {/* Neural network grid pattern */}
+          <svg className="absolute inset-0 w-full h-full opacity-20" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="neural-grid" width="100" height="100" patternUnits="userSpaceOnUse">
+                <circle cx="50" cy="50" r="1.5" fill="#8b5cf6" opacity="0.4">
+                  <animate attributeName="opacity" values="0.4;0.8;0.4" dur="4s" repeatCount="indefinite" />
+                </circle>
+                <line x1="50" y1="50" x2="100" y2="50" stroke="#8b5cf6" strokeWidth="0.5" opacity="0.3">
+                  <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite" />
+                </line>
+                <line x1="50" y1="50" x2="50" y2="100" stroke="#3b82f6" strokeWidth="0.5" opacity="0.3">
+                  <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3.5s" repeatCount="indefinite" />
+                </line>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#neural-grid)" />
+          </svg>
 
-        {/* Floating particles */}
-        <div className="absolute top-[10%] left-[15%] w-2 h-2 rounded-full bg-yellow-400/60 animate-float" />
-        <div className="absolute top-[30%] left-[75%] w-2 h-2 rounded-full bg-purple-400/60 animate-float" style={{ animationDelay: '1s', animationDuration: '8s' }} />
-        <div className="absolute top-[60%] left-[25%] w-2 h-2 rounded-full bg-blue-400/60 animate-float" style={{ animationDelay: '2s', animationDuration: '10s' }} />
-        <div className="absolute top-[80%] left-[80%] w-2 h-2 rounded-full bg-yellow-400/60 animate-float" style={{ animationDelay: '3s', animationDuration: '9s' }} />
-        <div className="absolute top-[40%] left-[50%] w-2 h-2 rounded-full bg-purple-400/60 animate-float" style={{ animationDelay: '1.5s', animationDuration: '7s' }} />
-        
-        {/* Circuit-like lines */}
-        <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0,200 Q200,100 400,200 T800,200" stroke="#8b5cf6" strokeWidth="2" fill="none">
-            <animate attributeName="stroke-dasharray" values="0,1000;1000,0" dur="6s" repeatCount="indefinite" />
-          </path>
-          <path d="M100,400 Q300,300 500,400 T900,400" stroke="#3b82f6" strokeWidth="2" fill="none">
-            <animate attributeName="stroke-dasharray" values="0,1000;1000,0" dur="7s" repeatCount="indefinite" />
-          </path>
-          <path d="M0,600 Q250,550 500,600 T1000,600" stroke="#eab308" strokeWidth="2" fill="none" opacity="0.6">
-            <animate attributeName="stroke-dasharray" values="0,1000;1000,0" dur="8s" repeatCount="indefinite" />
-          </path>
-        </svg>
+          {/* Floating particles */}
+          <div className="absolute top-[10%] left-[15%] w-2 h-2 rounded-full bg-yellow-400/60 animate-float" />
+          <div className="absolute top-[30%] left-[75%] w-2 h-2 rounded-full bg-purple-400/60 animate-float" style={{ animationDelay: '1s', animationDuration: '8s' }} />
+          <div className="absolute top-[60%] left-[25%] w-2 h-2 rounded-full bg-blue-400/60 animate-float" style={{ animationDelay: '2s', animationDuration: '10s' }} />
+          <div className="absolute top-[80%] left-[80%] w-2 h-2 rounded-full bg-yellow-400/60 animate-float" style={{ animationDelay: '3s', animationDuration: '9s' }} />
+          
+          {/* Circuit-like lines */}
+          <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,200 Q200,100 400,200 T800,200" stroke="#8b5cf6" strokeWidth="2" fill="none">
+              <animate attributeName="stroke-dasharray" values="0,1000;1000,0" dur="6s" repeatCount="indefinite" />
+            </path>
+            <path d="M100,400 Q300,300 500,400 T900,400" stroke="#3b82f6" strokeWidth="2" fill="none">
+              <animate attributeName="stroke-dasharray" values="0,1000;1000,0" dur="7s" repeatCount="indefinite" />
+            </path>
+            <path d="M0,600 Q250,550 500,600 T1000,600" stroke="#eab308" strokeWidth="2" fill="none" opacity="0.6">
+              <animate attributeName="stroke-dasharray" values="0,1000;1000,0" dur="8s" repeatCount="indefinite" />
+            </path>
+          </svg>
 
-        {/* Data stream effect */}
-        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-purple-500/30 to-transparent animate-data-stream" />
-        <div className="absolute top-0 left-3/4 w-px h-full bg-gradient-to-b from-transparent via-blue-500/30 to-transparent animate-data-stream" style={{ animationDelay: '2s' }} />
+          {/* Data stream effect */}
+          <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-purple-500/30 to-transparent animate-data-stream" />
+          <div className="absolute top-0 left-3/4 w-px h-full bg-gradient-to-b from-transparent via-blue-500/30 to-transparent animate-data-stream" style={{ animationDelay: '2s' }} />
+        </div>
+
+        {/* Branding Content */}
+        <div className="relative z-10 text-center px-12">
+          <img 
+            src={m2mLogo} 
+            alt="M2M Logo" 
+            className="h-20 mx-auto mb-8"
+          />
+          <h1 className="text-4xl font-bold text-white mb-4">
+            Welcome to AURA
+          </h1>
+          <p className="text-lg text-white/70 max-w-md mx-auto">
+            Building autonomous AI systems for enterprise. Transform your data centre operations with intelligent automation.
+          </p>
+        </div>
       </div>
 
-      <DCCard className="max-w-md w-full shadow-2xl border-white/20 backdrop-blur-xl bg-white/90 dark:bg-card/90 relative z-10 ring-1 ring-white/30">
-        <div className="p-8">
-          <div className="mb-8 text-center">
+      {/* Right Panel - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background">
+        <div className="w-full max-w-md">
+          {/* Mobile logo */}
+          <div className="lg:hidden mb-8 text-center">
             <img 
               src={m2mLogo} 
               alt="M2M Logo" 
-              className="h-16 mx-auto mb-6"
+              className="h-16 mx-auto mb-4"
             />
-            <h1 className="text-3xl font-bold mb-2 text-foreground">
-              Welcome to AURA
-            </h1>
+            <h1 className="text-2xl font-bold text-foreground">Welcome to AURA</h1>
+          </div>
+
+          <div className="lg:mb-8">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
+              {isSignUp ? "Create your account" : "Sign in to your account"}
+            </h2>
             <p className="text-muted-foreground">
-              {isSignUp ? "Create your account to get started" : "Building autonomous AI systems for enterprise"}
+              {isSignUp ? "Get started with AURA today" : "Enter your credentials to continue"}
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5 mt-6">
             <div>
               <Label htmlFor="signin-email" className="text-sm font-semibold">Email Address</Label>
               <Input
@@ -248,7 +271,7 @@ export default function Auth() {
             </button>
           </div>
         </div>
-      </DCCard>
+      </div>
     </div>
   );
 }

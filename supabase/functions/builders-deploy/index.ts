@@ -51,35 +51,44 @@ serve(createHandler({
 
     const config = builder.config as Record<string, any>;
 
-    // Derive effective type with a safe default
-    const effectiveType = config.type || 'agent';
+    // Support both standard builder and DC Twin builder data structures
+    // DC Twin stores data in 'overview' object, standard builder at top level
+    const isDCTwin = !!config.overview;
+    
+    // Extract fields with DC Twin fallback
+    const effectiveGoal = config.goal || config.overview?.twinSummary || config.overview?.description;
+    const effectiveIndustry = config.industry || config.overview?.industry || config.overview?.industries?.[0];
+    const effectiveDepartment = config.department || (isDCTwin ? 'IT Operations' : null);
+    const effectiveType = config.type || (isDCTwin ? '3d_twin' : 'agent');
 
     // Validate required fields (template is optional for now)
     const errors: string[] = [];
-    if (!config.goal) errors.push('Goal is required');
-    if (!config.industry) errors.push('Industry is required');
-    if (!config.department) errors.push('Department is required');
+    if (!effectiveGoal) errors.push('Goal is required');
+    if (!effectiveIndustry) errors.push('Industry is required');
+    if (!effectiveDepartment) errors.push('Department is required');
     if (!effectiveType) errors.push('Type is required');
     
-    // Enhanced workflow validation
-    if (!config.workflow) {
+    // Enhanced workflow validation - support both standard and DC Twin structures
+    // DC Twin uses 'workflows' array, standard builder uses 'workflow.actions'
+    const hasStandardWorkflow = config.workflow?.actions?.length > 0;
+    const hasDCWorkflows = Array.isArray(config.workflows) && config.workflows.length > 0;
+    
+    if (!hasStandardWorkflow && !hasDCWorkflows) {
       errors.push('Workflow configuration is required');
-    } else if (!Array.isArray(config.workflow.actions)) {
-      errors.push('Workflow actions must be an array');
-    } else if (config.workflow.actions.length === 0) {
-      errors.push('Workflow must have at least one action');
     }
     
     // Log workflow state for debugging
     log("Workflow validation", { 
-      hasWorkflow: !!config.workflow,
-      actionsType: typeof config.workflow?.actions,
-      actionsIsArray: Array.isArray(config.workflow?.actions),
-      actionsLength: config.workflow?.actions?.length || 0,
-      actions: config.workflow?.actions
+      isDCTwin,
+      hasStandardWorkflow,
+      hasDCWorkflows,
+      standardActions: config.workflow?.actions?.length || 0,
+      dcWorkflows: config.workflows?.length || 0,
     });
     
-    if (!config.model_config?.model) errors.push('Model configuration is required');
+    // Model config validation - DC Twin stores in 'intelligence' object
+    const hasModelConfig = config.model_config?.model || config.intelligence?.modelId;
+    if (!hasModelConfig) errors.push('Model configuration is required');
 
     // Log when we have to fall back the type so we can tighten this later
     if (!config.type && effectiveType) {
@@ -95,12 +104,21 @@ serve(createHandler({
       };
     }
 
-    // Update agent to deployed status
+    // Update agent to deployed status with normalized fields
     const nowIso = new Date().toISOString();
     const updatedConfig = {
       ...config,
+      // Normalize fields for consistency
+      goal: effectiveGoal,
+      industry: effectiveIndustry,
+      department: effectiveDepartment,
       type: effectiveType,
       deployed_at: nowIso,
+      // Ensure model_config exists for DC Twin
+      model_config: config.model_config || {
+        model: config.intelligence?.modelId || 'google/gemini-2.5-flash',
+        provider: config.intelligence?.modelProvider || 'google',
+      },
     };
 
     const { data: deployedAgent, error: deployError } = await supabase
@@ -131,9 +149,9 @@ serve(createHandler({
         version: 'v1',
         status: 'active',
         deployed_by: userId,
-        region: 'us-east-1',
-        model: config.model_config.model,
-        grounding: !!config.model_config.rag
+        region: isDCTwin ? (config.deployment?.targetDeploymentRegion || 'ca-central-1') : 'us-east-1',
+        model: updatedConfig.model_config.model,
+        grounding: !!config.model_config?.rag || !!config.intelligence?.ragEnabled
       });
 
     if (deploymentError) {

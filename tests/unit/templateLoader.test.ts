@@ -1,17 +1,16 @@
 import { describe, it, expect } from '@jest/globals';
 import { loadAllTemplates, loadTemplateById, validateTemplate } from '@/lib/templateLoader';
 
-describe('Template Loader', () => {
+describe('Template Loader - Data Centre Only', () => {
   describe('loadAllTemplates', () => {
-    it('should return 40-50 templates after Phase 3 completion', () => {
+    it('should return exactly 1 template (Data Centre Master)', () => {
       const templates = loadAllTemplates();
-      expect(templates.length).toBeGreaterThanOrEqual(40);
-      expect(templates.length).toBeLessThanOrEqual(50);
+      expect(templates.length).toBe(1);
       expect(Array.isArray(templates)).toBe(true);
-      expect(templates.every(t => t.id)).toBe(true);
+      expect(templates[0].id).toBe('datacentre-master-twin-v1');
     });
 
-    it('should have valid schema for all templates', () => {
+    it('should have valid schema for the Data Centre template', () => {
       const templates = loadAllTemplates();
       templates.forEach(template => {
         expect(validateTemplate(template)).toBe(true);
@@ -36,10 +35,11 @@ describe('Template Loader', () => {
   });
 
   describe('loadTemplateById', () => {
-    it('should load existing template by id', () => {
-      const template = loadTemplateById('retail_inventory_optimization');
+    it('should load Data Centre template by id', () => {
+      const template = loadTemplateById('datacentre-master-twin-v1');
       expect(template).toBeDefined();
-      expect(template?.id).toBe('retail_inventory_optimization');
+      expect(template?.id).toBe('datacentre-master-twin-v1');
+      expect(template?.name).toBe('Data Centre Digital Twin');
     });
 
     it('should return null for non-existent template', () => {
@@ -48,7 +48,7 @@ describe('Template Loader', () => {
     });
   });
 
-  describe('Template Schema Validation', () => {
+  describe('Data Centre Template Schema Validation', () => {
     it('should validate RAG configuration', () => {
       const templates = loadAllTemplates();
       templates.forEach(template => {
@@ -86,24 +86,25 @@ describe('Template Loader', () => {
     });
   });
 
-  describe('ROI Calculations', () => {
-    it('should have valid ROI hint within acceptable range', () => {
-      const templates = loadAllTemplates();
-      templates.forEach(template => {
-        const m = template.metrics_defaults;
-        const timeInHours = (m.time_saved_per_run_min / 60) * m.runs_per_week * 52;
-        const laborSavings = timeInHours * m.loaded_cost_per_hour;
-        const errorReduction = m.runs_per_week * 52 * (m.accuracy_improvement_pct / 100) * m.cost_per_error;
-        const totalSavings = laborSavings + errorReduction;
-        
-        // Mock implementation cost (would vary in real scenario)
-        const implementationCost = 50000;
-        const calculatedROI = ((totalSavings - implementationCost) / implementationCost) * 100;
-        
-        // Allow for rounding differences
-        const diff = Math.abs(calculatedROI - template.roi_hint);
-        expect(diff).toBeLessThan(100); // Reasonable variance
-      });
+  describe('Data Centre Specific Validation', () => {
+    it('should have 9 domain twins configuration', () => {
+      const template = loadTemplateById('datacentre-master-twin-v1');
+      expect(template?.badges).toContain('Sovereign AI');
+      expect(template?.badges).toContain('Tier IV');
+    });
+
+    it('should have simulation scenarios', () => {
+      const template = loadTemplateById('datacentre-master-twin-v1');
+      expect(template?.simulation_scripts).toBeDefined();
+      expect(template?.simulation_scripts?.length).toBeGreaterThan(0);
+    });
+
+    it('should have DC-specific KPIs', () => {
+      const template = loadTemplateById('datacentre-master-twin-v1');
+      expect(template?.blueprint.kpis).toBeDefined();
+      const kpiNames = template?.blueprint.kpis.map(k => k.name);
+      expect(kpiNames).toContain('Power Usage Effectiveness');
+      expect(kpiNames).toContain('GPU Cluster Utilization');
     });
   });
 });

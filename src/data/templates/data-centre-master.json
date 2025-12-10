@@ -1,0 +1,122 @@
+[
+  {
+    "id": "datacentre-master-twin-v1",
+    "name": "Data Centre Digital Twin",
+    "industry": "Technology",
+    "department": "Infrastructure Operations",
+    "twin_type": "operational",
+    "description": "Production-grade Data Centre Digital Twin with 9 domain twins (Thermal, Power, Cooling, Network, Facility, Workload, Sovereignty, Carbon, Financial), 50+ KPIs, 15+ simulation scenarios, and comprehensive synthetic telemetry for sovereign AI infrastructure.",
+    "short_description": "Complete data centre monitoring, simulation, and optimization platform",
+    "badges": ["Sovereign AI", "Carbon Neutral", "GPU-Optimized", "Tier IV", "Real-time Telemetry", "Simulation-Ready"],
+    "difficulty": "advanced",
+    "certified": true,
+    "blueprint": {
+      "process_mirrored": "Data Centre Operations & Infrastructure Management",
+      "event_triggers": ["Thermal anomaly", "Power fluctuation", "Cooling inefficiency", "GPU utilization spike", "Sovereignty violation", "Carbon threshold exceeded"],
+      "data_sources": ["GPU Telemetry", "PDU/UPS Monitors", "CRAC/CRAH Sensors", "Network Fabric", "Sovereignty Engine", "Carbon API"],
+      "workflow_steps": [
+        { "id": "ingest", "type": "monitor", "label": "Ingest telemetry from all 9 domain twins" },
+        { "id": "analyze", "type": "compute", "label": "AI-powered anomaly detection and forecasting" },
+        { "id": "correlate", "type": "compute", "label": "Cross-domain correlation analysis" },
+        { "id": "alert", "type": "decision", "label": "Smart alerting with severity classification" },
+        { "id": "recommend", "type": "decision", "label": "Generate optimization recommendations" },
+        { "id": "approve", "type": "human", "label": "NOC operator approval for critical actions" },
+        { "id": "execute", "type": "action", "label": "Automated remediation or escalation" },
+        { "id": "audit", "type": "monitor", "label": "Compliance logging and sovereignty tracking" }
+      ],
+      "human_approval_points": ["Critical infrastructure changes", "Sovereignty routing overrides", "Carbon credit purchases", "Emergency power procedures"],
+      "kpis": [
+        { "name": "Power Usage Effectiveness", "metric": "ratio", "target": 1.2 },
+        { "name": "GPU Cluster Utilization", "metric": "percentage", "target": 85 },
+        { "name": "Thermal Stability Score", "metric": "score", "target": 95 },
+        { "name": "Sovereign Compute Ratio", "metric": "percentage", "target": 100 },
+        { "name": "Carbon Efficiency", "metric": "gCO2/kWh", "target": 50 },
+        { "name": "UPS Health Index", "metric": "percentage", "target": 99 },
+        { "name": "Network Fabric Saturation", "metric": "percentage", "target": 60 },
+        { "name": "Cooling Efficiency Ratio", "metric": "ratio", "target": 0.8 }
+      ],
+      "integrations": ["Prometheus", "SNMP", "DCIM", "Slurm/K8s", "Carbon APIs", "Energy Providers", "Vertex AI"]
+    },
+    "rag": {
+      "provider": "vertex",
+      "hybrid_search": true,
+      "top_k": 10,
+      "top_n": 5,
+      "embedding_model": "text-embedding-004",
+      "vector_dim": 768,
+      "index_name": "data-centre-operations",
+      "grounding_provider": "vertex"
+    },
+    "llm": {
+      "provider": "google",
+      "model": "gemini-2.5-pro",
+      "temperature": 0.3,
+      "location": "northamerica-northeast1"
+    },
+    "knowledge": [
+      { "type": "internal_docs", "ref": "dc_operations_manual" },
+      { "type": "internal_docs", "ref": "sovereignty_policies" },
+      { "type": "internal_docs", "ref": "carbon_reporting_standards" },
+      { "type": "web", "allow": ["uptime.is", "datacenterknowledge.com"] }
+    ],
+    "connectors": [
+      { "id": "gpu_telemetry", "mode": "realtime" },
+      { "id": "power_chain", "mode": "realtime" },
+      { "id": "cooling_engine", "mode": "realtime" },
+      { "id": "network_fabric", "mode": "realtime" },
+      { "id": "sovereignty_validator", "mode": "realtime" },
+      { "id": "carbon_tracker", "mode": "batch" },
+      { "id": "financial_engine", "mode": "batch" }
+    ],
+    "workflow": {
+      "nodes": [
+        { "id": "telemetry_ingestion", "type": "ingest", "label": "Telemetry Ingestion" },
+        { "id": "anomaly_detection", "type": "compute", "label": "AI Anomaly Detection" },
+        { "id": "cross_domain_correlation", "type": "compute", "label": "Cross-Domain Correlation" },
+        { "id": "alert_classification", "type": "decision", "label": "Alert Classification" },
+        { "id": "recommendation_engine", "type": "decision", "label": "Recommendation Engine" },
+        { "id": "noc_approval", "type": "human", "label": "NOC Approval" },
+        { "id": "auto_remediation", "type": "action", "label": "Auto-Remediation" },
+        { "id": "audit_log", "type": "monitor", "label": "Compliance Audit" }
+      ],
+      "edges": [
+        { "from": "telemetry_ingestion", "to": "anomaly_detection" },
+        { "from": "anomaly_detection", "to": "cross_domain_correlation" },
+        { "from": "cross_domain_correlation", "to": "alert_classification" },
+        { "from": "alert_classification", "to": "recommendation_engine" },
+        { "from": "recommendation_engine", "to": "noc_approval" },
+        { "from": "noc_approval", "to": "auto_remediation" },
+        { "from": "auto_remediation", "to": "audit_log" }
+      ]
+    },
+    "system_prompt": "You are the Data Centre Digital Twin CoPilot, an expert AI assistant for sovereign data centre operations. You monitor 9 domain twins: Thermal, Power, Cooling, Network, Facility, Workload, Sovereignty, Carbon, and Financial. You understand PUE optimization, GPU workload scheduling, sovereignty compliance, carbon neutrality targets, and incident response procedures. Provide actionable insights based on real-time telemetry and simulation results.",
+    "metrics_defaults": {
+      "time_saved_per_run_min": 45,
+      "runs_per_week": 168,
+      "loaded_cost_per_hour": 150,
+      "accuracy_improvement_pct": 35,
+      "cost_per_error": 25000
+    },
+    "roi_hint": 280,
+    "rating": 4.9,
+    "downloads": 1250,
+    "simulation_scripts": [
+      { "scenario": "GPU Load Spike", "inputs": { "gpu_utilization_increase": 40 }, "expected_outputs": { "pue_change": 0.15, "thermal_risk": "elevated" } },
+      { "scenario": "Cooling System Fault", "inputs": { "crac_failure": true }, "expected_outputs": { "temp_rise": 8, "thermal_stability": "critical" } },
+      { "scenario": "Power Grid Fluctuation", "inputs": { "voltage_variance": 5 }, "expected_outputs": { "ups_activation": true, "power_reliability": "degraded" } },
+      { "scenario": "Sovereignty Violation Attempt", "inputs": { "cross_border_request": true }, "expected_outputs": { "blocked": true, "audit_logged": true } },
+      { "scenario": "Carbon Price Shock", "inputs": { "carbon_price_increase_pct": 50 }, "expected_outputs": { "opex_impact": 12000, "renewable_shift_recommended": true } }
+    ],
+    "copilot_prompts": {
+      "intro": "I'm your Data Centre CoPilot. I monitor all 9 domain twins and can help you optimize PUE, manage GPU workloads, ensure sovereignty compliance, track carbon emissions, and respond to incidents.",
+      "capabilities": ["Real-time telemetry analysis", "Cross-domain correlation", "Simulation scenario execution", "Sovereignty compliance validation", "Carbon footprint tracking", "Financial impact forecasting"],
+      "limitations": ["Cannot make physical infrastructure changes", "Requires NOC approval for critical actions", "Carbon pricing based on market estimates"]
+    },
+    "twin_score": {
+      "overall": 94,
+      "explainability": 92,
+      "reliability": 96,
+      "efficiency": 93
+    }
+  }
+]

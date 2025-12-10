@@ -1,39 +1,40 @@
 /**
- * Test fixtures for marketplace templates
+ * Test fixtures for Data Centre Digital Twin template
  */
 
-export const inventoryOptimizationTemplate = {
-  id: 'multi-location-inventory-twin',
-  name: 'Multi-Location Inventory Optimization Twin',
-  description: 'Digital twin that monitors and optimizes inventory across multiple retail locations in real-time',
-  short_description: 'Real-time multi-location inventory optimization',
-  industry: 'Retail',
-  department: 'Operations',
-  twin_type: 'process_twin',
+export const dataCentreDigitalTwinTemplate = {
+  id: 'datacentre-master-twin-v1',
+  name: 'Data Centre Digital Twin',
+  description: 'Production-grade Data Centre Digital Twin with 9 domain twins (Thermal, Power, Cooling, Network, Facility, Workload, Sovereignty, Carbon, Financial), 50+ KPIs, 15+ simulation scenarios, and comprehensive synthetic telemetry for sovereign AI infrastructure.',
+  short_description: 'Complete data centre monitoring, simulation, and optimization platform',
+  industry: 'Technology',
+  department: 'Infrastructure Operations',
+  twin_type: 'operational',
   certified: true,
-  rating: 4.8,
-  downloads: 342,
-  roi_pct: 45,
-  roi_hint: 45,
-  tags: ['inventory', 'retail', 'optimization', 'multi-location'],
-  hero_icon: '📦',
+  rating: 4.9,
+  downloads: 1250,
+  roi_pct: 280,
+  roi_hint: 280,
+  tags: ['Sovereign AI', 'Carbon Neutral', 'GPU-Optimized', 'Tier IV', 'Real-time Telemetry', 'Simulation-Ready'],
+  hero_icon: '🏢',
   
   default_config: {
-    department: 'Operations',
-    useCase: 'Multi-location inventory optimization',
+    department: 'Infrastructure Operations',
+    useCase: 'Data Centre Operations & Infrastructure Management',
     level: 'Strategic',
-    type: 'process_twin',
+    type: 'operational',
     goals: [
-      'Reduce stockouts by 60%',
-      'Minimize overstock by 40%',
-      'Improve turnover rate by 35%',
+      'Optimize PUE to 1.2 or lower',
+      'Maximize GPU cluster utilization to 85%+',
+      'Achieve 100% sovereignty compliance',
+      'Reduce carbon emissions by 40%',
     ],
-    selectedModel: 'google/gemini-2.5-flash',
+    selectedModel: 'google/gemini-2.5-pro',
     temperature: 0.3,
-    topK: 20,
+    topK: 10,
     topP: 0.95,
-    systemPrompt: 'You are an inventory optimization twin that monitors stock levels, predicts demand, and recommends reorder points across multiple retail locations.',
-    personaTemplate: 'Data-driven inventory optimization system',
+    systemPrompt: 'You are the Data Centre Digital Twin CoPilot, an expert AI assistant for sovereign data centre operations. You monitor 9 domain twins: Thermal, Power, Cooling, Network, Facility, Workload, Sovereignty, Carbon, and Financial. Provide actionable insights based on real-time telemetry and simulation results.',
+    personaTemplate: 'Data Centre Operations Expert',
     grounding: true,
     knowledge: true,
     communicationStyle: {
@@ -41,142 +42,78 @@ export const inventoryOptimizationTemplate = {
       emojis: false,
       detailedExplanations: true,
     },
-    connectors: ['POS System', 'Warehouse Management', 'Supply Chain API'],
+    connectors: [
+      { id: 'gpu_telemetry', mode: 'realtime' },
+      { id: 'power_chain', mode: 'realtime' },
+      { id: 'cooling_engine', mode: 'realtime' },
+      { id: 'network_fabric', mode: 'realtime' },
+      { id: 'sovereignty_validator', mode: 'realtime' },
+      { id: 'carbon_tracker', mode: 'batch' },
+      { id: 'financial_engine', mode: 'batch' },
+    ],
     workflowNodes: [
       {
-        type: 'trigger',
-        name: 'Stock Level Alert',
-        description: 'Triggered when stock falls below threshold',
+        type: 'ingest',
+        name: 'Telemetry Ingestion',
+        description: 'Ingest telemetry from all 9 domain twins',
       },
       {
-        type: 'trigger',
-        name: 'Daily Optimization',
-        description: 'Scheduled daily inventory analysis',
+        type: 'compute',
+        name: 'Anomaly Detection',
+        description: 'AI-powered anomaly detection and forecasting',
+      },
+      {
+        type: 'decision',
+        name: 'Alert Classification',
+        description: 'Smart alerting with severity classification',
+      },
+      {
+        type: 'human',
+        name: 'NOC Approval',
+        description: 'NOC operator approval for critical actions',
       },
       {
         type: 'action',
-        name: 'Analyze Demand',
-        description: 'Predict demand based on historical data',
-      },
-      {
-        type: 'action',
-        name: 'Generate Reorder',
-        description: 'Create optimized purchase orders',
-      },
-      {
-        type: 'action',
-        name: 'Transfer Stock',
-        description: 'Recommend inter-location transfers',
+        name: 'Auto-Remediation',
+        description: 'Automated remediation or escalation',
       },
     ],
   },
   
-  // Alternative schema support (from JSON files)
   blueprint: {
+    process_mirrored: 'Data Centre Operations & Infrastructure Management',
+    event_triggers: ['Thermal anomaly', 'Power fluctuation', 'Cooling inefficiency', 'GPU utilization spike', 'Sovereignty violation', 'Carbon threshold exceeded'],
     kpis: [
-      { name: 'Stockout Reduction', metric: 'percentage', target: 60 },
-      { name: 'Overstock Reduction', metric: 'percentage', target: 40 },
-      { name: 'Turnover Improvement', metric: 'percentage', target: 35 },
+      { name: 'Power Usage Effectiveness', metric: 'ratio', target: 1.2 },
+      { name: 'GPU Cluster Utilization', metric: 'percentage', target: 85 },
+      { name: 'Thermal Stability Score', metric: 'score', target: 95 },
+      { name: 'Sovereign Compute Ratio', metric: 'percentage', target: 100 },
+      { name: 'Carbon Efficiency', metric: 'gCO2/kWh', target: 50 },
+      { name: 'UPS Health Index', metric: 'percentage', target: 99 },
+      { name: 'Network Fabric Saturation', metric: 'percentage', target: 60 },
+      { name: 'Cooling Efficiency Ratio', metric: 'ratio', target: 0.8 },
     ],
-    integrations: ['POS System', 'Warehouse Management', 'Supply Chain API'],
+    integrations: ['Prometheus', 'SNMP', 'DCIM', 'Slurm/K8s', 'Carbon APIs', 'Energy Providers', 'Vertex AI'],
   },
   
   kpi_definitions: {
-    timeSavedPerWeek: '25 hours/week',
-    efficiencyGain: '45% improvement',
+    pue: { name: 'PUE', target: 1.2, unit: 'ratio' },
+    gpuUtilization: { name: 'GPU Utilization', target: 85, unit: '%' },
+    thermalStability: { name: 'Thermal Stability', target: 95, unit: 'score' },
+    sovereignCompute: { name: 'Sovereign Compute', target: 100, unit: '%' },
+    carbonEfficiency: { name: 'Carbon Efficiency', target: 50, unit: 'gCO2/kWh' },
   },
   
   metrics_defaults: {
-    time_saved_per_run_min: 30,
-    runs_per_week: 50,
+    time_saved_per_run_min: 45,
+    runs_per_week: 168,
+    loaded_cost_per_hour: 150,
+    accuracy_improvement_pct: 35,
+    cost_per_error: 25000,
   },
 };
 
-export const customerSupportTemplate = {
-  id: 'customer-support-ai-agent',
-  name: 'Customer Support AI Agent',
-  description: 'Intelligent customer support agent that handles inquiries 24/7',
-  industry: 'Technology',
-  certified: false,
-  rating: 4.5,
-  downloads: 523,
-  roi_pct: 35,
-  tags: ['support', 'customer-service', 'chatbot'],
-  hero_icon: '💬',
-  
-  default_config: {
-    department: 'Customer Support',
-    useCase: 'Automated customer support',
-    level: 'Tactical',
-    type: 'agent',
-    goals: [
-      'Reduce response time by 80%',
-      'Handle 70% of tickets automatically',
-      'Improve CSAT score to 4.5+',
-    ],
-    selectedModel: 'google/gemini-2.5-flash',
-    temperature: 0.7,
-    topK: 20,
-    topP: 0.95,
-    systemPrompt: 'You are a helpful customer support agent. Provide clear, friendly, and accurate responses to customer inquiries.',
-    personaTemplate: 'Friendly and professional support assistant',
-    grounding: true,
-    knowledge: true,
-    communicationStyle: {
-      formal: false,
-      emojis: true,
-      detailedExplanations: true,
-    },
-    connectors: ['Slack', 'Zendesk', 'Knowledge Base API'],
-    workflowNodes: [
-      {
-        type: 'trigger',
-        name: 'New Customer Message',
-        description: 'Triggered when customer sends message',
-      },
-      {
-        type: 'action',
-        name: 'Analyze Intent',
-        description: 'Understand customer request',
-      },
-      {
-        type: 'action',
-        name: 'Search Knowledge Base',
-        description: 'Find relevant information',
-      },
-      {
-        type: 'action',
-        name: 'Generate Response',
-        description: 'Provide helpful answer',
-      },
-    ],
-  },
-  
-  kpi_definitions: {
-    timeSavedPerWeek: '30 hours/week',
-    efficiencyGain: '35% improvement',
-  },
-};
-
-export const minimalTemplate = {
-  id: 'basic-agent',
-  name: 'Basic AI Agent',
-  description: 'Simple AI agent starter template',
-  industry: 'Technology',
-  certified: false,
-  rating: 4.0,
-  downloads: 150,
-  roi_pct: 20,
-  tags: ['basic', 'starter'],
-  
-  default_config: {
-    type: 'agent',
-    goals: ['Automate basic tasks'],
-    selectedModel: 'google/gemini-2.5-flash',
-    systemPrompt: 'You are a helpful AI assistant.',
-    connectors: [],
-    workflowNodes: [],
-  },
-  
-  kpi_definitions: {},
-};
+// Alias for backward compatibility
+export const inventoryOptimizationTemplate = dataCentreDigitalTwinTemplate;
+export const customerSupportTemplate = dataCentreDigitalTwinTemplate;
+export const minimalTemplate = dataCentreDigitalTwinTemplate;

@@ -11,7 +11,7 @@ import { SystemDeleteDialog } from '@/components/SystemDeleteDialog';
 import { useToast } from '@/hooks/use-toast';
 import { AOCIntroCard } from '@/components/aoc/AOCIntroCard';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
-import { useBlueprintAgents } from '@/hooks/useBlueprintAgents';
+import { useAgentDefinitionsData } from '@/hooks/useAgentDefinitionsData';
 
 export default function ManageAgents() {
   const navigate = useNavigate();
@@ -22,8 +22,8 @@ export default function ManageAgents() {
   const [deleteAgentName, setDeleteAgentName] = useState<string>('');
   const [deleteAgentStatus, setDeleteAgentStatus] = useState<string>('');
 
-  // Get agents from blueprint (source of truth)
-  const { agents: blueprintAgents, stats, isLoading, error } = useBlueprintAgents();
+  // Get agents from agent_definitions table (source of truth)
+  const { agents, stats, isLoading, error, refetch } = useAgentDefinitionsData();
 
   // Update Co-Pilot context
   useEffect(() => {
@@ -93,7 +93,8 @@ export default function ManageAgents() {
   };
 
   const handleManage = (agent: Agent) => {
-    navigate(`/app/agents/${agent.id}/manage`);
+    // Navigate to agent detail page using slug
+    navigate(`/app/agents/${agent.slug || agent.id}/detail`);
   };
 
   const handleDelete = (agent: Agent) => {
@@ -234,13 +235,13 @@ export default function ManageAgents() {
           </div>
           <div className="p-6">
             <AgentsGrid
-              agents={blueprintAgents}
+              agents={agents}
               isLoading={isLoading}
-              error={error}
+              error={error?.message || null}
               onRun={handleRun}
               onManage={handleManage}
               onDelete={handleDelete}
-              onRetry={() => {}}
+              onRetry={refetch}
               mode="manage"
             />
           </div>

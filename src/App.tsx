@@ -41,6 +41,7 @@ import SystemManage from "./pages/SystemManage";
 import TwinManage from "./pages/TwinManage";
 import DataCentreTwin from "./pages/DataCentreTwin";
 import Blueprint from "./pages/Blueprint";
+import AgentDetail from "./pages/AgentDetail";
 import Profile from "./pages/account/Profile";
 import Settings from "./pages/account/Settings";
 import AccessControl from "./pages/account/AccessControl";
@@ -139,6 +140,8 @@ function AuthenticatedApp() {
         {/* Unified Agent Management Routes */}
         <Route path="/app/agents" element={<ManageAgents />} />
         <Route path="/agents" element={<Navigate to="/app/agents" replace />} />
+        <Route path="/subsystem-agents" element={<Navigate to="/app/agents" replace />} />
+        <Route path="/app/agents/:slug/detail" element={<AgentDetail />} />
         <Route path="/app/agents/:agentId/manage" element={<TwinManage />} />
         {/* Legacy route redirects */}
         <Route path="/app/agents/:agentId/operations" element={<AgentOperationsRedirect />} />

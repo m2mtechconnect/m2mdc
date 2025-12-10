@@ -1,22 +1,31 @@
 /**
  * Hook for fetching Green DC Twin recommendations
+ * Now initializes the DC Twin Builder store from recommendations
  */
 
 import { useState, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { GreenDcTwinRecommendation, GreenDcRecommendResponse } from "@/types/greenDcTwin";
+import { useDCTwinBuilderStore } from "@/stores/dcTwinBuilderStore";
 
 export function useGreenDcRecommendation() {
   const [recommendation, setRecommendation] = useState<GreenDcTwinRecommendation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   const queryClient = useQueryClient();
+  
+  // Get the store initialization method
+  const initializeFromGreenDcRecommendation = useDCTwinBuilderStore(
+    (s) => s.initializeFromGreenDcRecommendation
+  );
 
   const fetchRecommendation = useCallback(async (url: string, forceRecrawl = false, deepRecrawl = false) => {
     setIsLoading(true);
     setError(null);
     setRecommendation(null);
+    setIsInitialized(false);
 
     try {
       const { data, error: fnError } = await supabase.functions.invoke<GreenDcRecommendResponse>("green-dc-recommend", {
@@ -34,6 +43,11 @@ export function useGreenDcRecommendation() {
       if (data?.recommendation) {
         setRecommendation(data.recommendation);
         
+        // Initialize the builder store from the recommendation
+        const sessionId = crypto.randomUUID();
+        initializeFromGreenDcRecommendation(data.recommendation, sessionId);
+        setIsInitialized(true);
+        
         // Save scan session to database
         await saveScanSession(url, data.recommendation);
         
@@ -46,17 +60,19 @@ export function useGreenDcRecommendation() {
     } finally {
       setIsLoading(false);
     }
-  }, [queryClient]);
+  }, [queryClient, initializeFromGreenDcRecommendation]);
 
   const reset = useCallback(() => {
     setRecommendation(null);
     setError(null);
+    setIsInitialized(false);
   }, []);
 
   return {
     recommendation,
     isLoading,
     error,
+    isInitialized,
     fetchRecommendation,
     reset
   };

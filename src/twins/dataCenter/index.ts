@@ -40,6 +40,16 @@ export {
   playbookToMarkdown,
 } from './simulationEngine';
 
+// Master Template Configuration
+export { 
+  DataCentreMasterTemplate, 
+  MASTER_TEMPLATE_CONFIG,
+  DOMAIN_DEFINITIONS,
+  SIMULATION_SCENARIOS as MASTER_SCENARIOS,
+  BUILDER_STEP_CONFIGS,
+  COPILOT_CAPABILITIES,
+} from './MasterTemplate';
+
 // Template Definition
 export const DATA_CENTRE_TEMPLATE_ID = 'data-centre-digital-twin';
 export const DATA_CENTRE_TEMPLATE_SLUG = 'data-centre-twin';

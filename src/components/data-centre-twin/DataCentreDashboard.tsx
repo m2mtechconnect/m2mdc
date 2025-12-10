@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
-  Thermometer, Zap, Wind, Network, Shield, Cpu, 
+  Thermometer, Zap, Wind, Network, Shield, Cpu, Leaf,
   Globe, DollarSign, AlertTriangle, Activity, Server, PlayCircle,
   FileText, Eye
 } from 'lucide-react';
@@ -26,6 +26,7 @@ import { NetworkDomainView } from './domains/NetworkDomainView';
 import { FacilityDomainView } from './domains/FacilityDomainView';
 import { WorkloadDomainView } from './domains/WorkloadDomainView';
 import { SovereigntyDomainView } from './domains/SovereigntyDomainView';
+import { CarbonDomainView } from './domains/CarbonDomainView';
 import { FinancialDomainView } from './domains/FinancialDomainView';
 import { AlertsPanel } from './AlertsPanel';
 import { DCSimulationPanel } from '@/components/simulation/DCSimulationPanel';
@@ -53,6 +54,7 @@ const domainTabs = [
   { id: 'facility', label: 'Facility', icon: Shield },
   { id: 'workload', label: 'Workload', icon: Cpu },
   { id: 'sovereignty', label: 'Sovereignty', icon: Globe },
+  { id: 'carbon', label: 'Carbon', icon: Leaf },
   { id: 'financial', label: 'Financial', icon: DollarSign },
 ];
 
@@ -490,6 +492,10 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
 
         <TabsContent value="sovereignty">
           <SovereigntyDomainView facility={facility} />
+        </TabsContent>
+
+        <TabsContent value="carbon">
+          <CarbonDomainView facility={facility} />
         </TabsContent>
 
         <TabsContent value="financial">

@@ -159,14 +159,14 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Leaf className="h-5 w-5 text-green-600" />
+              <Leaf className="h-5 w-5 text-success" />
               <CardTitle className="text-xl">Green Data Centre Twin Recommendation</CardTitle>
             </div>
             <p className="text-sm text-muted-foreground">
               Automatically generated for <span className="font-medium text-foreground">{rec.companyName || rec.domain}</span>
             </p>
           </div>
-          <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/30">
+          <Badge variant="outline" className="bg-success/10 text-success border-success/30">
             {industryLabels[rec.industry]}
           </Badge>
         </div>
@@ -202,7 +202,7 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
           <ul className="space-y-1">
             {rec.objectives.map((obj, i) => (
               <li key={i} className="text-sm text-studio-body flex items-start gap-2">
-                <CheckCircle2 className="h-3.5 w-3.5 text-green-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="h-3.5 w-3.5 text-success mt-0.5 flex-shrink-0" />
                 {obj}
               </li>
             ))}
@@ -212,27 +212,27 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
         {/* KPI Targets */}
         <div className="grid grid-cols-5 gap-3">
           <div className="text-center p-2 rounded-lg bg-muted/50">
-            <Zap className="h-4 w-4 mx-auto text-amber-500 mb-1" />
+            <Zap className="h-4 w-4 mx-auto text-warning mb-1" />
             <div className="text-lg font-semibold text-foreground">{rec.kpiTargets.pueTarget}</div>
             <div className="text-xs text-studio-muted">PUE Target</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
-            <Leaf className="h-4 w-4 mx-auto text-green-500 mb-1" />
+            <Leaf className="h-4 w-4 mx-auto text-success mb-1" />
             <div className="text-lg font-semibold text-foreground">{rec.kpiTargets.renewableShareTargetPct}%</div>
             <div className="text-xs text-studio-muted">Renewable</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
-            <Shield className="h-4 w-4 mx-auto text-blue-500 mb-1" />
+            <Shield className="h-4 w-4 mx-auto text-info mb-1" />
             <div className="text-lg font-semibold text-foreground">{rec.kpiTargets.sovereigntyScoreTargetPct}%</div>
             <div className="text-xs text-studio-muted">Sovereignty</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
-            <Thermometer className="h-4 w-4 mx-auto text-orange-500 mb-1" />
+            <Thermometer className="h-4 w-4 mx-auto text-warning mb-1" />
             <div className="text-lg font-semibold text-foreground">{rec.kpiTargets.carbonIntensityTargetGPerKwh}</div>
             <div className="text-xs text-studio-muted">g CO₂/kWh</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
-            <Server className="h-4 w-4 mx-auto text-purple-500 mb-1" />
+            <Server className="h-4 w-4 mx-auto text-accent mb-1" />
             <div className="text-lg font-semibold text-foreground">{rec.kpiTargets.uptimeTargetPct}%</div>
             <div className="text-xs text-studio-muted">Uptime</div>
           </div>
@@ -272,8 +272,8 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
                     key={scenarioId} 
                     variant="outline" 
                     className={`text-xs ${
-                      info?.severity === "critical" ? "border-red-500/50 text-red-700" :
-                      info?.severity === "high" ? "border-orange-500/50 text-orange-700" :
+                      info?.severity === "critical" ? "border-destructive/50 text-destructive" :
+                      info?.severity === "high" ? "border-warning/50 text-warning" :
                       "border-muted-foreground/30"
                     }`}
                   >
@@ -302,7 +302,7 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
             </div>
             <div>
               <div className="text-studio-muted">Green Upgrade Savings</div>
-              <div className="font-semibold text-green-600">
+              <div className="font-semibold text-success">
                 ~{rec.financialModel.greenVariantSavingsCostPct}% cost, ~{rec.financialModel.greenVariantSavingsCarbonPct}% carbon
               </div>
             </div>

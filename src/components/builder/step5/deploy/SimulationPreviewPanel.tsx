@@ -59,7 +59,7 @@ export function SimulationPreviewPanel({
   const statusIcon = (status: SimulationRun['status']) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+        return <CheckCircle2 className="h-4 w-4 text-success" />;
       case 'failed':
         return <AlertCircle className="h-4 w-4 text-destructive" />;
       case 'running':
@@ -75,10 +75,10 @@ export function SimulationPreviewPanel({
     <div className="space-y-4">
       {/* Sample Data Info Banner */}
       {isSampleData && (
-        <Alert className="bg-amber-500/10 border-amber-500/30">
-          <Info className="h-4 w-4 text-amber-500" />
+        <Alert className="bg-warning/10 border-warning/30">
+          <Info className="h-4 w-4 text-warning" />
           <AlertDescription className="text-sm">
-            Showing recommended sample KPIs for <strong>{industryLabel}</strong>. 
+            Showing recommended sample KPIs for <strong>{industryLabel}</strong>.
             Connect real data to replace these values.
           </AlertDescription>
         </Alert>

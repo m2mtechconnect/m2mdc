@@ -190,15 +190,15 @@ export function VersionSnapshot({
                   <h4 className="text-sm font-medium mb-2">Previous (v{versionHistory[0]?.version})</h4>
                   <div className="p-3 rounded-lg bg-muted/50 text-xs font-mono">
                     {/* Simplified diff view */}
-                    <p className="text-red-500">- {versionHistory[0]?.changes?.join('\n- ') || 'No changes recorded'}</p>
+                    <p className="text-destructive">- {versionHistory[0]?.changes?.join('\n- ') || 'No changes recorded'}</p>
                   </div>
                 </div>
                 <div>
                   <h4 className="text-sm font-medium mb-2">Current (v{currentVersion})</h4>
                   <div className="p-3 rounded-lg bg-muted/50 text-xs font-mono">
-                    <p className="text-green-500">+ Model: {builderState?.modelConfig?.model}</p>
-                    <p className="text-green-500">+ Workflows: {builderState?.workflow?.actions?.length || 0}</p>
-                    <p className="text-green-500">+ Integrations: {builderState?.workflow?.integrations?.length || 0}</p>
+                    <p className="text-success">+ Model: {builderState?.modelConfig?.model}</p>
+                    <p className="text-success">+ Workflows: {builderState?.workflow?.actions?.length || 0}</p>
+                    <p className="text-success">+ Integrations: {builderState?.workflow?.integrations?.length || 0}</p>
                   </div>
                 </div>
               </div>

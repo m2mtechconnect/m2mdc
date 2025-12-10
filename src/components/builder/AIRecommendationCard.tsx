@@ -280,42 +280,42 @@ export function AIRecommendationCard({
         <div className="space-y-3">
           <h4 className="text-sm font-semibold text-foreground">Expected Impact</h4>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="p-3 rounded-lg bg-gradient-to-br from-green-500/10 to-green-600/5 border border-green-500/20">
+            <div className="p-3 rounded-lg bg-gradient-to-br from-success/10 to-success/5 border border-success/20">
               <div className="flex items-center gap-2 mb-1">
-                <TrendingUp className="h-4 w-4 text-green-600" />
-                <span className="text-xs font-medium text-green-700">ROI</span>
+                <TrendingUp className="h-4 w-4 text-success" />
+                <span className="text-xs font-medium text-success">ROI</span>
               </div>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-2xl font-bold text-success">
                 {recommendation.roi > 0 ? '+' : ''}{recommendation.roi}%
               </p>
             </div>
 
-            <div className="p-3 rounded-lg bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20">
+            <div className="p-3 rounded-lg bg-gradient-to-br from-info/10 to-info/5 border border-info/20">
               <div className="flex items-center gap-2 mb-1">
-                <DollarSign className="h-4 w-4 text-blue-600" />
-                <span className="text-xs font-medium text-blue-700">Savings/Year</span>
+                <DollarSign className="h-4 w-4 text-info" />
+                <span className="text-xs font-medium text-info">Savings/Year</span>
               </div>
-              <p className="text-2xl font-bold text-blue-600">
+              <p className="text-2xl font-bold text-info">
                 ${(recommendation.annualSavings / 1000).toFixed(0)}k
               </p>
             </div>
 
-            <div className="p-3 rounded-lg bg-gradient-to-br from-purple-500/10 to-purple-600/5 border border-purple-500/20">
+            <div className="p-3 rounded-lg bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/20">
               <div className="flex items-center gap-2 mb-1">
-                <Clock className="h-4 w-4 text-purple-600" />
-                <span className="text-xs font-medium text-purple-700">Time/Week</span>
+                <Clock className="h-4 w-4 text-accent" />
+                <span className="text-xs font-medium text-accent">Time/Week</span>
               </div>
-              <p className="text-2xl font-bold text-purple-600">
+              <p className="text-2xl font-bold text-accent">
                 {recommendation.timeSavedPerWeek}h
               </p>
             </div>
 
-            <div className="p-3 rounded-lg bg-gradient-to-br from-orange-500/10 to-orange-600/5 border border-orange-500/20">
+            <div className="p-3 rounded-lg bg-gradient-to-br from-warning/10 to-warning/5 border border-warning/20">
               <div className="flex items-center gap-2 mb-1">
-                <Target className="h-4 w-4 text-orange-600" />
-                <span className="text-xs font-medium text-orange-700">Accuracy</span>
+                <Target className="h-4 w-4 text-warning" />
+                <span className="text-xs font-medium text-warning">Accuracy</span>
               </div>
-              <p className="text-2xl font-bold text-orange-600">
+              <p className="text-2xl font-bold text-warning">
                 +{recommendation.accuracyImprovement}%
               </p>
             </div>
@@ -330,9 +330,9 @@ export function AIRecommendationCard({
               {recommendation.optimizations.map((opt, idx) => (
                 <div 
                   key={idx}
-                  className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/5 border border-amber-500/20"
+                  className="flex items-start gap-2 p-3 rounded-lg bg-warning/5 border border-warning/20"
                 >
-                  <Sparkles className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                  <Sparkles className="h-4 w-4 text-warning shrink-0 mt-0.5" />
                   <p className="text-sm text-foreground">{opt}</p>
                 </div>
               ))}

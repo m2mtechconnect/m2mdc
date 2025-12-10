@@ -94,15 +94,15 @@ export function DeploymentWarnings({
   const warningCount = warnings.filter(w => w.severity === 'warning').length;
 
   return (
-    <Card className="border-yellow-500/50 bg-yellow-500/5">
+    <Card className="border-warning/50 bg-warning/5">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5 text-yellow-500" />
+          <AlertTriangle className="h-5 w-5 text-warning" />
           <CardTitle className="text-lg">Deployment Warnings</CardTitle>
           <span className="text-sm text-muted-foreground ml-auto">
             {criticalCount > 0 && <span className="text-destructive font-medium">{criticalCount} critical</span>}
             {criticalCount > 0 && warningCount > 0 && ' · '}
-            {warningCount > 0 && <span className="text-yellow-600">{warningCount} warning</span>}
+            {warningCount > 0 && <span className="text-warning">{warningCount} warning</span>}
           </span>
         </div>
       </CardHeader>
@@ -115,15 +115,15 @@ export function DeploymentWarnings({
               className={`flex items-center justify-between p-3 rounded-lg border ${
                 warning.severity === 'critical'
                   ? 'bg-destructive/10 border-destructive/30'
-                  : 'bg-yellow-500/10 border-yellow-500/30'
+                  : 'bg-warning/10 border-warning/30'
               }`}
             >
               <div className="flex items-center gap-3 flex-1">
                 <Icon className={`h-4 w-4 ${
-                  warning.severity === 'critical' ? 'text-destructive' : 'text-yellow-600'
+                  warning.severity === 'critical' ? 'text-destructive' : 'text-warning'
                 }`} />
                 <span className={`text-sm ${
-                  warning.severity === 'critical' ? 'text-destructive' : 'text-yellow-700 dark:text-yellow-300'
+                  warning.severity === 'critical' ? 'text-destructive' : 'text-warning'
                 }`}>
                   {warning.message}
                 </span>

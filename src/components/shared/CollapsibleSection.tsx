@@ -14,6 +14,7 @@ interface CollapsibleSectionProps {
   defaultOpen?: boolean;
   children: ReactNode;
   headerExtra?: ReactNode;
+  icon?: ReactNode;
 }
 
 export function CollapsibleSection({ 
@@ -21,7 +22,8 @@ export function CollapsibleSection({
   badge, 
   defaultOpen = true, 
   children,
-  headerExtra 
+  headerExtra,
+  icon
 }: CollapsibleSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -32,6 +34,7 @@ export function CollapsibleSection({
           <CardHeader className="pb-3 cursor-pointer hover:bg-muted/30 transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
+                {icon}
                 <CardTitle className="text-base font-semibold">{title}</CardTitle>
                 {badge !== undefined && (
                   <Badge variant="secondary" className="text-xs">

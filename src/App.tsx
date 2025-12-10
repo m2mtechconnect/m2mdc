@@ -8,7 +8,6 @@ import { Layout } from "@/components/Layout";
 import { RBACProvider } from "@/contexts/RBACContext";
 import { CoPilotProvider } from "@/contexts/CoPilotContext";
 import { CoPilotCommandProvider } from "@/contexts/CoPilotCommandContext";
-import { TwinProvider } from "@/contexts/TwinContext";
 import { ActiveTwinProvider } from "@/context/ActiveTwinContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemeProvider } from "next-themes";
@@ -188,15 +187,13 @@ const App = () => (
           <RBACProvider>
             <BrowserRouter>
               <ActiveTwinProvider>
-                <TwinProvider>
-                  <CoPilotProvider>
-                    <CoPilotCommandProvider>
-                      <Toaster />
-                      <Sonner />
-                      <AuthenticatedApp />
-                    </CoPilotCommandProvider>
-                  </CoPilotProvider>
-                </TwinProvider>
+                <CoPilotProvider>
+                  <CoPilotCommandProvider>
+                    <Toaster />
+                    <Sonner />
+                    <AuthenticatedApp />
+                  </CoPilotCommandProvider>
+                </CoPilotProvider>
               </ActiveTwinProvider>
             </BrowserRouter>
           </RBACProvider>

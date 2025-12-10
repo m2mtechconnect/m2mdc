@@ -193,6 +193,150 @@ export type Database = {
           },
         ]
       }
+      agent_definition_runs: {
+        Row: {
+          agent_definition_id: string
+          completed_at: string | null
+          created_at: string | null
+          duration_ms: number | null
+          error_message: string | null
+          id: string
+          input_data: Json | null
+          logs: Json | null
+          metrics: Json | null
+          output_data: Json | null
+          started_at: string | null
+          status: string
+          twin_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          agent_definition_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          input_data?: Json | null
+          logs?: Json | null
+          metrics?: Json | null
+          output_data?: Json | null
+          started_at?: string | null
+          status?: string
+          twin_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          agent_definition_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          input_data?: Json | null
+          logs?: Json | null
+          metrics?: Json | null
+          output_data?: Json | null
+          started_at?: string | null
+          status?: string
+          twin_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_definition_runs_agent_definition_id_fkey"
+            columns: ["agent_definition_id"]
+            isOneToOne: false
+            referencedRelation: "agent_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_definition_runs_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "digital_twins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_definitions: {
+        Row: {
+          avg_duration_ms: number | null
+          created_at: string | null
+          description: string | null
+          domain: string
+          icon: string | null
+          id: string
+          inputs: Json | null
+          is_active: boolean | null
+          is_system_default: boolean | null
+          kpi_bindings: Json | null
+          last_run_at: string | null
+          name: string
+          outputs: Json | null
+          owner_id: string | null
+          runtime_config: Json | null
+          safety_rules: Json | null
+          slug: string
+          success_rate: number | null
+          tools: Json | null
+          total_runs: number | null
+          type: string
+          updated_at: string | null
+          version: number | null
+        }
+        Insert: {
+          avg_duration_ms?: number | null
+          created_at?: string | null
+          description?: string | null
+          domain: string
+          icon?: string | null
+          id?: string
+          inputs?: Json | null
+          is_active?: boolean | null
+          is_system_default?: boolean | null
+          kpi_bindings?: Json | null
+          last_run_at?: string | null
+          name: string
+          outputs?: Json | null
+          owner_id?: string | null
+          runtime_config?: Json | null
+          safety_rules?: Json | null
+          slug: string
+          success_rate?: number | null
+          tools?: Json | null
+          total_runs?: number | null
+          type?: string
+          updated_at?: string | null
+          version?: number | null
+        }
+        Update: {
+          avg_duration_ms?: number | null
+          created_at?: string | null
+          description?: string | null
+          domain?: string
+          icon?: string | null
+          id?: string
+          inputs?: Json | null
+          is_active?: boolean | null
+          is_system_default?: boolean | null
+          kpi_bindings?: Json | null
+          last_run_at?: string | null
+          name?: string
+          outputs?: Json | null
+          owner_id?: string | null
+          runtime_config?: Json | null
+          safety_rules?: Json | null
+          slug?: string
+          success_rate?: number | null
+          tools?: Json | null
+          total_runs?: number | null
+          type?: string
+          updated_at?: string | null
+          version?: number | null
+        }
+        Relationships: []
+      }
       agent_drafts: {
         Row: {
           config: Json | null
@@ -3658,6 +3802,51 @@ export type Database = {
           token?: string
         }
         Relationships: []
+      }
+      twin_agent_bindings: {
+        Row: {
+          agent_definition_id: string
+          config_overrides: Json | null
+          created_at: string | null
+          id: string
+          is_enabled: boolean | null
+          twin_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          agent_definition_id: string
+          config_overrides?: Json | null
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          twin_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          agent_definition_id?: string
+          config_overrides?: Json | null
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          twin_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "twin_agent_bindings_agent_definition_id_fkey"
+            columns: ["agent_definition_id"]
+            isOneToOne: false
+            referencedRelation: "agent_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "twin_agent_bindings_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "digital_twins"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

@@ -11,19 +11,27 @@ export interface Agent {
   id: string;
   name: string;
   description: string;
-  department: string;
-  category: string;
+  department?: string;
+  category?: string;
   status: string;
-  grounding: boolean;
-  roi: number;
-  lastActivity: string;
-  totalRuns: number;
-  successRate: number;
-  version: string;
-  type: 'system' | 'agent';
+  grounding?: boolean;
+  roi?: number;
+  lastActivity?: string;
+  totalRuns?: number;
+  successRate?: number;
+  version?: string;
+  type?: 'system' | 'agent' | string;
   templateId?: string;
   industry?: string;
   twinType?: string;
+  // New fields for agent_definitions
+  domain?: string;
+  domainLabel?: string;
+  icon?: string;
+  slug?: string;
+  avgDurationMs?: number;
+  lastRunAt?: string | null;
+  isSystemDefault?: boolean;
 }
 
 interface AgentsGridProps {

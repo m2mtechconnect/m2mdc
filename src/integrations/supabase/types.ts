@@ -1396,6 +1396,105 @@ export type Database = {
         }
         Relationships: []
       }
+      dc_blueprint_templates: {
+        Row: {
+          annual_carbon_target_tonnes: number
+          compliance_focus: string[]
+          cost_focus: string | null
+          created_at: string
+          default_agents: string[]
+          default_capacity_kw: number
+          default_tier: string
+          description: string | null
+          id: string
+          name: string
+          renewable_target_pct: number
+          slug: string
+          sovereign_compute_pct: number
+          sustainability_focus: string[]
+          target_pue: number
+          updated_at: string
+        }
+        Insert: {
+          annual_carbon_target_tonnes?: number
+          compliance_focus?: string[]
+          cost_focus?: string | null
+          created_at?: string
+          default_agents?: string[]
+          default_capacity_kw?: number
+          default_tier?: string
+          description?: string | null
+          id?: string
+          name: string
+          renewable_target_pct?: number
+          slug: string
+          sovereign_compute_pct?: number
+          sustainability_focus?: string[]
+          target_pue?: number
+          updated_at?: string
+        }
+        Update: {
+          annual_carbon_target_tonnes?: number
+          compliance_focus?: string[]
+          cost_focus?: string | null
+          created_at?: string
+          default_agents?: string[]
+          default_capacity_kw?: number
+          default_tier?: string
+          description?: string | null
+          id?: string
+          name?: string
+          renewable_target_pct?: number
+          slug?: string
+          sovereign_compute_pct?: number
+          sustainability_focus?: string[]
+          target_pue?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      dc_scan_sessions: {
+        Row: {
+          blueprint_id: string | null
+          blueprint_profile: string
+          created_at: string
+          detected_industry: string
+          id: string
+          raw_signals: Json | null
+          recommendation_json: Json | null
+          sustainability_priority: string
+          traffic_scale: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          blueprint_id?: string | null
+          blueprint_profile: string
+          created_at?: string
+          detected_industry?: string
+          id?: string
+          raw_signals?: Json | null
+          recommendation_json?: Json | null
+          sustainability_priority?: string
+          traffic_scale?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          blueprint_id?: string | null
+          blueprint_profile?: string
+          created_at?: string
+          detected_industry?: string
+          id?: string
+          raw_signals?: Json | null
+          recommendation_json?: Json | null
+          sustainability_priority?: string
+          traffic_scale?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       departments: {
         Row: {
           created_at: string | null

@@ -281,6 +281,7 @@ export type Database = {
           success_rate: number | null
           tools: Json | null
           total_runs: number | null
+          twin_id: string | null
           type: string
           updated_at: string | null
           version: number | null
@@ -306,6 +307,7 @@ export type Database = {
           success_rate?: number | null
           tools?: Json | null
           total_runs?: number | null
+          twin_id?: string | null
           type?: string
           updated_at?: string | null
           version?: number | null
@@ -331,11 +333,20 @@ export type Database = {
           success_rate?: number | null
           tools?: Json | null
           total_runs?: number | null
+          twin_id?: string | null
           type?: string
           updated_at?: string | null
           version?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "agent_definitions_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_twins"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       agent_drafts: {
         Row: {
@@ -580,6 +591,7 @@ export type Database = {
           input: Json | null
           output: Json | null
           status: string
+          twin_id: string | null
           user_id: string
         }
         Insert: {
@@ -593,6 +605,7 @@ export type Database = {
           input?: Json | null
           output?: Json | null
           status?: string
+          twin_id?: string | null
           user_id: string
         }
         Update: {
@@ -606,6 +619,7 @@ export type Database = {
           input?: Json | null
           output?: Json | null
           status?: string
+          twin_id?: string | null
           user_id?: string
         }
         Relationships: [
@@ -614,6 +628,13 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_runs_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_twins"
             referencedColumns: ["id"]
           },
         ]
@@ -814,6 +835,7 @@ export type Database = {
           id: string
           name: string
           trigger_type: string | null
+          twin_id: string | null
           updated_at: string | null
           workflow_json: Json
         }
@@ -824,6 +846,7 @@ export type Database = {
           id?: string
           name: string
           trigger_type?: string | null
+          twin_id?: string | null
           updated_at?: string | null
           workflow_json: Json
         }
@@ -834,6 +857,7 @@ export type Database = {
           id?: string
           name?: string
           trigger_type?: string | null
+          twin_id?: string | null
           updated_at?: string | null
           workflow_json?: Json
         }
@@ -843,6 +867,13 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_workflows_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_twins"
             referencedColumns: ["id"]
           },
         ]
@@ -865,6 +896,7 @@ export type Database = {
           success_rate: number | null
           template_id: string | null
           total_runs: number | null
+          twin_id: string | null
           updated_at: string | null
           version: string
           workflow_graph_id: string | null
@@ -886,6 +918,7 @@ export type Database = {
           success_rate?: number | null
           template_id?: string | null
           total_runs?: number | null
+          twin_id?: string | null
           updated_at?: string | null
           version?: string
           workflow_graph_id?: string | null
@@ -907,6 +940,7 @@ export type Database = {
           success_rate?: number | null
           template_id?: string | null
           total_runs?: number | null
+          twin_id?: string | null
           updated_at?: string | null
           version?: string
           workflow_graph_id?: string | null
@@ -917,6 +951,13 @@ export type Database = {
             columns: ["environment_id"]
             isOneToOne: false
             referencedRelation: "environments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agents_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_twins"
             referencedColumns: ["id"]
           },
         ]
@@ -1396,6 +1437,71 @@ export type Database = {
         }
         Relationships: []
       }
+      data_centre_twins: {
+        Row: {
+          blueprint_id: string | null
+          capacity_kw: number
+          carbon_intensity: number | null
+          city: string
+          created_at: string
+          created_by_user: string
+          id: string
+          industry: string | null
+          metadata: Json | null
+          name: string
+          pue_target: number | null
+          region_code: string
+          renewable_target_pct: number | null
+          sovereignty_level: string | null
+          tier: string
+          updated_at: string
+        }
+        Insert: {
+          blueprint_id?: string | null
+          capacity_kw?: number
+          carbon_intensity?: number | null
+          city: string
+          created_at?: string
+          created_by_user: string
+          id?: string
+          industry?: string | null
+          metadata?: Json | null
+          name: string
+          pue_target?: number | null
+          region_code: string
+          renewable_target_pct?: number | null
+          sovereignty_level?: string | null
+          tier?: string
+          updated_at?: string
+        }
+        Update: {
+          blueprint_id?: string | null
+          capacity_kw?: number
+          carbon_intensity?: number | null
+          city?: string
+          created_at?: string
+          created_by_user?: string
+          id?: string
+          industry?: string | null
+          metadata?: Json | null
+          name?: string
+          pue_target?: number | null
+          region_code?: string
+          renewable_target_pct?: number | null
+          sovereignty_level?: string | null
+          tier?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_centre_twins_blueprint_id_fkey"
+            columns: ["blueprint_id"]
+            isOneToOne: false
+            referencedRelation: "digital_twins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dc_blueprint_templates: {
         Row: {
           annual_carbon_target_tonnes: number
@@ -1464,6 +1570,7 @@ export type Database = {
           recommendation_json: Json | null
           sustainability_priority: string
           traffic_scale: string
+          twin_id: string | null
           url: string
           user_id: string
         }
@@ -1477,6 +1584,7 @@ export type Database = {
           recommendation_json?: Json | null
           sustainability_priority?: string
           traffic_scale?: string
+          twin_id?: string | null
           url: string
           user_id: string
         }
@@ -1490,10 +1598,19 @@ export type Database = {
           recommendation_json?: Json | null
           sustainability_priority?: string
           traffic_scale?: string
+          twin_id?: string | null
           url?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dc_scan_sessions_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_twins"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       departments: {
         Row: {
@@ -3943,6 +4060,288 @@ export type Database = {
             columns: ["twin_id"]
             isOneToOne: false
             referencedRelation: "digital_twins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      twin_carbon_emissions: {
+        Row: {
+          created_at: string
+          emissions_kg: number
+          grid_carbon_intensity: number | null
+          id: string
+          period_end: string
+          period_start: string
+          power_consumption_kwh: number | null
+          renewable_pct: number | null
+          twin_id: string
+        }
+        Insert: {
+          created_at?: string
+          emissions_kg: number
+          grid_carbon_intensity?: number | null
+          id?: string
+          period_end: string
+          period_start: string
+          power_consumption_kwh?: number | null
+          renewable_pct?: number | null
+          twin_id: string
+        }
+        Update: {
+          created_at?: string
+          emissions_kg?: number
+          grid_carbon_intensity?: number | null
+          id?: string
+          period_end?: string
+          period_start?: string
+          power_consumption_kwh?: number | null
+          renewable_pct?: number | null
+          twin_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "twin_carbon_emissions_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_twins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      twin_financial_records: {
+        Row: {
+          amount: number
+          category: string | null
+          created_at: string
+          currency: string | null
+          id: string
+          metadata: Json | null
+          period_end: string
+          period_start: string
+          record_type: string
+          twin_id: string
+        }
+        Insert: {
+          amount: number
+          category?: string | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          metadata?: Json | null
+          period_end: string
+          period_start: string
+          record_type: string
+          twin_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          metadata?: Json | null
+          period_end?: string
+          period_start?: string
+          record_type?: string
+          twin_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "twin_financial_records_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_twins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      twin_kpi_snapshots: {
+        Row: {
+          created_at: string
+          domain: string | null
+          id: string
+          kpi_key: string
+          kpi_unit: string | null
+          kpi_value: number | null
+          snapshot_at: string
+          twin_id: string
+        }
+        Insert: {
+          created_at?: string
+          domain?: string | null
+          id?: string
+          kpi_key: string
+          kpi_unit?: string | null
+          kpi_value?: number | null
+          snapshot_at?: string
+          twin_id: string
+        }
+        Update: {
+          created_at?: string
+          domain?: string | null
+          id?: string
+          kpi_key?: string
+          kpi_unit?: string | null
+          kpi_value?: number | null
+          snapshot_at?: string
+          twin_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "twin_kpi_snapshots_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_twins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      twin_simulation_runs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          duration_seconds: number | null
+          events: Json | null
+          id: string
+          kpi_deltas: Json | null
+          result_summary: Json | null
+          scenario_id: string
+          scenario_name: string | null
+          started_at: string | null
+          status: string
+          twin_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          duration_seconds?: number | null
+          events?: Json | null
+          id?: string
+          kpi_deltas?: Json | null
+          result_summary?: Json | null
+          scenario_id: string
+          scenario_name?: string | null
+          started_at?: string | null
+          status?: string
+          twin_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          duration_seconds?: number | null
+          events?: Json | null
+          id?: string
+          kpi_deltas?: Json | null
+          result_summary?: Json | null
+          scenario_id?: string
+          scenario_name?: string | null
+          started_at?: string | null
+          status?: string
+          twin_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "twin_simulation_runs_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_twins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      twin_sovereignty_events: {
+        Row: {
+          compliance_status: string | null
+          created_at: string
+          data_classification: string | null
+          destination_region: string | null
+          details: Json | null
+          event_type: string
+          id: string
+          occurred_at: string
+          resolved_at: string | null
+          severity: string
+          source_region: string | null
+          twin_id: string
+        }
+        Insert: {
+          compliance_status?: string | null
+          created_at?: string
+          data_classification?: string | null
+          destination_region?: string | null
+          details?: Json | null
+          event_type: string
+          id?: string
+          occurred_at?: string
+          resolved_at?: string | null
+          severity?: string
+          source_region?: string | null
+          twin_id: string
+        }
+        Update: {
+          compliance_status?: string | null
+          created_at?: string
+          data_classification?: string | null
+          destination_region?: string | null
+          details?: Json | null
+          event_type?: string
+          id?: string
+          occurred_at?: string
+          resolved_at?: string | null
+          severity?: string
+          source_region?: string | null
+          twin_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "twin_sovereignty_events_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_twins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      twin_telemetry: {
+        Row: {
+          created_at: string
+          domain: string
+          id: string
+          metadata: Json | null
+          metric_key: string
+          metric_value: number | null
+          recorded_at: string
+          twin_id: string
+        }
+        Insert: {
+          created_at?: string
+          domain: string
+          id?: string
+          metadata?: Json | null
+          metric_key: string
+          metric_value?: number | null
+          recorded_at?: string
+          twin_id: string
+        }
+        Update: {
+          created_at?: string
+          domain?: string
+          id?: string
+          metadata?: Json | null
+          metric_key?: string
+          metric_value?: number | null
+          recorded_at?: string
+          twin_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "twin_telemetry_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_twins"
             referencedColumns: ["id"]
           },
         ]

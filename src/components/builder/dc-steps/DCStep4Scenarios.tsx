@@ -15,11 +15,11 @@ import { useState } from 'react';
 
 const SEVERITY_COLORS: Record<string, string> = {
   critical: 'bg-destructive text-destructive-foreground',
-  high: 'bg-orange-500 text-white',
-  warning: 'bg-yellow-500 text-black',
-  medium: 'bg-yellow-500 text-black',
-  low: 'bg-blue-500 text-white',
-  info: 'bg-blue-500 text-white',
+  high: 'bg-warning text-warning-foreground',
+  warning: 'bg-warning text-warning-foreground',
+  medium: 'bg-warning text-warning-foreground',
+  low: 'bg-info text-info-foreground',
+  info: 'bg-info text-info-foreground',
 };
 
 export function DCStep4Scenarios() {

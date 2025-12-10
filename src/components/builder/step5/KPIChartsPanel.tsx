@@ -165,8 +165,8 @@ export function KPIChartsPanel({ kpis, data, scenario, isRunning }: KPIChartsPan
                   <CardTitle className="text-sm font-medium">
                     {kpiLabel}
                   </CardTitle>
-                  {trend === 'up' && <TrendingUp className="h-4 w-4 text-green-500" />}
-                  {trend === 'down' && <TrendingDown className="h-4 w-4 text-red-500" />}
+                  {trend === 'up' && <TrendingUp className="h-4 w-4 text-success" />}
+                  {trend === 'down' && <TrendingDown className="h-4 w-4 text-destructive" />}
                   {trend === 'stable' && <Minus className="h-4 w-4 text-muted-foreground" />}
                 </div>
                 <div className="flex items-baseline gap-2">
@@ -182,7 +182,7 @@ export function KPIChartsPanel({ kpis, data, scenario, isRunning }: KPIChartsPan
                     <span className="text-muted-foreground">Target:</span>
                     <span className={cn(
                       "font-medium",
-                      isAlert ? "text-destructive" : "text-green-600"
+                      isAlert ? "text-destructive" : "text-success"
                     )}>
                       {threshold} {unit}
                     </span>

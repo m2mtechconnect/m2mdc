@@ -20,7 +20,7 @@ import {
 import { useState } from 'react';
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
-  pass: <CheckCircle2 className="h-4 w-4 text-green-500" />,
+  pass: <CheckCircle2 className="h-4 w-4 text-success" />,
   fail: <XCircle className="h-4 w-4 text-destructive" />,
   pending: <Clock className="h-4 w-4 text-muted-foreground" />,
 };
@@ -74,21 +74,21 @@ export function DCStep5Deploy() {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <span className="font-medium">Overall Score</span>
-            <span className={`text-2xl font-bold ${readinessScore >= 70 ? 'text-green-600' : 'text-amber-600'}`}>
+            <span className={`text-2xl font-bold ${readinessScore >= 70 ? 'text-success' : 'text-warning'}`}>
               {readinessScore}%
             </span>
           </div>
           <Progress value={readinessScore} className="h-3" />
           
           {failedChecks.length > 0 && (
-            <div className="rounded-lg bg-amber-500/10 p-3 space-y-2">
-              <div className="flex items-center gap-2 text-amber-700">
+            <div className="rounded-lg bg-warning/10 p-3 space-y-2">
+              <div className="flex items-center gap-2 text-warning">
                 <AlertTriangle className="h-4 w-4" />
                 <span className="text-sm font-medium">
                   {failedChecks.length} check{failedChecks.length > 1 ? 's' : ''} need attention
                 </span>
               </div>
-              <ul className="text-sm text-amber-700 space-y-1 ml-6">
+              <ul className="text-sm text-warning space-y-1 ml-6">
                 {failedChecks.slice(0, 3).map(check => (
                   <li key={check.id}>• {check.name}</li>
                 ))}
@@ -192,7 +192,7 @@ export function DCStep5Deploy() {
       </div>
 
       {!canDeploy && (
-        <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 p-3 text-amber-700">
+        <div className="flex items-center gap-2 rounded-lg bg-warning/10 p-3 text-warning">
           <AlertTriangle className="h-4 w-4" />
           <span className="text-sm">
             Readiness score must be at least 70% to deploy. Review the checks above.

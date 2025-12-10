@@ -93,14 +93,14 @@ const INTEGRATION_TEMPLATES = [
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
-  compute: 'bg-blue-500/10 text-blue-700 border-blue-200',
-  power: 'bg-amber-500/10 text-amber-700 border-amber-200',
-  cooling: 'bg-cyan-500/10 text-cyan-700 border-cyan-200',
-  monitoring: 'bg-purple-500/10 text-purple-700 border-purple-200',
-  infrastructure: 'bg-slate-500/10 text-slate-700 border-slate-200',
-  sustainability: 'bg-green-500/10 text-green-700 border-green-200',
-  compliance: 'bg-red-500/10 text-red-700 border-red-200',
-  workload: 'bg-indigo-500/10 text-indigo-700 border-indigo-200',
+  compute: 'bg-info/10 text-info border-info/30',
+  power: 'bg-warning/10 text-warning border-warning/30',
+  cooling: 'bg-accent/10 text-accent border-accent/30',
+  monitoring: 'bg-accent/10 text-accent border-accent/30',
+  infrastructure: 'bg-muted text-muted-foreground border-border',
+  sustainability: 'bg-success/10 text-success border-success/30',
+  compliance: 'bg-destructive/10 text-destructive border-destructive/30',
+  workload: 'bg-info/10 text-info border-info/30',
 };
 
 export function DCStep3Integrations() {
@@ -213,7 +213,7 @@ export function DCStep3Integrations() {
                       >
                         <Icon className="h-4 w-4" />
                         <span className="flex-1 text-left">{template.name}</span>
-                        {isAdded && <CheckCircle2 className="h-4 w-4 text-green-600" />}
+                        {isAdded && <CheckCircle2 className="h-4 w-4 text-success" />}
                       </Button>
                     );
                   })}

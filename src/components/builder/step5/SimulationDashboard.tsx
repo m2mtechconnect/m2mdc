@@ -233,7 +233,7 @@ export function SimulationDashboard({
   const statusConfig = {
     idle: { label: 'Idle', color: 'bg-muted text-muted-foreground', icon: Info },
     running: { label: 'Running...', color: 'bg-primary text-primary-foreground animate-pulse', icon: Activity },
-    completed: { label: 'Completed', color: 'bg-green-500 text-white', icon: CheckCircle2 },
+    completed: { label: 'Completed', color: 'bg-success text-success-foreground', icon: CheckCircle2 },
     error: { label: 'Error', color: 'bg-destructive text-destructive-foreground', icon: AlertTriangle },
   }[status];
 

@@ -1,6 +1,7 @@
 /**
  * DC Twin Blueprint Tab
  * Shows agents, data sources, KPIs, and workflows from builder store
+ * Enhanced with Executive Summary, Domain Health Map, Dependency Graph, and Change Log
  */
 
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +13,11 @@ import {
 } from 'lucide-react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import type { DCAgentDomain } from '@/types/dcTwinBuilder';
+import { ExecutiveSummaryBlock } from '@/components/blueprint/ExecutiveSummaryBlock';
+import { DomainHealthMap } from '@/components/blueprint/DomainHealthMap';
+import { DependencyGraph } from '@/components/blueprint/DependencyGraph';
+import { ChangeLogPanel } from '@/components/blueprint/ChangeLogPanel';
+import { AgentHealthPanel } from '@/components/blueprint/AgentHealthPanel';
 
 const domainIcons: Record<DCAgentDomain, React.ReactNode> = {
   thermal: <Thermometer className="h-4 w-4" />,
@@ -22,7 +28,7 @@ const domainIcons: Record<DCAgentDomain, React.ReactNode> = {
   financial: <DollarSign className="h-4 w-4" />,
   incidents: <AlertTriangle className="h-4 w-4" />,
   sovereignty: <Globe className="h-4 w-4" />,
-  retail: <Bot className="h-4 w-4" />, // Retail domain icon
+  retail: <Bot className="h-4 w-4" />,
 };
 
 export function DCBlueprintTab() {
@@ -34,6 +40,18 @@ export function DCBlueprintTab() {
   
   return (
     <div className="space-y-6">
+      {/* Executive Summary Block */}
+      <ExecutiveSummaryBlock />
+      
+      {/* Domain Health Map */}
+      <DomainHealthMap />
+      
+      {/* Dependency Graph & Change Log */}
+      <div className="grid lg:grid-cols-2 gap-4">
+        <DependencyGraph />
+        <ChangeLogPanel />
+      </div>
+      
       <Tabs defaultValue="agents" className="space-y-4">
         <TabsList>
           <TabsTrigger value="agents" className="gap-2">

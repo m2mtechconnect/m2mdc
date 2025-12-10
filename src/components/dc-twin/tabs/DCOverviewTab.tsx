@@ -7,7 +7,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
-  Server, Zap, Clock, Download, CheckCircle2, 
+  Server, Zap, Clock, CheckCircle2, 
   Target, TrendingUp, Leaf, Users, Briefcase
 } from 'lucide-react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
@@ -75,11 +75,11 @@ export function DCOverviewTab() {
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
             <div className="p-2 rounded-lg bg-info/10">
-              <Download className="h-5 w-5 text-info" />
+              <Zap className="h-5 w-5 text-info" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{overview.displayDownloads}</p>
-              <p className="text-xs text-muted-foreground">Downloads</p>
+              <p className="text-2xl font-bold">{overview.renewablePercent}%</p>
+              <p className="text-xs text-muted-foreground">Renewable Energy</p>
             </div>
           </CardContent>
         </Card>

@@ -178,7 +178,7 @@ export function DCStep3Integrations() {
                   {integrations.map((integration) => (
                     <div key={integration.id} className="flex items-center justify-between rounded-lg border p-2">
                       <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <Database className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm">{integration.name}</span>
                       </div>
                       <Badge variant="outline" className="text-xs">{integration.type}</Badge>
@@ -241,7 +241,7 @@ export function DCStep3Integrations() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Active Integrations */}
+          {/* Active Integrations - No fake connected status */}
           {integrations.length > 0 && (
             <div className="space-y-3">
               <Label>Active Integrations</Label>

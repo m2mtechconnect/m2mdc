@@ -183,17 +183,19 @@ export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onO
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Leaf className="h-5 w-5 text-green-600" />
-              <CardTitle className="text-xl">Green Data Centre Twin Recommendation</CardTitle>
+              <CardTitle className="text-xl">Sovereign Green AI Data Centre Twin</CardTitle>
             </div>
-            <p className="text-sm text-muted-foreground">
-              Automatically generated for{" "}
+            <p className="text-base">
+              <span className="text-muted-foreground">Recommendation for </span>
               <span className="font-semibold text-foreground">{safeCustomerName}</span>
-              {overview.industry && (
-                <span className="ml-1">({industryLabels[overview.industry] || overview.industry})</span>
-              )}
             </p>
+            {overview.industry && (
+              <Badge variant="outline" className="bg-muted/50">
+                {industryLabels[overview.industry] || overview.industry}
+              </Badge>
+            )}
           </div>
-          <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/30">
+          <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/30 hidden sm:inline-flex">
             {industryLabels[overview.industry || primaryIndustry] || primaryIndustry}
           </Badge>
         </div>

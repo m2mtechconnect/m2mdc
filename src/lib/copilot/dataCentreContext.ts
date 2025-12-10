@@ -148,6 +148,7 @@ export function getDataCentreSampleQuestions(): string[] {
  */
 export function isDataCentreContext(context: CoPilotContext): boolean {
   return (
+    context.activePage === 'data_centre_twin' ||
     context.templateId?.includes('data-cent') ||
     context.templateId?.includes('sovereign') ||
     context.industry?.toLowerCase().includes('data cent') ||

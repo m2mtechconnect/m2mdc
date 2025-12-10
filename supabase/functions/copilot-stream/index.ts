@@ -267,6 +267,12 @@ async function saveMemory(supabase: any, userId: string, query: string, context:
  * Build context-aware system prompt
  */
 function buildSystemPrompt(context: any, memory: Record<string, any> = {}): string {
+  // If DC domain system prompt is provided, use it directly
+  if (context.domainSystemPrompt && context.isDataCentreDomain) {
+    console.log('[CoPilot] Using DC domain system prompt');
+    return context.domainSystemPrompt;
+  }
+
   let prompt = `You are AURA Co-Pilot, an intelligent assistant for the AURA Digital Twin & Agentic Studio platform.
 
 Current Context:

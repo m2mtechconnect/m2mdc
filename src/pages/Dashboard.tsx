@@ -29,7 +29,6 @@ import { useBlueprintAgents } from '@/hooks/useBlueprintAgents';
 // DC-specific imports
 import { DCKPITile } from '@/components/dc-ui';
 import { DCCard } from '@/components/dc-ui';
-import { DCScannerPanel } from '@/components/dc-scan/DCScannerPanel';
 import { DataCentreSelector } from '@/components/twin-selector';
 
 interface Metrics {
@@ -518,10 +517,7 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        {/* Green DC Twin Scanner */}
-        <div className="mb-8">
-          <DCScannerPanel />
-        </div>
+        {/* Green DC Twin Scanner - Now unified in HeroSearchBar above */}
 
         {/* Twin Stats */}
         {isEmpty && (

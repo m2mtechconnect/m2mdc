@@ -33,8 +33,7 @@ import MemberProfileModal from "@/components/teams/MemberProfileModal";
 import InviteTeamMemberModal from "@/components/teams/InviteTeamMemberModal";
 import RoleBreakdownSection from "@/components/teams/RoleBreakdownSection";
 import ActivityFeed from "@/components/teams/ActivityFeed";
-import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
-import { DCKPITile } from "@/components/dc-ui/DCKPITile";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const roleIcons: Record<string, any> = {
   executive: Crown,
@@ -276,23 +275,8 @@ export default function Teams() {
     setRoleFilter(role);
   };
 
-  if (loadingMembers || loadingInvites || loadingActivity) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <div className="space-y-4">
-            <Skeleton className="h-12 w-3/4" />
-            <Skeleton className="h-6 w-1/2" />
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {[...Array(6)].map((_, i) => (
-                <Skeleton key={i} className="h-32" />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Show loading only if members are loading (main content)
+  const isInitialLoading = loadingMembers;
 
   return (
     <TooltipProvider>
@@ -323,72 +307,57 @@ export default function Teams() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
-            <DCKPITile
-              label="Total Members"
-              value={totalMembers.toString()}
-              status="normal"
-              icon={<Users className="h-5 w-5" />}
-            />
-            <DCKPITile
-              label="Active Now"
-              value={activeNow.toString()}
-              status="normal"
-              icon={<CheckCircle2 className="h-5 w-5" />}
-            />
-            <DCKPITile
-              label="Systems"
-              value={totalSystems.toString()}
-              status="normal"
-              icon={<Wrench className="h-5 w-5" />}
-            />
-            <DCKPITile
-              label="Pending"
-              value={pendingInvitesCount.toString()}
-              status={pendingInvitesCount > 0 ? "warning" : "normal"}
-              icon={<Clock className="h-5 w-5" />}
-            />
-            <DCKPITile
-              label="Roles"
-              value={rolesCount.toString()}
-              status="normal"
-              icon={<Shield className="h-5 w-5" />}
-            />
-            <DCKPITile
-              label="Departments"
-              value={rolesCount.toString()}
-              status="normal"
-              icon={<Building2 className="h-5 w-5" />}
-            />
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+            {[
+              { label: "Total Members", value: totalMembers, icon: Users },
+              { label: "Active Now", value: activeNow, icon: CheckCircle2 },
+              { label: "Systems", value: totalSystems, icon: Wrench },
+              { label: "Pending", value: pendingInvitesCount, icon: Clock, warning: pendingInvitesCount > 0 },
+              { label: "Roles", value: rolesCount, icon: Shield },
+              { label: "Departments", value: rolesCount, icon: Building2 },
+            ].map((stat) => (
+              <Card key={stat.label} className={stat.warning ? "border-l-4 border-l-warning" : ""}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-muted-foreground">{stat.label}</span>
+                    <stat.icon className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div className="text-2xl font-bold">{stat.value}</div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column - Team Members Table */}
             <div className="lg:col-span-2 space-y-6">
-              <DCCard
-                title="Team Members"
-                icon={<Users className="h-5 w-5" />}
-                status="operational"
-                headerAction={
-                  <Badge variant="secondary" className="text-sm">
-                    {filteredMembers.length} of {activeMembersCount}
-                  </Badge>
-                }
-              >
-                {/* Filters */}
-                <div className="flex flex-wrap gap-3 mb-6">
-                  <div className="flex-1 min-w-[200px]">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Search members..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 bg-dc-bg-card border-dc-border"
-                      />
+              <Card>
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-5 w-5 text-muted-foreground" />
+                      <CardTitle className="text-lg">Team Members</CardTitle>
                     </div>
+                    <Badge variant="secondary" className="text-sm">
+                      {isInitialLoading ? "..." : `${filteredMembers.length} of ${activeMembersCount}`}
+                    </Badge>
                   </div>
+                </CardHeader>
+                <CardContent>
+                  {/* Filters */}
+                  <div className="flex flex-wrap gap-3 mb-6">
+                    <div className="flex-1 min-w-[200px]">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Search members..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
                   <Select value={roleFilter} onValueChange={setRoleFilter}>
                     <SelectTrigger className="w-[180px]">
                       <Filter className="h-4 w-4 mr-2" />
@@ -419,10 +388,12 @@ export default function Teams() {
                   </Select>
                 </div>
 
-                {/* Members List */}
-                <div className="space-y-3">
-                  {filteredMembers.length > 0 ? (
-                    filteredMembers.map((member) => {
+                  {/* Members List */}
+                  <div className="space-y-3">
+                    {isInitialLoading ? (
+                      [...Array(3)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)
+                    ) : filteredMembers.length > 0 ? (
+                      filteredMembers.map((member) => {
                       const RoleIcon = roleIcons[member.role] || Wrench;
                       return (
                         <Tooltip key={member.email}>
@@ -476,15 +447,16 @@ export default function Teams() {
                           <TooltipContent>Click to view full member profile and permissions</TooltipContent>
                         </Tooltip>
                       );
-                    })
-                  ) : (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                      <p>No members found matching filters</p>
-                    </div>
-                  )}
-                </div>
-              </DCCard>
+                      })
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                        <p>No members found matching filters</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Right Column - Role Breakdown, Activity & Simulation Runs */}
@@ -499,30 +471,34 @@ export default function Teams() {
               />
               
               {/* Recent Simulation Runs */}
-              <DCCard
-                title="Recent Simulation Runs"
-                icon={<Activity className="h-5 w-5" />}
-                status="operational"
-              >
-                <div className="space-y-3">
-                  {[
-                    { scenario: 'GPU Spike - Training Job', user: 'Sarah Chen', time: '2 hours ago', runId: 'run-001' },
-                    { scenario: 'CRAH Failure - Hot Aisle', user: 'Michael Wong', time: '5 hours ago', runId: 'run-002' },
-                    { scenario: 'Cross-Border Data Violation', user: 'Alex Johnson', time: '1 day ago', runId: 'run-003' },
-                  ].map((run, idx) => (
-                    <div 
-                      key={idx}
-                      className="p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
-                      onClick={() => navigate(`/data-centre-twin?view=simulation&runId=${run.runId}`)}
-                    >
-                      <div className="font-medium text-sm">{run.scenario}</div>
-                      <div className="text-xs text-muted-foreground">
-                        Run by {run.user} – {run.time}
+              <Card>
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-muted-foreground" />
+                    <CardTitle className="text-lg">Recent Simulation Runs</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {[
+                      { scenario: 'GPU Spike - Training Job', user: 'Sarah Chen', time: '2 hours ago', runId: 'run-001' },
+                      { scenario: 'CRAH Failure - Hot Aisle', user: 'Michael Wong', time: '5 hours ago', runId: 'run-002' },
+                      { scenario: 'Cross-Border Data Violation', user: 'Alex Johnson', time: '1 day ago', runId: 'run-003' },
+                    ].map((run, idx) => (
+                      <div 
+                        key={idx}
+                        className="p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
+                        onClick={() => navigate(`/data-centre-twin?view=simulation&runId=${run.runId}`)}
+                      >
+                        <div className="font-medium text-sm">{run.scenario}</div>
+                        <div className="text-xs text-muted-foreground">
+                          Run by {run.user} – {run.time}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </DCCard>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

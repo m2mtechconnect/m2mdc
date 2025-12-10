@@ -28,6 +28,8 @@ import { useBlueprintScenarios } from "@/hooks/useBlueprintScenarios";
 import { useSovereignty } from "@/sovereignty";
 import { SovereigntyAuditTimeline } from "@/components/compliance/SovereigntyAuditTimeline";
 import { SovereigntyRiskOverview } from "@/components/compliance/SovereigntyRiskOverview";
+import { useTwinContext } from "@/contexts/TwinContext";
+import { useTwinSovereigntyEvents } from "@/hooks/useTwinData";
 
 // DC-specific audit timeline
 const auditTimeline = [
@@ -137,9 +139,14 @@ export default function Compliance() {
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [selectedStressScenario, setSelectedStressScenario] = useState<string>('');
   
-  // Get Blueprint data for workflows, roles, and scenarios
-  const { blueprint, summary, downloadBlueprint } = useBlueprint('default');
-  const { scenarios } = useBlueprintScenarios('default');
+  // Twin context for scoped data
+  const { twin, twinId } = useTwinContext();
+  const { data: sovereigntyEvents } = useTwinSovereigntyEvents({ limit: 50 });
+  
+  // Get Blueprint data for workflows, roles, and scenarios - use twin's blueprint if available
+  const blueprintId = twin?.blueprint_id || 'default';
+  const { blueprint, summary, downloadBlueprint } = useBlueprint(blueprintId);
+  const { scenarios } = useBlueprintScenarios(blueprintId);
   
   // Get sovereignty engine data
   const sovereignty = useSovereignty();
@@ -195,7 +202,7 @@ export default function Compliance() {
                 Sovereignty & Safety Audit
               </h1>
               <p className="text-muted-foreground">
-                Data Centre compliance, thermal safety, and operational governance
+                {twin ? `${twin.name} - ${twin.city}` : 'Data Centre compliance, thermal safety, and operational governance'}
               </p>
             </div>
             <Button variant="outline">

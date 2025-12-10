@@ -37,6 +37,8 @@ import { useBlueprintScenarios } from '@/hooks/useBlueprintScenarios';
 import { useBlueprintKPIs } from '@/hooks/useBlueprintKPIs';
 import { DcToolsStrip } from '@/components/dc-tools';
 import { SovereigntyAnalyticsTab } from '@/components/telemetry/SovereigntyAnalyticsTab';
+import { useTwinContext } from '@/contexts/TwinContext';
+import { useTwinTelemetry, useTwinKPIs } from '@/hooks/useTwinData';
 
 interface System {
   id: string;
@@ -62,10 +64,18 @@ export default function IntelligenceDashboard() {
   const [subsystem, setSubsystem] = useState('all');
   const [region, setRegion] = useState('all');
 
-  // Blueprint data for KPIs and scenarios
-  const { blueprint, summary } = useBlueprint('default');
-  const { scenarios, scenarioCount } = useBlueprintScenarios('default');
-  const { totalKpis, kpisByDomain } = useBlueprintKPIs('default');
+  // Twin context for scoped data
+  const { twin, twinId, twins } = useTwinContext();
+  
+  // Twin-scoped telemetry and KPIs
+  const { data: twinTelemetry } = useTwinTelemetry();
+  const { data: twinKpis } = useTwinKPIs();
+
+  // Blueprint data for KPIs and scenarios - use twin's blueprint if available
+  const blueprintId = twin?.blueprint_id || 'default';
+  const { blueprint, summary } = useBlueprint(blueprintId);
+  const { scenarios, scenarioCount } = useBlueprintScenarios(blueprintId);
+  const { totalKpis, kpisByDomain } = useBlueprintKPIs(blueprintId);
 
   // Use real KPI hooks
   const roiKpi = useKpi('roi_growth');
@@ -161,7 +171,9 @@ export default function IntelligenceDashboard() {
               <BarChart3 className="h-6 w-6 text-primary" />
               Telemetry & Analytics
             </h1>
-            <p className="text-muted-foreground">Data Centre performance monitoring and insights</p>
+            <p className="text-muted-foreground">
+              {twin ? `${twin.name} - ${twin.city}` : 'Data Centre performance monitoring and insights'}
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="outline" className="gap-2" onClick={() => navigate('/blueprint/default')}>

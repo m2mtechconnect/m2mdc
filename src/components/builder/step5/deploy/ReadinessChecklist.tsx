@@ -127,9 +127,9 @@ export function ReadinessChecklist({
   const statusIcon = (status: ReadinessItem['status']) => {
     switch (status) {
       case 'ok':
-        return <Check className="h-4 w-4 text-green-500" />;
+        return <Check className="h-4 w-4 text-success" />;
       case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+        return <AlertTriangle className="h-4 w-4 text-warning" />;
       case 'missing':
         return <X className="h-4 w-4 text-destructive" />;
     }
@@ -138,9 +138,9 @@ export function ReadinessChecklist({
   const statusBg = (status: ReadinessItem['status']) => {
     switch (status) {
       case 'ok':
-        return 'bg-green-500/10 border-green-500/20';
+        return 'bg-success/10 border-success/20';
       case 'warning':
-        return 'bg-yellow-500/10 border-yellow-500/20';
+        return 'bg-warning/10 border-warning/20';
       case 'missing':
         return 'bg-destructive/10 border-destructive/20';
     }
@@ -157,12 +157,12 @@ export function ReadinessChecklist({
                   <CardTitle className="text-lg">Deployment Readiness</CardTitle>
                   <div className="flex gap-2">
                     {okCount > 0 && (
-                      <Badge variant="secondary" className="bg-green-500/10 text-green-600">
+                      <Badge variant="secondary" className="bg-success/10 text-success">
                         {okCount} OK
                       </Badge>
                     )}
                     {warningCount > 0 && (
-                      <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600">
+                      <Badge variant="secondary" className="bg-warning/10 text-warning">
                         {warningCount} Warning
                       </Badge>
                     )}
@@ -222,8 +222,8 @@ export function ReadinessChecklist({
               </div>
 
               {allPassed && (
-                <div className="mt-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-                  <div className="flex items-center gap-2 text-green-600">
+                <div className="mt-4 p-3 bg-success/10 border border-success/20 rounded-lg">
+                  <div className="flex items-center gap-2 text-success">
                     <Check className="h-5 w-5" />
                     <span className="font-medium">All critical checks passed! Ready for deployment.</span>
                   </div>

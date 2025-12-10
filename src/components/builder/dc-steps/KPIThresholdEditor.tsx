@@ -36,7 +36,7 @@ export function KPIThresholdEditor({ kpi, onUpdate }: KPIThresholdEditorProps) {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button type="button" className="inline-flex items-center justify-center rounded-full bg-muted/50 hover:bg-muted h-4 w-4 text-xs">
-                    <DirectionIcon className={`h-3 w-3 ${isLowerBetter ? 'text-green-600' : 'text-blue-600'}`} />
+                    <DirectionIcon className={`h-3 w-3 ${isLowerBetter ? 'text-success' : 'text-info'}`} />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="top" className="max-w-xs">
@@ -85,7 +85,7 @@ export function KPIThresholdEditor({ kpi, onUpdate }: KPIThresholdEditorProps) {
             
             <div className="space-y-2">
               <Label className="text-xs flex items-center gap-1.5">
-                <AlertTriangle className="h-3 w-3 text-yellow-600" />
+                <AlertTriangle className="h-3 w-3 text-warning" />
                 Warning Threshold
               </Label>
               <Input

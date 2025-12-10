@@ -283,7 +283,7 @@ export function BuilderIntegrationsHub({ systemId }: BuilderIntegrationsHubProps
               </div>
               {statusData.summary.expired > 0 && (
                 <div>
-                  <div className="text-2xl font-bold text-orange-500">{statusData.summary.expired}</div>
+                  <div className="text-2xl font-bold text-warning">{statusData.summary.expired}</div>
                   <div className="text-sm text-muted-foreground">Expired</div>
                 </div>
               )}

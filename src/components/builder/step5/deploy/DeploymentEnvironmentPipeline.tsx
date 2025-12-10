@@ -19,9 +19,9 @@ interface DeploymentEnvironmentPipelineProps {
 }
 
 const environments = [
-  { id: 'dev', label: 'Development', icon: Server, description: 'Test changes safely', color: 'text-blue-500 border-blue-500' },
-  { id: 'staging', label: 'Staging', icon: Shield, description: 'Pre-production validation', color: 'text-yellow-500 border-yellow-500' },
-  { id: 'production', label: 'Production', icon: Rocket, description: 'Live deployment', color: 'text-green-500 border-green-500' },
+  { id: 'dev', label: 'Development', icon: Server, description: 'Test changes safely', color: 'text-info border-info' },
+  { id: 'staging', label: 'Staging', icon: Shield, description: 'Pre-production validation', color: 'text-warning border-warning' },
+  { id: 'production', label: 'Production', icon: Rocket, description: 'Live deployment', color: 'text-success border-success' },
 ] as const;
 
 export function DeploymentEnvironmentPipeline({

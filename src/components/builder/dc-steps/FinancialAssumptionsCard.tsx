@@ -63,7 +63,7 @@ export function FinancialAssumptionsCard() {
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="annualPowerCost" className="flex items-center gap-1.5">
-              <Zap className="h-3.5 w-3.5 text-amber-500" />
+              <Zap className="h-3.5 w-3.5 text-warning" />
               Annual Power Cost (USD)
             </Label>
             <div className="relative">
@@ -83,7 +83,7 @@ export function FinancialAssumptionsCard() {
 
           <div className="space-y-2">
             <Label htmlFor="annualCarbon" className="flex items-center gap-1.5">
-              <Leaf className="h-3.5 w-3.5 text-green-600" />
+              <Leaf className="h-3.5 w-3.5 text-success" />
               Annual Carbon Emissions (tonnes CO₂e)
             </Label>
             <Input
@@ -123,7 +123,7 @@ export function FinancialAssumptionsCard() {
 
           <div className="space-y-2">
             <Label htmlFor="carbonSavings" className="flex items-center gap-1.5">
-              <Leaf className="h-3.5 w-3.5 text-green-600" />
+              <Leaf className="h-3.5 w-3.5 text-success" />
               Expected Carbon Reduction (%)
             </Label>
             <div className="relative">
@@ -255,7 +255,7 @@ export function FinancialAssumptionsCard() {
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Carbon Reduction</p>
-              <p className="text-lg font-semibold text-green-600">
+              <p className="text-lg font-semibold text-success">
                 {Math.round(financial.annualCarbonTonnes * (financial.carbonSavingsPercent / 100)).toLocaleString()} t
               </p>
             </div>

@@ -182,7 +182,7 @@ export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onO
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Leaf className="h-5 w-5 text-green-600" />
+              <Leaf className="h-5 w-5 text-success" />
               <CardTitle className="text-xl">Sovereign Green AI Data Centre Twin</CardTitle>
             </div>
             <p className="text-base">
@@ -195,7 +195,7 @@ export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onO
               </Badge>
             )}
           </div>
-          <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/30 hidden sm:inline-flex">
+          <Badge variant="outline" className="bg-success/10 text-success border-success/30 hidden sm:inline-flex">
             {industryLabels[overview.industry || primaryIndustry] || primaryIndustry}
           </Badge>
         </div>
@@ -229,7 +229,7 @@ export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onO
           <ul className="space-y-1">
             {overview.primaryUseCases.map((obj, i) => (
               <li key={i} className="text-sm text-studio-body flex items-start gap-2">
-                <CheckCircle2 className="h-3.5 w-3.5 text-green-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="h-3.5 w-3.5 text-success mt-0.5 flex-shrink-0" />
                 {obj}
               </li>
             ))}
@@ -239,12 +239,12 @@ export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onO
         {/* KPI Targets from builder KPIs */}
         <div className="grid grid-cols-5 gap-3">
           <div className="text-center p-2 rounded-lg bg-muted/50">
-            <Zap className="h-4 w-4 mx-auto text-amber-500 mb-1" />
+            <Zap className="h-4 w-4 mx-auto text-warning mb-1" />
             <div className="text-lg font-semibold text-foreground">{pueKpi?.target || 1.3}</div>
             <div className="text-xs text-studio-muted">PUE Target</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
-            <Leaf className="h-4 w-4 mx-auto text-green-500 mb-1" />
+            <Leaf className="h-4 w-4 mx-auto text-success mb-1" />
             <div className="text-lg font-semibold text-foreground">{overview.renewablePercent}%</div>
             <div className="text-xs text-studio-muted">Renewable</div>
           </div>
@@ -254,12 +254,12 @@ export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onO
             <div className="text-xs text-studio-muted">Sovereignty</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
-            <Thermometer className="h-4 w-4 mx-auto text-orange-500 mb-1" />
+            <Thermometer className="h-4 w-4 mx-auto text-destructive mb-1" />
             <div className="text-lg font-semibold text-foreground">{carbonKpi?.target || 70}</div>
             <div className="text-xs text-studio-muted">g CO₂/kWh</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
-            <Server className="h-4 w-4 mx-auto text-purple-500 mb-1" />
+            <Server className="h-4 w-4 mx-auto text-accent mb-1" />
             <div className="text-lg font-semibold text-foreground">{uptimeKpi?.target || 99.9}%</div>
             <div className="text-xs text-studio-muted">Uptime</div>
           </div>
@@ -297,8 +297,8 @@ export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onO
                   key={scenario.id} 
                   variant="outline" 
                   className={`text-xs ${
-                    scenario.severity === "critical" ? "border-red-500/50 text-red-700" :
-                    scenario.severity === "warning" ? "border-orange-500/50 text-orange-700" :
+                    scenario.severity === "critical" ? "border-destructive/50 text-destructive" :
+                    scenario.severity === "warning" ? "border-warning/50 text-warning" :
                     "border-muted-foreground/30"
                   }`}
                 >
@@ -329,7 +329,7 @@ export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onO
             </div>
             <div>
               <div className="text-studio-muted">Green Upgrade Savings</div>
-              <div className="font-semibold text-green-600">
+              <div className="font-semibold text-success">
                 ~{financial.upgradeSavingsPercent}% cost, ~{financial.carbonSavingsPercent}% carbon
               </div>
             </div>

@@ -36,34 +36,34 @@ function getSeverityConfig(severity?: 'low' | 'medium' | 'high' | 'critical') {
     case 'critical':
       return {
         icon: AlertCircle,
-        color: 'text-red-500',
-        bgColor: 'bg-red-500/10',
-        borderColor: 'border-red-500/30',
+        color: 'text-destructive',
+        bgColor: 'bg-destructive/10',
+        borderColor: 'border-destructive/30',
         label: 'Critical',
       };
     case 'high':
       return {
         icon: AlertTriangle,
-        color: 'text-orange-500',
-        bgColor: 'bg-orange-500/10',
-        borderColor: 'border-orange-500/30',
+        color: 'text-warning',
+        bgColor: 'bg-warning/10',
+        borderColor: 'border-warning/30',
         label: 'High',
       };
     case 'medium':
       return {
         icon: Info,
-        color: 'text-yellow-500',
-        bgColor: 'bg-yellow-500/10',
-        borderColor: 'border-yellow-500/30',
+        color: 'text-warning',
+        bgColor: 'bg-warning/10',
+        borderColor: 'border-warning/30',
         label: 'Medium',
       };
     case 'low':
     default:
       return {
         icon: CheckCircle2,
-        color: 'text-green-500',
-        bgColor: 'bg-green-500/10',
-        borderColor: 'border-green-500/30',
+        color: 'text-success',
+        bgColor: 'bg-success/10',
+        borderColor: 'border-success/30',
         label: 'Low',
       };
   }

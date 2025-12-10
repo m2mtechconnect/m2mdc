@@ -46,6 +46,8 @@ export interface SimulationKpiDelta {
   isGood: boolean;
 }
 
+export type AlertLevel = 'normal' | 'warning' | 'critical';
+
 export interface RackMetrics {
   rackId: string;
   tempC: number;

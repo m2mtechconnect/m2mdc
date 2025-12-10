@@ -1,6 +1,7 @@
 /**
  * DC Scanner Panel
  * Main component for URL scanning and recommendation display
+ * Integrates with TwinContext for multi-tenant twin creation
  */
 
 import { useState, useEffect } from "react";
@@ -16,6 +17,8 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useTwinContext } from "@/contexts/TwinContext";
+import { getRegionByCode } from "@/data/regions";
 import { 
   useLastScanSession, 
   useBlueprintTemplate,
@@ -30,6 +33,7 @@ import type { DCRecommendation, DCBlueprintProfile } from "@/types/dcScan";
 export function DCScannerPanel() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { createTwin, setTwinId, refreshTwins } = useTwinContext();
   
   const [url, setUrl] = useState("");
   const [isScanning, setIsScanning] = useState(false);
@@ -125,23 +129,53 @@ export function DCScannerPanel() {
   };
 
   const handleCreateTwin = async () => {
-    if (!recommendation || !currentSessionId) return;
+    if (!recommendation) return;
 
     setIsCreatingTwin(true);
     try {
-      // Call the create-twin edge function
-      const { data, error } = await supabase.functions.invoke("dc-create-twin-from-recommendation", {
-        body: { sessionId: currentSessionId }
+      // Get region profile - use ca-central-1 as default (Montreal)
+      const regionCode = 'ca-central-1';
+      const region = getRegionByCode(regionCode);
+      
+      // Create twin using TwinContext
+      const newTwin = await createTwin({
+        name: recommendation.blueprintName,
+        city: region?.city || 'Montreal',
+        region_code: regionCode,
+        tier: recommendation.suggestedTier || 'Tier III',
+        capacity_kw: recommendation.suggestedCapacityKw || 5000,
+        industry: recommendation.detectedIndustry || 'technology',
+        pue_target: region?.default_pue || 1.3,
+        renewable_target_pct: region?.energy_mix.renewable || 80,
+        carbon_intensity: region?.carbon_intensity || 30,
+        sovereignty_level: region?.sovereignty_profile.level || 'standard',
+        metadata: {
+          created_from: 'scanner',
+          scan_session_id: currentSessionId,
+          recommendation,
+          source_url: url,
+        },
       });
 
-      if (error) throw error;
+      if (newTwin) {
+        // Update the scan session with the new twin ID
+        if (currentSessionId) {
+          await supabase
+            .from('dc_scan_sessions')
+            .update({ twin_id: newTwin.id })
+            .eq('id', currentSessionId);
+        }
 
-      if (data?.twinId) {
+        await refreshTwins();
+        refetchLastScan();
+        
         toast({
           title: "Twin Created",
           description: `Your ${recommendation.blueprintName} has been created.`
         });
-        navigate(`/data-centre-twin/${data.twinId}`);
+        
+        // Navigate to the new twin
+        navigate(`/data-centre-twin/${newTwin.id}`);
       }
     } catch (error) {
       console.error("Create twin error:", error);

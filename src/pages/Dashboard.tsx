@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Wrench, Bot, AlertCircle, ArrowUpRight, Server, Cpu, Thermometer, Globe, Zap as ZapIcon, Activity } from "lucide-react";
+import { Loader2, Wrench, Bot, AlertCircle, ArrowUpRight, Server, Cpu, Thermometer, Globe, Zap as ZapIcon, Activity, Bug } from "lucide-react";
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { UnifiedIntakeModal } from '@/components/dashboard/UnifiedIntakeModal';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
+import { useTwinContext } from '@/contexts/TwinContext';
 import HeroSearchBar from "@/components/HeroSearchBar";
 import { SystemDetailsDrawer } from '@/components/SystemDetailsDrawer';
 import { SystemDeleteDialog } from '@/components/SystemDeleteDialog';
@@ -29,6 +30,7 @@ import { useBlueprintAgents } from '@/hooks/useBlueprintAgents';
 import { DCKPITile } from '@/components/dc-ui';
 import { DCCard } from '@/components/dc-ui';
 import { DCScannerPanel } from '@/components/dc-scan/DCScannerPanel';
+import { DataCentreSelector } from '@/components/twin-selector';
 
 interface Metrics {
   roi: number;
@@ -67,6 +69,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { updateContext, askCoPilot } = useCoPilotContext();
+  const { twins, twin, twinId, isLoading: twinsLoading } = useTwinContext();
   const [selectedSystem, setSelectedSystem] = useState<string | null>(null);
   const [deleteSystemId, setDeleteSystemId] = useState<string | null>(null);
   const [deleteSystemName, setDeleteSystemName] = useState<string>('');
@@ -284,20 +287,25 @@ export default function Dashboard() {
   const hasData = unifiedData && unifiedData.stats.total > 0;
   const isEmpty = !roiKpi.loading && !timeSavedKpi.loading && !complianceKpi.loading && !agentsKpi.loading && !hasData;
 
-  // KPIs for Dashboard - Use blueprint agents for accurate counts + DC baseline metrics
-  const totalTwins = Math.max(1, (unifiedData?.stats.total || 0)); // At least 1 for the master DC twin
-  const activeTwins = blueprintAgents.filter(a => a.status === 'running' || a.status === 'active').length || 9; // 9 blueprint agents
+  // KPIs for Dashboard - Use twins from TwinContext for accurate counts
+  const totalTwins = twins.length || 0;
+  const activeTwins = blueprintAgents.filter(a => a.status === 'running' || a.status === 'active').length || 9;
   const draftTwins = unifiedData?.stats.draft || 0;
+  
+  // Calculate average PUE from twins
+  const avgPue = twins.length > 0 
+    ? (twins.reduce((sum, t) => sum + (t.pue_target || 1.4), 0) / twins.length).toFixed(2)
+    : '1.38';
   
   const kpis = [
     {
       key: 'total_twins',
       label: 'Total Data Centre Twins',
       value: totalTwins.toString(),
-      change: '',
+      change: twins.length > 0 ? `${twins.length} configured` : '',
       trend: "neutral" as const,
       icon: Server,
-      loading: systemsLoading,
+      loading: twinsLoading || systemsLoading,
       onClick: () => navigate('/data-centre-twin'),
       tooltip: 'Total number of Data Centre Twins configured',
     },
@@ -326,11 +334,11 @@ export default function Dashboard() {
     {
       key: 'avg_pue',
       label: 'Average PUE',
-      value: '1.38',
+      value: avgPue,
       change: '-2.1%',
       trend: "down" as const,
       icon: ZapIcon,
-      loading: false,
+      loading: twinsLoading,
       onClick: () => navigate('/data-centre-twin'),
       tooltip: 'Average Power Usage Effectiveness across all facilities',
     },
@@ -352,6 +360,24 @@ export default function Dashboard() {
           <p className="text-muted-foreground text-lg sm:text-xl max-w-3xl mx-auto">
             Monitor PUE, thermals, power, sovereign compute, and GPU workloads.
           </p>
+          {/* Current Twin Indicator */}
+          {twin && (
+            <div className="mt-4 flex items-center justify-center gap-3">
+              <Badge variant="outline" className="text-sm px-3 py-1">
+                <Server className="h-3 w-3 mr-1.5" />
+                {twin.name}
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                {twin.city} • {twin.tier}
+              </Badge>
+              <Link to="/twin-debug">
+                <Button variant="ghost" size="sm" className="text-xs gap-1 text-muted-foreground hover:text-foreground">
+                  <Bug className="h-3 w-3" />
+                  Debug
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Hero Search Bar */}

@@ -326,6 +326,7 @@ Keep responses under 200 words unless complex explanation is needed.`;
 
 /**
  * Generate structured response (Actions, Insights, Next Steps, Follow-ups)
+ * Now with full DC domain support
  */
 function generateStructuredResponse(query: string, context: any, response: string): any {
   const structured: any = {
@@ -335,7 +336,16 @@ function generateStructuredResponse(query: string, context: any, response: strin
     followUps: [],
   };
 
-  // Generate context-aware actions
+  // Check if this is a DC domain context
+  const isDCDomain = context.isDataCentreDomain || 
+                     context.activePage === 'data_centre_twin' ||
+                     context.dcContext;
+
+  if (isDCDomain) {
+    return generateDCStructuredResponse(query, context, response);
+  }
+
+  // Generate context-aware actions for non-DC pages
   if (context.activePage === 'builder' || (context.workflowsCount !== undefined && context.workflowsCount === 0)) {
     structured.actions.push({
       label: 'Create Workflow',
@@ -392,10 +402,175 @@ function generateStructuredResponse(query: string, context: any, response: strin
     ];
   }
 
-  // Generate contextually relevant follow-up questions based on the original query
+  // Generate contextually relevant follow-up questions
   structured.followUps = generateContextualFollowUps(query, context, response);
 
   return structured;
+}
+
+/**
+ * Generate DC-specific structured response with actions, insights, and follow-ups
+ */
+function generateDCStructuredResponse(query: string, context: any, response: string): any {
+  const queryLower = query.toLowerCase();
+  const dcContext = context.dcContext || {};
+  
+  const structured: any = {
+    actions: [],
+    insights: [],
+    nextSteps: [],
+    followUps: [],
+  };
+
+  // Detect query intent for DC domain
+  const isPUEQuery = /pue|power\s*usage|efficiency/i.test(queryLower);
+  const isThermalQuery = /thermal|temperature|heat|cooling|hot\s*spot/i.test(queryLower);
+  const isGPUQuery = /gpu|utilization|workload|cluster|training|inference/i.test(queryLower);
+  const isCarbonQuery = /carbon|emission|green|renewable|sustainability/i.test(queryLower);
+  const isSovereigntyQuery = /sovereign|compliance|cross.?border|jurisdiction|residency/i.test(queryLower);
+  const isFinancialQuery = /cost|expense|roi|financial|budget|opex/i.test(queryLower);
+  const isPowerQuery = /power|ups|pdu|battery|grid|outage/i.test(queryLower);
+  const isSimulationQuery = /simulation|scenario|simulate|what.?if/i.test(queryLower);
+  const isRCAQuery = /why|cause|reason|explain|diagnose|root\s*cause|troubleshoot/i.test(queryLower);
+
+  // Generate DC-specific actions based on query and context
+  if (isSimulationQuery) {
+    structured.actions.push(
+      { label: 'Run Cooling Failure', handler: 'cmd:runSimulation:cooling_failure_hot_aisle', icon: 'play' },
+      { label: 'Run GPU Spike', handler: 'cmd:runSimulation:gpu_spike_training_job', icon: 'play' }
+    );
+  }
+
+  if (isThermalQuery || isPUEQuery) {
+    structured.actions.push(
+      { label: 'View Thermal Tab', handler: 'cmd:navigateToTab:thermal', icon: 'thermal' },
+      { label: 'Highlight PUE', handler: 'cmd:highlightKPI:pue', icon: 'activity' }
+    );
+  }
+
+  if (isGPUQuery) {
+    structured.actions.push(
+      { label: 'View Workload Tab', handler: 'cmd:navigateToTab:workload', icon: 'workload' }
+    );
+  }
+
+  if (isCarbonQuery) {
+    structured.actions.push(
+      { label: 'View Financial Tab', handler: 'cmd:navigateToTab:financial', icon: 'financial' },
+      { label: 'Run Carbon Shock', handler: 'cmd:runSimulation:carbon_price_shock', icon: 'play' }
+    );
+  }
+
+  if (isSovereigntyQuery) {
+    structured.actions.push(
+      { label: 'View Sovereignty Tab', handler: 'cmd:navigateToTab:sovereignty', icon: 'sovereignty' }
+    );
+  }
+
+  if (isPowerQuery) {
+    structured.actions.push(
+      { label: 'View Power Tab', handler: 'cmd:navigateToTab:power', icon: 'power' },
+      { label: 'Run UPS Failure', handler: 'cmd:runSimulation:ups_failure_runtime_drop', icon: 'play' }
+    );
+  }
+
+  // Generate insights based on DC context
+  if (dcContext.pue) {
+    if (dcContext.pue > 1.6) {
+      structured.insights.push(`PUE is elevated at ${dcContext.pue.toFixed(2)}. Consider reviewing cooling efficiency.`);
+    } else if (dcContext.pue < 1.3) {
+      structured.insights.push(`Excellent PUE of ${dcContext.pue.toFixed(2)} indicates highly efficient operations.`);
+    }
+  }
+
+  if (dcContext.gpuUtilization) {
+    if (dcContext.gpuUtilization > 90) {
+      structured.insights.push(`GPU cluster is running at ${dcContext.gpuUtilization}% - near saturation. Consider capacity planning.`);
+    } else if (dcContext.gpuUtilization < 50) {
+      structured.insights.push(`GPU utilization at ${dcContext.gpuUtilization}% is below optimal. Review workload scheduling.`);
+    }
+  }
+
+  if (dcContext.sovereigntyRisk && dcContext.sovereigntyRisk > 5) {
+    structured.insights.push(`Sovereignty risk score is elevated at ${dcContext.sovereigntyRisk}%. Review cross-border data flows.`);
+  }
+
+  if (dcContext.alertsOpen && dcContext.alertsOpen > 0) {
+    structured.insights.push(`${dcContext.alertsOpen} active alerts require attention. ${dcContext.criticalAlerts || 0} are critical.`);
+  }
+
+  // Generate next steps based on RCA or general query
+  if (isRCAQuery) {
+    structured.nextSteps = [
+      'Review correlated metrics across thermal and power domains',
+      'Check event timeline for triggering events',
+      'Run simulation to verify root cause hypothesis'
+    ];
+  } else if (isSimulationQuery) {
+    structured.nextSteps = [
+      'Select a scenario from the preset list',
+      'Review KPI deltas after simulation completes',
+      'Document findings for operational playbook'
+    ];
+  } else {
+    structured.nextSteps = [
+      'Monitor real-time KPIs in the dashboard',
+      'Review alerts and acknowledge resolved issues',
+      'Run simulations to test operational resilience'
+    ];
+  }
+
+  // Generate DC-specific follow-ups
+  structured.followUps = generateDCFollowUps(query, dcContext);
+
+  return structured;
+}
+
+/**
+ * Generate DC domain-specific follow-up questions
+ */
+function generateDCFollowUps(query: string, dcContext: any): string[] {
+  const queryLower = query.toLowerCase();
+  const followUps: string[] = [];
+
+  if (/pue/i.test(queryLower)) {
+    followUps.push("What is causing the current PUE trend?", "How does PUE compare to last week?");
+  }
+  
+  if (/thermal|temperature|cooling/i.test(queryLower)) {
+    followUps.push('Are there any thermal hotspots?', 'Run cooling failure simulation');
+  }
+  
+  if (/gpu|workload/i.test(queryLower)) {
+    followUps.push('Which GPU cluster is most saturated?', 'What is the training vs inference split?');
+  }
+  
+  if (/carbon|emission/i.test(queryLower)) {
+    followUps.push('Compare carbon intensity QC vs AB', 'What is the projected annual emissions?');
+  }
+  
+  if (/sovereign|compliance/i.test(queryLower)) {
+    followUps.push('Are there any cross-border data flows?', 'What is the sovereign compute ratio?');
+  }
+  
+  if (/cost|financial|roi/i.test(queryLower)) {
+    followUps.push('What is the cost per GPU-hour?', 'What is the carbon cost impact?');
+  }
+  
+  if (/power|ups/i.test(queryLower)) {
+    followUps.push('What is the UPS battery health?', 'Run grid outage simulation');
+  }
+
+  // Default DC follow-ups if nothing specific matched
+  if (followUps.length === 0) {
+    followUps.push(
+      'What is the current PUE?',
+      'Are there any active alerts?',
+      'Show GPU cluster utilization'
+    );
+  }
+
+  return followUps.slice(0, 3);
 }
 
 /**

@@ -37,6 +37,15 @@ const industryLabels: Record<string, string> = {
   generic: "Enterprise",
   Government: "Government",
   Technology: "Technology",
+  Retail: "Retail",
+  Logistics: "Logistics",
+  "Supply Chain": "Supply Chain",
+  "Edge Computing": "Edge Computing",
+};
+
+// Check if this is a mega-retailer based on archetypeId or store count
+const isMegaRetailer = (archetypeId: string | undefined, storeCount: number | undefined) => {
+  return archetypeId === 'retail_hyperscale_green_twin' || (storeCount && storeCount > 1000);
 };
 
 export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onOpenSimulation }: Props) {
@@ -280,6 +289,9 @@ export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onO
           <h4 className="text-sm font-medium mb-3 flex items-center gap-2 text-foreground">
             <DollarSign className="h-4 w-4 text-primary" />
             Carbon & Cost Model
+            {isMegaRetailer(sourceRecommendation?.blueprintProfile, financial.multiStoreAggregationCount) && (
+              <Badge variant="outline" className="ml-2 text-xs">Hyperscale Retail</Badge>
+            )}
           </h4>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
@@ -300,6 +312,19 @@ export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onO
               <div className="text-studio-muted">Payback Period</div>
               <div className="font-semibold text-foreground">~{financial.paybackYears} years</div>
             </div>
+            {/* Retail-specific financial fields */}
+            {financial.annualColdChainEnergyCostUsd && (
+              <div>
+                <div className="text-studio-muted">Cold Chain Energy</div>
+                <div className="font-semibold text-foreground">{formatCurrency(financial.annualColdChainEnergyCostUsd)}</div>
+              </div>
+            )}
+            {financial.multiStoreAggregationCount && (
+              <div>
+                <div className="text-studio-muted">Sites Aggregated</div>
+                <div className="font-semibold text-foreground">{financial.multiStoreAggregationCount.toLocaleString()}+</div>
+              </div>
+            )}
           </div>
         </div>
 

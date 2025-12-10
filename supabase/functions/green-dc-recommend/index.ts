@@ -28,6 +28,7 @@ type DcCapacityTier = "small" | "medium" | "large" | "hyperscale";
 type DcTwinArchetypeId = 
   | "finance_core_banking_green_twin"
   | "retail_ecommerce_green_twin"
+  | "retail_hyperscale_green_twin"
   | "gov_sovereign_cloud_twin"
   | "saas_multitenant_ai_twin"
   | "healthcare_phi_twin"
@@ -36,6 +37,17 @@ type DcTwinArchetypeId =
   | "energy_grid_ai_twin"
   | "education_research_ai_twin"
   | "generic_enterprise_green_twin";
+
+// Mega-retailer domain patterns (Fortune 50 retailers)
+const MEGA_RETAILER_DOMAINS = [
+  "walmart", "costco", "target", "kroger", "walgreens", "cvs",
+  "homedepot", "lowes", "bestbuy", "tjx", "dollar", "macys",
+  "nordstrom", "kohls", "jcpenney", "sears", "albertsons", "safeway",
+  "publix", "ahold", "tesco", "carrefour", "aldi", "lidl",
+  "metro", "auchan", "leclerc", "edeka", "rewe", "migros", "coop",
+  "woolworths", "coles", "aeon", "seven", "lawson", "familymart",
+  "alibaba", "jd", "pinduoduo", "suning", "rakuten", "mercadolibre"
+];
 
 interface GreenDcTwinRecommendation {
   id: string;
@@ -62,9 +74,16 @@ interface GreenDcTwinRecommendation {
     greenVariantSavingsCostPct: number;
     greenVariantSavingsCarbonPct: number;
     estimatedPaybackYears: number;
+    // Retail hyperscale fields
+    annualColdChainEnergyCostUsd?: number;
+    annualEdgeComputeEnergyCostUsd?: number;
+    fleetWideCarbonTaxRiskUsd?: number;
+    aiWorkloadOptimizationSavingsUsd?: number;
+    multiStoreAggregationCount?: number;
   };
   notes: string[];
   detectedConstraints?: string[];
+  isMegaRetailer?: boolean;
   scanSummary?: {
     pagesScanned: number;
     contentExtracted: string;
@@ -102,6 +121,29 @@ const GREEN_DC_ARCHETYPES: Record<DcTwinArchetypeId, {
     defaultAgents: ["thermal_agent", "power_agent", "cooling_agent", "network_agent", "workload_gpu_agent", "carbon_cost_agent", "incident_response_agent"],
     defaultKpiTargets: { pueTarget: 1.3, renewableShareTargetPct: 75, sovereigntyScoreTargetPct: 85, carbonIntensityTargetGPerKwh: 70, uptimeTargetPct: 99.95 },
     defaultScenarios: ["black_friday_peak_load", "flash_sale_gpu_spike", "cooling_cascade_failure", "cdn_origin_overload", "carbon_price_spike"]
+  },
+  retail_hyperscale_green_twin: {
+    label: "Hyperscale Retail DC Twin (Fortune 50)",
+    defaultObjectives: [
+      "Maintain sub-2-second failover for 4,000+ distributed retail edge sites",
+      "Reduce cold-chain energy consumption across logistics and stores",
+      "Optimize GPU fleet for real-time computer vision (inventory, robotics)",
+      "Improve global supply chain sovereignty compliance",
+      "Reduce carbon footprint for refrigerated warehouses",
+      "Optimize edge–core–cloud routing for retail AI workloads"
+    ],
+    defaultAgents: [
+      "thermal_agent", "power_agent", "cooling_agent", "network_agent", 
+      "facility_safety_agent", "workload_gpu_agent", "sovereignty_agent", 
+      "carbon_cost_agent", "incident_response_agent",
+      "retail_edge_resilience_agent", "cold_chain_optimizer_agent", "supply_chain_sovereignty_agent"
+    ],
+    defaultKpiTargets: { pueTarget: 1.25, renewableShareTargetPct: 85, sovereigntyScoreTargetPct: 92, carbonIntensityTargetGPerKwh: 55, uptimeTargetPct: 99.99 },
+    defaultScenarios: [
+      "black_friday_peak_load", "flash_sale_gpu_spike", "cooling_cascade_failure", 
+      "cdn_origin_overload", "carbon_price_spike", "retail_edge_failure", 
+      "cold_chain_failure", "logistics_dc_overload", "ai_model_drift", "global_sovereignty_breach"
+    ]
   },
   gov_sovereign_cloud_twin: {
     label: "Sovereign Government Cloud Twin",
@@ -238,11 +280,25 @@ function classifyIndustry(text: string): { industry: DcIndustry; businessModel?:
   return { industry: "generic" };
 }
 
-function selectArchetype(industry: DcIndustry, text: string): DcTwinArchetypeId {
+function isMegaRetailer(domain: string): boolean {
+  const lowerDomain = domain.toLowerCase();
+  return MEGA_RETAILER_DOMAINS.some(retailer => lowerDomain.includes(retailer));
+}
+
+function selectArchetype(industry: DcIndustry, text: string, domain: string): DcTwinArchetypeId {
   const lower = text.toLowerCase();
   switch (industry) {
     case "finance": return "finance_core_banking_green_twin";
-    case "retail": return "retail_ecommerce_green_twin";
+    case "retail": 
+      // Check for mega-retailer domains or hyperscale indicators
+      if (isMegaRetailer(domain) || 
+          lower.includes("fortune 50") || lower.includes("fortune 100") ||
+          lower.includes("thousands of stores") || lower.includes("global retail") ||
+          lower.includes("supply chain") || lower.includes("logistics network") ||
+          lower.includes("distribution center") || lower.includes("fulfillment")) {
+        return "retail_hyperscale_green_twin";
+      }
+      return "retail_ecommerce_green_twin";
     case "government": return "gov_sovereign_cloud_twin";
     case "healthcare": return "healthcare_phi_twin";
     case "telecom": return "telco_edge_5g_twin";
@@ -268,9 +324,11 @@ function inferRegions(text: string): string[] {
   return regions.length > 0 ? regions : ["NA"];
 }
 
-function inferCapacityTier(text: string): DcCapacityTier {
+function inferCapacityTier(text: string, domain: string): DcCapacityTier {
   const lower = text.toLowerCase();
-  if (lower.includes("global leader") || lower.includes("hyperscale") || lower.includes("millions of customers") || lower.includes("billions of") || lower.includes("worldwide operations") || lower.includes("fortune 100") || lower.includes("fortune 500")) return "hyperscale";
+  // Mega-retailers are always hyperscale
+  if (isMegaRetailer(domain)) return "hyperscale";
+  if (lower.includes("global leader") || lower.includes("hyperscale") || lower.includes("millions of customers") || lower.includes("billions of") || lower.includes("worldwide operations") || lower.includes("fortune 100") || lower.includes("fortune 500") || lower.includes("fortune 50")) return "hyperscale";
   if (lower.includes("national") || lower.includes("enterprise") || lower.includes("large scale") || lower.includes("multinational") || lower.includes("thousands of employees") || lower.includes("regional leader")) return "large";
   if (lower.includes("startup") || lower.includes("small business") || lower.includes("local") || lower.includes("boutique")) return "small";
   return "medium";
@@ -318,6 +376,7 @@ const CAPACITY_BASELINES: Record<DcCapacityTier, { costUsd: number; carbonTonnes
 const INDUSTRY_MULTIPLIERS: Record<DcTwinArchetypeId, { cost: number; carbon: number; savings: number }> = {
   finance_core_banking_green_twin: { cost: 1.4, carbon: 1.2, savings: 0.18 },
   retail_ecommerce_green_twin: { cost: 1.1, carbon: 1.3, savings: 0.22 },
+  retail_hyperscale_green_twin: { cost: 2.5, carbon: 2.2, savings: 0.28 },
   gov_sovereign_cloud_twin: { cost: 1.3, carbon: 0.9, savings: 0.15 },
   saas_multitenant_ai_twin: { cost: 1.5, carbon: 1.6, savings: 0.25 },
   healthcare_phi_twin: { cost: 1.2, carbon: 1.0, savings: 0.16 },
@@ -327,6 +386,23 @@ const INDUSTRY_MULTIPLIERS: Record<DcTwinArchetypeId, { cost: number; carbon: nu
   education_research_ai_twin: { cost: 0.8, carbon: 1.1, savings: 0.20 },
   generic_enterprise_green_twin: { cost: 1.0, carbon: 1.0, savings: 0.18 }
 };
+
+// Retail hyperscale financial estimator
+function estimateRetailHyperscaleFinancials(baseFinancials: GreenDcTwinRecommendation["financialModel"], storeCount: number) {
+  const coldChainMultiplier = 0.25; // 25% of energy goes to cold chain
+  const edgeComputeMultiplier = 0.15; // 15% for edge computing
+  const carbonTaxRate = 50; // $50/tonne assumed carbon tax
+  const aiOptimizationSavings = 0.12; // 12% savings from AI optimization
+  
+  return {
+    ...baseFinancials,
+    annualColdChainEnergyCostUsd: Math.round(baseFinancials.baselineAnnualCostUsd * coldChainMultiplier),
+    annualEdgeComputeEnergyCostUsd: Math.round(baseFinancials.baselineAnnualCostUsd * edgeComputeMultiplier),
+    fleetWideCarbonTaxRiskUsd: Math.round(baseFinancials.baselineAnnualCarbonTonnes * carbonTaxRate),
+    aiWorkloadOptimizationSavingsUsd: Math.round(baseFinancials.baselineAnnualCostUsd * aiOptimizationSavings),
+    multiStoreAggregationCount: storeCount,
+  };
+}
 
 const REGION_COST_MULTIPLIERS: Record<string, number> = { NA: 1.0, EU: 1.15, APAC: 0.9, LATAM: 0.75 };
 
@@ -480,16 +556,26 @@ serve(async (req) => {
 
     // Run classification
     const { industry, businessModel } = classifyIndustry(extractedText);
-    const archetypeId = selectArchetype(industry, extractedText);
+    const archetypeId = selectArchetype(industry, extractedText, domain);
     const regions = inferRegions(extractedText);
-    const capacityTier = inferCapacityTier(extractedText);
+    const capacityTier = inferCapacityTier(extractedText, domain);
     const constraints = detectConstraints(extractedText);
     const companyName = extractCompanyName(extractedText, domain);
+    const megaRetailer = isMegaRetailer(domain);
     
-    console.log(`[green-dc-recommend:${requestId}] Classification:`, { industry, businessModel, archetypeId, regions, capacityTier });
+    console.log(`[green-dc-recommend:${requestId}] Classification:`, { industry, businessModel, archetypeId, regions, capacityTier, megaRetailer });
 
     // Get archetype configuration
     const archetype = GREEN_DC_ARCHETYPES[archetypeId];
+    
+    // Calculate base financials
+    let financialModel = estimateFinancials(archetypeId, capacityTier, regions);
+    
+    // Enhance financials for mega-retailers
+    if (megaRetailer || archetypeId === "retail_hyperscale_green_twin") {
+      const storeCount = megaRetailer ? 4000 : 500; // Default store count estimate
+      financialModel = estimateRetailHyperscaleFinancials(financialModel, storeCount);
+    }
     
     // Build recommendation
     const recommendation: GreenDcTwinRecommendation = {
@@ -511,9 +597,10 @@ serve(async (req) => {
         uptimeTargetPct: archetype.defaultKpiTargets.uptimeTargetPct ?? 99.9,
       },
       scenarios: archetype.defaultScenarios,
-      financialModel: estimateFinancials(archetypeId, capacityTier, regions),
+      financialModel,
       notes: buildNotes(industry, regions, constraints, capacityTier),
       detectedConstraints: constraints,
+      isMegaRetailer: megaRetailer,
       scanSummary: {
         pagesScanned,
         contentExtracted: extractedText.slice(0, 500) + (extractedText.length > 500 ? "..." : ""),

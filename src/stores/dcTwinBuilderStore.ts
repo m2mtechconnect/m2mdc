@@ -279,6 +279,7 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
         console.log('[DCTwinBuilder] Initializing from Green DC recommendation:', recommendation.archetypeId);
         
         const defaultState = createDefaultDCTwinBuilderState();
+        const isMegaRetailer = recommendation.isMegaRetailer || recommendation.archetypeId === 'retail_hyperscale_green_twin';
         
         // Map archetype agent IDs to builder agent IDs
         const mappedAgentIds = recommendation.agents.map(
@@ -294,19 +295,30 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
         const validScenarioIds = new Set(REQUIRED_DC_SCENARIOS.map(s => s.id));
         const uniqueScenarios = [...new Set(mappedScenarioIds)].filter(id => validScenarioIds.has(id));
         
+        // Determine capacity for mega-retailers
+        const capacityKw = isMegaRetailer ? 20000 : // 20MW for mega-retailers
+          recommendation.capacityTier === 'small' ? 500 :
+          recommendation.capacityTier === 'medium' ? 2500 :
+          recommendation.capacityTier === 'large' ? 10000 : 50000;
+        
+        // Build enterprise description for mega-retailers
+        const description = isMegaRetailer 
+          ? `Your organization operates one of the world's largest distributed retail infrastructures. This Twin optimizes both hyperscale data centres and retail edge workloads across thousands of sites.`
+          : `AI-powered digital twin for ${recommendation.industry} operations with focus on sustainability and sovereignty.`;
+        
         // Map recommendation to overview
         const overview: DCTwinOverview = {
           ...defaultState.overview,
           twinName: `Sovereign Green AI Data Centre Twin for ${recommendation.companyName || recommendation.domain}`,
           twinSlug: `dc-twin-${(recommendation.companyName || recommendation.domain).toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
           twinSummary: recommendation.objectives.join('. '),
-          description: `AI-powered digital twin for ${recommendation.industry} operations with focus on sustainability and sovereignty.`,
+          description,
           siteUrl: recommendation.domain,
-          industries: [recommendation.industry, 'Technology', 'IT Operations', 'Sustainability'],
-          primaryUseCases: recommendation.objectives.slice(0, 4),
-          capacityKw: recommendation.capacityTier === 'small' ? 500 :
-                      recommendation.capacityTier === 'medium' ? 2500 :
-                      recommendation.capacityTier === 'large' ? 10000 : 50000,
+          industries: isMegaRetailer 
+            ? ['Retail', 'Logistics', 'Supply Chain', 'Edge Computing', 'Sustainability']
+            : [recommendation.industry, 'Technology', 'IT Operations', 'Sustainability'],
+          primaryUseCases: recommendation.objectives.slice(0, 6),
+          capacityKw,
           tier: recommendation.kpiTargets.uptimeTargetPct >= 99.99 ? 'Tier IV' : 'Tier III',
           renewablePercent: recommendation.kpiTargets.renewableShareTargetPct,
           sovereignCompliance: recommendation.kpiTargets.sovereigntyScoreTargetPct >= 80,
@@ -319,30 +331,42 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
           ],
         };
         
-        // Map financial model
+        // Map financial model with retail-specific fields
         const financial: DCFinancialModel = {
           annualPowerCostUsd: recommendation.financialModel.baselineAnnualCostUsd,
           annualCarbonTonnes: recommendation.financialModel.baselineAnnualCarbonTonnes,
           upgradeSavingsPercent: recommendation.financialModel.greenVariantSavingsCostPct,
           carbonSavingsPercent: recommendation.financialModel.greenVariantSavingsCarbonPct,
           paybackYears: recommendation.financialModel.estimatedPaybackYears,
+          // Retail hyperscale fields
+          annualColdChainEnergyCostUsd: recommendation.financialModel.annualColdChainEnergyCostUsd,
+          annualEdgeComputeEnergyCostUsd: recommendation.financialModel.annualEdgeComputeEnergyCostUsd,
+          fleetWideCarbonTaxRiskUsd: recommendation.financialModel.fleetWideCarbonTaxRiskUsd,
+          aiWorkloadOptimizationSavingsUsd: recommendation.financialModel.aiWorkloadOptimizationSavingsUsd,
+          multiStoreAggregationCount: recommendation.financialModel.multiStoreAggregationCount,
         };
         
-        // Update KPI targets based on recommendation
+        // Update KPI targets based on recommendation + enable retail KPIs for mega-retailers
+        const retailKpiIds = ['retail-edge-uptime', 'cold-chain-efficiency', 'gpu-fleet-saturation', 'retail-latency', 'carbon-cost-exposure'];
         const updatedKpis = defaultState.kpis.map(kpi => {
+          let updated = { ...kpi };
           if (kpi.id === 'effective-ai-pue') {
-            return { ...kpi, target: recommendation.kpiTargets.pueTarget };
+            updated.target = recommendation.kpiTargets.pueTarget;
           }
           if (kpi.id === 'sovereign-compute-ratio') {
-            return { ...kpi, target: recommendation.kpiTargets.sovereigntyScoreTargetPct };
+            updated.target = recommendation.kpiTargets.sovereigntyScoreTargetPct;
           }
           if (kpi.id === 'uptime') {
-            return { ...kpi, target: recommendation.kpiTargets.uptimeTargetPct };
+            updated.target = recommendation.kpiTargets.uptimeTargetPct;
           }
           if (kpi.id === 'gco2-per-gpu-hour') {
-            return { ...kpi, target: recommendation.kpiTargets.carbonIntensityTargetGPerKwh };
+            updated.target = recommendation.kpiTargets.carbonIntensityTargetGPerKwh;
           }
-          return kpi;
+          // Enable retail KPIs for mega-retailers
+          if (isMegaRetailer && retailKpiIds.includes(kpi.id)) {
+            updated.enabled = true;
+          }
+          return updated;
         });
         
         // Enable agents that are in the recommendation

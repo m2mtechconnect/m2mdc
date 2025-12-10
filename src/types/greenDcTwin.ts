@@ -64,6 +64,7 @@ export interface GreenDcTwinRecommendation {
   };
   notes: string[];
   detectedConstraints?: string[]; // SOC2, GDPR, etc.
+  isMegaRetailer?: boolean; // Fortune 50 retail detection flag
   scanSummary?: {
     pagesScanned: number;
     contentExtracted: string;

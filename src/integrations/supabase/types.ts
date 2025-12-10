@@ -254,7 +254,7 @@ export type Database = {
             foreignKeyName: "agent_definition_runs_twin_id_fkey"
             columns: ["twin_id"]
             isOneToOne: false
-            referencedRelation: "digital_twins"
+            referencedRelation: "data_centre_twins"
             referencedColumns: ["id"]
           },
         ]
@@ -1437,6 +1437,57 @@ export type Database = {
         }
         Relationships: []
       }
+      data_centre_locations: {
+        Row: {
+          capacity_kw: number
+          city: string
+          cloud_region: string | null
+          country: string
+          created_at: string
+          created_by: string
+          id: string
+          industry: string
+          name: string
+          provider_type: string
+          province: string | null
+          tags: Json | null
+          tier: string
+          updated_at: string
+        }
+        Insert: {
+          capacity_kw?: number
+          city: string
+          cloud_region?: string | null
+          country?: string
+          created_at?: string
+          created_by: string
+          id?: string
+          industry?: string
+          name: string
+          provider_type?: string
+          province?: string | null
+          tags?: Json | null
+          tier?: string
+          updated_at?: string
+        }
+        Update: {
+          capacity_kw?: number
+          city?: string
+          cloud_region?: string | null
+          country?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          industry?: string
+          name?: string
+          provider_type?: string
+          province?: string | null
+          tags?: Json | null
+          tier?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       data_centre_twins: {
         Row: {
           blueprint_id: string | null
@@ -1447,6 +1498,7 @@ export type Database = {
           created_by_user: string
           id: string
           industry: string | null
+          location_id: string | null
           metadata: Json | null
           name: string
           pue_target: number | null
@@ -1465,6 +1517,7 @@ export type Database = {
           created_by_user: string
           id?: string
           industry?: string | null
+          location_id?: string | null
           metadata?: Json | null
           name: string
           pue_target?: number | null
@@ -1483,6 +1536,7 @@ export type Database = {
           created_by_user?: string
           id?: string
           industry?: string | null
+          location_id?: string | null
           metadata?: Json | null
           name?: string
           pue_target?: number | null
@@ -1498,6 +1552,13 @@ export type Database = {
             columns: ["blueprint_id"]
             isOneToOne: false
             referencedRelation: "digital_twins"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_centre_twins_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_locations"
             referencedColumns: ["id"]
           },
         ]

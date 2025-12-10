@@ -20,8 +20,7 @@ import { useAgentDefinition } from '@/hooks/useAgentDefinitions';
 import { useAgentRuns, useStartAgentRun } from '@/hooks/useAgentRuns';
 import { DOMAIN_INFO, TYPE_INFO } from '@/types/agentDefinition';
 import { cn } from '@/lib/utils';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
-import Sidebar from '@/components/Sidebar';
+import { AgentRunsList } from '@/components/agents/AgentRunsList';
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Thermometer, Zap, Wind, Network, Shield, Cpu, Globe, Leaf, AlertTriangle, Bot,
@@ -45,52 +44,26 @@ const AgentDetail: React.FC = () => {
     }
   };
   
-  // Transform runs for display
-  const displayRuns = runs.map(r => ({
-    id: r.id,
-    agentDefinitionId: r.agentId,
-    twinId: null,
-    userId: null,
-    status: r.status as any,
-    inputData: {},
-    outputData: {},
-    metrics: {},
-    logs: [],
-    errorMessage: r.error,
-    startedAt: r.createdAt,
-    completedAt: r.completedAt,
-    durationMs: r.durationMs,
-    createdAt: r.createdAt,
-  }));
+  // Runs are now already transformed by the hook
   
   if (isLoading) {
     return (
-      <SidebarProvider>
-        <Sidebar />
-        <SidebarInset>
-          <div className="flex items-center justify-center h-screen">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
     );
   }
   
   if (error || !agent) {
     return (
-      <SidebarProvider>
-        <Sidebar />
-        <SidebarInset>
-          <div className="flex flex-col items-center justify-center h-screen gap-4">
-            <AlertTriangle className="h-12 w-12 text-destructive" />
-            <p className="text-lg">Agent not found</p>
-            <Button variant="outline" onClick={() => navigate('/subsystem-agents')}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Agents
-            </Button>
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
+      <div className="flex flex-col items-center justify-center h-screen gap-4">
+        <AlertTriangle className="h-12 w-12 text-destructive" />
+        <p className="text-lg">Agent not found</p>
+        <Button variant="outline" onClick={() => navigate('/subsystem-agents')}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Agents
+        </Button>
+      </div>
     );
   }
   
@@ -99,10 +72,7 @@ const AgentDetail: React.FC = () => {
   const typeInfo = TYPE_INFO[agent.type];
 
   return (
-    <SidebarProvider>
-      <Sidebar />
-      <SidebarInset>
-        <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen">
           {/* Header */}
           <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="flex items-center justify-between px-6 py-4">
@@ -469,8 +439,6 @@ const AgentDetail: React.FC = () => {
             </div>
           </ScrollArea>
         </div>
-      </SidebarInset>
-    </SidebarProvider>
   );
 };
 

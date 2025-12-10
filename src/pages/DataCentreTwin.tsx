@@ -5,19 +5,42 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { DataCentreDashboard } from '@/components/data-centre-twin';
 import { sovereignQCFacility } from '@/twins/dataCenter/mockData';
+import { useTwinContext } from '@/contexts/TwinContext';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 export default function DataCentreTwin() {
+  const { id } = useParams<{ id?: string }>();
+  const { twin, setTwinId, isLoading: twinLoading } = useTwinContext();
   const [facility, setFacility] = useState<DataCentreFacility | null>(null);
   
+  // Set twin from URL param if provided
   useEffect(() => {
-    document.title = 'Data Centre Twin | Sovereign AI Facility';
-    setFacility(sovereignQCFacility);
-  }, []);
+    if (id) {
+      setTwinId(id);
+    }
+  }, [id, setTwinId]);
   
-  if (!facility) {
+  useEffect(() => {
+    // Update page title with current twin name
+    const twinName = twin?.name || 'Sovereign AI Facility';
+    document.title = `Data Centre Twin | ${twinName}`;
+    
+    // Use mock facility data enhanced with current twin info
+    const enhancedFacility: DataCentreFacility = {
+      ...sovereignQCFacility,
+      id: twin?.id || sovereignQCFacility.id,
+      name: twin?.name || sovereignQCFacility.name,
+      location: twin?.city 
+        ? { ...sovereignQCFacility.location, city: twin.city }
+        : sovereignQCFacility.location,
+    };
+    setFacility(enhancedFacility);
+  }, [twin]);
+  
+  if (!facility || twinLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px] bg-background">
         <div className="flex flex-col items-center gap-4">
@@ -28,7 +51,7 @@ export default function DataCentreTwin() {
             </div>
           </div>
           <p className="text-sm text-muted-foreground font-mono animate-pulse">
-            Initializing Data Centre Twin...
+            {twinLoading ? 'Loading Twin Data...' : 'Initializing Data Centre Twin...'}
           </p>
         </div>
       </div>

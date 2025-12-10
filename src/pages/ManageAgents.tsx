@@ -12,18 +12,32 @@ import { useToast } from '@/hooks/use-toast';
 import { AOCIntroCard } from '@/components/aoc/AOCIntroCard';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useAgentDefinitionsData } from '@/hooks/useAgentDefinitionsData';
+import { useTwinContext } from '@/contexts/TwinContext';
+import { useTwinAgents } from '@/hooks/useTwinData';
 
 export default function ManageAgents() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { updateContext } = useCoPilotContext();
+  const { twin, twinId } = useTwinContext();
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
   const [deleteAgentId, setDeleteAgentId] = useState<string | null>(null);
   const [deleteAgentName, setDeleteAgentName] = useState<string>('');
   const [deleteAgentStatus, setDeleteAgentStatus] = useState<string>('');
 
-  // Get agents from agent_definitions table (source of truth)
-  const { agents, stats, isLoading, error, refetch } = useAgentDefinitionsData();
+  // Get agents from agent_definitions table - twin-scoped if twin selected
+  const { data: twinAgents } = useTwinAgents();
+  const { agents: allAgents, stats, isLoading, error, refetch } = useAgentDefinitionsData();
+  
+  // Use twin-scoped agents if available, otherwise fall back to all agents
+  const agents = twinId && twinAgents?.length ? twinAgents.map(a => ({
+    id: a.id,
+    name: a.name,
+    description: a.description || '',
+    status: a.is_active ? 'active' : 'draft',
+    slug: a.slug,
+    domain: a.domain,
+  })) as Agent[] : allAgents;
 
   // Update Co-Pilot context
   useEffect(() => {

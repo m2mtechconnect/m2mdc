@@ -61,7 +61,8 @@ export type DCAgentDomain =
   | 'workload'
   | 'financial'
   | 'incidents'
-  | 'sovereignty';
+  | 'sovereignty'
+  | 'retail';
 
 export interface DCAgentConfig {
   id: string;
@@ -177,6 +178,40 @@ export const REQUIRED_DC_AGENTS: DCAgentConfig[] = [
     kpisImpacted: ['env-safety', 'early-warning', 'fire-readiness'],
     workflowIds: ['wf-major-incident', 'wf-escalation', 'wf-post-mortem'],
   },
+  // Retail-specific agents (enabled when industry=retail hyperscale)
+  {
+    id: 'retail-edge-resilience',
+    name: 'Retail Edge Resilience Agent',
+    description: 'Monitors POS uptime, IoT devices, and store compute infrastructure across 4,000+ sites',
+    domain: 'retail',
+    enabled: false,
+    inputSignals: ['POS status', 'IoT heartbeats', 'Store network', 'Edge compute utilization'],
+    outputActions: ['Failover triggers', 'Edge alerts', 'Store notifications'],
+    kpisImpacted: ['retail-edge-uptime', 'retail-latency', 'uptime'],
+    workflowIds: ['wf-retail-edge-failure', 'wf-pos-degradation'],
+  },
+  {
+    id: 'cold-chain-optimizer',
+    name: 'Cold Chain Optimization Agent',
+    description: 'Optimizes refrigerated logistics and cooling cycles for warehouses and stores',
+    domain: 'retail',
+    enabled: false,
+    inputSignals: ['Refrigeration temps', 'Compressor loads', 'Defrost cycles', 'Ambient conditions'],
+    outputActions: ['Cooling adjustments', 'Defrost scheduling', 'Energy optimization'],
+    kpisImpacted: ['cold-chain-efficiency', 'effective-ai-pue', 'gco2-per-gpu-hour'],
+    workflowIds: ['wf-cold-chain-failure', 'wf-refrigeration-optimization'],
+  },
+  {
+    id: 'supply-chain-sovereignty',
+    name: 'Supply Chain Sovereignty Agent',
+    description: 'Ensures global compliance routing for supply chain data across PIPEDA, PCI, and regional regulations',
+    domain: 'retail',
+    enabled: false,
+    inputSignals: ['Supply chain data flows', 'Geo-routing', 'Compliance rules', 'PCI scopes'],
+    outputActions: ['Route blocking', 'Compliance alerts', 'Audit reports'],
+    kpisImpacted: ['sovereign-compute-ratio', 'sovereign-risk-score'],
+    workflowIds: ['wf-supply-chain-sovereignty', 'wf-pci-violation'],
+  },
 ];
 
 // Map archetype agent IDs (underscores) to builder agent IDs (hyphens)
@@ -190,6 +225,10 @@ export const ARCHETYPE_TO_BUILDER_AGENT_MAP: Record<string, string> = {
   sovereignty_agent: 'sovereignty-sentinel',
   carbon_cost_agent: 'carbon-cost-agent',
   incident_response_agent: 'incident-response',
+  // Retail-specific agent mappings
+  retail_edge_resilience_agent: 'retail-edge-resilience',
+  cold_chain_optimizer_agent: 'cold-chain-optimizer',
+  supply_chain_sovereignty_agent: 'supply-chain-sovereignty',
 };
 
 // ============================================================================
@@ -241,7 +280,7 @@ export interface DCKPIConfig {
   enabled: boolean;
 }
 
-// Required KPIs per spec (9 KPIs including uptime)
+// Required KPIs per spec (14 KPIs including retail-specific)
 export const REQUIRED_DC_KPIS: DCKPIConfig[] = [
   { id: 'sovereign-compute-ratio', name: 'Sovereign Compute Ratio', unit: '%', description: 'Percentage of compute in sovereign jurisdiction', direction: 'higher_is_better', target: 100, warningThreshold: 90, criticalThreshold: 80, dataSourceId: 'compliance-policies', domain: 'sovereignty', enabled: true },
   { id: 'effective-ai-pue', name: 'Effective AI PUE', unit: '', description: 'Power Usage Effectiveness for AI workloads', direction: 'lower_is_better', target: 1.2, warningThreshold: 1.4, criticalThreshold: 1.6, dataSourceId: 'dcim-telemetry', domain: 'power', enabled: true },
@@ -252,6 +291,12 @@ export const REQUIRED_DC_KPIS: DCKPIConfig[] = [
   { id: 'ups-runtime-remaining', name: 'UPS Runtime Remaining', unit: 'min', description: 'UPS battery backup runtime', direction: 'higher_is_better', target: 30, warningThreshold: 15, criticalThreshold: 10, dataSourceId: 'dcim-telemetry', domain: 'power', enabled: true },
   { id: 'redundancy-level', name: 'Redundancy Level', unit: '', description: 'Power redundancy (N, N+1, 2N)', direction: 'higher_is_better', target: 2, warningThreshold: 1, criticalThreshold: 0, dataSourceId: 'dcim-telemetry', domain: 'power', enabled: true },
   { id: 'uptime', name: 'Uptime', unit: '%', description: 'System availability percentage', direction: 'higher_is_better', target: 99.99, warningThreshold: 99.9, criticalThreshold: 99.5, dataSourceId: 'dcim-telemetry', domain: 'power', enabled: true },
+  // Retail-specific KPIs (enabled when industry=retail hyperscale)
+  { id: 'retail-edge-uptime', name: 'Retail Edge Uptime', unit: '%', description: 'Edge site availability across 4,000+ stores', direction: 'higher_is_better', target: 99.99, warningThreshold: 99.9, criticalThreshold: 99.5, dataSourceId: 'dcim-telemetry', domain: 'retail', enabled: false },
+  { id: 'cold-chain-efficiency', name: 'Cold Chain Energy Efficiency', unit: 'kWh/ton', description: 'Energy consumption per ton of refrigerated goods', direction: 'lower_is_better', target: 50, warningThreshold: 75, criticalThreshold: 100, dataSourceId: 'energy-feeds', domain: 'retail', enabled: false },
+  { id: 'gpu-fleet-saturation', name: 'GPU Fleet Utilization', unit: '%', description: 'GPU cluster utilization for retail AI workloads', direction: 'higher_is_better', target: 85, warningThreshold: 60, criticalThreshold: 40, dataSourceId: 'gpu-telemetry', domain: 'workload', enabled: false },
+  { id: 'retail-latency', name: 'Edge → Core Latency', unit: 'ms', description: 'Latency between retail edge and core DC', direction: 'lower_is_better', target: 15, warningThreshold: 50, criticalThreshold: 100, dataSourceId: 'dcim-telemetry', domain: 'network', enabled: false },
+  { id: 'carbon-cost-exposure', name: 'Carbon Cost Exposure', unit: '$', description: 'Annual carbon tax/credit exposure', direction: 'lower_is_better', target: 500000, warningThreshold: 1000000, criticalThreshold: 2000000, dataSourceId: 'carbon-intensity', domain: 'financial', enabled: false },
 ];
 
 // ============================================================================
@@ -346,7 +391,7 @@ export interface DCScenarioConfig {
   enabled: boolean;
 }
 
-// Required scenarios per spec (minimum 8)
+// Required scenarios per spec (13 scenarios including retail-specific)
 export const REQUIRED_DC_SCENARIOS: DCScenarioConfig[] = [
   { id: 'scenario-gpu-overload', name: 'GPU Overload', description: 'Simulate GPU cluster reaching capacity', severity: 'warning', category: 'capacity', durationSeconds: 300, eventsCount: 15, linkedWorkflows: ['wf-gpu-saturation'], kpisImpacted: ['gpu-utilization', 'queue-depth', 'sla-breach'], defaultRunCount: 1, enabled: true },
   { id: 'scenario-cooling-stress', name: 'Cooling Stress', description: 'Simulate CRAC failure and PUE spike', severity: 'critical', category: 'incident', durationSeconds: 600, eventsCount: 25, linkedWorkflows: ['wf-cooling-failure'], kpisImpacted: ['effective-ai-pue', 'supply-temp', 'cooling-efficiency'], defaultRunCount: 1, enabled: true },
@@ -356,6 +401,12 @@ export const REQUIRED_DC_SCENARIOS: DCScenarioConfig[] = [
   { id: 'scenario-tenant-expansion', name: 'Tenant Expansion', description: 'Simulate new large tenant onboarding', severity: 'info', category: 'capacity', durationSeconds: 600, eventsCount: 30, linkedWorkflows: ['wf-gpu-saturation'], kpisImpacted: ['gpu-utilization', 'economic-efficiency'], defaultRunCount: 1, enabled: true },
   { id: 'scenario-renewable-drop', name: 'Renewable Drop', description: 'Simulate renewable energy availability drop', severity: 'warning', category: 'emissions', durationSeconds: 300, eventsCount: 12, linkedWorkflows: ['wf-carbon-price-shock'], kpisImpacted: ['renewable-pct', 'gco2-per-gpu-hour'], defaultRunCount: 1, enabled: true },
   { id: 'scenario-optimization-run', name: 'Optimization Run', description: 'Run full optimization pass across all systems', severity: 'info', category: 'optimization', durationSeconds: 900, eventsCount: 50, linkedWorkflows: [], kpisImpacted: ['effective-ai-pue', 'economic-efficiency', 'cooling-efficiency'], defaultRunCount: 1, enabled: true },
+  // Retail-specific scenarios (enabled when industry=retail hyperscale)
+  { id: 'scenario-retail-edge-failure', name: 'Retail Edge Outage', description: 'Simulate distributed edge site failure across retail stores', severity: 'critical', category: 'incident', durationSeconds: 300, eventsCount: 40, linkedWorkflows: ['wf-retail-edge-failure'], kpisImpacted: ['retail-edge-uptime', 'retail-latency', 'uptime'], defaultRunCount: 1, enabled: false },
+  { id: 'scenario-cold-chain-failure', name: 'Cold Chain Failure', description: 'Simulate refrigeration system failure in logistics/warehouses', severity: 'critical', category: 'incident', durationSeconds: 450, eventsCount: 30, linkedWorkflows: ['wf-cold-chain-failure'], kpisImpacted: ['cold-chain-efficiency', 'effective-ai-pue'], defaultRunCount: 1, enabled: false },
+  { id: 'scenario-logistics-overload', name: 'Logistics DC Overload', description: 'Simulate logistics data center reaching capacity during peak shipping', severity: 'warning', category: 'capacity', durationSeconds: 600, eventsCount: 35, linkedWorkflows: ['wf-gpu-saturation'], kpisImpacted: ['gpu-fleet-saturation', 'retail-latency'], defaultRunCount: 1, enabled: false },
+  { id: 'scenario-ai-model-drift', name: 'AI Model Drift (Shelf Scanning)', description: 'Simulate computer vision model drift affecting inventory accuracy', severity: 'warning', category: 'optimization', durationSeconds: 240, eventsCount: 15, linkedWorkflows: [], kpisImpacted: ['gpu-fleet-saturation', 'economic-efficiency'], defaultRunCount: 1, enabled: false },
+  { id: 'scenario-global-sovereignty-breach', name: 'Cross-Border Routing Violation', description: 'Simulate supply chain data crossing jurisdictional boundaries', severity: 'critical', category: 'compliance', durationSeconds: 180, eventsCount: 12, linkedWorkflows: ['wf-sovereignty-violation'], kpisImpacted: ['sovereign-compute-ratio', 'sovereign-risk-score', 'carbon-cost-exposure'], defaultRunCount: 1, enabled: false },
 ];
 
 // ============================================================================
@@ -473,6 +524,12 @@ export interface DCFinancialModel {
   upgradeSavingsPercent: number;
   carbonSavingsPercent: number;
   paybackYears: number;
+  // Retail-specific fields (optional)
+  annualColdChainEnergyCostUsd?: number;
+  annualEdgeComputeEnergyCostUsd?: number;
+  fleetWideCarbonTaxRiskUsd?: number;
+  aiWorkloadOptimizationSavingsUsd?: number;
+  multiStoreAggregationCount?: number;
 }
 
 export const DEFAULT_DC_FINANCIAL_MODEL: DCFinancialModel = {
@@ -497,6 +554,12 @@ export const ARCHETYPE_TO_BUILDER_SCENARIO_MAP: Record<string, string> = {
   sovereignty_routing_violation: 'scenario-sovereignty-violation',
   // Finance mappings
   trading_peak_surge: 'scenario-gpu-overload',
+  // Retail hyperscale mappings
+  retail_edge_failure: 'scenario-retail-edge-failure',
+  cold_chain_failure: 'scenario-cold-chain-failure',
+  logistics_dc_overload: 'scenario-logistics-overload',
+  ai_model_drift: 'scenario-ai-model-drift',
+  global_sovereignty_breach: 'scenario-global-sovereignty-breach',
   // Retail mappings  
   black_friday_peak_load: 'scenario-tenant-expansion',
   flash_sale_gpu_spike: 'scenario-gpu-overload',

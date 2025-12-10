@@ -82,6 +82,51 @@ export const GREEN_DC_ARCHETYPES: Record<DcTwinArchetypeId, GreenDcArchetype> = 
       "carbon_price_spike"
     ]
   },
+  retail_hyperscale_green_twin: {
+    id: "retail_hyperscale_green_twin",
+    label: "Hyperscale Retail DC Twin (Fortune 50)",
+    defaultObjectives: [
+      "Maintain sub-2-second failover for 4,000+ distributed retail edge sites",
+      "Reduce cold-chain energy consumption across logistics and stores",
+      "Optimize GPU fleet for real-time computer vision (inventory, robotics)",
+      "Improve global supply chain sovereignty compliance",
+      "Reduce carbon footprint for refrigerated warehouses",
+      "Optimize edge–core–cloud routing for retail AI workloads"
+    ],
+    defaultAgents: [
+      "thermal_agent",
+      "power_agent",
+      "cooling_agent",
+      "network_agent",
+      "facility_safety_agent",
+      "workload_gpu_agent",
+      "sovereignty_agent",
+      "carbon_cost_agent",
+      "incident_response_agent",
+      "retail_edge_resilience_agent",
+      "cold_chain_optimizer_agent",
+      "supply_chain_sovereignty_agent"
+    ],
+    defaultKpiTargets: {
+      pueTarget: 1.25,
+      renewableShareTargetPct: 85,
+      sovereigntyScoreTargetPct: 92,
+      carbonIntensityTargetGPerKwh: 55,
+      uptimeTargetPct: 99.99
+    },
+    defaultScenarios: [
+      "black_friday_peak_load",
+      "flash_sale_gpu_spike",
+      "cooling_cascade_failure",
+      "cdn_origin_overload",
+      "carbon_price_spike",
+      "retail_edge_failure",
+      "cold_chain_failure",
+      "logistics_dc_overload",
+      "ai_model_drift",
+      "global_sovereignty_breach"
+    ]
+  },
   gov_sovereign_cloud_twin: {
     id: "gov_sovereign_cloud_twin",
     label: "Sovereign Government Cloud Twin",
@@ -365,7 +410,11 @@ export const AGENT_DISPLAY_NAMES: Record<string, string> = {
   workload_gpu_agent: "Workload Orchestrator",
   sovereignty_agent: "Sovereignty Sentinel",
   carbon_cost_agent: "Carbon & Cost Agent",
-  incident_response_agent: "Incident Response Agent"
+  incident_response_agent: "Incident Response Agent",
+  // Retail-specific agents
+  retail_edge_resilience_agent: "Retail Edge Resilience Agent",
+  cold_chain_optimizer_agent: "Cold Chain Optimization Agent",
+  supply_chain_sovereignty_agent: "Supply Chain Sovereignty Agent"
 };
 
 /**
@@ -417,5 +466,11 @@ export const SCENARIO_DISPLAY_INFO: Record<string, { name: string; severity: str
   conference_demo_preparation: { name: "Conference Demo Preparation", severity: "low", domain: "workload" },
   thermal_excursion_secure_zone: { name: "Thermal Excursion – Secure Zone", severity: "high", domain: "thermal" },
   emergency_evacuation_protocol: { name: "Emergency Evacuation Protocol", severity: "critical", domain: "facility" },
-  grid_outage_critical_services: { name: "Grid Outage – Critical Services", severity: "critical", domain: "power" }
+  grid_outage_critical_services: { name: "Grid Outage – Critical Services", severity: "critical", domain: "power" },
+  // Retail hyperscale scenarios
+  retail_edge_failure: { name: "Retail Edge Outage", severity: "critical", domain: "network" },
+  cold_chain_failure: { name: "Cold Chain Failure", severity: "critical", domain: "cooling" },
+  logistics_dc_overload: { name: "Logistics DC Overload", severity: "high", domain: "workload" },
+  ai_model_drift: { name: "AI Model Drift (Shelf Scanning)", severity: "medium", domain: "workload" },
+  global_sovereignty_breach: { name: "Cross-Border Routing Violation", severity: "critical", domain: "sovereignty" }
 };

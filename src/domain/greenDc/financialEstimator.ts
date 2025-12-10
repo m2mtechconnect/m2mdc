@@ -28,6 +28,7 @@ const CAPACITY_BASELINES: Record<DcCapacityTier, { costUsd: number; carbonTonnes
 const INDUSTRY_MULTIPLIERS: Record<DcTwinArchetypeId, { cost: number; carbon: number; savings: number }> = {
   finance_core_banking_green_twin: { cost: 1.4, carbon: 1.2, savings: 0.18 },
   retail_ecommerce_green_twin: { cost: 1.1, carbon: 1.3, savings: 0.22 },
+  retail_hyperscale_green_twin: { cost: 2.5, carbon: 2.2, savings: 0.28 }, // Mega-retail hyperscale
   gov_sovereign_cloud_twin: { cost: 1.3, carbon: 0.9, savings: 0.15 },
   saas_multitenant_ai_twin: { cost: 1.5, carbon: 1.6, savings: 0.25 },
   healthcare_phi_twin: { cost: 1.2, carbon: 1.0, savings: 0.16 },
@@ -100,7 +101,7 @@ export function buildNotes(
     finance: "Financial services require highest availability (99.99%+) with strict data sovereignty for regulatory compliance.",
     government: "Government workloads mandate 100% data residency and enhanced physical security controls.",
     healthcare: "PHI handling requires HIPAA/PHIPA compliance with encrypted data-at-rest and audit logging.",
-    retail: "E-commerce workloads need elastic scaling for seasonal peaks with cost optimization focus.",
+    retail: "Your organization operates one of the world's largest distributed retail infrastructures. This Twin optimizes both hyperscale data centres and retail edge workloads across thousands of sites.",
     telecom: "Edge computing architecture optimizes latency for 5G services with distributed cooling management.",
     manufacturing: "IIoT integration requires OT/IT convergence with real-time analytics at the edge.",
     energy: "Grid AI operations prioritize renewable utilization and demand response capabilities.",

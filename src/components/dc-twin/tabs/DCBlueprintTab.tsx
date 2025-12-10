@@ -22,6 +22,7 @@ const domainIcons: Record<DCAgentDomain, React.ReactNode> = {
   financial: <DollarSign className="h-4 w-4" />,
   incidents: <AlertTriangle className="h-4 w-4" />,
   sovereignty: <Globe className="h-4 w-4" />,
+  retail: <Bot className="h-4 w-4" />, // Retail domain icon
 };
 
 export function DCBlueprintTab() {

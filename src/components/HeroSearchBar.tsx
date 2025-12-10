@@ -23,6 +23,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { startBuilderFromUrl } from "@/lib/intake";
 import { useGreenDcRecommendation } from "@/hooks/useGreenDcRecommendation";
 import { GreenDcRecommendationPanel } from "./greenDc/GreenDcRecommendationPanel";
+import { LastScanBanner } from "./dc-scan/LastScanBanner";
+import { useLastScanSession } from "@/hooks/useDCScanSessions";
 
 export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (query: string) => void }) {
   const [searchResult, setSearchResult] = useState<any>(null);
@@ -52,6 +54,9 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
     fetchRecommendation: fetchGreenDcRecommendation,
     reset: resetGreenDc
   } = useGreenDcRecommendation();
+  
+  // Last scan session for banner display
+  const { data: lastScan, refetch: refetchLastScan } = useLastScanSession();
   
   // Access cached recommendations from Zustand store
   const { generatedItems, lastGenerated } = useRecommendationsStore();
@@ -224,6 +229,29 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
 
   return (
     <>
+      {/* Last Scan Banner - Show when no active recommendation */}
+      {lastScan?.exists && !greenDcRecommendation && !greenDcLoading && (
+        <LastScanBanner
+          lastScan={lastScan}
+          onViewRecommendation={() => {
+            if (lastScan.recommendation) {
+              // Re-use the cached recommendation
+              fetchGreenDcRecommendation(lastScan.url!, false, false);
+            }
+          }}
+          onRescan={() => {
+            if (lastScan.url) {
+              handleUrlAnalysis(lastScan.url, true, true);
+            }
+          }}
+          onOpenTwin={() => {
+            if (lastScan.blueprintId) {
+              navigate(`/data-centre-twin/${lastScan.blueprintId}`);
+            }
+          }}
+        />
+      )}
+
       {/* Smart Agent Input */}
       <SmartAgentInput
         onUrlAnalysis={(url, force, deepIngest) => handleUrlAnalysis(url, force || false, deepIngest || false)}

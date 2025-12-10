@@ -19,11 +19,14 @@ import {
   Users, 
   PlayCircle,
   MessageCircle,
-  Sparkles
+  Sparkles,
+  Plus,
+  Loader2
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useTwinContext } from '@/contexts/TwinContext';
+import { useToast } from '@/hooks/use-toast';
 
 // Blueprint Tab Components
 import { BlueprintOverviewTab } from '@/components/blueprint/tabs/BlueprintOverviewTab';
@@ -33,6 +36,68 @@ import { BlueprintKPIsTab } from '@/components/blueprint/tabs/BlueprintKPIsTab';
 import { BlueprintWorkflowsTab } from '@/components/blueprint/tabs/BlueprintWorkflowsTab';
 import { BlueprintRolesTab } from '@/components/blueprint/tabs/BlueprintRolesTab';
 import { BlueprintScenariosTab } from '@/components/blueprint/tabs/BlueprintScenariosTab';
+
+// Create Twin from Blueprint Button Component
+function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: any }) {
+  const { createTwin } = useTwinContext();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const [isCreating, setIsCreating] = useState(false);
+
+  const handleCreate = async () => {
+    setIsCreating(true);
+    try {
+      const newTwin = await createTwin({
+        name: blueprint.name || 'Montreal Sovereign AI DC',
+        city: 'Montreal',
+        region_code: 'QC',
+        tier: blueprint.tier || 'Tier III',
+        capacity_kw: blueprint.capacityKw * 1000 || 10000,
+        industry: 'ai_compute',
+        pue_target: blueprint.pueTarget || 1.3,
+        renewable_target_pct: 95,
+        carbon_intensity: 12,
+        sovereignty_level: 'federal',
+        metadata: {
+          from_blueprint: 'default',
+          racks: blueprint.racks,
+        },
+      });
+
+      if (newTwin) {
+        toast({
+          title: 'Twin Created',
+          description: `${newTwin.name} is now available in the selector.`,
+        });
+        navigate('/data-centre-twin');
+      }
+    } catch (err) {
+      toast({
+        title: 'Creation Failed',
+        description: err instanceof Error ? err.message : 'Failed to create twin',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  return (
+    <Button onClick={handleCreate} disabled={isCreating}>
+      {isCreating ? (
+        <>
+          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          Creating...
+        </>
+      ) : (
+        <>
+          <Plus className="h-4 w-4 mr-2" />
+          Add to My Twins
+        </>
+      )}
+    </Button>
+  );
+}
 
 export default function Blueprint() {
   const { id } = useParams<{ id: string }>();
@@ -105,6 +170,9 @@ export default function Blueprint() {
               </div>
             </div>
             <div className="flex gap-2">
+              {!twin && blueprintId === 'default' && (
+                <CreateTwinFromBlueprintButton blueprint={blueprint} />
+              )}
               <Button variant="outline" onClick={downloadBlueprint}>
                 <Download className="h-4 w-4 mr-2" />
                 Download JSON

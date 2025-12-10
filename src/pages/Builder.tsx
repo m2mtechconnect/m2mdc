@@ -7,6 +7,7 @@ import { Step3Tools } from '@/components/builder/steps/Step3Tools';
 import { Step4Workflow } from '@/components/builder/steps/Step4Workflow';
 import { Step5Deploy } from '@/components/builder/steps/Step5Deploy';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
+import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { validateStep1 } from '@/lib/validation/builderValidation';
@@ -20,6 +21,14 @@ export default function Builder() {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // Check if coming from scanner (use DC Twin Builder Store)
+  const fromScanner = searchParams.get('from') === 'scanner' || 
+                      (location.state as any)?.fromRecommendation === true;
+  
+  // Use DC Twin Builder Store when coming from scanner
+  const dcTwinStore = useDCTwinBuilderStore();
+  
   const { 
     currentStep, 
     setCurrentStep, 
@@ -42,16 +51,24 @@ export default function Builder() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [showDeploymentProgress, setShowDeploymentProgress] = useState(false);
+  
+  // Use DC Twin Builder Store step when from scanner
+  const effectiveCurrentStep = fromScanner ? dcTwinStore.currentStep : currentStep;
+  const effectiveSetCurrentStep = fromScanner ? dcTwinStore.setCurrentStep : setCurrentStep;
+  const effectiveMarkStepComplete = fromScanner ? dcTwinStore.markStepComplete : markStepComplete;
 
   // Update Co-Pilot context when step changes
   useEffect(() => {
+    const effectiveIndustry = fromScanner ? dcTwinStore.overview.industries[0] : industry;
+    const effectiveDepartment = fromScanner ? 'Data Centre Operations' : department;
+    
     updateContext({
       activePage: 'builder',
-      builderStep: currentStep,
-      industry,
-      department,
+      builderStep: effectiveCurrentStep,
+      industry: effectiveIndustry,
+      department: effectiveDepartment,
     });
-  }, [currentStep, industry, department, updateContext]);
+  }, [effectiveCurrentStep, industry, department, fromScanner, dcTwinStore.overview.industries, updateContext]);
 
   // Memoize steps to prevent unnecessary re-renders
   // Use useCallback for validation functions to avoid stale closures
@@ -187,7 +204,7 @@ export default function Builder() {
     }
   }, [error, toast]);
 
-  const CurrentStepComponent = steps[currentStep - 1].component;
+  const CurrentStepComponent = steps[effectiveCurrentStep - 1].component;
   
   // Compute validation on demand to avoid calling during render
   const [isValid, setIsValid] = useState(true);
@@ -196,7 +213,7 @@ export default function Builder() {
   useEffect(() => {
     const checkValid = () => {
       try {
-        return steps[currentStep - 1].validate();
+        return steps[effectiveCurrentStep - 1].validate();
       } catch (err) {
         console.error('[Builder] Validation error:', err);
         return false;
@@ -212,11 +229,11 @@ export default function Builder() {
     });
     
     return () => unsubscribe();
-  }, [currentStep, steps]);
+  }, [effectiveCurrentStep, steps]);
 
   const handleNext = () => {
     // Validate again on button click
-    const valid = steps[currentStep - 1].validate();
+    const valid = steps[effectiveCurrentStep - 1].validate();
     
     if (!valid) {
       toast({
@@ -228,28 +245,28 @@ export default function Builder() {
     }
 
     // Track step completion
-    trackBuilderStep(currentStep, {
+    trackBuilderStep(effectiveCurrentStep, {
       sessionId: searchParams.get('session') || undefined,
     });
 
-    markStepComplete(currentStep);
+    effectiveMarkStepComplete(effectiveCurrentStep);
 
-    if (currentStep < steps.length) {
-      setCurrentStep(currentStep + 1);
+    if (effectiveCurrentStep < steps.length) {
+      effectiveSetCurrentStep(effectiveCurrentStep + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+    if (effectiveCurrentStep > 1) {
+      effectiveSetCurrentStep(effectiveCurrentStep - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentStep]);
+  }, [effectiveCurrentStep]);
 
   // Show loading state while checking auth or initializing
   if (!authChecked || !isInitialized || isLoading) {
@@ -310,10 +327,10 @@ export default function Builder() {
         onNext={handleNext}
         onBack={handleBack}
         nextDisabled={!isValid}
-        nextLabel={currentStep === 5 ? 'Deploy to Production' : 'Next'}
-        lastSaved={lastSaved}
-        onDeploy={currentStep === 5 ? handleDeployClick : undefined}
-        currentStep={currentStep}
+        nextLabel={effectiveCurrentStep === 5 ? 'Deploy to Production' : 'Next'}
+        lastSaved={fromScanner ? dcTwinStore.lastSaved : lastSaved}
+        onDeploy={effectiveCurrentStep === 5 ? handleDeployClick : undefined}
+        currentStep={effectiveCurrentStep}
       >
         <CurrentStepComponent />
       </BuilderLayout>

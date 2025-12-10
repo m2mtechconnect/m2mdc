@@ -1,7 +1,7 @@
 /**
  * DC Scanner Panel
  * Main component for URL scanning and recommendation display
- * Integrates with TwinContext for multi-tenant twin creation
+ * Integrates with DC Twin Builder Store for end-to-end flow
  */
 
 import { useState, useEffect } from "react";
@@ -13,7 +13,6 @@ import {
   Search, 
   Loader2, 
   Globe,
-  AlertCircle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,12 +27,14 @@ import { buildScanSignals, selectBlueprintProfile } from "@/lib/dc-scan/selectBl
 import { generateRecommendation } from "@/lib/dc-scan/generateRecommendation";
 import { DCScanRecommendationCard } from "./DCScanRecommendationCard";
 import { LastScanBanner } from "./LastScanBanner";
+import { useDCTwinBuilderStore } from "@/stores/dcTwinBuilderStore";
 import type { DCRecommendation, DCBlueprintProfile } from "@/types/dcScan";
 
 export function DCScannerPanel() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { createTwin, setActiveTwin, refreshTwins } = useActiveTwin();
+  const { initializeFromRecommendation, setCurrentStep } = useDCTwinBuilderStore();
   
   const [url, setUrl] = useState("");
   const [isScanning, setIsScanning] = useState(false);
@@ -133,6 +134,9 @@ export function DCScannerPanel() {
 
     setIsCreatingTwin(true);
     try {
+      // Initialize the DC Twin Builder Store from the recommendation
+      initializeFromRecommendation(recommendation, currentSessionId || '');
+      
       // Get region profile - use ca-central-1 as default (Montreal)
       const regionCode = 'ca-central-1';
       const region = getRegionByCode(regionCode);
@@ -174,8 +178,8 @@ export function DCScannerPanel() {
           description: `Your ${recommendation.blueprintName} has been created.`
         });
         
-        // Navigate to the new twin
-        navigate(`/data-centre-twin/${newTwin.id}`);
+        // Navigate to the builder with the new twin
+        navigate(`/app/build?twinId=${newTwin.id}&from=scanner`);
       }
     } catch (error) {
       console.error("Create twin error:", error);
@@ -190,6 +194,12 @@ export function DCScannerPanel() {
   };
 
   const handleAdjustBlueprint = () => {
+    if (!recommendation) return;
+    
+    // Initialize the DC Twin Builder Store from the recommendation
+    initializeFromRecommendation(recommendation, currentSessionId || '');
+    setCurrentStep(1);
+    
     // Navigate to builder with pre-filled data
     navigate("/app/build", {
       state: {

@@ -1,18 +1,24 @@
 /**
  * DC Twin Overview Tab
  * Renders overview content from DC Twin Builder Store
+ * All content sourced from store - no hard-coded values
  */
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
-  Server, Zap, Cpu, Globe, Shield, Leaf, Users, Target,
-  TrendingUp, Clock, Download, CheckCircle2
+  Server, Zap, Clock, Download, CheckCircle2, 
+  Target, TrendingUp, Leaf, Users, Briefcase
 } from 'lucide-react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 
 export function DCOverviewTab() {
-  const { overview, kpis } = useDCTwinBuilderStore();
+  const { overview } = useDCTwinBuilderStore();
+  
+  // Prefer primaryUseCases when available, fall back to keyCapabilities
+  const useCases = overview.primaryUseCases?.length > 0 
+    ? overview.primaryUseCases 
+    : overview.keyCapabilities ?? [];
   
   return (
     <div className="space-y-6">
@@ -91,6 +97,30 @@ export function DCOverviewTab() {
         </Card>
       </div>
       
+      {/* Business Impact & ROI - Uses businessImpactSummary from store */}
+      {overview.businessImpactSummary && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Briefcase className="h-5 w-5" />
+              Business Impact & ROI
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground leading-relaxed">
+              {overview.businessImpactSummary}
+            </p>
+            {overview.exampleImpact && (
+              <div className="mt-4 p-3 rounded-lg bg-success/5 border border-success/20">
+                <p className="text-sm text-success-foreground">
+                  <strong>Example:</strong> {overview.exampleImpact}
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+      
       {/* Facility Specs */}
       <Card>
         <CardHeader>
@@ -133,24 +163,28 @@ export function DCOverviewTab() {
         </CardContent>
       </Card>
       
-      {/* Key Capabilities */}
+      {/* Primary Use Cases - Uses primaryUseCases[] with keyCapabilities fallback */}
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Target className="h-5 w-5" />
-              Key Capabilities
+              Primary Use Cases
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2">
-              {overview.keyCapabilities.map((cap, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm">
-                  <CheckCircle2 className="h-4 w-4 text-success mt-0.5 shrink-0" />
-                  {cap}
-                </li>
-              ))}
-            </ul>
+            {useCases.length > 0 ? (
+              <ul className="space-y-2">
+                {useCases.map((useCase, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-success mt-0.5 shrink-0" />
+                    {useCase}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">No use cases defined yet.</p>
+            )}
           </CardContent>
         </Card>
         
@@ -172,41 +206,45 @@ export function DCOverviewTab() {
       </div>
       
       {/* Key Benefits */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Leaf className="h-5 w-5" />
-            Key Benefits
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {overview.keyBenefits.map((benefit, i) => (
-              <div key={i} className="flex items-start gap-2 p-3 rounded-lg bg-muted/50">
-                <CheckCircle2 className="h-4 w-4 text-success mt-0.5 shrink-0" />
-                <span className="text-sm">{benefit}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {overview.keyBenefits.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Leaf className="h-5 w-5" />
+              Key Benefits
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {overview.keyBenefits.map((benefit, i) => (
+                <div key={i} className="flex items-start gap-2 p-3 rounded-lg bg-muted/50">
+                  <CheckCircle2 className="h-4 w-4 text-success mt-0.5 shrink-0" />
+                  <span className="text-sm">{benefit}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
       
       {/* Who Is This For */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Who Is This For
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {overview.targetAudience.map((audience, i) => (
-              <Badge key={i} variant="secondary">{audience}</Badge>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {overview.targetAudience.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Who Is This For
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {overview.targetAudience.map((audience, i) => (
+                <Badge key={i} variant="secondary">{audience}</Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
       
       {/* How It Works */}
       {overview.howItWorks.length > 0 && (

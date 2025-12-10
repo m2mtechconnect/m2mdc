@@ -8,3 +8,7 @@ export { DCStep2Blueprint } from './DCStep2Blueprint';
 export { DCStep3Integrations } from './DCStep3Integrations';
 export { DCStep4Scenarios } from './DCStep4Scenarios';
 export { DCStep5Deploy } from './DCStep5Deploy';
+
+// Shared components
+export { KPIThresholdEditor } from './KPIThresholdEditor';
+export { FinancialAssumptionsCard } from './FinancialAssumptionsCard';

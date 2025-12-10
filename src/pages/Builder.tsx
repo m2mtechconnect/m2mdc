@@ -6,6 +6,11 @@ import { Step2Intelligence } from '@/components/builder/steps/Step2Intelligence'
 import { Step3Tools } from '@/components/builder/steps/Step3Tools';
 import { Step4Workflow } from '@/components/builder/steps/Step4Workflow';
 import { Step5Deploy } from '@/components/builder/steps/Step5Deploy';
+import { DCStep1Summary } from '@/components/builder/steps/DCStep1Summary';
+import { DCStep2Blueprint } from '@/components/builder/steps/DCStep2Blueprint';
+import { DCStep3Integrations } from '@/components/builder/steps/DCStep3Integrations';
+import { DCStep4Scenarios } from '@/components/builder/steps/DCStep4Scenarios';
+import { DCStep5Deploy } from '@/components/builder/steps/DCStep5Deploy';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { useToast } from '@/hooks/use-toast';
@@ -24,6 +29,7 @@ export default function Builder() {
   
   // Check if coming from scanner (use DC Twin Builder Store)
   const fromScanner = searchParams.get('from') === 'scanner' || 
+                      searchParams.get('fromScanner') === 'true' ||
                       (location.state as any)?.fromRecommendation === true;
   
   // Use DC Twin Builder Store when coming from scanner
@@ -70,30 +76,71 @@ export default function Builder() {
     });
   }, [effectiveCurrentStep, industry, department, fromScanner, dcTwinStore.overview.industries, updateContext]);
 
-  // Memoize steps to prevent unnecessary re-renders
-  // Use useCallback for validation functions to avoid stale closures
-  const steps = useMemo(() => {
-    // Get fresh state on each validation
+  // DC Twin Builder steps - used when coming from scanner
+  const dcSteps = useMemo(() => {
+    return [
+      { 
+        id: 1, 
+        component: DCStep1Summary, 
+        validate: () => {
+          const state = useDCTwinBuilderStore.getState();
+          return !!state.overview.twinName && state.overview.twinName.length > 0;
+        }
+      },
+      { 
+        id: 2, 
+        component: DCStep2Blueprint, 
+        validate: () => {
+          const state = useDCTwinBuilderStore.getState();
+          return state.agents.length > 0;
+        }
+      },
+      { 
+        id: 3, 
+        component: DCStep3Integrations, 
+        validate: () => true // Integrations are optional
+      },
+      { 
+        id: 4, 
+        component: DCStep4Scenarios, 
+        validate: () => {
+          const state = useDCTwinBuilderStore.getState();
+          return state.scenarios.length > 0;
+        }
+      },
+      { 
+        id: 5, 
+        component: DCStep5Deploy, 
+        validate: () => {
+          const state = useDCTwinBuilderStore.getState();
+          return !!state.deployment.targetDeploymentRegion;
+        }
+      },
+    ];
+  }, []);
+
+  // Standard wizard steps
+  const wizardSteps = useMemo(() => {
     const getFreshState = () => useWizardBuilderStore.getState();
     
     return [
       { 
         id: 1, 
         component: Step1Summary, 
-        validate: () => true // Summary is always valid
+        validate: () => true
       },
       { 
         id: 2, 
         component: Step2Intelligence, 
         validate: () => {
           const state = getFreshState();
-          return !!state.modelConfig?.model; // Model must be selected
+          return !!state.modelConfig?.model;
         }
       },
       { 
         id: 3, 
         component: Step3Tools, 
-        validate: () => true // Tools are optional
+        validate: () => true
       },
       { 
         id: 4, 
@@ -113,7 +160,10 @@ export default function Builder() {
         }
       },
     ];
-  }, []); // Empty deps - validation functions read fresh state
+  }, []);
+
+  // Use appropriate steps based on mode
+  const steps = fromScanner ? dcSteps : wizardSteps;
 
   // Check auth before initializing
   useEffect(() => {

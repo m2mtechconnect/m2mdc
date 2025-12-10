@@ -6,11 +6,7 @@ import { Step2Intelligence } from '@/components/builder/steps/Step2Intelligence'
 import { Step3Tools } from '@/components/builder/steps/Step3Tools';
 import { Step4Workflow } from '@/components/builder/steps/Step4Workflow';
 import { Step5Deploy } from '@/components/builder/steps/Step5Deploy';
-import { DCStep1Summary } from '@/components/builder/steps/DCStep1Summary';
-import { DCStep2Blueprint } from '@/components/builder/steps/DCStep2Blueprint';
-import { DCStep3Integrations } from '@/components/builder/steps/DCStep3Integrations';
-import { DCStep4Scenarios } from '@/components/builder/steps/DCStep4Scenarios';
-import { DCStep5Deploy } from '@/components/builder/steps/DCStep5Deploy';
+import { DCStep1Summary, DCStep2Blueprint, DCStep3Integrations, DCStep4Scenarios, DCStep5Deploy } from '@/components/builder/dc-steps';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { useToast } from '@/hooks/use-toast';

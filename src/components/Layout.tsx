@@ -35,17 +35,25 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
-// Data Centre Twin Studio navigation
-const allNavigation = [
+// Data Centre Twin Studio navigation - organized by section
+const coreNavigation = [
   { name: "Data Centre Command", href: "/", icon: LayoutDashboard },
   { name: "Build Data Centre Twin", href: "/builder", icon: Wrench },
   { name: "Subsystem Agents", href: "/app/agents", icon: Server },
   { name: "Telemetry & Analytics", href: "/intelligence", icon: BarChart3 },
   { name: "Simulation", href: "/data-centre-twin?view=simulation", icon: Activity },
+];
+
+const complianceNavigation = [
   { name: "Sovereignty & Safety Audit", href: "/compliance", icon: Shield },
   { name: "Teams", href: "/teams", icon: Users },
+];
+
+const supportNavigation = [
   { name: "Help", href: "/help", icon: HelpCircle },
 ];
+
+const allNavigation = [...coreNavigation, ...complianceNavigation, ...supportNavigation];
 
 // Helper function to get time-based greeting
 const getGreeting = () => {
@@ -160,7 +168,10 @@ export function Layout({ children }: LayoutProps) {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-1" aria-label="Main menu">
               {allNavigation.map((item) => {
-                const isActive = location.pathname === item.href;
+                // Handle query string routes like /data-centre-twin?view=simulation
+                const isActive = item.href.includes('?') 
+                  ? location.pathname + location.search === item.href
+                  : location.pathname === item.href;
                 return (
                   <Tooltip key={item.name}>
                     <TooltipTrigger asChild>
@@ -249,8 +260,9 @@ export function Layout({ children }: LayoutProps) {
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Data Centre
               </h3>
-              {allNavigation.slice(0, 4).map((item) => {
-                const isActive = location.pathname === item.href;
+              {coreNavigation.map((item) => {
+                const isActive = location.pathname === item.href || 
+                  (item.href.includes('?') && location.pathname + location.search === item.href);
                 return (
                   <Link
                     key={item.name}
@@ -276,7 +288,7 @@ export function Layout({ children }: LayoutProps) {
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Teams & Compliance
               </h3>
-              {allNavigation.slice(4, 6).map((item) => {
+              {complianceNavigation.map((item) => {
                 const isActive = location.pathname === item.href;
                 return (
                   <Link
@@ -303,7 +315,7 @@ export function Layout({ children }: LayoutProps) {
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Support
               </h3>
-              {allNavigation.slice(6).map((item) => {
+              {supportNavigation.map((item) => {
                 const isActive = location.pathname === item.href;
                 return (
                   <Link

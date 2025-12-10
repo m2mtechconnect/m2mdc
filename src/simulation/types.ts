@@ -9,7 +9,7 @@ import type { DomainType, AlertSeverity } from '@/types/dataCenterTwin';
 // SIMULATION STATE
 // ============================================================================
 
-export type SimulationStatus = 'idle' | 'running' | 'paused' | 'completed';
+export type SimulationStatus = 'idle' | 'running' | 'paused' | 'completed' | 'error';
 
 export interface SimulationState {
   status: SimulationStatus;
@@ -20,6 +20,58 @@ export interface SimulationState {
   kpiSnapshots: KPISnapshot[];
   baselineKpis: Record<string, number>;
   currentKpis: Record<string, number>;
+  rackMetrics?: RackMetrics[];
+  errorMessage?: string;
+}
+
+// ============================================================================
+// SIMULATION TICK (for streaming UI updates)
+// ============================================================================
+
+export interface SimulationTick {
+  simTimeSec: number;
+  progressPct: number;
+  kpiDeltas: SimulationKpiDelta[];
+  rackMetrics?: RackMetrics[];
+  events?: SimulationEvent[];
+}
+
+export interface SimulationKpiDelta {
+  id: string;
+  label: string;
+  unit?: string;
+  before: number;
+  after: number;
+  trend: 'up' | 'down' | 'stable';
+  isGood: boolean;
+}
+
+export interface RackMetrics {
+  rackId: string;
+  tempC: number;
+  powerKw: number;
+  gpuUtilPct: number;
+  alertLevel: 'normal' | 'warning' | 'critical';
+}
+
+// ============================================================================
+// SIMULATION RESULT SUMMARY
+// ============================================================================
+
+export interface SimulationResultSummary {
+  durationSec: number;
+  scenarioId: string;
+  scenarioName: string;
+  kpiDeltas: SimulationKpiDelta[];
+  events: SimulationEvent[];
+  rcaMarkdown: string;
+  recommendationsMarkdown: string;
+  actualVsExpected: {
+    metric: string;
+    expected: string;
+    actual: string;
+    withinRange: boolean;
+  }[];
 }
 
 // ============================================================================
@@ -89,6 +141,10 @@ export interface ScenarioDefinition {
   timeline: ScenarioTimelineStep[];
   tags?: string[];
   isCustom?: boolean;
+  expectedImpacts?: {
+    metric: string;
+    expectedRange: string;
+  }[];
 }
 
 // ============================================================================
@@ -119,7 +175,9 @@ export type SimulationEngineEventType =
   | 'kpi-update'
   | 'scenario-start'
   | 'scenario-complete'
-  | 'tick';
+  | 'tick'
+  | 'rack-update'
+  | 'error';
 
 export interface SimulationEngineEvent {
   type: SimulationEngineEventType;

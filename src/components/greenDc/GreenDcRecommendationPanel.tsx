@@ -111,13 +111,13 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
       <CardContent className="space-y-6">
         {/* Objectives */}
         <div>
-          <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
+          <h4 className="text-sm font-medium mb-2 flex items-center gap-2 text-foreground">
             <Target className="h-4 w-4 text-primary" />
             Objectives
           </h4>
           <ul className="space-y-1">
             {rec.objectives.map((obj, i) => (
-              <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+              <li key={i} className="text-sm text-studio-body flex items-start gap-2">
                 <CheckCircle2 className="h-3.5 w-3.5 text-green-600 mt-0.5 flex-shrink-0" />
                 {obj}
               </li>
@@ -129,34 +129,34 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
         <div className="grid grid-cols-5 gap-3">
           <div className="text-center p-2 rounded-lg bg-muted/50">
             <Zap className="h-4 w-4 mx-auto text-amber-500 mb-1" />
-            <div className="text-lg font-semibold">{rec.kpiTargets.pueTarget}</div>
-            <div className="text-xs text-muted-foreground">PUE Target</div>
+            <div className="text-lg font-semibold text-foreground">{rec.kpiTargets.pueTarget}</div>
+            <div className="text-xs text-studio-muted">PUE Target</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
             <Leaf className="h-4 w-4 mx-auto text-green-500 mb-1" />
-            <div className="text-lg font-semibold">{rec.kpiTargets.renewableShareTargetPct}%</div>
-            <div className="text-xs text-muted-foreground">Renewable</div>
+            <div className="text-lg font-semibold text-foreground">{rec.kpiTargets.renewableShareTargetPct}%</div>
+            <div className="text-xs text-studio-muted">Renewable</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
             <Shield className="h-4 w-4 mx-auto text-blue-500 mb-1" />
-            <div className="text-lg font-semibold">{rec.kpiTargets.sovereigntyScoreTargetPct}%</div>
-            <div className="text-xs text-muted-foreground">Sovereignty</div>
+            <div className="text-lg font-semibold text-foreground">{rec.kpiTargets.sovereigntyScoreTargetPct}%</div>
+            <div className="text-xs text-studio-muted">Sovereignty</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
             <Thermometer className="h-4 w-4 mx-auto text-orange-500 mb-1" />
-            <div className="text-lg font-semibold">{rec.kpiTargets.carbonIntensityTargetGPerKwh}</div>
-            <div className="text-xs text-muted-foreground">g CO₂/kWh</div>
+            <div className="text-lg font-semibold text-foreground">{rec.kpiTargets.carbonIntensityTargetGPerKwh}</div>
+            <div className="text-xs text-studio-muted">g CO₂/kWh</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
             <Server className="h-4 w-4 mx-auto text-purple-500 mb-1" />
-            <div className="text-lg font-semibold">{rec.kpiTargets.uptimeTargetPct}%</div>
-            <div className="text-xs text-muted-foreground">Uptime</div>
+            <div className="text-lg font-semibold text-foreground">{rec.kpiTargets.uptimeTargetPct}%</div>
+            <div className="text-xs text-studio-muted">Uptime</div>
           </div>
         </div>
 
         {/* Agents - Collapsible */}
         <Collapsible open={showAgents} onOpenChange={setShowAgents}>
-          <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium w-full">
+          <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium w-full text-foreground">
             <Server className="h-4 w-4 text-primary" />
             Agents to Deploy ({rec.agents.length})
             {showAgents ? <ChevronUp className="h-4 w-4 ml-auto" /> : <ChevronDown className="h-4 w-4 ml-auto" />}
@@ -174,7 +174,7 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
 
         {/* Scenarios - Collapsible */}
         <Collapsible open={showScenarios} onOpenChange={setShowScenarios}>
-          <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium w-full">
+          <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium w-full text-foreground">
             <Play className="h-4 w-4 text-primary" />
             Simulation Scenarios ({rec.scenarios.length})
             {showScenarios ? <ChevronUp className="h-4 w-4 ml-auto" /> : <ChevronDown className="h-4 w-4 ml-auto" />}
@@ -203,35 +203,35 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
 
         {/* Financial Summary */}
         <div className="p-4 rounded-lg bg-muted/30 border">
-          <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+          <h4 className="text-sm font-medium mb-3 flex items-center gap-2 text-foreground">
             <DollarSign className="h-4 w-4 text-primary" />
             Carbon & Cost Model
           </h4>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <div className="text-muted-foreground">Est. Annual Power Cost</div>
-              <div className="font-semibold">{formatCurrency(rec.financialModel.baselineAnnualCostUsd)}</div>
+              <div className="text-studio-muted">Est. Annual Power Cost</div>
+              <div className="font-semibold text-foreground">{formatCurrency(rec.financialModel.baselineAnnualCostUsd)}</div>
             </div>
             <div>
-              <div className="text-muted-foreground">Est. Annual Carbon</div>
-              <div className="font-semibold">{rec.financialModel.baselineAnnualCarbonTonnes.toLocaleString()} tonnes</div>
+              <div className="text-studio-muted">Est. Annual Carbon</div>
+              <div className="font-semibold text-foreground">{rec.financialModel.baselineAnnualCarbonTonnes.toLocaleString()} tonnes</div>
             </div>
             <div>
-              <div className="text-muted-foreground">Green Upgrade Savings</div>
+              <div className="text-studio-muted">Green Upgrade Savings</div>
               <div className="font-semibold text-green-600">
                 ~{rec.financialModel.greenVariantSavingsCostPct}% cost, ~{rec.financialModel.greenVariantSavingsCarbonPct}% carbon
               </div>
             </div>
             <div>
-              <div className="text-muted-foreground">Payback Period</div>
-              <div className="font-semibold">~{rec.financialModel.estimatedPaybackYears} years</div>
+              <div className="text-studio-muted">Payback Period</div>
+              <div className="font-semibold text-foreground">~{rec.financialModel.estimatedPaybackYears} years</div>
             </div>
           </div>
         </div>
 
         {/* Notes */}
         {rec.notes.length > 0 && (
-          <div className="text-xs text-muted-foreground space-y-1 border-t pt-3">
+          <div className="text-xs text-studio-muted space-y-1 border-t pt-3">
             {rec.notes.map((note, i) => (
               <p key={i}>• {note}</p>
             ))}

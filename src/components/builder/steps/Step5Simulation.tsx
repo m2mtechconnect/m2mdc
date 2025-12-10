@@ -180,20 +180,20 @@ export function Step5Simulation() {
               {summary && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="p-3 bg-muted/50 rounded-lg border border-border">
-                    <div className="text-xs text-muted-foreground">Domains</div>
-                    <div className="text-lg font-semibold">{summary.enabledDomains}/{summary.totalDomains}</div>
+                    <div className="text-xs text-studio-muted">Domains</div>
+                    <div className="text-lg font-semibold text-foreground">{summary.enabledDomains}/{summary.totalDomains}</div>
                   </div>
                   <div className="p-3 bg-muted/50 rounded-lg border border-border">
-                    <div className="text-xs text-muted-foreground">Agents</div>
-                    <div className="text-lg font-semibold">{summary.totalAgents}</div>
+                    <div className="text-xs text-studio-muted">Agents</div>
+                    <div className="text-lg font-semibold text-foreground">{summary.totalAgents}</div>
                   </div>
                   <div className="p-3 bg-muted/50 rounded-lg border border-border">
-                    <div className="text-xs text-muted-foreground">KPIs</div>
-                    <div className="text-lg font-semibold">{summary.totalKpis}</div>
+                    <div className="text-xs text-studio-muted">KPIs</div>
+                    <div className="text-lg font-semibold text-foreground">{summary.totalKpis}</div>
                   </div>
                   <div className="p-3 bg-muted/50 rounded-lg border border-border">
-                    <div className="text-xs text-muted-foreground">Scenarios</div>
-                    <div className="text-lg font-semibold">{summary.totalScenarios}</div>
+                    <div className="text-xs text-studio-muted">Scenarios</div>
+                    <div className="text-lg font-semibold text-foreground">{summary.totalScenarios}</div>
                   </div>
                 </div>
               )}
@@ -203,8 +203,8 @@ export function Step5Simulation() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium">{blueprint.name}</h4>
-                      <p className="text-sm text-muted-foreground">{blueprint.location} • {blueprint.tier} • {blueprint.capacityKw}kW</p>
+                      <h4 className="font-medium text-foreground">{blueprint.name}</h4>
+                      <p className="text-sm text-studio-muted">{blueprint.location} • {blueprint.tier} • {blueprint.capacityKw}kW</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="text-xs">v{blueprint.version}</Badge>
@@ -214,7 +214,7 @@ export function Step5Simulation() {
                   {/* Quick Lists */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="p-3 bg-muted/50 rounded-lg border border-border">
-                      <h5 className="text-xs font-medium text-muted-foreground mb-2">Active Agents</h5>
+                      <h5 className="text-xs font-medium text-studio-muted mb-2">Active Agents</h5>
                       <div className="flex flex-wrap gap-1">
                         {blueprint.agents.filter(a => a.status === 'active').slice(0, 5).map(a => (
                           <Badge key={a.id} variant="secondary" className="text-xs">{a.name}</Badge>
@@ -225,7 +225,7 @@ export function Step5Simulation() {
                       </div>
                     </div>
                     <div className="p-3 bg-muted/50 rounded-lg border border-border">
-                      <h5 className="text-xs font-medium text-muted-foreground mb-2">Enabled Workflows</h5>
+                      <h5 className="text-xs font-medium text-studio-muted mb-2">Enabled Workflows</h5>
                       <div className="flex flex-wrap gap-1">
                         {blueprint.workflows.filter(w => w.enabled).slice(0, 5).map(w => (
                           <Badge key={w.id} variant="secondary" className="text-xs">{w.name}</Badge>

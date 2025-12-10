@@ -50,12 +50,12 @@ export function LastScanBanner({
     : "";
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-muted/50 rounded-lg border">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-muted/50 rounded-lg border mb-4">
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-2 text-sm">
-          <Clock className="h-4 w-4 text-muted-foreground" />
-          <span className="text-muted-foreground">Last scan:</span>
-          <span className="font-medium">{domain}</span>
+          <Clock className="h-4 w-4 text-studio-muted" />
+          <span className="text-studio-muted">Last scan:</span>
+          <span className="font-medium text-foreground">{domain}</span>
         </div>
         
         <Badge variant="secondary" className="text-xs">
@@ -64,13 +64,13 @@ export function LastScanBanner({
         </Badge>
         
         {lastScan.blueprintName && (
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm text-studio-body">
             → {lastScan.blueprintName}
           </span>
         )}
         
         {timeAgo && (
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-studio-muted">
             ({timeAgo})
           </span>
         )}

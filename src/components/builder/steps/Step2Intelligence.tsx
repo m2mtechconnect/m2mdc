@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 import { BuilderToolsPanel } from '@/components/dc-tools';
 import { SovereigntyConfigSection } from '@/components/builder/SovereigntyConfigSection';
+import { CarbonFinancialConfigSection } from '@/components/builder/CarbonFinancialConfigSection';
 
 export function Step2Intelligence() {
   const { modelConfig, setModelConfig, builderId } = useWizardBuilderStore();
@@ -328,9 +329,16 @@ export function Step2Intelligence() {
         {/* Sovereignty Configuration Section */}
         <SovereigntyConfigSection 
           onConfigChange={(config) => {
-            // Log sovereignty config for now - can be persisted to wizard store
             console.log('[Builder:Step2] Sovereignty config updated:', config);
             toast.success('Sovereignty configuration updated');
+          }}
+        />
+
+        {/* Carbon & Financial Configuration Section */}
+        <CarbonFinancialConfigSection 
+          onConfigChange={(config) => {
+            console.log('[Builder:Step2] Carbon/Financial config updated:', config);
+            toast.success('Carbon & Financial configuration updated');
           }}
         />
 

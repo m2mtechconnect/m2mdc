@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ModelPreview } from "@/components/builder/ModelPreview";
 import { ROICalculator } from "@/components/builder/ROICalculator";
 import { GroundedRecommendationsCard } from "@/components/builder/GroundedRecommendationsCard";
+import { DeployReadinessChecks } from "@/components/deploy/DeployReadinessChecks";
 import { SimulationChecklist } from "@/components/simulation/SimulationChecklist";
 import { 
   CheckCircle2, 
@@ -678,14 +679,21 @@ export default function Deploy() {
           )}
         </DCCard>
 
-        {/* Right: ROI Calculator & Simulation Checklist */}
+        {/* Right: ROI Calculator, Readiness Checks & Simulation Checklist */}
         <div className="space-y-4">
+          {/* Carbon & Financial Readiness Checks */}
+          <DeployReadinessChecks 
+            onFixIssue={(checkId) => {
+              // Navigate to builder to fix issues
+              navigate(`/builder?id=${systemId}&step=2`);
+            }}
+          />
+          
           {/* Simulation Checklist */}
           <SimulationChecklist />
           
           <ROICalculator 
             onChange={(metrics) => {
-              // Store ROI metrics for deployment record
               setRoiMetrics(metrics);
             }}
           />

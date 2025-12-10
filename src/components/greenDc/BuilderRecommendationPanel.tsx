@@ -20,6 +20,8 @@ import {
 
 interface Props {
   onTwinCreated?: (twinId: string) => void;
+  onOpenBlueprint?: () => void;
+  onOpenSimulation?: () => void;
 }
 
 const industryLabels: Record<string, string> = {
@@ -37,7 +39,7 @@ const industryLabels: Record<string, string> = {
   Technology: "Technology",
 };
 
-export function BuilderRecommendationPanel({ onTwinCreated }: Props) {
+export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onOpenSimulation }: Props) {
   const navigate = useNavigate();
   const [showAgents, setShowAgents] = useState(true);
   const [showScenarios, setShowScenarios] = useState(false);
@@ -132,8 +134,12 @@ export function BuilderRecommendationPanel({ onTwinCreated }: Props) {
   };
 
   const handleRunSimulation = () => {
-    const scenarioIds = enabledScenarios.slice(0, 3).map(s => s.id).join(',');
-    navigate(`/data-centre-twin?view=simulation&scenarios=${encodeURIComponent(scenarioIds)}`);
+    if (onOpenSimulation) {
+      onOpenSimulation();
+    } else {
+      const scenarioIds = enabledScenarios.slice(0, 3).map(s => s.id).join(',');
+      navigate(`/data-centre-twin?view=simulation&scenarios=${encodeURIComponent(scenarioIds)}`);
+    }
   };
 
   const formatCurrency = (value: number) => {

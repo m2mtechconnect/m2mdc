@@ -301,6 +301,7 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
           twinSlug: `dc-twin-${(recommendation.companyName || recommendation.domain).toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
           twinSummary: recommendation.objectives.join('. '),
           description: `AI-powered digital twin for ${recommendation.industry} operations with focus on sustainability and sovereignty.`,
+          siteUrl: recommendation.domain,
           industries: [recommendation.industry, 'Technology', 'IT Operations', 'Sustainability'],
           primaryUseCases: recommendation.objectives.slice(0, 4),
           capacityKw: recommendation.capacityTier === 'small' ? 500 :

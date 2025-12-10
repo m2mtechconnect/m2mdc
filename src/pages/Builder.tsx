@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { DeploymentProgressModal } from '@/components/deployment/DeploymentProgressModal';
 import { trackBuilderStep, trackDeployment, trackAnalytics } from '@/lib/analytics/analyticsService';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
+import { useTwinContext } from '@/contexts/TwinContext';
 
 export default function Builder() {
   const [searchParams] = useSearchParams();
@@ -37,6 +38,7 @@ export default function Builder() {
   } = useWizardBuilderStore();
   const { toast } = useToast();
   const { updateContext } = useCoPilotContext();
+  const { createTwin, setTwinId } = useTwinContext();
   const [isInitialized, setIsInitialized] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [showDeploymentProgress, setShowDeploymentProgress] = useState(false);
@@ -262,7 +264,38 @@ export default function Builder() {
   }
 
   const handleDeploy = async () => {
-    const { deployBuilder } = useWizardBuilderStore.getState();
+    const state = useWizardBuilderStore.getState();
+    const { deployBuilder } = state;
+    
+    // Create a twin if deploying a DC twin type
+    if (state.type === '3d_twin' || state.type === 'process_twin') {
+      try {
+        const twin = await createTwin({
+          name: state.goal || 'New Data Centre Twin',
+          city: 'Montreal',
+          region_code: 'QC',
+          tier: 'Tier III',
+          capacity_kw: 5000,
+          industry: state.industry || 'cloud_saas',
+          metadata: {
+            builder_id: state.builderId,
+            template: state.template,
+          },
+        });
+        
+        if (twin) {
+          setTwinId(twin.id);
+          toast({
+            title: 'Twin Created',
+            description: `Data Centre Twin "${twin.name}" created successfully.`,
+          });
+        }
+      } catch (err) {
+        console.error('[Builder] Failed to create twin:', err);
+        // Continue with deploy even if twin creation fails
+      }
+    }
+    
     return await deployBuilder();
   };
 

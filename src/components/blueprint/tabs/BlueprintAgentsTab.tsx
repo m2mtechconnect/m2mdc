@@ -35,6 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { AgentHealthPanel } from '../AgentHealthPanel';
 
 export interface BlueprintAgentsTabProps {
   agents: AgentBlueprint[];
@@ -151,6 +152,9 @@ export function BlueprintAgentsTab({ agents, domains, highlightAgentId, useRealD
 
   return (
     <div className="space-y-6">
+      {/* Agent Health Panel */}
+      <AgentHealthPanel />
+
       {/* Summary */}
       <Card>
         <CardHeader>

@@ -2,22 +2,27 @@
  * Network Domain View - Network monitoring
  */
 
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Network, Activity, AlertTriangle, Wifi, ArrowUp, ArrowDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Network, Activity, AlertTriangle, Wifi, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 interface NetworkDomainViewProps {
   facility: DataCentreFacility;
 }
 
+type SwitchType = 'all' | 'ToR' | 'Spine' | 'Leaf';
+type StatusFilter = 'all' | 'normal' | 'warning' | 'critical';
+
 // Generate more switches for demo
 const generateSwitches = (baseSwitches: any[]) => {
   const switchTypes = ['ToR', 'Spine', 'Leaf'];
   const allSwitches = [...baseSwitches];
   
-  // Add more switches to reach ~24 for a full grid
   for (let i = baseSwitches.length; i < 24; i++) {
     const type = switchTypes[i % 3];
     const hasWarning = Math.random() > 0.8;
@@ -44,16 +49,40 @@ const generateSwitches = (baseSwitches: any[]) => {
 };
 
 export function NetworkDomainView({ facility }: NetworkDomainViewProps) {
+  const [fabricOpen, setFabricOpen] = useState(true);
+  const [throughputOpen, setThroughputOpen] = useState(true);
+  const [typeFilter, setTypeFilter] = useState<SwitchType>('all');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+
   const baseSwitches = facility.network.switches;
-  const switches = generateSwitches(baseSwitches);
+  const allSwitches = generateSwitches(baseSwitches);
   
-  const avgPortUtil = switches.length > 0
-    ? switches.reduce((acc, s) => acc + s.cpuUtilization, 0) / switches.length
-    : 0;
-  const totalErrors = switches.reduce((acc, s) => 
-    acc + s.ports.reduce((sum, p) => sum + p.packetErrors + p.crcErrors, 0), 0);
+  // Apply filters
+  const switches = allSwitches.filter(sw => {
+    const typeMatch = typeFilter === 'all' || sw.type === typeFilter;
+    const statusMatch = statusFilter === 'all' || sw.status === statusFilter;
+    return typeMatch && statusMatch;
+  });
+
   const avgLatency = facility.network.kpis.avgLatencyMs;
+  const totalErrors = allSwitches.reduce((acc, s) => 
+    acc + s.ports.reduce((sum, p) => sum + p.packetErrors + p.crcErrors, 0), 0);
   
+  // Count by type and status for filter badges
+  const typeCounts = {
+    all: allSwitches.length,
+    ToR: allSwitches.filter(s => s.type === 'ToR').length,
+    Spine: allSwitches.filter(s => s.type === 'Spine').length,
+    Leaf: allSwitches.filter(s => s.type === 'Leaf').length,
+  };
+  
+  const statusCounts = {
+    all: allSwitches.length,
+    normal: allSwitches.filter(s => s.status === 'normal').length,
+    warning: allSwitches.filter(s => s.status === 'warning').length,
+    critical: allSwitches.filter(s => s.status === 'critical').length,
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'critical': return 'text-red-500';
@@ -112,118 +141,192 @@ export function NetworkDomainView({ facility }: NetworkDomainViewProps) {
         />
         <SummaryCard
           title="Active Switches"
-          value={`${switches.length}`}
+          value={`${allSwitches.length}`}
           status="good"
           icon={Wifi}
         />
       </div>
 
-      {/* Network Fabric */}
-      <Card className="border-border/50">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold">Network Fabric</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {switches.map((sw) => {
-              const portsUp = sw.ports.filter((p: any) => p.status === 'up').length;
-              
-              return (
-                <div 
-                  key={sw.id} 
-                  className={`p-4 rounded-lg border bg-card hover:bg-muted/30 transition-colors ${
-                    sw.status === 'critical' ? 'border-red-500/30' :
-                    sw.status === 'warning' ? 'border-amber-500/30' :
-                    'border-border/50'
-                  }`}
-                >
-                  {/* Header */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Network className={`h-4 w-4 ${getStatusColor(sw.status)}`} />
-                      <span className="font-medium text-sm">{sw.name}</span>
-                    </div>
-                    {getStatusBadge(sw.type, sw.status)}
+      {/* Network Fabric - Collapsible */}
+      <Collapsible open={fabricOpen} onOpenChange={setFabricOpen}>
+        <Card className="border-border/50">
+          <CollapsibleTrigger asChild>
+            <CardHeader className="pb-3 cursor-pointer hover:bg-muted/30 transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CardTitle className="text-base font-semibold">Network Fabric</CardTitle>
+                  <Badge variant="secondary" className="text-xs">
+                    {switches.length} switches
+                  </Badge>
+                </div>
+                {fabricOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+              </div>
+            </CardHeader>
+          </CollapsibleTrigger>
+          
+          <CollapsibleContent>
+            <CardContent className="pt-0">
+              {/* Filters */}
+              <div className="flex flex-wrap items-center gap-4 mb-4 pb-4 border-b border-border/50">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Type:</span>
+                  <div className="flex gap-1">
+                    {(['all', 'ToR', 'Spine', 'Leaf'] as SwitchType[]).map(type => (
+                      <Button
+                        key={type}
+                        variant={typeFilter === type ? 'default' : 'outline'}
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => setTypeFilter(type)}
+                      >
+                        {type === 'all' ? 'All' : type}
+                        <span className="ml-1 opacity-70">({typeCounts[type]})</span>
+                      </Button>
+                    ))}
                   </div>
-                  
-                  {/* CPU Progress */}
-                  <div className="mb-3">
-                    <div className="flex justify-between text-xs mb-1.5">
-                      <span className="text-muted-foreground">CPU Utilization</span>
-                      <span className="font-medium">{sw.cpuUtilization.toFixed(0)}%</span>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Status:</span>
+                  <div className="flex gap-1">
+                    {(['all', 'normal', 'warning', 'critical'] as StatusFilter[]).map(status => (
+                      <Button
+                        key={status}
+                        variant={statusFilter === status ? 'default' : 'outline'}
+                        size="sm"
+                        className={`h-7 text-xs ${
+                          statusFilter === status ? '' :
+                          status === 'critical' ? 'border-red-500/30 text-red-500 hover:bg-red-500/10' :
+                          status === 'warning' ? 'border-amber-500/30 text-amber-500 hover:bg-amber-500/10' :
+                          status === 'normal' ? 'border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10' : ''
+                        }`}
+                        onClick={() => setStatusFilter(status)}
+                      >
+                        {status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)}
+                        {status !== 'all' && <span className="ml-1 opacity-70">({statusCounts[status]})</span>}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Switch Grid */}
+              {switches.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No switches match the current filters
+                </div>
+              ) : (
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  {switches.map((sw) => {
+                    const portsUp = sw.ports.filter((p: any) => p.status === 'up').length;
+                    
+                    return (
+                      <div 
+                        key={sw.id} 
+                        className={`p-4 rounded-lg border bg-card hover:bg-muted/30 transition-colors ${
+                          sw.status === 'critical' ? 'border-red-500/30' :
+                          sw.status === 'warning' ? 'border-amber-500/30' :
+                          'border-border/50'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <Network className={`h-4 w-4 ${getStatusColor(sw.status)}`} />
+                            <span className="font-medium text-sm">{sw.name}</span>
+                          </div>
+                          {getStatusBadge(sw.type, sw.status)}
+                        </div>
+                        
+                        <div className="mb-3">
+                          <div className="flex justify-between text-xs mb-1.5">
+                            <span className="text-muted-foreground">CPU Utilization</span>
+                            <span className="font-medium">{sw.cpuUtilization.toFixed(0)}%</span>
+                          </div>
+                          <Progress 
+                            value={sw.cpuUtilization} 
+                            className={`h-1.5 ${
+                              sw.cpuUtilization > 80 ? '[&>div]:bg-red-500' :
+                              sw.cpuUtilization > 60 ? '[&>div]:bg-amber-500' :
+                              '[&>div]:bg-emerald-500'
+                            }`}
+                          />
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                          <div>
+                            <p className="text-muted-foreground">Memory</p>
+                            <p className="font-medium">{sw.memoryUtilization.toFixed(0)}%</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Ports</p>
+                            <p className="font-medium">{portsUp}/{sw.ports.length}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Temp</p>
+                            <p className={`font-medium ${sw.temperature > 40 ? 'text-amber-500' : ''}`}>
+                              {sw.temperature.toFixed(0)}°C
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Uptime</p>
+                            <p className="font-medium">{getUptimeDisplay(sw.uptime)}</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
+
+      {/* Network Throughput - Collapsible */}
+      <Collapsible open={throughputOpen} onOpenChange={setThroughputOpen}>
+        <Card className="border-border/50">
+          <CollapsibleTrigger asChild>
+            <CardHeader className="pb-3 cursor-pointer hover:bg-muted/30 transition-colors">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-semibold">Network Throughput</CardTitle>
+                {throughputOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+              </div>
+            </CardHeader>
+          </CollapsibleTrigger>
+          
+          <CollapsibleContent>
+            <CardContent className="space-y-4 pt-0">
+              {facility.network.fabrics.map((fabric) => {
+                const utilizationPct = (fabric.throughputGbps / fabric.maxThroughputGbps) * 100;
+                
+                return (
+                  <div key={fabric.id} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium w-28">{fabric.name}</span>
+                        <Badge variant="outline" className="text-xs">
+                          {fabric.type}
+                        </Badge>
+                      </div>
+                      <span className="text-sm text-muted-foreground">
+                        {fabric.throughputGbps.toFixed(0)} / {fabric.maxThroughputGbps} Gbps
+                      </span>
                     </div>
                     <Progress 
-                      value={sw.cpuUtilization} 
-                      className={`h-1.5 ${
-                        sw.cpuUtilization > 80 ? '[&>div]:bg-red-500' :
-                        sw.cpuUtilization > 60 ? '[&>div]:bg-amber-500' :
-                        '[&>div]:bg-emerald-500'
+                      value={utilizationPct} 
+                      className={`h-2 ${
+                        utilizationPct > 80 ? '[&>div]:bg-amber-500' :
+                        '[&>div]:bg-blue-500'
                       }`}
                     />
                   </div>
-                  
-                  {/* Metrics Grid */}
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
-                    <div>
-                      <p className="text-muted-foreground">Memory</p>
-                      <p className="font-medium">{sw.memoryUtilization.toFixed(0)}%</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Ports</p>
-                      <p className="font-medium">{portsUp}/{sw.ports.length}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Temp</p>
-                      <p className={`font-medium ${sw.temperature > 40 ? 'text-amber-500' : ''}`}>
-                        {sw.temperature.toFixed(0)}°C
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Uptime</p>
-                      <p className="font-medium">{getUptimeDisplay(sw.uptime)}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Network Throughput */}
-      <Card className="border-border/50">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold">Network Throughput</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {facility.network.fabrics.map((fabric) => {
-            const utilizationPct = (fabric.throughputGbps / fabric.maxThroughputGbps) * 100;
-            
-            return (
-              <div key={fabric.id} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium w-28">{fabric.name}</span>
-                    <Badge variant="outline" className="text-xs">
-                      {fabric.type}
-                    </Badge>
-                  </div>
-                  <span className="text-sm text-muted-foreground">
-                    {fabric.throughputGbps.toFixed(0)} / {fabric.maxThroughputGbps} Gbps
-                  </span>
-                </div>
-                <Progress 
-                  value={utilizationPct} 
-                  className={`h-2 ${
-                    utilizationPct > 80 ? '[&>div]:bg-amber-500' :
-                    '[&>div]:bg-blue-500'
-                  }`}
-                />
-              </div>
-            );
-          })}
-        </CardContent>
-      </Card>
+                );
+              })}
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
     </div>
   );
 }

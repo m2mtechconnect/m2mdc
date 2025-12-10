@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/select';
 import { 
   Play, Pause, RotateCcw, FastForward, Clock, 
-  Activity, CheckCircle2, AlertCircle
+  Activity, CheckCircle2, AlertCircle, AlertTriangle
 } from 'lucide-react';
 import type { SimulationStatus } from '@/simulation/types';
 import { cn } from '@/lib/utils';
@@ -73,6 +73,11 @@ const statusConfig: Record<SimulationStatus, {
     label: 'Completed', 
     color: 'bg-info/10 text-info border-info/30', 
     icon: CheckCircle2 
+  },
+  error: {
+    label: 'Error',
+    color: 'bg-destructive/10 text-destructive border-destructive/30',
+    icon: AlertTriangle
   },
 };
 

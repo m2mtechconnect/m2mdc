@@ -34,32 +34,32 @@ export function EventLogPanel({ events, isRunning }: EventLogPanelProps) {
       case 'detect':
         return {
           icon: AlertTriangle,
-          color: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20',
-          iconColor: 'text-yellow-600'
+          color: 'bg-warning/10 text-warning border-warning/20',
+          iconColor: 'text-warning'
         };
       case 'decision':
         return {
           icon: Zap,
-          color: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-          iconColor: 'text-blue-600'
+          color: 'bg-info/10 text-info border-info/20',
+          iconColor: 'text-info'
         };
       case 'action':
         return {
           icon: Activity,
-          color: 'bg-purple-500/10 text-purple-600 border-purple-500/20',
-          iconColor: 'text-purple-600'
+          color: 'bg-accent/10 text-accent border-accent/20',
+          iconColor: 'text-accent'
         };
       case 'resolved':
         return {
           icon: CheckCircle2,
-          color: 'bg-green-500/10 text-green-600 border-green-500/20',
-          iconColor: 'text-green-600'
+          color: 'bg-success/10 text-success border-success/20',
+          iconColor: 'text-success'
         };
       case 'alert':
         return {
           icon: AlertTriangle,
-          color: 'bg-red-500/10 text-red-600 border-red-500/20',
-          iconColor: 'text-red-600'
+          color: 'bg-destructive/10 text-destructive border-destructive/20',
+          iconColor: 'text-destructive'
         };
       default:
         return {

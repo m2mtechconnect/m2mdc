@@ -176,8 +176,8 @@ export function Step2Intelligence() {
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                  <Users className="h-4 w-4 text-purple-500" />
+                <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center">
+                  <Users className="h-4 w-4 text-accent" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">Supervisor Agent</p>
@@ -189,8 +189,8 @@ export function Step2Intelligence() {
             
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                  <Search className="h-4 w-4 text-blue-500" />
+                <div className="w-9 h-9 rounded-lg bg-info/10 flex items-center justify-center">
+                  <Search className="h-4 w-4 text-info" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">Deep Research Agent</p>

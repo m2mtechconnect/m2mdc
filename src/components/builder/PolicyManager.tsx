@@ -93,11 +93,11 @@ export function PolicyManager({ systemId }: PolicyManagerProps) {
 
   const getScopeColor = (scope: string) => {
     const colors = {
-      global: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
-      model: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-      rag: 'bg-green-500/10 text-green-500 border-green-500/20',
-      mcp: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
-      workflow: 'bg-pink-500/10 text-pink-500 border-pink-500/20',
+      global: 'bg-accent/10 text-accent border-accent/20',
+      model: 'bg-info/10 text-info border-info/20',
+      rag: 'bg-success/10 text-success border-success/20',
+      mcp: 'bg-warning/10 text-warning border-warning/20',
+      workflow: 'bg-primary/10 text-primary border-primary/20',
     };
     return colors[scope as keyof typeof colors] || colors.global;
   };
@@ -149,7 +149,7 @@ export function PolicyManager({ systemId }: PolicyManagerProps) {
             <Card className="px-4 py-2 bg-accent/50">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">Enabled:</span>
-                <span className="text-sm font-bold text-green-600 dark:text-green-400">
+                <span className="text-sm font-bold text-success">
                   {policies.filter(p => p.is_enabled).length}
                 </span>
               </div>
@@ -205,7 +205,7 @@ export function PolicyManager({ systemId }: PolicyManagerProps) {
                   </TableCell>
                   <TableCell>
                     {policy.is_enabled ? (
-                      <Badge variant="outline" className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
+                      <Badge variant="outline" className="bg-success/10 text-success border-success/20">
                         <CheckCircle2 className="h-3 w-3 mr-1" />
                         Enabled
                       </Badge>

@@ -28,7 +28,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   capacity: 'bg-info/10 text-info border-info/30',
   incident: 'bg-destructive/10 text-destructive border-destructive/30',
   emissions: 'bg-success/10 text-success border-success/30',
-  compliance: 'bg-purple-500/10 text-purple-500 border-purple-500/30',
+  compliance: 'bg-accent/10 text-accent border-accent/30',
   optimization: 'bg-warning/10 text-warning border-warning/30',
 };
 

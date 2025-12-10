@@ -58,13 +58,13 @@ export function AnimatedDeployButton({
   if (state === 'success') {
     return (
       <div className="space-y-3 animate-fade-in">
-        <div className="flex items-center justify-center gap-3 p-6 bg-green-50 dark:bg-green-950/20 border border-green-500/20 rounded-lg">
-          <CheckCircle2 className="h-8 w-8 text-green-600 animate-scale-in" />
+        <div className="flex items-center justify-center gap-3 p-6 bg-success/10 border border-success/20 rounded-lg">
+          <CheckCircle2 className="h-8 w-8 text-success animate-scale-in" />
           <div>
-            <p className="font-semibold text-green-900 dark:text-green-100">
+            <p className="font-semibold text-foreground">
               {agentName} is now deployed!
             </p>
-            <p className="text-sm text-green-700 dark:text-green-300">
+            <p className="text-sm text-muted-foreground">
               Redirecting to dashboard...
             </p>
           </div>

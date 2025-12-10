@@ -1,11 +1,12 @@
 /**
- * DC Builder Step 1: Summary / Overview
- * Captures basic twin information and facility details
- * All fields editable and synced to Overview tab via store
+ * DC Builder Step 1: Summary / Overview (Refactored)
+ * Customer-first design with Quick Edit / Architect mode support
+ * P0: Customer name prominently editable at top
  */
 
 import { useState } from 'react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
+import { useBuilderMode } from '../BuilderModeContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,7 +15,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Building2, Zap, Thermometer, Leaf, MapPin, Target, Users, TrendingUp, Clock, List, Plus, X, FileText } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Building2, Zap, Thermometer, Leaf, MapPin, Target, Users, TrendingUp, Clock, List, Plus, X, ChevronDown, Settings2 } from 'lucide-react';
 import type { DCTier } from '@/types/dcScan';
 
 const TIER_OPTIONS: { value: DCTier; label: string }[] = [
@@ -39,11 +41,13 @@ const POWER_TOPOLOGY_OPTIONS: { value: 'N' | 'N+1' | '2N' | '2N+1'; label: strin
 
 export function DCStep1Summary() {
   const { overview, updateOverview } = useDCTwinBuilderStore();
+  const { isArchitectMode } = useBuilderMode();
   
   // Local state for new item inputs
   const [newUseCase, setNewUseCase] = useState('');
   const [newBenefit, setNewBenefit] = useState('');
   const [newAudience, setNewAudience] = useState('');
+  const [showAdvancedSpecs, setShowAdvancedSpecs] = useState(false);
 
   // Array field helpers
   const addUseCase = () => {
@@ -81,15 +85,56 @@ export function DCStep1Summary() {
 
   return (
     <div className="space-y-6">
-      {/* Basic Information */}
+      {/* P0: Customer Name - Prominent at Top */}
+      <Card className="border-primary/30 bg-primary/5">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-primary" />
+            Customer Profile
+          </CardTitle>
+          <CardDescription>
+            Who is this Data Centre Twin for?
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="customerName" className="text-base font-medium">
+                Customer / Organization Name *
+              </Label>
+              <Input
+                id="customerName"
+                value={overview.customerName || ''}
+                onChange={(e) => updateOverview({ customerName: e.target.value })}
+                placeholder="e.g., Walmart, TD Bank, Government of Canada"
+                className="text-base"
+              />
+              <p className="text-xs text-muted-foreground">
+                This name appears in all headers and reports
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="industry">Industry</Label>
+              <Input
+                id="industry"
+                value={overview.industry || ''}
+                onChange={(e) => updateOverview({ industry: e.target.value })}
+                placeholder="e.g., Retail, Financial Services, Government"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Twin Information */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-primary" />
-            Twin Information
+            Twin Configuration
           </CardTitle>
           <CardDescription>
-            Define the basic details of your Sovereign Green AI Data Centre Twin
+            Define your Sovereign Green AI Data Centre Twin
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -119,23 +164,12 @@ export function DCStep1Summary() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={overview.description}
-              onChange={(e) => updateOverview({ description: e.target.value })}
-              placeholder="Describe the purpose and goals of this data centre twin..."
-              rows={2}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="twinSummary">Twin Summary</Label>
+            <Label htmlFor="twinSummary">Summary</Label>
             <Textarea
               id="twinSummary"
               value={overview.twinSummary}
               onChange={(e) => updateOverview({ twinSummary: e.target.value })}
-              placeholder="Provide a detailed summary of this digital twin's purpose and capabilities..."
+              placeholder="Describe the purpose and goals of this data centre twin..."
               rows={3}
             />
             <p className="text-xs text-muted-foreground">This summary appears in the Overview tab header</p>
@@ -161,23 +195,23 @@ export function DCStep1Summary() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary" />
-            Business Impact & ROI
+            Business Impact
           </CardTitle>
           <CardDescription>
-            Define the expected business value and impact metrics
+            Expected value and impact metrics
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="displayRoi">Display ROI</Label>
+              <Label htmlFor="displayRoi">Expected ROI</Label>
               <Input
                 id="displayRoi"
                 value={overview.displayRoi}
                 onChange={(e) => updateOverview({ displayRoi: e.target.value })}
                 placeholder="e.g., 35-50%"
               />
-              <p className="text-xs text-muted-foreground">Shown in Overview ROI badge</p>
+              <p className="text-xs text-muted-foreground">Displayed in Overview badge</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="displayTimeSaved">Time Saved</Label>
@@ -191,20 +225,18 @@ export function DCStep1Summary() {
                   placeholder="e.g., 20+ hrs/week"
                 />
               </div>
-              <p className="text-xs text-muted-foreground">Shown in Overview time saved badge</p>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="businessImpactSummary">Business Impact Summary</Label>
+            <Label htmlFor="businessImpactSummary">Impact Summary</Label>
             <Textarea
               id="businessImpactSummary"
               value={overview.businessImpactSummary}
               onChange={(e) => updateOverview({ businessImpactSummary: e.target.value })}
-              placeholder="Describe the overall business impact, e.g., 'Reduce energy costs, minimize carbon footprint, ensure data sovereignty...'"
+              placeholder="Describe the overall business impact..."
               rows={2}
             />
-            <p className="text-xs text-muted-foreground">Displayed in Overview "Business Impact & ROI" section</p>
           </div>
         </CardContent>
       </Card>
@@ -214,67 +246,58 @@ export function DCStep1Summary() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5 text-primary" />
-            Primary Use Cases
+            Use Cases & Benefits
           </CardTitle>
-          <CardDescription>
-            Define the main use cases this twin addresses
-          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            {overview.primaryUseCases.map((useCase, index) => (
-              <Badge key={index} variant="secondary" className="flex items-center gap-1 py-1 px-2">
-                {useCase}
-                <button onClick={() => removeUseCase(index)} className="ml-1 hover:text-destructive">
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <Input
-              value={newUseCase}
-              onChange={(e) => setNewUseCase(e.target.value)}
-              placeholder="Add a use case..."
-              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addUseCase())}
-            />
-            <Button type="button" variant="outline" size="icon" onClick={addUseCase}>
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Key Benefits */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <List className="h-5 w-5 text-primary" />
-            Key Benefits
-          </CardTitle>
-          <CardDescription>
-            List the main benefits users will gain from this twin
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {overview.keyBenefits.map((benefit, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <span className="flex-1 text-sm">{benefit}</span>
-              <Button variant="ghost" size="icon" onClick={() => removeBenefit(index)}>
-                <X className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+          {/* Use Cases */}
+          <div className="space-y-3">
+            <Label>Primary Use Cases</Label>
+            <div className="flex flex-wrap gap-2">
+              {overview.primaryUseCases.map((useCase, index) => (
+                <Badge key={index} variant="secondary" className="flex items-center gap-1 py-1 px-2">
+                  {useCase}
+                  <button onClick={() => removeUseCase(index)} className="ml-1 hover:text-destructive">
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={newUseCase}
+                onChange={(e) => setNewUseCase(e.target.value)}
+                placeholder="Add a use case..."
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addUseCase())}
+              />
+              <Button type="button" variant="outline" size="icon" onClick={addUseCase}>
+                <Plus className="h-4 w-4" />
               </Button>
             </div>
-          ))}
-          <div className="flex gap-2">
-            <Input
-              value={newBenefit}
-              onChange={(e) => setNewBenefit(e.target.value)}
-              placeholder="Add a benefit..."
-              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addBenefit())}
-            />
-            <Button type="button" variant="outline" size="icon" onClick={addBenefit}>
-              <Plus className="h-4 w-4" />
-            </Button>
+          </div>
+
+          {/* Key Benefits */}
+          <div className="space-y-3 pt-3 border-t">
+            <Label>Key Benefits</Label>
+            {overview.keyBenefits.map((benefit, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <span className="flex-1 text-sm">{benefit}</span>
+                <Button variant="ghost" size="icon" onClick={() => removeBenefit(index)}>
+                  <X className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                </Button>
+              </div>
+            ))}
+            <div className="flex gap-2">
+              <Input
+                value={newBenefit}
+                onChange={(e) => setNewBenefit(e.target.value)}
+                placeholder="Add a benefit..."
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addBenefit())}
+              />
+              <Button type="button" variant="outline" size="icon" onClick={addBenefit}>
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -286,9 +309,6 @@ export function DCStep1Summary() {
             <Users className="h-5 w-5 text-primary" />
             Who Is This For?
           </CardTitle>
-          <CardDescription>
-            Define the target audience for this digital twin
-          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {overview.targetAudience.map((audience, index) => (
@@ -315,18 +335,15 @@ export function DCStep1Summary() {
         </CardContent>
       </Card>
 
-      {/* Facility Specifications */}
+      {/* Facility Specifications - Core */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-primary" />
             Facility Specifications
           </CardTitle>
-          <CardDescription>
-            Configure power, tier, and capacity settings
-          </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="capacityKw">Total IT Load (kW)</Label>
@@ -357,79 +374,6 @@ export function DCStep1Summary() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Power Topology</Label>
-              <Select
-                value={overview.powerTopology}
-                onValueChange={(value: 'N' | 'N+1' | '2N' | '2N+1') => updateOverview({ powerTopology: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select topology" />
-                </SelectTrigger>
-                <SelectContent>
-                  {POWER_TOPOLOGY_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Cooling & GPU */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Thermometer className="h-5 w-5 text-primary" />
-            Cooling & Compute
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Cooling System</Label>
-              <Select
-                value={overview.coolingType}
-                onValueChange={(value: 'air' | 'liquid' | 'hybrid' | 'chilled_water') => updateOverview({ coolingType: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select cooling type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {COOLING_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="gpuFleet">GPU Fleet / Model Types</Label>
-              <Input
-                id="gpuFleet"
-                value={overview.gpuFleet}
-                onChange={(e) => updateOverview({ gpuFleet: e.target.value })}
-                placeholder="e.g., NVIDIA H100, A100"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Sustainability & Sovereignty */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Leaf className="h-5 w-5 text-green-600" />
-            Sustainability & Sovereignty
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
               <Label htmlFor="renewablePercent">Renewable Energy (%)</Label>
               <Input
                 id="renewablePercent"
@@ -438,22 +382,137 @@ export function DCStep1Summary() {
                 max={100}
                 value={overview.renewablePercent}
                 onChange={(e) => updateOverview({ renewablePercent: parseInt(e.target.value) || 0 })}
-                placeholder="e.g., 95"
               />
             </div>
-            <div className="space-y-2">
-              <Label>Sovereign Compliance</Label>
-              <div className="flex items-center gap-3 rounded-lg border p-3">
-                <Switch
-                  checked={overview.sovereignCompliance}
-                  onCheckedChange={(checked) => updateOverview({ sovereignCompliance: checked })}
-                />
-                <span className="text-sm">
-                  {overview.sovereignCompliance ? 'Sovereign compliant (Canada-only)' : 'Not sovereign compliant'}
-                </span>
+          </div>
+
+          {/* Sovereignty Toggle */}
+          <div className="flex items-center justify-between rounded-lg border p-3">
+            <div>
+              <span className="font-medium">Sovereign Compliance</span>
+              <p className="text-sm text-muted-foreground">Canadian data sovereignty required</p>
+            </div>
+            <Switch
+              checked={overview.sovereignCompliance}
+              onCheckedChange={(checked) => updateOverview({ sovereignCompliance: checked })}
+            />
+          </div>
+
+          {/* Advanced Specs - Hidden by default in Quick Mode */}
+          {isArchitectMode ? (
+            <div className="space-y-4 pt-4 border-t">
+              <h4 className="text-sm font-medium flex items-center gap-2">
+                <Settings2 className="h-4 w-4" />
+                Technical Specifications
+              </h4>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Power Topology</Label>
+                  <Select
+                    value={overview.powerTopology}
+                    onValueChange={(value: 'N' | 'N+1' | '2N' | '2N+1') => updateOverview({ powerTopology: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select topology" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {POWER_TOPOLOGY_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Cooling System</Label>
+                  <Select
+                    value={overview.coolingType}
+                    onValueChange={(value: 'air' | 'liquid' | 'hybrid' | 'chilled_water') => updateOverview({ coolingType: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select cooling type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {COOLING_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="gpuFleet">GPU Fleet / Model Types</Label>
+                  <Input
+                    id="gpuFleet"
+                    value={overview.gpuFleet}
+                    onChange={(e) => updateOverview({ gpuFleet: e.target.value })}
+                    placeholder="e.g., NVIDIA H100, A100"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <Collapsible open={showAdvancedSpecs} onOpenChange={setShowAdvancedSpecs}>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground">
+                  <Settings2 className="h-4 w-4" />
+                  {showAdvancedSpecs ? 'Hide' : 'Show'} Technical Details
+                  <ChevronDown className={`h-4 w-4 transition-transform ${showAdvancedSpecs ? 'rotate-180' : ''}`} />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-4 pt-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Power Topology</Label>
+                    <Select
+                      value={overview.powerTopology}
+                      onValueChange={(value: 'N' | 'N+1' | '2N' | '2N+1') => updateOverview({ powerTopology: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select topology" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {POWER_TOPOLOGY_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Cooling System</Label>
+                    <Select
+                      value={overview.coolingType}
+                      onValueChange={(value: 'air' | 'liquid' | 'hybrid' | 'chilled_water') => updateOverview({ coolingType: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select cooling type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {COOLING_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="gpuFleet">GPU Fleet / Model Types</Label>
+                    <Input
+                      id="gpuFleet"
+                      value={overview.gpuFleet}
+                      onChange={(e) => updateOverview({ gpuFleet: e.target.value })}
+                      placeholder="e.g., NVIDIA H100, A100"
+                    />
+                  </div>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          )}
         </CardContent>
       </Card>
     </div>

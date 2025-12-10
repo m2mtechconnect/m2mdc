@@ -1,10 +1,11 @@
 /**
- * DC Builder Step 3: Integrations
- * Configure external integrations and intelligence settings
- * All 8 required integration templates defined per spec
+ * DC Builder Step 3: Integrations (Refactored)
+ * Quick Edit: Minimal - just shows summary
+ * Architect: Full AI intelligence settings
  */
 
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
+import { useBuilderMode } from '../BuilderModeContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,10 +15,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Brain, Database, Link, Plus, Trash2, Thermometer, Zap, Cpu, X, 
-  Activity, Server, Gauge, Shield, Container, BarChart3 
+  Activity, Server, Gauge, Shield, Container, ChevronDown, Settings2,
+  CheckCircle2, Info
 } from 'lucide-react';
+import { useState } from 'react';
 
 // All 8 required integration templates per QA spec
 const INTEGRATION_TEMPLATES = [
@@ -27,7 +32,6 @@ const INTEGRATION_TEMPLATES = [
     type: 'sensor', 
     icon: Cpu,
     description: 'HPC/GPU utilization, queues, tenants from NVIDIA DCGM or similar',
-    dataSources: ['gpu-telemetry'],
     category: 'compute'
   },
   { 
@@ -36,7 +40,6 @@ const INTEGRATION_TEMPLATES = [
     type: 'sensor', 
     icon: Zap,
     description: 'Power distribution unit metrics and per-rack power consumption',
-    dataSources: ['dcim-telemetry'],
     category: 'power'
   },
   { 
@@ -45,7 +48,6 @@ const INTEGRATION_TEMPLATES = [
     type: 'sensor', 
     icon: Thermometer,
     description: 'CRAC/CRAH unit status, supply/return temps, refrigerant levels',
-    dataSources: ['dcim-telemetry'],
     category: 'cooling'
   },
   { 
@@ -54,7 +56,6 @@ const INTEGRATION_TEMPLATES = [
     type: 'telemetry', 
     icon: Activity,
     description: 'Ingest metrics from Prometheus for GPU, node, and infra telemetry',
-    dataSources: ['gpu-telemetry', 'dcim-telemetry'],
     category: 'monitoring'
   },
   { 
@@ -62,8 +63,7 @@ const INTEGRATION_TEMPLATES = [
     name: 'DCIM/BMS', 
     type: 'api', 
     icon: Server,
-    description: 'Data Center Infrastructure Management and Building Management System integration',
-    dataSources: ['dcim-telemetry', 'energy-feeds'],
+    description: 'Data Center Infrastructure Management and Building Management System',
     category: 'infrastructure'
   },
   { 
@@ -72,7 +72,6 @@ const INTEGRATION_TEMPLATES = [
     type: 'api', 
     icon: Gauge,
     description: 'Real-time grid carbon intensity (gCO₂/kWh) and renewable mix data',
-    dataSources: ['carbon-intensity'],
     category: 'sustainability'
   },
   { 
@@ -81,7 +80,6 @@ const INTEGRATION_TEMPLATES = [
     type: 'database', 
     icon: Shield,
     description: 'PIPEDA, internal policies, SLAs, and sovereignty compliance rules',
-    dataSources: ['compliance-policies'],
     category: 'compliance'
   },
   { 
@@ -90,7 +88,6 @@ const INTEGRATION_TEMPLATES = [
     type: 'api', 
     icon: Container,
     description: 'Workload scheduler metrics from Slurm or Kubernetes clusters',
-    dataSources: ['gpu-telemetry'],
     category: 'workload'
   },
 ];
@@ -116,9 +113,10 @@ export function DCStep3Integrations() {
     addSampleQuery, 
     removeSampleQuery 
   } = useDCTwinBuilderStore();
+  const { isArchitectMode, isQuickMode } = useBuilderMode();
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const handleAddIntegration = (template: typeof INTEGRATION_TEMPLATES[0]) => {
-    // Check if already added
     if (integrations.some(i => i.id.startsWith(template.id))) {
       return;
     }
@@ -129,7 +127,6 @@ export function DCStep3Integrations() {
       connected: false, 
       config: {
         description: template.description,
-        dataSources: template.dataSources,
         category: template.category,
       }
     });
@@ -139,6 +136,97 @@ export function DCStep3Integrations() {
     return integrations.some(i => i.id.startsWith(templateId));
   };
 
+  // Quick Mode View
+  if (isQuickMode) {
+    return (
+      <div className="space-y-6">
+        {/* Summary Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Brain className="h-5 w-5 text-primary" />
+              AI Configuration
+            </CardTitle>
+            <CardDescription>
+              Your digital twin uses AI to analyze data and provide recommendations
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Current AI Model Summary */}
+            <div className="rounded-lg bg-muted/50 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-medium">Current AI Model</h4>
+                <Badge variant="secondary">{intelligence.llmModel.split('/')[1] || intelligence.llmModel}</Badge>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {intelligence.ragEnabled ? 'RAG enabled for knowledge retrieval' : 'Standard AI mode'}
+              </p>
+            </div>
+
+            {/* Integrations Summary */}
+            <div className="space-y-3">
+              <h4 className="font-medium">Data Integrations ({integrations.length} connected)</h4>
+              {integrations.length === 0 ? (
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    No integrations configured yet. Data sources from Step 2 will be used for monitoring.
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <div className="grid gap-2">
+                  {integrations.map((integration) => (
+                    <div key={integration.id} className="flex items-center justify-between rounded-lg border p-2">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <span className="text-sm">{integration.name}</span>
+                      </div>
+                      <Badge variant="outline" className="text-xs">{integration.type}</Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Quick Add Integration */}
+            <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground">
+                  <Settings2 className="h-4 w-4" />
+                  {showAdvanced ? 'Hide' : 'Add'} Integrations
+                  <ChevronDown className={`h-4 w-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`} />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-4">
+                <div className="grid gap-2 md:grid-cols-2">
+                  {INTEGRATION_TEMPLATES.map((template) => {
+                    const isAdded = isIntegrationAdded(template.id);
+                    const Icon = template.icon;
+                    return (
+                      <Button
+                        key={template.id}
+                        variant={isAdded ? 'secondary' : 'outline'}
+                        size="sm"
+                        className="justify-start gap-2 h-auto py-2"
+                        onClick={() => !isAdded && handleAddIntegration(template)}
+                        disabled={isAdded}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span className="flex-1 text-left">{template.name}</span>
+                        {isAdded && <CheckCircle2 className="h-4 w-4 text-green-600" />}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Architect Mode View - Full Configuration
   return (
     <div className="space-y-6">
       {/* External Integrations */}
@@ -165,12 +253,6 @@ export function DCStep3Integrations() {
                       <span className="font-medium">{integration.name}</span>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant="outline" className="text-xs">{integration.type}</Badge>
-                        <Badge 
-                          variant={integration.connected ? 'default' : 'secondary'} 
-                          className="text-xs"
-                        >
-                          {integration.connected ? 'Connected' : 'Not Connected'}
-                        </Badge>
                         {integration.config?.category && (
                           <Badge 
                             variant="outline" 
@@ -192,7 +274,7 @@ export function DCStep3Integrations() {
 
           {/* Available Integration Templates */}
           <div className="space-y-3">
-            <Label>Available Integrations ({INTEGRATION_TEMPLATES.length} templates)</Label>
+            <Label>Available Integrations</Label>
             <div className="grid gap-3 md:grid-cols-2">
               {INTEGRATION_TEMPLATES.map((template) => {
                 const isAdded = isIntegrationAdded(template.id);
@@ -228,15 +310,6 @@ export function DCStep3Integrations() {
                         <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                           {template.description}
                         </p>
-                        <div className="flex items-center gap-1 mt-2">
-                          <Badge variant="outline" className="text-xs">{template.type}</Badge>
-                          <Badge 
-                            variant="outline" 
-                            className={`text-xs ${CATEGORY_COLORS[template.category] || ''}`}
-                          >
-                            {template.category}
-                          </Badge>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -247,12 +320,13 @@ export function DCStep3Integrations() {
         </CardContent>
       </Card>
 
-      {/* AI Intelligence Settings */}
+      {/* AI Intelligence Settings - Architect Only */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5 text-primary" />
             AI Intelligence Settings
+            <Badge variant="outline" className="text-xs">Architect Mode</Badge>
           </CardTitle>
           <CardDescription>
             Configure the AI model and behavior for this digital twin
@@ -296,7 +370,10 @@ export function DCStep3Integrations() {
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label>Temperature</Label>
+              <Label className="flex items-center gap-2">
+                Temperature
+                <Badge variant="outline" className="text-xs">Advanced</Badge>
+              </Label>
               <span className="text-sm text-muted-foreground">{intelligence.temperature.toFixed(2)}</span>
             </div>
             <Slider 
@@ -307,7 +384,7 @@ export function DCStep3Integrations() {
               onValueChange={([value]) => updateIntelligence({ temperature: value })} 
             />
             <p className="text-xs text-muted-foreground">
-              Lower values = more focused, higher values = more creative
+              Lower = more focused and deterministic, Higher = more creative
             </p>
           </div>
 

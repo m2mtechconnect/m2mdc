@@ -10,21 +10,21 @@ import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 // Thermal components
-import { ThermalKPIs } from './thermal/ThermalKPIs';
-import { ThermalHeatmapTile } from './thermal/ThermalHeatmapTile';
-import { CoolingCorrelationPanel } from './thermal/CoolingCorrelationPanel';
-import { CoolingUnitsPanel } from './thermal/CoolingUnitsPanel';
-import { ThermalPlayback } from './thermal/ThermalPlayback';
-import { ThermalForecastPanel } from './thermal/ThermalForecastPanel';
-import { ThermalInsightsPanel } from './thermal/ThermalInsightsPanel';
-import { EnhancedRackTable } from './thermal/EnhancedRackTable';
+import { ThermalKPIs } from '../thermal/ThermalKPIs';
+import { ThermalHeatmapTile } from '../thermal/ThermalHeatmapTile';
+import { CoolingCorrelationPanel } from '../thermal/CoolingCorrelationPanel';
+import { CoolingUnitsPanel } from '../thermal/CoolingUnitsPanel';
+import { ThermalPlayback } from '../thermal/ThermalPlayback';
+import { ThermalForecastPanel } from '../thermal/ThermalForecastPanel';
+import { ThermalInsightsPanel } from '../thermal/ThermalInsightsPanel';
+import { EnhancedRackTable } from '../thermal/EnhancedRackTable';
 import { 
   addAisleMetadata, 
   applyThermalFilter, 
   THERMAL_FILTERS,
   type ThermalFilter,
   type RackWithAisle 
-} from './thermal/ThermalHeatmapUtils';
+} from '../thermal/ThermalHeatmapUtils';
 
 interface ThermalDomainViewProps {
   facility: DataCentreFacility;

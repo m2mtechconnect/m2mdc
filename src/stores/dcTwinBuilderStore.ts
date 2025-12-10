@@ -17,6 +17,7 @@ import type {
   DCScenarioConfig,
   DCIntelligenceConfig,
   DCDeploymentConfig,
+  DCFinancialModel,
 } from '@/types/dcTwinBuilder';
 import {
   createDefaultDCTwinBuilderState,
@@ -28,14 +29,22 @@ import {
   DEFAULT_DC_INTELLIGENCE,
   CANADIAN_CLOUD_REGIONS,
   DEFAULT_DEPLOYMENT_STEPS,
+  DEFAULT_DC_FINANCIAL_MODEL,
+  ARCHETYPE_TO_BUILDER_AGENT_MAP,
+  ARCHETYPE_TO_BUILDER_SCENARIO_MAP,
 } from '@/types/dcTwinBuilder';
 import type { DCRecommendation, DCScanIndustry, DCBlueprintProfile } from '@/types/dcScan';
+import type { GreenDcTwinRecommendation } from '@/types/greenDcTwin';
 
 interface DCTwinBuilderActions {
   // Initialization
   initializeFromRecommendation: (recommendation: DCRecommendation, sessionId: string) => void;
+  initializeFromGreenDcRecommendation: (recommendation: GreenDcTwinRecommendation, sessionId: string) => void;
   initializeFromScratch: () => void;
   loadFromStorage: () => void;
+  
+  // Financial
+  updateFinancial: (updates: Partial<DCFinancialModel>) => void;
   
   // Step 1: Overview
   updateOverview: (updates: Partial<DCTwinOverview>) => void;
@@ -266,6 +275,112 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
         set(ensuredState);
       },
 
+      initializeFromGreenDcRecommendation: (recommendation, sessionId) => {
+        console.log('[DCTwinBuilder] Initializing from Green DC recommendation:', recommendation.archetypeId);
+        
+        const defaultState = createDefaultDCTwinBuilderState();
+        
+        // Map archetype agent IDs to builder agent IDs
+        const mappedAgentIds = recommendation.agents.map(
+          agentId => ARCHETYPE_TO_BUILDER_AGENT_MAP[agentId] || agentId
+        );
+        
+        // Map archetype scenario IDs to builder scenario IDs
+        const mappedScenarioIds = recommendation.scenarios.map(
+          scenarioId => ARCHETYPE_TO_BUILDER_SCENARIO_MAP[scenarioId] || scenarioId
+        );
+        
+        // Get unique scenario IDs that exist in our required scenarios
+        const validScenarioIds = new Set(REQUIRED_DC_SCENARIOS.map(s => s.id));
+        const uniqueScenarios = [...new Set(mappedScenarioIds)].filter(id => validScenarioIds.has(id));
+        
+        // Map recommendation to overview
+        const overview: DCTwinOverview = {
+          ...defaultState.overview,
+          twinName: `Sovereign Green AI Data Centre Twin for ${recommendation.companyName || recommendation.domain}`,
+          twinSlug: `dc-twin-${(recommendation.companyName || recommendation.domain).toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+          twinSummary: recommendation.objectives.join('. '),
+          description: `AI-powered digital twin for ${recommendation.industry} operations with focus on sustainability and sovereignty.`,
+          industries: [recommendation.industry, 'Technology', 'IT Operations', 'Sustainability'],
+          primaryUseCases: recommendation.objectives.slice(0, 4),
+          capacityKw: recommendation.capacityTier === 'small' ? 500 :
+                      recommendation.capacityTier === 'medium' ? 2500 :
+                      recommendation.capacityTier === 'large' ? 10000 : 50000,
+          tier: recommendation.kpiTargets.uptimeTargetPct >= 99.99 ? 'Tier IV' : 'Tier III',
+          renewablePercent: recommendation.kpiTargets.renewableShareTargetPct,
+          sovereignCompliance: recommendation.kpiTargets.sovereigntyScoreTargetPct >= 80,
+          keyCapabilities: recommendation.objectives,
+          kpisImproved: [
+            `PUE Target: ${recommendation.kpiTargets.pueTarget}`,
+            `Renewable: ${recommendation.kpiTargets.renewableShareTargetPct}%`,
+            `Sovereignty: ${recommendation.kpiTargets.sovereigntyScoreTargetPct}%`,
+            `Uptime: ${recommendation.kpiTargets.uptimeTargetPct}%`,
+          ],
+        };
+        
+        // Map financial model
+        const financial: DCFinancialModel = {
+          annualPowerCostUsd: recommendation.financialModel.baselineAnnualCostUsd,
+          annualCarbonTonnes: recommendation.financialModel.baselineAnnualCarbonTonnes,
+          upgradeSavingsPercent: recommendation.financialModel.greenVariantSavingsCostPct,
+          carbonSavingsPercent: recommendation.financialModel.greenVariantSavingsCarbonPct,
+          paybackYears: recommendation.financialModel.estimatedPaybackYears,
+        };
+        
+        // Update KPI targets based on recommendation
+        const updatedKpis = defaultState.kpis.map(kpi => {
+          if (kpi.id === 'effective-ai-pue') {
+            return { ...kpi, target: recommendation.kpiTargets.pueTarget };
+          }
+          if (kpi.id === 'sovereign-compute-ratio') {
+            return { ...kpi, target: recommendation.kpiTargets.sovereigntyScoreTargetPct };
+          }
+          if (kpi.id === 'uptime') {
+            return { ...kpi, target: recommendation.kpiTargets.uptimeTargetPct };
+          }
+          if (kpi.id === 'gco2-per-gpu-hour') {
+            return { ...kpi, target: recommendation.kpiTargets.carbonIntensityTargetGPerKwh };
+          }
+          return kpi;
+        });
+        
+        // Enable agents that are in the recommendation
+        const updatedAgents = defaultState.agents.map(agent => ({
+          ...agent,
+          enabled: mappedAgentIds.includes(agent.id),
+        }));
+        
+        // Enable scenarios that are in the recommendation
+        const updatedScenarios = defaultState.scenarios.map(scenario => ({
+          ...scenario,
+          enabled: uniqueScenarios.includes(scenario.id),
+        }));
+        
+        // Create base state with updated values
+        const baseState: DCTwinBuilderState = {
+          ...defaultState,
+          sessionId,
+          overview,
+          agents: updatedAgents,
+          kpis: updatedKpis,
+          scenarios: updatedScenarios,
+          financial,
+          sourceRecommendation: {
+            url: recommendation.domain,
+            detectedIndustry: recommendation.industry as DCScanIndustry,
+            blueprintProfile: recommendation.archetypeId as DCBlueprintProfile,
+          },
+          isDirty: true,
+          lastSaved: null,
+        };
+
+        // Ensure all required entities exist and calculate deployment checks
+        const ensuredState = ensureRequiredEntities(baseState);
+        ensuredState.deployment.deploymentChecks = calculateDeploymentChecks(ensuredState);
+
+        set(ensuredState);
+      },
+
       initializeFromScratch: () => {
         console.log('[DCTwinBuilder] Initializing from scratch');
         const baseState = createDefaultDCTwinBuilderState();
@@ -283,6 +398,17 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
           set(ensuredState);
         }
         console.log('[DCTwinBuilder] State loaded from storage and validated');
+      },
+      
+      // =====================================================================
+      // FINANCIAL
+      // =====================================================================
+      
+      updateFinancial: (updates) => {
+        set((state) => ({
+          financial: { ...state.financial, ...updates },
+          isDirty: true,
+        }));
       },
 
       // =====================================================================

@@ -75,7 +75,7 @@ export interface DCAgentConfig {
   icon?: string;
 }
 
-// Required agents per spec
+// Required agents per spec (9 agents total)
 export const REQUIRED_DC_AGENTS: DCAgentConfig[] = [
   {
     id: 'thermal-guardian',
@@ -122,6 +122,17 @@ export const REQUIRED_DC_AGENTS: DCAgentConfig[] = [
     workflowIds: ['wf-network-congestion', 'wf-switch-failure'],
   },
   {
+    id: 'facility-safety',
+    name: 'Facility & Safety Agent',
+    description: 'Monitors physical security, fire suppression, water detection, and environmental safety',
+    domain: 'incidents',
+    enabled: true,
+    inputSignals: ['Fire sensors', 'Water leak detectors', 'Security cameras', 'Access logs', 'Air quality'],
+    outputActions: ['Safety alerts', 'Evacuation triggers', 'Security notifications'],
+    kpisImpacted: ['env-safety', 'fire-readiness', 'physical-security'],
+    workflowIds: ['wf-fire-suppression', 'wf-water-leak', 'wf-security-breach'],
+  },
+  {
     id: 'workload-orchestrator',
     name: 'Workload Orchestrator',
     description: 'Optimizes GPU workload scheduling, manages queues, ensures SLA compliance',
@@ -131,6 +142,17 @@ export const REQUIRED_DC_AGENTS: DCAgentConfig[] = [
     outputActions: ['Scheduling decisions', 'Queue priorities', 'SLA breach alerts'],
     kpisImpacted: ['gpu-utilization', 'gpu-fairness', 'queue-depth', 'sla-breach'],
     workflowIds: ['wf-gpu-saturation', 'wf-sla-breach', 'wf-tenant-overload'],
+  },
+  {
+    id: 'sovereignty-sentinel',
+    name: 'Sovereignty Sentinel',
+    description: 'Monitors data residency, ensures compliance with PIPEDA and jurisdictional requirements',
+    domain: 'sovereignty',
+    enabled: true,
+    inputSignals: ['Data flow logs', 'Geo-routing paths', 'Jurisdiction tags', 'Compliance rules'],
+    outputActions: ['Sovereignty alerts', 'Route blocking', 'Compliance reports'],
+    kpisImpacted: ['sovereign-compute-ratio', 'sovereign-risk-score', 'compliance-score'],
+    workflowIds: ['wf-sovereignty-violation', 'wf-data-residency'],
   },
   {
     id: 'carbon-cost-agent',
@@ -155,6 +177,19 @@ export const REQUIRED_DC_AGENTS: DCAgentConfig[] = [
     workflowIds: ['wf-major-incident', 'wf-escalation', 'wf-post-mortem'],
   },
 ];
+
+// Map archetype agent IDs (underscores) to builder agent IDs (hyphens)
+export const ARCHETYPE_TO_BUILDER_AGENT_MAP: Record<string, string> = {
+  thermal_agent: 'thermal-guardian',
+  power_agent: 'power-ups-monitor',
+  cooling_agent: 'cooling-optimization',
+  network_agent: 'network-fabric',
+  facility_safety_agent: 'facility-safety',
+  workload_gpu_agent: 'workload-orchestrator',
+  sovereignty_agent: 'sovereignty-sentinel',
+  carbon_cost_agent: 'carbon-cost-agent',
+  incident_response_agent: 'incident-response',
+};
 
 // ============================================================================
 // DATA SOURCE CONFIGURATION (Builder Step 2)
@@ -205,7 +240,7 @@ export interface DCKPIConfig {
   enabled: boolean;
 }
 
-// Required KPIs per spec
+// Required KPIs per spec (9 KPIs including uptime)
 export const REQUIRED_DC_KPIS: DCKPIConfig[] = [
   { id: 'sovereign-compute-ratio', name: 'Sovereign Compute Ratio', unit: '%', description: 'Percentage of compute in sovereign jurisdiction', direction: 'higher_is_better', target: 100, warningThreshold: 90, criticalThreshold: 80, dataSourceId: 'compliance-policies', domain: 'sovereignty', enabled: true },
   { id: 'effective-ai-pue', name: 'Effective AI PUE', unit: '', description: 'Power Usage Effectiveness for AI workloads', direction: 'lower_is_better', target: 1.2, warningThreshold: 1.4, criticalThreshold: 1.6, dataSourceId: 'dcim-telemetry', domain: 'power', enabled: true },
@@ -215,6 +250,7 @@ export const REQUIRED_DC_KPIS: DCKPIConfig[] = [
   { id: 'dcie', name: 'DCIE', unit: '%', description: 'Data Center Infrastructure Efficiency', direction: 'higher_is_better', target: 85, warningThreshold: 70, criticalThreshold: 55, dataSourceId: 'dcim-telemetry', domain: 'power', enabled: true },
   { id: 'ups-runtime-remaining', name: 'UPS Runtime Remaining', unit: 'min', description: 'UPS battery backup runtime', direction: 'higher_is_better', target: 30, warningThreshold: 15, criticalThreshold: 10, dataSourceId: 'dcim-telemetry', domain: 'power', enabled: true },
   { id: 'redundancy-level', name: 'Redundancy Level', unit: '', description: 'Power redundancy (N, N+1, 2N)', direction: 'higher_is_better', target: 2, warningThreshold: 1, criticalThreshold: 0, dataSourceId: 'dcim-telemetry', domain: 'power', enabled: true },
+  { id: 'uptime', name: 'Uptime', unit: '%', description: 'System availability percentage', direction: 'higher_is_better', target: 99.99, warningThreshold: 99.9, criticalThreshold: 99.5, dataSourceId: 'dcim-telemetry', domain: 'power', enabled: true },
 ];
 
 // ============================================================================
@@ -427,6 +463,89 @@ export const DEFAULT_DEPLOYMENT_STEPS: DCDeploymentConfig['orchestratorSteps'] =
 ];
 
 // ============================================================================
+// FINANCIAL MODEL (Builder Step 5)
+// ============================================================================
+
+export interface DCFinancialModel {
+  annualPowerCostUsd: number;
+  annualCarbonTonnes: number;
+  upgradeSavingsPercent: number;
+  carbonSavingsPercent: number;
+  paybackYears: number;
+}
+
+export const DEFAULT_DC_FINANCIAL_MODEL: DCFinancialModel = {
+  annualPowerCostUsd: 2900000,
+  annualCarbonTonnes: 800,
+  upgradeSavingsPercent: 18,
+  carbonSavingsPercent: 27,
+  paybackYears: 5,
+};
+
+// ============================================================================
+// SCENARIO ID MAPPING (Archetype → Builder)
+// ============================================================================
+
+export const ARCHETYPE_TO_BUILDER_SCENARIO_MAP: Record<string, string> = {
+  // Generic mappings
+  gpu_spike_training_cluster: 'scenario-gpu-overload',
+  cooling_unit_degradation: 'scenario-cooling-stress',
+  ups_failure_generator_failover: 'scenario-grid-instability',
+  carbon_price_spike: 'scenario-carbon-shock',
+  grid_outage_battery_transition: 'scenario-grid-instability',
+  sovereignty_routing_violation: 'scenario-sovereignty-violation',
+  // Finance mappings
+  trading_peak_surge: 'scenario-gpu-overload',
+  // Retail mappings  
+  black_friday_peak_load: 'scenario-tenant-expansion',
+  flash_sale_gpu_spike: 'scenario-gpu-overload',
+  cooling_cascade_failure: 'scenario-cooling-stress',
+  cdn_origin_overload: 'scenario-gpu-overload',
+  // Government mappings
+  sovereignty_breach_attempt: 'scenario-sovereignty-violation',
+  classified_workload_spillover: 'scenario-sovereignty-violation',
+  grid_outage_critical_services: 'scenario-grid-instability',
+  thermal_excursion_secure_zone: 'scenario-cooling-stress',
+  emergency_evacuation_protocol: 'scenario-cooling-stress',
+  // SaaS mappings
+  training_job_surge: 'scenario-gpu-overload',
+  gpu_thermal_throttling: 'scenario-cooling-stress',
+  tenant_noisy_neighbor: 'scenario-tenant-expansion',
+  model_serving_spike: 'scenario-gpu-overload',
+  renewable_availability_drop: 'scenario-renewable-drop',
+  // Healthcare mappings
+  ehr_access_surge: 'scenario-gpu-overload',
+  imaging_storage_spike: 'scenario-tenant-expansion',
+  hipaa_audit_simulation: 'scenario-sovereignty-violation',
+  emergency_generator_test: 'scenario-grid-instability',
+  phi_sovereignty_violation: 'scenario-sovereignty-violation',
+  // Telco mappings
+  edge_site_overload: 'scenario-gpu-overload',
+  backhaul_congestion: 'scenario-gpu-overload',
+  distributed_cooling_failure: 'scenario-cooling-stress',
+  '5g_traffic_surge': 'scenario-gpu-overload',
+  renewable_grid_fluctuation: 'scenario-renewable-drop',
+  // Manufacturing mappings
+  production_line_surge: 'scenario-gpu-overload',
+  ot_network_isolation: 'scenario-sovereignty-violation',
+  scada_integration_failure: 'scenario-cooling-stress',
+  predictive_model_update: 'scenario-optimization-run',
+  shift_change_load_spike: 'scenario-tenant-expansion',
+  // Energy mappings
+  grid_frequency_deviation: 'scenario-grid-instability',
+  renewable_intermittency: 'scenario-renewable-drop',
+  demand_response_event: 'scenario-optimization-run',
+  battery_storage_cycle: 'scenario-optimization-run',
+  carbon_credit_optimization: 'scenario-carbon-shock',
+  // Education mappings
+  semester_end_compute_rush: 'scenario-gpu-overload',
+  research_grant_deadline: 'scenario-gpu-overload',
+  shared_cluster_contention: 'scenario-tenant-expansion',
+  data_intensive_experiment: 'scenario-gpu-overload',
+  conference_demo_preparation: 'scenario-optimization-run',
+};
+
+// ============================================================================
 // COMPLETE DC TWIN BUILDER STATE
 // ============================================================================
 
@@ -457,8 +576,9 @@ export interface DCTwinBuilderState {
   workflows: DCWorkflowConfig[];
   scenarios: DCScenarioConfig[];
   
-  // Step 5: Deployment
+  // Step 5: Deployment & Financial
   deployment: DCDeploymentConfig;
+  financial: DCFinancialModel;
   
   // Meta
   currentStep: number;
@@ -539,6 +659,8 @@ export function createDefaultDCTwinBuilderState(): DCTwinBuilderState {
       targetDeploymentRegion: 'ca-central-1',
       orchestratorSteps: [...DEFAULT_DEPLOYMENT_STEPS],
     },
+    
+    financial: { ...DEFAULT_DC_FINANCIAL_MODEL },
     
     currentStep: 1,
     completedSteps: [],

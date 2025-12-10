@@ -28,6 +28,7 @@ import { useBlueprintAgents } from '@/hooks/useBlueprintAgents';
 // DC-specific imports
 import { DCKPITile } from '@/components/dc-ui';
 import { DCCard } from '@/components/dc-ui';
+import { DCScannerPanel } from '@/components/dc-scan/DCScannerPanel';
 
 interface Metrics {
   roi: number;
@@ -489,6 +490,11 @@ export default function Dashboard() {
               </div>
             </Card>
           </Link>
+        </div>
+
+        {/* Green DC Twin Scanner */}
+        <div className="mb-8">
+          <DCScannerPanel />
         </div>
 
         {/* Twin Stats */}

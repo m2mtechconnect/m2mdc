@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
+import { useTwinContext } from '@/contexts/TwinContext';
 
 // Blueprint Tab Components
 import { BlueprintOverviewTab } from '@/components/blueprint/tabs/BlueprintOverviewTab';
@@ -38,7 +39,11 @@ export default function Blueprint() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { openWithQuestion } = useCoPilotContext();
-  const { blueprint, summary, isLoading, downloadBlueprint } = useBlueprint(id || 'default');
+  const { twin, twinId } = useTwinContext();
+  
+  // Use twin's blueprint_id if available, otherwise use URL param or 'default'
+  const blueprintId = twin?.blueprint_id || id || 'default';
+  const { blueprint, summary, isLoading, downloadBlueprint } = useBlueprint(blueprintId);
   
   // Read tab and highlight from query params
   const tabParam = searchParams.get('tab');
@@ -88,8 +93,8 @@ export default function Blueprint() {
                   <Server className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-semibold">{blueprint.name}</h1>
-                  <p className="text-sm text-muted-foreground">{blueprint.location}</p>
+                  <h1 className="text-2xl font-semibold">{twin?.name || blueprint.name}</h1>
+                  <p className="text-sm text-muted-foreground">{twin?.city || blueprint.location}</p>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2 mt-3">

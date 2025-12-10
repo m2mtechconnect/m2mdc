@@ -10,6 +10,9 @@ export { DomainHealthMap } from './DomainHealthMap';
 export { DependencyGraph } from './DependencyGraph';
 export { ChangeLogPanel } from './ChangeLogPanel';
 export { AgentHealthPanel } from './AgentHealthPanel';
+export { KPIEnhancementsPanel } from './KPIEnhancementsPanel';
+export { WorkflowEnhancementsPanel } from './WorkflowEnhancementsPanel';
+export { ScenarioEnhancementsPanel } from './ScenarioEnhancementsPanel';
 
 // Tab components
 export * from './tabs';

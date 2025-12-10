@@ -306,13 +306,15 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
           ? `Your organization operates one of the world's largest distributed retail infrastructures. This Twin optimizes both hyperscale data centres and retail edge workloads across thousands of sites.`
           : `AI-powered digital twin for ${recommendation.industry} operations with focus on sustainability and sovereignty.`;
         
-        // Map recommendation to overview
+        // Map recommendation to overview with customer name and industry
         const overview: DCTwinOverview = {
           ...defaultState.overview,
-          twinName: `Sovereign Green AI Data Centre Twin for ${recommendation.companyName || recommendation.domain}`,
+          twinName: `${recommendation.companyName} Sovereign Green AI Data Centre Twin`,
           twinSlug: `dc-twin-${(recommendation.companyName || recommendation.domain).toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+          customerName: recommendation.companyName,
+          siteUrl: recommendation.domain,
+          industry: recommendation.industryId || recommendation.industry,
           twinSummary: recommendation.objectives.join('. '),
-          description,
           siteUrl: recommendation.domain,
           industries: isMegaRetailer 
             ? ['Retail', 'Logistics', 'Supply Chain', 'Edge Computing', 'Sustainability']

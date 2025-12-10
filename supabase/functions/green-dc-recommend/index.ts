@@ -52,7 +52,8 @@ const MEGA_RETAILER_DOMAINS = [
 interface GreenDcTwinRecommendation {
   id: string;
   domain: string;
-  companyName?: string;
+  companyName: string; // Always populated - clean company name
+  industryId: string; // Normalized industry ID (retail, financial_services, etc.)
   industry: DcIndustry;
   businessModel?: string;
   archetypeId: DcTwinArchetypeId;
@@ -361,13 +362,95 @@ function detectConstraints(text: string): string[] {
   return constraints;
 }
 
-function extractCompanyName(text: string, domain: string): string {
-  const titleMatch = text.match(/^([^|–\-:]+)/);
-  if (titleMatch && titleMatch[1].length < 50) {
-    return titleMatch[1].trim();
+/**
+ * Robust company name extractor with priority order:
+ * 1. og:site_name or application-name meta tag
+ * 2. First segment of <title> (before | - :)
+ * 3. Domain root capitalized
+ * 
+ * Strips common junk patterns like "Skip to main content", brackets, "Welcome to..."
+ */
+function deriveCompanyName(html: string, text: string, domain: string): string {
+  // Helper to clean extracted names
+  const cleanName = (name: string): string | null => {
+    if (!name) return null;
+    let cleaned = name.trim();
+    
+    // Strip junk patterns
+    cleaned = cleaned
+      .replace(/^skip\s+to\s+(main\s+)?content\s*/i, "")
+      .replace(/^welcome\s+to\s+/i, "")
+      .replace(/\[.*?\]/g, "") // Remove [brackets]
+      .replace(/\(.*?\)/g, "") // Remove (parentheses)
+      .replace(/^\s*[-–—|:]\s*/, "") // Remove leading separators
+      .replace(/\s*[-–—|:]\s*$/, "") // Remove trailing separators
+      .trim();
+    
+    // Skip if too short, too long, or looks like junk
+    if (cleaned.length < 2 || cleaned.length > 60) return null;
+    if (/^(home|homepage|main|page|site|website|official)$/i.test(cleaned)) return null;
+    if (/^\d+$/.test(cleaned)) return null; // Just numbers
+    
+    return cleaned;
+  };
+  
+  // Priority 1: Try og:site_name meta tag
+  const ogSiteNameMatch = html.match(/<meta[^>]*property=["']og:site_name["'][^>]*content=["']([^"']+)["']/i) ||
+                          html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:site_name["']/i);
+  if (ogSiteNameMatch) {
+    const cleaned = cleanName(ogSiteNameMatch[1]);
+    if (cleaned) return cleaned;
   }
+  
+  // Priority 2: Try application-name meta tag
+  const appNameMatch = html.match(/<meta[^>]*name=["']application-name["'][^>]*content=["']([^"']+)["']/i) ||
+                       html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*name=["']application-name["']/i);
+  if (appNameMatch) {
+    const cleaned = cleanName(appNameMatch[1]);
+    if (cleaned) return cleaned;
+  }
+  
+  // Priority 3: First segment of title (before | - – — :)
+  const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+  if (titleMatch) {
+    // Split on common separators and take first part
+    const parts = titleMatch[1].split(/\s*[|–—\-:]\s*/);
+    for (const part of parts) {
+      const cleaned = cleanName(part);
+      if (cleaned) return cleaned;
+    }
+  }
+  
+  // Also try from extracted text (markdown or plain text)
+  const textTitleMatch = text.match(/^#?\s*([^\n|–\-:]+)/);
+  if (textTitleMatch) {
+    const cleaned = cleanName(textTitleMatch[1]);
+    if (cleaned && cleaned.length < 40) return cleaned;
+  }
+  
+  // Priority 4: Fallback to domain name
   const domainParts = domain.replace(/^www\./, "").split(".");
-  return domainParts[0].charAt(0).toUpperCase() + domainParts[0].slice(1);
+  const domainName = domainParts[0];
+  
+  // Capitalize properly (handle camelCase domains like "costco" → "Costco")
+  return domainName.charAt(0).toUpperCase() + domainName.slice(1);
+}
+
+// Legacy wrapper for backward compatibility
+function extractCompanyName(text: string, domain: string): string {
+  return deriveCompanyName("", text, domain);
+}
+
+/**
+ * Normalize raw industry detection to standard IndustryId
+ */
+function normalizeIndustryToId(industry: DcIndustry, businessModel?: string): string {
+  if (industry === "finance") return "financial_services";
+  if (industry === "government") return "public_sector";
+  if (industry === "saas") return "technology_saas";
+  if (industry === "education") return "ai_compute";
+  if (businessModel === "hyperscale_retail") return "retail";
+  return industry; // retail, healthcare, telecom, manufacturing, energy, generic
 }
 
 // Financial estimator
@@ -485,6 +568,7 @@ serve(async (req) => {
 
     // Crawl the website using Firecrawl if available, otherwise use simple fetch
     let extractedText = "";
+    let rawHtml = ""; // Keep raw HTML for company name extraction
     let pagesScanned = 1;
 
     try {
@@ -501,7 +585,7 @@ serve(async (req) => {
           },
           body: JSON.stringify({
             url: normalizedUrl,
-            formats: ["markdown"],
+            formats: ["markdown", "html"],
             onlyMainContent: true,
           }),
         });
@@ -509,6 +593,7 @@ serve(async (req) => {
         if (scrapeResponse.ok) {
           const scrapeData = await scrapeResponse.json();
           extractedText = scrapeData.markdown || scrapeData.data?.markdown || "";
+          rawHtml = scrapeData.html || scrapeData.data?.html || "";
           console.log(`[green-dc-recommend:${requestId}] Firecrawl extracted ${extractedText.length} chars`);
         }
       }
@@ -521,12 +606,12 @@ serve(async (req) => {
         });
         
         if (response.ok) {
-          const html = await response.text();
+          rawHtml = await response.text();
           // Extract title and meta description
-          const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-          const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i);
-          const h1Matches = html.match(/<h1[^>]*>([^<]+)<\/h1>/gi) || [];
-          const h2Matches = html.match(/<h2[^>]*>([^<]+)<\/h2>/gi) || [];
+          const titleMatch = rawHtml.match(/<title[^>]*>([^<]+)<\/title>/i);
+          const descMatch = rawHtml.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i);
+          const h1Matches = rawHtml.match(/<h1[^>]*>([^<]+)<\/h1>/gi) || [];
+          const h2Matches = rawHtml.match(/<h2[^>]*>([^<]+)<\/h2>/gi) || [];
           
           extractedText = [
             titleMatch ? titleMatch[1] : "",
@@ -536,7 +621,7 @@ serve(async (req) => {
           ].join(" ");
           
           // Also try to get text from body
-          const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+          const bodyMatch = rawHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
           if (bodyMatch) {
             const bodyText = bodyMatch[1]
               .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
@@ -565,10 +650,16 @@ serve(async (req) => {
     const regions = inferRegions(extractedText);
     const capacityTier = inferCapacityTier(extractedText, domain);
     const constraints = detectConstraints(extractedText);
-    const companyName = extractCompanyName(extractedText, domain);
+    
+    // Extract company name using robust extractor with HTML priority
+    const companyName = deriveCompanyName(rawHtml, extractedText, domain);
+    
+    // Normalize industry to standard ID
+    const industryId = normalizeIndustryToId(industry, businessModel);
+    
     const megaRetailer = isMegaRetailerDomain || isMegaRetailer(domain);
     
-    console.log(`[green-dc-recommend:${requestId}] Classification:`, { industry, businessModel, archetypeId, regions, capacityTier, megaRetailer });
+    console.log(`[green-dc-recommend:${requestId}] Classification:`, { industry, industryId, businessModel, archetypeId, regions, capacityTier, megaRetailer, companyName });
 
     // Get archetype configuration
     const archetype = GREEN_DC_ARCHETYPES[archetypeId];
@@ -587,6 +678,7 @@ serve(async (req) => {
       id: crypto.randomUUID(),
       domain,
       companyName,
+      industryId,
       industry,
       businessModel,
       archetypeId,

@@ -33,7 +33,8 @@ export type DcTwinArchetypeId =
 export interface GreenDcTwinRecommendation {
   id: string;
   domain: string;
-  companyName?: string;
+  companyName: string; // Clean company name (always populated)
+  industryId: string; // Normalized industry ID (retail, financial_services, etc.)
   industry: DcIndustry;
   businessModel?: string;
   archetypeId: DcTwinArchetypeId;

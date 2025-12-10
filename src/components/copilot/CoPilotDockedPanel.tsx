@@ -89,6 +89,7 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
   
   const { 
     context, 
+    updateContext,
     messages, 
     isStreaming, 
     sendMessage, 
@@ -98,31 +99,35 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
     setMemoryEnabled,
   } = useCoPilotContext();
   
-  // Build enhanced context with twin data
-  const enhancedContext = {
-    ...context,
-    twinId: activeTwinId,
-    twin: twin ? {
-      name: twin.name,
-      city: twin.city,
-      region: twin.region_code,
-      tier: twin.tier,
-      capacity_kw: twin.capacity_kw,
-      industry: twin.industry,
-      sovereignty_level: twin.sovereignty_level,
-      pue_target: twin.pue_target,
-    } : null,
-    location: location ? {
-      name: location.name,
-      city: location.city,
-      province: location.province,
-      country: location.country,
-      cloud_region: location.cloud_region,
-      provider_type: location.provider_type,
-      industry: location.industry,
-    } : null,
-    activeTab,
-  };
+  // Update CoPilot context when twin changes
+  useEffect(() => {
+    if (activeTwinId) {
+      updateContext({
+        agentId: activeTwinId,
+        twinId: activeTwinId,
+        twin: twin ? {
+          name: twin.name,
+          city: twin.city,
+          region: twin.region_code,
+          tier: twin.tier,
+          capacity_kw: twin.capacity_kw,
+          industry: twin.industry,
+          sovereignty_level: twin.sovereignty_level,
+          pue_target: twin.pue_target,
+        } : undefined,
+        location: location ? {
+          name: location.name,
+          city: location.city,
+          province: location.province,
+          country: location.country,
+          cloud_region: location.cloud_region,
+          provider_type: location.provider_type,
+          industry: location.industry,
+        } : undefined,
+      });
+    }
+  }, [activeTwinId, twin, location, updateContext]);
+  
 
   // Auto-scroll to bottom
   useEffect(() => {

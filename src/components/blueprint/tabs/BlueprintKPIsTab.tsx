@@ -1,5 +1,5 @@
 /**
- * Blueprint KPIs Tab - All KPIs defined in the blueprint
+ * Blueprint KPIs Tab - All KPIs defined in the blueprint with enhancement panel
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,6 +26,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { KPIEnhancementsPanel } from '../KPIEnhancementsPanel';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Info } from 'lucide-react';
 
 interface BlueprintKPIsTabProps {
   kpis: KpiBlueprint[];
@@ -44,6 +48,7 @@ const domainIcons: Record<string, React.ReactNode> = {
 
 export function BlueprintKPIsTab({ kpis }: BlueprintKPIsTabProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedKPI, setSelectedKPI] = useState<KpiBlueprint | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<string>('all');
 
   // Get unique domains
@@ -117,14 +122,20 @@ export function BlueprintKPIsTab({ kpis }: BlueprintKPIsTabProps) {
               {domainKPIs.map((kpi) => (
                 <div 
                   key={kpi.id}
-                  className="p-4 rounded-lg border bg-card hover:bg-muted/30 transition-colors"
+                  className="p-4 rounded-lg border bg-card hover:bg-muted/30 transition-colors cursor-pointer"
+                  onClick={() => setSelectedKPI(kpi)}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <Target className="h-4 w-4 text-primary" />
                       <p className="font-medium text-sm">{kpi.name}</p>
                     </div>
-                    <Badge variant="outline" className="text-xs">{kpi.unit}</Badge>
+                    <div className="flex items-center gap-1">
+                      <Badge variant="outline" className="text-xs">{kpi.unit}</Badge>
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); setSelectedKPI(kpi); }}>
+                        <Info className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
                   <p className="text-xs text-muted-foreground mb-3">{kpi.description}</p>
                   
@@ -167,6 +178,30 @@ export function BlueprintKPIsTab({ kpis }: BlueprintKPIsTabProps) {
           </CardContent>
         </Card>
       ))}
+
+      {/* KPI Enhancement Dialog */}
+      <Dialog open={!!selectedKPI} onOpenChange={(open) => !open && setSelectedKPI(null)}>
+        <DialogContent className="max-w-lg">
+          <KPIEnhancementsPanel 
+            kpi={selectedKPI ? {
+              id: selectedKPI.id,
+              name: selectedKPI.name,
+              value: selectedKPI.targetRange?.ideal || 0,
+              unit: selectedKPI.unit,
+              target: selectedKPI.targetRange?.ideal || 0,
+              warningThreshold: selectedKPI.targetRange?.min || 0,
+              criticalThreshold: (selectedKPI.targetRange?.min || 0) * 0.8,
+              trend: 'stable',
+              trendValue: 0,
+              why: `${selectedKPI.name} is critical for ${selectedKPI.domain} operations. ${selectedKPI.description}`,
+              impacts: selectedKPI.inputs || [],
+              workflows: [],
+              forecast: [],
+              autoRecommendations: [],
+            } : undefined}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

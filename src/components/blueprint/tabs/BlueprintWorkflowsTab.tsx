@@ -1,16 +1,21 @@
 /**
  * Blueprint Workflows Tab - All workflows and triggers
+ * Enhanced with Version Control and Simulation Preview
  */
 
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { 
   GitBranch, 
   Play,
   Pause,
   AlertTriangle,
   CheckCircle2,
-  ArrowRight
+  ArrowRight,
+  Eye,
+  History
 } from 'lucide-react';
 import type { WorkflowBlueprint } from '@/types/dataCentreBlueprint';
 import {
@@ -27,12 +32,24 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { WorkflowVersionControl } from '../WorkflowVersionControl';
+import { WorkflowSimulationPreview } from '../WorkflowSimulationPreview';
 
 interface BlueprintWorkflowsTabProps {
   workflows: WorkflowBlueprint[];
 }
 
 export function BlueprintWorkflowsTab({ workflows }: BlueprintWorkflowsTabProps) {
+  const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowBlueprint | null>(null);
+  const [showVersionControl, setShowVersionControl] = useState(false);
+  const [showSimulationPreview, setShowSimulationPreview] = useState(false);
+
   // Group workflows by domain
   const workflowsByDomain = workflows.reduce((acc, workflow) => {
     const domain = workflow.domain;
@@ -43,8 +60,30 @@ export function BlueprintWorkflowsTab({ workflows }: BlueprintWorkflowsTabProps)
     return acc;
   }, {} as Record<string, WorkflowBlueprint[]>);
 
+  const handleOpenVersionControl = (workflow: WorkflowBlueprint) => {
+    setSelectedWorkflow(workflow);
+    setShowVersionControl(true);
+  };
+
+  const handleOpenSimulationPreview = (workflow: WorkflowBlueprint) => {
+    setSelectedWorkflow(workflow);
+    setShowSimulationPreview(true);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Enhanced Controls Panel */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <WorkflowVersionControl 
+          workflowName={selectedWorkflow?.id.replace(/-/g, ' ').replace(/wf /i, '') || 'Select a workflow'}
+          onRollback={(versionId) => console.log('Rollback to:', versionId)}
+        />
+        <WorkflowSimulationPreview 
+          workflowName={selectedWorkflow?.id.replace(/-/g, ' ').replace(/wf /i, '') || 'Select a workflow'}
+          onApplyToProduction={() => console.log('Apply to production')}
+        />
+      </div>
+
       {/* Summary Table */}
       <Card>
         <CardHeader>
@@ -62,11 +101,16 @@ export function BlueprintWorkflowsTab({ workflows }: BlueprintWorkflowsTabProps)
                 <TableHead>Trigger</TableHead>
                 <TableHead>Actions</TableHead>
                 <TableHead>Auto</TableHead>
+                <TableHead className="text-right">Tools</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {workflows.map((workflow) => (
-                <TableRow key={workflow.id}>
+                <TableRow 
+                  key={workflow.id}
+                  className={selectedWorkflow?.id === workflow.id ? 'bg-primary/5' : ''}
+                  onClick={() => setSelectedWorkflow(workflow)}
+                >
                   <TableCell>
                     <p className="font-medium">{workflow.id.replace(/-/g, ' ').replace(/wf /i, '')}</p>
                   </TableCell>
@@ -94,7 +138,7 @@ export function BlueprintWorkflowsTab({ workflows }: BlueprintWorkflowsTabProps)
                   </TableCell>
                   <TableCell>
                     {workflow.autoRun ? (
-                      <div className="flex items-center gap-1 text-green-600">
+                      <div className="flex items-center gap-1 text-success">
                         <Play className="h-3 w-3" />
                         <span className="text-xs">Auto</span>
                       </div>
@@ -104,6 +148,34 @@ export function BlueprintWorkflowsTab({ workflows }: BlueprintWorkflowsTabProps)
                         <span className="text-xs">Manual</span>
                       </div>
                     )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenSimulationPreview(workflow);
+                        }}
+                        title="Preview Simulation"
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenVersionControl(workflow);
+                        }}
+                        title="Version History"
+                      >
+                        <History className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -139,24 +211,35 @@ export function BlueprintWorkflowsTab({ workflows }: BlueprintWorkflowsTabProps)
                             <p className="font-medium">{workflow.id.replace(/-/g, ' ').replace(/wf /i, '')}</p>
                             <p className="text-xs text-muted-foreground">Agent: {workflow.agentId}</p>
                           </div>
-                          {workflow.autoRun ? (
-                            <Badge className="bg-green-500/10 text-green-600 border-green-500/30">
-                              <Play className="h-3 w-3 mr-1" />
-                              Auto-run
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline">
-                              <Pause className="h-3 w-3 mr-1" />
-                              Manual
-                            </Badge>
-                          )}
+                          <div className="flex items-center gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-7 text-xs"
+                              onClick={() => handleOpenSimulationPreview(workflow)}
+                            >
+                              <Eye className="h-3 w-3 mr-1" />
+                              Preview
+                            </Button>
+                            {workflow.autoRun ? (
+                              <Badge className="bg-success/10 text-success border-success/30">
+                                <Play className="h-3 w-3 mr-1" />
+                                Auto-run
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline">
+                                <Pause className="h-3 w-3 mr-1" />
+                                Manual
+                              </Badge>
+                            )}
+                          </div>
                         </div>
 
                         <div className="space-y-3">
                           <div>
                             <p className="text-xs font-medium text-muted-foreground mb-1">Trigger Condition</p>
                             <div className="flex items-center gap-2">
-                              <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                              <AlertTriangle className="h-4 w-4 text-warning" />
                               <p className="text-sm">{workflow.triggerCondition}</p>
                             </div>
                           </div>
@@ -178,7 +261,7 @@ export function BlueprintWorkflowsTab({ workflows }: BlueprintWorkflowsTabProps)
                           <div>
                             <p className="text-xs font-medium text-muted-foreground mb-1">Recommended Mitigation</p>
                             <div className="flex items-center gap-2">
-                              <CheckCircle2 className="h-4 w-4 text-green-500" />
+                              <CheckCircle2 className="h-4 w-4 text-success" />
                               <p className="text-sm">{workflow.recommendedMitigation}</p>
                             </div>
                           </div>
@@ -205,6 +288,38 @@ export function BlueprintWorkflowsTab({ workflows }: BlueprintWorkflowsTabProps)
           </Accordion>
         </CardContent>
       </Card>
+
+      {/* Version Control Dialog */}
+      <Dialog open={showVersionControl} onOpenChange={setShowVersionControl}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Version History</DialogTitle>
+          </DialogHeader>
+          <WorkflowVersionControl 
+            workflowName={selectedWorkflow?.id.replace(/-/g, ' ').replace(/wf /i, '')}
+            onRollback={(versionId) => {
+              console.log('Rollback to:', versionId);
+              setShowVersionControl(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Simulation Preview Dialog */}
+      <Dialog open={showSimulationPreview} onOpenChange={setShowSimulationPreview}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Simulation Preview</DialogTitle>
+          </DialogHeader>
+          <WorkflowSimulationPreview 
+            workflowName={selectedWorkflow?.id.replace(/-/g, ' ').replace(/wf /i, '')}
+            onApplyToProduction={() => {
+              console.log('Apply to production');
+              setShowSimulationPreview(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

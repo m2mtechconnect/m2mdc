@@ -13,6 +13,8 @@ export { AgentHealthPanel } from './AgentHealthPanel';
 export { KPIEnhancementsPanel } from './KPIEnhancementsPanel';
 export { WorkflowEnhancementsPanel } from './WorkflowEnhancementsPanel';
 export { ScenarioEnhancementsPanel } from './ScenarioEnhancementsPanel';
+export { WorkflowVersionControl } from './WorkflowVersionControl';
+export { WorkflowSimulationPreview } from './WorkflowSimulationPreview';
 
 // Tab components
 export * from './tabs';

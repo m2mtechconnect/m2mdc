@@ -547,18 +547,35 @@ serve(async (req) => {
       );
     }
 
-    // Normalize URL
-    let normalizedUrl = url.trim();
-    if (!normalizedUrl.startsWith("http://") && !normalizedUrl.startsWith("https://")) {
-      normalizedUrl = `https://${normalizedUrl}`;
+    // Robust URL normalization - accepts any format
+    let normalizedUrl = url.trim()
+      .replace(/^(https?:\/\/)?/i, '') // Remove existing protocol
+      .replace(/^www\./i, '')          // Remove www prefix for normalization
+      .replace(/\/+$/, '')             // Remove trailing slashes
+      .split(/[?#]/)[0];               // Remove query params and hash for base URL
+    
+    // Clean up any remaining whitespace or invalid chars
+    normalizedUrl = normalizedUrl.replace(/\s+/g, '').toLowerCase();
+    
+    // Handle edge cases like "walmart" -> "walmart.com"
+    if (!normalizedUrl.includes('.')) {
+      // Try common TLDs
+      normalizedUrl = `${normalizedUrl}.com`;
     }
-
+    
+    // Add https protocol
+    normalizedUrl = `https://${normalizedUrl}`;
+    
     let urlObj: URL;
     try {
       urlObj = new URL(normalizedUrl);
-    } catch {
+    } catch (urlError) {
+      console.error(`[green-dc-recommend:${requestId}] URL parse error:`, urlError);
       return new Response(
-        JSON.stringify({ status: "error", message: "Invalid URL format" }),
+        JSON.stringify({ 
+          status: "error", 
+          message: `Invalid URL format: "${url}". Please enter a valid website (e.g., walmart.com, www.target.com, https://costco.com)` 
+        }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

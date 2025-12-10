@@ -315,7 +315,6 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
           siteUrl: recommendation.domain,
           industry: recommendation.industryId || recommendation.industry,
           twinSummary: recommendation.objectives.join('. '),
-          siteUrl: recommendation.domain,
           industries: isMegaRetailer 
             ? ['Retail', 'Logistics', 'Supply Chain', 'Edge Computing', 'Sustainability']
             : [recommendation.industry, 'Technology', 'IT Operations', 'Sustainability'],

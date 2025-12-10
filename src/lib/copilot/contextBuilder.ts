@@ -9,6 +9,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { generateDefaultBlueprint } from '@/data/defaultBlueprint';
 import { dcToolRegistry, type DcToolDefinition } from '@/data/dcToolRegistry';
 import { getSovereigntyEngine, mockDataAssets, mockDataFlows, mockSovereigntyPolicies, mockComplianceFrameworks } from '@/sovereignty';
+import { CarbonEngine, REGIONAL_CARBON_INTENSITY } from '@/engines/carbon';
+import { FinancialEngine, DEFAULT_FINANCIAL_ASSUMPTIONS } from '@/engines/financial';
 
 export interface SimulationTemplateContext {
   title: string;
@@ -135,6 +137,30 @@ export interface CoPilotContext {
     auditReadinessScore: number;
     riskLevel: string;
     primaryJurisdiction: string;
+  };
+  
+  // Carbon context for CoPilot awareness
+  carbonContext?: {
+    carbonPerGpuHour: number;
+    dailyEmissionsKg: number;
+    projectedAnnualEmissionsTons: number;
+    carbonEfficiencyScore: number;
+    renewablePercent: number;
+    regionCarbonIntensity: number;
+    region: string;
+  };
+  
+  // Financial context for CoPilot awareness
+  financialContext?: {
+    costPerGpuHour: number;
+    opexPerDay: number;
+    opexPerYear: number;
+    carbonCostImpactPerYear: number;
+    carbonCostPctOfOpex: number;
+    roiYears: number;
+    npv: number;
+    irr: number;
+    financialHealthScore: number;
   };
 }
 
@@ -267,6 +293,53 @@ export async function enrichWithBlueprint(
       primaryJurisdiction: 'CA-QC',
     };
     
+    // Build carbon context using CarbonEngine
+    const region = 'CA-QC';
+    const regionalFeed = REGIONAL_CARBON_INTENSITY[region];
+    const carbonInput = {
+      pue: 1.2,
+      powerKwh: 8500,
+      carbonIntensityGPerKwh: regionalFeed.carbonIntensityGPerKwh,
+      renewableMixPct: regionalFeed.renewablePercentage,
+      activeGpuCount: 384,
+    };
+    const carbonMetrics = CarbonEngine.evaluate(carbonInput);
+    
+    const carbonContext = {
+      carbonPerGpuHour: carbonMetrics.carbonPerGpuHour,
+      dailyEmissionsKg: carbonMetrics.dailyEmissionsKg,
+      projectedAnnualEmissionsTons: carbonMetrics.projectedAnnualEmissionsTons,
+      carbonEfficiencyScore: carbonMetrics.carbonEfficiencyScore,
+      renewablePercent: regionalFeed.renewablePercentage,
+      regionCarbonIntensity: regionalFeed.carbonIntensityGPerKwh,
+      region,
+    };
+    
+    // Build financial context using FinancialEngine
+    const financialInput = {
+      powerKwh: 8500,
+      pue: 1.2,
+      activeGpuCount: 384,
+      gpuHoursPerDay: 384 * 24 * 0.8, // 80% utilization
+      hourlyEmissionsKg: carbonMetrics.hourlyEmissionsKg,
+      assumptions: DEFAULT_FINANCIAL_ASSUMPTIONS,
+      capexTotal: 500_000_000,
+      expectedRevenuePerYear: 150_000_000,
+    };
+    const financialMetrics = FinancialEngine.evaluate(financialInput);
+    
+    const financialContext = {
+      costPerGpuHour: financialMetrics.costPerGpuHour,
+      opexPerDay: financialMetrics.opexPerDay,
+      opexPerYear: financialMetrics.opexPerYear,
+      carbonCostImpactPerYear: financialMetrics.carbonCostImpactPerYear,
+      carbonCostPctOfOpex: financialMetrics.carbonCostPctOfOpex,
+      roiYears: financialMetrics.roiYears,
+      npv: financialMetrics.npv,
+      irr: financialMetrics.irr,
+      financialHealthScore: financialMetrics.financialHealthScore,
+    };
+    
     return {
       ...context,
       agentName: blueprint.name,
@@ -276,6 +349,8 @@ export async function enrichWithBlueprint(
       integrationsCount: blueprint.integrations.length,
       availableTools,
       sovereigntyContext,
+      carbonContext,
+      financialContext,
     };
   } catch (error) {
     console.error('Failed to enrich context with blueprint:', error);

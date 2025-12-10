@@ -27,7 +27,7 @@ const InputSchema = z.object({
   industry: z.string().nullish(),
   department: z.string().nullish(),
   type: z.enum(['agent', 'process_twin', '3d_twin']).nullish(),
-  template_id: z.string().uuid().nullish(),
+  template_id: z.string().nullish(), // Accept both UUID and slug strings
 });
 
 serve(createHandler({

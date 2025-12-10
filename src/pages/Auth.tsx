@@ -122,7 +122,7 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex">
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] relative overflow-hidden items-center justify-center">
+      <div className="hidden lg:flex lg:w-3/5 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] relative overflow-hidden items-center justify-center">
         {/* AI/ML Animated Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {/* Base gradient glow orbs */}
@@ -189,7 +189,7 @@ export default function Auth() {
       </div>
 
       {/* Right Panel - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background">
+      <div className="w-full lg:w-2/5 flex items-center justify-center p-8 bg-background">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden mb-8 text-center">

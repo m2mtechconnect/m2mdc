@@ -172,9 +172,8 @@ export function Layout({ children }: LayoutProps) {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-1" aria-label="Main menu">
-              {allNavigation.map((item) => {
-                // Handle query string routes like /data-centre-twin?view=simulation
+            <nav className="hidden xl:flex items-center gap-0.5" aria-label="Main menu">
+              {coreNavigation.map((item) => {
                 const isActive = item.href.includes('?') 
                   ? location.pathname + location.search === item.href
                   : location.pathname === item.href;
@@ -185,13 +184,42 @@ export function Layout({ children }: LayoutProps) {
                         <Button
                           variant={isActive ? "secondary" : "ghost"}
                           size="sm"
-                          className={`gap-2 transition-smooth min-h-[44px] ${
-                            isActive ? "bg-primary/10 text-primary" : ""
+                          className={`gap-1.5 px-2.5 text-xs font-medium transition-smooth min-h-[36px] ${
+                            isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
                           }`}
                           aria-current={isActive ? "page" : undefined}
                         >
-                          <item.icon className="h-4 w-4" aria-hidden="true" />
-                          <span className="hidden xl:inline">{item.name}</span>
+                          <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
+                          <span className="whitespace-nowrap">{item.name}</span>
+                        </Button>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      <p>{item.name}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+              
+              {/* Separator */}
+              <div className="h-4 w-px bg-border mx-1" />
+              
+              {complianceNavigation.map((item) => {
+                const isActive = location.pathname === item.href;
+                return (
+                  <Tooltip key={item.name}>
+                    <TooltipTrigger asChild>
+                      <Link to={item.href}>
+                        <Button
+                          variant={isActive ? "secondary" : "ghost"}
+                          size="sm"
+                          className={`gap-1.5 px-2.5 text-xs font-medium transition-smooth min-h-[36px] ${
+                            isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
+                          }`}
+                          aria-current={isActive ? "page" : undefined}
+                        >
+                          <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
+                          <span className="whitespace-nowrap">{item.name}</span>
                         </Button>
                       </Link>
                     </TooltipTrigger>
@@ -213,15 +241,15 @@ export function Layout({ children }: LayoutProps) {
             <Button
               variant="outline"
               size="sm"
-              className="hidden lg:flex gap-2 text-muted-foreground min-h-[44px] hover:bg-accent/10 transition-smooth"
+              className="hidden xl:flex gap-1.5 text-muted-foreground min-h-[36px] hover:bg-accent/10 transition-smooth"
               aria-label="Open command palette"
             >
-              <Command className="h-4 w-4" aria-hidden="true" />
+              <Command className="h-3.5 w-3.5" aria-hidden="true" />
               <span className="text-xs">Ctrl+K</span>
             </Button>
 
             {/* User Menu - Desktop */}
-            <div className="hidden lg:block">
+            <div className="hidden xl:block">
               <UserMenu />
             </div>
 
@@ -229,7 +257,7 @@ export function Layout({ children }: LayoutProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="lg:hidden min-h-[44px] min-w-[44px] hover:bg-accent/10 transition-smooth group"
+              className="xl:hidden min-h-[44px] min-w-[44px] hover:bg-accent/10 transition-smooth group"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle mobile menu"
               aria-expanded={mobileMenuOpen}

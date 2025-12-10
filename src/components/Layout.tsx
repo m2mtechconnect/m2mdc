@@ -289,6 +289,11 @@ export function Layout({ children }: LayoutProps) {
           </SheetHeader>
 
           <nav className="mt-6 space-y-1" role="menu">
+            {/* Data Centre Selector - Mobile */}
+            <div className="px-3 mb-4">
+              <DataCentreSelector />
+            </div>
+            
             {/* Platform Section */}
             <div className="pb-4">
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">

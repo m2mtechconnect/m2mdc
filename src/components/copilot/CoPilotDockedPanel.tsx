@@ -21,6 +21,7 @@ import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useCoPilotCommands } from '@/contexts/CoPilotCommandContext';
 import { logCoPilotEvent } from '@/lib/copilot/analytics';
 import { getModelDisplayName, getModelVersion } from '@/lib/copilot/copilotConfig';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
 
 interface CoPilotDockedPanelProps {
   isOpen: boolean;
@@ -83,6 +84,9 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
   const { isDCPage, activeTab, pageContext } = useDCPageContext();
   const { executeCommand } = useCoPilotCommands();
   
+  // Get active twin context
+  const { activeTwinId, twin, location } = useActiveTwin();
+  
   const { 
     context, 
     messages, 
@@ -93,6 +97,32 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
     memoryEnabled,
     setMemoryEnabled,
   } = useCoPilotContext();
+  
+  // Build enhanced context with twin data
+  const enhancedContext = {
+    ...context,
+    twinId: activeTwinId,
+    twin: twin ? {
+      name: twin.name,
+      city: twin.city,
+      region: twin.region_code,
+      tier: twin.tier,
+      capacity_kw: twin.capacity_kw,
+      industry: twin.industry,
+      sovereignty_level: twin.sovereignty_level,
+      pue_target: twin.pue_target,
+    } : null,
+    location: location ? {
+      name: location.name,
+      city: location.city,
+      province: location.province,
+      country: location.country,
+      cloud_region: location.cloud_region,
+      provider_type: location.provider_type,
+      industry: location.industry,
+    } : null,
+    activeTab,
+  };
 
   // Auto-scroll to bottom
   useEffect(() => {

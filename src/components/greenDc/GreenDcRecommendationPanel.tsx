@@ -1,6 +1,7 @@
 /**
  * Green DC Twin Recommendation Panel
  * Displays industry-specific DC twin recommendations from URL scanning
+ * Creates location + twin when user clicks "Create Twin"
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,17 +10,20 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { toast } from "sonner";
 import type { GreenDcTwinRecommendation } from "@/types/greenDcTwin";
 import { AGENT_DISPLAY_NAMES, SCENARIO_DISPLAY_INFO } from "@/domain/greenDc/archetypes";
+import { useActiveTwin } from "@/context/ActiveTwinContext";
 import { 
   Leaf, Server, Zap, Thermometer, Shield, DollarSign, Play, FileText, 
-  ChevronDown, ChevronUp, Target, Globe, Building2, CheckCircle2 
+  ChevronDown, ChevronUp, Target, Globe, Building2, CheckCircle2, Loader2, Plus 
 } from "lucide-react";
 
 interface Props {
   rec: GreenDcTwinRecommendation;
   onOpenBlueprint?: () => void;
   onOpenSimulation?: () => void;
+  onTwinCreated?: (twinId: string) => void;
 }
 
 const industryLabels: Record<string, string> = {
@@ -42,10 +46,90 @@ const capacityLabels: Record<string, string> = {
   hyperscale: "Hyperscale (20MW+)"
 };
 
-export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulation }: Props) {
+export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulation, onTwinCreated }: Props) {
   const navigate = useNavigate();
   const [showAgents, setShowAgents] = useState(true);
   const [showScenarios, setShowScenarios] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  
+  const { createLocation, createTwin, setActiveTwin } = useActiveTwin();
+
+  // Capacity tier to kW mapping
+  const capacityMap: Record<string, number> = {
+    small: 500,
+    medium: 2500,
+    large: 10000,
+    hyperscale: 50000,
+  };
+
+  const handleCreateTwin = async () => {
+    setIsCreating(true);
+    try {
+      // Create location first
+      const region = rec.regions[0] || 'ca-central-1';
+      const city = region.includes('central') ? 'Montreal' : 
+                   region.includes('west') ? 'Vancouver' : 
+                   region.includes('east') ? 'Toronto' : 'Montreal';
+      
+      const location = await createLocation({
+        name: `${rec.companyName || rec.domain} - ${city}`,
+        city,
+        province: city === 'Montreal' ? 'Quebec' : city === 'Vancouver' ? 'BC' : 'Ontario',
+        country: 'Canada',
+        cloud_region: region,
+        provider_type: 'Hybrid',
+        industry: rec.industry,
+        capacity_kw: capacityMap[rec.capacityTier] || 5000,
+        tier: rec.kpiTargets.uptimeTargetPct >= 99.99 ? 'Tier IV' : 'Tier III',
+        tags: rec.detectedConstraints || [],
+      });
+      
+      if (!location) {
+        throw new Error('Failed to create location');
+      }
+      
+      // Create twin linked to location
+      const twin = await createTwin(location.id, {
+        name: `${rec.companyName || rec.domain} Green DC Twin`,
+        city,
+        region_code: region,
+        tier: rec.kpiTargets.uptimeTargetPct >= 99.99 ? 'Tier IV' : 'Tier III',
+        capacity_kw: capacityMap[rec.capacityTier] || 5000,
+        industry: rec.industry,
+        sovereignty_level: rec.detectedConstraints?.includes('sovereignty') ? 'sovereign' : 'standard',
+        pue_target: rec.kpiTargets.pueTarget,
+        renewable_target_pct: rec.kpiTargets.renewableShareTargetPct,
+        carbon_intensity: rec.kpiTargets.carbonIntensityTargetGPerKwh,
+        metadata: {
+          sourceUrl: rec.domain,
+          archetypeId: rec.archetypeId,
+          agents: rec.agents,
+          scenarios: rec.scenarios,
+          objectives: rec.objectives,
+          kpiTargets: rec.kpiTargets,
+          financialModel: rec.financialModel,
+        },
+      });
+      
+      if (!twin) {
+        throw new Error('Failed to create twin');
+      }
+      
+      // Set as active twin
+      setActiveTwin(twin.id);
+      
+      toast.success('Green Data Centre Twin created successfully!');
+      onTwinCreated?.(twin.id);
+      
+      // Navigate to builder for this twin
+      navigate(`/builder?twinId=${twin.id}`);
+    } catch (error) {
+      console.error('Failed to create twin:', error);
+      toast.error('Failed to create Data Centre Twin');
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
   const handleOpenBlueprint = () => {
     if (onOpenBlueprint) {
@@ -240,13 +324,17 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
 
         {/* CTAs */}
         <div className="flex gap-3 pt-2">
-          <Button onClick={handleOpenBlueprint} className="flex-1">
-            <FileText className="h-4 w-4 mr-2" />
-            Open Twin Blueprint
+          <Button onClick={handleCreateTwin} className="flex-1" disabled={isCreating}>
+            {isCreating ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Plus className="h-4 w-4 mr-2" />
+            )}
+            {isCreating ? 'Creating...' : 'Create Green DC Twin'}
           </Button>
           <Button onClick={handleRunSimulation} variant="outline" className="flex-1">
             <Play className="h-4 w-4 mr-2" />
-            Run Simulation
+            Preview Simulation
           </Button>
         </div>
       </CardContent>

@@ -9,6 +9,7 @@ export interface CarbonIntensityFeed {
   region: RegionCode;
   carbonIntensityGPerKwh: number;
   renewablePercentage: number;
+  gridType: 'hydro' | 'nuclear' | 'natural_gas' | 'coal' | 'mixed' | 'renewable';
   lastUpdated: string;
 }
 
@@ -40,47 +41,61 @@ export interface CarbonEngineInput {
 }
 
 // Regional carbon intensity data (gCO2/kWh)
-export const REGIONAL_CARBON_INTENSITY: Record<RegionCode, CarbonIntensityFeed> = {
+export const REGIONAL_CARBON_INTENSITY: Record<string, CarbonIntensityFeed> = {
   'CA-QC': {
     region: 'CA-QC',
     carbonIntensityGPerKwh: 15,      // Quebec: ~95% hydro
     renewablePercentage: 95,
+    gridType: 'hydro',
     lastUpdated: new Date().toISOString(),
   },
   'CA-ON': {
     region: 'CA-ON',
     carbonIntensityGPerKwh: 35,      // Ontario: mix of nuclear, hydro
     renewablePercentage: 75,
+    gridType: 'nuclear',
     lastUpdated: new Date().toISOString(),
   },
   'CA-AB': {
     region: 'CA-AB',
     carbonIntensityGPerKwh: 520,     // Alberta: natural gas heavy
     renewablePercentage: 15,
+    gridType: 'natural_gas',
     lastUpdated: new Date().toISOString(),
   },
   'CA-BC': {
     region: 'CA-BC',
     carbonIntensityGPerKwh: 12,      // BC: ~98% hydro
     renewablePercentage: 98,
+    gridType: 'hydro',
     lastUpdated: new Date().toISOString(),
   },
   'US-WEST': {
     region: 'US-WEST',
     carbonIntensityGPerKwh: 300,
     renewablePercentage: 40,
+    gridType: 'mixed',
     lastUpdated: new Date().toISOString(),
   },
   'US-EAST': {
     region: 'US-EAST',
     carbonIntensityGPerKwh: 400,
     renewablePercentage: 25,
+    gridType: 'mixed',
     lastUpdated: new Date().toISOString(),
   },
-  'EU': {
-    region: 'EU',
+  'EU-WEST': {
+    region: 'EU-WEST',
     carbonIntensityGPerKwh: 250,
     renewablePercentage: 45,
+    gridType: 'mixed',
+    lastUpdated: new Date().toISOString(),
+  },
+  'NORDIC': {
+    region: 'NORDIC',
+    carbonIntensityGPerKwh: 20,
+    renewablePercentage: 90,
+    gridType: 'renewable',
     lastUpdated: new Date().toISOString(),
   },
 };

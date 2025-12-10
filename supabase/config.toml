@@ -1,1 +1,4 @@
 project_id = "psfvrskpnwcshvajzeix"
+
+[functions.green-dc-recommend]
+verify_jwt = false

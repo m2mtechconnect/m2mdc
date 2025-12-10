@@ -371,10 +371,58 @@ function detectConstraints(text: string): string[] {
  * Strips common junk patterns like "Skip to main content", brackets, "Welcome to..."
  */
 function deriveCompanyName(html: string, text: string, domain: string): string {
+  // Known company name mappings for common domains
+  const KNOWN_COMPANIES: Record<string, string> = {
+    "walmart": "Walmart",
+    "target": "Target",
+    "costco": "Costco",
+    "amazon": "Amazon",
+    "bestbuy": "Best Buy",
+    "homedepot": "The Home Depot",
+    "lowes": "Lowe's",
+    "kroger": "Kroger",
+    "walgreens": "Walgreens",
+    "cvs": "CVS Health",
+    "apple": "Apple",
+    "microsoft": "Microsoft",
+    "google": "Google",
+    "meta": "Meta",
+    "netflix": "Netflix",
+    "disney": "Disney",
+    "nike": "Nike",
+    "starbucks": "Starbucks",
+    "mcdonalds": "McDonald's",
+    "chevron": "Chevron",
+    "shell": "Shell",
+    "exxonmobil": "ExxonMobil",
+    "jpmorgan": "JPMorgan Chase",
+    "bankofamerica": "Bank of America",
+    "wellsfargo": "Wells Fargo",
+    "citibank": "Citibank",
+    "fedex": "FedEx",
+    "ups": "UPS",
+    "tesla": "Tesla",
+    "ford": "Ford",
+    "gm": "General Motors",
+    "toyota": "Toyota",
+    "honda": "Honda",
+  };
+  
+  // Check known companies first (from domain)
+  const baseDomain = domain.replace(/^www\./, "").split(".")[0].toLowerCase();
+  if (KNOWN_COMPANIES[baseDomain]) {
+    return KNOWN_COMPANIES[baseDomain];
+  }
+  
   // Helper to clean extracted names
   const cleanName = (name: string): string | null => {
     if (!name) return null;
     let cleaned = name.trim();
+    
+    // Explicitly filter out garbage patterns
+    if (/^\*[\s\*]*\*?$/.test(cleaned)) return null; // "* * *" patterns
+    if (/^[\s\*\-_=\.]+$/.test(cleaned)) return null; // Only symbols
+    if (/^(loading|please wait|javascript|undefined|null)$/i.test(cleaned)) return null;
     
     // Strip junk patterns
     cleaned = cleaned
@@ -382,14 +430,16 @@ function deriveCompanyName(html: string, text: string, domain: string): string {
       .replace(/^welcome\s+to\s+/i, "")
       .replace(/\[.*?\]/g, "") // Remove [brackets]
       .replace(/\(.*?\)/g, "") // Remove (parentheses)
-      .replace(/^\s*[-–—|:]\s*/, "") // Remove leading separators
-      .replace(/\s*[-–—|:]\s*$/, "") // Remove trailing separators
+      .replace(/^\s*[-–—|:*]\s*/, "") // Remove leading separators including *
+      .replace(/\s*[-–—|:*]\s*$/, "") // Remove trailing separators including *
+      .replace(/\*+/g, "") // Remove asterisks
       .trim();
     
     // Skip if too short, too long, or looks like junk
     if (cleaned.length < 2 || cleaned.length > 60) return null;
     if (/^(home|homepage|main|page|site|website|official)$/i.test(cleaned)) return null;
     if (/^\d+$/.test(cleaned)) return null; // Just numbers
+    if (/^[\s\*\-_=\.]+$/.test(cleaned)) return null; // Re-check after cleaning
     
     return cleaned;
   };
@@ -428,11 +478,8 @@ function deriveCompanyName(html: string, text: string, domain: string): string {
     if (cleaned && cleaned.length < 40) return cleaned;
   }
   
-  // Priority 4: Fallback to domain name
-  const domainParts = domain.replace(/^www\./, "").split(".");
-  const domainName = domainParts[0];
-  
-  // Capitalize properly (handle camelCase domains like "costco" → "Costco")
+  // Priority 4: Fallback to domain name (properly capitalized)
+  const domainName = baseDomain;
   return domainName.charAt(0).toUpperCase() + domainName.slice(1);
 }
 

@@ -178,6 +178,10 @@ export function DCScannerPanel() {
           description: `Your ${recommendation.blueprintName} has been created.`
         });
         
+        // Initialize the DC Twin Builder Store from the recommendation
+        initializeFromRecommendation(recommendation, currentSessionId || newTwin.id);
+        setCurrentStep(1);
+        
         // Navigate to the builder with the new twin
         navigate(`/builder?twinId=${newTwin.id}&fromScanner=true`);
       }

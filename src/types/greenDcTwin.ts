@@ -20,6 +20,7 @@ export type DcCapacityTier = "small" | "medium" | "large" | "hyperscale";
 export type DcTwinArchetypeId =
   | "finance_core_banking_green_twin"
   | "retail_ecommerce_green_twin"
+  | "retail_hyperscale_green_twin"
   | "gov_sovereign_cloud_twin"
   | "saas_multitenant_ai_twin"
   | "healthcare_phi_twin"
@@ -54,6 +55,12 @@ export interface GreenDcTwinRecommendation {
     greenVariantSavingsCostPct: number;
     greenVariantSavingsCarbonPct: number;
     estimatedPaybackYears: number;
+    // Retail-specific fields (optional)
+    annualColdChainEnergyCostUsd?: number;
+    annualEdgeComputeEnergyCostUsd?: number;
+    fleetWideCarbonTaxRiskUsd?: number;
+    aiWorkloadOptimizationSavingsUsd?: number;
+    multiStoreAggregationCount?: number;
   };
   notes: string[];
   detectedConstraints?: string[]; // SOC2, GDPR, etc.

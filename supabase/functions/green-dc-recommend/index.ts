@@ -244,40 +244,45 @@ const GREEN_DC_ARCHETYPES: Record<DcTwinArchetypeId, {
 };
 
 // Classification functions
-function classifyIndustry(text: string): { industry: DcIndustry; businessModel?: string } {
+function classifyIndustry(text: string, domain: string): { industry: DcIndustry; businessModel?: string; isMegaRetailerDomain: boolean } {
   const lower = text.toLowerCase();
+  
+  // CRITICAL: Check domain first for mega-retailers (they may not have retail keywords in page content)
+  if (isMegaRetailer(domain)) {
+    return { industry: "retail", businessModel: "hyperscale_retail", isMegaRetailerDomain: true };
+  }
 
   if (lower.includes("core banking") || lower.includes("retail banking") || lower.includes("capital markets") || lower.includes("wealth management") || lower.includes("payment processing") || lower.includes("financial services")) {
-    return { industry: "finance", businessModel: "bank" };
+    return { industry: "finance", businessModel: "bank", isMegaRetailerDomain: false };
   }
   if (lower.includes("insurance") || lower.includes("policyholder") || lower.includes("underwriting")) {
-    return { industry: "finance", businessModel: "insurance" };
+    return { industry: "finance", businessModel: "insurance", isMegaRetailerDomain: false };
   }
   if (lower.includes("ministry") || lower.includes("government") || lower.includes("public sector") || lower.includes("federal agency") || lower.includes("municipal") || lower.includes("provincial") || lower.includes("state agency") || lower.includes(".gov")) {
-    return { industry: "government", businessModel: "public_sector" };
+    return { industry: "government", businessModel: "public_sector", isMegaRetailerDomain: false };
   }
   if (lower.includes("ehr") || lower.includes("electronic health record") || lower.includes("clinical data") || lower.includes("patient") || lower.includes("hospital") || lower.includes("healthcare") || lower.includes("medical") || lower.includes("hipaa") || lower.includes("phipa")) {
-    return { industry: "healthcare", businessModel: "health_system" };
+    return { industry: "healthcare", businessModel: "health_system", isMegaRetailerDomain: false };
   }
   if (lower.includes("5g") || lower.includes("telecom") || lower.includes("telecommunications") || lower.includes("carrier") || lower.includes("mobile network") || lower.includes("wireless")) {
-    return { industry: "telecom" };
+    return { industry: "telecom", isMegaRetailerDomain: false };
   }
   if (lower.includes("manufacturing") || lower.includes("factory") || lower.includes("iiot") || lower.includes("industrial iot") || lower.includes("production line") || lower.includes("supply chain") || lower.includes("assembly")) {
-    return { industry: "manufacturing" };
+    return { industry: "manufacturing", isMegaRetailerDomain: false };
   }
   if (lower.includes("energy") || lower.includes("utility") || lower.includes("power grid") || lower.includes("renewable") || lower.includes("solar") || lower.includes("wind power") || lower.includes("electricity")) {
-    return { industry: "energy" };
+    return { industry: "energy", isMegaRetailerDomain: false };
   }
   if (lower.includes("university") || lower.includes("research institute") || lower.includes("college") || lower.includes("academic") || lower.includes("higher education") || lower.includes(".edu")) {
-    return { industry: "education" };
+    return { industry: "education", isMegaRetailerDomain: false };
   }
   if (lower.includes("e-commerce") || lower.includes("ecommerce") || lower.includes("shopping cart") || lower.includes("retail") || lower.includes("online store") || lower.includes("marketplace")) {
-    return { industry: "retail", businessModel: "ecommerce" };
+    return { industry: "retail", businessModel: "ecommerce", isMegaRetailerDomain: false };
   }
   if (lower.includes("cloud") || lower.includes("saas") || lower.includes("software as a service") || lower.includes("platform") || lower.includes("api")) {
-    return { industry: "saas", businessModel: "enterprise_saas" };
+    return { industry: "saas", businessModel: "enterprise_saas", isMegaRetailerDomain: false };
   }
-  return { industry: "generic" };
+  return { industry: "generic", isMegaRetailerDomain: false };
 }
 
 function isMegaRetailer(domain: string): boolean {
@@ -554,14 +559,14 @@ serve(async (req) => {
       console.log(`[green-dc-recommend:${requestId}] Using domain-only classification`);
     }
 
-    // Run classification
-    const { industry, businessModel } = classifyIndustry(extractedText);
+    // Run classification - pass domain for mega-retailer detection
+    const { industry, businessModel, isMegaRetailerDomain } = classifyIndustry(extractedText, domain);
     const archetypeId = selectArchetype(industry, extractedText, domain);
     const regions = inferRegions(extractedText);
     const capacityTier = inferCapacityTier(extractedText, domain);
     const constraints = detectConstraints(extractedText);
     const companyName = extractCompanyName(extractedText, domain);
-    const megaRetailer = isMegaRetailer(domain);
+    const megaRetailer = isMegaRetailerDomain || isMegaRetailer(domain);
     
     console.log(`[green-dc-recommend:${requestId}] Classification:`, { industry, businessModel, archetypeId, regions, capacityTier, megaRetailer });
 

@@ -113,7 +113,7 @@ export function Step5Simulation() {
 
       {/* View Toggle */}
       <Tabs value={activeView} onValueChange={(v) => setActiveView(v as 'simulation' | 'facility' | 'blueprint')} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-dc-surface">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="simulation" className="flex items-center gap-2">
             <Activity className="h-4 w-4" />
             DC Simulation
@@ -179,21 +179,21 @@ export function Step5Simulation() {
               {/* Summary Stats */}
               {summary && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="p-3 bg-dc-surface rounded-lg border border-dc-border">
-                    <div className="text-xs text-dc-text-muted">Domains</div>
-                    <div className="text-lg font-semibold text-dc-text">{summary.enabledDomains}/{summary.totalDomains}</div>
+                  <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                    <div className="text-xs text-muted-foreground">Domains</div>
+                    <div className="text-lg font-semibold">{summary.enabledDomains}/{summary.totalDomains}</div>
                   </div>
-                  <div className="p-3 bg-dc-surface rounded-lg border border-dc-border">
-                    <div className="text-xs text-dc-text-muted">Agents</div>
-                    <div className="text-lg font-semibold text-dc-text">{summary.totalAgents}</div>
+                  <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                    <div className="text-xs text-muted-foreground">Agents</div>
+                    <div className="text-lg font-semibold">{summary.totalAgents}</div>
                   </div>
-                  <div className="p-3 bg-dc-surface rounded-lg border border-dc-border">
-                    <div className="text-xs text-dc-text-muted">KPIs</div>
-                    <div className="text-lg font-semibold text-dc-text">{summary.totalKpis}</div>
+                  <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                    <div className="text-xs text-muted-foreground">KPIs</div>
+                    <div className="text-lg font-semibold">{summary.totalKpis}</div>
                   </div>
-                  <div className="p-3 bg-dc-surface rounded-lg border border-dc-border">
-                    <div className="text-xs text-dc-text-muted">Scenarios</div>
-                    <div className="text-lg font-semibold text-dc-text">{summary.totalScenarios}</div>
+                  <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                    <div className="text-xs text-muted-foreground">Scenarios</div>
+                    <div className="text-lg font-semibold">{summary.totalScenarios}</div>
                   </div>
                 </div>
               )}
@@ -203,8 +203,8 @@ export function Step5Simulation() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-dc-text">{blueprint.name}</h4>
-                      <p className="text-sm text-dc-text-muted">{blueprint.location} • {blueprint.tier} • {blueprint.capacityKw}kW</p>
+                      <h4 className="font-medium">{blueprint.name}</h4>
+                      <p className="text-sm text-muted-foreground">{blueprint.location} • {blueprint.tier} • {blueprint.capacityKw}kW</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="text-xs">v{blueprint.version}</Badge>
@@ -213,8 +213,8 @@ export function Step5Simulation() {
 
                   {/* Quick Lists */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-3 bg-dc-surface rounded-lg border border-dc-border">
-                      <h5 className="text-xs font-medium text-dc-text-muted mb-2">Active Agents</h5>
+                    <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                      <h5 className="text-xs font-medium text-muted-foreground mb-2">Active Agents</h5>
                       <div className="flex flex-wrap gap-1">
                         {blueprint.agents.filter(a => a.status === 'active').slice(0, 5).map(a => (
                           <Badge key={a.id} variant="secondary" className="text-xs">{a.name}</Badge>
@@ -224,8 +224,8 @@ export function Step5Simulation() {
                         )}
                       </div>
                     </div>
-                    <div className="p-3 bg-dc-surface rounded-lg border border-dc-border">
-                      <h5 className="text-xs font-medium text-dc-text-muted mb-2">Enabled Workflows</h5>
+                    <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                      <h5 className="text-xs font-medium text-muted-foreground mb-2">Enabled Workflows</h5>
                       <div className="flex flex-wrap gap-1">
                         {blueprint.workflows.filter(w => w.enabled).slice(0, 5).map(w => (
                           <Badge key={w.id} variant="secondary" className="text-xs">{w.name}</Badge>
@@ -240,7 +240,7 @@ export function Step5Simulation() {
               )}
 
               {/* Actions */}
-              <div className="flex items-center gap-3 pt-4 border-t border-dc-border">
+              <div className="flex items-center gap-3 pt-4 border-t border-border">
                 <Button variant="outline" onClick={handleDownloadBlueprint} className="gap-2">
                   <Download className="h-4 w-4" />
                   Download JSON

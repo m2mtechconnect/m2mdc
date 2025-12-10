@@ -329,12 +329,12 @@ export function Step5Deploy() {
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-5 w-full bg-dc-surface">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-dc-primary/10">Overview</TabsTrigger>
-          <TabsTrigger value="blueprint" className="data-[state=active]:bg-dc-primary/10">Blueprint</TabsTrigger>
-          <TabsTrigger value="simulation" className="data-[state=active]:bg-dc-primary/10">Simulation</TabsTrigger>
-          <TabsTrigger value="version" className="data-[state=active]:bg-dc-primary/10">Versions</TabsTrigger>
-          <TabsTrigger value="governance" className="data-[state=active]:bg-dc-primary/10">Governance</TabsTrigger>
+        <TabsList className="grid grid-cols-5 w-full">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="blueprint">Blueprint</TabsTrigger>
+          <TabsTrigger value="simulation">Simulation</TabsTrigger>
+          <TabsTrigger value="version">Versions</TabsTrigger>
+          <TabsTrigger value="governance">Governance</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4 mt-4">
@@ -386,9 +386,9 @@ export function Step5Deploy() {
           {(['dev', 'staging', 'production'] as const).map((env) => {
             const isActive = deployingTo === env;
             const envConfig = {
-              dev: { label: 'Development', icon: Server, color: 'dc-info' },
-              staging: { label: 'Staging', icon: Cloud, color: 'dc-warning' },
-              production: { label: 'Production', icon: Rocket, color: 'dc-success' },
+              dev: { label: 'Development', icon: Server, color: 'info' },
+              staging: { label: 'Staging', icon: Cloud, color: 'warning' },
+              production: { label: 'Production', icon: Rocket, color: 'success' },
             }[env];
             const EnvIcon = envConfig.icon;
             
@@ -396,12 +396,12 @@ export function Step5Deploy() {
               <div 
                 key={env}
                 className={`p-4 rounded-lg border transition-all ${
-                  isActive ? 'border-dc-primary bg-dc-primary/10' : 'border-dc-border bg-dc-surface'
+                  isActive ? 'border-primary bg-primary/10' : 'border-border bg-muted/50'
                 }`}
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-10 h-10 rounded-lg bg-${envConfig.color}/10 flex items-center justify-center`}>
-                    <EnvIcon className={`h-5 w-5 text-${envConfig.color}`} />
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <EnvIcon className="h-5 w-5 text-primary" />
                   </div>
                   <div>
                     <p className="font-medium text-sm">{envConfig.label}</p>
@@ -430,9 +430,9 @@ export function Step5Deploy() {
       </DCCard>
 
       {/* Co-Pilot Integration */}
-      <DCCard className="bg-dc-surface/50">
+      <DCCard className="bg-muted/30">
         <div className="flex items-center gap-3">
-          <Sparkles className="h-4 w-4 text-dc-primary" />
+          <Sparkles className="h-4 w-4 text-primary" />
           <span className="text-sm text-muted-foreground">Ask Co-Pilot:</span>
           <div className="flex flex-wrap gap-2">
             {copilotQuestions.map((q, idx) => (
@@ -441,7 +441,7 @@ export function Step5Deploy() {
                 variant="ghost"
                 size="sm"
                 onClick={() => openWithQuestion(q.question)}
-                className="text-xs bg-dc-surface hover:bg-dc-surface/80"
+                className="text-xs bg-muted hover:bg-muted/80"
               >
                 <MessageCircle className="h-3 w-3 mr-1" />
                 {q.label}

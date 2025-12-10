@@ -86,10 +86,10 @@ export function Step4Workflow() {
 
       {/* Validation Warning */}
       {(workflow?.actions?.length || 0) === 0 && (
-        <div className="flex items-center gap-3 p-4 rounded-lg bg-dc-critical/10 border border-dc-critical/30">
-          <AlertCircle className="h-5 w-5 text-dc-critical flex-shrink-0" />
+        <div className="flex items-center gap-3 p-4 rounded-lg bg-destructive/10 border border-destructive/30">
+          <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0" />
           <div>
-            <p className="text-sm font-medium text-dc-critical">At least one action is required</p>
+            <p className="text-sm font-medium text-destructive">At least one action is required</p>
             <p className="text-xs text-muted-foreground">Add workflow actions to enable deployment</p>
           </div>
         </div>
@@ -100,13 +100,13 @@ export function Step4Workflow() {
         <DCCard
           title="Visual Workflow Editor"
           headerAction={
-            <Button variant="outline" size="sm" onClick={() => setShowEditor(false)} className="border-dc-border">
+            <Button variant="outline" size="sm" onClick={() => setShowEditor(false)}>
               Close Editor
             </Button>
           }
           noPadding
         >
-          <div className="h-[500px] border-t border-dc-border">
+          <div className="h-[500px] border-t border-border">
             <WorkflowEditor workflowId={builderId} systemId={builderId} />
           </div>
         </DCCard>
@@ -124,10 +124,10 @@ export function Step4Workflow() {
                 return (
                   <div
                     key={node.id}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-dc-surface border border-dc-border hover:border-dc-primary/30 transition-colors cursor-grab"
+                    className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border hover:border-primary/30 transition-colors cursor-grab"
                   >
-                    <div className={`w-9 h-9 rounded-lg bg-${node.color}/10 flex items-center justify-center`}>
-                      <IconComp className={`h-4 w-4 text-${node.color}`} />
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <IconComp className="h-4 w-4 text-primary" />
                     </div>
                     <div>
                       <p className="font-medium text-sm">{node.label}</p>
@@ -144,9 +144,9 @@ export function Step4Workflow() {
             <DCCard title="Configured Actions" icon={<Play className="h-4 w-4" />}>
               <div className="space-y-2">
                 {workflow.actions.map((action, idx) => (
-                  <div key={idx} className="flex items-center gap-3 p-3 rounded-lg bg-dc-surface border border-dc-border">
-                    <div className="w-8 h-8 rounded-full bg-dc-primary/10 flex items-center justify-center">
-                      <span className="text-sm font-mono font-medium text-dc-primary">{idx + 1}</span>
+                  <div key={idx} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <span className="text-sm font-mono font-medium text-primary">{idx + 1}</span>
                     </div>
                     <span className="text-sm">{action}</span>
                   </div>
@@ -156,7 +156,7 @@ export function Step4Workflow() {
           )}
 
           {/* Open Editor Button */}
-          <DCCard className="bg-dc-surface/50">
+          <DCCard className="bg-muted/30">
             <div className="space-y-4">
               <Button className="w-full" size="lg" onClick={() => setShowEditor(true)}>
                 <Play className="h-4 w-4 mr-2" />
@@ -184,7 +184,7 @@ export function Step4Workflow() {
             'Real-time validation',
           ].map((feature, idx) => (
             <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span className="w-1.5 h-1.5 rounded-full bg-dc-success" />
+              <span className="w-1.5 h-1.5 rounded-full bg-success" />
               {feature}
             </div>
           ))}

@@ -176,7 +176,6 @@ export function Step1Summary() {
         subtitle={type === 'agent' ? 'Agentic Intelligence' : type === '3d_twin' ? '3D Digital Twin' : 'Process Twin'}
         icon={<Bot className="h-5 w-5" />}
         status={currentBlueprint ? 'normal' : 'warning'}
-        className="border-primary/30"
       >
         <div className="space-y-4">
           <div>

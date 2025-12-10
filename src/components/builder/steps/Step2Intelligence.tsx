@@ -172,13 +172,12 @@ export function Step2Intelligence() {
           title="Agent Modes"
           subtitle="Enable advanced capabilities for complex reasoning"
           icon={<Sparkles className="h-4 w-4" />}
-          className="border-dc-primary/30"
         >
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-dc-surface border border-dc-border">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                  <Users className="h-4 w-4 text-purple-400" />
+                  <Users className="h-4 w-4 text-purple-500" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">Supervisor Agent</p>
@@ -188,10 +187,10 @@ export function Step2Intelligence() {
               <Switch checked={supervisorEnabled} onCheckedChange={handleSupervisorToggle} />
             </div>
             
-            <div className="flex items-center justify-between p-3 rounded-lg bg-dc-surface border border-dc-border">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                  <Search className="h-4 w-4 text-blue-400" />
+                  <Search className="h-4 w-4 text-blue-500" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">Deep Research Agent</p>
@@ -217,11 +216,11 @@ export function Step2Intelligence() {
                   key={sys.id}
                   className={`flex items-center gap-3 p-3 rounded-lg border transition-colors cursor-pointer ${
                     sys.enabled 
-                      ? 'bg-dc-primary/10 border-dc-primary/30' 
-                      : 'bg-dc-surface border-dc-border hover:border-dc-primary/30'
+                      ? 'bg-primary/10 border-primary/30' 
+                      : 'bg-muted/50 border-border hover:border-primary/30'
                   }`}
                 >
-                  <IconComp className={`h-4 w-4 ${sys.enabled ? 'text-dc-primary' : 'text-muted-foreground'}`} />
+                  <IconComp className={`h-4 w-4 ${sys.enabled ? 'text-primary' : 'text-muted-foreground'}`} />
                   <span className="text-sm font-medium">{sys.label}</span>
                 </div>
               );
@@ -239,21 +238,20 @@ export function Step2Intelligence() {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <Label>GPU Utilization Threshold</Label>
-                <span className="text-sm font-mono text-dc-gpu">{gpuUtilThreshold[0]}%</span>
+                <span className="text-sm font-mono text-primary">{gpuUtilThreshold[0]}%</span>
               </div>
               <Slider
                 value={gpuUtilThreshold}
                 onValueChange={setGpuUtilThreshold}
                 max={100}
                 step={5}
-                className="[&>span]:bg-dc-gpu"
               />
             </div>
 
             <div className="space-y-3">
               <div className="flex justify-between">
                 <Label>CPU Thermal Limit</Label>
-                <span className="text-sm font-mono text-dc-thermal">{cpuThermalLimit[0]}°C</span>
+                <span className="text-sm font-mono text-destructive">{cpuThermalLimit[0]}°C</span>
               </div>
               <Slider
                 value={cpuThermalLimit}
@@ -261,14 +259,13 @@ export function Step2Intelligence() {
                 max={100}
                 min={50}
                 step={5}
-                className="[&>span]:bg-dc-thermal"
               />
             </div>
 
             <div className="space-y-3">
               <div className="flex justify-between">
                 <Label>GPU Thermal Limit</Label>
-                <span className="text-sm font-mono text-dc-thermal">{gpuThermalLimit[0]}°C</span>
+                <span className="text-sm font-mono text-destructive">{gpuThermalLimit[0]}°C</span>
               </div>
               <Slider
                 value={gpuThermalLimit}
@@ -276,14 +273,13 @@ export function Step2Intelligence() {
                 max={100}
                 min={60}
                 step={5}
-                className="[&>span]:bg-dc-thermal"
               />
             </div>
 
             <div className="space-y-3">
               <div className="flex justify-between">
                 <Label>PUE Drift Alert Threshold</Label>
-                <span className="text-sm font-mono text-dc-power">{pueDriftThreshold[0].toFixed(2)}</span>
+                <span className="text-sm font-mono text-warning">{pueDriftThreshold[0].toFixed(2)}</span>
               </div>
               <Slider
                 value={pueDriftThreshold}
@@ -291,14 +287,13 @@ export function Step2Intelligence() {
                 max={0.5}
                 min={0.01}
                 step={0.01}
-                className="[&>span]:bg-dc-power"
               />
             </div>
 
             <div className="space-y-3">
               <div className="flex justify-between">
                 <Label>Carbon Intensity Alert (gCO₂e/kWh)</Label>
-                <span className="text-sm font-mono text-dc-success">{carbonThreshold[0]}</span>
+                <span className="text-sm font-mono text-success">{carbonThreshold[0]}</span>
               </div>
               <Slider
                 value={carbonThreshold}
@@ -306,14 +301,13 @@ export function Step2Intelligence() {
                 max={800}
                 min={100}
                 step={50}
-                className="[&>span]:bg-dc-success"
               />
             </div>
 
             <div className="space-y-2">
               <Label>Sovereignty Violation Sensitivity</Label>
               <Select value={sovereigntyLevel} onValueChange={(val: 'low' | 'medium' | 'high') => setSovereigntyLevel(val)}>
-                <SelectTrigger className="bg-dc-surface border-dc-border">
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -343,20 +337,20 @@ export function Step2Intelligence() {
         />
 
         <Tabs defaultValue="model" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-dc-surface">
-            <TabsTrigger value="model" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="model" className="flex items-center gap-2">
               <Brain className="h-4 w-4" />
               <span className="hidden sm:inline">Model</span>
             </TabsTrigger>
-            <TabsTrigger value="knowledge" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
+            <TabsTrigger value="knowledge" className="flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
               <span className="hidden sm:inline">Knowledge</span>
             </TabsTrigger>
-            <TabsTrigger value="behavior" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
+            <TabsTrigger value="behavior" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               <span className="hidden sm:inline">Behavior</span>
             </TabsTrigger>
-            <TabsTrigger value="advanced" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
+            <TabsTrigger value="advanced" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
               <span className="hidden sm:inline">Advanced</span>
             </TabsTrigger>
@@ -368,7 +362,7 @@ export function Step2Intelligence() {
                 <div className="space-y-2">
                   <Label>Model</Label>
                   <Select value={modelConfig.model} onValueChange={handleModelChange}>
-                    <SelectTrigger className="bg-dc-surface border-dc-border">
+                    <SelectTrigger>
                       <SelectValue placeholder="Select a model" />
                     </SelectTrigger>
                     <SelectContent>
@@ -381,7 +375,7 @@ export function Step2Intelligence() {
                   </Select>
                 </div>
 
-                <div className="grid gap-3 p-4 bg-dc-surface rounded-lg border border-dc-border">
+                <div className="grid gap-3 p-4 bg-muted/50 rounded-lg border border-border">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Context Window:</span>
                     <span className="font-mono">128K tokens</span>
@@ -392,7 +386,7 @@ export function Step2Intelligence() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Reasoning Mode:</span>
-                    <Badge className="bg-dc-success/10 text-dc-success border-dc-success/30">Fast & Balanced</Badge>
+                    <Badge className="bg-success/10 text-success border-success/30">Fast & Balanced</Badge>
                   </div>
                 </div>
               </div>

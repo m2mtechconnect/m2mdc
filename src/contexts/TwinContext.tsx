@@ -105,7 +105,7 @@ export function TwinProvider({ children }: TwinProviderProps) {
     
     return () => subscription.unsubscribe();
   }, []);
-  const { user } = useAuth();
+
   const [twinId, setTwinIdState] = useState<string | null>(() => {
     // Restore from localStorage
     if (typeof window !== 'undefined') {
@@ -132,7 +132,7 @@ export function TwinProvider({ children }: TwinProviderProps) {
 
   // Fetch all twins for the current user
   const refreshTwins = useCallback(async () => {
-    if (!user?.id) {
+    if (!userId) {
       setTwins([]);
       return;
     }
@@ -144,7 +144,7 @@ export function TwinProvider({ children }: TwinProviderProps) {
       const { data, error: fetchError } = await supabase
         .from('data_centre_twins')
         .select('*')
-        .eq('created_by_user', user.id)
+        .eq('created_by_user', userId)
         .order('created_at', { ascending: false });
 
       if (fetchError) throw fetchError;
@@ -155,7 +155,7 @@ export function TwinProvider({ children }: TwinProviderProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [user?.id]);
+  }, [userId]);
 
   // Fetch current twin details when twinId changes
   useEffect(() => {
@@ -197,15 +197,27 @@ export function TwinProvider({ children }: TwinProviderProps) {
 
   // Create a new twin
   const createTwin = useCallback(async (data: Partial<DataCentreTwin>): Promise<DataCentreTwin | null> => {
-    if (!user?.id) return null;
+    if (!userId) return null;
 
     try {
+      const insertData = {
+        name: data.name || 'New Twin',
+        city: data.city || 'Unknown',
+        region_code: data.region_code || 'ca-central-1',
+        tier: data.tier || 'III',
+        capacity_kw: data.capacity_kw || 1000,
+        created_by_user: userId,
+        industry: data.industry || 'technology',
+        pue_target: data.pue_target || 1.4,
+        renewable_target_pct: data.renewable_target_pct || 50,
+        carbon_intensity: data.carbon_intensity || 30,
+        sovereignty_level: data.sovereignty_level || 'standard',
+        metadata: data.metadata || {},
+      };
+
       const { data: newTwin, error: createError } = await supabase
         .from('data_centre_twins')
-        .insert({
-          ...data,
-          created_by_user: user.id,
-        })
+        .insert(insertData)
         .select()
         .single();
 
@@ -219,7 +231,7 @@ export function TwinProvider({ children }: TwinProviderProps) {
       console.error('Failed to create twin:', err);
       throw err;
     }
-  }, [user?.id, refreshTwins, setTwinId]);
+  }, [userId, refreshTwins, setTwinId]);
 
   // Update a twin
   const updateTwin = useCallback(async (id: string, data: Partial<DataCentreTwin>) => {

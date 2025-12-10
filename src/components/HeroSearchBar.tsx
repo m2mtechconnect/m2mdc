@@ -21,6 +21,8 @@ import { logger } from "@/lib/logger";
 import { useRecommendationsStore } from "@/stores/recommendationsStore";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { startBuilderFromUrl } from "@/lib/intake";
+import { useGreenDcRecommendation } from "@/hooks/useGreenDcRecommendation";
+import { GreenDcRecommendationPanel } from "./greenDc/GreenDcRecommendationPanel";
 
 export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (query: string) => void }) {
   const [searchResult, setSearchResult] = useState<any>(null);
@@ -41,6 +43,15 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
   const navigate = useNavigate();
   const { uiState, fetchRecommendations, fetchRecommendationsFromContent, reset: resetRecommendations, isLoading } = useRecommendations();
   const [currentUrl, setCurrentUrl] = useState("");
+  
+  // Green DC Twin Recommendation hook
+  const { 
+    recommendation: greenDcRecommendation, 
+    isLoading: greenDcLoading, 
+    error: greenDcError, 
+    fetchRecommendation: fetchGreenDcRecommendation,
+    reset: resetGreenDc
+  } = useGreenDcRecommendation();
   
   // Access cached recommendations from Zustand store
   const { generatedItems, lastGenerated } = useRecommendationsStore();
@@ -73,7 +84,7 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
       }
 
       const normalizedUrl = url.startsWith("http") ? url : `https://${url}`;
-      console.log("[HeroSearchBar] Starting URL analysis:", {
+      console.log("[HeroSearchBar] Starting Green DC URL analysis:", {
         url,
         normalizedUrl,
         force,
@@ -87,10 +98,11 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
       setCaptureError(null);
       setShowCachedRecommendations(false);
       
-      // Reset recommendations store to clear old data
+      // Reset recommendation states
       resetState();
+      resetGreenDc();
       
-      logger.debug("Starting unified intake from URL", {
+      logger.debug("Starting Green DC Twin recommendation from URL", {
         component: "HeroSearchBar",
         action: "handleUrlAnalysis",
         metadata: { normalizedUrl },
@@ -104,11 +116,11 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
           return;
         }
 
-        // Fetch recommendations instead of going directly to builder
-        toast.info("Scanning website for agent opportunities...");
-        await fetchRecommendations(normalizedUrl, force, deepIngest);
+        // Fetch Green DC Twin Recommendation
+        toast.info("Scanning website for Green Data Centre Twin recommendations...");
+        await fetchGreenDcRecommendation(normalizedUrl, force, deepIngest);
       } catch (error) {
-        console.error("[HeroSearchBar] Error during URL analysis:", error);
+        console.error("[HeroSearchBar] Error during Green DC URL analysis:", error);
         const errorMessage =
           error instanceof Error
             ? error.message
@@ -131,7 +143,7 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
         }
       }
     },
-    [navigate, resetState]
+    [navigate, resetState, resetGreenDc, fetchGreenDcRecommendation]
   );
 
   const handleManualContentSubmit = useCallback(
@@ -216,12 +228,52 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
       <SmartAgentInput
         onUrlAnalysis={(url, force, deepIngest) => handleUrlAnalysis(url, force || false, deepIngest || false)}
         onCoPilotQuery={onCoPilotQuery}
-        isAnalyzing={isLoading}
+        isAnalyzing={greenDcLoading}
       />
 
+      {/* Green DC Twin Recommendation - Primary Output */}
+      {greenDcLoading && (
+        <div className="mt-8 animate-fade-in">
+          <LoadingState domain={currentUrl} />
+        </div>
+      )}
 
-      {/* Recommendations UI States */}
-      {uiState.kind === "loading" && (
+      {greenDcError && !greenDcLoading && (
+        <div className="mt-8 animate-fade-in">
+          <ErrorState
+            message={greenDcError}
+            onRetry={() => handleUrlAnalysis(currentUrl, false)}
+            onForce={() => handleUrlAnalysis(currentUrl, true)}
+            onForceIngest={() => handleUrlAnalysis(currentUrl, true, true)}
+            onDifferentUrl={() => {
+              setCurrentUrl("");
+              resetGreenDc();
+            }}
+            onDiagnostics={() => setShowDiagnostics(true)}
+            onManualInput={() => setShowManualInput(true)}
+          />
+        </div>
+      )}
+
+      {greenDcRecommendation && !greenDcLoading && !greenDcError && (
+        <div className="mt-8 animate-fade-in">
+          <GreenDcRecommendationPanel
+            rec={greenDcRecommendation}
+            onOpenBlueprint={() => {
+              // Navigate to blueprint with recommendation data
+              navigate(`/blueprint/new?fromUrl=${encodeURIComponent(greenDcRecommendation.domain)}&industry=${greenDcRecommendation.industry}&archetype=${greenDcRecommendation.archetypeId}`);
+            }}
+            onOpenSimulation={() => {
+              // Navigate to simulation with recommended scenarios
+              const scenarioParams = greenDcRecommendation.scenarios.slice(0, 3).join(',');
+              navigate(`/data-centre-twin?view=simulation&scenarios=${encodeURIComponent(scenarioParams)}`);
+            }}
+          />
+        </div>
+      )}
+
+      {/* Legacy Recommendations UI States - hidden when Green DC is active */}
+      {!greenDcRecommendation && !greenDcLoading && !greenDcError && uiState.kind === "loading" && (
         <LoadingState domain={uiState.domain || currentUrl} />
       )}
 

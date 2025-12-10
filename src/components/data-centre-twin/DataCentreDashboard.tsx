@@ -262,7 +262,18 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
   };
 
   const handleChipClick = (chip: string) => {
-    console.log('Chip clicked:', chip);
+    const chipToTab: Record<string, string> = {
+      'PUE': 'power',
+      'GPU Load': 'workload',
+      'Thermals': 'thermal',
+      'Cooling': 'cooling',
+      'Simulation': 'simulation',
+      'Sovereignty': 'sovereignty',
+    };
+    const targetTab = chipToTab[chip];
+    if (targetTab) {
+      setActiveTab(targetTab);
+    }
   };
   
   return (

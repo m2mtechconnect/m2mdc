@@ -14,7 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { DeploymentProgressModal } from '@/components/deployment/DeploymentProgressModal';
 import { trackBuilderStep, trackDeployment, trackAnalytics } from '@/lib/analytics/analyticsService';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
-import { useTwinContext } from '@/contexts/TwinContext';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
 
 export default function Builder() {
   const [searchParams] = useSearchParams();
@@ -38,7 +38,7 @@ export default function Builder() {
   } = useWizardBuilderStore();
   const { toast } = useToast();
   const { updateContext } = useCoPilotContext();
-  const { createTwin, setTwinId } = useTwinContext();
+  const { twin, activeTwinId, createTwin, setActiveTwin } = useActiveTwin();
   const [isInitialized, setIsInitialized] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [showDeploymentProgress, setShowDeploymentProgress] = useState(false);
@@ -270,7 +270,8 @@ export default function Builder() {
     // Create a twin if deploying a DC twin type
     if (state.type === '3d_twin' || state.type === 'process_twin') {
       try {
-        const twin = await createTwin({
+        // Create twin without location (null for legacy support)
+        const newTwin = await createTwin(null, {
           name: state.goal || 'New Data Centre Twin',
           city: 'Montreal',
           region_code: 'QC',
@@ -283,11 +284,11 @@ export default function Builder() {
           },
         });
         
-        if (twin) {
-          setTwinId(twin.id);
+        if (newTwin) {
+          setActiveTwin(newTwin.id);
           toast({
             title: 'Twin Created',
-            description: `Data Centre Twin "${twin.name}" created successfully.`,
+            description: `Data Centre Twin "${newTwin.name}" created successfully.`,
           });
         }
       } catch (err) {

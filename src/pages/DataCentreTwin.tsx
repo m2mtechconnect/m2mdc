@@ -5,25 +5,29 @@
  */
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { DataCentreDashboard } from '@/components/data-centre-twin';
 import { sovereignQCFacility } from '@/twins/dataCenter/mockData';
-import { useTwinContext } from '@/contexts/TwinContext';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { EmptyStateSelectTwin } from '@/components/twin-selector';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 export default function DataCentreTwin() {
   const { id } = useParams<{ id?: string }>();
-  const { twin, setTwinId, isLoading: twinLoading } = useTwinContext();
+  const [searchParams] = useSearchParams();
+  const { twin, activeTwinId, setActiveTwin, isLoading } = useActiveTwin();
   const [facility, setFacility] = useState<DataCentreFacility | null>(null);
   
   // Set twin from URL param if provided
   useEffect(() => {
-    if (id) {
-      setTwinId(id);
+    if (id && id !== activeTwinId) {
+      setActiveTwin(id);
     }
-  }, [id, setTwinId]);
+  }, [id, activeTwinId, setActiveTwin]);
   
   useEffect(() => {
+    if (!twin) return;
+    
     // Update page title with current twin name
     const twinName = twin?.name || 'Sovereign AI Facility';
     document.title = `Data Centre Twin | ${twinName}`;
@@ -40,7 +44,8 @@ export default function DataCentreTwin() {
     setFacility(enhancedFacility);
   }, [twin]);
   
-  if (!facility || twinLoading) {
+  // Loading state
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px] bg-background">
         <div className="flex flex-col items-center gap-4">
@@ -51,7 +56,33 @@ export default function DataCentreTwin() {
             </div>
           </div>
           <p className="text-sm text-muted-foreground font-mono animate-pulse">
-            {twinLoading ? 'Loading Twin Data...' : 'Initializing Data Centre Twin...'}
+            Loading Twin Data...
+          </p>
+        </div>
+      </div>
+    );
+  }
+  
+  // No twin selected - show empty state
+  if (!activeTwinId || !twin) {
+    return (
+      <EmptyStateSelectTwin 
+        title="Select a Data Centre"
+        description="Choose a data centre from the header dropdown to view the digital twin dashboard, simulations, and blueprints."
+      />
+    );
+  }
+  
+  // Facility not yet loaded
+  if (!facility) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px] bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary/20 border-t-primary"></div>
+          </div>
+          <p className="text-sm text-muted-foreground font-mono animate-pulse">
+            Initializing Data Centre Twin...
           </p>
         </div>
       </div>

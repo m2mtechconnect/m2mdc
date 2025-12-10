@@ -9,7 +9,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { UnifiedIntakeModal } from '@/components/dashboard/UnifiedIntakeModal';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
-import { useTwinContext } from '@/contexts/TwinContext';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
 import HeroSearchBar from "@/components/HeroSearchBar";
 import { SystemDetailsDrawer } from '@/components/SystemDetailsDrawer';
 import { SystemDeleteDialog } from '@/components/SystemDeleteDialog';
@@ -68,7 +68,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { updateContext, askCoPilot } = useCoPilotContext();
-  const { twins, twin, twinId, isLoading: twinsLoading } = useTwinContext();
+  const { twin, activeTwinId, twins, isLoading: twinsLoading } = useActiveTwin();
   const [selectedSystem, setSelectedSystem] = useState<string | null>(null);
   const [deleteSystemId, setDeleteSystemId] = useState<string | null>(null);
   const [deleteSystemName, setDeleteSystemName] = useState<string>('');

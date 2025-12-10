@@ -1,6 +1,6 @@
 /**
  * Hook to fetch agent definitions from the database
- * Replaces useBlueprintAgents for the ManageAgents page
+ * Supports twin-scoped queries when twinId is provided
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,14 +15,21 @@ interface AgentDefinitionsStats {
   avgRoi: number;
 }
 
-export function useAgentDefinitionsData() {
+export function useAgentDefinitionsData(twinId?: string) {
   const query = useQuery({
-    queryKey: ['agent-definitions-grid'],
+    queryKey: ['agent-definitions-grid', twinId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let queryBuilder = supabase
         .from('agent_definitions')
         .select('*')
         .order('created_at', { ascending: false });
+      
+      // Scope to twin if twinId provided
+      if (twinId) {
+        queryBuilder = queryBuilder.eq('twin_id', twinId);
+      }
+
+      const { data, error } = await queryBuilder;
 
       if (error) throw error;
       return data || [];

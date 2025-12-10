@@ -22,7 +22,8 @@ import { useRecommendationsStore } from "@/stores/recommendationsStore";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { startBuilderFromUrl } from "@/lib/intake";
 import { useGreenDcRecommendation } from "@/hooks/useGreenDcRecommendation";
-import { GreenDcRecommendationPanel } from "./greenDc/GreenDcRecommendationPanel";
+import { BuilderRecommendationPanel } from "./greenDc/BuilderRecommendationPanel";
+import { useDCTwinBuilderStore } from "@/stores/dcTwinBuilderStore";
 import { LastScanBanner } from "./dc-scan/LastScanBanner";
 import { useLastScanSession } from "@/hooks/useDCScanSessions";
 
@@ -285,16 +286,15 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
 
       {greenDcRecommendation && !greenDcLoading && !greenDcError && (
         <div className="mt-8 animate-fade-in">
-          <GreenDcRecommendationPanel
-            rec={greenDcRecommendation}
+          <BuilderRecommendationPanel
             onOpenBlueprint={() => {
-              // Navigate to blueprint with recommendation data
-              navigate(`/blueprint/new?fromUrl=${encodeURIComponent(greenDcRecommendation.domain)}&industry=${greenDcRecommendation.industry}&archetype=${greenDcRecommendation.archetypeId}`);
+              // Navigate to blueprint - builder state is already populated
+              const { overview } = useDCTwinBuilderStore.getState();
+              navigate(`/blueprint/new?fromUrl=${encodeURIComponent(overview.siteUrl || '')}&industry=${overview.industries[0] || ''}`);
             }}
             onOpenSimulation={() => {
-              // Navigate to simulation with recommended scenarios
-              const scenarioParams = greenDcRecommendation.scenarios.slice(0, 3).join(',');
-              navigate(`/data-centre-twin?view=simulation&scenarios=${encodeURIComponent(scenarioParams)}`);
+              // Navigate to simulation - scenarios come from builder
+              navigate(`/data-centre-twin?view=simulation`);
             }}
           />
         </div>

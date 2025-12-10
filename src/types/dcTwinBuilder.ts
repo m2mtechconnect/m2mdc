@@ -17,6 +17,7 @@ export interface DCTwinOverview {
   twinSlug: string;
   twinSummary: string;
   description: string;
+  siteUrl?: string; // Source URL from scanner
   
   // Classification
   industries: string[];
@@ -610,6 +611,7 @@ export function createDefaultDCTwinBuilderState(): DCTwinBuilderState {
       twinSlug: 'sovereign-green-ai-dc-twin',
       twinSummary: '',
       description: 'AI-powered digital twin for sovereign, sustainable data centre operations',
+      siteUrl: undefined,
       industries: ['Government', 'Technology', 'IT Operations', 'Sustainability'],
       primaryUseCases: ['PUE Optimization', 'Carbon Tracking', 'Sovereignty Compliance', 'Capacity Planning'],
       targetAudience: ['Data Centre Operations Teams', 'Sustainability Officers', 'IT Directors', 'Compliance Teams'],

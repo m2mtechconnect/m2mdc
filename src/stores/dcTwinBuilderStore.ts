@@ -2,6 +2,7 @@
  * DC Twin Builder Store
  * Zustand store for Sovereign Green AI Data Centre Twin builder state
  * Single source of truth for all builder tabs and steps
+ * Includes auto-creation mechanism for required entities
  */
 
 import { create } from 'zustand';
@@ -85,10 +86,142 @@ interface DCTwinBuilderActions {
 
 type DCTwinBuilderStore = DCTwinBuilderState & DCTwinBuilderActions;
 
+// ============================================================================
+// AUTO-CREATION MECHANISM FOR REQUIRED ENTITIES
+// ============================================================================
+
+/**
+ * Ensures all required entities (KPIs, agents, workflows, scenarios) exist in state.
+ * If any required entity is missing, it will be auto-created with default config.
+ * This function does NOT overwrite existing entries.
+ */
+function ensureRequiredEntities(state: DCTwinBuilderState): DCTwinBuilderState {
+  let updated = { ...state };
+  let hasChanges = false;
+
+  // 1. Ensure all required KPIs exist
+  const existingKpiIds = new Set(updated.kpis.map(k => k.id));
+  const missingKpis = REQUIRED_DC_KPIS.filter(k => !existingKpiIds.has(k.id));
+  if (missingKpis.length > 0) {
+    updated.kpis = [...updated.kpis, ...missingKpis];
+    hasChanges = true;
+    console.log('[DCTwinBuilder] Auto-created missing KPIs:', missingKpis.map(k => k.id));
+  }
+
+  // 2. Ensure all required agents exist
+  const existingAgentIds = new Set(updated.agents.map(a => a.id));
+  const missingAgents = REQUIRED_DC_AGENTS.filter(a => !existingAgentIds.has(a.id));
+  if (missingAgents.length > 0) {
+    updated.agents = [...updated.agents, ...missingAgents];
+    hasChanges = true;
+    console.log('[DCTwinBuilder] Auto-created missing agents:', missingAgents.map(a => a.id));
+  }
+
+  // 3. Ensure all required workflows exist
+  const existingWorkflowIds = new Set(updated.workflows.map(w => w.id));
+  const missingWorkflows = REQUIRED_DC_WORKFLOWS.filter(w => !existingWorkflowIds.has(w.id));
+  if (missingWorkflows.length > 0) {
+    updated.workflows = [...updated.workflows, ...missingWorkflows];
+    hasChanges = true;
+    console.log('[DCTwinBuilder] Auto-created missing workflows:', missingWorkflows.map(w => w.id));
+  }
+
+  // 4. Ensure all required scenarios exist
+  const existingScenarioIds = new Set(updated.scenarios.map(s => s.id));
+  const missingScenarios = REQUIRED_DC_SCENARIOS.filter(s => !existingScenarioIds.has(s.id));
+  if (missingScenarios.length > 0) {
+    updated.scenarios = [...updated.scenarios, ...missingScenarios];
+    hasChanges = true;
+    console.log('[DCTwinBuilder] Auto-created missing scenarios:', missingScenarios.map(s => s.id));
+  }
+
+  // 5. Ensure all required data sources exist
+  const existingDataSourceIds = new Set(updated.dataSources.map(ds => ds.id));
+  const missingDataSources = REQUIRED_DC_DATA_SOURCES.filter(ds => !existingDataSourceIds.has(ds.id));
+  if (missingDataSources.length > 0) {
+    updated.dataSources = [...updated.dataSources, ...missingDataSources];
+    hasChanges = true;
+    console.log('[DCTwinBuilder] Auto-created missing data sources:', missingDataSources.map(ds => ds.id));
+  }
+
+  // 6. Ensure deployment checks are populated
+  if (updated.deployment.deploymentChecks.length === 0) {
+    updated.deployment = {
+      ...updated.deployment,
+      deploymentChecks: calculateDeploymentChecks(updated),
+    };
+    hasChanges = true;
+    console.log('[DCTwinBuilder] Auto-created deployment checks');
+  }
+
+  if (hasChanges) {
+    updated.isDirty = true;
+  }
+
+  return updated;
+}
+
+/**
+ * Calculate deployment checks based on current state
+ */
+function calculateDeploymentChecks(state: DCTwinBuilderState) {
+  const checks = [
+    {
+      id: 'check-region-selected',
+      name: 'Target Region Selected',
+      category: 'sovereignty' as const,
+      status: state.deployment.targetDeploymentRegion ? 'pass' : 'pending',
+      requiresConfigAction: !state.deployment.targetDeploymentRegion,
+    },
+    {
+      id: 'check-agents-enabled',
+      name: 'Core Agents Enabled',
+      category: 'workflows' as const,
+      status: state.agents.filter((a) => a.enabled).length >= 3 ? 'pass' : 'pending',
+      requiresConfigAction: state.agents.filter((a) => a.enabled).length < 3,
+    },
+    {
+      id: 'check-data-sources',
+      name: 'Data Sources Connected',
+      category: 'telemetry' as const,
+      status: state.dataSources.filter((ds) => ds.enabled).length >= 3 ? 'pass' : 'pending',
+      requiresConfigAction: state.dataSources.filter((ds) => ds.enabled).length < 3,
+    },
+    {
+      id: 'check-kpis-configured',
+      name: 'KPIs Configured',
+      category: 'kpis' as const,
+      status: state.kpis.filter((k) => k.enabled).length >= 5 ? 'pass' : 'pending',
+      requiresConfigAction: state.kpis.filter((k) => k.enabled).length < 5,
+    },
+    {
+      id: 'check-workflows-enabled',
+      name: 'Workflows Enabled',
+      category: 'workflows' as const,
+      status: state.workflows.filter((w) => w.enabled).length >= 2 ? 'pass' : 'pending',
+      requiresConfigAction: state.workflows.filter((w) => w.enabled).length < 2,
+    },
+    {
+      id: 'check-sovereignty',
+      name: 'Sovereignty Compliance',
+      category: 'sovereignty' as const,
+      status: state.overview.sovereignCompliance ? 'pass' : 'pending',
+      requiresConfigAction: !state.overview.sovereignCompliance,
+    },
+  ];
+
+  return checks as DCTwinBuilderState['deployment']['deploymentChecks'];
+}
+
+// ============================================================================
+// STORE IMPLEMENTATION
+// ============================================================================
+
 export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
   persist(
     (set, get) => ({
-      ...createDefaultDCTwinBuilderState(),
+      // Initialize with ensured entities
+      ...ensureRequiredEntities(createDefaultDCTwinBuilderState()),
 
       // =====================================================================
       // INITIALIZATION
@@ -112,17 +245,11 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
           kpisImproved: recommendation.mainKPIs,
         };
 
-        // Calculate deployment checks based on configuration
-        const deploymentChecks = calculateDeploymentChecks(defaultState);
-
-        set({
+        // Create base state with updated overview
+        const baseState: DCTwinBuilderState = {
           ...defaultState,
           sessionId,
           overview,
-          deployment: {
-            ...defaultState.deployment,
-            deploymentChecks,
-          },
           sourceRecommendation: {
             url: recommendation.url,
             detectedIndustry: recommendation.detectedIndustry,
@@ -130,17 +257,32 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
           },
           isDirty: true,
           lastSaved: null,
-        });
+        };
+
+        // Ensure all required entities exist and calculate deployment checks
+        const ensuredState = ensureRequiredEntities(baseState);
+        ensuredState.deployment.deploymentChecks = calculateDeploymentChecks(ensuredState);
+
+        set(ensuredState);
       },
 
       initializeFromScratch: () => {
         console.log('[DCTwinBuilder] Initializing from scratch');
-        set(createDefaultDCTwinBuilderState());
+        const baseState = createDefaultDCTwinBuilderState();
+        const ensuredState = ensureRequiredEntities(baseState);
+        ensuredState.deployment.deploymentChecks = calculateDeploymentChecks(ensuredState);
+        set(ensuredState);
       },
 
       loadFromStorage: () => {
         // This is handled by the persist middleware
-        console.log('[DCTwinBuilder] State loaded from storage');
+        // After loading, ensure required entities exist
+        const currentState = get();
+        const ensuredState = ensureRequiredEntities(currentState);
+        if (ensuredState !== currentState) {
+          set(ensuredState);
+        }
+        console.log('[DCTwinBuilder] State loaded from storage and validated');
       },
 
       // =====================================================================
@@ -339,7 +481,10 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
       
       reset: () => {
         console.log('[DCTwinBuilder] Resetting state');
-        set(createDefaultDCTwinBuilderState());
+        const baseState = createDefaultDCTwinBuilderState();
+        const ensuredState = ensureRequiredEntities(baseState);
+        ensuredState.deployment.deploymentChecks = calculateDeploymentChecks(ensuredState);
+        set(ensuredState);
       },
 
       // =====================================================================
@@ -409,8 +554,15 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
           twin: {
             name: state.overview.twinName,
             slug: state.overview.twinSlug,
+            summary: state.overview.twinSummary,
             description: state.overview.description,
             industries: state.overview.industries,
+            primaryUseCases: state.overview.primaryUseCases,
+            targetAudience: state.overview.targetAudience,
+            displayRoi: state.overview.displayRoi,
+            displayTimeSaved: state.overview.displayTimeSaved,
+            businessImpactSummary: state.overview.businessImpactSummary,
+            keyBenefits: state.overview.keyBenefits,
             facility: {
               location: state.overview.facilityLocation,
               regionCode: state.overview.regionCode,
@@ -426,12 +578,14 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
           agents: state.agents.filter((a) => a.enabled),
           dataSources: state.dataSources.filter((ds) => ds.enabled),
           kpis: state.kpis.filter((k) => k.enabled),
+          integrations: state.integrations,
           workflows: state.workflows.filter((w) => w.enabled),
           scenarios: state.scenarios.filter((s) => s.enabled),
           intelligence: state.intelligence,
           deployment: {
             targetRegion: state.deployment.targetDeploymentRegion,
             cloudRegions: state.deployment.cloudRegions,
+            deploymentChecks: state.deployment.deploymentChecks,
           },
           sourceRecommendation: state.sourceRecommendation,
         };
@@ -455,64 +609,26 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
         completedSteps: state.completedSteps,
         sourceRecommendation: state.sourceRecommendation,
       }),
+      // On rehydration, ensure required entities exist
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          const ensuredState = ensureRequiredEntities(state);
+          if (ensuredState.deployment.deploymentChecks.length === 0) {
+            ensuredState.deployment.deploymentChecks = calculateDeploymentChecks(ensuredState);
+          }
+          // Merge ensured state back
+          Object.assign(state, ensuredState);
+          console.log('[DCTwinBuilder] State rehydrated and validated');
+        }
+      },
     }
   )
 );
-
-// ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
-
-function calculateDeploymentChecks(state: DCTwinBuilderState) {
-  const checks = [
-    {
-      id: 'check-region-selected',
-      name: 'Target Region Selected',
-      category: 'sovereignty' as const,
-      status: state.deployment.targetDeploymentRegion ? 'pass' : 'pending',
-      requiresConfigAction: !state.deployment.targetDeploymentRegion,
-    },
-    {
-      id: 'check-agents-enabled',
-      name: 'Core Agents Enabled',
-      category: 'workflows' as const,
-      status: state.agents.filter((a) => a.enabled).length >= 3 ? 'pass' : 'pending',
-      requiresConfigAction: state.agents.filter((a) => a.enabled).length < 3,
-    },
-    {
-      id: 'check-data-sources',
-      name: 'Data Sources Connected',
-      category: 'telemetry' as const,
-      status: state.dataSources.filter((ds) => ds.enabled).length >= 3 ? 'pass' : 'pending',
-      requiresConfigAction: state.dataSources.filter((ds) => ds.enabled).length < 3,
-    },
-    {
-      id: 'check-kpis-configured',
-      name: 'KPIs Configured',
-      category: 'kpis' as const,
-      status: state.kpis.filter((k) => k.enabled).length >= 5 ? 'pass' : 'pending',
-      requiresConfigAction: state.kpis.filter((k) => k.enabled).length < 5,
-    },
-    {
-      id: 'check-workflows-enabled',
-      name: 'Workflows Enabled',
-      category: 'workflows' as const,
-      status: state.workflows.filter((w) => w.enabled).length >= 2 ? 'pass' : 'pending',
-      requiresConfigAction: state.workflows.filter((w) => w.enabled).length < 2,
-    },
-    {
-      id: 'check-sovereignty',
-      name: 'Sovereignty Compliance',
-      category: 'sovereignty' as const,
-      status: state.overview.sovereignCompliance ? 'pass' : 'pending',
-      requiresConfigAction: !state.overview.sovereignCompliance,
-    },
-  ];
-
-  return checks as DCTwinBuilderState['deployment']['deploymentChecks'];
-}
 
 // Export a hook to use the store
 export function useDCTwinBuilder() {
   return useDCTwinBuilderStore();
 }
+
+// Export the ensure function for external use (testing, imports)
+export { ensureRequiredEntities, calculateDeploymentChecks };

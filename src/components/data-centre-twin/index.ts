@@ -7,6 +7,7 @@
 export { DataCentreDashboard } from './DataCentreDashboard';
 export { KPICockpit } from './KPICockpit';
 export { AlertsPanel } from './AlertsPanel';
+export { DCIncidentTimeline, generateCarbonFinancialIncidents } from './DCIncidentTimeline';
 
 // Domain Views
 export { ThermalDomainView } from './domains/ThermalDomainView';

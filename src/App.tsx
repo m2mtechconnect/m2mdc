@@ -14,6 +14,7 @@ import { ThemeProvider } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
+import { initChangeLogMiddleware } from "@/stores/dcBuilderChangeLogMiddleware";
 import Dashboard from "./pages/Dashboard";
 import Builder from "./pages/Builder";
 import Deploy from "./pages/Deploy";
@@ -47,6 +48,9 @@ import TwinDebug from "./pages/TwinDebug";
 import Profile from "./pages/account/Profile";
 import Settings from "./pages/account/Settings";
 import AccessControl from "./pages/account/AccessControl";
+
+// Initialize changelog middleware for builder store
+initChangeLogMiddleware();
 
 // Redirect components for legacy routes
 function AgentOperationsRedirect() {
@@ -179,6 +183,8 @@ function AuthenticatedApp() {
   );
 }
 
+import { PerformancePanel } from '@/components/debug/PerformancePanel';
+
 const App = () => (
   <ErrorBoundary>
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
@@ -192,6 +198,7 @@ const App = () => (
                     <Toaster />
                     <Sonner />
                     <AuthenticatedApp />
+                    <PerformancePanel />
                   </CoPilotCommandProvider>
                 </CoPilotProvider>
               </ActiveTwinProvider>

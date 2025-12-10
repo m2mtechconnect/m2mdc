@@ -338,6 +338,74 @@ export const PRESET_SCENARIOS: ScenarioDefinition[] = [
       { at: 300, type: 'END', kpiDeltas: {}, eventTitle: 'Scenario Complete', eventDescription: 'Region migration scenario completed', severity: 'low', domain: 'sovereignty' },
     ],
   },
+
+  // 15. Move Workload to Cleaner Region
+  {
+    id: 'carbon_workload_migration_clean_region',
+    name: 'Migrate to Low-Carbon Region',
+    description: 'Move GPU workloads from high-carbon grid (AB) to low-carbon region (QC) to reduce emissions.',
+    durationSeconds: 300, // 5 minutes
+    domainsInvolved: ['financial_carbon', 'workload_gpu'],
+    severity: 'info',
+    category: 'financial_carbon',
+    tags: ['Carbon', 'Migration', 'Sustainability'],
+    timeline: [
+      { at: 0, type: 'START', kpiDeltas: {}, eventTitle: 'Scenario Started', eventDescription: 'Carbon region migration simulation initiated', severity: 'low', domain: 'financial_carbon' },
+      { at: 20, type: 'INFO', kpiDeltas: {}, eventTitle: 'Analysis Complete', eventDescription: 'Identified workloads in high-carbon AB region for migration to QC', severity: 'low', domain: 'financial_carbon' },
+      { at: 50, type: 'TRIGGER', kpiDeltas: { avgGpuUtilization: -8 }, eventTitle: 'Migration Started', eventDescription: 'Workloads pausing for cross-region migration', severity: 'medium', domain: 'workload_gpu' },
+      { at: 100, type: 'MITIGATION', kpiDeltas: { gCo2PerGpuHour: -50, carbonNeutralProgress: 10 }, eventTitle: 'Phase 1 Complete', eventDescription: 'First batch now on Quebec hydro-powered grid', severity: 'low', domain: 'financial_carbon' },
+      { at: 150, type: 'MITIGATION', kpiDeltas: { gCo2PerGpuHour: -30, economicEfficiencyScore: 5 }, eventTitle: 'Phase 2 Complete', eventDescription: 'Additional workloads migrated, carbon intensity dropping', severity: 'low', domain: 'financial_carbon' },
+      { at: 200, type: 'RECOVERY', kpiDeltas: { avgGpuUtilization: 8, renewableEnergyScore: 15 }, eventTitle: 'Workloads Resumed', eventDescription: 'Full capacity restored in low-carbon region', severity: 'low', domain: 'workload_gpu' },
+      { at: 250, type: 'RECOVERY', kpiDeltas: { economicEfficiencyScore: 8 }, eventTitle: 'Cost Savings Realized', eventDescription: 'Lower carbon costs improving economic efficiency', severity: 'low', domain: 'financial_carbon' },
+      { at: 300, type: 'END', kpiDeltas: {}, eventTitle: 'Scenario Complete', eventDescription: 'Carbon region migration completed - 60% reduction in gCO2/GPU-hr', severity: 'low', domain: 'financial_carbon' },
+    ],
+  },
+
+  // 16. Cooling Efficiency Drop
+  {
+    id: 'cooling_efficiency_drop_pue_spike',
+    name: 'Cooling Efficiency Drop - PUE Spike',
+    description: 'Cooling system degradation causes PUE to rise, increasing power costs and carbon footprint.',
+    durationSeconds: 240, // 4 minutes
+    domainsInvolved: ['cooling', 'financial_carbon'],
+    severity: 'warning',
+    category: 'financial_carbon',
+    tags: ['PUE', 'Cooling', 'Cost'],
+    timeline: [
+      { at: 0, type: 'START', kpiDeltas: {}, eventTitle: 'Scenario Started', eventDescription: 'Cooling efficiency drop simulation initiated', severity: 'low', domain: 'cooling' },
+      { at: 20, type: 'ALERT', kpiDeltas: { coolingEfficiencyIndex: -15, effectivePue: 0.1 }, eventTitle: 'Efficiency Dropping', eventDescription: 'Cooling system efficiency declining - damper malfunction suspected', severity: 'medium', domain: 'cooling' },
+      { at: 50, type: 'TRIGGER', kpiDeltas: { effectivePue: 0.15, economicEfficiencyScore: -10 }, eventTitle: 'PUE Rising', eventDescription: 'PUE increased from 1.2 to 1.45 - 20% more power for same IT load', severity: 'high', domain: 'financial_carbon' },
+      { at: 80, type: 'ALERT', kpiDeltas: { gCo2PerGpuHour: 15, carbonNeutralProgress: -5 }, eventTitle: 'Carbon Impact', eventDescription: 'Higher power draw increasing carbon emissions', severity: 'high', domain: 'financial_carbon' },
+      { at: 110, type: 'INFO', kpiDeltas: {}, eventTitle: 'OPEX Impact Assessed', eventDescription: 'Daily OPEX increased by $2,400 due to power inefficiency', severity: 'high', domain: 'financial_carbon' },
+      { at: 140, type: 'MITIGATION', kpiDeltas: { coolingEfficiencyIndex: 8 }, eventTitle: 'Issue Identified', eventDescription: 'Damper actuator malfunction confirmed - repair in progress', severity: 'medium', domain: 'cooling' },
+      { at: 180, type: 'RECOVERY', kpiDeltas: { effectivePue: -0.12, economicEfficiencyScore: 6 }, eventTitle: 'Repair Complete', eventDescription: 'Cooling system restored - PUE returning to baseline', severity: 'low', domain: 'cooling' },
+      { at: 220, type: 'RECOVERY', kpiDeltas: { gCo2PerGpuHour: -10, coolingEfficiencyIndex: 7, carbonNeutralProgress: 3 }, eventTitle: 'Efficiency Restored', eventDescription: 'Full cooling efficiency recovered - carbon and cost metrics normalizing', severity: 'low', domain: 'financial_carbon' },
+      { at: 240, type: 'END', kpiDeltas: {}, eventTitle: 'Scenario Complete', eventDescription: 'Cooling efficiency scenario completed', severity: 'low', domain: 'financial_carbon' },
+    ],
+  },
+
+  // 17. GPU Demand Spike - Financial Impact
+  {
+    id: 'gpu_spike_financial_impact',
+    name: 'GPU Demand Spike - Financial Impact',
+    description: 'Sudden GPU utilization surge to 95%+ increases power costs and GPU-hour pricing.',
+    durationSeconds: 240, // 4 minutes
+    domainsInvolved: ['workload_gpu', 'financial_carbon'],
+    severity: 'warning',
+    category: 'financial_carbon',
+    tags: ['GPU', 'Cost', 'Demand'],
+    timeline: [
+      { at: 0, type: 'START', kpiDeltas: {}, eventTitle: 'Scenario Started', eventDescription: 'GPU demand spike financial simulation initiated', severity: 'low', domain: 'workload_gpu' },
+      { at: 15, type: 'TRIGGER', kpiDeltas: { avgGpuUtilization: 25, costPerGpuHour: 0.5 }, eventTitle: 'Demand Surge', eventDescription: 'Large training job queue causing GPU utilization spike', severity: 'medium', domain: 'workload_gpu' },
+      { at: 40, type: 'ALERT', kpiDeltas: { avgGpuUtilization: 15, economicEfficiencyScore: -5 }, eventTitle: 'Utilization at 95%', eventDescription: 'All GPU clusters at near-maximum utilization', severity: 'high', domain: 'workload_gpu' },
+      { at: 70, type: 'TRIGGER', kpiDeltas: { gCo2PerGpuHour: 8, effectivePue: 0.03 }, eventTitle: 'Power Surge', eventDescription: 'Increased power draw raising emissions per GPU-hour', severity: 'medium', domain: 'financial_carbon' },
+      { at: 100, type: 'INFO', kpiDeltas: {}, eventTitle: 'Revenue Opportunity', eventDescription: 'Peak utilization driving higher revenue - spot pricing in effect', severity: 'low', domain: 'financial_carbon' },
+      { at: 130, type: 'MITIGATION', kpiDeltas: { queueDepth: -5 }, eventTitle: 'Queue Management', eventDescription: 'Lower-priority jobs deferred to manage demand', severity: 'low', domain: 'workload_gpu' },
+      { at: 170, type: 'RECOVERY', kpiDeltas: { avgGpuUtilization: -15, costPerGpuHour: -0.3 }, eventTitle: 'Demand Normalizing', eventDescription: 'Training jobs completing - utilization returning to normal', severity: 'low', domain: 'workload_gpu' },
+      { at: 210, type: 'RECOVERY', kpiDeltas: { economicEfficiencyScore: 5, gCo2PerGpuHour: -5 }, eventTitle: 'Metrics Stabilized', eventDescription: 'Cost and carbon metrics returning to baseline', severity: 'low', domain: 'financial_carbon' },
+      { at: 240, type: 'END', kpiDeltas: {}, eventTitle: 'Scenario Complete', eventDescription: 'GPU demand spike financial scenario completed', severity: 'low', domain: 'financial_carbon' },
+    ],
+  },
 ];
 
 // ============================================================================

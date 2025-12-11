@@ -103,7 +103,7 @@ export function SovereigntyConfigSection({ onConfigChange }: SovereigntyConfigSe
       title="Data Sovereignty & Compliance"
       subtitle="Configure data residency rules and compliance frameworks"
       icon={<Shield className="h-4 w-4" />}
-      className="border-dc-sovereignty/30"
+      className="border-l-info"
     >
       <div className="space-y-6">
         {/* Primary Jurisdiction */}
@@ -121,7 +121,7 @@ export function SovereigntyConfigSection({ onConfigChange }: SovereigntyConfigSe
               });
             }}
           >
-            <SelectTrigger className="bg-dc-surface border-dc-border">
+            <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -141,10 +141,10 @@ export function SovereigntyConfigSection({ onConfigChange }: SovereigntyConfigSe
         </div>
 
         {/* Data Residency Enforcement */}
-        <div className="flex items-center justify-between p-3 rounded-lg bg-dc-surface border border-dc-border">
+        <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-dc-sovereignty/10 flex items-center justify-center">
-              <Shield className="h-4 w-4 text-dc-sovereignty" />
+            <div className="w-9 h-9 rounded-lg bg-info/10 flex items-center justify-center">
+              <Shield className="h-4 w-4 text-info" />
             </div>
             <div>
               <p className="font-medium text-sm">Enforce Data Residency</p>
@@ -177,12 +177,12 @@ export function SovereigntyConfigSection({ onConfigChange }: SovereigntyConfigSe
                   onClick={() => handleFrameworkToggle(framework.id)}
                   className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                     isEnabled
-                      ? 'bg-dc-sovereignty/10 border-dc-sovereignty/30'
-                      : 'bg-dc-surface border-dc-border hover:border-dc-sovereignty/30'
+                      ? 'bg-info/10 border-info/30'
+                      : 'bg-muted/50 border-border hover:border-info/30'
                   }`}
                 >
                   <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
-                    isEnabled ? 'border-dc-sovereignty bg-dc-sovereignty' : 'border-muted-foreground'
+                    isEnabled ? 'border-info bg-info' : 'border-muted-foreground'
                   }`}>
                     {isEnabled && <span className="text-white text-xs">✓</span>}
                   </div>
@@ -208,7 +208,7 @@ export function SovereigntyConfigSection({ onConfigChange }: SovereigntyConfigSe
             {crossBorderRoutes.map((route, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-2 p-2 rounded-lg bg-dc-surface border border-dc-border"
+                className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 border border-border"
               >
                 <Badge variant="outline" className="text-xs">
                   {JURISDICTIONS.find(j => j.code === route.from)?.label || route.from}
@@ -232,7 +232,7 @@ export function SovereigntyConfigSection({ onConfigChange }: SovereigntyConfigSe
           {/* Add Route */}
           <div className="flex items-center gap-2 flex-wrap">
             <Select value={newRouteFrom} onValueChange={(val: JurisdictionCode) => setNewRouteFrom(val)}>
-              <SelectTrigger className="w-[160px] bg-dc-surface border-dc-border">
+              <SelectTrigger className="w-[160px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -243,7 +243,7 @@ export function SovereigntyConfigSection({ onConfigChange }: SovereigntyConfigSe
             </Select>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
             <Select value={newRouteTo} onValueChange={(val: JurisdictionCode) => setNewRouteTo(val)}>
-              <SelectTrigger className="w-[160px] bg-dc-surface border-dc-border">
+              <SelectTrigger className="w-[160px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

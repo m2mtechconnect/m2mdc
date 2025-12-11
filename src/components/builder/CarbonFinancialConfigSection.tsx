@@ -68,14 +68,14 @@ export function CarbonFinancialConfigSection({ onConfigChange }: CarbonFinancial
         title="Carbon Model Configuration"
         subtitle="Configure regional carbon intensity and renewable energy mix"
         icon={<Leaf className="h-4 w-4" />}
-        className="border-dc-success/30"
+        className="border-l-success"
       >
         <div className="space-y-6">
           {/* Region Selection */}
           <div className="space-y-2">
             <Label>Grid Region</Label>
             <Select value={region} onValueChange={(val) => handleRegionChange(val as RegionCode)}>
-              <SelectTrigger className="bg-dc-surface border-dc-border">
+              <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -92,13 +92,13 @@ export function CarbonFinancialConfigSection({ onConfigChange }: CarbonFinancial
             
             {/* Regional Stats */}
             <div className="flex gap-2 mt-2">
-              <Badge variant="outline" className="bg-dc-success/10 text-dc-success border-dc-success/30">
+              <Badge variant="outline" className="bg-success/10 text-success border-success/30">
                 {regionalData.carbonIntensityGPerKwh} gCO₂/kWh
               </Badge>
-              <Badge variant="outline" className="bg-dc-info/10 text-dc-info border-dc-info/30">
+              <Badge variant="outline" className="bg-info/10 text-info border-info/30">
                 {regionalData.renewablePercentage}% Renewable
               </Badge>
-              <Badge variant="outline" className="bg-dc-surface text-muted-foreground border-dc-border">
+              <Badge variant="outline" className="bg-muted text-muted-foreground border-border">
                 {regionalData.gridType}
               </Badge>
             </div>
@@ -108,7 +108,7 @@ export function CarbonFinancialConfigSection({ onConfigChange }: CarbonFinancial
           <div className="space-y-3">
             <div className="flex justify-between">
               <Label>Renewable Energy Mix (%)</Label>
-              <span className="text-sm font-mono text-dc-success">{renewableMix[0]}%</span>
+              <span className="text-sm font-mono text-success">{renewableMix[0]}%</span>
             </div>
             <Slider
               value={renewableMix}
@@ -116,7 +116,6 @@ export function CarbonFinancialConfigSection({ onConfigChange }: CarbonFinancial
               max={100}
               min={0}
               step={5}
-              className="[&>span]:bg-dc-success"
             />
             <p className="text-xs text-muted-foreground">
               Override regional default with your facility's actual renewable mix
@@ -127,7 +126,7 @@ export function CarbonFinancialConfigSection({ onConfigChange }: CarbonFinancial
           <div className="space-y-3">
             <div className="flex justify-between">
               <Label>Carbon Price ($/ton CO₂)</Label>
-              <span className="text-sm font-mono text-dc-warning">${carbonPrice[0]}</span>
+              <span className="text-sm font-mono text-warning">${carbonPrice[0]}</span>
             </div>
             <Slider
               value={carbonPrice}
@@ -135,7 +134,6 @@ export function CarbonFinancialConfigSection({ onConfigChange }: CarbonFinancial
               max={200}
               min={10}
               step={5}
-              className="[&>span]:bg-dc-warning"
             />
             <p className="text-xs text-muted-foreground">
               Carbon tax/credit price for emissions cost calculations
@@ -149,14 +147,14 @@ export function CarbonFinancialConfigSection({ onConfigChange }: CarbonFinancial
         title="Financial Model Configuration"
         subtitle="Configure electricity rates, cooling costs, and depreciation assumptions"
         icon={<DollarSign className="h-4 w-4" />}
-        className="border-dc-info/30"
+        className="border-l-info"
       >
         <div className="space-y-6">
           {/* Electricity Rate */}
           <div className="space-y-3">
             <div className="flex justify-between">
               <Label>Electricity Rate ($/kWh)</Label>
-              <span className="text-sm font-mono text-dc-power">${electricityRate[0].toFixed(3)}</span>
+              <span className="text-sm font-mono text-warning">${electricityRate[0].toFixed(3)}</span>
             </div>
             <Slider
               value={electricityRate}
@@ -164,7 +162,6 @@ export function CarbonFinancialConfigSection({ onConfigChange }: CarbonFinancial
               max={0.20}
               min={0.02}
               step={0.005}
-              className="[&>span]:bg-dc-power"
             />
           </div>
 
@@ -172,7 +169,7 @@ export function CarbonFinancialConfigSection({ onConfigChange }: CarbonFinancial
           <div className="space-y-3">
             <div className="flex justify-between">
               <Label>Cooling Cost (% of electricity)</Label>
-              <span className="text-sm font-mono text-dc-cooling">{coolingCostPct[0]}%</span>
+              <span className="text-sm font-mono text-info">{coolingCostPct[0]}%</span>
             </div>
             <Slider
               value={coolingCostPct}
@@ -180,7 +177,6 @@ export function CarbonFinancialConfigSection({ onConfigChange }: CarbonFinancial
               max={50}
               min={10}
               step={5}
-              className="[&>span]:bg-dc-cooling"
             />
           </div>
 
@@ -188,7 +184,7 @@ export function CarbonFinancialConfigSection({ onConfigChange }: CarbonFinancial
           <div className="space-y-3">
             <div className="flex justify-between">
               <Label>GPU Cost ($/hour)</Label>
-              <span className="text-sm font-mono text-dc-gpu">${gpuCostPerHour[0].toFixed(2)}</span>
+              <span className="text-sm font-mono text-accent">${gpuCostPerHour[0].toFixed(2)}</span>
             </div>
             <Slider
               value={gpuCostPerHour}
@@ -196,7 +192,6 @@ export function CarbonFinancialConfigSection({ onConfigChange }: CarbonFinancial
               max={5.0}
               min={0.5}
               step={0.1}
-              className="[&>span]:bg-dc-gpu"
             />
           </div>
 

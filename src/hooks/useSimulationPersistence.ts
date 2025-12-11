@@ -6,6 +6,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import type { Json } from '@/integrations/supabase/types';
 
 export interface SimulationRunRecord {
   id: string;
@@ -102,10 +103,10 @@ export function useSimulationPersistence() {
           status: 'completed',
           finished_at: new Date().toISOString(),
           duration_ms: params.durationMs,
-          final_kpis: params.finalKpis as unknown as Record<string, unknown>,
-          kpi_snapshots: params.kpiSnapshots as unknown as Record<string, unknown>[],
-          events: params.events as unknown as Record<string, unknown>[],
-          metadata: (params.metadata || {}) as unknown as Record<string, unknown>,
+          final_kpis: params.finalKpis as Json,
+          kpi_snapshots: params.kpiSnapshots as Json,
+          events: params.events as Json,
+          metadata: (params.metadata || {}) as Json,
           run_label: params.runLabel,
         })
         .eq('id', runId);
@@ -155,11 +156,11 @@ export function useSimulationPersistence() {
           started_at: new Date(Date.now() - params.durationMs).toISOString(),
           finished_at: new Date().toISOString(),
           duration_ms: params.durationMs,
-          baseline_kpis: params.baselineKpis as unknown as Record<string, unknown>,
-          final_kpis: params.finalKpis as unknown as Record<string, unknown>,
-          kpi_snapshots: params.kpiSnapshots as unknown as Record<string, unknown>[],
-          events: params.events as unknown as Record<string, unknown>[],
-          metadata: (params.metadata || {}) as unknown as Record<string, unknown>,
+          baseline_kpis: params.baselineKpis as Json,
+          final_kpis: params.finalKpis as Json,
+          kpi_snapshots: params.kpiSnapshots as Json,
+          events: params.events as Json,
+          metadata: (params.metadata || {}) as Json,
         }])
         .select('id')
         .single();

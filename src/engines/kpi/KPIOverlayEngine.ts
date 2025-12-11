@@ -471,7 +471,7 @@ function calculatePearsonCorrelation(x: number[], y: number[]): number {
 
 export function generateHoverInsight(
   kpiId: string,
-  value: number,
+  value: number | null | undefined,
   timestamp: number,
   snapshots: KPISnapshot[],
   events: SimulationEvent[]
@@ -481,6 +481,9 @@ export function generateHoverInsight(
     return { title: 'Unknown KPI', description: '', relatedEvents: [] };
   }
 
+  // Handle null/undefined value
+  const safeValue = value ?? 0;
+
   // Find events around this timestamp
   const relatedEvents = events.filter(
     e => Math.abs(e.timestamp - timestamp) <= 30 && 
@@ -489,13 +492,14 @@ export function generateHoverInsight(
 
   // Determine severity based on thresholds
   const band = config.thresholds.bands.find(
-    b => value >= b.min && value <= b.max
+    b => safeValue >= b.min && safeValue <= b.max
   );
 
   // Calculate delta from baseline
-  const baseline = snapshots[0]?.[kpiId] ?? value;
-  const delta = value - baseline;
-  const deltaPercent = ((delta / baseline) * 100).toFixed(1);
+  const baseline = snapshots[0]?.[kpiId] ?? safeValue;
+  const safeBaseline = baseline ?? safeValue;
+  const delta = safeValue - safeBaseline;
+  const deltaPercent = safeBaseline !== 0 ? ((delta / safeBaseline) * 100).toFixed(1) : '0';
 
   let description = '';
   if (relatedEvents.length > 0) {
@@ -506,7 +510,7 @@ export function generateHoverInsight(
   description += config.whyItMatters;
 
   return {
-    title: `${config.name}: ${value.toFixed(2)}${config.unit}`,
+    title: `${config.name}: ${safeValue.toFixed(2)}${config.unit}`,
     description,
     relatedEvents,
   };

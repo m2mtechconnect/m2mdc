@@ -37,6 +37,28 @@ The mismatch between header (showing "Montreal Sovereign...") and Blueprint titl
 - Added deprecation notice for `TwinContext`
 - Clarified that `ActiveTwinContext` is the single source of truth
 
+### 5. DC Twin Tab Components (Additional Fix)
+All DC Twin tab components now use `useTwinContext()` to prioritize active twin:
+- `src/components/dc-twin/tabs/DCOverviewTab.tsx`
+- `src/components/dc-twin/tabs/DCBlueprintTab.tsx`
+- `src/components/dc-twin/tabs/DCPreviewTab.tsx`
+- `src/components/dc-twin/tabs/DCSimulationTab.tsx`
+- `src/components/dc-twin/tabs/DCDeployTab.tsx`
+
+Pattern applied:
+```typescript
+const { activeTwin } = useTwinContext();
+const { overview: builderOverview } = useDCTwinBuilderStore();
+
+// CRITICAL: Use active twin data if available
+const overview = {
+  ...builderOverview,
+  twinName: activeTwin?.name || builderOverview.twinName,
+  facilityLocation: activeTwin?.city || builderOverview.facilityLocation,
+  regionCode: activeTwin?.region_code || builderOverview.regionCode,
+};
+```
+
 ## Regression Tests
 
 ### Test 1: Twin Selection Consistency

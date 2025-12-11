@@ -2,6 +2,8 @@
  * DC Twin Simulation Tab
  * Enterprise-grade KPI System matching Nvidia Omniverse, Siemens, Schneider, AWS, Azure
  * SIMULATION MODE - Read-only blueprint, focus on running scenarios
+ * 
+ * CRITICAL: Uses useTwinContext() to prioritize active twin over builder store
  */
 
 import { useState, useMemo } from 'react';
@@ -17,6 +19,7 @@ import {
 } from 'lucide-react';
 import { SIMULATION, getScenarioDescription } from '@/ux';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
+import { useTwinContext } from '@/hooks/useTwinContext';
 import type { DCScenarioCategory } from '@/types/dcTwinBuilder';
 import { MultiKPIOverlay } from '@/components/simulation/MultiKPIOverlay';
 import { EnhancedTimeControls } from '@/components/simulation/EnhancedTimeControls';

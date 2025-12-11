@@ -1,6 +1,6 @@
 /**
  * TwinUseCases - Persona cards showing use cases
- * With scroll-triggered staggered animations
+ * Uses M2M brand design tokens from index.css
  */
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -73,7 +73,7 @@ const cardVariants = {
 
 export function TwinUseCases() {
   return (
-    <section className="py-16 lg:py-24 overflow-hidden">
+    <section className="py-16 lg:py-24 overflow-hidden bg-background">
       <div className="max-w-6xl mx-auto px-4 lg:px-8">
         <motion.div 
           className="text-center mb-12"
@@ -82,10 +82,10 @@ export function TwinUseCases() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-2xl lg:text-3xl font-bold text-white mb-3">
+          <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-3">
             Built for Every Stakeholder
           </h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto">
             From executive strategy to hands-on operations, the Twin Studio serves your entire organization.
           </p>
         </motion.div>
@@ -100,7 +100,7 @@ export function TwinUseCases() {
           {personas.map((persona, index) => (
             <motion.div key={index} variants={cardVariants}>
               <Card 
-                className="bg-slate-800/30 border-slate-700/50 hover:border-primary/50 transition-all duration-300 h-full group cursor-default"
+                className="bg-card/30 border-border/50 hover:border-primary/50 transition-all duration-300 h-full group cursor-default"
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-center gap-4">
@@ -112,10 +112,10 @@ export function TwinUseCases() {
                       <persona.icon className="h-6 w-6 text-primary" />
                     </motion.div>
                     <div>
-                      <h3 className="text-lg font-semibold text-white group-hover:text-primary transition-colors">
+                      <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
                         {persona.title}
                       </h3>
-                      <p className="text-sm text-slate-400">
+                      <p className="text-sm text-muted-foreground">
                         {persona.subtitle}
                       </p>
                     </div>
@@ -126,7 +126,7 @@ export function TwinUseCases() {
                     {persona.bullets.map((bullet, bulletIndex) => (
                       <motion.li 
                         key={bulletIndex} 
-                        className="flex items-start gap-2 text-sm text-slate-300"
+                        className="flex items-start gap-2 text-sm text-muted-foreground"
                         initial={{ opacity: 0, x: -10 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}

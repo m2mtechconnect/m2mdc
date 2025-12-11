@@ -1,6 +1,6 @@
 /**
  * TwinHero - Hero section for Data Centre Twin landing page
- * Includes scroll animations and hover effects
+ * Uses M2M brand design tokens from index.css
  */
 
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ export function TwinHero() {
   const navigate = useNavigate();
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-20 lg:py-32">
+    <section className="relative overflow-hidden bg-background py-20 lg:py-32">
       {/* Animated background decoration */}
       <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-5" />
       <motion.div 
@@ -25,7 +25,7 @@ export function TwinHero() {
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div 
-        className="absolute bottom-0 left-1/4 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"
+        className="absolute bottom-0 left-1/4 w-64 h-64 bg-success/10 rounded-full blur-3xl"
         animate={{ 
           scale: [1, 1.3, 1],
           opacity: [0.1, 0.2, 0.1]
@@ -54,19 +54,19 @@ export function TwinHero() {
               </motion.div>
               
               <motion.h1 
-                className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight"
+                className="text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground leading-tight"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
               >
                 Sovereign Green AI{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-success">
                   Data Centre Twin
                 </span>
               </motion.h1>
               
               <motion.p 
-                className="text-lg lg:text-xl text-slate-300 leading-relaxed max-w-xl"
+                className="text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-xl"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
@@ -93,7 +93,7 @@ export function TwinHero() {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="text-base px-8 border-slate-600 text-slate-200 hover:bg-slate-800 transition-all duration-300 hover:scale-105"
+                className="text-base px-8 border-border text-foreground hover:bg-muted transition-all duration-300 hover:scale-105"
                 onClick={() => navigate("/dashboard")}
               >
                 <Play className="mr-2 h-5 w-5" />
@@ -108,12 +108,12 @@ export function TwinHero() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.7 }}
             >
-              <div className="text-sm text-slate-400">Trusted by</div>
-              <div className="flex items-center gap-4 text-slate-500">
+              <div className="text-sm text-muted-foreground">Trusted by</div>
+              <div className="flex items-center gap-4 text-muted-foreground/70">
                 <span className="font-medium">Scale AI</span>
-                <span className="text-slate-600">•</span>
+                <span className="text-border">•</span>
                 <span className="font-medium">Upskill Canada</span>
-                <span className="text-slate-600">•</span>
+                <span className="text-border">•</span>
                 <span className="font-medium">Enterprise DC Ops</span>
               </div>
             </motion.div>
@@ -127,12 +127,12 @@ export function TwinHero() {
             transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
           >
             <motion.div 
-              className="relative bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-4 shadow-2xl"
+              className="relative bg-card/50 backdrop-blur-sm rounded-2xl border border-border/50 p-4 shadow-2xl"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.3 }}
             >
               {/* Mock screenshot placeholder */}
-              <div className="aspect-[4/3] bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg overflow-hidden relative">
+              <div className="aspect-[4/3] bg-gradient-to-br from-muted to-background rounded-lg overflow-hidden relative">
                 <img 
                   src="/assets/landing/twin-hero.png" 
                   alt="3D sovereign data centre twin overview"
@@ -151,9 +151,9 @@ export function TwinHero() {
                 >
                   <div className="flex flex-wrap gap-2">
                     {[
-                      { label: "PUE 1.33", color: "bg-emerald-500/90" },
-                      { label: "1075 kW", color: "bg-blue-500/90" },
-                      { label: "30 gCO₂", color: "bg-amber-500/90" },
+                      { label: "PUE 1.33", color: "bg-success/90" },
+                      { label: "1075 kW", color: "bg-info/90" },
+                      { label: "30 gCO₂", color: "bg-warning/90" },
                       { label: "85% renewable", color: "bg-primary/90" },
                     ].map((badge, i) => (
                       <motion.div
@@ -162,7 +162,7 @@ export function TwinHero() {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.3, delay: 0.9 + i * 0.1 }}
                       >
-                        <Badge className={`${badge.color} text-white border-0`}>
+                        <Badge className={`${badge.color} text-primary-foreground border-0`}>
                           {badge.label}
                         </Badge>
                       </motion.div>
@@ -171,38 +171,38 @@ export function TwinHero() {
                 </motion.div>
 
                 {/* Decorative grid overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
               </div>
               
               {/* Window controls decoration */}
               <div className="absolute top-2 left-6 flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                <div className="w-3 h-3 rounded-full bg-destructive/80" />
+                <div className="w-3 h-3 rounded-full bg-warning/80" />
+                <div className="w-3 h-3 rounded-full bg-success/80" />
               </div>
             </motion.div>
 
             {/* Floating stats cards */}
             <motion.div 
-              className="absolute -bottom-6 -left-6 bg-slate-800/90 backdrop-blur-sm rounded-lg border border-slate-700/50 p-3 shadow-xl"
+              className="absolute -bottom-6 -left-6 bg-card/90 backdrop-blur-sm rounded-lg border border-border/50 p-3 shadow-xl"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 1 }}
               whileHover={{ scale: 1.05, y: -2 }}
             >
-              <div className="text-2xl font-bold text-emerald-400">98.7%</div>
-              <div className="text-xs text-slate-400">Uptime SLA</div>
+              <div className="text-2xl font-bold text-success">98.7%</div>
+              <div className="text-xs text-muted-foreground">Uptime SLA</div>
             </motion.div>
             
             <motion.div 
-              className="absolute -top-4 -right-4 bg-slate-800/90 backdrop-blur-sm rounded-lg border border-slate-700/50 p-3 shadow-xl"
+              className="absolute -top-4 -right-4 bg-card/90 backdrop-blur-sm rounded-lg border border-border/50 p-3 shadow-xl"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 1.1 }}
               whileHover={{ scale: 1.05, y: 2 }}
             >
               <div className="text-2xl font-bold text-primary">24/7</div>
-              <div className="text-xs text-slate-400">Monitoring</div>
+              <div className="text-xs text-muted-foreground">Monitoring</div>
             </motion.div>
           </motion.div>
         </div>

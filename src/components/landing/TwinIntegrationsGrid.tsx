@@ -1,6 +1,6 @@
 /**
  * TwinIntegrationsGrid - Integration logos and ecosystem section
- * With staggered hover animations
+ * Uses M2M brand design tokens from index.css
  */
 
 import { Cloud, Cpu, Server, Gauge } from "lucide-react";
@@ -40,7 +40,7 @@ const itemVariants = {
 
 export function TwinIntegrationsGrid() {
   return (
-    <section className="py-16 lg:py-24 bg-slate-950 overflow-hidden">
+    <section className="py-16 lg:py-24 bg-background overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 lg:px-8">
         <motion.div 
           className="text-center mb-12"
@@ -49,10 +49,10 @@ export function TwinIntegrationsGrid() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-2xl lg:text-3xl font-bold text-white mb-3">
+          <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-3">
             Connect to Your Existing Stack
           </h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto">
             Ingest metrics from DCIM, cloud, GPU platforms, and sustainability APIs. 
             Enrich with AI-driven modeling.
           </p>
@@ -74,20 +74,20 @@ export function TwinIntegrationsGrid() {
                 y: -5,
                 transition: { duration: 0.2 }
               }}
-              className="group flex flex-col items-center p-6 bg-slate-800/30 rounded-xl border border-slate-700/50 hover:border-primary/50 hover:bg-slate-800/50 transition-colors cursor-default"
+              className="group flex flex-col items-center p-6 bg-card/30 rounded-xl border border-border/50 hover:border-primary/50 hover:bg-card/50 transition-colors cursor-default"
             >
               <motion.div 
-                className="w-16 h-16 rounded-full bg-slate-700/50 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors"
+                className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors"
                 whileHover={{ rotate: [0, -10, 10, 0] }}
                 transition={{ duration: 0.4 }}
               >
-                <integration.icon className="h-8 w-8 text-slate-400 group-hover:text-primary transition-colors" />
+                <integration.icon className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors" />
               </motion.div>
               <div className="text-center">
-                <div className="font-semibold text-white mb-1 group-hover:text-primary transition-colors">
+                <div className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
                   {integration.name}
                 </div>
-                <div className="text-xs text-slate-500">
+                <div className="text-xs text-muted-foreground">
                   {integration.description}
                 </div>
               </div>

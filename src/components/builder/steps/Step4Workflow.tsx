@@ -9,13 +9,13 @@ import { WorkflowEditor } from '@/components/workflow/WorkflowEditor';
 import { DCCard, DCSectionHeader, DCKPITile } from '@/components/dc-ui';
 
 const DC_NODE_TYPES = [
-  { id: 'gpu-spike', label: 'GPU Spike Trigger', icon: Cpu, color: 'dc-gpu' },
-  { id: 'thermal-alert', label: 'Thermal Anomaly', icon: Thermometer, color: 'dc-thermal' },
-  { id: 'cooling-failure', label: 'Cooling Failure', icon: Wind, color: 'dc-cooling' },
-  { id: 'pue-drift', label: 'PUE Drift Alert', icon: Zap, color: 'dc-power' },
-  { id: 'sovereignty-event', label: 'Sovereignty Event', icon: Shield, color: 'dc-sovereignty' },
-  { id: 'carbon-shock', label: 'Carbon Price Shock', icon: DollarSign, color: 'dc-warning' },
-  { id: 'network-congestion', label: 'Network Congestion', icon: Network, color: 'dc-info' },
+  { id: 'gpu-spike', label: 'GPU Spike Trigger', icon: Cpu, color: 'primary' },
+  { id: 'thermal-alert', label: 'Thermal Anomaly', icon: Thermometer, color: 'destructive' },
+  { id: 'cooling-failure', label: 'Cooling Failure', icon: Wind, color: 'info' },
+  { id: 'pue-drift', label: 'PUE Drift Alert', icon: Zap, color: 'warning' },
+  { id: 'sovereignty-event', label: 'Sovereignty Event', icon: Shield, color: 'success' },
+  { id: 'carbon-shock', label: 'Carbon Price Shock', icon: DollarSign, color: 'warning' },
+  { id: 'network-congestion', label: 'Network Congestion', icon: Network, color: 'info' },
 ];
 
 export function Step4Workflow() {

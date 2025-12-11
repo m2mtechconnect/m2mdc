@@ -21,6 +21,7 @@ import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { EmptyStateSelectTwin } from '@/components/twin-selector';
 import { Eye, FileText, MessageSquare, PlayCircle, Rocket, LayoutDashboard } from 'lucide-react';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
+import { OVERVIEW, SIMULATION, EMPTY_STATES } from '@/ux';
 
 export default function DataCentreTwin() {
   const { id } = useParams<{ id?: string }>();
@@ -144,8 +145,8 @@ export default function DataCentreTwin() {
   if (!activeTwinId || !twin) {
     return (
       <EmptyStateSelectTwin 
-        title="Select a Data Centre"
-        description="Choose a data centre from the header dropdown to view the digital twin dashboard, simulations, and blueprints."
+        title={OVERVIEW.EMPTY_STATE.NO_TWIN.split('.')[0]}
+        description={OVERVIEW.EMPTY_STATE.NO_TWIN}
       />
     );
   }

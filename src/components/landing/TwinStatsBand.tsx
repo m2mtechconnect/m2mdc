@@ -1,9 +1,11 @@
 /**
  * TwinStatsBand - Full-width metrics/ROI band
+ * With scroll-triggered counter animations
  */
 
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, Zap, Leaf, Clock } from "lucide-react";
+import { motion } from "framer-motion";
 
 const stats = [
   {
@@ -32,39 +34,88 @@ const stats = [
   },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 } as const,
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.5 },
+  },
+};
+
 export function TwinStatsBand() {
   return (
-    <section className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 py-16 border-y border-slate-700/50">
+    <section className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 py-16 border-y border-slate-700/50 overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 lg:px-8">
-        <div className="text-center mb-12">
+        <motion.div 
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
           <h2 className="text-2xl lg:text-3xl font-bold text-white mb-3">
             Measurable Impact on Your Operations
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto">
             Real results from organizations optimizing their data centre infrastructure with our digital twin platform.
           </p>
-        </div>
+        </motion.div>
         
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div 
+          className="grid grid-cols-2 lg:grid-cols-4 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+        >
           {stats.map((stat, index) => (
-            <Card 
-              key={index} 
-              className="bg-slate-800/50 border-slate-700/50 hover:border-primary/50 transition-colors"
-            >
-              <CardContent className="p-6 text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-700/50 mb-4">
-                  <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                </div>
-                <div className={`text-3xl lg:text-4xl font-bold mb-2 ${stat.color}`}>
-                  {stat.value}
-                </div>
-                <div className="text-sm text-slate-400">
-                  {stat.label}
-                </div>
-              </CardContent>
-            </Card>
+            <motion.div key={index} variants={cardVariants}>
+              <Card 
+                className="bg-slate-800/50 border-slate-700/50 hover:border-primary/50 transition-all duration-300 group cursor-default"
+              >
+                <CardContent className="p-6 text-center">
+                  <motion.div 
+                    className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-700/50 mb-4 group-hover:bg-slate-700 transition-colors"
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                  </motion.div>
+                  <motion.div 
+                    className={`text-3xl lg:text-4xl font-bold mb-2 ${stat.color}`}
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    whileInView={{ scale: 1, opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ 
+                      duration: 0.5, 
+                      delay: 0.3 + index * 0.1,
+                      type: "spring",
+                      stiffness: 200
+                    }}
+                  >
+                    {stat.value}
+                  </motion.div>
+                  <div className="text-sm text-slate-400">
+                    {stat.label}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

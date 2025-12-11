@@ -11,6 +11,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, Rea
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import { useRecommendationStore } from '@/stores/recommendationStore';
+import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 
 // Types
 export interface DataCentreLocation {
@@ -227,6 +228,11 @@ export function ActiveTwinProvider({ children }: { children: ReactNode }) {
     // This ensures recommendations don't leak into real twin views
     const { clearRecommendation } = useRecommendationStore.getState();
     clearRecommendation();
+    
+    // CRITICAL: Reset builder store when switching to a real twin
+    // This prevents builder state from leaking into real twin views
+    const { reset } = useDCTwinBuilderStore.getState();
+    reset();
     
     const t = await fetchTwin(twinId);
     setTwin(t);

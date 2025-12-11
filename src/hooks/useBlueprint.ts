@@ -2,10 +2,13 @@
  * useBlueprint - Hook for Managing Data Centre Blueprint
  * Provides reactive access to the authoritative system model
  * 
- * CRITICAL: This hook follows the single source of truth pattern:
- * 1. If twinId is a valid UUID, load from database and merge with defaults
- * 2. If builder store has data, use that as the overlay
+ * CRITICAL: This hook follows the ACTIVE TWIN as single source of truth:
+ * 1. If twinId is a valid UUID, load from database ONLY
+ * 2. If twinId is 'preview' or 'default', check builder store or recommendation store
  * 3. Fall back to default blueprint
+ * 
+ * IMPORTANT: Builder store data should NEVER override database twin data.
+ * Builder store is only used for preview/sandbox modes.
  * 
  * ═══════════════════════════════════════════════════════════════════════════════
  * INDUSTRY SOURCE REFERENCES
@@ -26,11 +29,12 @@ import { generateDefaultBlueprint } from '@/data/defaultBlueprint';
 import { calculateBlueprintSummary } from '@/types/dataCentreBlueprint';
 import { supabase } from '@/integrations/supabase/client';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
+import { useRecommendationStore } from '@/stores/recommendationStore';
 
 // UUID validation regex
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-export type BlueprintLoadSource = 'database' | 'builder' | 'default';
+export type BlueprintLoadSource = 'database' | 'builder' | 'recommendation' | 'default';
 
 export function useBlueprint(twinId: string) {
   const [blueprint, setBlueprint] = useState<DataCentreBlueprint | null>(null);
@@ -38,9 +42,18 @@ export function useBlueprint(twinId: string) {
   const [loadSource, setLoadSource] = useState<BlueprintLoadSource>('default');
   const [dbTwinData, setDbTwinData] = useState<any>(null);
   
-  // Access builder store state
+  // Access builder store state (only for preview mode)
   const builderOverview = useDCTwinBuilderStore((s) => s.overview);
-  const hasBuilderData = builderOverview?.twinName && 
+  
+  // Access recommendation store (for sandbox preview)
+  const recommendation = useRecommendationStore((s) => s.recommendation);
+  const isPreviewMode = useRecommendationStore((s) => s.isPreviewMode);
+  
+  // Check if we're in preview mode (twinId is 'preview' or 'default')
+  const isPreviewTwinId = twinId === 'preview' || twinId === 'default';
+  
+  // Only use builder data for preview mode, never for real twins
+  const hasBuilderData = isPreviewTwinId && builderOverview?.twinName && 
     builderOverview.twinName !== 'New Data Centre Twin' &&
     builderOverview.twinName.length > 0;
 
@@ -51,7 +64,8 @@ export function useBlueprint(twinId: string) {
       setIsLoading(true);
       
       try {
-        // Priority 1: If twinId is a valid UUID, try to load from database
+        // Priority 1: If twinId is a valid UUID, load from database ONLY
+        // NEVER overlay builder store data on database twins
         if (UUID_REGEX.test(twinId)) {
           console.log('[useBlueprint] Loading from database for UUID:', twinId);
           
@@ -92,9 +106,35 @@ export function useBlueprint(twinId: string) {
           }
         }
         
-        // Priority 2: If builder store has data (from scan/recommendation), use it as overlay
+        // Priority 2: For preview mode, check recommendation store first (sandbox)
+        if (isPreviewTwinId && isPreviewMode && recommendation && mounted) {
+          console.log('[useBlueprint] Using recommendation preview (sandbox)');
+          const baseBp = generateDefaultBlueprint('preview');
+          
+          // Map recommendation fields to blueprint fields
+          const capacityKw = recommendation.capacityTier === 'hyperscale' ? 20000 :
+                            recommendation.capacityTier === 'large' ? 10000 :
+                            recommendation.capacityTier === 'medium' ? 5000 : 2500;
+          
+          const bp: DataCentreBlueprint = {
+            ...baseBp,
+            id: 'preview',
+            twinId: 'preview',
+            name: `${recommendation.companyName} Sovereign Green AI Data Centre Twin`,
+            location: recommendation.regions?.[0] || baseBp.location,
+            tier: 'Tier III', // Default tier
+            capacityKw,
+          };
+          
+          setBlueprint(bp);
+          setLoadSource('recommendation');
+          setIsLoading(false);
+          return;
+        }
+        
+        // Priority 3: For preview mode with builder store data
         if (hasBuilderData && mounted) {
-          console.log('[useBlueprint] Overlaying builder store data:', builderOverview.twinName);
+          console.log('[useBlueprint] Using builder store data (preview mode):', builderOverview.twinName);
           const baseBp = generateDefaultBlueprint(twinId);
           
           // Overlay builder values onto the default blueprint
@@ -114,7 +154,7 @@ export function useBlueprint(twinId: string) {
           return;
         }
         
-        // Priority 3: Fall back to default blueprint
+        // Priority 4: Fall back to default blueprint
         if (mounted) {
           console.log('[useBlueprint] Using default blueprint');
           const bp = generateDefaultBlueprint(twinId);

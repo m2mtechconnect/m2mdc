@@ -3,6 +3,58 @@
  * Zustand store for Sovereign Green AI Data Centre Twin builder state
  * Single source of truth for all builder tabs and steps
  * Includes auto-creation mechanism for required entities
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * DIGITAL TWIN BUILDER PATTERNS:
+ * - ISO 23247:2021 Digital Twin Framework for Manufacturing
+ *   https://www.iso.org/standard/75066.html
+ * - Digital Twin Consortium - Digital Twin Capabilities Periodic Table
+ *   https://www.digitaltwinconsortium.org/initiatives/capabilities-periodic-table/
+ * - NVIDIA Omniverse USD (Universal Scene Description)
+ *   https://developer.nvidia.com/usd
+ * 
+ * DATA CENTER CONFIGURATION STANDARDS:
+ * - Uptime Institute Tier Classification System
+ *   https://uptimeinstitute.com/tier-certification/tier-requirements
+ * - TIA-942-B Telecommunications Infrastructure Standard for Data Centers
+ *   https://tiaonline.org/what-we-do/standards/
+ * - BICSI Data Center Design and Implementation Best Practices
+ *   https://www.bicsi.org/standards/available-standards-store/single-purchase/bicsi-009-2019
+ * 
+ * SOVEREIGN CLOUD REQUIREMENTS:
+ * - Treasury Board of Canada - Direction on Electronic Data Residency
+ *   https://www.canada.ca/en/government/system/digital-government/digital-government-innovations/cloud-services/direction-electronic-data-residency.html
+ * - Canadian Centre for Cyber Security Cloud Security Controls
+ *   https://cyber.gc.ca/en/guidance/itsg-33-it-security-risk-management-lifecycle-approach
+ * - PIPEDA Compliance Requirements
+ *   https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/
+ * 
+ * GREEN DATA CENTER METRICS:
+ * - The Green Grid PUE/DCiE/WUE/CUE Definitions
+ *   https://www.thegreengrid.org/en/resources/library-and-tools
+ * - EPA ENERGY STAR Data Center Rating
+ *   https://www.energystar.gov/buildings/benchmark/understand_metrics/data_center
+ * - GHG Protocol ICT Sector Guidance
+ *   https://ghgprotocol.org/sites/default/files/ghgp/standards/ict-sector-guidance.pdf
+ * 
+ * STATE MANAGEMENT PATTERNS:
+ * - Zustand State Management Library
+ *   https://github.com/pmndrs/zustand
+ * - Redux Toolkit Best Practices (for store design patterns)
+ *   https://redux-toolkit.js.org/usage/usage-guide
+ * - React Query for Server State (cache invalidation patterns)
+ *   https://tanstack.com/query/latest
+ * 
+ * DEPLOYMENT & ORCHESTRATION:
+ * - Kubernetes Operators Pattern
+ *   https://kubernetes.io/docs/concepts/extend-kubernetes/operator/
+ * - AWS Well-Architected Framework - Operational Excellence Pillar
+ *   https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import { create } from 'zustand';

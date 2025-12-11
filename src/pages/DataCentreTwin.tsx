@@ -97,9 +97,9 @@ export default function DataCentreTwin() {
                 <Eye className="h-4 w-4" />
                 Overview
               </TabsTrigger>
-              <TabsTrigger value="blueprint" className="gap-2">
+              <TabsTrigger value="design" className="gap-2">
                 <FileText className="h-4 w-4" />
-                Blueprint
+                Design
               </TabsTrigger>
               <TabsTrigger value="preview" className="gap-2">
                 <MessageSquare className="h-4 w-4" />
@@ -119,7 +119,7 @@ export default function DataCentreTwin() {
               <DCOverviewTab />
             </TabsContent>
             
-            <TabsContent value="blueprint">
+            <TabsContent value="design">
               <DCBlueprintTab />
             </TabsContent>
             

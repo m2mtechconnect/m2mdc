@@ -1,6 +1,9 @@
 /**
  * Simulation Components Index
  * Exports all simulation-related components
+ * 
+ * SIMULATION MODE ONLY - These components should never appear in Blueprint Designer
+ * All components operate on frozen blueprint snapshots
  */
 
 // Core simulation components
@@ -16,7 +19,10 @@ export { SimulationChecklist } from './SimulationChecklist';
 export { SimulationToolsPanel } from './SimulationToolsPanel';
 export { SimulationQuickNav } from './SimulationQuickNav';
 export { SimulationBlueprintSnapshotPanel } from './SimulationBlueprintSnapshotPanel';
+
+// Mode Headers - CLEAR VISUAL SEPARATION
 export { SimulationModeHeader } from './SimulationModeHeader';
+export { SimulationSnapshotHeader } from './SimulationSnapshotHeader';
 
 // Enhanced simulation components
 export { EnhancedTimeControls } from './EnhancedTimeControls';

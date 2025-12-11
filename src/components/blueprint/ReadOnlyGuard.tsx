@@ -65,7 +65,8 @@ export function useReadOnlyMode() {
   
   return {
     isReadOnly: readOnly,
-    isSnapshot: mode === 'snapshot',
+    isSnapshot: mode === 'simulationSnapshot',
+    isDesignView: mode === 'designView',
     isDesigner: mode === 'designer',
     canEdit: !readOnly,
     capabilities,

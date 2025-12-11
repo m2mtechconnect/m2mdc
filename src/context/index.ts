@@ -14,6 +14,8 @@ export {
   useCanEdit,
   useCanShow,
   DESIGNER_CAPABILITIES,
-  SNAPSHOT_CAPABILITIES,
+  DESIGN_VIEW_CAPABILITIES,
+  SIMULATION_SNAPSHOT_CAPABILITIES,
+  SNAPSHOT_CAPABILITIES, // Legacy alias
 } from './BlueprintViewContext';
 export type { BlueprintViewMode, BlueprintModeCapabilities } from './BlueprintViewContext';

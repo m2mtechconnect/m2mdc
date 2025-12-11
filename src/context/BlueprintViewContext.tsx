@@ -1,22 +1,26 @@
 /**
- * Blueprint View Context - Designer vs Snapshot Mode
- * ENFORCES separation between editable Blueprint Designer and read-only Simulation Snapshot
+ * Blueprint View Context - THREE-MODE ARCHITECTURE
  * 
- * RULES:
- * - Designer Mode: Full editing, no live telemetry, no time-series
- * - Snapshot Mode: Read-only, tied to simulation run, no editing allowed
+ * ENFORCES strict separation between:
+ * 1. DESIGNER MODE - Full-screen Blueprint Designer (ONLY place for editing)
+ * 2. DESIGN VIEW MODE - Read-only summary on Solution page tabs
+ * 3. SIMULATION SNAPSHOT MODE - Frozen snapshot during simulation runtime
+ * 
+ * INDUSTRY STANDARD: Matches Google Cloud TwinMaker, AWS SimSpace Weaver, Azure Digital Twins
  */
 
 import React, { createContext, useContext, ReactNode, useMemo } from 'react';
 
-export type BlueprintViewMode = 'designer' | 'snapshot';
+/**
+ * Three distinct modes for Blueprint visualization
+ */
+export type BlueprintViewMode = 'designer' | 'designView' | 'simulationSnapshot';
 
 /**
- * Feature flags for each mode
- * These enforce what is allowed in each context
+ * Feature flags for each mode - STRICT enforcement
  */
-interface BlueprintModeCapabilities {
-  // Editing capabilities
+export interface BlueprintModeCapabilities {
+  // Editing capabilities - ONLY enabled in Designer
   canEditAgents: boolean;
   canEditKPIs: boolean;
   canEditWorkflows: boolean;
@@ -24,18 +28,26 @@ interface BlueprintModeCapabilities {
   canEditThresholds: boolean;
   canEditFacility: boolean;
   canEditSovereignty: boolean;
+  canEditTopology: boolean;
   canAddItems: boolean;
   canDeleteItems: boolean;
   canSave: boolean;
   
-  // Display capabilities
+  // Designer-only displays
   showValidationWarnings: boolean;
   showReadinessScore: boolean;
   showVersionHistory: boolean;
   showChangeLog: boolean;
   showDependencyGraph: boolean;
   
-  // FORBIDDEN in Designer (Simulation-only)
+  // Design View displays (read-only summary)
+  showArchitectureSummary: boolean;
+  showDomainOverview: boolean;
+  showWorkflowPreview: boolean;
+  showKPISummary: boolean;
+  showDesignerCTA: boolean;
+  
+  // Simulation-ONLY displays (FORBIDDEN in Designer & Design View)
   showLiveTelemetry: boolean;
   showTimeSeries: boolean;
   showHeatmaps: boolean;
@@ -44,9 +56,14 @@ interface BlueprintModeCapabilities {
   showKPIDeltas: boolean;
   showRootCauseAnalysis: boolean;
   showLiveRecommendations: boolean;
+  showSnapshotInfo: boolean;
 }
 
-const DESIGNER_CAPABILITIES: BlueprintModeCapabilities = {
+/**
+ * DESIGNER MODE - Full editing capability
+ * URL: /blueprint/:id
+ */
+export const DESIGNER_CAPABILITIES: BlueprintModeCapabilities = {
   // Full editing in Designer
   canEditAgents: true,
   canEditKPIs: true,
@@ -55,6 +72,7 @@ const DESIGNER_CAPABILITIES: BlueprintModeCapabilities = {
   canEditThresholds: true,
   canEditFacility: true,
   canEditSovereignty: true,
+  canEditTopology: true,
   canAddItems: true,
   canDeleteItems: true,
   canSave: true,
@@ -66,6 +84,13 @@ const DESIGNER_CAPABILITIES: BlueprintModeCapabilities = {
   showChangeLog: true,
   showDependencyGraph: true,
   
+  // Design View displays (also shown in designer)
+  showArchitectureSummary: true,
+  showDomainOverview: true,
+  showWorkflowPreview: true,
+  showKPISummary: true,
+  showDesignerCTA: false, // Already in designer
+  
   // FORBIDDEN in Designer - these are Simulation-only
   showLiveTelemetry: false,
   showTimeSeries: false,
@@ -75,10 +100,15 @@ const DESIGNER_CAPABILITIES: BlueprintModeCapabilities = {
   showKPIDeltas: false,
   showRootCauseAnalysis: false,
   showLiveRecommendations: false,
+  showSnapshotInfo: false,
 };
 
-const SNAPSHOT_CAPABILITIES: BlueprintModeCapabilities = {
-  // NO editing in Snapshot
+/**
+ * DESIGN VIEW MODE - Read-only summary on Solution page
+ * Tab: "Design" (formerly "Blueprint")
+ */
+export const DESIGN_VIEW_CAPABILITIES: BlueprintModeCapabilities = {
+  // NO editing in Design View
   canEditAgents: false,
   canEditKPIs: false,
   canEditWorkflows: false,
@@ -86,19 +116,27 @@ const SNAPSHOT_CAPABILITIES: BlueprintModeCapabilities = {
   canEditThresholds: false,
   canEditFacility: false,
   canEditSovereignty: false,
+  canEditTopology: false,
   canAddItems: false,
   canDeleteItems: false,
   canSave: false,
   
-  // Snapshot displays (read-only views)
+  // No designer-specific displays
   showValidationWarnings: false,
   showReadinessScore: false,
   showVersionHistory: false,
   showChangeLog: false,
   showDependencyGraph: true, // Can view but not edit
   
-  // Simulation-context displays allowed in Snapshot
-  showLiveTelemetry: false, // Live telemetry is in Simulation, not Snapshot
+  // Design View displays (read-only summary)
+  showArchitectureSummary: true,
+  showDomainOverview: true,
+  showWorkflowPreview: true,
+  showKPISummary: true,
+  showDesignerCTA: true, // Show CTA to open Blueprint Designer
+  
+  // FORBIDDEN - Simulation-only
+  showLiveTelemetry: false,
   showTimeSeries: false,
   showHeatmaps: false,
   showEventTimeline: false,
@@ -106,6 +144,51 @@ const SNAPSHOT_CAPABILITIES: BlueprintModeCapabilities = {
   showKPIDeltas: false,
   showRootCauseAnalysis: false,
   showLiveRecommendations: false,
+  showSnapshotInfo: false,
+};
+
+/**
+ * SIMULATION SNAPSHOT MODE - Frozen snapshot during runtime
+ * Tab: "Simulation" with snapshot panel
+ */
+export const SIMULATION_SNAPSHOT_CAPABILITIES: BlueprintModeCapabilities = {
+  // NO editing in Simulation
+  canEditAgents: false,
+  canEditKPIs: false,
+  canEditWorkflows: false,
+  canEditScenarios: false,
+  canEditThresholds: false,
+  canEditFacility: false,
+  canEditSovereignty: false,
+  canEditTopology: false,
+  canAddItems: false,
+  canDeleteItems: false,
+  canSave: false,
+  
+  // No designer-specific displays
+  showValidationWarnings: false,
+  showReadinessScore: false,
+  showVersionHistory: false,
+  showChangeLog: false,
+  showDependencyGraph: false,
+  
+  // Limited Design View displays
+  showArchitectureSummary: false,
+  showDomainOverview: false,
+  showWorkflowPreview: false,
+  showKPISummary: false,
+  showDesignerCTA: true, // Show CTA to open Blueprint Designer
+  
+  // Simulation displays ENABLED
+  showLiveTelemetry: true,
+  showTimeSeries: true,
+  showHeatmaps: true,
+  showEventTimeline: true,
+  showSimulationControls: true,
+  showKPIDeltas: true,
+  showRootCauseAnalysis: true,
+  showLiveRecommendations: true,
+  showSnapshotInfo: true,
 };
 
 interface BlueprintViewContextValue {
@@ -113,16 +196,18 @@ interface BlueprintViewContextValue {
   readOnly: boolean;
   capabilities: BlueprintModeCapabilities;
   
-  // Snapshot-specific metadata (only present when mode === 'snapshot')
+  // Snapshot metadata (only present when mode === 'simulationSnapshot')
   snapshotMeta?: {
     simulationRunId: string;
     blueprintVersion: string;
     capturedAt: string;
+    scenarioName?: string;
   };
   
   // Helper methods
   isDesigner: () => boolean;
-  isSnapshot: () => boolean;
+  isDesignView: () => boolean;
+  isSimulationSnapshot: () => boolean;
   canEdit: (feature: keyof BlueprintModeCapabilities) => boolean;
   canShow: (feature: keyof BlueprintModeCapabilities) => boolean;
 }
@@ -136,6 +221,7 @@ interface BlueprintViewProviderProps {
     simulationRunId: string;
     blueprintVersion: string;
     capturedAt: string;
+    scenarioName?: string;
   };
 }
 
@@ -145,16 +231,31 @@ export function BlueprintViewProvider({
   snapshotMeta 
 }: BlueprintViewProviderProps) {
   const value = useMemo<BlueprintViewContextValue>(() => {
-    const capabilities = mode === 'designer' ? DESIGNER_CAPABILITIES : SNAPSHOT_CAPABILITIES;
+    let capabilities: BlueprintModeCapabilities;
+    
+    switch (mode) {
+      case 'designer':
+        capabilities = DESIGNER_CAPABILITIES;
+        break;
+      case 'designView':
+        capabilities = DESIGN_VIEW_CAPABILITIES;
+        break;
+      case 'simulationSnapshot':
+        capabilities = SIMULATION_SNAPSHOT_CAPABILITIES;
+        break;
+      default:
+        capabilities = DESIGNER_CAPABILITIES;
+    }
     
     return {
       mode,
-      readOnly: mode === 'snapshot',
+      readOnly: mode !== 'designer',
       capabilities,
-      snapshotMeta: mode === 'snapshot' ? snapshotMeta : undefined,
+      snapshotMeta: mode === 'simulationSnapshot' ? snapshotMeta : undefined,
       
       isDesigner: () => mode === 'designer',
-      isSnapshot: () => mode === 'snapshot',
+      isDesignView: () => mode === 'designView',
+      isSimulationSnapshot: () => mode === 'simulationSnapshot',
       canEdit: (feature) => capabilities[feature] === true,
       canShow: (feature) => capabilities[feature] === true,
     };
@@ -177,7 +278,8 @@ export function useBlueprintView(): BlueprintViewContextValue {
       readOnly: false,
       capabilities: DESIGNER_CAPABILITIES,
       isDesigner: () => true,
-      isSnapshot: () => false,
+      isDesignView: () => false,
+      isSimulationSnapshot: () => false,
       canEdit: () => true,
       canShow: (feature) => DESIGNER_CAPABILITIES[feature] === true,
     };
@@ -188,7 +290,6 @@ export function useBlueprintView(): BlueprintViewContextValue {
 
 /**
  * Hook for checking if current view is read-only
- * Convenience wrapper for common use case
  */
 export function useBlueprintReadOnly(): boolean {
   const { readOnly } = useBlueprintView();
@@ -219,6 +320,5 @@ export function useCanShow(feature: keyof BlueprintModeCapabilities): boolean {
   return canShow(feature);
 }
 
-// Export capabilities for external use
-export { DESIGNER_CAPABILITIES, SNAPSHOT_CAPABILITIES };
-export type { BlueprintModeCapabilities };
+// Legacy export for backward compatibility
+export const SNAPSHOT_CAPABILITIES = SIMULATION_SNAPSHOT_CAPABILITIES;

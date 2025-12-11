@@ -7,7 +7,7 @@
  * Supports mode-aware context for Blueprint Designer and Simulation modes.
  */
 
-import { createContext, useContext, useState, ReactNode, useEffect, useCallback, useRef } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { buildCoPilotContext, type CoPilotContext as CoPilotContextType, enrichWithBlueprint } from '@/lib/copilot/contextBuilder';
 import { streamCoPilotResponse } from '@/lib/copilot/streaming';
@@ -405,34 +405,55 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Memoize the context value to prevent unnecessary re-renders
+  const contextValue = useMemo<CoPilotContextValue>(() => ({
+    context,
+    dcContext,
+    updateContext,
+    updateDCContext,
+    isOpen,
+    setIsOpen,
+    initialMessage,
+    setInitialMessage,
+    messages,
+    isStreaming,
+    error,
+    sendMessage,
+    stopStreaming,
+    openWithQuestion,
+    memory,
+    saveMemory,
+    getMemory,
+    clearMemory,
+    memoryEnabled,
+    setMemoryEnabled,
+    isDCPage,
+    currentMode,
+    setCurrentMode,
+  }), [
+    context,
+    dcContext,
+    updateContext,
+    updateDCContext,
+    isOpen,
+    initialMessage,
+    messages,
+    isStreaming,
+    error,
+    sendMessage,
+    stopStreaming,
+    openWithQuestion,
+    memory,
+    saveMemory,
+    getMemory,
+    clearMemory,
+    memoryEnabled,
+    isDCPage,
+    currentMode,
+  ]);
+
   return (
-    <CoPilotContext.Provider 
-      value={{ 
-        context,
-        dcContext,
-        updateContext,
-        updateDCContext,
-        isOpen,
-        setIsOpen,
-        initialMessage,
-        setInitialMessage,
-        messages,
-        isStreaming,
-        error,
-        sendMessage,
-        stopStreaming,
-        openWithQuestion,
-        memory,
-        saveMemory,
-        getMemory,
-        clearMemory,
-        memoryEnabled,
-        setMemoryEnabled,
-        isDCPage,
-        currentMode,
-        setCurrentMode,
-      }}
-    >
+    <CoPilotContext.Provider value={contextValue}>
       {children}
     </CoPilotContext.Provider>
   );

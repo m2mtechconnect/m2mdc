@@ -42,20 +42,26 @@ export function useBlueprint(twinId: string) {
   const [loadSource, setLoadSource] = useState<BlueprintLoadSource>('default');
   const [dbTwinData, setDbTwinData] = useState<any>(null);
   
-  // Access builder store state (only for preview mode)
-  const builderOverview = useDCTwinBuilderStore((s) => s.overview);
+  // Access builder store state (only for preview mode) - select primitive values to avoid re-renders
+  const builderTwinName = useDCTwinBuilderStore((s) => s.overview?.twinName);
+  const builderTwinSlug = useDCTwinBuilderStore((s) => s.overview?.twinSlug);
+  const builderFacilityLocation = useDCTwinBuilderStore((s) => s.overview?.facilityLocation);
+  const builderTier = useDCTwinBuilderStore((s) => s.overview?.tier);
+  const builderCapacityKw = useDCTwinBuilderStore((s) => s.overview?.capacityKw);
   
-  // Access recommendation store (for sandbox preview)
-  const recommendation = useRecommendationStore((s) => s.recommendation);
+  // Access recommendation store (for sandbox preview) - select primitive values
+  const recommendationCompanyName = useRecommendationStore((s) => s.recommendation?.companyName);
+  const recommendationCapacityTier = useRecommendationStore((s) => s.recommendation?.capacityTier);
+  const recommendationRegions = useRecommendationStore((s) => s.recommendation?.regions);
   const isPreviewMode = useRecommendationStore((s) => s.isPreviewMode);
   
   // Check if we're in preview mode (twinId is 'preview' or 'default')
   const isPreviewTwinId = twinId === 'preview' || twinId === 'default';
   
   // Only use builder data for preview mode, never for real twins
-  const hasBuilderData = isPreviewTwinId && builderOverview?.twinName && 
-    builderOverview.twinName !== 'New Data Centre Twin' &&
-    builderOverview.twinName.length > 0;
+  const hasBuilderData = isPreviewTwinId && builderTwinName && 
+    builderTwinName !== 'New Data Centre Twin' &&
+    builderTwinName.length > 0;
 
   useEffect(() => {
     let mounted = true;
@@ -107,21 +113,21 @@ export function useBlueprint(twinId: string) {
         }
         
         // Priority 2: For preview mode, check recommendation store first (sandbox)
-        if (isPreviewTwinId && isPreviewMode && recommendation && mounted) {
+        if (isPreviewTwinId && isPreviewMode && recommendationCompanyName && mounted) {
           console.log('[useBlueprint] Using recommendation preview (sandbox)');
           const baseBp = generateDefaultBlueprint('preview');
           
           // Map recommendation fields to blueprint fields
-          const capacityKw = recommendation.capacityTier === 'hyperscale' ? 20000 :
-                            recommendation.capacityTier === 'large' ? 10000 :
-                            recommendation.capacityTier === 'medium' ? 5000 : 2500;
+          const capacityKw = recommendationCapacityTier === 'hyperscale' ? 20000 :
+                            recommendationCapacityTier === 'large' ? 10000 :
+                            recommendationCapacityTier === 'medium' ? 5000 : 2500;
           
           const bp: DataCentreBlueprint = {
             ...baseBp,
             id: 'preview',
             twinId: 'preview',
-            name: `${recommendation.companyName} Sovereign Green AI Data Centre Twin`,
-            location: recommendation.regions?.[0] || baseBp.location,
+            name: `${recommendationCompanyName} Sovereign Green AI Data Centre Twin`,
+            location: recommendationRegions?.[0] || baseBp.location,
             tier: 'Tier III', // Default tier
             capacityKw,
           };
@@ -134,18 +140,18 @@ export function useBlueprint(twinId: string) {
         
         // Priority 3: For preview mode with builder store data
         if (hasBuilderData && mounted) {
-          console.log('[useBlueprint] Using builder store data (preview mode):', builderOverview.twinName);
+          console.log('[useBlueprint] Using builder store data (preview mode):', builderTwinName);
           const baseBp = generateDefaultBlueprint(twinId);
           
           // Overlay builder values onto the default blueprint
           const bp: DataCentreBlueprint = {
             ...baseBp,
-            id: builderOverview.twinSlug || twinId,
-            twinId: builderOverview.twinSlug || twinId,
-            name: builderOverview.twinName || baseBp.name,
-            location: builderOverview.facilityLocation || baseBp.location,
-            tier: builderOverview.tier || baseBp.tier,
-            capacityKw: builderOverview.capacityKw || baseBp.capacityKw,
+            id: builderTwinSlug || twinId,
+            twinId: builderTwinSlug || twinId,
+            name: builderTwinName || baseBp.name,
+            location: builderFacilityLocation || baseBp.location,
+            tier: builderTier || baseBp.tier,
+            capacityKw: builderCapacityKw || baseBp.capacityKw,
           };
           
           setBlueprint(bp);
@@ -181,7 +187,7 @@ export function useBlueprint(twinId: string) {
     return () => {
       mounted = false;
     };
-  }, [twinId, hasBuilderData, builderOverview]);
+  }, [twinId, hasBuilderData, builderTwinName, builderTwinSlug, builderFacilityLocation, builderTier, builderCapacityKw, isPreviewTwinId, isPreviewMode, recommendationCompanyName, recommendationCapacityTier, recommendationRegions]);
 
   const summary = useMemo<BlueprintSummary | null>(() => {
     if (!blueprint) return null;

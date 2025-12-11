@@ -15,6 +15,7 @@ export { SimulationResultPanel } from './SimulationResultPanel';
 export { SimulationChecklist } from './SimulationChecklist';
 export { SimulationToolsPanel } from './SimulationToolsPanel';
 export { SimulationQuickNav } from './SimulationQuickNav';
+export { SimulationBlueprintSnapshotPanel } from './SimulationBlueprintSnapshotPanel';
 
 // Enhanced simulation components
 export { EnhancedTimeControls } from './EnhancedTimeControls';

@@ -1,7 +1,7 @@
 /**
  * DC Twin Overview Tab
  * Renders overview content from DC Twin Builder Store
- * All content sourced from store - no hard-coded values
+ * All UX content sourced from centralized UX_STRINGS
  */
 
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,7 @@ import {
   Target, TrendingUp, Leaf, Users, Briefcase
 } from 'lucide-react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
+import { OVERVIEW } from '@/ux';
 
 export function DCOverviewTab() {
   const { overview } = useDCTwinBuilderStore();
@@ -34,8 +35,14 @@ export function DCOverviewTab() {
           </div>
         </div>
         
+        {/* Purpose Statement - sourced from UX_STRINGS */}
         <p className="text-base text-muted-foreground leading-relaxed max-w-3xl">
-          {overview.twinSummary || overview.description}
+          {overview.twinSummary || OVERVIEW.PURPOSE_STATEMENT}
+        </p>
+        
+        {/* Business Impact */}
+        <p className="text-sm text-muted-foreground/80 leading-relaxed max-w-3xl">
+          {OVERVIEW.BUSINESS_IMPACT}
         </p>
         
         {/* Industry Tags */}
@@ -46,7 +53,7 @@ export function DCOverviewTab() {
         </div>
       </div>
       
-      {/* Metrics Row */}
+      {/* Metrics Row - Using UX_STRINGS labels */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
@@ -55,7 +62,7 @@ export function DCOverviewTab() {
             </div>
             <div>
               <p className="text-2xl font-bold">{overview.displayRoi}</p>
-              <p className="text-xs text-muted-foreground">Expected ROI</p>
+              <p className="text-xs text-muted-foreground">{OVERVIEW.KEY_METRICS.ROI_IMPACT}</p>
             </div>
           </CardContent>
         </Card>
@@ -67,7 +74,7 @@ export function DCOverviewTab() {
             </div>
             <div>
               <p className="text-2xl font-bold">{overview.displayTimeSaved}</p>
-              <p className="text-xs text-muted-foreground">Time Saved</p>
+              <p className="text-xs text-muted-foreground">{OVERVIEW.KEY_METRICS.EFFICIENCY_GAIN}</p>
             </div>
           </CardContent>
         </Card>
@@ -75,11 +82,11 @@ export function DCOverviewTab() {
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
             <div className="p-2 rounded-lg bg-info/10">
-              <Zap className="h-5 w-5 text-info" />
+              <Leaf className="h-5 w-5 text-info" />
             </div>
             <div>
               <p className="text-2xl font-bold">{overview.renewablePercent}%</p>
-              <p className="text-xs text-muted-foreground">Renewable Energy</p>
+              <p className="text-xs text-muted-foreground">{OVERVIEW.KEY_METRICS.GREEN_ENERGY}</p>
             </div>
           </CardContent>
         </Card>
@@ -91,7 +98,7 @@ export function DCOverviewTab() {
             </div>
             <div>
               <p className="text-2xl font-bold">{overview.capacityKw.toLocaleString()} kW</p>
-              <p className="text-xs text-muted-foreground">IT Capacity</p>
+              <p className="text-xs text-muted-foreground">{OVERVIEW.KEY_METRICS.COMPUTE_CAPACITY}</p>
             </div>
           </CardContent>
         </Card>

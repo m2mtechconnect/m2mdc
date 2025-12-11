@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Wrench, Bot, AlertCircle, ArrowUpRight, Server, Cpu, Thermometer, Globe, Zap as ZapIcon, Activity, Bug, Leaf, Shield } from "lucide-react";
@@ -35,6 +35,9 @@ import { DataCentreSelector } from '@/components/twin-selector';
 // UI Polish imports
 import { StatusBadge, KpiTooltip, NoTwinSelectedEmptyState, LoadingState, ScannerEmptyState } from '@/components/ui';
 import { IndustryComplianceBadges } from '@/components/shared';
+
+// 3D Twin Visualization
+import { TwinVisualizationLayout } from '@/components/twin-visualization';
 
 interface Metrics {
   roi: number;
@@ -482,6 +485,21 @@ export default function Dashboard() {
             </Card>
           </KpiTooltip>
         </section>
+
+        {/* Live Twin 3D Preview */}
+        {twin && (
+          <Card className="mb-6 overflow-hidden">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Activity className="h-4 w-4 text-primary" />
+                Live Twin Preview
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <TwinVisualizationLayout mode="dashboard" />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Quick Link to DC Twin */}
         <div className="mb-8">

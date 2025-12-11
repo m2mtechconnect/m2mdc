@@ -2,11 +2,13 @@
  * Data Centre Digital Twin Page
  * Entry point for the Data Centre Twin Dashboard
  * Supports both operational view and builder preview tabs
+ * ENHANCED: Added 3D Twin Visualization header
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataCentreDashboard } from '@/components/data-centre-twin';
 import { 
   DCOverviewTab, 
@@ -19,13 +21,29 @@ import { sovereignQCFacility } from '@/twins/dataCenter/mockData';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { EmptyStateSelectTwin } from '@/components/twin-selector';
-import { Eye, FileText, MessageSquare, PlayCircle, Rocket, LayoutDashboard } from 'lucide-react';
+import { Eye, FileText, MessageSquare, PlayCircle, Rocket, LayoutDashboard, Activity } from 'lucide-react';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 import { OVERVIEW, SIMULATION, EMPTY_STATES } from '@/ux';
 
 // UI Polish Components
 import { LoadingState, NoTwinSelectedEmptyState } from '@/components/ui/empty-state';
 import { ModeBadge, SnapshotBadge } from '@/components/ui/snapshot-indicator';
+
+// Lazy load 3D visualization for performance
+const TwinVisualizationLayout = lazy(() => 
+  import('@/components/twin-visualization').then(m => ({ default: m.TwinVisualizationLayout }))
+);
+
+function VisualizationSkeleton() {
+  return (
+    <div className="h-64 bg-muted rounded-lg animate-pulse flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+        <p className="text-sm text-muted-foreground">Loading 3D Twin...</p>
+      </div>
+    </div>
+  );
+}
 
 export default function DataCentreTwin() {
   const { id } = useParams<{ id?: string }>();
@@ -160,6 +178,21 @@ export default function DataCentreTwin() {
           <ModeBadge mode="snapshot" />
           <SnapshotBadge version="Live" />
         </div>
+        
+        {/* 3D Twin Visualization Header */}
+        <Card className="overflow-hidden">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Activity className="h-4 w-4 text-primary" />
+              Live Digital Twin
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Suspense fallback={<VisualizationSkeleton />}>
+              <TwinVisualizationLayout mode="dashboard" />
+            </Suspense>
+          </CardContent>
+        </Card>
         
         <DataCentreDashboard 
           facility={facility} 

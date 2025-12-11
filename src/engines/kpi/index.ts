@@ -3,3 +3,4 @@
  */
 
 export * from './KPIOverlayEngine';
+export * from './TimelineSyncEngine';

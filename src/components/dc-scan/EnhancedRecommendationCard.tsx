@@ -35,8 +35,8 @@ import { INDUSTRY_LABELS } from "@/types/dcScan";
 interface EnhancedRecommendationCardProps {
   recommendation: EnhancedDCRecommendation;
   onCreateTwin: () => void;
-  onAdjustBlueprint: () => void;
-  onPreviewSimulation?: () => void;
+  onPreviewBlueprint: () => void;
+  onPreviewSimulation: () => void;
   isCreating?: boolean;
 }
 
@@ -130,7 +130,7 @@ function ScenarioCard({ scenario }: { scenario: ScenarioRecommendation }) {
 export function EnhancedRecommendationCard({
   recommendation,
   onCreateTwin,
-  onAdjustBlueprint,
+  onPreviewBlueprint,
   onPreviewSimulation,
   isCreating = false
 }: EnhancedRecommendationCardProps) {
@@ -329,25 +329,23 @@ export function EnhancedRecommendationCard({
               </>
             )}
           </Button>
-          {onPreviewSimulation && (
-            <Button 
-              variant="secondary" 
-              onClick={onPreviewSimulation}
-              disabled={isCreating}
-              size="lg"
-            >
-              <Play className="h-4 w-4 mr-2" />
-              Preview Simulation
-            </Button>
-          )}
+          <Button 
+            variant="secondary" 
+            onClick={onPreviewSimulation}
+            disabled={isCreating}
+            size="lg"
+          >
+            <Play className="h-4 w-4 mr-2" />
+            Preview Simulation
+          </Button>
           <Button 
             variant="outline" 
-            onClick={onAdjustBlueprint}
+            onClick={onPreviewBlueprint}
             disabled={isCreating}
             size="lg"
           >
             <Settings className="h-4 w-4 mr-2" />
-            Customize Blueprint
+            Preview Blueprint
           </Button>
         </div>
       </CardContent>

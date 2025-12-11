@@ -28,6 +28,7 @@ import { generateRecommendation } from "@/lib/dc-scan/generateRecommendation";
 import { EnhancedRecommendationCard } from "./EnhancedRecommendationCard";
 import { LastScanBanner } from "./LastScanBanner";
 import { useDCTwinBuilderStore } from "@/stores/dcTwinBuilderStore";
+import { useRecommendationStore } from "@/stores/recommendationStore";
 import { transformToEnhancedRecommendation, isEnhancedRecommendation, toLegacyRecommendation } from "@/lib/dc-scan/transformToEnhanced";
 import type { DCRecommendation, DCBlueprintProfile } from "@/types/dcScan";
 import type { EnhancedDCRecommendation } from "@/types/enhancedRecommendation";
@@ -37,6 +38,7 @@ export function DCScannerPanel() {
   const { toast } = useToast();
   const { createTwin, setActiveTwin, refreshTwins } = useActiveTwin();
   const { initializeFromRecommendation, setCurrentStep } = useDCTwinBuilderStore();
+  const { setRecommendation: setGlobalRecommendation } = useRecommendationStore();
   
   const [url, setUrl] = useState("");
   const [isScanning, setIsScanning] = useState(false);
@@ -210,22 +212,32 @@ export function DCScannerPanel() {
     }
   };
 
-  const handleAdjustBlueprint = () => {
+  const handlePreviewBlueprint = () => {
     if (!recommendation) return;
     
-    // Initialize the DC Twin Builder Store from the recommendation (convert to legacy format)
-    const legacyRec = toLegacyRecommendation(recommendation);
-    initializeFromRecommendation(legacyRec, currentSessionId || '');
-    setCurrentStep(1);
-    
-    // Navigate to builder with pre-filled data
-    navigate("/builder?fromScanner=true", {
-      state: {
-        fromRecommendation: true,
-        recommendation,
-        sessionId: currentSessionId
-      }
+    // Store recommendation in preview store (sandbox mode) - NO twin creation
+    setGlobalRecommendation({
+      recommendation: recommendation as any, // Enhanced recommendation is compatible
+      sourceUrl: url,
+      scanSessionId: currentSessionId,
     });
+    
+    console.log('[DCScannerPanel] Opening blueprint preview (sandbox mode)');
+    navigate('/blueprint/preview');
+  };
+  
+  const handlePreviewSimulation = () => {
+    if (!recommendation) return;
+    
+    // Store recommendation in preview store (sandbox mode) - NO twin creation
+    setGlobalRecommendation({
+      recommendation: recommendation as any,
+      sourceUrl: url,
+      scanSessionId: currentSessionId,
+    });
+    
+    console.log('[DCScannerPanel] Opening simulation preview (sandbox mode)');
+    navigate('/simulation/preview');
   };
 
   return (
@@ -287,7 +299,8 @@ export function DCScannerPanel() {
         <EnhancedRecommendationCard
           recommendation={recommendation}
           onCreateTwin={handleCreateTwin}
-          onAdjustBlueprint={handleAdjustBlueprint}
+          onPreviewBlueprint={handlePreviewBlueprint}
+          onPreviewSimulation={handlePreviewSimulation}
           isCreating={isCreatingTwin}
         />
       )}

@@ -75,7 +75,7 @@ export function AOCDesignTab({ instance }: AOCDesignTabProps) {
           subtitle={`Production configuration for ${instance.name}`}
           icon={<Cpu className="h-5 w-5" />}
           status="info"
-          headerAction={<Badge variant="outline" className="border-dc-primary/30">v{instance.version}</Badge>}
+          headerAction={<Badge variant="outline" className="border-primary/30">v{instance.version}</Badge>}
         >
           <div className="text-sm text-muted-foreground">
             This is a read-only view of the operational design. To make changes, open the Blueprint Designer.
@@ -122,16 +122,16 @@ export function AOCDesignTab({ instance }: AOCDesignTabProps) {
       {/* Intelligence Configuration */}
       <DCCard 
         title="Intelligence Configuration"
-        icon={<Brain className="h-4 w-4 text-dc-gpu" />}
+        icon={<Brain className="h-4 w-4 text-primary" />}
       >
         {intelligence ? (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+              <div className="p-3 rounded-lg bg-muted/50 border border-border">
                 <p className="text-xs text-muted-foreground mb-1">AI Model</p>
                 <p className="text-sm font-medium">{intelligence.model_id || 'Gemini 2.5 Flash'}</p>
               </div>
-              <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+              <div className="p-3 rounded-lg bg-muted/50 border border-border">
                 <p className="text-xs text-muted-foreground mb-1">Version</p>
                 <p className="text-sm font-medium">{intelligence.version || '1.0.0'}</p>
               </div>
@@ -142,7 +142,7 @@ export function AOCDesignTab({ instance }: AOCDesignTabProps) {
                 <p className="text-xs text-muted-foreground mb-2">Enabled Tools</p>
                 <div className="flex flex-wrap gap-2">
                   {intelligence.tool_allowlist.map((tool, idx) => (
-                    <Badge key={idx} variant="outline" className="bg-dc-surface border-dc-primary/30">
+                    <Badge key={idx} variant="outline" className="bg-muted/50 border-primary/30">
                       {tool}
                     </Badge>
                   ))}
@@ -153,7 +153,7 @@ export function AOCDesignTab({ instance }: AOCDesignTabProps) {
             {intelligence.mcp_servers && (
               <div>
                 <p className="text-xs text-muted-foreground mb-2">MCP Servers</p>
-                <pre className="text-xs bg-dc-bg-secondary p-4 rounded-lg overflow-auto font-mono max-h-[200px]">
+                <pre className="text-xs bg-muted p-4 rounded-lg overflow-auto font-mono max-h-[200px]">
                   {JSON.stringify(intelligence.mcp_servers, null, 2)}
                 </pre>
               </div>
@@ -167,8 +167,8 @@ export function AOCDesignTab({ instance }: AOCDesignTabProps) {
       {/* Integrations */}
       <DCCard 
         title="Connected Integrations"
-        icon={<Zap className="h-4 w-4 text-dc-power" />}
-        headerAction={<Badge variant="outline" className="border-dc-power/30">{integrations.length} active</Badge>}
+        icon={<Zap className="h-4 w-4 text-warning" />}
+        headerAction={<Badge variant="outline" className="border-warning/30">{integrations.length} active</Badge>}
       >
         {integrations.length === 0 ? (
           <p className="text-sm text-muted-foreground">No integrations connected</p>
@@ -177,16 +177,16 @@ export function AOCDesignTab({ instance }: AOCDesignTabProps) {
             {integrations.map((integration) => (
               <div 
                 key={integration.id} 
-                className="p-4 rounded-lg bg-dc-surface border border-dc-border"
+                className="p-4 rounded-lg bg-muted/50 border border-border"
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <Database className="h-4 w-4 text-dc-info" />
+                    <Database className="h-4 w-4 text-info" />
                     <span className="font-medium text-sm uppercase">{integration.provider}</span>
                   </div>
                   <Badge 
                     variant={integration.status === 'active' ? 'default' : 'secondary'} 
-                    className={integration.status === 'active' ? 'bg-dc-success/20 text-dc-success border-dc-success/30' : ''}
+                    className={integration.status === 'active' ? 'bg-success/20 text-success border-success/30' : ''}
                   >
                     {integration.status}
                   </Badge>
@@ -209,19 +209,19 @@ export function AOCDesignTab({ instance }: AOCDesignTabProps) {
         icon={<Database className="h-4 w-4" />}
       >
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+          <div className="p-3 rounded-lg bg-muted/50 border border-border">
             <p className="text-xs text-muted-foreground mb-1">Status</p>
             <p className="font-medium text-sm">{instance.status}</p>
           </div>
-          <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+          <div className="p-3 rounded-lg bg-muted/50 border border-border">
             <p className="text-xs text-muted-foreground mb-1">Version</p>
             <p className="font-medium text-sm">v{instance.version}</p>
           </div>
-          <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+          <div className="p-3 rounded-lg bg-muted/50 border border-border">
             <p className="text-xs text-muted-foreground mb-1">Category</p>
             <p className="font-medium text-sm">{instance.category}</p>
           </div>
-          <div className="p-3 rounded-lg bg-dc-surface border border-dc-border">
+          <div className="p-3 rounded-lg bg-muted/50 border border-border">
             <p className="text-xs text-muted-foreground mb-1">Department</p>
             <p className="font-medium text-sm">{instance.department}</p>
           </div>

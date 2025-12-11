@@ -100,21 +100,21 @@ export function DCFacilityMap({ onRackSelect, selectedRackId }: DCFacilityMapPro
   const [hoveredRack, setHoveredRack] = useState<string | null>(null);
 
   const getHeatmapColor = (temp: number): string => {
-    if (temp < 25) return 'bg-dc-cooling/60';
-    if (temp < 30) return 'bg-dc-success/60';
-    if (temp < 35) return 'bg-dc-warning/60';
-    if (temp < 40) return 'bg-dc-thermal/60';
-    return 'bg-dc-critical/80';
+    if (temp < 25) return 'bg-info/60';
+    if (temp < 30) return 'bg-success/60';
+    if (temp < 35) return 'bg-warning/60';
+    if (temp < 40) return 'bg-destructive/40';
+    return 'bg-destructive/80';
   };
 
   const getZoneColor = (type: ZoneData['type']): string => {
     switch (type) {
-      case 'cooling': return 'bg-dc-cooling/20 border-dc-cooling/40';
-      case 'power': return 'bg-dc-power/20 border-dc-power/40';
-      case 'ups': return 'bg-dc-warning/20 border-dc-warning/40';
-      case 'hot_aisle': return 'bg-dc-thermal/20 border-dc-thermal/40';
-      case 'cold_aisle': return 'bg-dc-info/20 border-dc-info/40';
-      default: return 'bg-dc-surface';
+      case 'cooling': return 'bg-info/20 border-info/40';
+      case 'power': return 'bg-warning/20 border-warning/40';
+      case 'ups': return 'bg-warning/20 border-warning/40';
+      case 'hot_aisle': return 'bg-destructive/20 border-destructive/40';
+      case 'cold_aisle': return 'bg-info/20 border-info/40';
+      default: return 'bg-muted';
     }
   };
 
@@ -133,29 +133,29 @@ export function DCFacilityMap({ onRackSelect, selectedRackId }: DCFacilityMapPro
       <div className="flex items-center gap-4 text-xs">
         <span className="text-muted-foreground">Temperature:</span>
         <div className="flex items-center gap-1">
-          <div className="w-4 h-4 rounded bg-dc-cooling/60" />
+          <div className="w-4 h-4 rounded bg-info/60" />
           <span>&lt;25°C</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-4 h-4 rounded bg-dc-success/60" />
+          <div className="w-4 h-4 rounded bg-success/60" />
           <span>25-30°C</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-4 h-4 rounded bg-dc-warning/60" />
+          <div className="w-4 h-4 rounded bg-warning/60" />
           <span>30-35°C</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-4 h-4 rounded bg-dc-thermal/60" />
+          <div className="w-4 h-4 rounded bg-destructive/40" />
           <span>35-40°C</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-4 h-4 rounded bg-dc-critical/80" />
+          <div className="w-4 h-4 rounded bg-destructive/80" />
           <span>&gt;40°C</span>
         </div>
       </div>
 
       {/* Facility Grid */}
-      <div className="relative bg-dc-bg-secondary rounded-lg p-4 border border-dc-border">
+      <div className="relative bg-muted rounded-lg p-4 border border-border">
         <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gridTemplateRows: 'repeat(5, minmax(60px, 80px))' }}>
           {/* Racks */}
           {racks.map((rack) => (
@@ -164,9 +164,9 @@ export function DCFacilityMap({ onRackSelect, selectedRackId }: DCFacilityMapPro
               className={cn(
                 'relative rounded-lg border-2 p-2 cursor-pointer transition-all hover:scale-105',
                 getHeatmapColor(rack.temperature),
-                rack.status === 'critical' ? 'border-dc-critical animate-pulse' : 
-                rack.status === 'warning' ? 'border-dc-warning' : 'border-dc-border/50',
-                selectedRackId === rack.id && 'ring-2 ring-dc-primary ring-offset-2 ring-offset-dc-bg-primary'
+                rack.status === 'critical' ? 'border-destructive animate-pulse' : 
+                rack.status === 'warning' ? 'border-warning' : 'border-border/50',
+                selectedRackId === rack.id && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
               )}
               style={{ gridRow: rack.row + 1, gridColumn: rack.col + 1 }}
               onMouseEnter={() => setHoveredRack(rack.id)}
@@ -182,13 +182,13 @@ export function DCFacilityMap({ onRackSelect, selectedRackId }: DCFacilityMapPro
               {rack.status !== 'normal' && (
                 <AlertTriangle className={cn(
                   'absolute top-1 right-1 h-3 w-3',
-                  rack.status === 'critical' ? 'text-dc-critical' : 'text-dc-warning'
+                  rack.status === 'critical' ? 'text-destructive' : 'text-warning'
                 )} />
               )}
 
               {/* Hover tooltip */}
               {hoveredRack === rack.id && (
-                <div className="absolute z-10 bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 bg-dc-surface-elevated rounded-lg border border-dc-border shadow-lg whitespace-nowrap">
+                <div className="absolute z-10 bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 bg-card rounded-lg border border-border shadow-lg whitespace-nowrap">
                   <div className="text-xs space-y-1">
                     <div className="font-medium">{rack.name}</div>
                     <div className="flex items-center gap-2">
@@ -202,9 +202,9 @@ export function DCFacilityMap({ onRackSelect, selectedRackId }: DCFacilityMapPro
                     <Badge 
                       className={cn(
                         'text-[10px]',
-                        rack.status === 'critical' ? 'bg-dc-critical/20 text-dc-critical' :
-                        rack.status === 'warning' ? 'bg-dc-warning/20 text-dc-warning' :
-                        'bg-dc-success/20 text-dc-success'
+                        rack.status === 'critical' ? 'bg-destructive/20 text-destructive' :
+                        rack.status === 'warning' ? 'bg-warning/20 text-warning' :
+                        'bg-success/20 text-success'
                       )}
                     >
                       {rack.status}
@@ -240,7 +240,7 @@ export function DCFacilityMap({ onRackSelect, selectedRackId }: DCFacilityMapPro
 
       {/* Selected Rack Details */}
       {selectedRackId && (
-        <div className="p-4 bg-dc-surface rounded-lg border border-dc-border animate-fade-in">
+        <div className="p-4 bg-card rounded-lg border border-border animate-fade-in">
           <h4 className="font-medium mb-2">
             {racks.find(r => r.id === selectedRackId)?.name} Details
           </h4>

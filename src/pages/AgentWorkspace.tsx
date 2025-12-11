@@ -111,18 +111,18 @@ export default function AgentWorkspace() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dc-bg-primary flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-dc-cyan" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (!agent) {
     return (
-      <div className="min-h-screen bg-dc-bg-primary section-padding-lg">
+      <div className="min-h-screen bg-background section-padding-lg">
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-2xl font-semibold mb-4 text-foreground">Agent not found</h2>
-          <Button onClick={() => navigate('/dashboard')} className="bg-dc-cyan hover:bg-dc-cyan/80 text-dc-bg-primary">
+          <Button onClick={() => navigate('/dashboard')} className="bg-primary hover:bg-primary/80">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Dashboard
           </Button>
@@ -132,7 +132,7 @@ export default function AgentWorkspace() {
   }
 
   return (
-    <div className="min-h-screen bg-dc-bg-primary section-padding-lg">
+    <div className="min-h-screen bg-background section-padding-lg">
       <div className="max-w-7xl mx-auto space-y-6 px-4">
         {/* Header */}
         <div className="flex items-start justify-between">
@@ -147,8 +147,8 @@ export default function AgentWorkspace() {
               Back to Dashboard
             </Button>
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-dc-cyan/10 border border-dc-cyan/30">
-                <Cpu className="h-6 w-6 text-dc-cyan" />
+              <div className="p-2 rounded-lg bg-primary/10 border border-primary/30">
+                <Cpu className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <h1 className="text-2xl font-semibold text-foreground">{agent.name}</h1>
@@ -156,11 +156,11 @@ export default function AgentWorkspace() {
               </div>
             </div>
             <div className="flex gap-2 mt-2">
-              <Badge className={agent.status === 'deployed' ? 'bg-dc-green/20 text-dc-green border-dc-green/30' : 'bg-muted text-muted-foreground'}>
+              <Badge className={agent.status === 'deployed' ? 'bg-success/20 text-success border-success/30' : 'bg-muted text-muted-foreground'}>
                 {agent.status}
               </Badge>
               {template && (
-                <Badge variant="outline" className="border-dc-border">
+                <Badge variant="outline" className="border-border">
                   {template.icon} {template.name}
                 </Badge>
               )}
@@ -169,7 +169,7 @@ export default function AgentWorkspace() {
           <Button
             variant="outline"
             onClick={() => navigate(`/builder?id=${id}`)}
-            className="border-dc-border hover:bg-dc-bg-secondary"
+            className="border-border hover:bg-muted"
           >
             <Settings className="mr-2 h-4 w-4" />
             Configure
@@ -213,16 +213,16 @@ export default function AgentWorkspace() {
 
         {/* Main Content */}
         <Tabs defaultValue="chat" className="space-y-4">
-          <TabsList className="bg-dc-bg-secondary border border-dc-border">
-            <TabsTrigger value="chat" className="data-[state=active]:bg-dc-cyan/20 data-[state=active]:text-dc-cyan">
+          <TabsList className="bg-muted border border-border">
+            <TabsTrigger value="chat" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
               <Activity className="mr-2 h-4 w-4" />
               Chat
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-dc-cyan/20 data-[state=active]:text-dc-cyan">
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
               <TrendingUp className="mr-2 h-4 w-4" />
               Analytics
             </TabsTrigger>
-            <TabsTrigger value="history" className="data-[state=active]:bg-dc-cyan/20 data-[state=active]:text-dc-cyan">
+            <TabsTrigger value="history" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
               <FileText className="mr-2 h-4 w-4" />
               History
             </TabsTrigger>
@@ -241,17 +241,17 @@ export default function AgentWorkspace() {
               <DCSectionHeader
                 title="Performance Analytics"
                 subtitle="Agent execution metrics and performance indicators"
-                icon={<TrendingUp className="h-5 w-5 text-dc-cyan" />}
+                icon={<TrendingUp className="h-5 w-5 text-primary" />}
               />
               <div className="space-y-4 mt-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-dc-bg-secondary rounded-lg border border-dc-border">
+                  <div className="p-4 bg-muted rounded-lg border border-border">
                     <p className="text-xs text-muted-foreground mb-1">Total Conversations</p>
                     <p className="text-2xl font-semibold text-foreground">{stats.totalRuns}</p>
                   </div>
-                  <div className="p-4 bg-dc-bg-secondary rounded-lg border border-dc-border">
+                  <div className="p-4 bg-muted rounded-lg border border-border">
                     <p className="text-xs text-muted-foreground mb-1">Success Rate</p>
-                    <p className="text-2xl font-semibold text-dc-green">{stats.successRate.toFixed(1)}%</p>
+                    <p className="text-2xl font-semibold text-success">{stats.successRate.toFixed(1)}%</p>
                   </div>
                 </div>
                 {template?.kpi_definitions && template.kpi_definitions.length > 0 && (
@@ -259,7 +259,7 @@ export default function AgentWorkspace() {
                     <h4 className="text-sm font-medium mb-2 text-foreground">Template KPIs</h4>
                     <div className="grid grid-cols-2 gap-4">
                       {template.kpi_definitions.map((kpi: any, idx: number) => (
-                        <div key={idx} className="p-3 bg-dc-bg-secondary rounded-lg border border-dc-border">
+                        <div key={idx} className="p-3 bg-muted rounded-lg border border-border">
                           <p className="text-xs text-muted-foreground">{kpi.label}</p>
                           <p className="text-sm font-medium text-foreground">Target: {kpi.target}{kpi.type === 'percentage' ? '%' : ''}</p>
                         </div>
@@ -276,7 +276,7 @@ export default function AgentWorkspace() {
               <DCSectionHeader
                 title="Run History"
                 subtitle="Execution logs and historical data"
-                icon={<FileText className="h-5 w-5 text-dc-cyan" />}
+                icon={<FileText className="h-5 w-5 text-primary" />}
               />
               <p className="text-muted-foreground mt-4">Run history details will appear here</p>
             </DCCard>

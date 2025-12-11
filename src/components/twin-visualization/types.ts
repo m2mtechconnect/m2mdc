@@ -94,43 +94,47 @@ export interface TwinVisualizationState {
   carbonIntensity: number;
 }
 
-// Color scales for visualization
+// Enhanced color scales for visualization - more NOC-like appearance
 export const THERMAL_COLORS = {
-  cool: '#3B82F6',    // blue-500
-  warm: '#F59E0B',    // amber-500
-  hot: '#EF4444',     // red-500
-  critical: '#DC2626' // red-600
+  cold: '#1e88e5',    // bright blue
+  cool: '#42a5f5',    // light blue
+  warm: '#ffa726',    // orange
+  hot: '#ef5350',     // red
+  critical: '#d32f2f' // dark red
 };
 
 export const UTILIZATION_COLORS = {
-  low: '#22C55E',     // green-500
-  medium: '#F59E0B',  // amber-500
-  high: '#EF4444',    // red-500
+  low: '#26a69a',     // teal
+  medium: '#ffb74d',  // amber
+  high: '#ef5350',    // red
 };
 
 export const POWER_COLORS = {
-  healthy: '#22C55E',
-  warning: '#F59E0B',
-  critical: '#EF4444',
-  degraded: '#6B7280'
+  healthy: '#26a69a',
+  warning: '#ffb74d',
+  critical: '#ef5350',
+  degraded: '#78909c'
 };
 
 export function getThermalColor(celsius: number): string {
+  // Smooth gradient interpolation for more realistic thermal visualization
+  if (celsius < 18) return THERMAL_COLORS.cold;
   if (celsius < 22) return THERMAL_COLORS.cool;
+  if (celsius < 26) return '#8bc34a'; // light green - optimal
   if (celsius < 28) return THERMAL_COLORS.warm;
   if (celsius < 32) return THERMAL_COLORS.hot;
   return THERMAL_COLORS.critical;
 }
 
 export function getUtilizationColor(percent: number): string {
-  if (percent < 60) return UTILIZATION_COLORS.low;
-  if (percent < 85) return UTILIZATION_COLORS.medium;
+  if (percent < 50) return UTILIZATION_COLORS.low;
+  if (percent < 75) return UTILIZATION_COLORS.medium;
   return UTILIZATION_COLORS.high;
 }
 
 export function getPowerColor(loadRatio: number, isDegraded: boolean): string {
   if (isDegraded) return POWER_COLORS.degraded;
-  if (loadRatio < 0.7) return POWER_COLORS.healthy;
-  if (loadRatio < 0.9) return POWER_COLORS.warning;
+  if (loadRatio < 0.6) return POWER_COLORS.healthy;
+  if (loadRatio < 0.85) return POWER_COLORS.warning;
   return POWER_COLORS.critical;
 }

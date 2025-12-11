@@ -152,7 +152,7 @@ export default function AccessControl() {
         <DCCard 
           title="Access Denied" 
           subtitle="You need global admin permissions to access this page."
-          icon={<Shield className="h-5 w-5 text-dc-cyan" />}
+          icon={<Shield className="h-5 w-5 text-info" />}
         >
           <div />
         </DCCard>
@@ -165,7 +165,7 @@ export default function AccessControl() {
       <DCSectionHeader
         title="Access Control & RBAC"
         subtitle="Manage user roles and permissions across the platform"
-        icon={<Shield className="h-5 w-5 text-dc-cyan" />}
+        icon={<Shield className="h-5 w-5 text-info" />}
         action={
           <Dialog open={isGrantDialogOpen} onOpenChange={setIsGrantDialogOpen}>
             <DialogTrigger asChild>
@@ -257,7 +257,7 @@ export default function AccessControl() {
       />
 
       {/* Role Descriptions */}
-      <DCCard title="Role Permissions" icon={<Info className="h-4 w-4 text-dc-cyan" />}>
+      <DCCard title="Role Permissions" icon={<Info className="h-4 w-4 text-info" />}>
           <div className="grid md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Badge variant="secondary">Viewer</Badge>

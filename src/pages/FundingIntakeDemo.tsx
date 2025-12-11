@@ -105,7 +105,7 @@ export default function FundingIntakeDemo() {
       <DCSectionHeader
         title="Funding Intake & Triage Twin – Demo"
         subtitle="Submit a company funding intake form to see the Digital Twin in action. The system will automatically classify the opportunity, check eligibility, and generate a triage summary."
-        icon={<FileText className="h-6 w-6 text-dc-cyan" />}
+        icon={<FileText className="h-6 w-6 text-info" />}
       />
 
       <div className="grid gap-6 lg:grid-cols-2">

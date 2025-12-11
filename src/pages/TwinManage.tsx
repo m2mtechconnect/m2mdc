@@ -184,7 +184,7 @@ export default function TwinManage() {
           <TabsList className="grid w-full grid-cols-7 mb-6 sticky top-[60px] z-10 bg-background">
             <TabsTrigger value="live">Live</TabsTrigger>
             <TabsTrigger value="workflow">Workflow</TabsTrigger>
-            <TabsTrigger value="blueprint">Blueprint</TabsTrigger>
+            <TabsTrigger value="design">Design</TabsTrigger>
             <TabsTrigger value="simulation">Simulation</TabsTrigger>
             <TabsTrigger value="metrics">Metrics</TabsTrigger>
             <TabsTrigger value="deploy">Deploy</TabsTrigger>
@@ -200,7 +200,7 @@ export default function TwinManage() {
               <AOCWorkflowTab agentId={resolvedId!} />
             </TabsContent>
 
-            <TabsContent value="blueprint" className="mt-0">
+            <TabsContent value="design" className="mt-0">
               <AOCBlueprintTab instance={instance} />
             </TabsContent>
 

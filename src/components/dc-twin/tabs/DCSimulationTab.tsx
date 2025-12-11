@@ -75,7 +75,7 @@ export function DCSimulationTab() {
   };
   
   return (
-    <BlueprintViewProvider mode="snapshot">
+    <BlueprintViewProvider mode="simulationSnapshot">
       <div className="space-y-6">
         {/* SIMULATION MODE HEADER - Clear visual distinction */}
         <SimulationModeHeader

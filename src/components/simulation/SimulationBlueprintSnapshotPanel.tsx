@@ -148,9 +148,9 @@ export function SimulationBlueprintSnapshotPanel({ twinId }: SimulationBlueprint
           </div>
         </SheetHeader>
 
-        {/* Wrapped in snapshot mode context */}
+        {/* Wrapped in simulation snapshot mode context */}
         <BlueprintViewProvider 
-          mode="snapshot" 
+          mode="simulationSnapshot" 
           snapshotMeta={{
             simulationRunId,
             blueprintVersion,

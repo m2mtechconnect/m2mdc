@@ -1,7 +1,7 @@
 /**
- * DC Twin Blueprint Tab
- * READ-ONLY view of Blueprint when accessed from DC Twin page
- * For full editing, user must go to Blueprint Designer page
+ * DC Twin Design Tab (formerly Blueprint Tab)
+ * READ-ONLY summary view of Design when accessed from DC Twin page
+ * For full editing, user must go to Blueprint Designer
  */
 
 import { useState } from 'react';
@@ -24,7 +24,8 @@ import { ChangeLogPanel } from '@/components/blueprint/ChangeLogPanel';
 import { AgentHealthPanel } from '@/components/blueprint/AgentHealthPanel';
 import { KPIEnhancementsPanel } from '@/components/blueprint/KPIEnhancementsPanel';
 import { WorkflowEnhancementsPanel } from '@/components/blueprint/WorkflowEnhancementsPanel';
-import { BlueprintViewProvider, useBlueprintView } from '@/context/BlueprintViewContext';
+import { BlueprintViewProvider } from '@/context/BlueprintViewContext';
+import { DesignViewHeader } from '@/components/blueprint/DesignViewHeader';
 
 const domainIcons: Record<DCAgentDomain, React.ReactNode> = {
   thermal: <Thermometer className="h-4 w-4" />,
@@ -53,38 +54,17 @@ export function DCBlueprintTab() {
   };
   
   return (
-    <BlueprintViewProvider mode="snapshot">
+    <BlueprintViewProvider mode="designView">
       <div className="space-y-6">
-        {/* Blueprint View Header - Indicates this is READ-ONLY */}
-        <div className="rounded-lg border-2 border-muted bg-gradient-to-r from-muted/30 to-muted/50 p-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-muted">
-                <FileText className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-semibold">Blueprint Overview</h2>
-                  <Badge variant="secondary" className="gap-1">
-                    <Eye className="h-3 w-3" />
-                    View Only
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {overview.twinName || 'Data Centre Configuration'} • Read-only snapshot
-                </p>
-              </div>
-            </div>
-            <Button 
-              variant="outline" 
-              onClick={handleOpenDesigner}
-              className="gap-2 shrink-0"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Open Full Blueprint Designer
-            </Button>
-          </div>
-        </div>
+        {/* DESIGN VIEW HEADER - Indicates this is READ-ONLY */}
+        <DesignViewHeader
+          twinName={overview.twinName || 'Data Centre Configuration'}
+          twinId="default"
+          facilityLocation={overview.facilityLocation || 'Montreal, QC'}
+          capacityKw={overview.capacityKw || 10000}
+          tier={overview.tier || 'Tier IV'}
+          renewablePercent={overview.renewablePercent || 95}
+        />
 
         {/* Executive Summary Block */}
         <ExecutiveSummaryBlock />

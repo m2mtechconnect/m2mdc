@@ -2,8 +2,10 @@
  * Blueprint Components Index
  * Exports all blueprint-related components
  * 
- * IMPORTANT: These components are for DESIGNER MODE only
- * Do not import simulation components here
+ * MODE SEPARATION:
+ * - Designer components: Full editing capability (mode="designer")
+ * - Design View components: Read-only summary (mode="designView")
+ * - Simulation components: Frozen snapshot (mode="simulationSnapshot")
  */
 
 // Core Blueprint Components
@@ -22,7 +24,10 @@ export { BlueprintDesignerWrapper } from './BlueprintDesignerWrapper';
 export { BlueprintSnapshotCard } from './BlueprintSnapshotCard';
 export { BlueprintSummaryCard } from './BlueprintSummaryCard';
 export { BlueprintReviewSection } from './BlueprintReviewSection';
+
+// Mode-specific Headers
 export { DesignerModeHeader } from './DesignerModeHeader';
+export { DesignViewHeader } from './DesignViewHeader';
 export { ReadOnlyGuard, useReadOnlyMode, withReadOnlyDisabled } from './ReadOnlyGuard';
 
 // Tab Components

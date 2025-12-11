@@ -52,8 +52,9 @@ export default function DataCentreTwin() {
   const [facility, setFacility] = useState<DataCentreFacility | null>(null);
   
   // Check if we have an active builder session
+  // CRITICAL: Only use builder session when there's NO active twin from header dropdown
   const dcBuilderStore = useDCTwinBuilderStore();
-  const hasBuilderSession = dcBuilderStore.sessionId && dcBuilderStore.overview.twinName;
+  const hasBuilderSession = !twin && dcBuilderStore.sessionId && dcBuilderStore.overview.twinName;
   
   // Get tab from URL or default
   const urlTab = searchParams.get('tab');
@@ -68,12 +69,12 @@ export default function DataCentreTwin() {
   }, [id, activeTwinId, setActiveTwin]);
   
   useEffect(() => {
+    // CRITICAL: Always prioritize real twin over builder session
+    // Builder session is only for preview/sandbox mode
     if (!twin && !hasBuilderSession) return;
     
-    // Update page title
-    const twinName = hasBuilderSession 
-      ? dcBuilderStore.overview.twinName 
-      : (twin?.name || 'Sovereign AI Facility');
+    // Update page title - ALWAYS use twin.name if available
+    const twinName = twin?.name || (hasBuilderSession ? dcBuilderStore.overview.twinName : 'Sovereign AI Facility');
     document.title = `Data Centre Twin | ${twinName}`;
     
     // Use mock facility data enhanced with current twin info

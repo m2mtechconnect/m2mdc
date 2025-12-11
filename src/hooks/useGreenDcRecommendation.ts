@@ -1,6 +1,46 @@
 /**
- * Hook for fetching Green DC Twin recommendations
- * Now initializes the DC Twin Builder store from recommendations
+ * useGreenDcRecommendation - Hook for Fetching Green DC Twin Recommendations
+ * Initializes DC Twin Builder store from URL scanner recommendations
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * GREEN DATA CENTER STANDARDS:
+ * - The Green Grid Data Center Efficiency Metrics (PUE, DCiE, WUE, CUE)
+ *   https://www.thegreengrid.org/en/resources/library-and-tools
+ * - LEED v4 Data Center Certification
+ *   https://www.usgbc.org/leed
+ * - EPA ENERGY STAR Data Center Certification
+ *   https://www.energystar.gov/buildings/benchmark/understand_metrics/data_center
+ * 
+ * SUSTAINABILITY FRAMEWORKS:
+ * - GHG Protocol Corporate Standard (Scope 1, 2, 3)
+ *   https://ghgprotocol.org/corporate-standard
+ * - SBTi (Science Based Targets initiative) for ICT Sector
+ *   https://sciencebasedtargets.org/sectors/ict
+ * - RE100 Renewable Electricity Initiative
+ *   https://www.there100.org/
+ * 
+ * INDUSTRY CLASSIFICATION:
+ * - NAICS (North American Industry Classification System)
+ *   https://www.census.gov/naics/
+ * - GICS (Global Industry Classification Standard)
+ *   https://www.msci.com/our-solutions/indexes/gics
+ * 
+ * CANADIAN DATA SOVEREIGNTY:
+ * - Treasury Board of Canada - Direction on Electronic Data Residency
+ *   https://www.canada.ca/en/government/system/digital-government/digital-government-innovations/cloud-services/direction-electronic-data-residency.html
+ * - PIPEDA Compliance Requirements
+ *   https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/
+ * 
+ * REACT PATTERNS:
+ * - React Query for Server State Management
+ *   https://tanstack.com/query/latest
+ * - React useCallback for Stable Function References
+ *   https://react.dev/reference/react/useCallback
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import { useState, useCallback } from "react";

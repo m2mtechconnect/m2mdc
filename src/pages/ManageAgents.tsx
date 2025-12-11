@@ -15,6 +15,7 @@ import { useAgentDefinitionsData } from '@/hooks/useAgentDefinitionsData';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { EmptyStateSelectTwin } from '@/components/twin-selector';
 import { AGENTS, getAgentSummary } from '@/ux';
+import { LoadingState, NoAgentsEmptyState } from '@/components/ui/empty-state';
 
 export default function ManageAgents() {
   const navigate = useNavigate();

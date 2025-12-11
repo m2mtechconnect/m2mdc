@@ -1496,6 +1496,7 @@ export type Database = {
           city: string
           created_at: string
           created_by_user: string
+          deployed_at: string | null
           id: string
           industry: string | null
           location_id: string | null
@@ -1515,6 +1516,7 @@ export type Database = {
           city: string
           created_at?: string
           created_by_user: string
+          deployed_at?: string | null
           id?: string
           industry?: string | null
           location_id?: string | null
@@ -1534,6 +1536,7 @@ export type Database = {
           city?: string
           created_at?: string
           created_by_user?: string
+          deployed_at?: string | null
           id?: string
           industry?: string | null
           location_id?: string | null
@@ -3671,6 +3674,71 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      simulation_runs: {
+        Row: {
+          baseline_kpis: Json | null
+          created_at: string
+          duration_ms: number | null
+          events: Json | null
+          final_kpis: Json | null
+          finished_at: string | null
+          id: string
+          kpi_snapshots: Json | null
+          metadata: Json | null
+          run_label: string | null
+          scenario_key: string
+          scenario_name: string | null
+          started_at: string
+          status: string
+          twin_id: string
+          user_id: string
+        }
+        Insert: {
+          baseline_kpis?: Json | null
+          created_at?: string
+          duration_ms?: number | null
+          events?: Json | null
+          final_kpis?: Json | null
+          finished_at?: string | null
+          id?: string
+          kpi_snapshots?: Json | null
+          metadata?: Json | null
+          run_label?: string | null
+          scenario_key: string
+          scenario_name?: string | null
+          started_at?: string
+          status?: string
+          twin_id: string
+          user_id: string
+        }
+        Update: {
+          baseline_kpis?: Json | null
+          created_at?: string
+          duration_ms?: number | null
+          events?: Json | null
+          final_kpis?: Json | null
+          finished_at?: string | null
+          id?: string
+          kpi_snapshots?: Json | null
+          metadata?: Json | null
+          run_label?: string | null
+          scenario_key?: string
+          scenario_name?: string | null
+          started_at?: string
+          status?: string
+          twin_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "simulation_runs_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_twins"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       site_crawls: {
         Row: {

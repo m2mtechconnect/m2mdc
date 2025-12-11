@@ -264,10 +264,16 @@ async function saveMemory(supabase: any, userId: string, query: string, context:
 }
 
 /**
- * Build context-aware system prompt
+ * Build context-aware system prompt with Blueprint Designer / Simulation mode support
  */
 function buildSystemPrompt(context: any, memory: Record<string, any> = {}): string {
-  // If DC domain system prompt is provided, use it directly
+  // Check for new CoPilotContextPayload format (mode-aware)
+  if (context.mode === 'blueprint-designer' || context.mode === 'simulation') {
+    console.log('[CoPilot] Using mode-aware system prompt:', context.mode);
+    return buildModeAwarePrompt(context, memory);
+  }
+  
+  // If DC domain system prompt is provided, use it directly (legacy)
   if (context.domainSystemPrompt && context.isDataCentreDomain) {
     console.log('[CoPilot] Using DC domain system prompt');
     return context.domainSystemPrompt;
@@ -325,6 +331,237 @@ Keep responses under 200 words unless complex explanation is needed.`;
 }
 
 /**
+ * Build mode-aware prompt for Blueprint Designer or Simulation context
+ */
+function buildModeAwarePrompt(context: any, memory: Record<string, any> = {}): string {
+  const { mode, twinId, overview, domains, agents, kpis, workflows, scenarios, financial } = context;
+  
+  const twinName = overview?.twinName || 'Data Centre Twin';
+  const tier = overview?.tier || 'Tier III';
+  const capacityKw = overview?.capacityKw || 5000;
+  const region = overview?.cloudRegion || 'ca-central-1';
+  
+  // Common twin context
+  let prompt = `You are AURA Co-Pilot, a context-aware assistant for the Data Centre Digital Twin Studio.
+
+=== TWIN CONTEXT ===
+Twin: ${twinName}
+ID: ${twinId}
+Region: ${region}
+Tier: ${tier}
+Capacity: ${capacityKw} kW
+`;
+
+  // Add domain summary
+  if (domains?.length > 0) {
+    prompt += `\nDomains (${domains.length}):`;
+    for (const domain of domains.slice(0, 8)) {
+      prompt += `\n  - ${domain.label}: ${domain.agentCount} agents, ${domain.kpiCount} KPIs, status: ${domain.healthStatus}`;
+    }
+  }
+
+  // Add agent summary
+  if (agents?.length > 0) {
+    const enabledAgents = agents.filter((a: any) => a.enabled);
+    prompt += `\n\nAgents (${enabledAgents.length}/${agents.length} enabled):`;
+    for (const agent of enabledAgents.slice(0, 6)) {
+      prompt += `\n  - ${agent.name} (${agent.domain})`;
+    }
+  }
+
+  // Add KPI summary
+  if (kpis?.length > 0) {
+    const enabledKpis = kpis.filter((k: any) => k.enabled);
+    prompt += `\n\nKPIs (${enabledKpis.length}/${kpis.length} enabled):`;
+    for (const kpi of enabledKpis.slice(0, 8)) {
+      const value = kpi.currentValue !== undefined ? ` = ${kpi.currentValue}${kpi.unit}` : '';
+      const target = kpi.targetValue !== undefined ? ` (target: ${kpi.targetValue})` : '';
+      prompt += `\n  - ${kpi.name}${value}${target}`;
+    }
+  }
+
+  // Add workflow summary
+  if (workflows?.length > 0) {
+    const enabledWorkflows = workflows.filter((w: any) => w.enabled);
+    prompt += `\n\nWorkflows (${enabledWorkflows.length}/${workflows.length} enabled):`;
+    for (const workflow of enabledWorkflows.slice(0, 5)) {
+      prompt += `\n  - ${workflow.name} (trigger: ${workflow.triggerType})`;
+    }
+  }
+
+  // Add financial summary
+  if (financial) {
+    prompt += `\n\nFinancial Model:`;
+    if (financial.annualPowerCostUsd) prompt += `\n  - Annual Power Cost: $${financial.annualPowerCostUsd.toLocaleString()}`;
+    if (financial.annualCarbonTonnes) prompt += `\n  - Annual Carbon: ${financial.annualCarbonTonnes} tonnes`;
+    if (financial.paybackMonths) prompt += `\n  - Payback: ${financial.paybackMonths} months`;
+    if (financial.projectedROI) prompt += `\n  - Projected ROI: ${financial.projectedROI}%`;
+  }
+
+  // MODE-SPECIFIC CONTEXT
+  if (mode === 'blueprint-designer') {
+    prompt += buildBlueprintDesignerContext(context, memory);
+  } else if (mode === 'simulation') {
+    prompt += buildSimulationContext(context, memory);
+  }
+
+  return prompt;
+}
+
+/**
+ * Build Blueprint Designer specific context
+ */
+function buildBlueprintDesignerContext(context: any, memory: Record<string, any>): string {
+  let prompt = `
+
+=== MODE: BLUEPRINT DESIGNER (Design-Time) ===
+You are a Design Assistant helping configure and optimize this twin's blueprint.
+
+YOUR CAPABILITIES:
+- Explain current design: domains, agents, KPIs, workflows, scenarios
+- Suggest missing agents/KPIs based on industry, tier, and capacity
+- Recommend optimization scenarios (carbon, ROI, thermal risk)
+- Explain validation warnings and how to fix them
+- Summarize recent changes from ChangeLog
+- Propose new scenarios, workflows, or KPI threshold adjustments
+
+CONSTRAINTS:
+- You can PROPOSE changes to the blueprint
+- You should NEVER claim to "run" anything - only DESIGN
+- Always be specific about what changes you recommend`;
+
+  // Add validation report if available
+  if (context.validationReport) {
+    const { isValid, readinessScore, issues, missingAgents, missingKPIs, warnings } = context.validationReport;
+    prompt += `\n\nValidation Report:
+  - Valid: ${isValid}
+  - Readiness Score: ${readinessScore}%`;
+    
+    if (issues?.length > 0) {
+      prompt += `\n  - Issues (${issues.length}):`;
+      for (const issue of issues.slice(0, 5)) {
+        prompt += `\n      [${issue.severity}] ${issue.message}`;
+      }
+    }
+    if (missingAgents?.length > 0) {
+      prompt += `\n  - Missing Agents: ${missingAgents.join(', ')}`;
+    }
+    if (missingKPIs?.length > 0) {
+      prompt += `\n  - Missing KPIs: ${missingKPIs.join(', ')}`;
+    }
+    if (warnings?.length > 0) {
+      prompt += `\n  - Warnings: ${warnings.slice(0, 3).join('; ')}`;
+    }
+  }
+
+  // Add change log if available
+  if (context.changeLog?.length > 0) {
+    prompt += `\n\nRecent Changes (${context.changeLog.length}):`;
+    for (const entry of context.changeLog.slice(0, 5)) {
+      prompt += `\n  - ${entry.action} ${entry.entityType} "${entry.entityId}"${entry.field ? ` (${entry.field})` : ''}`;
+    }
+  }
+
+  // Add readiness score
+  if (context.readinessScore !== undefined) {
+    prompt += `\n\nBlueprint Readiness: ${context.readinessScore}%`;
+  }
+
+  prompt += `\n
+When proposing changes, structure your response to include:
+1. Clear explanation of the change
+2. Expected impact on KPIs or operations
+3. Any dependencies or prerequisites`;
+
+  return prompt;
+}
+
+/**
+ * Build Simulation specific context
+ */
+function buildSimulationContext(context: any, memory: Record<string, any>): string {
+  let prompt = `
+
+=== MODE: SIMULATION (Run-Time) ===
+You are a Run Analyst helping interpret and improve simulation runs.
+
+YOUR CAPABILITIES:
+- Explain what is happening in the current run (hot spots, bottlenecks)
+- Interpret KPI trends (anomalies, breaking points, correlations)
+- Compare Run A vs Run B and explain deltas in plain language
+- Prioritize Live Recommendations (which to apply first & why)
+- Suggest design changes to fix issues (as suggestions for Blueprint Designer)
+
+CONSTRAINTS:
+- You CANNOT directly edit the blueprint
+- Any design suggestions must be surfaced as "Send to Blueprint Designer" recommendations
+- Always reference the Design Snapshot version to avoid confusion`;
+
+  // Add simulation run info
+  if (context.simulationRun) {
+    const { runId, scenarioId, scenarioName, startedAt, duration, speed, status } = context.simulationRun;
+    prompt += `\n\nActive Simulation:
+  - Run ID: ${runId}
+  - Scenario: ${scenarioName} (${scenarioId})
+  - Status: ${status}
+  - Duration: ${duration}s at ${speed}x speed
+  - Started: ${startedAt}`;
+  }
+
+  // Add active scenario
+  if (context.activeScenarioId) {
+    const activeScenario = context.scenarios?.find((s: any) => s.id === context.activeScenarioId);
+    if (activeScenario) {
+      prompt += `\n\nActive Scenario: ${activeScenario.name}
+  - Severity: ${activeScenario.severity}
+  - Category: ${activeScenario.category}
+  - Duration: ${activeScenario.durationMinutes} minutes`;
+    }
+  }
+
+  // Add KPI time series summary
+  if (context.kpiTimeSeries?.length > 0) {
+    prompt += `\n\nKPI Trends (${context.kpiTimeSeries.length} tracked):`;
+    for (const series of context.kpiTimeSeries.slice(0, 6)) {
+      const anomaly = series.anomalyDetected ? ' [ANOMALY]' : '';
+      prompt += `\n  - ${series.kpiName}: trend ${series.trend}${anomaly}`;
+    }
+  }
+
+  // Add comparison runs
+  if (context.comparisonRuns?.length > 0) {
+    prompt += `\n\nRun Comparisons Available:`;
+    for (const comp of context.comparisonRuns) {
+      prompt += `\n  - ${comp.runAName} vs ${comp.runBName} (${comp.kpiDeltas.length} KPI deltas)`;
+    }
+  }
+
+  // Add live recommendations
+  if (context.liveRecommendations?.length > 0) {
+    prompt += `\n\nLive Recommendations (${context.liveRecommendations.length}):`;
+    for (const rec of context.liveRecommendations.slice(0, 5)) {
+      prompt += `\n  - [${rec.priority}/${rec.type}] ${rec.title}`;
+    }
+  }
+
+  // Add snapshot metadata
+  if (context.snapshotVersion) {
+    prompt += `\n\nDesign Snapshot: v${context.snapshotVersion}`;
+    if (context.snapshotCapturedAt) {
+      prompt += ` (captured: ${context.snapshotCapturedAt})`;
+    }
+  }
+
+  prompt += `\n
+When analyzing simulation results, provide:
+1. Clear explanation of what happened
+2. Root cause analysis if issues detected
+3. Actionable recommendations (immediate and design-level)`;
+
+  return prompt;
+}
+
+/**
  * Generate structured response (Actions, Insights, Next Steps, Follow-ups)
  * Now with full DC domain support
  */
@@ -336,7 +573,16 @@ function generateStructuredResponse(query: string, context: any, response: strin
     followUps: [],
   };
 
-  // Check if this is a DC domain context
+  // Check for mode-aware context (new CoPilotContextPayload)
+  if (context.mode === 'blueprint-designer') {
+    return generateBlueprintDesignerResponse(query, context, response);
+  }
+  
+  if (context.mode === 'simulation') {
+    return generateSimulationResponse(query, context, response);
+  }
+
+  // Check if this is a DC domain context (legacy)
   const isDCDomain = context.isDataCentreDomain || 
                      context.activePage === 'data_centre_twin' ||
                      context.dcContext;
@@ -404,6 +650,196 @@ function generateStructuredResponse(query: string, context: any, response: strin
 
   // Generate contextually relevant follow-up questions
   structured.followUps = generateContextualFollowUps(query, context, response);
+
+  return structured;
+}
+
+/**
+ * Generate Blueprint Designer specific structured response
+ */
+function generateBlueprintDesignerResponse(query: string, context: any, response: string): any {
+  const queryLower = query.toLowerCase();
+  
+  const structured: any = {
+    actions: [],
+    insights: [],
+    nextSteps: [],
+    followUps: [],
+    proposedChanges: [], // Blueprint-specific: changes to apply
+  };
+
+  // Detect query intent
+  const isValidationQuery = /validation|issue|warning|error|fix|problem/i.test(queryLower);
+  const isAgentQuery = /agent|missing|add|enable|disable/i.test(queryLower);
+  const isKPIQuery = /kpi|threshold|metric|target/i.test(queryLower);
+  const isWorkflowQuery = /workflow|trigger|automation/i.test(queryLower);
+  const isScenarioQuery = /scenario|simulation|test|what.?if/i.test(queryLower);
+  const isOptimizeQuery = /optimize|improve|reduce|increase|better/i.test(queryLower);
+
+  // Generate actions based on query
+  if (isValidationQuery && context.validationReport?.issues?.length > 0) {
+    structured.actions.push(
+      { label: 'Fix All Issues', handler: 'cmd:fixValidationIssues', icon: 'wrench' },
+      { label: 'View Validation Tab', handler: 'cmd:navigateToTab:validation', icon: 'clipboard-check' }
+    );
+  }
+
+  if (isAgentQuery) {
+    structured.actions.push(
+      { label: 'View Agents Tab', handler: 'cmd:navigateToTab:agents', icon: 'bot' },
+      { label: 'Suggest Agents', handler: 'cmd:suggestAgents', icon: 'sparkles' }
+    );
+  }
+
+  if (isKPIQuery) {
+    structured.actions.push(
+      { label: 'View KPIs Tab', handler: 'cmd:navigateToTab:kpis', icon: 'activity' },
+      { label: 'Adjust Thresholds', handler: 'cmd:openKPIEditor', icon: 'sliders' }
+    );
+  }
+
+  if (isWorkflowQuery) {
+    structured.actions.push(
+      { label: 'View Workflows Tab', handler: 'cmd:navigateToTab:workflows', icon: 'git-branch' }
+    );
+  }
+
+  if (isScenarioQuery) {
+    structured.actions.push(
+      { label: 'View Scenarios Tab', handler: 'cmd:navigateToTab:scenarios', icon: 'play' },
+      { label: 'Create Scenario', handler: 'cmd:createScenario', icon: 'plus' }
+    );
+  }
+
+  // Generate insights from validation report
+  if (context.validationReport) {
+    if (!context.validationReport.isValid) {
+      structured.insights.push(`Blueprint has ${context.validationReport.issues?.length || 0} validation issues to resolve.`);
+    }
+    if (context.validationReport.missingAgents?.length > 0) {
+      structured.insights.push(`Missing recommended agents: ${context.validationReport.missingAgents.join(', ')}`);
+    }
+    if (context.validationReport.readinessScore < 70) {
+      structured.insights.push(`Blueprint readiness is ${context.validationReport.readinessScore}% - consider addressing validation issues.`);
+    }
+  }
+
+  // Generate next steps
+  if (isOptimizeQuery) {
+    structured.nextSteps = [
+      'Review KPI thresholds and adjust targets',
+      'Enable additional monitoring agents',
+      'Add optimization scenarios for testing'
+    ];
+  } else {
+    structured.nextSteps = [
+      'Complete validation to ensure blueprint is ready',
+      'Review agent configurations for all domains',
+      'Set up scenarios to test operational resilience'
+    ];
+  }
+
+  // Generate follow-ups
+  structured.followUps = [
+    'What agents are missing for this configuration?',
+    'How can I improve the readiness score?',
+    'What scenarios should I add for testing?'
+  ];
+
+  return structured;
+}
+
+/**
+ * Generate Simulation specific structured response
+ */
+function generateSimulationResponse(query: string, context: any, response: string): any {
+  const queryLower = query.toLowerCase();
+  
+  const structured: any = {
+    actions: [],
+    insights: [],
+    nextSteps: [],
+    followUps: [],
+    blueprintSuggestions: [], // Simulation-specific: suggestions for blueprint designer
+  };
+
+  // Detect query intent
+  const isExplainQuery = /explain|what|why|happening|cause/i.test(queryLower);
+  const isTrendQuery = /trend|spike|anomaly|pattern/i.test(queryLower);
+  const isCompareQuery = /compare|difference|delta|vs/i.test(queryLower);
+  const isRecommendQuery = /recommend|suggest|fix|improve|prioritize/i.test(queryLower);
+
+  // Generate actions based on query
+  if (isExplainQuery) {
+    structured.actions.push(
+      { label: 'View Event Timeline', handler: 'cmd:showEventTimeline', icon: 'clock' },
+      { label: 'Inspect KPI Details', handler: 'cmd:showKPIDetails', icon: 'activity' }
+    );
+  }
+
+  if (isTrendQuery && context.kpiTimeSeries?.length > 0) {
+    const anomalyKpis = context.kpiTimeSeries.filter((k: any) => k.anomalyDetected);
+    if (anomalyKpis.length > 0) {
+      structured.actions.push(
+        { label: `View ${anomalyKpis.length} Anomalies`, handler: 'cmd:showAnomalies', icon: 'alert-triangle' }
+      );
+    }
+  }
+
+  if (isCompareQuery && context.comparisonRuns?.length > 0) {
+    structured.actions.push(
+      { label: 'Open Comparison View', handler: 'cmd:showComparison', icon: 'columns' }
+    );
+  }
+
+  if (isRecommendQuery && context.liveRecommendations?.length > 0) {
+    const highPriority = context.liveRecommendations.filter((r: any) => r.priority === 'high');
+    structured.actions.push(
+      { label: `Apply ${highPriority.length} High Priority`, handler: 'cmd:applyHighPriorityRecs', icon: 'zap' }
+    );
+  }
+
+  // Always offer to send suggestions to blueprint
+  structured.actions.push(
+    { label: 'Send to Blueprint Designer', handler: 'cmd:sendToBlueprintDesigner', icon: 'send' }
+  );
+
+  // Generate insights from simulation state
+  if (context.simulationRun?.status === 'running') {
+    structured.insights.push(`Simulation "${context.simulationRun.scenarioName}" is in progress at ${context.simulationRun.speed}x speed.`);
+  }
+
+  if (context.kpiTimeSeries?.some((k: any) => k.anomalyDetected)) {
+    const anomalyCount = context.kpiTimeSeries.filter((k: any) => k.anomalyDetected).length;
+    structured.insights.push(`${anomalyCount} KPI(s) showing anomalous behavior.`);
+  }
+
+  if (context.liveRecommendations?.length > 0) {
+    const highCount = context.liveRecommendations.filter((r: any) => r.priority === 'high').length;
+    structured.insights.push(`${context.liveRecommendations.length} recommendations available (${highCount} high priority).`);
+  }
+
+  // Generate next steps
+  if (context.simulationRun?.status === 'completed') {
+    structured.nextSteps = [
+      'Review KPI deltas and root cause analysis',
+      'Export simulation report for documentation',
+      'Run comparison with baseline scenario'
+    ];
+  } else {
+    structured.nextSteps = [
+      'Monitor KPI trends for anomalies',
+      'Review live recommendations as they appear',
+      'Prepare design changes based on findings'
+    ];
+  }
+
+  // Generate follow-ups
+  structured.followUps = [
+    'What is causing this KPI trend?',
+    'Compare this run to the baseline',
+    'What design changes would prevent this failure?'
+  ];
 
   return structured;
 }

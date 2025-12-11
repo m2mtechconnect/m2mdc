@@ -4,6 +4,7 @@
  * Manages global Co-Pilot state with rich context tracking across all pages
  * and centralized streaming chat state with persistent memory.
  * Now integrated with DC Domain Context for data centre intelligence.
+ * Supports mode-aware context for Blueprint Designer and Simulation modes.
  */
 
 import { createContext, useContext, useState, ReactNode, useEffect, useCallback, useRef } from 'react';
@@ -14,6 +15,7 @@ import { logCoPilotEvent } from '@/lib/copilot/analytics';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { getDCDomainContext, type DCDomainContext } from '@/lib/copilot/dcDomainContext';
+import type { CoPilotContextPayload, CoPilotContextMode } from '@/types/copilotContext';
 
 export type CoPilotMessage = {
   role: 'user' | 'assistant';
@@ -23,6 +25,8 @@ export type CoPilotMessage = {
     insights?: string[];
     nextSteps?: string[];
     followUps?: string[];
+    proposedChanges?: any[]; // Blueprint Designer mode
+    blueprintSuggestions?: any[]; // Simulation mode
   };
   streaming?: boolean;
 };
@@ -39,9 +43,9 @@ interface CoPilotContextValue {
   messages: CoPilotMessage[];
   isStreaming: boolean;
   error?: string | null;
-  sendMessage: (text: string) => Promise<void>;
+  sendMessage: (text: string, modePayload?: CoPilotContextPayload) => Promise<void>;
   stopStreaming: () => void;
-  openWithQuestion: (text: string) => void;
+  openWithQuestion: (text: string, modePayload?: CoPilotContextPayload) => void;
   memory: Record<string, any>;
   saveMemory: (key: string, value: any) => Promise<void>;
   getMemory: (key: string) => any;
@@ -49,6 +53,8 @@ interface CoPilotContextValue {
   memoryEnabled: boolean;
   setMemoryEnabled: (enabled: boolean) => void;
   isDCPage: boolean;
+  currentMode: CoPilotContextMode | null;
+  setCurrentMode: (mode: CoPilotContextMode | null) => void;
 }
 
 const CoPilotContext = createContext<CoPilotContextValue | undefined>(undefined);
@@ -61,12 +67,16 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
   });
   const [dcContext, setDCContext] = useState<DCDomainContext | null>(null);
   const [isDCPage, setIsDCPage] = useState(false);
+  const [currentMode, setCurrentMode] = useState<CoPilotContextMode | null>(null);
 
   const [messages, setMessages] = useState<CoPilotMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionId] = useState(() => crypto.randomUUID());
   const abortControllerRef = useRef<AbortController | null>(null);
+  
+  // Store mode payload for use in sendMessage
+  const modePayloadRef = useRef<CoPilotContextPayload | null>(null);
   
   // Memory state
   const [memory, setMemory] = useState<Record<string, any>>({});
@@ -248,7 +258,7 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
     }
   }, [memoryEnabled, memory, saveMemory]);
 
-  const sendMessage = useCallback(async (text: string) => {
+  const sendMessage = useCallback(async (text: string, modePayload?: CoPilotContextPayload) => {
     const query = text.trim();
     if (!query) return;
 
@@ -257,8 +267,18 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Store mode payload for potential follow-up questions
+    if (modePayload) {
+      modePayloadRef.current = modePayload;
+      setCurrentMode(modePayload.mode);
+    }
+
+    // Determine which context to use
+    const streamContext = modePayload || modePayloadRef.current || context;
+    const contextMode = (streamContext as CoPilotContextPayload).mode;
+
     console.log('[CoPilotContext] sendMessage:', query);
-    console.log('[CoPilotContext] Current context:', context);
+    console.log('[CoPilotContext] Using context mode:', contextMode || 'legacy');
 
     const userMessage: CoPilotMessage = { role: 'user', content: query };
     setMessages(prev => [...prev, userMessage]);
@@ -283,7 +303,7 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
 
       await streamCoPilotResponse({
         query,
-        context,
+        context: streamContext,
         sessionId,
         signal: controller.signal,
         onToken: (token: string) => {
@@ -363,13 +383,13 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const openWithQuestion = useCallback((text: string) => {
-    console.log('[CoPilotContext] openWithQuestion:', text);
+  const openWithQuestion = useCallback((text: string, modePayload?: CoPilotContextPayload) => {
+    console.log('[CoPilotContext] openWithQuestion:', text, 'mode:', modePayload?.mode);
     setIsOpen(true);
     setMessages([]);
     setError(null);
     setInitialMessage(undefined);
-    void sendMessage(text);
+    void sendMessage(text, modePayload);
   }, [sendMessage]);
 
   // Global keyboard shortcut
@@ -409,6 +429,8 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
         memoryEnabled,
         setMemoryEnabled,
         isDCPage,
+        currentMode,
+        setCurrentMode,
       }}
     >
       {children}

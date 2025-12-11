@@ -2,23 +2,32 @@
  * Co-Pilot Streaming Client
  * 
  * Handles token-by-token streaming from backend with structured response parsing.
+ * Supports both legacy CoPilotContext and new CoPilotContextPayload (mode-aware).
  */
 
 import { supabase } from '@/integrations/supabase/client';
 import type { CoPilotContext } from './contextBuilder';
+import type { CoPilotContextPayload } from '@/types/copilotContext';
 import { buildDataCentreSystemPrompt, isDataCentreContext } from './dataCentreContext';
 import { getDCDomainContext } from './dcDomainContext';
 import { buildDCSystemPrompt } from './dcSystemPrompt';
 
 interface StreamOptions {
   query: string;
-  context: CoPilotContext;
+  context: CoPilotContext | CoPilotContextPayload;
   sessionId: string;
   signal: AbortSignal;
   onToken: (token: string) => void;
   onStructured?: (data: any) => void;
   onComplete: () => void;
   onError: (error: Error) => void;
+}
+
+/**
+ * Check if context is the new CoPilotContextPayload format
+ */
+function isCoPilotContextPayload(context: any): context is CoPilotContextPayload {
+  return context && (context.mode === 'blueprint-designer' || context.mode === 'simulation');
 }
 
 /**
@@ -44,30 +53,45 @@ export async function streamCoPilotResponse(options: StreamOptions): Promise<voi
 
     const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/copilot-stream`;
     console.log('[CoPilot Streaming] Calling:', url);
-    console.log('[CoPilot Streaming] Payload:', { query, sessionId, contextKeys: Object.keys(context), authenticated: !!session });
-
-    // Build domain-specific system prompt enhancement
-    let domainPrompt = buildDataCentreSystemPrompt(context);
     
-    // If DC domain, use enhanced DC context with live data
-    const isDCDomain = isDataCentreContext(context);
-    let dcDomainContext = null;
+    // Determine context type and build appropriate payload
+    let enhancedContext: any;
     
-    if (isDCDomain) {
-      dcDomainContext = getDCDomainContext(
-        context.agentId || 'facility-sovereign-qc-001',
-        context.activeTab || 'overview',
-        context.activePage || 'data_centre_twin'
-      );
-      domainPrompt = buildDCSystemPrompt(dcDomainContext);
+    if (isCoPilotContextPayload(context)) {
+      // New mode-aware context - pass directly to backend
+      console.log('[CoPilot Streaming] Using mode-aware context:', context.mode);
+      enhancedContext = context;
+    } else {
+      // Legacy context - apply domain-specific enhancements
+      console.log('[CoPilot Streaming] Using legacy context');
+      let domainPrompt = buildDataCentreSystemPrompt(context);
+      
+      const isDCDomain = isDataCentreContext(context);
+      let dcDomainContext = null;
+      
+      if (isDCDomain) {
+        dcDomainContext = getDCDomainContext(
+          context.agentId || 'facility-sovereign-qc-001',
+          context.activeTab || 'overview',
+          context.activePage || 'data_centre_twin'
+        );
+        domainPrompt = buildDCSystemPrompt(dcDomainContext);
+      }
+      
+      enhancedContext = {
+        ...context,
+        domainSystemPrompt: domainPrompt || undefined,
+        isDataCentreDomain: isDCDomain,
+        dcDomainContext: dcDomainContext,
+      };
     }
     
-    const enhancedContext = {
-      ...context,
-      domainSystemPrompt: domainPrompt || undefined,
-      isDataCentreDomain: isDCDomain,
-      dcDomainContext: dcDomainContext,
-    };
+    console.log('[CoPilot Streaming] Payload:', { 
+      query, 
+      sessionId, 
+      mode: enhancedContext.mode || 'legacy',
+      authenticated: !!session 
+    });
 
     const response = await fetch(url, {
       method: 'POST',

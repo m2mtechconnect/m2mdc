@@ -52,12 +52,13 @@ export function useScannerController(props?: ScannerControllerProps) {
     error: apiError, 
     fetchRecommendation, 
     reset: resetHook,
-    isInitialized
+    isPreviewMode
   } = useGreenDcRecommendation();
 
   // Watch for recommendation changes from the hook
+  // Note: isPreviewMode indicates recommendation is ready for preview (sandbox only)
   useEffect(() => {
-    if (recommendation && isInitialized && state.lastScannedUrl) {
+    if (recommendation && isPreviewMode && state.lastScannedUrl) {
       // Map capacity tier to kW
       const capacityMap: Record<string, number> = {
         small: 500,
@@ -98,7 +99,7 @@ export function useScannerController(props?: ScannerControllerProps) {
 
       onScanComplete?.(result);
     }
-  }, [recommendation, isInitialized, state.lastScannedUrl, onScanComplete]);
+  }, [recommendation, isPreviewMode, state.lastScannedUrl, onScanComplete]);
 
   // Watch for errors from the hook
   useEffect(() => {

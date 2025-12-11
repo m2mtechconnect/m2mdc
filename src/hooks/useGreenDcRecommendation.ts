@@ -47,25 +47,38 @@ import { useState, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { GreenDcTwinRecommendation, GreenDcRecommendResponse } from "@/types/greenDcTwin";
-import { useDCTwinBuilderStore } from "@/stores/dcTwinBuilderStore";
+import { useRecommendationStore } from "@/stores/recommendationStore";
 
+/**
+ * useGreenDcRecommendation - Hook for Fetching Green DC Twin Recommendations
+ * 
+ * CRITICAL CHANGE: This hook now populates the RECOMMENDATION STORE only.
+ * It does NOT automatically create twins or modify the builder store.
+ * 
+ * The recommendation is treated as a PREVIEW/SANDBOX until the user
+ * explicitly clicks "Create Green DC Twin" in the UI.
+ */
 export function useGreenDcRecommendation() {
-  const [recommendation, setRecommendation] = useState<GreenDcTwinRecommendation | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
   const queryClient = useQueryClient();
   
-  // Get the store initialization method
-  const initializeFromGreenDcRecommendation = useDCTwinBuilderStore(
-    (s) => s.initializeFromGreenDcRecommendation
-  );
+  // Use the dedicated recommendation store (NOT the builder store)
+  const { 
+    recommendation, 
+    isLoading, 
+    error, 
+    isPreviewMode,
+    setRecommendation, 
+    setLoading, 
+    setError, 
+    clearRecommendation 
+  } = useRecommendationStore();
 
   const fetchRecommendation = useCallback(async (url: string, forceRecrawl = false, deepRecrawl = false) => {
-    setIsLoading(true);
+    setLoading(true);
     setError(null);
-    setRecommendation(null);
-    setIsInitialized(false);
+    clearRecommendation();
+
+    console.log('[useGreenDcRecommendation] Fetching recommendation (PREVIEW ONLY - no twin created):', url);
 
     try {
       const { data, error: fnError } = await supabase.functions.invoke<GreenDcRecommendResponse>("green-dc-recommend", {
@@ -81,15 +94,18 @@ export function useGreenDcRecommendation() {
       }
 
       if (data?.recommendation) {
-        setRecommendation(data.recommendation);
+        // Save to scan session first
+        const sessionId = await saveScanSession(url, data.recommendation);
         
-        // Initialize the builder store from the recommendation
-        const sessionId = crypto.randomUUID();
-        initializeFromGreenDcRecommendation(data.recommendation, sessionId);
-        setIsInitialized(true);
+        // Store the recommendation in the DEDICATED recommendation store
+        // This is PREVIEW ONLY - no twin is created, no builder state is modified
+        setRecommendation({
+          recommendation: data.recommendation,
+          sourceUrl: url,
+          scanSessionId: sessionId,
+        });
         
-        // Save scan session to database
-        await saveScanSession(url, data.recommendation);
+        console.log('[useGreenDcRecommendation] Recommendation stored in preview mode. Twin NOT created.');
         
         // Invalidate the last scan query to refresh the banner
         queryClient.invalidateQueries({ queryKey: ["dc-scan-sessions", "last"] });
@@ -98,21 +114,19 @@ export function useGreenDcRecommendation() {
       console.error("[useGreenDcRecommendation] Error:", err);
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  }, [queryClient, initializeFromGreenDcRecommendation]);
+  }, [queryClient, setRecommendation, setLoading, setError, clearRecommendation]);
 
   const reset = useCallback(() => {
-    setRecommendation(null);
-    setError(null);
-    setIsInitialized(false);
-  }, []);
+    clearRecommendation();
+  }, [clearRecommendation]);
 
   return {
     recommendation,
     isLoading,
     error,
-    isInitialized,
+    isPreviewMode,
     fetchRecommendation,
     reset
   };
@@ -121,26 +135,29 @@ export function useGreenDcRecommendation() {
 /**
  * Save scan session to dc_scan_sessions table
  */
-async function saveScanSession(url: string, recommendation: GreenDcTwinRecommendation) {
+/**
+ * Save scan session to dc_scan_sessions table
+ * Returns the session ID if successful
+ */
+async function saveScanSession(url: string, recommendation: GreenDcTwinRecommendation): Promise<string | null> {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       console.warn("[saveScanSession] No authenticated user, skipping save");
-      return;
+      return null;
     }
 
     // Map industry from edge function to database enum values
-    // Database constraint: finance, government, retail, telecom, cloud_saas, manufacturing, healthcare, energy, ai_compute, other
     const industryToDbMap: Record<string, string> = {
       finance: "finance",
       government: "government",
       retail: "retail",
-      saas: "cloud_saas", // Edge function returns 'saas', DB expects 'cloud_saas'
+      saas: "cloud_saas",
       healthcare: "healthcare",
       telecom: "telecom",
       manufacturing: "manufacturing",
       energy: "energy",
-      education: "other", // Map education to 'other' as it's not in DB enum
+      education: "other",
       generic: "other"
     };
     
@@ -162,7 +179,7 @@ async function saveScanSession(url: string, recommendation: GreenDcTwinRecommend
     
     const dbIndustry = industryToDbMap[recommendation.industry] || "other";
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("dc_scan_sessions")
       .insert({
         user_id: user.id,
@@ -177,14 +194,19 @@ async function saveScanSession(url: string, recommendation: GreenDcTwinRecommend
           agents: recommendation.agents,
           kpiTargets: recommendation.kpiTargets
         }
-      });
+      })
+      .select('id')
+      .single();
 
     if (error) {
       console.error("[saveScanSession] Error saving scan session:", error);
-    } else {
-      console.log("[saveScanSession] Scan session saved successfully");
+      return null;
     }
+    
+    console.log("[saveScanSession] Scan session saved:", data?.id);
+    return data?.id ?? null;
   } catch (err) {
     console.error("[saveScanSession] Unexpected error:", err);
+    return null;
   }
 }

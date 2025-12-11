@@ -87,7 +87,22 @@ function generateMockEvents(): SimulationEvent[] {
 }
 
 export function DCSimulationTab() {
-  const { overview, scenarios, kpis } = useDCTwinBuilderStore();
+  // CRITICAL: Use useTwinContext() to prioritize active twin over builder store
+  const { activeTwin, isPreviewMode, recommendation } = useTwinContext();
+  const builderStore = useDCTwinBuilderStore();
+  
+  // Priority: activeTwin (header) → preview recommendation → builder store fallback
+  const overview = {
+    ...builderStore.overview,
+    twinName: activeTwin?.name || recommendation?.companyName || builderStore.overview.twinName,
+    facilityLocation: activeTwin?.city || recommendation?.regions?.[0] || builderStore.overview.facilityLocation,
+    regionCode: activeTwin?.region_code || builderStore.overview.regionCode,
+    capacityKw: activeTwin?.capacity_kw || builderStore.overview.capacityKw,
+    renewablePercent: activeTwin?.renewable_target_pct || recommendation?.kpiTargets?.renewableShareTargetPct || builderStore.overview.renewablePercent,
+  };
+  const scenarios = builderStore.scenarios;
+  const kpis = builderStore.kpis;
+  
   const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);

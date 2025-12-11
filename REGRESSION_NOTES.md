@@ -143,6 +143,7 @@ const overview = {
 ### Visualization & CoPilot
 - `src/components/twin-visualization/hooks/useTwinVisualizationData.ts` - Prioritize activeTwin over builder store
 - `src/hooks/useCoPilotSimulationContext.ts` - Use useTwinContext for proper prioritization
+- `src/hooks/useCoPilotPayload.ts` - Use useTwinContext to build effectiveOverview with correct priority
 
 ### Preview Pages (Already Correct)
 - `src/pages/BlueprintPreview.tsx` - Uses recommendationStore correctly

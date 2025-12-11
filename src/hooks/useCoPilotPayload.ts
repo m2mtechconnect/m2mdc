@@ -3,11 +3,14 @@
  * 
  * Builds the context-aware payload for Co-Pilot based on current mode
  * (blueprint-designer or simulation) using real store data.
+ * 
+ * CRITICAL: Uses useTwinContext() to prioritize active twin over builder store
  */
 
 import { useMemo } from 'react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { useBlueprintView } from '@/context/BlueprintViewContext';
+import { useTwinContext } from '@/hooks/useTwinContext';
 import type { 
   CoPilotContextPayload, 
   CoPilotContextMode,
@@ -39,17 +42,31 @@ interface UseCoPilotPayloadOptions {
 export function useCoPilotPayload(options: UseCoPilotPayloadOptions = {}): CoPilotContextPayload | null {
   const store = useDCTwinBuilderStore();
   const blueprintContext = useBlueprintView();
+  const { activeTwin, isPreviewMode, recommendation } = useTwinContext();
   
   // Determine mode from options or context
   const mode: CoPilotContextMode = options.mode || 
     (blueprintContext?.mode === 'simulationSnapshot' ? 'simulation' : 'blueprint-designer');
 
   return useMemo(() => {
-    if (!store.overview?.twinName) {
+    // CRITICAL: Prioritize active twin from header dropdown
+    const effectiveTwinName = activeTwin?.name || recommendation?.companyName || store.overview?.twinName;
+    
+    if (!effectiveTwinName) {
       return null;
     }
 
-    const twinId = store.overview.twinSlug || 'default';
+    const twinId = activeTwin?.id || store.overview.twinSlug || 'default';
+    
+    // Build overview with correct priority
+    const effectiveOverview = {
+      ...store.overview,
+      twinName: effectiveTwinName,
+      facilityLocation: activeTwin?.city || recommendation?.regions?.[0] || store.overview.facilityLocation,
+      regionCode: activeTwin?.region_code || store.overview.regionCode,
+      capacityKw: activeTwin?.capacity_kw || store.overview.capacityKw,
+      renewablePercent: activeTwin?.renewable_target_pct || recommendation?.kpiTargets?.renewableShareTargetPct || store.overview.renewablePercent,
+    };
 
     // Build domain summaries
     const domainMap = new Map<string, TwinDomainSummary>();
@@ -118,11 +135,11 @@ export function useCoPilotPayload(options: UseCoPilotPayloadOptions = {}): CoPil
       durationMinutes: Math.round(s.durationSeconds / 60),
     }));
 
-    // Base payload
+    // Base payload - use effectiveOverview instead of store.overview
     const payload: CoPilotContextPayload = {
       twinId,
       mode,
-      overview: store.overview,
+      overview: effectiveOverview,
       domains: Array.from(domainMap.values()),
       agents,
       kpis,
@@ -249,5 +266,5 @@ export function useCoPilotPayload(options: UseCoPilotPayloadOptions = {}): CoPil
     }
 
     return payload;
-  }, [store, mode, options.simulationRunId, options.activeScenarioId, blueprintContext]);
+  }, [store, mode, options.simulationRunId, options.activeScenarioId, blueprintContext, activeTwin, recommendation]);
 }

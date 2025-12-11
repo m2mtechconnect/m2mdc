@@ -317,10 +317,13 @@ export default function Builder() {
   // Show loading state while checking auth or initializing
   if (!authChecked || !isInitialized || isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading builder...</p>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" />
+          <div>
+            <p className="font-medium">Loading Twin Builder...</p>
+            <p className="text-sm text-muted-foreground">Preparing your configuration</p>
+          </div>
         </div>
       </div>
     );

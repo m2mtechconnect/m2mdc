@@ -485,6 +485,116 @@ export const SCANNER = {
 } as const;
 
 // =============================================================================
+// ENHANCED RECOMMENDATION UX
+// =============================================================================
+
+export const RECOMMENDATION = {
+  // Header section
+  HEADER: {
+    BADGE: 'Sovereign Green AI Data Centre Twin',
+    TITLE: (companyName: string) => `Recommendation for ${companyName}`,
+    SUBTITLE: 'Industry-specific blueprint based on website analysis',
+    FALLBACK_COMPANY: 'This company',
+  },
+  
+  // Quick metrics strip
+  METRICS: {
+    ROI: 'Projected ROI',
+    RENEWABLE: 'Renewable',
+    CAPACITY: 'kW Capacity',
+    SOVEREIGNTY: 'Sovereignty Region',
+  },
+  
+  // Objectives section
+  OBJECTIVES: {
+    TITLE: 'Scan-Derived Objectives',
+    SUBTITLE: 'Business priorities identified from website analysis',
+    CATEGORIES: {
+      operational: 'Operational',
+      sustainability: 'Sustainability',
+      compliance: 'Compliance',
+      financial: 'Financial',
+    },
+  },
+  
+  // KPI Insights section
+  KPI_INSIGHTS: {
+    TITLE: 'Key Performance Insights',
+    SUBTITLE: 'vs Industry Benchmarks',
+    TARGET_LABEL: 'Target',
+    BENCHMARK_LABEL: 'vs Industry',
+    STATUS: {
+      excellent: 'Excellent',
+      good: 'Good',
+      warning: 'Warning',
+      critical: 'Critical',
+    },
+  },
+  
+  // Agents section
+  AGENTS: {
+    TITLE: 'Recommended Subsystem Agents',
+    TOOLTIP: (companyName: string) => `Hover over agents to see why they're recommended for ${companyName}`,
+    PRIORITY: {
+      critical: 'Required',
+      high: 'High Priority',
+      recommended: 'Recommended',
+      optional: 'Optional',
+    },
+  },
+  
+  // Scenarios section
+  SCENARIOS: {
+    TITLE: 'Priority Simulation Scenarios',
+    SUBTITLE: 'Industry-Prioritized',
+    SEVERITY: {
+      critical: 'Critical',
+      high: 'High',
+      medium: 'Medium',
+      low: 'Low',
+    },
+  },
+  
+  // Carbon & Financial section
+  FINANCIAL: {
+    TITLE: 'Carbon & Financial Impact',
+    METRICS: {
+      POWER_COST: 'Annual Power Cost',
+      CARBON: 'Tonnes CO₂e/yr',
+      PAYBACK: 'Payback Period',
+      CARBON_REDUCTION: 'Carbon Reduction',
+    },
+    NARRATIVE_INTRO: 'Executive Summary',
+  },
+  
+  // Compliance & Sustainability
+  FOCUS: {
+    COMPLIANCE: 'Compliance Focus',
+    SUSTAINABILITY: 'Sustainability Focus',
+  },
+  
+  // Actions
+  ACTIONS: {
+    CREATE: 'Create Green Data Centre Twin',
+    CREATING: 'Creating Twin...',
+    PREVIEW: 'Preview Simulation',
+    CUSTOMIZE: 'Customize Blueprint',
+  },
+  
+  // Executive narrative templates by grid carbon intensity
+  NARRATIVE: {
+    CLEAN_GRID: (companyRef: string, regionName: string, carbonIntensity: number, opexReduction: number, savings: string, payback: number, carbonReduction: number, renewableTarget: number) =>
+      `${companyRef}'s data centre in ${regionName} benefits from one of the cleanest grids globally with carbon intensity of just ${carbonIntensity} gCO₂/kWh. Projected to reduce OPEX by ${opexReduction}% through cooling and power optimization, with estimated annual savings of ${savings} and a ${payback}-year payback period. Carbon footprint projected to decrease ~${carbonReduction}% through ${renewableTarget}% renewable procurement and workload scheduling optimization.`,
+    
+    MODERATE_GRID: (companyRef: string, regionName: string, carbonIntensity: number, opexReduction: number, savings: string, payback: number, carbonReduction: number) =>
+      `${companyRef}'s ${regionName} facility operates on a moderate-carbon grid (${carbonIntensity} gCO₂/kWh). Implementing the green twin is projected to reduce OPEX by ${opexReduction}% with ${savings} annual savings and a ${payback}-year payback. Carbon reduction of ~${carbonReduction}% achievable through renewable PPAs and carbon-aware workload shifting.`,
+    
+    HIGH_CARBON_GRID: (companyRef: string, regionName: string, carbonIntensity: number, opexReduction: number, savings: string, payback: number, carbonReduction: number, renewableTarget: number) =>
+      `${companyRef}'s ${regionName} facility faces higher carbon exposure (${carbonIntensity} gCO₂/kWh grid intensity). The green twin provides significant opportunity: projected ${opexReduction}% OPEX reduction with ${savings} annual savings. Critical carbon reduction of ~${carbonReduction}% achievable through aggressive renewable procurement targeting ${renewableTarget}% and efficiency optimization. Payback period estimated at ${payback} years with additional carbon pricing risk mitigation.`,
+  },
+} as const;
+
+// =============================================================================
 // BUILDER
 // =============================================================================
 

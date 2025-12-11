@@ -122,11 +122,10 @@ export function useSimulation(options: UseSimulationOptions = {}): UseSimulation
   const presetScenarios = PRESET_SCENARIOS;
   
   // Convert Blueprint scenarios to Simulation format
+  // Note: measureSync is for instrumentation only, not a reactive dependency
   const blueprintScenarios = useMemo(() => {
-    return measureSync('blueprintConversion', () => {
-      return convertAllBlueprintScenarios(blueprintScenariosRaw);
-    }, 'compute');
-  }, [blueprintScenariosRaw, measureSync]);
+    return convertAllBlueprintScenarios(blueprintScenariosRaw);
+  }, [blueprintScenariosRaw]);
   
   // Register Blueprint scenarios with the engine
   useEffect(() => {

@@ -116,10 +116,11 @@ export function Layout({ children }: LayoutProps) {
     try {
       await supabase.auth.signOut();
       toast.success('Signed out successfully');
-      navigate('/auth');
+      navigate('/', { replace: true });
     } catch (error) {
       console.error('Error signing out:', error);
       toast.error('Failed to sign out');
+      navigate('/', { replace: true });
     }
   };
 

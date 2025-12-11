@@ -1,5 +1,35 @@
 /**
  * Hook for managing Sovereign DC Twin state and operations
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * DATA SOVEREIGNTY FRAMEWORKS:
+ * - PIPEDA (Personal Information Protection and Electronic Documents Act)
+ *   https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/
+ * - Canadian Digital Charter Implementation Act (Bill C-27)
+ *   https://www.parl.ca/DocumentViewer/en/44-1/bill/C-27/first-reading
+ * - Treasury Board of Canada - Direction on Electronic Data Residency
+ *   https://www.canada.ca/en/government/system/digital-government/digital-government-innovations/cloud-services/direction-electronic-data-residency.html
+ * 
+ * SOVEREIGN CLOUD STANDARDS:
+ * - CCCS (Canadian Centre for Cyber Security) Cloud Security Guidelines
+ *   https://cyber.gc.ca/en/guidance/cloud-security-assessment-csc-csac
+ * - Protected B Cloud Security Requirements
+ *   https://www.canada.ca/en/government/system/digital-government/digital-government-innovations/cloud-services/government-canada-security-control-profile-cloud-based-it-services.html
+ * 
+ * GPU CLUSTER MANAGEMENT:
+ * - NVIDIA DGX SuperPOD Architecture Guide
+ *   https://docs.nvidia.com/dgx-superpod/
+ * - NVIDIA Base Command Manager
+ *   https://docs.nvidia.com/base-command-manager/
+ * 
+ * SIMULATION & DIGITAL TWIN:
+ * - ISO 23247:2021 Digital Twin Framework
+ *   https://www.iso.org/standard/75066.html
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import { useState, useCallback, useMemo } from 'react';

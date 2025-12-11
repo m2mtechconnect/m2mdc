@@ -1,5 +1,55 @@
 /**
  * Financial model estimator for Green DC Twin recommendations
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * DATA CENTER COST BENCHMARKS:
+ * - JLL Data Center Outlook 2024 (Construction & operational costs)
+ *   https://www.us.jll.com/en/trends-and-insights/research/data-center-outlook
+ * - Cushman & Wakefield Global Data Center Market Comparison
+ *   https://www.cushmanwakefield.com/en/insights
+ * - Uptime Institute Annual Data Center Survey (OpEx benchmarks)
+ *   https://uptimeinstitute.com/resources/research-and-reports
+ * 
+ * CAPACITY TIER CLASSIFICATIONS:
+ * - Uptime Institute Tier Certification Standards
+ *   https://uptimeinstitute.com/tier-certification/tier-requirements
+ *   Small: <1MW, Medium: 1-5MW, Large: 5-20MW, Hyperscale: 20MW+
+ * - TIA-942-B Data Center Infrastructure Standard
+ *   https://tiaonline.org/what-we-do/standards/
+ * 
+ * INDUSTRY-SPECIFIC MULTIPLIERS:
+ * - Gartner Industry TCO Models
+ *   https://www.gartner.com/en/information-technology
+ * - Financial Services: 40% premium for compliance/security
+ * - Healthcare: 20% premium for HIPAA/PHIPA compliance
+ * - Government: 30% premium for sovereignty requirements
+ * 
+ * CARBON ACCOUNTING:
+ * - GHG Protocol Corporate Standard (Scope 1, 2, 3)
+ *   https://ghgprotocol.org/corporate-standard
+ * - Science Based Targets Initiative (SBTi)
+ *   https://sciencebasedtargets.org/
+ * - CDP Climate Disclosure Standards
+ *   https://www.cdp.net/en
+ * 
+ * REGIONAL COST FACTORS:
+ * - NRCan Canadian Energy Statistics
+ *   https://www.nrcan.gc.ca/energy/energy-sources-distribution/
+ * - EIA US Regional Electricity Prices
+ *   https://www.eia.gov/electricity/state/
+ * - Eurostat EU Energy Statistics
+ *   https://ec.europa.eu/eurostat/web/energy
+ * 
+ * ROI & PAYBACK CALCULATIONS:
+ * - EPA ENERGY STAR Data Center Calculator
+ *   https://www.energystar.gov/buildings/tools-and-resources
+ * - The Green Grid ROI Calculator
+ *   https://www.thegreengrid.org/en/resources/library-and-tools
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import type { DcCapacityTier, DcTwinArchetypeId, GreenDcTwinRecommendation } from "@/types/greenDcTwin";

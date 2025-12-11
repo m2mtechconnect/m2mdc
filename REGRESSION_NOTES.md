@@ -124,6 +124,36 @@ const overview = {
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## Files Modified
+
+### Core Fixes
+- `src/hooks/useBlueprint.ts` - Prioritize database twin over builder store
+- `src/context/ActiveTwinContext.tsx` - Clear stores on twin change
+- `src/context/index.ts` - Deprecation notices
+- `src/pages/DataCentreTwin.tsx` - Prioritize activeTwin
+- `src/hooks/useTwinContext.ts` - Central helper for twin context
+
+### Tab Components
+- `src/components/dc-twin/tabs/DCOverviewTab.tsx` - Use useTwinContext
+- `src/components/dc-twin/tabs/DCBlueprintTab.tsx` - Use useTwinContext
+- `src/components/dc-twin/tabs/DCPreviewTab.tsx` - Use useTwinContext
+- `src/components/dc-twin/tabs/DCSimulationTab.tsx` - Use useTwinContext
+- `src/components/dc-twin/tabs/DCDeployTab.tsx` - Use useTwinContext
+
+### Visualization & CoPilot
+- `src/components/twin-visualization/hooks/useTwinVisualizationData.ts` - Prioritize activeTwin over builder store
+- `src/hooks/useCoPilotSimulationContext.ts` - Use useTwinContext for proper prioritization
+
+### Preview Pages (Already Correct)
+- `src/pages/BlueprintPreview.tsx` - Uses recommendationStore correctly
+- `src/pages/SimulationPreview.tsx` - Uses recommendationStore correctly
+
+## Additional Components Verified
+
+These components were audited and are already correct:
+- `src/stores/recommendationStore.ts` - Properly isolated, never creates twins
+- `src/components/dc-scan/DCScannerPanel.tsx` - Only creates twins on explicit CTA click
+
 ## Key Rules
 
 1. **Header dropdown is the only way to switch active twins**

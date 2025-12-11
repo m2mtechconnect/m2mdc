@@ -1,11 +1,14 @@
 /**
  * Hook: useTwinVisualizationData
- * Maps builder + KPI + simulation state into visual primitives
+ * Maps active twin + builder state into visual primitives
+ * 
+ * CRITICAL: Prioritizes ActiveTwinContext data over builder store
  */
 
 import { useMemo } from 'react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { useTwinContext } from '@/hooks/useTwinContext';
 import type {
   RackVisual,
   RowVisual,
@@ -198,13 +201,40 @@ function generateNetworkTopology(racks: RackVisual[]): {
 }
 
 export function useTwinVisualizationData(): TwinVisualizationState {
-  const { activeTwinId } = useActiveTwin();
+  const { activeTwin, isPreviewMode, recommendation } = useTwinContext();
   const builderState = useDCTwinBuilderStore();
   
   const visualData = useMemo(() => {
-    const overview = builderState.overview;
-    const capacityKw = overview?.capacityKw || 500;
-    const facilityName = overview?.twinName || 'Data Centre Twin';
+    // PRIORITY: ActiveTwin (from header) > Recommendation preview > Builder store
+    let capacityKw = 500;
+    let facilityName = 'Data Centre Twin';
+    let carbonIntensity = 30;
+    
+    if (activeTwin) {
+      // Real twin selected via header dropdown
+      capacityKw = activeTwin.capacity_kw || 500;
+      facilityName = activeTwin.name || 'Data Centre Twin';
+      carbonIntensity = activeTwin.carbon_intensity || 30;
+    } else if (isPreviewMode && recommendation) {
+      // Preview mode from scanner - derive capacity from capacityTier
+      const tierToKw: Record<string, number> = {
+        'small': 1000,
+        'medium': 5000,
+        'large': 10000,
+        'hyperscale': 20000,
+      };
+      capacityKw = tierToKw[recommendation.capacityTier] || 5000;
+      facilityName = recommendation.companyName 
+        ? `${recommendation.companyName} Sovereign Green AI Data Centre Twin` 
+        : 'Preview Twin';
+      carbonIntensity = recommendation.kpiTargets?.carbonIntensityTargetGPerKwh || 30;
+    } else {
+      // Fallback to builder store (sandbox only)
+      const overview = builderState.overview;
+      capacityKw = overview?.capacityKw || 500;
+      facilityName = overview?.twinName || 'Data Centre Twin';
+      carbonIntensity = (overview as any)?.carbonIntensityGCo2PerKwh || 30;
+    }
     
     // Get scenario events if simulation is active
     const activeScenario = builderState.scenarios?.find(s => s.enabled);
@@ -247,9 +277,9 @@ export function useTwinVisualizationData(): TwinVisualizationState {
       facilityName,
       totalCapacityKw: capacityKw,
       pue,
-      carbonIntensity: (overview as any)?.carbonIntensityGCo2PerKwh || 30
+      carbonIntensity
     };
-  }, [builderState, activeTwinId]);
+  }, [activeTwin, isPreviewMode, recommendation, builderState]);
 
   return visualData;
 }

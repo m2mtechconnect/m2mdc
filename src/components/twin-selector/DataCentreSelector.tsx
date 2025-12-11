@@ -48,6 +48,7 @@ import {
   Settings2
 } from 'lucide-react';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { useRecommendationStore } from '@/stores/recommendationStore';
 import { toast } from 'sonner';
 import { DeleteTwinModal } from './DeleteTwinModal';
 
@@ -90,8 +91,13 @@ export function DataCentreSelector() {
     location.search.includes('view=simulation');
 
   const handleTwinChange = (value: string) => {
+    // CRITICAL: Clear any active recommendation when switching twins
+    // This ensures recommendations don't leak into real twin views
+    useRecommendationStore.getState().clearRecommendation();
+    
     setActiveTwin(value);
     const selectedTwin = twins.find(t => t.id === value);
+    console.log('[DataCentreSelector] Twin switched to:', selectedTwin?.name);
     toast.success(`Switched to: ${selectedTwin?.name || 'Unknown'}`);
   };
 

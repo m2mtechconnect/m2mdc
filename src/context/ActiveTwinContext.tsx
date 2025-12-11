@@ -1,11 +1,16 @@
 /**
  * Active Twin Context - Global state for multi-tenant DC studio
  * Provides location/twin selection that scopes all views
+ * 
+ * IMPORTANT: This is the SINGLE SOURCE OF TRUTH for active twin selection.
+ * URL scans and recommendations are preview-only and do NOT affect this context.
+ * The dropdown selector controls the entire studio context.
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
+import { useRecommendationStore } from '@/stores/recommendationStore';
 
 // Types
 export interface DataCentreLocation {
@@ -214,8 +219,14 @@ export function ActiveTwinProvider({ children }: { children: ReactNode }) {
 
   // Set active twin
   const setActiveTwin = useCallback(async (twinId: string) => {
+    console.log('[ActiveTwinContext] Setting active twin:', twinId);
     setActiveTwinIdState(twinId);
     localStorage.setItem(STORAGE_KEY_TWIN, twinId);
+    
+    // CRITICAL: Clear any active recommendation when switching twins
+    // This ensures recommendations don't leak into real twin views
+    const { clearRecommendation } = useRecommendationStore.getState();
+    clearRecommendation();
     
     const t = await fetchTwin(twinId);
     setTwin(t);

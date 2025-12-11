@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils';
 import type { ScenarioDefinition, SimulationResultSummary } from '@/simulation/types';
 import type { DomainType } from '@/types/dataCenterTwin';
 import { motion } from 'framer-motion';
+import { EMPTY_STATES } from '@/ux';
 
 interface ScenarioContextSidebarProps {
   scenario: ScenarioDefinition | null;
@@ -58,7 +59,7 @@ export function ScenarioContextSidebar({
       <Card className={cn('bg-card border-border', className)}>
         <CardContent className="flex flex-col items-center justify-center h-full min-h-[200px] text-center">
           <Target className="h-8 w-8 text-muted-foreground mb-2" />
-          <p className="text-sm text-muted-foreground">Select a scenario to view details</p>
+          <p className="text-sm text-muted-foreground">{EMPTY_STATES.SCENARIO_DETAIL}</p>
         </CardContent>
       </Card>
     );

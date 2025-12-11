@@ -441,6 +441,17 @@ export const SIMULATION = {
     BADGE: 'Design Snapshot',
     TOOLTIP: 'Simulation runs against a frozen design snapshot. Configuration changes must be made in the Blueprint Designer.',
   },
+  
+  RESULT: {
+    KPI_SUMMARY: 'KPI Summary',
+    RCA_TITLE: 'Root Cause Analysis',
+    ACTIONS_TITLE: 'Recommended Actions',
+    IMPROVEMENTS: 'Improvements',
+    DEGRADATIONS: 'Degradations',
+    ACTUAL_VS_EXPECTED: 'Actual vs Expected Impact',
+    NO_RCA: 'No root cause analysis available for this scenario.',
+    NO_ACTIONS: 'No specific recommendations for this scenario.',
+  },
 } as const;
 
 // =============================================================================
@@ -481,6 +492,8 @@ export const BUILDER = {
   STEPS: {
     STEP_1: {
       NAME: 'Business Profile',
+      TITLE: 'Data Centre Twin Configuration',
+      SUBTITLE: 'Configure your Sovereign Green AI Data Centre Twin',
       DESCRIPTION: 'Define facility location, capacity, and sustainability targets.',
     },
     STEP_2: {
@@ -547,6 +560,8 @@ export const EMPTY_STATES = {
   NO_SCENARIOS: 'No scenarios defined. Add scenarios to stress-test your twin.',
   NO_DATA: 'Awaiting data. Connect telemetry sources to populate metrics.',
   NO_RESULTS: 'No simulation results. Run a scenario to generate performance data.',
+  SCENARIOS: 'No scenarios found.',
+  SCENARIO_DETAIL: 'Select a scenario to view details',
 } as const;
 
 // =============================================================================

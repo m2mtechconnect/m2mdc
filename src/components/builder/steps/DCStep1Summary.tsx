@@ -19,6 +19,7 @@ import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { toast } from 'sonner';
 import { DCCard, DCSectionHeader, DCKPITile } from '@/components/dc-ui';
+import { BUILDER, GLOBAL } from '@/ux';
 
 const INDUSTRY_OPTIONS = [
   'Government', 'Technology', 'Financial Services', 'Retail', 
@@ -88,8 +89,8 @@ export function DCStep1Summary() {
     <div className="space-y-6 max-w-[920px] mx-auto">
       {/* Header */}
       <DCSectionHeader
-        title="Data Centre Twin Configuration"
-        subtitle="Configure your Sovereign Green AI Data Centre Twin"
+        title={BUILDER.STEPS.STEP_1.TITLE}
+        subtitle={BUILDER.STEPS.STEP_1.SUBTITLE}
         icon={<Server className="h-5 w-5" />}
       />
 
@@ -107,7 +108,7 @@ export function DCStep1Summary() {
       {/* Main Twin Overview Card */}
       <DCCard 
         title={overview.twinName}
-        subtitle="Sovereign Green AI Data Centre Twin"
+        subtitle={GLOBAL.TWIN_SUFFIX}
         icon={<Bot className="h-5 w-5" />}
         status="normal"
       >

@@ -25,6 +25,7 @@ import { DepartmentGroup } from '@/components/unified-dashboard/DepartmentGroup'
 import { TrendingUp, Clock, CheckCircle2, Zap } from "lucide-react";
 import { trackKPIClick, trackAnalytics } from '@/lib/analytics/analyticsService';
 import { useBlueprintAgents } from '@/hooks/useBlueprintAgents';
+import { OVERVIEW, TOOLTIPS } from '@/ux';
 
 // DC-specific imports
 import { DCKPITile } from '@/components/dc-ui';
@@ -353,11 +354,11 @@ export default function Dashboard() {
               <Server className="h-6 w-6 text-primary" />
             </div>
             <h1 className="text-h1 font-display text-gradient-hero">
-              Data Centre Command
+              {OVERVIEW.TITLE}
             </h1>
           </div>
           <p className="text-muted-foreground text-lg sm:text-xl max-w-3xl mx-auto">
-            Monitor PUE, thermals, power, sovereign compute, and GPU workloads.
+            {OVERVIEW.PURPOSE_STATEMENT}
           </p>
           {/* Current Twin Indicator */}
           {twin && (

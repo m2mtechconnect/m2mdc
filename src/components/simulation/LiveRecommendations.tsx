@@ -20,6 +20,7 @@ import {
   Shield
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SIMULATION } from '@/ux';
 
 interface Recommendation {
   id: string;
@@ -125,7 +126,7 @@ export function LiveRecommendations({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base">
             <Lightbulb className="h-4 w-4 text-warning" />
-            Live Recommendations
+            {SIMULATION.SECTIONS.LIVE_INSIGHTS}
           </CardTitle>
           <Badge variant="secondary" className="text-xs">
             {recs.length} active

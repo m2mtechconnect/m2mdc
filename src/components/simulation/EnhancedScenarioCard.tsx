@@ -13,6 +13,7 @@ import {
 import { motion } from 'framer-motion';
 import type { ScenarioDefinition } from '@/simulation/types';
 import { cn } from '@/lib/utils';
+import { getScenarioDescription } from '@/ux';
 
 interface EnhancedScenarioCardProps {
   scenario: ScenarioDefinition;

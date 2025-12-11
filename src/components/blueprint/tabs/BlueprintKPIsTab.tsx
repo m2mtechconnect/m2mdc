@@ -16,6 +16,7 @@ import {
   Globe,
   DollarSign
 } from 'lucide-react';
+import { KPIS, getKPIDescription } from '@/ux';
 import type { KpiBlueprint } from '@/types/dataCentreBlueprint';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
@@ -73,6 +74,11 @@ export function BlueprintKPIsTab({ kpis }: BlueprintKPIsTabProps) {
 
   return (
     <div className="space-y-6">
+      {/* Section Intro */}
+      <div className="text-sm text-muted-foreground">
+        {KPIS.SECTION_INTRO}
+      </div>
+
       {/* Filters */}
       <Card>
         <CardHeader>

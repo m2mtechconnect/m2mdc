@@ -13,6 +13,7 @@ import {
   TrendingUp,
   TrendingDown
 } from 'lucide-react';
+import { SCENARIOS, getScenarioDescription } from '@/ux';
 import type { SimulationScenarioBlueprint } from '@/types/dataCentreBlueprint';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -56,15 +57,21 @@ export function BlueprintScenariosTab({ scenarios }: BlueprintScenariosTabProps)
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
-      {/* Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <PlayCircle className="h-4 w-4" />
-            Simulation Scenarios ({scenarios.length} scenarios)
-          </CardTitle>
-        </CardHeader>
+    <div className="space-y-6">
+      {/* Section Intro */}
+      <div className="text-sm text-muted-foreground">
+        {SCENARIOS.SECTION_INTRO}
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <PlayCircle className="h-4 w-4" />
+              Simulation Scenarios ({scenarios.length} scenarios)
+            </CardTitle>
+          </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
             {Object.entries(scenariosBySeverity).map(([severity, severityScenarios]) => (
@@ -179,6 +186,7 @@ export function BlueprintScenariosTab({ scenarios }: BlueprintScenariosTabProps)
       {/* Scenario Chain Simulator */}
       <div className="lg:col-span-1">
         <ScenarioEnhancementsPanel onRunChain={handleRunChain} />
+      </div>
       </div>
     </div>
   );

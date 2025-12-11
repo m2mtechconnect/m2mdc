@@ -147,66 +147,75 @@ export type DomainKey = keyof typeof DOMAINS;
 // =============================================================================
 
 export const AGENTS = {
-  'thermal-guardian': {
-    NAME: 'Thermal Guardian',
-    SUMMARY: 'Predicts thermal drift and triggers cooling adjustments before throttling thresholds are breached.',
-    DOMAIN: 'thermal',
-  },
-  'power-monitor': {
-    NAME: 'Power & UPS Monitor',
-    SUMMARY: 'Tracks power distribution, battery health, and failover readiness to ensure uninterrupted operations.',
-    DOMAIN: 'power',
-  },
-  'cooling-optimizer': {
-    NAME: 'Cooling Optimization Agent',
-    SUMMARY: 'Predicts cooling inefficiencies and adjusts airflow/chiller usage to maintain thermal stability during load spikes.',
-    DOMAIN: 'cooling',
-  },
-  'network-sentinel': {
-    NAME: 'Network Sentinel',
-    SUMMARY: 'Monitors switch saturation, latency spikes, and packet loss to maintain network reliability.',
-    DOMAIN: 'network',
-  },
-  'facility-guardian': {
-    NAME: 'Facility Guardian',
-    SUMMARY: 'Detects environmental anomalies, fire risks, and water intrusion to protect physical infrastructure.',
-    DOMAIN: 'facility',
-  },
-  'workload-orchestrator': {
-    NAME: 'Workload Orchestrator',
-    SUMMARY: 'Balances GPU workloads across racks, optimizes queue times, and prevents resource contention.',
-    DOMAIN: 'workload',
-  },
-  'sovereignty-sentinel': {
-    NAME: 'Sovereignty Sentinel',
-    SUMMARY: 'Detects cross-border data flows and enforces regional data-processing constraints.',
-    DOMAIN: 'sovereignty',
-  },
-  'carbon-optimizer': {
-    NAME: 'Carbon & Cost Optimizer',
-    SUMMARY: 'Forecasts emissions and cost exposure based on workload, grid mix, and renewable penetration.',
-    DOMAIN: 'financial',
-  },
-  'incident-response': {
-    NAME: 'Incident Response Agent',
-    SUMMARY: 'Coordinates automated responses to critical alerts across thermal, power, and sovereignty domains.',
-    DOMAIN: 'facility',
+  SECTION_INTRO: 
+    'Autonomous agents monitor domains, detect anomalies, and trigger automated responses. Each agent binds to specific KPIs and workflows to maintain operational stability.',
+  
+  ITEMS: {
+    'thermal-guardian': {
+      NAME: 'Thermal Guardian',
+      SUMMARY: 'Predicts thermal drift and triggers cooling adjustments before throttling thresholds are breached.',
+      DOMAIN: 'thermal',
+    },
+    'power-monitor': {
+      NAME: 'Power & UPS Monitor',
+      SUMMARY: 'Tracks power distribution, battery health, and failover readiness to ensure uninterrupted operations.',
+      DOMAIN: 'power',
+    },
+    'cooling-optimizer': {
+      NAME: 'Cooling Optimization Agent',
+      SUMMARY: 'Predicts cooling inefficiencies and adjusts airflow/chiller usage to maintain thermal stability during load spikes.',
+      DOMAIN: 'cooling',
+    },
+    'network-sentinel': {
+      NAME: 'Network Sentinel',
+      SUMMARY: 'Monitors switch saturation, latency spikes, and packet loss to maintain network reliability.',
+      DOMAIN: 'network',
+    },
+    'facility-guardian': {
+      NAME: 'Facility Guardian',
+      SUMMARY: 'Detects environmental anomalies, fire risks, and water intrusion to protect physical infrastructure.',
+      DOMAIN: 'facility',
+    },
+    'workload-orchestrator': {
+      NAME: 'Workload Orchestrator',
+      SUMMARY: 'Balances GPU workloads across racks, optimizes queue times, and prevents resource contention.',
+      DOMAIN: 'workload',
+    },
+    'sovereignty-sentinel': {
+      NAME: 'Sovereignty Sentinel',
+      SUMMARY: 'Detects cross-border data flows and enforces regional data-processing constraints.',
+      DOMAIN: 'sovereignty',
+    },
+    'carbon-optimizer': {
+      NAME: 'Carbon & Cost Optimizer',
+      SUMMARY: 'Forecasts emissions and cost exposure based on workload, grid mix, and renewable penetration.',
+      DOMAIN: 'financial',
+    },
+    'incident-response': {
+      NAME: 'Incident Response Agent',
+      SUMMARY: 'Coordinates automated responses to critical alerts across thermal, power, and sovereignty domains.',
+      DOMAIN: 'facility',
+    },
   },
 } as const;
 
-export type AgentKey = keyof typeof AGENTS;
+export type AgentKey = keyof typeof AGENTS.ITEMS;
 
 // =============================================================================
 // KPIs
 // =============================================================================
 
 export const KPIS = {
-  'effective-ai-pue': {
-    NAME: 'Effective AI PUE',
-    DESCRIPTION: 'Measures power efficiency across compute and facility infrastructure.',
-    UNIT: 'ratio',
-    DIRECTION: 'lower_is_better',
-  },
+  SECTION_INTRO: 
+    'Key Performance Indicators validate energy, carbon, sovereignty, and operational thresholds. Each KPI defines targets, alerts, and owner accountability.',
+  
+  ITEMS: {
+    'effective-ai-pue': {
+      NAME: 'Effective AI PUE',
+      DESCRIPTION: 'Measures power efficiency across compute and facility infrastructure.',
+      UNIT: 'ratio',
+      DIRECTION: 'lower_is_better',
+    },
   'gco2-per-gpu-hour': {
     NAME: 'Carbon Intensity',
     DESCRIPTION: 'Tracks emissions per compute unit; essential for green-build modeling.',
@@ -255,15 +264,16 @@ export const KPIS = {
     UNIT: 'kW/kW',
     DIRECTION: 'higher_is_better',
   },
-  'carbon-cost-exposure': {
-    NAME: 'Carbon Cost Exposure',
-    DESCRIPTION: 'Quantifies financial risk from carbon pricing and regulatory changes.',
-    UNIT: 'USD',
-    DIRECTION: 'lower_is_better',
+    'carbon-cost-exposure': {
+      NAME: 'Carbon Cost Exposure',
+      DESCRIPTION: 'Quantifies financial risk from carbon pricing and regulatory changes.',
+      UNIT: 'USD',
+      DIRECTION: 'lower_is_better',
+    },
   },
 } as const;
 
-export type KPIKey = keyof typeof KPIS;
+export type KPIKey = keyof typeof KPIS.ITEMS;
 
 // =============================================================================
 // WORKFLOWS

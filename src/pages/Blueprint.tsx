@@ -10,6 +10,7 @@ import { useBlueprint } from '@/hooks/useBlueprint';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   ArrowLeft, 
   Download, 
@@ -330,6 +331,12 @@ export default function Blueprint() {
             >
               Scenarios
             </TabsTrigger>
+            <TabsTrigger 
+              value="validation"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
+            >
+              Validation
+            </TabsTrigger>
           </TabsList>
 
           <div className="mt-6">
@@ -353,6 +360,42 @@ export default function Blueprint() {
             </TabsContent>
             <TabsContent value="scenarios" className="m-0">
               <BlueprintScenariosTab scenarios={blueprint.simulationScenarios} />
+            </TabsContent>
+            <TabsContent value="validation" className="m-0">
+              <div className="grid lg:grid-cols-2 gap-6">
+                <BlueprintValidationPanel blueprint={blueprint} />
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Activity className="h-4 w-4" />
+                      Deployment Readiness
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Review validation issues before deploying this blueprint to production.
+                    </p>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
+                        <span className="text-sm">Agents Configured</span>
+                        <Badge variant="outline">{blueprint.agents.length}</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
+                        <span className="text-sm">KPIs Tracked</span>
+                        <Badge variant="outline">{blueprint.kpis.length}</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
+                        <span className="text-sm">Workflows Active</span>
+                        <Badge variant="outline">{blueprint.workflows.filter(w => w.enabled).length}</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
+                        <span className="text-sm">Scenarios Ready</span>
+                        <Badge variant="outline">{blueprint.simulationScenarios.length}</Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
           </div>
         </Tabs>

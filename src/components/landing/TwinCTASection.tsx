@@ -1,6 +1,6 @@
 /**
  * TwinCTASection - Bottom CTA section
- * Inspired by Deloitte's corporate credibility and Monday.com's urgency patterns
+ * M2M Tech brand styling with Space Grotesk display font
  * Uses M2M brand design tokens from index.css
  */
 
@@ -75,7 +75,7 @@ export function TwinCTASection() {
             
             {/* Headline */}
             <motion.h2 
-              className="text-3xl lg:text-5xl font-bold text-foreground mb-4 leading-tight"
+              className="font-display text-3xl lg:text-5xl font-bold text-foreground mb-4 leading-tight"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}

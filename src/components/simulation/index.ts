@@ -50,3 +50,10 @@ export { CustomScenarioBuilder } from './CustomScenarioBuilder';
 export { ClickableEventTimeline } from './ClickableEventTimeline';
 export { KPIDetailModal } from './KPIDetailModal';
 export { AIRecommendationsPanel } from './AIRecommendationsPanel';
+
+// Enterprise KPI System Components
+export { EnterpriseKPICard } from './EnterpriseKPICard';
+export { EnterpriseKPIChart } from './EnterpriseKPIChart';
+export { KPICorrelationMatrix } from './KPICorrelationMatrix';
+export { WhatIfControls } from './WhatIfControls';
+export { EnhancedComparisonMode } from './EnhancedComparisonMode';

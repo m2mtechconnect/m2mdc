@@ -31,6 +31,7 @@ interface LiveInsightsKPIPanelProps {
   hoveredKpiId?: string | null;
   hoveredValue?: number;
   isRunning?: boolean;
+  onKpiClick?: (kpiId: string) => void;
   className?: string;
 }
 
@@ -41,6 +42,7 @@ export function LiveInsightsKPIPanel({
   hoveredKpiId,
   hoveredValue,
   isRunning = false,
+  onKpiClick,
   className,
 }: LiveInsightsKPIPanelProps) {
   const [insights, setInsights] = useState<LiveInsight[]>([]);
@@ -248,13 +250,19 @@ export function LiveInsightsKPIPanel({
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ delay: i * 0.05 }}
+                  onClick={() => {
+                    if (onKpiClick && insight.relatedKpis.length > 0) {
+                      onKpiClick(insight.relatedKpis[0]);
+                    }
+                  }}
                   className={cn(
                     "p-3 rounded-lg border transition-colors",
                     insight.severity === 'critical' 
                       ? "border-destructive/30 bg-destructive/5" 
                       : insight.type === 'recommendation'
                         ? "border-success/30 bg-success/5"
-                        : "border-border bg-muted/30"
+                        : "border-border bg-muted/30",
+                    onKpiClick && insight.relatedKpis.length > 0 && "cursor-pointer hover:bg-muted/50"
                   )}
                 >
                   <div className="flex items-start gap-2">

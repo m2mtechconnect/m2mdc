@@ -2,6 +2,18 @@
  * Data Centre Digital Twin - Complete Type Definitions
  * 5 Domain Twins: Thermal/Hardware, Power/UPS, Cooling, Network, Facility/Safety
  * Plus: Workload/GPU, Sovereignty, Financial/Carbon
+ * 
+ * INDUSTRY SOURCES:
+ * - Uptime Institute Tier Standards: https://uptimeinstitute.com/tier-certification
+ * - ASHRAE TC 9.9 Thermal Guidelines: https://tc0909.ashraetcs.org/
+ * - The Green Grid PUE/DCiE Standards: https://www.thegreengrid.org/
+ * - TIA-942-B Data Center Standards: https://tiaonline.org/what-we-do/standards/
+ * - IEEE 493 Power System Reliability: https://standards.ieee.org/standard/493-2007.html
+ * - NFPA 75/76 Data Center Fire Protection: https://www.nfpa.org/
+ * - EN 50600 European DC Standards: https://www.cenelec.eu/
+ * - NVIDIA DGX Infrastructure: https://docs.nvidia.com/dgx/
+ * - Canadian Data Sovereignty (PIPEDA): https://www.priv.gc.ca/
+ * - GHG Protocol Scope 2 Guidance: https://ghgprotocol.org/scope_2_guidance
  */
 
 // ============================================================================

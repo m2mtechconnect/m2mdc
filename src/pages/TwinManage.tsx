@@ -10,7 +10,7 @@ import type { DeployedSystem } from '@/types/system';
 import { AOCUnifiedHeader } from '@/components/aoc/AOCUnifiedHeader';
 import { AOCLiveTab } from '@/components/aoc/AOCLiveTab';
 import { AOCWorkflowTab } from '@/components/aoc/AOCWorkflowTab';
-import { AOCBlueprintTab } from '@/components/aoc/AOCBlueprintTab';
+import { AOCDesignTab } from '@/components/aoc/AOCDesignTab';
 import { AOCSimulationTab } from '@/components/aoc/AOCSimulationTab';
 import { AOCMetricsTab } from '@/components/aoc/AOCMetricsTab';
 import { AOCDeployTab } from '@/components/aoc/AOCDeployTab';
@@ -201,7 +201,7 @@ export default function TwinManage() {
             </TabsContent>
 
             <TabsContent value="design" className="mt-0">
-              <AOCBlueprintTab instance={instance} />
+              <AOCDesignTab instance={instance} />
             </TabsContent>
 
             <TabsContent value="simulation" className="mt-0">

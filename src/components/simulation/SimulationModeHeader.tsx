@@ -1,17 +1,19 @@
 /**
  * Simulation Mode Header
  * Clear visual indicator that user is in SIMULATION mode, not Blueprint Designer
- * Shows simulation badge, read-only status, and link to Designer
+ * Shows simulation badge, snapshot info, and link to Designer
  */
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
   PlayCircle, 
-  Lock, 
+  Eye, 
   ExternalLink,
   Activity,
-  Info
+  Info,
+  Clock,
+  GitBranch
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -20,14 +22,20 @@ interface SimulationModeHeaderProps {
   twinName?: string;
   twinId?: string;
   subtitle?: string;
+  blueprintVersion?: string;
+  lastUpdated?: string;
   showDesignerLink?: boolean;
+  onViewSnapshot?: () => void;
 }
 
 export function SimulationModeHeader({ 
   twinName = 'Data Centre Twin',
   twinId = 'default',
   subtitle,
-  showDesignerLink = true
+  blueprintVersion = 'v1.0',
+  lastUpdated,
+  showDesignerLink = true,
+  onViewSnapshot
 }: SimulationModeHeaderProps) {
   const navigate = useNavigate();
 
@@ -41,7 +49,7 @@ export function SimulationModeHeader({
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent animate-pulse" />
       
       <div className="relative p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           {/* Left: Title and badges */}
           <div>
             <div className="flex items-center gap-3 mb-2">
@@ -49,7 +57,7 @@ export function SimulationModeHeader({
                 <PlayCircle className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold">Run Simulation</h1>
+                <h1 className="text-xl sm:text-2xl font-bold">Simulation Environment</h1>
                 <p className="text-sm text-muted-foreground">{twinName}</p>
               </div>
             </div>
@@ -61,10 +69,10 @@ export function SimulationModeHeader({
                 Simulation Mode
               </Badge>
               
-              {/* Read-only indicator */}
+              {/* Design Snapshot indicator */}
               <Badge variant="secondary" className="gap-1">
-                <Lock className="h-3 w-3" />
-                Read-Only Blueprint
+                <Eye className="h-3 w-3" />
+                Using Design Snapshot
               </Badge>
               
               {/* Info tooltip */}
@@ -74,7 +82,7 @@ export function SimulationModeHeader({
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="max-w-xs">
                   <p className="text-sm">
-                    <strong>Simulation Mode</strong> runs scenarios against a frozen blueprint snapshot. 
+                    <strong>Simulation Mode</strong> runs scenarios against a frozen design snapshot. 
                     Configuration changes must be made in the Blueprint Designer.
                   </p>
                 </TooltipContent>
@@ -86,17 +94,50 @@ export function SimulationModeHeader({
             )}
           </div>
           
-          {/* Right: Designer link */}
-          {showDesignerLink && (
-            <Button 
-              variant="outline" 
-              onClick={handleOpenDesigner}
-              className="gap-2 shrink-0 border-primary/30 hover:bg-primary/10"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Open Blueprint Designer
-            </Button>
-          )}
+          {/* Center: Snapshot Info */}
+          <div className="rounded-lg bg-muted/50 px-4 py-3 border border-border hidden md:block">
+            <p className="text-xs text-muted-foreground mb-1">Design Snapshot</p>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <GitBranch className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-mono font-medium">{blueprintVersion}</span>
+              </div>
+              {lastUpdated && (
+                <>
+                  <div className="h-4 w-px bg-border" />
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">{lastUpdated}</span>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+          
+          {/* Right: Actions */}
+          <div className="flex gap-2">
+            {onViewSnapshot && (
+              <Button 
+                variant="outline" 
+                onClick={onViewSnapshot}
+                className="gap-2"
+              >
+                <Eye className="h-4 w-4" />
+                View Design Snapshot
+              </Button>
+            )}
+            
+            {showDesignerLink && (
+              <Button 
+                variant="outline" 
+                onClick={handleOpenDesigner}
+                className="gap-2 shrink-0 border-primary/30 hover:bg-primary/10"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Open Blueprint Designer
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

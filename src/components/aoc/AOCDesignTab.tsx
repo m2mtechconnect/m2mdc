@@ -1,20 +1,28 @@
+/**
+ * AOC Design Tab (formerly Blueprint Tab)
+ * READ-ONLY summary view of design configuration
+ * For full editing, users must go to Blueprint Designer
+ */
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Cpu, Database, Zap, Brain, Wind, Network, Shield, GitBranch, ArrowRight, PlayCircle } from 'lucide-react';
+import { Cpu, Database, Zap, Brain, Wind, Network, Shield, GitBranch, ArrowRight, PlayCircle, ExternalLink } from 'lucide-react';
 import type { DeployedSystem } from '@/types/system';
 import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 import { DCArchitectureDiagram } from '@/components/dc-ui/DCArchitectureDiagram';
 import { SimulationPreviewModal } from '@/components/simulation/SimulationPreviewModal';
+import { BlueprintViewProvider } from '@/context/BlueprintViewContext';
+import { DesignViewHeader } from '@/components/blueprint/DesignViewHeader';
 
-interface AOCBlueprintTabProps {
+interface AOCDesignTabProps {
   instance: DeployedSystem;
 }
 
-export function AOCBlueprintTab({ instance }: AOCBlueprintTabProps) {
+export function AOCDesignTab({ instance }: AOCDesignTabProps) {
   const navigate = useNavigate();
   const [showSimPreview, setShowSimPreview] = useState(false);
   
@@ -46,26 +54,33 @@ export function AOCBlueprintTab({ instance }: AOCBlueprintTabProps) {
   });
 
   return (
-    <div className="space-y-6">
-      {/* Section Header */}
-      <DCSectionHeader
-        title="Data Centre Architecture"
-        subtitle="Infrastructure blueprint and system topology"
-        icon={<Cpu className="h-5 w-5" />}
-      />
+    <BlueprintViewProvider mode="designView">
+      <div className="space-y-6">
+        {/* DESIGN VIEW HEADER - Read-only indicator */}
+        <DesignViewHeader
+          twinName={instance.name}
+          twinId={instance.id}
+        />
 
-      {/* Deployed Configuration Header */}
-      <DCCard 
-        title="Deployed Blueprint" 
-        subtitle={`Current production configuration for ${instance.name}`}
-        icon={<Cpu className="h-5 w-5" />}
-        status="info"
-        headerAction={<Badge variant="outline" className="border-dc-primary/30">v{instance.version}</Badge>}
-      >
-        <div className="text-sm text-muted-foreground">
-          This blueprint defines the operational topology and data flow for the Data Centre Digital Twin.
-        </div>
-      </DCCard>
+        {/* Section Header */}
+        <DCSectionHeader
+          title="Data Centre Architecture"
+          subtitle="Infrastructure design and system topology (read-only)"
+          icon={<Cpu className="h-5 w-5" />}
+        />
+
+        {/* Deployed Configuration Header */}
+        <DCCard 
+          title="Current Design" 
+          subtitle={`Production configuration for ${instance.name}`}
+          icon={<Cpu className="h-5 w-5" />}
+          status="info"
+          headerAction={<Badge variant="outline" className="border-dc-primary/30">v{instance.version}</Badge>}
+        >
+          <div className="text-sm text-muted-foreground">
+            This is a read-only view of the operational design. To make changes, open the Blueprint Designer.
+          </div>
+        </DCCard>
 
       {/* Simulation Preview Card */}
       <DCCard 
@@ -222,7 +237,8 @@ export function AOCBlueprintTab({ instance }: AOCBlueprintTabProps) {
           setShowSimPreview(false);
           navigate(`/deploy?id=${instance.id}`);
         }}
-      />
-    </div>
+        />
+      </div>
+    </BlueprintViewProvider>
   );
 }

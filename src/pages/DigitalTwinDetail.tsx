@@ -38,7 +38,7 @@ export default function DigitalTwinDetail() {
       
       if (!data) {
         toast.error("Digital twin not found");
-        navigate("/digital-twins");
+        navigate("/");
         return;
       }
 
@@ -59,7 +59,7 @@ export default function DigitalTwinDetail() {
     } catch (error) {
       console.error("Error loading digital twin:", error);
       toast.error("Failed to load digital twin");
-      navigate("/digital-twins");
+      navigate("/");
     } finally {
       setLoading(false);
     }
@@ -95,7 +95,7 @@ export default function DigitalTwinDetail() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/digital-twins")}>
+          <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>

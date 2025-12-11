@@ -81,6 +81,8 @@ export function DCSimulationTab() {
         <SimulationModeHeader
           twinName={overview.twinName || 'Sovereign AI Data Centre'}
           subtitle={`${overview.facilityLocation || 'Montreal, QC'} • ${overview.renewablePercent || 95}% Renewable • ${overview.capacityKw?.toLocaleString() || '10,000'} kW`}
+          blueprintVersion="v1.0"
+          lastUpdated={new Date().toLocaleDateString()}
           showDesignerLink={true}
         />
 

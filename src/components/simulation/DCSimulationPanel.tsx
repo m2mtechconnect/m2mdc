@@ -229,7 +229,7 @@ export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSim
           />
         </div>
         
-        {/* View Blueprint Snapshot Button */}
+        {/* View Design Snapshot Button */}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -240,12 +240,12 @@ export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSim
               className="gap-2 shrink-0"
             >
               <FileText className="h-4 w-4" />
-              View Blueprint Snapshot
+              View Design Snapshot
               <Info className="h-3 w-3 text-muted-foreground" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom" className="max-w-xs">
-            <p>View the exact blueprint configuration used for this simulation run (read-only snapshot).</p>
+            <p>View the exact design configuration used for this simulation run (read-only snapshot).</p>
           </TooltipContent>
         </Tooltip>
       </div>

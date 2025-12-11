@@ -1,14 +1,77 @@
 /**
  * Industry-Accurate Data Centre Defaults
  * 
- * All values are based on real-world benchmarks from:
- * - Uptime Institute reports
- * - ASHRAE Data Center Guidelines (TC 9.9)
- * - ISO/IEC 22237
- * - NVIDIA DGX / H100 thermal profiles
- * - Canadian grid carbon intensity (NRCan, IESO, Hydro-Québec)
- * - Real PUE ranges from industry surveys
- * - Sovereignty frameworks (PIPEDA, AGA, DS Law)
+ * All values are based on real-world benchmarks from authoritative industry sources:
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * PRIMARY DATA SOURCES & CITATIONS:
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * UPTIME INSTITUTE:
+ * - Global Data Center Survey 2024: PUE industry averages (1.58 average)
+ *   https://uptimeinstitute.com/resources/research-and-reports/uptime-institute-global-data-center-survey-results-2024
+ * - Tier Standard: Topology (Tier I-IV availability requirements)
+ *   https://uptimeinstitute.com/tiers
+ * - Annual Outages Analysis 2024: MTTR and incident statistics
+ *   https://uptimeinstitute.com/resources/asset/2024-annual-outages-analysis
+ * 
+ * ASHRAE TECHNICAL COMMITTEE 9.9:
+ * - Thermal Guidelines for Data Processing Environments, 5th Edition (2021)
+ *   - A1 Class: 15-32°C inlet, 20-80% RH (recommended for enterprise)
+ *   - A2 Class: 10-35°C inlet, 20-80% RH (allowable for most equipment)
+ *   - H1 Class: 5-25°C inlet (high-density computing)
+ *   https://tc0909.ashraetcs.org/
+ * - Power Consumption Guidelines (2016 White Paper)
+ * 
+ * ISO/IEC STANDARDS:
+ * - ISO/IEC 22237-1:2021 Data Centre Facilities - General concepts
+ * - ISO/IEC 22237-2:2021 Building construction (security, fire protection)
+ * - ISO/IEC 22237-3:2021 Power distribution
+ * - ISO/IEC 22237-4:2021 Environmental control
+ * - ISO 27001:2022 Information Security Management Systems
+ * - ISO 50001:2018 Energy Management Systems
+ * 
+ * NVIDIA GPU SPECIFICATIONS:
+ * - H100 SXM: 700W TDP, 80GB HBM3, optimal temp <83°C
+ * - A100 SXM: 400W TDP, 80GB HBM2e, optimal temp <83°C
+ * - L40S: 350W TDP, 48GB GDDR6, optimal temp <85°C
+ *   https://www.nvidia.com/en-us/data-center/
+ * - DCGM Metrics Reference: https://docs.nvidia.com/datacenter/dcgm/latest/
+ * 
+ * CANADIAN GRID & CARBON DATA:
+ * - NRCan National Energy Use Database (NEUD)
+ *   https://oee.nrcan.gc.ca/corporate/statistics/neud/dpa/data_e/databases.cfm
+ * - IESO Ontario Power Generation Data (28 gCO₂eq/kWh)
+ *   https://www.ieso.ca/en/Power-Data
+ * - Hydro-Québec Annual Report 2023 (1.2 gCO₂eq/kWh, 99.8% renewable)
+ *   https://www.hydroquebec.com/publications/en/annual-report/
+ * - BC Hydro Integrated Resource Plan (10.5 gCO₂eq/kWh)
+ *   https://www.bchydro.com/energy-in-bc/planning-for-our-future.html
+ * - AESO Alberta Grid Data (470 gCO₂eq/kWh)
+ *   https://www.aeso.ca/market/market-and-system-reporting/
+ * 
+ * CANADIAN SOVEREIGNTY FRAMEWORKS:
+ * - PIPEDA (Personal Information Protection and Electronic Documents Act)
+ * - AGA (Artificial Intelligence and Data Act - proposed Bill C-27)
+ * - Quebec Law 25 (Private Sector Privacy Act modernization)
+ * - OSFI B-13 Technology and Cyber Risk Management Guideline
+ * - ITSG-33 Security Control Catalogue (Government of Canada)
+ * 
+ * US GRID DATA:
+ * - EPA eGRID 2023: https://www.epa.gov/egrid
+ * - EIA Electric Power Monthly: https://www.eia.gov/electricity/monthly/
+ * 
+ * PUE BENCHMARKS (Uptime Institute 2024):
+ * - Industry average: 1.58
+ * - Top performers: 1.20-1.30
+ * - Hyperscale leaders: 1.10-1.20
+ * - Legacy facilities: 1.80-2.20
+ * 
+ * REAL-TIME CARBON DATA PROVIDERS:
+ * - Electricity Maps API: https://app.electricitymaps.com/
+ * - WattTime API: https://www.watttime.org/
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 // ============================================================================

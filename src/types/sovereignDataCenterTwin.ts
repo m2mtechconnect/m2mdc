@@ -1,6 +1,61 @@
 /**
  * Sovereign Green AI Data Centre Twin Types
  * Complete type definitions for data center digital twin simulation
+ * 
+ * Industry Sources & Compliance Frameworks:
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * CANADIAN DATA SOVEREIGNTY:
+ * - PIPEDA (Personal Information Protection and Electronic Documents Act)
+ *   https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/
+ * - Quebec Law 25 (Private Sector Privacy Act modernization)
+ *   https://www.cai.gouv.qc.ca/english/
+ * - OSFI B-13 Technology and Cyber Risk Management (Banking sector)
+ *   https://www.osfi-bsif.gc.ca/Eng/Docs/b13.pdf
+ * - ITSG-33 Security Control Catalogue (Government of Canada)
+ *   https://cyber.gc.ca/en/guidance/it-security-risk-management-lifecycle-approach-itsg-33
+ * - Protected B Classification Requirements
+ *   https://www.tpsgc-pwgsc.gc.ca/esc-src/protection-safeguarding/niveaux-levels-eng.html
+ * 
+ * US DATA RESIDENCY:
+ * - FedRAMP (Federal Risk and Authorization Management Program)
+ *   https://www.fedramp.gov/
+ * - CCPA (California Consumer Privacy Act)
+ *   https://oag.ca.gov/privacy/ccpa
+ * - HIPAA (Health Insurance Portability and Accountability Act)
+ *   https://www.hhs.gov/hipaa/index.html
+ * 
+ * EUROPEAN REGULATIONS:
+ * - GDPR (General Data Protection Regulation)
+ *   https://gdpr.eu/
+ * - EU Cloud Code of Conduct (CISPE)
+ *   https://eucoc.cloud/en/home.html
+ * - Gaia-X European Data Infrastructure
+ *   https://gaia-x.eu/
+ * 
+ * DATA CENTRE INFRASTRUCTURE:
+ * - Uptime Institute Tier Standards (I-IV)
+ *   https://uptimeinstitute.com/tiers
+ * - TIA-942 Data Center Standards
+ *   https://tiaonline.org/products/tia-942-c-2017-rev-c-data-center-design/
+ * - EN 50600 European Data Centre Standard Series
+ *   https://www.en50600.com/
+ * 
+ * ENVIRONMENTAL STANDARDS:
+ * - ASHRAE TC 9.9 Thermal Guidelines for Data Processing Environments
+ *   https://tc0909.ashraetcs.org/documents/ASHRAE_TC0909_Power_White_Paper_22_June_2016_REVISED.pdf
+ * - ISO 14001 Environmental Management Systems
+ *   https://www.iso.org/iso-14001-environmental-management.html
+ * - ISO 50001 Energy Management Systems
+ *   https://www.iso.org/iso-50001-energy-management.html
+ * 
+ * PUE & EFFICIENCY:
+ * - The Green Grid PUE Measurement Methodology
+ *   https://www.thegreengrid.org/
+ * - Uptime Institute Annual Data Center Survey (PUE benchmarks)
+ *   https://uptimeinstitute.com/resources/research-and-reports/uptime-institute-global-data-center-survey-results-2024
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 export type EnergyMix = {

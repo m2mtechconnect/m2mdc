@@ -1,6 +1,44 @@
 /**
  * Generate Simulation Result Summary
  * Creates RCA, recommendations, and KPI delta summary from simulation data
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * ROOT CAUSE ANALYSIS (RCA) METHODOLOGIES:
+ * - ITIL v4 Problem Management - Root Cause Analysis
+ *   https://www.axelos.com/best-practice-solutions/itil
+ * - 5 Whys Analysis (Toyota Production System)
+ *   https://asq.org/quality-resources/five-whys
+ * - Ishikawa/Fishbone Diagram (Cause and Effect Analysis)
+ *   https://asq.org/quality-resources/fishbone
+ * - Kepner-Tregoe Problem Analysis
+ *   https://kepner-tregoe.com/
+ * 
+ * INCIDENT MANAGEMENT & RECOMMENDATIONS:
+ * - Google SRE Handbook - Postmortem Culture
+ *   https://sre.google/sre-book/postmortem-culture/
+ * - PagerDuty Incident Response Best Practices
+ *   https://response.pagerduty.com/
+ * - Atlassian Incident Management Handbook
+ *   https://www.atlassian.com/incident-management
+ * 
+ * DATA CENTER SPECIFIC RCA:
+ * - Uptime Institute Abnormal Incident Reports (AIRs)
+ *   https://uptimeinstitute.com/resources/research-and-reports
+ * - Schneider Electric Data Center Troubleshooting Guides
+ *   https://www.se.com/ww/en/work/solutions/for-business/data-centers-and-networks/
+ * - ASHRAE TC 9.9 Data Center Cooling Troubleshooting
+ *   https://tc0909.ashraetcs.org/
+ * 
+ * KPI BENCHMARKING:
+ * - The Green Grid PUE/DCiE Benchmarks
+ *   https://www.thegreengrid.org/en/resources/library-and-tools
+ * - Uptime Institute Global Data Center Survey
+ *   https://uptimeinstitute.com/resources/research-and-reports
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import type { 

@@ -1,6 +1,36 @@
 /**
  * Custom Scenario Builder
  * Utilities for creating user-defined scenarios
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * SCENARIO PLANNING & SIMULATION:
+ * - ISO 22301:2019 Business Continuity Management Systems
+ *   https://www.iso.org/standard/75106.html
+ * - Uptime Institute Tier Certification Scenario Testing
+ *   https://uptimeinstitute.com/tier-certification
+ * 
+ * FAILURE MODE ANALYSIS:
+ * - FMEA (Failure Mode and Effects Analysis) - ASQ
+ *   https://asq.org/quality-resources/fmea
+ * - IEEE 1413 Standard for Reliability Predictions
+ *   https://standards.ieee.org/standard/1413-2021.html
+ * 
+ * DATA CENTER DOMAINS:
+ * - TIA-942-B Data Center Infrastructure Standard
+ *   https://tiaonline.org/what-we-do/standards/
+ * - Uptime Institute Tier Topology Standards
+ *   https://uptimeinstitute.com/tier-certification/tier-requirements
+ * 
+ * KPI DEFINITIONS:
+ * - The Green Grid Metrics (PUE, DCiE, CUE, WUE)
+ *   https://www.thegreengrid.org/en/resources/library-and-tools
+ * - DCIM KPI Best Practices (Schneider Electric)
+ *   https://www.se.com/ww/en/download/document/WP104/
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import type { ScenarioDefinition, ScenarioTimelineStep, CustomScenarioConfig } from './types';

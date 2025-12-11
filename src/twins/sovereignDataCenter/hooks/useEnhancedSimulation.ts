@@ -1,5 +1,45 @@
 /**
  * Hook for Enhanced Sovereign DC Simulation with AI Recommendations & Multi-Run Support
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * SIMULATION ENGINE PATTERNS:
+ * - NVIDIA Omniverse Digital Twin SDK
+ *   https://developer.nvidia.com/omniverse
+ * - Microsoft Azure Digital Twins
+ *   https://learn.microsoft.com/en-us/azure/digital-twins/
+ * - ISO 23247:2021 Digital Twin Framework for Manufacturing
+ *   https://www.iso.org/standard/75066.html
+ * 
+ * EVENT-DRIVEN SIMULATION:
+ * - Discrete Event Simulation (DES) Methodology
+ *   ISBN: 978-0131446793 (Jerry Banks)
+ * - SimPy Discrete Event Simulation Library
+ *   https://simpy.readthedocs.io/
+ * 
+ * KPI TRACKING & OBSERVABILITY:
+ * - Prometheus Time-Series Metrics
+ *   https://prometheus.io/docs/concepts/metric_types/
+ * - OpenTelemetry Metrics Specification
+ *   https://opentelemetry.io/docs/specs/otel/metrics/
+ * - Datadog APM & Monitoring
+ *   https://www.datadoghq.com/product/apm/
+ * 
+ * AI-POWERED RECOMMENDATIONS:
+ * - NVIDIA Modulus AI for Simulation
+ *   https://developer.nvidia.com/modulus
+ * - Google DeepMind Data Center Cooling AI
+ *   https://deepmind.google/discover/blog/deepmind-ai-reduces-google-data-centre-cooling-bill-by-40/
+ * 
+ * REACT STATE MANAGEMENT:
+ * - React useCallback/useRef Patterns
+ *   https://react.dev/reference/react/useCallback
+ * - Event Emitter Pattern in JavaScript
+ *   https://nodejs.org/api/events.html
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';

@@ -1,6 +1,46 @@
 /**
  * Timeline <-> KPI Sync Engine
  * Universal synchronization layer between timeline events and KPI charts
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * TIME-SERIES SYNCHRONIZATION:
+ * - Prometheus Time-Series Database Patterns
+ *   https://prometheus.io/docs/prometheus/latest/querying/basics/
+ * - InfluxDB Time-Series Alignment
+ *   https://docs.influxdata.com/influxdb/v2.0/query-data/
+ * - OpenTelemetry Trace Context Propagation
+ *   https://opentelemetry.io/docs/concepts/context-propagation/
+ * 
+ * EVENT CORRELATION:
+ * - Splunk Event Correlation Best Practices
+ *   https://www.splunk.com/en_us/blog/tips-and-tricks/
+ * - Elastic APM Distributed Tracing
+ *   https://www.elastic.co/guide/en/apm/guide/current/apm-distributed-tracing.html
+ * - Datadog Event Correlation
+ *   https://www.datadoghq.com/blog/event-correlation/
+ * 
+ * THRESHOLD BREACH DETECTION:
+ * - Prometheus Alerting Rules
+ *   https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
+ * - Grafana Alert Thresholds
+ *   https://grafana.com/docs/grafana/latest/alerting/
+ * 
+ * ANOMALY DETECTION ALGORITHMS:
+ * - Z-Score Statistical Process Control
+ *   https://asq.org/quality-resources/statistical-process-control
+ * - Moving Average Convergence/Divergence
+ *   https://www.investopedia.com/terms/m/macd.asp
+ * 
+ * REACT PATTERNS:
+ * - React Context for State Management
+ *   https://react.dev/learn/passing-data-deeply-with-context
+ * - useMemo/useCallback Optimization
+ *   https://react.dev/reference/react/useMemo
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import { useState, useCallback, useEffect, createContext, useContext, useMemo } from 'react';

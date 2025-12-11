@@ -46,18 +46,18 @@ export function DCRackVisualization({
   className,
 }: DCRackVisualizationProps) {
   const statusColors = {
-    operational: 'bg-dc-green/30 border-dc-green/50',
-    normal: 'bg-dc-green/30 border-dc-green/50',
-    warning: 'bg-dc-amber/30 border-dc-amber/50',
-    critical: 'bg-dc-red/40 border-dc-red/60 animate-pulse-glow',
+    operational: 'bg-success/30 border-success/50',
+    normal: 'bg-success/30 border-success/50',
+    warning: 'bg-warning/30 border-warning/50',
+    critical: 'bg-destructive/40 border-destructive/60 animate-pulse',
     offline: 'bg-muted/30 border-muted',
   };
 
   const getThermalColor = (temp: number) => {
-    if (temp >= 80) return 'bg-dc-red';
-    if (temp >= 70) return 'bg-dc-amber';
-    if (temp >= 60) return 'bg-dc-green';
-    return 'bg-dc-cyan';
+    if (temp >= 80) return 'bg-destructive';
+    if (temp >= 70) return 'bg-warning';
+    if (temp >= 60) return 'bg-success';
+    return 'bg-info';
   };
 
   // Handle racks without servers array
@@ -91,8 +91,8 @@ export function DCRackVisualization({
           {showTemperature && rack.avgTemperature && (
             <span className={cn(
               'font-mono',
-              rack.avgTemperature >= 70 ? 'text-dc-amber' : 
-              rack.avgTemperature >= 80 ? 'text-dc-red' : 'text-dc-green'
+              rack.avgTemperature >= 70 ? 'text-warning' : 
+              rack.avgTemperature >= 80 ? 'text-destructive' : 'text-success'
             )}>
               {rack.avgTemperature}°C
             </span>
@@ -113,7 +113,7 @@ export function DCRackVisualization({
               return (
                 <div
                   key={slotNum}
-                  className="h-2 rounded-sm bg-noc-surface-elevated border border-noc-border"
+                  className="h-2 rounded-sm bg-muted border border-border"
                 />
               );
             }
@@ -152,9 +152,9 @@ export function DCRackVisualization({
                     )}
                     <div className={cn(
                       'capitalize',
-                      serverStatus === 'operational' ? 'text-dc-green' :
-                      serverStatus === 'warning' ? 'text-dc-amber' :
-                      serverStatus === 'critical' ? 'text-dc-red' : 'text-muted-foreground'
+                      serverStatus === 'operational' ? 'text-success' :
+                      serverStatus === 'warning' ? 'text-warning' :
+                      serverStatus === 'critical' ? 'text-destructive' : 'text-muted-foreground'
                     )}>
                       {serverStatus}
                     </div>
@@ -169,15 +169,15 @@ export function DCRackVisualization({
       {/* Legend */}
       <div className="flex items-center gap-3 px-2 text-[10px] text-muted-foreground">
         <div className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-sm bg-dc-green/50" />
+          <span className="w-2 h-2 rounded-sm bg-success/50" />
           <span>Normal</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-sm bg-dc-amber/50" />
+          <span className="w-2 h-2 rounded-sm bg-warning/50" />
           <span>Warm</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-sm bg-dc-red/50" />
+          <span className="w-2 h-2 rounded-sm bg-destructive/50" />
           <span>Hot</span>
         </div>
       </div>
@@ -195,16 +195,16 @@ interface DCRackGridProps {
 
 export function DCRackGrid({ racks, columns = 4, onRackClick, className }: DCRackGridProps) {
   const statusBg = {
-    operational: 'bg-dc-green/20 border-dc-green/30',
-    normal: 'bg-dc-green/20 border-dc-green/30',
-    warning: 'bg-dc-amber/20 border-dc-amber/30',
-    critical: 'bg-dc-red/20 border-dc-red/30',
+    operational: 'bg-success/20 border-success/30',
+    normal: 'bg-success/20 border-success/30',
+    warning: 'bg-warning/20 border-warning/30',
+    critical: 'bg-destructive/20 border-destructive/30',
   };
 
   const thermalColors = {
-    low: 'bg-dc-green/60',
-    medium: 'bg-dc-amber/60',
-    high: 'bg-dc-red/60',
+    low: 'bg-success/60',
+    medium: 'bg-warning/60',
+    high: 'bg-destructive/60',
   };
 
   return (
@@ -223,7 +223,7 @@ export function DCRackGrid({ racks, columns = 4, onRackClick, className }: DCRac
                   statusBg[rack.status]
                 )}
               >
-                <div className="h-full w-full rounded bg-noc-surface flex flex-col justify-end p-0.5 gap-0.5">
+                <div className="h-full w-full rounded bg-muted flex flex-col justify-end p-0.5 gap-0.5">
                   {rack.servers ? (
                     rack.servers.slice(0, 8).map((server, i) => {
                       const serverStatus = server.status === 'normal' ? 'operational' : server.status;
@@ -232,8 +232,8 @@ export function DCRackGrid({ racks, columns = 4, onRackClick, className }: DCRac
                           key={i}
                           className={cn(
                             'h-0.5 rounded-full',
-                            serverStatus === 'critical' ? 'bg-dc-red' :
-                            serverStatus === 'warning' ? 'bg-dc-amber' : 'bg-dc-green/60'
+                            serverStatus === 'critical' ? 'bg-destructive' :
+                            serverStatus === 'warning' ? 'bg-warning' : 'bg-success/60'
                           )}
                         />
                       );
@@ -242,7 +242,7 @@ export function DCRackGrid({ racks, columns = 4, onRackClick, className }: DCRac
                     // Simplified view for racks without detailed server data
                     <div className={cn(
                       'h-full rounded',
-                      rack.thermalLoad ? thermalColors[rack.thermalLoad] : 'bg-dc-green/40'
+                      rack.thermalLoad ? thermalColors[rack.thermalLoad] : 'bg-success/40'
                     )} />
                   )}
                 </div>

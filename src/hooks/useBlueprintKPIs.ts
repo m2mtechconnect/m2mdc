@@ -1,5 +1,35 @@
 /**
  * useBlueprintKPIs - Hook to get KPI definitions from Blueprint
+ * Provides reactive access to blueprint KPIs with grouping and lookup utilities
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * KPI DEFINITION STANDARDS:
+ * - The Green Grid Data Center Metrics Library
+ *   https://www.thegreengrid.org/en/resources/library-and-tools
+ *   PUE, DCiE, WUE, CUE, ERE definitions and calculation methods
+ * - Uptime Institute Performance Metrics Guide
+ *   https://uptimeinstitute.com/resources
+ * - ISO 30134 Data Centre Key Performance Indicators
+ *   https://www.iso.org/standard/62773.html
+ * 
+ * DOMAIN-SPECIFIC KPI BENCHMARKS:
+ * - ASHRAE TC 9.9 Thermal Guidelines (Thermal KPIs)
+ *   https://tc0909.ashraetcs.org/documents.php
+ * - IEEE 493 Industrial Power Systems (Power KPIs)
+ *   https://standards.ieee.org/standard/493-2007.html
+ * - NVIDIA Data Center GPU Metrics (Workload KPIs)
+ *   https://docs.nvidia.com/datacenter/dcgm/latest/user-guide/feature-overview.html
+ * 
+ * REACT PATTERNS:
+ * - React useMemo Optimization Patterns
+ *   https://react.dev/reference/react/useMemo
+ * - Custom Hooks Best Practices
+ *   https://react.dev/learn/reusing-logic-with-custom-hooks
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import { useMemo } from 'react';

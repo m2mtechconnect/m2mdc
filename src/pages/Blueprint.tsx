@@ -35,6 +35,7 @@ import { useToast } from '@/hooks/use-toast';
 // Blueprint View Context - Designer Mode
 import { BlueprintDesignerWrapper } from '@/components/blueprint/BlueprintDesignerWrapper';
 import { BlueprintValidationPanel } from '@/components/blueprint/BlueprintValidationPanel';
+import { DesignerModeHeader } from '@/components/blueprint/DesignerModeHeader';
 
 // Blueprint Tab Components
 import { BlueprintOverviewTab } from '@/components/blueprint/tabs/BlueprintOverviewTab';
@@ -149,51 +150,43 @@ export default function Blueprint() {
     <BlueprintDesignerWrapper>
       <div className="min-h-screen bg-background">
         <div className="container mx-auto py-6 px-4 max-w-7xl">
-          {/* Designer Mode Header */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
+          {/* DESIGNER MODE HEADER - Clear visual distinction */}
+          <DesignerModeHeader
+            twinName={twin?.name || blueprint.name}
+            twinId={blueprintId}
+            location={twin?.city || blueprint.location}
+            showSimulationLink={true}
+          />
+
+          {/* Quick Actions Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 onClick={() => navigate(-1)}
-                className="-ml-2 text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
               </Button>
-              <Badge variant="outline" className="text-xs">
-                <Edit3 className="h-3 w-3 mr-1" />
-                Designer Mode
-              </Badge>
             </div>
+            <div className="flex gap-2">
+              {!twin && blueprintId === 'default' && (
+                <CreateTwinFromBlueprintButton blueprint={blueprint} />
+              )}
+              <Button variant="outline" onClick={downloadBlueprint}>
+                <Download className="h-4 w-4 mr-2" />
+                Download JSON
+              </Button>
+            </div>
+          </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <Server className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h1 className="text-2xl font-semibold">{twin?.name || blueprint.name}</h1>
-                    <p className="text-sm text-muted-foreground">{twin?.city || blueprint.location}</p>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  <Badge variant="outline">Tier {blueprint.tier}</Badge>
-                  <Badge variant="outline">{blueprint.capacityKw} MW</Badge>
-                  <Badge variant="outline">{blueprint.racks} Racks</Badge>
-                  <Badge variant="secondary">v{blueprint.version}</Badge>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                {!twin && blueprintId === 'default' && (
-                  <CreateTwinFromBlueprintButton blueprint={blueprint} />
-                )}
-                <Button variant="outline" onClick={downloadBlueprint}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Download JSON
-                </Button>
-              </div>
-            </div>
+          {/* Blueprint Info Card */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            <Badge variant="outline">Tier {blueprint.tier}</Badge>
+            <Badge variant="outline">{blueprint.capacityKw} MW</Badge>
+            <Badge variant="outline">{blueprint.racks} Racks</Badge>
+            <Badge variant="secondary">v{blueprint.version}</Badge>
           </div>
 
         {/* Quick Stats */}

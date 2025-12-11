@@ -22,8 +22,8 @@ import { useRecommendationsStore } from "@/stores/recommendationsStore";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { startBuilderFromUrl } from "@/lib/intake";
 import { useGreenDcRecommendation } from "@/hooks/useGreenDcRecommendation";
-import { UnifiedRecommendationPanel, normalizeFromBuilderStore } from "./recommendation/UnifiedRecommendationPanel";
-import { useDCTwinBuilderStore } from "@/stores/dcTwinBuilderStore";
+import { UnifiedRecommendationPanel, normalizeFromRecommendation } from "./recommendation/UnifiedRecommendationPanel";
+import { useRecommendationStore } from "@/stores/recommendationStore";
 import { LastScanBanner } from "./dc-scan/LastScanBanner";
 import { useLastScanSession } from "@/hooks/useDCScanSessions";
 
@@ -289,29 +289,22 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
 
       {greenDcRecommendation && !greenDcLoading && !greenDcError && (
         <div className="mt-8 animate-fade-in">
-          {(() => {
-            const store = useDCTwinBuilderStore.getState();
-            const normalizedRec = normalizeFromBuilderStore(
-              store.overview,
-              store.agents,
-              store.scenarios,
-              store.kpis,
-              store.financial,
-              store.sourceRecommendation
-            );
-            return (
-              <UnifiedRecommendationPanel
-                recommendation={normalizedRec}
-                onOpenBlueprint={() => {
-                  const { overview } = store;
-                  navigate(`/blueprint/new?fromUrl=${encodeURIComponent(overview.siteUrl || '')}&industry=${overview.industries[0] || ''}`);
-                }}
-                onOpenSimulation={() => {
-                  navigate(`/data-centre-twin?view=simulation`);
-                }}
-              />
-            );
-          })()}
+          {/* Use recommendation directly from store - NOT the builder store */}
+          <UnifiedRecommendationPanel
+            recommendation={normalizeFromRecommendation(greenDcRecommendation)}
+            onOpenBlueprint={() => {
+              // Preview mode - pass recommendation via state
+              navigate('/blueprint/preview', {
+                state: { mode: 'preview', fromRecommendation: true }
+              });
+            }}
+            onOpenSimulation={() => {
+              // Preview mode - pass recommendation via state
+              navigate('/simulation/preview', {
+                state: { mode: 'preview', fromRecommendation: true }
+              });
+            }}
+          />
         </div>
       )}
 

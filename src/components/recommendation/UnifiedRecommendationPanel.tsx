@@ -2,6 +2,10 @@
  * Unified Recommendation Panel
  * Single canonical component for displaying DC Twin recommendations
  * Consolidates GreenDcRecommendationPanel and BuilderRecommendationPanel
+ * 
+ * CRITICAL: This component displays PREVIEW recommendations.
+ * Twin creation is an EXPLICIT action triggered by "Create Green DC Twin" button.
+ * The recommendation store is cleared after successful twin creation.
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,9 +16,11 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useActiveTwin } from "@/context/ActiveTwinContext";
+import { useRecommendationStore } from "@/stores/recommendationStore";
+import { useDCTwinBuilderStore } from "@/stores/dcTwinBuilderStore";
 import { 
   Leaf, Server, Zap, Thermometer, Shield, DollarSign, Play, 
-  ChevronDown, ChevronUp, Target, Globe, Building2, CheckCircle2, Loader2, Plus 
+  ChevronDown, ChevronUp, Target, Globe, Building2, CheckCircle2, Loader2, Plus, Eye
 } from "lucide-react";
 
 // Normalized recommendation type that works with both sources
@@ -108,9 +114,23 @@ export function UnifiedRecommendationPanel({
   const [isCreating, setIsCreating] = useState(false);
   
   const { createLocation, createTwin, setActiveTwin } = useActiveTwin();
+  
+  // Access recommendation store to clear after twin creation
+  const { recommendation: rawRecommendation, clearRecommendation } = useRecommendationStore();
+  
+  // Access builder store for initializing from recommendation
+  const initializeFromGreenDcRecommendation = useDCTwinBuilderStore(
+    (s) => s.initializeFromGreenDcRecommendation
+  );
 
+  /**
+   * EXPLICIT twin creation action
+   * This is the ONLY way to create a twin from a recommendation
+   */
   const handleCreateTwin = async () => {
     setIsCreating(true);
+    console.log('[UnifiedRecommendationPanel] Creating twin from recommendation (EXPLICIT action)');
+    
     try {
       const region = rec.regions[0] || 'ca-central-1';
       const city = region.includes('central') ? 'Montreal' : 
@@ -160,12 +180,26 @@ export function UnifiedRecommendationPanel({
       
       if (!twin) throw new Error('Failed to create twin');
       
+      // Now that twin is created, initialize the builder store
+      // This is the ONLY place where initializeFromGreenDcRecommendation should be called
+      if (rawRecommendation) {
+        initializeFromGreenDcRecommendation(rawRecommendation, twin.id);
+        console.log('[UnifiedRecommendationPanel] Builder store initialized for twin:', twin.id);
+      }
+      
+      // Set the active twin (this updates the dropdown)
       setActiveTwin(twin.id);
+      
+      // Clear the recommendation preview (no longer in sandbox mode)
+      clearRecommendation();
+      
       toast.success('Green Data Centre Twin created successfully!');
+      console.log('[UnifiedRecommendationPanel] Twin created and activated:', twin.id);
+      
       onTwinCreated?.(twin.id);
       navigate(`/builder?twinId=${twin.id}`);
     } catch (error) {
-      console.error('Failed to create twin:', error);
+      console.error('[UnifiedRecommendationPanel] Failed to create twin:', error);
       toast.error('Failed to create Data Centre Twin');
     } finally {
       setIsCreating(false);
@@ -389,6 +423,86 @@ export function UnifiedRecommendationPanel({
       </CardContent>
     </Card>
   );
+}
+
+/**
+ * Helper to convert GreenDcTwinRecommendation directly to NormalizedRecommendation
+ * Used for PREVIEW mode where recommendation is NOT yet saved as a twin
+ */
+export function normalizeFromRecommendation(
+  rec: import('@/types/greenDcTwin').GreenDcTwinRecommendation
+): NormalizedRecommendation {
+  const getCapacityTier = (tier: string): 'small' | 'medium' | 'large' | 'hyperscale' => {
+    if (tier === 'small' || tier === 'medium' || tier === 'large' || tier === 'hyperscale') {
+      return tier;
+    }
+    return 'medium';
+  };
+
+  const capacityMap: Record<string, number> = {
+    small: 500,
+    medium: 2500,
+    large: 10000,
+    hyperscale: 50000,
+  };
+
+  return {
+    companyName: rec.companyName || 'Organization',
+    twinName: `${rec.companyName || 'Organization'} Sovereign Green AI Data Centre Twin`,
+    industry: rec.industry || 'generic',
+    industryLabel: rec.industryId || rec.industry || 'Enterprise',
+    capacityKw: capacityMap[rec.capacityTier] || 5000,
+    capacityTier: getCapacityTier(rec.capacityTier),
+    regions: rec.regions || ['ca-central-1'],
+    tier: rec.kpiTargets?.uptimeTargetPct >= 99.99 ? 'Tier IV' : 'Tier III',
+    objectives: rec.objectives || [],
+    pueTarget: rec.kpiTargets?.pueTarget || 1.3,
+    renewablePercent: rec.kpiTargets?.renewableShareTargetPct || 80,
+    sovereigntyScore: rec.kpiTargets?.sovereigntyScoreTargetPct || 80,
+    carbonIntensity: rec.kpiTargets?.carbonIntensityTargetGPerKwh || 70,
+    uptimeTarget: rec.kpiTargets?.uptimeTargetPct || 99.9,
+    agents: (rec.agents || []).map((id, i) => ({ 
+      id, 
+      name: formatAgentName(id), 
+      enabled: true 
+    })),
+    scenarios: (rec.scenarios || []).map((id, i) => ({ 
+      id, 
+      name: formatScenarioName(id), 
+      severity: 'warning',
+      enabled: true 
+    })),
+    annualPowerCostUsd: rec.financialModel?.baselineAnnualCostUsd || 0,
+    annualCarbonTonnes: rec.financialModel?.baselineAnnualCarbonTonnes || 0,
+    savingsPercent: rec.financialModel?.greenVariantSavingsCostPct || 0,
+    carbonSavingsPercent: rec.financialModel?.greenVariantSavingsCarbonPct || 0,
+    paybackYears: rec.financialModel?.estimatedPaybackYears || 3,
+    isHyperscaleRetail: rec.isMegaRetailer || rec.archetypeId === 'retail_hyperscale_green_twin',
+    storeCount: rec.financialModel?.multiStoreAggregationCount,
+    coldChainCost: rec.financialModel?.annualColdChainEnergyCostUsd,
+    sourceUrl: rec.domain ? `https://${rec.domain}` : undefined,
+    notes: [],
+  };
+}
+
+/** Format agent ID to human-readable name */
+function formatAgentName(id: string): string {
+  return id
+    .replace(/-/g, ' ')
+    .replace(/_/g, ' ')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+/** Format scenario ID to human-readable name */
+function formatScenarioName(id: string): string {
+  return id
+    .replace(/-/g, ' ')
+    .replace(/_/g, ' ')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 /**

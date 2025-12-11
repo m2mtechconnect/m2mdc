@@ -52,11 +52,16 @@ export function recommendationToBuilderState(
 
 /**
  * Initialize the DC Twin Builder from a URL scan recommendation
+ * 
+ * @deprecated DO NOT call this automatically from scanner hooks!
+ * This should ONLY be called from explicit user actions like "Create Twin from Recommendation".
+ * The scanner should populate useRecommendationStore for sandbox/preview mode instead.
  */
 export function initializeBuilderFromScan(
   recommendation: DCRecommendation,
   sessionId: string
 ): void {
+  console.warn('[scanToBuilder] initializeBuilderFromScan called - ensure this is from explicit user action');
   const store = useDCTwinBuilderStore.getState();
   store.initializeFromRecommendation(recommendation, sessionId);
 }

@@ -1,6 +1,6 @@
 /**
  * Recommendation Components Index
- * Exports the unified recommendation panel
+ * Exports the unified recommendation panel and utilities
  */
 
 export { 
@@ -9,3 +9,6 @@ export {
 } from './UnifiedRecommendationPanel';
 
 export type { NormalizedRecommendation } from './UnifiedRecommendationPanel';
+
+// Re-export for backward compatibility
+export { UnifiedRecommendationPanel as RecommendationPanel } from './UnifiedRecommendationPanel';

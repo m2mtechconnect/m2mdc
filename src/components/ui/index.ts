@@ -31,3 +31,9 @@ export {
 
 // KPI Tooltips
 export { KpiTooltip, KPI_TOOLTIPS, getKpiTooltipProps } from './kpi-tooltip';
+
+// Re-export common shadcn components for convenience
+export { Badge } from './badge';
+export { Button } from './button';
+export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './card';
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './tooltip';

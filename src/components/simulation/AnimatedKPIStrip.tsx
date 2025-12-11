@@ -1,16 +1,17 @@
 /**
  * Animated KPI Strip - Real-time animated KPIs during simulation
- * Shows PUE, GPU Utilization, Cooling Load, Carbon Intensity, Sovereign Compute
+ * Uses centralized KPI catalog for consistent definitions
  */
 
-import { memo, useMemo, useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   Zap, Cpu, Wind, Leaf, Shield, TrendingUp, TrendingDown, Minus
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { KPI_CATALOG, KPIKey, type KPIDefinition } from '@/domain/greenDc/kpiCatalog';
 
 interface AnimatedKPIStripProps {
   kpis: Record<string, number>;
@@ -28,53 +29,39 @@ interface KPIConfig {
   format?: (v: number) => string;
 }
 
-const kpiConfigs: KPIConfig[] = [
-  { 
-    id: 'pue', 
-    label: 'PUE', 
-    unit: '', 
-    icon: Zap, 
-    color: 'text-warning',
-    goodDirection: 'down',
-    format: (v) => v.toFixed(2)
-  },
-  { 
-    id: 'gpuUtilization', 
-    label: 'GPU Util', 
-    unit: '%', 
-    icon: Cpu, 
-    color: 'text-accent',
-    goodDirection: 'up',
-    format: (v) => Math.round(v).toString()
-  },
-  { 
-    id: 'coolingLoad', 
-    label: 'Cooling', 
-    unit: '%', 
-    icon: Wind, 
-    color: 'text-info',
-    goodDirection: 'down',
-    format: (v) => Math.round(v).toString()
-  },
-  { 
-    id: 'carbonIntensity', 
-    label: 'Carbon', 
-    unit: 'g/kWh', 
-    icon: Leaf, 
-    color: 'text-success',
-    goodDirection: 'down',
-    format: (v) => Math.round(v).toString()
-  },
-  { 
-    id: 'sovereignty', 
-    label: 'Sovereign', 
-    unit: '%', 
-    icon: Shield, 
-    color: 'text-primary',
-    goodDirection: 'up',
-    format: (v) => Math.round(v).toString()
-  },
+// Map KPIKey to icons and colors
+const kpiIconMap: Record<string, { icon: React.ElementType; color: string }> = {
+  [KPIKey.PUE]: { icon: Zap, color: 'text-warning' },
+  [KPIKey.GPU_UTILIZATION]: { icon: Cpu, color: 'text-accent' },
+  [KPIKey.COOLING_EFFICIENCY]: { icon: Wind, color: 'text-info' },
+  [KPIKey.CARBON_INTENSITY]: { icon: Leaf, color: 'text-success' },
+  [KPIKey.SOVEREIGN_COMPLIANCE]: { icon: Shield, color: 'text-primary' },
+};
+
+// Core simulation KPIs to display
+const simulationKpiKeys: KPIKey[] = [
+  KPIKey.PUE,
+  KPIKey.GPU_UTILIZATION,
+  KPIKey.COOLING_EFFICIENCY,
+  KPIKey.CARBON_INTENSITY,
+  KPIKey.SOVEREIGN_COMPLIANCE,
 ];
+
+// Build KPI configs from catalog
+const kpiConfigs: KPIConfig[] = simulationKpiKeys.map(key => {
+  const def = KPI_CATALOG[key];
+  const iconConfig = kpiIconMap[key] || { icon: Zap, color: 'text-muted-foreground' };
+  
+  return {
+    id: key,
+    label: def?.label || key,
+    unit: def?.unit || '',
+    icon: iconConfig.icon,
+    color: iconConfig.color,
+    goodDirection: def?.direction === 'higher_is_better' ? 'up' : 'down',
+    format: def?.unit === '' ? (v: number) => v.toFixed(2) : (v: number) => Math.round(v).toString(),
+  };
+});
 
 const AnimatedKPICard = memo(function AnimatedKPICard({
   config,

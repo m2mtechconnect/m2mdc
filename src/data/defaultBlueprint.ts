@@ -1,6 +1,62 @@
 /**
  * Default Data Centre Blueprint Generator
  * Creates a complete blueprint with all agents, KPIs, workflows, roles, and scenarios
+ * 
+ * Industry Sources & Standards:
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * AGENT DESIGN PATTERNS:
+ * - ITIL v4 Service Operations: Agent responsibility alignment
+ *   https://www.axelos.com/certifications/itil-service-management
+ * - Gartner I&O Automation Framework: Agent orchestration patterns
+ *   https://www.gartner.com/en/information-technology/glossary/it-operations-automation
+ * - ServiceNow Event Management: Incident correlation and response
+ *   https://docs.servicenow.com/bundle/tokyo-it-operations-management/page/product/event-management/concept/event-management-overview.html
+ * 
+ * MONITORING & TELEMETRY:
+ * - Prometheus Monitoring Best Practices
+ *   https://prometheus.io/docs/practices/
+ * - SNMP MIBs for Data Center Equipment (RFC 1157, 3411-3418)
+ *   https://www.ietf.org/rfc/rfc3411.txt
+ * - DMTF Redfish API Specification (Server Hardware Management)
+ *   https://www.dmtf.org/standards/redfish
+ * - IPMI v2.0 Specification (Intel Platform Management Interface)
+ *   https://www.intel.com/content/www/us/en/products/docs/servers/ipmi/ipmi-second-gen-interface-spec-v2-rev1-1.html
+ * 
+ * BUILDING AUTOMATION:
+ * - BACnet Protocol (ASHRAE Standard 135-2020)
+ *   http://www.bacnet.org/
+ * - Modbus Protocol Specification
+ *   https://modbus.org/specs.php
+ * - DCIM Integration Standards (DMTF, ASHRAE)
+ *   https://www.dmtf.org/standards/dcim
+ * 
+ * KPI DEFINITIONS:
+ * - Uptime Institute Tier Certification: Availability requirements (99.671% - 99.995%)
+ *   https://uptimeinstitute.com/tiers
+ * - The Green Grid: PUE, DCiE, WUE metrics
+ *   https://www.thegreengrid.org/en/resources/library
+ * - ASHRAE TC 9.9: Thermal envelope specifications (A1-A4 classes)
+ *   https://tc0909.ashraetcs.org/
+ * - NVIDIA DCGM Metrics: GPU health, utilization, thermal monitoring
+ *   https://docs.nvidia.com/datacenter/dcgm/latest/user-guide/index.html
+ * 
+ * WORKFLOW STANDARDS:
+ * - ITIL v4 Incident Management Process
+ * - ISO/IEC 27001 Information Security Incident Response
+ * - NFPA 75 & 76: Fire Protection for Data Centers
+ *   https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=75
+ * - Uptime Institute Abnormal Incident Reports (AIRs) patterns
+ *   https://uptimeinstitute.com/resources/asset/2024-annual-outages-analysis
+ * 
+ * SOVEREIGNTY & COMPLIANCE:
+ * - PIPEDA (Personal Information Protection and Electronic Documents Act)
+ * - OSFI B-13 Technology and Cyber Risk Management
+ * - ITSG-33 Security Control Catalogue (Government of Canada)
+ * - SOC 2 Type II Trust Services Criteria
+ *   https://www.aicpa.org/resources/landing/system-and-organization-controls-soc-suite-of-services
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import type { 

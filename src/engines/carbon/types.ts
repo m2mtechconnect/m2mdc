@@ -1,6 +1,63 @@
 /**
  * Carbon Engine Types
  * Defines schema for carbon intensity, emissions, and sustainability metrics
+ * 
+ * Industry Sources & References:
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * CARBON INTENSITY DATA:
+ * - Canada National Inventory Report (NIR) 2024, Environment & Climate Change Canada
+ *   https://www.canada.ca/en/environment-climate-change/services/climate-change/greenhouse-gas-emissions.html
+ * - Hydro-Québec 2023 Annual Report: 99.8% renewable, 1.2 gCO₂eq/kWh
+ *   https://www.hydroquebec.com/publications/en/annual-report/
+ * - IESO Ontario Power System Report 2024: Nuclear-hydro mix, 28 gCO₂eq/kWh
+ *   https://www.ieso.ca/en/Power-Data
+ * - BC Hydro Integrated Resource Plan: 98% renewable, 10.5 gCO₂eq/kWh
+ *   https://www.bchydro.com/energy-in-bc/planning-for-our-future.html
+ * - AESO Alberta Electricity System Operator: Gas-dominant grid, 470 gCO₂eq/kWh
+ *   https://www.aeso.ca/market/market-and-system-reporting/
+ * 
+ * US GRID DATA:
+ * - EPA eGRID 2023: Regional emission factors for US power grids
+ *   https://www.epa.gov/egrid
+ * - EIA Electric Power Monthly: Regional generation and emissions
+ *   https://www.eia.gov/electricity/monthly/
+ * 
+ * EUROPEAN DATA:
+ * - European Environment Agency (EEA) 2024 Greenhouse Gas Data Viewer
+ *   https://www.eea.europa.eu/data-and-maps/dashboards/greenhouse-gases-viewer
+ * - EU Emissions Trading System (EU ETS) Pricing Dashboard
+ *   https://climate.ec.europa.eu/eu-action/eu-emissions-trading-system-eu-ets_en
+ * 
+ * REAL-TIME CARBON DATA PROVIDERS:
+ * - Electricity Maps API: Real-time carbon intensity by region
+ *   https://app.electricitymaps.com/
+ * - WattTime API: Marginal emissions data for grid optimization
+ *   https://www.watttime.org/
+ * 
+ * GPU EFFICIENCY BENCHMARKS:
+ * - MLPerf Power Benchmarks: Standardized AI workload power measurements
+ *   https://mlcommons.org/en/training-normal-21/
+ * - NVIDIA Data Center GPU Specifications (H100, A100, L40S)
+ *   https://www.nvidia.com/en-us/data-center/
+ * - NVIDIA Sustainability Reports: Carbon per GPU-hour metrics
+ *   https://www.nvidia.com/en-us/about-nvidia/sustainability/
+ * 
+ * CARBON PRICING:
+ * - World Bank Carbon Pricing Dashboard 2024
+ *   https://carbonpricingdashboard.worldbank.org/
+ * - Canada Federal Carbon Pricing: $80/tonne (2024) → $170/tonne (2030)
+ *   https://www.canada.ca/en/environment-climate-change/services/climate-change/pricing-pollution-how-it-will-work.html
+ * - California Air Resources Board Cap-and-Trade Program
+ *   https://ww2.arb.ca.gov/our-work/programs/cap-and-trade-program
+ * 
+ * GHG PROTOCOL STANDARDS:
+ * - GHG Protocol Corporate Standard: Scope 1, 2, 3 emissions accounting
+ *   https://ghgprotocol.org/corporate-standard
+ * - GHG Protocol Scope 2 Guidance: Location-based vs market-based emissions
+ *   https://ghgprotocol.org/scope_2_guidance
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 export type RegionCode = 'CA-QC' | 'CA-ON' | 'CA-AB' | 'CA-BC' | 'US-WEST' | 'US-EAST' | 'EU' | string;

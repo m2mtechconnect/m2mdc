@@ -87,18 +87,18 @@ export function TwinHero() {
             {/* Main headline - M2M brand typography with Space Grotesk */}
             <div className="space-y-4">
               <motion.h1 
-                className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-[1.1] tracking-tight"
+                className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 leading-[1.1] tracking-tight"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
               >
                 Design and simulate{" "}
                 <span className="relative">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-secondary">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600">
                     sovereign AI data centres
                   </span>
                   <motion.span 
-                    className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary rounded-full"
+                    className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full"
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: 1 }}
                     transition={{ duration: 0.8, delay: 0.8 }}
@@ -107,7 +107,7 @@ export function TwinHero() {
               </motion.h1>
               
               <motion.p 
-                className="text-lg lg:text-xl text-muted-foreground leading-relaxed"
+                className="text-lg lg:text-xl text-slate-600 leading-relaxed"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}

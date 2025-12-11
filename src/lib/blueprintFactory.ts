@@ -1,6 +1,16 @@
 /**
  * Blueprint Factory
  * Creates and initializes blueprints from various sources
+ * 
+ * INDUSTRY SOURCES:
+ * - Digital Twin Factory Patterns: https://www.digitaltwinconsortium.org/initiatives/capabilities-periodic-table/
+ * - ISO 23247 Digital Twin Framework: https://www.iso.org/standard/75066.html
+ * - Data Center Sustainability Standards: https://www.thegreengrid.org/
+ * - Green Data Center Metrics: https://www.uptimeinstitute.com/resources/asset/annual-data-center-survey
+ * - Sovereign Cloud Standards: https://gaia-x.eu/what-is-gaia-x/core-components/
+ * - Canadian Digital Infrastructure: https://ised-isde.canada.ca/site/digital-charter/en
+ * - Sustainability Frameworks: https://www.cdp.net/en, https://ghgprotocol.org/
+ * - Industry Vertical Standards: ISO 27001, SOC 2, HIPAA, PCI-DSS
  */
 
 import type { TwinBlueprintBaseSchema } from '@/types/twinBlueprintSchema';

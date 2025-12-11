@@ -2,6 +2,14 @@
  * Blueprint Helper Functions
  * Utilities for converting blueprints to/from builder state
  * and navigating to the builder with a blueprint
+ * 
+ * INDUSTRY SOURCES:
+ * - State Management Patterns: https://redux.js.org/usage/structuring-reducers/normalizing-state-shape
+ * - Digital Twin Data Models: https://www.digitaltwinconsortium.org/initiatives/capabilities-periodic-table/
+ * - Builder Wizard UX Patterns: https://www.nngroup.com/articles/wizards/
+ * - Multi-Step Form Best Practices: https://uxdesign.cc/multi-step-form-patterns-8e73b98c48b1
+ * - Zustand State Management: https://docs.pmnd.rs/zustand/getting-started/introduction
+ * - React Router Navigation: https://reactrouter.com/en/main/start/concepts
  */
 
 import { AgentBlueprint } from '@/types/agentBlueprint';

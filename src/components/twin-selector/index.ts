@@ -4,3 +4,4 @@
 
 export { DataCentreSelector } from './DataCentreSelector';
 export { EmptyStateSelectTwin } from './EmptyStateSelectTwin';
+export { DeleteTwinModal } from './DeleteTwinModal';

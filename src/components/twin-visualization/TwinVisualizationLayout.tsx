@@ -142,6 +142,7 @@ export function TwinVisualizationLayout({
                 showPower={showPower}
                 showThermal={showThermal}
                 compact={isCompact}
+                mode={mode}
                 onRackClick={onRackSelect}
               />
             </Suspense>

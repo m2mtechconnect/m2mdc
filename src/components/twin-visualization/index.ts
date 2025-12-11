@@ -16,6 +16,10 @@ export { ThermalOverlayLayer } from './ThermalOverlayLayer';
 export { PowerFlowLayer } from './PowerFlowLayer';
 export { NetworkTopologyLayer } from './NetworkTopologyLayer';
 
+// Controls
+export { ZoomControlsOverlay } from './ZoomControlsOverlay';
+export type { ZoomControlsOverlayProps } from './ZoomControlsOverlay';
+
 // Timeline component
 export { SimulationTimeline } from './SimulationTimeline';
 

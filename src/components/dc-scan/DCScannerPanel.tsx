@@ -25,10 +25,12 @@ import {
 } from "@/hooks/useDCScanSessions";
 import { buildScanSignals, selectBlueprintProfile } from "@/lib/dc-scan/selectBlueprintProfile";
 import { generateRecommendation } from "@/lib/dc-scan/generateRecommendation";
-import { DCScanRecommendationCard } from "./DCScanRecommendationCard";
+import { EnhancedRecommendationCard } from "./EnhancedRecommendationCard";
 import { LastScanBanner } from "./LastScanBanner";
 import { useDCTwinBuilderStore } from "@/stores/dcTwinBuilderStore";
+import { transformToEnhancedRecommendation, isEnhancedRecommendation } from "@/lib/dc-scan/transformToEnhanced";
 import type { DCRecommendation, DCBlueprintProfile } from "@/types/dcScan";
+import type { EnhancedDCRecommendation } from "@/types/enhancedRecommendation";
 
 export function DCScannerPanel() {
   const navigate = useNavigate();
@@ -38,7 +40,7 @@ export function DCScannerPanel() {
   
   const [url, setUrl] = useState("");
   const [isScanning, setIsScanning] = useState(false);
-  const [recommendation, setRecommendation] = useState<DCRecommendation | null>(null);
+  const [recommendation, setRecommendation] = useState<EnhancedDCRecommendation | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<DCBlueprintProfile | null>(null);
   const [isCreatingTwin, setIsCreatingTwin] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
@@ -82,14 +84,19 @@ export function DCScannerPanel() {
       if (error) throw error;
 
       if (data?.recommendation) {
-        setRecommendation(data.recommendation);
+        // Transform to enhanced recommendation
+        const enhancedRec = isEnhancedRecommendation(data.recommendation) 
+          ? data.recommendation 
+          : transformToEnhancedRecommendation(data.recommendation);
+        
+        setRecommendation(enhancedRec);
         setSelectedProfile(data.recommendation.blueprintProfile);
         setCurrentSessionId(data.sessionId);
         refetchLastScan();
         
         toast({
           title: "Scan Complete",
-          description: `Detected ${data.recommendation.detectedIndustry} industry. Recommended: ${data.recommendation.blueprintName}`
+          description: `Detected ${enhancedRec.detectedIndustry} industry. Recommendation generated for ${enhancedRec.companyName}.`
         });
       }
     } catch (error) {
@@ -106,7 +113,12 @@ export function DCScannerPanel() {
 
   const handleViewLastRecommendation = () => {
     if (lastScan?.recommendation) {
-      setRecommendation(lastScan.recommendation);
+      // Transform to enhanced recommendation
+      const enhancedRec = isEnhancedRecommendation(lastScan.recommendation) 
+        ? lastScan.recommendation 
+        : transformToEnhancedRecommendation(lastScan.recommendation);
+      
+      setRecommendation(enhancedRec);
       setSelectedProfile(lastScan.blueprintProfile || null);
       setCurrentSessionId(lastScan.sessionId || null);
     } else if (lastScan?.url) {
@@ -268,9 +280,9 @@ export function DCScannerPanel() {
         </CardContent>
       </Card>
 
-      {/* Recommendation Card */}
+      {/* Enhanced Recommendation Card */}
       {recommendation && (
-        <DCScanRecommendationCard
+        <EnhancedRecommendationCard
           recommendation={recommendation}
           onCreateTwin={handleCreateTwin}
           onAdjustBlueprint={handleAdjustBlueprint}

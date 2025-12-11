@@ -58,3 +58,16 @@ export { KPICorrelationMatrix } from './KPICorrelationMatrix';
 export { WhatIfControls } from './WhatIfControls';
 export { EnhancedComparisonMode } from './EnhancedComparisonMode';
 export { LiveInsightsKPIPanel } from './LiveInsightsKPIPanel';
+
+// UI Polish Components
+export {
+  LiveSimulationBadge,
+  KPILegend,
+  EventSeverityBadge,
+  TimelineEventMarker,
+  SimulationProgressBar,
+  SimulationTimeDisplay,
+  ComparisonRow,
+  ComparisonTable,
+  KPI_DOMAIN_COLORS,
+} from './SimulationEnvironmentPolish';

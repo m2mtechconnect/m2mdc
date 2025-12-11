@@ -23,6 +23,10 @@ import { Eye, FileText, MessageSquare, PlayCircle, Rocket, LayoutDashboard } fro
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 import { OVERVIEW, SIMULATION, EMPTY_STATES } from '@/ux';
 
+// UI Polish Components
+import { LoadingState, NoTwinSelectedEmptyState } from '@/components/ui/empty-state';
+import { ModeBadge, SnapshotBadge } from '@/components/ui/snapshot-indicator';
+
 export default function DataCentreTwin() {
   const { id } = useParams<{ id?: string }>();
   const [searchParams] = useSearchParams();
@@ -70,28 +74,20 @@ export default function DataCentreTwin() {
   
   // Loading state
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px] bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary/20 border-t-primary"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-4 w-4 rounded-full bg-primary/30 animate-pulse"></div>
-            </div>
-          </div>
-          <p className="text-sm text-muted-foreground font-mono animate-pulse">
-            Loading Twin Data...
-          </p>
-        </div>
-      </div>
-    );
+    return <LoadingState message="Loading Twin Data..." />;
   }
   
   // If we have a builder session, show builder tabs even without a saved twin
   if (hasBuilderSession) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto py-6 px-4">
+        <div className="container mx-auto py-6 px-4 space-y-6">
+          {/* Builder Session Header */}
+          <div className="flex items-center gap-2">
+            <ModeBadge mode="designer" />
+            <SnapshotBadge version="Draft" />
+          </div>
+          
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="h-auto flex-wrap gap-1">
               <TabsTrigger value="overview" className="gap-2">
@@ -153,23 +149,18 @@ export default function DataCentreTwin() {
   
   // Facility not yet loaded
   if (!facility) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px] bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary/20 border-t-primary"></div>
-          </div>
-          <p className="text-sm text-muted-foreground font-mono animate-pulse">
-            Initializing Data Centre Twin...
-          </p>
-        </div>
-      </div>
-    );
+    return <LoadingState message="Initializing Data Centre Twin..." />;
   }
   
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-6 px-4">
+      <div className="container mx-auto py-6 px-4 space-y-6">
+        {/* Operational Mode Header */}
+        <div className="flex items-center gap-2">
+          <ModeBadge mode="snapshot" />
+          <SnapshotBadge version="Live" />
+        </div>
+        
         <DataCentreDashboard 
           facility={facility} 
           onScenarioSelect={(scenarioId) => {

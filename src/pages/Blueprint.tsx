@@ -28,6 +28,7 @@ import {
   Edit3,
   PanelRightOpen,
   PanelRightClose,
+  MapPin,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
@@ -52,7 +53,10 @@ import { BlueprintScenariosTab } from '@/components/blueprint/tabs/BlueprintScen
 // Co-Pilot Components
 import { BlueprintCoPilotPanel, CoPilotModeHeader } from '@/components/copilot';
 
-// Create Twin from Blueprint Button Component
+// UI Polish Components
+import { SnapshotBadge, ModeBadge, LastUpdatedBadge, SnapshotHeader } from '@/components/ui/snapshot-indicator';
+import { KpiTooltip } from '@/components/ui/kpi-tooltip';
+import { LoadingState, SnapshotNotFoundEmptyState } from '@/components/ui/empty-state';
 function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: any }) {
   const { createTwin } = useActiveTwin();
   const { toast } = useToast();
@@ -138,15 +142,12 @@ export default function Blueprint() {
     }
   }, [tabParam]);
 
-  if (isLoading || !blueprint) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px] bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary/20 border-t-primary"></div>
-          <p className="text-sm text-muted-foreground">Loading Blueprint...</p>
-        </div>
-      </div>
-    );
+  if (isLoading) {
+    return <LoadingState message="Loading Blueprint..." />;
+  }
+
+  if (!blueprint) {
+    return <SnapshotNotFoundEmptyState onGoBack={() => navigate('/dashboard')} />;
   }
 
   const handleAskCoPilot = (question: string) => {
@@ -213,12 +214,21 @@ export default function Blueprint() {
                 </div>
               </div>
 
-              {/* Blueprint Info Card */}
-              <div className="flex flex-wrap gap-2 mb-6">
+              {/* Blueprint Snapshot Header */}
+              <div className="flex flex-wrap items-center gap-2 mb-6">
+                <SnapshotHeader
+                  version={String(blueprint.version)}
+                  mode="designer"
+                  changesCount={0}
+                  lastUpdated={new Date()}
+                />
+                <Badge variant="outline" className="gap-1">
+                  <MapPin className="h-3 w-3" />
+                  {twin?.city || blueprint.location}
+                </Badge>
                 <Badge variant="outline">Tier {blueprint.tier}</Badge>
                 <Badge variant="outline">{blueprint.capacityKw} MW</Badge>
                 <Badge variant="outline">{blueprint.racks} Racks</Badge>
-                <Badge variant="secondary">v{blueprint.version}</Badge>
               </div>
 
               {/* Quick Stats */}

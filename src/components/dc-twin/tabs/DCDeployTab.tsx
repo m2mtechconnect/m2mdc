@@ -31,14 +31,14 @@ const providerLogos: Record<string, string> = {
 };
 
 export function DCDeployTab() {
-  const { activeTwin } = useTwinContext();
+  const { activeTwin, recommendation } = useTwinContext();
   const { overview: builderOverview, deployment, setTargetRegion } = useDCTwinBuilderStore();
   
-  // CRITICAL: Use active twin data if available
+  // CRITICAL: Priority order: activeTwin → recommendation → builderStore
   const overview = {
     ...builderOverview,
-    twinName: activeTwin?.name || builderOverview.twinName,
-    facilityLocation: activeTwin?.city || builderOverview.facilityLocation,
+    twinName: activeTwin?.name || recommendation?.companyName || builderOverview.twinName,
+    facilityLocation: activeTwin?.city || recommendation?.regions?.[0] || builderOverview.facilityLocation,
     regionCode: activeTwin?.region_code || builderOverview.regionCode,
   };
   

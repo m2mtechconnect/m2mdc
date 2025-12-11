@@ -118,6 +118,7 @@ function AuthenticatedApp() {
   if (!session || !user) {
     return (
       <Routes>
+        <Route path="/" element={<DataCentreTwinLanding />} />
         <Route path="/auth" element={<SignIn />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
@@ -125,7 +126,7 @@ function AuthenticatedApp() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/mfa" element={<MFA />} />
         <Route path="/twin-datacentre" element={<DataCentreTwinLanding />} />
-        <Route path="*" element={<Navigate to="/sign-in" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
   }

@@ -111,12 +111,14 @@ export function useCoPilotCommands() {
 
 // Helper hook for registering commands from components
 // FIXED: Use useEffect instead of calling useCallback result directly in render
+// registerCommands is stable (useCallback with empty deps), so we don't need it in our deps
 export function useRegisterCoPilotCommands(cmds: Partial<CoPilotCommands>, deps: any[] = []) {
   const { registerCommands } = useCoPilotCommands();
   
   // Register on mount and when deps change - use useEffect, NOT calling during render
+  // registerCommands is stable, no need to include in deps
   useEffect(() => {
     registerCommands(cmds);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registerCommands, ...deps]);
+  }, deps);
 }

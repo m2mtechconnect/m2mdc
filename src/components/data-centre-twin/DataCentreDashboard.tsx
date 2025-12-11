@@ -187,7 +187,8 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
   const simulationRef = useRef(simulation);
   simulationRef.current = simulation;
   
-  // Register CoPilot commands
+  // Register CoPilot commands - only run once on mount
+  // registerCommands is stable via useCallback, but we only need to register once
   useEffect(() => {
     registerCommands({
       navigateToTab: (tabName: string) => {
@@ -230,12 +231,14 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
         setActiveTab(domainName.toLowerCase());
       },
     });
-  }, [registerCommands]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only register once on mount
   
-  // Update DC context when tab changes
+  // Update DC context when tab changes - updateDCContext is stable via useCallback
   useEffect(() => {
     updateDCContext({ domainTabActive: activeTab });
-  }, [activeTab, updateDCContext]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]); // Only depend on activeTab, updateDCContext is stable
   
   const activeAlerts = facility.alerts.filter(a => a.status === 'active');
   const criticalAlerts = activeAlerts.filter(a => a.severity === 'critical');

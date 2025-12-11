@@ -1,6 +1,60 @@
 /**
  * Financial & Cost Modelling Engine
  * Calculates OPEX, cost per GPU-hour, ROI, NPV, IRR, and financial health
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * DATA CENTER COST MODELING:
+ * - Uptime Institute Data Center Survey (Annual OpEx/CapEx benchmarks)
+ *   https://uptimeinstitute.com/resources/research-and-reports
+ * - Gartner Data Center Total Cost of Ownership Model
+ *   https://www.gartner.com/en/information-technology/glossary/total-cost-of-ownership-tco
+ * - JLL Data Center Outlook (Construction & operational costs)
+ *   https://www.us.jll.com/en/trends-and-insights/research/data-center-outlook
+ * - Cushman & Wakefield Global Data Center Market Comparison
+ *   https://www.cushmanwakefield.com/en/insights/global-data-center-market-comparison
+ * 
+ * ELECTRICITY PRICING (CANADIAN):
+ * - Hydro-Québec Large Power Rate L (2024): $0.0519-$0.0589/kWh
+ *   https://www.hydroquebec.com/business/customer-space/rates/rate-l-industrial-rate-large-power-customers.html
+ * - Ontario Energy Board Class A Industrial Rates
+ *   https://www.oeb.ca/consumer-information-and-protection/electricity-rates
+ * - BC Hydro Large General Service Rate Schedule 1823
+ *   https://www.bchydro.com/accounts-billing/rates-energy-use/electricity-rates/business-rates.html
+ * 
+ * CARBON PRICING:
+ * - Environment and Climate Change Canada - Federal Carbon Pricing
+ *   https://www.canada.ca/en/environment-climate-change/services/climate-change/pricing-pollution-how-it-will-work.html
+ *   Trajectory: $80/tonne (2024) → $170/tonne (2030)
+ * - Government of Canada Greenhouse Gas Pollution Pricing Act
+ *   https://laws-lois.justice.gc.ca/eng/acts/G-11.55/
+ * 
+ * GPU ECONOMICS:
+ * - NVIDIA Data Center GPU Pricing & Specifications
+ *   https://www.nvidia.com/en-us/data-center/products/
+ *   H100 SXM: ~$30k/GPU, A100: ~$15k/GPU, H200: ~$35k/GPU
+ * - NVIDIA DGX Cloud Pricing Models
+ *   https://www.nvidia.com/en-us/data-center/dgx-cloud/
+ * - MLCommons Training Cost Benchmarks
+ *   https://mlcommons.org/en/
+ * 
+ * FINANCIAL CALCULATIONS:
+ * - Discounted Cash Flow Analysis (Investopedia)
+ *   https://www.investopedia.com/terms/d/dcf.asp
+ * - Internal Rate of Return (IRR) - Newton-Raphson Method
+ *   https://www.investopedia.com/terms/i/irr.asp
+ * - Net Present Value (NPV) Calculation Standards
+ *   https://www.investopedia.com/terms/n/npv.asp
+ * 
+ * LABOR & MAINTENANCE COSTS:
+ * - Bank of Canada Prime Rate (Interest rate baseline)
+ *   https://www.bankofcanada.ca/rates/daily-digest/
+ * - Uptime Institute Staffing Benchmarks
+ *   https://uptimeinstitute.com/resources
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import type { 

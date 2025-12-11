@@ -1,6 +1,36 @@
 /**
  * Blueprint Scenario Adapter
  * Converts SimulationScenarioBlueprint from Blueprint to ScenarioDefinition for the Simulation Engine
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * DIGITAL TWIN SCENARIO PATTERNS:
+ * - ISO 23247:2021 Digital Twin Framework for Manufacturing
+ *   https://www.iso.org/standard/75066.html
+ * - NVIDIA Omniverse Digital Twin Simulation SDK
+ *   https://developer.nvidia.com/omniverse
+ * 
+ * INCIDENT RESPONSE TIMELINE STANDARDS:
+ * - ITIL v4 Incident Management Process
+ *   https://www.axelos.com/best-practice-solutions/itil
+ * - NIST SP 800-61 Computer Security Incident Handling Guide
+ *   https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final
+ * 
+ * SEVERITY CLASSIFICATION:
+ * - Uptime Institute Incident Classification Framework
+ *   https://uptimeinstitute.com/resources
+ * - ITIL Incident Priority Matrix
+ *   https://wiki.en.it-processmaps.com/index.php/Incident_Management
+ * 
+ * KPI IMPACT MODELING:
+ * - Prometheus Alert Rules Best Practices
+ *   https://prometheus.io/docs/practices/alerting/
+ * - Datadog Incident Impact Assessment
+ *   https://www.datadoghq.com/blog/incident-management-best-practices/
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import type { SimulationScenarioBlueprint, KpiImpact } from '@/types/dataCentreBlueprint';

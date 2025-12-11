@@ -2,6 +2,61 @@
  * KPI Overlay Engine
  * Enterprise-grade rendering engine for KPI charts
  * Features: Threshold zones, anomaly detection, forecasting, event markers, causal links
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * KPI DEFINITIONS & THRESHOLDS:
+ * - The Green Grid - PUE/DCiE Metrics
+ *   https://www.thegreengrid.org/en/resources/library-and-tools
+ *   PUE targets: Excellent <1.2, Average 1.4-1.6, Poor >1.8
+ * - Uptime Institute PUE Benchmark Survey
+ *   https://uptimeinstitute.com/resources/research-and-reports
+ * - ASHRAE TC 9.9 Thermal Guidelines (Temperature thresholds)
+ *   https://tc0909.ashraetcs.org/documents.php
+ * 
+ * ANOMALY DETECTION METHODS:
+ * - Statistical Process Control (SPC) - Z-score detection
+ *   https://asq.org/quality-resources/statistical-process-control
+ * - Prometheus Recording Rules for Anomaly Detection
+ *   https://prometheus.io/docs/practices/rules/
+ * - Netflix Atlas Anomaly Detection Framework
+ *   https://netflixtechblog.com/
+ * 
+ * TIME-SERIES FORECASTING:
+ * - Linear Regression for Trend Prediction
+ *   https://otexts.com/fpp3/regression.html
+ * - Exponential Smoothing Methods (Holt-Winters)
+ *   https://otexts.com/fpp3/expsmooth.html
+ * - Prophet Forecasting (Facebook/Meta)
+ *   https://facebook.github.io/prophet/
+ * 
+ * CORRELATION & CAUSAL ANALYSIS:
+ * - Pearson Correlation Coefficient
+ *   https://www.statisticshowto.com/probability-and-statistics/correlation-coefficient-formula/
+ * - Granger Causality Testing
+ *   https://en.wikipedia.org/wiki/Granger_causality
+ * - Root Cause Analysis (RCA) Methodologies
+ *   https://asq.org/quality-resources/root-cause-analysis
+ * 
+ * OBSERVABILITY PATTERNS:
+ * - Google SRE Book - Service Level Objectives (SLOs)
+ *   https://sre.google/sre-book/service-level-objectives/
+ * - Datadog KPI Dashboard Best Practices
+ *   https://www.datadoghq.com/blog/
+ * - Grafana Alerting Thresholds
+ *   https://grafana.com/docs/grafana/latest/alerting/
+ * 
+ * DATA CENTER SPECIFIC KPIS:
+ * - NVIDIA DCGM (Data Center GPU Manager) Metrics
+ *   https://docs.nvidia.com/datacenter/dcgm/latest/user-guide/index.html
+ * - Schneider Electric Data Center Metrics (White Paper 100)
+ *   https://www.se.com/ww/en/download/document/WP100/
+ * - Uptime Institute M&O KPI Framework
+ *   https://uptimeinstitute.com/tier-certification/management-operations
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import type {

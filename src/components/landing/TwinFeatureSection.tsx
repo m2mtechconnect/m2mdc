@@ -1,11 +1,13 @@
 /**
  * TwinFeatureSection - Reusable feature section with image and bullets
+ * Inspired by Deloitte's professional imagery and Monday.com's dynamic layouts
  * Uses M2M brand design tokens from index.css
  */
 
-import { Check } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 
 interface TwinFeatureSectionProps {
   title: string;
@@ -14,7 +16,19 @@ interface TwinFeatureSectionProps {
   imageSrc: string;
   imageAlt: string;
   flip?: boolean;
+  accentColor?: "primary" | "success" | "info" | "warning";
+  cta?: {
+    label: string;
+    href: string;
+  };
 }
+
+const colorMap = {
+  primary: "text-primary bg-primary/10",
+  success: "text-success bg-success/10",
+  info: "text-info bg-info/10",
+  warning: "text-warning bg-warning/10",
+};
 
 const bulletVariants = {
   hidden: { opacity: 0, x: -20 } as const,
@@ -22,7 +36,7 @@ const bulletVariants = {
     opacity: 1,
     x: 0,
     transition: {
-      delay: 0.3 + i * 0.1,
+      delay: 0.3 + i * 0.08,
       duration: 0.4,
     },
   }),
@@ -35,25 +49,38 @@ export function TwinFeatureSection({
   imageSrc,
   imageAlt,
   flip = false,
+  accentColor = "primary",
+  cta,
 }: TwinFeatureSectionProps) {
+  const colors = colorMap[accentColor];
+  const [textColor, bgColor] = colors.split(" ");
+
   return (
-    <section className="py-16 lg:py-24 overflow-hidden bg-background">
-      <div className="max-w-6xl mx-auto px-4 lg:px-8">
+    <section className="py-20 lg:py-28 overflow-hidden bg-background">
+      <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className={cn(
-          "grid lg:grid-cols-2 gap-12 lg:gap-16 items-center",
-          flip && "lg:flex-row-reverse"
+          "grid lg:grid-cols-12 gap-12 lg:gap-20 items-center",
         )}>
-          {/* Text content */}
+          {/* Text content - 5 columns */}
           <motion.div 
-            className={cn("space-y-6", flip && "lg:order-2")}
-            initial={{ opacity: 0, x: flip ? 50 : -50 }}
+            className={cn("lg:col-span-5 space-y-6", flip && "lg:order-2")}
+            initial={{ opacity: 0, x: flip ? 40 : -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
             <div className="space-y-4">
+              {/* Section indicator line */}
+              <motion.div 
+                className={`w-12 h-1 rounded-full ${bgColor.replace('/10', '/60')}`}
+                initial={{ width: 0 }}
+                whileInView={{ width: 48 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4 }}
+              />
+              
               <motion.h2 
-                className="text-3xl lg:text-4xl font-bold text-foreground"
+                className="text-3xl lg:text-4xl font-bold text-foreground leading-tight"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -62,7 +89,7 @@ export function TwinFeatureSection({
                 {title}
               </motion.h2>
               <motion.p 
-                className="text-lg text-muted-foreground"
+                className="text-lg text-muted-foreground leading-relaxed"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -72,11 +99,11 @@ export function TwinFeatureSection({
               </motion.p>
             </div>
             
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {bullets.map((bullet, index) => (
                 <motion.li 
                   key={index} 
-                  className="flex items-start gap-3"
+                  className="flex items-start gap-3 group"
                   custom={index}
                   variants={bulletVariants}
                   initial="hidden"
@@ -84,37 +111,72 @@ export function TwinFeatureSection({
                   viewport={{ once: true }}
                 >
                   <motion.div 
-                    className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center"
-                    whileHover={{ scale: 1.2, backgroundColor: "hsl(var(--primary) / 0.4)" }}
-                    transition={{ duration: 0.2 }}
+                    className={`mt-0.5 flex-shrink-0 w-6 h-6 rounded-lg ${bgColor} flex items-center justify-center transition-all group-hover:scale-110`}
+                    whileHover={{ rotate: [0, -5, 5, 0] }}
+                    transition={{ duration: 0.3 }}
                   >
-                    <Check className="h-3 w-3 text-primary" />
+                    <Check className={`h-3.5 w-3.5 ${textColor}`} />
                   </motion.div>
-                  <span className="text-muted-foreground">{bullet}</span>
+                  <span className="text-muted-foreground group-hover:text-foreground transition-colors">
+                    {bullet}
+                  </span>
                 </motion.li>
               ))}
             </ul>
+
+            {cta && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.5 }}
+              >
+                <Button 
+                  variant="outline" 
+                  className="group border-border hover:border-primary/50"
+                  asChild
+                >
+                  <a href={cta.href}>
+                    {cta.label}
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </a>
+                </Button>
+              </motion.div>
+            )}
           </motion.div>
 
-          {/* Image */}
+          {/* Image - 7 columns */}
           <motion.div 
-            className={cn("relative group", flip && "lg:order-1")}
-            initial={{ opacity: 0, x: flip ? -50 : 50, scale: 0.95 }}
+            className={cn("lg:col-span-7 relative", flip && "lg:order-1")}
+            initial={{ opacity: 0, x: flip ? -40 : 40, scale: 0.98 }}
             whileInView={{ opacity: 1, x: 0, scale: 1 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
+            {/* Decorative background glow */}
             <motion.div 
-              className="relative bg-card/50 backdrop-blur-sm rounded-2xl border border-border/50 p-3 shadow-xl overflow-hidden"
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.3 }}
+              className={`absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 rounded-full blur-3xl ${bgColor.replace('/10', '/5')}`}
+              animate={{ 
+                scale: [1, 1.1, 1],
+                opacity: [0.5, 0.8, 0.5]
+              }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            />
+
+            <motion.div 
+              className="relative bg-gradient-to-br from-card/70 to-card/40 backdrop-blur-sm rounded-2xl border border-border/40 p-3 shadow-2xl shadow-black/5 overflow-hidden"
+              whileHover={{ scale: 1.01 }}
+              transition={{ duration: 0.4 }}
             >
-              <div className="aspect-[16/10] bg-gradient-to-br from-muted to-background rounded-lg overflow-hidden">
+              {/* Accent border highlight */}
+              <div className={`absolute top-0 left-0 right-0 h-1 ${bgColor.replace('/10', '/50')} rounded-t-2xl`} />
+              
+              <div className="aspect-[16/10] bg-gradient-to-br from-muted/80 via-muted/50 to-background rounded-xl overflow-hidden relative">
                 <motion.img 
                   src={imageSrc} 
                   alt={imageAlt}
                   className="w-full h-full object-cover"
-                  initial={{ scale: 1.1 }}
+                  initial={{ scale: 1.05 }}
                   whileInView={{ scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8 }}
@@ -122,28 +184,10 @@ export function TwinFeatureSection({
                     e.currentTarget.style.display = 'none';
                   }}
                 />
-                {/* Subtle overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
               </div>
-              
-              {/* Glow effect on hover */}
-              <motion.div 
-                className="absolute inset-0 bg-primary/5 rounded-2xl pointer-events-none"
-                initial={{ opacity: 0 }}
-                whileHover={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-              />
             </motion.div>
-            
-            {/* Decorative elements */}
-            <motion.div 
-              className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-primary/10 rounded-full blur-3xl"
-              animate={{ 
-                scale: [1, 1.1, 1],
-                opacity: [0.1, 0.15, 0.1]
-              }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            />
           </motion.div>
         </div>
       </div>

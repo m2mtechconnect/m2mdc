@@ -1,13 +1,26 @@
 /**
  * TwinUseCases - Persona cards showing use cases
+ * Inspired by Monday.com's interactive cards and Deloitte's stakeholder focus
  * Uses M2M brand design tokens from index.css
  */
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Building2, Leaf, Server, Cpu, Check } from "lucide-react";
+import { Building2, Leaf, Server, Cpu, Check, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
-const personas = [
+interface Persona {
+  icon: typeof Building2;
+  title: string;
+  subtitle: string;
+  bullets: string[];
+  color: string;
+  bgColor: string;
+  stat: string;
+  statLabel: string;
+}
+
+const personas: Persona[] = [
   {
     icon: Building2,
     title: "CIO / CTO",
@@ -17,6 +30,10 @@ const personas = [
       "Quantify sovereignty and compliance posture",
       "Align DC strategy with ESG and carbon goals",
     ],
+    color: "text-primary",
+    bgColor: "bg-primary/10",
+    stat: "18-24%",
+    statLabel: "ROI improvement",
   },
   {
     icon: Leaf,
@@ -27,6 +44,10 @@ const personas = [
       "Compare renewable energy mix across regions",
       "Report carbon savings to stakeholders",
     ],
+    color: "text-success",
+    bgColor: "bg-success/10",
+    stat: "70%+",
+    statLabel: "Carbon visibility",
   },
   {
     icon: Server,
@@ -37,6 +58,10 @@ const personas = [
       "Simulate failure scenarios and recovery playbooks",
       "Optimize rack placement and thermal zones",
     ],
+    color: "text-info",
+    bgColor: "bg-info/10",
+    stat: "99.9%",
+    statLabel: "Uptime target",
   },
   {
     icon: Cpu,
@@ -47,6 +72,10 @@ const personas = [
       "Simulate job scheduling under power constraints",
       "Balance cost, latency, and carbon per inference",
     ],
+    color: "text-warning",
+    bgColor: "bg-warning/10",
+    stat: "30-50%",
+    statLabel: "Efficiency gains",
   },
 ];
 
@@ -55,14 +84,14 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15,
+      staggerChildren: 0.12,
       delayChildren: 0.1,
     },
   },
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 40, scale: 0.95 } as const,
+  hidden: { opacity: 0, y: 30, scale: 0.97 } as const,
   visible: {
     opacity: 1,
     y: 0,
@@ -71,22 +100,127 @@ const cardVariants = {
   },
 };
 
+function PersonaCard({ persona, index }: { persona: Persona; index: number }) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <motion.div 
+      variants={cardVariants}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <Card 
+        className={`relative h-full overflow-hidden bg-card/40 border-border/40 transition-all duration-500 group cursor-default ${
+          isHovered ? 'bg-card shadow-xl border-border' : 'hover:bg-card/60'
+        }`}
+      >
+        {/* Colored top border */}
+        <div className={`absolute top-0 left-0 right-0 h-1 ${persona.bgColor.replace('/10', '/60')} transition-all duration-300 ${isHovered ? 'h-1.5' : ''}`} />
+        
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <motion.div 
+                className={`w-14 h-14 rounded-2xl ${persona.bgColor} flex items-center justify-center transition-all duration-300 ${isHovered ? 'scale-110' : ''}`}
+                animate={{ rotate: isHovered ? [0, -5, 5, 0] : 0 }}
+                transition={{ duration: 0.4 }}
+              >
+                <persona.icon className={`h-7 w-7 ${persona.color}`} />
+              </motion.div>
+              <div>
+                <h3 className={`text-lg font-semibold transition-colors duration-300 ${isHovered ? persona.color : 'text-foreground'}`}>
+                  {persona.title}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {persona.subtitle}
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        
+        <CardContent className="space-y-4">
+          <ul className="space-y-2.5">
+            {persona.bullets.map((bullet, bulletIndex) => (
+              <motion.li 
+                key={bulletIndex} 
+                className="flex items-start gap-2.5 text-sm text-muted-foreground group-hover:text-muted-foreground/90"
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ 
+                  duration: 0.3, 
+                  delay: 0.3 + index * 0.08 + bulletIndex * 0.05 
+                }}
+              >
+                <motion.div
+                  whileHover={{ scale: 1.2 }}
+                  transition={{ duration: 0.2 }}
+                  className="mt-0.5 flex-shrink-0"
+                >
+                  <Check className={`h-4 w-4 ${persona.color}`} />
+                </motion.div>
+                <span>{bullet}</span>
+              </motion.li>
+            ))}
+          </ul>
+
+          {/* Stat reveal on hover */}
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ 
+              opacity: isHovered ? 1 : 0, 
+              height: isHovered ? 'auto' : 0 
+            }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className={`p-3 rounded-xl ${persona.bgColor} flex items-center justify-between mt-2`}>
+              <div>
+                <div className={`text-2xl font-bold ${persona.color}`}>
+                  {persona.stat}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {persona.statLabel}
+                </div>
+              </div>
+              <ArrowRight className={`h-5 w-5 ${persona.color}`} />
+            </div>
+          </motion.div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
+
 export function TwinUseCases() {
   return (
-    <section className="py-16 lg:py-24 overflow-hidden bg-background">
-      <div className="max-w-6xl mx-auto px-4 lg:px-8">
+    <section className="py-20 lg:py-28 overflow-hidden bg-gradient-to-b from-muted/20 via-background to-background">
+      <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <motion.div 
-          className="text-center mb-12"
+          className="text-center mb-14"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-3">
-            Built for Every Stakeholder
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="inline-block mb-4"
+          >
+            <span className="px-4 py-1.5 rounded-full bg-muted text-foreground text-sm font-medium">
+              For Every Stakeholder
+            </span>
+          </motion.div>
+          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
+            Built for Your Entire Organization
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            From executive strategy to hands-on operations, the Twin Studio serves your entire organization.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            From executive strategy to hands-on operations, the Twin Studio serves 
+            every role in your data centre ecosystem.
           </p>
         </motion.div>
         
@@ -98,56 +232,7 @@ export function TwinUseCases() {
           viewport={{ once: true, margin: "-50px" }}
         >
           {personas.map((persona, index) => (
-            <motion.div key={index} variants={cardVariants}>
-              <Card 
-                className="bg-card/30 border-border/50 hover:border-primary/50 transition-all duration-300 h-full group cursor-default"
-              >
-                <CardHeader className="pb-2">
-                  <div className="flex items-center gap-4">
-                    <motion.div 
-                      className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors"
-                      whileHover={{ scale: 1.1, rotate: 5 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <persona.icon className="h-6 w-6 text-primary" />
-                    </motion.div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
-                        {persona.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {persona.subtitle}
-                      </p>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {persona.bullets.map((bullet, bulletIndex) => (
-                      <motion.li 
-                        key={bulletIndex} 
-                        className="flex items-start gap-2 text-sm text-muted-foreground"
-                        initial={{ opacity: 0, x: -10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ 
-                          duration: 0.3, 
-                          delay: 0.3 + index * 0.1 + bulletIndex * 0.05 
-                        }}
-                      >
-                        <motion.div
-                          whileHover={{ scale: 1.2 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                        </motion.div>
-                        <span>{bullet}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            </motion.div>
+            <PersonaCard key={index} persona={persona} index={index} />
           ))}
         </motion.div>
       </div>

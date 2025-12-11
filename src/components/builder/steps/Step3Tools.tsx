@@ -170,13 +170,13 @@ export function Step3Tools() {
         key={tool.id}
         className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
           isEnabled 
-            ? 'bg-dc-primary/10 border-dc-primary/30' 
-            : 'bg-dc-surface border-dc-border hover:border-dc-primary/20'
+            ? 'bg-primary/10 border-primary/30' 
+            : 'bg-muted/50 border-border hover:border-primary/20'
         }`}
       >
         <div className="flex items-center gap-3">
           <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-            isEnabled ? 'bg-dc-primary text-dc-primary-foreground' : 'bg-dc-surface-elevated'
+            isEnabled ? 'bg-primary text-primary-foreground' : 'bg-muted'
           }`}>
             <IconComponent className="h-4 w-4" />
           </div>
@@ -190,7 +190,7 @@ export function Step3Tools() {
           size="sm"
           onClick={() => toggleTool(tool.id, DATA_CENTRE_TOOLS)}
           disabled={isLoading}
-          className={isEnabled ? 'border-dc-primary/30' : ''}
+          className={isEnabled ? 'border-primary/30' : ''}
         >
           {isEnabled ? 'Disable' : 'Enable'}
         </Button>
@@ -207,22 +207,22 @@ export function Step3Tools() {
       />
 
       <Tabs defaultValue="datacentre" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-dc-surface">
-          <TabsTrigger value="datacentre" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="datacentre" className="flex items-center gap-2">
             <Cpu className="h-4 w-4" />
             <span className="hidden sm:inline">DC Tools</span>
-            {enabledDCTools > 0 && <Badge className="ml-1 bg-dc-primary/20 text-dc-primary">{enabledDCTools}</Badge>}
+            {enabledDCTools > 0 && <Badge className="ml-1 bg-primary/20 text-primary">{enabledDCTools}</Badge>}
           </TabsTrigger>
-          <TabsTrigger value="integrations" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
+          <TabsTrigger value="integrations" className="flex items-center gap-2">
             <Link2 className="h-4 w-4" />
             <span className="hidden sm:inline">Apps</span>
             {connectedIntegrations.size > 0 && <Badge variant="secondary" className="ml-1">{connectedIntegrations.size}</Badge>}
           </TabsTrigger>
-          <TabsTrigger value="mcp" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
+          <TabsTrigger value="mcp" className="flex items-center gap-2">
             <Plug className="h-4 w-4" />
             <span className="hidden sm:inline">MCP</span>
           </TabsTrigger>
-          <TabsTrigger value="api" className="flex items-center gap-2 data-[state=active]:bg-dc-primary/10">
+          <TabsTrigger value="api" className="flex items-center gap-2">
             <Code className="h-4 w-4" />
             <span className="hidden sm:inline">API</span>
             {apiConnectors.length > 0 && <Badge variant="secondary" className="ml-1">{apiConnectors.length}</Badge>}
@@ -234,7 +234,7 @@ export function Step3Tools() {
           <DCCard 
             title="Telemetry Tools" 
             subtitle="Real-time data collection from infrastructure"
-            icon={<Activity className="h-4 w-4 text-dc-info" />}
+            icon={<Activity className="h-4 w-4 text-info" />}
           >
             <div className="space-y-3">
               {DATA_CENTRE_TOOLS.filter(t => t.category === 'Telemetry').map((tool) => 
@@ -247,7 +247,7 @@ export function Step3Tools() {
           <DCCard 
             title="Analytics Models" 
             subtitle="PUE, thermal prediction, and financial analysis"
-            icon={<Calculator className="h-4 w-4 text-dc-success" />}
+            icon={<Calculator className="h-4 w-4 text-success" />}
           >
             <div className="space-y-3">
               {DATA_CENTRE_TOOLS.filter(t => t.category === 'Model').map((tool) => 
@@ -260,7 +260,7 @@ export function Step3Tools() {
           <DCCard 
             title="Compliance & Governance" 
             subtitle="Sovereignty validation and audit logging"
-            icon={<Shield className="h-4 w-4 text-dc-sovereignty" />}
+            icon={<Shield className="h-4 w-4 text-info" />}
           >
             <div className="space-y-3">
               {DATA_CENTRE_TOOLS.filter(t => t.category === 'Compliance').map((tool) => 
@@ -273,7 +273,7 @@ export function Step3Tools() {
           <DCCard 
             title="Infrastructure Integrations" 
             subtitle="DCIM, orchestration, and monitoring platforms"
-            icon={<Database className="h-4 w-4 text-dc-power" />}
+            icon={<Database className="h-4 w-4 text-warning" />}
           >
             <div className="space-y-3">
               {DATA_CENTRE_TOOLS.filter(t => t.category === 'Integration').map((tool) => 
@@ -292,7 +292,7 @@ export function Step3Tools() {
                   <div
                     key={integration.id}
                     className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
-                      isConnected ? 'bg-dc-primary/10 border-dc-primary/30' : 'bg-dc-surface border-dc-border'
+                      isConnected ? 'bg-primary/10 border-primary/30' : 'bg-muted/50 border-border'
                     }`}
                   >
                     <div>
@@ -330,7 +330,6 @@ export function Step3Tools() {
                     placeholder="e.g., DCIM API" 
                     value={apiForm.name}
                     onChange={(e) => setApiForm(f => ({ ...f, name: e.target.value }))}
-                    className="bg-dc-surface border-dc-border"
                   />
                 </div>
                 <div className="space-y-2">
@@ -339,13 +338,12 @@ export function Step3Tools() {
                     placeholder="https://api.example.com/v1" 
                     value={apiForm.endpoint}
                     onChange={(e) => setApiForm(f => ({ ...f, endpoint: e.target.value }))}
-                    className="bg-dc-surface border-dc-border"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Method</Label>
                   <Select value={apiForm.method} onValueChange={(v) => setApiForm(f => ({ ...f, method: v }))}>
-                    <SelectTrigger className="bg-dc-surface border-dc-border">
+                    <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -359,7 +357,7 @@ export function Step3Tools() {
                 <div className="space-y-2">
                   <Label>Auth Type</Label>
                   <Select value={apiForm.authType} onValueChange={(v) => setApiForm(f => ({ ...f, authType: v }))}>
-                    <SelectTrigger className="bg-dc-surface border-dc-border">
+                    <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -378,10 +376,10 @@ export function Step3Tools() {
               </Button>
 
               {apiConnectors.length > 0 && (
-                <div className="space-y-2 pt-4 border-t border-dc-border">
+                <div className="space-y-2 pt-4 border-t border-border">
                   <Label>Configured APIs</Label>
                   {apiConnectors.map((api) => (
-                    <div key={api.id} className="flex items-center justify-between p-3 bg-dc-surface rounded-lg border border-dc-border">
+                    <div key={api.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border">
                       <div>
                         <p className="font-medium text-sm">{api.name}</p>
                         <p className="text-xs text-muted-foreground font-mono">{api.endpoint}</p>

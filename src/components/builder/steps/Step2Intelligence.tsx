@@ -398,9 +398,9 @@ export function Step2Intelligence() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Upload DC Documentation</Label>
-                  <div 
+                <div 
                     onClick={() => setShowUploadWizard(true)}
-                    className="border-2 border-dashed border-dc-border rounded-lg p-6 text-center hover:bg-dc-surface/50 transition-colors cursor-pointer"
+                    className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:bg-muted/50 transition-colors cursor-pointer"
                   >
                     <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                     <p className="text-sm text-muted-foreground">Drop DCIM docs, thermal specs, or runbooks</p>

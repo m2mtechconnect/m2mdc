@@ -2,10 +2,13 @@ import { ReactNode, useState, useEffect } from 'react';
 import { Check, Home, Rocket, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
 import { BuilderModeProvider } from './BuilderModeContext';
 import { BuilderModeToggle } from './BuilderModeToggle';
+import { LastUpdatedBadge, BuilderStateIndicator } from '@/components/ui/snapshot-indicator';
+import { formatRelativeTime } from '@/lib/formatters';
 
 enum DeployState {
   idle = "idle",
@@ -27,11 +30,11 @@ interface BuilderLayoutProps {
 }
 
 const STEPS = [
-  { id: 1, title: 'Business Profile', shortTitle: 'Profile' },
-  { id: 2, title: 'Capabilities', shortTitle: 'Capabilities' },
-  { id: 3, title: 'AI & Integrations', shortTitle: 'AI' },
-  { id: 4, title: 'Scenarios', shortTitle: 'Scenarios' },
-  { id: 5, title: 'Deploy', shortTitle: 'Deploy' },
+  { id: 1, title: 'Business Profile', shortTitle: 'Profile', tooltip: 'Define your organization and twin objectives' },
+  { id: 2, title: 'Capabilities', shortTitle: 'Capabilities', tooltip: 'Configure KPIs and monitoring agents' },
+  { id: 3, title: 'AI & Integrations', shortTitle: 'AI', tooltip: 'Set up AI models and data sources' },
+  { id: 4, title: 'Scenarios', shortTitle: 'Scenarios', tooltip: 'Define simulation scenarios for testing' },
+  { id: 5, title: 'Deploy', shortTitle: 'Deploy', tooltip: 'Review and deploy your twin to production' },
 ];
 
 export function BuilderLayout({
@@ -155,8 +158,8 @@ export function BuilderLayout({
 
           {/* Auto-save indicator */}
           {lastSaved && (
-            <div className="px-4 py-2 text-xs text-muted-foreground border-b">
-              Saved {lastSaved.toLocaleTimeString()}
+            <div className="px-4 py-2 border-b">
+              <LastUpdatedBadge timestamp={lastSaved} prefix="Saved" />
             </div>
           )}
 
@@ -164,29 +167,36 @@ export function BuilderLayout({
             <ul className="space-y-1">
               {STEPS.map((step) => (
                 <li key={step.id}>
-                  <button
-                    onClick={() => isStepAccessible(step.id) && setCurrentStep(step.id)}
-                    disabled={!isStepAccessible(step.id)}
-                    className={cn(
-                      'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-left',
-                      isStepActive(step.id) && 'bg-primary text-primary-foreground font-medium',
-                      !isStepActive(step.id) && isStepComplete(step.id) && 'text-foreground hover:bg-muted',
-                      !isStepActive(step.id) && !isStepComplete(step.id) && 'text-muted-foreground',
-                      !isStepAccessible(step.id) && 'opacity-50 cursor-not-allowed'
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        'flex items-center justify-center w-6 h-6 rounded-full border-2 text-xs font-medium',
-                        isStepActive(step.id) && 'border-primary-foreground bg-primary-foreground text-primary',
-                        isStepComplete(step.id) && !isStepActive(step.id) && 'border-primary bg-primary text-primary-foreground',
-                        !isStepComplete(step.id) && !isStepActive(step.id) && 'border-muted-foreground'
-                      )}
-                    >
-                      {isStepComplete(step.id) ? <Check className="w-3.5 h-3.5" /> : step.id}
-                    </div>
-                    <span>{step.title}</span>
-                  </button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => isStepAccessible(step.id) && setCurrentStep(step.id)}
+                        disabled={!isStepAccessible(step.id)}
+                        className={cn(
+                          'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-left',
+                          isStepActive(step.id) && 'bg-primary text-primary-foreground font-medium',
+                          !isStepActive(step.id) && isStepComplete(step.id) && 'text-foreground hover:bg-muted',
+                          !isStepActive(step.id) && !isStepComplete(step.id) && 'text-muted-foreground',
+                          !isStepAccessible(step.id) && 'opacity-50 cursor-not-allowed'
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            'flex items-center justify-center w-6 h-6 rounded-full border-2 text-xs font-medium',
+                            isStepActive(step.id) && 'border-primary-foreground bg-primary-foreground text-primary',
+                            isStepComplete(step.id) && !isStepActive(step.id) && 'border-primary bg-primary text-primary-foreground',
+                            !isStepComplete(step.id) && !isStepActive(step.id) && 'border-muted-foreground'
+                          )}
+                        >
+                          {isStepComplete(step.id) ? <Check className="w-3.5 h-3.5" /> : step.id}
+                        </div>
+                        <span>{step.title}</span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-[200px]">
+                      <p className="text-xs">{step.tooltip}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </li>
               ))}
             </ul>

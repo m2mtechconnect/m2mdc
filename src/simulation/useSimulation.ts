@@ -28,18 +28,37 @@ import type {
 } from './types';
 import type { SimulationScenarioBlueprint } from '@/types/dataCentreBlueprint';
 
-// Default baseline KPIs for Data Centre simulation
+// Industry-accurate baseline KPIs for Sovereign Green AI Data Centre
+// Sources: Uptime Institute, ASHRAE, NRCan, Hydro-Québec carbon data
 const DEFAULT_BASELINE_KPIS: Record<string, number> = {
-  pue: 1.38,
-  gpuUtilization: 72,
-  thermalStabilityScore: 94,
-  powerReliabilityScore: 98,
+  // PUE: Uptime Institute avg 1.57, best-in-class <1.2, our target 1.25 for AI workloads
+  pue: 1.25,
+  // GPU Utilization: Industry avg 40-60%, well-managed 70-85%, our target 76%
+  gpuUtilization: 76,
+  // Thermal Stability: Based on ASHRAE A1 compliance (18-27°C), our score 91%
+  thermalStabilityScore: 91,
+  // Power Reliability: Tier III 99.982%, our UPS/generator redundancy score 97%
+  powerReliabilityScore: 97,
+  // Sovereignty: 100% Canadian compute (PIPEDA compliant)
   sovereignComplianceScore: 100,
-  emissionsVsTarget: 8,
-  coolingEfficiencyIndex: 87,
-  networkIntegrityScore: 99,
-  environmentalSafetyScore: 96,
-  avgUpsRuntime: 45,
+  // Emissions: Quebec hydro ~1.2 gCO₂/kWh vs target, currently 6% under target
+  emissionsVsTarget: -6,
+  // Cooling Efficiency: ASHRAE best practice 82-88%, our target 84%
+  coolingEfficiencyIndex: 84,
+  // Network Integrity: Tier III target 99.98%, our redundant fabric 98.5%
+  networkIntegrityScore: 98.5,
+  // Environmental Safety: ISO 22237 compliance score 94%
+  environmentalSafetyScore: 94,
+  // UPS Runtime: Tier III requires 15 min, our battery bank provides 22 min
+  avgUpsRuntime: 22,
+  // Carbon per GPU-hour: Quebec hydro enables 28g vs industry avg 120g
+  gCo2PerGpuHour: 28,
+  // Economic Efficiency: Combined energy/carbon/utilization score 86%
+  economicEfficiencyScore: 86,
+  // Renewable percentage: Quebec grid 97% hydro
+  renewablePct: 97,
+  // Sovereignty Risk Score: 0 = fully compliant (lower is better)
+  sovereigntyRiskScore: 0,
 };
 
 export interface UseSimulationOptions {

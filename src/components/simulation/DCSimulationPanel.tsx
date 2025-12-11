@@ -37,15 +37,31 @@ interface DCSimulationPanelProps {
   twinId?: string;
 }
 
-// Generate base rack data
+// Generate industry-accurate rack data based on ASHRAE thermal guidelines
+// ASHRAE A1: 18-27°C recommended inlet, 15-32°C allowable
+// Typical GPU rack: 15-25kW, H100 racks: 35-70kW
 function generateBaseRacks(count: number = 20): RackMetrics[] {
-  return Array.from({ length: count }, (_, i) => ({
-    rackId: `Rack-${String(i + 1).padStart(2, '0')}`,
-    tempC: 22 + Math.random() * 6,
-    powerKw: 8 + Math.random() * 4,
-    gpuUtilPct: 60 + Math.random() * 30,
-    alertLevel: 'normal' as const,
-  }));
+  return Array.from({ length: count }, (_, i) => {
+    // Simulate realistic temperature distribution across hot/cold aisles
+    // Cold aisle inlet: 18-22°C, Hot aisle outlet: 28-35°C
+    const isHighDensity = i % 4 === 0; // Every 4th rack is high-density GPU
+    const baseTemp = 19 + Math.random() * 4; // 19-23°C inlet (ASHRAE A1)
+    const tempVariance = isHighDensity ? Math.random() * 3 : Math.random() * 2;
+    
+    // Power: Standard IT rack 5-10kW, GPU rack 15-25kW, H100 rack 35-50kW
+    const basePower = isHighDensity ? 28 + Math.random() * 18 : 6 + Math.random() * 6;
+    
+    // GPU utilization: Typical range 65-85%, with variance
+    const baseUtil = 68 + Math.random() * 16;
+    
+    return {
+      rackId: `Rack-${String(i + 1).padStart(2, '0')}`,
+      tempC: baseTemp + tempVariance,
+      powerKw: basePower,
+      gpuUtilPct: Math.min(98, baseUtil),
+      alertLevel: 'normal' as const,
+    };
+  });
 }
 
 export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSimulationPanelProps) {

@@ -29,19 +29,32 @@ interface DCKPIDeltasProps {
   compact?: boolean;
 }
 
+// Industry-accurate KPI definitions for Sovereign Green AI Data Centre
+// Baselines from Uptime Institute, ASHRAE, NRCan, and Hydro-Québec data
 const defaultKPIs: Omit<KPIDelta, 'value' | 'baseline'>[] = [
+  // PUE: Uptime Institute best-in-class <1.2, industry avg 1.57
   { id: 'pue', label: 'PUE', unit: '', icon: Zap, format: (v) => v.toFixed(2), invertDelta: true },
+  // GPU Utilization: Industry avg 40-60%, well-managed 70-85%
   { id: 'gpuUtilization', label: 'GPU Utilization', unit: '%', icon: Cpu },
+  // Thermal Stability: ASHRAE A1 compliance (18-27°C inlet temp)
   { id: 'thermalStabilityScore', label: 'Thermal Stability', unit: '%', icon: Thermometer },
+  // Power Reliability: Tier III = 99.982%, Tier IV = 99.995%
   { id: 'powerReliabilityScore', label: 'Power Reliability', unit: '%', icon: Battery },
+  // Sovereignty: PIPEDA compliance, 100% = all compute in Canada
   { id: 'sovereignComplianceScore', label: 'Sovereignty', unit: '%', icon: Globe },
+  // Emissions vs Target: negative = under target (good), based on Quebec hydro 1.2 gCO₂/kWh
   { id: 'emissionsVsTarget', label: 'Emissions vs Target', unit: '%', icon: Wind },
+  // Cooling Efficiency: ASHRAE best practice 82-88%
   { id: 'coolingEfficiencyIndex', label: 'Cooling Efficiency', unit: '%', icon: Wind },
+  // UPS Runtime: Tier III requires 15 min, typical 20-30 min
   { id: 'avgUpsRuntime', label: 'UPS Runtime', unit: 'min', icon: Battery },
-  // Carbon & Financial KPIs
+  // Carbon Efficiency: Based on gCO₂/GPU-hour (Quebec ~28g vs Alberta ~180g)
   { id: 'carbonEfficiencyScore', label: 'Carbon Efficiency', unit: '%', icon: Wind },
+  // Cost per GPU-hour: Quebec hydro $0.058/kWh enables $0.42/GPU-hr
   { id: 'costPerGpuHour', label: 'Cost/GPU-Hour', unit: '', icon: DollarSign, format: (v) => `$${v.toFixed(2)}`, invertDelta: true },
+  // Financial Health: Combined OpEx/carbon/utilization efficiency
   { id: 'financialHealthScore', label: 'Financial Health', unit: '%', icon: DollarSign },
+  // Daily Emissions: Quebec hydro enables ~85 kg/day for 5MW facility
   { id: 'dailyEmissionsKg', label: 'Daily Emissions', unit: 'kg', icon: Wind, invertDelta: true },
 ];
 

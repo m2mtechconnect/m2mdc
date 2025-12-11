@@ -2,6 +2,7 @@
  * useSimulation React Hook
  * Provides reactive access to the Data Centre Simulation Engine
  * Now supports Blueprint scenarios as authoritative source
+ * Includes performance instrumentation for simulationLoopTime tracking
  */
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
@@ -16,6 +17,7 @@ import {
 } from './scenarioRegistry';
 import { createCustomScenario } from './customScenarioBuilder';
 import { convertAllBlueprintScenarios } from './blueprintScenarioAdapter';
+import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
 import type { 
   SimulationState, 
   SimulationEvent, 
@@ -81,7 +83,11 @@ export interface UseSimulationReturn {
 export function useSimulation(options: UseSimulationOptions = {}): UseSimulationReturn {
   const { blueprintScenarios: blueprintScenariosRaw = [] } = options;
   
+  // Performance monitoring for simulation loop
+  const { startTiming, endTiming, measureSync } = usePerformanceMonitor('SimulationEngine');
+  
   const engineRef = useRef<SimulationEngine | null>(null);
+  const tickTimingRef = useRef<number | null>(null);
   const [state, setState] = useState<SimulationState>({
     status: 'idle',
     currentTime: 0,
@@ -98,8 +104,10 @@ export function useSimulation(options: UseSimulationOptions = {}): UseSimulation
   
   // Convert Blueprint scenarios to Simulation format
   const blueprintScenarios = useMemo(() => {
-    return convertAllBlueprintScenarios(blueprintScenariosRaw);
-  }, [blueprintScenariosRaw]);
+    return measureSync('blueprintConversion', () => {
+      return convertAllBlueprintScenarios(blueprintScenariosRaw);
+    }, 'compute');
+  }, [blueprintScenariosRaw, measureSync]);
   
   // Register Blueprint scenarios with the engine
   useEffect(() => {
@@ -117,20 +125,40 @@ export function useSimulation(options: UseSimulationOptions = {}): UseSimulation
     return Array.from(uniqueMap.values());
   }, [presetScenarios, blueprintScenarios, customScenarios]);
   
-  // Initialize engine with baseline KPIs
+  // Initialize engine with baseline KPIs and performance instrumentation
   useEffect(() => {
     engineRef.current = getSimulationEngine(DEFAULT_BASELINE_KPIS);
     
     const unsubscribe = engineRef.current.subscribe((event) => {
+      // Track simulation loop time on each tick
+      if (event.type === 'tick') {
+        if (tickTimingRef.current !== null) {
+          endTiming(tickTimingRef.current);
+        }
+        tickTimingRef.current = startTiming('simulationLoopTime', 'simulation');
+      }
+      
       if (event.type === 'state-change' || event.type === 'tick') {
         setState(engineRef.current!.getState());
+      }
+      
+      // End timing on simulation complete
+      if (event.type === 'scenario-complete') {
+        if (tickTimingRef.current !== null) {
+          endTiming(tickTimingRef.current);
+          tickTimingRef.current = null;
+        }
       }
     });
     
     return () => {
       unsubscribe();
+      if (tickTimingRef.current !== null) {
+        endTiming(tickTimingRef.current);
+        tickTimingRef.current = null;
+      }
     };
-  }, []);
+  }, [startTiming, endTiming]);
   
   // Get active scenario from all available scenarios
   const activeScenario = state.activeScenarioId 

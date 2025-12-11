@@ -291,6 +291,30 @@ function logScenarioChanges(
         scenario.category
       ));
     }
+    
+    // Severity change
+    if (prevScenario.severity !== scenario.severity) {
+      addEntry(createChangeEntry(
+        'scenario_change',
+        `${scenario.name} Severity Updated`,
+        `scenarios.${scenario.id}.severity`,
+        prevScenario.severity,
+        scenario.severity,
+        scenario.category
+      ));
+    }
+    
+    // Category change
+    if (prevScenario.category !== scenario.category) {
+      addEntry(createChangeEntry(
+        'scenario_change',
+        `${scenario.name} Category Updated`,
+        `scenarios.${scenario.id}.category`,
+        prevScenario.category,
+        scenario.category,
+        scenario.category
+      ));
+    }
   });
 }
 

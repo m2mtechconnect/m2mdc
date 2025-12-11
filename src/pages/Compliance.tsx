@@ -30,6 +30,7 @@ import { SovereigntyAuditTimeline } from "@/components/compliance/SovereigntyAud
 import { SovereigntyRiskOverview } from "@/components/compliance/SovereigntyRiskOverview";
 import { useActiveTwin } from "@/context/ActiveTwinContext";
 import { useTwinSovereigntyEvents } from "@/hooks/useTwinData";
+import { DOMAINS } from "@/ux";
 
 // DC-specific audit timeline
 const auditTimeline = [

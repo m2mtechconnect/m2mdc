@@ -14,6 +14,7 @@ import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useAgentDefinitionsData } from '@/hooks/useAgentDefinitionsData';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { EmptyStateSelectTwin } from '@/components/twin-selector';
+import { AGENTS, getAgentSummary } from '@/ux';
 
 export default function ManageAgents() {
   const navigate = useNavigate();
@@ -158,7 +159,7 @@ export default function ManageAgents() {
                 Subsystem Agents
               </h1>
               <p className="text-sm text-muted-foreground">
-                Manage Data Centre subsystem agents and automation
+                {AGENTS.SECTION_INTRO}
               </p>
             </div>
             <Button

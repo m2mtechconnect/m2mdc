@@ -12,6 +12,7 @@ import {
   GitBranch, AlertCircle, CheckCircle2
 } from 'lucide-react';
 import { sanitizeTwinName } from '@/lib/utils/extractCompanyIdentity';
+import { SIMULATION } from '@/ux';
 
 interface SimulationSnapshotHeaderProps {
   twinName?: string;
@@ -80,7 +81,7 @@ export function SimulationSnapshotHeader({
         
         {/* Center: Design Snapshot Info */}
         <div className="rounded-lg bg-muted/50 px-4 py-3 border border-border">
-          <p className="text-xs text-muted-foreground mb-1">Using Design Snapshot</p>
+          <p className="text-xs text-muted-foreground mb-1">{SIMULATION.SNAPSHOT.BADGE}</p>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
               <GitBranch className="h-4 w-4 text-muted-foreground" />

@@ -6,15 +6,13 @@
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Bot,
   BarChart3,
   GitBranch,
   PlayCircle,
-  ArrowRight,
-  ChevronRight,
   Network,
 } from 'lucide-react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
@@ -138,181 +136,79 @@ export function DependencyGraph({ className }: { className?: string }) {
     }
   };
 
+  const renderNodeList = (nodes: DependencyNode[]) => (
+    <ScrollArea className="h-44">
+      <div className="space-y-1.5 pr-2">
+        {nodes.map(node => {
+          const styles = getNodeStyles(node.type);
+          const Icon = styles.icon;
+          return (
+            <div
+              key={node.id}
+              className={cn(
+                'p-2 rounded border text-xs flex items-center gap-1.5',
+                styles.bg,
+                styles.border
+              )}
+            >
+              <Icon className={cn('h-3 w-3 shrink-0', styles.text)} />
+              <span className="truncate">{node.name.replace(' Agent', '')}</span>
+            </div>
+          );
+        })}
+        {nodes.length === 0 && (
+          <p className="text-xs text-muted-foreground text-center py-4">No items</p>
+        )}
+      </div>
+    </ScrollArea>
+  );
+
   return (
     <Card className={className}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm flex items-center gap-2">
             <Network className="h-4 w-4" />
-            System Dependency Graph
+            Dependencies
           </CardTitle>
           <Badge variant="outline" className="text-xs">
-            {graph.nodes.length} nodes • {graph.connections.length} connections
+            {graph.nodes.length} nodes
           </Badge>
         </div>
-        <p className="text-[10px] text-muted-foreground mt-1">
-          Agents monitor KPIs → trigger workflows → respond to scenarios
-        </p>
       </CardHeader>
-      <CardContent className="pb-6">
-        {/* Flow Legend */}
-        <div className="flex items-center justify-center gap-2 mb-4 p-2 rounded-lg bg-muted/50">
-          <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 text-xs">
-            <Bot className="h-3 w-3 mr-1" />
-            Agents
-          </Badge>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          <Badge variant="outline" className="bg-info/10 text-info border-info/30 text-xs">
-            <BarChart3 className="h-3 w-3 mr-1" />
-            KPIs
-          </Badge>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30 text-xs">
-            <GitBranch className="h-3 w-3 mr-1" />
-            Workflows
-          </Badge>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          <Badge variant="outline" className="bg-success/10 text-success border-success/30 text-xs">
-            <PlayCircle className="h-3 w-3 mr-1" />
-            Scenarios
-          </Badge>
-        </div>
-
-        {/* Graph Columns */}
-        <div className="grid grid-cols-4 gap-3">
-          {/* Agents Column */}
-          <div className="space-y-2">
-            <p className="text-xs font-medium text-muted-foreground text-center mb-2">
-              Agents ({agentNodes.length})
-            </p>
-            <ScrollArea className="h-48">
-              <div className="space-y-1.5">
-                {agentNodes.slice(0, 8).map(node => {
-                  const styles = getNodeStyles(node.type);
-                  const Icon = styles.icon;
-                  return (
-                    <div
-                      key={node.id}
-                      className={cn(
-                        'p-2 rounded border text-xs flex items-center gap-1.5',
-                        styles.bg,
-                        styles.border
-                      )}
-                    >
-                      <Icon className={cn('h-3 w-3', styles.text)} />
-                      <span className="truncate">{node.name.replace(' Agent', '')}</span>
-                    </div>
-                  );
-                })}
-                {agentNodes.length > 8 && (
-                  <p className="text-[10px] text-muted-foreground text-center">
-                    +{agentNodes.length - 8} more
-                  </p>
-                )}
-              </div>
-            </ScrollArea>
-          </div>
-
-          {/* KPIs Column */}
-          <div className="space-y-2">
-            <p className="text-xs font-medium text-muted-foreground text-center mb-2">
-              KPIs ({kpiNodes.length})
-            </p>
-            <ScrollArea className="h-48">
-              <div className="space-y-1.5">
-                {kpiNodes.slice(0, 8).map(node => {
-                  const styles = getNodeStyles(node.type);
-                  const Icon = styles.icon;
-                  return (
-                    <div
-                      key={node.id}
-                      className={cn(
-                        'p-2 rounded border text-xs flex items-center gap-1.5',
-                        styles.bg,
-                        styles.border
-                      )}
-                    >
-                      <Icon className={cn('h-3 w-3', styles.text)} />
-                      <span className="truncate">{node.name}</span>
-                    </div>
-                  );
-                })}
-                {kpiNodes.length > 8 && (
-                  <p className="text-[10px] text-muted-foreground text-center">
-                    +{kpiNodes.length - 8} more
-                  </p>
-                )}
-              </div>
-            </ScrollArea>
-          </div>
-
-          {/* Workflows Column */}
-          <div className="space-y-2">
-            <p className="text-xs font-medium text-muted-foreground text-center mb-2">
-              Workflows ({workflowNodes.length})
-            </p>
-            <ScrollArea className="h-48">
-              <div className="space-y-1.5">
-                {workflowNodes.slice(0, 8).map(node => {
-                  const styles = getNodeStyles(node.type);
-                  const Icon = styles.icon;
-                  return (
-                    <div
-                      key={node.id}
-                      className={cn(
-                        'p-2 rounded border text-xs flex items-center gap-1.5',
-                        styles.bg,
-                        styles.border
-                      )}
-                    >
-                      <Icon className={cn('h-3 w-3', styles.text)} />
-                      <span className="truncate">{node.name}</span>
-                    </div>
-                  );
-                })}
-                {workflowNodes.length > 8 && (
-                  <p className="text-[10px] text-muted-foreground text-center">
-                    +{workflowNodes.length - 8} more
-                  </p>
-                )}
-              </div>
-            </ScrollArea>
-          </div>
-
-          {/* Scenarios Column */}
-          <div className="space-y-2">
-            <p className="text-xs font-medium text-muted-foreground text-center mb-2">
-              Scenarios ({scenarioNodes.length})
-            </p>
-            <ScrollArea className="h-48">
-              <div className="space-y-1.5">
-                {scenarioNodes.slice(0, 8).map(node => {
-                  const styles = getNodeStyles(node.type);
-                  const Icon = styles.icon;
-                  return (
-                    <div
-                      key={node.id}
-                      className={cn(
-                        'p-2 rounded border text-xs flex items-center gap-1.5',
-                        styles.bg,
-                        styles.border
-                      )}
-                    >
-                      <Icon className={cn('h-3 w-3', styles.text)} />
-                      <span className="truncate">{node.name}</span>
-                    </div>
-                  );
-                })}
-                {scenarioNodes.length > 8 && (
-                  <p className="text-[10px] text-muted-foreground text-center">
-                    +{scenarioNodes.length - 8} more
-                  </p>
-                )}
-              </div>
-            </ScrollArea>
-          </div>
-        </div>
-
+      <CardContent className="pt-0">
+        <Tabs defaultValue="agents" className="w-full">
+          <TabsList className="w-full grid grid-cols-4 h-8">
+            <TabsTrigger value="agents" className="text-xs px-1">
+              <Bot className="h-3 w-3 mr-1" />
+              {agentNodes.length}
+            </TabsTrigger>
+            <TabsTrigger value="kpis" className="text-xs px-1">
+              <BarChart3 className="h-3 w-3 mr-1" />
+              {kpiNodes.length}
+            </TabsTrigger>
+            <TabsTrigger value="workflows" className="text-xs px-1">
+              <GitBranch className="h-3 w-3 mr-1" />
+              {workflowNodes.length}
+            </TabsTrigger>
+            <TabsTrigger value="scenarios" className="text-xs px-1">
+              <PlayCircle className="h-3 w-3 mr-1" />
+              {scenarioNodes.length}
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="agents" className="mt-2">
+            {renderNodeList(agentNodes)}
+          </TabsContent>
+          <TabsContent value="kpis" className="mt-2">
+            {renderNodeList(kpiNodes)}
+          </TabsContent>
+          <TabsContent value="workflows" className="mt-2">
+            {renderNodeList(workflowNodes)}
+          </TabsContent>
+          <TabsContent value="scenarios" className="mt-2">
+            {renderNodeList(scenarioNodes)}
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );

@@ -37,7 +37,10 @@ export function DeleteTwinModal({
 }: DeleteTwinModalProps) {
   const [confirmationText, setConfirmationText] = useState('');
   
-  const isNameMatch = confirmationText.trim().toLowerCase() === twinName.toLowerCase();
+  // Normalize both strings: trim whitespace and convert to lowercase for comparison
+  const normalizedInput = confirmationText.trim().toLowerCase().replace(/\s+/g, ' ');
+  const normalizedTwinName = twinName.trim().toLowerCase().replace(/\s+/g, ' ');
+  const isNameMatch = normalizedInput === normalizedTwinName;
   
   const handleClose = () => {
     setConfirmationText('');

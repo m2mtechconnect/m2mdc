@@ -24,6 +24,7 @@ import {
   ExternalLink,
   Play
 } from 'lucide-react';
+import { AGENTS, getAgentSummary } from '@/ux';
 import type { AgentBlueprint, DomainSection } from '@/types/dataCentreBlueprint';
 import { useAgentDefinitions } from '@/hooks/useAgentDefinitions';
 import { DOMAIN_INFO, TYPE_INFO } from '@/types/agentDefinition';
@@ -152,6 +153,11 @@ export function BlueprintAgentsTab({ agents, domains, highlightAgentId, useRealD
 
   return (
     <div className="space-y-6">
+      {/* Section Intro */}
+      <div className="text-sm text-muted-foreground">
+        {AGENTS.SECTION_INTRO}
+      </div>
+
       {/* Agent Health Panel */}
       <AgentHealthPanel />
 

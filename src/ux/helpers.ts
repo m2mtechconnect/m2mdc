@@ -87,16 +87,16 @@ export function getDomainName(domain: DomainKey | string): string {
  */
 export function getAgentSummary(agentId: AgentKey | string): string {
   const key = agentId as AgentKey;
-  if (AGENTS[key]) {
-    return AGENTS[key].SUMMARY;
+  if (AGENTS.ITEMS[key]) {
+    return AGENTS.ITEMS[key].SUMMARY;
   }
   // Try to match partial IDs
-  const matchingKey = Object.keys(AGENTS).find(k => 
+  const matchingKey = Object.keys(AGENTS.ITEMS).find(k => 
     agentId.includes(k) || k.includes(agentId)
   ) as AgentKey | undefined;
   
   if (matchingKey) {
-    return AGENTS[matchingKey].SUMMARY;
+    return AGENTS.ITEMS[matchingKey].SUMMARY;
   }
   
   return 'Automated agent for domain-specific monitoring and optimization.';
@@ -107,16 +107,16 @@ export function getAgentSummary(agentId: AgentKey | string): string {
  */
 export function getAgentName(agentId: AgentKey | string): string {
   const key = agentId as AgentKey;
-  if (AGENTS[key]) {
-    return AGENTS[key].NAME;
+  if (AGENTS.ITEMS[key]) {
+    return AGENTS.ITEMS[key].NAME;
   }
   // Try to match partial IDs
-  const matchingKey = Object.keys(AGENTS).find(k => 
+  const matchingKey = Object.keys(AGENTS.ITEMS).find(k => 
     agentId.includes(k) || k.includes(agentId)
   ) as AgentKey | undefined;
   
   if (matchingKey) {
-    return AGENTS[matchingKey].NAME;
+    return AGENTS.ITEMS[matchingKey].NAME;
   }
   
   return agentId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
@@ -127,16 +127,16 @@ export function getAgentName(agentId: AgentKey | string): string {
  */
 export function getKPIDescription(kpiId: KPIKey | string): string {
   const key = kpiId as KPIKey;
-  if (KPIS[key]) {
-    return KPIS[key].DESCRIPTION;
+  if (KPIS.ITEMS[key]) {
+    return KPIS.ITEMS[key].DESCRIPTION;
   }
   // Try to match partial IDs
-  const matchingKey = Object.keys(KPIS).find(k => 
+  const matchingKey = Object.keys(KPIS.ITEMS).find(k => 
     kpiId.includes(k) || k.includes(kpiId)
   ) as KPIKey | undefined;
   
   if (matchingKey) {
-    return KPIS[matchingKey].DESCRIPTION;
+    return KPIS.ITEMS[matchingKey].DESCRIPTION;
   }
   
   return 'Measures operational performance for this metric.';
@@ -147,16 +147,16 @@ export function getKPIDescription(kpiId: KPIKey | string): string {
  */
 export function getKPIName(kpiId: KPIKey | string): string {
   const key = kpiId as KPIKey;
-  if (KPIS[key]) {
-    return KPIS[key].NAME;
+  if (KPIS.ITEMS[key]) {
+    return KPIS.ITEMS[key].NAME;
   }
   // Try to match partial IDs
-  const matchingKey = Object.keys(KPIS).find(k => 
+  const matchingKey = Object.keys(KPIS.ITEMS).find(k => 
     kpiId.includes(k) || k.includes(kpiId)
   ) as KPIKey | undefined;
   
   if (matchingKey) {
-    return KPIS[matchingKey].NAME;
+    return KPIS.ITEMS[matchingKey].NAME;
   }
   
   return kpiId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');

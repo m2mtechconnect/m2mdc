@@ -15,6 +15,7 @@ import {
   Zap, Leaf, Shield, TrendingUp, Server, GitCompare, LineChart, 
   Lightbulb, SlidersHorizontal, Network, PanelRightOpen, PanelRightClose
 } from 'lucide-react';
+import { SIMULATION, getScenarioDescription } from '@/ux';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import type { DCScenarioCategory } from '@/types/dcTwinBuilder';
 import { MultiKPIOverlay } from '@/components/simulation/MultiKPIOverlay';

@@ -17,6 +17,7 @@ import {
   Eye,
   History
 } from 'lucide-react';
+import { WORKFLOWS, getWorkflowDescription } from '@/ux';
 import type { WorkflowBlueprint } from '@/types/dataCentreBlueprint';
 import {
   Table,
@@ -72,6 +73,11 @@ export function BlueprintWorkflowsTab({ workflows }: BlueprintWorkflowsTabProps)
 
   return (
     <div className="space-y-6">
+      {/* Section Intro */}
+      <div className="text-sm text-muted-foreground">
+        {WORKFLOWS.SECTION_INTRO}
+      </div>
+
       {/* Enhanced Controls Panel */}
       <div className="grid md:grid-cols-2 gap-4">
         <WorkflowVersionControl 

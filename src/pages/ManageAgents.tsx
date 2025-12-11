@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Bot, Wrench, ArrowLeft, Server, Activity, Zap, TrendingUp, CheckCircle2 } from 'lucide-react';
@@ -16,6 +16,8 @@ import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { EmptyStateSelectTwin } from '@/components/twin-selector';
 import { AGENTS, getAgentSummary } from '@/ux';
 import { LoadingState, NoAgentsEmptyState } from '@/components/ui/empty-state';
+import { useTwinAgents } from '@/hooks/useTwinAgentsCatalog';
+import { AGENT_CATALOG, type AgentDefinitionCatalog } from '@/domain/greenDc/agentsCatalog';
 
 export default function ManageAgents() {
   const navigate = useNavigate();
@@ -125,14 +127,20 @@ export default function ManageAgents() {
 
   const healthPercentage = stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0;
 
-  // DC-specific agent types
-  const dcAgentTypes = [
-    { name: 'Thermal Guardian', description: 'Monitors temperature across all racks and zones', status: 'active' },
-    { name: 'Power & UPS Monitor', description: 'Tracks power distribution and battery health', status: 'active' },
-    { name: 'Workload Orchestrator', description: 'Optimizes GPU/CPU workload distribution', status: 'active' },
-    { name: 'Sovereignty Sentinel', description: 'Ensures data residency compliance', status: 'active' },
-    { name: 'Cooling Optimization Agent', description: 'Manages cooling efficiency and PUE', status: 'active' },
-  ];
+  // Get agents from centralized catalog - automatically filtered by industry
+  const { allAgents: catalogAgents, enabledAgents, industryAgents } = useTwinAgents();
+  
+  // DC-specific agent types from catalog (use industry agents if available, else all)
+  const dcAgentTypes = useMemo(() => {
+    const agentsToShow = industryAgents.length > 0 ? industryAgents : Object.values(AGENT_CATALOG);
+    return agentsToShow.slice(0, 6).map((agent: AgentDefinitionCatalog) => ({
+      id: agent.id,
+      name: agent.label,
+      description: agent.description,
+      status: agent.defaultEnabled ? 'active' : 'draft',
+      domain: agent.domain,
+    }));
+  }, [industryAgents]);
 
   return (
     <div className="min-h-screen bg-background">

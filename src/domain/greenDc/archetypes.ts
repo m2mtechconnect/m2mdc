@@ -82,13 +82,20 @@
  */
 
 import type { DcTwinArchetypeId, GreenDcTwinRecommendation } from "@/types/greenDcTwin";
+import { AgentId, mapArchetypeAgentIds } from './agentsCatalog';
+import { KPIKey } from './kpiCatalog';
 
 export interface GreenDcArchetype {
   id: DcTwinArchetypeId;
   label: string;
   defaultObjectives: string[];
+  /** Archetype agent IDs (will be mapped to AgentId via mapArchetypeAgentIds) */
   defaultAgents: string[];
+  /** Mapped AgentIds for type-safe usage */
+  defaultAgentIds?: AgentId[];
   defaultKpiTargets: Partial<GreenDcTwinRecommendation["kpiTargets"]>;
+  /** KPI keys this archetype tracks */
+  defaultKpiKeys?: KPIKey[];
   defaultScenarios: string[];
 }
 

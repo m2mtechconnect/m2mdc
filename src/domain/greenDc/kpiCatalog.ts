@@ -23,6 +23,7 @@ export enum KPIKey {
   THERMAL_STABILITY = 'thermalStabilityScore',
   AVG_SERVER_TEMP = 'avg-server-temp',
   HOTSPOT_RISK = 'hotspot-risk',
+  THERMAL_INCIDENTS = 'thermal-incidents',
 
   // Cooling
   COOLING_EFFICIENCY = 'coolingEfficiencyIndex',
@@ -41,6 +42,7 @@ export enum KPIKey {
   RENEWABLE_PCT = 'renewable-pct',
   ENERGY_COST = 'energy-cost',
   ECONOMIC_EFFICIENCY = 'economic-efficiency',
+  CARBON_INTENSITY = 'carbon-intensity',
 
   // Sovereignty / Compliance
   SOVEREIGN_COMPLIANCE = 'sovereignComplianceScore',
@@ -238,6 +240,19 @@ export const KPI_CATALOG: Record<KPIKey, KPIDefinition> = {
     criticalThreshold: 30,
     relevantIndustries: ['*'],
   },
+  [KPIKey.THERMAL_INCIDENTS]: {
+    key: KPIKey.THERMAL_INCIDENTS,
+    label: 'Thermal Incidents',
+    description: 'Number of thermal threshold breaches in last 24h',
+    unit: '',
+    category: 'performance',
+    domain: 'thermal',
+    direction: 'lower_is_better',
+    target: 0,
+    warningThreshold: 5,
+    criticalThreshold: 15,
+    relevantIndustries: ['*'],
+  },
 
   // Cooling KPIs
   [KPIKey.COOLING_EFFICIENCY]: {
@@ -398,6 +413,19 @@ export const KPI_CATALOG: Record<KPIKey, KPIDefinition> = {
     target: 88,
     warningThreshold: 72,
     criticalThreshold: 55,
+    relevantIndustries: ['*'],
+  },
+  [KPIKey.CARBON_INTENSITY]: {
+    key: KPIKey.CARBON_INTENSITY,
+    label: 'Carbon Intensity',
+    description: 'Grid carbon intensity in grams CO₂ per kWh',
+    unit: 'g/kWh',
+    category: 'carbon',
+    domain: 'financial',
+    direction: 'lower_is_better',
+    target: 50,
+    warningThreshold: 100,
+    criticalThreshold: 200,
     relevantIndustries: ['*'],
   },
 

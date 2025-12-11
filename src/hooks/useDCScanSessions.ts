@@ -243,7 +243,9 @@ export function useCreateScanSession() {
       return transformSession(data);
     },
     onSuccess: () => {
+      // Invalidate both the list and the "last" query
       queryClient.invalidateQueries({ queryKey: ["dc-scan-sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["dc-scan-sessions", "last"] });
     }
   });
 }
@@ -268,6 +270,7 @@ export function useUpdateScanSession() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dc-scan-sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["dc-scan-sessions", "last"] });
     }
   });
 }

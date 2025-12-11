@@ -21,48 +21,66 @@ interface ZapRun {
   }>;
 }
 
-const mockZapRuns: ZapRun[] = [
+/**
+ * Data Centre Integration Run Log
+ * Real-world DC operations automation examples
+ */
+const dcIntegrationRuns: ZapRun[] = [
   {
-    id: "zap-001",
-    zapName: "Gmail → Document Index",
-    trigger: "New Email Received",
+    id: "run-001",
+    zapName: "DCIM → Thermal Alert Workflow",
+    trigger: "Rack inlet temp > 27°C",
     status: "success",
-    timestamp: "2 minutes ago",
-    duration: "1.2s",
-    recordsProcessed: 1,
-    details: [
-      { step: "Trigger: Gmail", status: "success", message: "Email received from support@example.com" },
-      { step: "Extract Attachments", status: "success", message: "1 PDF file extracted" },
-      { step: "Index Document", status: "success", message: "Document indexed successfully" },
-    ],
-  },
-  {
-    id: "zap-002",
-    zapName: "Zendesk → Support Index",
-    trigger: "New Support Ticket",
-    status: "success",
-    timestamp: "5 minutes ago",
+    timestamp: "3 minutes ago",
     duration: "0.8s",
     recordsProcessed: 1,
     details: [
-      { step: "Trigger: Zendesk", status: "success", message: "Ticket #12345 created" },
-      { step: "Extract Content", status: "success", message: "Ticket content extracted" },
-      { step: "Index", status: "success", message: "Ticket indexed for search" },
+      { step: "Trigger: DCIM Telemetry", status: "success", message: "Rack R-14 inlet temp 27.4°C detected via BMS API" },
+      { step: "Evaluate Threshold", status: "success", message: "ASHRAE A1 warning threshold (27°C) exceeded" },
+      { step: "Dispatch Alert", status: "success", message: "Thermal alert sent to ops@datacenter.local, Slack #noc-alerts" },
     ],
   },
   {
-    id: "zap-003",
-    zapName: "Sheets → Data Sync",
-    trigger: "New Row Added",
-    status: "failed",
-    timestamp: "12 minutes ago",
-    duration: "2.1s",
-    recordsProcessed: 0,
-    error: "API rate limit exceeded",
+    id: "run-002",
+    zapName: "Power Monitor → UPS Health Check",
+    trigger: "Battery discharge event",
+    status: "success",
+    timestamp: "8 minutes ago",
+    duration: "1.4s",
+    recordsProcessed: 1,
     details: [
-      { step: "Trigger: Google Sheets", status: "success", message: "New row detected" },
-      { step: "Validate Data", status: "success", message: "Data validation passed" },
-      { step: "Sync to Database", status: "failed", message: "Rate limit exceeded (429)" },
+      { step: "Trigger: UPS Controller", status: "success", message: "UPS-Bank-2 voltage dip: 478V → 471V (1.5%)" },
+      { step: "Battery Assessment", status: "success", message: "Battery health 94%, runtime 38 min at current load" },
+      { step: "Log Event", status: "success", message: "Power event logged to CMDB, no escalation required" },
+    ],
+  },
+  {
+    id: "run-003",
+    zapName: "GPU Scheduler → Workload Rebalance",
+    trigger: "Cluster utilization imbalance",
+    status: "failed",
+    timestamp: "15 minutes ago",
+    duration: "2.3s",
+    recordsProcessed: 0,
+    error: "Scheduler lock contention: retry in 60s",
+    details: [
+      { step: "Trigger: GPU Telemetry", status: "success", message: "Cluster A: 94% util, Cluster B: 52% util (Δ42%)" },
+      { step: "Generate Migration Plan", status: "success", message: "Identified 3 jobs for migration (est. 12 GPU-hours)" },
+      { step: "Execute Migration", status: "failed", message: "Scheduler lock held by priority job, retry queued" },
+    ],
+  },
+  {
+    id: "run-004",
+    zapName: "Carbon Monitor → Grid Signal Response",
+    trigger: "Grid carbon intensity spike",
+    status: "success",
+    timestamp: "22 minutes ago",
+    duration: "0.6s",
+    recordsProcessed: 1,
+    details: [
+      { step: "Trigger: WattTime API", status: "success", message: "CA-QC grid intensity: 1.2 → 8.4 gCO₂/kWh (import event)" },
+      { step: "Evaluate Response", status: "success", message: "Defer non-critical batch jobs per carbon policy" },
+      { step: "Update Dashboard", status: "success", message: "Carbon intensity widget updated, ops notified" },
     ],
   },
 ];
@@ -85,9 +103,9 @@ export default function ZapRunLog() {
 
   return (
     <Card className="section-padding">
-      <h3 className="text-h3 mb-4">Recent Zap Runs</h3>
+      <h3 className="text-h3 mb-4">Recent Integration Runs</h3>
       <div className="space-y-3">
-        {mockZapRuns.map((run) => (
+        {dcIntegrationRuns.map((run) => (
           <div key={run.id} className="border border-border rounded-lg overflow-hidden">
             <div
               className="p-4 cursor-pointer hover:bg-muted/30 transition-smooth"

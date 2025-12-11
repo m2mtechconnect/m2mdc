@@ -62,26 +62,28 @@ export function IntegrationDrawer({
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     if (type === "gemini") {
+      // DC-specific grounded response example
       setTestResult({
         success: true,
-        answer: "This is a sample grounded answer from Gemini 1.5 Flash with citations.",
+        answer: "Based on current thermal telemetry, Rack R-14 inlet temperature is 27.4°C, exceeding the ASHRAE A1 recommended envelope (18-27°C). GPU cluster exhaust temps averaging 39.2°C suggest adequate airflow. Recommend monitoring CRAH-03 coil deltaT which shows 1.2°C degradation over 24h.",
         citations: [
-          { source: "HIPAA Compliance Guide", confidence: 0.92 },
-          { source: "Q4 Marketing Report", confidence: 0.87 },
+          { source: "ASHRAE TC 9.9 Thermal Guidelines 2021", confidence: 0.96 },
+          { source: "Facility Thermal Monitoring Policy v2.3", confidence: 0.91 },
         ],
-        latency: 1243,
-        tokens: { input: 156, output: 89 },
+        latency: 847,
+        tokens: { input: 234, output: 127 },
       });
     } else {
+      // DC-specific search result example
       setTestResult({
         success: true,
-        results: 6,
+        results: 8,
         topResult: {
-          title: "HIPAA Compliance Guide 2024",
-          score: 0.94,
-          snippet: "Complete guide to HIPAA compliance requirements...",
+          title: "Data Centre Cooling Best Practices - ASHRAE 2021",
+          score: 0.97,
+          snippet: "Recommended inlet air temperatures for A1 class equipment: 18-27°C. Maximum rate of change: 5°C/hr...",
         },
-        latency: 234,
+        latency: 186,
       });
     }
 

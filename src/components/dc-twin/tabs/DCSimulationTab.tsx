@@ -33,6 +33,11 @@ import { LiveInsightsKPIPanel } from '@/components/simulation/LiveInsightsKPIPan
 import { SimulationCoPilotPanel, CoPilotModeHeader } from '@/components/copilot';
 import type { KPISnapshot, SimulationEvent } from '@/simulation/types';
 
+// UI Polish Components
+import { StatusBadge, NoSimulationHistoryEmptyState, LoadingState } from '@/components/ui';
+import { KpiTooltip } from '@/components/ui/kpi-tooltip';
+import { LiveSimulationBadge, KPILegend, TimelineEventMarker, KPI_DOMAIN_COLORS } from '@/components/simulation/SimulationEnvironmentPolish';
+
 const categoryIcons: Record<DCScenarioCategory, React.ReactNode> = {
   capacity: <Server className="h-4 w-4" />,
   incident: <AlertTriangle className="h-4 w-4" />,
@@ -131,15 +136,20 @@ export function DCSimulationTab() {
         {/* Main Content */}
         <div className={`flex-1 transition-all duration-300 ${showCoPilotPanel ? 'pr-96' : ''}`}>
           <div className="space-y-6">
-            {/* SIMULATION MODE HEADER */}
             <div className="flex items-center justify-between">
-              <SimulationModeHeader
-                twinName={overview.twinName || 'Sovereign AI Data Centre'}
-                subtitle={`${overview.facilityLocation || 'Montreal, QC'} • ${overview.renewablePercent || 95}% Renewable • ${overview.capacityKw?.toLocaleString() || '10,000'} kW`}
-                blueprintVersion="v1.0"
-                lastUpdated={new Date().toLocaleDateString()}
-                showDesignerLink={true}
-              />
+              <div className="flex items-center gap-3">
+                <SimulationModeHeader
+                  twinName={overview.twinName || 'Sovereign AI Data Centre'}
+                  subtitle={`${overview.facilityLocation || 'Montreal, QC'} • ${overview.renewablePercent || 95}% Renewable • ${overview.capacityKw?.toLocaleString() || '10,000'} kW`}
+                  blueprintVersion="v1.0"
+                  lastUpdated={new Date().toLocaleDateString()}
+                  showDesignerLink={true}
+                />
+                
+                {/* Live Simulation Badge */}
+                {isRunning && <LiveSimulationBadge isRunning={true} />}
+                {!isRunning && selectedScenario && <LiveSimulationBadge isRunning={false} isPaused={true} />}
+              </div>
               
               {/* Co-Pilot Controls */}
               <div className="flex items-center gap-2">
@@ -163,6 +173,9 @@ export function DCSimulationTab() {
                 </Button>
               </div>
             </div>
+            
+            {/* KPI Legend */}
+            <KPILegend activeDomains={['thermal', 'power', 'cooling', 'sovereignty', 'financial', 'workload']} />
 
             {/* Enterprise KPI Cards Grid */}
             <EnterpriseKPICardGrid

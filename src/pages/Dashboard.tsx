@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Wrench, Bot, AlertCircle, ArrowUpRight, Server, Cpu, Thermometer, Globe, Zap as ZapIcon, Activity, Bug } from "lucide-react";
+import { Loader2, Wrench, Bot, AlertCircle, ArrowUpRight, Server, Cpu, Thermometer, Globe, Zap as ZapIcon, Activity, Bug, Leaf, Shield } from "lucide-react";
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { UnifiedIntakeModal } from '@/components/dashboard/UnifiedIntakeModal';
@@ -31,6 +31,10 @@ import { OVERVIEW, TOOLTIPS } from '@/ux';
 import { DCKPITile } from '@/components/dc-ui';
 import { DCCard } from '@/components/dc-ui';
 import { DataCentreSelector } from '@/components/twin-selector';
+
+// UI Polish imports
+import { StatusBadge, KpiTooltip, NoTwinSelectedEmptyState, LoadingState, ScannerEmptyState } from '@/components/ui';
+import { IndustryComplianceBadges } from '@/components/shared';
 
 interface Metrics {
   roi: number;
@@ -346,30 +350,32 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-6 sm:py-8 max-w-7xl">
-        {/* Header */}
-        <div className="mb-6 sm:mb-8 text-center px-4">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Server className="h-6 w-6 text-primary" />
+      <div className="container mx-auto py-8 sm:py-10 max-w-7xl space-y-8">
+        {/* Header Section */}
+        <section className="text-center px-4">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="p-3 rounded-xl bg-primary/10">
+              <Server className="h-7 w-7 text-primary" />
             </div>
             <h1 className="text-h1 font-display text-gradient-hero">
               {OVERVIEW.TITLE}
             </h1>
           </div>
-          <p className="text-muted-foreground text-lg sm:text-xl max-w-3xl mx-auto">
+          <p className="text-muted-foreground text-lg sm:text-xl max-w-3xl mx-auto mb-6">
             {OVERVIEW.PURPOSE_STATEMENT}
           </p>
-          {/* Current Twin Indicator */}
+          
+          {/* Current Twin Indicator with Status Badges */}
           {twin && (
-            <div className="mt-4 flex items-center justify-center gap-3">
-              <Badge variant="outline" className="text-sm px-3 py-1">
-                <Server className="h-3 w-3 mr-1.5" />
-                {twin.name}
-              </Badge>
-              <Badge variant="secondary" className="text-xs">
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              <StatusBadge status="active" customLabel={twin.name} />
+              <Badge variant="secondary" className="text-xs gap-1">
+                <Globe className="h-3 w-3" />
                 {twin.city} • {twin.tier}
               </Badge>
+              {twin.industry && (
+                <IndustryComplianceBadges industry={twin.industry} />
+              )}
               <Link to="/twin-debug">
                 <Button variant="ghost" size="sm" className="text-xs gap-1 text-muted-foreground hover:text-foreground">
                   <Bug className="h-3 w-3" />
@@ -378,7 +384,7 @@ export default function Dashboard() {
               </Link>
             </div>
           )}
-        </div>
+        </section>
 
         {/* Hero Search Bar */}
         <HeroSearchBar 
@@ -413,60 +419,69 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* DC-Specific KPI Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 mb-8">
-          <Card className="p-4 border hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/data-centre-twin')}>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-green-500/10">
-                <ZapIcon className="h-4 w-4 text-green-500" />
+        {/* DC-Specific KPI Row with Tooltips */}
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <KpiTooltip title="Power Usage Effectiveness" description="Measures facility energy efficiency. Lower is better. Industry average is 1.58.">
+            <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-lg bg-success/10">
+                  <ZapIcon className="h-4 w-4 text-success" />
+                </div>
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Global PUE</span>
               </div>
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Global PUE</span>
-            </div>
-            <div className="font-mono text-2xl font-bold">1.38</div>
-            <div className="text-xs text-green-600 flex items-center gap-1 mt-1">
-              ↓ 2.1% improvement
-            </div>
-          </Card>
+              <div className="font-mono text-2xl font-bold">1.38</div>
+              <div className="text-xs text-success flex items-center gap-1 mt-2">
+                ↓ 2.1% improvement
+              </div>
+            </Card>
+          </KpiTooltip>
           
-          <Card className="p-4 border hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/data-centre-twin')}>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <Cpu className="h-4 w-4 text-purple-500" />
+          <KpiTooltip title="GPU Saturation Risk" description="Percentage of GPU clusters approaching capacity limits. High values indicate scaling needs.">
+            <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Cpu className="h-4 w-4 text-primary" />
+                </div>
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">GPU Saturation</span>
               </div>
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">GPU Saturation</span>
-            </div>
-            <div className="font-mono text-2xl font-bold">23%</div>
-            <div className="text-xs text-amber-600 flex items-center gap-1 mt-1">
-              ↑ 4.2% from baseline
-            </div>
-          </Card>
+              <div className="font-mono text-2xl font-bold">23%</div>
+              <div className="text-xs text-warning flex items-center gap-1 mt-2">
+                ↑ 4.2% from baseline
+              </div>
+            </Card>
+          </KpiTooltip>
           
-          <Card className="p-4 border hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/data-centre-twin')}>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-cyan-500/10">
-                <Thermometer className="h-4 w-4 text-cyan-500" />
+          <KpiTooltip title="Thermal Stability Index" description="Measures temperature consistency across cooling zones. Target is >90%.">
+            <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-lg bg-info/10">
+                  <Thermometer className="h-4 w-4 text-info" />
+                </div>
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Thermal Stability</span>
               </div>
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Thermal Stability</span>
-            </div>
-            <div className="font-mono text-2xl font-bold">94%</div>
-            <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-              Stable
-            </div>
-          </Card>
+              <div className="font-mono text-2xl font-bold">94%</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
+                <StatusBadge status="active" customLabel="Stable" showIcon={false} />
+              </div>
+            </Card>
+          </KpiTooltip>
           
-          <Card className="p-4 border hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/data-centre-twin')}>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Globe className="h-4 w-4 text-blue-500" />
+          <KpiTooltip title="Sovereign Compute" description="Workloads processed within Canadian jurisdiction. Critical for data residency compliance.">
+            <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-lg bg-info/10">
+                  <Shield className="h-4 w-4 text-info" />
+                </div>
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Sovereign Compute</span>
               </div>
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Sovereign Compute</span>
-            </div>
-            <div className="font-mono text-2xl font-bold">98%</div>
-            <div className="text-xs text-blue-600 flex items-center gap-1 mt-1">
-              Canada-compliant
-            </div>
-          </Card>
-        </div>
+              <div className="font-mono text-2xl font-bold">98%</div>
+              <div className="text-xs text-info flex items-center gap-1 mt-2">
+                <Leaf className="h-3 w-3" />
+                Canada-compliant
+              </div>
+            </Card>
+          </KpiTooltip>
+        </section>
 
         {/* Quick Link to DC Twin */}
         <div className="mb-8">

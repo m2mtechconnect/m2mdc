@@ -2,6 +2,8 @@
  * Executive Summary Block
  * ROI summary, Carbon summary, Top risks, Top optimization opportunities
  * Uses centralized KPI and agent catalogs
+ * 
+ * CRITICAL: Uses useTwinContext() to prioritize active twin over builder store
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +21,7 @@ import {
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { useTwinAgents } from '@/hooks/useTwinAgentsCatalog';
 import { useTwinKPIsFromSimulation } from '@/hooks/useTwinKPIsFromSimulation';
+import { useTwinContext } from '@/hooks/useTwinContext';
 import { cn } from '@/lib/utils';
 
 interface ExecutiveSummaryBlockProps {
@@ -27,9 +30,21 @@ interface ExecutiveSummaryBlockProps {
 }
 
 export function ExecutiveSummaryBlock({ className, twinId }: ExecutiveSummaryBlockProps) {
-  const { overview, kpis, scenarios, agents, financial } = useDCTwinBuilderStore();
+  // CRITICAL: Prioritize active twin from header over builder store
+  const { activeTwin, isPreviewMode, recommendation } = useTwinContext();
+  const { overview: builderOverview, kpis, scenarios, agents, financial: builderFinancial } = useDCTwinBuilderStore();
   const { enabledAgents } = useTwinAgents();
   const { kpis: simulationKpis } = useTwinKPIsFromSimulation(twinId);
+
+  // Merge overview with active twin priority
+  const overview = {
+    ...builderOverview,
+    twinName: activeTwin?.name || recommendation?.companyName || builderOverview.twinName,
+    facilityLocation: activeTwin?.city || recommendation?.regions?.[0] || builderOverview.facilityLocation,
+    regionCode: activeTwin?.region_code || builderOverview.regionCode,
+  };
+  
+  const financial = builderFinancial;
 
   // Calculate ROI metrics
   const roiValue = financial?.upgradeSavingsPercent || 15;

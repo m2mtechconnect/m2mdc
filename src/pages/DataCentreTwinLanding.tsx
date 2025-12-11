@@ -100,7 +100,7 @@ const features = [
 
 export default function DataCentreTwinLanding() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground scroll-smooth">
       {/* Header Navigation */}
       <TwinHeader />
       
@@ -113,30 +113,38 @@ export default function DataCentreTwinLanding() {
       <TwinCapabilityBadges />
       
       {/* Feature Sections */}
-      {features.map((feature, index) => (
-        <TwinFeatureSection
-          key={index}
-          title={feature.title}
-          subtitle={feature.subtitle}
-          bullets={feature.bullets}
-          imageSrc={feature.imageSrc}
-          imageAlt={feature.imageAlt}
-          flip={feature.flip}
-          accentColor={feature.accentColor}
-        />
-      ))}
+      <div id="features">
+        {features.map((feature, index) => (
+          <TwinFeatureSection
+            key={index}
+            title={feature.title}
+            subtitle={feature.subtitle}
+            bullets={feature.bullets}
+            imageSrc={feature.imageSrc}
+            imageAlt={feature.imageAlt}
+            flip={feature.flip}
+            accentColor={feature.accentColor}
+          />
+        ))}
+      </div>
       
       {/* Stats/ROI Band */}
       <TwinStatsBand />
       
       {/* Integrations */}
-      <TwinIntegrationsGrid />
+      <div id="integrations">
+        <TwinIntegrationsGrid />
+      </div>
       
       {/* Use Cases */}
-      <TwinUseCases />
+      <div id="use-cases">
+        <TwinUseCases />
+      </div>
       
       {/* Differentiators */}
-      <TwinDifferentiators />
+      <div id="differentiators">
+        <TwinDifferentiators />
+      </div>
       
       {/* Trust Section */}
       <TwinTrustSection />

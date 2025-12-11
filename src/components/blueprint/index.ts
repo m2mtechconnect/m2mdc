@@ -1,10 +1,12 @@
 /**
  * Blueprint Components Index
+ * Exports all blueprint-related components
+ * 
+ * IMPORTANT: These components are for DESIGNER MODE only
+ * Do not import simulation components here
  */
 
-export { BlueprintSummaryCard } from './BlueprintSummaryCard';
-export { BlueprintSnapshotCard } from './BlueprintSnapshotCard';
-export { BlueprintReviewSection } from './BlueprintReviewSection';
+// Core Blueprint Components
 export { ExecutiveSummaryBlock } from './ExecutiveSummaryBlock';
 export { DomainHealthMap } from './DomainHealthMap';
 export { DependencyGraph } from './DependencyGraph';
@@ -15,11 +17,17 @@ export { WorkflowEnhancementsPanel } from './WorkflowEnhancementsPanel';
 export { ScenarioEnhancementsPanel } from './ScenarioEnhancementsPanel';
 export { WorkflowVersionControl } from './WorkflowVersionControl';
 export { WorkflowSimulationPreview } from './WorkflowSimulationPreview';
+export { BlueprintValidationPanel } from './BlueprintValidationPanel';
+export { BlueprintDesignerWrapper } from './BlueprintDesignerWrapper';
+export { BlueprintSnapshotCard } from './BlueprintSnapshotCard';
+export { BlueprintSummaryCard } from './BlueprintSummaryCard';
+export { BlueprintReviewSection } from './BlueprintReviewSection';
 
-// Tab components
-export * from './tabs';
-
-// Re-export hooks for convenience
-export { useBlueprint } from '@/hooks/useBlueprint';
-export { useBlueprintScenarios } from '@/hooks/useBlueprintScenarios';
-export { useBlueprintKPIs } from '@/hooks/useBlueprintKPIs';
+// Tab Components
+export { BlueprintOverviewTab } from './tabs/BlueprintOverviewTab';
+export { BlueprintAgentsTab } from './tabs/BlueprintAgentsTab';
+export { BlueprintDataTab } from './tabs/BlueprintDataTab';
+export { BlueprintKPIsTab } from './tabs/BlueprintKPIsTab';
+export { BlueprintWorkflowsTab } from './tabs/BlueprintWorkflowsTab';
+export { BlueprintRolesTab } from './tabs/BlueprintRolesTab';
+export { BlueprintScenariosTab } from './tabs/BlueprintScenariosTab';

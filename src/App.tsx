@@ -113,16 +113,16 @@ function AuthenticatedApp() {
     );
   }
 
-  // TEMPORARILY BYPASSED FOR SCREENSHOTS - Remove this bypass after capturing screenshots
-  // if (!session || !user) {
-  //   return (
-  //     <Routes>
-  //       <Route path="/auth" element={<Auth />} />
-  //       <Route path="/twin-datacentre" element={<DataCentreTwinLanding />} />
-  //       <Route path="*" element={<Navigate to="/auth" replace />} />
-  //     </Routes>
-  //   );
-  // }
+  // If not authenticated, show only Auth page and public landing pages
+  if (!session || !user) {
+    return (
+      <Routes>
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/twin-datacentre" element={<DataCentreTwinLanding />} />
+        <Route path="*" element={<Navigate to="/auth" replace />} />
+      </Routes>
+    );
+  }
 
   // If authenticated, show all protected routes
   return (

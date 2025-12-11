@@ -1,6 +1,7 @@
 /**
  * Enhanced Simulation Comparison Mode
  * Radar chart, bar delta view, AI summary, and impact badges
+ * Now loads historical runs from database when no runs provided
  */
 
 import { useState, useMemo } from 'react';
@@ -10,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   GitCompare, 
   TrendingUp, 
@@ -19,7 +21,9 @@ import {
   BarChart3,
   Radar,
   Sparkles,
-  Award
+  Award,
+  RefreshCw,
+  Database
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -41,10 +45,12 @@ import {
 } from 'recharts';
 import type { SimulationRunMetrics } from '@/simulation/types';
 import { DEFAULT_KPI_CONFIGS } from '@/engines/kpi/KPIOverlayEngine';
+import { useHistoricalSimulationRuns, type SimulationRunForComparison } from '@/hooks/useHistoricalSimulationRuns';
 
 interface EnhancedComparisonModeProps {
   availableRuns?: SimulationRunMetrics[];
   className?: string;
+  useHistorical?: boolean; // If true, loads from database
 }
 
 // Industry-accurate simulation runs based on real DC operational scenarios
@@ -136,17 +142,78 @@ const generateIndustryKpis = (runId: string): Record<string, number> => {
   };
 };
 
-export function EnhancedComparisonMode({ availableRuns, className }: EnhancedComparisonModeProps) {
-  const runs = availableRuns?.length ? availableRuns : INDUSTRY_RUNS;
-  const [runA, setRunA] = useState<string>(runs[0]?.runId || '');
-  const [runB, setRunB] = useState<string>(runs[1]?.runId || '');
+export function EnhancedComparisonMode({ availableRuns, className, useHistorical = true }: EnhancedComparisonModeProps) {
+  // Load historical runs from database if enabled
+  const { runs: historicalRuns, isLoading, error, refetch } = useHistoricalSimulationRuns({ limit: 20 });
+  
+  // Merge provided runs with historical ones, or use industry defaults
+  const allRuns = useMemo(() => {
+    if (availableRuns?.length) {
+      // Map availableRuns to comparison format
+      return availableRuns.map(r => ({
+        id: r.runId,
+        runId: r.runId,
+        scenarioId: r.scenarioId,
+        scenarioName: r.scenarioName,
+        startTime: r.startTime,
+        durationSeconds: r.durationSeconds,
+        status: 'completed',
+        createdAt: r.startTime,
+        baselineKpis: {} as Record<string, number>,
+        finalKpis: {} as Record<string, number>,
+        eventsCount: r.events?.length || 0,
+        overallImpactScore: r.overallImpactScore,
+      }));
+    }
+    if (useHistorical && historicalRuns.length > 0) {
+      return historicalRuns;
+    }
+    // Fallback to industry mock runs
+    return INDUSTRY_RUNS.map(r => ({
+      id: r.runId,
+      runId: r.runId,
+      scenarioId: r.scenarioId,
+      scenarioName: r.scenarioName,
+      startTime: r.startTime,
+      durationSeconds: r.durationSeconds,
+      status: 'completed',
+      createdAt: r.startTime,
+      baselineKpis: generateIndustryKpis(r.runId),
+      finalKpis: generateIndustryKpis(r.runId),
+      eventsCount: 0,
+      overallImpactScore: r.overallImpactScore,
+    }));
+  }, [availableRuns, useHistorical, historicalRuns]);
+  
+  const [runA, setRunA] = useState<string>('');
+  const [runB, setRunB] = useState<string>('');
   const [activeView, setActiveView] = useState('table');
+  
+  // Initialize selects when runs load
+  useMemo(() => {
+    if (allRuns.length >= 2 && !runA && !runB) {
+      setRunA(allRuns[0]?.runId || '');
+      setRunB(allRuns[1]?.runId || '');
+    }
+  }, [allRuns, runA, runB]);
 
-  const selectedA = runs.find(r => r.runId === runA);
-  const selectedB = runs.find(r => r.runId === runB);
+  const selectedA = allRuns.find(r => r.runId === runA);
+  const selectedB = allRuns.find(r => r.runId === runB);
 
-  const kpisA = useMemo(() => generateIndustryKpis(runA), [runA]);
-  const kpisB = useMemo(() => generateIndustryKpis(runB), [runB]);
+  // Use actual final KPIs from runs or fallback to generated
+  const kpisA = useMemo(() => {
+    if (selectedA && Object.keys(selectedA.finalKpis).length > 0) {
+      return selectedA.finalKpis;
+    }
+    return generateIndustryKpis(runA);
+  }, [runA, selectedA]);
+  
+  const kpisB = useMemo(() => {
+    if (selectedB && Object.keys(selectedB.finalKpis).length > 0) {
+      return selectedB.finalKpis;
+    }
+    return generateIndustryKpis(runB);
+  }, [runB, selectedB]);
 
   // Prepare radar chart data
   const radarData = useMemo(() => {
@@ -219,6 +286,28 @@ export function EnhancedComparisonMode({ availableRuns, className }: EnhancedCom
     };
   }, [selectedA, selectedB, barData]);
 
+  // Show loading state
+  if (isLoading) {
+    return (
+      <Card className={className}>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <GitCompare className="h-4 w-4 text-primary" />
+              Scenario Comparison
+            </CardTitle>
+            <Badge variant="secondary" className="text-xs">Loading...</Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-[200px] w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className={className}>
       <CardHeader className="pb-3">
@@ -227,10 +316,25 @@ export function EnhancedComparisonMode({ availableRuns, className }: EnhancedCom
             <GitCompare className="h-4 w-4 text-primary" />
             Scenario Comparison
           </CardTitle>
-          <Badge variant="secondary" className="text-xs">
-            Enterprise Compare
-          </Badge>
+          <div className="flex items-center gap-2">
+            {useHistorical && (
+              <Button variant="ghost" size="sm" onClick={refetch} className="h-7 gap-1.5">
+                <RefreshCw className="h-3 w-3" />
+                Refresh
+              </Button>
+            )}
+            <Badge variant="secondary" className="text-xs flex items-center gap-1">
+              <Database className="h-3 w-3" />
+              {allRuns.length} runs
+            </Badge>
+          </div>
         </div>
+        
+        {error && (
+          <div className="text-xs text-destructive bg-destructive/10 p-2 rounded mt-2">
+            Failed to load historical runs: {error}
+          </div>
+        )}
 
         {/* Run Selectors */}
         <div className="flex items-center gap-3 pt-2">
@@ -241,7 +345,7 @@ export function EnhancedComparisonMode({ availableRuns, className }: EnhancedCom
                 <SelectValue placeholder="Select run A" />
               </SelectTrigger>
               <SelectContent>
-                {runs.map(run => (
+                {allRuns.map(run => (
                   <SelectItem key={run.runId} value={run.runId} className="text-xs">
                     {run.scenarioName}
                   </SelectItem>
@@ -259,7 +363,7 @@ export function EnhancedComparisonMode({ availableRuns, className }: EnhancedCom
                 <SelectValue placeholder="Select run B" />
               </SelectTrigger>
               <SelectContent>
-                {runs.map(run => (
+                {allRuns.map(run => (
                   <SelectItem key={run.runId} value={run.runId} className="text-xs">
                     {run.scenarioName}
                   </SelectItem>

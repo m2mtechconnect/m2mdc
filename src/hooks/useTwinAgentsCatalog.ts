@@ -13,6 +13,7 @@ import {
   getAgentById,
   getAgentsForIndustry,
 } from '@/domain/greenDc/agentsCatalog';
+import { useTwinKPIsFromSimulation } from './useTwinKPIsFromSimulation';
 
 export interface UseTwinAgentsResult {
   // All agents from catalog
@@ -81,9 +82,6 @@ export function useTwinAgents(): UseTwinAgentsResult {
  */
 export function useAgentKPIBindings(twinId?: string) {
   const { enabledAgents } = useTwinAgents();
-  
-  // Import dynamically to avoid circular deps
-  const { useTwinKPIsFromSimulation } = require('./useTwinKPIsFromSimulation');
   const { kpis } = useTwinKPIsFromSimulation(twinId);
 
   return useMemo(() => {

@@ -414,3 +414,69 @@ export function IndustryComplianceBadges({ industry }: { industry: string }) {
     </div>
   );
 }
+
+// ============================================================================
+// SOVEREIGNTY & GREEN BADGES
+// ============================================================================
+
+interface SovereigntyBadgeProps {
+  level: "Protected A" | "Protected B" | "Protected C" | "Unclassified";
+  className?: string;
+}
+
+export function SovereigntyBadge({ level, className }: SovereigntyBadgeProps) {
+  const levelColors: Record<string, string> = {
+    "Protected C": "bg-destructive/15 text-destructive border-destructive/30",
+    "Protected B": "bg-warning/15 text-warning border-warning/30",
+    "Protected A": "bg-info/15 text-info border-info/30",
+    "Unclassified": "bg-muted text-muted-foreground border-muted-foreground/30",
+  };
+
+  return (
+    <Badge variant="outline" className={cn(levelColors[level] || levelColors["Unclassified"], className)}>
+      <Shield className="h-3 w-3 mr-1" />
+      {level}
+    </Badge>
+  );
+}
+
+interface GreenBadgeProps {
+  renewablePercent: number;
+  className?: string;
+}
+
+export function GreenBadge({ renewablePercent, className }: GreenBadgeProps) {
+  const status = renewablePercent >= 90 ? "excellent" : renewablePercent >= 50 ? "good" : "low";
+  const statusColors = {
+    excellent: "bg-success/15 text-success border-success/30",
+    good: "bg-info/15 text-info border-info/30",
+    low: "bg-muted text-muted-foreground border-muted-foreground/30",
+  };
+
+  return (
+    <Badge variant="outline" className={cn(statusColors[status], className)}>
+      <Leaf className="h-3 w-3 mr-1" />
+      {renewablePercent}% Renewable
+    </Badge>
+  );
+}
+
+interface TierBadgeProps {
+  tier: string;
+  className?: string;
+}
+
+export function TierBadge({ tier, className }: TierBadgeProps) {
+  const tierColors: Record<string, string> = {
+    "Tier IV": "bg-primary/15 text-primary border-primary/30",
+    "Tier III": "bg-info/15 text-info border-info/30",
+    "Tier II": "bg-muted text-muted-foreground border-muted-foreground/30",
+  };
+
+  return (
+    <Badge variant="outline" className={cn(tierColors[tier] || tierColors["Tier II"], className)}>
+      <Building2 className="h-3 w-3 mr-1" />
+      {tier}
+    </Badge>
+  );
+}

@@ -25,4 +25,8 @@ export {
   SOC2Badge,
   ISO27001Badge,
   PCIDSSBadge,
+  // Sovereignty & Green badges
+  SovereigntyBadge,
+  GreenBadge,
+  TierBadge,
 } from './IndustryUIExtensions';

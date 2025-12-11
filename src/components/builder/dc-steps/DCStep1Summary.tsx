@@ -16,7 +16,8 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Building2, Zap, Thermometer, Leaf, MapPin, Target, Users, TrendingUp, Clock, List, Plus, X, ChevronDown, Settings2 } from 'lucide-react';
+import { Building2, Zap, Thermometer, Leaf, MapPin, Target, Users, TrendingUp, Clock, List, Plus, X, ChevronDown, Settings2, ShieldCheck } from 'lucide-react';
+import { IndustryComplianceBadges, SovereigntyBadge, GreenBadge, TierBadge } from '@/components/shared/IndustryUIExtensions';
 import type { DCTier } from '@/types/dcScan';
 
 const TIER_OPTIONS: { value: DCTier; label: string }[] = [
@@ -175,18 +176,18 @@ export function DCStep1Summary() {
             <p className="text-xs text-muted-foreground">This summary appears in the Overview tab header</p>
           </div>
 
-          {overview.industries.length > 0 && (
-            <div className="space-y-2">
-              <Label>Industries</Label>
-              <div className="flex flex-wrap gap-2">
-                {overview.industries.map((industry) => (
-                  <Badge key={industry} variant="secondary">
-                    {industry}
-                  </Badge>
-                ))}
-              </div>
+          {/* Industry, Sovereignty, and Tier Badges */}
+          <div className="space-y-2">
+            <Label>Classification</Label>
+            <div className="flex flex-wrap gap-2">
+              {overview.industries.map((industry) => (
+                <IndustryComplianceBadges key={industry} industry={industry} />
+              ))}
+              {overview.sovereignCompliance && <SovereigntyBadge level="Protected B" />}
+              {overview.renewablePercent >= 50 && <GreenBadge renewablePercent={overview.renewablePercent} />}
+              <TierBadge tier={overview.tier} />
             </div>
-          )}
+          </div>
         </CardContent>
       </Card>
 

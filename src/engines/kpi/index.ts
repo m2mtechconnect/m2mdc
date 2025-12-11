@@ -3,4 +3,4 @@
  */
 
 export * from './KPIOverlayEngine';
-export * from './TimelineSyncEngine';
+export { TimelineSyncProvider, useTimelineSync, useThresholdBreachEvents } from './TimelineSyncEngine';

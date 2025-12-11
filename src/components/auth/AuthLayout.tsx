@@ -16,7 +16,7 @@ interface AuthLayoutProps {
 
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen flex bg-auth-bg">
+    <div className="min-h-screen flex bg-background">
       {/* Left Panel - Branding with animated background */}
       <div className="hidden lg:flex lg:w-3/5 relative overflow-hidden items-center justify-center bg-gradient-to-br from-[#0A0F1F] via-[#131B2E] to-[#1A2637]">
         <BackgroundGrid />

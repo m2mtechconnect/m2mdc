@@ -27,11 +27,16 @@ export function formatNumber(value: number | null | undefined, decimals: number 
 }
 
 /**
- * Format currency (USD)
+ * Format currency (USD) - supports compact mode for large values
  */
-export function formatCurrency(value: number | null | undefined, decimals: number = 0): string {
+export function formatCurrency(value: number | null | undefined, decimals: number = 0, compact: boolean = false): string {
   if (value === null || value === undefined || isNaN(value)) {
     return '$0';
+  }
+  if (compact) {
+    if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
+    if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+    if (value >= 1_000) return `$${(value / 1_000).toFixed(0)}K`;
   }
   return `$${formatNumber(value, decimals)}`;
 }
@@ -141,4 +146,97 @@ export function formatFileSize(bytes: number | null | undefined): string {
   }
 
   return `${size.toFixed(unitIndex === 0 ? 0 : 2)} ${units[unitIndex]}`;
+}
+
+// ============================================================================
+// UI FORMATTING HELPERS
+// ============================================================================
+
+/**
+ * Format agent ID for UI display (kebab-case/snake_case to Title Case)
+ * @example thermal_agent → Thermal Agent
+ * @example cooling-optimizer → Cooling Optimizer
+ */
+export function formatAgentIdForUI(id: string): string {
+  if (!id) return '';
+  return id
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, char => char.toUpperCase());
+}
+
+/**
+ * Format scenario ID for UI display
+ */
+export function formatScenarioIdForUI(id: string): string {
+  if (!id) return '';
+  return id
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, char => char.toUpperCase());
+}
+
+/**
+ * Format KPI ID for UI display with proper acronym handling
+ */
+export function formatKpiIdForUI(id: string): string {
+  if (!id) return '';
+  const acronyms = ['pue', 'gpu', 'ups', 'kpi', 'roi', 'sla', 'ai'];
+  return id
+    .replace(/[-_]/g, ' ')
+    .split(' ')
+    .map(word => {
+      const lower = word.toLowerCase();
+      if (acronyms.includes(lower)) {
+        return lower.toUpperCase();
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join(' ');
+}
+
+/**
+ * Format domain key for UI display
+ */
+export function formatDomainForUI(domain: string): string {
+  const domainLabels: Record<string, string> = {
+    thermal: 'Thermal & Hardware',
+    power: 'Power & UPS',
+    cooling: 'Cooling Systems',
+    network: 'Network Infrastructure',
+    facility: 'Facility & Safety',
+    workload: 'Workload & GPU',
+    sovereignty: 'Sovereignty & Compliance',
+    financial: 'Financial & Carbon',
+  };
+  return domainLabels[domain] || formatAgentIdForUI(domain);
+}
+
+/**
+ * Format carbon emissions
+ */
+export function formatCarbon(tonnes: number): string {
+  if (tonnes >= 1_000_000) return `${(tonnes / 1_000_000).toFixed(1)}M tonnes CO₂e`;
+  if (tonnes >= 1_000) return `${(tonnes / 1_000).toFixed(1)}K tonnes CO₂e`;
+  return `${tonnes.toLocaleString()} tonnes CO₂e`;
+}
+
+/**
+ * Format power capacity
+ */
+export function formatPower(kw: number): string {
+  if (kw >= 1_000) return `${(kw / 1_000).toFixed(1)} MW`;
+  return `${kw} kW`;
+}
+
+/**
+ * Normalize backend agent ID to UI format (underscore to kebab)
+ */
+export function normalizeAgentId(id: string): string {
+  return id.replace(/_/g, '-').toLowerCase();
+}
+
+/**
+ * Normalize scenario ID
+ */
+export function normalizeScenarioId(id: string): string {
+  return id.replace(/_/g, '-').toLowerCase();
 }

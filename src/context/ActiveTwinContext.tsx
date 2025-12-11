@@ -67,6 +67,8 @@ export interface ActiveTwinContextValue {
   refreshTwins: () => Promise<void>;
   createLocation: (data: Partial<DataCentreLocation>) => Promise<DataCentreLocation | null>;
   createTwin: (locationId: string | null, data: Partial<DataCentreTwin>) => Promise<DataCentreTwin | null>;
+  deleteTwin: (twinId: string) => Promise<boolean>;
+  clearActiveTwin: () => void;
 }
 
 const STORAGE_KEY_LOCATION = 'dc_active_location_id';
@@ -299,6 +301,43 @@ export function ActiveTwinProvider({ children }: { children: ReactNode }) {
     }
   }, [user, refreshTwins]);
 
+  // Delete a twin
+  const deleteTwin = useCallback(async (twinId: string): Promise<boolean> => {
+    if (!user) return false;
+    
+    try {
+      const { error } = await supabase
+        .from('data_centre_twins')
+        .delete()
+        .eq('id', twinId);
+      
+      if (error) throw error;
+      
+      // Clear active twin if it was the deleted one
+      if (activeTwinId === twinId) {
+        clearActiveTwin();
+      }
+      
+      await refreshTwins();
+      return true;
+    } catch (err) {
+      console.error('Failed to delete twin:', err);
+      return false;
+    }
+  }, [user, activeTwinId, refreshTwins]);
+
+  // Clear active twin selection
+  const clearActiveTwin = useCallback(() => {
+    setActiveTwinIdState(null);
+    setTwin(null);
+    localStorage.removeItem(STORAGE_KEY_TWIN);
+    
+    // Also clear location
+    setActiveLocationIdState(null);
+    setLocation(null);
+    localStorage.removeItem(STORAGE_KEY_LOCATION);
+  }, []);
+
   // Initialize on mount and user change
   useEffect(() => {
     const initialize = async () => {
@@ -391,6 +430,8 @@ export function ActiveTwinProvider({ children }: { children: ReactNode }) {
     refreshTwins,
     createLocation,
     createTwin,
+    deleteTwin,
+    clearActiveTwin,
   };
 
   return (

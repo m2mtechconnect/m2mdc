@@ -5,7 +5,7 @@
  */
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Select, 
   SelectContent, 
@@ -24,6 +24,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { 
@@ -33,10 +40,16 @@ import {
   Zap, 
   Leaf,
   Shield,
-  Loader2
+  Loader2,
+  MoreVertical,
+  Copy,
+  Pencil,
+  Trash2,
+  Settings2
 } from 'lucide-react';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { toast } from 'sonner';
+import { DeleteTwinModal } from './DeleteTwinModal';
 
 // Region data for new twin creation
 const REGIONS = [
@@ -48,6 +61,7 @@ const REGIONS = [
 
 export function DataCentreSelector() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { 
     activeTwinId, 
     setActiveTwin, 
@@ -57,16 +71,23 @@ export function DataCentreSelector() {
     isLoading, 
     createLocation,
     createTwin,
+    deleteTwin,
   } = useActiveTwin();
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [newTwinData, setNewTwinData] = useState({
     name: '',
     region_code: 'ca-central-1',
     tier: 'Tier III',
     capacity_kw: 5000,
   });
+
+  // Check if we're in simulation snapshot mode (should hide destructive actions)
+  const isSimulationMode = location.pathname.includes('/data-centre-twin') && 
+    location.search.includes('view=simulation');
 
   const handleTwinChange = (value: string) => {
     setActiveTwin(value);
@@ -85,7 +106,7 @@ export function DataCentreSelector() {
       const region = REGIONS.find(r => r.code === newTwinData.region_code);
       
       // Create location first
-      const location = await createLocation({
+      const newLocation = await createLocation({
         name: `${newTwinData.name} - ${region?.name || 'Unknown'}`,
         city: region?.name || 'Montreal',
         province: region?.province,
@@ -98,12 +119,12 @@ export function DataCentreSelector() {
         tags: [],
       });
 
-      if (!location) {
+      if (!newLocation) {
         throw new Error('Failed to create location');
       }
 
       // Create twin linked to location
-      const created = await createTwin(location.id, {
+      const created = await createTwin(newLocation.id, {
         name: newTwinData.name,
         city: region?.name || 'Montreal',
         region_code: newTwinData.region_code,
@@ -135,6 +156,41 @@ export function DataCentreSelector() {
     } finally {
       setIsCreating(false);
     }
+  };
+
+  const handleDeleteTwin = async () => {
+    if (!twin || !activeTwinId) return;
+    
+    setIsDeleting(true);
+    try {
+      const success = await deleteTwin(activeTwinId);
+      
+      if (success) {
+        toast.success(`${twin.name} has been deleted.`);
+        setIsDeleteOpen(false);
+        // Navigate to dashboard after deletion
+        navigate('/');
+      } else {
+        toast.error('Failed to delete twin. Please try again.');
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete twin');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDuplicateTwin = () => {
+    if (!twin) return;
+    // Pre-fill the create dialog with current twin's data
+    setNewTwinData({
+      name: `${twin.name} (Copy)`,
+      region_code: twin.region_code,
+      tier: twin.tier,
+      capacity_kw: twin.capacity_kw,
+    });
+    setIsCreateOpen(true);
+    toast.info('Duplicating twin... Customize and save.');
   };
 
   const getCarbonBadgeVariant = (intensity: number | null) => {
@@ -171,7 +227,7 @@ export function DataCentreSelector() {
             )}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-background z-50">
           {twins.length === 0 ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
               No data centre twins yet.
@@ -216,6 +272,46 @@ export function DataCentreSelector() {
         </SelectContent>
       </Select>
 
+      {/* Twin Actions Dropdown */}
+      {twin && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="flex-shrink-0 h-8 w-8">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48 bg-background z-50">
+            <DropdownMenuItem onClick={() => navigate(`/builder?twinId=${activeTwinId}`)}>
+              <Settings2 className="h-4 w-4 mr-2" />
+              Edit in Builder
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate(`/data-centre-twin?twinId=${activeTwinId}`)}>
+              <Pencil className="h-4 w-4 mr-2" />
+              Open Dashboard
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleDuplicateTwin}>
+              <Copy className="h-4 w-4 mr-2" />
+              Duplicate Twin
+            </DropdownMenuItem>
+            
+            {/* Only show delete option when NOT in simulation mode */}
+            {!isSimulationMode && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={() => setIsDeleteOpen(true)}
+                  className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Twin
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+
+      {/* Create Twin Dialog */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogTrigger asChild>
           <Button variant="outline" size="icon" className="flex-shrink-0">
@@ -250,7 +346,7 @@ export function DataCentreSelector() {
                 <SelectTrigger>
                   <SelectValue placeholder="Select region" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background z-50">
                   {REGIONS.map((region) => (
                     <SelectItem key={region.code} value={region.code}>
                       <div className="flex items-center gap-2">
@@ -278,7 +374,7 @@ export function DataCentreSelector() {
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-background z-50">
                     <SelectItem value="Tier II">Tier II</SelectItem>
                     <SelectItem value="Tier III">Tier III</SelectItem>
                     <SelectItem value="Tier IV">Tier IV</SelectItem>
@@ -321,6 +417,18 @@ export function DataCentreSelector() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Twin Modal */}
+      {twin && (
+        <DeleteTwinModal
+          isOpen={isDeleteOpen}
+          onOpenChange={setIsDeleteOpen}
+          twinName={twin.name}
+          twinId={twin.id}
+          onConfirmDelete={handleDeleteTwin}
+          isDeleting={isDeleting}
+        />
+      )}
     </div>
   );
 }

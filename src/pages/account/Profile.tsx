@@ -259,11 +259,11 @@ export default function Profile() {
         <DCSectionHeader
           title="Profile"
           subtitle="Manage your personal account settings and preferences"
-          icon={<User className="h-5 w-5 text-dc-cyan" />}
+          icon={<User className="h-5 w-5 text-primary" />}
         />
 
         {/* Profile Picture */}
-        <DCCard title="Profile Picture" icon={<Camera className="h-4 w-4 text-dc-cyan" />}>
+        <DCCard title="Profile Picture" icon={<Camera className="h-4 w-4 text-primary" />}>
           <div className="flex items-center gap-6">
             <div className="relative group">
               <UserAvatar

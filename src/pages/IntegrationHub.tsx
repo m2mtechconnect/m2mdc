@@ -187,14 +187,14 @@ export default function IntegrationHub() {
   };
 
   return (
-    <div className="min-h-screen bg-dc-bg-primary">
+    <div className="min-h-screen bg-background">
       <div className="container max-w-[1400px] mx-auto py-8 px-4 space-y-6">
         {/* DC Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold mb-2 flex items-center gap-3 text-foreground">
-              <div className="p-2 rounded-lg bg-dc-cyan/10 border border-dc-cyan/30">
-                <Plug className="h-6 w-6 text-dc-cyan" />
+              <div className="p-2 rounded-lg bg-primary/10 border border-primary/30">
+                <Plug className="h-6 w-6 text-primary" />
               </div>
               Integration Hub
             </h1>
@@ -238,14 +238,14 @@ export default function IntegrationHub() {
 
         {/* Marketplace wrapped in DC Card */}
         <DCCard status="info" className="p-0 overflow-hidden">
-          <div className="p-4 border-b border-dc-border bg-dc-bg-secondary">
+          <div className="p-4 border-b border-border bg-muted">
             <DCSectionHeader 
               title="Integration Marketplace"
               subtitle="Connect enterprise tools and data sources"
-              icon={<Plug className="h-5 w-5 text-dc-cyan" />}
+              icon={<Plug className="h-5 w-5 text-primary" />}
             />
           </div>
-          <div className="p-6 bg-dc-bg-primary">
+          <div className="p-6 bg-background">
             <IntegrationMarketplace
               integrations={integrations}
               onConnect={handleConnect}
@@ -274,7 +274,7 @@ export default function IntegrationHub() {
 
         {/* Integration Details Dialog */}
         <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-          <DialogContent className="bg-dc-bg-secondary border-dc-border">
+          <DialogContent className="bg-card border-border">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-foreground">
                 <span className="text-2xl">{selectedIntegration?.icon}</span>

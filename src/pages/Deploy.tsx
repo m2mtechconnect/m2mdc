@@ -711,24 +711,24 @@ export default function Deploy() {
           <div className="space-y-3">
             <div className="text-sm space-y-2">
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-dc-success" />
+                <span className="w-1.5 h-1.5 rounded-full bg-success" />
                 <span>EKS for container orchestration</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-dc-success" />
+                <span className="w-1.5 h-1.5 rounded-full bg-success" />
                 <span>EC2 Trn1/Inf2 for GPU workloads</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-dc-success" />
+                <span className="w-1.5 h-1.5 rounded-full bg-success" />
                 <span>CloudWatch for metrics collection</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-dc-success" />
+                <span className="w-1.5 h-1.5 rounded-full bg-success" />
                 <span>Kinesis for real-time streaming</span>
               </div>
             </div>
-            <div className="pt-3 border-t border-dc-border">
-              <Badge className="bg-dc-success/10 text-dc-success border-dc-success/30">
+            <div className="pt-3 border-t border-border">
+              <Badge className="bg-success/10 text-success border-success/30">
                 GPU Autoscaling Ready
               </Badge>
             </div>
@@ -747,24 +747,24 @@ export default function Deploy() {
           <div className="space-y-3">
             <div className="text-sm space-y-2">
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-dc-info" />
+                <span className="w-1.5 h-1.5 rounded-full bg-info" />
                 <span>AKS for Kubernetes workloads</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-dc-info" />
+                <span className="w-1.5 h-1.5 rounded-full bg-info" />
                 <span>Azure ML for model hosting</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-dc-info" />
+                <span className="w-1.5 h-1.5 rounded-full bg-info" />
                 <span>Azure Monitor for telemetry</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-dc-info" />
+                <span className="w-1.5 h-1.5 rounded-full bg-info" />
                 <span>NDv5 SKUs for AI/DC workloads</span>
               </div>
             </div>
-            <div className="pt-3 border-t border-dc-border">
-              <Badge className="bg-dc-info/10 text-dc-info border-dc-info/30">
+            <div className="pt-3 border-t border-border">
+              <Badge className="bg-info/10 text-info border-info/30">
                 DC/AI Optimized SKUs
               </Badge>
             </div>
@@ -783,24 +783,24 @@ export default function Deploy() {
           <div className="space-y-3">
             <div className="text-sm space-y-2">
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-dc-power" />
+                <span className="w-1.5 h-1.5 rounded-full bg-warning" />
                 <span>Vertex AI for model serving</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-dc-power" />
+                <span className="w-1.5 h-1.5 rounded-full bg-warning" />
                 <span>GKE for container workloads</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-dc-power" />
+                <span className="w-1.5 h-1.5 rounded-full bg-warning" />
                 <span>BigQuery for analytics</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-dc-power" />
+                <span className="w-1.5 h-1.5 rounded-full bg-warning" />
                 <span>Cloud Functions for automation</span>
               </div>
             </div>
-            <div className="pt-3 border-t border-dc-border">
-              <Badge className="bg-dc-success/10 text-dc-success border-dc-success/30">
+            <div className="pt-3 border-t border-border">
+              <Badge className="bg-success/10 text-success border-success/30">
                 Carbon-Smart Regions
               </Badge>
             </div>

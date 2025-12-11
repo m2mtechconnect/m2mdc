@@ -30,32 +30,32 @@ export function DCStatusBadge({
 }: DCStatusBadgeProps) {
   const severityConfig = {
     critical: {
-      bg: 'bg-dc-red/15',
-      border: 'border-dc-red/30',
-      text: 'text-dc-red-light',
+      bg: 'bg-destructive/15',
+      border: 'border-destructive/30',
+      text: 'text-destructive',
       icon: XCircle,
-      dot: 'bg-dc-red',
+      dot: 'bg-destructive',
     },
     warning: {
-      bg: 'bg-dc-amber/15',
-      border: 'border-dc-amber/30',
-      text: 'text-dc-amber-light',
+      bg: 'bg-warning/15',
+      border: 'border-warning/30',
+      text: 'text-warning',
       icon: AlertTriangle,
-      dot: 'bg-dc-amber',
+      dot: 'bg-warning',
     },
     info: {
-      bg: 'bg-dc-blue/15',
-      border: 'border-dc-blue/30',
-      text: 'text-dc-blue-light',
+      bg: 'bg-info/15',
+      border: 'border-info/30',
+      text: 'text-info',
       icon: Info,
-      dot: 'bg-dc-blue',
+      dot: 'bg-info',
     },
     success: {
-      bg: 'bg-dc-green/15',
-      border: 'border-dc-green/30',
-      text: 'text-dc-green-light',
+      bg: 'bg-success/15',
+      border: 'border-success/30',
+      text: 'text-success',
       icon: CheckCircle,
-      dot: 'bg-dc-green',
+      dot: 'bg-success',
     },
     neutral: {
       bg: 'bg-muted/50',
@@ -136,13 +136,13 @@ interface DCEventBadgeProps {
 
 export function DCEventBadge({ type, label, size = 'md', className }: DCEventBadgeProps) {
   const typeConfig = {
-    thermal: { bg: 'bg-dc-red/15', border: 'border-dc-red/30', text: 'text-dc-red-light', icon: Zap },
-    power: { bg: 'bg-dc-amber/15', border: 'border-dc-amber/30', text: 'text-dc-amber-light', icon: Zap },
-    cooling: { bg: 'bg-dc-cyan/15', border: 'border-dc-cyan/30', text: 'text-dc-cyan', icon: Zap },
-    network: { bg: 'bg-dc-blue/15', border: 'border-dc-blue/30', text: 'text-dc-blue-light', icon: Zap },
-    security: { bg: 'bg-dc-red/15', border: 'border-dc-red/30', text: 'text-dc-red-light', icon: Zap },
-    gpu: { bg: 'bg-dc-purple/15', border: 'border-dc-purple/30', text: 'text-dc-purple-light', icon: Zap },
-    sovereignty: { bg: 'bg-dc-blue/15', border: 'border-dc-blue/30', text: 'text-dc-blue-light', icon: Zap },
+    thermal: { bg: 'bg-destructive/15', border: 'border-destructive/30', text: 'text-destructive', icon: Zap },
+    power: { bg: 'bg-warning/15', border: 'border-warning/30', text: 'text-warning', icon: Zap },
+    cooling: { bg: 'bg-info/15', border: 'border-info/30', text: 'text-info', icon: Zap },
+    network: { bg: 'bg-primary/15', border: 'border-primary/30', text: 'text-primary', icon: Zap },
+    security: { bg: 'bg-destructive/15', border: 'border-destructive/30', text: 'text-destructive', icon: Zap },
+    gpu: { bg: 'bg-accent/15', border: 'border-accent/30', text: 'text-accent-foreground', icon: Zap },
+    sovereignty: { bg: 'bg-info/15', border: 'border-info/30', text: 'text-info', icon: Zap },
   };
 
   const sizeConfig = {

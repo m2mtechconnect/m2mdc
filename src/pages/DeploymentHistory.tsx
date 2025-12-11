@@ -205,13 +205,13 @@ export default function DeploymentHistory() {
   }
 
   return (
-    <div className="min-h-screen bg-dc-bg-primary">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 max-w-[1600px]">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-lg bg-dc-cyan/10 border border-dc-cyan/30">
-              <Rocket className="h-6 w-6 text-dc-cyan" />
+            <div className="p-2 rounded-lg bg-primary/10 border border-primary/30">
+              <Rocket className="h-6 w-6 text-primary" />
             </div>
             <h1 className="text-2xl font-semibold text-foreground">Deployment History</h1>
           </div>

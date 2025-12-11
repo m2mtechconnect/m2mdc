@@ -1,6 +1,18 @@
 /**
  * Universal Twin Blueprint Base Schema
  * Master template structure used across all industries
+ * 
+ * INDUSTRY SOURCES:
+ * - Digital Twin Consortium Capabilities Periodic Table: https://www.digitaltwinconsortium.org/initiatives/capabilities-periodic-table/
+ * - ISO 23247:2021 Digital Twin Framework: https://www.iso.org/standard/75066.html
+ * - NIST Digital Twin Interoperability Framework: https://www.nist.gov/el/smart-connected-systems-division
+ * - IEEE P2806 Digital Twin Architecture: https://standards.ieee.org/ieee/2806/10555/
+ * - Open Manufacturing Platform (OMP): https://open-manufacturing.org/
+ * - Industrial Internet Consortium (IIC) Reference Architecture: https://www.iiconsortium.org/IIRA.htm
+ * - ASHRAE Data Center Standards: https://www.ashrae.org/technical-resources/bookstore/datacom-series
+ * - Uptime Institute Tier Standards: https://uptimeinstitute.com/tier-certification
+ * - The Green Grid Metrics: https://www.thegreengrid.org/
+ * - EU Taxonomy for Sustainable Activities: https://ec.europa.eu/sustainable-finance-taxonomy/
  */
 
 export interface TwinBlueprintBaseSchema {

@@ -708,13 +708,20 @@ function createDefaultDomains(): DataCentreBlueprint['domains'] {
 }
 
 // ============================================================================
-// BLUEPRINT GENERATOR
+// UNIVERSAL STANDARD BLUEPRINT GENERATOR
+// This is the master template used by ALL Data Centre twins:
+// - Montreal, Toronto, Vancouver, Calgary, etc.
+// - Walmart, Costco, Target, retail hyperscale
+// - All scanner-generated twins
+// - All regional variants (CA, US, EU, APAC, LATAM)
+// The template provides complete enterprise-grade structure that is
+// identical across all twins - only the data values change.
 // ============================================================================
 
 export function generateDefaultBlueprint(
   twinId: string,
-  name: string = 'Montreal Sovereign AI DC',
-  location: string = 'Montreal, QC, Canada',
+  name: string = 'Sovereign Green AI Data Centre Twin',
+  location: string = 'Canada',
   capacityKw: number = 10000,
   racks: number = 200,
   tier: string = 'Tier III'
@@ -731,6 +738,7 @@ export function generateDefaultBlueprint(
     tier,
     jurisdiction: 'CA-QC',
     
+    // Universal Standard Components - ALL twins get these
     domains: createDefaultDomains(),
     agents: defaultAgents,
     dataSources: defaultDataSources,
@@ -745,5 +753,8 @@ export function generateDefaultBlueprint(
     version: 1,
   };
 }
+
+// Alias for clarity - this IS the Walmart Standard Template
+export const generateUniversalBlueprint = generateDefaultBlueprint;
 
 export { defaultAgents, defaultDataSources, defaultIntegrations, defaultKpis, defaultWorkflows, defaultHumanRoles, defaultSimulationScenarios };

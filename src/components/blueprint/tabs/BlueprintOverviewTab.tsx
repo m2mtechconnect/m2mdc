@@ -1,5 +1,7 @@
 /**
- * Blueprint Overview Tab - Summary view with executive insights
+ * Blueprint Overview Tab - Universal Enterprise Template
+ * ALL Data Centre twins use this standard layout with complete enterprise components
+ * This is the Walmart Standard Blueprint template applied globally
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,10 +21,16 @@ import {
   Activity
 } from 'lucide-react';
 import type { DataCentreBlueprint, BlueprintSummary } from '@/types/dataCentreBlueprint';
+
+// Universal Enterprise Components - ALL twins get these
 import { ExecutiveSummaryBlock } from '../ExecutiveSummaryBlock';
 import { DomainHealthMap } from '../DomainHealthMap';
 import { DependencyGraph } from '../DependencyGraph';
 import { ChangeLogPanel } from '../ChangeLogPanel';
+import { AgentHealthPanel } from '../AgentHealthPanel';
+import { KPIEnhancementsPanel } from '../KPIEnhancementsPanel';
+import { WorkflowEnhancementsPanel } from '../WorkflowEnhancementsPanel';
+import { ScenarioEnhancementsPanel } from '../ScenarioEnhancementsPanel';
 
 interface BlueprintOverviewTabProps {
   blueprint: DataCentreBlueprint;
@@ -51,21 +59,63 @@ const domainColors: Record<string, string> = {
   financial: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30',
 };
 
+/**
+ * Universal Blueprint Overview Tab
+ * This is the standard enterprise template used by ALL Data Centre twins:
+ * - Montreal Sovereign AI DC
+ * - Toronto Sovereign AI DC
+ * - Walmart Green DC
+ * - All scanner-generated twins
+ * - All regional variants (BC, Alberta, Quebec, US, EU, APAC, etc.)
+ */
 export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTabProps) {
   const domains = Object.entries(blueprint.domains);
 
   return (
     <div className="space-y-6">
-      {/* Executive Summary */}
+      {/* ============================================== */}
+      {/* SECTION 1: Executive Summary Block */}
+      {/* ROI, Carbon Impact, Active Systems, Costs */}
+      {/* ============================================== */}
       <ExecutiveSummaryBlock />
 
-      {/* Domain Health + Dependency Graph Row */}
+      {/* ============================================== */}
+      {/* SECTION 2: Domain Health + Dependency Graph */}
+      {/* Visual system overview and relationships */}
+      {/* ============================================== */}
       <div className="grid lg:grid-cols-2 gap-6">
         <DomainHealthMap />
         <DependencyGraph />
       </div>
 
-      {/* Facility Summary */}
+      {/* ============================================== */}
+      {/* SECTION 3: Agent Health & Performance Panel */}
+      {/* Health scores, latency, refresh rates, ML reasoning */}
+      {/* ============================================== */}
+      <AgentHealthPanel />
+
+      {/* ============================================== */}
+      {/* SECTION 4: KPI Insights & Forecasting */}
+      {/* Why KPIs matter, impacts, 30-day forecasts, recommendations */}
+      {/* ============================================== */}
+      <KPIEnhancementsPanel />
+
+      {/* ============================================== */}
+      {/* SECTION 5: Workflow Version Control & Preview */}
+      {/* Simulation preview, version history, rollback, impact analysis */}
+      {/* ============================================== */}
+      <WorkflowEnhancementsPanel />
+
+      {/* ============================================== */}
+      {/* SECTION 6: Scenario Chain Simulator */}
+      {/* Multi-scenario chaining, complexity scoring, KPI deltas */}
+      {/* ============================================== */}
+      <ScenarioEnhancementsPanel />
+
+      {/* ============================================== */}
+      {/* SECTION 7: Facility Summary */}
+      {/* Location, Capacity, Racks, Tier */}
+      {/* ============================================== */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
@@ -107,7 +157,10 @@ export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTa
         </CardContent>
       </Card>
 
-      {/* Domain Overview */}
+      {/* ============================================== */}
+      {/* SECTION 8: Domains & Agents Overview */}
+      {/* 8-domain grid with agent/KPI counts */}
+      {/* ============================================== */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
@@ -147,7 +200,10 @@ export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTa
         </CardContent>
       </Card>
 
-      {/* Key Metrics */}
+      {/* ============================================== */}
+      {/* SECTION 9: Blueprint Metrics Summary */}
+      {/* Total counts for all components */}
+      {/* ============================================== */}
       {summary && (
         <Card>
           <CardHeader>
@@ -184,7 +240,10 @@ export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTa
         </Card>
       )}
 
-      {/* Metadata */}
+      {/* ============================================== */}
+      {/* SECTION 10: Blueprint Metadata */}
+      {/* ID, Version, Created, Updated timestamps */}
+      {/* ============================================== */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Blueprint Metadata</CardTitle>
@@ -211,7 +270,10 @@ export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTa
         </CardContent>
       </Card>
 
-      {/* Change Log */}
+      {/* ============================================== */}
+      {/* SECTION 11: Real-Time Change Log */}
+      {/* Audit trail of all builder edits */}
+      {/* ============================================== */}
       <ChangeLogPanel />
     </div>
   );

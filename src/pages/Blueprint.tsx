@@ -33,6 +33,7 @@ import { useState, useEffect } from 'react';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useToast } from '@/hooks/use-toast';
+import { BLUEPRINT } from '@/ux';
 
 // Blueprint View Context - Designer Mode
 import { BlueprintDesignerWrapper } from '@/components/blueprint/BlueprintDesignerWrapper';

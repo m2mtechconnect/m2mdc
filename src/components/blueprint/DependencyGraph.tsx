@@ -311,8 +311,8 @@ export function DependencyGraph({ className }: { className?: string }) {
         </div>
 
         {/* Connection Summary */}
-        <div className="mt-4 pt-3 border-t px-2">
-          <p className="text-xs text-muted-foreground text-center leading-relaxed">
+        <div className="mt-3 pt-2 border-t">
+          <p className="text-[10px] text-muted-foreground text-center">
             This graph shows how agents monitor KPIs, which trigger workflows that respond to scenarios. All components work together to maintain optimal data centre operations.
           </p>
         </div>

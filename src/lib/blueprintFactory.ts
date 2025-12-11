@@ -12,6 +12,7 @@ import {
   getComplianceFrameworks,
   type SupportedIndustry 
 } from './industryAdapter';
+import { normalizeCompanyName, generateTwinName } from './utils/normalizeCompanyName';
 
 /**
  * Create a blueprint from a URL scan recommendation
@@ -37,8 +38,9 @@ export function createBlueprintFromRecommendation(
 
   const industry = industryMap[recommendation.industry] || 'data_centre';
   
-  // Derive twin name from company name
-  const twinName = `${recommendation.companyName} Sovereign Green AI Data Centre Twin`;
+  // Normalize company name and generate twin name
+  const normalizedCompanyName = normalizeCompanyName(recommendation.companyName);
+  const twinName = generateTwinName(normalizedCompanyName);
   
   // Map capacity tier to kW
   const capacityMap: Record<string, number> = {

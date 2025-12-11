@@ -11,15 +11,34 @@ import { INDUSTRY_LABELS } from '@/types/dcScan';
 /**
  * Map a scan recommendation to a complete DC Twin Builder state
  */
+/**
+ * Normalize company name from domain
+ */
+function normalizeCompanyFromDomain(domain: string): string {
+  const domainBase = domain.split('.')[0];
+  return domainBase
+    .replace(/-/g, ' ')
+    .replace(/_/g, ' ')
+    .split(' ')
+    .filter(w => w.length > 0)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+}
+
 export function recommendationToBuilderState(
   recommendation: DCRecommendation,
   sessionId: string
 ): Partial<DCTwinBuilderState> {
   const domain = getDomainFromUrl(recommendation.url);
+  const companyName = normalizeCompanyFromDomain(domain);
+  const twinName = companyName 
+    ? `${companyName} Sovereign Green AI Data Centre Twin`
+    : 'Sovereign Green AI Data Centre Twin';
   
   // Build overview from recommendation
   const overview: Partial<DCTwinOverview> = {
-    twinName: `Sovereign Green AI Data Centre Twin for ${domain}`,
+    twinName,
+    customerName: companyName,
     twinSlug: `dc-twin-${domain.replace(/\./g, '-')}`,
     twinSummary: recommendation.summary,
     description: recommendation.summary,

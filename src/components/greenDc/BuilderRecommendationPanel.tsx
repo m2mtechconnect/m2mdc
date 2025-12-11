@@ -69,23 +69,45 @@ export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onO
   const enabledScenarios = scenarios.filter(s => s.enabled);
   const primaryIndustry = overview.industries[0] || 'Enterprise';
   
-  // Extract domain name from URL for fallback
-  const extractDomainName = (url: string | undefined): string | null => {
-    if (!url) return null;
-    try {
-      const hostname = url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
-      const domainPart = hostname.split('.')[0];
-      return domainPart.charAt(0).toUpperCase() + domainPart.slice(1);
-    } catch {
-      return null;
+  // Normalize and extract company name with robust fallback chain
+  const normalizeAndExtract = (value: string | undefined): string | null => {
+    if (!value) return null;
+    
+    let cleaned = value
+      .replace(/^https?:\/\//gi, '')
+      .replace(/^www\./gi, '')
+      .replace(/^!\(/g, '')
+      .replace(/^\[/g, '')
+      .replace(/\)$/g, '')
+      .replace(/\]$/g, '')
+      .split('/')[0]
+      .split('?')[0];
+    
+    // If it's a domain, extract the name part
+    if (cleaned.includes('.') && !cleaned.includes(' ')) {
+      cleaned = cleaned.split('.')[0];
     }
+    
+    // Convert hyphens/underscores to spaces and capitalize
+    cleaned = cleaned
+      .replace(/-/g, ' ')
+      .replace(/_/g, ' ')
+      .split(' ')
+      .filter(w => w.length > 0)
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(' ');
+    
+    return cleaned.length >= 2 ? cleaned : null;
   };
   
-  // Safe customer name with fallback chain
+  // Safe customer name with fallback chain - removes malformed patterns
+  const rawCustomerName = overview.customerName;
+  const cleanTwinName = overview.twinName?.replace(/^!\(.*?Sovereign/, 'Sovereign').replace(' Sovereign Green AI Data Centre Twin', '');
+  
   const safeCustomerName = 
-    overview.customerName || 
-    extractDomainName(overview.siteUrl) || 
-    overview.twinName?.replace(' Sovereign Green AI Data Centre Twin', '') ||
+    normalizeAndExtract(rawCustomerName) || 
+    normalizeAndExtract(overview.siteUrl) || 
+    normalizeAndExtract(cleanTwinName) ||
     'This Organization';
   
   // Get KPI values from builder

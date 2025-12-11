@@ -1,10 +1,15 @@
 /**
  * DC Builder Step 5: Deployment
  * Includes Financial Assumptions section for customer editing
+ * P0 Fix: Now persists twin to database on deploy
  */
 
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { useBuilderMode } from '../BuilderModeContext';
+import { useTwinPersistence } from '@/hooks/useTwinPersistence';
 import { FinancialAssumptionsCard } from './FinancialAssumptionsCard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,9 +20,8 @@ import { Label } from '@/components/ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
   Rocket, MapPin, CheckCircle2, XCircle, Clock, 
-  Activity, Download, AlertTriangle, ChevronDown 
+  Activity, Download, AlertTriangle, ChevronDown, Loader2 
 } from 'lucide-react';
-import { useState } from 'react';
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
   pass: <CheckCircle2 className="h-4 w-4 text-success" />,
@@ -26,15 +30,20 @@ const STATUS_ICONS: Record<string, React.ReactNode> = {
 };
 
 export function DCStep5Deploy() {
+  const navigate = useNavigate();
   const { 
     deployment, 
     setTargetRegion, 
     getReadinessScore, 
     isReadyForDeployment, 
-    getBlueprintJSON 
+    getBlueprintJSON,
+    updateOverview,
+    updateDeployment,
   } = useDCTwinBuilderStore();
   const { isArchitectMode } = useBuilderMode();
+  const { saveTwinToDatabase, isSaving } = useTwinPersistence();
   const [showAllChecks, setShowAllChecks] = useState(false);
+  const [isDeploying, setIsDeploying] = useState(false);
 
   const readinessScore = getReadinessScore();
   const canDeploy = isReadyForDeployment();
@@ -52,6 +61,46 @@ export function DCStep5Deploy() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const handleDeploy = async () => {
+    if (!canDeploy) {
+      toast.error('Please complete all required configuration before deploying');
+      return;
+    }
+
+    setIsDeploying(true);
+    try {
+      // P0 Fix: Persist twin to database
+      const builderState = useDCTwinBuilderStore.getState();
+      const existingTwinId = builderState.overview.deployedTwinId;
+      
+      const twinId = await saveTwinToDatabase(builderState, existingTwinId);
+      
+      if (twinId) {
+        // Update store with deployed twin ID
+        updateOverview({ 
+          deployedTwinId: twinId,
+          updatedAt: new Date().toISOString(),
+        });
+        updateDeployment({
+          deployedTwinId: twinId,
+          deployedAt: new Date().toISOString(),
+        });
+        
+        toast.success('Data Centre Twin deployed successfully!');
+        
+        // Navigate to the twin dashboard
+        setTimeout(() => {
+          navigate(`/data-centre-twin?twinId=${twinId}`);
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('Deploy error:', error);
+      toast.error('Failed to deploy twin');
+    } finally {
+      setIsDeploying(false);
+    }
   };
 
   return (
@@ -185,9 +234,17 @@ export function DCStep5Deploy() {
             Download Blueprint JSON
           </Button>
         )}
-        <Button disabled={!canDeploy} className="flex-1">
-          <Rocket className="h-4 w-4 mr-2" />
-          Deploy Twin
+        <Button 
+          disabled={!canDeploy || isDeploying || isSaving} 
+          onClick={handleDeploy}
+          className="flex-1"
+        >
+          {isDeploying || isSaving ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Rocket className="h-4 w-4 mr-2" />
+          )}
+          {isDeploying ? 'Deploying...' : 'Deploy Twin'}
         </Button>
       </div>
 

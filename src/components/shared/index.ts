@@ -3,4 +3,26 @@
  * Exports all shared/reusable components
  */
 
-export { IndustryComplianceBadges, IndustryKpiTiles } from './IndustryUIExtensions';
+// Industry-specific UI extensions
+export { 
+  IndustryComplianceBadges, 
+  IndustryKpiTiles,
+  ComplianceBadge,
+  KpiTile,
+  // Industry KPI tiles
+  FinanceKpiTiles,
+  HealthcareKpiTiles,
+  GovernmentKpiTiles,
+  ManufacturingKpiTiles,
+  RetailKpiTiles,
+  TelecomKpiTiles,
+  // Preset compliance badges
+  OSFIBadge,
+  HIPAABadge,
+  PHIPABadge,
+  ProtectedBBadge,
+  ProtectedCBadge,
+  SOC2Badge,
+  ISO27001Badge,
+  PCIDSSBadge,
+} from './IndustryUIExtensions';

@@ -398,6 +398,7 @@ function detectConstraints(text: string): string[] {
 function deriveCompanyName(html: string, text: string, domain: string): string {
   // Known company name mappings for common domains
   const KNOWN_COMPANIES: Record<string, string> = {
+    // Mega-retailers
     "walmart": "Walmart",
     "target": "Target",
     "costco": "Costco",
@@ -408,6 +409,7 @@ function deriveCompanyName(html: string, text: string, domain: string): string {
     "kroger": "Kroger",
     "walgreens": "Walgreens",
     "cvs": "CVS Health",
+    // Tech giants
     "apple": "Apple",
     "microsoft": "Microsoft",
     "google": "Google",
@@ -417,20 +419,51 @@ function deriveCompanyName(html: string, text: string, domain: string): string {
     "nike": "Nike",
     "starbucks": "Starbucks",
     "mcdonalds": "McDonald's",
+    // Energy
     "chevron": "Chevron",
     "shell": "Shell",
     "exxonmobil": "ExxonMobil",
+    // Financial
     "jpmorgan": "JPMorgan Chase",
     "bankofamerica": "Bank of America",
     "wellsfargo": "Wells Fargo",
     "citibank": "Citibank",
+    "citigroup": "Citigroup",
+    "goldmansachs": "Goldman Sachs",
+    "morganstanley": "Morgan Stanley",
+    // Logistics
     "fedex": "FedEx",
     "ups": "UPS",
+    // Automotive
     "tesla": "Tesla",
     "ford": "Ford",
     "gm": "General Motors",
     "toyota": "Toyota",
     "honda": "Honda",
+    // Consulting / Professional Services (Big 4 + major firms)
+    "deloitte": "Deloitte",
+    "pwc": "PwC",
+    "ey": "EY (Ernst & Young)",
+    "kpmg": "KPMG",
+    "mckinsey": "McKinsey & Company",
+    "bcg": "Boston Consulting Group",
+    "bain": "Bain & Company",
+    "accenture": "Accenture",
+    "capgemini": "Capgemini",
+    "cognizant": "Cognizant",
+    "infosys": "Infosys",
+    "tcs": "Tata Consultancy Services",
+    "wipro": "Wipro",
+    "ibm": "IBM",
+    "oracle": "Oracle",
+    "sap": "SAP",
+    "salesforce": "Salesforce",
+    "adobe": "Adobe",
+    "servicenow": "ServiceNow",
+    "workday": "Workday",
+    "snowflake": "Snowflake",
+    "databricks": "Databricks",
+    "nvidia": "NVIDIA",
   };
   
   // Check known companies first (from domain)

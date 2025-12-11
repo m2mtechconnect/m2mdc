@@ -57,6 +57,12 @@ function transformTemplate(row: any): DCBlueprintTemplate {
 
 /**
  * Fetch the last scan session for the current user
+ * 
+ * This is the SINGLE SOURCE OF TRUTH for the Dashboard's "Last scan" banner.
+ * It queries the dc_scan_sessions table ordered by created_at DESC and returns
+ * the most recent scan session with all relevant metadata for display.
+ * 
+ * @returns LastScanSummary with company name, twin name, industry, and timestamps
  */
 export function useLastScanSession() {
   return useQuery({
@@ -85,7 +91,14 @@ export function useLastScanSession() {
       }
 
       const session = transformSession(data);
-      const blueprintName = BLUEPRINT_PROFILE_NAMES[session.blueprintProfile] || session.blueprintProfile;
+      
+      // Extract company name and twin name from recommendation_json if available
+      const recJson = session.recommendationJson as any;
+      const companyName = recJson?.companyName || recJson?.displayName || null;
+      const twinName = recJson?.twinName || null;
+      
+      // Use twin name from recommendation or fall back to blueprint profile name
+      const blueprintName = twinName || BLUEPRINT_PROFILE_NAMES[session.blueprintProfile] || session.blueprintProfile;
 
       return {
         exists: true,
@@ -96,12 +109,15 @@ export function useLastScanSession() {
         blueprintProfile: session.blueprintProfile,
         blueprintName,
         blueprintId: session.blueprintId,
-        recommendation: session.recommendationJson
+        recommendation: session.recommendationJson,
+        companyName,
+        twinName
       };
     },
     staleTime: 0, // Always refetch when invalidated
     refetchOnMount: true,
     refetchOnWindowFocus: true,
+    gcTime: 0, // Don't cache stale data
   });
 }
 

@@ -3,21 +3,26 @@
  * Main simulation interface combining all simulation components
  * Uses Studio design system tokens
  * Now wired to Blueprint for scenarios
+ * Integrated with Blueprint Snapshot system for simulation traceability
  */
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Activity, Clock, Sparkles, BarChart3, Grid3X3 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Activity, Clock, Sparkles, BarChart3, Grid3X3, FileText, Info } from 'lucide-react';
 import { useSimulation } from '@/simulation/useSimulation';
 import { useBlueprint } from '@/hooks/useBlueprint';
+import { useSimulationSnapshotStore } from '@/stores/simulationSnapshotStore';
 import { DCScenarioSelector } from './DCScenarioSelector';
 import { EnhancedSimulationControls } from './EnhancedSimulationControls';
 import { DCEventTimeline } from './DCEventTimeline';
 import { DCKPIDeltas, defaultKPIs } from './DCKPIDeltas';
 import { CustomScenarioBuilder } from './CustomScenarioBuilder';
 import { SimulationResultPanel } from './SimulationResultPanel';
+import { SimulationBlueprintSnapshotPanel } from './SimulationBlueprintSnapshotPanel';
 import { AnimatedKPIChartGrid } from './AnimatedKPIChart';
 import { AnimatedRackHeatmap } from './AnimatedRackHeatmap';
 import { ScenarioContextSidebar } from './ScenarioContextSidebar';
@@ -49,9 +54,18 @@ export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSim
   const [simulationResult, setSimulationResult] = useState<SimulationResultSummary | null>(null);
   const [baseRacks] = useState<RackMetrics[]>(() => generateBaseRacks(20));
   const [liveRackMetrics, setLiveRackMetrics] = useState<RackMetrics[]>(baseRacks);
+  const runIdRef = useRef<string>('');
   
   // Get Blueprint scenarios
   const { blueprint } = useBlueprint(twinId);
+  
+  // Snapshot store for Blueprint Snapshot feature
+  const { 
+    captureSnapshot, 
+    clearCurrentSnapshot, 
+    setSnapshotPanelOpen,
+    currentSnapshot 
+  } = useSimulationSnapshotStore();
   
   const {
     status,
@@ -120,8 +134,21 @@ export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSim
       pause();
     }
     setSimulationResult(null);
+    
+    // Generate a unique run ID and capture blueprint snapshot
+    if (blueprint) {
+      const newRunId = `run-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      runIdRef.current = newRunId;
+      captureSnapshot(blueprint, newRunId, {
+        activeScenarioIds: [scenarioId],
+        // Include all agents and KPIs for now; could be filtered per scenario
+        activeAgentIds: blueprint.agents.map(a => a.id),
+        activeKpiIds: blueprint.kpis.slice(0, 12).map(k => k.id),
+      });
+    }
+    
     startScenario(scenarioId);
-  }, [status, pause, startScenario]);
+  }, [status, pause, startScenario, blueprint, captureSnapshot]);
   
   const handlePlay = useCallback(() => {
     if (activeScenarioId) {
@@ -131,8 +158,13 @@ export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSim
   
   const handleReset = useCallback(() => {
     setSimulationResult(null);
+    clearCurrentSnapshot();
     reset();
-  }, [reset]);
+  }, [reset, clearCurrentSnapshot]);
+  
+  const handleViewBlueprintSnapshot = useCallback(() => {
+    setSnapshotPanelOpen(true);
+  }, [setSnapshotPanelOpen]);
   
   const handleCreateCustomScenario = useCallback((config: CustomScenarioConfig) => {
     const scenario = createCustomScenario(config);
@@ -178,21 +210,45 @@ export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSim
   
   return (
     <div className="space-y-6">
-      {/* Controls */}
-      <EnhancedSimulationControls
-        status={status}
-        timeScale={timeScale}
-        progress={progress}
-        elapsedTime={elapsedTime}
-        remainingTime={remainingTime}
-        scenarioName={activeScenario?.name}
-        onPlay={handlePlay}
-        onPause={pause}
-        onResume={resume}
-        onReset={handleReset}
-        onTimeScaleChange={setTimeScale}
-        disabled={!activeScenarioId}
-      />
+      {/* Controls Header with Snapshot Button */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex-1">
+          <EnhancedSimulationControls
+            status={status}
+            timeScale={timeScale}
+            progress={progress}
+            elapsedTime={elapsedTime}
+            remainingTime={remainingTime}
+            scenarioName={activeScenario?.name}
+            onPlay={handlePlay}
+            onPause={pause}
+            onResume={resume}
+            onReset={handleReset}
+            onTimeScaleChange={setTimeScale}
+            disabled={!activeScenarioId}
+          />
+        </div>
+        
+        {/* View Blueprint Snapshot Button */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleViewBlueprintSnapshot}
+              disabled={!currentSnapshot}
+              className="gap-2 shrink-0"
+            >
+              <FileText className="h-4 w-4" />
+              View Blueprint Snapshot
+              <Info className="h-3 w-3 text-muted-foreground" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-xs">
+            <p>View the exact blueprint configuration used for this simulation run (read-only snapshot).</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
       
       {/* Main layout with sidebar */}
       <div className="flex gap-6">
@@ -304,6 +360,9 @@ export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSim
           />
         </DialogContent>
       </Dialog>
+      
+      {/* Blueprint Snapshot Panel - Read-only view of blueprint used for this simulation */}
+      <SimulationBlueprintSnapshotPanel twinId={twinId} />
     </div>
   );
 }

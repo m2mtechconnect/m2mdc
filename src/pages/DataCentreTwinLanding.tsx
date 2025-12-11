@@ -16,7 +16,7 @@ import {
   TwinCTASection,
 } from "@/components/landing";
 
-// Feature section data
+// Feature section data - using real Studio UI screenshots
 const features = [
   {
     title: "Live 3D Data Centre Twin",
@@ -26,8 +26,9 @@ const features = [
       "Thermal and power overlays with hotspots",
       "Live KPI overlays for PUE, kW, and carbon",
     ],
-    imageSrc: "/assets/landing/feature-3d-twin.png",
-    imageAlt: "3D data centre visualization with thermal overlays",
+    imageSrc: "/landing/screenshots/twin3d-desktop.webp",
+    imageAlt: "3D data centre visualization with thermal overlays and rack layouts",
+    accentColor: "primary" as const,
   },
   {
     title: "Scenario Simulation for Energy, Carbon & GPU Spikes",
@@ -37,9 +38,10 @@ const features = [
       "Run carbon price shock and energy mix scenarios",
       "Compare \"brown vs green\" build strategies side by side",
     ],
-    imageSrc: "/assets/landing/feature-simulation.png",
-    imageAlt: "Simulation engine with scenario controls",
+    imageSrc: "/landing/screenshots/simulation-desktop.webp",
+    imageAlt: "Simulation panel with timeline controls and KPI trend overlays",
     flip: true,
+    accentColor: "info" as const,
   },
   {
     title: "Sovereignty & Safety Audits, Built-In",
@@ -49,8 +51,9 @@ const features = [
       "Track OSFI, HIPAA, PIPEDA, and internal controls",
       "Score compute, storage, and network sovereignty",
     ],
-    imageSrc: "/assets/landing/feature-sovereignty.png",
-    imageAlt: "Sovereignty audit dashboard",
+    imageSrc: "/landing/screenshots/sovereignty-desktop.webp",
+    imageAlt: "Sovereignty and Safety Audit dashboard with compliance metrics",
+    accentColor: "success" as const,
   },
   {
     title: "Subsystem Agents for Every Critical Domain",
@@ -62,9 +65,10 @@ const features = [
       "Workload Orchestrator for GPU scheduling",
       "Carbon & Cost Agent for sustainability",
     ],
-    imageSrc: "/assets/landing/feature-agents.png",
-    imageAlt: "Subsystem agents dashboard",
+    imageSrc: "/landing/screenshots/agents-desktop.webp",
+    imageAlt: "Subsystem Agents dashboard showing AI optimization agents",
     flip: true,
+    accentColor: "warning" as const,
   },
   {
     title: "Blueprint Designer for Tier, GPUs, and Regions",
@@ -74,8 +78,22 @@ const features = [
       "Size GPU fleets and IT capacity",
       "Model renewable mix and energy contracts",
     ],
-    imageSrc: "/assets/landing/feature-blueprint.png",
-    imageAlt: "Blueprint designer interface",
+    imageSrc: "/landing/screenshots/blueprint-desktop.webp",
+    imageAlt: "Blueprint Designer interface for configuring Data Centre Twin",
+    accentColor: "primary" as const,
+  },
+  {
+    title: "Real-Time Telemetry & Analytics",
+    subtitle: "Monitor every metric across your data centre infrastructure.",
+    bullets: [
+      "PUE trend analysis and GPU utilization heatmaps",
+      "Energy consumption tracking and forecasting",
+      "Carbon emissions monitoring with targets",
+    ],
+    imageSrc: "/landing/screenshots/telemetry-desktop.webp",
+    imageAlt: "Telemetry and Analytics dashboard with real-time KPI monitoring",
+    flip: true,
+    accentColor: "info" as const,
   },
 ];
 
@@ -98,6 +116,7 @@ export default function DataCentreTwinLanding() {
           imageSrc={feature.imageSrc}
           imageAlt={feature.imageAlt}
           flip={feature.flip}
+          accentColor={feature.accentColor}
         />
       ))}
       

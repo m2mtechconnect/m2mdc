@@ -28,6 +28,7 @@ import {
 import { cn } from '@/lib/utils';
 import type { SimulationResultSummary, SimulationKpiDelta, SimulationEvent } from '@/simulation/types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SIMULATION } from '@/ux';
 
 interface SimulationResultPanelProps {
   result: SimulationResultSummary;
@@ -299,7 +300,7 @@ ${result.recommendationsMarkdown}
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4 text-warning" />
-                        Root Cause Analysis
+                        {SIMULATION.RESULT.RCA_TITLE}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -317,7 +318,7 @@ ${result.recommendationsMarkdown}
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
                         <Lightbulb className="h-4 w-4 text-primary" />
-                        Recommended Actions
+                        {SIMULATION.RESULT.ACTIONS_TITLE}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>

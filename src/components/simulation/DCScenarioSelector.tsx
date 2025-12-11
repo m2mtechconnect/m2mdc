@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import type { ScenarioDefinition } from '@/simulation/types';
 import { cn } from '@/lib/utils';
+import { getScenarioDescription, EMPTY_STATES } from '@/ux';
 
 interface DCScenarioSelectorProps {
   presetScenarios: ScenarioDefinition[];
@@ -217,7 +218,7 @@ export function DCScenarioSelector({
           
           {filteredScenarios.length === 0 && (
             <div className="w-full py-8 text-center text-muted-foreground text-sm">
-              No scenarios found. {filter === 'custom' && onCreateCustom && (
+              {EMPTY_STATES.SCENARIOS} {filter === 'custom' && onCreateCustom && (
                 <Button variant="link" onClick={onCreateCustom} className="px-1">
                   Create your first custom scenario
                 </Button>

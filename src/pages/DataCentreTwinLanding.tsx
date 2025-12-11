@@ -5,6 +5,7 @@
  */
 
 import { 
+  TwinHeader,
   TwinHero,
   TwinCapabilityBadges,
   TwinFeatureSection,
@@ -100,8 +101,13 @@ const features = [
 export default function DataCentreTwinLanding() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Hero Section */}
-      <TwinHero />
+      {/* Header Navigation */}
+      <TwinHeader />
+      
+      {/* Hero Section - add pt for fixed header */}
+      <div className="pt-16 lg:pt-20">
+        <TwinHero />
+      </div>
       
       {/* Capability Badges */}
       <TwinCapabilityBadges />

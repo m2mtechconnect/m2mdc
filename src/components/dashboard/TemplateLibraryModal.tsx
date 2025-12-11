@@ -32,9 +32,6 @@ export function TemplateLibraryModal({ open, onOpenChange }: TemplateLibraryModa
   });
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
   
-  // VERIFICATION LOG
-  console.log('[TemplateLibraryModal] v2 with JSON fallback');
-  
   // Load templates from catalog store
   const {
     m2mTemplates, 
@@ -84,9 +81,6 @@ export function TemplateLibraryModal({ open, onOpenChange }: TemplateLibraryModa
 
   const allTemplates = hasDbTemplates ? dbTemplates : jsonTemplates;
 
-  // Debug logging
-  console.log('[TemplateLibraryModal] dbTemplates:', dbTemplates.length, 'jsonTemplates:', jsonTemplates.length);
-  console.log('[TemplateLibraryModal] allTemplates:', allTemplates.length);
 
   // Get unique industries for filtering
   const industries = ['All', ...new Set(allTemplates.map(t => t.industry).filter(Boolean))];

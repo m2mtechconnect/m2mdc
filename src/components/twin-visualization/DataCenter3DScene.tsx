@@ -243,11 +243,37 @@ function WebGLFallback() {
 
 export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   const [hasWebGL, setHasWebGL] = useState(true);
+  const [contextLost, setContextLost] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [lastInteractionTime, setLastInteractionTime] = useState(Date.now());
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
   
   const baseDistance = props.compact ? 22 : 30;
   const [targetDistance, setTargetDistance] = useState(baseDistance);
+  
+  // Handle WebGL context lost/restored
+  useEffect(() => {
+    const handleContextLost = () => {
+      setContextLost(true);
+    };
+    
+    const handleContextRestored = () => {
+      setContextLost(false);
+    };
+    
+    const container = canvasContainerRef.current;
+    const canvas = container?.querySelector('canvas');
+    
+    if (canvas) {
+      canvas.addEventListener('webglcontextlost', handleContextLost);
+      canvas.addEventListener('webglcontextrestored', handleContextRestored);
+      
+      return () => {
+        canvas.removeEventListener('webglcontextlost', handleContextLost);
+        canvas.removeEventListener('webglcontextrestored', handleContextRestored);
+      };
+    }
+  }, [hasWebGL]);
   
   // Mark user interaction
   const markInteraction = useCallback(() => {
@@ -316,10 +342,23 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
         onZoomOut={handleZoomOut}
         onReset={handleReset}
         zoomLevel={zoomLevel}
+        disabled={contextLost}
       />
+
+      {/* Context lost overlay */}
+      {contextLost && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/90 backdrop-blur-sm">
+          <div className="text-center p-4">
+            <div className="text-2xl mb-2">⚠️</div>
+            <p className="text-sm text-slate-300 mb-2">3D rendering paused</p>
+            <p className="text-xs text-slate-500">WebGL context will restore automatically</p>
+          </div>
+        </div>
+      )}
 
       {/* Canvas container with wheel handler */}
       <div 
+        ref={canvasContainerRef}
         className="h-full w-full" 
         onWheel={handleWheel}
         onMouseDown={markInteraction}
@@ -331,7 +370,8 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             frameloop="always"
             gl={{ 
               antialias: true,
-              failIfMajorPerformanceCaveat: true 
+              failIfMajorPerformanceCaveat: true,
+              powerPreference: 'high-performance'
             }}
             onCreated={({ gl }) => {
               if (!gl.capabilities.isWebGL2) {

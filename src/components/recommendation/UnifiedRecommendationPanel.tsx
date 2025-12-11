@@ -206,12 +206,27 @@ export function UnifiedRecommendationPanel({
     }
   };
 
-  const handleRunSimulation = () => {
+  /**
+   * Preview simulation - opens preview page WITHOUT creating a twin
+   */
+  const handlePreviewSimulation = () => {
     if (onOpenSimulation) {
       onOpenSimulation();
     } else {
-      const scenarioIds = rec.scenarios.filter(s => s.enabled).slice(0, 3).map(s => s.id).join(',');
-      navigate(`/data-centre-twin?view=simulation&scenarios=${encodeURIComponent(scenarioIds)}`);
+      // Navigate to preview mode - does NOT create or select any twin
+      navigate('/simulation/preview', { state: { mode: 'preview' } });
+    }
+  };
+  
+  /**
+   * Preview blueprint - opens preview page WITHOUT creating a twin
+   */
+  const handlePreviewBlueprint = () => {
+    if (onOpenBlueprint) {
+      onOpenBlueprint();
+    } else {
+      // Navigate to preview mode - does NOT create or select any twin
+      navigate('/blueprint/preview', { state: { mode: 'preview' } });
     }
   };
 
@@ -415,7 +430,13 @@ export function UnifiedRecommendationPanel({
             )}
             {isCreating ? 'Creating...' : 'Create Green DC Twin'}
           </Button>
-          <Button onClick={handleRunSimulation} variant="outline" className="flex-1">
+        </div>
+        <div className="flex gap-3">
+          <Button onClick={handlePreviewBlueprint} variant="outline" className="flex-1">
+            <Eye className="h-4 w-4 mr-2" />
+            Preview Blueprint
+          </Button>
+          <Button onClick={handlePreviewSimulation} variant="outline" className="flex-1">
             <Play className="h-4 w-4 mr-2" />
             Preview Simulation
           </Button>

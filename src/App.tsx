@@ -43,6 +43,8 @@ import SystemManage from "./pages/SystemManage";
 import TwinManage from "./pages/TwinManage";
 import DataCentreTwin from "./pages/DataCentreTwin";
 import Blueprint from "./pages/Blueprint";
+import BlueprintPreview from "./pages/BlueprintPreview";
+import SimulationPreview from "./pages/SimulationPreview";
 import AgentDetail from "./pages/AgentDetail";
 import TwinDebug from "./pages/TwinDebug";
 import Profile from "./pages/account/Profile";
@@ -157,7 +159,8 @@ function AuthenticatedApp() {
         {/* Blueprint Routes */}
         <Route path="/data-centre-twin/:id/blueprint" element={<Blueprint />} />
         <Route path="/blueprint/:id" element={<Blueprint />} />
-        
+        <Route path="/blueprint/preview" element={<BlueprintPreview />} />
+        <Route path="/simulation/preview" element={<SimulationPreview />} />
         <Route path="/help" element={<Help />} />
         <Route path="/connect/monitor" element={<ConnectMonitor />} />
         <Route path="/connect/health" element={<ConnectHealth />} />

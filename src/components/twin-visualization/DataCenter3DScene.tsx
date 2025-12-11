@@ -41,54 +41,68 @@ function Scene({
   onRackClick 
 }: Omit<DataCenter3DSceneProps, 'events'>) {
   // Calculate camera position based on layout
-  const maxZ = Math.max(...rows.map(r => r.position[2])) + 5;
-  const maxX = Math.max(...racks.map(r => r.position[0])) + 3;
+  const maxZ = Math.max(...rows.map(r => r.position[2]), 5) + 5;
+  const maxX = Math.max(...racks.map(r => r.position[0]), 8) + 3;
   
+  // Improved camera angle - more dramatic isometric view
   const cameraPosition: [number, number, number] = compact 
-    ? [maxX / 2, 8, maxZ + 4]
-    : [maxX / 2, 12, maxZ + 8];
+    ? [maxX * 0.8, 10, maxZ + 6]
+    : [maxX * 0.7, 14, maxZ + 10];
 
   return (
     <>
       <PerspectiveCamera 
         makeDefault 
         position={cameraPosition}
-        fov={compact ? 50 : 45}
+        fov={compact ? 45 : 40}
       />
       <OrbitControls 
         enablePan={!compact}
         enableZoom={!compact}
-        maxPolarAngle={Math.PI / 2.2}
-        minDistance={compact ? 8 : 5}
-        maxDistance={compact ? 20 : 50}
+        maxPolarAngle={Math.PI / 2.1}
+        minDistance={compact ? 10 : 8}
+        maxDistance={compact ? 25 : 60}
+        target={[maxX / 2, 0.5, maxZ / 2]}
       />
 
-      {/* Lighting */}
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[10, 15, 10]} intensity={0.8} castShadow />
-      <directionalLight position={[-10, 10, -10]} intensity={0.3} />
+      {/* Enhanced Lighting - darker ambient with dramatic directional */}
+      <ambientLight intensity={0.25} color="#8899bb" />
+      <directionalLight 
+        position={[15, 20, 15]} 
+        intensity={1.2} 
+        castShadow 
+        shadow-mapSize={[1024, 1024]}
+        color="#ffffff"
+      />
+      <directionalLight position={[-10, 8, -10]} intensity={0.15} color="#4488ff" />
+      <pointLight position={[maxX / 2, 6, maxZ / 2]} intensity={0.3} color="#6699ff" distance={20} />
 
-      {/* Environment */}
-      <Environment preset="warehouse" />
+      {/* Environment - night mode for NOC aesthetic */}
+      <Environment preset="night" />
+      <fog attach="fog" args={['#0a0a1a', 15, 60]} />
 
-      {/* Ground plane */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[maxX / 2, -0.01, maxZ / 2]} receiveShadow>
-        <planeGeometry args={[maxX + 10, maxZ + 10]} />
-        <meshStandardMaterial color="#1a1a2e" roughness={0.9} />
+      {/* Dark floor with subtle grid lines */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[maxX / 2, -0.02, maxZ / 2]} receiveShadow>
+        <planeGeometry args={[maxX + 20, maxZ + 20]} />
+        <meshStandardMaterial 
+          color="#0d0d1a" 
+          roughness={0.95} 
+          metalness={0.05}
+        />
       </mesh>
 
-      {/* Grid helper */}
+      {/* Grid with improved styling */}
       <Grid 
         position={[maxX / 2, 0, maxZ / 2]}
-        args={[maxX + 10, maxZ + 10]}
-        cellSize={1}
-        cellThickness={0.5}
-        cellColor="#333355"
-        sectionSize={5}
-        sectionThickness={1}
-        sectionColor="#444466"
-        fadeDistance={50}
-        fadeStrength={1}
+        args={[maxX + 16, maxZ + 16]}
+        cellSize={0.8}
+        cellThickness={0.3}
+        cellColor="#1a1a3a"
+        sectionSize={4}
+        sectionThickness={0.8}
+        sectionColor="#2a2a4a"
+        fadeDistance={40}
+        fadeStrength={1.2}
         followCamera={false}
       />
 
@@ -146,10 +160,10 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
     return <WebGLFallback />;
   }
 
-  const height = props.compact ? 'h-64' : 'h-[400px]';
+  const height = props.compact ? 'h-72' : 'h-[450px]';
 
   return (
-    <div className={`relative ${height} w-full rounded-lg overflow-hidden border border-border bg-background`}>
+    <div className={`relative ${height} w-full rounded-lg overflow-hidden border border-border bg-[#0a0a14]`}>
       <Suspense fallback={<LoadingFallback />}>
         <Canvas
           dpr={[1, 1.5]}

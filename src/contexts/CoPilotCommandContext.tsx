@@ -5,7 +5,7 @@
  * real UI actions like running simulations, navigating tabs, etc.
  */
 
-import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useState, ReactNode, useCallback, useMemo, useEffect } from 'react';
 
 export interface CoPilotCommands {
   runSimulation: (scenarioId?: string) => void;
@@ -85,16 +85,17 @@ export function CoPilotCommandProvider({ children }: { children: ReactNode }) {
     }
   }, [commands]);
 
+  // Memoize the context value to prevent unnecessary re-renders
+  const contextValue = useMemo<CoPilotCommandContextValue>(() => ({
+    commands,
+    registerCommands,
+    highlightedKPI,
+    clearHighlight,
+    executeCommand,
+  }), [commands, registerCommands, highlightedKPI, clearHighlight, executeCommand]);
+
   return (
-    <CoPilotCommandContext.Provider 
-      value={{ 
-        commands, 
-        registerCommands, 
-        highlightedKPI, 
-        clearHighlight,
-        executeCommand 
-      }}
-    >
+    <CoPilotCommandContext.Provider value={contextValue}>
       {children}
     </CoPilotCommandContext.Provider>
   );
@@ -109,11 +110,13 @@ export function useCoPilotCommands() {
 }
 
 // Helper hook for registering commands from components
+// FIXED: Use useEffect instead of calling useCallback result directly in render
 export function useRegisterCoPilotCommands(cmds: Partial<CoPilotCommands>, deps: any[] = []) {
   const { registerCommands } = useCoPilotCommands();
   
-  // Register on mount and when deps change
-  useCallback(() => {
+  // Register on mount and when deps change - use useEffect, NOT calling during render
+  useEffect(() => {
     registerCommands(cmds);
-  }, [registerCommands, ...deps])();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [registerCommands, ...deps]);
 }

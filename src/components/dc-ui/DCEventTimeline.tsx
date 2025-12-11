@@ -85,13 +85,13 @@ export function DCEventTimeline({
             onClick={() => onEventClick?.(event)}
             className={cn(
               'relative flex gap-3 p-3 rounded-lg transition-colors',
-              onEventClick && 'cursor-pointer hover:bg-noc-surface',
+              onEventClick && 'cursor-pointer hover:bg-muted/50',
               event.resolved && 'opacity-60'
             )}
           >
             {/* Timeline line */}
             {index < displayEvents.length - 1 && (
-              <div className="absolute left-[26px] top-12 w-px h-[calc(100%-24px)] bg-noc-border" />
+              <div className="absolute left-[26px] top-12 w-px h-[calc(100%-24px)] bg-border" />
             )}
             
             {/* Icon */}
@@ -161,7 +161,7 @@ export function DCEventList({ events, maxEvents = 5, onEventClick, className }: 
           <button
             key={event.id}
             onClick={() => onEventClick?.(event)}
-            className="w-full flex items-center gap-2 p-2 rounded-md text-left hover:bg-noc-surface transition-colors"
+            className="w-full flex items-center gap-2 p-2 rounded-md text-left hover:bg-muted/50 transition-colors"
           >
             <Icon className={cn('h-3.5 w-3.5 flex-shrink-0', domainColors[event.domain])} />
             <span className="flex-1 text-xs truncate">{event.title}</span>

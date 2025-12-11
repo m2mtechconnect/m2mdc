@@ -50,7 +50,7 @@ export function DCSimulationControls({
 
   return (
     <div className={cn(
-      'flex flex-col gap-3 p-4 rounded-lg border bg-noc-surface border-noc-border',
+      'flex flex-col gap-3 p-4 rounded-lg border bg-card border-border',
       className
     )}>
       {/* Progress bar */}
@@ -116,7 +116,7 @@ export function DCSimulationControls({
                   size="icon"
                   className={cn(
                     'h-10 w-10',
-                    isPlaying && 'bg-dc-green hover:bg-dc-green/80'
+                    isPlaying && 'bg-success hover:bg-success/80'
                   )}
                   disabled={isCompleted && !onSeek}
                 >
@@ -154,7 +154,7 @@ export function DCSimulationControls({
         <div className="flex items-center gap-2">
           <FastForward className="h-4 w-4 text-muted-foreground" />
           <Select value={speed} onValueChange={(v) => onSpeedChange(v as PlaybackSpeed)}>
-            <SelectTrigger className="w-24 h-9 bg-noc-surface-elevated">
+            <SelectTrigger className="w-24 h-9 bg-muted">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -172,9 +172,9 @@ export function DCSimulationControls({
         <div className="flex items-center gap-2">
           <span className={cn(
             'h-2 w-2 rounded-full',
-            state === 'running' && 'bg-dc-green animate-pulse-glow',
-            state === 'paused' && 'bg-dc-amber',
-            state === 'completed' && 'bg-dc-blue',
+            state === 'running' && 'bg-success animate-pulse',
+            state === 'paused' && 'bg-warning',
+            state === 'completed' && 'bg-info',
             state === 'idle' && 'bg-muted-foreground'
           )} />
           <span className="text-xs text-muted-foreground capitalize">{state}</span>
@@ -202,10 +202,10 @@ interface DCScenarioSelectorProps {
 
 export function DCScenarioSelector({ scenarios, selectedId, onSelect, className }: DCScenarioSelectorProps) {
   const severityColors = {
-    low: 'border-dc-blue/30 hover:border-dc-blue',
-    medium: 'border-dc-amber/30 hover:border-dc-amber',
-    high: 'border-dc-red/30 hover:border-dc-red',
-    critical: 'border-dc-red/50 hover:border-dc-red',
+    low: 'border-info/30 hover:border-info',
+    medium: 'border-warning/30 hover:border-warning',
+    high: 'border-destructive/30 hover:border-destructive',
+    critical: 'border-destructive/50 hover:border-destructive',
   };
 
   return (
@@ -215,7 +215,7 @@ export function DCScenarioSelector({ scenarios, selectedId, onSelect, className 
           key={scenario.id}
           onClick={() => onSelect(scenario)}
           className={cn(
-            'p-4 rounded-lg border-2 bg-noc-surface text-left transition-all',
+            'p-4 rounded-lg border-2 bg-card text-left transition-all',
             severityColors[scenario.severity],
             selectedId === scenario.id && 'border-primary ring-1 ring-primary/50'
           )}
@@ -224,10 +224,10 @@ export function DCScenarioSelector({ scenarios, selectedId, onSelect, className 
             <h4 className="font-semibold text-sm">{scenario.name}</h4>
             <span className={cn(
               'text-[10px] uppercase px-1.5 py-0.5 rounded',
-              scenario.severity === 'critical' && 'bg-dc-red/20 text-dc-red-light',
-              scenario.severity === 'high' && 'bg-dc-red/15 text-dc-red-light',
-              scenario.severity === 'medium' && 'bg-dc-amber/20 text-dc-amber-light',
-              scenario.severity === 'low' && 'bg-dc-blue/20 text-dc-blue-light'
+              scenario.severity === 'critical' && 'bg-destructive/20 text-destructive',
+              scenario.severity === 'high' && 'bg-destructive/15 text-destructive',
+              scenario.severity === 'medium' && 'bg-warning/20 text-warning',
+              scenario.severity === 'low' && 'bg-info/20 text-info'
             )}>
               {scenario.severity}
             </span>

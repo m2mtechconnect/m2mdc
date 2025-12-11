@@ -22,6 +22,7 @@ export { BlueprintDesignerWrapper } from './BlueprintDesignerWrapper';
 export { BlueprintSnapshotCard } from './BlueprintSnapshotCard';
 export { BlueprintSummaryCard } from './BlueprintSummaryCard';
 export { BlueprintReviewSection } from './BlueprintReviewSection';
+export { DesignerModeHeader } from './DesignerModeHeader';
 
 // Tab Components
 export { BlueprintOverviewTab } from './tabs/BlueprintOverviewTab';

@@ -1,6 +1,7 @@
 /**
  * DC Twin Simulation Tab
  * Enhanced with Multi-KPI Overlay, Time Controls, Comparison Mode, Live Recommendations
+ * SIMULATION MODE - Read-only blueprint, focus on running scenarios
  */
 
 import { useState } from 'react';
@@ -19,6 +20,8 @@ import { EnhancedTimeControls } from '@/components/simulation/EnhancedTimeContro
 import { SimulationComparisonMode } from '@/components/simulation/SimulationComparisonMode';
 import { LiveRecommendations } from '@/components/simulation/LiveRecommendations';
 import { ScenarioEnhancementsPanel } from '@/components/blueprint/ScenarioEnhancementsPanel';
+import { SimulationModeHeader } from '@/components/simulation/SimulationModeHeader';
+import { BlueprintViewProvider } from '@/context/BlueprintViewContext';
 
 const categoryIcons: Record<DCScenarioCategory, React.ReactNode> = {
   capacity: <Server className="h-4 w-4" />,
@@ -72,24 +75,14 @@ export function DCSimulationTab() {
   };
   
   return (
-    <div className="space-y-6">
-      {/* Facility Header */}
-      <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-bold">{overview.twinName}</h2>
-              <p className="text-sm text-muted-foreground">
-                {overview.facilityLocation} • {overview.renewablePercent}% Renewable • {overview.sovereignCompliance ? 'Sovereign Compliant' : 'Standard'}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline">{overview.tier}</Badge>
-              <Badge variant="outline">{overview.capacityKw.toLocaleString()} kW</Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <BlueprintViewProvider mode="snapshot">
+      <div className="space-y-6">
+        {/* SIMULATION MODE HEADER - Clear visual distinction */}
+        <SimulationModeHeader
+          twinName={overview.twinName || 'Sovereign AI Data Centre'}
+          subtitle={`${overview.facilityLocation || 'Montreal, QC'} • ${overview.renewablePercent || 95}% Renewable • ${overview.capacityKw?.toLocaleString() || '10,000'} kW`}
+          showDesignerLink={true}
+        />
 
       {/* View Tabs */}
       <Tabs value={activeView} onValueChange={setActiveView}>
@@ -276,6 +269,7 @@ export function DCSimulationTab() {
           </div>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </BlueprintViewProvider>
   );
 }

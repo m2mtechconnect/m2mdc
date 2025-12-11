@@ -32,6 +32,7 @@ import Search from "./pages/Search";
 import UniversalSearch from "./pages/UniversalSearch";
 import AISettings from "./pages/AISettings";
 import Auth from "./pages/Auth";
+import { SignIn, SignUp, SignOut, ForgotPassword, MFA } from "./pages/auth";
 import NotFound from "./pages/NotFound";
 import AgentWorkspace from "./pages/AgentWorkspace";
 import AgentChat from "./pages/AgentChat";
@@ -113,13 +114,18 @@ function AuthenticatedApp() {
     );
   }
 
-  // If not authenticated, show only Auth page and public landing pages
+  // If not authenticated, show only Auth pages and public landing pages
   if (!session || !user) {
     return (
       <Routes>
-        <Route path="/auth" element={<Auth />} />
+        <Route path="/auth" element={<SignIn />} />
+        <Route path="/sign-in" element={<SignIn />} />
+        <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/sign-out" element={<SignOut />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/mfa" element={<MFA />} />
         <Route path="/twin-datacentre" element={<DataCentreTwinLanding />} />
-        <Route path="*" element={<Navigate to="/auth" replace />} />
+        <Route path="*" element={<Navigate to="/sign-in" replace />} />
       </Routes>
     );
   }
@@ -170,6 +176,11 @@ function AuthenticatedApp() {
         <Route path="/universal-search" element={<UniversalSearch />} />
         <Route path="/settings/ai" element={<AISettings />} />
         <Route path="/auth" element={<Navigate to="/" replace />} />
+        <Route path="/sign-in" element={<Navigate to="/" replace />} />
+        <Route path="/sign-up" element={<Navigate to="/" replace />} />
+        <Route path="/sign-out" element={<SignOut />} />
+        <Route path="/forgot-password" element={<Navigate to="/" replace />} />
+        <Route path="/mfa" element={<Navigate to="/" replace />} />
         <Route path="/playbook" element={<Playbook />} />
         <Route path="/pilot" element={<Pilot />} />
         {/* Data Centre Twin */}

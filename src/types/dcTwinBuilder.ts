@@ -80,7 +80,6 @@ export interface DCTwinOverview {
   // Display metrics
   displayRoi: string;
   displayTimeSaved: string;
-  displayDownloads: number;
   
   // Business context
   businessImpactSummary: string;
@@ -100,6 +99,13 @@ export interface DCTwinOverview {
   tier: DCTier;
   renewablePercent: number;
   sovereignCompliance: boolean;
+  
+  // Timestamps (P0 - audit fix)
+  createdAt?: string;
+  updatedAt?: string;
+  
+  // Deployment tracking (P0 - audit fix)
+  deployedTwinId?: string;
 }
 
 // ============================================================================
@@ -450,6 +456,9 @@ export interface DCScenarioConfig {
   kpisImpacted: string[];
   defaultRunCount: number;
   enabled: boolean;
+  // Tracking fields (P0 - audit fix)
+  lastRunAt?: string;
+  runCount?: number;
 }
 
 // Required scenarios per spec (13 scenarios including retail-specific)
@@ -538,6 +547,10 @@ export interface DCDeploymentConfig {
     tasks: string[];
     status: 'pending' | 'in_progress' | 'completed' | 'failed';
   }[];
+  // Deployment tracking (P0 - audit fix)
+  deployedTwinId?: string;
+  deployedAt?: string;
+  lastDeployedVersion?: string;
 }
 
 // Canadian cloud regions per spec
@@ -751,7 +764,6 @@ export function createDefaultDCTwinBuilderState(): DCTwinBuilderState {
       targetAudience: ['Data Centre Operations Teams', 'Chief Sustainability Officers', 'IT Directors', 'Compliance & Legal Teams'],
       displayRoi: '18-24%',
       displayTimeSaved: '32+ hrs/week',
-      displayDownloads: 0,
       businessImpactSummary: 'Reduce energy costs by $2.4M annually, achieve 97% renewable energy mix, ensure 100% Canadian data sovereignty, and optimize GPU utilization to 78%+',
       keyBenefits: [
         'Achieve PUE of 1.22 (industry-leading for AI workloads)',

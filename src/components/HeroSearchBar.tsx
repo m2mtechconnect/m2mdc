@@ -22,7 +22,7 @@ import { useRecommendationsStore } from "@/stores/recommendationsStore";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { startBuilderFromUrl } from "@/lib/intake";
 import { useGreenDcRecommendation } from "@/hooks/useGreenDcRecommendation";
-import { BuilderRecommendationPanel } from "./greenDc/BuilderRecommendationPanel";
+import { UnifiedRecommendationPanel, normalizeFromBuilderStore } from "./recommendation/UnifiedRecommendationPanel";
 import { useDCTwinBuilderStore } from "@/stores/dcTwinBuilderStore";
 import { LastScanBanner } from "./dc-scan/LastScanBanner";
 import { useLastScanSession } from "@/hooks/useDCScanSessions";
@@ -289,17 +289,29 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
 
       {greenDcRecommendation && !greenDcLoading && !greenDcError && (
         <div className="mt-8 animate-fade-in">
-          <BuilderRecommendationPanel
-            onOpenBlueprint={() => {
-              // Navigate to blueprint - builder state is already populated
-              const { overview } = useDCTwinBuilderStore.getState();
-              navigate(`/blueprint/new?fromUrl=${encodeURIComponent(overview.siteUrl || '')}&industry=${overview.industries[0] || ''}`);
-            }}
-            onOpenSimulation={() => {
-              // Navigate to simulation - scenarios come from builder
-              navigate(`/data-centre-twin?view=simulation`);
-            }}
-          />
+          {(() => {
+            const store = useDCTwinBuilderStore.getState();
+            const normalizedRec = normalizeFromBuilderStore(
+              store.overview,
+              store.agents,
+              store.scenarios,
+              store.kpis,
+              store.financial,
+              store.sourceRecommendation
+            );
+            return (
+              <UnifiedRecommendationPanel
+                recommendation={normalizedRec}
+                onOpenBlueprint={() => {
+                  const { overview } = store;
+                  navigate(`/blueprint/new?fromUrl=${encodeURIComponent(overview.siteUrl || '')}&industry=${overview.industries[0] || ''}`);
+                }}
+                onOpenSimulation={() => {
+                  navigate(`/data-centre-twin?view=simulation`);
+                }}
+              />
+            );
+          })()}
         </div>
       )}
 

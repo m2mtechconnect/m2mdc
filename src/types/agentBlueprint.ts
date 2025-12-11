@@ -2,6 +2,15 @@
  * Unified Agent Blueprint Type
  * Used by all three intake flows (file upload, questionnaire, templates)
  * to provide a consistent data structure for the Builder
+ * 
+ * INDUSTRY SOURCES:
+ * - AI Agent Design Patterns: https://www.deeplearning.ai/short-courses/ai-agents-in-langgraph/
+ * - Multi-Agent System Architecture: https://www.langchain.com/langgraph
+ * - RAG Implementation Standards: https://docs.llamaindex.ai/en/stable/
+ * - LLM Application Patterns: https://platform.openai.com/docs/guides/text-generation
+ * - Google Vertex AI Agent Builder: https://cloud.google.com/vertex-ai/docs/generative-ai/agents
+ * - Enterprise AI Governance: https://www.ibm.com/topics/ai-governance
+ * - AI Safety Standards: https://www.nist.gov/itl/ai-risk-management-framework
  */
 
 export type AgentBlueprintSource = "file" | "questionnaire" | "template" | "url" | "manual";

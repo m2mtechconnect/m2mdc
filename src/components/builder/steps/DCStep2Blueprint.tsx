@@ -15,6 +15,7 @@ import { Switch } from '@/components/ui/switch';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { toast } from 'sonner';
 import { DCCard, DCSectionHeader, DCKPITile } from '@/components/dc-ui';
+import { BUILDER, AGENTS, KPIS } from '@/ux';
 
 const DOMAIN_ICONS: Record<string, any> = {
   thermal: Thermometer,
@@ -62,8 +63,8 @@ export function DCStep2Blueprint() {
   return (
     <div className="space-y-6 max-w-[920px] mx-auto">
       <DCSectionHeader
-        title="Blueprint Configuration"
-        subtitle="Configure agents, data sources, and KPIs for your Data Centre Twin"
+        title={BUILDER.STEPS.STEP_2.TITLE}
+        subtitle={BUILDER.STEPS.STEP_2.SUBTITLE}
         icon={<Database className="h-5 w-5" />}
       />
 

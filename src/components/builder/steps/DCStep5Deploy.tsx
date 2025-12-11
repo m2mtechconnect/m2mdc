@@ -18,6 +18,7 @@ import { Progress } from '@/components/ui/progress';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { toast } from 'sonner';
 import { DCCard, DCSectionHeader, DCKPITile } from '@/components/dc-ui';
+import { BUILDER } from '@/ux';
 
 const PROVIDER_ICONS: Record<string, string> = {
   AWS: '🟧',
@@ -101,8 +102,8 @@ export function DCStep5Deploy() {
   return (
     <div className="space-y-6 max-w-[920px] mx-auto">
       <DCSectionHeader
-        title="Deployment Configuration"
-        subtitle="Select cloud region and deploy your Sovereign Green AI Data Centre Twin"
+        title={BUILDER.STEPS.STEP_5.TITLE}
+        subtitle={BUILDER.STEPS.STEP_5.SUBTITLE}
         icon={<Rocket className="h-5 w-5" />}
       />
 

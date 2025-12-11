@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { toast } from 'sonner';
 import { DCCard, DCSectionHeader, DCKPITile } from '@/components/dc-ui';
+import { BUILDER } from '@/ux';
 
 const AVAILABLE_INTEGRATIONS = [
   { id: 'prometheus', name: 'Prometheus', type: 'monitoring', icon: BarChart, description: 'Metrics collection and alerting' },
@@ -101,8 +102,8 @@ export function DCStep3Integrations() {
   return (
     <div className="space-y-6 max-w-[920px] mx-auto">
       <DCSectionHeader
-        title="Integrations"
-        subtitle="Connect your Data Centre Twin to monitoring and infrastructure systems"
+        title={BUILDER.STEPS.STEP_3.TITLE}
+        subtitle={BUILDER.STEPS.STEP_3.SUBTITLE}
         icon={<Plug className="h-5 w-5" />}
       />
 

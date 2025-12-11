@@ -23,6 +23,7 @@ export { BlueprintSnapshotCard } from './BlueprintSnapshotCard';
 export { BlueprintSummaryCard } from './BlueprintSummaryCard';
 export { BlueprintReviewSection } from './BlueprintReviewSection';
 export { DesignerModeHeader } from './DesignerModeHeader';
+export { ReadOnlyGuard, useReadOnlyMode, withReadOnlyDisabled } from './ReadOnlyGuard';
 
 // Tab Components
 export { BlueprintOverviewTab } from './tabs/BlueprintOverviewTab';

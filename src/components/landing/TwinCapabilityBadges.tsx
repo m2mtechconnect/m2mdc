@@ -1,6 +1,6 @@
 /**
  * TwinCapabilityBadges - Horizontal badge row showing key capabilities
- * With scroll-triggered staggered animations
+ * Uses M2M brand design tokens from index.css
  */
 
 import { 
@@ -45,7 +45,7 @@ const itemVariants = {
 
 export function TwinCapabilityBadges() {
   return (
-    <section className="bg-slate-900/50 border-y border-slate-800 py-8">
+    <section className="bg-muted/50 border-y border-border py-8">
       <div className="max-w-6xl mx-auto px-4 lg:px-8">
         <motion.div 
           className="flex flex-wrap justify-center gap-4 lg:gap-6"
@@ -63,7 +63,7 @@ export function TwinCapabilityBadges() {
                 borderColor: "hsl(var(--primary))",
                 transition: { duration: 0.2 }
               }}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 rounded-full border border-slate-700/50 text-sm text-slate-300 hover:text-primary cursor-default transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-card/50 rounded-full border border-border/50 text-sm text-muted-foreground hover:text-primary cursor-default transition-colors"
             >
               <cap.icon className="h-4 w-4 text-primary" />
               <span>{cap.label}</span>

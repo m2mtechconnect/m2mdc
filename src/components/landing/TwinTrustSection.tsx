@@ -1,6 +1,6 @@
 /**
  * TwinTrustSection - Trust & sovereignty section
- * With scroll-triggered animations
+ * Uses M2M brand design tokens from index.css
  */
 
 import { Badge } from "@/components/ui/badge";
@@ -61,7 +61,7 @@ const itemVariants = {
 
 export function TwinTrustSection() {
   return (
-    <section className="py-16 lg:py-24 overflow-hidden">
+    <section className="py-16 lg:py-24 overflow-hidden bg-background">
       <div className="max-w-6xl mx-auto px-4 lg:px-8">
         <motion.div 
           className="text-center mb-12"
@@ -70,10 +70,10 @@ export function TwinTrustSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-2xl lg:text-3xl font-bold text-white mb-3">
+          <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-3">
             Built for Regulated, Sovereign AI Infrastructure
           </h2>
-          <p className="text-slate-400 max-w-2xl mx-auto mb-8">
+          <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
             Trusted by organizations that cannot compromise on data sovereignty, security, and compliance.
           </p>
           
@@ -118,11 +118,11 @@ export function TwinTrustSection() {
                 scale: 1.02,
                 transition: { duration: 0.2 }
               }}
-              className="flex gap-4 p-6 bg-slate-800/20 rounded-xl border border-slate-700/50 hover:border-primary/50 transition-colors cursor-default group"
+              className="flex gap-4 p-6 bg-card/20 rounded-xl border border-border/50 hover:border-primary/50 transition-colors cursor-default group"
             >
               <div className="flex-shrink-0">
                 <motion.div 
-                  className="w-10 h-10 rounded-lg bg-slate-700/50 flex items-center justify-center group-hover:bg-primary/20 transition-colors"
+                  className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center group-hover:bg-primary/20 transition-colors"
                   whileHover={{ rotate: [0, -5, 5, 0] }}
                   transition={{ duration: 0.3 }}
                 >
@@ -130,10 +130,10 @@ export function TwinTrustSection() {
                 </motion.div>
               </div>
               <div>
-                <h3 className="font-semibold text-white mb-1 group-hover:text-primary transition-colors">
+                <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
                   {point.title}
                 </h3>
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-muted-foreground">
                   {point.description}
                 </p>
               </div>
@@ -143,17 +143,17 @@ export function TwinTrustSection() {
         
         {/* Trust logos row */}
         <motion.div 
-          className="mt-12 pt-8 border-t border-slate-800"
+          className="mt-12 pt-8 border-t border-border"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <div className="text-center text-sm text-slate-500 mb-4">
+          <div className="text-center text-sm text-muted-foreground mb-4">
             Recognized by industry leaders
           </div>
           <motion.div 
-            className="flex flex-wrap justify-center items-center gap-8 text-slate-600"
+            className="flex flex-wrap justify-center items-center gap-8 text-muted-foreground/70"
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -162,7 +162,7 @@ export function TwinTrustSection() {
             {["Scale AI", "Upskill Canada", "IRAP", "NRC"].map((name, index) => (
               <motion.span 
                 key={name}
-                className="font-medium hover:text-slate-400 transition-colors cursor-default"
+                className="font-medium hover:text-muted-foreground transition-colors cursor-default"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}

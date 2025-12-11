@@ -1,6 +1,6 @@
 /**
  * TwinStatsBand - Full-width metrics/ROI band
- * With scroll-triggered counter animations
+ * Uses M2M brand design tokens from index.css
  */
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,25 +12,25 @@ const stats = [
     icon: TrendingUp,
     value: "18–24%",
     label: "Projected ROI Impact",
-    color: "text-emerald-400",
+    colorClass: "text-success",
   },
   {
     icon: Zap,
     value: "30–50%",
     label: "Energy Cost Reduction Potential",
-    color: "text-amber-400",
+    colorClass: "text-warning",
   },
   {
     icon: Leaf,
     value: "Up to 70%",
     label: "Renewable Energy Mix",
-    color: "text-green-400",
+    colorClass: "text-success",
   },
   {
     icon: Clock,
     value: "20+",
     label: "Hours Saved Weekly per DC Engineer",
-    color: "text-blue-400",
+    colorClass: "text-info",
   },
 ];
 
@@ -57,7 +57,7 @@ const cardVariants = {
 
 export function TwinStatsBand() {
   return (
-    <section className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 py-16 border-y border-slate-700/50 overflow-hidden">
+    <section className="bg-gradient-to-r from-muted via-card to-muted py-16 border-y border-border/50 overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 lg:px-8">
         <motion.div 
           className="text-center mb-12"
@@ -66,10 +66,10 @@ export function TwinStatsBand() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-2xl lg:text-3xl font-bold text-white mb-3">
+          <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-3">
             Measurable Impact on Your Operations
           </h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto">
             Real results from organizations optimizing their data centre infrastructure with our digital twin platform.
           </p>
         </motion.div>
@@ -84,18 +84,18 @@ export function TwinStatsBand() {
           {stats.map((stat, index) => (
             <motion.div key={index} variants={cardVariants}>
               <Card 
-                className="bg-slate-800/50 border-slate-700/50 hover:border-primary/50 transition-all duration-300 group cursor-default"
+                className="bg-card/50 border-border/50 hover:border-primary/50 transition-all duration-300 group cursor-default"
               >
                 <CardContent className="p-6 text-center">
                   <motion.div 
-                    className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-700/50 mb-4 group-hover:bg-slate-700 transition-colors"
+                    className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted mb-4 group-hover:bg-muted/80 transition-colors"
                     whileHover={{ scale: 1.1, rotate: 5 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                    <stat.icon className={`h-6 w-6 ${stat.colorClass}`} />
                   </motion.div>
                   <motion.div 
-                    className={`text-3xl lg:text-4xl font-bold mb-2 ${stat.color}`}
+                    className={`text-3xl lg:text-4xl font-bold mb-2 ${stat.colorClass}`}
                     initial={{ scale: 0.5, opacity: 0 }}
                     whileInView={{ scale: 1, opacity: 1 }}
                     viewport={{ once: true }}
@@ -108,7 +108,7 @@ export function TwinStatsBand() {
                   >
                     {stat.value}
                   </motion.div>
-                  <div className="text-sm text-slate-400">
+                  <div className="text-sm text-muted-foreground">
                     {stat.label}
                   </div>
                 </CardContent>

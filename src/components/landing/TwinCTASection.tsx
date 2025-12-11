@@ -1,6 +1,6 @@
 /**
  * TwinCTASection - Bottom CTA section
- * With scroll-triggered animations
+ * Uses M2M brand design tokens from index.css
  */
 
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ export function TwinCTASection() {
   const navigate = useNavigate();
 
   return (
-    <section className="py-20 lg:py-28 bg-gradient-to-b from-slate-900 to-slate-950 overflow-hidden relative">
+    <section className="py-20 lg:py-28 bg-gradient-to-b from-muted to-background overflow-hidden relative">
       {/* Animated background elements */}
       <motion.div 
         className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl"
@@ -23,7 +23,7 @@ export function TwinCTASection() {
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div 
-        className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl"
+        className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-success/10 rounded-full blur-3xl"
         animate={{ 
           scale: [1, 1.3, 1],
           opacity: [0.1, 0.2, 0.1]
@@ -34,7 +34,7 @@ export function TwinCTASection() {
       <div className="max-w-4xl mx-auto px-4 lg:px-8 text-center relative z-10">
         {/* Decorative element */}
         <motion.div 
-          className="w-16 h-1 bg-gradient-to-r from-primary to-emerald-400 mx-auto mb-8 rounded-full"
+          className="w-16 h-1 bg-gradient-to-r from-primary to-success mx-auto mb-8 rounded-full"
           initial={{ width: 0, opacity: 0 }}
           whileInView={{ width: 64, opacity: 1 }}
           viewport={{ once: true }}
@@ -58,7 +58,7 @@ export function TwinCTASection() {
         </motion.div>
         
         <motion.h2 
-          className="text-3xl lg:text-4xl font-bold text-white mb-4"
+          className="text-3xl lg:text-4xl font-bold text-foreground mb-4"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -68,7 +68,7 @@ export function TwinCTASection() {
         </motion.h2>
         
         <motion.p 
-          className="text-lg text-slate-400 mb-8 max-w-2xl mx-auto"
+          className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -106,7 +106,7 @@ export function TwinCTASection() {
             <Button 
               size="lg" 
               variant="outline" 
-              className="text-base px-8 border-slate-600 text-slate-200 hover:bg-slate-800"
+              className="text-base px-8 border-border text-foreground hover:bg-muted"
               asChild
             >
               <a href="mailto:info@m2mtechconnect.com">
@@ -119,7 +119,7 @@ export function TwinCTASection() {
         
         {/* No pricing / signup note */}
         <motion.p 
-          className="mt-8 text-sm text-slate-500"
+          className="mt-8 text-sm text-muted-foreground"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}

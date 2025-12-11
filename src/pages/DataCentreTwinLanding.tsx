@@ -1,6 +1,7 @@
 /**
  * DataCentreTwinLanding - Marketing landing page for Sovereign Green AI Data Centre Twin
  * Public, read-only page showcasing the platform capabilities
+ * Uses M2M brand design tokens from index.css
  */
 
 import { 
@@ -80,7 +81,7 @@ const features = [
 
 export default function DataCentreTwinLanding() {
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Hero Section */}
       <TwinHero />
       
@@ -119,16 +120,16 @@ export default function DataCentreTwinLanding() {
       <TwinCTASection />
       
       {/* Footer */}
-      <footer className="py-8 border-t border-slate-800">
+      <footer className="py-8 border-t border-border">
         <div className="max-w-6xl mx-auto px-4 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-sm text-slate-500">
+            <div className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} M2M Tech Connect. All rights reserved.
             </div>
-            <div className="flex items-center gap-6 text-sm text-slate-500">
-              <a href="/privacy" className="hover:text-slate-300 transition-colors">Privacy</a>
-              <a href="/terms" className="hover:text-slate-300 transition-colors">Terms</a>
-              <a href="mailto:info@m2mtechconnect.com" className="hover:text-slate-300 transition-colors">Contact</a>
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <a href="/privacy" className="hover:text-foreground transition-colors">Privacy</a>
+              <a href="/terms" className="hover:text-foreground transition-colors">Terms</a>
+              <a href="mailto:info@m2mtechconnect.com" className="hover:text-foreground transition-colors">Contact</a>
             </div>
           </div>
         </div>

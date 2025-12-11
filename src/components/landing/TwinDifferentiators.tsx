@@ -1,6 +1,6 @@
 /**
  * TwinDifferentiators - Why we're different section
- * With scroll-triggered animations
+ * Uses M2M brand design tokens from index.css
  */
 
 import { Shield, Box, Leaf, Cpu, Check } from "lucide-react";
@@ -63,7 +63,7 @@ const itemVariants = {
 
 export function TwinDifferentiators() {
   return (
-    <section className="py-16 lg:py-24 bg-slate-900/50 overflow-hidden">
+    <section className="py-16 lg:py-24 bg-muted/50 overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 lg:px-8">
         <motion.div 
           className="text-center mb-12"
@@ -72,10 +72,10 @@ export function TwinDifferentiators() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-2xl lg:text-3xl font-bold text-white mb-3">
+          <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-3">
             Why Organizations Choose Our Platform
           </h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto">
             Purpose-built for sovereign, sustainable AI infrastructure — not retrofitted from generic tools.
           </p>
         </motion.div>
@@ -96,7 +96,7 @@ export function TwinDifferentiators() {
                 x: 5,
                 transition: { duration: 0.2 }
               }}
-              className="flex gap-4 p-6 bg-slate-800/30 rounded-xl border border-slate-700/50 hover:border-primary/50 transition-colors cursor-default group"
+              className="flex gap-4 p-6 bg-card/30 rounded-xl border border-border/50 hover:border-primary/50 transition-colors cursor-default group"
             >
               <div className="flex-shrink-0">
                 <motion.div 
@@ -108,10 +108,10 @@ export function TwinDifferentiators() {
                 </motion.div>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-primary transition-colors">
+                <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
                   {diff.title}
                 </h3>
-                <p className="text-slate-400 text-sm">
+                <p className="text-muted-foreground text-sm">
                   {diff.description}
                 </p>
               </div>
@@ -121,13 +121,13 @@ export function TwinDifferentiators() {
         
         {/* Additional comparison points */}
         <motion.div 
-          className="mt-12 p-6 bg-slate-800/20 rounded-xl border border-slate-700/50"
+          className="mt-12 p-6 bg-card/20 rounded-xl border border-border/50"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <h3 className="text-lg font-semibold text-white mb-4 text-center">
+          <h3 className="text-lg font-semibold text-foreground mb-4 text-center">
             Key Platform Capabilities
           </h3>
           <motion.div 
@@ -140,7 +140,7 @@ export function TwinDifferentiators() {
             {capabilities.map((cap, index) => (
               <motion.div 
                 key={index} 
-                className="flex items-center gap-2 text-sm text-slate-300 group cursor-default"
+                className="flex items-center gap-2 text-sm text-muted-foreground group cursor-default"
                 initial={{ opacity: 0, x: -10 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -151,9 +151,9 @@ export function TwinDifferentiators() {
                   whileHover={{ scale: 1.2 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Check className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+                  <Check className="h-4 w-4 text-success flex-shrink-0" />
                 </motion.div>
-                <span className="group-hover:text-white transition-colors">{cap}</span>
+                <span className="group-hover:text-foreground transition-colors">{cap}</span>
               </motion.div>
             ))}
           </motion.div>

@@ -1,6 +1,6 @@
 /**
  * TwinFeatureSection - Reusable feature section with image and bullets
- * With scroll-triggered animations
+ * Uses M2M brand design tokens from index.css
  */
 
 import { Check } from "lucide-react";
@@ -37,7 +37,7 @@ export function TwinFeatureSection({
   flip = false,
 }: TwinFeatureSectionProps) {
   return (
-    <section className="py-16 lg:py-24 overflow-hidden">
+    <section className="py-16 lg:py-24 overflow-hidden bg-background">
       <div className="max-w-6xl mx-auto px-4 lg:px-8">
         <div className={cn(
           "grid lg:grid-cols-2 gap-12 lg:gap-16 items-center",
@@ -53,7 +53,7 @@ export function TwinFeatureSection({
           >
             <div className="space-y-4">
               <motion.h2 
-                className="text-3xl lg:text-4xl font-bold text-white"
+                className="text-3xl lg:text-4xl font-bold text-foreground"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -62,7 +62,7 @@ export function TwinFeatureSection({
                 {title}
               </motion.h2>
               <motion.p 
-                className="text-lg text-slate-400"
+                className="text-lg text-muted-foreground"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -90,7 +90,7 @@ export function TwinFeatureSection({
                   >
                     <Check className="h-3 w-3 text-primary" />
                   </motion.div>
-                  <span className="text-slate-300">{bullet}</span>
+                  <span className="text-muted-foreground">{bullet}</span>
                 </motion.li>
               ))}
             </ul>
@@ -105,11 +105,11 @@ export function TwinFeatureSection({
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
             <motion.div 
-              className="relative bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-3 shadow-xl overflow-hidden"
+              className="relative bg-card/50 backdrop-blur-sm rounded-2xl border border-border/50 p-3 shadow-xl overflow-hidden"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="aspect-[16/10] bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg overflow-hidden">
+              <div className="aspect-[16/10] bg-gradient-to-br from-muted to-background rounded-lg overflow-hidden">
                 <motion.img 
                   src={imageSrc} 
                   alt={imageAlt}
@@ -123,7 +123,7 @@ export function TwinFeatureSection({
                   }}
                 />
                 {/* Subtle overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
               </div>
               
               {/* Glow effect on hover */}

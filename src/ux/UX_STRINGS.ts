@@ -498,18 +498,26 @@ export const BUILDER = {
     },
     STEP_2: {
       NAME: 'Capabilities',
+      TITLE: 'Blueprint Configuration',
+      SUBTITLE: 'Configure agents, data sources, and KPIs for your Data Centre Twin',
       DESCRIPTION: 'Configure KPI thresholds and enable subsystem agents.',
     },
     STEP_3: {
       NAME: 'AI & Integrations',
+      TITLE: 'Integrations',
+      SUBTITLE: 'Connect your Data Centre Twin to monitoring and infrastructure systems',
       DESCRIPTION: 'Set intelligence model and connect data sources.',
     },
     STEP_4: {
       NAME: 'Scenarios & Workflows',
+      TITLE: 'Workflows & Scenarios',
+      SUBTITLE: 'Configure automation workflows and simulation scenarios',
       DESCRIPTION: 'Enable simulation scenarios and automated workflows.',
     },
     STEP_5: {
       NAME: 'Deployment & Financials',
+      TITLE: 'Deployment Configuration',
+      SUBTITLE: 'Select cloud region and deploy your Sovereign Green AI Data Centre Twin',
       DESCRIPTION: 'Select cloud region and configure financial model.',
     },
   },

@@ -15,6 +15,7 @@ import { Switch } from '@/components/ui/switch';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { toast } from 'sonner';
 import { DCCard, DCSectionHeader, DCKPITile } from '@/components/dc-ui';
+import { BUILDER, SCENARIOS, WORKFLOWS } from '@/ux';
 
 const CATEGORY_ICONS: Record<string, any> = {
   capacity: Cpu,
@@ -74,8 +75,8 @@ export function DCStep4Scenarios() {
   return (
     <div className="space-y-6 max-w-[920px] mx-auto">
       <DCSectionHeader
-        title="Workflows & Scenarios"
-        subtitle="Configure automation workflows and simulation scenarios"
+        title={BUILDER.STEPS.STEP_4.TITLE}
+        subtitle={BUILDER.STEPS.STEP_4.SUBTITLE}
         icon={<GitBranch className="h-5 w-5" />}
       />
 

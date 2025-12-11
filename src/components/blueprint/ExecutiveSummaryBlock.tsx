@@ -1,11 +1,11 @@
 /**
  * Executive Summary Block
  * ROI summary, Carbon summary, Top risks, Top optimization opportunities
+ * Uses centralized KPI and agent catalogs
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import {
   TrendingUp,
   Leaf,
@@ -17,14 +17,19 @@ import {
   Shield,
 } from 'lucide-react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
+import { useTwinAgents } from '@/hooks/useTwinAgentsCatalog';
+import { useTwinKPIsFromSimulation } from '@/hooks/useTwinKPIsFromSimulation';
 import { cn } from '@/lib/utils';
 
 interface ExecutiveSummaryBlockProps {
   className?: string;
+  twinId?: string;
 }
 
-export function ExecutiveSummaryBlock({ className }: ExecutiveSummaryBlockProps) {
+export function ExecutiveSummaryBlock({ className, twinId }: ExecutiveSummaryBlockProps) {
   const { overview, kpis, scenarios, agents, financial } = useDCTwinBuilderStore();
+  const { enabledAgents } = useTwinAgents();
+  const { kpis: simulationKpis } = useTwinKPIsFromSimulation(twinId);
 
   // Calculate ROI metrics
   const roiValue = financial?.upgradeSavingsPercent || 15;

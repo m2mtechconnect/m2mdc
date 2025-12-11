@@ -63,6 +63,14 @@ export function BuilderRecommendationPanel({ onTwinCreated, onOpenBlueprint, onO
   const kpis = useDCTwinBuilderStore((s) => s.kpis);
   const financial = useDCTwinBuilderStore((s) => s.financial);
   const sourceRecommendation = useDCTwinBuilderStore((s) => s.sourceRecommendation);
+  
+  // Debug logging
+  console.log("[BuilderRecommendationPanel] Rendering with:", {
+    customerName: overview.customerName,
+    twinName: overview.twinName,
+    industry: overview.industry,
+    siteUrl: overview.siteUrl,
+  });
 
   // Derived values from builder state
   const enabledAgents = agents.filter(a => a.enabled);

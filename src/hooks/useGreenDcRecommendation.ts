@@ -81,10 +81,18 @@ export function useGreenDcRecommendation() {
       }
 
       if (data?.recommendation) {
+        console.log("[useGreenDcRecommendation] Recommendation received:", {
+          companyName: data.recommendation.companyName,
+          industry: data.recommendation.industry,
+          businessModel: data.recommendation.businessModel,
+          archetypeId: data.recommendation.archetypeId,
+        });
+        
         setRecommendation(data.recommendation);
         
         // Initialize the builder store from the recommendation
         const sessionId = crypto.randomUUID();
+        console.log("[useGreenDcRecommendation] Initializing builder store with sessionId:", sessionId);
         initializeFromGreenDcRecommendation(data.recommendation, sessionId);
         setIsInitialized(true);
         
@@ -93,6 +101,7 @@ export function useGreenDcRecommendation() {
         
         // Invalidate the last scan query to refresh the banner
         queryClient.invalidateQueries({ queryKey: ["dc-scan-sessions", "last"] });
+        console.log("[useGreenDcRecommendation] Store initialized and session saved");
       }
     } catch (err) {
       console.error("[useGreenDcRecommendation] Error:", err);

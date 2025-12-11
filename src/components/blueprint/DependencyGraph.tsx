@@ -140,7 +140,7 @@ export function DependencyGraph({ className }: { className?: string }) {
 
   return (
     <Card className={className}>
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm flex items-center gap-2">
             <Network className="h-4 w-4" />
@@ -150,6 +150,9 @@ export function DependencyGraph({ className }: { className?: string }) {
             {graph.nodes.length} nodes • {graph.connections.length} connections
           </Badge>
         </div>
+        <p className="text-[10px] text-muted-foreground mt-1">
+          Agents monitor KPIs → trigger workflows → respond to scenarios
+        </p>
       </CardHeader>
       <CardContent className="pb-6">
         {/* Flow Legend */}
@@ -310,12 +313,6 @@ export function DependencyGraph({ className }: { className?: string }) {
           </div>
         </div>
 
-        {/* Connection Summary */}
-        <div className="mt-3 pt-2 border-t">
-          <p className="text-[10px] text-muted-foreground text-center">
-            This graph shows how agents monitor KPIs, which trigger workflows that respond to scenarios. All components work together to maintain optimal data centre operations.
-          </p>
-        </div>
       </CardContent>
     </Card>
   );

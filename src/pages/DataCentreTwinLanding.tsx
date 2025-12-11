@@ -16,6 +16,7 @@ import {
   TwinTrustSection,
   TwinCTASection,
   ScrollReveal,
+  TwinFooter,
 } from "@/components/landing";
 
 // Feature section data - using real Studio UI screenshots
@@ -167,20 +168,7 @@ export default function DataCentreTwinLanding() {
       <TwinCTASection />
       
       {/* Footer */}
-      <footer className="py-8 border-t border-border">
-        <div className="max-w-6xl mx-auto px-4 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} M2M Tech Connect. All rights reserved.
-            </div>
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <a href="/privacy" className="hover:text-foreground transition-colors">Privacy</a>
-              <a href="/terms" className="hover:text-foreground transition-colors">Terms</a>
-              <a href="mailto:info@m2mtechconnect.com" className="hover:text-foreground transition-colors">Contact</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <TwinFooter />
     </div>
   );
 }

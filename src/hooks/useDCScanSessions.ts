@@ -98,7 +98,10 @@ export function useLastScanSession() {
         blueprintId: session.blueprintId,
         recommendation: session.recommendationJson
       };
-    }
+    },
+    staleTime: 0, // Always refetch when invalidated
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 }
 

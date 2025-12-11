@@ -125,6 +125,9 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
         // Fetch Green DC Twin Recommendation
         toast.info("Scanning website for Green Data Centre Twin recommendations...");
         await fetchGreenDcRecommendation(normalizedUrl, force, deepIngest);
+        
+        // Refetch last scan session after successful recommendation
+        await refetchLastScan();
       } catch (error) {
         console.error("[HeroSearchBar] Error during Green DC URL analysis:", error);
         const errorMessage =
@@ -149,7 +152,7 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
         }
       }
     },
-    [navigate, resetState, resetGreenDc, fetchGreenDcRecommendation]
+    [navigate, resetState, resetGreenDc, fetchGreenDcRecommendation, refetchLastScan]
   );
 
   const handleManualContentSubmit = useCallback(

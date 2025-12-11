@@ -1,7 +1,11 @@
 /**
  * DC Twin Overview Tab
- * Renders overview content from DC Twin Builder Store
+ * Renders overview content - ALWAYS prioritizes ActiveTwinContext over builder store
  * All UX content sourced from centralized UX_STRINGS
+ * 
+ * CRITICAL: Uses useTwinContext() to determine the source of truth:
+ * - If activeTwin exists, use its data (from header dropdown selection)
+ * - Only fall back to builder store when in preview/sandbox mode
  */
 
 import { Badge } from '@/components/ui/badge';
@@ -11,10 +15,31 @@ import {
   Target, TrendingUp, Leaf, Users, Briefcase
 } from 'lucide-react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
+import { useTwinContext } from '@/hooks/useTwinContext';
 import { OVERVIEW } from '@/ux';
 
 export function DCOverviewTab() {
-  const { overview } = useDCTwinBuilderStore();
+  const { activeTwin, isPreviewMode, recommendation } = useTwinContext();
+  const builderOverview = useDCTwinBuilderStore((s) => s.overview);
+  
+  // CRITICAL: Derive display values from the correct source of truth
+  // Priority 1: Active twin from header dropdown (real persisted twin)
+  // Priority 2: Builder store (preview/draft mode only)
+  const twinName = activeTwin?.name || builderOverview.twinName || 'Data Centre Twin';
+  const facilityLocation = activeTwin?.city || builderOverview.facilityLocation || 'Unknown';
+  const regionCode = activeTwin?.region_code || builderOverview.regionCode || 'ca-central-1';
+  const industries = activeTwin?.industry 
+    ? [activeTwin.industry] 
+    : builderOverview.industries || [];
+  
+  // For computed values, always use builder store since twins don't store these
+  const overview = {
+    ...builderOverview,
+    twinName,
+    facilityLocation,
+    regionCode,
+    industries,
+  };
   
   // Prefer primaryUseCases when available, fall back to keyCapabilities
   const useCases = overview.primaryUseCases?.length > 0 

@@ -1,6 +1,8 @@
 /**
  * DC Twin Deploy Tab
  * Shows deployment configuration, cloud regions, and readiness checks
+ * 
+ * CRITICAL: Uses useTwinContext() to prioritize active twin over builder store
  */
 
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +14,7 @@ import {
   Shield, Database, GitBranch, BarChart3, Lock, Rocket
 } from 'lucide-react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
+import { useTwinContext } from '@/hooks/useTwinContext';
 
 const categoryIcons: Record<string, React.ReactNode> = {
   sovereignty: <Shield className="h-4 w-4" />,
@@ -28,7 +31,16 @@ const providerLogos: Record<string, string> = {
 };
 
 export function DCDeployTab() {
-  const { overview, deployment, setTargetRegion } = useDCTwinBuilderStore();
+  const { activeTwin } = useTwinContext();
+  const { overview: builderOverview, deployment, setTargetRegion } = useDCTwinBuilderStore();
+  
+  // CRITICAL: Use active twin data if available
+  const overview = {
+    ...builderOverview,
+    twinName: activeTwin?.name || builderOverview.twinName,
+    facilityLocation: activeTwin?.city || builderOverview.facilityLocation,
+    regionCode: activeTwin?.region_code || builderOverview.regionCode,
+  };
   
   const passedChecks = deployment.deploymentChecks.filter(c => c.status === 'pass').length;
   const totalChecks = deployment.deploymentChecks.length;

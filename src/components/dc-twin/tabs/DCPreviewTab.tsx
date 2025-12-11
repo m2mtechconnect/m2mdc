@@ -1,6 +1,8 @@
 /**
  * DC Twin Preview Tab
  * Shows intelligence configuration and sample queries
+ * 
+ * CRITICAL: Uses useTwinContext() to prioritize active twin over builder store
  */
 
 import { useState } from 'react';
@@ -13,6 +15,7 @@ import {
   Thermometer, DollarSign, Shield, AlertTriangle
 } from 'lucide-react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
+import { useTwinContext } from '@/hooks/useTwinContext';
 
 const capabilityIcons: Record<string, React.ReactNode> = {
   'HPC/GPU': <Zap className="h-4 w-4" />,
@@ -23,7 +26,17 @@ const capabilityIcons: Record<string, React.ReactNode> = {
 };
 
 export function DCPreviewTab() {
-  const { overview, intelligence } = useDCTwinBuilderStore();
+  const { activeTwin } = useTwinContext();
+  const { overview: builderOverview, intelligence } = useDCTwinBuilderStore();
+  
+  // CRITICAL: Use active twin data if available
+  const overview = {
+    ...builderOverview,
+    twinName: activeTwin?.name || builderOverview.twinName,
+    facilityLocation: activeTwin?.city || builderOverview.facilityLocation,
+    regionCode: activeTwin?.region_code || builderOverview.regionCode,
+  };
+  
   const [query, setQuery] = useState('');
   const [selectedQuery, setSelectedQuery] = useState<string | null>(null);
   

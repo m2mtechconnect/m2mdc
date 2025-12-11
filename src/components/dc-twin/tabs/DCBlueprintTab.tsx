@@ -2,6 +2,8 @@
  * DC Twin Design Tab (formerly Blueprint Tab)
  * READ-ONLY summary view of Design when accessed from DC Twin page
  * All UX content sourced from centralized UX_STRINGS
+ * 
+ * CRITICAL: Uses useTwinContext() to prioritize active twin over builder store
  */
 
 import { useState } from 'react';
@@ -16,6 +18,7 @@ import {
   ExternalLink, Lock, Eye, FileText
 } from 'lucide-react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
+import { useTwinContext } from '@/hooks/useTwinContext';
 import type { DCAgentDomain } from '@/types/dcTwinBuilder';
 import { ExecutiveSummaryBlock } from '@/components/blueprint/ExecutiveSummaryBlock';
 import { DomainHealthMap } from '@/components/blueprint/DomainHealthMap';
@@ -42,9 +45,18 @@ const domainIcons: Record<DCAgentDomain, React.ReactNode> = {
 
 export function DCBlueprintTab() {
   const navigate = useNavigate();
-  const { agents, dataSources, kpis, workflows, overview } = useDCTwinBuilderStore();
+  const { activeTwin } = useTwinContext();
+  const { agents, dataSources, kpis, workflows, overview: builderOverview } = useDCTwinBuilderStore();
   const [selectedKpiId, setSelectedKpiId] = useState<string | null>(null);
   const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null);
+  
+  // CRITICAL: Use active twin name if available
+  const overview = {
+    ...builderOverview,
+    twinName: activeTwin?.name || builderOverview.twinName,
+    facilityLocation: activeTwin?.city || builderOverview.facilityLocation,
+    regionCode: activeTwin?.region_code || builderOverview.regionCode,
+  };
   
   const enabledAgents = agents.filter(a => a.enabled);
   const activeDataSources = dataSources.filter(ds => ds.enabled);

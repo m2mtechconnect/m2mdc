@@ -42,41 +42,45 @@ interface WorkflowSimulationPreviewProps {
   className?: string;
 }
 
-// Mock workflow steps
-const MOCK_STEPS: WorkflowStep[] = [
+/**
+ * Industry-accurate workflow steps for thermal response
+ * Based on ASHRAE TC 9.9 recommended response procedures
+ * and Uptime Institute Tier III+ operational requirements
+ */
+const THERMAL_RESPONSE_STEPS: WorkflowStep[] = [
   {
     id: 'step-1',
-    name: 'Temperature Threshold Trigger',
+    name: 'ASHRAE A1 Threshold Trigger',
     type: 'trigger',
     status: 'success',
-    duration: 50,
-    output: 'Trigger condition met: rack_temp > 28°C',
+    duration: 45,
+    output: 'Trigger condition met: rack inlet temp 28.2°C > ASHRAE A1 recommended max (27°C)',
   },
   {
     id: 'step-2',
-    name: 'Check GPU Load',
+    name: 'GPU Load & Throttle Check',
     type: 'condition',
     status: 'success',
-    duration: 120,
-    output: 'GPU load at 85% - condition passed',
+    duration: 112,
+    output: 'H100 cluster at 87% utilization - thermal throttling risk assessed at 12%',
   },
   {
     id: 'step-3',
-    name: 'Increase Cooling Output',
+    name: 'CRAH Setpoint Adjustment',
     type: 'action',
     status: 'running',
     duration: undefined,
-    output: 'Adjusting CRAH setpoint...',
+    output: 'Adjusting CRAH-B-1 supply air setpoint from 18°C to 16°C via BACnet...',
   },
   {
     id: 'step-4',
-    name: 'Redistribute Workload',
+    name: 'Workload Rebalancing',
     type: 'action',
     status: 'pending',
   },
   {
     id: 'step-5',
-    name: 'Send Alert Notification',
+    name: 'NOC Alert & Ticket Creation',
     type: 'notification',
     status: 'pending',
   },
@@ -91,8 +95,8 @@ export function WorkflowSimulationPreview({
   className
 }: WorkflowSimulationPreviewProps) {
   const [isRunning, setIsRunning] = useState(false);
-  const [simulationSteps, setSimulationSteps] = useState<WorkflowStep[]>(steps || MOCK_STEPS);
-  const [currentStepIndex, setCurrentStepIndex] = useState(2); // Mock: step 3 is running
+  const [simulationSteps, setSimulationSteps] = useState<WorkflowStep[]>(steps || THERMAL_RESPONSE_STEPS);
+  const [currentStepIndex, setCurrentStepIndex] = useState(2); // Step 3 (CRAH adjustment) is running
   
   const completedSteps = simulationSteps.filter(s => s.status === 'success').length;
   const failedSteps = simulationSteps.filter(s => s.status === 'failed').length;
@@ -131,7 +135,7 @@ export function WorkflowSimulationPreview({
   const handleReset = () => {
     setIsRunning(false);
     setCurrentStepIndex(0);
-    setSimulationSteps(steps || MOCK_STEPS.map(s => ({ ...s, status: 'pending' as const })));
+    setSimulationSteps(steps || THERMAL_RESPONSE_STEPS.map(s => ({ ...s, status: 'pending' as const })));
   };
 
   const handleRunPreview = () => {

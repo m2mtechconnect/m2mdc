@@ -31,42 +31,72 @@ interface DCFacilityMapProps {
   selectedRackId?: string;
 }
 
-// Generate mock rack data
-const generateMockRacks = (): RackData[] => {
+/**
+ * Generate realistic rack data based on industry standards
+ * Temperature ranges per ASHRAE TC 9.9 Thermal Guidelines:
+ * - Recommended: 18-27°C inlet (A1 Class)
+ * - Allowable: 15-32°C inlet (A2 Class)
+ * Load distribution based on typical hyperscale patterns
+ */
+const generateIndustryRacks = (): RackData[] => {
   const racks: RackData[] = [];
+  const rackConfigs = [
+    // Row A - High-density GPU racks (NVIDIA DGX pattern)
+    { temp: 24.2, load: 78, status: 'normal' as const },
+    { temp: 25.8, load: 85, status: 'normal' as const },
+    { temp: 27.1, load: 92, status: 'warning' as const },
+    { temp: 26.4, load: 88, status: 'normal' as const },
+    { temp: 23.8, load: 72, status: 'normal' as const },
+    // Row B - Mixed compute/storage
+    { temp: 22.5, load: 65, status: 'normal' as const },
+    { temp: 23.9, load: 71, status: 'normal' as const },
+    { temp: 28.4, load: 94, status: 'warning' as const },
+    { temp: 24.7, load: 76, status: 'normal' as const },
+    { temp: 21.8, load: 58, status: 'normal' as const },
+    // Row C - Inference cluster
+    { temp: 25.2, load: 82, status: 'normal' as const },
+    { temp: 31.2, load: 96, status: 'critical' as const },
+    { temp: 26.8, load: 87, status: 'normal' as const },
+    { temp: 24.1, load: 74, status: 'normal' as const },
+    { temp: 22.9, load: 68, status: 'normal' as const },
+    // Row D - Network/Edge
+    { temp: 20.5, load: 45, status: 'normal' as const },
+    { temp: 21.2, load: 52, status: 'normal' as const },
+    { temp: 22.8, load: 61, status: 'normal' as const },
+    { temp: 21.9, load: 55, status: 'normal' as const },
+    { temp: 20.1, load: 42, status: 'normal' as const },
+  ];
+
   for (let row = 0; row < 4; row++) {
     for (let col = 0; col < 5; col++) {
-      const temp = 20 + Math.random() * 25;
-      const load = Math.random() * 100;
-      let status: 'normal' | 'warning' | 'critical' = 'normal';
-      if (temp > 40 || load > 90) status = 'critical';
-      else if (temp > 35 || load > 80) status = 'warning';
+      const configIndex = row * 5 + col;
+      const config = rackConfigs[configIndex];
       
       racks.push({
         id: `rack-${row}-${col}`,
         name: `Rack ${String.fromCharCode(65 + row)}${col + 1}`,
         row,
         col,
-        temperature: temp,
-        load,
-        status,
+        temperature: config.temp,
+        load: config.load,
+        status: config.status,
       });
     }
   }
   return racks;
 };
 
-// Zone definitions
+// Zone definitions based on typical Tier III+ data center layout
 const zones: ZoneData[] = [
-  { id: 'cooling-1', name: 'Cooling Zone A', type: 'cooling', row: 0, col: 5, span: { rows: 2, cols: 1 } },
-  { id: 'cooling-2', name: 'Cooling Zone B', type: 'cooling', row: 2, col: 5, span: { rows: 2, cols: 1 } },
-  { id: 'ups-1', name: 'UPS Room', type: 'ups', row: 4, col: 0, span: { rows: 1, cols: 2 } },
-  { id: 'power-1', name: 'Power Room', type: 'power', row: 4, col: 2, span: { rows: 1, cols: 2 } },
-  { id: 'hot-aisle', name: 'Hot Aisle', type: 'hot_aisle', row: 4, col: 4, span: { rows: 1, cols: 2 } },
+  { id: 'crah-a', name: 'CRAH Zone A', type: 'cooling', row: 0, col: 5, span: { rows: 2, cols: 1 } },
+  { id: 'crah-b', name: 'CRAH Zone B', type: 'cooling', row: 2, col: 5, span: { rows: 2, cols: 1 } },
+  { id: 'ups-room', name: 'UPS Room (2N)', type: 'ups', row: 4, col: 0, span: { rows: 1, cols: 2 } },
+  { id: 'pdu-mdb', name: 'PDU / MDB', type: 'power', row: 4, col: 2, span: { rows: 1, cols: 2 } },
+  { id: 'hot-aisle', name: 'Hot Aisle Containment', type: 'hot_aisle', row: 4, col: 4, span: { rows: 1, cols: 2 } },
 ];
 
 export function DCFacilityMap({ onRackSelect, selectedRackId }: DCFacilityMapProps) {
-  const [racks] = useState(generateMockRacks);
+  const [racks] = useState(generateIndustryRacks);
   const [hoveredRack, setHoveredRack] = useState<string | null>(null);
 
   const getHeatmapColor = (temp: number): string => {

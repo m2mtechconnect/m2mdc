@@ -21,14 +21,20 @@ interface SearchResult {
   icon: typeof FileText;
 }
 
-const mockResults: SearchResult[] = [
-  { id: "1", title: "HIPAA Compliance Guide.pdf", type: "file", source: "Google Drive", path: "/builder?doc=1", icon: FileText },
-  { id: "2", title: "Q4 Marketing Report", type: "file", source: "SharePoint", path: "/builder?doc=2", icon: FileText },
-  { id: "3", title: "Connect Google Drive", type: "app", path: "/connect", icon: Database },
-  { id: "4", title: "Intelligence Dashboard", type: "page", path: "/intelligence", icon: BarChart3 },
-  { id: "5", title: "Compliance Audit Trail", type: "page", path: "/compliance", icon: Shield },
-  { id: "6", title: "Zapier Integration", type: "app", source: "Zapier", path: "/connect", icon: Zap },
-  { id: "7", title: "AI System Settings", type: "setting", path: "/builder", icon: Settings },
+/**
+ * Search results for Data Centre Twin operations
+ * Categories: Documents, Pages, Apps/Integrations, Settings
+ */
+const dcSearchResults: SearchResult[] = [
+  { id: "1", title: "ASHRAE TC 9.9 Thermal Guidelines", type: "file", source: "Documentation", path: "/builder?doc=ashrae-tc99", icon: FileText },
+  { id: "2", title: "Uptime Institute Tier III Certification", type: "file", source: "Compliance", path: "/builder?doc=uptime-tier3", icon: FileText },
+  { id: "3", title: "PIPEDA Data Residency Policy", type: "file", source: "Sovereignty", path: "/builder?doc=pipeda-policy", icon: Shield },
+  { id: "4", title: "Telemetry & Analytics Dashboard", type: "page", path: "/intelligence", icon: BarChart3 },
+  { id: "5", title: "Sovereignty & Safety Audit", type: "page", path: "/compliance", icon: Shield },
+  { id: "6", title: "Prometheus Integration", type: "app", source: "Metrics Backend", path: "/connect", icon: Zap },
+  { id: "7", title: "DCIM Platform Settings", type: "setting", path: "/builder", icon: Settings },
+  { id: "8", title: "Carbon Intensity Dashboard", type: "page", path: "/data-centre-twin?tab=financial", icon: BarChart3 },
+  { id: "9", title: "GPU Scheduler Agent Config", type: "setting", path: "/manage-agents", icon: Database },
 ];
 
 export default function GlobalSearchBar() {
@@ -49,7 +55,7 @@ export default function GlobalSearchBar() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  const filteredResults = mockResults.filter((result) =>
+  const filteredResults = dcSearchResults.filter((result) =>
     result.title.toLowerCase().includes(query.toLowerCase()) ||
     result.source?.toLowerCase().includes(query.toLowerCase())
   );

@@ -1,6 +1,33 @@
 /**
  * React Hook for Carbon Engine
  * Provides reactive carbon metrics from facility data
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * CARBON ACCOUNTING STANDARDS:
+ * - GHG Protocol Corporate Standard (Scope 1, 2, 3 Emissions)
+ *   https://ghgprotocol.org/corporate-standard
+ * - ISO 14064-1:2018 Quantification and Reporting of GHG Emissions
+ *   https://www.iso.org/standard/66453.html
+ * 
+ * REGIONAL CARBON INTENSITY FEEDS:
+ * - Environment and Climate Change Canada - National Inventory Report
+ *   https://www.canada.ca/en/environment-climate-change/services/climate-change/greenhouse-gas-emissions/inventory.html
+ * - Electricity Maps Real-Time Carbon Intensity API
+ *   https://www.electricitymaps.com/
+ * 
+ * CARBON PRICING REFERENCES:
+ * - Environment and Climate Change Canada - Federal Carbon Pricing Trajectory
+ *   https://www.canada.ca/en/environment-climate-change/services/climate-change/pricing-pollution-how-it-will-work.html
+ *   Current: $80/tonne (2024) → $170/tonne (2030)
+ * 
+ * REACT PATTERNS:
+ * - React useMemo Optimization Patterns
+ *   https://react.dev/reference/react/useMemo
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import { useMemo } from 'react';

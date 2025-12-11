@@ -1,6 +1,77 @@
 /**
  * Data Centre Simulation - Scenario Registry
  * 12+ preset scenarios with timeline scripts
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * POWER & UPS SCENARIOS:
+ * - Uptime Institute Tier III/IV Concurrently Maintainable Requirements
+ *   https://uptimeinstitute.com/tier-certification/tier-requirements
+ * - IEEE 1100-2005 Recommended Practice for Powering and Grounding
+ *   https://standards.ieee.org/standard/1100-2005.html
+ * - NFPA 110 Standard for Emergency and Standby Power Systems
+ *   https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=110
+ * - Schneider Electric UPS Battery Degradation Analysis (White Paper 176)
+ *   https://www.se.com/ww/en/download/document/WP176/
+ * 
+ * COOLING FAILURE SCENARIOS:
+ * - ASHRAE TC 9.9 Thermal Guidelines for Data Processing Environments (5th Ed)
+ *   https://tc0909.ashraetcs.org/documents.php
+ * - Uptime Institute Data Center Cooling Best Practices
+ *   https://uptimeinstitute.com/resources/research-and-reports
+ * - CRAH/CRAC Failure Response Protocols (Schneider Electric White Paper 59)
+ *   https://www.se.com/ww/en/download/document/WP59/
+ * 
+ * FIRE SUPPRESSION SCENARIOS:
+ * - NFPA 75 Standard for the Fire Protection of Information Technology Equipment
+ *   https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=75
+ * - NFPA 2001 Standard on Clean Agent Fire Extinguishing Systems (FM-200)
+ *   https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=2001
+ * - FM Global Data Sheet 5-32 Data Centers and Related Facilities
+ *   https://www.fmglobal.com/research-and-resources/fm-global-data-sheets
+ * 
+ * WATER LEAK & ENVIRONMENTAL SCENARIOS:
+ * - TIA-942-B Telecommunications Infrastructure Standard for Data Centers
+ *   https://tiaonline.org/what-we-do/standards/
+ * - Uptime Institute Environmental Best Practices
+ *   https://uptimeinstitute.com/resources
+ * 
+ * CARBON PRICING SCENARIOS:
+ * - Environment and Climate Change Canada - Federal Carbon Pricing Trajectory
+ *   https://www.canada.ca/en/environment-climate-change/services/climate-change/pricing-pollution-how-it-will-work/carbon-pollution-pricing-federal-benchmark-information.html
+ *   Current: $80/tonne (2024) → $170/tonne (2030)
+ * - Government of Canada Greenhouse Gas Pollution Pricing Act
+ *   https://laws-lois.justice.gc.ca/eng/acts/G-11.55/
+ * - Canada's 2030 Emissions Reduction Plan
+ *   https://www.canada.ca/en/services/environment/weather/climatechange/climate-plan/climate-plan-overview/emissions-reduction-2030.html
+ * 
+ * DATA SOVEREIGNTY SCENARIOS:
+ * - PIPEDA (Personal Information Protection and Electronic Documents Act)
+ *   https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/
+ * - Canadian Digital Charter Implementation Act (Bill C-27)
+ *   https://www.parl.ca/DocumentViewer/en/44-1/bill/C-27/first-reading
+ * - Treasury Board of Canada Secretariat - Direction on Electronic Data Residency
+ *   https://www.canada.ca/en/government/system/digital-government/digital-government-innovations/cloud-services/direction-electronic-data-residency.html
+ * 
+ * GPU WORKLOAD SCENARIOS:
+ * - NVIDIA DGX Cloud Infrastructure Guidelines
+ *   https://docs.nvidia.com/dgx-cloud/
+ * - MLCommons Training Benchmark Suite (MLPerf)
+ *   https://mlcommons.org/en/training-normal-21/
+ * - NVIDIA GPU Thermal Management Best Practices
+ *   https://docs.nvidia.com/datacenter/tesla/mig-user-guide/
+ * 
+ * NETWORK RESILIENCE SCENARIOS:
+ * - Cisco Data Center Network Design Guide
+ *   https://www.cisco.com/c/en/us/td/docs/solutions/Enterprise/Data_Center/DC_3_0/DC-3_0_Design.html
+ * - IEEE 802.1Q VLAN and Network Segmentation Standards
+ *   https://standards.ieee.org/standard/802_1Q-2022.html
+ * - BGP Security Best Practices (NIST SP 800-54)
+ *   https://csrc.nist.gov/publications/detail/sp/800-54/final
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import type { ScenarioDefinition, ScenarioTimelineStep } from './types';

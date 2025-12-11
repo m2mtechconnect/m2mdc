@@ -1,6 +1,67 @@
 /**
  * Carbon Intelligence Engine
  * Calculates carbon emissions, efficiency scores, and sustainability metrics
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * GHG PROTOCOL & CARBON ACCOUNTING:
+ * - GHG Protocol Corporate Standard (Scope 1, 2, 3 Emissions)
+ *   https://ghgprotocol.org/corporate-standard
+ * - GHG Protocol Scope 2 Guidance (Purchased Electricity)
+ *   https://ghgprotocol.org/scope_2_guidance
+ * - ISO 14064-1:2018 Quantification and Reporting of GHG Emissions
+ *   https://www.iso.org/standard/66453.html
+ * 
+ * REGIONAL CARBON INTENSITY DATA:
+ * - Environment and Climate Change Canada - National Inventory Report
+ *   https://www.canada.ca/en/environment-climate-change/services/climate-change/greenhouse-gas-emissions/inventory.html
+ * - Canada Energy Regulator - Provincial Grid Emission Factors
+ *   https://www.cer-rec.gc.ca/en/data-analysis/energy-commodities/electricity/
+ * - Quebec Hydro-Quebec (98% renewable hydro): ~15-20 gCO2e/kWh
+ * - Alberta AESO (coal/gas heavy): ~450-550 gCO2e/kWh
+ * - Ontario IESO (nuclear/hydro mix): ~35-50 gCO2e/kWh
+ * 
+ * US REGIONAL EMISSIONS:
+ * - US EPA eGRID (Emissions & Generation Resource Integrated Database)
+ *   https://www.epa.gov/egrid
+ * - EIA (Energy Information Administration) State Electricity Profiles
+ *   https://www.eia.gov/electricity/state/
+ * 
+ * EUROPEAN CARBON INTENSITY:
+ * - European Environment Agency - CO2 Intensity of Electricity Generation
+ *   https://www.eea.europa.eu/data-and-maps/daviz/co2-emission-intensity-12
+ * - Electricity Maps Real-Time Carbon Intensity API
+ *   https://www.electricitymaps.com/
+ * 
+ * CARBON PRICING:
+ * - Environment and Climate Change Canada - Federal Carbon Pricing
+ *   https://www.canada.ca/en/environment-climate-change/services/climate-change/pricing-pollution-how-it-will-work.html
+ *   Trajectory: $80/tonne (2024) → $170/tonne (2030)
+ * - EU Emissions Trading System (EU ETS) Pricing
+ *   https://climate.ec.europa.eu/eu-action/eu-emissions-trading-system-eu-ets_en
+ * - World Bank Carbon Pricing Dashboard
+ *   https://carbonpricingdashboard.worldbank.org/
+ * 
+ * DATA CENTER CARBON METRICS:
+ * - The Green Grid - Carbon Usage Effectiveness (CUE) Metric
+ *   https://www.thegreengrid.org/en/resources/library-and-tools
+ * - Google Carbon-Free Energy Percentage Methodology
+ *   https://cloud.google.com/sustainability/region-carbon
+ * - Microsoft Sustainability Calculator
+ *   https://azure.microsoft.com/en-us/blog/microsoft-sustainability-calculator-helps-enterprises-analyze-the-carbon-emissions-of-their-it-infrastructure/
+ * 
+ * GPU-SPECIFIC CARBON CALCULATIONS:
+ * - NVIDIA Data Center GPU Power Specifications
+ *   https://www.nvidia.com/en-us/data-center/products/
+ *   H100 SXM: 700W TDP, A100: 400W TDP, H200: 700W TDP
+ * - MLCommons Carbon Footprint of AI Training
+ *   https://mlcommons.org/en/
+ * - Google AI Training Carbon Footprint Studies
+ *   https://arxiv.org/abs/2104.10350
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import type { 

@@ -1,6 +1,42 @@
 /**
- * Hook to fetch agents from the Data Centre Twin Blueprint
+ * useBlueprintAgents - Hook to Fetch Agents from Data Centre Twin Blueprint
  * Ensures Subsystem Agents page always mirrors the Blueprint → Agents tab
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * DATA CENTER AGENT ARCHITECTURES:
+ * - NVIDIA DGX Cloud Agent-Based Monitoring
+ *   https://docs.nvidia.com/dgx-cloud/
+ * - Schneider Electric EcoStruxure IT Expert
+ *   https://www.se.com/ww/en/work/solutions/for-business/data-centers-and-networks/discover-ecostruxure-it/
+ * - Vertiv Trellis Platform Agent Architecture
+ *   https://www.vertiv.com/en-us/products-catalog/monitoring-control-and-management/software/
+ * 
+ * SUBSYSTEM AGENT DOMAINS:
+ * - Thermal: ASHRAE TC 9.9 Thermal Guidelines
+ *   https://tc0909.ashraetcs.org/documents.php
+ * - Power: IEEE 493 Industrial Power Systems
+ *   https://standards.ieee.org/standard/493-2007.html
+ * - Cooling: ASHRAE Handbook - HVAC Applications (Data Centers Chapter)
+ *   https://www.ashrae.org/technical-resources/ashrae-handbook
+ * - Network: Cisco Data Center Network Design Guide
+ *   https://www.cisco.com/c/en/us/td/docs/solutions/Enterprise/Data_Center/DC_3_0/DC-3_0_Design.html
+ * - Sovereignty: PIPEDA & Canadian Data Residency Requirements
+ *   https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/
+ * 
+ * AGENT STATUS & LIFECYCLE:
+ * - ITIL Agent Management Best Practices
+ *   https://www.axelos.com/certifications/itil-service-management
+ * - Prometheus Service Discovery Patterns
+ *   https://prometheus.io/docs/prometheus/latest/configuration/configuration/#service_discovery
+ * 
+ * REACT PATTERNS:
+ * - React useMemo for Expensive Transformations
+ *   https://react.dev/reference/react/useMemo
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import { useMemo } from 'react';

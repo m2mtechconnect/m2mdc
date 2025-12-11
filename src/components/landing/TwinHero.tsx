@@ -222,9 +222,10 @@ export function TwinHero() {
               {/* Screenshot content */}
               <div className="aspect-[16/10] bg-gradient-to-br from-muted/80 via-muted/50 to-background rounded-b-lg overflow-hidden relative">
                 <img 
-                  src="/assets/landing/twin-hero.png" 
+                  src="/landing/screenshots/dashboard-desktop.webp" 
                   alt="3D sovereign data centre twin dashboard showing real-time PUE, carbon metrics, and GPU utilization"
                   className="w-full h-full object-cover"
+                  loading="eager"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}

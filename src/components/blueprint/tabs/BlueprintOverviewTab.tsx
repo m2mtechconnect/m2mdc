@@ -49,14 +49,14 @@ const domainIcons: Record<string, React.ReactNode> = {
 };
 
 const domainColors: Record<string, string> = {
-  thermal: 'bg-orange-500/10 text-orange-600 border-orange-500/30',
-  power: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/30',
-  cooling: 'bg-blue-500/10 text-blue-600 border-blue-500/30',
-  network: 'bg-purple-500/10 text-purple-600 border-purple-500/30',
-  facility: 'bg-gray-500/10 text-gray-600 border-gray-500/30',
-  workload: 'bg-pink-500/10 text-pink-600 border-pink-500/30',
-  sovereignty: 'bg-green-500/10 text-green-600 border-green-500/30',
-  financial: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30',
+  thermal: 'bg-warning/10 text-warning border-warning/30',
+  power: 'bg-warning/10 text-warning border-warning/30',
+  cooling: 'bg-info/10 text-info border-info/30',
+  network: 'bg-primary/10 text-primary border-primary/30',
+  facility: 'bg-muted text-muted-foreground border-border',
+  workload: 'bg-primary/10 text-primary border-primary/30',
+  sovereignty: 'bg-success/10 text-success border-success/30',
+  financial: 'bg-success/10 text-success border-success/30',
 };
 
 /**

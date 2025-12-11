@@ -46,20 +46,20 @@ export interface BlueprintAgentsTabProps {
 }
 
 const domainIcons: Record<string, React.ReactNode> = {
-  thermal: <Thermometer className="h-4 w-4 text-orange-500" />,
-  thermal_hardware: <Thermometer className="h-4 w-4 text-orange-500" />,
-  power: <Zap className="h-4 w-4 text-yellow-500" />,
-  power_ups: <Zap className="h-4 w-4 text-yellow-500" />,
-  cooling: <Wind className="h-4 w-4 text-blue-500" />,
-  network: <Network className="h-4 w-4 text-purple-500" />,
-  facility: <Building2 className="h-4 w-4 text-gray-500" />,
-  facility_safety: <Building2 className="h-4 w-4 text-gray-500" />,
-  workload: <Cpu className="h-4 w-4 text-pink-500" />,
-  workload_gpu: <Cpu className="h-4 w-4 text-pink-500" />,
-  sovereignty: <Globe className="h-4 w-4 text-green-500" />,
-  financial: <DollarSign className="h-4 w-4 text-emerald-500" />,
-  financial_carbon: <DollarSign className="h-4 w-4 text-emerald-500" />,
-  incident_response: <AlertTriangle className="h-4 w-4 text-red-500" />,
+  thermal: <Thermometer className="h-4 w-4 text-warning" />,
+  thermal_hardware: <Thermometer className="h-4 w-4 text-warning" />,
+  power: <Zap className="h-4 w-4 text-warning" />,
+  power_ups: <Zap className="h-4 w-4 text-warning" />,
+  cooling: <Wind className="h-4 w-4 text-info" />,
+  network: <Network className="h-4 w-4 text-primary" />,
+  facility: <Building2 className="h-4 w-4 text-muted-foreground" />,
+  facility_safety: <Building2 className="h-4 w-4 text-muted-foreground" />,
+  workload: <Cpu className="h-4 w-4 text-primary" />,
+  workload_gpu: <Cpu className="h-4 w-4 text-primary" />,
+  sovereignty: <Globe className="h-4 w-4 text-success" />,
+  financial: <DollarSign className="h-4 w-4 text-success" />,
+  financial_carbon: <DollarSign className="h-4 w-4 text-success" />,
+  incident_response: <AlertTriangle className="h-4 w-4 text-destructive" />,
 };
 
 const typeIcons: Record<string, React.ReactNode> = {
@@ -72,12 +72,12 @@ const typeIcons: Record<string, React.ReactNode> = {
 };
 
 const typeBadgeColors: Record<string, string> = {
-  monitoring: 'bg-blue-500/10 text-blue-600 border-blue-500/30',
-  control: 'bg-purple-500/10 text-purple-600 border-purple-500/30',
-  analytics: 'bg-green-500/10 text-green-600 border-green-500/30',
-  incident: 'bg-red-500/10 text-red-600 border-red-500/30',
-  optimizer: 'bg-amber-500/10 text-amber-600 border-amber-500/30',
-  scheduler: 'bg-pink-500/10 text-pink-600 border-pink-500/30',
+  monitoring: 'bg-info/10 text-info border-info/30',
+  control: 'bg-primary/10 text-primary border-primary/30',
+  analytics: 'bg-success/10 text-success border-success/30',
+  incident: 'bg-destructive/10 text-destructive border-destructive/30',
+  optimizer: 'bg-warning/10 text-warning border-warning/30',
+  scheduler: 'bg-primary/10 text-primary border-primary/30',
 };
 
 export function BlueprintAgentsTab({ agents, domains, highlightAgentId, useRealData = true }: BlueprintAgentsTabProps) {

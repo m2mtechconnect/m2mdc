@@ -1,6 +1,15 @@
-// Template loader utility for Digital Twin Studio
-// SINGLE TEMPLATE: Data Centre Digital Twin Master Template
-
+/**
+ * Template loader utility for Digital Twin Studio
+ * SINGLE TEMPLATE: Data Centre Digital Twin Master Template
+ * 
+ * INDUSTRY SOURCES:
+ * - Digital Twin Design Patterns: https://www.digitaltwinconsortium.org/initiatives/capabilities-periodic-table/
+ * - Data Center Template Standards: https://www.uptimeinstitute.com/tier-certification
+ * - Green Data Center Design: https://www.thegreengrid.org/
+ * - Uptime Institute Tier Standards: https://uptimeinstitute.com/tier-certification
+ * - ASHRAE Thermal Guidelines: https://www.ashrae.org/technical-resources/bookstore/datacom-series
+ * - TIA-942 Data Center Standards: https://tiaonline.org/what-we-do/standards/
+ */
 export interface DigitalTwinBlueprint {
   id: string;
   name: string;

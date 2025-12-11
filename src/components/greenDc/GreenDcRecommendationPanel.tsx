@@ -65,6 +65,10 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
   const handleCreateTwin = async () => {
     setIsCreating(true);
     try {
+      // Use canonical company name from recommendation
+      const companyName = rec.companyName || rec.domain.split('.')[0];
+      const displayName = companyName.charAt(0).toUpperCase() + companyName.slice(1);
+      
       // Create location first
       const region = rec.regions[0] || 'ca-central-1';
       const city = region.includes('central') ? 'Montreal' : 
@@ -72,7 +76,7 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
                    region.includes('east') ? 'Toronto' : 'Montreal';
       
       const location = await createLocation({
-        name: `${rec.companyName || rec.domain} - ${city}`,
+        name: `${displayName} - ${city}`,
         city,
         province: city === 'Montreal' ? 'Quebec' : city === 'Vancouver' ? 'BC' : 'Ontario',
         country: 'Canada',
@@ -88,9 +92,10 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
         throw new Error('Failed to create location');
       }
       
-      // Create twin linked to location
+      // Create twin linked to location with canonical name
+      const twinName = `${displayName} Sovereign Green AI Data Centre Twin`;
       const twin = await createTwin(location.id, {
-        name: `${rec.companyName || rec.domain} Green DC Twin`,
+        name: twinName,
         city,
         region_code: region,
         tier: rec.kpiTargets.uptimeTargetPct >= 99.99 ? 'Tier IV' : 'Tier III',
@@ -102,6 +107,7 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
         carbon_intensity: rec.kpiTargets.carbonIntensityTargetGPerKwh,
         metadata: {
           sourceUrl: rec.domain,
+          companyName: displayName,
           archetypeId: rec.archetypeId,
           agents: rec.agents,
           scenarios: rec.scenarios,
@@ -153,6 +159,10 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
     return `$${value}`;
   };
 
+  // Get display name for the company
+  const companyDisplayName = rec.companyName || 
+    (rec.domain ? rec.domain.split('.')[0].charAt(0).toUpperCase() + rec.domain.split('.')[0].slice(1) : 'Organization');
+
   return (
     <Card className="border-primary/20 bg-card">
       <CardHeader className="pb-4">
@@ -163,7 +173,7 @@ export function GreenDcRecommendationPanel({ rec, onOpenBlueprint, onOpenSimulat
               <CardTitle className="text-xl">Green Data Centre Twin Recommendation</CardTitle>
             </div>
             <p className="text-sm text-muted-foreground">
-              Automatically generated for <span className="font-medium text-foreground">{rec.companyName || rec.domain}</span>
+              Automatically generated for <span className="font-medium text-foreground">{companyDisplayName}</span>
             </p>
           </div>
           <Badge variant="outline" className="bg-success/10 text-success border-success/30">

@@ -3,6 +3,8 @@
  * Used for URL scanning and Green DC Twin recommendations
  */
 
+import type { ScrapedSiteMeta, CompanyIdentity } from './scrapedSiteMeta';
+
 export type DCScanIndustry =
   | "finance"
   | "government"
@@ -43,6 +45,9 @@ export interface DCScanSignals {
   };
   sustainabilityKeywords: string[];
   contentSummary?: string;
+  // Enhanced metadata
+  siteMeta?: ScrapedSiteMeta;
+  companyIdentity?: CompanyIdentity;
 }
 
 export interface DCScanSession {
@@ -81,6 +86,12 @@ export interface DCBlueprintTemplate {
 export interface DCRecommendation {
   sessionId: string;
   url: string;
+  domain: string;
+  // Company identity fields
+  companyName: string;
+  displayName: string;
+  twinName: string;
+  // Detection results
   detectedIndustry: DCScanIndustry;
   blueprintProfile: DCBlueprintProfile;
   blueprintName: string;
@@ -93,6 +104,8 @@ export interface DCRecommendation {
   costFocus: string;
   complianceFocus: string[];
   sustainabilityFocus: string[];
+  // Metadata reference
+  siteMeta?: ScrapedSiteMeta;
 }
 
 export interface LastScanSummary {
@@ -105,6 +118,8 @@ export interface LastScanSummary {
   blueprintName?: string;
   blueprintId?: string | null;
   recommendation?: DCRecommendation | null;
+  companyName?: string;
+  twinName?: string;
 }
 
 // Industry display labels

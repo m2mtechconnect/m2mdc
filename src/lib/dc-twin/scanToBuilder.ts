@@ -10,30 +10,16 @@ import { INDUSTRY_LABELS } from '@/types/dcScan';
 
 /**
  * Map a scan recommendation to a complete DC Twin Builder state
+ * Uses the canonical twinName and companyName from the recommendation
  */
-/**
- * Normalize company name from domain
- */
-function normalizeCompanyFromDomain(domain: string): string {
-  const domainBase = domain.split('.')[0];
-  return domainBase
-    .replace(/-/g, ' ')
-    .replace(/_/g, ' ')
-    .split(' ')
-    .filter(w => w.length > 0)
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join(' ');
-}
-
 export function recommendationToBuilderState(
   recommendation: DCRecommendation,
   sessionId: string
 ): Partial<DCTwinBuilderState> {
-  const domain = getDomainFromUrl(recommendation.url);
-  const companyName = normalizeCompanyFromDomain(domain);
-  const twinName = companyName 
-    ? `${companyName} Sovereign Green AI Data Centre Twin`
-    : 'Sovereign Green AI Data Centre Twin';
+  // Use the canonical company identity from the recommendation
+  const companyName = recommendation.companyName || recommendation.displayName || 'Organization';
+  const twinName = recommendation.twinName || `${companyName} Sovereign Green AI Data Centre Twin`;
+  const domain = recommendation.domain || getDomainFromUrl(recommendation.url);
   
   // Build overview from recommendation
   const overview: Partial<DCTwinOverview> = {

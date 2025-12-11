@@ -4,6 +4,7 @@
  * Right-side docked assistant panel with streaming responses,
  * context chips, and structured 4-section layout.
  * Now integrated with DC domain context and quick chips.
+ * P0 fix: Context-aware in Simulation mode with badge indicator.
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
@@ -17,11 +18,13 @@ import { CoPilotContextChips } from './CoPilotContextChips';
 import { CoPilotStructuredResponse } from './CoPilotStructuredResponse';
 import { CoPilotFormattedContent } from './CoPilotFormattedContent';
 import { DCCoPilotChips } from './DCCoPilotChips';
+import { SimulationContextBadge } from './SimulationContextBadge';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useCoPilotCommands } from '@/contexts/CoPilotCommandContext';
 import { logCoPilotEvent } from '@/lib/copilot/analytics';
 import { getModelDisplayName, getModelVersion } from '@/lib/copilot/copilotConfig';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { useCoPilotSimulationContext } from '@/hooks/useCoPilotSimulationContext';
 import { COPILOT } from '@/ux';
 
 interface CoPilotDockedPanelProps {
@@ -87,6 +90,9 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
   
   // Get active twin context
   const { activeTwinId, twin, location } = useActiveTwin();
+  
+  // Get simulation context for context-aware CoPilot (P0 fix)
+  const { hasSimulationContext, contextSummary, simulationContextPayload } = useCoPilotSimulationContext();
   
   const { 
     context, 
@@ -217,6 +223,17 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
           <X className="h-4 w-4" />
         </Button>
       </div>
+      
+      {/* Simulation Context Badge - P0 fix: Shows when CoPilot is using simulation context */}
+      {hasSimulationContext && contextSummary && (
+        <div className="px-4 py-2 border-b border-border bg-muted/20">
+          <SimulationContextBadge
+            scenarioName={contextSummary.scenarioName}
+            progress={contextSummary.progress / 100}
+            isRunning={contextSummary.isRunning}
+          />
+        </div>
+      )}
 
       {/* Context Chips - Show DC chips when on DC pages */}
       {isDCPage ? (

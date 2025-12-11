@@ -22,6 +22,27 @@ interface SimulationSnapshotHeaderProps {
   onDownloadSnapshot?: () => void;
 }
 
+/**
+ * Sanitize twin name to remove malformed patterns like "!(https..."
+ */
+function sanitizeTwinName(name: string | undefined): string {
+  if (!name) return 'Sovereign AI Data Centre';
+  
+  let cleaned = name
+    .replace(/^!\(/g, '')
+    .replace(/^\[/g, '')
+    .replace(/^https?:\/\//gi, '')
+    .replace(/^www\./gi, '')
+    .trim();
+  
+  // If still looks malformed, use fallback
+  if (cleaned.startsWith('(') || cleaned.length < 3) {
+    return 'Sovereign AI Data Centre';
+  }
+  
+  return cleaned;
+}
+
 export function SimulationSnapshotHeader({
   twinName = 'Sovereign AI Data Centre',
   twinId = 'default',
@@ -32,6 +53,7 @@ export function SimulationSnapshotHeader({
   onDownloadSnapshot,
 }: SimulationSnapshotHeaderProps) {
   const navigate = useNavigate();
+  const safeTwinName = sanitizeTwinName(twinName);
 
   const handleOpenDesigner = () => {
     navigate(`/blueprint/${twinId}`);
@@ -91,7 +113,7 @@ export function SimulationSnapshotHeader({
             </div>
           </div>
           <p className="text-xs text-muted-foreground mt-1 truncate max-w-xs">
-            {twinName}
+            {safeTwinName}
           </p>
         </div>
         

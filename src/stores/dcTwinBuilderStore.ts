@@ -241,10 +241,33 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
         
         const defaultState = createDefaultDCTwinBuilderState();
         
+        // Extract and normalize company name from URL
+        const extractCompanyFromUrl = (url: string): string => {
+          try {
+            const hostname = new URL(url).hostname.replace(/^www\./i, '');
+            const domainBase = hostname.split('.')[0];
+            // Convert hyphens to spaces and capitalize
+            return domainBase
+              .replace(/-/g, ' ')
+              .replace(/_/g, ' ')
+              .split(' ')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+              .join(' ');
+          } catch {
+            return '';
+          }
+        };
+        
+        const companyName = extractCompanyFromUrl(recommendation.url);
+        const twinName = companyName 
+          ? `${companyName} Sovereign Green AI Data Centre Twin`
+          : 'Sovereign Green AI Data Centre Twin';
+        
         // Map recommendation to overview
         const overview: DCTwinOverview = {
           ...defaultState.overview,
-          twinName: `Sovereign Green AI Data Centre Twin for ${new URL(recommendation.url).hostname.replace('www.', '')}`,
+          twinName,
+          customerName: companyName,
           twinSummary: recommendation.summary,
           description: recommendation.summary,
           industries: [recommendation.detectedIndustry, 'Technology', 'IT Operations', 'Sustainability'],
@@ -306,12 +329,38 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
           ? `Your organization operates one of the world's largest distributed retail infrastructures. This Twin optimizes both hyperscale data centres and retail edge workloads across thousands of sites.`
           : `AI-powered digital twin for ${recommendation.industry} operations with focus on sustainability and sovereignty.`;
         
+        // Normalize company name - remove URL artifacts and format properly
+        const normalizeCompanyNameLocal = (raw: string | undefined): string => {
+          if (!raw) return '';
+          let cleaned = raw
+            .replace(/^https?:\/\//gi, '')
+            .replace(/^www\./gi, '')
+            .replace(/^!\(/g, '')
+            .replace(/\)$/g, '')
+            .split('/')[0]
+            .split('.')[0]
+            .replace(/-/g, ' ')
+            .replace(/_/g, ' ');
+          return cleaned
+            .split(' ')
+            .filter(w => w.length > 0)
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+            .join(' ');
+        };
+        
+        const normalizedCompanyName = normalizeCompanyNameLocal(recommendation.companyName) || 
+                                      normalizeCompanyNameLocal(recommendation.domain);
+        const twinName = normalizedCompanyName 
+          ? `${normalizedCompanyName} Sovereign Green AI Data Centre Twin`
+          : 'Sovereign Green AI Data Centre Twin';
+        const twinSlug = `dc-twin-${(normalizedCompanyName || 'default').toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+        
         // Map recommendation to overview with customer name and industry
         const overview: DCTwinOverview = {
           ...defaultState.overview,
-          twinName: `${recommendation.companyName} Sovereign Green AI Data Centre Twin`,
-          twinSlug: `dc-twin-${(recommendation.companyName || recommendation.domain).toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
-          customerName: recommendation.companyName,
+          twinName,
+          twinSlug,
+          customerName: normalizedCompanyName,
           siteUrl: recommendation.domain,
           industry: recommendation.industryId || recommendation.industry,
           twinSummary: recommendation.objectives.join('. '),

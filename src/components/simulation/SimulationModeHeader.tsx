@@ -28,6 +28,27 @@ interface SimulationModeHeaderProps {
   onViewSnapshot?: () => void;
 }
 
+/**
+ * Sanitize twin name to remove malformed patterns like "!(https..."
+ */
+function sanitizeTwinName(name: string | undefined): string {
+  if (!name) return 'Data Centre Twin';
+  
+  let cleaned = name
+    .replace(/^!\(/g, '')
+    .replace(/^\[/g, '')
+    .replace(/^https?:\/\//gi, '')
+    .replace(/^www\./gi, '')
+    .trim();
+  
+  // If still looks malformed, use fallback
+  if (cleaned.startsWith('(') || cleaned.length < 3) {
+    return 'Data Centre Twin';
+  }
+  
+  return cleaned;
+}
+
 export function SimulationModeHeader({ 
   twinName = 'Data Centre Twin',
   twinId = 'default',
@@ -38,6 +59,7 @@ export function SimulationModeHeader({
   onViewSnapshot
 }: SimulationModeHeaderProps) {
   const navigate = useNavigate();
+  const safeTwinName = sanitizeTwinName(twinName);
 
   const handleOpenDesigner = () => {
     navigate(`/blueprint/${twinId}`);
@@ -58,7 +80,7 @@ export function SimulationModeHeader({
               </div>
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold">Simulation Environment</h1>
-                <p className="text-sm text-muted-foreground">{twinName}</p>
+                <p className="text-sm text-muted-foreground">{safeTwinName}</p>
               </div>
             </div>
             

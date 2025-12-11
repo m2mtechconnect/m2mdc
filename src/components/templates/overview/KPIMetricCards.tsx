@@ -16,16 +16,71 @@ interface KPIMetricCardsProps {
   kpis: (KPI | string)[];
 }
 
+// Industry-accurate default KPIs for Sovereign Green AI Data Centre
+const DEFAULT_DC_KPIS: KPI[] = [
+  {
+    name: 'Power Usage Effectiveness (PUE)',
+    unit: 'ratio',
+    target: '1.20 - 1.25',
+    direction: 'lower',
+    current_value: 1.25,
+    target_value: 1.20,
+  },
+  {
+    name: 'Carbon Intensity',
+    unit: 'gCO₂/kWh',
+    target: '< 35 (Quebec Hydro)',
+    direction: 'lower',
+    current_value: 28,
+    target_value: 20,
+  },
+  {
+    name: 'GPU Utilization',
+    unit: '%',
+    target: '70% - 85%',
+    direction: 'higher',
+    current_value: 76,
+    target_value: 85,
+  },
+  {
+    name: 'Sovereign Compute Ratio',
+    unit: '%',
+    target: '100% (PIPEDA Compliant)',
+    direction: 'higher',
+    current_value: 97,
+    target_value: 100,
+  },
+  {
+    name: 'Renewable Energy Mix',
+    unit: '%',
+    target: '> 95%',
+    direction: 'higher',
+    current_value: 98,
+    target_value: 100,
+  },
+  {
+    name: 'Thermal Stability Score',
+    unit: 'score',
+    target: '> 90 (ASHRAE A1)',
+    direction: 'higher',
+    current_value: 92,
+    target_value: 95,
+  },
+];
+
 export function KPIMetricCards({ kpis }: KPIMetricCardsProps) {
-  if (!kpis || kpis.length === 0) {
+  // Use industry defaults if no KPIs provided
+  const displayKpis = kpis && kpis.length > 0 ? kpis : DEFAULT_DC_KPIS;
+  
+  if (displayKpis.length === 0) {
     return null;
   }
   
   return (
     <Card className="p-6 bg-card border-border">
       <h3 className="text-xl font-semibold mb-4 text-foreground">KPIs Improved</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {kpis.map((kpi: KPI | string, idx: number) => {
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {displayKpis.map((kpi: KPI | string, idx: number) => {
           // Handle both object and string formats
           const kpiData: KPI = typeof kpi === 'string' 
             ? { name: kpi } 

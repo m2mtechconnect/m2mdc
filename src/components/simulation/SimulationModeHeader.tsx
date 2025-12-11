@@ -1,7 +1,7 @@
 /**
  * Simulation Mode Header
  * Clear visual indicator that user is in SIMULATION mode, not Blueprint Designer
- * Shows simulation badge, snapshot info, and link to Designer
+ * All UX content sourced from centralized UX_STRINGS
  */
 
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +18,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { sanitizeTwinName } from '@/lib/utils/extractCompanyIdentity';
+import { SIMULATION } from '@/ux';
 
 interface SimulationModeHeaderProps {
   twinName?: string;
@@ -59,7 +60,7 @@ export function SimulationModeHeader({
                 <PlayCircle className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold">Simulation Environment</h1>
+                <h1 className="text-xl sm:text-2xl font-bold">{SIMULATION.TITLE}</h1>
                 <p className="text-sm text-muted-foreground">{safeTwinName}</p>
               </div>
             </div>
@@ -74,7 +75,7 @@ export function SimulationModeHeader({
               {/* Design Snapshot indicator */}
               <Badge variant="secondary" className="gap-1">
                 <Eye className="h-3 w-3" />
-                Using Design Snapshot
+                {SIMULATION.SNAPSHOT.BADGE}
               </Badge>
               
               {/* Info tooltip */}
@@ -84,8 +85,7 @@ export function SimulationModeHeader({
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="max-w-xs">
                   <p className="text-sm">
-                    <strong>Simulation Mode</strong> runs scenarios against a frozen design snapshot. 
-                    Configuration changes must be made in the Blueprint Designer.
+                    {SIMULATION.SNAPSHOT.TOOLTIP}
                   </p>
                 </TooltipContent>
               </Tooltip>

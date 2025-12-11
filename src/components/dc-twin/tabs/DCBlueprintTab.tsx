@@ -1,14 +1,14 @@
 /**
  * DC Twin Design Tab (formerly Blueprint Tab)
  * READ-ONLY summary view of Design when accessed from DC Twin page
- * For full editing, user must go to Blueprint Designer
+ * All UX content sourced from centralized UX_STRINGS
  */
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Bot, Database, BarChart3, GitBranch, CheckCircle2, AlertCircle,
@@ -26,6 +26,7 @@ import { KPIEnhancementsPanel } from '@/components/blueprint/KPIEnhancementsPane
 import { WorkflowEnhancementsPanel } from '@/components/blueprint/WorkflowEnhancementsPanel';
 import { BlueprintViewProvider } from '@/context/BlueprintViewContext';
 import { DesignViewHeader } from '@/components/blueprint/DesignViewHeader';
+import { BLUEPRINT, WORKFLOWS, getAgentSummary } from '@/ux';
 
 const domainIcons: Record<DCAgentDomain, React.ReactNode> = {
   thermal: <Thermometer className="h-4 w-4" />,
@@ -65,6 +66,14 @@ export function DCBlueprintTab() {
           tier={overview.tier || 'Tier IV'}
           renewablePercent={overview.renewablePercent || 95}
         />
+
+        {/* Blueprint Intro - from UX_STRINGS */}
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">{BLUEPRINT.TITLE}</CardTitle>
+            <CardDescription>{BLUEPRINT.INTRO}</CardDescription>
+          </CardHeader>
+        </Card>
 
         {/* Executive Summary Block */}
         <ExecutiveSummaryBlock />

@@ -1,7 +1,7 @@
 /**
  * Green DC Twin Recommendation Panel
  * Displays industry-specific DC twin recommendations from URL scanning
- * Creates location + twin when user clicks "Create Twin"
+ * All UX content sourced from centralized UX_STRINGS
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +18,7 @@ import {
   Leaf, Server, Zap, Thermometer, Shield, DollarSign, Play, FileText, 
   ChevronDown, ChevronUp, Target, Globe, Building2, CheckCircle2, Loader2, Plus 
 } from "lucide-react";
+import { SCANNER, getIndustryName } from "@/ux";
 
 interface Props {
   rec: GreenDcTwinRecommendation;

@@ -3,6 +3,7 @@
  * Shows health score, latency, refresh rate, data freshness, success rate, and ML reasoning preview
  */
 
+import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -38,33 +39,56 @@ interface AgentHealthMetrics {
   };
 }
 
+// Seeded random number generator for stable mock values
+function seededRandom(seed: string): number {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    const char = seed.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash % 100) / 100;
+}
+
 export function AgentHealthPanel({ className }: { className?: string }) {
   const { agents } = useDCTwinBuilderStore();
 
-  // Generate mock health metrics for enabled agents
-  const agentMetrics: AgentHealthMetrics[] = agents
-    .filter(a => a.enabled)
-    .map(agent => ({
-      id: agent.id,
-      name: agent.name,
-      domain: agent.domain,
-      healthScore: 85 + Math.floor(Math.random() * 15),
-      latencyMs: 50 + Math.floor(Math.random() * 150),
-      refreshRateHz: 1 + Math.floor(Math.random() * 9),
-      dataFreshnessMs: 100 + Math.floor(Math.random() * 900),
-      successRate: 92 + Math.floor(Math.random() * 8),
-      lastDecision: agent.domain === 'thermal' ? {
-        action: 'Increased cooling to Zone B',
-        reasoning: 'GPU cluster approaching thermal threshold',
-        confidence: 0.94,
-        factors: ['Temperature +3°C', 'GPU utilization 95%', 'Ambient humidity 45%'],
-      } : agent.domain === 'workload' ? {
-        action: 'Redistributed jobs to Rack 12-15',
-        reasoning: 'Load imbalance detected across clusters',
-        confidence: 0.89,
-        factors: ['Queue depth 142', 'Latency SLA 98.2%', 'GPU fairness index 0.78'],
-      } : undefined,
-    }));
+  // Generate stable mock health metrics for enabled agents using useMemo
+  const agentMetrics: AgentHealthMetrics[] = useMemo(() => {
+    return agents
+      .filter(a => a.enabled)
+      .map(agent => {
+        // Use agent ID as seed for stable random values
+        const seed = agent.id;
+        const r1 = seededRandom(seed + 'health');
+        const r2 = seededRandom(seed + 'latency');
+        const r3 = seededRandom(seed + 'refresh');
+        const r4 = seededRandom(seed + 'freshness');
+        const r5 = seededRandom(seed + 'success');
+
+        return {
+          id: agent.id,
+          name: agent.name,
+          domain: agent.domain,
+          healthScore: 85 + Math.floor(r1 * 15),
+          latencyMs: 50 + Math.floor(r2 * 150),
+          refreshRateHz: 1 + Math.floor(r3 * 9),
+          dataFreshnessMs: 100 + Math.floor(r4 * 900),
+          successRate: 92 + Math.floor(r5 * 8),
+          lastDecision: agent.domain === 'thermal' ? {
+            action: 'Increased cooling to Zone B',
+            reasoning: 'GPU cluster approaching thermal threshold',
+            confidence: 0.94,
+            factors: ['Temperature +3°C', 'GPU utilization 95%', 'Ambient humidity 45%'],
+          } : agent.domain === 'workload' ? {
+            action: 'Redistributed jobs to Rack 12-15',
+            reasoning: 'Load imbalance detected across clusters',
+            confidence: 0.89,
+            factors: ['Queue depth 142', 'Latency SLA 98.2%', 'GPU fairness index 0.78'],
+          } : undefined,
+        };
+      });
+  }, [agents]);
 
   const getHealthColor = (score: number) => {
     if (score >= 90) return { text: 'text-success', bg: 'bg-success' };

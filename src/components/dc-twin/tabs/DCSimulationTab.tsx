@@ -13,7 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { 
   PlayCircle, Pause, RotateCcw, Clock, AlertTriangle, 
   Zap, Leaf, Shield, TrendingUp, Server, GitCompare, LineChart, 
-  Lightbulb, SlidersHorizontal, Network
+  Lightbulb, SlidersHorizontal, Network, PanelRightOpen, PanelRightClose
 } from 'lucide-react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import type { DCScenarioCategory } from '@/types/dcTwinBuilder';
@@ -29,6 +29,7 @@ import { KPICorrelationMatrix } from '@/components/simulation/KPICorrelationMatr
 import { WhatIfControls } from '@/components/simulation/WhatIfControls';
 import { EnhancedComparisonMode } from '@/components/simulation/EnhancedComparisonMode';
 import { LiveInsightsKPIPanel } from '@/components/simulation/LiveInsightsKPIPanel';
+import { SimulationCoPilotPanel, CoPilotModeHeader } from '@/components/copilot';
 import type { KPISnapshot, SimulationEvent } from '@/simulation/types';
 
 const categoryIcons: Record<DCScenarioCategory, React.ReactNode> = {
@@ -84,6 +85,7 @@ export function DCSimulationTab() {
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [activeView, setActiveView] = useState('scenarios');
   const [selectedKpiId, setSelectedKpiId] = useState<string>('pue');
+  const [showCoPilotPanel, setShowCoPilotPanel] = useState(false);
   
   // Mock data for enterprise KPI system
   const snapshots = useMemo(() => generateMockSnapshots(30), []);
@@ -124,25 +126,52 @@ export function DCSimulationTab() {
   
   return (
     <BlueprintViewProvider mode="simulationSnapshot">
-      <div className="space-y-6">
-        {/* SIMULATION MODE HEADER */}
-        <SimulationModeHeader
-          twinName={overview.twinName || 'Sovereign AI Data Centre'}
-          subtitle={`${overview.facilityLocation || 'Montreal, QC'} • ${overview.renewablePercent || 95}% Renewable • ${overview.capacityKw?.toLocaleString() || '10,000'} kW`}
-          blueprintVersion="v1.0"
-          lastUpdated={new Date().toLocaleDateString()}
-          showDesignerLink={true}
-        />
+      <div className="flex">
+        {/* Main Content */}
+        <div className={`flex-1 transition-all duration-300 ${showCoPilotPanel ? 'pr-96' : ''}`}>
+          <div className="space-y-6">
+            {/* SIMULATION MODE HEADER */}
+            <div className="flex items-center justify-between">
+              <SimulationModeHeader
+                twinName={overview.twinName || 'Sovereign AI Data Centre'}
+                subtitle={`${overview.facilityLocation || 'Montreal, QC'} • ${overview.renewablePercent || 95}% Renewable • ${overview.capacityKw?.toLocaleString() || '10,000'} kW`}
+                blueprintVersion="v1.0"
+                lastUpdated={new Date().toLocaleDateString()}
+                showDesignerLink={true}
+              />
+              
+              {/* Co-Pilot Controls */}
+              <div className="flex items-center gap-2">
+                <CoPilotModeHeader mode="simulation" />
+                <Button
+                  variant={showCoPilotPanel ? 'secondary' : 'outline'}
+                  onClick={() => setShowCoPilotPanel(!showCoPilotPanel)}
+                  className="gap-2"
+                >
+                  {showCoPilotPanel ? (
+                    <>
+                      <PanelRightClose className="h-4 w-4" />
+                      Hide
+                    </>
+                  ) : (
+                    <>
+                      <PanelRightOpen className="h-4 w-4" />
+                      Assistant
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
 
-        {/* Enterprise KPI Cards Grid */}
-        <EnterpriseKPICardGrid
-          snapshots={snapshots.slice(0, currentSnapshotIndex + 1)}
-          isLive={isRunning}
-          onKpiClick={(kpiId) => {
-            setSelectedKpiId(kpiId);
-            setActiveView('kpis');
-          }}
-        />
+            {/* Enterprise KPI Cards Grid */}
+            <EnterpriseKPICardGrid
+              snapshots={snapshots.slice(0, currentSnapshotIndex + 1)}
+              isLive={isRunning}
+              onKpiClick={(kpiId) => {
+                setSelectedKpiId(kpiId);
+                setActiveView('kpis');
+              }}
+            />
 
         {/* View Tabs */}
         <Tabs value={activeView} onValueChange={setActiveView}>
@@ -391,6 +420,18 @@ export function DCSimulationTab() {
             </div>
           </TabsContent>
         </Tabs>
+          </div>
+        </div>
+
+        {/* Co-Pilot Side Panel */}
+        {showCoPilotPanel && (
+          <div className="fixed right-0 top-16 bottom-0 w-96 border-l bg-background shadow-lg z-40 overflow-hidden">
+            <SimulationCoPilotPanel 
+              activeScenarioId={selectedScenario || undefined}
+              className="h-full" 
+            />
+          </div>
+        )}
       </div>
     </BlueprintViewProvider>
   );

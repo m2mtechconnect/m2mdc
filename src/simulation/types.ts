@@ -1,7 +1,62 @@
 /**
  * Data Centre Simulation Engine - Type Definitions
  * Core types for simulation state, events, and KPIs
- * ENTERPRISE-GRADE: Matches Nvidia Omniverse, AWS CloudWatch, Siemens Digital Twins
+ * 
+ * ENTERPRISE-GRADE: Matches industry-leading digital twin platforms
+ * 
+ * Industry Sources & Standards:
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * DIGITAL TWIN PLATFORMS:
+ * - NVIDIA Omniverse Enterprise: Real-time simulation and visualization
+ *   https://www.nvidia.com/en-us/omniverse/
+ * - Siemens Digital Industries: Industrial digital twin framework
+ *   https://www.siemens.com/global/en/products/automation/topic-areas/digital-enterprise/digital-twin.html
+ * - AWS IoT TwinMaker: Cloud-based digital twin service
+ *   https://aws.amazon.com/iot-twinmaker/
+ * - Microsoft Azure Digital Twins: Enterprise IoT platform
+ *   https://azure.microsoft.com/en-us/products/digital-twins
+ * 
+ * SIMULATION & MODELING:
+ * - Monte Carlo Simulation Methods (Risk analysis)
+ *   Reference: "Simulation Modeling and Analysis" - Averill M. Law
+ * - Discrete Event Simulation (DES) for operational modeling
+ * - Agent-Based Modeling (ABM) for multi-agent systems
+ * 
+ * KPI FRAMEWORKS:
+ * - Uptime Institute Tier Standards: Availability metrics (99.671% - 99.995%)
+ *   https://uptimeinstitute.com/tiers
+ * - The Green Grid: PUE, DCiE, WUE, CUE measurement protocols
+ *   https://www.thegreengrid.org/en/resources/library
+ * - ISO 50001: Energy performance indicators
+ *   https://www.iso.org/iso-50001-energy-management.html
+ * 
+ * THERMAL MODELING:
+ * - ASHRAE TC 9.9: Thermal Guidelines for Data Processing Environments
+ *   - Class A1: 18-27°C inlet (controlled)
+ *   - Class A2: 10-35°C inlet (allowable)
+ *   - Class H1: 5-25°C inlet (high-density)
+ *   https://tc0909.ashraetcs.org/
+ * - CFD (Computational Fluid Dynamics) validation benchmarks
+ * 
+ * POWER SYSTEM MODELING:
+ * - IEEE 493: Recommended Practice for Design of Reliable Industrial Power Systems
+ *   https://standards.ieee.org/standard/493-2007.html
+ * - TIA-942-B: Telecommunications Infrastructure Standard for Data Centers
+ *   https://tiaonline.org/products/tia-942-c-2017/
+ * 
+ * ANOMALY DETECTION:
+ * - Statistical Process Control (SPC): 3-sigma rule for threshold detection
+ * - ARIMA/Prophet: Time-series forecasting for predictive maintenance
+ * - Isolation Forest / LOF: Unsupervised anomaly detection algorithms
+ * 
+ * INCIDENT RESPONSE:
+ * - ITIL v4: Incident Management Practice Guide
+ *   https://www.axelos.com/certifications/itil-service-management
+ * - Uptime Institute Abnormal Incident Reports (AIRs)
+ *   https://uptimeinstitute.com/resources/asset/2024-annual-outages-analysis
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import type { DomainType, AlertSeverity } from '@/types/dataCenterTwin';

@@ -2,6 +2,55 @@
  * DC Twin Builder Types - Single Source of Truth
  * Complete schema for Sovereign Green AI Data Centre Twin builder configuration
  * All tabs (Overview, Blueprint, Preview, Simulation, Deploy) read from this schema
+ * 
+ * Industry Sources & Compliance Standards:
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * BUILDER WORKFLOW STANDARDS:
+ * - TOGAF (The Open Group Architecture Framework): Enterprise architecture methodology
+ *   https://www.opengroup.org/togaf
+ * - DCIM (Data Center Infrastructure Management) Best Practices
+ *   https://www.gartner.com/en/documents/3894484
+ * 
+ * FACILITY CONFIGURATION:
+ * - Uptime Institute Tier Standard: Topology requirements
+ *   - Tier I: 99.671% availability, N capacity
+ *   - Tier II: 99.749% availability, N+1 capacity
+ *   - Tier III: 99.982% availability, N+1 concurrent maintainability
+ *   - Tier IV: 99.995% availability, 2(N+1) fault tolerant
+ *   https://uptimeinstitute.com/tiers
+ * 
+ * POWER TOPOLOGY:
+ * - TIA-942-C Rating System (1-4)
+ * - IEEE 493: Design of Reliable Industrial Power Systems
+ * - NFPA 70 (NEC): Electrical installation requirements
+ * 
+ * COOLING SYSTEMS:
+ * - ASHRAE TC 9.9: Thermal Guidelines (A1-H1 classes)
+ * - Direct Liquid Cooling (DLC) standards for high-density GPU
+ * - ASHRAE 90.1: Energy Standard for Buildings
+ * 
+ * CANADIAN SOVEREIGNTY:
+ * - PIPEDA: Personal Information Protection and Electronic Documents Act
+ * - Quebec Law 25: Private Sector Privacy Act modernization
+ * - OSFI B-13: Technology and Cyber Risk Management (Banking)
+ * - ITSG-33: Security Control Catalogue (Government of Canada)
+ * - Protected B/C Classification Requirements
+ * 
+ * CARBON & SUSTAINABILITY:
+ * - Canada Federal Carbon Pricing: $80/tonne (2024) → $170/tonne (2030)
+ *   https://www.canada.ca/en/environment-climate-change/services/climate-change/pricing-pollution-how-it-will-work.html
+ * - GHG Protocol Corporate Standard (Scope 1, 2, 3)
+ *   https://ghgprotocol.org/corporate-standard
+ * - ISO 14064: Greenhouse gas accounting and verification
+ * 
+ * GPU & AI WORKLOADS:
+ * - NVIDIA DGX SuperPOD Reference Architecture
+ *   https://docs.nvidia.com/dgx-superpod/
+ * - MLPerf Benchmarks: AI workload standardization
+ *   https://mlcommons.org/en/
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import type { DCScanIndustry, DCBlueprintProfile, DCTier, DCTrafficScale } from './dcScan';

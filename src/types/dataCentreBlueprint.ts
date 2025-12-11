@@ -1,6 +1,47 @@
 /**
  * Data Centre System Blueprint - Single Source of Truth
  * Complete schema for DC twin configuration, agents, KPIs, workflows, roles, scenarios
+ * 
+ * Industry Sources & Standards:
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * BLUEPRINT ARCHITECTURE:
+ * - ISO/IEC 22237 Series: Data Centre Facilities and Infrastructures
+ *   https://www.iso.org/standard/77617.html
+ * - TIA-942-C: Telecommunications Infrastructure Standard for Data Centers
+ *   https://tiaonline.org/products/tia-942-c-2017/
+ * - EN 50600 Series: European Data Centre Standard (design, security, management)
+ *   https://www.en50600.com/
+ * 
+ * DOMAIN CLASSIFICATIONS:
+ * - Thermal: ASHRAE TC 9.9 Thermal Guidelines, Class A1-H1 envelopes
+ * - Power: IEEE 493 Reliability, TIA-942 Tier topologies (N, N+1, 2N, 2(N+1))
+ * - Cooling: ASHRAE 90.1 Energy Efficiency, Liquid cooling guidelines
+ * - Network: TIA-568 Structured Cabling, IEEE 802.3 Ethernet standards
+ * - Facility: NFPA 75/76 Fire Protection, EN 50600-2-5 Physical Security
+ * - Workload: NVIDIA DCGM, Kubernetes resource management, Slurm HPC
+ * - Sovereignty: PIPEDA, GDPR, CCPA, OSFI B-13, ITSG-33
+ * - Financial: GHG Protocol Scope 2, ISO 14064, World Bank Carbon Pricing
+ * 
+ * KPI DEFINITIONS:
+ * - The Green Grid: PUE, DCiE, WUE, CUE measurement protocols
+ *   https://www.thegreengrid.org/en/resources/library
+ * - Uptime Institute: Availability tiers (99.671% to 99.995%)
+ *   https://uptimeinstitute.com/tiers
+ * 
+ * WORKFLOW STANDARDS:
+ * - ITIL v4: Incident, Problem, Change Management practices
+ * - ISO/IEC 27001:2022: Information Security Management
+ * - NIST Cybersecurity Framework: Identify, Protect, Detect, Respond, Recover
+ * 
+ * DATA SOURCE PROTOCOLS:
+ * - SNMP v3 (RFC 3411-3418): Network device monitoring
+ * - BACnet (ASHRAE 135-2020): Building automation
+ * - Modbus: Industrial control systems
+ * - DMTF Redfish: Server hardware management API
+ * - OPC-UA: Industrial interoperability
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import type { DomainType, AlertSeverity, Jurisdiction } from './dataCenterTwin';

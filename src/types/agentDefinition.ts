@@ -1,5 +1,48 @@
 /**
  * Agent Definition Types - Single source of truth for subsystem agents
+ * 
+ * Industry Sources & Design Patterns:
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * AGENT ARCHITECTURE:
+ * - Multi-Agent Systems (MAS): Wooldridge "An Introduction to MultiAgent Systems"
+ * - BDI (Belief-Desire-Intention) Agent Architecture
+ *   Reference: Rao & Georgeff, "BDI Agents: From Theory to Practice"
+ * - FIPA Agent Communication Language (ACL) Standards
+ *   http://www.fipa.org/specs/fipa00061/
+ * 
+ * OBSERVABILITY PATTERNS:
+ * - OpenTelemetry: Distributed tracing and metrics collection
+ *   https://opentelemetry.io/
+ * - Prometheus Monitoring: Time-series metrics and alerting
+ *   https://prometheus.io/docs/concepts/
+ * - Grafana Observability Stack: Visualization and dashboarding
+ *   https://grafana.com/
+ * 
+ * DATA CENTER OPERATIONS:
+ * - ITIL v4 Service Operations: Agent responsibility domains
+ *   https://www.axelos.com/certifications/itil-service-management
+ * - Gartner AIOps: Artificial Intelligence for IT Operations
+ *   https://www.gartner.com/en/information-technology/glossary/aiops-artificial-intelligence-operations
+ * - ServiceNow IT Operations Management (ITOM)
+ *   https://docs.servicenow.com/bundle/tokyo-it-operations-management/
+ * 
+ * DOMAIN CLASSIFICATIONS:
+ * - Thermal: ASHRAE TC 9.9 thermal envelope management
+ * - Power: IEEE 493 reliability, TIA-942 redundancy tiers
+ * - Cooling: ASHRAE 90.1 energy efficiency
+ * - Network: RFC 7011 IPFIX, sFlow (RFC 3176)
+ * - Facility: NFPA 75/76 fire protection, EN 50600 physical security
+ * - Workload: NVIDIA DCGM, Kubernetes resource management
+ * - Sovereignty: PIPEDA, GDPR, CCPA compliance frameworks
+ * - Financial: GHG Protocol Scope 2, ISO 14064 carbon accounting
+ * 
+ * RUNTIME PATTERNS:
+ * - Cron Scheduling: Quartz Scheduler syntax
+ * - Event-Driven Architecture: Apache Kafka, AWS EventBridge patterns
+ * - Circuit Breaker: Hystrix/Resilience4j fault tolerance
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 export type AgentDomain =

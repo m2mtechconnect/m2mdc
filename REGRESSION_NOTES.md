@@ -140,6 +140,9 @@ const overview = {
 - `src/components/dc-twin/tabs/DCSimulationTab.tsx` - Use useTwinContext
 - `src/components/dc-twin/tabs/DCDeployTab.tsx` - Use useTwinContext
 
+### Blueprint Components
+- `src/components/blueprint/ExecutiveSummaryBlock.tsx` - Use useTwinContext for overview priority
+
 ### Visualization & CoPilot
 - `src/components/twin-visualization/hooks/useTwinVisualizationData.ts` - Prioritize activeTwin over builder store
 - `src/hooks/useCoPilotSimulationContext.ts` - Use useTwinContext for proper prioritization

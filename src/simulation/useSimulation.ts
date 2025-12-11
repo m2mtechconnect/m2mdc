@@ -177,7 +177,9 @@ export function useSimulation(options: UseSimulationOptions = {}): UseSimulation
         tickTimingRef.current = null;
       }
     };
-  }, [startTiming, endTiming]);
+    // startTiming and endTiming are now stable, no need in deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   // Get active scenario from all available scenarios
   const activeScenario = state.activeScenarioId 

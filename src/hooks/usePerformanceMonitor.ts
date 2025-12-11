@@ -33,22 +33,24 @@ export function usePerformanceMonitor(componentName: string) {
   const [metrics, setMetrics] = useState<PerformanceMetric[]>([]);
   const renderStartRef = useRef<number>(0);
   const mountTimeRef = useRef<number>(0);
+  const componentNameRef = useRef(componentName);
+  componentNameRef.current = componentName;
 
-  // Subscribe to global metrics
+  // Subscribe to global metrics - only on mount/unmount
   useEffect(() => {
-    const handler = (m: PerformanceMetric[]) => setMetrics(m.filter(x => x.name.startsWith(componentName)));
+    const handler = (m: PerformanceMetric[]) => setMetrics(m.filter(x => x.name.startsWith(componentNameRef.current)));
     subscribers.add(handler);
     return () => { subscribers.delete(handler); };
-  }, [componentName]);
+  }, []);
 
-  // Track component mount/render time
+  // Track component mount/render time - only once on mount
   useEffect(() => {
     const mountEnd = performance.now();
     const mountDuration = mountEnd - mountTimeRef.current;
     
     if (mountTimeRef.current > 0) {
       const metric: PerformanceMetric = {
-        name: `${componentName}:mount`,
+        name: `${componentNameRef.current}:mount`,
         startTime: mountTimeRef.current,
         endTime: mountEnd,
         duration: mountDuration,
@@ -58,26 +60,26 @@ export function usePerformanceMonitor(componentName: string) {
       notifySubscribers();
 
       if (mountDuration > PERFORMANCE_THRESHOLD_MS) {
-        console.warn(`[Performance] ${componentName} mount exceeded ${PERFORMANCE_THRESHOLD_MS}ms: ${mountDuration.toFixed(2)}ms`);
+        console.warn(`[Performance] ${componentNameRef.current} mount exceeded ${PERFORMANCE_THRESHOLD_MS}ms: ${mountDuration.toFixed(2)}ms`);
       }
     }
-  }, [componentName]);
+  }, []);
 
   // Set mount start time on first render
   if (mountTimeRef.current === 0) {
     mountTimeRef.current = performance.now();
   }
 
-  // Manual timing functions
+  // Manual timing functions - stable references using refs
   const startTiming = useCallback((operationName: string, type: PerformanceMetric['type'] = 'compute') => {
     const metric: PerformanceMetric = {
-      name: `${componentName}:${operationName}`,
+      name: `${componentNameRef.current}:${operationName}`,
       startTime: performance.now(),
       type,
     };
     globalMetrics.push(metric);
     return globalMetrics.length - 1; // Return index for endTiming
-  }, [componentName]);
+  }, []);
 
   const endTiming = useCallback((index: number) => {
     if (globalMetrics[index]) {
@@ -131,7 +133,7 @@ export function usePerformanceMonitor(componentName: string) {
 
   // Generate performance report
   const getReport = useCallback((): PerformanceReport => {
-    const componentMetrics = globalMetrics.filter(m => m.name.startsWith(componentName) && m.duration !== undefined);
+    const componentMetrics = globalMetrics.filter(m => m.name.startsWith(componentNameRef.current) && m.duration !== undefined);
     const warnings: string[] = [];
     const averages: Record<string, number> = {};
 
@@ -155,12 +157,12 @@ export function usePerformanceMonitor(componentName: string) {
       : undefined;
 
     return { metrics: componentMetrics, warnings, averages, peakLoad };
-  }, [componentName]);
+  }, []);
 
   // Log performance summary
   const logSummary = useCallback(() => {
     const report = getReport();
-    console.group(`[Performance] ${componentName} Summary`);
+    console.group(`[Performance] ${componentNameRef.current} Summary`);
     console.log('Metrics:', report.metrics.length);
     console.log('Averages:', report.averages);
     if (report.peakLoad) console.log('Peak Load:', report.peakLoad.toFixed(2), 'ms');
@@ -168,7 +170,7 @@ export function usePerformanceMonitor(componentName: string) {
       console.warn('Warnings:', report.warnings);
     }
     console.groupEnd();
-  }, [componentName, getReport]);
+  }, [getReport]);
 
   return {
     metrics,

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { sanitizeTwinName } from '@/lib/utils/extractCompanyIdentity';
 
 interface SimulationModeHeaderProps {
   twinName?: string;
@@ -26,27 +27,6 @@ interface SimulationModeHeaderProps {
   lastUpdated?: string;
   showDesignerLink?: boolean;
   onViewSnapshot?: () => void;
-}
-
-/**
- * Sanitize twin name to remove malformed patterns like "!(https..."
- */
-function sanitizeTwinName(name: string | undefined): string {
-  if (!name) return 'Data Centre Twin';
-  
-  let cleaned = name
-    .replace(/^!\(/g, '')
-    .replace(/^\[/g, '')
-    .replace(/^https?:\/\//gi, '')
-    .replace(/^www\./gi, '')
-    .trim();
-  
-  // If still looks malformed, use fallback
-  if (cleaned.startsWith('(') || cleaned.length < 3) {
-    return 'Data Centre Twin';
-  }
-  
-  return cleaned;
 }
 
 export function SimulationModeHeader({ 

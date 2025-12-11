@@ -2,6 +2,7 @@
  * Landing page components index
  */
 
+export { TwinHeader } from './TwinHeader';
 export { TwinHero } from './TwinHero';
 export { TwinCapabilityBadges } from './TwinCapabilityBadges';
 export { TwinFeatureSection } from './TwinFeatureSection';

@@ -15,6 +15,7 @@ import {
   TwinDifferentiators,
   TwinTrustSection,
   TwinCTASection,
+  ScrollReveal,
 } from "@/components/landing";
 
 // Feature section data - using real Studio UI screenshots
@@ -110,44 +111,57 @@ export default function DataCentreTwinLanding() {
       </div>
       
       {/* Capability Badges */}
-      <TwinCapabilityBadges />
+      <ScrollReveal>
+        <TwinCapabilityBadges />
+      </ScrollReveal>
       
       {/* Feature Sections */}
       <div id="features">
         {features.map((feature, index) => (
-          <TwinFeatureSection
-            key={index}
-            title={feature.title}
-            subtitle={feature.subtitle}
-            bullets={feature.bullets}
-            imageSrc={feature.imageSrc}
-            imageAlt={feature.imageAlt}
-            flip={feature.flip}
-            accentColor={feature.accentColor}
-          />
+          <ScrollReveal key={index} delay={index * 0.1} direction={feature.flip ? "right" : "left"}>
+            <TwinFeatureSection
+              title={feature.title}
+              subtitle={feature.subtitle}
+              bullets={feature.bullets}
+              imageSrc={feature.imageSrc}
+              imageAlt={feature.imageAlt}
+              flip={feature.flip}
+              accentColor={feature.accentColor}
+            />
+          </ScrollReveal>
         ))}
       </div>
       
       {/* Stats/ROI Band */}
-      <TwinStatsBand />
+      <ScrollReveal>
+        <TwinStatsBand />
+      </ScrollReveal>
       
       {/* Integrations */}
-      <div id="integrations">
-        <TwinIntegrationsGrid />
-      </div>
+      <ScrollReveal>
+        <div id="integrations">
+          <TwinIntegrationsGrid />
+        </div>
+      </ScrollReveal>
       
       {/* Use Cases */}
-      <div id="use-cases">
-        <TwinUseCases />
-      </div>
+      <ScrollReveal>
+        <div id="use-cases">
+          <TwinUseCases />
+        </div>
+      </ScrollReveal>
       
       {/* Differentiators */}
-      <div id="differentiators">
-        <TwinDifferentiators />
-      </div>
+      <ScrollReveal>
+        <div id="differentiators">
+          <TwinDifferentiators />
+        </div>
+      </ScrollReveal>
       
       {/* Trust Section */}
-      <TwinTrustSection />
+      <ScrollReveal>
+        <TwinTrustSection />
+      </ScrollReveal>
       
       {/* Bottom CTA */}
       <TwinCTASection />

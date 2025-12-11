@@ -28,6 +28,21 @@ import {
   type IndustryKey,
 } from './UX_STRINGS';
 
+// Re-export formatting utilities for convenience
+export {
+  formatAgentIdForUI,
+  formatScenarioIdForUI,
+  formatKpiIdForUI,
+  formatDomainForUI,
+  formatCurrency,
+  formatPercentage,
+  formatCarbon,
+  formatPower,
+  formatRelativeTime,
+  normalizeAgentId,
+  normalizeScenarioId,
+} from '@/lib/formatters';
+
 /**
  * Generate a canonical twin name for a company
  */

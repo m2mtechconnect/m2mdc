@@ -245,12 +245,35 @@ const GREEN_DC_ARCHETYPES: Record<DcTwinArchetypeId, {
 };
 
 // Classification functions
+// Known consulting/professional services domains (check before industry keyword matching)
+const CONSULTING_DOMAINS = [
+  "deloitte", "pwc", "ey", "kpmg", "mckinsey", "bcg", "bain", "accenture", 
+  "capgemini", "cognizant", "infosys", "tcs", "wipro", "ibm", "oracle",
+  "sap", "microsoft", "google", "amazon", "meta", "apple", "nvidia",
+  "salesforce", "adobe", "servicenow", "workday", "snowflake", "databricks"
+];
+
+function isConsultingFirm(domain: string): boolean {
+  const lowerDomain = domain.toLowerCase();
+  return CONSULTING_DOMAINS.some(firm => lowerDomain.includes(firm));
+}
+
 function classifyIndustry(text: string, domain: string): { industry: DcIndustry; businessModel?: string; isMegaRetailerDomain: boolean } {
   const lower = text.toLowerCase();
   
   // CRITICAL: Check domain first for mega-retailers (they may not have retail keywords in page content)
   if (isMegaRetailer(domain)) {
     return { industry: "retail", businessModel: "hyperscale_retail", isMegaRetailerDomain: true };
+  }
+  
+  // IMPORTANT: Check for consulting/professional services firms BEFORE retail
+  // These firms mention "retail" because they serve retail clients, not because they ARE retail
+  if (isConsultingFirm(domain) || 
+      lower.includes("consulting") || lower.includes("advisory") || 
+      lower.includes("professional services") || lower.includes("big four") ||
+      lower.includes("management consulting") || lower.includes("strategy consulting") ||
+      lower.includes("audit") || lower.includes("assurance") || lower.includes("tax services")) {
+    return { industry: "saas", businessModel: "enterprise_consulting", isMegaRetailerDomain: false };
   }
 
   if (lower.includes("core banking") || lower.includes("retail banking") || lower.includes("capital markets") || lower.includes("wealth management") || lower.includes("payment processing") || lower.includes("financial services")) {
@@ -277,7 +300,9 @@ function classifyIndustry(text: string, domain: string): { industry: DcIndustry;
   if (lower.includes("university") || lower.includes("research institute") || lower.includes("college") || lower.includes("academic") || lower.includes("higher education") || lower.includes(".edu")) {
     return { industry: "education", isMegaRetailerDomain: false };
   }
-  if (lower.includes("e-commerce") || lower.includes("ecommerce") || lower.includes("shopping cart") || lower.includes("retail") || lower.includes("online store") || lower.includes("marketplace")) {
+  // Retail check AFTER consulting - to avoid mis-classifying consulting firms that mention retail clients
+  if (lower.includes("e-commerce") || lower.includes("ecommerce") || lower.includes("shopping cart") || lower.includes("online store") || lower.includes("marketplace") ||
+      (lower.includes("retail") && !lower.includes("consulting") && !lower.includes("advisory"))) {
     return { industry: "retail", businessModel: "ecommerce", isMegaRetailerDomain: false };
   }
   if (lower.includes("cloud") || lower.includes("saas") || lower.includes("software as a service") || lower.includes("platform") || lower.includes("api")) {

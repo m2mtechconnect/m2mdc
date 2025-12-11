@@ -28,6 +28,7 @@ import { EnterpriseKPIChart } from '@/components/simulation/EnterpriseKPIChart';
 import { KPICorrelationMatrix } from '@/components/simulation/KPICorrelationMatrix';
 import { WhatIfControls } from '@/components/simulation/WhatIfControls';
 import { EnhancedComparisonMode } from '@/components/simulation/EnhancedComparisonMode';
+import { LiveInsightsKPIPanel } from '@/components/simulation/LiveInsightsKPIPanel';
 import type { KPISnapshot, SimulationEvent } from '@/simulation/types';
 
 const categoryIcons: Record<DCScenarioCategory, React.ReactNode> = {
@@ -366,6 +367,18 @@ export function DCSimulationTab() {
           </TabsContent>
 
           <TabsContent value="insights" className="space-y-6">
+            {/* Enterprise Live Insights KPI Panel */}
+            <LiveInsightsKPIPanel
+              snapshots={snapshots.slice(0, currentSnapshotIndex + 1)}
+              events={events}
+              isRunning={isRunning}
+              currentTime={currentTime}
+              onKpiClick={(kpiId) => {
+                setSelectedKpiId(kpiId);
+                setActiveView('kpis');
+              }}
+            />
+            
             <div className="grid lg:grid-cols-2 gap-6">
               <LiveRecommendations currentTime={currentTime} />
               <EnterpriseKPIChart

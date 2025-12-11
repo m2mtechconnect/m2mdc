@@ -1,6 +1,10 @@
 /**
  * Last Scan Banner
  * Shows the user's last scan session with quick actions
+ * 
+ * This component is the SINGLE UI for displaying the user's most recent
+ * successful scan. It reads from useLastScanSession() which queries
+ * dc_scan_sessions ordered by created_at DESC.
  */
 
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +37,7 @@ export function LastScanBanner({
     return null;
   }
 
+  // Extract domain from URL
   const domain = (() => {
     try {
       return new URL(lastScan.url).hostname.replace("www.", "");
@@ -40,6 +45,9 @@ export function LastScanBanner({
       return lastScan.url;
     }
   })();
+
+  // Display company name if available, otherwise use domain
+  const displayName = lastScan.companyName || domain;
 
   const industryLabel = lastScan.detectedIndustry 
     ? INDUSTRY_LABELS[lastScan.detectedIndustry] 
@@ -49,13 +57,16 @@ export function LastScanBanner({
     ? formatDistanceToNow(new Date(lastScan.createdAt), { addSuffix: true })
     : "";
 
+  // Use twinName if available, otherwise blueprintName
+  const twinLabel = lastScan.twinName || lastScan.blueprintName;
+
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-muted/50 rounded-lg border mb-4">
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-2 text-sm">
-          <Clock className="h-4 w-4 text-studio-muted" />
-          <span className="text-studio-muted">Last scan:</span>
-          <span className="font-medium text-foreground">{domain}</span>
+          <Clock className="h-4 w-4 text-muted-foreground" />
+          <span className="text-muted-foreground">Last scan:</span>
+          <span className="font-medium text-foreground">{displayName}</span>
         </div>
         
         <Badge variant="secondary" className="text-xs">
@@ -63,14 +74,14 @@ export function LastScanBanner({
           {industryLabel}
         </Badge>
         
-        {lastScan.blueprintName && (
-          <span className="text-sm text-studio-body">
-            → {lastScan.blueprintName}
+        {twinLabel && (
+          <span className="text-sm text-muted-foreground">
+            → {twinLabel}
           </span>
         )}
         
         {timeAgo && (
-          <span className="text-xs text-studio-muted">
+          <span className="text-xs text-muted-foreground">
             ({timeAgo})
           </span>
         )}

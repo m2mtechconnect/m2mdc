@@ -256,7 +256,7 @@ export default function Auth() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-3">
             <button
               type="button"
               onClick={() => {
@@ -269,6 +269,16 @@ export default function Auth() {
                 ? "Already have an account? Sign in" 
                 : "Don't have an account? Sign up"}
             </button>
+            
+            {/* Landing page link */}
+            <div className="pt-2 border-t border-border">
+              <a 
+                href="/twin-datacentre"
+                className="text-sm text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
+              >
+                Learn about the Sovereign Green AI Data Centre Twin →
+              </a>
+            </div>
           </div>
         </div>
       </div>

@@ -45,6 +45,7 @@ import DataCentreTwin from "./pages/DataCentreTwin";
 import Blueprint from "./pages/Blueprint";
 import BlueprintPreview from "./pages/BlueprintPreview";
 import SimulationPreview from "./pages/SimulationPreview";
+import DataCentreTwinLanding from "./pages/DataCentreTwinLanding";
 import AgentDetail from "./pages/AgentDetail";
 import TwinDebug from "./pages/TwinDebug";
 import Profile from "./pages/account/Profile";
@@ -112,11 +113,12 @@ function AuthenticatedApp() {
     );
   }
 
-  // If not authenticated, show only Auth page
+  // If not authenticated, show only Auth page and public landing pages
   if (!session || !user) {
     return (
       <Routes>
         <Route path="/auth" element={<Auth />} />
+        <Route path="/twin-datacentre" element={<DataCentreTwinLanding />} />
         <Route path="*" element={<Navigate to="/auth" replace />} />
       </Routes>
     );
@@ -173,6 +175,8 @@ function AuthenticatedApp() {
         {/* Data Centre Twin */}
         <Route path="/data-centre-twin" element={<DataCentreTwin />} />
         <Route path="/data-centre-twin/:id" element={<DataCentreTwin />} />
+        {/* Public Landing Page (also accessible when authenticated) */}
+        <Route path="/twin-datacentre" element={<DataCentreTwinLanding />} />
         {/* Twin Debug Page */}
         <Route path="/twin-debug" element={<TwinDebug />} />
         {/* Redirect old digital-twins routes to dashboard */}

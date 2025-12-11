@@ -1,6 +1,6 @@
 /**
  * TwinCapabilityBadges - Horizontal badge row showing key capabilities
- * Inspired by Monday.com's clean feature pills with interactive hover states
+ * M2M Tech brand styling with Space Grotesk display font
  * Uses M2M brand design tokens from index.css
  */
 

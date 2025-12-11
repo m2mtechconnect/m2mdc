@@ -1,6 +1,6 @@
 /**
  * TwinStatsBand - Full-width metrics/ROI band
- * Inspired by Monday.com's flip cards with testimonials and impactful metrics
+ * M2M Tech brand styling with Space Grotesk display font
  * Uses M2M brand design tokens from index.css
  */
 
@@ -205,7 +205,7 @@ export function TwinStatsBand() {
               Measurable Results
             </span>
           </motion.div>
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
+          <h2 className="font-display text-3xl lg:text-4xl font-bold text-foreground mb-4">
             Real Impact on Your Operations
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

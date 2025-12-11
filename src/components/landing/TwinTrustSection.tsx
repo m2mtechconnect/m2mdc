@@ -1,6 +1,6 @@
 /**
  * TwinTrustSection - Trust & sovereignty section
- * Inspired by Deloitte's corporate credibility and professional trust signals
+ * M2M Tech brand styling with Space Grotesk display font
  * Uses M2M brand design tokens from index.css
  */
 
@@ -97,7 +97,7 @@ export function TwinTrustSection() {
               Enterprise Trust
             </span>
           </motion.div>
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
+          <h2 className="font-display text-3xl lg:text-4xl font-bold text-foreground mb-4">
             Built for Regulated, Sovereign AI Infrastructure
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">

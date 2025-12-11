@@ -1,6 +1,6 @@
 /**
  * TwinHero - Hero section for Data Centre Twin landing page
- * Inspired by Deloitte's professional corporate style and Monday.com's vibrant SaaS patterns
+ * M2M Tech brand styling with Space Grotesk display font
  * Uses M2M brand design tokens from index.css
  */
 
@@ -84,10 +84,10 @@ export function TwinHero() {
               </Badge>
             </motion.div>
             
-            {/* Main headline - Deloitte-style bold typography */}
+            {/* Main headline - M2M brand typography with Space Grotesk */}
             <div className="space-y-4">
               <motion.h1 
-                className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-[1.1] tracking-tight"
+                className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-[1.1] tracking-tight"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}

@@ -1,6 +1,6 @@
 /**
  * TwinFeatureSection - Reusable feature section with image and bullets
- * Inspired by Deloitte's professional imagery and Monday.com's dynamic layouts
+ * M2M Tech brand styling with Space Grotesk display font
  * Uses M2M brand design tokens from index.css
  */
 
@@ -80,7 +80,7 @@ export function TwinFeatureSection({
               />
               
               <motion.h2 
-                className="text-3xl lg:text-4xl font-bold text-foreground leading-tight"
+                className="font-display text-3xl lg:text-4xl font-bold text-foreground leading-tight"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

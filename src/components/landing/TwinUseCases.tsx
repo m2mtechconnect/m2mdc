@@ -1,6 +1,6 @@
 /**
  * TwinUseCases - Persona cards showing use cases
- * Inspired by Monday.com's interactive cards and Deloitte's stakeholder focus
+ * M2M Tech brand styling with Space Grotesk display font
  * Uses M2M brand design tokens from index.css
  */
 
@@ -215,7 +215,7 @@ export function TwinUseCases() {
               For Every Stakeholder
             </span>
           </motion.div>
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
+          <h2 className="font-display text-3xl lg:text-4xl font-bold text-foreground mb-4">
             Built for Your Entire Organization
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

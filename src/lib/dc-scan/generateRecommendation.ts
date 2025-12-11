@@ -6,9 +6,10 @@ import type {
   DCScanSignals, 
   DCBlueprintTemplate, 
   DCRecommendation,
-  DCScanIndustry
 } from "@/types/dcScan";
 import { INDUSTRY_LABELS } from "@/types/dcScan";
+import { resolveCompanyIdentity, generateCanonicalTwinName } from "@/lib/utils/extractCompanyIdentity";
+import type { ScrapedSiteMeta } from "@/types/scrapedSiteMeta";
 
 // Agent slug to display name mapping
 const AGENT_DISPLAY_NAMES: Record<string, string> = {
@@ -25,14 +26,26 @@ const AGENT_DISPLAY_NAMES: Record<string, string> = {
 };
 
 /**
+ * Extract domain from URL
+ */
+function extractDomain(url: string): string {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.hostname.replace(/^www\./i, '');
+  } catch {
+    return url;
+  }
+}
+
+/**
  * Generate a human-readable summary based on signals and template
  */
 function generateSummary(
   signals: DCScanSignals, 
-  template: DCBlueprintTemplate
+  template: DCBlueprintTemplate,
+  companyName: string
 ): string {
   const industryLabel = INDUSTRY_LABELS[signals.industry];
-  const domain = new URL(signals.url).hostname.replace("www.", "");
   
   // Build context based on detected signals
   const contexts: string[] = [];
@@ -54,7 +67,7 @@ function generateSummary(
     ? ` with ${contexts.join(", ")}`
     : "";
   
-  return `Based on analysis of ${domain}, your organization operates in the ${industryLabel} sector${contextStr}. We recommend the ${template.name} optimized for ${template.complianceFocus.slice(0, 2).join(" and ")} compliance with a target PUE of ${template.targetPue} and ${template.renewableTargetPct}% renewable energy.`;
+  return `Based on analysis of ${companyName}'s digital footprint, your organization operates in the ${industryLabel} sector${contextStr}. We recommend the ${template.name} optimized for ${template.complianceFocus.slice(0, 2).join(" and ")} compliance with a target PUE of ${template.targetPue} and ${template.renewableTargetPct}% renewable energy.`;
 }
 
 /**
@@ -111,13 +124,32 @@ export function generateRecommendation(
     slug => AGENT_DISPLAY_NAMES[slug] || slug
   );
 
+  const domain = extractDomain(signals.url);
+  
+  // Build site metadata from signals or create minimal version
+  const siteMeta: ScrapedSiteMeta = signals.siteMeta || {
+    url: signals.url,
+    domain,
+    pageTitle: signals.contentSummary?.slice(0, 100),
+  };
+  
+  // Resolve company identity
+  const companyIdentity = signals.companyIdentity || resolveCompanyIdentity(siteMeta);
+  const twinName = generateCanonicalTwinName(companyIdentity);
+
   return {
     sessionId,
     url: signals.url,
+    domain,
+    // Company identity
+    companyName: companyIdentity.companyName,
+    displayName: companyIdentity.displayName,
+    twinName,
+    // Detection results
     detectedIndustry: signals.industry,
     blueprintProfile: template.slug,
     blueprintName: template.name,
-    summary: generateSummary(signals, template),
+    summary: generateSummary(signals, template, companyIdentity.companyName),
     suggestedCapacityKw: estimateCapacity(signals, template.defaultCapacityKw),
     suggestedTier: template.defaultTier,
     mainKPIs: generateMainKPIs(template),
@@ -125,6 +157,8 @@ export function generateRecommendation(
     carbonTarget: generateCarbonTarget(template),
     costFocus: template.costFocus,
     complianceFocus: template.complianceFocus,
-    sustainabilityFocus: template.sustainabilityFocus
+    sustainabilityFocus: template.sustainabilityFocus,
+    // Metadata reference
+    siteMeta,
   };
 }

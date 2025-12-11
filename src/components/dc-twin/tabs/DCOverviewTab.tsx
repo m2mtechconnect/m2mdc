@@ -24,13 +24,16 @@ export function DCOverviewTab() {
   
   // CRITICAL: Derive display values from the correct source of truth
   // Priority 1: Active twin from header dropdown (real persisted twin)
-  // Priority 2: Builder store (preview/draft mode only)
-  const twinName = activeTwin?.name || builderOverview.twinName || 'Data Centre Twin';
-  const facilityLocation = activeTwin?.city || builderOverview.facilityLocation || 'Unknown';
+  // Priority 2: Recommendation from scanner (preview mode)
+  // Priority 3: Builder store (draft mode only)
+  const twinName = activeTwin?.name || recommendation?.companyName || builderOverview.twinName || 'Data Centre Twin';
+  const facilityLocation = activeTwin?.city || recommendation?.regions?.[0] || builderOverview.facilityLocation || 'Unknown';
   const regionCode = activeTwin?.region_code || builderOverview.regionCode || 'ca-central-1';
   const industries = activeTwin?.industry 
     ? [activeTwin.industry] 
-    : builderOverview.industries || [];
+    : recommendation?.industry
+      ? [recommendation.industry]
+      : builderOverview.industries || [];
   
   // For computed values, always use builder store since twins don't store these
   const overview = {

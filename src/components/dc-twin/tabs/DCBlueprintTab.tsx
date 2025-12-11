@@ -45,16 +45,16 @@ const domainIcons: Record<DCAgentDomain, React.ReactNode> = {
 
 export function DCBlueprintTab() {
   const navigate = useNavigate();
-  const { activeTwin } = useTwinContext();
+  const { activeTwin, recommendation } = useTwinContext();
   const { agents, dataSources, kpis, workflows, overview: builderOverview } = useDCTwinBuilderStore();
   const [selectedKpiId, setSelectedKpiId] = useState<string | null>(null);
   const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null);
   
-  // CRITICAL: Use active twin name if available
+  // CRITICAL: Priority order: activeTwin → recommendation → builderStore
   const overview = {
     ...builderOverview,
-    twinName: activeTwin?.name || builderOverview.twinName,
-    facilityLocation: activeTwin?.city || builderOverview.facilityLocation,
+    twinName: activeTwin?.name || recommendation?.companyName || builderOverview.twinName,
+    facilityLocation: activeTwin?.city || recommendation?.regions?.[0] || builderOverview.facilityLocation,
     regionCode: activeTwin?.region_code || builderOverview.regionCode,
   };
   

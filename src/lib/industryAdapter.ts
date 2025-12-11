@@ -1,6 +1,19 @@
 /**
  * Industry Adaptation Logic
  * Maps detected industries to universal TwinBlueprintBaseSchema configurations
+ * 
+ * INDUSTRY SOURCES:
+ * - NAICS Industry Classification: https://www.census.gov/naics/
+ * - GICS Industry Standards: https://www.msci.com/our-solutions/indexes/gics
+ * - Digital Twin Vertical Applications: https://www.digitaltwinconsortium.org/
+ * - Healthcare Compliance (HIPAA): https://www.hhs.gov/hipaa/
+ * - Retail Digital Transformation: https://nrf.com/research-insights
+ * - Financial Services Standards: https://www.iso.org/iso-20022-universal-financial-industry-message-scheme.html
+ * - Manufacturing IIoT Standards: https://www.iiconsortium.org/
+ * - Telecom Infrastructure: https://www.3gpp.org/specifications
+ * - Energy Grid Standards: https://www.nerc.com/
+ * - Government Compliance: https://www.canada.ca/en/government/system/digital-government.html
+ * - Canadian Sovereignty: https://www.canada.ca/en/treasury-board-secretariat/services/access-information-privacy.html
  */
 
 import type { 

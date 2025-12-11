@@ -12,11 +12,9 @@ import m2mLogo from "@/assets/m2m-logo.png";
 
 const navItems = [
   { label: "Features", href: "#features" },
-  { label: "How It Works", href: "#how-it-works" },
   { label: "Use Cases", href: "#use-cases" },
-  { label: "Testimonials", href: "#testimonials" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "Contact", href: "#contact" },
+  { label: "Integrations", href: "#integrations" },
+  { label: "Why M2M", href: "#differentiators" },
 ];
 
 export function TwinHeader() {

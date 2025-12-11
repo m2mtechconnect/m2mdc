@@ -68,37 +68,36 @@ export function EnterpriseKPIChart({
   });
 
   const config = DEFAULT_KPI_CONFIGS[kpiId];
-  
-  if (!config) return null;
 
-  // Prepare chart data
+  // Prepare chart data - must be called before any early returns
   const chartData = useMemo(() => {
+    if (!config) return [];
     return snapshots.map(s => ({
       time: s.timestamp,
       value: s[kpiId] ?? 0,
       timeLabel: formatTime(s.timestamp),
     }));
-  }, [snapshots, kpiId]);
+  }, [snapshots, kpiId, config]);
 
   // Detect anomalies
   const anomalies = useMemo(() => {
-    if (!visibleLayers.anomalies) return [];
+    if (!visibleLayers.anomalies || !config) return [];
     return detectAnomalies(snapshots, kpiId, config.anomalySensitivity);
-  }, [snapshots, kpiId, config.anomalySensitivity, visibleLayers.anomalies]);
+  }, [snapshots, kpiId, config, visibleLayers.anomalies]);
 
   // Generate forecast
   const forecast = useMemo(() => {
-    if (!visibleLayers.forecast || !config.forecastEnabled) return null;
+    if (!visibleLayers.forecast || !config?.forecastEnabled) return null;
     return generateForecast(snapshots, kpiId, config.forecastHorizonMinutes);
-  }, [snapshots, kpiId, config.forecastEnabled, config.forecastHorizonMinutes, visibleLayers.forecast]);
+  }, [snapshots, kpiId, config, visibleLayers.forecast]);
 
   // Find related events
   const relatedEvents = useMemo(() => {
-    if (!visibleLayers.events) return [];
+    if (!visibleLayers.events || !config) return [];
     return events.filter(
       e => e.affectedKpis?.includes(kpiId) || e.domain === config.domain
     );
-  }, [events, kpiId, config.domain, visibleLayers.events]);
+  }, [events, kpiId, config, visibleLayers.events]);
 
   // Combined chart data with forecast
   const fullChartData = useMemo(() => {
@@ -117,7 +116,16 @@ export function EnterpriseKPIChart({
     return [...chartData, ...forecastData];
   }, [chartData, forecast]);
 
-  // Current values
+  // Hover insight
+  const hoverInsight = useMemo(() => {
+    if (!hoveredPoint) return null;
+    return generateHoverInsight(kpiId, hoveredPoint.value, hoveredPoint.timestamp, snapshots, events);
+  }, [hoveredPoint, kpiId, snapshots, events]);
+
+  // Early return AFTER all hooks
+  if (!config) return null;
+
+  // Current values - these can be computed after the early return since they don't use hooks
   const currentValue = chartData.length > 0 ? chartData[chartData.length - 1].value : baseline ?? 0;
   const delta = baseline ? currentValue - baseline : 0;
   const isImprovement = config.lowerIsBetter ? delta < 0 : delta > 0;
@@ -126,12 +134,6 @@ export function EnterpriseKPIChart({
 
   const TrendIcon = isNeutral ? Minus : isImprovement ? TrendingUp : TrendingDown;
   const trendColor = isNeutral ? 'text-muted-foreground' : isImprovement ? 'text-success' : 'text-destructive';
-
-  // Hover insight
-  const hoverInsight = useMemo(() => {
-    if (!hoveredPoint) return null;
-    return generateHoverInsight(kpiId, hoveredPoint.value, hoveredPoint.timestamp, snapshots, events);
-  }, [hoveredPoint, kpiId, snapshots, events]);
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload, label }: any) => {

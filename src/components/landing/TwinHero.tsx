@@ -94,11 +94,11 @@ export function TwinHero() {
               >
                 Design and simulate{" "}
                 <span className="relative">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary to-success">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-secondary">
                     sovereign AI data centres
                   </span>
                   <motion.span 
-                    className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-primary to-success rounded-full"
+                    className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary rounded-full"
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: 1 }}
                     transition={{ duration: 0.8, delay: 0.8 }}
@@ -147,7 +147,7 @@ export function TwinHero() {
             >
               <Button 
                 size="lg" 
-                className="text-base px-8 h-12 group relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-primary/20"
+                className="text-base px-8 h-12 group relative overflow-hidden transition-all duration-300 bg-accent text-accent-foreground hover:bg-accent/90 hover:shadow-xl hover:shadow-accent/30"
                 onClick={() => navigate("/contact")}
               >
                 <span className="relative z-10 flex items-center">

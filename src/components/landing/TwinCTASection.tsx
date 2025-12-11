@@ -82,7 +82,7 @@ export function TwinCTASection() {
               transition={{ duration: 0.5, delay: 0.2 }}
             >
               Ready to Build Your{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-success">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
                 Sovereign AI Data Centre Twin
               </span>
               ?
@@ -114,7 +114,7 @@ export function TwinCTASection() {
               >
                 <Button 
                   size="lg" 
-                  className="text-base px-10 h-14 group shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-shadow"
+                  className="text-base px-10 h-14 group bg-accent text-accent-foreground hover:bg-accent/90 shadow-xl shadow-accent/20 hover:shadow-accent/30 transition-shadow"
                   onClick={() => navigate("/contact")}
                 >
                   Get Started Free

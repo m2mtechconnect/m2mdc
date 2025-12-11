@@ -28,7 +28,7 @@ import { generateRecommendation } from "@/lib/dc-scan/generateRecommendation";
 import { EnhancedRecommendationCard } from "./EnhancedRecommendationCard";
 import { LastScanBanner } from "./LastScanBanner";
 import { useDCTwinBuilderStore } from "@/stores/dcTwinBuilderStore";
-import { transformToEnhancedRecommendation, isEnhancedRecommendation } from "@/lib/dc-scan/transformToEnhanced";
+import { transformToEnhancedRecommendation, isEnhancedRecommendation, toLegacyRecommendation } from "@/lib/dc-scan/transformToEnhanced";
 import type { DCRecommendation, DCBlueprintProfile } from "@/types/dcScan";
 import type { EnhancedDCRecommendation } from "@/types/enhancedRecommendation";
 
@@ -146,8 +146,9 @@ export function DCScannerPanel() {
 
     setIsCreatingTwin(true);
     try {
-      // Initialize the DC Twin Builder Store from the recommendation
-      initializeFromRecommendation(recommendation, currentSessionId || '');
+      // Initialize the DC Twin Builder Store from the recommendation (convert to legacy format)
+      const legacyRec = toLegacyRecommendation(recommendation);
+      initializeFromRecommendation(legacyRec, currentSessionId || '');
       
       // Get region profile - use ca-central-1 as default (Montreal)
       const regionCode = 'ca-central-1';
@@ -190,8 +191,8 @@ export function DCScannerPanel() {
           description: `Your ${recommendation.blueprintName} has been created.`
         });
         
-        // Initialize the DC Twin Builder Store from the recommendation
-        initializeFromRecommendation(recommendation, currentSessionId || newTwin.id);
+        // Initialize the DC Twin Builder Store from the recommendation (convert to legacy format)
+        initializeFromRecommendation(legacyRec, currentSessionId || newTwin.id);
         setCurrentStep(1);
         
         // Navigate to the builder with the new twin
@@ -212,8 +213,9 @@ export function DCScannerPanel() {
   const handleAdjustBlueprint = () => {
     if (!recommendation) return;
     
-    // Initialize the DC Twin Builder Store from the recommendation
-    initializeFromRecommendation(recommendation, currentSessionId || '');
+    // Initialize the DC Twin Builder Store from the recommendation (convert to legacy format)
+    const legacyRec = toLegacyRecommendation(recommendation);
+    initializeFromRecommendation(legacyRec, currentSessionId || '');
     setCurrentStep(1);
     
     // Navigate to builder with pre-filled data

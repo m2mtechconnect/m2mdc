@@ -81,7 +81,7 @@ export function transformToEnhancedRecommendation(
   const kpiInsights = generateAllKPIInsights(mockTemplate, industry, regionCode);
   const agents = generateDefaultAgents(industry, companyName);
   const scenarios = generateDefaultScenarios(industry);
-  const financialModel = generateFinancialModel(industry, capacityKw, mockTemplate, regionCode);
+  const financialModel = generateFinancialModel(mockTemplate, industry, companyName, capacityKw, regionCode);
   
   return {
     sessionId: legacy.sessionId,

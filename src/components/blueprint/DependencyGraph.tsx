@@ -151,7 +151,7 @@ export function DependencyGraph({ className }: { className?: string }) {
           </Badge>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pb-6">
         {/* Flow Legend */}
         <div className="flex items-center justify-center gap-2 mb-4 p-2 rounded-lg bg-muted/50">
           <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 text-xs">

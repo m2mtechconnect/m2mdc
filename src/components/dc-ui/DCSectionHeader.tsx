@@ -27,7 +27,7 @@ export function DCSectionHeader({
       <div className="flex items-start gap-3">
         {icon && (
           <div className={cn(
-            'flex items-center justify-center rounded-lg bg-dc-cyan/10 border border-dc-cyan/30',
+            'flex items-center justify-center rounded-lg bg-primary/10 border border-primary/30',
             variant === 'compact' ? 'p-1.5' : 'p-2',
             variant === 'large' && 'p-3'
           )}>

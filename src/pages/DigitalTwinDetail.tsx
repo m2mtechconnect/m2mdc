@@ -102,7 +102,7 @@ export default function DigitalTwinDetail() {
           <DCSectionHeader
             title={twin.name}
             subtitle={twin.slug}
-            icon={<Box className="h-5 w-5 text-dc-cyan" />}
+            icon={<Box className="h-5 w-5 text-primary" />}
             action={
               <Badge variant={getStatusVariant(twin.status) === "operational" ? "default" : "secondary"}>
                 {twin.status}

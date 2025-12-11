@@ -93,7 +93,7 @@ export function DCQuickChips({ onChipClick, variant = 'compact', maxChips = 4 }:
               variant="outline"
               size="sm"
               onClick={() => onChipClick(chip.query)}
-              className="h-7 text-xs bg-dc-surface border-dc-border hover:bg-dc-surface-elevated hover:border-dc-primary/30"
+              className="h-7 text-xs bg-muted/50 border-border hover:bg-muted hover:border-primary/30"
             >
               <IconComp className="h-3 w-3 mr-1.5" />
               {chip.label}
@@ -114,7 +114,7 @@ export function DCQuickChips({ onChipClick, variant = 'compact', maxChips = 4 }:
             variant="outline"
             size="sm"
             onClick={() => onChipClick(chip.query)}
-            className="h-auto py-2 px-3 justify-start text-left bg-dc-surface border-dc-border hover:bg-dc-surface-elevated hover:border-dc-primary/30"
+            className="h-auto py-2 px-3 justify-start text-left bg-muted/50 border-border hover:bg-muted hover:border-primary/30"
           >
             <IconComp className="h-4 w-4 mr-2 flex-shrink-0" />
             <span className="text-xs">{chip.label}</span>

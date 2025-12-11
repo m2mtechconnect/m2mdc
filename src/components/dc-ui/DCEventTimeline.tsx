@@ -41,13 +41,13 @@ const domainIcons = {
 };
 
 const domainColors = {
-  thermal: 'text-dc-red',
-  power: 'text-dc-amber',
-  cooling: 'text-dc-cyan',
-  network: 'text-dc-blue',
-  security: 'text-dc-red',
-  gpu: 'text-dc-purple',
-  sovereignty: 'text-dc-blue',
+  thermal: 'text-destructive',
+  power: 'text-warning',
+  cooling: 'text-info',
+  network: 'text-info',
+  security: 'text-destructive',
+  gpu: 'text-primary',
+  sovereignty: 'text-info',
   system: 'text-muted-foreground',
 };
 
@@ -67,7 +67,7 @@ export function DCEventTimeline({
   if (displayEvents.length === 0) {
     return (
       <div className={cn('flex flex-col items-center justify-center py-8 text-center', className)}>
-        <CheckCircle className="h-8 w-8 text-dc-green mb-2" />
+        <CheckCircle className="h-8 w-8 text-success mb-2" />
         <p className="text-sm text-muted-foreground">No recent events</p>
       </div>
     );
@@ -96,12 +96,12 @@ export function DCEventTimeline({
             
             {/* Icon */}
             <div className={cn(
-              'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border bg-noc-surface z-10',
-              event.severity === 'critical' && 'border-dc-red/50 bg-dc-red/10',
-              event.severity === 'warning' && 'border-dc-amber/50 bg-dc-amber/10',
-              event.severity === 'info' && 'border-dc-blue/50 bg-dc-blue/10',
-              event.severity === 'success' && 'border-dc-green/50 bg-dc-green/10',
-              event.severity === 'neutral' && 'border-noc-border'
+              'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border bg-muted z-10',
+              event.severity === 'critical' && 'border-destructive/50 bg-destructive/10',
+              event.severity === 'warning' && 'border-warning/50 bg-warning/10',
+              event.severity === 'info' && 'border-info/50 bg-info/10',
+              event.severity === 'success' && 'border-success/50 bg-success/10',
+              event.severity === 'neutral' && 'border-border'
             )}>
               <Icon className={cn('h-4 w-4', domainColors[event.domain])} />
             </div>
@@ -113,7 +113,7 @@ export function DCEventTimeline({
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className="text-sm font-medium truncate">{event.title}</span>
                     {event.resolved && (
-                      <span className="text-[10px] text-dc-green uppercase">Resolved</span>
+                      <span className="text-[10px] text-success uppercase">Resolved</span>
                     )}
                   </div>
                   {event.description && (

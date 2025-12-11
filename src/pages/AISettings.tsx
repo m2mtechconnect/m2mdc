@@ -126,12 +126,12 @@ export default function AISettings() {
         <DCSectionHeader
           title="AI Engine Settings"
           subtitle="Configure Google Gemini (Vertex AI) for M2M Co-Pilot"
-          icon={<Settings className="h-5 w-5 text-dc-cyan" />}
+          icon={<Settings className="h-5 w-5 text-primary" />}
         />
 
         <DCCard
           title="Google Cloud Configuration"
-          icon={<Sparkles className="h-5 w-5 text-dc-cyan" />}
+          icon={<Sparkles className="h-5 w-5 text-primary" />}
           status="operational"
         >
           <div className="grid gap-6">
@@ -175,7 +175,7 @@ export default function AISettings() {
 
         <DCCard
           title="Vertex AI Search & Grounding"
-          icon={<Database className="h-5 w-5 text-dc-cyan" />}
+          icon={<Database className="h-5 w-5 text-primary" />}
           status="info"
         >
           <div className="flex items-center justify-between mb-6">
@@ -187,7 +187,7 @@ export default function AISettings() {
           </div>
 
           {groundingEnabled && (
-            <div className="space-y-6 pl-4 border-l-2 border-dc-cyan/20">
+            <div className="space-y-6 pl-4 border-l-2 border-primary/20">
               <div className="space-y-2">
                 <Label>Data Store / Index ID</Label>
                 <Input 
@@ -200,7 +200,7 @@ export default function AISettings() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <Label>Top-K Documents</Label>
-                  <span className="text-sm font-mono text-dc-cyan">{topK}</span>
+                  <span className="text-sm font-mono text-primary">{topK}</span>
                 </div>
                 <Slider value={[topK]} onValueChange={([v]) => setTopK(v)} min={5} max={50} step={5} />
                 <p className="text-xs text-muted-foreground">Initial documents to retrieve</p>
@@ -220,7 +220,7 @@ export default function AISettings() {
 
         <DCCard
           title="Generation Parameters"
-          icon={<Shield className="h-5 w-5 text-dc-cyan" />}
+          icon={<Shield className="h-5 w-5 text-primary" />}
           status="operational"
         >
           <div className="space-y-6">

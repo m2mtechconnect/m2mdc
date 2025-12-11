@@ -128,11 +128,11 @@ export function DCArchitectureDiagram({ showJson = false }: DCArchitectureDiagra
       </div>
 
       {/* Integration Icons */}
-      <div className="flex items-center gap-4 p-4 bg-dc-surface rounded-lg border border-dc-border">
+      <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg border border-border">
         <span className="text-sm text-muted-foreground">Integrations:</span>
         <div className="flex flex-wrap gap-2">
           {['Prometheus', 'Grafana', 'Slurm', 'DCIM API', 'Energy Grid API', 'Carbon API'].map((integration) => (
-            <Badge key={integration} variant="outline" className="bg-dc-bg-secondary">
+            <Badge key={integration} variant="outline" className="bg-muted">
               <Database className="h-3 w-3 mr-1" />
               {integration}
             </Badge>
@@ -143,7 +143,7 @@ export function DCArchitectureDiagram({ showJson = false }: DCArchitectureDiagra
       {/* JSON Preview */}
       {showJson && (
         <DCCard title="Architecture Configuration" icon={<Database className="h-4 w-4" />}>
-          <pre className="text-xs font-mono bg-dc-bg-secondary p-4 rounded-lg overflow-x-auto max-h-[300px]">
+          <pre className="text-xs font-mono bg-muted p-4 rounded-lg overflow-x-auto max-h-[300px]">
             {JSON.stringify(architectureJson, null, 2)}
           </pre>
         </DCCard>

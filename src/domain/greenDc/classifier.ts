@@ -1,5 +1,62 @@
 /**
- * Industry and capacity classifier for Green DC Twin recommendations
+ * Industry and Capacity Classifier for Green DC Twin Recommendations
+ * Classifies industries, archetypes, regions, and compliance constraints from website content
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * INDUSTRY CLASSIFICATION STANDARDS:
+ * - NAICS (North American Industry Classification System)
+ *   https://www.census.gov/naics/
+ * - GICS (Global Industry Classification Standard)
+ *   https://www.msci.com/our-solutions/indexes/gics
+ * - Statistics Canada NAICS Reference
+ *   https://www23.statcan.gc.ca/imdb/p3VD.pl?Function=getVD&TVD=1181553
+ * 
+ * DATA CENTER CAPACITY TIERS:
+ * - Uptime Institute Data Center Tier Classifications
+ *   https://uptimeinstitute.com/tier-certification/tier-requirements
+ *   - Tier III: Concurrently maintainable (99.982% uptime)
+ *   - Tier IV: Fault tolerant (99.995% uptime)
+ * - The Green Grid Data Center Maturity Model (DCMM)
+ *   https://www.thegreengrid.org/en/resources/library
+ * 
+ * COMPLIANCE & REGULATORY FRAMEWORKS:
+ * - PIPEDA (Personal Information Protection and Electronic Documents Act)
+ *   https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/
+ * - GDPR (General Data Protection Regulation)
+ *   https://gdpr.eu/
+ * - HIPAA (Health Insurance Portability and Accountability Act)
+ *   https://www.hhs.gov/hipaa/index.html
+ * - PHIPA (Personal Health Information Protection Act - Ontario)
+ *   https://www.ontario.ca/laws/statute/04p03
+ * - SOC 2 Trust Services Criteria
+ *   https://www.aicpa.org/interestareas/frc/assuranceadvisoryservices/socforserviceorganizations.html
+ * - ISO 27001 Information Security Management
+ *   https://www.iso.org/isoiec-27001-information-security.html
+ * - PCI-DSS (Payment Card Industry Data Security Standard)
+ *   https://www.pcisecuritystandards.org/
+ * - FedRAMP (Federal Risk and Authorization Management Program)
+ *   https://www.fedramp.gov/
+ * 
+ * SUSTAINABILITY STANDARDS:
+ * - SBTi (Science Based Targets initiative)
+ *   https://sciencebasedtargets.org/
+ * - GHG Protocol Corporate Standard
+ *   https://ghgprotocol.org/corporate-standard
+ * - CDP (Carbon Disclosure Project)
+ *   https://www.cdp.net/
+ * - RE100 Renewable Electricity Initiative
+ *   https://www.there100.org/
+ * 
+ * DATA SOVEREIGNTY FRAMEWORKS:
+ * - Treasury Board of Canada - Direction on Electronic Data Residency
+ *   https://www.canada.ca/en/government/system/digital-government/digital-government-innovations/cloud-services/direction-electronic-data-residency.html
+ * - Canadian Digital Charter Implementation Act (Bill C-27)
+ *   https://www.parl.ca/DocumentViewer/en/44-1/bill/C-27/first-reading
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import type { DcIndustry, DcCapacityTier, DcTwinArchetypeId } from "@/types/greenDcTwin";

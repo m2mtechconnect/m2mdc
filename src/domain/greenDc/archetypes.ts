@@ -1,5 +1,84 @@
 /**
- * Green DC Twin Archetypes - Base configurations for each industry
+ * Green DC Twin Archetypes - Base Configurations for Each Industry
+ * Industry-specific templates with objectives, agents, KPIs, and scenarios
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * FINANCIAL SERVICES DATA CENTERS:
+ * - Basel Committee on Banking Supervision - Operational Resilience
+ *   https://www.bis.org/bcbs/publ/d516.htm
+ * - OSFI (Office of the Superintendent of Financial Institutions) Guidelines
+ *   https://www.osfi-bsif.gc.ca/Eng/fi-if/rg-ro/gdn-ort/gl-ld/Pages/b10.aspx
+ * - PCI-DSS Physical Security Requirements for Data Centers
+ *   https://www.pcisecuritystandards.org/documents/PCI-DSS-v4-0.pdf
+ * 
+ * GOVERNMENT & PUBLIC SECTOR:
+ * - Treasury Board of Canada - Protected B Cloud Security
+ *   https://www.canada.ca/en/government/system/digital-government/digital-government-innovations/cloud-services/government-canada-cloud-adoption-strategy.html
+ * - NIST SP 800-53 Security and Privacy Controls
+ *   https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final
+ * - FedRAMP High Baseline Requirements
+ *   https://www.fedramp.gov/baselines/
+ * 
+ * HEALTHCARE DATA CENTERS:
+ * - HIPAA Technical Safeguards (45 CFR § 164.312)
+ *   https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html
+ * - PHIPA (Personal Health Information Protection Act - Ontario)
+ *   https://www.ontario.ca/laws/statute/04p03
+ * - HL7 FHIR Infrastructure Requirements
+ *   https://www.hl7.org/fhir/
+ * 
+ * RETAIL & E-COMMERCE:
+ * - Retail Industry Leaders Association (RILA) Sustainability Guidelines
+ *   https://www.rila.org/sustainability
+ * - NRF (National Retail Federation) Technology Standards
+ *   https://nrf.com/resources/retail-technology
+ * - Cold Chain Logistics - ASHRAE Refrigeration Handbook
+ *   https://www.ashrae.org/technical-resources/ashrae-handbook
+ * 
+ * TELECOMMUNICATIONS:
+ * - ETSI NFV (Network Functions Virtualization) Standards
+ *   https://www.etsi.org/technologies/nfv
+ * - 3GPP 5G Core Network Requirements
+ *   https://www.3gpp.org/technologies/5g-system-overview
+ * - TM Forum Edge Computing Architecture
+ *   https://www.tmforum.org/
+ * 
+ * MANUFACTURING & INDUSTRIAL:
+ * - IEC 62443 Industrial Cybersecurity Standard
+ *   https://www.iec.ch/cyber-security
+ * - ISA-95 Enterprise-Control System Integration
+ *   https://www.isa.org/standards-and-publications/isa-standards
+ * - OPC UA (Unified Architecture) Specification
+ *   https://opcfoundation.org/about/opc-technologies/opc-ua/
+ * 
+ * ENERGY & UTILITIES:
+ * - NERC CIP (Critical Infrastructure Protection) Standards
+ *   https://www.nerc.com/pa/Stand/Pages/CIPStandards.aspx
+ * - IEEE 2030 Smart Grid Interoperability
+ *   https://standards.ieee.org/standard/2030-2011.html
+ * - IEC 61850 Communication Networks in Substations
+ *   https://www.iec.ch/smartgrid/standards/
+ * 
+ * RESEARCH & EDUCATION:
+ * - CANARIE (Canada's National Research and Education Network)
+ *   https://www.canarie.ca/
+ * - Internet2 Research Network Requirements
+ *   https://internet2.edu/
+ * - NSF Cyberinfrastructure Guidelines
+ *   https://www.nsf.gov/cise/oac/
+ * 
+ * KPI TARGETS & BENCHMARKS:
+ * - Uptime Institute Global Data Center Survey
+ *   https://uptimeinstitute.com/annual-global-data-center-survey
+ * - The Green Grid PUE Efficiency Benchmarks
+ *   https://www.thegreengrid.org/en/resources/library
+ * - EPA ENERGY STAR Data Center Rating
+ *   https://www.energystar.gov/buildings/benchmark/understand_metrics/data_center
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import type { DcTwinArchetypeId, GreenDcTwinRecommendation } from "@/types/greenDcTwin";

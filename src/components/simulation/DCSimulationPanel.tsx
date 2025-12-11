@@ -4,6 +4,8 @@
  * Uses Studio design system tokens
  * Now wired to Blueprint for scenarios
  * Integrated with Blueprint Snapshot system for simulation traceability
+ * 
+ * P0 FIX: Now persists simulation runs to database on completion
  */
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
@@ -16,6 +18,8 @@ import { Activity, Clock, Sparkles, BarChart3, Grid3X3, FileText, Info } from 'l
 import { useSimulation } from '@/simulation/useSimulation';
 import { useBlueprint } from '@/hooks/useBlueprint';
 import { useSimulationSnapshotStore } from '@/stores/simulationSnapshotStore';
+import { useSimulationPersistence } from '@/hooks/useSimulationPersistence';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { DCScenarioSelector } from './DCScenarioSelector';
 import { EnhancedSimulationControls } from './EnhancedSimulationControls';
 import { DCEventTimeline } from './DCEventTimeline';
@@ -71,9 +75,16 @@ export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSim
   const [baseRacks] = useState<RackMetrics[]>(() => generateBaseRacks(20));
   const [liveRackMetrics, setLiveRackMetrics] = useState<RackMetrics[]>(baseRacks);
   const runIdRef = useRef<string>('');
+  const hasSavedRef = useRef<string>(''); // Track which run has been saved to prevent duplicates
   
   // Get Blueprint scenarios
   const { blueprint } = useBlueprint(twinId);
+  
+  // Get active twin for database persistence
+  const { activeTwinId } = useActiveTwin();
+  
+  // Simulation persistence hook - P0 FIX
+  const { saveSimulationRun } = useSimulationPersistence();
   
   // Snapshot store for Blueprint Snapshot feature
   const { 
@@ -120,7 +131,7 @@ export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSim
     }
   }, [status, events, currentTime, baseRacks]);
   
-  // Generate result when simulation completes
+  // Generate result and PERSIST when simulation completes - P0 FIX
   useEffect(() => {
     if (status === 'completed' && activeScenario) {
       const result = generateSimulationResult(
@@ -131,6 +142,28 @@ export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSim
         elapsedTime
       );
       setSimulationResult(result);
+      
+      // P0 FIX: Persist simulation run to database
+      const runKey = `${activeScenarioId}-${elapsedTime}`;
+      if (activeTwinId && hasSavedRef.current !== runKey) {
+        hasSavedRef.current = runKey;
+        saveSimulationRun({
+          twinId: activeTwinId,
+          scenarioKey: activeScenarioId || 'custom',
+          scenarioName: activeScenario.name,
+          runLabel: `${activeScenario.name} - ${new Date().toLocaleString()}`,
+          baselineKpis,
+          finalKpis: currentKpis,
+          kpiSnapshots: kpiSnapshots.map(snap => ({ timestamp: snap.timestamp, kpis: snap.kpis })),
+          events: events.map(e => ({ id: e.id, timestamp: e.timestamp, type: e.type, severity: e.severity, title: e.title })),
+          durationMs: elapsedTime * 1000,
+          metadata: { scenarioCategory: activeScenario.category, severity: activeScenario.severity },
+        }).then(runId => {
+          if (runId) {
+            console.log('[DCSimulationPanel] Simulation run persisted:', runId);
+          }
+        });
+      }
     } else if (status === 'idle' || status === 'running') {
       setSimulationResult(null);
     }

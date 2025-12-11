@@ -29,7 +29,7 @@ const features = [
       "Thermal and power overlays with hotspots",
       "Live KPI overlays for PUE, kW, and carbon",
     ],
-    imageSrc: "/landing/screenshots/twin3d-desktop.png",
+    imageSrc: "/landing/screenshots/dashboard-desktop.png",
     imageAlt: "3D data centre visualization with thermal overlays and rack layouts",
     accentColor: "primary" as const,
   },

@@ -18,6 +18,7 @@ import {
   Activity,
   PlayCircle,
   Users,
+  CheckCircle2,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +32,9 @@ import { SovereigntyRiskOverview } from "@/components/compliance/SovereigntyRisk
 import { useActiveTwin } from "@/context/ActiveTwinContext";
 import { useTwinSovereigntyEvents } from "@/hooks/useTwinData";
 import { DOMAINS } from "@/ux";
+import { getSovereigntyRulesForContext, type SovereigntyRule } from "@/domain/greenDc/sovereigntyConfig";
+import { useTwinKPIsFromSimulation } from "@/hooks/useTwinKPIsFromSimulation";
+import { KPI_CATALOG, KPIKey } from "@/domain/greenDc/kpiCatalog";
 
 // DC-specific audit timeline
 const auditTimeline = [
@@ -152,6 +156,18 @@ export default function Compliance() {
   // Get sovereignty engine data
   const sovereignty = useSovereignty();
   
+  // Get KPIs from simulation runs
+  const { kpis: simulationKpis, loading: kpisLoading } = useTwinKPIsFromSimulation(twinId || undefined);
+  
+  // Get region and industry from twin for filtering sovereignty rules
+  const twinRegion = twin?.region_code || 'CA-QC';
+  const twinIndustry = twin?.industry || 'generic';
+  
+  // Get relevant sovereignty rules based on region + industry
+  const relevantSovereigntyRules = useMemo(() => {
+    return getSovereigntyRulesForContext(twinRegion, twinIndustry);
+  }, [twinRegion, twinIndustry]);
+  
   // Get compliance-relevant scenarios (sovereignty, facility_safety, financial)
   const complianceScenarios = useMemo(() => {
     return scenarios.filter(s => 
@@ -254,6 +270,77 @@ export default function Compliance() {
               </div>
             </Card>
           </div>
+
+          {/* Applicable Sovereignty Rules - Filtered by Region + Industry */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Applicable Compliance Requirements
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Rules for {twinRegion} region, {twinIndustry} industry • {relevantSovereigntyRules.length} requirements
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {relevantSovereigntyRules.map((rule: SovereigntyRule) => {
+                  // Get KPI value if rule has a kpiKey
+                  const kpiValue = rule.kpiKey ? simulationKpis[rule.kpiKey] : null;
+                  const kpiDef = rule.kpiKey ? KPI_CATALOG[rule.kpiKey as KPIKey] : null;
+                  const isCompliant = kpiValue !== null && kpiDef 
+                    ? (kpiDef.direction === 'higher_is_better' ? kpiValue >= (kpiDef.target || 0) : kpiValue <= (kpiDef.target || 100))
+                    : null;
+                  
+                  return (
+                    <Card key={rule.id} className={`p-4 border ${
+                      rule.severity === 'critical' ? 'border-destructive/50' : 
+                      rule.severity === 'high' ? 'border-amber-500/50' : 'border-border'
+                    }`}>
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Badge variant={rule.severity === 'critical' ? 'destructive' : rule.severity === 'high' ? 'default' : 'secondary'}>
+                            {rule.severity}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">{rule.id.toUpperCase()}</span>
+                        </div>
+                        {isCompliant !== null && (
+                          <Badge variant={isCompliant ? 'default' : 'destructive'} className={isCompliant ? 'bg-green-600' : ''}>
+                            {isCompliant ? <CheckCircle2 className="h-3 w-3 mr-1" /> : <AlertTriangle className="h-3 w-3 mr-1" />}
+                            {isCompliant ? 'Compliant' : 'At Risk'}
+                          </Badge>
+                        )}
+                      </div>
+                      <h4 className="font-medium mb-1">{rule.label}</h4>
+                      {rule.kpiKey && kpiDef && (
+                        <div className="text-sm text-muted-foreground mb-2">
+                          {kpiDef.label}: {kpiValue !== null ? `${kpiValue}${kpiDef.unit || ''}` : 'N/A'}
+                        </div>
+                      )}
+                      <div className="space-y-1">
+                        {rule.checklistItems.slice(0, 2).map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <CheckCircle2 className="h-3 w-3 text-green-500" />
+                            {item}
+                          </div>
+                        ))}
+                        {rule.checklistItems.length > 2 && (
+                          <div className="text-xs text-muted-foreground">
+                            +{rule.checklistItems.length - 2} more requirements
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  );
+                })}
+                {relevantSovereigntyRules.length === 0 && (
+                  <div className="col-span-full text-center py-8 text-muted-foreground">
+                    No specific sovereignty rules apply to this region and industry combination.
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

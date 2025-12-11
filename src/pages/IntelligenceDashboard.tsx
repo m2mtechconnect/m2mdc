@@ -39,6 +39,9 @@ import { DcToolsStrip } from '@/components/dc-tools';
 import { SovereigntyAnalyticsTab } from '@/components/telemetry/SovereigntyAnalyticsTab';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useTwinTelemetry, useTwinKPIs } from '@/hooks/useTwinData';
+import { useTwinKPIsFromSimulation } from '@/hooks/useTwinKPIsFromSimulation';
+import { useAgentKPIBindings } from '@/hooks/useTwinAgentsCatalog';
+import { KPI_CATALOG, KPIKey } from '@/domain/greenDc/kpiCatalog';
 
 interface System {
   id: string;
@@ -70,6 +73,12 @@ export default function IntelligenceDashboard() {
   // Twin-scoped telemetry and KPIs
   const { data: twinTelemetry } = useTwinTelemetry();
   const { data: twinKpis } = useTwinKPIs();
+  
+  // Get KPIs from simulation runs (single source of truth)
+  const { kpis: simulationKpis, kpiValues, loading: kpisLoading } = useTwinKPIsFromSimulation(twinId || undefined);
+  
+  // Get agent-KPI bindings for telemetry display
+  const agentKpiBindings = useAgentKPIBindings(twinId || undefined);
 
   // Blueprint data for KPIs and scenarios - use twin's blueprint if available
   const blueprintId = twin?.blueprint_id || 'default';
@@ -283,59 +292,59 @@ export default function IntelligenceDashboard() {
           </CardContent>
         </Card>
 
-        {/* DC KPI Strip */}
+        {/* DC KPI Strip - Using real simulation data */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           <KpiCard
-            label="PUE Trend"
-            value="1.38"
+            label={KPI_CATALOG[KPIKey.PUE]?.label || "PUE Trend"}
+            value={simulationKpis[KPIKey.PUE]?.toFixed(2) || "1.38"}
             change="-2.1%"
             icon={Zap}
             trend="down"
-            tooltip="Power Usage Effectiveness - lower is better"
+            tooltip={KPI_CATALOG[KPIKey.PUE]?.description || "Power Usage Effectiveness - lower is better"}
             onClick={() => navigate('/data-centre-twin')}
           />
           <KpiCard
-            label="GPU Utilization"
-            value="78%"
+            label={KPI_CATALOG[KPIKey.GPU_UTILIZATION]?.label || "GPU Utilization"}
+            value={simulationKpis[KPIKey.GPU_UTILIZATION] ? `${simulationKpis[KPIKey.GPU_UTILIZATION]}%` : "78%"}
             change="+5%"
             icon={Cpu}
             trend="up"
-            tooltip="Average GPU cluster utilization"
+            tooltip={KPI_CATALOG[KPIKey.GPU_UTILIZATION]?.description || "Average GPU cluster utilization"}
             onClick={() => navigate('/data-centre-twin')}
           />
           <KpiCard
-            label="Thermal Incidents"
-            value="8"
+            label={KPI_CATALOG[KPIKey.THERMAL_INCIDENTS]?.label || "Thermal Incidents"}
+            value={simulationKpis[KPIKey.THERMAL_INCIDENTS]?.toString() || "8"}
             change="-3"
             icon={Thermometer}
             trend="down"
-            tooltip="Thermal events in last 24h"
+            tooltip={KPI_CATALOG[KPIKey.THERMAL_INCIDENTS]?.description || "Thermal events in last 24h"}
             onClick={() => navigate('/data-centre-twin')}
           />
           <KpiCard
-            label="Emissions vs Target"
-            value="94%"
+            label={KPI_CATALOG[KPIKey.CARBON_INTENSITY]?.label || "Emissions vs Target"}
+            value={simulationKpis[KPIKey.CARBON_INTENSITY] ? `${(100 - (simulationKpis[KPIKey.CARBON_INTENSITY] / 0.7)).toFixed(0)}%` : "94%"}
             change="+2%"
             icon={Flame}
             trend="up"
-            tooltip="On track for carbon targets"
+            tooltip={KPI_CATALOG[KPIKey.CARBON_INTENSITY]?.description || "On track for carbon targets"}
           />
           <KpiCard
-            label="Sovereign Compute"
-            value="98%"
+            label={KPI_CATALOG[KPIKey.SOVEREIGN_COMPLIANCE]?.label || "Sovereign Compute"}
+            value={simulationKpis[KPIKey.SOVEREIGN_COMPLIANCE] ? `${simulationKpis[KPIKey.SOVEREIGN_COMPLIANCE]}%` : "98%"}
             change="0%"
             icon={Globe}
             trend="neutral"
-            tooltip="Data residency compliance"
+            tooltip={KPI_CATALOG[KPIKey.SOVEREIGN_COMPLIANCE]?.description || "Data residency compliance"}
             onClick={() => navigate('/compliance')}
           />
           <KpiCard
-            label="System Uptime"
-            value="99.97%"
+            label={KPI_CATALOG[KPIKey.UPTIME]?.label || "System Uptime"}
+            value={simulationKpis[KPIKey.UPTIME] ? `${simulationKpis[KPIKey.UPTIME]}%` : "99.97%"}
             change="+0.02%"
             icon={Activity}
             trend="up"
-            tooltip="Overall system availability"
+            tooltip={KPI_CATALOG[KPIKey.UPTIME]?.description || "Overall system availability"}
           />
         </div>
 

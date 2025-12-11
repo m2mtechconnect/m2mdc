@@ -416,9 +416,9 @@ export function Step2Intelligence() {
                       value={urlInput}
                       onChange={(e) => setUrlInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleAddUrl()}
-                      className="bg-dc-surface border-dc-border"
+                      className="bg-muted/50 border-border"
                     />
-                    <Button variant="outline" onClick={handleAddUrl} disabled={isAddingUrl} className="border-dc-border">
+                    <Button variant="outline" onClick={handleAddUrl} disabled={isAddingUrl} className="border-border">
                       <Link2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -427,26 +427,26 @@ export function Step2Intelligence() {
                 <div className="space-y-2">
                   <Label>Connect Infrastructure Sources</Label>
                   <div className="grid gap-2">
-                    <Button variant="outline" className="justify-start bg-dc-surface border-dc-border hover:bg-dc-surface/80">
+                    <Button variant="outline" className="justify-start bg-muted/50 border-border hover:bg-muted">
                       <Database className="h-4 w-4 mr-2" />
                       Connect DCIM System
                     </Button>
-                    <Button variant="outline" className="justify-start bg-dc-surface border-dc-border hover:bg-dc-surface/80">
+                    <Button variant="outline" className="justify-start bg-muted/50 border-border hover:bg-muted">
                       <Database className="h-4 w-4 mr-2" />
                       Connect Prometheus
                     </Button>
-                    <Button variant="outline" className="justify-start bg-dc-surface border-dc-border hover:bg-dc-surface/80">
+                    <Button variant="outline" className="justify-start bg-muted/50 border-border hover:bg-muted">
                       <Database className="h-4 w-4 mr-2" />
                       Connect Asset Database
                     </Button>
                   </div>
                 </div>
 
-                <div className="p-4 bg-dc-surface rounded-lg border border-dc-border space-y-3">
+                <div className="p-4 bg-muted/50 rounded-lg border border-border space-y-3">
                   <h4 className="text-sm font-medium">RAG Quality Score</h4>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Retrieval Accuracy</span>
-                    <Badge className="bg-dc-success/10 text-dc-success border-dc-success/30">85%</Badge>
+                    <Badge className="bg-success/10 text-success border-success/30">85%</Badge>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Sources Indexed</span>
@@ -468,7 +468,7 @@ export function Step2Intelligence() {
                     onChange={(e) => handleSystemPromptChange(e.target.value)}
                     onBlur={handleSystemPromptBlur}
                     rows={6}
-                    className="resize-none font-mono text-sm bg-dc-surface border-dc-border"
+                    className="resize-none font-mono text-sm bg-muted/50 border-border"
                   />
                   <p className="text-xs text-muted-foreground">
                     Define DC-specific behavior, monitoring priorities, and operational constraints.
@@ -478,7 +478,7 @@ export function Step2Intelligence() {
                 <div className="space-y-2">
                   <Label>Operational Mode</Label>
                   <Select value={persona} onValueChange={setPersona}>
-                    <SelectTrigger className="bg-dc-surface border-dc-border">
+                    <SelectTrigger className="bg-muted/50 border-border">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -491,11 +491,11 @@ export function Step2Intelligence() {
                 </div>
 
                 <div className="grid gap-3">
-                  <div className="flex items-center justify-between p-3 bg-dc-surface rounded-lg border border-dc-border">
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border">
                     <span className="text-sm">Detailed Explanations</span>
                     <Switch checked={detailedExplanations} onCheckedChange={setDetailedExplanations} />
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-dc-surface rounded-lg border border-dc-border">
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border">
                     <span className="text-sm">Formal Technical Tone</span>
                     <Switch checked={formalTone} onCheckedChange={setFormalTone} />
                   </div>
@@ -507,7 +507,7 @@ export function Step2Intelligence() {
           <TabsContent value="advanced" className="space-y-4 mt-6">
             <DCCard title="Safety & Thresholds" icon={<Shield className="h-4 w-4" />}>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-dc-surface rounded-lg border border-dc-border">
+                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border">
                   <div>
                     <p className="text-sm font-medium">Hallucination Prevention</p>
                     <p className="text-xs text-muted-foreground">Only respond from verified DC knowledge</p>
@@ -515,7 +515,7 @@ export function Step2Intelligence() {
                   <Switch checked={hallucinationPrevention} onCheckedChange={(v) => handleSafetyToggle('hallucination', v)} />
                 </div>
 
-                <div className="flex items-center justify-between p-3 bg-dc-surface rounded-lg border border-dc-border">
+                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border">
                   <div>
                     <p className="text-sm font-medium">Knowledge Restrictions</p>
                     <p className="text-xs text-muted-foreground">Limit to indexed sources only</p>
@@ -523,7 +523,7 @@ export function Step2Intelligence() {
                   <Switch checked={knowledgeRestrictions} onCheckedChange={(v) => handleSafetyToggle('knowledge', v)} />
                 </div>
 
-                <div className="flex items-center justify-between p-3 bg-dc-surface rounded-lg border border-dc-border">
+                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border">
                   <div>
                     <p className="text-sm font-medium">Require Citations</p>
                     <p className="text-xs text-muted-foreground">Always cite data sources in responses</p>
@@ -531,7 +531,7 @@ export function Step2Intelligence() {
                   <Switch checked={requireCitations} onCheckedChange={(v) => handleSafetyToggle('citations', v)} />
                 </div>
 
-                <div className="space-y-3 pt-4 border-t border-dc-border">
+                <div className="space-y-3 pt-4 border-t border-border">
                   <Label>Temperature (Creativity): {temperature[0]}</Label>
                   <Slider
                     value={temperature}

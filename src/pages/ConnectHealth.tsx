@@ -28,7 +28,7 @@ export default function ConnectHealth() {
   const warningCount = healthMetrics.filter(m => m.status === "warning").length;
 
   return (
-    <div className="min-h-screen bg-dc-bg-primary section-padding-lg">
+    <div className="min-h-screen bg-background section-padding-lg">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -52,8 +52,8 @@ export default function ConnectHealth() {
         >
           <div className="flex items-center justify-between mb-6">
             <div className="text-right">
-              <div className="text-5xl font-bold text-dc-cyan">{overallHealth}%</div>
-              <div className="flex items-center gap-1 text-dc-green text-sm mt-1">
+              <div className="text-5xl font-bold text-primary">{overallHealth}%</div>
+              <div className="flex items-center gap-1 text-success text-sm mt-1">
                 <TrendingUp className="h-4 w-4" />
                 +2.3% from yesterday
               </div>
@@ -137,7 +137,7 @@ export default function ConnectHealth() {
                     </span>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-dc-cyan mb-1">{metric.health}%</div>
+                    <div className="text-2xl font-bold text-primary mb-1">{metric.health}%</div>
                     <div className="text-caption text-muted-foreground">Health Score</div>
                   </div>
                 </div>

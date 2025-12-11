@@ -475,7 +475,7 @@ export default function Deploy() {
   }
 
   return (
-    <div className="min-h-screen bg-dc-bg-primary">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 max-w-7xl">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
@@ -490,8 +490,8 @@ export default function Deploy() {
           </Button>
           <div className="flex-1">
             <h1 className="text-2xl font-semibold flex items-center gap-3 text-foreground">
-              <div className="p-2 rounded-lg bg-dc-cyan/10 border border-dc-cyan/30">
-                <Rocket className="h-6 w-6 text-dc-cyan" />
+              <div className="p-2 rounded-lg bg-primary/10 border border-primary/30">
+                <Rocket className="h-6 w-6 text-primary" />
               </div>
               Final Review & Deploy
             </h1>
@@ -501,11 +501,11 @@ export default function Deploy() {
             variant="outline"
             size="sm"
             onClick={() => navigate('/deployments')}
-            className="border-dc-border hover:bg-dc-bg-secondary"
+            className="border-border hover:bg-muted"
           >
             View History
           </Button>
-          <Badge variant={canDeploy ? "default" : "secondary"} className="bg-dc-cyan/20 text-dc-cyan border-dc-cyan/30">
+          <Badge variant={canDeploy ? "default" : "secondary"} className="bg-primary/20 text-primary border-primary/30">
             {role || 'user'}
           </Badge>
         </div>

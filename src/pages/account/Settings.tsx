@@ -171,7 +171,7 @@ export default function Settings() {
         <DCSectionHeader
           title="Workspace Settings"
           subtitle="Manage workspace configuration and team defaults"
-          icon={<SettingsIcon className="h-5 w-5 text-dc-cyan" />}
+          icon={<SettingsIcon className="h-5 w-5 text-primary" />}
           action={
             !isAdmin ? (
               <Badge variant="secondary">
@@ -216,7 +216,7 @@ export default function Settings() {
 
             {/* General Tab */}
             <TabsContent value="general" className="space-y-6">
-              <DCCard title="Workspace Information" icon={<Building2 className="h-4 w-4 text-dc-cyan" />}>
+              <DCCard title="Workspace Information" icon={<Building2 className="h-4 w-4 text-primary" />}>
                 <div className="grid gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="workspace_name">Workspace Name</Label>
@@ -301,7 +301,7 @@ export default function Settings() {
 
             {/* Security Tab */}
             <TabsContent value="security" className="space-y-6">
-              <DCCard title="Access & Security" icon={<Shield className="h-4 w-4 text-dc-cyan" />}>
+              <DCCard title="Access & Security" icon={<Shield className="h-4 w-4 text-primary" />}>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
@@ -339,7 +339,7 @@ export default function Settings() {
 
             {/* Notifications Tab */}
             <TabsContent value="notifications" className="space-y-6">
-              <DCCard title="Notification Preferences" icon={<Bell className="h-4 w-4 text-dc-cyan" />}>
+              <DCCard title="Notification Preferences" icon={<Bell className="h-4 w-4 text-primary" />}>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">

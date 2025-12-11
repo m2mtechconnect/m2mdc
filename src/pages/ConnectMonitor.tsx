@@ -51,7 +51,7 @@ export default function ConnectMonitor() {
         <DCSectionHeader
           title="Sync Monitor"
           subtitle="Real-time status of all data connections and background jobs."
-          icon={<Activity className="h-5 w-5 text-dc-cyan" />}
+          icon={<Activity className="h-5 w-5 text-primary" />}
           action={
             <Button variant="outline" onClick={() => navigate("/connect/health")}>
               View Health
@@ -92,7 +92,7 @@ export default function ConnectMonitor() {
         </div>
 
         {/* Filters */}
-        <DCCard title="Filters" icon={<Search className="h-4 w-4 text-dc-cyan" />} noPadding>
+        <DCCard title="Filters" icon={<Search className="h-4 w-4 text-primary" />} noPadding>
           <div className="flex gap-4 items-center p-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

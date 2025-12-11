@@ -183,11 +183,11 @@ export function DeployReadinessChecks({ facility, onFixIssue }: DeployReadinessC
   const getStatusIcon = (status: 'pass' | 'fail' | 'warning') => {
     switch (status) {
       case 'pass':
-        return <CheckCircle2 className="h-4 w-4 text-dc-success" />;
+        return <CheckCircle2 className="h-4 w-4 text-success" />;
       case 'fail':
-        return <XCircle className="h-4 w-4 text-dc-critical" />;
+        return <XCircle className="h-4 w-4 text-destructive" />;
       case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-dc-warning" />;
+        return <AlertTriangle className="h-4 w-4 text-warning" />;
     }
   };
 
@@ -201,16 +201,16 @@ export function DeployReadinessChecks({ facility, onFixIssue }: DeployReadinessC
       <div className="space-y-4">
         {/* Summary Badges */}
         <div className="flex gap-2 flex-wrap">
-          <Badge className="bg-dc-success/10 text-dc-success border-dc-success/30">
+          <Badge className="bg-success/10 text-success border-success/30">
             {passCount} Passed
           </Badge>
           {warningCount > 0 && (
-            <Badge className="bg-dc-warning/10 text-dc-warning border-dc-warning/30">
+            <Badge className="bg-warning/10 text-warning border-warning/30">
               {warningCount} Warnings
             </Badge>
           )}
           {failCount > 0 && (
-            <Badge className="bg-dc-critical/10 text-dc-critical border-dc-critical/30">
+            <Badge className="bg-destructive/10 text-destructive border-destructive/30">
               {failCount} Failed
             </Badge>
           )}
@@ -219,13 +219,13 @@ export function DeployReadinessChecks({ facility, onFixIssue }: DeployReadinessC
         {/* Carbon Checks */}
         <div className="space-y-2">
           <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-            <Leaf className="h-3 w-3 text-dc-success" />
+            <Leaf className="h-3 w-3 text-success" />
             Carbon Model
           </h4>
           {checks.filter(c => c.domain === 'carbon').map(check => (
             <div 
               key={check.id}
-              className="flex items-center justify-between p-2 rounded-lg bg-dc-surface border border-dc-border"
+              className="flex items-center justify-between p-2 rounded-lg bg-muted/50 border border-border"
             >
               <div className="flex items-center gap-3">
                 {getStatusIcon(check.status)}
@@ -251,13 +251,13 @@ export function DeployReadinessChecks({ facility, onFixIssue }: DeployReadinessC
         {/* Financial Checks */}
         <div className="space-y-2">
           <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-            <DollarSign className="h-3 w-3 text-dc-info" />
+            <DollarSign className="h-3 w-3 text-info" />
             Financial Model
           </h4>
           {checks.filter(c => c.domain === 'financial').map(check => (
             <div 
               key={check.id}
-              className="flex items-center justify-between p-2 rounded-lg bg-dc-surface border border-dc-border"
+              className="flex items-center justify-between p-2 rounded-lg bg-muted/50 border border-border"
             >
               <div className="flex items-center gap-3">
                 {getStatusIcon(check.status)}
@@ -282,8 +282,8 @@ export function DeployReadinessChecks({ facility, onFixIssue }: DeployReadinessC
 
         {/* Overall Status Message */}
         {failCount > 0 && (
-          <div className="p-3 rounded-lg bg-dc-critical/10 border border-dc-critical/30">
-            <p className="text-sm text-dc-critical font-medium">
+          <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30">
+            <p className="text-sm text-destructive font-medium">
               {failCount} issue(s) must be fixed before deployment
             </p>
           </div>

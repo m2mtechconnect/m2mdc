@@ -1,6 +1,52 @@
 /**
  * Data Centre Simulation Engine
  * Core engine for running scenarios with tick-based updates
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * INDUSTRY SOURCE REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * 
+ * DIGITAL TWIN SIMULATION STANDARDS:
+ * - ISO 23247:2021 Digital Twin Framework for Manufacturing
+ *   https://www.iso.org/standard/75066.html
+ * - NVIDIA Omniverse Digital Twin Platform (Real-time simulation architecture)
+ *   https://developer.nvidia.com/omniverse
+ * - Microsoft Azure Digital Twins (Event-driven twin modeling)
+ *   https://learn.microsoft.com/en-us/azure/digital-twins/
+ * 
+ * DATA CENTER SIMULATION METHODOLOGIES:
+ * - Uptime Institute M&O Stamp - Scenario Testing Requirements
+ *   https://uptimeinstitute.com/tier-certification/management-operations
+ * - Schneider Electric Data Center Simulation Best Practices (White Paper 142)
+ *   https://www.se.com/ww/en/download/document/SPD_VAVR-5WKLPK_EN/
+ * - ASHRAE TC 9.9 Thermal Guidelines for Data Processing Environments
+ *   https://tc0909.ashraetcs.org/documents.php
+ * 
+ * TICK-BASED SIMULATION PATTERNS:
+ * - Game Engine Architecture - Tick/Update Loop Design (Jason Gregory)
+ *   ISBN: 978-1138035454
+ * - Real-Time Systems Design Principles (Hermann Kopetz)
+ *   ISBN: 978-1441982360
+ * - Discrete Event Simulation Modeling (Jerry Banks)
+ *   ISBN: 978-0131446793
+ * 
+ * KPI SNAPSHOT & TIME-SERIES DATA:
+ * - Prometheus Monitoring System - Time-Series Best Practices
+ *   https://prometheus.io/docs/practices/naming/
+ * - InfluxDB Time Series Data Modeling
+ *   https://docs.influxdata.com/influxdb/v2.0/write-data/best-practices/
+ * - OpenTelemetry Metrics Specification
+ *   https://opentelemetry.io/docs/specs/otel/metrics/
+ * 
+ * SCENARIO EXECUTION & STATE MANAGEMENT:
+ * - State Pattern (Gang of Four Design Patterns)
+ *   ISBN: 978-0201633610
+ * - Redux State Management Architecture
+ *   https://redux.js.org/understanding/thinking-in-redux/three-principles
+ * - XState Finite State Machines
+ *   https://xstate.js.org/docs/
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import type {

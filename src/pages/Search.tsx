@@ -122,7 +122,7 @@ export default function Search() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value.slice(0, 500))}
                     placeholder="Search across all sources..."
-                    className="pl-12 h-12 text-body bg-dc-bg-card border-dc-border"
+                    className="pl-12 h-12 text-body bg-card border-border"
                     maxLength={500}
                   />
                 </div>

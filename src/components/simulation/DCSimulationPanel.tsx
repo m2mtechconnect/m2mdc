@@ -6,15 +6,16 @@
  * Integrated with Blueprint Snapshot system for simulation traceability
  * 
  * P0 FIX: Now persists simulation runs to database on completion
+ * ENHANCED: Added 3D Twin Visualization with live simulation updates
  */
 
-import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef, lazy, Suspense } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Activity, Clock, Sparkles, BarChart3, Grid3X3, FileText, Info } from 'lucide-react';
+import { Activity, Clock, Sparkles, BarChart3, Grid3X3, FileText, Info, Box } from 'lucide-react';
 import { useSimulation } from '@/simulation/useSimulation';
 import { useBlueprint } from '@/hooks/useBlueprint';
 import { useSimulationSnapshotStore } from '@/stores/simulationSnapshotStore';
@@ -35,6 +36,22 @@ import { generateSimulationResult, generateRackMetrics } from '@/simulation/gene
 import { DcToolsRow } from '@/components/dc-tools';
 import type { CustomScenarioConfig, SimulationResultSummary, RackMetrics } from '@/simulation/types';
 import { AnimatePresence, motion } from 'framer-motion';
+
+// Lazy load 3D visualization for performance
+const TwinVisualizationLayout = lazy(() => 
+  import('@/components/twin-visualization').then(m => ({ default: m.TwinVisualizationLayout }))
+);
+
+function VisualizationSkeleton() {
+  return (
+    <div className="h-[400px] bg-muted rounded-lg animate-pulse flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+        <p className="text-sm text-muted-foreground">Loading 3D Twin...</p>
+      </div>
+    </div>
+  );
+}
 
 interface DCSimulationPanelProps {
   compact?: boolean;
@@ -309,6 +326,10 @@ export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSim
                 <Sparkles className="h-3.5 w-3.5" />
                 Scenarios
               </TabsTrigger>
+              <TabsTrigger value="3d-view" className="gap-1">
+                <Box className="h-3.5 w-3.5" />
+                3D View
+              </TabsTrigger>
               <TabsTrigger value="heatmap" className="gap-1">
                 <Grid3X3 className="h-3.5 w-3.5" />
                 Rack Map
@@ -332,6 +353,15 @@ export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSim
                 onCreateCustom={() => setShowCustomBuilder(true)}
                 isRunning={status === 'running'}
               />
+            </TabsContent>
+            
+            <TabsContent value="3d-view" className="mt-4">
+              <Suspense fallback={<VisualizationSkeleton />}>
+                <TwinVisualizationLayout 
+                  mode="simulation" 
+                  showTimeline={status === 'running' || status === 'completed'}
+                />
+              </Suspense>
             </TabsContent>
             
             <TabsContent value="heatmap" className="mt-4">

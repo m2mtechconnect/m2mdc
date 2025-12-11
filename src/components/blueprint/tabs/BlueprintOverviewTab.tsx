@@ -4,6 +4,7 @@
  * This is the Walmart Standard Blueprint template applied globally
  */
 
+import { lazy, Suspense } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -31,6 +32,22 @@ import { AgentHealthPanel } from '../AgentHealthPanel';
 import { KPIEnhancementsPanel } from '../KPIEnhancementsPanel';
 import { WorkflowEnhancementsPanel } from '../WorkflowEnhancementsPanel';
 import { ScenarioEnhancementsPanel } from '../ScenarioEnhancementsPanel';
+
+// Lazy load 3D visualization for performance
+const TwinVisualizationLayout = lazy(() => 
+  import('@/components/twin-visualization').then(m => ({ default: m.TwinVisualizationLayout }))
+);
+
+function VisualizationSkeleton() {
+  return (
+    <div className="h-[400px] bg-muted rounded-lg animate-pulse flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+        <p className="text-sm text-muted-foreground">Loading 3D Twin...</p>
+      </div>
+    </div>
+  );
+}
 
 interface BlueprintOverviewTabProps {
   blueprint: DataCentreBlueprint;
@@ -73,6 +90,24 @@ export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTa
 
   return (
     <div className="space-y-6">
+      {/* ============================================== */}
+      {/* SECTION 0: 3D Twin Visualization */}
+      {/* Visual layout of racks, power, cooling, network */}
+      {/* ============================================== */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            Blueprint Layout Visualization
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Suspense fallback={<VisualizationSkeleton />}>
+            <TwinVisualizationLayout mode="blueprint" />
+          </Suspense>
+        </CardContent>
+      </Card>
+
       {/* ============================================== */}
       {/* SECTION 1: Executive Summary Block */}
       {/* ROI, Carbon Impact, Active Systems, Costs */}

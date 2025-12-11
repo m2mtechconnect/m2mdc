@@ -11,6 +11,7 @@ import {
   PlayCircle, ExternalLink, FileDown, Clock, 
   GitBranch, AlertCircle, CheckCircle2
 } from 'lucide-react';
+import { sanitizeTwinName } from '@/lib/utils/extractCompanyIdentity';
 
 interface SimulationSnapshotHeaderProps {
   twinName?: string;
@@ -20,27 +21,6 @@ interface SimulationSnapshotHeaderProps {
   scenarioName?: string;
   isRunning?: boolean;
   onDownloadSnapshot?: () => void;
-}
-
-/**
- * Sanitize twin name to remove malformed patterns like "!(https..."
- */
-function sanitizeTwinName(name: string | undefined): string {
-  if (!name) return 'Sovereign AI Data Centre';
-  
-  let cleaned = name
-    .replace(/^!\(/g, '')
-    .replace(/^\[/g, '')
-    .replace(/^https?:\/\//gi, '')
-    .replace(/^www\./gi, '')
-    .trim();
-  
-  // If still looks malformed, use fallback
-  if (cleaned.startsWith('(') || cleaned.length < 3) {
-    return 'Sovereign AI Data Centre';
-  }
-  
-  return cleaned;
 }
 
 export function SimulationSnapshotHeader({

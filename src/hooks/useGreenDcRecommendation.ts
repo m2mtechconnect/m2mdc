@@ -129,28 +129,47 @@ async function saveScanSession(url: string, recommendation: GreenDcTwinRecommend
       return;
     }
 
+    // Map industry from edge function to database enum values
+    // Database constraint: finance, government, retail, telecom, cloud_saas, manufacturing, healthcare, energy, ai_compute, other
+    const industryToDbMap: Record<string, string> = {
+      finance: "finance",
+      government: "government",
+      retail: "retail",
+      saas: "cloud_saas", // Edge function returns 'saas', DB expects 'cloud_saas'
+      healthcare: "healthcare",
+      telecom: "telecom",
+      manufacturing: "manufacturing",
+      energy: "energy",
+      education: "other", // Map education to 'other' as it's not in DB enum
+      generic: "other"
+    };
+    
     // Map industry to blueprint profile
     const blueprintProfileMap: Record<string, string> = {
       finance: "finance_green_dc",
       government: "gov_sovereign_dc",
       retail: "retail_edge_dc",
       saas: "saas_ai_dc",
+      cloud_saas: "saas_ai_dc",
       healthcare: "healthcare_phi_dc",
       telecom: "telco_edge_dc",
       manufacturing: "manufacturing_iiot_dc",
       energy: "energy_grid_dc",
       education: "education_research_dc",
-      generic: "generic_enterprise_dc"
+      generic: "generic_enterprise_dc",
+      other: "generic_enterprise_dc"
     };
+    
+    const dbIndustry = industryToDbMap[recommendation.industry] || "other";
 
     const { error } = await supabase
       .from("dc_scan_sessions")
       .insert({
         user_id: user.id,
         url,
-        detected_industry: recommendation.industry,
+        detected_industry: dbIndustry,
         blueprint_profile: blueprintProfileMap[recommendation.industry] || "generic_enterprise_dc",
-        sustainability_priority: "balanced",
+        sustainability_priority: "medium",
         traffic_scale: recommendation.capacityTier,
         recommendation_json: recommendation as any,
         raw_signals: {

@@ -177,25 +177,27 @@ export const PRESET_SCENARIOS: ScenarioDefinition[] = [
     ],
   },
 
-  // 8. Carbon Price Shock
+  // 8. Carbon Price Shock (Based on Canadian Federal Carbon Pricing trajectory)
+  // Source: Environment and Climate Change Canada - 2024 carbon pricing projections
+  // Current: $80/tonne (2024), Rising to: $170/tonne (2030)
   {
     id: 'carbon_price_shock',
-    name: 'Carbon Price Shock to $250',
-    description: 'Carbon price doubles, stress testing financial impact.',
+    name: 'Carbon Price Acceleration to $170/tonne',
+    description: 'Accelerated carbon price increase to 2030 target ($170/tonne CAD), stress testing financial resilience per Canadian federal carbon pricing trajectory.',
     durationSeconds: 240, // 4 minutes
     domainsInvolved: ['financial_carbon'],
     severity: 'warning',
     category: 'financial_carbon',
-    tags: ['Carbon', 'Financial', 'ESG'],
+    tags: ['Carbon', 'Financial', 'ESG', 'ECCC', 'Net-Zero'],
     timeline: [
-      { at: 0, type: 'START', kpiDeltas: {}, eventTitle: 'Scenario Started', eventDescription: 'Carbon price shock simulation initiated', severity: 'low', domain: 'financial_carbon' },
-      { at: 20, type: 'ALERT', kpiDeltas: { economicEfficiencyScore: -8 }, eventTitle: 'Price Announcement', eventDescription: 'Regulatory announcement: carbon price to $250/tonne', severity: 'medium', domain: 'financial_carbon' },
-      { at: 45, type: 'TRIGGER', kpiDeltas: { economicEfficiencyScore: -15, gCo2PerGpuHour: 0 }, eventTitle: 'Model Recalculation', eventDescription: 'Financial models updating with new carbon costs', severity: 'medium', domain: 'financial_carbon' },
-      { at: 80, type: 'INFO', kpiDeltas: {}, eventTitle: 'OPEX Impact Assessed', eventDescription: 'Monthly OPEX increase estimated at 12%', severity: 'high', domain: 'financial_carbon' },
-      { at: 120, type: 'MITIGATION', kpiDeltas: { carbonNeutralProgress: 5 }, eventTitle: 'Strategy Review', eventDescription: 'Accelerating renewable energy procurement', severity: 'medium', domain: 'financial_carbon' },
-      { at: 160, type: 'MITIGATION', kpiDeltas: { renewableEnergyScore: 5 }, eventTitle: 'PPA Negotiations', eventDescription: 'Additional renewable PPAs under negotiation', severity: 'low', domain: 'financial_carbon' },
-      { at: 200, type: 'RECOVERY', kpiDeltas: { economicEfficiencyScore: 5 }, eventTitle: 'Hedging Strategy', eventDescription: 'Carbon credit hedging strategy implemented', severity: 'low', domain: 'financial_carbon' },
-      { at: 240, type: 'END', kpiDeltas: {}, eventTitle: 'Scenario Complete', eventDescription: 'Carbon price shock scenario completed', severity: 'low', domain: 'financial_carbon' },
+      { at: 0, type: 'START', kpiDeltas: {}, eventTitle: 'Scenario Started', eventDescription: 'Carbon price acceleration simulation initiated (current: $80/tonne CAD)', severity: 'low', domain: 'financial_carbon' },
+      { at: 20, type: 'ALERT', kpiDeltas: { economicEfficiencyScore: -8 }, eventTitle: 'ECCC Policy Update', eventDescription: 'Environment and Climate Change Canada announces accelerated carbon pricing: $170/tonne effective immediately', severity: 'medium', domain: 'financial_carbon' },
+      { at: 45, type: 'TRIGGER', kpiDeltas: { economicEfficiencyScore: -15, gCo2PerGpuHour: 0 }, eventTitle: 'Financial Model Update', eventDescription: 'TCO models recalculating with 112% carbon cost increase', severity: 'medium', domain: 'financial_carbon' },
+      { at: 80, type: 'INFO', kpiDeltas: {}, eventTitle: 'OPEX Impact Assessed', eventDescription: 'Quebec facility: minimal impact (99.8% hydro). Alberta equivalent: +$127,500/year per MW', severity: 'high', domain: 'financial_carbon' },
+      { at: 120, type: 'MITIGATION', kpiDeltas: { carbonNeutralProgress: 5 }, eventTitle: 'PPA Strategy Review', eventDescription: 'Accelerating Hydro-Québec renewable PPA negotiations', severity: 'medium', domain: 'financial_carbon' },
+      { at: 160, type: 'MITIGATION', kpiDeltas: { renewableEnergyScore: 5 }, eventTitle: 'Carbon Credit Strategy', eventDescription: 'Evaluating BC and Quebec carbon offset markets', severity: 'low', domain: 'financial_carbon' },
+      { at: 200, type: 'RECOVERY', kpiDeltas: { economicEfficiencyScore: 5 }, eventTitle: 'Financial Resilience', eventDescription: 'Quebec location advantage confirmed: carbon cost exposure <0.1% of OPEX', severity: 'low', domain: 'financial_carbon' },
+      { at: 240, type: 'END', kpiDeltas: {}, eventTitle: 'Scenario Complete', eventDescription: 'Carbon price shock scenario completed - Quebec hydro positioning validated', severity: 'low', domain: 'financial_carbon' },
     ],
   },
 

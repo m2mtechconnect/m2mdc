@@ -57,17 +57,37 @@ export interface BlueprintCarbonFinancialExtension {
 /**
  * Generate default carbon model for a region
  */
+/**
+ * Generate default carbon model for a region
+ * Carbon pricing sources:
+ * - Canada: Federal carbon price $80/tonne (2024), rising to $170/tonne by 2030
+ * - BC: Carbon tax $80/tonne (2024) - first jurisdiction in North America
+ * - Quebec: Cap-and-trade linked with California, ~$45 CAD/tonne
+ * - EU ETS: ~€85-100/tonne
+ */
 export function generateDefaultCarbonModel(region: RegionCode = 'CA-QC'): BlueprintCarbonModel {
   const regionalData = REGIONAL_CARBON_INTENSITY[region];
+  
+  // Regional carbon pricing based on jurisdiction
+  const carbonPriceByRegion: Record<string, number> = {
+    'CA-QC': 80,    // Federal backstop + provincial mechanisms
+    'CA-ON': 80,    // Federal carbon pricing
+    'CA-BC': 80,    // BC Carbon Tax (first in North America, 2008)
+    'CA-AB': 80,    // TIER system (Technology Innovation and Emissions Reduction)
+    'US-WEST': 32,  // California Cap-and-Trade
+    'US-EAST': 15,  // RGGI (Regional Greenhouse Gas Initiative)
+    'EU': 95,       // EU ETS average 2024
+    'EU-NORDIC': 95,
+  };
   
   return {
     region,
     carbonIntensityGPerKwh: regionalData.carbonIntensityGPerKwh,
     renewablePercentage: regionalData.renewablePercentage,
     gridType: regionalData.gridType,
-    carbonPricePerTon: 65, // Canadian federal carbon price baseline
+    carbonPricePerTon: carbonPriceByRegion[region] || 80, // Default to Canadian federal rate
     offsetStrategy: 'partial',
-    certifications: ['ISO 14001', 'Carbon Trust'],
+    certifications: ['ISO 14001', 'ISO 50001', 'Carbon Trust Standard'],
   };
 }
 

@@ -18,6 +18,7 @@ import {
 } from '@/components/dc-twin/tabs';
 import { montrealSovereignDC, sovereignQCFacility } from '@/twins/dataCenter/mockData';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { TwinOverlayProvider } from '@/context/TwinOverlayContext';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { EmptyStateSelectTwin } from '@/components/twin-selector';
 import { Eye, FileText, MessageSquare, Rocket, LayoutDashboard, Activity } from 'lucide-react';
@@ -123,6 +124,7 @@ export default function DataCentreTwin() {
   // DEMO MODE: Show simulation with mock data
   if (isDemoMode || hasBuilderSession) {
     return (
+      <TwinOverlayProvider>
       <div className="min-h-screen bg-background">
         <div className="container mx-auto py-6 px-4 space-y-6">
           {/* Demo/Session Header */}
@@ -197,6 +199,7 @@ export default function DataCentreTwin() {
           </Tabs>
         </div>
       </div>
+      </TwinOverlayProvider>
     );
   }
   
@@ -216,6 +219,7 @@ export default function DataCentreTwin() {
   }
   
   return (
+    <TwinOverlayProvider>
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-6 px-4 space-y-6">
         {/* Operational Mode Header */}
@@ -248,5 +252,6 @@ export default function DataCentreTwin() {
         />
       </div>
     </div>
+    </TwinOverlayProvider>
   );
 }

@@ -2,15 +2,16 @@
  * TwinVisualizationLayout Component
  * Standard wrapper composing 3D view, KPI cards, legends, and timeline
  * 
- * CRITICAL: Now properly synced with SimulationEngine for real-time updates
+ * CRITICAL: Uses TwinOverlayContext as single source of truth for overlay state
  * UPGRADED: Added KPI tab → 3D overlay domain binding
  * HARDENED: Wrapped with SimulationErrorBoundary for crash protection
  */
 
-import { lazy, Suspense, useState, useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   Thermometer, 
   Zap, 
@@ -25,6 +26,7 @@ import { NetworkTopologyLayer } from './NetworkTopologyLayer';
 import { SimulationTimeline } from './SimulationTimeline';
 import { SimulationErrorBoundary } from './SimulationErrorBoundary';
 import { useSimulationVisualization } from '@/hooks/useSimulationVisualization';
+import { useTwinOverlaySafe, OVERLAY_CONFIG, type TwinOverlay } from '@/context/TwinOverlayContext';
 import type { TwinVisualizationMode } from './types';
 import type { OverlayDomain } from './DataCenter3DScene';
 
@@ -40,7 +42,7 @@ interface TwinVisualizationLayoutProps {
   showOverlayControls?: boolean;
   onRackSelect?: (rackId: string) => void;
   className?: string;
-  /** Optional pre-selected overlay domain from parent */
+  /** @deprecated Use TwinOverlayProvider instead */
   initialOverlay?: OverlayDomain;
 }
 
@@ -61,16 +63,23 @@ export function TwinVisualizationLayout({
   showOverlayControls,
   onRackSelect,
   className = '',
-  initialOverlay = 'thermal'
 }: TwinVisualizationLayoutProps) {
   const data = useTwinVisualizationData();
   const simulation = useSimulationVisualization();
   
-  // Overlay domain state - controls which layer is visible in 3D scene
-  const [activeOverlay, setActiveOverlay] = useState<OverlayDomain>(initialOverlay);
+  // Use global overlay context - single source of truth
+  const { activeOverlay: contextOverlay, setOverlay } = useTwinOverlaySafe();
+  const activeOverlay = contextOverlay as OverlayDomain;
+  
+  // Network is a special toggle (not exclusive with other overlays)
   const [showNetwork, setShowNetwork] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+  
+  // Toggle overlay handler
+  const toggleOverlay = useCallback((overlay: TwinOverlay) => {
+    setOverlay(activeOverlay === overlay ? 'none' : overlay);
+  }, [activeOverlay, setOverlay]);
 
   // Sync playing state with simulation
   useEffect(() => {
@@ -132,71 +141,78 @@ export function TwinVisualizationLayout({
             </CardTitle>
             
             {showControls && (
-              <div className="flex items-center gap-1 flex-wrap">
-                <Button
-                  variant={activeOverlay === 'thermal' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => setActiveOverlay(activeOverlay === 'thermal' ? 'none' : 'thermal')}
-                >
-                  <Thermometer className="h-3 w-3 mr-1" />
-                  Thermal
-                </Button>
-                <Button
-                  variant={activeOverlay === 'power' || activeOverlay === 'pue' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => setActiveOverlay(activeOverlay === 'power' ? 'none' : 'power')}
-                >
-                  <Zap className="h-3 w-3 mr-1" />
-                  Power
-                </Button>
-                <Button
-                  variant={activeOverlay === 'cooling' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => setActiveOverlay(activeOverlay === 'cooling' ? 'none' : 'cooling')}
-                >
-                  <Snowflake className="h-3 w-3 mr-1" />
-                  Cooling
-                </Button>
-                <Button
-                  variant={activeOverlay === 'gpu' || activeOverlay === 'workload' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => setActiveOverlay(activeOverlay === 'gpu' ? 'none' : 'gpu')}
-                >
-                  <Cpu className="h-3 w-3 mr-1" />
-                  GPU
-                </Button>
-                <Button
-                  variant={activeOverlay === 'sovereignty' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => setActiveOverlay(activeOverlay === 'sovereignty' ? 'none' : 'sovereignty')}
-                >
-                  <Shield className="h-3 w-3 mr-1" />
-                  Sovereignty
-                </Button>
-                <Button
-                  variant={showNetwork ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => setShowNetwork(!showNetwork)}
-                >
-                  <Network className="h-3 w-3 mr-1" />
-                  Network
-                </Button>
-                <Button
-                  variant={activeOverlay === 'carbon' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => setActiveOverlay(activeOverlay === 'carbon' ? 'none' : 'carbon')}
-                >
-                  <Leaf className="h-3 w-3 mr-1" />
-                  Carbon
-                </Button>
-              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <Button
+                      variant={activeOverlay === 'thermal' ? 'secondary' : 'ghost'}
+                      size="sm"
+                      className="h-7 px-2"
+                      onClick={() => toggleOverlay('thermal')}
+                    >
+                      <Thermometer className="h-3 w-3 mr-1" />
+                      Thermal
+                    </Button>
+                    <Button
+                      variant={activeOverlay === 'power' || activeOverlay === 'pue' ? 'secondary' : 'ghost'}
+                      size="sm"
+                      className="h-7 px-2"
+                      onClick={() => toggleOverlay('power')}
+                    >
+                      <Zap className="h-3 w-3 mr-1" />
+                      Power
+                    </Button>
+                    <Button
+                      variant={activeOverlay === 'cooling' ? 'secondary' : 'ghost'}
+                      size="sm"
+                      className="h-7 px-2"
+                      onClick={() => toggleOverlay('cooling')}
+                    >
+                      <Snowflake className="h-3 w-3 mr-1" />
+                      Cooling
+                    </Button>
+                    <Button
+                      variant={activeOverlay === 'gpu' || activeOverlay === 'workload' ? 'secondary' : 'ghost'}
+                      size="sm"
+                      className="h-7 px-2"
+                      onClick={() => toggleOverlay('gpu')}
+                    >
+                      <Cpu className="h-3 w-3 mr-1" />
+                      GPU
+                    </Button>
+                    <Button
+                      variant={activeOverlay === 'sovereignty' ? 'secondary' : 'ghost'}
+                      size="sm"
+                      className="h-7 px-2"
+                      onClick={() => toggleOverlay('sovereignty')}
+                    >
+                      <Shield className="h-3 w-3 mr-1" />
+                      Sovereignty
+                    </Button>
+                    <Button
+                      variant={showNetwork ? 'secondary' : 'ghost'}
+                      size="sm"
+                      className="h-7 px-2"
+                      onClick={() => setShowNetwork(!showNetwork)}
+                    >
+                      <Network className="h-3 w-3 mr-1" />
+                      Network
+                    </Button>
+                    <Button
+                      variant={activeOverlay === 'carbon' ? 'secondary' : 'ghost'}
+                      size="sm"
+                      className="h-7 px-2"
+                      onClick={() => toggleOverlay('carbon')}
+                    >
+                      <Leaf className="h-3 w-3 mr-1" />
+                      Carbon
+                    </Button>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="text-xs">
+                  Overlays control how the digital twin is visualized
+                </TooltipContent>
+              </Tooltip>
             )}
           </CardHeader>
           

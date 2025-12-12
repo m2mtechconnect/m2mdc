@@ -1,6 +1,7 @@
 /**
  * MiniTwinPreview - Compact 3D twin preview for Overview tab
  * Read-only, minimal interaction, shows current thermal/power state
+ * Uses TwinOverlayContext for consistent overlay state
  */
 
 import { lazy, Suspense } from 'react';
@@ -11,6 +12,7 @@ import { Eye, Maximize2, Activity } from 'lucide-react';
 import { useTwinVisualizationData } from '@/components/twin-visualization/hooks/useTwinVisualizationData';
 import { useSimulationVisualization } from '@/hooks/useSimulationVisualization';
 import { SimulationErrorBoundary } from '@/components/twin-visualization/SimulationErrorBoundary';
+import { useTwinOverlaySafe, OVERLAY_CONFIG } from '@/context/TwinOverlayContext';
 import { cn } from '@/lib/utils';
 
 const DataCenter3DScene = lazy(() => 
@@ -36,6 +38,8 @@ function LoadingSkeleton() {
 export function MiniTwinPreview({ onExpand, className }: MiniTwinPreviewProps) {
   const data = useTwinVisualizationData();
   const simulation = useSimulationVisualization();
+  const { activeOverlay } = useTwinOverlaySafe();
+  const overlayConfig = OVERLAY_CONFIG[activeOverlay];
   
   const criticalRacks = data.racks.filter(r => r.isCritical).length;
   const avgTemp = data.racks.reduce((sum, r) => sum + r.thermalCelsius, 0) / (data.racks.length || 1);
@@ -46,6 +50,10 @@ export function MiniTwinPreview({ onExpand, className }: MiniTwinPreviewProps) {
         <CardTitle className="text-sm font-medium flex items-center gap-2">
           <Eye className="h-4 w-4 text-muted-foreground" />
           Twin Preview
+          {/* Read-only overlay badge - non-interactive */}
+          <Badge variant="outline" className="text-[10px] h-5 font-normal">
+            {overlayConfig.label}
+          </Badge>
         </CardTitle>
         <div className="flex items-center gap-2">
           {simulation.isSimulating && (
@@ -73,7 +81,7 @@ export function MiniTwinPreview({ onExpand, className }: MiniTwinPreviewProps) {
                 events={[]}
                 compact
                 mode="dashboard"
-                activeOverlay="thermal"
+                activeOverlay={activeOverlay as any}
                 simulationKpis={simulation.currentKpis}
               />
             </div>

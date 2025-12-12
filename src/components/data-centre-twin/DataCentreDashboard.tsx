@@ -28,7 +28,7 @@ import { WorkloadDomainView } from './domains/WorkloadDomainView';
 import { SovereigntyDomainView } from './domains/SovereigntyDomainView';
 import { CarbonDomainView } from './domains/CarbonDomainView';
 import { FinancialDomainView } from './domains/FinancialDomainView';
-import { ScenarioSimulationPanel } from '@/components/simulation/ScenarioSimulationPanel';
+import { DCSimulationTab } from './DCSimulationTab';
 import { useBlueprint } from '@/hooks/useBlueprint';
 import { 
   CompactKPICockpit, 
@@ -37,7 +37,8 @@ import {
   CompactAlertsPanel, 
   CompactEventTimeline,
   CompactDCToolsPanel,
-  SimulationSummaryCard
+  SimulationSummaryCard,
+  MiniTwinPreview
 } from './overview';
 import { useCoPilotCommands } from '@/contexts/CoPilotCommandContext';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
@@ -471,8 +472,10 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
             
             {/* Right Column - Secondary Content */}
             <div className="space-y-6">
-              <CompactRackOverview facility={facility} maxRacks={20} />
-              <CompactDCToolsPanel twinId={twinId} maxVisible={5} />
+              {/* Mini 3D Twin Preview */}
+              <MiniTwinPreview onExpand={() => setActiveTab('simulation')} />
+              <CompactRackOverview facility={facility} maxRacks={16} />
+              <CompactDCToolsPanel twinId={twinId} maxVisible={4} />
               <CompactEventTimeline events={timelineEvents} />
             </div>
           </div>
@@ -480,13 +483,7 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
 
         {/* SIMULATION TAB - Full scenario engine and 3D digital twin */}
         <TabsContent value="simulation" className="space-y-6">
-          <ScenarioSimulationPanel
-            layout="full"
-            showHeader
-            showControls
-            showTimeline
-            twinId={twinId}
-          />
+          <DCSimulationTab facility={facility} twinId={twinId} />
         </TabsContent>
         <TabsContent value="thermal">
           <ThermalDomainView facility={facility} />

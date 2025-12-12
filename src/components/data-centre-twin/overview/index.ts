@@ -21,3 +21,6 @@ export { CompactEventTimeline } from './CompactEventTimeline';
 
 // Simulation summary for Overview tab
 export { SimulationSummaryCard } from './SimulationSummaryCard';
+
+// Mini 3D Twin Preview for Overview tab
+export { MiniTwinPreview } from './MiniTwinPreview';

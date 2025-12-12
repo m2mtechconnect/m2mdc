@@ -95,7 +95,7 @@ export class SimulationEngine {
   private processedStepIndices: Set<number> = new Set();
   private twinId: string | null = null;
   private tickCount: number = 0;
-  private readonly TICK_THROTTLE = 3; // Only emit every 3rd tick for performance
+  private readonly TICK_THROTTLE = 2; // Emit every 2nd tick at 30fps = 15fps visual updates
 
   constructor(baselineKpis: Record<string, number> = {}, twinId?: string) {
     // Normalize baseline KPIs to ensure all aliases are populated
@@ -318,20 +318,20 @@ export class SimulationEngine {
   /**
    * Get current state (readonly)
    * Returns a DEEP CLONE to ensure React state updates trigger re-renders
-   * Using structuredClone-like approach for full isolation
+   * Optimized: Uses spread operators instead of JSON.parse/stringify for performance
    */
   getState(): Readonly<SimulationState> {
-    // Deep clone all nested objects to ensure React detects changes
+    // Spread-based cloning - faster than JSON.parse/stringify
     return {
       status: this.state.status,
       currentTime: this.state.currentTime,
       timeScale: this.state.timeScale,
       activeScenarioId: this.state.activeScenarioId,
-      // Deep clone objects - this is critical for React re-renders
-      baselineKpis: JSON.parse(JSON.stringify(this.state.baselineKpis)),
-      currentKpis: JSON.parse(JSON.stringify(this.state.currentKpis)),
-      events: JSON.parse(JSON.stringify(this.state.events)),
-      kpiSnapshots: JSON.parse(JSON.stringify(this.state.kpiSnapshots)),
+      // Shallow clone objects - React will detect these as new references
+      baselineKpis: { ...this.state.baselineKpis },
+      currentKpis: { ...this.state.currentKpis },
+      events: [...this.state.events],
+      kpiSnapshots: [...this.state.kpiSnapshots],
     };
   }
 
@@ -369,13 +369,13 @@ export class SimulationEngine {
     this.stopTickLoop();
     this.lastTickTime = Date.now();
     
-    // Use 60fps tick rate
+    // Use 30fps tick rate for better performance (instead of 60fps)
     this.tickInterval = setInterval(() => {
       const now = Date.now();
       const deltaMs = now - this.lastTickTime;
       this.lastTickTime = now;
       this.tick(deltaMs);
-    }, 1000 / 60);
+    }, 1000 / 30);
   }
 
   private stopTickLoop(): void {

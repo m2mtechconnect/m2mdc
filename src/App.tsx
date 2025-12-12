@@ -202,7 +202,8 @@ function AuthenticatedApp() {
   );
 }
 
-import { PerformancePanel } from '@/components/debug/PerformancePanel';
+// Performance panel hidden - use Ctrl+Shift+P to toggle if needed
+// import { PerformancePanel } from '@/components/debug/PerformancePanel';
 
 const App = () => (
   <ErrorBoundary>
@@ -217,7 +218,7 @@ const App = () => (
                     <Toaster />
                     <Sonner />
                     <AuthenticatedApp />
-                    <PerformancePanel />
+                    {/* PerformancePanel hidden */}
                   </CoPilotCommandProvider>
                 </CoPilotProvider>
               </ActiveTwinProvider>

@@ -3,6 +3,8 @@
  * Provides reactive access to the Data Centre Simulation Engine
  * Now supports Blueprint scenarios as authoritative source
  * Includes performance instrumentation for simulationLoopTime tracking
+ * 
+ * CRITICAL: Uses activeTwin as primary data source, NOT builder store
  */
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
@@ -18,6 +20,7 @@ import {
 import { createCustomScenario } from './customScenarioBuilder';
 import { convertAllBlueprintScenarios } from './blueprintScenarioAdapter';
 import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
+import { useSimulationDataIsolation } from './useSimulationGuards';
 import type { 
   SimulationState, 
   SimulationEvent, 
@@ -33,8 +36,10 @@ import type { SimulationScenarioBlueprint } from '@/types/dataCentreBlueprint';
 const DEFAULT_BASELINE_KPIS: Record<string, number> = {
   // PUE: Uptime Institute avg 1.57, best-in-class <1.2, our target 1.25 for AI workloads
   pue: 1.25,
+  effectivePue: 1.25,
   // GPU Utilization: Industry avg 40-60%, well-managed 70-85%, our target 76%
   gpuUtilization: 76,
+  avgGpuUtilization: 76,
   // Thermal Stability: Based on ASHRAE A1 compliance (18-27°C), our score 91%
   thermalStabilityScore: 91,
   // Power Reliability: Tier III 99.982%, our UPS/generator redundancy score 97%
@@ -43,6 +48,7 @@ const DEFAULT_BASELINE_KPIS: Record<string, number> = {
   sovereignComplianceScore: 100,
   // Emissions: Quebec hydro ~1.2 gCO₂/kWh vs target, currently 6% under target
   emissionsVsTarget: -6,
+  carbonNeutralProgress: 65,
   // Cooling Efficiency: ASHRAE best practice 82-88%, our target 84%
   coolingEfficiencyIndex: 84,
   // Network Integrity: Tier III target 99.98%, our redundant fabric 98.5%
@@ -57,13 +63,17 @@ const DEFAULT_BASELINE_KPIS: Record<string, number> = {
   economicEfficiencyScore: 86,
   // Renewable percentage: Quebec grid 97% hydro
   renewablePct: 97,
+  greenEnergyPct: 97,
   // Sovereignty Risk Score: 0 = fully compliant (lower is better)
   sovereigntyRiskScore: 0,
+  dataSovereigntyScore: 100,
 };
 
 export interface UseSimulationOptions {
   /** Blueprint scenarios to merge with presets */
   blueprintScenarios?: SimulationScenarioBlueprint[];
+  /** Twin ID for context tracking */
+  twinId?: string;
 }
 
 export interface UseSimulationReturn {
@@ -100,13 +110,27 @@ export interface UseSimulationReturn {
 }
 
 export function useSimulation(options: UseSimulationOptions = {}): UseSimulationReturn {
-  const { blueprintScenarios: blueprintScenariosRaw = [] } = options;
+  const { blueprintScenarios: blueprintScenariosRaw = [], twinId } = options;
+  
+  // Get isolated baseline from twin context (NOT builder store)
+  const { getIsolatedBaseline, twinId: contextTwinId } = useSimulationDataIsolation();
+  const effectiveTwinId = twinId || contextTwinId || undefined;
   
   // Performance monitoring for simulation loop
   const { startTiming, endTiming, measureSync } = usePerformanceMonitor('SimulationEngine');
   
   const engineRef = useRef<SimulationEngine | null>(null);
   const tickTimingRef = useRef<number | null>(null);
+  
+  // Get baseline KPIs from twin (priority) or defaults
+  const baselineKpis = useMemo(() => {
+    const twinBaseline = getIsolatedBaseline();
+    // Merge twin baseline with defaults (twin values take priority)
+    return Object.keys(twinBaseline).length > 0 
+      ? { ...DEFAULT_BASELINE_KPIS, ...twinBaseline }
+      : DEFAULT_BASELINE_KPIS;
+  }, [getIsolatedBaseline]);
+  
   const [state, setState] = useState<SimulationState>({
     status: 'idle',
     currentTime: 0,
@@ -114,8 +138,8 @@ export function useSimulation(options: UseSimulationOptions = {}): UseSimulation
     activeScenarioId: null,
     events: [],
     kpiSnapshots: [],
-    baselineKpis: DEFAULT_BASELINE_KPIS,
-    currentKpis: { ...DEFAULT_BASELINE_KPIS },
+    baselineKpis: baselineKpis,
+    currentKpis: { ...baselineKpis },
   });
   
   const [customScenarios, setCustomScenarios] = useState<ScenarioDefinition[]>([]);
@@ -145,7 +169,7 @@ export function useSimulation(options: UseSimulationOptions = {}): UseSimulation
   
   // Initialize engine with baseline KPIs and performance instrumentation
   useEffect(() => {
-    engineRef.current = getSimulationEngine(DEFAULT_BASELINE_KPIS);
+    engineRef.current = getSimulationEngine(baselineKpis, effectiveTwinId);
     
     const unsubscribe = engineRef.current.subscribe((event) => {
       // Track simulation loop time on each tick
@@ -176,9 +200,9 @@ export function useSimulation(options: UseSimulationOptions = {}): UseSimulation
         tickTimingRef.current = null;
       }
     };
-    // startTiming and endTiming are now stable, no need in deps
+    // baselineKpis and effectiveTwinId are stable
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [effectiveTwinId]);
   
   // Get active scenario from all available scenarios
   const activeScenario = state.activeScenarioId 

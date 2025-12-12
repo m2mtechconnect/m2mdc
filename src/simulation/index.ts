@@ -13,7 +13,10 @@ export * from './scenarioRegistry';
 export * from './blueprintScenarioAdapter';
 
 // Simulation Engine
-export { SimulationEngine, getSimulationEngine, resetSimulationEngine } from './SimulationEngine';
+export { SimulationEngine, getSimulationEngine, resetSimulationEngine, getSimulationEngineTwinId } from './SimulationEngine';
+
+// Simulation Guards
+export * from './useSimulationGuards';
 
 // Custom Scenario Builder utilities
 export { createCustomScenario } from './customScenarioBuilder';

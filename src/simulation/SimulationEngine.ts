@@ -86,13 +86,36 @@ export class SimulationEngine {
   private lastTickTime: number = 0;
   private activeScenario: ScenarioDefinition | null = null;
   private processedStepIndices: Set<number> = new Set();
+  private twinId: string | null = null;
+  private tickCount: number = 0;
+  private readonly TICK_THROTTLE = 3; // Only emit every 3rd tick for performance
 
-  constructor(baselineKpis: Record<string, number> = {}) {
+  constructor(baselineKpis: Record<string, number> = {}, twinId?: string) {
     this.state = {
       ...createDefaultState(),
       baselineKpis,
       currentKpis: { ...baselineKpis },
     };
+    this.twinId = twinId || null;
+  }
+
+  /**
+   * Set the twin ID for context tracking
+   */
+  setTwinId(twinId: string | null): void {
+    // If changing twin during simulation, reset
+    if (this.twinId && twinId !== this.twinId && this.state.status === 'running') {
+      console.warn('[SimulationEngine] Twin changed during simulation - resetting');
+      this.reset();
+    }
+    this.twinId = twinId;
+  }
+
+  /**
+   * Get current twin ID
+   */
+  getTwinId(): string | null {
+    return this.twinId;
   }
 
   // ============================================================================
@@ -100,13 +123,34 @@ export class SimulationEngine {
   // ============================================================================
 
   /**
+   * Validate before starting simulation
+   */
+  private validatePrestart(): { valid: boolean; errors: string[] } {
+    const errors: string[] = [];
+    
+    // Check baseline KPIs exist
+    if (Object.keys(this.state.baselineKpis).length === 0) {
+      errors.push('No baseline KPIs configured');
+    }
+    
+    return { valid: errors.length === 0, errors };
+  }
+
+  /**
    * Start a scenario by ID
    */
   startScenario(scenarioId: string): boolean {
     const scenario = getScenarioById(scenarioId);
     if (!scenario) {
-      console.error(`Scenario not found: ${scenarioId}`);
+      console.error(`[SimulationEngine] Scenario not found: ${scenarioId}`);
       return false;
+    }
+
+    // Run preflight validation
+    const validation = this.validatePrestart();
+    if (!validation.valid) {
+      console.warn('[SimulationEngine] Preflight warnings:', validation.errors);
+      // Continue with defaults but log warnings
     }
 
     // Reset state for new scenario
@@ -122,10 +166,10 @@ export class SimulationEngine {
     // Start tick loop
     this.startTickLoop();
 
-    // Emit start event
+    // Emit start event with twinId context
     this.emit({
       type: 'scenario-start',
-      payload: { scenarioId, scenario },
+      payload: { scenarioId, scenario, twinId: this.twinId },
       timestamp: Date.now(),
     });
 
@@ -176,10 +220,12 @@ export class SimulationEngine {
 
   /**
    * Advance simulation by deltaMs
+   * Throttled to reduce event emissions for performance
    */
   tick(deltaMs: number): void {
     if (this.state.status !== 'running' || !this.activeScenario) return;
 
+    this.tickCount++;
     const deltaSeconds = (deltaMs / 1000) * this.state.timeScale;
     this.state.currentTime += deltaSeconds;
 
@@ -189,24 +235,30 @@ export class SimulationEngine {
       return;
     }
 
-    // Process timeline steps
+    // Process timeline steps (always, for accuracy)
     this.processTimelineSteps();
 
+    // Throttle emissions for performance (emit every 3rd tick = ~20fps visual updates)
+    const shouldEmit = this.tickCount % this.TICK_THROTTLE === 0;
+
     // Take KPI snapshot periodically (every 5 simulated seconds)
-    if (Math.floor(this.state.currentTime) % 5 === 0) {
+    if (Math.floor(this.state.currentTime) % 5 === 0 && shouldEmit) {
       this.takeKpiSnapshot();
     }
 
-    // Emit tick event
-    this.emit({
-      type: 'tick',
-      payload: {
-        currentTime: this.state.currentTime,
-        progress: this.getProgress(),
-        currentKpis: this.state.currentKpis,
-      },
-      timestamp: Date.now(),
-    });
+    // Emit tick event (throttled)
+    if (shouldEmit) {
+      this.emit({
+        type: 'tick',
+        payload: {
+          currentTime: this.state.currentTime,
+          progress: this.getProgress(),
+          currentKpis: this.state.currentKpis,
+          twinId: this.twinId,
+        },
+        timestamp: Date.now(),
+      });
+    }
   }
 
   /**
@@ -429,23 +481,52 @@ export class SimulationEngine {
 }
 
 // ============================================================================
-// SINGLETON INSTANCE (optional)
+// SINGLETON INSTANCE WITH TWIN CONTEXT
 // ============================================================================
 
 let engineInstance: SimulationEngine | null = null;
+let currentTwinId: string | null = null;
 
-export function getSimulationEngine(baselineKpis?: Record<string, number>): SimulationEngine {
+/**
+ * Get simulation engine instance
+ * Automatically resets if twin changes to prevent data leakage
+ */
+export function getSimulationEngine(baselineKpis?: Record<string, number>, twinId?: string): SimulationEngine {
+  // If twin changed, reset the engine
+  if (twinId && currentTwinId && twinId !== currentTwinId) {
+    console.log('[SimulationEngine] Twin changed, resetting engine');
+    resetSimulationEngine();
+  }
+  
   if (!engineInstance) {
-    engineInstance = new SimulationEngine(baselineKpis);
-  } else if (baselineKpis) {
-    engineInstance.setBaselineKpis(baselineKpis);
+    engineInstance = new SimulationEngine(baselineKpis, twinId);
+    currentTwinId = twinId || null;
+  } else {
+    if (baselineKpis) {
+      engineInstance.setBaselineKpis(baselineKpis);
+    }
+    if (twinId && twinId !== currentTwinId) {
+      engineInstance.setTwinId(twinId);
+      currentTwinId = twinId;
+    }
   }
   return engineInstance;
 }
 
+/**
+ * Reset simulation engine and clear twin context
+ */
 export function resetSimulationEngine(): void {
   if (engineInstance) {
     engineInstance.reset();
   }
   engineInstance = null;
+  currentTwinId = null;
+}
+
+/**
+ * Get current engine twin ID for validation
+ */
+export function getSimulationEngineTwinId(): string | null {
+  return currentTwinId;
 }

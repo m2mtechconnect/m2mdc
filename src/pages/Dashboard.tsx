@@ -409,7 +409,7 @@ export default function Dashboard() {
           ].map((chip: { label: string; query?: string; isSimulation?: boolean }) => (
             <button
               key={chip.label}
-              onClick={() => chip.isSimulation ? navigate('/data-centre-twin?view=simulation') : askCoPilot(chip.query || '')}
+              onClick={() => chip.isSimulation ? navigate('/data-centre-twin/default?view=simulation&demo=true') : askCoPilot(chip.query || '')}
               className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
                 chip.isSimulation 
                   ? 'border-primary/50 bg-primary/10 text-primary hover:bg-primary/20' 
@@ -537,7 +537,7 @@ export default function Dashboard() {
                     size="sm"
                     onClick={(e) => {
                       e.preventDefault();
-                      navigate('/data-centre-twin?view=simulation');
+                      navigate('/data-centre-twin/default?view=simulation&demo=true');
                     }}
                     className="gap-2"
                   >

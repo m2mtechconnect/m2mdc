@@ -59,6 +59,13 @@ import type {
   ScenarioDefinition,
 } from './types';
 import { getScenarioById } from './scenarioRegistry';
+import { 
+  normalizeKpiKey, 
+  expandKpiKey, 
+  getKpiValue,
+  normalizeKpiRecord,
+  deepCloneState,
+} from '@/lib/kpiKeyMap';
 
 // ============================================================================
 // DEFAULT STATE
@@ -91,10 +98,12 @@ export class SimulationEngine {
   private readonly TICK_THROTTLE = 3; // Only emit every 3rd tick for performance
 
   constructor(baselineKpis: Record<string, number> = {}, twinId?: string) {
+    // Normalize baseline KPIs to ensure all aliases are populated
+    const normalizedBaseline = normalizeKpiRecord(baselineKpis);
     this.state = {
       ...createDefaultState(),
-      baselineKpis,
-      currentKpis: { ...baselineKpis },
+      baselineKpis: normalizedBaseline,
+      currentKpis: { ...normalizedBaseline },
     };
     this.twinId = twinId || null;
   }
@@ -158,10 +167,11 @@ export class SimulationEngine {
     this.activeScenario = scenario;
     this.processedStepIndices.clear();
 
-    // Update state
+    // Update state - ensure deep copy of baseline
     this.state.status = 'running';
     this.state.activeScenarioId = scenarioId;
-    this.state.currentKpis = { ...this.state.baselineKpis };
+    // Deep copy baseline to current, ensuring all aliases are populated
+    this.state.currentKpis = normalizeKpiRecord(this.state.baselineKpis);
 
     // Start tick loop
     this.startTickLoop();
@@ -205,11 +215,12 @@ export class SimulationEngine {
   reset(): void {
     this.stopTickLoop();
     
-    const baseline = this.state.baselineKpis;
+    // Deep copy baseline to ensure isolation
+    const baseline = { ...this.state.baselineKpis };
     this.state = {
       ...createDefaultState(),
       baselineKpis: baseline,
-      currentKpis: { ...baseline },
+      currentKpis: normalizeKpiRecord(baseline),
     };
     
     this.activeScenario = null;
@@ -306,16 +317,21 @@ export class SimulationEngine {
 
   /**
    * Get current state (readonly)
-   * Returns a deep copy to ensure React state updates trigger re-renders
+   * Returns a DEEP CLONE to ensure React state updates trigger re-renders
+   * Using structuredClone-like approach for full isolation
    */
   getState(): Readonly<SimulationState> {
-    return { 
-      ...this.state,
-      // Deep copy the KPIs to ensure React detects changes
-      baselineKpis: { ...this.state.baselineKpis },
-      currentKpis: { ...this.state.currentKpis },
-      events: [...this.state.events],
-      kpiSnapshots: [...this.state.kpiSnapshots],
+    // Deep clone all nested objects to ensure React detects changes
+    return {
+      status: this.state.status,
+      currentTime: this.state.currentTime,
+      timeScale: this.state.timeScale,
+      activeScenarioId: this.state.activeScenarioId,
+      // Deep clone objects - this is critical for React re-renders
+      baselineKpis: JSON.parse(JSON.stringify(this.state.baselineKpis)),
+      currentKpis: JSON.parse(JSON.stringify(this.state.currentKpis)),
+      events: JSON.parse(JSON.stringify(this.state.events)),
+      kpiSnapshots: JSON.parse(JSON.stringify(this.state.kpiSnapshots)),
     };
   }
 
@@ -328,12 +344,13 @@ export class SimulationEngine {
   }
 
   /**
-   * Update baseline KPIs
+   * Update baseline KPIs - normalizes all keys and populates aliases
    */
   setBaselineKpis(kpis: Record<string, number>): void {
-    this.state.baselineKpis = { ...kpis };
+    const normalizedKpis = normalizeKpiRecord(kpis);
+    this.state.baselineKpis = normalizedKpis;
     if (this.state.status === 'idle') {
-      this.state.currentKpis = { ...kpis };
+      this.state.currentKpis = { ...normalizedKpis };
     }
   }
 
@@ -381,53 +398,55 @@ export class SimulationEngine {
   private processStep(step: ScenarioDefinition['timeline'][0], index: number): void {
     this.processedStepIndices.add(index);
 
-    // KPI ID mapping for canonical ↔ alternate IDs
-    const kpiAliases: Record<string, string[]> = {
-      pue: ['effectivePue'],
-      effectivePue: ['pue'],
-      gpuUtilization: ['avgGpuUtilization'],
-      avgGpuUtilization: ['gpuUtilization'],
-    };
-
-    // Apply KPI deltas
-    const deltasApplied: Record<string, { before: number; delta: number; after: number }> = {};
-    
-    Object.entries(step.kpiDeltas).forEach(([key, delta]) => {
-      if (delta === undefined) return;
+    // Apply KPI deltas using centralized key mapping
+    Object.entries(step.kpiDeltas).forEach(([key, deltaValue]) => {
+      if (deltaValue === undefined || deltaValue === null) return;
       
-      const beforeValue = this.state.currentKpis[key] ?? this.state.baselineKpis[key] ?? 0;
+      // Normalize the key to canonical form
+      const canonical = normalizeKpiKey(key);
       
-      // Apply delta to the exact key (create if doesn't exist)
-      this.state.currentKpis[key] = beforeValue + delta;
+      // Get all equivalent keys (canonical + aliases)
+      const allKeys = expandKpiKey(canonical);
       
-      deltasApplied[key] = { before: beforeValue, delta, after: this.state.currentKpis[key] };
+      // Determine delta type and value
+      // Support both simple number deltas and { type, value } objects
+      let delta: number;
+      let isAbsolute = false;
       
-      // Also apply to any aliases for this key
-      const aliases = kpiAliases[key] || [];
-      aliases.forEach(alias => {
-        const aliasBeforeValue = this.state.currentKpis[alias] ?? this.state.baselineKpis[alias] ?? 0;
-        this.state.currentKpis[alias] = aliasBeforeValue + delta;
-        deltasApplied[alias] = { before: aliasBeforeValue, delta, after: this.state.currentKpis[alias] };
-      });
+      if (typeof deltaValue === 'object') {
+        const deltaObj = deltaValue as { value: number; type?: string };
+        delta = deltaObj.value ?? 0;
+        isAbsolute = deltaObj.type === 'absolute';
+      } else {
+        delta = Number(deltaValue) || 0;
+      }
       
-      // Clamp percentage values
-      const allKeys = [key, ...aliases];
+      // Apply delta to ALL equivalent keys to ensure consistency
       allKeys.forEach(k => {
-        if (k.includes('Pct') || k.includes('Score') || k.includes('Index') || k.includes('Progress')) {
-          this.state.currentKpis[k] = Math.max(0, Math.min(100, this.state.currentKpis[k]));
+        const beforeValue = getKpiValue(this.state.currentKpis, k, 0) || 
+                           getKpiValue(this.state.baselineKpis, k, 0);
+        
+        // Apply delta (absolute or relative)
+        let newValue: number;
+        if (isAbsolute) {
+          newValue = delta;
+        } else {
+          newValue = beforeValue + delta;
         }
+        
+        // Clamp percentage values
+        if (k.includes('Pct') || k.includes('Score') || k.includes('Index') || k.includes('Progress')) {
+          newValue = Math.max(0, Math.min(100, newValue));
+        }
+        
+        // Clamp PUE to reasonable bounds (1.0 - 3.0)
+        if (k === 'pue' || k === 'effectivePue') {
+          newValue = Math.max(1.0, Math.min(3.0, newValue));
+        }
+        
+        this.state.currentKpis[k] = newValue;
       });
     });
-    
-    // Debug log for KPI changes
-    if (Object.keys(deltasApplied).length > 0) {
-      console.log('[SimulationEngine] KPI Deltas Applied:', {
-        step: step.eventTitle,
-        time: step.at,
-        deltas: deltasApplied,
-        currentKpis: { ...this.state.currentKpis },
-      });
-    }
 
     // Create simulation event
     const event: SimulationEvent = {

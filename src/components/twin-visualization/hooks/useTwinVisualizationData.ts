@@ -6,12 +6,14 @@
  * 1. Prioritizes ActiveTwinContext data over builder store
  * 2. INTEGRATES with SimulationEngine for live updates during simulation
  * 3. Never uses builder store values when a real twin is selected
+ * 4. Uses centralized KPI key mapping for consistent alias resolution
  */
 
 import { useMemo } from 'react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { useTwinContext } from '@/hooks/useTwinContext';
 import { useSimulationVisualization } from '@/hooks/useSimulationVisualization';
+import { getKpiValue } from '@/lib/kpiKeyMap';
 import type {
   RackVisual,
   RowVisual,
@@ -263,9 +265,9 @@ export function useTwinVisualizationData(): TwinVisualizationState {
     const totalPower = racks.reduce((sum, r) => sum + r.powerKw, 0);
     const avgUtil = racks.reduce((sum, r) => sum + r.utilizationPercent, 0) / (racks.length || 1);
     
-    // Use simulation PUE if available, otherwise calculate
-    const pue = simulation.isSimulating && simulation.currentKpis.effectivePue
-      ? simulation.currentKpis.effectivePue
+    // Use simulation PUE if available (using centralized key mapping), otherwise calculate
+    const pue = simulation.isSimulating 
+      ? getKpiValue(simulation.currentKpis, 'pue', 1.2 + (avgUtil / 500))
       : 1.2 + (avgUtil / 500);
     
     // Map simulation events for timeline visualization with type normalization

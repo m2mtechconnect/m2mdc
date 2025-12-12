@@ -26,7 +26,7 @@ export const KPI_KEY_ALIASES: Record<string, string[]> = {
   powerReliabilityScore: ['powerScore', 'power_reliability', 'powerReliability'],
   
   // Carbon / Emissions
-  carbonIntensity: ['co2PerKWh', 'carbonPerKwh', 'gCo2PerKwh', 'carbon_intensity'],
+  carbonIntensity: ['co2PerKWh', 'carbonPerKwh', 'gCo2PerKwh', 'carbon_intensity', 'carbonIntensityGCo2Kwh'],
   gCo2PerGpuHour: ['carbonPerGpuHour', 'co2PerGpuHour'],
   
   // Sovereignty

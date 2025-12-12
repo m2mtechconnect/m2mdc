@@ -36,6 +36,8 @@ const DataCenter3DScene = lazy(() =>
 interface TwinVisualizationLayoutProps {
   mode: TwinVisualizationMode;
   showTimeline?: boolean;
+  /** Show overlay controls inside the 3D panel - this is the canonical source */
+  showOverlayControls?: boolean;
   onRackSelect?: (rackId: string) => void;
   className?: string;
   /** Optional pre-selected overlay domain from parent */
@@ -56,6 +58,7 @@ function LoadingSkeleton() {
 export function TwinVisualizationLayout({ 
   mode, 
   showTimeline = false,
+  showOverlayControls,
   onRackSelect,
   className = '',
   initialOverlay = 'thermal'
@@ -75,7 +78,8 @@ export function TwinVisualizationLayout({
   }, [simulation.isSimulating]);
 
   const isCompact = mode === 'dashboard';
-  const showControls = mode !== 'dashboard';
+  // Show controls if explicitly requested OR if not in compact mode
+  const showControls = showOverlayControls ?? (mode !== 'dashboard');
 
   // Calculate summary stats
   const criticalRacks = data.racks.filter(r => r.isCritical).length;
@@ -118,10 +122,13 @@ export function TwinVisualizationLayout({
         {/* 3D Scene */}
         <Card className="overflow-hidden">
           <CardHeader className="py-2 px-3 border-b flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
               {mode === 'blueprint' ? 'Blueprint Layout' : 
-               mode === 'simulation' ? 'Live Simulation' : 
+               mode === 'simulation' ? 'Digital Twin' : 
                'Twin Preview'}
+              {showControls && (
+                <span className="text-xs font-normal text-muted-foreground">• Overlay</span>
+              )}
             </CardTitle>
             
             {showControls && (
@@ -136,10 +143,10 @@ export function TwinVisualizationLayout({
                   Thermal
                 </Button>
                 <Button
-                  variant={activeOverlay === 'pue' || activeOverlay === 'power' ? 'secondary' : 'ghost'}
+                  variant={activeOverlay === 'power' || activeOverlay === 'pue' ? 'secondary' : 'ghost'}
                   size="sm"
                   className="h-7 px-2"
-                  onClick={() => setActiveOverlay(activeOverlay === 'pue' ? 'none' : 'pue')}
+                  onClick={() => setActiveOverlay(activeOverlay === 'power' ? 'none' : 'power')}
                 >
                   <Zap className="h-3 w-3 mr-1" />
                   Power
@@ -179,6 +186,15 @@ export function TwinVisualizationLayout({
                 >
                   <Network className="h-3 w-3 mr-1" />
                   Network
+                </Button>
+                <Button
+                  variant={activeOverlay === 'carbon' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => setActiveOverlay(activeOverlay === 'carbon' ? 'none' : 'carbon')}
+                >
+                  <Leaf className="h-3 w-3 mr-1" />
+                  Carbon
                 </Button>
               </div>
             )}

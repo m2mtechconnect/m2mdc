@@ -155,7 +155,7 @@ export default function Blueprint() {
   };
 
   return (
-    <BlueprintDesignerWrapper>
+    <BlueprintDesignerWrapper twinId={blueprintId}>
       <div className="min-h-screen bg-background">
         <div className="flex">
           {/* Main Content */}

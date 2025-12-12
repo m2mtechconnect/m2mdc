@@ -15,12 +15,12 @@ import {
 import { motion } from "framer-motion";
 
 const capabilities = [
-  { icon: Shield, label: "Sovereign Compute (Canada / EU)", color: "text-primary", bgHover: "hover:bg-primary/10 hover:border-primary/40" },
-  { icon: Leaf, label: "Green AI Infrastructure", color: "text-success", bgHover: "hover:bg-success/10 hover:border-success/40" },
-  { icon: Box, label: "Digital Twin Simulation", color: "text-info", bgHover: "hover:bg-info/10 hover:border-info/40" },
-  { icon: FileCheck, label: "OSFI / HIPAA / PIPEDA Ready", color: "text-warning", bgHover: "hover:bg-warning/10 hover:border-warning/40" },
-  { icon: Cpu, label: "GPU & Cooling Optimization", color: "text-primary", bgHover: "hover:bg-primary/10 hover:border-primary/40" },
-  { icon: DollarSign, label: "Carbon & Cost Modeling", color: "text-success", bgHover: "hover:bg-success/10 hover:border-success/40" },
+  { icon: Shield, label: "Sovereignty Score Tracking", color: "text-primary", bgHover: "hover:bg-primary/10 hover:border-primary/40" },
+  { icon: Leaf, label: "Carbon Intensity Monitoring", color: "text-success", bgHover: "hover:bg-success/10 hover:border-success/40" },
+  { icon: Box, label: "3D Rack Visualization", color: "text-info", bgHover: "hover:bg-info/10 hover:border-info/40" },
+  { icon: FileCheck, label: "Compliance Dashboard", color: "text-warning", bgHover: "hover:bg-warning/10 hover:border-warning/40" },
+  { icon: Cpu, label: "GPU Utilization Metrics", color: "text-primary", bgHover: "hover:bg-primary/10 hover:border-primary/40" },
+  { icon: DollarSign, label: "PUE Trend Analysis", color: "text-success", bgHover: "hover:bg-success/10 hover:border-success/40" },
 ];
 
 const containerVariants = {

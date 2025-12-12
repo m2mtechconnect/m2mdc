@@ -137,7 +137,7 @@ export function BuilderLayout({
         <aside className="hidden lg:flex w-[260px] border-r bg-muted/30 flex-col">
           <div className="p-6 border-b">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold">Twin Builder</h2>
+              <h2 className="text-lg font-semibold">Data Centre Twin</h2>
               <Button
                 variant="ghost"
                 size="sm"

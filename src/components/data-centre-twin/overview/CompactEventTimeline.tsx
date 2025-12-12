@@ -62,7 +62,7 @@ export function CompactEventTimeline({
     <CollapsibleSection
       title="Event Timeline"
       badge="Live"
-      defaultOpen={true}
+      defaultOpen={false}
       icon={<Clock className="h-4 w-4 text-primary" />}
     >
       {/* Domain Filter Chips */}

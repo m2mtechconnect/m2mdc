@@ -6,7 +6,10 @@
  * It lives inside the 3D Digital Twin panel and controls all visual layers
  */
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+
+// Storage key for overlay persistence
+const OVERLAY_STORAGE_KEY = 'twin-overlay-preference';
 
 /**
  * Canonical overlay types - unified across the entire system
@@ -39,13 +42,45 @@ const TwinOverlayContext = createContext<TwinOverlayState | null>(null);
 interface TwinOverlayProviderProps {
   children: ReactNode;
   defaultOverlay?: TwinOverlay;
+  /** Optional twin ID to persist overlay preference per twin */
+  twinId?: string;
 }
 
 export function TwinOverlayProvider({ 
   children, 
-  defaultOverlay = 'thermal' 
+  defaultOverlay = 'thermal',
+  twinId 
 }: TwinOverlayProviderProps) {
-  const [activeOverlay, setActiveOverlayState] = useState<TwinOverlay>(defaultOverlay);
+  // Load persisted overlay preference
+  const getStoredOverlay = useCallback((): TwinOverlay => {
+    if (!twinId) return defaultOverlay;
+    try {
+      const stored = localStorage.getItem(`${OVERLAY_STORAGE_KEY}-${twinId}`);
+      if (stored && isValidOverlay(stored)) {
+        return stored as TwinOverlay;
+      }
+    } catch {
+      // localStorage not available
+    }
+    return defaultOverlay;
+  }, [twinId, defaultOverlay]);
+
+  const [activeOverlay, setActiveOverlayState] = useState<TwinOverlay>(getStoredOverlay);
+
+  // Update stored preference when overlay changes
+  useEffect(() => {
+    if (!twinId) return;
+    try {
+      localStorage.setItem(`${OVERLAY_STORAGE_KEY}-${twinId}`, activeOverlay);
+    } catch {
+      // localStorage not available
+    }
+  }, [activeOverlay, twinId]);
+
+  // Reset to stored/default when twin changes
+  useEffect(() => {
+    setActiveOverlayState(getStoredOverlay());
+  }, [twinId, getStoredOverlay]);
 
   const setOverlay = useCallback((overlay: TwinOverlay) => {
     // Normalize any aliases to canonical types
@@ -63,6 +98,11 @@ export function TwinOverlayProvider({
       {children}
     </TwinOverlayContext.Provider>
   );
+}
+
+// Helper to validate overlay type
+function isValidOverlay(value: string): value is TwinOverlay {
+  return ['none', 'thermal', 'power', 'cooling', 'gpu', 'network', 'workload', 'sovereignty', 'carbon'].includes(value);
 }
 
 export function useTwinOverlay(): TwinOverlayState {

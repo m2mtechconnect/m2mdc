@@ -1,9 +1,11 @@
 /**
  * Simulation Preview Panel
  * Shows industry-specific KPIs, event timeline, and simulation controls
+ * 
+ * ENHANCED: Now connects to live simulation engine for real-time KPI updates
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,13 +13,15 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Play, Clock, CheckCircle2, AlertCircle, Activity, 
-  TrendingUp, Zap, Info, Plus
+  TrendingUp, Zap, Info, Plus, Pause
 } from 'lucide-react';
 import { 
   getSimulationTemplateForIndustry, 
   getIndustryLabel,
-  type SimulationTemplate 
+  type SimulationTemplate,
+  type SimulationKPI,
 } from '@/lib/simulationTemplates';
+import { useSimulation } from '@/simulation/useSimulation';
 import { SimulationKPICard } from './SimulationKPICard';
 import { SimulationEventTimeline } from './SimulationEventTimeline';
 
@@ -48,11 +52,65 @@ export function SimulationPreviewPanel({
   const [template, setTemplate] = useState<SimulationTemplate | null>(null);
   const [isSampleData, setIsSampleData] = useState(true);
   
+  // Connect to live simulation engine for real-time KPI data
+  const { 
+    status: simulationStatus, 
+    currentKpis, 
+    baselineKpis,
+    presetScenarios,
+    startScenario,
+    pause,
+    resume,
+    reset,
+    progress,
+  } = useSimulation();
+  
+  const isEngineRunning = simulationStatus === 'running';
+  
   useEffect(() => {
     const simTemplate = getSimulationTemplateForIndustry(industry);
     setTemplate(simTemplate);
-    setIsSampleData(simulationHistory.length === 0);
-  }, [industry, simulationHistory.length]);
+    setIsSampleData(simulationHistory.length === 0 && simulationStatus === 'idle');
+  }, [industry, simulationHistory.length, simulationStatus]);
+
+  // Create live KPIs by merging template definitions with live simulation data
+  const liveKpis = useMemo<SimulationKPI[]>(() => {
+    if (!template) return [];
+    
+    // Map template KPI codes to simulation engine KPI keys
+    const kpiCodeToEngineKey: Record<string, string> = {
+      'pue': 'pue',
+      'effectivePue': 'pue',
+      'gpu_utilization': 'gpuUtilization',
+      'gpuUtilization': 'gpuUtilization',
+      'avgGpuUtilization': 'gpuUtilization',
+      'thermal_stability': 'thermalStabilityScore',
+      'thermalStabilityScore': 'thermalStabilityScore',
+      'power_reliability': 'powerReliabilityScore',
+      'powerReliabilityScore': 'powerReliabilityScore',
+      'cooling_efficiency': 'coolingEfficiencyIndex',
+      'coolingEfficiencyIndex': 'coolingEfficiencyIndex',
+      'sovereignty': 'sovereignComplianceScore',
+      'sovereignComplianceScore': 'sovereignComplianceScore',
+    };
+    
+    return template.kpis.map(kpi => {
+      const engineKey = kpiCodeToEngineKey[kpi.code] || kpi.code;
+      const hasLiveData = engineKey in currentKpis && engineKey in baselineKpis;
+      
+      if (hasLiveData && simulationStatus !== 'idle') {
+        // Use live simulation data
+        return {
+          ...kpi,
+          baseline: baselineKpis[engineKey] ?? kpi.baseline,
+          simulated: currentKpis[engineKey] ?? kpi.simulated,
+        };
+      }
+      
+      // Fall back to template static values
+      return kpi;
+    });
+  }, [template, currentKpis, baselineKpis, simulationStatus]);
 
   const industryLabel = getIndustryLabel(industry);
 
@@ -73,13 +131,29 @@ export function SimulationPreviewPanel({
 
   return (
     <div className="space-y-4">
-      {/* Sample Data Info Banner */}
-      {isSampleData && (
+      {/* Sample Data Info Banner - show only when idle with no history */}
+      {isSampleData && simulationStatus === 'idle' && (
         <Alert className="bg-warning/10 border-warning/30">
           <Info className="h-4 w-4 text-warning" />
           <AlertDescription className="text-sm">
             Showing recommended sample KPIs for <strong>{industryLabel}</strong>.
-            Connect real data to replace these values.
+            Run a simulation scenario to see live KPI updates.
+          </AlertDescription>
+        </Alert>
+      )}
+      
+      {/* Live Simulation Status Banner */}
+      {isEngineRunning && (
+        <Alert className="bg-success/10 border-success/30">
+          <Activity className="h-4 w-4 text-success animate-pulse" />
+          <AlertDescription className="text-sm flex items-center justify-between">
+            <span>
+              Simulation running • <strong>{Math.round(progress)}%</strong> complete
+            </span>
+            <Button size="sm" variant="ghost" onClick={pause} className="h-6 gap-1">
+              <Pause className="h-3 w-3" />
+              Pause
+            </Button>
           </AlertDescription>
         </Alert>
       )}
@@ -111,18 +185,23 @@ export function SimulationPreviewPanel({
         </CardHeader>
       </Card>
 
-      {/* KPI Cards Grid */}
+      {/* KPI Cards Grid - uses live data when simulation is running */}
       <div>
         <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
           <TrendingUp className="h-4 w-4" />
           Key Performance Indicators
+          {isEngineRunning && (
+            <Badge variant="outline" className="text-[10px] ml-2 bg-success/10 text-success border-success/30 animate-pulse">
+              LIVE
+            </Badge>
+          )}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {template.kpis.map((kpi) => (
+          {liveKpis.map((kpi) => (
             <SimulationKPICard 
               key={kpi.code} 
               kpi={kpi} 
-              isSampleData={isSampleData} 
+              isSampleData={isSampleData && simulationStatus === 'idle'} 
             />
           ))}
         </div>

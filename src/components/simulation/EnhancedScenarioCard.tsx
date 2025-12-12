@@ -71,25 +71,25 @@ export const EnhancedScenarioCard = memo(function EnhancedScenarioCard({
       whileHover={{ y: -3, scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
     >
-      <Card 
-        className={cn(
-          'min-w-[280px] max-w-[320px] cursor-pointer transition-all duration-200',
-          'bg-card border-2 shadow-sm hover:shadow-lg',
-          severity.border,
-          isActive && 'ring-2 ring-primary/30 border-primary'
-        )}
-        onClick={onSelect}
-      >
-        <CardContent className="p-4 space-y-3">
-          <div className="flex items-start justify-between gap-2">
+        <Card 
+          className={cn(
+            'min-w-[280px] max-w-[320px] cursor-pointer transition-all duration-200 overflow-hidden',
+            'bg-card border-2 shadow-sm hover:shadow-lg',
+            severity.border,
+            isActive && 'ring-2 ring-primary/30 border-primary'
+          )}
+          onClick={onSelect}
+        >
+          <CardContent className="p-4 space-y-3 overflow-hidden">
+            <div className="flex items-start justify-between gap-2 overflow-hidden">
             <div className="flex items-center gap-2">
               <div className={cn('p-2 rounded-lg', domainColors[primaryDomain])}>
                 <PrimaryIcon className="h-4 w-4" />
               </div>
-              <div>
-                <h4 className="font-semibold text-sm leading-tight">{scenario.name}</h4>
+              <div className="min-w-0 flex-1">
+                <h4 className="font-semibold text-sm leading-tight truncate">{scenario.name}</h4>
                 {scenario.isCustom && (
-                  <Badge variant="outline" className="text-[10px] h-4 mt-1">
+                  <Badge variant="outline" className="text-[10px] h-4 mt-1 shrink-0">
                     <Sparkles className="h-2 w-2 mr-1" />Custom
                   </Badge>
                 )}

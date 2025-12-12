@@ -216,12 +216,12 @@ export function EnterpriseKPIChart({
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className={cn("bg-card border-border", className, isRunning && "ring-1 ring-primary/30")}>
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Activity className="h-4 w-4 text-primary" />
-              <CardTitle className="text-sm font-medium">{config.name}</CardTitle>
+      <Card className={cn("bg-card border-border overflow-hidden", className, isRunning && "ring-1 ring-primary/30")}>
+        <CardHeader className="pb-2 overflow-hidden">
+          <div className="flex items-center justify-between gap-2 overflow-hidden">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <Activity className="h-4 w-4 text-primary shrink-0" />
+              <CardTitle className="text-sm font-medium truncate">{config.name}</CardTitle>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
@@ -412,10 +412,10 @@ export function EnterpriseKPIChart({
           </div>
 
           {/* Footer stats */}
-          <div className="flex justify-between text-xs text-muted-foreground mt-2 pt-2 border-t border-border">
-            <span>Baseline: {baseline?.toFixed(2) ?? 'N/A'}{config.unit}</span>
-            <span>Target: {config.target}{config.unit}</span>
-            <span>Current: {currentValue.toFixed(2)}{config.unit}</span>
+          <div className="flex justify-between text-xs text-muted-foreground mt-2 pt-2 border-t border-border overflow-hidden">
+            <span className="truncate">Baseline: {baseline?.toFixed(2) ?? 'N/A'}{config.unit}</span>
+            <span className="truncate">Target: {config.target}{config.unit}</span>
+            <span className="truncate">Current: {currentValue.toFixed(2)}{config.unit}</span>
           </div>
         </CardContent>
       </Card>

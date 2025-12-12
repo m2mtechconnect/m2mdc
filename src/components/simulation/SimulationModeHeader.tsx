@@ -59,9 +59,9 @@ export function SimulationModeHeader({
               <div className="p-2 rounded-lg bg-primary/20 animate-pulse">
                 <PlayCircle className="h-6 w-6 text-primary" />
               </div>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-bold">{SIMULATION.TITLE}</h1>
-                <p className="text-sm text-muted-foreground">{safeTwinName}</p>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl sm:text-2xl font-bold truncate">{SIMULATION.TITLE}</h1>
+                <p className="text-sm text-muted-foreground truncate">{safeTwinName}</p>
               </div>
             </div>
             
@@ -92,7 +92,7 @@ export function SimulationModeHeader({
             </div>
             
             {subtitle && (
-              <p className="text-sm text-muted-foreground mt-2">{subtitle}</p>
+              <p className="text-sm text-muted-foreground mt-2 truncate">{subtitle}</p>
             )}
           </div>
           

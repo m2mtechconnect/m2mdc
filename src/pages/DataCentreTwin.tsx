@@ -14,16 +14,15 @@ import {
   DCOverviewTab, 
   DCBlueprintTab, 
   DCPreviewTab, 
-  DCSimulationTab, 
   DCDeployTab 
 } from '@/components/dc-twin/tabs';
 import { sovereignQCFacility } from '@/twins/dataCenter/mockData';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { EmptyStateSelectTwin } from '@/components/twin-selector';
-import { Eye, FileText, MessageSquare, PlayCircle, Rocket, LayoutDashboard, Activity } from 'lucide-react';
+import { Eye, FileText, MessageSquare, Rocket, LayoutDashboard, Activity } from 'lucide-react';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
-import { OVERVIEW, SIMULATION, EMPTY_STATES } from '@/ux';
+import { OVERVIEW } from '@/ux';
 
 // UI Polish Components
 import { LoadingState, NoTwinSelectedEmptyState } from '@/components/ui/empty-state';
@@ -65,8 +64,8 @@ export default function DataCentreTwin() {
   const isDemoMode = searchParams.get('demo') === 'true' || 
     (!twin && !hasBuilderSession && twins.length === 0 && isInitialized);
   
-  const defaultTab = hasBuilderSession ? 'overview' : (isDemoMode ? 'simulation' : 'dashboard');
-  const [activeTab, setActiveTab] = useState(urlTab || defaultTab);
+  const defaultTab = hasBuilderSession ? 'overview' : 'dashboard';
+  const [activeTab, setActiveTab] = useState(urlTab === 'simulation' ? 'dashboard' : (urlTab || defaultTab));
   
   // Set twin from URL param if provided
   useEffect(() => {
@@ -135,6 +134,10 @@ export default function DataCentreTwin() {
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="h-auto flex-wrap gap-1">
+              <TabsTrigger value="dashboard" className="gap-2">
+                <LayoutDashboard className="h-4 w-4" />
+                Dashboard
+              </TabsTrigger>
               {!isDemoMode && (
                 <>
                   <TabsTrigger value="overview" className="gap-2">
@@ -149,23 +152,23 @@ export default function DataCentreTwin() {
                     <MessageSquare className="h-4 w-4" />
                     Preview
                   </TabsTrigger>
+                  <TabsTrigger value="deploy" className="gap-2">
+                    <Rocket className="h-4 w-4" />
+                    Deploy
+                  </TabsTrigger>
                 </>
               )}
-              <TabsTrigger value="dashboard" className="gap-2">
-                <LayoutDashboard className="h-4 w-4" />
-                Dashboard
-              </TabsTrigger>
-              <TabsTrigger value="simulation" className="gap-2">
-                <PlayCircle className="h-4 w-4" />
-                Simulation
-              </TabsTrigger>
-              {!isDemoMode && (
-                <TabsTrigger value="deploy" className="gap-2">
-                  <Rocket className="h-4 w-4" />
-                  Deploy
-                </TabsTrigger>
-              )}
             </TabsList>
+            
+            
+            <TabsContent value="dashboard">
+              <DataCentreDashboard 
+                facility={sovereignQCFacility} 
+                onScenarioSelect={(scenarioId) => {
+                  console.log('Scenario selected:', scenarioId);
+                }}
+              />
+            </TabsContent>
             
             {!isDemoMode && (
               <>
@@ -180,27 +183,11 @@ export default function DataCentreTwin() {
                 <TabsContent value="preview">
                   <DCPreviewTab />
                 </TabsContent>
+                
+                <TabsContent value="deploy">
+                  <DCDeployTab />
+                </TabsContent>
               </>
-            )}
-            
-            <TabsContent value="dashboard">
-              <DataCentreDashboard 
-                facility={sovereignQCFacility} 
-                onScenarioSelect={(scenarioId) => {
-                  console.log('Scenario selected:', scenarioId);
-                  setActiveTab('simulation');
-                }}
-              />
-            </TabsContent>
-            
-            <TabsContent value="simulation">
-              <DCSimulationTab />
-            </TabsContent>
-            
-            {!isDemoMode && (
-              <TabsContent value="deploy">
-                <DCDeployTab />
-              </TabsContent>
             )}
           </Tabs>
         </div>

@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
   Thermometer, Zap, Wind, Network, Shield, Cpu, Leaf,
-  Globe, DollarSign, AlertTriangle, Activity, Server, PlayCircle,
+  Globe, DollarSign, AlertTriangle, Activity, Server,
   FileText, Eye
 } from 'lucide-react';
 import { DCSearchBar } from '@/components/dc-ui';
@@ -28,7 +28,6 @@ import { WorkloadDomainView } from './domains/WorkloadDomainView';
 import { SovereigntyDomainView } from './domains/SovereigntyDomainView';
 import { CarbonDomainView } from './domains/CarbonDomainView';
 import { FinancialDomainView } from './domains/FinancialDomainView';
-import { DCSimulationPanel } from '@/components/simulation/DCSimulationPanel';
 import { ScenarioSimulationPanel } from '@/components/simulation/ScenarioSimulationPanel';
 import { useBlueprint } from '@/hooks/useBlueprint';
 import { 
@@ -53,7 +52,6 @@ interface DataCentreDashboardProps {
 
 const domainTabs = [
   { id: 'overview', label: 'Overview', icon: Activity },
-  { id: 'simulation', label: 'Simulation', icon: PlayCircle },
   { id: 'thermal', label: 'Thermal', icon: Thermometer },
   { id: 'power', label: 'Power', icon: Zap },
   { id: 'cooling', label: 'Cooling', icon: Wind },
@@ -428,9 +426,6 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
           </div>
         </TabsContent>
 
-        <TabsContent value="simulation">
-          <DCSimulationPanel twinId={twinId} />
-        </TabsContent>
 
         <TabsContent value="thermal">
           <ThermalDomainView facility={facility} />

@@ -93,19 +93,29 @@ const KPICard = memo(function KPICard({
   if (compact) {
     return (
       <div className={cn(
-        'flex items-center justify-between p-2 rounded-lg bg-card border border-border',
-        isRunning && 'animate-pulse-subtle'
+        'flex items-center justify-between p-2 rounded-lg bg-card border border-border transition-all duration-300',
+        isRunning && 'ring-1 ring-primary/30 shadow-sm shadow-primary/10'
       )}>
         <div className="flex items-center gap-2">
-          <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+          <Icon className={cn(
+            'h-3.5 w-3.5 transition-colors duration-300',
+            isRunning ? 'text-primary animate-pulse' : 'text-muted-foreground'
+          )} />
           <span className="text-xs text-muted-foreground">{kpi.label}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm font-mono font-medium text-card-foreground">
+          <span className={cn(
+            'text-sm font-mono font-medium text-card-foreground transition-all duration-300',
+            isRunning && !isNeutral && 'scale-105'
+          )}>
             {formattedValue}{kpi.unit}
           </span>
           {!isNeutral && (
-            <Badge variant="outline" className={cn('text-[10px] h-4 gap-0.5', trendColor)}>
+            <Badge variant="outline" className={cn(
+              'text-[10px] h-4 gap-0.5 transition-all duration-300',
+              trendColor,
+              isRunning && 'animate-pulse'
+            )}>
               <TrendIcon className="h-2.5 w-2.5" />
               {Math.abs(deltaPercent).toFixed(1)}%
             </Badge>
@@ -117,32 +127,60 @@ const KPICard = memo(function KPICard({
   
   return (
     <Card className={cn(
-      'bg-card border-border transition-all duration-300 overflow-hidden',
-      isRunning && !isNeutral && 'border-primary/50'
+      'bg-card border-border transition-all duration-300 overflow-hidden relative',
+      isRunning && !isNeutral && 'border-primary/50 shadow-lg shadow-primary/5',
+      isRunning && isGoodDelta && 'border-success/50',
+      isRunning && !isGoodDelta && !isNeutral && 'border-destructive/50'
     )}>
-      <CardContent className="p-4 min-w-0">
+      {/* Live indicator pulse ring */}
+      {isRunning && (
+        <div className="absolute inset-0 pointer-events-none">
+          <div className={cn(
+            'absolute inset-0 rounded-lg animate-ping opacity-10',
+            isGoodDelta ? 'bg-success' : isNeutral ? 'bg-primary' : 'bg-destructive'
+          )} style={{ animationDuration: '2s' }} />
+        </div>
+      )}
+      
+      <CardContent className="p-4 min-w-0 relative">
         <div className="flex items-start justify-between mb-2">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <Icon className="h-4 w-4 text-primary" />
+          <div className={cn(
+            'p-2 rounded-lg transition-all duration-300',
+            isRunning ? 'bg-primary/20 scale-110' : 'bg-primary/10'
+          )}>
+            <Icon className={cn(
+              'h-4 w-4 transition-all duration-300',
+              isRunning ? 'text-primary animate-pulse' : 'text-primary'
+            )} />
           </div>
           {!isNeutral && (
             <Badge 
               variant="outline" 
               className={cn(
-                'text-xs gap-1',
+                'text-xs gap-1 transition-all duration-300',
                 isGoodDelta 
                   ? 'bg-success/10 text-success border-success/30' 
-                  : 'bg-destructive/10 text-destructive border-destructive/30'
+                  : 'bg-destructive/10 text-destructive border-destructive/30',
+                isRunning && 'animate-pulse scale-105'
               )}
             >
               <TrendIcon className="h-3 w-3" />
               {formattedDelta}{kpi.unit}
             </Badge>
           )}
+          {isNeutral && isRunning && (
+            <Badge variant="outline" className="text-[10px] h-5 animate-pulse bg-primary/10 text-primary border-primary/30">
+              <Activity className="h-3 w-3 mr-1" />
+              LIVE
+            </Badge>
+          )}
         </div>
         
         <div className="space-y-1 min-w-0">
-          <p className="text-2xl font-bold font-mono text-card-foreground truncate">
+          <p className={cn(
+            'text-2xl font-bold font-mono text-card-foreground truncate transition-all duration-300',
+            isRunning && !isNeutral && 'scale-105 origin-left'
+          )}>
             {formattedValue}
             <span className="text-sm text-muted-foreground ml-1">{kpi.unit}</span>
           </p>
@@ -157,18 +195,29 @@ const KPICard = memo(function KPICard({
           </span>
         </div>
         
-        {/* Delta bar */}
+        {/* Delta bar with animation */}
         {!isNeutral && (
           <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
             <div 
               className={cn(
                 'h-full rounded-full transition-all duration-500',
-                isGoodDelta ? 'bg-success' : 'bg-destructive'
+                isGoodDelta ? 'bg-success' : 'bg-destructive',
+                isRunning && 'animate-pulse'
               )}
               style={{ 
                 width: `${Math.min(100, Math.abs(deltaPercent))}%`,
                 marginLeft: isPositiveDelta ? '50%' : `${50 - Math.min(50, Math.abs(deltaPercent))}%`
               }}
+            />
+          </div>
+        )}
+        
+        {/* Neutral delta bar with animation when running */}
+        {isNeutral && isRunning && (
+          <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
+            <div 
+              className="h-full rounded-full bg-primary/50 animate-pulse"
+              style={{ width: '50%', marginLeft: '25%' }}
             />
           </div>
         )}

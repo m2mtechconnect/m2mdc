@@ -223,7 +223,22 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
           </div>
           
           {/* 3D Twin Visualization */}
-          <Card className="overflow-hidden">
+          <Card className={cn(
+            'overflow-hidden relative transition-all duration-300',
+            isRunning && 'ring-2 ring-success/30 shadow-lg shadow-success/10'
+          )}>
+            {/* Live Simulation Badge */}
+            {isRunning && (
+              <div className="absolute top-4 left-4 z-10">
+                <Badge className="bg-success text-success-foreground gap-1.5 shadow-lg animate-pulse">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success-foreground opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-success-foreground" />
+                  </span>
+                  Live Simulation
+                </Badge>
+              </div>
+            )}
             <TwinVisualizationLayout
               mode="simulation"
               showTimeline
@@ -233,14 +248,32 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
           </Card>
           
           {/* KPI Baseline vs Current Comparison */}
-          <Card>
+          <Card className={cn(
+            'transition-all duration-300',
+            isRunning && 'ring-1 ring-primary/20 shadow-lg shadow-primary/5'
+          )}>
             <CardHeader className="py-3 px-4 border-b">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-primary" />
+                <TrendingUp className={cn(
+                  'h-4 w-4 transition-colors duration-300',
+                  isRunning ? 'text-success animate-pulse' : 'text-primary'
+                )} />
                 KPI Impact Analysis
                 {isActive && (
-                  <Badge variant="outline" className="ml-2 text-xs">
+                  <Badge 
+                    variant="outline" 
+                    className={cn(
+                      'ml-2 text-xs transition-all duration-300',
+                      isRunning && 'bg-success/10 text-success border-success/30 animate-pulse'
+                    )}
+                  >
                     {Math.round(progress)}% Complete
+                  </Badge>
+                )}
+                {isRunning && (
+                  <Badge variant="outline" className="ml-auto text-[10px] bg-primary/10 text-primary animate-pulse">
+                    <Activity className="h-3 w-3 mr-1" />
+                    LIVE
                   </Badge>
                 )}
               </CardTitle>
@@ -252,22 +285,38 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
                   const baseline = getKpiValue(baselineKpis, kpi.id);
                   const delta = getKpiDelta(kpi.id);
                   const isImproved = delta !== null && (kpi.invertDelta ? delta < 0 : delta > 0);
+                  const hasDelta = delta !== null && Math.abs(delta) >= 0.1;
                   
                   return (
-                    <div key={kpi.id} className="text-center space-y-1">
+                    <div 
+                      key={kpi.id} 
+                      className={cn(
+                        'text-center space-y-1 p-2 rounded-lg transition-all duration-300',
+                        isRunning && 'bg-accent/30',
+                        isRunning && hasDelta && isImproved && 'bg-success/10 ring-1 ring-success/20',
+                        isRunning && hasDelta && !isImproved && 'bg-destructive/10 ring-1 ring-destructive/20'
+                      )}
+                    >
                       <p className="text-xs text-muted-foreground truncate">{kpi.label}</p>
-                      <p className="text-lg font-bold tabular-nums">
+                      <p className={cn(
+                        'text-lg font-bold tabular-nums transition-transform duration-300',
+                        isRunning && 'scale-105'
+                      )}>
                         {kpi.format(current || baseline)}
                         <span className="text-xs text-muted-foreground ml-0.5">{kpi.unit}</span>
                       </p>
-                      {delta !== null && delta !== 0 && (
+                      {hasDelta && (
                         <p className={cn(
-                          'text-xs flex items-center justify-center gap-0.5',
-                          isImproved ? 'text-success' : 'text-destructive'
+                          'text-xs flex items-center justify-center gap-0.5 transition-all duration-300',
+                          isImproved ? 'text-success' : 'text-destructive',
+                          isRunning && 'animate-pulse font-medium'
                         )}>
                           {isImproved ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                           {delta > 0 ? '+' : ''}{delta.toFixed(1)}%
                         </p>
+                      )}
+                      {!hasDelta && isRunning && (
+                        <p className="text-xs text-muted-foreground animate-pulse">—</p>
                       )}
                     </div>
                   );
@@ -317,17 +366,29 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
               {isActive && (
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{formatTime(elapsedTime)}</span>
+                    <span className={cn(isRunning && 'text-primary font-medium')}>{formatTime(elapsedTime)}</span>
                     <span>-{formatTime(remainingTime)}</span>
                   </div>
-                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden relative">
+                    {/* Animated background shimmer when running */}
+                    {isRunning && (
+                      <div 
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"
+                        style={{ backgroundSize: '200% 100%' }}
+                      />
+                    )}
                     <div 
                       className={cn(
-                        'h-full rounded-full transition-all',
+                        'h-full rounded-full transition-all duration-300 relative',
                         isRunning ? 'bg-success' : 'bg-primary'
                       )}
                       style={{ width: `${progress}%` }}
-                    />
+                    >
+                      {/* Glow effect when running */}
+                      {isRunning && (
+                        <div className="absolute inset-0 rounded-full bg-success/50 blur-sm animate-pulse" />
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
@@ -458,14 +519,26 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
                         event.severity === 'high' ? 'bg-warning/5 border-warning/30' :
                         'bg-info/5 border-info/30';
                       
+                      const isRecent = idx === 0 && isRunning;
+                      
                       return (
                         <div
                           key={event.id || idx}
-                          className={cn('p-2 rounded-lg border text-sm', severityClass)}
+                          className={cn(
+                            'p-2 rounded-lg border text-sm transition-all duration-300', 
+                            severityClass,
+                            isRecent && 'ring-1 ring-primary/30 scale-[1.02] shadow-sm animate-fade-in'
+                          )}
                         >
                         <div className="flex items-start justify-between gap-2">
-                          <span className="font-medium truncate">{event.title}</span>
-                          <span className="text-xs text-muted-foreground shrink-0">
+                          <span className={cn(
+                            'font-medium truncate',
+                            isRecent && 'text-primary'
+                          )}>{event.title}</span>
+                          <span className={cn(
+                            'text-xs shrink-0',
+                            isRecent ? 'text-primary font-medium' : 'text-muted-foreground'
+                          )}>
                             {formatTime(event.timestamp)}
                           </span>
                         </div>

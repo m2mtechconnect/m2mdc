@@ -132,11 +132,29 @@ export function ScenarioSimulationPanel({
   const { notifyStatusChange, reset: resetFeedback } = useSimulationFeedback();
   
   // Build KPI deltas from current state
+  // Map alternate KPI IDs to their canonical forms for display
   const kpiDeltas = useMemo(() => {
+    // Create a merged KPI lookup that handles alternate IDs
+    const mergedKpis = {
+      ...baselineKpis,
+      ...currentKpis,
+      // Map alternate IDs to canonical ones
+      pue: currentKpis.effectivePue ?? currentKpis.pue ?? baselineKpis.effectivePue ?? baselineKpis.pue ?? 1.25,
+      gpuUtilization: currentKpis.avgGpuUtilization ?? currentKpis.gpuUtilization ?? baselineKpis.avgGpuUtilization ?? baselineKpis.gpuUtilization ?? 76,
+      thermalStabilityScore: currentKpis.thermalStabilityScore ?? baselineKpis.thermalStabilityScore ?? 85,
+    };
+    
+    const mergedBaseline = {
+      ...baselineKpis,
+      pue: baselineKpis.effectivePue ?? baselineKpis.pue ?? 1.25,
+      gpuUtilization: baselineKpis.avgGpuUtilization ?? baselineKpis.gpuUtilization ?? 76,
+      thermalStabilityScore: baselineKpis.thermalStabilityScore ?? 85,
+    };
+    
     return defaultKPIs.map(kpiDef => ({
       ...kpiDef,
-      value: currentKpis[kpiDef.id] ?? baselineKpis[kpiDef.id] ?? 0,
-      baseline: baselineKpis[kpiDef.id] ?? 0,
+      value: mergedKpis[kpiDef.id] ?? 0,
+      baseline: mergedBaseline[kpiDef.id] ?? 0,
     }));
   }, [currentKpis, baselineKpis]);
   

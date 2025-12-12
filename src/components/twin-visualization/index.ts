@@ -15,6 +15,12 @@ export { RackGroup } from './RackGroup';
 export { ThermalOverlayLayer } from './ThermalOverlayLayer';
 export { PowerFlowLayer } from './PowerFlowLayer';
 export { NetworkTopologyLayer } from './NetworkTopologyLayer';
+export { SovereigntyOverlayLayer } from './SovereigntyOverlayLayer';
+export { CoolingOverlayLayer } from './CoolingOverlayLayer';
+export { WorkloadOverlayLayer } from './WorkloadOverlayLayer';
+
+// Overlay domain type
+export type { OverlayDomain } from './DataCenter3DScene';
 
 // Controls
 export { ZoomControlsOverlay } from './ZoomControlsOverlay';

@@ -3,6 +3,7 @@
  * Standard wrapper composing 3D view, KPI cards, legends, and timeline
  * 
  * CRITICAL: Now properly synced with SimulationEngine for real-time updates
+ * UPGRADED: Added KPI tab → 3D overlay domain binding
  */
 
 import { lazy, Suspense, useState, useEffect } from 'react';
@@ -15,12 +16,16 @@ import {
   Network, 
   Cpu, 
   Leaf,
+  Snowflake,
+  Shield,
+  Activity,
 } from 'lucide-react';
 import { useTwinVisualizationData } from './hooks/useTwinVisualizationData';
 import { NetworkTopologyLayer } from './NetworkTopologyLayer';
 import { SimulationTimeline } from './SimulationTimeline';
 import { useSimulationVisualization } from '@/hooks/useSimulationVisualization';
 import type { TwinVisualizationMode } from './types';
+import type { OverlayDomain } from './DataCenter3DScene';
 
 // Lazy load the 3D scene for performance
 const DataCenter3DScene = lazy(() => 
@@ -32,6 +37,8 @@ interface TwinVisualizationLayoutProps {
   showTimeline?: boolean;
   onRackSelect?: (rackId: string) => void;
   className?: string;
+  /** Optional pre-selected overlay domain from parent */
+  initialOverlay?: OverlayDomain;
 }
 
 function LoadingSkeleton() {
@@ -49,13 +56,14 @@ export function TwinVisualizationLayout({
   mode, 
   showTimeline = false,
   onRackSelect,
-  className = ''
+  className = '',
+  initialOverlay = 'thermal'
 }: TwinVisualizationLayoutProps) {
   const data = useTwinVisualizationData();
   const simulation = useSimulationVisualization();
   
-  const [showPower, setShowPower] = useState(false);
-  const [showThermal, setShowThermal] = useState(true);
+  // Overlay domain state - controls which layer is visible in 3D scene
+  const [activeOverlay, setActiveOverlay] = useState<OverlayDomain>(initialOverlay);
   const [showNetwork, setShowNetwork] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
@@ -116,24 +124,51 @@ export function TwinVisualizationLayout({
             </CardTitle>
             
             {showControls && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 flex-wrap">
                 <Button
-                  variant={showThermal ? 'secondary' : 'ghost'}
+                  variant={activeOverlay === 'thermal' ? 'secondary' : 'ghost'}
                   size="sm"
                   className="h-7 px-2"
-                  onClick={() => setShowThermal(!showThermal)}
+                  onClick={() => setActiveOverlay(activeOverlay === 'thermal' ? 'none' : 'thermal')}
                 >
                   <Thermometer className="h-3 w-3 mr-1" />
                   Thermal
                 </Button>
                 <Button
-                  variant={showPower ? 'secondary' : 'ghost'}
+                  variant={activeOverlay === 'pue' || activeOverlay === 'power' ? 'secondary' : 'ghost'}
                   size="sm"
                   className="h-7 px-2"
-                  onClick={() => setShowPower(!showPower)}
+                  onClick={() => setActiveOverlay(activeOverlay === 'pue' ? 'none' : 'pue')}
                 >
                   <Zap className="h-3 w-3 mr-1" />
                   Power
+                </Button>
+                <Button
+                  variant={activeOverlay === 'cooling' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => setActiveOverlay(activeOverlay === 'cooling' ? 'none' : 'cooling')}
+                >
+                  <Snowflake className="h-3 w-3 mr-1" />
+                  Cooling
+                </Button>
+                <Button
+                  variant={activeOverlay === 'gpu' || activeOverlay === 'workload' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => setActiveOverlay(activeOverlay === 'gpu' ? 'none' : 'gpu')}
+                >
+                  <Cpu className="h-3 w-3 mr-1" />
+                  GPU
+                </Button>
+                <Button
+                  variant={activeOverlay === 'sovereignty' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => setActiveOverlay(activeOverlay === 'sovereignty' ? 'none' : 'sovereignty')}
+                >
+                  <Shield className="h-3 w-3 mr-1" />
+                  Sovereignty
                 </Button>
                 <Button
                   variant={showNetwork ? 'secondary' : 'ghost'}
@@ -156,11 +191,11 @@ export function TwinVisualizationLayout({
                 powerSegments={data.powerSegments}
                 thermalZones={data.thermalZones}
                 events={data.events}
-                showPower={showPower}
-                showThermal={showThermal}
                 compact={isCompact}
                 mode={mode}
                 onRackClick={onRackSelect}
+                activeOverlay={activeOverlay}
+                simulationKpis={simulation.currentKpis}
               />
             </Suspense>
 

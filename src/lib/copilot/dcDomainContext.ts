@@ -5,7 +5,7 @@
  * All values are grounded in actual mock data - no fabrication.
  */
 
-import { sovereignQCFacility, prairieABFacility, getDemoFacilityById } from '@/twins/dataCenter/mockData';
+import { montrealSovereignDC, getDemoFacilityById } from '@/twins/dataCenter/mockData';
 import { CarbonEngine, REGIONAL_CARBON_INTENSITY } from '@/engines/carbon';
 import { FinancialEngine, DEFAULT_FINANCIAL_ASSUMPTIONS } from '@/engines/financial';
 import { getSovereigntyEngine, mockDataFlows, mockDataAssets, mockSovereigntyPolicies, mockComplianceFrameworks } from '@/sovereignty';
@@ -80,14 +80,14 @@ export interface DCDomainContext {
  * All values are REAL from the mock data - no fabrication
  */
 export function getDCDomainContext(
-  twinId: string = 'facility-sovereign-qc-001',
+  twinId: string = 'facility-montreal-dc-001',
   activeTab: string = 'overview',
   pageContext: string = 'data_centre_twin',
   simulationState: 'idle' | 'running' | 'paused' = 'idle',
   simulationScenario?: string
 ): DCDomainContext {
   // Get facility from mock data
-  const facility = getDemoFacilityById(twinId) || sovereignQCFacility;
+  const facility = getDemoFacilityById(twinId) || montrealSovereignDC;
   
   // Calculate carbon metrics using CarbonEngine
   const region = facility.region as keyof typeof REGIONAL_CARBON_INTENSITY;

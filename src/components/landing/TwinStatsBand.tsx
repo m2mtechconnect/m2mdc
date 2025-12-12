@@ -25,48 +25,48 @@ interface StatCard {
 const stats: StatCard[] = [
   {
     icon: TrendingUp,
-    value: "18–24%",
-    label: "ROI Impact",
+    value: "1.2–1.4",
+    label: "Target PUE",
     colorClass: "text-success",
     bgClass: "bg-success/10 group-hover:bg-success/20",
     testimonial: {
-      quote: "The twin simulation helped us identify $2.4M in potential savings before we broke ground.",
+      quote: "The PUE tracking helped us identify cooling inefficiencies and reduce our baseline from 1.6 to 1.32.",
       author: "VP Infrastructure",
-      role: "Major Canadian Bank",
+      role: "Canadian Financial Institution",
     },
   },
   {
     icon: Zap,
-    value: "30–50%",
-    label: "Energy Savings",
+    value: "85%+",
+    label: "GPU Utilization Target",
     colorClass: "text-warning",
     bgClass: "bg-warning/10 group-hover:bg-warning/20",
     testimonial: {
-      quote: "We reduced our cooling costs by 42% in the first quarter after implementing recommendations.",
+      quote: "The utilization dashboard showed us exactly where GPU clusters were underutilized.",
       author: "DC Operations Lead",
       role: "Enterprise Retailer",
     },
   },
   {
     icon: Leaf,
-    value: "70%+",
-    label: "Renewable Mix",
+    value: "<50",
+    label: "Carbon Intensity (gCO₂/kWh)",
     colorClass: "text-success",
     bgClass: "bg-success/10 group-hover:bg-success/20",
     testimonial: {
-      quote: "The carbon modeling gave us confidence to commit to net-zero by 2030.",
+      quote: "Real-time carbon tracking gave us the data we needed for our sustainability reports.",
       author: "Chief Sustainability Officer",
-      role: "Global Technology Co",
+      role: "Technology Company",
     },
   },
   {
     icon: Clock,
-    value: "6,970",
-    label: "Hours Saved Monthly",
+    value: "99.99%",
+    label: "Uptime SLA",
     colorClass: "text-info",
     bgClass: "bg-info/10 group-hover:bg-info/20",
     testimonial: {
-      quote: "Our team now focuses on strategy instead of manual reporting. It's a game changer.",
+      quote: "Simulation of failure scenarios helped us validate our redundancy before going live.",
       author: "Director of Operations",
       role: "Hyperscale Provider",
     },
@@ -206,11 +206,11 @@ export function TwinStatsBand() {
             </span>
           </motion.div>
           <h2 className="font-display text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            Real Impact on Your Operations
+            Operational Targets Tracked in Real Time
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Organizations using our platform see measurable improvements across efficiency, 
-            sustainability, and cost metrics.
+            Monitor key performance indicators displayed directly in the dashboard 
+            with configurable thresholds and alerts.
           </p>
         </motion.div>
         
@@ -235,7 +235,7 @@ export function TwinStatsBand() {
           transition={{ duration: 0.5, delay: 0.5 }}
         >
           <p className="text-sm text-muted-foreground">
-            Based on customer-reported metrics from production deployments
+            KPI targets are configurable per data centre twin in the Blueprint Designer
           </p>
         </motion.div>
       </div>

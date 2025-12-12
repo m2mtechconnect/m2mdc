@@ -21,51 +21,51 @@ interface Differentiator {
 const differentiators: Differentiator[] = [
   {
     icon: Shield,
-    title: "Sovereignty-First Digital Twin",
-    description: "Built from the ground up for Canadian and EU data residency requirements. Full control over where compute and storage reside.",
+    title: "Sovereignty Score Dashboard",
+    description: "View data residency status and Sovereignty Score percentage directly in the dashboard. Track compliance indicators for OSFI, HIPAA, and PIPEDA.",
     metric: "100%",
-    metricLabel: "Data residency compliance",
+    metricLabel: "Sovereignty visibility",
     colorClass: "text-primary",
     bgClass: "bg-primary/10 hover:bg-primary/20",
   },
   {
     icon: Box,
-    title: "3D Visualization + Simulation",
-    description: "See your data centre in 3D and run what-if scenarios without switching tools. Real-time thermal, power, and workload modeling.",
-    metric: "50+",
-    metricLabel: "Simulation scenarios",
+    title: "3D Rack Visualization",
+    description: "Inspect racks, aisles, and zones in a 3D model. Apply thermal, power, and cooling overlays to identify hotspots and load distribution.",
+    metric: "8",
+    metricLabel: "Domain overlays available",
     colorClass: "text-info",
     bgClass: "bg-info/10 hover:bg-info/20",
   },
   {
     icon: Leaf,
-    title: "Green vs Brown Economics",
-    description: "Compare renewable and carbon-intensive options with one click. Full carbon accounting with Scope 2 and Scope 3 emissions.",
-    metric: "70%",
-    metricLabel: "Carbon reduction potential",
+    title: "Carbon Intensity Tracking",
+    description: "Monitor Carbon Intensity (gCO₂/kWh) as a live KPI. Run simulation scenarios to compare carbon outcomes before making changes.",
+    metric: "<50",
+    metricLabel: "gCO₂/kWh target",
     colorClass: "text-success",
     bgClass: "bg-success/10 hover:bg-success/20",
   },
   {
     icon: Cpu,
-    title: "Subsystem Agents for Every Domain",
-    description: "Autonomous agents for power, cooling, GPUs, workload, and carbon optimization. 24/7 monitoring with proactive alerts.",
+    title: "Subsystem Agents Panel",
+    description: "View status of domain-specific agents: Thermal Guardian, Power Monitor, Workload Orchestrator, and Sovereignty Sentinel.",
     metric: "9",
-    metricLabel: "Specialized AI agents",
+    metricLabel: "Subsystem agents",
     colorClass: "text-warning",
     bgClass: "bg-warning/10 hover:bg-warning/20",
   },
 ];
 
 const capabilities = [
-  "Real-time PUE monitoring",
-  "Carbon cost modeling",
-  "GPU workload simulation",
-  "Cooling optimization",
-  "Sovereignty scoring",
-  "Compliance audits",
-  "Energy mix analysis",
-  "Failure scenario testing",
+  "PUE trend indicator",
+  "GPU Utilization metrics",
+  "Run Scenario button",
+  "Thermal overlay toggle",
+  "Sovereignty Score display",
+  "Blueprint Designer",
+  "KPI delta comparison",
+  "Timeline playback controls",
 ];
 
 const containerVariants = {
@@ -172,10 +172,10 @@ export function TwinDifferentiators() {
             </span>
           </motion.div>
           <h2 className="font-display text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            Why Organizations Choose Us
+            Key Dashboard Features
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Purpose-built for sovereign, sustainable AI infrastructure — not retrofitted from generic tools.
+            Features visible in the dashboard interface, accessible immediately after login.
           </p>
         </motion.div>
         
@@ -194,7 +194,7 @@ export function TwinDifferentiators() {
           transition={{ duration: 0.5, delay: 0.3 }}
         >
           <h3 className="text-xl font-semibold text-foreground mb-6 text-center">
-            Platform Capabilities
+            UI Controls Available in Dashboard
           </h3>
           <motion.div 
             className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4"

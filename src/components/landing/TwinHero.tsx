@@ -19,9 +19,9 @@ const trustedLogos = [
 ];
 
 const quickBenefits = [
-  "Sovereign-first architecture",
-  "Carbon & cost modeling",
-  "Real-time simulation",
+  "Canadian data sovereignty",
+  "Real-time KPI monitoring",
+  "Scenario simulation",
 ];
 
 export function TwinHero() {
@@ -93,10 +93,10 @@ export function TwinHero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
               >
-                Design and simulate{" "}
+                Live Digital Twin of Your{" "}
                 <span className="relative">
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600">
-                    sovereign AI data centres
+                    AI Data Centre
                   </span>
                   <motion.span 
                     className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full"
@@ -113,8 +113,8 @@ export function TwinHero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
-                Model, optimize, and deploy AI-ready infrastructure with full sovereignty, 
-                carbon intelligence, and real-time operational visibility.
+                View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, 
+                and Sovereignty Status in a single operational dashboard.
               </motion.p>
             </div>
 

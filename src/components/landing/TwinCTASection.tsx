@@ -10,9 +10,9 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const benefits = [
-  "No credit card required",
-  "Enterprise pricing available", 
-  "Deploy in days, not months",
+  "View live dashboard demo",
+  "Configure your own twin", 
+  "Run simulation scenarios",
 ];
 
 export function TwinCTASection() {
@@ -95,8 +95,8 @@ export function TwinCTASection() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              Get a personalized demo and see your environment modeled with real-time 
-              simulation, carbon tracking, and sovereignty scoring.
+              Access the dashboard to view 3D visualization, run simulation scenarios, 
+              and configure KPI targets for your data centre.
             </motion.p>
             
             {/* CTA buttons */}

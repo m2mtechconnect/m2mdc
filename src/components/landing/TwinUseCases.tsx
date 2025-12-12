@@ -24,58 +24,58 @@ const personas: Persona[] = [
   {
     icon: Building2,
     title: "CIO / CTO",
-    subtitle: "Shape sovereign AI and DC strategy",
+    subtitle: "Review Sovereignty Score and compliance status",
     bullets: [
-      "Model build vs buy scenarios for AI infrastructure",
-      "Quantify sovereignty and compliance posture",
-      "Align DC strategy with ESG and carbon goals",
+      "View Sovereignty Score percentage in the dashboard",
+      "Review data residency mapping by region",
+      "Access compliance indicators for OSFI, HIPAA, PIPEDA",
     ],
     color: "text-primary",
     bgColor: "bg-primary/10",
-    stat: "18-24%",
-    statLabel: "ROI improvement",
+    stat: "100%",
+    statLabel: "Sovereignty visibility",
   },
   {
     icon: Leaf,
     title: "Sustainability Lead",
-    subtitle: "Quantify and reduce energy and carbon footprints",
+    subtitle: "Monitor Carbon Intensity and renewable energy metrics",
     bullets: [
-      "Track Scope 2 and Scope 3 emissions in real-time",
-      "Compare renewable energy mix across regions",
-      "Report carbon savings to stakeholders",
+      "View Carbon Intensity (gCO₂/kWh) in real-time KPI cards",
+      "Track renewable energy percentage in facility overview",
+      "Run simulation scenarios to compare carbon outcomes",
     ],
     color: "text-success",
     bgColor: "bg-success/10",
-    stat: "70%+",
-    statLabel: "Carbon visibility",
+    stat: "<50",
+    statLabel: "gCO₂/kWh target",
   },
   {
     icon: Server,
     title: "Data Centre Operations",
-    subtitle: "Predict failures and cooling issues before they happen",
+    subtitle: "Monitor PUE and thermal overlays in the 3D view",
     bullets: [
-      "Monitor PUE, cooling efficiency, and power chains",
-      "Simulate failure scenarios and recovery playbooks",
-      "Optimize rack placement and thermal zones",
+      "View Power Usage Effectiveness (PUE) with trend indicator",
+      "Apply thermal overlay to identify hotspots in 3D view",
+      "Run Scenario to simulate cooling failures and power events",
     ],
     color: "text-info",
     bgColor: "bg-info/10",
-    stat: "99.9%",
-    statLabel: "Uptime target",
+    stat: "1.2–1.4",
+    statLabel: "Target PUE",
   },
   {
     icon: Cpu,
     title: "AI Infra Lead / MLOps",
-    subtitle: "Right-size GPUs and job routing by scenario",
+    subtitle: "Track GPU Utilization across clusters",
     bullets: [
-      "Model GPU cluster sizing for training workloads",
-      "Simulate job scheduling under power constraints",
-      "Balance cost, latency, and carbon per inference",
+      "View GPU Utilization percentage in KPI dashboard",
+      "Monitor workload distribution in Workload Orchestrator agent",
+      "Run GPU spike scenarios to observe KPI impact",
     ],
     color: "text-warning",
     bgColor: "bg-warning/10",
-    stat: "30-50%",
-    statLabel: "Efficiency gains",
+    stat: "85%+",
+    statLabel: "GPU utilization target",
   },
 ];
 
@@ -216,11 +216,11 @@ export function TwinUseCases() {
             </span>
           </motion.div>
           <h2 className="font-display text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            Built for Your Entire Organization
+            Dashboard Views for Every Role
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            From executive strategy to hands-on operations, the Twin Studio serves 
-            every role in your data centre ecosystem.
+            Each role accesses the same KPIs and visualizations, filtered 
+            to the metrics most relevant to their responsibilities.
           </p>
         </motion.div>
         

@@ -19,29 +19,29 @@ const regions = [
 const trustPoints = [
   {
     icon: Globe,
-    title: "Data Residency",
-    description: "Your data stays in your chosen jurisdiction. Full control over where compute and storage reside.",
+    title: "Data Residency Mapping",
+    description: "View data residency status by region and jurisdiction in the Sovereignty panel. Displayed as a map with zone indicators.",
     color: "text-primary",
     bgColor: "bg-primary/10",
   },
   {
     icon: Shield,
-    title: "Sovereign Regions",
-    description: "Deploy to certified sovereign cloud regions in Canada, EU, and regulated environments.",
+    title: "Sovereignty Score",
+    description: "Sovereignty Score displayed as a percentage in the dashboard. Breakdown available by compute, storage, and network categories.",
     color: "text-success",
     bgColor: "bg-success/10",
   },
   {
     icon: Lock,
-    title: "Compliance-First Architecture",
-    description: "Built to meet OSFI, HIPAA, PIPEDA, and industry-specific regulatory requirements.",
+    title: "Compliance Indicators",
+    description: "Compliance status for OSFI, HIPAA, and PIPEDA shown as indicators in the Sovereignty & Safety Audit panel.",
     color: "text-warning",
     bgColor: "bg-warning/10",
   },
   {
     icon: Server,
-    title: "On-Premises Options",
-    description: "Hybrid deployment models for organizations requiring air-gapped or on-prem infrastructure.",
+    title: "Canadian Cloud Regions",
+    description: "Region selection available in Blueprint Designer including ca-central-1 (Montreal) and ca-west-1 (Calgary) options.",
     color: "text-info",
     bgColor: "bg-info/10",
   },
@@ -98,10 +98,10 @@ export function TwinTrustSection() {
             </span>
           </motion.div>
           <h2 className="font-display text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            Built for Regulated, Sovereign AI Infrastructure
+            Sovereignty & Compliance Features
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            Trusted by organizations that cannot compromise on data sovereignty, security, and compliance.
+            Compliance indicators and data residency tracking displayed in the Sovereignty & Safety Audit panel.
           </p>
           
           {/* Region badges */}

@@ -70,11 +70,11 @@ export function TwinIntegrationsGrid() {
             </span>
           </motion.div>
           <h2 className="font-display text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            Connect to Your Existing Stack
+            Data Source Integrations
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Ingest metrics from DCIM, cloud, GPU platforms, and sustainability APIs. 
-            Enrich with AI-driven modeling and optimization.
+            Connect telemetry from DCIM platforms, cloud providers, GPU management systems, 
+            and carbon tracking APIs to populate the digital twin.
           </p>
         </motion.div>
         

@@ -5,6 +5,8 @@
  * - Twin switching during active simulation
  * - Starting simulation without required data
  * - Builder/recommendation store leakage into simulation
+ * 
+ * Uses centralized KPI key mapping for consistent alias resolution
  */
 
 import { useCallback, useEffect, useRef } from 'react';
@@ -12,6 +14,7 @@ import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useRecommendationStore } from '@/stores/recommendationStore';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { getSimulationEngine, resetSimulationEngine } from './SimulationEngine';
+import { normalizeKpiRecord } from '@/lib/kpiKeyMap';
 import type { SimulationStatus } from './types';
 
 export interface SimulationPreflightResult {
@@ -142,10 +145,10 @@ export function useSimulationDataIsolation() {
     const isDemo = new URLSearchParams(window.location.search).get('demo') === 'true';
     
     if (isDemo && !twin) {
-      // Use demo defaults
-      return {
-        effectivePue: 1.35,
-        avgGpuUtilization: 72,
+      // Use demo defaults - normalizeKpiRecord ensures all aliases are populated
+      return normalizeKpiRecord({
+        pue: 1.35,
+        gpuUtilization: 72,
         thermalStabilityScore: 88,
         powerReliabilityScore: 95,
         sovereigntyRiskScore: 5,
@@ -154,12 +157,12 @@ export function useSimulationDataIsolation() {
         networkIntegrityScore: 94,
         environmentalSafetyScore: 91,
         avgUpsRuntime: 28,
-        greenEnergyPct: 78,
+        renewablePct: 78,
         dataSovereigntyScore: 95,
         gpuClusterEfficiency: 85,
         coolantTempDelta: 8.5,
         rackDensityUtilization: 72,
-      };
+      });
     }
     
     if (!twin) {
@@ -171,9 +174,10 @@ export function useSimulationDataIsolation() {
     const metadata = twin.metadata as Record<string, unknown> || {};
     const kpis = (metadata.kpis as Record<string, number>) || {};
     
-    return {
-      effectivePue: twin.pue_target || 1.35,
-      avgGpuUtilization: (kpis.gpuUtilization as number) || 75,
+    // Normalize to ensure all aliases are populated (pue ↔ effectivePue, etc.)
+    return normalizeKpiRecord({
+      pue: twin.pue_target || 1.35,
+      gpuUtilization: (kpis.gpuUtilization as number) || 75,
       thermalStabilityScore: (kpis.thermalStability as number) || 85,
       powerReliabilityScore: (kpis.powerReliability as number) || 95,
       sovereigntyRiskScore: (kpis.sovereigntyRisk as number) || 10,
@@ -182,13 +186,13 @@ export function useSimulationDataIsolation() {
       networkIntegrityScore: (kpis.networkIntegrity as number) || 95,
       environmentalSafetyScore: (kpis.environmentalSafety as number) || 92,
       avgUpsRuntime: (kpis.upsRuntime as number) || 25,
-      greenEnergyPct: twin.renewable_target_pct || 80,
+      renewablePct: twin.renewable_target_pct || 80,
       dataSovereigntyScore: (kpis.dataSovereignty as number) || 95,
       gpuClusterEfficiency: (kpis.gpuEfficiency as number) || 85,
       coolantTempDelta: (kpis.coolantDelta as number) || 8,
       rackDensityUtilization: (kpis.rackDensity as number) || 70,
       ...kpis,
-    };
+    });
   }, [twin]);
   
   return {

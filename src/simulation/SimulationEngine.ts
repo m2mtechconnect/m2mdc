@@ -483,18 +483,19 @@ export class SimulationEngine {
   }
 
   private takeKpiSnapshot(): void {
+    // Use getKpiValue which checks all aliases
     const snapshot: KPISnapshot = {
       timestamp: this.state.currentTime,
-      pue: this.state.currentKpis.effectivePue || 1.35,
-      gpuUtilization: this.state.currentKpis.avgGpuUtilization || 75,
-      thermalStabilityScore: this.state.currentKpis.thermalStabilityScore || 85,
-      powerReliabilityScore: this.state.currentKpis.powerReliabilityScore || 95,
-      sovereignComplianceScore: 100 - (this.state.currentKpis.sovereigntyRiskScore || 10),
-      emissionsVsTarget: this.state.currentKpis.carbonNeutralProgress || 60,
-      coolingEfficiencyIndex: this.state.currentKpis.coolingEfficiencyIndex || 80,
-      networkIntegrityScore: this.state.currentKpis.networkIntegrityScore || 95,
-      environmentalSafetyScore: this.state.currentKpis.environmentalSafetyScore || 92,
-      avgUpsRuntime: this.state.currentKpis.avgUpsRuntime || 25,
+      pue: getKpiValue(this.state.currentKpis, 'pue', 1.35),
+      gpuUtilization: getKpiValue(this.state.currentKpis, 'gpuUtilization', 75),
+      thermalStabilityScore: getKpiValue(this.state.currentKpis, 'thermalStabilityScore', 85),
+      powerReliabilityScore: getKpiValue(this.state.currentKpis, 'powerReliabilityScore', 95),
+      sovereignComplianceScore: 100 - getKpiValue(this.state.currentKpis, 'sovereigntyRiskScore', 10),
+      emissionsVsTarget: getKpiValue(this.state.currentKpis, 'carbonNeutralProgress', 60),
+      coolingEfficiencyIndex: getKpiValue(this.state.currentKpis, 'coolingEfficiencyIndex', 80),
+      networkIntegrityScore: getKpiValue(this.state.currentKpis, 'networkIntegrityScore', 95),
+      environmentalSafetyScore: getKpiValue(this.state.currentKpis, 'environmentalSafetyScore', 92),
+      avgUpsRuntime: getKpiValue(this.state.currentKpis, 'avgUpsRuntime', 25),
       ...this.state.currentKpis,
     };
 

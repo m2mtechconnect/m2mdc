@@ -86,7 +86,7 @@ export function CompactDCToolsPanel({ twinId, onOpenTool, maxVisible = 6 }: Comp
     <CollapsibleSection
       title="Data Centre Tools"
       badge={`${tools.length} tools`}
-      defaultOpen={true}
+      defaultOpen={false}
       icon={<Settings className="h-4 w-4 text-primary" />}
     >
       <div className="flex flex-wrap gap-2">

@@ -458,24 +458,24 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
           ))}
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-6">
+        <TabsContent value="overview" className="space-y-8">
           {/* Simulation Summary - lightweight link to full simulation */}
           <SimulationSummaryCard onOpenSimulation={() => setActiveTab('simulation')} />
           
           {/* 2-Column NOC Layout - Primary (65%) / Secondary (35%) */}
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             {/* Left Column - Primary Content */}
-            <div className="space-y-6">
+            <div className="space-y-8">
               <CompactKPICockpit facility={facility} twinId={twinId} mode="overview" />
               <CompactAIInsightsPanel facility={facility} maxVisible={3} />
               <CompactAlertsPanel alerts={facility.alerts} maxVisible={3} />
             </div>
             
             {/* Right Column - Secondary Content */}
-            <div className="space-y-6">
+            <div className="space-y-8">
               {/* Mini 3D Twin Preview */}
               <MiniTwinPreview onExpand={() => setActiveTab('simulation')} />
-              <CompactRackOverview facility={facility} maxRacks={16} />
+              <CompactRackOverview facility={facility} maxRacks={12} />
               <CompactDCToolsPanel twinId={twinId} maxVisible={4} />
               <CompactEventTimeline events={timelineEvents} />
             </div>

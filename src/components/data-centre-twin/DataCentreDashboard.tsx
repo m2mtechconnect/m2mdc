@@ -184,7 +184,7 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
   
   // CoPilot command integration
   const { registerCommands, highlightedKPI } = useCoPilotCommands();
-  const { updateDCContext } = useCoPilotContext();
+  const { updateDCContext, openWithQuestion } = useCoPilotContext();
   
   // Simulation controls - get from hook
   const simulation = useSimulation();
@@ -376,6 +376,7 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
         value={searchQuery}
         onChange={setSearchQuery}
         onSearch={handleSearch}
+        onCoPilotQuery={openWithQuestion}
         onChipClick={handleChipClick}
         placeholder="Search racks, sensors, metrics..."
       />

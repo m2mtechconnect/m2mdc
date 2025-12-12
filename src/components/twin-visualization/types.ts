@@ -69,8 +69,8 @@ export interface SimulationEventVisual {
   timestamp: string;
   timeSeconds: number;
   label: string;
-  severity: 'info' | 'warning' | 'critical';
-  domain: 'power' | 'cooling' | 'network' | 'compute' | 'sovereignty';
+  severity: 'info' | 'warning' | 'critical' | 'low' | 'medium' | 'high';
+  domain: 'power' | 'cooling' | 'network' | 'compute' | 'sovereignty' | 'thermal' | 'workload' | 'financial';
   affectedRacks?: string[];
   affectedNodes?: string[];
 }
@@ -92,6 +92,9 @@ export interface TwinVisualizationState {
   totalCapacityKw: number;
   pue: number;
   carbonIntensity: number;
+  // Simulation-specific fields
+  simulationKpis?: Record<string, number>;
+  simulationProgress?: number;
 }
 
 // Enhanced color scales for visualization - more NOC-like appearance

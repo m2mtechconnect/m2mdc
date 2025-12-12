@@ -2,13 +2,16 @@
  * Hook: useTwinVisualizationData
  * Maps active twin + builder state into visual primitives
  * 
- * CRITICAL: Prioritizes ActiveTwinContext data over builder store
+ * CRITICAL: 
+ * 1. Prioritizes ActiveTwinContext data over builder store
+ * 2. INTEGRATES with SimulationEngine for live updates during simulation
+ * 3. Never uses builder store values when a real twin is selected
  */
 
 import { useMemo } from 'react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
-import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useTwinContext } from '@/hooks/useTwinContext';
+import { useSimulationVisualization } from '@/hooks/useSimulationVisualization';
 import type {
   RackVisual,
   RowVisual,
@@ -204,14 +207,18 @@ export function useTwinVisualizationData(): TwinVisualizationState {
   const { activeTwin, isPreviewMode, recommendation } = useTwinContext();
   const builderState = useDCTwinBuilderStore();
   
+  // CRITICAL: Connect to simulation engine for live updates
+  const simulation = useSimulationVisualization();
+  
   const visualData = useMemo(() => {
     // PRIORITY: ActiveTwin (from header) > Recommendation preview > Builder store
+    // NEVER use builder store when a real twin is selected
     let capacityKw = 500;
     let facilityName = 'Data Centre Twin';
     let carbonIntensity = 30;
     
     if (activeTwin) {
-      // Real twin selected via header dropdown
+      // Real twin selected via header dropdown - EXCLUSIVE source
       capacityKw = activeTwin.capacity_kw || 500;
       facilityName = activeTwin.name || 'Data Centre Twin';
       carbonIntensity = activeTwin.carbon_intensity || 30;
@@ -229,38 +236,69 @@ export function useTwinVisualizationData(): TwinVisualizationState {
         : 'Preview Twin';
       carbonIntensity = recommendation.kpiTargets?.carbonIntensityTargetGPerKwh || 30;
     } else {
-      // Fallback to builder store (sandbox only)
+      // Fallback to builder store ONLY when no twin selected (sandbox mode)
       const overview = builderState.overview;
       capacityKw = overview?.capacityKw || 500;
       facilityName = overview?.twinName || 'Data Centre Twin';
       carbonIntensity = (overview as any)?.carbonIntensityGCo2PerKwh || 30;
     }
     
-    // Get scenario events if simulation is active
-    const activeScenario = builderState.scenarios?.find(s => s.enabled);
-    const scenarioEvents: any[] = [];
+    // Use simulation events if simulation is active
+    const scenarioEvents = simulation.isSimulating ? simulation.events : [];
     
-    // Generate layout
-    const { racks, rows } = generateRackLayout(capacityKw, scenarioEvents);
-    const powerSegments = generatePowerSegments(racks);
-    const thermalZones = generateThermalZones(rows, racks);
+    // Generate base layout
+    let { racks, rows } = generateRackLayout(capacityKw, scenarioEvents);
+    let powerSegments = generatePowerSegments(racks);
+    let thermalZones = generateThermalZones(rows, racks);
     const { nodes: networkNodes, links: networkLinks } = generateNetworkTopology(racks);
     
-    // Calculate aggregate metrics
+    // CRITICAL: Apply simulation effects when simulation is running
+    if (simulation.isSimulating) {
+      racks = simulation.applyRackEffects(racks);
+      thermalZones = simulation.applyThermalEffects(thermalZones);
+      powerSegments = simulation.applyPowerEffects(powerSegments);
+    }
+    
+    // Calculate aggregate metrics from simulation KPIs or base values
     const totalPower = racks.reduce((sum, r) => sum + r.powerKw, 0);
     const avgUtil = racks.reduce((sum, r) => sum + r.utilizationPercent, 0) / (racks.length || 1);
-    const pue = 1.2 + (avgUtil / 500); // Simulated PUE based on utilization
     
-    // Map simulation events
-    const events: SimulationEventVisual[] = scenarioEvents.map((e, idx) => ({
-      id: `event-${idx}`,
-      timestamp: new Date(Date.now() + idx * 60000).toISOString(),
-      timeSeconds: idx * 60,
-      label: e.label || 'Event',
-      severity: e.severity || 'info',
-      domain: e.domain || 'compute',
-      affectedRacks: e.affectedRacks,
-      affectedNodes: e.affectedNodes
+    // Use simulation PUE if available, otherwise calculate
+    const pue = simulation.isSimulating && simulation.currentKpis.effectivePue
+      ? simulation.currentKpis.effectivePue
+      : 1.2 + (avgUtil / 500);
+    
+    // Map simulation events for timeline visualization with type normalization
+    const domainMap: Record<string, SimulationEventVisual['domain']> = {
+      'thermal': 'thermal',
+      'power': 'power',
+      'cooling': 'cooling',
+      'network': 'network',
+      'compute': 'compute',
+      'workload': 'workload',
+      'sovereignty': 'sovereignty',
+      'financial': 'financial',
+      'facility_safety': 'cooling', // Map facility_safety to closest domain
+    };
+    
+    const severityMap: Record<string, SimulationEventVisual['severity']> = {
+      'low': 'low',
+      'medium': 'medium',
+      'high': 'high',
+      'critical': 'critical',
+      'info': 'info',
+      'warning': 'warning',
+    };
+    
+    const events: SimulationEventVisual[] = simulation.events.map((e, idx) => ({
+      id: e.id || `event-${idx}`,
+      timestamp: new Date(Date.now() + e.timestamp * 1000).toISOString(),
+      timeSeconds: e.timestamp,
+      label: e.title || 'Event',
+      severity: severityMap[e.severity] || 'info',
+      domain: domainMap[e.domain] || 'compute',
+      affectedRacks: e.affectedRacks || [],
+      affectedNodes: e.affectedZones || []
     }));
 
     return {
@@ -271,15 +309,32 @@ export function useTwinVisualizationData(): TwinVisualizationState {
       networkNodes,
       networkLinks,
       events,
-      isSimulating: false,
-      activeScenario: activeScenario?.id || null,
-      currentTime: 0,
+      isSimulating: simulation.isSimulating,
+      activeScenario: simulation.activeScenarioId,
+      currentTime: simulation.currentTime,
       facilityName,
       totalCapacityKw: capacityKw,
       pue,
-      carbonIntensity
+      carbonIntensity,
+      // Expose simulation KPIs for external use
+      simulationKpis: simulation.currentKpis,
+      simulationProgress: simulation.progress,
     };
-  }, [activeTwin, isPreviewMode, recommendation, builderState]);
+  }, [
+    activeTwin, 
+    isPreviewMode, 
+    recommendation, 
+    builderState.overview,
+    simulation.isSimulating,
+    simulation.events,
+    simulation.currentKpis,
+    simulation.currentTime,
+    simulation.activeScenarioId,
+    simulation.progress,
+    simulation.applyRackEffects,
+    simulation.applyThermalEffects,
+    simulation.applyPowerEffects,
+  ]);
 
   return visualData;
 }

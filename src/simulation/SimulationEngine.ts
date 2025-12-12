@@ -373,16 +373,34 @@ export class SimulationEngine {
   private processStep(step: ScenarioDefinition['timeline'][0], index: number): void {
     this.processedStepIndices.add(index);
 
+    // KPI ID mapping for canonical ↔ alternate IDs
+    const kpiAliases: Record<string, string[]> = {
+      pue: ['effectivePue'],
+      effectivePue: ['pue'],
+      gpuUtilization: ['avgGpuUtilization'],
+      avgGpuUtilization: ['gpuUtilization'],
+    };
+
     // Apply KPI deltas
     Object.entries(step.kpiDeltas).forEach(([key, delta]) => {
-      if (delta !== undefined && key in this.state.currentKpis) {
-        this.state.currentKpis[key] = (this.state.currentKpis[key] || 0) + delta;
-        
-        // Clamp percentage values
-        if (key.includes('Pct') || key.includes('Score') || key.includes('Index') || key.includes('Progress')) {
-          this.state.currentKpis[key] = Math.max(0, Math.min(100, this.state.currentKpis[key]));
+      if (delta === undefined) return;
+      
+      // Apply delta to the exact key (create if doesn't exist)
+      this.state.currentKpis[key] = (this.state.currentKpis[key] || this.state.baselineKpis[key] || 0) + delta;
+      
+      // Also apply to any aliases for this key
+      const aliases = kpiAliases[key] || [];
+      aliases.forEach(alias => {
+        this.state.currentKpis[alias] = (this.state.currentKpis[alias] || this.state.baselineKpis[alias] || 0) + delta;
+      });
+      
+      // Clamp percentage values
+      const allKeys = [key, ...aliases];
+      allKeys.forEach(k => {
+        if (k.includes('Pct') || k.includes('Score') || k.includes('Index') || k.includes('Progress')) {
+          this.state.currentKpis[k] = Math.max(0, Math.min(100, this.state.currentKpis[k]));
         }
-      }
+      });
     });
 
     // Create simulation event

@@ -36,6 +36,9 @@ export {
   useTwinOverlay, 
   useTwinOverlaySafe,
   OVERLAY_CONFIG,
+  getDomainsForOverlay,
+  isKpiDomainMatchingOverlay,
+  useOverlayFilteredKpis,
 } from './TwinOverlayContext';
 export type { TwinOverlay, TwinOverlayState } from './TwinOverlayContext';
 

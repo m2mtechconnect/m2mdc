@@ -94,59 +94,103 @@ export const OVERLAY_CONFIG: Record<TwinOverlay, {
   icon: string;
   description: string;
   color: string;
+  domains: string[]; // KPI domains this overlay relates to
 }> = {
   none: {
     label: 'None',
     icon: 'eye-off',
     description: 'No overlay active',
     color: 'muted',
+    domains: [],
   },
   thermal: {
     label: 'Thermal',
     icon: 'thermometer',
     description: 'Temperature zones and hotspots',
     color: 'orange',
+    domains: ['thermal_hardware', 'thermal'],
   },
   power: {
     label: 'Power',
     icon: 'zap',
     description: 'Power flow and load intensity',
     color: 'yellow',
+    domains: ['power_ups', 'power'],
   },
   cooling: {
     label: 'Cooling',
     icon: 'snowflake',
     description: 'Airflow vectors and CRAC zones',
     color: 'cyan',
+    domains: ['cooling', 'cooling_system'],
   },
   gpu: {
     label: 'GPU',
     icon: 'cpu',
     description: 'Rack utilization and GPU clusters',
     color: 'purple',
+    domains: ['workload_gpu', 'gpu', 'compute'],
   },
   network: {
     label: 'Network',
     icon: 'network',
     description: 'Topology edges and latency glow',
     color: 'blue',
+    domains: ['network', 'network_topology'],
   },
   workload: {
     label: 'Workload',
     icon: 'activity',
     description: 'Job density and scheduling heat',
     color: 'violet',
+    domains: ['workload_gpu', 'workload', 'compute'],
   },
   sovereignty: {
     label: 'Sovereignty',
     icon: 'shield',
     description: 'Region shading and boundary locks',
     color: 'green',
+    domains: ['sovereignty_compliance', 'sovereignty', 'compliance'],
   },
   carbon: {
     label: 'Carbon',
     icon: 'leaf',
     description: 'Emissions gradient and cost overlay',
     color: 'emerald',
+    domains: ['financial_carbon', 'carbon', 'emissions'],
   },
 };
+
+/**
+ * Get KPI domains for the active overlay
+ */
+export function getDomainsForOverlay(overlay: TwinOverlay): string[] {
+  return OVERLAY_CONFIG[overlay]?.domains ?? [];
+}
+
+/**
+ * Check if a KPI domain matches the active overlay
+ */
+export function isKpiDomainMatchingOverlay(kpiDomain: string, overlay: TwinOverlay): boolean {
+  if (overlay === 'none') return true; // Show all when no overlay
+  const domains = getDomainsForOverlay(overlay);
+  return domains.length === 0 || domains.some(d => 
+    kpiDomain.toLowerCase().includes(d.toLowerCase()) ||
+    d.toLowerCase().includes(kpiDomain.toLowerCase())
+  );
+}
+
+/**
+ * Hook to get filtered KPIs based on active overlay
+ */
+export function useOverlayFilteredKpis<T extends { domain?: string }>(
+  kpis: T[]
+): T[] {
+  const { activeOverlay } = useTwinOverlaySafe();
+  
+  if (activeOverlay === 'none') return kpis;
+  
+  return kpis.filter(kpi => 
+    kpi.domain ? isKpiDomainMatchingOverlay(kpi.domain, activeOverlay) : true
+  );
+}

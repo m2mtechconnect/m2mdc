@@ -1,12 +1,23 @@
 /**
  * SimulationTimeline Component
- * Horizontal timeline with event markers
+ * Horizontal timeline with event markers and playback controls
+ * POLISHED: Enhanced animations, better visual hierarchy
  */
 
 import { useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, SkipForward, RotateCcw } from 'lucide-react';
+import { 
+  Play, 
+  Pause, 
+  SkipForward, 
+  RotateCcw,
+  Zap,
+  Snowflake,
+  Network,
+  Cpu,
+  Shield
+} from 'lucide-react';
 import type { SimulationEventVisual } from './types';
 
 interface SimulationTimelineProps {
@@ -20,18 +31,12 @@ interface SimulationTimelineProps {
   onReset: () => void;
 }
 
-const SEVERITY_COLORS: Record<string, string> = {
-  info: 'bg-info text-info-foreground',
-  warning: 'bg-warning text-warning-foreground',
-  critical: 'bg-destructive text-destructive-foreground'
-};
-
-const DOMAIN_ICONS: Record<string, string> = {
-  power: '⚡',
-  cooling: '❄️',
-  network: '🌐',
-  compute: '💻',
-  sovereignty: '🛡️'
+const DOMAIN_CONFIG: Record<string, { icon: typeof Zap; label: string }> = {
+  power: { icon: Zap, label: 'Power' },
+  cooling: { icon: Snowflake, label: 'Cooling' },
+  network: { icon: Network, label: 'Network' },
+  compute: { icon: Cpu, label: 'Compute' },
+  sovereignty: { icon: Shield, label: 'Sovereignty' }
 };
 
 export function SimulationTimeline({
@@ -44,7 +49,7 @@ export function SimulationTimeline({
   onPlayPause,
   onReset
 }: SimulationTimelineProps) {
-  const progressPercent = (currentTime / durationSeconds) * 100;
+  const progressPercent = Math.min((currentTime / durationSeconds) * 100, 100);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -60,73 +65,89 @@ export function SimulationTimeline({
   const handleTrackClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
-    const percent = x / rect.width;
+    const percent = Math.max(0, Math.min(1, x / rect.width));
     onSeek(percent * durationSeconds);
   };
 
   return (
-    <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg p-4 shadow-lg">
+    <div className="bg-card/95 backdrop-blur-sm border border-border rounded-lg p-4 shadow-lg">
       {/* Controls */}
       <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Button 
-            variant="outline" 
+            variant="ghost" 
             size="icon" 
-            className="h-8 w-8"
+            className="h-8 w-8 hover:bg-muted"
             onClick={onReset}
+            title="Reset"
           >
             <RotateCcw className="h-4 w-4" />
           </Button>
           <Button 
-            variant="default" 
+            variant={isPlaying ? "secondary" : "default"}
             size="icon" 
-            className="h-8 w-8"
+            className="h-9 w-9"
             onClick={onPlayPause}
+            title={isPlaying ? "Pause" : "Play"}
           >
-            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
           </Button>
           <Button 
-            variant="outline" 
+            variant="ghost" 
             size="icon" 
-            className="h-8 w-8"
+            className="h-8 w-8 hover:bg-muted"
             onClick={() => onSeek(Math.min(currentTime + 30, durationSeconds))}
+            title="Skip 30s"
           >
             <SkipForward className="h-4 w-4" />
           </Button>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-sm font-mono text-foreground">
-            {formatTime(currentTime)} / {formatTime(durationSeconds)}
-          </span>
-          <Badge variant="outline" className="text-xs">
-            {events.length} events
-          </Badge>
+          <div className="flex items-center gap-1.5 bg-muted/50 px-2.5 py-1 rounded-md">
+            <span className="text-sm font-mono font-medium text-foreground tabular-nums">
+              {formatTime(currentTime)}
+            </span>
+            <span className="text-muted-foreground">/</span>
+            <span className="text-sm font-mono text-muted-foreground tabular-nums">
+              {formatTime(durationSeconds)}
+            </span>
+          </div>
+          {events.length > 0 && (
+            <Badge variant="outline" className="text-xs font-medium">
+              {events.filter(e => e.timeSeconds <= currentTime).length}/{events.length} events
+            </Badge>
+          )}
         </div>
       </div>
 
       {/* Timeline track */}
       <div 
-        className="relative h-8 bg-muted rounded-md cursor-pointer group"
+        className="relative h-10 bg-muted/50 rounded-lg cursor-pointer group overflow-hidden"
         onClick={handleTrackClick}
       >
-        {/* Progress bar */}
+        {/* Progress bar with gradient */}
         <div 
-          className="absolute top-0 left-0 h-full bg-primary/30 rounded-l-md transition-all"
+          className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary/40 to-primary/20 rounded-l-lg transition-all duration-100"
           style={{ width: `${progressPercent}%` }}
         />
         
         {/* Playhead */}
         <div 
-          className="absolute top-0 w-0.5 h-full bg-primary shadow-md transition-all"
+          className="absolute top-0 w-0.5 h-full bg-primary shadow-lg transition-all duration-100 z-10"
           style={{ left: `${progressPercent}%` }}
         >
-          <div className="absolute -top-1 -left-1.5 w-3 h-3 bg-primary rounded-full" />
+          <div className="absolute -top-0.5 -left-2 w-4 h-4 bg-primary rounded-full shadow-md flex items-center justify-center">
+            <div className="w-1.5 h-1.5 bg-primary-foreground rounded-full" />
+          </div>
         </div>
 
         {/* Event markers */}
         {sortedEvents.map((event) => {
           const position = (event.timeSeconds / durationSeconds) * 100;
+          const isPast = event.timeSeconds <= currentTime;
+          const DomainIcon = DOMAIN_CONFIG[event.domain]?.icon || Cpu;
+          
           return (
             <div
               key={event.id}
@@ -139,21 +160,33 @@ export function SimulationTimeline({
               }}
             >
               <div 
-                className={`w-2 h-6 rounded-sm ${
-                  event.severity === 'critical' ? 'bg-destructive' :
-                  event.severity === 'warning' ? 'bg-warning' : 'bg-info'
-                } hover:scale-110 transition-transform`}
+                className={`w-2.5 h-8 rounded-sm transition-all duration-150 ${
+                  event.severity === 'critical' 
+                    ? 'bg-destructive hover:bg-destructive/80' 
+                    : event.severity === 'warning' 
+                      ? 'bg-warning hover:bg-warning/80' 
+                      : 'bg-info hover:bg-info/80'
+                } ${isPast ? 'opacity-100' : 'opacity-60'} hover:scale-110`}
               />
               
               {/* Tooltip on hover */}
-              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/event:opacity-100 transition-opacity pointer-events-none z-10">
-                <div className="bg-popover border border-border rounded-md p-2 shadow-lg whitespace-nowrap text-xs">
-                  <div className="flex items-center gap-1 font-medium">
-                    <span>{DOMAIN_ICONS[event.domain]}</span>
+              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover/event:opacity-100 transition-opacity pointer-events-none z-20">
+                <div className="bg-popover border border-border rounded-lg p-2.5 shadow-xl whitespace-nowrap">
+                  <div className="flex items-center gap-1.5 font-medium text-sm text-foreground">
+                    <DomainIcon className="h-3.5 w-3.5" />
                     <span>{event.label}</span>
                   </div>
-                  <div className="text-muted-foreground mt-0.5">
-                    {formatTime(event.timeSeconds)}
+                  <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2">
+                    <span>{formatTime(event.timeSeconds)}</span>
+                    <Badge 
+                      variant="outline" 
+                      className={`text-[10px] h-4 px-1 ${
+                        event.severity === 'critical' ? 'border-destructive text-destructive' :
+                        event.severity === 'warning' ? 'border-warning text-warning' : ''
+                      }`}
+                    >
+                      {event.severity}
+                    </Badge>
                   </div>
                 </div>
               </div>
@@ -162,27 +195,33 @@ export function SimulationTimeline({
         })}
       </div>
 
-      {/* Event list */}
+      {/* Event chips */}
       {events.length > 0 && (
-        <div className="flex gap-2 mt-3 flex-wrap">
-          {sortedEvents.slice(0, 5).map((event) => (
-            <Badge
-              key={event.id}
-              variant="outline"
-              className={`cursor-pointer text-xs ${
-                event.timeSeconds <= currentTime ? 'opacity-100' : 'opacity-50'
-              }`}
-              onClick={() => {
-                onEventClick(event.id);
-                onSeek(event.timeSeconds);
-              }}
-            >
-              {DOMAIN_ICONS[event.domain]} {event.label}
-            </Badge>
-          ))}
-          {events.length > 5 && (
-            <Badge variant="secondary" className="text-xs">
-              +{events.length - 5} more
+        <div className="flex gap-1.5 mt-3 flex-wrap">
+          {sortedEvents.slice(0, 6).map((event) => {
+            const isPast = event.timeSeconds <= currentTime;
+            const DomainIcon = DOMAIN_CONFIG[event.domain]?.icon || Cpu;
+            
+            return (
+              <Badge
+                key={event.id}
+                variant={isPast ? "secondary" : "outline"}
+                className={`cursor-pointer text-xs gap-1 transition-all ${
+                  isPast ? 'opacity-100' : 'opacity-50 hover:opacity-75'
+                }`}
+                onClick={() => {
+                  onEventClick(event.id);
+                  onSeek(event.timeSeconds);
+                }}
+              >
+                <DomainIcon className="h-3 w-3" />
+                {event.label}
+              </Badge>
+            );
+          })}
+          {events.length > 6 && (
+            <Badge variant="outline" className="text-xs opacity-60">
+              +{events.length - 6} more
             </Badge>
           )}
         </div>

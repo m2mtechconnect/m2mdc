@@ -17,6 +17,7 @@ import {
   Target,
   Zap,
   Shield,
+  Activity,
 } from 'lucide-react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { useTwinAgents } from '@/hooks/useTwinAgentsCatalog';
@@ -116,9 +117,12 @@ export function ExecutiveSummaryBlock({ className, twinId }: ExecutiveSummaryBlo
   return (
     <div className={cn('space-y-4', className)}>
       {/* Summary Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Executive Summary</h2>
-        <Badge variant="outline" className="text-xs">
+      <div className="flex items-center justify-between animate-fade-in">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <Activity className="h-5 w-5 text-primary" />
+          Executive Summary
+        </h2>
+        <Badge variant="outline" className="text-xs hover:bg-muted/50 transition-colors">
           {overview.tier} • {overview.capacityKw.toLocaleString()} kW
         </Badge>
       </div>
@@ -126,10 +130,10 @@ export function ExecutiveSummaryBlock({ className, twinId }: ExecutiveSummaryBlo
       {/* Key Metrics Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* ROI Summary */}
-        <Card className="bg-success/5 border-success/20">
+        <Card className="bg-gradient-to-br from-success/10 via-success/5 to-transparent border-success/20 hover:shadow-lg hover:shadow-success/10 transition-all duration-300 group animate-fade-in" style={{ animationDelay: '0.1s' }}>
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-success/10">
+              <div className="p-2.5 rounded-xl bg-success/15 group-hover:bg-success/25 transition-colors group-hover:scale-110 duration-300">
                 <TrendingUp className="h-5 w-5 text-success" />
               </div>
               <div className="flex-1 min-w-0">
@@ -147,10 +151,10 @@ export function ExecutiveSummaryBlock({ className, twinId }: ExecutiveSummaryBlo
         </Card>
 
         {/* Carbon Impact */}
-        <Card className="bg-info/5 border-info/20">
+        <Card className="bg-gradient-to-br from-info/10 via-info/5 to-transparent border-info/20 hover:shadow-lg hover:shadow-info/10 transition-all duration-300 group animate-fade-in" style={{ animationDelay: '0.15s' }}>
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-info/10">
+              <div className="p-2.5 rounded-xl bg-info/15 group-hover:bg-info/25 transition-colors group-hover:scale-110 duration-300">
                 <Leaf className="h-5 w-5 text-info" />
               </div>
               <div className="flex-1 min-w-0">
@@ -168,10 +172,10 @@ export function ExecutiveSummaryBlock({ className, twinId }: ExecutiveSummaryBlo
         </Card>
 
         {/* Active Systems */}
-        <Card className="bg-primary/5 border-primary/20">
+        <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/20 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 group animate-fade-in" style={{ animationDelay: '0.2s' }}>
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-primary/10">
+              <div className="p-2.5 rounded-xl bg-primary/15 group-hover:bg-primary/25 transition-colors group-hover:scale-110 duration-300">
                 <Shield className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
@@ -191,10 +195,10 @@ export function ExecutiveSummaryBlock({ className, twinId }: ExecutiveSummaryBlo
         </Card>
 
         {/* Financial Outlook */}
-        <Card className="bg-warning/5 border-warning/20">
+        <Card className="bg-gradient-to-br from-warning/10 via-warning/5 to-transparent border-warning/20 hover:shadow-lg hover:shadow-warning/10 transition-all duration-300 group animate-fade-in" style={{ animationDelay: '0.25s' }}>
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-warning/10">
+              <div className="p-2.5 rounded-xl bg-warning/15 group-hover:bg-warning/25 transition-colors group-hover:scale-110 duration-300">
                 <DollarSign className="h-5 w-5 text-warning" />
               </div>
               <div className="flex-1 min-w-0">
@@ -217,27 +221,30 @@ export function ExecutiveSummaryBlock({ className, twinId }: ExecutiveSummaryBlo
       {/* Risks & Opportunities Row */}
       <div className="grid md:grid-cols-2 gap-4">
         {/* Top Risks */}
-        <Card>
+        <Card className="hover:shadow-md transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.3s' }}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-warning" />
+              <div className="p-1.5 rounded-lg bg-warning/10">
+                <AlertTriangle className="h-4 w-4 text-warning" />
+              </div>
               Top 3 Risks
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {topRisks.map((risk) => (
+            {topRisks.map((risk, index) => (
               <div
                 key={risk.id}
                 className={cn(
-                  'flex items-start gap-3 p-2 rounded-lg border',
+                  'flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:shadow-sm cursor-pointer group animate-fade-in',
                   getSeverityColor(risk.severity)
                 )}
+                style={{ animationDelay: `${0.35 + index * 0.05}s` }}
               >
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">{risk.name}</p>
+                  <p className="text-sm font-medium group-hover:text-foreground transition-colors">{risk.name}</p>
                   <p className="text-xs opacity-80">{risk.description}</p>
                 </div>
-                <Badge variant="outline" className="text-[10px] shrink-0">
+                <Badge variant="outline" className="text-[10px] shrink-0 capitalize">
                   {risk.severity}
                 </Badge>
               </div>
@@ -246,25 +253,28 @@ export function ExecutiveSummaryBlock({ className, twinId }: ExecutiveSummaryBlo
         </Card>
 
         {/* Optimization Opportunities */}
-        <Card>
+        <Card className="hover:shadow-md transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.35s' }}>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
-              <Lightbulb className="h-4 w-4 text-success" />
+              <div className="p-1.5 rounded-lg bg-success/10">
+                <Lightbulb className="h-4 w-4 text-success" />
+              </div>
               Top Optimization Opportunities
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {opportunities.map((opp) => (
+            {opportunities.map((opp, index) => (
               <div
                 key={opp.id}
-                className="flex items-center gap-3 p-2 rounded-lg bg-success/5 border border-success/20"
+                className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-success/10 via-success/5 to-transparent border border-success/20 transition-all duration-300 hover:shadow-sm hover:border-success/40 cursor-pointer group animate-fade-in"
+                style={{ animationDelay: `${0.4 + index * 0.05}s` }}
               >
-                <div className="p-1.5 rounded bg-success/10">
-                  <opp.icon className="h-3.5 w-3.5 text-success" />
+                <div className="p-2 rounded-lg bg-success/15 group-hover:bg-success/25 transition-colors group-hover:scale-110 duration-300">
+                  <opp.icon className="h-4 w-4 text-success" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">{opp.name}</p>
-                  <p className="text-xs text-success">{opp.potential}</p>
+                  <p className="text-sm font-medium group-hover:text-foreground transition-colors">{opp.name}</p>
+                  <p className="text-xs text-success font-medium">{opp.potential}</p>
                 </div>
               </div>
             ))}

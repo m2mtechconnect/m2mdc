@@ -205,7 +205,7 @@ export function DomainHealthMap({ className }: { className?: string }) {
       <CardContent>
         <TooltipProvider>
           <div className="grid grid-cols-4 gap-3">
-            {domains.map((domain) => {
+            {domains.map((domain, index) => {
               const styles = getStatusStyles(domain.status);
               const Icon = domain.icon;
 
@@ -214,41 +214,54 @@ export function DomainHealthMap({ className }: { className?: string }) {
                   <TooltipTrigger asChild>
                     <div
                       className={cn(
-                        'relative p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md',
+                        'relative p-3 rounded-lg border cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] animate-fade-in group',
                         styles.bg,
                         styles.border
                       )}
+                      style={{ animationDelay: `${index * 0.05}s` }}
                     >
                       {/* Status Indicator */}
                       <div
                         className={cn(
-                          'absolute top-2 right-2 w-2 h-2 rounded-full',
+                          'absolute top-2 right-2 w-2.5 h-2.5 rounded-full transition-transform group-hover:scale-125',
                           styles.indicator,
-                          domain.status === 'healthy' && 'animate-pulse'
+                          domain.status === 'healthy' && 'animate-pulse shadow-sm',
+                          domain.status === 'critical' && 'animate-pulse'
                         )}
                       />
 
                       <div className="flex flex-col items-center text-center gap-2">
-                        <div className={cn('p-2 rounded-lg', styles.bg)}>
-                          <Icon className={cn('h-5 w-5', styles.text)} />
+                        <div className={cn(
+                          'p-2.5 rounded-xl transition-all duration-300 group-hover:shadow-md',
+                          styles.bg,
+                          'group-hover:scale-110'
+                        )}>
+                          <Icon className={cn('h-5 w-5 transition-colors', styles.text)} />
                         </div>
                         <div>
-                          <p className="text-xs font-medium">{domain.name}</p>
-                          <p className={cn('text-[10px]', styles.text)}>{styles.label}</p>
+                          <p className="text-xs font-medium group-hover:text-foreground transition-colors">{domain.name}</p>
+                          <p className={cn('text-[10px] font-medium', styles.text)}>{styles.label}</p>
                         </div>
                       </div>
+                      
+                      {/* Hover glow effect */}
+                      <div className={cn(
+                        'absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none',
+                        domain.status === 'healthy' && 'shadow-[inset_0_0_20px_rgba(34,197,94,0.1)]',
+                        domain.status === 'critical' && 'shadow-[inset_0_0_20px_rgba(239,68,68,0.1)]',
+                        domain.status === 'degraded' && 'shadow-[inset_0_0_20px_rgba(245,158,11,0.1)]'
+                      )} />
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" className="max-w-xs">
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       <p className="font-medium">{domain.name} Domain</p>
                       <p className="text-xs text-muted-foreground">
-                        {domain.metric}: {domain.value}
+                        {domain.metric}: <span className="font-medium text-foreground">{domain.value}</span>
                       </p>
                       <div className="flex gap-2 text-xs">
-                        <span>{domain.agentCount} agents</span>
-                        <span>•</span>
-                        <span>{domain.kpiCount} KPIs</span>
+                        <Badge variant="outline" className="text-[10px]">{domain.agentCount} agents</Badge>
+                        <Badge variant="outline" className="text-[10px]">{domain.kpiCount} KPIs</Badge>
                       </div>
                     </div>
                   </TooltipContent>

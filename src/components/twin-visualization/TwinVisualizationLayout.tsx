@@ -1,26 +1,25 @@
 /**
  * TwinVisualizationLayout Component
  * Standard wrapper composing 3D view, KPI cards, legends, and timeline
+ * 
+ * CRITICAL: Now properly synced with SimulationEngine for real-time updates
  */
 
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Thermometer, 
   Zap, 
   Network, 
   Cpu, 
   Leaf,
-  Eye,
-  EyeOff,
-  Maximize2
 } from 'lucide-react';
 import { useTwinVisualizationData } from './hooks/useTwinVisualizationData';
 import { NetworkTopologyLayer } from './NetworkTopologyLayer';
 import { SimulationTimeline } from './SimulationTimeline';
+import { useSimulationVisualization } from '@/hooks/useSimulationVisualization';
 import type { TwinVisualizationMode } from './types';
 
 // Lazy load the 3D scene for performance
@@ -53,13 +52,18 @@ export function TwinVisualizationLayout({
   className = ''
 }: TwinVisualizationLayoutProps) {
   const data = useTwinVisualizationData();
+  const simulation = useSimulationVisualization();
   
   const [showPower, setShowPower] = useState(false);
   const [showThermal, setShowThermal] = useState(true);
   const [showNetwork, setShowNetwork] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+
+  // Sync playing state with simulation
+  useEffect(() => {
+    setIsPlaying(simulation.isSimulating);
+  }, [simulation.isSimulating]);
 
   const isCompact = mode === 'dashboard';
   const showControls = mode !== 'dashboard';
@@ -68,6 +72,12 @@ export function TwinVisualizationLayout({
   const criticalRacks = data.racks.filter(r => r.isCritical).length;
   const avgUtilization = data.racks.reduce((sum, r) => sum + r.utilizationPercent, 0) / (data.racks.length || 1);
   const totalPower = data.racks.reduce((sum, r) => sum + r.powerKw, 0);
+
+  // Use simulation time or local state
+  const currentTime = simulation.isSimulating ? simulation.currentTime : data.currentTime;
+  
+  // Timeline duration from active scenario or default
+  const timelineDuration = 600; // Default 10 minutes
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -80,11 +90,18 @@ export function TwinVisualizationLayout({
           </p>
         </div>
         
-        {mode === 'simulation' && data.activeScenario && (
-          <Badge variant="secondary" className="text-xs">
-            Scenario: {data.activeScenario}
-          </Badge>
-        )}
+        <div className="flex items-center gap-2">
+          {simulation.isSimulating && (
+            <Badge variant="default" className="bg-success text-success-foreground animate-pulse">
+              Simulating
+            </Badge>
+          )}
+          {mode === 'simulation' && data.activeScenario && (
+            <Badge variant="secondary" className="text-xs">
+              Scenario: {data.activeScenario}
+            </Badge>
+          )}
+        </div>
       </div>
 
       {/* Main visualization area */}
@@ -229,20 +246,17 @@ export function TwinVisualizationLayout({
         )}
       </div>
 
-      {/* Simulation timeline */}
-      {(mode === 'simulation' || showTimeline) && data.events.length > 0 && (
+      {/* Simulation timeline - SYNCED with simulation engine */}
+      {(mode === 'simulation' || showTimeline || simulation.isSimulating) && data.events.length > 0 && (
         <SimulationTimeline
           events={data.events}
-          durationSeconds={600}
+          durationSeconds={timelineDuration}
           currentTime={currentTime}
           isPlaying={isPlaying}
-          onSeek={setCurrentTime}
+          onSeek={(time) => simulation.seekToTime(time)}
           onEventClick={setSelectedEvent}
           onPlayPause={() => setIsPlaying(!isPlaying)}
-          onReset={() => {
-            setCurrentTime(0);
-            setIsPlaying(false);
-          }}
+          onReset={() => simulation.seekToTime(0)}
         />
       )}
 
@@ -262,6 +276,11 @@ export function TwinVisualizationLayout({
             <Leaf className="h-4 w-4 text-muted-foreground" />
             <span className="font-medium">{data.carbonIntensity} gCO₂</span>
           </div>
+          {simulation.isSimulating && (
+            <Badge variant="default" className="bg-success/80 text-success-foreground text-xs">
+              Live
+            </Badge>
+          )}
           {criticalRacks > 0 && (
             <Badge variant="destructive" className="text-xs">
               {criticalRacks} Critical

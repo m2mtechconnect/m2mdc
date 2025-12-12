@@ -33,6 +33,7 @@ import { EnhancedSimulationControls } from './EnhancedSimulationControls';
 import { DCKPIDeltas, defaultKPIs } from './DCKPIDeltas';
 import { CoPilotModeHeader } from '@/components/copilot';
 import { cn } from '@/lib/utils';
+import { getKpiValue } from '@/lib/kpiKeyMap';
 
 export type ScenarioSimulationPanelProps = {
   /** Layout mode - 'full' for simulation tab, 'compact' for dashboard */
@@ -131,61 +132,14 @@ export function ScenarioSimulationPanel({
   // Feedback notifications
   const { notifyStatusChange, reset: resetFeedback } = useSimulationFeedback();
   
-  // Build KPI deltas from current state
-  // Map alternate KPI IDs to their canonical forms for display
+  // Build KPI deltas from current state using centralized key mapping
   const kpiDeltas = useMemo(() => {
-    // Debug: Log the raw KPI values to trace the issue
-    if (status === 'running') {
-      console.log('[ScenarioSimulationPanel] KPI Debug:', {
-        status,
-        currentKpis: { ...currentKpis },
-        baselineKpis: { ...baselineKpis },
-        effectivePue: currentKpis.effectivePue,
-        pue: currentKpis.pue,
-      });
-    }
-    
-    // Use the current values directly - the simulation engine should have updated them
-    // We merge alternate keys to handle both naming conventions
-    const getValue = (keys: string[]) => {
-      for (const key of keys) {
-        if (currentKpis[key] !== undefined) return currentKpis[key];
-      }
-      for (const key of keys) {
-        if (baselineKpis[key] !== undefined) return baselineKpis[key];
-      }
-      return 0;
-    };
-    
-    const getBaseline = (keys: string[]) => {
-      for (const key of keys) {
-        if (baselineKpis[key] !== undefined) return baselineKpis[key];
-      }
-      return 0;
-    };
-    
-    // Build KPIs with mapped values
+    // Build KPIs with mapped values using getKpiValue helper
     return defaultKPIs.map(kpiDef => {
-      let value: number;
-      let baseline: number;
-      
-      switch (kpiDef.id) {
-        case 'pue':
-          value = getValue(['pue', 'effectivePue']);
-          baseline = getBaseline(['pue', 'effectivePue']);
-          break;
-        case 'gpuUtilization':
-          value = getValue(['gpuUtilization', 'avgGpuUtilization']);
-          baseline = getBaseline(['gpuUtilization', 'avgGpuUtilization']);
-          break;
-        case 'thermalStabilityScore':
-          value = getValue(['thermalStabilityScore']);
-          baseline = getBaseline(['thermalStabilityScore']);
-          break;
-        default:
-          value = currentKpis[kpiDef.id] ?? baselineKpis[kpiDef.id] ?? 0;
-          baseline = baselineKpis[kpiDef.id] ?? 0;
-      }
+      // Use getKpiValue which handles all aliases automatically
+      const value = getKpiValue(currentKpis, kpiDef.id, 0) || 
+                   getKpiValue(baselineKpis, kpiDef.id, 0);
+      const baseline = getKpiValue(baselineKpis, kpiDef.id, 0);
       
       return {
         ...kpiDef,
@@ -193,7 +147,7 @@ export function ScenarioSimulationPanel({
         baseline,
       };
     });
-  }, [currentKpis, baselineKpis, status]);
+  }, [currentKpis, baselineKpis]);
   
   // How many KPIs to show based on layout
   const displayKpis = isCompact ? kpiDeltas.slice(0, 3) : kpiDeltas.slice(0, 6);

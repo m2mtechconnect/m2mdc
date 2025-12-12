@@ -14,6 +14,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getSimulationEngine } from '@/simulation/SimulationEngine';
 import type { SimulationEvent, SimulationEngineEvent, KPISnapshot } from '@/simulation/types';
 import type { RackVisual, ThermalZoneVisual, PowerSegmentVisual } from '@/components/twin-visualization/types';
+import { getKpiValue } from '@/lib/kpiKeyMap';
 
 export interface SimulationVisualizationState {
   /** Whether simulation is actively running */
@@ -108,10 +109,13 @@ export function useSimulationVisualization(): UseSimulationVisualizationReturn {
           progress: payload.progress,
           currentKpis: payload.currentKpis,
           lastTickTime: Date.now(),
-          // Calculate deltas for visualization effects
-          gpuLoadDelta: (payload.currentKpis.avgGpuUtilization || 0) - (prev.currentKpis.avgGpuUtilization || 0),
-          thermalDelta: (payload.currentKpis.thermalStabilityScore || 0) - (prev.currentKpis.thermalStabilityScore || 0),
-          powerDelta: (payload.currentKpis.effectivePue || 0) - (prev.currentKpis.effectivePue || 0),
+          // Calculate deltas for visualization effects using centralized key mapping
+          gpuLoadDelta: getKpiValue(payload.currentKpis, 'gpuUtilization', 0) - 
+                       getKpiValue(prev.currentKpis, 'gpuUtilization', 0),
+          thermalDelta: getKpiValue(payload.currentKpis, 'thermalStabilityScore', 0) - 
+                       getKpiValue(prev.currentKpis, 'thermalStabilityScore', 0),
+          powerDelta: getKpiValue(payload.currentKpis, 'pue', 0) - 
+                     getKpiValue(prev.currentKpis, 'pue', 0),
         }));
       }
       
@@ -230,7 +234,8 @@ export function useSimulationVisualization(): UseSimulationVisualizationReturn {
   const applyPowerEffects = useCallback((segments: PowerSegmentVisual[]): PowerSegmentVisual[] => {
     if (!state.isSimulating) return segments;
     
-    const pueEffect = state.currentKpis.effectivePue || 1.3;
+    // Use centralized key mapping for PUE lookup
+    const pueEffect = getKpiValue(state.currentKpis, 'pue', 1.3);
     const powerLoadMultiplier = 1 + (pueEffect - 1.3) * 0.5;
     
     return segments.map(segment => ({

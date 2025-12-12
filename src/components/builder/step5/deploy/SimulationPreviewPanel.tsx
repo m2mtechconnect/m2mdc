@@ -24,6 +24,7 @@ import {
 import { useSimulation } from '@/simulation/useSimulation';
 import { SimulationKPICard } from './SimulationKPICard';
 import { SimulationEventTimeline } from './SimulationEventTimeline';
+import { getKpiValue } from '@/lib/kpiKeyMap';
 
 interface SimulationRun {
   id: string;
@@ -77,33 +78,17 @@ export function SimulationPreviewPanel({
   const liveKpis = useMemo<SimulationKPI[]>(() => {
     if (!template) return [];
     
-    // Map template KPI codes to simulation engine KPI keys
-    const kpiCodeToEngineKey: Record<string, string> = {
-      'pue': 'pue',
-      'effectivePue': 'pue',
-      'gpu_utilization': 'gpuUtilization',
-      'gpuUtilization': 'gpuUtilization',
-      'avgGpuUtilization': 'gpuUtilization',
-      'thermal_stability': 'thermalStabilityScore',
-      'thermalStabilityScore': 'thermalStabilityScore',
-      'power_reliability': 'powerReliabilityScore',
-      'powerReliabilityScore': 'powerReliabilityScore',
-      'cooling_efficiency': 'coolingEfficiencyIndex',
-      'coolingEfficiencyIndex': 'coolingEfficiencyIndex',
-      'sovereignty': 'sovereignComplianceScore',
-      'sovereignComplianceScore': 'sovereignComplianceScore',
-    };
-    
     return template.kpis.map(kpi => {
-      const engineKey = kpiCodeToEngineKey[kpi.code] || kpi.code;
-      const hasLiveData = engineKey in currentKpis && engineKey in baselineKpis;
+      // Use centralized getKpiValue which handles all aliases automatically
+      const hasLiveData = simulationStatus !== 'idle' && 
+                         Object.keys(currentKpis).length > 0;
       
-      if (hasLiveData && simulationStatus !== 'idle') {
-        // Use live simulation data
+      if (hasLiveData) {
+        // Use live simulation data with alias resolution
         return {
           ...kpi,
-          baseline: baselineKpis[engineKey] ?? kpi.baseline,
-          simulated: currentKpis[engineKey] ?? kpi.simulated,
+          baseline: getKpiValue(baselineKpis, kpi.code, kpi.baseline),
+          simulated: getKpiValue(currentKpis, kpi.code, kpi.simulated),
         };
       }
       

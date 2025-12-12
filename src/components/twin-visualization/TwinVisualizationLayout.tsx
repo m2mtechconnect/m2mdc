@@ -81,6 +81,35 @@ export function TwinVisualizationLayout({
     setOverlay(activeOverlay === overlay ? 'none' : overlay);
   }, [activeOverlay, setOverlay]);
 
+  // Keyboard shortcuts for overlay switching (1-8)
+  useEffect(() => {
+    const overlayKeys: Record<string, TwinOverlay> = {
+      '1': 'thermal',
+      '2': 'power',
+      '3': 'cooling',
+      '4': 'gpu',
+      '5': 'network',
+      '6': 'workload',
+      '7': 'sovereignty',
+      '8': 'carbon',
+      '0': 'none',
+    };
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      
+      const overlay = overlayKeys[e.key];
+      if (overlay) {
+        e.preventDefault();
+        setOverlay(overlay);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [setOverlay]);
+
   // Sync playing state with simulation
   useEffect(() => {
     setIsPlaying(simulation.isSimulating);
@@ -209,8 +238,9 @@ export function TwinVisualizationLayout({
                     </Button>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="bottom" className="text-xs">
-                  Overlays control how the digital twin is visualized
+                <TooltipContent side="bottom" className="text-xs max-w-[200px]">
+                  <p>Overlays control how the digital twin is visualized.</p>
+                  <p className="text-muted-foreground mt-1">Keyboard: 1-8 to switch, 0 to clear</p>
                 </TooltipContent>
               </Tooltip>
             )}

@@ -12,13 +12,13 @@ export function BuilderModeToggle() {
   const { mode, setMode } = useBuilderMode();
 
   return (
-    <div className="flex items-center gap-1 rounded-lg border bg-muted/30 p-1 w-full">
+    <div className="flex items-center gap-1 rounded-lg border bg-muted/30 p-1 w-full overflow-hidden">
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
             variant={mode === 'quick' ? 'default' : 'ghost'}
             size="sm"
-            className="gap-2 h-8 flex-1 justify-center"
+            className="gap-1 h-8 flex-1 justify-center text-xs"
             onClick={() => setMode('quick')}
           >
             <Wand2 className="h-4 w-4" />
@@ -35,7 +35,7 @@ export function BuilderModeToggle() {
           <Button
             variant={mode === 'architect' ? 'default' : 'ghost'}
             size="sm"
-            className="gap-2 h-8 flex-1 justify-center"
+            className="gap-1 h-8 flex-1 justify-center text-xs"
             onClick={() => setMode('architect')}
           >
             <Settings2 className="h-4 w-4" />

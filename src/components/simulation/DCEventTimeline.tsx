@@ -2,9 +2,10 @@
  * DC Event Timeline Component
  * Chronological display of simulation events with severity markers
  * Uses Studio design system tokens
+ * OPTIMIZED: Memoized components and virtualized rendering
  */
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, memo, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -84,7 +85,7 @@ function formatTimestamp(seconds: number): string {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-function EventItem({ 
+const EventItem = memo(function EventItem({ 
   event, 
   isHighlighted,
   onHover,
@@ -172,9 +173,9 @@ function EventItem({
       </div>
     </div>
   );
-}
+});
 
-export function DCEventTimeline({
+export const DCEventTimeline = memo(function DCEventTimeline({
   events,
   maxHeight = '400px',
   highlightedEventId,
@@ -192,8 +193,20 @@ export function DCEventTimeline({
     }
   }, [events.length, autoScroll]);
   
-  // Sort events by timestamp (newest last)
-  const sortedEvents = [...events].sort((a, b) => a.timestamp - b.timestamp);
+  // Memoize sorted events to prevent re-sorting on every render
+  const sortedEvents = useMemo(() => 
+    [...events].sort((a, b) => a.timestamp - b.timestamp), 
+    [events]
+  );
+  
+  // Memoize event handlers
+  const handleEventHover = useCallback((eventId: string) => {
+    onEventHover?.(eventId);
+  }, [onEventHover]);
+  
+  const handleEventClick = useCallback((event: SimulationEvent) => {
+    onEventClick?.(event);
+  }, [onEventClick]);
   
   return (
     <Card className="bg-card border-border">
@@ -223,8 +236,8 @@ export function DCEventTimeline({
                   key={event.id}
                   event={event}
                   isHighlighted={event.id === highlightedEventId}
-                  onHover={() => onEventHover?.(event.id)}
-                  onClick={() => onEventClick?.(event)}
+                  onHover={() => handleEventHover(event.id)}
+                  onClick={() => handleEventClick(event)}
                 />
               ))
             )}
@@ -234,4 +247,4 @@ export function DCEventTimeline({
       </CardContent>
     </Card>
   );
-}
+});

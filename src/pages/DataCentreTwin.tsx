@@ -58,32 +58,40 @@ export default function DataCentreTwin() {
   
   // Get tab from URL - support both 'tab' and 'view' params
   const urlTab = searchParams.get('tab') || searchParams.get('view');
-  const defaultTab = hasBuilderSession ? 'overview' : 'dashboard';
+  
+  // Check for demo/sandbox mode - enabled when:
+  // 1. Explicitly requested via ?demo=true
+  // 2. No twin available and navigating to simulation/dashboard views
+  const isDemoMode = searchParams.get('demo') === 'true' || 
+    (!twin && !hasBuilderSession && twins.length === 0 && isInitialized);
+  
+  const defaultTab = hasBuilderSession ? 'overview' : (isDemoMode ? 'simulation' : 'dashboard');
   const [activeTab, setActiveTab] = useState(urlTab || defaultTab);
   
   // Set twin from URL param if provided
   useEffect(() => {
-    if (id && id !== activeTwinId) {
+    if (id && id !== 'default' && id !== activeTwinId) {
       setActiveTwin(id);
     }
   }, [id, activeTwinId, setActiveTwin]);
   
-  // Auto-select first twin if none selected and twins are available
+  // Auto-select first twin if none selected and twins are available (skip in demo mode)
   useEffect(() => {
-    if (isInitialized && !activeTwinId && !twin && twins.length > 0) {
+    if (isInitialized && !isDemoMode && !activeTwinId && !twin && twins.length > 0) {
       console.log('[DataCentreTwin] Auto-selecting first twin:', twins[0].id);
       setActiveTwin(twins[0].id);
     }
-  }, [isInitialized, activeTwinId, twin, twins, setActiveTwin]);
+  }, [isInitialized, isDemoMode, activeTwinId, twin, twins, setActiveTwin]);
   
   useEffect(() => {
-    // CRITICAL: Always prioritize real twin over builder session
-    // Builder session is only for preview/sandbox mode
-    if (!twin && !hasBuilderSession) return;
-    
-    // Update page title - ALWAYS use twin.name if available
-    const twinName = twin?.name || (hasBuilderSession ? dcBuilderStore.overview.twinName : 'Sovereign AI Facility');
-    document.title = `Data Centre Twin | ${twinName}`;
+    // Set page title based on mode
+    if (isDemoMode) {
+      document.title = 'Data Centre Twin | Demo Mode';
+    } else if (twin) {
+      document.title = `Data Centre Twin | ${twin.name}`;
+    } else if (hasBuilderSession) {
+      document.title = `Data Centre Twin | ${dcBuilderStore.overview.twinName}`;
+    }
     
     // Use mock facility data enhanced with current twin info
     if (twin) {
@@ -97,35 +105,37 @@ export default function DataCentreTwin() {
       };
       setFacility(enhancedFacility);
     }
-  }, [twin, hasBuilderSession, dcBuilderStore.overview.twinName]);
+  }, [twin, isDemoMode, hasBuilderSession, dcBuilderStore.overview.twinName]);
   
-  // Loading state - also show loading while auto-selecting twin
-  if (isLoading || (!isInitialized && twins.length === 0)) {
+  // Loading state - skip in demo mode
+  if (!isDemoMode && (isLoading || !isInitialized)) {
     return <LoadingState message="Loading Twin Data..." />;
   }
   
   // Still loading if we're about to auto-select a twin
-  if (!activeTwinId && !twin && twins.length > 0) {
+  if (!isDemoMode && !activeTwinId && !twin && twins.length > 0) {
     return <LoadingState message="Selecting Data Centre Twin..." />;
   }
   
-  // Check if we're in simulation preview mode (no twin, but view=simulation)
-  const isSimulationPreview = !twin && !hasBuilderSession && (urlTab === 'simulation' || urlTab === 'dashboard');
-  
-  // If we have a builder session OR simulation preview, show tabs with mock/builder data
-  if (hasBuilderSession || isSimulationPreview) {
+  // DEMO MODE: Show simulation with mock data
+  if (isDemoMode || hasBuilderSession) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto py-6 px-4 space-y-6">
-          {/* Session Header */}
+          {/* Demo/Session Header */}
           <div className="flex items-center gap-2">
-            <ModeBadge mode={isSimulationPreview ? "snapshot" : "designer"} />
-            <SnapshotBadge version={isSimulationPreview ? "Demo" : "Draft"} />
+            <ModeBadge mode={isDemoMode ? "snapshot" : "designer"} />
+            <SnapshotBadge version={isDemoMode ? "Demo" : "Draft"} />
+            {isDemoMode && (
+              <span className="text-xs text-muted-foreground ml-2">
+                Exploring with sample data • No data centre selected
+              </span>
+            )}
           </div>
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="h-auto flex-wrap gap-1">
-              {!isSimulationPreview && (
+              {!isDemoMode && (
                 <>
                   <TabsTrigger value="overview" className="gap-2">
                     <Eye className="h-4 w-4" />
@@ -149,7 +159,7 @@ export default function DataCentreTwin() {
                 <PlayCircle className="h-4 w-4" />
                 Simulation
               </TabsTrigger>
-              {!isSimulationPreview && (
+              {!isDemoMode && (
                 <TabsTrigger value="deploy" className="gap-2">
                   <Rocket className="h-4 w-4" />
                   Deploy
@@ -157,7 +167,7 @@ export default function DataCentreTwin() {
               )}
             </TabsList>
             
-            {!isSimulationPreview && (
+            {!isDemoMode && (
               <>
                 <TabsContent value="overview">
                   <DCOverviewTab />
@@ -187,7 +197,7 @@ export default function DataCentreTwin() {
               <DCSimulationTab />
             </TabsContent>
             
-            {!isSimulationPreview && (
+            {!isDemoMode && (
               <TabsContent value="deploy">
                 <DCDeployTab />
               </TabsContent>

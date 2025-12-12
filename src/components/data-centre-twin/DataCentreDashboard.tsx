@@ -32,12 +32,12 @@ import { DCSimulationPanel } from '@/components/simulation/DCSimulationPanel';
 import { ScenarioSimulationPanel } from '@/components/simulation/ScenarioSimulationPanel';
 import { useBlueprint } from '@/hooks/useBlueprint';
 import { 
-  EnhancedKPICockpit, 
-  AIInsightsPanel, 
-  EnhancedRackOverview, 
-  EnhancedAlertsPanel, 
-  EnhancedEventTimeline,
-  EnhancedDCToolsPanel 
+  CompactKPICockpit, 
+  CompactAIInsightsPanel, 
+  CompactRackOverview, 
+  CompactAlertsPanel, 
+  CompactEventTimeline,
+  CompactDCToolsPanel 
 } from './overview';
 import { useCoPilotCommands } from '@/contexts/CoPilotCommandContext';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
@@ -410,24 +410,20 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
             onOpenFullSimulation={() => setActiveTab('simulation')}
           />
           
-          {/* 3-Column NOC Layout */}
-          <div className="grid gap-6 lg:grid-cols-12">
-            {/* Column 1 — Core KPIs */}
-            <div className="lg:col-span-4 space-y-4">
-              <EnhancedKPICockpit facility={facility} twinId={twinId} />
+          {/* 2-Column NOC Layout - Primary (65%) / Secondary (35%) */}
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+            {/* Left Column - Primary Content */}
+            <div className="space-y-6">
+              <CompactKPICockpit facility={facility} twinId={twinId} mode="overview" />
+              <CompactAIInsightsPanel facility={facility} maxVisible={3} />
+              <CompactAlertsPanel alerts={facility.alerts} maxVisible={3} />
             </div>
             
-            {/* Column 2 — AI Insights + Alerts */}
-            <div className="lg:col-span-4 space-y-4">
-              <AIInsightsPanel facility={facility} />
-              <EnhancedAlertsPanel alerts={facility.alerts} />
-            </div>
-            
-            {/* Column 3 — DC Tools + Rack + Timeline */}
-            <div className="lg:col-span-4 space-y-4">
-              <EnhancedDCToolsPanel twinId={twinId} />
-              <EnhancedRackOverview facility={facility} />
-              <EnhancedEventTimeline events={timelineEvents} />
+            {/* Right Column - Secondary Content */}
+            <div className="space-y-6">
+              <CompactRackOverview facility={facility} maxRacks={20} />
+              <CompactDCToolsPanel twinId={twinId} maxVisible={5} />
+              <CompactEventTimeline events={timelineEvents} />
             </div>
           </div>
         </TabsContent>

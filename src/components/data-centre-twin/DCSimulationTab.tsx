@@ -10,7 +10,7 @@
  * Uses the same useSimulation hook as Overview so state never drifts.
  */
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -52,11 +52,11 @@ const categoryColors: Record<string, string> = {
 // KPI definitions for the comparison panel
 const kpiDefinitions = [
   { id: 'pue', label: 'PUE', unit: '', format: (v: number) => v.toFixed(2), invertDelta: true },
-  { id: 'gpuUtilization', label: 'GPU Utilization', unit: '%', format: (v: number) => v.toFixed(0) },
-  { id: 'thermalStabilityScore', label: 'Thermal Stability', unit: '%', format: (v: number) => v.toFixed(0) },
-  { id: 'carbonIntensity', label: 'Carbon Intensity', unit: 'g/kWh', format: (v: number) => v.toFixed(0), invertDelta: true },
-  { id: 'sovereignComplianceScore', label: 'Sovereignty', unit: '%', format: (v: number) => v.toFixed(0) },
-  { id: 'coolingEfficiencyIndex', label: 'Cooling Efficiency', unit: '%', format: (v: number) => v.toFixed(0) },
+  { id: 'gpuUtilization', label: 'GPU Util', unit: '%', format: (v: number) => v.toFixed(0) },
+  { id: 'thermalStabilityScore', label: 'Thermal', unit: '%', format: (v: number) => v.toFixed(0) },
+  { id: 'carbonNeutralProgress', label: 'Carbon', unit: '%', format: (v: number) => v.toFixed(0) },
+  { id: 'sovereignComplianceScore', label: 'Sovereign', unit: '%', format: (v: number) => v.toFixed(0) },
+  { id: 'coolingEfficiencyIndex', label: 'Cooling', unit: '%', format: (v: number) => v.toFixed(0) },
 ];
 
 export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTabProps) {
@@ -65,6 +65,10 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
   
   // Active overlay for 3D view
   const [activeOverlay, setActiveOverlay] = useState<OverlayDomain>('thermal');
+  
+  // Tick counter for forcing re-renders on KPI changes
+  const [tickCounter, setTickCounter] = useState(0);
+  const prevKpisRef = useRef<Record<string, number>>({});
   
   // Use shared simulation hook - single source of truth
   const {
@@ -93,6 +97,18 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
   
   const { notifyStatusChange, reset: resetFeedback } = useSimulationFeedback();
   
+  // Force re-render when KPIs change for live animation
+  useEffect(() => {
+    const currentPue = getKpiValue(currentKpis, 'pue');
+    const prevPue = prevKpisRef.current['pue'];
+    
+    if (currentPue !== prevPue && status === 'running') {
+      setTickCounter(c => c + 1);
+    }
+    
+    prevKpisRef.current = { ...currentKpis };
+  }, [currentKpis, status]);
+  
   // All scenarios combined
   const allScenarios = useMemo(() => {
     const combined = [...presetScenarios, ...blueprintScenarios];
@@ -120,8 +136,14 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
     } else if (activeScenarioId) {
       startScenario(activeScenarioId);
       notifyStatusChange('running', activeScenario?.name);
+    } else if (allScenarios.length > 0) {
+      // Auto-select first scenario if none selected
+      const firstScenario = allScenarios[0];
+      startScenario(firstScenario.id);
+      showScenarioSelectedToast(firstScenario.name);
+      notifyStatusChange('running', firstScenario.name);
     }
-  }, [status, activeScenarioId, activeScenario, resume, startScenario, notifyStatusChange]);
+  }, [status, activeScenarioId, activeScenario, allScenarios, resume, startScenario, notifyStatusChange]);
   
   const handlePause = useCallback(() => {
     pause();
@@ -131,6 +153,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
   const handleReset = useCallback(() => {
     reset();
     resetFeedback();
+    setTickCounter(0);
   }, [reset, resetFeedback]);
   
   // Format time display
@@ -141,17 +164,18 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
   };
   
   // Calculate KPI delta percentage
-  const getKpiDelta = (kpiId: string): number | null => {
+  const getKpiDelta = useCallback((kpiId: string): number | null => {
     const current = getKpiValue(currentKpis, kpiId);
     const baseline = getKpiValue(baselineKpis, kpiId);
     if (!baseline || baseline === 0) return null;
     return ((current - baseline) / baseline) * 100;
-  };
+  }, [currentKpis, baselineKpis]);
   
   const isRunning = status === 'running';
   const isPaused = status === 'paused';
   const isCompleted = status === 'completed';
   const isActive = isRunning || isPaused || isCompleted;
+  const hasScenarios = allScenarios.length > 0;
   
   return (
     <div className="space-y-6">
@@ -280,43 +304,56 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
             </CardHeader>
             <CardContent className="p-4">
               <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-                {kpiDefinitions.map(kpi => {
+                {kpiDefinitions.map((kpi, idx) => {
                   const current = getKpiValue(currentKpis, kpi.id);
                   const baseline = getKpiValue(baselineKpis, kpi.id);
                   const delta = getKpiDelta(kpi.id);
                   const isImproved = delta !== null && (kpi.invertDelta ? delta < 0 : delta > 0);
                   const hasDelta = delta !== null && Math.abs(delta) >= 0.1;
+                  const displayValue = current ?? baseline ?? 0;
                   
                   return (
                     <div 
-                      key={kpi.id} 
+                      key={`${kpi.id}-${tickCounter}`}
                       className={cn(
-                        'text-center space-y-1 p-2 rounded-lg transition-all duration-300',
-                        isRunning && 'bg-accent/30',
-                        isRunning && hasDelta && isImproved && 'bg-success/10 ring-1 ring-success/20',
-                        isRunning && hasDelta && !isImproved && 'bg-destructive/10 ring-1 ring-destructive/20'
+                        'text-center space-y-1 p-2.5 rounded-lg transition-all duration-300 border',
+                        !isActive && 'border-transparent bg-muted/30',
+                        isRunning && 'bg-accent/50 border-accent',
+                        isRunning && hasDelta && isImproved && 'bg-success/15 border-success/40 shadow-sm shadow-success/20',
+                        isRunning && hasDelta && !isImproved && 'bg-destructive/15 border-destructive/40 shadow-sm shadow-destructive/20',
+                        isCompleted && hasDelta && isImproved && 'bg-success/10 border-success/30',
+                        isCompleted && hasDelta && !isImproved && 'bg-destructive/10 border-destructive/30'
                       )}
+                      style={{
+                        animationDelay: `${idx * 50}ms`
+                      }}
                     >
-                      <p className="text-xs text-muted-foreground truncate">{kpi.label}</p>
+                      <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">{kpi.label}</p>
                       <p className={cn(
-                        'text-lg font-bold tabular-nums transition-transform duration-300',
-                        isRunning && 'scale-105'
+                        'text-xl font-bold tabular-nums transition-all duration-500',
+                        isRunning && 'scale-110',
+                        hasDelta && isImproved && 'text-success',
+                        hasDelta && !isImproved && 'text-destructive'
                       )}>
-                        {kpi.format(current || baseline)}
-                        <span className="text-xs text-muted-foreground ml-0.5">{kpi.unit}</span>
+                        {kpi.format(displayValue)}
+                        <span className="text-xs text-muted-foreground ml-0.5 font-normal">{kpi.unit}</span>
                       </p>
-                      {hasDelta && (
+                      {hasDelta ? (
                         <p className={cn(
-                          'text-xs flex items-center justify-center gap-0.5 transition-all duration-300',
+                          'text-xs flex items-center justify-center gap-0.5 font-medium',
                           isImproved ? 'text-success' : 'text-destructive',
-                          isRunning && 'animate-pulse font-medium'
+                          isRunning && 'animate-pulse'
                         )}>
                           {isImproved ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                           {delta > 0 ? '+' : ''}{delta.toFixed(1)}%
                         </p>
-                      )}
-                      {!hasDelta && isRunning && (
-                        <p className="text-xs text-muted-foreground animate-pulse">—</p>
+                      ) : isActive ? (
+                        <p className="text-xs text-muted-foreground h-4">
+                          {isRunning && <span className="inline-block w-2 h-2 rounded-full bg-primary animate-ping mr-1" />}
+                          {isRunning ? 'Monitoring' : '—'}
+                        </p>
+                      ) : (
+                        <p className="text-xs text-muted-foreground h-4">Baseline</p>
                       )}
                     </div>
                   );
@@ -338,17 +375,23 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
               <div className="flex items-center gap-2">
                 <Button
                   onClick={handlePlay}
-                  disabled={isRunning || !activeScenarioId}
-                  className="gap-2 flex-1"
+                  disabled={isRunning || !hasScenarios}
+                  className={cn(
+                    "gap-2 flex-1 transition-all",
+                    !activeScenarioId && hasScenarios && "animate-pulse"
+                  )}
                 >
                   <PlayCircle className="h-4 w-4" />
-                  {isPaused ? 'Resume' : 'Run'}
+                  {isPaused ? 'Resume' : activeScenarioId ? 'Run' : 'Run Scenario'}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={handlePause}
                   disabled={!isRunning}
-                  className="gap-2"
+                  className={cn(
+                    "gap-2 transition-all",
+                    isRunning && "border-warning text-warning hover:bg-warning/10"
+                  )}
                 >
                   <Pause className="h-4 w-4" />
                   Pause
@@ -357,10 +400,18 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
                   variant="ghost"
                   onClick={handleReset}
                   disabled={status === 'idle'}
+                  className="transition-all"
                 >
                   <RotateCcw className="h-4 w-4" />
                 </Button>
               </div>
+              
+              {/* No scenarios warning */}
+              {!hasScenarios && (
+                <div className="p-3 rounded-lg bg-warning/10 border border-warning/30 text-sm text-warning">
+                  No scenarios available. Add scenarios in Blueprint settings.
+                </div>
+              )}
               
               {/* Progress Bar */}
               {isActive && (

@@ -4,6 +4,12 @@
  * 
  * SIMULATION MODE ONLY - These components should never appear in Blueprint Designer
  * All components operate on frozen blueprint snapshots
+ * 
+ * PERFORMANCE OPTIMIZED:
+ * - DCSimulationPanel: memo, debounced updates, batched state
+ * - DCKPIDeltas: memo, memoized calculations
+ * - DCEventTimeline: memo, memoized sorting/handlers
+ * - AnimatedRackHeatmap: memo, memoized calculations/handlers
  */
 
 // Core simulation components
@@ -12,7 +18,7 @@ export { ScenarioSimulationPanel } from './ScenarioSimulationPanel';
 export { DCSimulationControls } from './DCSimulationControls';
 export { DCScenarioSelector } from './DCScenarioSelector';
 export { DCEventTimeline } from './DCEventTimeline';
-export { DCKPIDeltas } from './DCKPIDeltas';
+export { DCKPIDeltas, defaultKPIs } from './DCKPIDeltas';
 export { SimulationControls } from './SimulationControls';
 export { SimulationPreviewModal } from './SimulationPreviewModal';
 export { SimulationResultPanel } from './SimulationResultPanel';

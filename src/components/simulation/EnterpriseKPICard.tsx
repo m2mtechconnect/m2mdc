@@ -2,6 +2,8 @@
  * Enterprise KPI Card with Live State
  * Shows current value, delta, severity, target distance, and "why it matters"
  * Enhanced with enterprise-grade animations
+ * 
+ * Integrates with TwinOverlayContext to filter KPIs by active overlay domain
  */
 
 import { useMemo, useEffect, useRef, useState } from 'react';
@@ -13,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence, useSpring, useTransform } from 'framer-motion';
 import type { KPISnapshot } from '@/simulation/types';
 import { DEFAULT_KPI_CONFIGS, getThresholdZoneForValue, getDistanceToTarget } from '@/engines/kpi/KPIOverlayEngine';
+import { useTwinOverlaySafe, isKpiDomainMatchingOverlay } from '@/context/TwinOverlayContext';
 
 // Animated number component with smooth counting
 function AnimatedNumber({ 
@@ -451,8 +454,18 @@ export function EnterpriseKPICardGrid({ snapshots, isLive, onKpiClick }: Enterpr
   const currentSnapshot = snapshots[snapshots.length - 1];
   const previousSnapshot = snapshots[snapshots.length - 2];
   const baselineSnapshot = snapshots[0];
+  
+  // Filter KPIs based on active overlay
+  const { activeOverlay } = useTwinOverlaySafe();
 
-  const kpiIds = Object.keys(DEFAULT_KPI_CONFIGS);
+  const kpiIds = useMemo(() => {
+    const allKpiIds = Object.keys(DEFAULT_KPI_CONFIGS);
+    // Filter KPIs to show only those matching the active overlay domain
+    return allKpiIds.filter(kpiId => {
+      const config = DEFAULT_KPI_CONFIGS[kpiId];
+      return isKpiDomainMatchingOverlay(config?.domain || '', activeOverlay);
+    });
+  }, [activeOverlay]);
 
   // Build history for each KPI
   const kpiHistories = useMemo(() => {

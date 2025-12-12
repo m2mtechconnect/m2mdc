@@ -5,6 +5,7 @@
  * Includes performance instrumentation for simulationLoopTime tracking
  * 
  * CRITICAL: Uses activeTwin as primary data source, NOT builder store
+ * Uses centralized KPI key mapping for consistent alias resolution
  */
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
@@ -21,6 +22,7 @@ import { createCustomScenario } from './customScenarioBuilder';
 import { convertAllBlueprintScenarios } from './blueprintScenarioAdapter';
 import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
 import { useSimulationDataIsolation } from './useSimulationGuards';
+import { normalizeKpiRecord } from '@/lib/kpiKeyMap';
 import type { 
   SimulationState, 
   SimulationEvent, 
@@ -123,12 +125,14 @@ export function useSimulation(options: UseSimulationOptions = {}): UseSimulation
   const tickTimingRef = useRef<number | null>(null);
   
   // Get baseline KPIs from twin (priority) or defaults
+  // Always normalize to ensure all aliases are populated (pue ↔ effectivePue, etc.)
   const baselineKpis = useMemo(() => {
     const twinBaseline = getIsolatedBaseline();
-    // Merge twin baseline with defaults (twin values take priority)
-    return Object.keys(twinBaseline).length > 0 
+    // Merge twin baseline with defaults (twin values take priority), then normalize
+    const merged = Object.keys(twinBaseline).length > 0 
       ? { ...DEFAULT_BASELINE_KPIS, ...twinBaseline }
       : DEFAULT_BASELINE_KPIS;
+    return normalizeKpiRecord(merged);
   }, [getIsolatedBaseline]);
   
   const [state, setState] = useState<SimulationState>({

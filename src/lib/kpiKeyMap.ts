@@ -129,14 +129,20 @@ export function getKpiValue(
   if (!record) return defaultValue;
   
   // First try exact key
-  if (key in record && record[key] !== undefined) {
+  if (key in record && record[key] !== undefined && !isNaN(record[key])) {
     return record[key];
+  }
+  
+  // Normalize key and try canonical
+  const canonical = normalizeKpiKey(key);
+  if (canonical in record && record[canonical] !== undefined && !isNaN(record[canonical])) {
+    return record[canonical];
   }
   
   // Then try all aliases
   const allKeys = expandKpiKey(key);
   for (const k of allKeys) {
-    if (k in record && record[k] !== undefined) {
+    if (k in record && record[k] !== undefined && !isNaN(record[k])) {
       return record[k];
     }
   }

@@ -29,6 +29,7 @@ import { SovereigntyDomainView } from './domains/SovereigntyDomainView';
 import { CarbonDomainView } from './domains/CarbonDomainView';
 import { FinancialDomainView } from './domains/FinancialDomainView';
 import { DCSimulationPanel } from '@/components/simulation/DCSimulationPanel';
+import { ScenarioSimulationPanel } from '@/components/simulation/ScenarioSimulationPanel';
 import { useBlueprint } from '@/hooks/useBlueprint';
 import { 
   EnhancedKPICockpit, 
@@ -399,6 +400,16 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
+          {/* Compact Simulation Panel at top of Overview */}
+          <ScenarioSimulationPanel
+            layout="compact"
+            showHeader
+            showControls
+            showTimeline={false}
+            twinId={twinId}
+            onOpenFullSimulation={() => setActiveTab('simulation')}
+          />
+          
           {/* 3-Column NOC Layout */}
           <div className="grid gap-6 lg:grid-cols-12">
             {/* Column 1 — Core KPIs */}

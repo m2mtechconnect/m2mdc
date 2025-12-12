@@ -40,7 +40,7 @@ import type { KPISnapshot, SimulationEvent } from '@/simulation/types';
 import { StatusBadge, NoSimulationHistoryEmptyState, LoadingState } from '@/components/ui';
 import { KpiTooltip } from '@/components/ui/kpi-tooltip';
 import { LiveSimulationBadge, KPILegend, TimelineEventMarker, KPI_DOMAIN_COLORS } from '@/components/simulation/SimulationEnvironmentPolish';
-import { KPIGridSkeleton, SimulationStatusIndicator, useSimulationFeedback, showScenarioSelectedToast } from '@/components/simulation';
+import { KPIGridSkeleton, SimulationStatusIndicator, useSimulationFeedback, showScenarioSelectedToast, ScenarioSimulationPanel } from '@/components/simulation';
 
 const categoryIcons: Record<DCScenarioCategory, React.ReactNode> = {
   capacity: <Server className="h-4 w-4" />,
@@ -176,6 +176,15 @@ export function DCSimulationTab() {
         {/* Main Content */}
         <div className={`flex-1 transition-all duration-300 ${showCoPilotPanel ? 'pr-96' : ''}`}>
           <div className="space-y-6">
+            {/* Shared Scenario Simulation Panel - Full Mode */}
+            <ScenarioSimulationPanel
+              layout="full"
+              showHeader
+              showControls
+              showTimeline
+              twinId="default"
+            />
+            
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <SimulationModeHeader

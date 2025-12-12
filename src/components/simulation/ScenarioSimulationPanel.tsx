@@ -380,14 +380,31 @@ export function ScenarioSimulationPanel({
           'grid gap-3',
           isCompact ? 'grid-cols-3' : 'grid-cols-3 md:grid-cols-6'
         )}>
-        {displayKpis.map((kpi) => (
-            <Card key={kpi.id} className="bg-card/50 border-border overflow-hidden">
+        {displayKpis.map((kpi) => {
+          const hasDelta = kpi.baseline !== undefined && kpi.baseline !== 0 && Math.abs(((kpi.value - kpi.baseline) / kpi.baseline) * 100) >= 0.1;
+          const isImproved = kpi.invertDelta
+            ? (kpi.value < kpi.baseline)
+            : (kpi.value > kpi.baseline);
+          
+          return (
+            <Card 
+              key={kpi.id} 
+              className={cn(
+                'bg-card/50 border-border overflow-hidden transition-all duration-300',
+                status === 'running' && 'ring-1 ring-primary/20',
+                status === 'running' && hasDelta && isImproved && 'ring-success/30 bg-success/5',
+                status === 'running' && hasDelta && !isImproved && 'ring-destructive/30 bg-destructive/5'
+              )}
+            >
               <CardContent className="p-3">
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground truncate" title={kpi.label}>
                     {kpi.label}
                   </p>
-                  <p className="text-lg font-bold tabular-nums truncate">
+                  <p className={cn(
+                    'text-lg font-bold tabular-nums truncate transition-transform duration-300',
+                    status === 'running' && 'scale-105 origin-left'
+                  )}>
                     {kpi.format 
                       ? kpi.format(kpi.value) 
                       : typeof kpi.value === 'number' 
@@ -395,21 +412,24 @@ export function ScenarioSimulationPanel({
                         : kpi.value}
                     <span className="text-xs text-muted-foreground ml-1">{kpi.unit}</span>
                   </p>
-                  {kpi.baseline !== undefined && kpi.baseline !== 0 && (
+                  {hasDelta && (
                     <p className={cn(
-                      'text-xs',
-                      kpi.invertDelta
-                        ? (kpi.value > kpi.baseline ? 'text-destructive' : 'text-success')
-                        : (kpi.value > kpi.baseline ? 'text-success' : 'text-destructive')
+                      'text-xs transition-all duration-300',
+                      isImproved ? 'text-success' : 'text-destructive',
+                      status === 'running' && 'animate-pulse font-medium'
                     )}>
                       {kpi.value > kpi.baseline ? '+' : ''}
                       {(((kpi.value - kpi.baseline) / kpi.baseline) * 100).toFixed(1)}%
                     </p>
                   )}
+                  {!hasDelta && status === 'running' && (
+                    <p className="text-xs text-muted-foreground/50 animate-pulse">—</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
-          ))}
+          );
+        })}
         </div>
         
         {/* Scenario Selector - Always show when no active scenario */}

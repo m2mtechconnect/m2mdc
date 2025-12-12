@@ -184,7 +184,7 @@ export function EnterpriseKPICard({
           scale: { duration: 0.4, ease: "easeOut" }
         }}
         className={cn(
-          "p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md",
+          "p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md overflow-hidden",
           severityColor,
           isLive && glowColor
         )}
@@ -276,14 +276,14 @@ export function EnterpriseKPICard({
       >
         <Card 
           className={cn(
-            "cursor-pointer transition-all hover:shadow-lg",
+            "cursor-pointer transition-all hover:shadow-lg overflow-hidden",
             severityColor,
             isLive && "ring-1 ring-primary/30",
             isLive && glowColor
           )}
           onClick={onClick}
         >
-          <CardContent className="p-4">
+          <CardContent className="p-4 overflow-hidden">
             {/* Header */}
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1 min-w-0">
@@ -364,16 +364,16 @@ export function EnterpriseKPICard({
             )}
 
             {/* Target & Severity */}
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <Target className="h-3.5 w-3.5" />
-                <span>Target: {config.target}{config.unit}</span>
+            <div className="flex items-center justify-between text-xs overflow-hidden">
+              <div className="flex items-center gap-1.5 text-muted-foreground min-w-0 flex-1 truncate">
+                <Target className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">Target: {config.target}{config.unit}</span>
                 {distanceToTarget > 0 && (
                   <motion.span 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className={cn(
-                      "ml-1",
+                      "ml-1 shrink-0",
                       isImproving ? "text-success" : "text-destructive"
                     )}
                   >

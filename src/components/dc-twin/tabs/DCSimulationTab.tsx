@@ -333,19 +333,19 @@ export function DCSimulationTab() {
                   <button
                     key={scenario.id}
                     onClick={() => setSelectedScenario(scenario.id)}
-                    className={`text-left p-4 rounded-lg border transition-all hover:shadow-md ${
+                    className={`text-left p-4 rounded-lg border transition-all hover:shadow-md overflow-hidden ${
                       selectedScenario === scenario.id 
                         ? 'border-primary ring-2 ring-primary/20' 
                         : severityColors[scenario.severity] || 'border-border'
                     }`}
                   >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="p-2 rounded-lg bg-muted">
+                    <div className="flex items-start justify-between mb-2 gap-2">
+                      <div className="p-2 rounded-lg bg-muted shrink-0">
                         {categoryIcons[scenario.category]}
                       </div>
                       <Badge 
                         variant="outline" 
-                        className={`text-[10px] ${
+                        className={`text-[10px] shrink-0 ${
                           scenario.severity === 'critical' ? 'text-destructive' :
                           scenario.severity === 'warning' ? 'text-warning' : 'text-info'
                         }`}
@@ -354,7 +354,7 @@ export function DCSimulationTab() {
                       </Badge>
                     </div>
                     
-                    <h4 className="font-semibold text-sm mb-1">{scenario.name}</h4>
+                    <h4 className="font-semibold text-sm mb-1 truncate">{scenario.name}</h4>
                     <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{scenario.description}</p>
                     
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">

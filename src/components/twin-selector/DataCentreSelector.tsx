@@ -233,7 +233,7 @@ export function DataCentreSelector() {
             )}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent className="bg-background z-50">
+        <SelectContent>
           {twins.length === 0 ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
               No data centre twins yet.
@@ -286,7 +286,7 @@ export function DataCentreSelector() {
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48 bg-background z-50">
+          <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem onClick={() => navigate(`/builder?twinId=${activeTwinId}`)}>
               <Settings2 className="h-4 w-4 mr-2" />
               Edit in Builder
@@ -352,7 +352,7 @@ export function DataCentreSelector() {
                 <SelectTrigger>
                   <SelectValue placeholder="Select region" />
                 </SelectTrigger>
-                <SelectContent className="bg-background z-50">
+                <SelectContent>
                   {REGIONS.map((region) => (
                     <SelectItem key={region.code} value={region.code}>
                       <div className="flex items-center gap-2">
@@ -380,7 +380,7 @@ export function DataCentreSelector() {
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-background z-50">
+                  <SelectContent>
                     <SelectItem value="Tier II">Tier II</SelectItem>
                     <SelectItem value="Tier III">Tier III</SelectItem>
                     <SelectItem value="Tier IV">Tier IV</SelectItem>

@@ -18,3 +18,6 @@ export { CompactAlertsPanel } from './CompactAlertsPanel';
 export { CompactRackOverview } from './CompactRackOverview';
 export { CompactDCToolsPanel } from './CompactDCToolsPanel';
 export { CompactEventTimeline } from './CompactEventTimeline';
+
+// Simulation summary for Overview tab
+export { SimulationSummaryCard } from './SimulationSummaryCard';

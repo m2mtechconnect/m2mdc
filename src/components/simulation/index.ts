@@ -8,6 +8,7 @@
 
 // Core simulation components
 export { DCSimulationPanel } from './DCSimulationPanel';
+export { ScenarioSimulationPanel } from './ScenarioSimulationPanel';
 export { DCSimulationControls } from './DCSimulationControls';
 export { DCScenarioSelector } from './DCScenarioSelector';
 export { DCEventTimeline } from './DCEventTimeline';

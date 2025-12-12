@@ -3,6 +3,13 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import m2mLogo from "@/assets/m2m-logo.png";
 import {
   LayoutDashboard,
@@ -17,6 +24,7 @@ import {
   LogOut,
   Server,
   Activity,
+  MoreHorizontal,
 } from "lucide-react";
 import { User } from '@supabase/supabase-js';
 import GlobalSearchBar from "@/components/search/GlobalSearchBar";
@@ -37,24 +45,22 @@ interface LayoutProps {
 }
 
 // Data Centre Twin Studio navigation - organized by section
-const coreNavigation = [
-  { name: "Data Centre Command", href: "/", icon: LayoutDashboard },
-  { name: "Build Data Centre Twin", href: "/builder", icon: Wrench },
-  { name: "Subsystem Agents", href: "/app/agents", icon: Server },
-  { name: "Telemetry & Analytics", href: "/intelligence", icon: BarChart3 },
-  { name: "Simulation", href: "/data-centre-twin?view=simulation", icon: Activity },
+// Primary navigation items (always visible)
+const primaryNavigation = [
+  { name: "Command", fullName: "Data Centre Command", href: "/", icon: LayoutDashboard },
+  { name: "Build", fullName: "Build Data Centre Twin", href: "/builder", icon: Wrench },
+  { name: "Agents", fullName: "Subsystem Agents", href: "/app/agents", icon: Server },
 ];
 
-const complianceNavigation = [
-  { name: "Sovereignty & Safety Audit", href: "/compliance", icon: Shield },
-  { name: "Teams", href: "/teams", icon: Users },
+// Secondary navigation items (in "More" menu on smaller screens)
+const secondaryNavigation = [
+  { name: "Analytics", fullName: "Telemetry & Analytics", href: "/intelligence", icon: BarChart3 },
+  { name: "Simulation", fullName: "Simulation", href: "/data-centre-twin?view=simulation", icon: Activity },
+  { name: "Audit", fullName: "Sovereignty & Safety Audit", href: "/compliance", icon: Shield },
+  { name: "Teams", fullName: "Teams", href: "/teams", icon: Users },
 ];
 
-const supportNavigation = [
-  { name: "Help", href: "/help", icon: HelpCircle },
-];
-
-const allNavigation = [...coreNavigation, ...complianceNavigation, ...supportNavigation];
+const allNavigation = [...primaryNavigation, ...secondaryNavigation];
 
 // Helper function to get time-based greeting
 const getGreeting = () => {
@@ -172,9 +178,10 @@ export function Layout({ children }: LayoutProps) {
               <DataCentreSelector />
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden xl:flex items-center gap-0.5" aria-label="Main menu">
-              {coreNavigation.map((item) => {
+            {/* Desktop Navigation - Full labels on 2xl+, icons on lg-xl */}
+            <nav className="hidden lg:flex items-center gap-0.5" aria-label="Main menu">
+              {/* Primary navigation - always visible on lg+ */}
+              {primaryNavigation.map((item) => {
                 const isActive = item.href.includes('?') 
                   ? location.pathname + location.search === item.href
                   : location.pathname === item.href;
@@ -185,18 +192,18 @@ export function Layout({ children }: LayoutProps) {
                         <Button
                           variant={isActive ? "secondary" : "ghost"}
                           size="sm"
-                          className={`gap-1.5 px-2.5 text-xs font-medium transition-smooth min-h-[36px] ${
+                          className={`gap-1.5 px-2 xl:px-2.5 text-xs font-medium transition-smooth min-h-[36px] ${
                             isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
                           }`}
                           aria-current={isActive ? "page" : undefined}
                         >
                           <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
-                          <span className="whitespace-nowrap">{item.name}</span>
+                          <span className="hidden xl:inline whitespace-nowrap">{item.name}</span>
                         </Button>
                       </Link>
                     </TooltipTrigger>
                     <TooltipContent side="bottom">
-                      <p>{item.name}</p>
+                      <p>{item.fullName}</p>
                     </TooltipContent>
                   </Tooltip>
                 );
@@ -204,32 +211,78 @@ export function Layout({ children }: LayoutProps) {
               
               {/* Separator */}
               <div className="h-4 w-px bg-border mx-1" />
-              
-              {complianceNavigation.map((item) => {
-                const isActive = location.pathname === item.href;
-                return (
-                  <Tooltip key={item.name}>
-                    <TooltipTrigger asChild>
-                      <Link to={item.href}>
-                        <Button
-                          variant={isActive ? "secondary" : "ghost"}
-                          size="sm"
-                          className={`gap-1.5 px-2.5 text-xs font-medium transition-smooth min-h-[36px] ${
-                            isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
-                          }`}
-                          aria-current={isActive ? "page" : undefined}
-                        >
-                          <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
-                          <span className="whitespace-nowrap">{item.name}</span>
-                        </Button>
+
+              {/* Secondary navigation - full on 2xl, dropdown on lg-xl */}
+              <div className="hidden 2xl:flex items-center gap-0.5">
+                {secondaryNavigation.map((item) => {
+                  const isActive = item.href.includes('?') 
+                    ? location.pathname + location.search === item.href
+                    : location.pathname === item.href;
+                  return (
+                    <Tooltip key={item.name}>
+                      <TooltipTrigger asChild>
+                        <Link to={item.href}>
+                          <Button
+                            variant={isActive ? "secondary" : "ghost"}
+                            size="sm"
+                            className={`gap-1.5 px-2.5 text-xs font-medium transition-smooth min-h-[36px] ${
+                              isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
+                            }`}
+                            aria-current={isActive ? "page" : undefined}
+                          >
+                            <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
+                            <span className="whitespace-nowrap">{item.name}</span>
+                          </Button>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        <p>{item.fullName}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                })}
+              </div>
+
+              {/* More dropdown - visible on lg-xl only */}
+              <div className="2xl:hidden">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:text-foreground min-h-[36px]"
+                    >
+                      <MoreHorizontal className="h-3.5 w-3.5" />
+                      <span className="hidden xl:inline">More</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    {secondaryNavigation.map((item) => {
+                      const isActive = item.href.includes('?') 
+                        ? location.pathname + location.search === item.href
+                        : location.pathname === item.href;
+                      return (
+                        <DropdownMenuItem key={item.name} asChild>
+                          <Link 
+                            to={item.href}
+                            className={`flex items-center gap-2 ${isActive ? 'text-primary' : ''}`}
+                          >
+                            <item.icon className="h-4 w-4" />
+                            {item.fullName}
+                          </Link>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/help" className="flex items-center gap-2">
+                        <HelpCircle className="h-4 w-4" />
+                        Help
                       </Link>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">
-                      <p>{item.name}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                );
-              })}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </nav>
           </div>
 
@@ -300,7 +353,7 @@ export function Layout({ children }: LayoutProps) {
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Data Centre
               </h3>
-              {coreNavigation.map((item) => {
+              {primaryNavigation.map((item) => {
                 const isActive = location.pathname === item.href || 
                   (item.href.includes('?') && location.pathname + location.search === item.href);
                 return (
@@ -316,20 +369,21 @@ export function Layout({ children }: LayoutProps) {
                       aria-current={isActive ? "page" : undefined}
                     >
                       <item.icon className="h-5 w-5" aria-hidden="true" />
-                      {item.name}
+                      {item.fullName}
                     </Button>
                   </Link>
                 );
               })}
             </div>
 
-            {/* Teams & Compliance Section */}
+            {/* Analytics & Simulation Section */}
             <div className="pb-4 border-t border-border pt-4">
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Teams & Compliance
+                Analytics & Compliance
               </h3>
-              {complianceNavigation.map((item) => {
-                const isActive = location.pathname === item.href;
+              {secondaryNavigation.map((item) => {
+                const isActive = location.pathname === item.href || 
+                  (item.href.includes('?') && location.pathname + location.search === item.href);
                 return (
                   <Link
                     key={item.name}
@@ -343,7 +397,7 @@ export function Layout({ children }: LayoutProps) {
                       aria-current={isActive ? "page" : undefined}
                     >
                       <item.icon className="h-5 w-5" aria-hidden="true" />
-                      {item.name}
+                      {item.fullName}
                     </Button>
                   </Link>
                 );
@@ -355,26 +409,20 @@ export function Layout({ children }: LayoutProps) {
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Support
               </h3>
-              {supportNavigation.map((item) => {
-                const isActive = location.pathname === item.href;
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    role="menuitem"
-                  >
-                    <Button
-                      variant={isActive ? "secondary" : "ghost"}
-                      className="w-full justify-start gap-3 min-h-[44px] text-base"
-                      aria-current={isActive ? "page" : undefined}
-                    >
-                      <item.icon className="h-5 w-5" aria-hidden="true" />
-                      {item.name}
-                    </Button>
-                  </Link>
-                );
-              })}
+              <Link
+                to="/help"
+                onClick={() => setMobileMenuOpen(false)}
+                role="menuitem"
+              >
+                <Button
+                  variant={location.pathname === '/help' ? "secondary" : "ghost"}
+                  className="w-full justify-start gap-3 min-h-[44px] text-base"
+                  aria-current={location.pathname === '/help' ? "page" : undefined}
+                >
+                  <HelpCircle className="h-5 w-5" aria-hidden="true" />
+                  Help
+                </Button>
+              </Link>
             </div>
           </nav>
 

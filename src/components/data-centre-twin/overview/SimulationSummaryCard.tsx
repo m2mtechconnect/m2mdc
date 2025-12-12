@@ -9,7 +9,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { PlayCircle, ExternalLink, Clock, Activity, CheckCircle2 } from 'lucide-react';
+import { PlayCircle, ExternalLink, Clock, Activity, CheckCircle2, Sparkles } from 'lucide-react';
 import { useSimulation } from '@/simulation/useSimulation';
 import { cn } from '@/lib/utils';
 
@@ -22,14 +22,21 @@ export function SimulationSummaryCard({
   onOpenSimulation,
   className 
 }: SimulationSummaryCardProps) {
-  const { status, activeScenario, progress } = useSimulation();
+  const { status, activeScenario, progress, elapsedTime } = useSimulation();
   
   const isActive = status === 'running' || status === 'paused';
   const isCompleted = status === 'completed';
   
+  // Format elapsed time
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+  
   return (
     <Card className={cn(
-      'bg-gradient-to-r from-primary/5 to-transparent border-primary/20',
+      'bg-gradient-to-r from-primary/5 via-background to-transparent border-primary/20',
       className
     )}>
       <CardContent className="p-4">
@@ -37,7 +44,7 @@ export function SimulationSummaryCard({
           {/* Left: Status Info */}
           <div className="flex items-center gap-3 min-w-0">
             <div className={cn(
-              'p-2 rounded-full shrink-0',
+              'p-2.5 rounded-xl shrink-0',
               isActive ? 'bg-success/10' : 'bg-primary/10'
             )}>
               {isActive ? (
@@ -45,13 +52,13 @@ export function SimulationSummaryCard({
               ) : isCompleted ? (
                 <CheckCircle2 className="h-5 w-5 text-primary" />
               ) : (
-                <PlayCircle className="h-5 w-5 text-primary" />
+                <Sparkles className="h-5 w-5 text-primary" />
               )}
             </div>
             
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h4 className="font-medium text-sm">Simulation</h4>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h4 className="font-semibold text-sm">Scenario Simulation</h4>
                 <Badge 
                   variant={isActive ? 'default' : 'outline'}
                   className={cn(
@@ -67,13 +74,27 @@ export function SimulationSummaryCard({
               </div>
               
               {activeScenario ? (
-                <p className="text-xs text-muted-foreground truncate">
-                  {activeScenario.name}
-                  {isActive && ` • ${Math.round(progress)}%`}
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-sm text-muted-foreground truncate">
+                    {activeScenario.name}
+                  </p>
+                  {isActive && (
+                    <>
+                      <span className="text-muted-foreground">•</span>
+                      <span className="text-xs text-muted-foreground tabular-nums">
+                        {Math.round(progress)}%
+                      </span>
+                      <span className="text-muted-foreground">•</span>
+                      <span className="text-xs text-muted-foreground tabular-nums flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {formatTime(elapsedTime)}
+                      </span>
+                    </>
+                  )}
+                </div>
               ) : (
-                <p className="text-xs text-muted-foreground">
-                  Run scenarios in the Simulation tab
+                <p className="text-sm text-muted-foreground">
+                  Run scenarios to test your data centre twin
                 </p>
               )}
             </div>
@@ -93,12 +114,24 @@ export function SimulationSummaryCard({
               </>
             ) : (
               <>
-                <ExternalLink className="h-4 w-4" />
+                <PlayCircle className="h-4 w-4" />
                 Open Simulation
               </>
             )}
           </Button>
         </div>
+        
+        {/* Progress bar when active */}
+        {isActive && (
+          <div className="mt-3">
+            <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+              <div 
+                className="h-full bg-success rounded-full transition-all"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

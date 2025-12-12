@@ -102,3 +102,11 @@ export {
   SimulationProgress,
   useSimulationFeedback,
 } from './SimulationFeedback';
+
+// Error Boundaries
+export {
+  SimulationErrorBoundary,
+  KPIErrorBoundary,
+  ChartErrorBoundary,
+  withSimulationErrorBoundary,
+} from './SimulationErrorBoundary';

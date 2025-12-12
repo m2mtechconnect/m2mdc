@@ -127,16 +127,7 @@ export default function DataCentreTwin() {
       <TwinOverlayProvider twinId={isDemoMode ? 'demo' : dcBuilderStore.sessionId || 'draft'}>
       <div className="min-h-screen bg-background">
         <div className="container mx-auto py-6 px-4 space-y-6">
-          {/* Demo/Session Header */}
-          <div className="flex items-center gap-2">
-            <ModeBadge mode={isDemoMode ? "snapshot" : "designer"} />
-            <SnapshotBadge version={isDemoMode ? "Demo" : "Draft"} />
-            {isDemoMode && (
-              <span className="text-xs text-muted-foreground ml-2">
-                Exploring with sample data • No data centre selected
-              </span>
-            )}
-          </div>
+          {/* Demo/Session Header - Hidden for cleaner UI */}
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="h-auto flex-wrap gap-1">
@@ -222,11 +213,7 @@ export default function DataCentreTwin() {
     <TwinOverlayProvider twinId={activeTwinId || twin?.id || 'default'}>
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-6 px-4 space-y-6">
-        {/* Operational Mode Header */}
-        <div className="flex items-center gap-2">
-          <ModeBadge mode="snapshot" />
-          <SnapshotBadge version="Live" />
-        </div>
+        {/* Operational Mode Header - Hidden for cleaner UI */}
         
         {/* 3D Twin Visualization Header */}
         <Card className="overflow-hidden">

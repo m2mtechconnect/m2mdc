@@ -41,6 +41,7 @@ import {
 import { useCoPilotCommands } from '@/contexts/CoPilotCommandContext';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useSimulation } from '@/simulation/useSimulation';
+import { getKpiValue } from '@/lib/kpiKeyMap';
 import { cn } from '@/lib/utils';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
@@ -242,10 +243,38 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
   const activeAlerts = facility.alerts.filter(a => a.status === 'active');
   const criticalAlerts = activeAlerts.filter(a => a.severity === 'critical');
   
+  // Simulation-aware values for Hero KPIs
+  const isSimulating = simulation.status === 'running' || simulation.status === 'completed' || simulation.status === 'paused';
+  
+  const getSimValue = (kpiId: string, facilityValue: number): number => {
+    if (isSimulating) {
+      const simValue = getKpiValue(simulation.currentKpis, kpiId);
+      if (simValue !== 0) return simValue;
+    }
+    return facilityValue;
+  };
+  
+  const getSimDelta = (kpiId: string, defaultDelta: number): number => {
+    if (isSimulating) {
+      const current = getKpiValue(simulation.currentKpis, kpiId);
+      const baseline = getKpiValue(simulation.baselineKpis, kpiId);
+      if (baseline && baseline !== 0) {
+        return ((current - baseline) / baseline) * 100;
+      }
+    }
+    return defaultDelta;
+  };
+  
+  // Get KPI values - simulation when active, facility otherwise
   const gpuClusters = facility.workloadGpu.clusters;
-  const avgGpuUtilization = gpuClusters.length > 0 
+  const facilityAvgGpu = gpuClusters.length > 0 
     ? gpuClusters.reduce((acc, c) => acc + c.avgUtilization, 0) / gpuClusters.length
     : 0;
+  
+  const pueValue = getSimValue('pue', facility.pue);
+  const gpuValue = getSimValue('gpuUtilization', facilityAvgGpu);
+  const carbonValue = getSimValue('carbonIntensity', facility.carbonIntensityGCo2Kwh);
+  const sovereigntyRisk = getSimValue('sovereigntyRiskScore', facility.sovereignty?.kpis?.sovereigntyRiskScore ?? 6);
   
   const timelineEvents = activeAlerts.slice(0, 8).map(alert => ({
     id: alert.id,
@@ -347,39 +376,67 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
         placeholder="Search racks, sensors, metrics..."
       />
 
-      {/* Hero KPI Row */}
+      {/* Hero KPI Row - Simulation Aware */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KPITile
-          label="Power Usage Effectiveness"
-          value={facility.pue.toFixed(2)}
-          unit=""
-          status={facility.pue < 1.4 ? 'normal' : facility.pue < 1.6 ? 'warning' : 'critical'}
-          delta={-2.3}
-          icon={<Zap className="h-4 w-4 text-primary" />}
-        />
-        <KPITile
-          label="GPU Cluster Utilization"
-          value={Math.round(avgGpuUtilization)}
-          unit="%"
-          status={avgGpuUtilization > 70 ? 'normal' : avgGpuUtilization > 50 ? 'warning' : 'critical'}
-          delta={5.2}
-          icon={<Cpu className="h-4 w-4 text-primary" />}
-        />
-        <KPITile
-          label="Carbon Intensity"
-          value={facility.carbonIntensityGCo2Kwh}
-          unit="g/kWh"
-          status={facility.carbonIntensityGCo2Kwh < 150 ? 'normal' : facility.carbonIntensityGCo2Kwh < 250 ? 'warning' : 'critical'}
-          delta={-8.1}
-          icon={<Globe className="h-4 w-4 text-primary" />}
-        />
-        <KPITile
-          label="Sovereign Compute"
-          value={facility.sovereignty?.kpis?.sovereigntyRiskScore !== undefined ? 100 - facility.sovereignty.kpis.sovereigntyRiskScore : 94}
-          unit="%"
-          status="info"
-          icon={<Shield className="h-4 w-4 text-primary" />}
-        />
+        <div className="relative">
+          {isSimulating && (
+            <Badge variant="default" className="absolute -top-2 -right-2 z-10 text-[10px] bg-primary animate-pulse">
+              SIM
+            </Badge>
+          )}
+          <KPITile
+            label="Power Usage Effectiveness"
+            value={pueValue.toFixed(2)}
+            unit=""
+            status={pueValue < 1.4 ? 'normal' : pueValue < 1.6 ? 'warning' : 'critical'}
+            delta={Number(getSimDelta('pue', -2.3).toFixed(1))}
+            icon={<Zap className="h-4 w-4 text-primary" />}
+          />
+        </div>
+        <div className="relative">
+          {isSimulating && (
+            <Badge variant="default" className="absolute -top-2 -right-2 z-10 text-[10px] bg-primary animate-pulse">
+              SIM
+            </Badge>
+          )}
+          <KPITile
+            label="GPU Cluster Utilization"
+            value={Math.round(gpuValue)}
+            unit="%"
+            status={gpuValue > 70 ? 'normal' : gpuValue > 50 ? 'warning' : 'critical'}
+            delta={Number(getSimDelta('gpuUtilization', 5.2).toFixed(1))}
+            icon={<Cpu className="h-4 w-4 text-primary" />}
+          />
+        </div>
+        <div className="relative">
+          {isSimulating && (
+            <Badge variant="default" className="absolute -top-2 -right-2 z-10 text-[10px] bg-primary animate-pulse">
+              SIM
+            </Badge>
+          )}
+          <KPITile
+            label="Carbon Intensity"
+            value={Math.round(carbonValue)}
+            unit="g/kWh"
+            status={carbonValue < 150 ? 'normal' : carbonValue < 250 ? 'warning' : 'critical'}
+            delta={Number(getSimDelta('carbonIntensity', -8.1).toFixed(1))}
+            icon={<Globe className="h-4 w-4 text-primary" />}
+          />
+        </div>
+        <div className="relative">
+          {isSimulating && (
+            <Badge variant="default" className="absolute -top-2 -right-2 z-10 text-[10px] bg-primary animate-pulse">
+              SIM
+            </Badge>
+          )}
+          <KPITile
+            label="Sovereign Compute"
+            value={Math.round(100 - sovereigntyRisk)}
+            unit="%"
+            status="info"
+            icon={<Shield className="h-4 w-4 text-primary" />}
+          />
+        </div>
       </div>
 
       {/* Main content with tabs */}

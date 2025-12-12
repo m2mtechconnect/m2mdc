@@ -48,7 +48,7 @@ function VisualizationSkeleton() {
 export default function DataCentreTwin() {
   const { id } = useParams<{ id?: string }>();
   const [searchParams] = useSearchParams();
-  const { twin, activeTwinId, setActiveTwin, isLoading } = useActiveTwin();
+  const { twin, activeTwinId, setActiveTwin, isLoading, twins, isInitialized } = useActiveTwin();
   const [facility, setFacility] = useState<DataCentreFacility | null>(null);
   
   // Check if we have an active builder session
@@ -56,8 +56,8 @@ export default function DataCentreTwin() {
   const dcBuilderStore = useDCTwinBuilderStore();
   const hasBuilderSession = !twin && dcBuilderStore.sessionId && dcBuilderStore.overview.twinName;
   
-  // Get tab from URL or default
-  const urlTab = searchParams.get('tab');
+  // Get tab from URL - support both 'tab' and 'view' params
+  const urlTab = searchParams.get('tab') || searchParams.get('view');
   const defaultTab = hasBuilderSession ? 'overview' : 'dashboard';
   const [activeTab, setActiveTab] = useState(urlTab || defaultTab);
   
@@ -67,6 +67,14 @@ export default function DataCentreTwin() {
       setActiveTwin(id);
     }
   }, [id, activeTwinId, setActiveTwin]);
+  
+  // Auto-select first twin if none selected and twins are available
+  useEffect(() => {
+    if (isInitialized && !activeTwinId && !twin && twins.length > 0) {
+      console.log('[DataCentreTwin] Auto-selecting first twin:', twins[0].id);
+      setActiveTwin(twins[0].id);
+    }
+  }, [isInitialized, activeTwinId, twin, twins, setActiveTwin]);
   
   useEffect(() => {
     // CRITICAL: Always prioritize real twin over builder session
@@ -91,9 +99,14 @@ export default function DataCentreTwin() {
     }
   }, [twin, hasBuilderSession, dcBuilderStore.overview.twinName]);
   
-  // Loading state
-  if (isLoading) {
+  // Loading state - also show loading while auto-selecting twin
+  if (isLoading || (!isInitialized && twins.length === 0)) {
     return <LoadingState message="Loading Twin Data..." />;
+  }
+  
+  // Still loading if we're about to auto-select a twin
+  if (!activeTwinId && !twin && twins.length > 0) {
+    return <LoadingState message="Selecting Data Centre Twin..." />;
   }
   
   // If we have a builder session, show builder tabs even without a saved twin

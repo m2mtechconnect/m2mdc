@@ -9,7 +9,8 @@
  * ENHANCED: Added 3D Twin Visualization with live simulation updates
  */
 
-import { useState, useCallback, useMemo, useEffect, useRef, lazy, Suspense } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef, lazy, Suspense, memo } from 'react';
+import { useDebouncedValue, useRenderPerformance, useBatchedUpdates } from '@/hooks/usePerformanceOptimization';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -85,7 +86,11 @@ function generateBaseRacks(count: number = 20): RackMetrics[] {
   });
 }
 
-export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSimulationPanelProps) {
+export const DCSimulationPanel = memo(function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSimulationPanelProps) {
+  // Performance monitoring
+  useRenderPerformance('DCSimulationPanel');
+  const batchUpdate = useBatchedUpdates();
+  
   const [showCustomBuilder, setShowCustomBuilder] = useState(false);
   const [activeTab, setActiveTab] = useState<'scenarios' | 'timeline' | 'kpis' | 'heatmap'>('scenarios');
   const [simulationResult, setSimulationResult] = useState<SimulationResultSummary | null>(null);
@@ -138,15 +143,20 @@ export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSim
     blueprintScenarios: blueprint?.simulationScenarios 
   });
   
-  // Update rack metrics during simulation
+  // Debounce currentTime to reduce rack metric recalculations
+  const debouncedTime = useDebouncedValue(currentTime, 100);
+  
+  // Update rack metrics during simulation (batched for performance)
   useEffect(() => {
     if (status === 'running') {
-      const updatedRacks = generateRackMetrics(baseRacks, events, currentTime);
-      setLiveRackMetrics(updatedRacks);
+      batchUpdate(() => {
+        const updatedRacks = generateRackMetrics(baseRacks, events, debouncedTime);
+        setLiveRackMetrics(updatedRacks);
+      });
     } else if (status === 'idle') {
       setLiveRackMetrics(baseRacks);
     }
-  }, [status, events, currentTime, baseRacks]);
+  }, [status, events, debouncedTime, baseRacks, batchUpdate]);
   
   // Generate result and PERSIST when simulation completes - P0 FIX
   useEffect(() => {
@@ -444,4 +454,4 @@ export function DCSimulationPanel({ compact = false, twinId = 'default' }: DCSim
       <SimulationBlueprintSnapshotPanel twinId={twinId} />
     </div>
   );
-}
+});

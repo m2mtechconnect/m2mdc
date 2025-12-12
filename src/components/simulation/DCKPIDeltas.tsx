@@ -2,8 +2,10 @@
  * DC KPI Deltas Component
  * Shows current KPI values with delta from baseline during simulation
  * Uses Studio design system tokens
+ * OPTIMIZED: Memoized for performance during rapid simulation updates
  */
 
+import { memo, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -58,7 +60,7 @@ const defaultKPIs: Omit<KPIDelta, 'value' | 'baseline'>[] = [
   { id: 'dailyEmissionsKg', label: 'Daily Emissions', unit: 'kg', icon: Wind, invertDelta: true },
 ];
 
-function KPICard({ 
+const KPICard = memo(function KPICard({ 
   kpi, 
   isRunning,
   compact = false,
@@ -68,13 +70,18 @@ function KPICard({
   compact: boolean;
 }) {
   const Icon = kpi.icon || Activity;
-  const delta = kpi.value - kpi.baseline;
-  const deltaPercent = kpi.baseline !== 0 ? (delta / kpi.baseline) * 100 : 0;
   
-  // Determine if delta is good or bad
-  const isPositiveDelta = delta > 0;
-  const isGoodDelta = kpi.invertDelta ? !isPositiveDelta : isPositiveDelta;
-  const isNeutral = Math.abs(deltaPercent) < 0.5;
+  // Memoize expensive calculations
+  const { delta, deltaPercent, isPositiveDelta, isGoodDelta, isNeutral, formattedValue, formattedDelta } = useMemo(() => {
+    const d = kpi.value - kpi.baseline;
+    const dPercent = kpi.baseline !== 0 ? (d / kpi.baseline) * 100 : 0;
+    const isPos = d > 0;
+    const isGood = kpi.invertDelta ? !isPos : isPos;
+    const isNeut = Math.abs(dPercent) < 0.5;
+    const fValue = kpi.format ? kpi.format(kpi.value) : kpi.value.toFixed(1);
+    const fDelta = d >= 0 ? `+${d.toFixed(1)}` : d.toFixed(1);
+    return { delta: d, deltaPercent: dPercent, isPositiveDelta: isPos, isGoodDelta: isGood, isNeutral: isNeut, formattedValue: fValue, formattedDelta: fDelta };
+  }, [kpi.value, kpi.baseline, kpi.format, kpi.invertDelta]);
   
   const TrendIcon = isNeutral ? Minus : isPositiveDelta ? TrendingUp : TrendingDown;
   const trendColor = isNeutral 
@@ -82,9 +89,6 @@ function KPICard({
     : isGoodDelta 
       ? 'text-success' 
       : 'text-destructive';
-  
-  const formattedValue = kpi.format ? kpi.format(kpi.value) : kpi.value.toFixed(1);
-  const formattedDelta = delta >= 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1);
   
   if (compact) {
     return (
@@ -171,9 +175,9 @@ function KPICard({
       </CardContent>
     </Card>
   );
-}
+});
 
-export function DCKPIDeltas({
+export const DCKPIDeltas = memo(function DCKPIDeltas({
   kpis,
   isRunning = false,
   compact = false,
@@ -212,6 +216,6 @@ export function DCKPIDeltas({
       </CardContent>
     </Card>
   );
-}
+});
 
 export { defaultKPIs };

@@ -2,6 +2,7 @@
  * DataCenter3DScene Component
  * Main 3D canvas with rack layout, power, thermal, and event overlays
  * Enhanced with smooth camera animations, zoom controls, and auto-orbit
+ * UPGRADED: Added domain-specific overlay support (KPI tab binding)
  */
 
 import { Suspense, useState, useRef, useEffect, useCallback, WheelEvent } from 'react';
@@ -18,6 +19,9 @@ import type {
 import { RackGroup } from './RackGroup';
 import { ThermalOverlayLayer } from './ThermalOverlayLayer';
 import { PowerFlowLayer } from './PowerFlowLayer';
+import { SovereigntyOverlayLayer } from './SovereigntyOverlayLayer';
+import { CoolingOverlayLayer } from './CoolingOverlayLayer';
+import { WorkloadOverlayLayer } from './WorkloadOverlayLayer';
 import { ZoomControlsOverlay } from './ZoomControlsOverlay';
 
 // Zoom configuration constants
@@ -25,6 +29,18 @@ const MIN_ZOOM = 0.4;
 const MAX_ZOOM = 2.5;
 const ZOOM_STEP = 0.2;
 const IDLE_THRESHOLD_MS = 8000; // 8 seconds before auto-orbit
+
+// Supported overlay domains for KPI tab binding
+export type OverlayDomain = 
+  | 'none' 
+  | 'pue' 
+  | 'gpu' 
+  | 'thermal' 
+  | 'cooling' 
+  | 'sovereignty' 
+  | 'workload'
+  | 'power'
+  | 'network';
 
 interface DataCenter3DSceneProps {
   racks: RackVisual[];
@@ -38,6 +54,10 @@ interface DataCenter3DSceneProps {
   compact?: boolean;
   mode?: 'dashboard' | 'blueprint' | 'simulation';
   onRackClick?: (rackId: string) => void;
+  /** Active overlay domain - binds to KPI tab selection */
+  activeOverlay?: OverlayDomain;
+  /** Simulation KPIs for overlay customization */
+  simulationKpis?: Record<string, number>;
 }
 
 interface CameraControllerProps {
@@ -108,7 +128,9 @@ function Scene({
   onRackClick,
   targetDistance,
   baseDistance,
-  lastInteractionTime
+  lastInteractionTime,
+  activeOverlay,
+  simulationKpis,
 }: Omit<DataCenter3DSceneProps, 'events'> & { 
   targetDistance: number; 
   baseDistance: number;
@@ -195,11 +217,37 @@ function Scene({
         followCamera={false}
       />
 
-      {/* Thermal overlay */}
-      <ThermalOverlayLayer zones={thermalZones} visible={showThermal || false} />
+      {/* Domain-specific overlays based on KPI tab selection */}
+      {/* Thermal overlay - show when thermal domain active or explicit showThermal */}
+      <ThermalOverlayLayer 
+        zones={thermalZones} 
+        visible={showThermal || activeOverlay === 'thermal'} 
+      />
 
-      {/* Power flow */}
-      <PowerFlowLayer segments={powerSegments} visible={showPower || false} />
+      {/* Power flow - show when PUE or power domain active */}
+      <PowerFlowLayer 
+        segments={powerSegments} 
+        visible={showPower || activeOverlay === 'pue' || activeOverlay === 'power'} 
+      />
+
+      {/* Sovereignty overlay - show when sovereignty domain active */}
+      <SovereigntyOverlayLayer 
+        visible={activeOverlay === 'sovereignty'}
+        rackCount={racks.length}
+      />
+
+      {/* Cooling overlay - show when cooling domain active */}
+      <CoolingOverlayLayer 
+        visible={activeOverlay === 'cooling'}
+        coolingEfficiency={simulationKpis?.coolingEfficiencyIndex}
+      />
+
+      {/* Workload/GPU overlay - show when gpu or workload domain active */}
+      <WorkloadOverlayLayer 
+        visible={activeOverlay === 'gpu' || activeOverlay === 'workload'}
+        racks={racks}
+        avgGpuUtilization={simulationKpis?.avgGpuUtilization}
+      />
 
       {/* Rack groups */}
       {rows.map((row) => (
@@ -207,7 +255,7 @@ function Scene({
           key={row.id}
           row={row}
           racks={racks}
-          showThermal={showThermal || false}
+          showThermal={showThermal || activeOverlay === 'thermal'}
           onRackClick={onRackClick}
         />
       ))}
@@ -385,6 +433,8 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
               targetDistance={targetDistance}
               baseDistance={baseDistance}
               lastInteractionTime={lastInteractionTime}
+              activeOverlay={props.activeOverlay}
+              simulationKpis={props.simulationKpis}
             />
           </Canvas>
         </Suspense>

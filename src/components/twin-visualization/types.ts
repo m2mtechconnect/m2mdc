@@ -14,6 +14,7 @@ export interface RackVisual {
   thermalCelsius: number;
   isCritical: boolean;
   isAffected: boolean; // Highlighted during simulation events
+  gpuLoad?: number; // GPU utilization percentage (0-100)
 }
 
 export interface RowVisual {

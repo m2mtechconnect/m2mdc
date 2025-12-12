@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { 
   Thermometer, Zap, Wind, Network, Shield, Cpu, Leaf,
   Globe, DollarSign, AlertTriangle, Activity, Server,
-  FileText, Eye
+  FileText, Eye, PlayCircle
 } from 'lucide-react';
 import { DCSearchBar } from '@/components/dc-ui';
 import { KPICockpit } from './KPICockpit';
@@ -36,7 +36,8 @@ import {
   CompactRackOverview, 
   CompactAlertsPanel, 
   CompactEventTimeline,
-  CompactDCToolsPanel 
+  CompactDCToolsPanel,
+  SimulationSummaryCard
 } from './overview';
 import { useCoPilotCommands } from '@/contexts/CoPilotCommandContext';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
@@ -53,6 +54,7 @@ interface DataCentreDashboardProps {
 
 const domainTabs = [
   { id: 'overview', label: 'Overview', icon: Activity },
+  { id: 'simulation', label: 'Simulation', icon: PlayCircle },
   { id: 'thermal', label: 'Thermal', icon: Thermometer },
   { id: 'power', label: 'Power', icon: Zap },
   { id: 'cooling', label: 'Cooling', icon: Wind },
@@ -455,15 +457,8 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          {/* Compact Simulation Panel at top of Overview */}
-          <ScenarioSimulationPanel
-            layout="compact"
-            showHeader
-            showControls
-            showTimeline={false}
-            twinId={twinId}
-            onOpenFullSimulation={() => setActiveTab('simulation')}
-          />
+          {/* Simulation Summary - lightweight link to full simulation */}
+          <SimulationSummaryCard onOpenSimulation={() => setActiveTab('simulation')} />
           
           {/* 2-Column NOC Layout - Primary (65%) / Secondary (35%) */}
           <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
@@ -483,7 +478,16 @@ export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSe
           </div>
         </TabsContent>
 
-
+        {/* SIMULATION TAB - Full scenario engine and 3D digital twin */}
+        <TabsContent value="simulation" className="space-y-6">
+          <ScenarioSimulationPanel
+            layout="full"
+            showHeader
+            showControls
+            showTimeline
+            twinId={twinId}
+          />
+        </TabsContent>
         <TabsContent value="thermal">
           <ThermalDomainView facility={facility} />
         </TabsContent>

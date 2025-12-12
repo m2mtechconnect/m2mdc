@@ -4,6 +4,7 @@
  * 
  * CRITICAL: Now properly synced with SimulationEngine for real-time updates
  * UPGRADED: Added KPI tab → 3D overlay domain binding
+ * HARDENED: Wrapped with SimulationErrorBoundary for crash protection
  */
 
 import { lazy, Suspense, useState, useEffect } from 'react';
@@ -18,11 +19,11 @@ import {
   Leaf,
   Snowflake,
   Shield,
-  Activity,
 } from 'lucide-react';
 import { useTwinVisualizationData } from './hooks/useTwinVisualizationData';
 import { NetworkTopologyLayer } from './NetworkTopologyLayer';
 import { SimulationTimeline } from './SimulationTimeline';
+import { SimulationErrorBoundary } from './SimulationErrorBoundary';
 import { useSimulationVisualization } from '@/hooks/useSimulationVisualization';
 import type { TwinVisualizationMode } from './types';
 import type { OverlayDomain } from './DataCenter3DScene';
@@ -184,20 +185,22 @@ export function TwinVisualizationLayout({
           </CardHeader>
           
           <CardContent className="p-0 relative">
-            <Suspense fallback={<LoadingSkeleton />}>
-              <DataCenter3DScene
-                racks={data.racks}
-                rows={data.rows}
-                powerSegments={data.powerSegments}
-                thermalZones={data.thermalZones}
-                events={data.events}
-                compact={isCompact}
-                mode={mode}
-                onRackClick={onRackSelect}
-                activeOverlay={activeOverlay}
-                simulationKpis={simulation.currentKpis}
-              />
-            </Suspense>
+            <SimulationErrorBoundary fallbackMessage="3D Visualization Error">
+              <Suspense fallback={<LoadingSkeleton />}>
+                <DataCenter3DScene
+                  racks={data.racks}
+                  rows={data.rows}
+                  powerSegments={data.powerSegments}
+                  thermalZones={data.thermalZones}
+                  events={data.events}
+                  compact={isCompact}
+                  mode={mode}
+                  onRackClick={onRackSelect}
+                  activeOverlay={activeOverlay}
+                  simulationKpis={simulation.currentKpis}
+                />
+              </Suspense>
+            </SimulationErrorBoundary>
 
             {/* Network topology overlay */}
             {showNetwork && (

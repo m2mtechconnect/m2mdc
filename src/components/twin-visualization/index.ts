@@ -6,6 +6,9 @@
 // Main layout component
 export { TwinVisualizationLayout } from './TwinVisualizationLayout';
 
+// Error boundary for simulation crashes
+export { SimulationErrorBoundary } from './SimulationErrorBoundary';
+
 // Core 3D components (lazy-loaded internally)
 export { DataCenter3DScene } from './DataCenter3DScene';
 export { Rack } from './Rack';

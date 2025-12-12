@@ -65,8 +65,11 @@ export default function DataCentreTwin() {
     (!twin && !hasBuilderSession && twins.length === 0 && isInitialized);
   
   const defaultTab = hasBuilderSession ? 'overview' : 'dashboard';
-  // When view=simulation is specified, always go to dashboard (which now has simulation tab)
-  const [activeTab, setActiveTab] = useState(urlTab || defaultTab);
+  // When view=simulation is specified in demo mode, we stay on 'dashboard' tab 
+  // but pass initialTab='simulation' to DataCentreDashboard for its internal tabs
+  // When not in demo mode and view param is set, use it directly
+  const effectiveTab = (isDemoMode && urlTab === 'simulation') ? 'dashboard' : (urlTab || defaultTab);
+  const [activeTab, setActiveTab] = useState(effectiveTab);
   
   // Set twin from URL param if provided
   useEffect(() => {

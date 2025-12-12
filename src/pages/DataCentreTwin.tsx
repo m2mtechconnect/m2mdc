@@ -65,7 +65,8 @@ export default function DataCentreTwin() {
     (!twin && !hasBuilderSession && twins.length === 0 && isInitialized);
   
   const defaultTab = hasBuilderSession ? 'overview' : 'dashboard';
-  const [activeTab, setActiveTab] = useState(urlTab === 'simulation' ? 'dashboard' : (urlTab || defaultTab));
+  // When view=simulation is specified, always go to dashboard (which now has simulation tab)
+  const [activeTab, setActiveTab] = useState(urlTab || defaultTab);
   
   // Set twin from URL param if provided
   useEffect(() => {
@@ -164,6 +165,7 @@ export default function DataCentreTwin() {
             <TabsContent value="dashboard">
               <DataCentreDashboard 
                 facility={montrealSovereignDC} 
+                initialTab={urlTab === 'simulation' ? 'simulation' : undefined}
                 onScenarioSelect={(scenarioId) => {
                   console.log('Scenario selected:', scenarioId);
                 }}
@@ -236,6 +238,7 @@ export default function DataCentreTwin() {
         
         <DataCentreDashboard 
           facility={facility} 
+          initialTab={urlTab === 'simulation' ? 'simulation' : undefined}
           onScenarioSelect={(scenarioId) => {
             console.log('Scenario selected:', scenarioId);
           }}

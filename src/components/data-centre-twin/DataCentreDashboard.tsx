@@ -50,6 +50,7 @@ import type { DataCentreFacility } from '@/types/dataCenterTwin';
 interface DataCentreDashboardProps {
   facility: DataCentreFacility;
   twinId?: string;
+  initialTab?: string;
   onScenarioSelect?: (scenarioId: string) => void;
 }
 
@@ -172,9 +173,9 @@ function EventTimeline({ events }: { events: Array<{ id: string; title: string; 
   );
 }
 
-export function DataCentreDashboard({ facility, twinId = 'default', onScenarioSelect }: DataCentreDashboardProps) {
+export function DataCentreDashboard({ facility, twinId = 'default', initialTab, onScenarioSelect }: DataCentreDashboardProps) {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState(initialTab || 'overview');
   const [searchQuery, setSearchQuery] = useState('');
   const [highlightedKPILocal, setHighlightedKPILocal] = useState<string | null>(null);
   

@@ -18,7 +18,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   PlayCircle, Pause, RotateCcw, 
-  Thermometer, Zap, Wind, Cpu, Shield, Leaf, Network,
   Clock, AlertTriangle, Sparkles, ChevronRight,
   Info, Activity, CheckCircle2, TrendingUp, TrendingDown
 } from 'lucide-react';
@@ -30,7 +29,6 @@ import { showScenarioSelectedToast, useSimulationFeedback } from '@/components/s
 import { getKpiValue } from '@/lib/kpiKeyMap';
 import { cn } from '@/lib/utils';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
-import type { OverlayDomain } from '@/components/twin-visualization/DataCenter3DScene';
 
 interface DCSimulationTabProps {
   facility: DataCentreFacility;
@@ -62,9 +60,6 @@ const kpiDefinitions = [
 export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTabProps) {
   const { activeTwin, recommendation } = useTwinContext();
   const { blueprint } = useBlueprint(twinId);
-  
-  // Active overlay for 3D view
-  const [activeOverlay, setActiveOverlay] = useState<OverlayDomain>('thermal');
   
   // Tick counter for forcing re-renders on KPI changes
   const [tickCounter, setTickCounter] = useState(0);
@@ -222,31 +217,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         {/* Left: 3D Digital Twin */}
         <div className="space-y-4">
-          {/* Overlay Domain Chips */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm text-muted-foreground mr-1">Overlay:</span>
-            {[
-              { id: 'thermal', label: 'Thermal', icon: Thermometer },
-              { id: 'power', label: 'Power', icon: Zap },
-              { id: 'cooling', label: 'Cooling', icon: Wind },
-              { id: 'gpu', label: 'Workload', icon: Cpu },
-              { id: 'sovereignty', label: 'Sovereignty', icon: Shield },
-              { id: 'carbon', label: 'Carbon', icon: Leaf },
-            ].map(({ id, label, icon: Icon }) => (
-              <Button
-                key={id}
-                variant={activeOverlay === id ? 'secondary' : 'ghost'}
-                size="sm"
-                className="h-7 px-2 gap-1"
-                onClick={() => setActiveOverlay(activeOverlay === id ? 'none' : id as OverlayDomain)}
-              >
-                <Icon className="h-3.5 w-3.5" />
-                {label}
-              </Button>
-            ))}
-          </div>
-          
-          {/* 3D Twin Visualization */}
+          {/* 3D Twin Visualization - Overlay controls are INSIDE the 3D panel (canonical source) */}
           <Card className={cn(
             'overflow-hidden relative transition-all duration-300',
             isRunning && 'ring-2 ring-success/30 shadow-lg shadow-success/10'
@@ -266,7 +237,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
             <TwinVisualizationLayout
               mode="simulation"
               showTimeline
-              initialOverlay={activeOverlay}
+              showOverlayControls
               className="min-h-[400px]"
             />
           </Card>

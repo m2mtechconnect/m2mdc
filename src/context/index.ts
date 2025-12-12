@@ -30,6 +30,15 @@ export {
 } from './BlueprintViewContext';
 export type { BlueprintViewMode, BlueprintModeCapabilities } from './BlueprintViewContext';
 
+// Twin Overlay Context - Single source of truth for 3D overlay state
+export { 
+  TwinOverlayProvider, 
+  useTwinOverlay, 
+  useTwinOverlaySafe,
+  OVERLAY_CONFIG,
+} from './TwinOverlayContext';
+export type { TwinOverlay, TwinOverlayState } from './TwinOverlayContext';
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // OTHER CONTEXTS (Re-exported from src/contexts for backward compatibility)
 // ═══════════════════════════════════════════════════════════════════════════════

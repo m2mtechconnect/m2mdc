@@ -40,7 +40,8 @@ export type OverlayDomain =
   | 'sovereignty' 
   | 'workload'
   | 'power'
-  | 'network';
+  | 'network'
+  | 'carbon';
 
 interface DataCenter3DSceneProps {
   racks: RackVisual[];

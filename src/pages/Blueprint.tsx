@@ -231,147 +231,99 @@ export default function Blueprint() {
                 <Badge variant="outline">{blueprint.racks} Racks</Badge>
               </div>
 
-              {/* Quick Stats */}
+              {/* Quick Stats - Enhanced with animations and hover effects */}
               {summary && (
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
-                  <div className="p-3 rounded-lg border bg-card">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Bot className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Agents</span>
-                    </div>
-                    <p className="text-lg font-semibold">{summary.totalAgents}</p>
-                  </div>
-                  <div className="p-3 rounded-lg border bg-card">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Database className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Data Sources</span>
-                    </div>
-                    <p className="text-lg font-semibold">{summary.totalDataSources}</p>
-                  </div>
-                  <div className="p-3 rounded-lg border bg-card">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Activity className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">KPIs</span>
-                    </div>
-                    <p className="text-lg font-semibold">{summary.totalKpis}</p>
-                  </div>
-                  <div className="p-3 rounded-lg border bg-card">
-                    <div className="flex items-center gap-2 mb-1">
-                      <GitBranch className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Workflows</span>
-                    </div>
-                    <p className="text-lg font-semibold">{summary.totalWorkflows}</p>
-                  </div>
-                  <div className="p-3 rounded-lg border bg-card">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Users className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Roles</span>
-                    </div>
-                    <p className="text-lg font-semibold">{summary.totalRoles}</p>
-                  </div>
-                  <div className="p-3 rounded-lg border bg-card">
-                    <div className="flex items-center gap-2 mb-1">
-                      <PlayCircle className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Scenarios</span>
-                    </div>
-                    <p className="text-lg font-semibold">{summary.totalScenarios}</p>
-                  </div>
-                  <div className="p-3 rounded-lg border bg-card">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Database className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Integrations</span>
-                    </div>
-                    <p className="text-lg font-semibold">{summary.totalIntegrations}</p>
-                  </div>
+                  {[
+                    { icon: Bot, label: 'Agents', value: summary.totalAgents, color: 'primary' },
+                    { icon: Database, label: 'Data Sources', value: summary.totalDataSources, color: 'info' },
+                    { icon: Activity, label: 'KPIs', value: summary.totalKpis, color: 'success' },
+                    { icon: GitBranch, label: 'Workflows', value: summary.totalWorkflows, color: 'warning' },
+                    { icon: Users, label: 'Roles', value: summary.totalRoles, color: 'primary' },
+                    { icon: PlayCircle, label: 'Scenarios', value: summary.totalScenarios, color: 'destructive' },
+                    { icon: Database, label: 'Integrations', value: summary.totalIntegrations, color: 'info' },
+                  ].map((stat, index) => {
+                    const Icon = stat.icon;
+                    return (
+                      <div 
+                        key={stat.label}
+                        className="group p-3 rounded-lg border bg-card hover:bg-muted/50 hover:shadow-md hover:border-primary/30 transition-all duration-300 cursor-pointer animate-fade-in"
+                        style={{ animationDelay: `${index * 0.05}s` }}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className={`p-1 rounded bg-${stat.color}/10 group-hover:bg-${stat.color}/20 transition-colors`}>
+                            <Icon className={`h-3.5 w-3.5 text-muted-foreground group-hover:text-${stat.color} transition-colors`} />
+                          </div>
+                          <span className="text-xs text-muted-foreground">{stat.label}</span>
+                        </div>
+                        <p className="text-lg font-semibold group-hover:text-primary transition-colors">{stat.value}</p>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
-              {/* Co-Pilot Quick Actions */}
-              <div className="flex items-center gap-3 p-3 rounded-lg border bg-muted/30 mb-6">
-                <Sparkles className="h-4 w-4 text-primary" />
-                <span className="text-sm text-muted-foreground">Ask Co-Pilot:</span>
+              {/* Co-Pilot Quick Actions - Enhanced */}
+              <div className="flex items-center gap-3 p-4 rounded-xl border bg-gradient-to-r from-primary/5 via-background to-primary/5 mb-6 animate-fade-in hover:shadow-md transition-all duration-300">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+                </div>
+                <span className="text-sm font-medium text-foreground">Ask Co-Pilot:</span>
                 <div className="flex flex-wrap gap-2">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs"
+                    className="text-xs hover:bg-primary/10 hover:text-primary transition-all group"
                     onClick={() => handleAskCoPilot('Which agents manage thermal safety in this data centre?')}
                   >
-                    <MessageCircle className="h-3 w-3 mr-1" />
+                    <MessageCircle className="h-3 w-3 mr-1 group-hover:scale-110 transition-transform" />
                     Thermal Agents
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs"
+                    className="text-xs hover:bg-primary/10 hover:text-primary transition-all group"
                     onClick={() => handleAskCoPilot('Show all workflows related to UPS failures in this blueprint.')}
                   >
-                    <MessageCircle className="h-3 w-3 mr-1" />
+                    <MessageCircle className="h-3 w-3 mr-1 group-hover:scale-110 transition-transform" />
                     UPS Workflows
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs"
+                    className="text-xs hover:bg-primary/10 hover:text-primary transition-all group"
                     onClick={() => handleAskCoPilot('What KPIs relate to carbon and cost in this data centre?')}
                   >
-                    <MessageCircle className="h-3 w-3 mr-1" />
+                    <MessageCircle className="h-3 w-3 mr-1 group-hover:scale-110 transition-transform" />
                     Carbon KPIs
                   </Button>
                 </div>
               </div>
 
-              {/* Main Tabs */}
+              {/* Main Tabs - Enhanced with better styling */}
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="w-full justify-start border-b rounded-none bg-transparent p-0 h-auto">
-                  <TabsTrigger 
-                    value="overview" 
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
-                  >
-                    Overview
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="agents"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
-                  >
-                    Agents
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="data"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
-                  >
-                    Data
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="kpis"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
-                  >
-                    KPIs
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="workflows"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
-                  >
-                    Workflows
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="roles"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
-                  >
-                    Roles
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="scenarios"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
-                  >
-                    Scenarios
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="validation"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
-                  >
-                    Validation
-                  </TabsTrigger>
+                <TabsList className="w-full justify-start border-b rounded-none bg-transparent p-0 h-auto flex-wrap gap-1">
+                  {[
+                    { value: 'overview', label: 'Overview' },
+                    { value: 'agents', label: 'Agents' },
+                    { value: 'data', label: 'Data' },
+                    { value: 'kpis', label: 'KPIs' },
+                    { value: 'workflows', label: 'Workflows' },
+                    { value: 'roles', label: 'Roles' },
+                    { value: 'scenarios', label: 'Scenarios' },
+                    { value: 'validation', label: 'Validation' },
+                  ].map((tab) => (
+                    <TabsTrigger 
+                      key={tab.value}
+                      value={tab.value}
+                      className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2.5 text-muted-foreground data-[state=active]:text-foreground hover:text-foreground transition-all duration-200 data-[state=active]:font-medium"
+                    >
+                      {tab.label}
+                      {activeTab === tab.value && (
+                        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary animate-pulse" />
+                      )}
+                    </TabsTrigger>
+                  ))}
                 </TabsList>
 
                 <div className="mt-6">

@@ -124,7 +124,7 @@ export default function DataCentreTwin() {
   // DEMO MODE: Show simulation with mock data
   if (isDemoMode || hasBuilderSession) {
     return (
-      <TwinOverlayProvider>
+      <TwinOverlayProvider twinId={isDemoMode ? 'demo' : dcBuilderStore.sessionId || 'draft'}>
       <div className="min-h-screen bg-background">
         <div className="container mx-auto py-6 px-4 space-y-6">
           {/* Demo/Session Header */}
@@ -219,7 +219,7 @@ export default function DataCentreTwin() {
   }
   
   return (
-    <TwinOverlayProvider>
+    <TwinOverlayProvider twinId={activeTwinId || twin?.id || 'default'}>
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-6 px-4 space-y-6">
         {/* Operational Mode Header */}

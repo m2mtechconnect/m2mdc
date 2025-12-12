@@ -120,6 +120,12 @@ function KPICard({ kpi, index }: KPICardProps) {
     Critical: 'bg-red-500/20 text-red-500 border-red-500/30',
   };
   
+  const glowColors = {
+    Stable: '',
+    Warning: 'shadow-[0_0_15px_-3px_hsl(var(--warning)/0.3)]',
+    Critical: 'shadow-[0_0_20px_-3px_hsl(var(--destructive)/0.4)]',
+  };
+  
   const trendIcons = {
     up: TrendingUp,
     down: TrendingDown,
@@ -129,40 +135,116 @@ function KPICard({ kpi, index }: KPICardProps) {
   
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-      className={`rounded-lg border p-4 ${statusColors[kpi.status]}`}
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ 
+        opacity: 1, 
+        y: 0, 
+        scale: 1,
+      }}
+      transition={{ 
+        delay: index * 0.1,
+        type: "spring",
+        stiffness: 300,
+        damping: 25
+      }}
+      whileHover={{ 
+        scale: 1.02,
+        transition: { duration: 0.2 }
+      }}
+      className={`rounded-lg border p-4 ${statusColors[kpi.status]} ${glowColors[kpi.status]} transition-shadow duration-300 cursor-pointer`}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <Icon className="h-4 w-4 text-muted-foreground" />
+          <motion.div
+            animate={kpi.status === 'Critical' ? { 
+              scale: [1, 1.2, 1],
+              rotate: [0, -5, 5, 0]
+            } : {}}
+            transition={{ 
+              duration: 0.6, 
+              repeat: kpi.status === 'Critical' ? Infinity : 0,
+              repeatDelay: 2
+            }}
+          >
+            <Icon className={`h-4 w-4 ${
+              kpi.status === 'Critical' ? 'text-red-500' : 'text-muted-foreground'
+            }`} />
+          </motion.div>
           <span className="text-sm text-muted-foreground">{kpi.label}</span>
         </div>
-        <Badge className={statusBadgeColors[kpi.status]}>{kpi.status}</Badge>
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: index * 0.1 + 0.2, type: "spring", stiffness: 400 }}
+        >
+          <Badge className={`${statusBadgeColors[kpi.status]} ${
+            kpi.status === 'Critical' ? 'animate-pulse' : ''
+          }`}>
+            {kpi.status}
+          </Badge>
+        </motion.div>
       </div>
       
-      {/* Value */}
+      {/* Value with counting animation */}
       <div className="flex items-baseline gap-2 mb-3">
-        <span className="text-2xl font-bold">{kpi.value}</span>
-        <span className="text-sm text-muted-foreground">{kpi.unit}</span>
-        <TrendIcon className={`h-4 w-4 ml-auto ${
-          kpi.trend === 'up' ? 'text-red-500' : 
-          kpi.trend === 'down' ? 'text-emerald-500' : 'text-muted-foreground'
-        }`} />
+        <motion.span 
+          className="text-2xl font-bold font-mono"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: index * 0.1 + 0.15 }}
+        >
+          {kpi.value}
+        </motion.span>
+        <motion.span 
+          className="text-sm text-muted-foreground"
+          initial={{ opacity: 0, x: -5 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: index * 0.1 + 0.2 }}
+        >
+          {kpi.unit}
+        </motion.span>
+        <motion.div
+          className="ml-auto"
+          animate={kpi.trend === 'up' ? { 
+            y: [0, -3, 0],
+          } : kpi.trend === 'down' ? {
+            y: [0, 3, 0],
+          } : {}}
+          transition={{ 
+            duration: 1.5, 
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        >
+          <TrendIcon className={`h-4 w-4 ${
+            kpi.trend === 'up' ? 'text-red-500' : 
+            kpi.trend === 'down' ? 'text-emerald-500' : 'text-muted-foreground'
+          }`} />
+        </motion.div>
       </div>
       
-      {/* Sparkline */}
+      {/* Animated Sparkline */}
       <div className="h-8 mb-3">
-        <Sparkline data={kpi.sparkline} status={kpi.status} />
+        <AnimatedSparkline data={kpi.sparkline} status={kpi.status} delay={index * 0.1} />
       </div>
       
-      {/* AI Insight */}
+      {/* AI Insight with fade-in */}
       {kpi.insight && (
-        <div className="text-xs text-muted-foreground bg-muted/50 rounded p-2 border border-border/50">
-          💡 {kpi.insight}
-        </div>
+        <motion.div 
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 + 0.4 }}
+          className="text-xs text-muted-foreground bg-muted/50 rounded p-2 border border-border/50"
+        >
+          <motion.span
+            animate={{ opacity: [0.7, 1, 0.7] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            💡
+          </motion.span>{' '}
+          {kpi.insight}
+        </motion.div>
       )}
     </motion.div>
   );
@@ -171,9 +253,10 @@ function KPICard({ kpi, index }: KPICardProps) {
 interface SparklineProps {
   data: number[];
   status: 'Stable' | 'Warning' | 'Critical';
+  delay?: number;
 }
 
-function Sparkline({ data, status }: SparklineProps) {
+function AnimatedSparkline({ data, status, delay = 0 }: SparklineProps) {
   const min = Math.min(...data);
   const max = Math.max(...data);
   const range = max - min || 1;
@@ -184,21 +267,60 @@ function Sparkline({ data, status }: SparklineProps) {
     Critical: 'stroke-red-500',
   }[status];
   
+  const fillColor = {
+    Stable: 'fill-emerald-500/10',
+    Warning: 'fill-amber-500/10',
+    Critical: 'fill-red-500/10',
+  }[status];
+  
   const points = data.map((value, index) => {
     const x = (index / (data.length - 1)) * 100;
     const y = 100 - ((value - min) / range) * 80 - 10;
     return `${x},${y}`;
   }).join(' ');
   
+  // Create area fill path
+  const areaPath = `M 0,100 L ${data.map((value, index) => {
+    const x = (index / (data.length - 1)) * 100;
+    const y = 100 - ((value - min) / range) * 80 - 10;
+    return `${x},${y}`;
+  }).join(' L ')} L 100,100 Z`;
+  
   return (
     <svg viewBox="0 0 100 100" className="w-full h-full" preserveAspectRatio="none">
-      <polyline
+      {/* Gradient fill under the line */}
+      <motion.path
+        d={areaPath}
+        className={fillColor}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: delay + 0.3, duration: 0.5 }}
+      />
+      {/* Animated line */}
+      <motion.polyline
         points={points}
         fill="none"
-        className={`${strokeColor} opacity-60`}
+        className={`${strokeColor} opacity-70`}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 0.7 }}
+        transition={{ 
+          delay: delay + 0.2,
+          duration: 0.8, 
+          ease: "easeOut" 
+        }}
+      />
+      {/* Animated end dot */}
+      <motion.circle
+        cx={(data.length - 1) / (data.length - 1) * 100}
+        cy={100 - ((data[data.length - 1] - min) / range) * 80 - 10}
+        r="3"
+        className={strokeColor.replace('stroke-', 'fill-')}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: delay + 0.9, type: "spring", stiffness: 300 }}
       />
     </svg>
   );

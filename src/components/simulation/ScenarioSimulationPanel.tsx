@@ -403,14 +403,17 @@ export function ScenarioSimulationPanel({
           ))}
         </div>
         
-        {/* Scenario Selector - Only in full mode or when no scenario selected */}
-        {!isCompact && !activeScenarioId && (
+        {/* Scenario Selector - Always show when no active scenario */}
+        {!activeScenarioId && (
           <div className="pt-2">
             <p className="text-sm text-muted-foreground mb-3">
               Select a scenario to simulate:
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {[...presetScenarios, ...blueprintScenarios].slice(0, 4).map((scenario) => (
+            <div className={cn(
+              'grid gap-2',
+              isCompact ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-4'
+            )}>
+              {[...presetScenarios, ...blueprintScenarios].slice(0, isCompact ? 4 : 8).map((scenario) => (
                 <Button
                   key={scenario.id}
                   variant="outline"
@@ -422,6 +425,11 @@ export function ScenarioSimulationPanel({
                 </Button>
               ))}
             </div>
+            {[...presetScenarios, ...blueprintScenarios].length > (isCompact ? 4 : 8) && (
+              <p className="text-xs text-muted-foreground mt-2">
+                +{[...presetScenarios, ...blueprintScenarios].length - (isCompact ? 4 : 8)} more scenarios available
+              </p>
+            )}
           </div>
         )}
         

@@ -277,30 +277,30 @@ export function Step1Summary() {
         </DCCard>
       )}
 
-      {/* Expected Outcomes KPIs */}
+      {/* Data Centre KPIs */}
       <div className="grid gap-4 grid-cols-3">
         <DCKPITile
-          label="Expected ROI"
-          value={expectedRoi}
-          sublabel="Cost reduction"
+          label="Target PUE"
+          value="1.2-1.4"
+          sublabel="Power efficiency"
+          status="normal"
+          icon={<Zap className="h-4 w-4" />}
+          trend="up"
+        />
+        <DCKPITile
+          label="Carbon Reduction"
+          value="25-40%"
+          sublabel="Annual target"
           status="normal"
           icon={<TrendingUp className="h-4 w-4" />}
           trend="up"
         />
         <DCKPITile
-          label="Time Saved"
-          value={timeSaved}
-          sublabel="Per week"
+          label="Uptime SLA"
+          value="99.99%"
+          sublabel="Availability"
           status="normal"
           icon={<Clock className="h-4 w-4" />}
-          trend="up"
-        />
-        <DCKPITile
-          label="Efficiency Gain"
-          value={efficiencyGain}
-          sublabel="Processing speed"
-          status="normal"
-          icon={<Zap className="h-4 w-4" />}
           trend="up"
         />
       </div>

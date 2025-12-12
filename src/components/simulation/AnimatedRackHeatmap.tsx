@@ -2,9 +2,10 @@
  * Animated Rack Heatmap Component
  * Shows rack temperature visualization with live updates
  * Color gradients from green (cool) to red (hot)
+ * OPTIMIZED: Memoized tiles and calculations
  */
 
-import { useMemo } from 'react';
+import { useMemo, memo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -51,7 +52,7 @@ function getAlertIndicator(rack: RackMetrics): { show: boolean; color: string; i
   return { show: false, color: '', icon: null };
 }
 
-function RackTile({ 
+const RackTile = memo(function RackTile({ 
   rack, 
   isRunning, 
   onClick,
@@ -149,9 +150,9 @@ function RackTile({
       </Tooltip>
     </TooltipProvider>
   );
-}
+});
 
-export function AnimatedRackHeatmap({
+export const AnimatedRackHeatmap = memo(function AnimatedRackHeatmap({
   rackMetrics,
   isRunning = false,
   onRackClick,
@@ -164,8 +165,18 @@ export function AnimatedRackHeatmap({
     return rackMetrics;
   }, [rackMetrics]);
 
-  const hotRacks = racks.filter(r => r.tempC > 35).length;
-  const avgTemp = racks.reduce((sum, r) => sum + r.tempC, 0) / racks.length;
+  // Memoize calculations
+  const { hotRacks, avgTemp, optimalCount, elevatedCount } = useMemo(() => ({
+    hotRacks: racks.filter(r => r.tempC > 35).length,
+    avgTemp: racks.reduce((sum, r) => sum + r.tempC, 0) / racks.length,
+    optimalCount: racks.filter(r => r.tempC <= 28).length,
+    elevatedCount: racks.filter(r => r.tempC > 28 && r.tempC <= 35).length,
+  }), [racks]);
+  
+  // Memoize click handler
+  const handleRackClick = useCallback((rackId: string) => {
+    onRackClick?.(rackId);
+  }, [onRackClick]);
 
   return (
     <Card className={cn('bg-card border-border', isRunning && 'ring-1 ring-primary/20')}>
@@ -216,7 +227,7 @@ export function AnimatedRackHeatmap({
               key={rack.rackId}
               rack={rack}
               isRunning={isRunning}
-              onClick={onRackClick ? () => onRackClick(rack.rackId) : undefined}
+              onClick={onRackClick ? () => handleRackClick(rack.rackId) : undefined}
               index={index}
             />
           ))}
@@ -225,11 +236,11 @@ export function AnimatedRackHeatmap({
         {/* Summary Stats */}
         <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-border">
           <div className="text-center">
-            <p className="text-lg font-bold font-mono text-success">{racks.filter(r => r.tempC <= 28).length}</p>
+            <p className="text-lg font-bold font-mono text-success">{optimalCount}</p>
             <p className="text-[10px] text-muted-foreground">Optimal</p>
           </div>
           <div className="text-center">
-            <p className="text-lg font-bold font-mono text-warning">{racks.filter(r => r.tempC > 28 && r.tempC <= 35).length}</p>
+            <p className="text-lg font-bold font-mono text-warning">{elevatedCount}</p>
             <p className="text-[10px] text-muted-foreground">Elevated</p>
           </div>
           <div className="text-center">
@@ -240,4 +251,4 @@ export function AnimatedRackHeatmap({
       </CardContent>
     </Card>
   );
-}
+});

@@ -2,7 +2,7 @@
  * Enhanced KPI Cockpit - Interactive, Predictive with AI Insights
  */
 
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { 
   Thermometer, Zap, Wind, Network, Shield, Cpu, 
@@ -33,6 +33,34 @@ export function EnhancedKPICockpit({
   
   const kpis = useMemo(() => generateKPIsWithInsights(facility, carbonMetrics, financialMetrics), [facility, carbonMetrics, financialMetrics]);
   
+  // Memoize sparkline data to prevent flickering on re-renders
+  // Only regenerate when facility values actually change
+  const sparklineDataRef = useRef<Record<string, number[]>>({});
+  const sparklineData = useMemo(() => {
+    // Generate stable sparkline data based on KPI values
+    return {
+      pue: generateSparklineData(facility.pue, 0.05),
+      thermalStability: generateSparklineData(facility.thermalHardware.kpis.thermalStabilityScore, 0.08),
+      coolingEfficiency: generateSparklineData(facility.cooling.kpis.coolingEfficiencyIndex, 0.06),
+      gpuUtilization: generateSparklineData(facility.workloadGpu.kpis.avgGpuUtilization, 0.1),
+      networkIntegrity: generateSparklineData(facility.network.kpis.networkIntegrityScore, 0.03),
+      facilitySafety: generateSparklineData(facility.facilitySafety.kpis.environmentalSafetyScore, 0.02),
+      sovereignty: generateSparklineData(100 - facility.sovereignty.kpis.sovereigntyRiskScore, 0.04),
+      carbonEfficiency: generateSparklineData(carbonMetrics.carbonEfficiencyScore, 0.05),
+      financialHealth: generateSparklineData(financialMetrics.financialHealthScore, 0.04),
+    };
+  }, [
+    facility.pue,
+    facility.thermalHardware.kpis.thermalStabilityScore,
+    facility.cooling.kpis.coolingEfficiencyIndex,
+    facility.workloadGpu.kpis.avgGpuUtilization,
+    facility.network.kpis.networkIntegrityScore,
+    facility.facilitySafety.kpis.environmentalSafetyScore,
+    facility.sovereignty.kpis.sovereigntyRiskScore,
+    carbonMetrics.carbonEfficiencyScore,
+    financialMetrics.financialHealthScore,
+  ]);
+  
   return (
     <CollapsibleSection 
       title="KPI Cockpit" 
@@ -58,7 +86,7 @@ export function EnhancedKPICockpit({
         </Badge>
       </div>
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
         <EnhancedKPICard
           id="pue"
           label="Power Usage Effectiveness"
@@ -69,7 +97,7 @@ export function EnhancedKPICockpit({
           delta={-2.3}
           icon={<Zap className="h-4 w-4 text-primary" />}
           insight={kpis.pue?.insight}
-          sparklineData={generateSparklineData(facility.pue, 0.05)}
+          sparklineData={sparklineData.pue}
           highlighted={highlightedKPI === 'pue'}
           onSimulate={onSimulateKPI}
         />
@@ -84,7 +112,7 @@ export function EnhancedKPICockpit({
           delta={1.2}
           icon={<Thermometer className="h-4 w-4 text-primary" />}
           insight={kpis.thermalStability?.insight}
-          sparklineData={generateSparklineData(facility.thermalHardware.kpis.thermalStabilityScore, 0.08)}
+          sparklineData={sparklineData.thermalStability}
           highlighted={highlightedKPI === 'thermalStability'}
           onSimulate={onSimulateKPI}
         />
@@ -99,7 +127,7 @@ export function EnhancedKPICockpit({
           delta={3.4}
           icon={<Wind className="h-4 w-4 text-primary" />}
           insight={kpis.coolingEfficiency?.insight}
-          sparklineData={generateSparklineData(facility.cooling.kpis.coolingEfficiencyIndex, 0.06)}
+          sparklineData={sparklineData.coolingEfficiency}
           highlighted={highlightedKPI === 'coolingEfficiency'}
           onSimulate={onSimulateKPI}
         />
@@ -114,7 +142,7 @@ export function EnhancedKPICockpit({
           delta={5.8}
           icon={<Cpu className="h-4 w-4 text-primary" />}
           insight={kpis.gpuUtilization?.insight}
-          sparklineData={generateSparklineData(facility.workloadGpu.kpis.avgGpuUtilization, 0.1)}
+          sparklineData={sparklineData.gpuUtilization}
           highlighted={highlightedKPI === 'gpuUtilization'}
           onSimulate={onSimulateKPI}
         />
@@ -128,7 +156,7 @@ export function EnhancedKPICockpit({
           trend="stable"
           icon={<Network className="h-4 w-4 text-primary" />}
           insight={kpis.networkIntegrity?.insight}
-          sparklineData={generateSparklineData(facility.network.kpis.networkIntegrityScore, 0.03)}
+          sparklineData={sparklineData.networkIntegrity}
           highlighted={highlightedKPI === 'networkIntegrity'}
           onSimulate={onSimulateKPI}
         />
@@ -142,7 +170,7 @@ export function EnhancedKPICockpit({
           trend="stable"
           icon={<Shield className="h-4 w-4 text-primary" />}
           insight={kpis.facilitySafety?.insight}
-          sparklineData={generateSparklineData(facility.facilitySafety.kpis.environmentalSafetyScore, 0.02)}
+          sparklineData={sparklineData.facilitySafety}
           highlighted={highlightedKPI === 'facilitySafety'}
           onSimulate={onSimulateKPI}
         />
@@ -156,7 +184,7 @@ export function EnhancedKPICockpit({
           trend="stable"
           icon={<Globe className="h-4 w-4 text-primary" />}
           insight={kpis.sovereignty?.insight}
-          sparklineData={generateSparklineData(100 - facility.sovereignty.kpis.sovereigntyRiskScore, 0.04)}
+          sparklineData={sparklineData.sovereignty}
           highlighted={highlightedKPI === 'sovereignty'}
           onSimulate={onSimulateKPI}
         />
@@ -171,7 +199,7 @@ export function EnhancedKPICockpit({
           delta={3.2}
           icon={<Leaf className="h-4 w-4 text-primary" />}
           insight={kpis.carbonEfficiency?.insight}
-          sparklineData={generateSparklineData(carbonMetrics.carbonEfficiencyScore, 0.05)}
+          sparklineData={sparklineData.carbonEfficiency}
           highlighted={highlightedKPI === 'carbonEfficiency'}
           onSimulate={onSimulateKPI}
         />
@@ -186,7 +214,7 @@ export function EnhancedKPICockpit({
           delta={-0.8}
           icon={<DollarSign className="h-4 w-4 text-primary" />}
           insight={kpis.financialHealth?.insight}
-          sparklineData={generateSparklineData(financialMetrics.financialHealthScore, 0.04)}
+          sparklineData={sparklineData.financialHealth}
           highlighted={highlightedKPI === 'financialHealth'}
           onSimulate={onSimulateKPI}
         />

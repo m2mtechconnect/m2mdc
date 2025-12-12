@@ -98,14 +98,14 @@ export function EnhancedKPICard({
     <>
       <Card 
         className={cn(
-          'bg-card border-border hover:border-primary/30 transition-all cursor-pointer group',
+          'bg-card border-border hover:border-primary/30 transition-all cursor-pointer group overflow-hidden',
           highlighted && 'ring-2 ring-primary ring-offset-2',
           status === 'critical' && 'border-destructive/30',
           status === 'warning' && 'border-warning/30'
         )}
         onClick={() => setShowDrilldown(true)}
       >
-        <CardContent className="p-4">
+        <CardContent className="p-4 overflow-hidden">
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center gap-2">
               {icon && <div className="p-2 rounded-lg bg-primary/10">{icon}</div>}
@@ -124,25 +124,25 @@ export function EnhancedKPICard({
             )}
           </div>
           
-          <div className="space-y-2">
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <div className="flex items-baseline gap-1">
-              <span className={cn('text-2xl font-bold font-mono', statusColors[status])}>
+          <div className="space-y-2 min-w-0">
+            <p className="text-xs text-muted-foreground truncate">{label}</p>
+            <div className="flex items-baseline gap-1 min-w-0">
+              <span className={cn('text-2xl font-bold font-mono truncate', statusColors[status])}>
                 {value}
               </span>
-              <span className="text-sm text-muted-foreground">{unit}</span>
+              <span className="text-sm text-muted-foreground flex-shrink-0">{unit}</span>
             </div>
           </div>
           
-          <div className="mt-3">
-            <SparklineChart data={sparkData} width={140} height={28} />
+          <div className="mt-3 w-full overflow-hidden">
+            <SparklineChart data={sparkData} width={140} height={28} className="max-w-full" />
           </div>
           
           {insight && (
-            <div className="mt-3 p-2 rounded bg-muted/50 border border-border">
-              <div className="flex items-start gap-2">
+            <div className="mt-3 p-2 rounded bg-muted/50 border border-border overflow-hidden">
+              <div className="flex items-start gap-2 min-w-0">
                 <Info className="h-3 w-3 text-primary mt-0.5 shrink-0" />
-                <p className="text-[10px] text-muted-foreground leading-relaxed">{insight}</p>
+                <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-3">{insight}</p>
               </div>
             </div>
           )}

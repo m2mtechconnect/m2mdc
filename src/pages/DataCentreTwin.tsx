@@ -16,7 +16,7 @@ import {
   DCPreviewTab, 
   DCDeployTab 
 } from '@/components/dc-twin/tabs';
-import { sovereignQCFacility } from '@/twins/dataCenter/mockData';
+import { montrealSovereignDC, sovereignQCFacility } from '@/twins/dataCenter/mockData';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { EmptyStateSelectTwin } from '@/components/twin-selector';
@@ -95,12 +95,12 @@ export default function DataCentreTwin() {
     // Use mock facility data enhanced with current twin info
     if (twin) {
       const enhancedFacility: DataCentreFacility = {
-        ...sovereignQCFacility,
-        id: twin?.id || sovereignQCFacility.id,
-        name: twin?.name || sovereignQCFacility.name,
+        ...montrealSovereignDC,
+        id: twin?.id || montrealSovereignDC.id,
+        name: twin?.name || montrealSovereignDC.name,
         location: twin?.city 
-          ? { ...sovereignQCFacility.location, city: twin.city }
-          : sovereignQCFacility.location,
+          ? { ...montrealSovereignDC.location, city: twin.city }
+          : montrealSovereignDC.location,
       };
       setFacility(enhancedFacility);
     }
@@ -163,7 +163,7 @@ export default function DataCentreTwin() {
             
             <TabsContent value="dashboard">
               <DataCentreDashboard 
-                facility={sovereignQCFacility} 
+                facility={montrealSovereignDC} 
                 onScenarioSelect={(scenarioId) => {
                   console.log('Scenario selected:', scenarioId);
                 }}

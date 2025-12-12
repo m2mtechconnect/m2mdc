@@ -907,6 +907,12 @@ export function generateDataCentreFacility(id: string, name: string, region: Jur
 // DEMO FACILITIES
 // ============================================================================
 
+export const montrealSovereignDC = generateDataCentreFacility(
+  'facility-montreal-dc-001',
+  'Montreal Sovereign AI Data Centre',
+  'CA-QC'
+);
+
 export const sovereignQCFacility = generateDataCentreFacility(
   'facility-sovereign-qc-001',
   'Sovereign AI Factory Quebec',
@@ -920,7 +926,7 @@ export const prairieABFacility = generateDataCentreFacility(
 );
 
 export function getAllDemoFacilities(): DataCentreFacility[] {
-  return [sovereignQCFacility, prairieABFacility];
+  return [montrealSovereignDC, sovereignQCFacility, prairieABFacility];
 }
 
 export function getDemoFacilityById(id: string): DataCentreFacility | undefined {

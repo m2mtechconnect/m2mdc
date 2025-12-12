@@ -9,6 +9,7 @@ export * from '@/types/dataCenterTwin';
 // Mock Data
 export { 
   generateDataCentreFacility,
+  montrealSovereignDC,
   sovereignQCFacility,
   prairieABFacility,
   getAllDemoFacilities,

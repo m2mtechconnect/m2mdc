@@ -306,9 +306,17 @@ export class SimulationEngine {
 
   /**
    * Get current state (readonly)
+   * Returns a deep copy to ensure React state updates trigger re-renders
    */
   getState(): Readonly<SimulationState> {
-    return { ...this.state };
+    return { 
+      ...this.state,
+      // Deep copy the KPIs to ensure React detects changes
+      baselineKpis: { ...this.state.baselineKpis },
+      currentKpis: { ...this.state.currentKpis },
+      events: [...this.state.events],
+      kpiSnapshots: [...this.state.kpiSnapshots],
+    };
   }
 
   /**
@@ -382,16 +390,24 @@ export class SimulationEngine {
     };
 
     // Apply KPI deltas
+    const deltasApplied: Record<string, { before: number; delta: number; after: number }> = {};
+    
     Object.entries(step.kpiDeltas).forEach(([key, delta]) => {
       if (delta === undefined) return;
       
+      const beforeValue = this.state.currentKpis[key] ?? this.state.baselineKpis[key] ?? 0;
+      
       // Apply delta to the exact key (create if doesn't exist)
-      this.state.currentKpis[key] = (this.state.currentKpis[key] || this.state.baselineKpis[key] || 0) + delta;
+      this.state.currentKpis[key] = beforeValue + delta;
+      
+      deltasApplied[key] = { before: beforeValue, delta, after: this.state.currentKpis[key] };
       
       // Also apply to any aliases for this key
       const aliases = kpiAliases[key] || [];
       aliases.forEach(alias => {
-        this.state.currentKpis[alias] = (this.state.currentKpis[alias] || this.state.baselineKpis[alias] || 0) + delta;
+        const aliasBeforeValue = this.state.currentKpis[alias] ?? this.state.baselineKpis[alias] ?? 0;
+        this.state.currentKpis[alias] = aliasBeforeValue + delta;
+        deltasApplied[alias] = { before: aliasBeforeValue, delta, after: this.state.currentKpis[alias] };
       });
       
       // Clamp percentage values
@@ -402,6 +418,16 @@ export class SimulationEngine {
         }
       });
     });
+    
+    // Debug log for KPI changes
+    if (Object.keys(deltasApplied).length > 0) {
+      console.log('[SimulationEngine] KPI Deltas Applied:', {
+        step: step.eventTitle,
+        time: step.at,
+        deltas: deltasApplied,
+        currentKpis: { ...this.state.currentKpis },
+      });
+    }
 
     // Create simulation event
     const event: SimulationEvent = {

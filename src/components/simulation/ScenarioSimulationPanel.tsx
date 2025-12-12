@@ -134,29 +134,66 @@ export function ScenarioSimulationPanel({
   // Build KPI deltas from current state
   // Map alternate KPI IDs to their canonical forms for display
   const kpiDeltas = useMemo(() => {
-    // Create a merged KPI lookup that handles alternate IDs
-    const mergedKpis = {
-      ...baselineKpis,
-      ...currentKpis,
-      // Map alternate IDs to canonical ones
-      pue: currentKpis.effectivePue ?? currentKpis.pue ?? baselineKpis.effectivePue ?? baselineKpis.pue ?? 1.25,
-      gpuUtilization: currentKpis.avgGpuUtilization ?? currentKpis.gpuUtilization ?? baselineKpis.avgGpuUtilization ?? baselineKpis.gpuUtilization ?? 76,
-      thermalStabilityScore: currentKpis.thermalStabilityScore ?? baselineKpis.thermalStabilityScore ?? 85,
+    // Debug: Log the raw KPI values to trace the issue
+    if (status === 'running') {
+      console.log('[ScenarioSimulationPanel] KPI Debug:', {
+        status,
+        currentKpis: { ...currentKpis },
+        baselineKpis: { ...baselineKpis },
+        effectivePue: currentKpis.effectivePue,
+        pue: currentKpis.pue,
+      });
+    }
+    
+    // Use the current values directly - the simulation engine should have updated them
+    // We merge alternate keys to handle both naming conventions
+    const getValue = (keys: string[]) => {
+      for (const key of keys) {
+        if (currentKpis[key] !== undefined) return currentKpis[key];
+      }
+      for (const key of keys) {
+        if (baselineKpis[key] !== undefined) return baselineKpis[key];
+      }
+      return 0;
     };
     
-    const mergedBaseline = {
-      ...baselineKpis,
-      pue: baselineKpis.effectivePue ?? baselineKpis.pue ?? 1.25,
-      gpuUtilization: baselineKpis.avgGpuUtilization ?? baselineKpis.gpuUtilization ?? 76,
-      thermalStabilityScore: baselineKpis.thermalStabilityScore ?? 85,
+    const getBaseline = (keys: string[]) => {
+      for (const key of keys) {
+        if (baselineKpis[key] !== undefined) return baselineKpis[key];
+      }
+      return 0;
     };
     
-    return defaultKPIs.map(kpiDef => ({
-      ...kpiDef,
-      value: mergedKpis[kpiDef.id] ?? 0,
-      baseline: mergedBaseline[kpiDef.id] ?? 0,
-    }));
-  }, [currentKpis, baselineKpis]);
+    // Build KPIs with mapped values
+    return defaultKPIs.map(kpiDef => {
+      let value: number;
+      let baseline: number;
+      
+      switch (kpiDef.id) {
+        case 'pue':
+          value = getValue(['pue', 'effectivePue']);
+          baseline = getBaseline(['pue', 'effectivePue']);
+          break;
+        case 'gpuUtilization':
+          value = getValue(['gpuUtilization', 'avgGpuUtilization']);
+          baseline = getBaseline(['gpuUtilization', 'avgGpuUtilization']);
+          break;
+        case 'thermalStabilityScore':
+          value = getValue(['thermalStabilityScore']);
+          baseline = getBaseline(['thermalStabilityScore']);
+          break;
+        default:
+          value = currentKpis[kpiDef.id] ?? baselineKpis[kpiDef.id] ?? 0;
+          baseline = baselineKpis[kpiDef.id] ?? 0;
+      }
+      
+      return {
+        ...kpiDef,
+        value,
+        baseline,
+      };
+    });
+  }, [currentKpis, baselineKpis, status]);
   
   // How many KPIs to show based on layout
   const displayKpis = isCompact ? kpiDeltas.slice(0, 3) : kpiDeltas.slice(0, 6);
@@ -365,7 +402,7 @@ export function ScenarioSimulationPanel({
             {status === 'running' && (
               <div className="ml-auto flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="h-4 w-4" />
-                <span className="tabular-nums">{Math.round(progress * 100)}%</span>
+                <span className="tabular-nums">{Math.round(progress)}%</span>
               </div>
             )}
             

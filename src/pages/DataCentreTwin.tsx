@@ -109,60 +109,89 @@ export default function DataCentreTwin() {
     return <LoadingState message="Selecting Data Centre Twin..." />;
   }
   
-  // If we have a builder session, show builder tabs even without a saved twin
-  if (hasBuilderSession) {
+  // Check if we're in simulation preview mode (no twin, but view=simulation)
+  const isSimulationPreview = !twin && !hasBuilderSession && (urlTab === 'simulation' || urlTab === 'dashboard');
+  
+  // If we have a builder session OR simulation preview, show tabs with mock/builder data
+  if (hasBuilderSession || isSimulationPreview) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto py-6 px-4 space-y-6">
-          {/* Builder Session Header */}
+          {/* Session Header */}
           <div className="flex items-center gap-2">
-            <ModeBadge mode="designer" />
-            <SnapshotBadge version="Draft" />
+            <ModeBadge mode={isSimulationPreview ? "snapshot" : "designer"} />
+            <SnapshotBadge version={isSimulationPreview ? "Demo" : "Draft"} />
           </div>
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="h-auto flex-wrap gap-1">
-              <TabsTrigger value="overview" className="gap-2">
-                <Eye className="h-4 w-4" />
-                Overview
-              </TabsTrigger>
-              <TabsTrigger value="design" className="gap-2">
-                <FileText className="h-4 w-4" />
-                Design
-              </TabsTrigger>
-              <TabsTrigger value="preview" className="gap-2">
-                <MessageSquare className="h-4 w-4" />
-                Preview
+              {!isSimulationPreview && (
+                <>
+                  <TabsTrigger value="overview" className="gap-2">
+                    <Eye className="h-4 w-4" />
+                    Overview
+                  </TabsTrigger>
+                  <TabsTrigger value="design" className="gap-2">
+                    <FileText className="h-4 w-4" />
+                    Design
+                  </TabsTrigger>
+                  <TabsTrigger value="preview" className="gap-2">
+                    <MessageSquare className="h-4 w-4" />
+                    Preview
+                  </TabsTrigger>
+                </>
+              )}
+              <TabsTrigger value="dashboard" className="gap-2">
+                <LayoutDashboard className="h-4 w-4" />
+                Dashboard
               </TabsTrigger>
               <TabsTrigger value="simulation" className="gap-2">
                 <PlayCircle className="h-4 w-4" />
                 Simulation
               </TabsTrigger>
-              <TabsTrigger value="deploy" className="gap-2">
-                <Rocket className="h-4 w-4" />
-                Deploy
-              </TabsTrigger>
+              {!isSimulationPreview && (
+                <TabsTrigger value="deploy" className="gap-2">
+                  <Rocket className="h-4 w-4" />
+                  Deploy
+                </TabsTrigger>
+              )}
             </TabsList>
             
-            <TabsContent value="overview">
-              <DCOverviewTab />
-            </TabsContent>
+            {!isSimulationPreview && (
+              <>
+                <TabsContent value="overview">
+                  <DCOverviewTab />
+                </TabsContent>
+                
+                <TabsContent value="design">
+                  <DCBlueprintTab />
+                </TabsContent>
+                
+                <TabsContent value="preview">
+                  <DCPreviewTab />
+                </TabsContent>
+              </>
+            )}
             
-            <TabsContent value="design">
-              <DCBlueprintTab />
-            </TabsContent>
-            
-            <TabsContent value="preview">
-              <DCPreviewTab />
+            <TabsContent value="dashboard">
+              <DataCentreDashboard 
+                facility={sovereignQCFacility} 
+                onScenarioSelect={(scenarioId) => {
+                  console.log('Scenario selected:', scenarioId);
+                  setActiveTab('simulation');
+                }}
+              />
             </TabsContent>
             
             <TabsContent value="simulation">
               <DCSimulationTab />
             </TabsContent>
             
-            <TabsContent value="deploy">
-              <DCDeployTab />
-            </TabsContent>
+            {!isSimulationPreview && (
+              <TabsContent value="deploy">
+                <DCDeployTab />
+              </TabsContent>
+            )}
           </Tabs>
         </div>
       </div>

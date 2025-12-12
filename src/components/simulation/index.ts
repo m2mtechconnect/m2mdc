@@ -71,3 +71,27 @@ export {
   ComparisonTable,
   KPI_DOMAIN_COLORS,
 } from './SimulationEnvironmentPolish';
+
+// Loading & Feedback Components
+export {
+  KPICardSkeleton,
+  KPIGridSkeleton,
+  ScenarioCardSkeleton,
+  ScenarioGridSkeleton,
+  ChartSkeleton,
+  TimeControlsSkeleton,
+  SimulationPageSkeleton,
+} from './SimulationLoadingSkeleton';
+
+export {
+  showSimulationStartToast,
+  showSimulationPauseToast,
+  showSimulationResetToast,
+  showSimulationCompleteToast,
+  showScenarioSelectedToast,
+  showSimulationErrorToast,
+  ActionPulse,
+  SimulationStatusIndicator,
+  SimulationProgress,
+  useSimulationFeedback,
+} from './SimulationFeedback';

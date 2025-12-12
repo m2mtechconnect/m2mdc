@@ -40,6 +40,7 @@ import type { KPISnapshot, SimulationEvent } from '@/simulation/types';
 import { StatusBadge, NoSimulationHistoryEmptyState, LoadingState } from '@/components/ui';
 import { KpiTooltip } from '@/components/ui/kpi-tooltip';
 import { LiveSimulationBadge, KPILegend, TimelineEventMarker, KPI_DOMAIN_COLORS } from '@/components/simulation/SimulationEnvironmentPolish';
+import { KPIGridSkeleton, SimulationStatusIndicator, useSimulationFeedback, showScenarioSelectedToast } from '@/components/simulation';
 
 const categoryIcons: Record<DCScenarioCategory, React.ReactNode> = {
   capacity: <Server className="h-4 w-4" />,
@@ -110,6 +111,16 @@ export function DCSimulationTab() {
   const [activeView, setActiveView] = useState('scenarios');
   const [selectedKpiId, setSelectedKpiId] = useState<string>('pue');
   const [showCoPilotPanel, setShowCoPilotPanel] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Simulation feedback hook
+  const { notifyStatusChange, reset: resetFeedback } = useSimulationFeedback();
+  
+  // Simulate initial loading
+  useState(() => {
+    const timer = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(timer);
+  });
   
   // Mock data for enterprise KPI system
   const snapshots = useMemo(() => generateMockSnapshots(30), []);
@@ -120,19 +131,30 @@ export function DCSimulationTab() {
   const totalDuration = activeScenario?.durationSeconds || 300;
   
   const handleRunScenario = () => {
-    if (selectedScenario) {
+    if (selectedScenario && activeScenario) {
       setIsRunning(true);
+      notifyStatusChange('running', activeScenario.name);
     }
   };
   
   const handlePause = () => {
     setIsRunning(false);
+    notifyStatusChange('paused');
   };
   
   const handleReset = () => {
     setIsRunning(false);
     setSelectedScenario(null);
     setCurrentTime(0);
+    resetFeedback();
+  };
+  
+  const handleSelectScenario = (scenarioId: string) => {
+    const scenario = scenarios.find(s => s.id === scenarioId);
+    setSelectedScenario(scenarioId);
+    if (scenario) {
+      showScenarioSelectedToast(scenario.name);
+    }
   };
 
   const handleSeek = (time: number) => {
@@ -164,9 +186,10 @@ export function DCSimulationTab() {
                   showDesignerLink={true}
                 />
                 
-                {/* Live Simulation Badge */}
-                {isRunning && <LiveSimulationBadge isRunning={true} />}
-                {!isRunning && selectedScenario && <LiveSimulationBadge isRunning={false} isPaused={true} />}
+                {/* Simulation Status Indicator */}
+                <SimulationStatusIndicator 
+                  status={isRunning ? 'running' : selectedScenario ? 'paused' : 'idle'} 
+                />
               </div>
               
               {/* Co-Pilot Controls */}
@@ -195,15 +218,19 @@ export function DCSimulationTab() {
             {/* KPI Legend */}
             <KPILegend activeDomains={['thermal', 'power', 'cooling', 'sovereignty', 'financial', 'workload']} />
 
-            {/* Enterprise KPI Cards Grid */}
-            <EnterpriseKPICardGrid
-              snapshots={snapshots.slice(0, currentSnapshotIndex + 1)}
-              isLive={isRunning}
-              onKpiClick={(kpiId) => {
-                setSelectedKpiId(kpiId);
-                setActiveView('kpis');
-              }}
-            />
+            {/* Enterprise KPI Cards Grid - with loading skeleton */}
+            {isLoading ? (
+              <KPIGridSkeleton count={6} compact />
+            ) : (
+              <EnterpriseKPICardGrid
+                snapshots={snapshots.slice(0, currentSnapshotIndex + 1)}
+                isLive={isRunning}
+                onKpiClick={(kpiId) => {
+                  setSelectedKpiId(kpiId);
+                  setActiveView('kpis');
+                }}
+              />
+            )}
 
         {/* View Tabs */}
         <Tabs value={activeView} onValueChange={setActiveView}>
@@ -332,7 +359,7 @@ export function DCSimulationTab() {
                 {enabledScenarios.map((scenario) => (
                   <button
                     key={scenario.id}
-                    onClick={() => setSelectedScenario(scenario.id)}
+                    onClick={() => handleSelectScenario(scenario.id)}
                     className={`text-left p-4 rounded-lg border transition-all hover:shadow-md overflow-hidden ${
                       selectedScenario === scenario.id 
                         ? 'border-primary ring-2 ring-primary/20' 

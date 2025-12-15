@@ -144,7 +144,6 @@ allBlueprints.forEach(template => {
 });
 
 export function loadAllTemplates(): DigitalTwinBlueprint[] {
-  console.log('[templateLoader] loadAllTemplates called, returning Data Centre template');
   return allBlueprints;
 }
 

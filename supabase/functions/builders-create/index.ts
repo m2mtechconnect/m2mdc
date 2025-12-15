@@ -5,7 +5,7 @@
  * AUTH: user (requires valid JWT token)
  * 
  * REQUEST:
- * - source: string (optional) - "file" | "questionnaire" | "template" | "url" | "manual" | "homepage" | "dashboard" | "imported"
+ * - source: string (optional) - "file" | "questionnaire" | "template" | "url" | "manual" | "homepage" | "dashboard" | "imported" | "manage-agents" | "blank"
  * - goal: string (optional)
  * - industry: string (optional)
  * - department: string (optional)

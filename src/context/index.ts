@@ -42,7 +42,9 @@ export {
 } from './TwinOverlayContext';
 export type { TwinOverlay, TwinOverlayState } from './TwinOverlayContext';
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// Tour Context - Guided onboarding tours
+export { TourProvider, useTour } from './TourContext';
+
 // OTHER CONTEXTS (Re-exported from src/contexts for backward compatibility)
 // ═══════════════════════════════════════════════════════════════════════════════
 export { CoPilotProvider, useCoPilot } from '../contexts/CoPilotContext';

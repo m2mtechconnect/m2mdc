@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -21,10 +20,15 @@ import {
   Headphones,
   GraduationCap,
   Activity,
+  Compass,
+  Layers,
+  RefreshCw,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
 import { DCKPITile } from "@/components/dc-ui/DCKPITile";
+import { useTour } from "@/context/TourContext";
+import { tourRegistry, TourId } from "@/tours/tourRegistry";
 
 // Validation Schema
 const contactSchema = z.object({
@@ -68,6 +72,8 @@ const helpSections = [
 
 export default function Help() {
   const navigate = useNavigate();
+  const { startTour, resetAllTours, isTourSeen } = useTour();
+  
   // ROI Calculator State
   const [manualHours, setManualHours] = useState(40);
   const [hourlyCost, setHourlyCost] = useState(75);
@@ -127,8 +133,7 @@ export default function Help() {
   };
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           {/* Header */}
           <DCSectionHeader
@@ -184,6 +189,55 @@ export default function Help() {
               </div>
             </DCCard>
           </div>
+
+          {/* Guided Tours Section */}
+          <DCCard
+            title="Guided Tours"
+            subtitle="Interactive walkthroughs to learn the platform"
+            icon={<Compass className="h-5 w-5" />}
+            status="operational"
+            className="mb-8"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              {(Object.keys(tourRegistry) as TourId[]).map((tourId) => {
+                const tour = tourRegistry[tourId];
+                const seen = isTourSeen(tourId);
+                return (
+                  <button
+                    key={tourId}
+                    onClick={() => {
+                      startTour(tourId);
+                      navigate('/');
+                    }}
+                    className="p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors text-left group"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <Layers className="h-4 w-4 text-primary" />
+                      <span className="font-medium text-sm">{tour.name}</span>
+                      {seen && (
+                        <span className="text-xs text-muted-foreground ml-auto">✓</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {tour.description}
+                    </p>
+                    <div className="mt-2 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                      Start tour →
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={resetAllTours}
+              className="gap-2"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Reset All Tours
+            </Button>
+          </DCCard>
 
           {/* Original 4-Section Grid Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -471,9 +525,8 @@ export default function Help() {
                 </div>
               </form>
             </DCCard>
-          </div>
         </div>
       </div>
-    </Layout>
+    </div>
   );
 }

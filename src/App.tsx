@@ -15,6 +15,8 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
 import { initChangeLogMiddleware } from "@/stores/dcBuilderChangeLogMiddleware";
+import { TourProvider } from "@/context/TourContext";
+import { TourRenderer } from "@/tours/TourRenderer";
 import Dashboard from "./pages/Dashboard";
 import Builder from "./pages/Builder";
 import Deploy from "./pages/Deploy";
@@ -213,14 +215,17 @@ const App = () => (
           <RBACProvider>
             <BrowserRouter>
               <ActiveTwinProvider>
-                <CoPilotProvider>
-                  <CoPilotCommandProvider>
-                    <Toaster />
-                    <Sonner />
-                    <AuthenticatedApp />
-                    {/* PerformancePanel hidden */}
-                  </CoPilotCommandProvider>
-                </CoPilotProvider>
+                <TourProvider>
+                  <CoPilotProvider>
+                    <CoPilotCommandProvider>
+                      <Toaster />
+                      <Sonner />
+                      <TourRenderer />
+                      <AuthenticatedApp />
+                      {/* PerformancePanel hidden */}
+                    </CoPilotCommandProvider>
+                  </CoPilotProvider>
+                </TourProvider>
               </ActiveTwinProvider>
             </BrowserRouter>
           </RBACProvider>

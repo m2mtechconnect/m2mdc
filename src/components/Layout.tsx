@@ -299,6 +299,9 @@ const { isOpen, setIsOpen } = useCoPilot();
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
+            {/* Help Menu with Tours */}
+            <HelpMenu />
+            
             {/* AOC Quick Access */}
             <AOCQuickAccessButton />
             

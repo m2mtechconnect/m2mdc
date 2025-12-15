@@ -1,7 +1,7 @@
 import Joyride, { CallBackProps, STATUS, EVENTS, ACTIONS, Step } from 'react-joyride';
 import { useTour } from '@/context/TourContext';
 import { tourRegistry } from './tourRegistry';
-import { useMemo, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // Filter out steps with missing targets for graceful degradation
 function filterValidSteps(steps: Step[]): Step[] {

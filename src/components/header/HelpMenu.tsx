@@ -64,7 +64,7 @@ export function HelpMenu() {
               onClick={() => handleStartTour(tourId)}
               className="flex items-center gap-3 cursor-pointer"
             >
-              <span className="text-muted-foreground">
+              <span className="text-primary">
                 {tourIcons[tourId]}
               </span>
               <div className="flex-1">

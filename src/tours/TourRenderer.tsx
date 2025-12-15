@@ -1,6 +1,18 @@
-import Joyride, { CallBackProps, STATUS, EVENTS, ACTIONS } from 'react-joyride';
+import Joyride, { CallBackProps, STATUS, EVENTS, ACTIONS, Step } from 'react-joyride';
 import { useTour } from '@/context/TourContext';
 import { tourRegistry } from './tourRegistry';
+import { useMemo } from 'react';
+
+// Filter out steps with missing targets for graceful degradation
+function filterValidSteps(steps: Step[]): Step[] {
+  return steps.filter((step) => {
+    if (typeof step.target === 'string') {
+      const element = document.querySelector(step.target);
+      return element !== null;
+    }
+    return true;
+  });
+}
 
 export function TourRenderer() {
   const { activeTourId, setActiveTourId, completeTour, stepIndex, setStepIndex } = useTour();
@@ -36,14 +48,22 @@ export function TourRenderer() {
     }
   };
 
+  // Filter steps based on available targets (responsive safety)
+  const validSteps = useMemo(() => {
+    if (!activeTourId) return [];
+    const tour = tourRegistry[activeTourId];
+    if (!tour) return [];
+    return filterValidSteps(tour.steps);
+  }, [activeTourId]);
+
   if (!activeTourId) return null;
 
   const tour = tourRegistry[activeTourId];
-  if (!tour || !tour.steps.length) return null;
+  if (!tour || validSteps.length === 0) return null;
 
   return (
     <Joyride
-      steps={tour.steps}
+      steps={validSteps}
       run={true}
       stepIndex={stepIndex}
       continuous

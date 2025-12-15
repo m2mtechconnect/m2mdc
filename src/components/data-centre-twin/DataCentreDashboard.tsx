@@ -467,17 +467,25 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
           <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             {/* Left Column - Primary Content */}
             <div className="space-y-8">
-              <CompactKPICockpit facility={facility} twinId={twinId} mode="overview" />
+              <div data-tour="overview-kpi-cockpit">
+                <CompactKPICockpit facility={facility} twinId={twinId} mode="overview" />
+              </div>
               <CompactAIInsightsPanel facility={facility} maxVisible={3} />
-              <CompactAlertsPanel alerts={facility.alerts} maxVisible={3} />
+              <div data-tour="overview-alerts">
+                <CompactAlertsPanel alerts={facility.alerts} maxVisible={3} />
+              </div>
             </div>
             
             {/* Right Column - Secondary Content */}
             <div className="space-y-8">
               {/* Mini 3D Twin Preview */}
-              <MiniTwinPreview onExpand={() => setActiveTab('simulation')} />
+              <div data-tour="overview-3d-preview">
+                <MiniTwinPreview onExpand={() => setActiveTab('simulation')} />
+              </div>
               <CompactRackOverview facility={facility} maxRacks={12} />
-              <CompactDCToolsPanel twinId={twinId} maxVisible={4} />
+              <div data-tour="overview-tools">
+                <CompactDCToolsPanel twinId={twinId} maxVisible={4} />
+              </div>
               <CompactEventTimeline events={timelineEvents} />
             </div>
           </div>

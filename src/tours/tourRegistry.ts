@@ -189,3 +189,11 @@ export const tourRegistry: Record<TourId, TourDefinition> = {
 };
 
 export const tourIds: TourId[] = ['studioIntro', 'overview', 'simulation', 'blueprint'];
+
+// Centralized tour routes - maps each tour to its target page
+export const tourRoutes: Record<TourId, string> = {
+  studioIntro: '/',
+  overview: '/',
+  simulation: '/data-centre-twin?view=simulation',
+  blueprint: '/builder',
+};

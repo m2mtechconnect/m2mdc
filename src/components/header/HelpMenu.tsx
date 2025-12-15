@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { HelpCircle, Play, RefreshCw, BookOpen, Compass, Activity, Layers } from 'lucide-react';
 import { useTour } from '@/context/TourContext';
-import { tourRegistry, TourId } from '@/tours/tourRegistry';
+import { tourRegistry, TourId, tourRoutes } from '@/tours/tourRegistry';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const tourIcons: Record<TourId, React.ReactNode> = {
@@ -17,14 +17,6 @@ const tourIcons: Record<TourId, React.ReactNode> = {
   overview: <BookOpen className="h-4 w-4" />,
   simulation: <Activity className="h-4 w-4" />,
   blueprint: <Layers className="h-4 w-4" />,
-};
-
-// Map tours to their target routes
-const tourRoutes: Record<TourId, string> = {
-  studioIntro: '/',
-  overview: '/',
-  simulation: '/data-centre-twin?view=simulation',
-  blueprint: '/builder',
 };
 
 export function HelpMenu() {

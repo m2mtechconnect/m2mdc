@@ -28,7 +28,7 @@ export function useTourAutoStart(options: AutoStartOptions = {}) {
   const { isTourSeen, startTour, activeTourId, isLoading } = useTour();
   const { twin: activeTwin, isLoading: twinLoading } = useActiveTwin();
   
-const hasStartedRef = useRef<Set<TourId>>(new Set());
+  const hasStartedRef = useRef<Set<TourId>>(new Set());
   const noContextToastShownRef = useRef(false);
   const isDemo = searchParams.get('demo') === 'true';
   const isPreview = searchParams.get('preview') === 'true';

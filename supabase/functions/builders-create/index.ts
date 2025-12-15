@@ -22,7 +22,7 @@ import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { createHandler } from "../_shared/handler.ts";
 
 const InputSchema = z.object({
-  source: z.enum(['file', 'questionnaire', 'template', 'url', 'manual', 'homepage', 'dashboard', 'imported']).nullish(),
+  source: z.enum(['file', 'questionnaire', 'template', 'url', 'manual', 'homepage', 'dashboard', 'imported', 'manage-agents', 'blank']).nullish(),
   goal: z.string().nullish(),
   industry: z.string().nullish(),
   department: z.string().nullish(),

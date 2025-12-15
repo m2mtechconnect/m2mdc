@@ -39,6 +39,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AOCQuickAccessButton } from "@/components/aoc/AOCQuickAccessButton";
 import { DataCentreSelector } from "@/components/twin-selector";
+import { HelpMenu } from "@/components/header/HelpMenu";
+import { useTourAutoStart } from "@/tours/useTourAutoStart";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -174,7 +176,7 @@ export function Layout({ children }: LayoutProps) {
             </div>
 
             {/* Data Centre Twin Selector */}
-            <div className="hidden lg:block">
+            <div className="hidden lg:block" data-tour="dc-selector">
               <DataCentreSelector />
             </div>
 

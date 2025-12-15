@@ -191,7 +191,7 @@ const { isOpen, setIsOpen } = useCoPilot();
                   ? location.pathname + location.search === item.href
                   : location.pathname === item.href;
                 const tourId = item.href === '/' ? 'nav-dashboard' : 
-                  item.href === '/builder' ? 'nav-blueprint' :
+                  item.href === '/builder' ? 'nav-builder' :
                   item.href === '/app/agents' ? 'nav-agents' : undefined;
                 return (
                   <Tooltip key={item.name}>

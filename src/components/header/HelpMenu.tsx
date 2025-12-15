@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { HelpCircle, Play, RefreshCw, BookOpen, Compass, Activity, Layers } from 'lucide-react';
 import { useTour } from '@/context/TourContext';
 import { tourRegistry, TourId } from '@/tours/tourRegistry';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const tourIcons: Record<TourId, React.ReactNode> = {
   studioIntro: <Compass className="h-4 w-4" />,
@@ -18,11 +19,31 @@ const tourIcons: Record<TourId, React.ReactNode> = {
   blueprint: <Layers className="h-4 w-4" />,
 };
 
+// Map tours to their target routes
+const tourRoutes: Record<TourId, string> = {
+  studioIntro: '/',
+  overview: '/',
+  simulation: '/data-centre-twin?view=simulation',
+  blueprint: '/builder',
+};
+
 export function HelpMenu() {
   const { startTour, resetAllTours, isTourSeen } = useTour();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleStartTour = (tourId: TourId) => {
-    startTour(tourId);
+    const targetRoute = tourRoutes[tourId];
+    const currentPath = location.pathname + location.search;
+    
+    // Navigate to the correct route if not already there
+    if (currentPath !== targetRoute) {
+      navigate(targetRoute);
+      // Small delay to let the page render before starting tour
+      setTimeout(() => startTour(tourId), 300);
+    } else {
+      startTour(tourId);
+    }
   };
 
   return (

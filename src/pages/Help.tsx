@@ -202,12 +202,19 @@ export default function Help() {
               {(Object.keys(tourRegistry) as TourId[]).map((tourId) => {
                 const tour = tourRegistry[tourId];
                 const seen = isTourSeen(tourId);
+                // Map tours to their target routes
+                const tourRoutes: Record<TourId, string> = {
+                  studioIntro: '/',
+                  overview: '/',
+                  simulation: '/data-centre-twin?view=simulation',
+                  blueprint: '/builder',
+                };
                 return (
                   <button
                     key={tourId}
                     onClick={() => {
-                      startTour(tourId);
-                      navigate('/');
+                      navigate(tourRoutes[tourId]);
+                      setTimeout(() => startTour(tourId), 300);
                     }}
                     className="p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors text-left group"
                   >

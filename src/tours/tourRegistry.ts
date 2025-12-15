@@ -10,6 +10,7 @@ export interface TourDefinition {
 }
 
 // Studio Intro Tour - Global first login experience
+// Uses multiple selectors for responsive fallbacks
 const studioIntroSteps: Step[] = [
   {
     target: '[data-tour="dc-selector"]',
@@ -22,21 +23,21 @@ const studioIntroSteps: Step[] = [
     target: '[data-tour="nav-dashboard"]',
     title: 'Command Centre',
     content: 'Your main dashboard showing real-time KPIs, alerts, and operational status for the active data centre.',
-    placement: 'right',
+    placement: 'bottom',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="nav-blueprint"]',
+    target: '[data-tour="nav-builder"]',
     title: 'Blueprint Designer',
     content: 'Define your twin\'s configuration—agents, KPIs, workflows, and deployment settings.',
-    placement: 'right',
+    placement: 'bottom',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="nav-simulation"]',
-    title: 'Simulation Engine',
-    content: 'Run what-if scenarios to predict outcomes before making real operational changes.',
-    placement: 'right',
+    target: '[data-tour="nav-agents"]',
+    title: 'Subsystem Agents',
+    content: 'Monitor and configure your AI agents that manage thermal, power, cooling, and other data centre subsystems.',
+    placement: 'bottom',
     disableBeacon: true,
   },
   {

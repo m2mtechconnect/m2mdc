@@ -1,7 +1,7 @@
 import Joyride, { CallBackProps, STATUS, EVENTS, ACTIONS, Step } from 'react-joyride';
 import { useTour } from '@/context/TourContext';
 import { tourRegistry } from './tourRegistry';
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 
 // Filter out steps with missing targets for graceful degradation
 function filterValidSteps(steps: Step[]): Step[] {
@@ -16,6 +16,28 @@ function filterValidSteps(steps: Step[]): Step[] {
 
 export function TourRenderer() {
   const { activeTourId, setActiveTourId, completeTour, stepIndex, setStepIndex } = useTour();
+  const [validSteps, setValidSteps] = useState<Step[]>([]);
+
+  // Re-filter steps when tour changes, with slight delay for DOM to settle
+  useEffect(() => {
+    if (!activeTourId) {
+      setValidSteps([]);
+      return;
+    }
+
+    const tour = tourRegistry[activeTourId];
+    if (!tour) {
+      setValidSteps([]);
+      return;
+    }
+
+    // Small delay to let DOM elements render
+    const timer = setTimeout(() => {
+      setValidSteps(filterValidSteps(tour.steps));
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [activeTourId]);
 
   const handleCallback = (data: CallBackProps) => {
     const { status, action, index, type } = data;
@@ -47,14 +69,6 @@ export function TourRenderer() {
       setStepIndex(0);
     }
   };
-
-  // Filter steps based on available targets (responsive safety)
-  const validSteps = useMemo(() => {
-    if (!activeTourId) return [];
-    const tour = tourRegistry[activeTourId];
-    if (!tour) return [];
-    return filterValidSteps(tour.steps);
-  }, [activeTourId]);
 
   if (!activeTourId) return null;
 

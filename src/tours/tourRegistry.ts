@@ -117,13 +117,8 @@ const simulationSteps: Step[] = [
     placement: 'top',
     disableBeacon: true,
   },
-  {
-    target: '[data-tour="simulation-compare"]',
-    title: 'Compare Runs',
-    content: 'Compare current simulation against historical runs to identify trends and improvements.',
-    placement: 'left',
-    disableBeacon: true,
-  },
+  // Note: simulation-compare step removed as EnhancedComparisonMode is not yet integrated
+  // into the primary DCSimulationTab. Re-add when comparison feature is wired up.
 ];
 
 // Blueprint Tour - Blueprint/Builder tab

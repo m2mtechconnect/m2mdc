@@ -28,7 +28,8 @@ export function useTourAutoStart(options: AutoStartOptions = {}) {
   const { isTourSeen, startTour, activeTourId, isLoading } = useTour();
   const { twin: activeTwin, isLoading: twinLoading } = useActiveTwin();
   
-  const hasStartedRef = useRef<Set<TourId>>(new Set());
+const hasStartedRef = useRef<Set<TourId>>(new Set());
+  const noContextToastShownRef = useRef(false);
   const isDemo = searchParams.get('demo') === 'true';
   const isPreview = searchParams.get('preview') === 'true';
 
@@ -58,10 +59,10 @@ export function useTourAutoStart(options: AutoStartOptions = {}) {
       if (isTourSeen(tourId)) return false;
       
       if (requiresContext && !hasContext) {
-        // Show toast only once
-        if (!hasStartedRef.current.has('noContext' as TourId)) {
+        // Show toast only once per session
+        if (!noContextToastShownRef.current) {
           toast.info('Select a Data Centre in the header to begin the tour.');
-          hasStartedRef.current.add('noContext' as TourId);
+          noContextToastShownRef.current = true;
         }
         return false;
       }

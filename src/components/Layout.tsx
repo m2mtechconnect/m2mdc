@@ -97,9 +97,12 @@ export function Layout({ children }: LayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const { isOpen, setIsOpen } = useCoPilot();
+const { isOpen, setIsOpen } = useCoPilot();
   const [greeting, setGreeting] = useState(getGreeting());
   const headerRef = useRef<HTMLElement>(null);
+
+  // Auto-start tours based on route and user state
+  useTourAutoStart();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {

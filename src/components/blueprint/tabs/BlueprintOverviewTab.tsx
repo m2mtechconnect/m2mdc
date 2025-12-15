@@ -89,7 +89,7 @@ export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTa
   const domains = Object.entries(blueprint.domains);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-tour="blueprint-overview">
       {/* ============================================== */}
       {/* SECTION 0: 3D Twin Visualization */}
       {/* Visual layout of racks, power, cooling, network */}

@@ -374,7 +374,7 @@ export function DCStep1Summary() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2" data-tour="blueprint-energy">
               <Label htmlFor="renewablePercent">Renewable Energy (%)</Label>
               <Input
                 id="renewablePercent"
@@ -443,7 +443,7 @@ export function DCStep1Summary() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2 md:col-span-2">
+                <div className="space-y-2 md:col-span-2" data-tour="blueprint-gpu">
                   <Label htmlFor="gpuFleet">GPU Fleet / Model Types</Label>
                   <Input
                     id="gpuFleet"
@@ -501,7 +501,7 @@ export function DCStep1Summary() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2 md:col-span-2">
+                  <div className="space-y-2 md:col-span-2" data-tour="blueprint-gpu">
                     <Label htmlFor="gpuFleet">GPU Fleet / Model Types</Label>
                     <Input
                       id="gpuFleet"

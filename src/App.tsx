@@ -136,6 +136,7 @@ function AuthenticatedApp() {
   // If authenticated, show all protected routes
   return (
     <Layout>
+      <TourRenderer />
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
@@ -220,7 +221,6 @@ const App = () => (
                     <CoPilotCommandProvider>
                       <Toaster />
                       <Sonner />
-                      <TourRenderer />
                       <AuthenticatedApp />
                       {/* PerformancePanel hidden */}
                     </CoPilotCommandProvider>

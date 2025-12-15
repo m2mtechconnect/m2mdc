@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,6 +29,14 @@ import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
 import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 import { useTour } from "@/context/TourContext";
 import { tourRegistry, TourId } from "@/tours/tourRegistry";
+
+// Tour icon mapping - matches HelpMenu
+const tourIcons: Record<TourId, React.ReactNode> = {
+  studioIntro: <Compass className="h-4 w-4 text-primary" />,
+  overview: <BookOpen className="h-4 w-4 text-primary" />,
+  simulation: <Activity className="h-4 w-4 text-primary" />,
+  blueprint: <Layers className="h-4 w-4 text-primary" />,
+};
 
 // Validation Schema
 const contactSchema = z.object({
@@ -219,7 +227,7 @@ export default function Help() {
                     className="p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors text-left group"
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <Layers className="h-4 w-4 text-primary" />
+                      {tourIcons[tourId]}
                       <span className="font-medium text-sm">{tour.name}</span>
                       {seen && (
                         <span className="text-xs text-muted-foreground ml-auto">✓</span>

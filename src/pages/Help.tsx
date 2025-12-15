@@ -28,14 +28,14 @@ import { useNavigate } from "react-router-dom";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
 import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 import { useTour } from "@/context/TourContext";
-import { tourRegistry, TourId } from "@/tours/tourRegistry";
+import { tourRegistry, TourId, tourRoutes } from "@/tours/tourRegistry";
 
-// Tour icon mapping - matches HelpMenu
+// Tour icon mapping - matches HelpMenu styling
 const tourIcons: Record<TourId, React.ReactNode> = {
-  studioIntro: <Compass className="h-4 w-4 text-primary" />,
-  overview: <BookOpen className="h-4 w-4 text-primary" />,
-  simulation: <Activity className="h-4 w-4 text-primary" />,
-  blueprint: <Layers className="h-4 w-4 text-primary" />,
+  studioIntro: <Compass className="h-4 w-4" />,
+  overview: <BookOpen className="h-4 w-4" />,
+  simulation: <Activity className="h-4 w-4" />,
+  blueprint: <Layers className="h-4 w-4" />,
 };
 
 // Validation Schema
@@ -210,13 +210,6 @@ export default function Help() {
               {(Object.keys(tourRegistry) as TourId[]).map((tourId) => {
                 const tour = tourRegistry[tourId];
                 const seen = isTourSeen(tourId);
-                // Map tours to their target routes
-                const tourRoutes: Record<TourId, string> = {
-                  studioIntro: '/',
-                  overview: '/',
-                  simulation: '/data-centre-twin?view=simulation',
-                  blueprint: '/builder',
-                };
                 return (
                   <button
                     key={tourId}
@@ -227,7 +220,7 @@ export default function Help() {
                     className="p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors text-left group"
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      {tourIcons[tourId]}
+                      <span className="text-primary">{tourIcons[tourId]}</span>
                       <span className="font-medium text-sm">{tour.name}</span>
                       {seen && (
                         <span className="text-xs text-muted-foreground ml-auto">✓</span>

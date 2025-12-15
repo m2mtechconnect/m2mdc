@@ -90,8 +90,9 @@ const hasStartedRef = useRef<Set<TourId>>(new Set());
       }
     }
 
-    // Simulation Tour
-    if (path.includes('/simulation') || searchParams.get('tab') === 'simulation') {
+    // Simulation Tour - check for simulation view param
+    const view = searchParams.get('view');
+    if (path.includes('/data-centre-twin') && view === 'simulation') {
       tryStartTour('simulation');
     }
 

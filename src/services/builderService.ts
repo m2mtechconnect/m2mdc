@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export interface BuilderConfig {
-  source?: 'homepage' | 'dashboard' | 'imported';
+  source?: 'file' | 'questionnaire' | 'template' | 'url' | 'manual' | 'homepage' | 'dashboard' | 'imported' | 'manage-agents' | 'blank';
   goal?: string;
   industry?: string;
   department?: string;

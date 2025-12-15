@@ -337,7 +337,7 @@ export function DCStep1Summary() {
       </Card>
 
       {/* Facility Specifications - Core */}
-      <Card>
+      <Card data-tour="blueprint-tier">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-primary" />

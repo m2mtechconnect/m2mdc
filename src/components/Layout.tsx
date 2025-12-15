@@ -187,10 +187,13 @@ export function Layout({ children }: LayoutProps) {
                 const isActive = item.href.includes('?') 
                   ? location.pathname + location.search === item.href
                   : location.pathname === item.href;
+                const tourId = item.href === '/' ? 'nav-dashboard' : 
+                  item.href === '/builder' ? 'nav-blueprint' :
+                  item.href === '/app/agents' ? 'nav-agents' : undefined;
                 return (
                   <Tooltip key={item.name}>
                     <TooltipTrigger asChild>
-                      <Link to={item.href}>
+                      <Link to={item.href} data-tour={tourId}>
                         <Button
                           variant={isActive ? "secondary" : "ghost"}
                           size="sm"
@@ -220,10 +223,13 @@ export function Layout({ children }: LayoutProps) {
                   const isActive = item.href.includes('?') 
                     ? location.pathname + location.search === item.href
                     : location.pathname === item.href;
+                  const tourId = item.href.includes('simulation') ? 'nav-simulation' :
+                    item.href === '/intelligence' ? 'nav-analytics' :
+                    item.href === '/compliance' ? 'nav-audit' : undefined;
                   return (
                     <Tooltip key={item.name}>
                       <TooltipTrigger asChild>
-                        <Link to={item.href}>
+                        <Link to={item.href} data-tour={tourId}>
                           <Button
                             variant={isActive ? "secondary" : "ghost"}
                             size="sm"

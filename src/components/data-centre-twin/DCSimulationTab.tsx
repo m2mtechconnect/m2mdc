@@ -218,7 +218,9 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
         {/* Left: 3D Digital Twin */}
         <div className="space-y-4">
           {/* 3D Twin Visualization - Overlay controls are INSIDE the 3D panel (canonical source) */}
-          <Card className={cn(
+          <Card 
+            data-tour="simulation-3d-view"
+            className={cn(
             'overflow-hidden relative transition-all duration-300',
             isRunning && 'ring-2 ring-success/30 shadow-lg shadow-success/10'
           )}>
@@ -243,7 +245,9 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
           </Card>
           
           {/* KPI Baseline vs Current Comparison */}
-          <Card className={cn(
+          <Card 
+            data-tour="simulation-kpi-grid"
+            className={cn(
             'transition-all duration-300',
             isRunning && 'ring-1 ring-primary/20 shadow-lg shadow-primary/5'
           )}>
@@ -337,7 +341,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
         {/* Right: Scenario Controls & Timeline */}
         <div className="space-y-4">
           {/* Simulation Controls */}
-          <Card>
+          <Card data-tour="simulation-run-controls">
             <CardHeader className="py-3 px-4 border-b">
               <CardTitle className="text-sm font-medium">Simulation Controls</CardTitle>
             </CardHeader>
@@ -461,7 +465,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
           </Card>
           
           {/* Scenario Picker */}
-          <Card>
+          <Card data-tour="simulation-scenario-list">
             <CardHeader className="py-3 px-4 border-b">
               <CardTitle className="text-sm font-medium flex items-center justify-between">
                 <span>Select Scenario</span>
@@ -513,7 +517,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
           </Card>
           
           {/* Event Timeline */}
-          <Card>
+          <Card data-tour="simulation-timeline">
             <CardHeader className="py-3 px-4 border-b">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-warning" />

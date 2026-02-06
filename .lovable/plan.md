@@ -1,118 +1,83 @@
-# M2M Digital Twin Platform - Competitive Audit Implementation
 
-## Implementation Status
 
-### Phase 1: Critical ✅ COMPLETED
+## Plan: Replace All Marketing Site Images with Clean Imagery
 
-| Item | Status | Details |
+### Problem Identified
+
+The AI-generated images contain garbled, non-English text that looks unprofessional:
+- **dashboard-desktop.png**: Shows "Cnaber", "Distarks", "Polvicies", "Gaven trangels", "Pryt Ocheat" 
+- **twin3d-desktop.png**: Shows "Reevel Atliza", "ROTANILTONE", "Doades" etc.
+- These nonsense labels ruin the professional appearance of the marketing site
+
+### Complete Image Inventory
+
+**Product Screenshots (in `/public/landing/screenshots/`):**
+| File | Status | Used In |
 |------|--------|---------|
-| Security Definer Views | ✅ Done | Converted 3 views to SECURITY INVOKER |
-| RLS Policy Hardening | ✅ Done | Fixed 3 overly permissive policies |
-| Bundle Splitting | ✅ Done | 7 vendor chunks configured in vite.config.ts |
-| TypeScript Strict Mode | ⏳ Deferred | 100+ errors require phased migration (see docs/TYPESCRIPT_STRICT_MIGRATION.md) |
+| `dashboard-desktop.png` | Bad AI text | Hero section |
+| `twin3d-desktop.png` | Bad AI text | Feature section #1 |
+| `simulation-desktop.png` | Real capture | Feature section #2 |
+| `sovereignty-desktop.png` | Real capture | Feature section #3 |
+| `agents-desktop.png` | Real capture | Feature section #4 |
+| `blueprint-desktop.png` | Real capture | Feature section #5 |
+| `telemetry-desktop.png` | Real capture | Feature section #6 |
+| `recommendation-desktop.png` | Exists but unused | - |
 
-### Security Changes Applied
-
-**Views Fixed:**
-- `vw_mcp_servers` → SECURITY INVOKER
-- `vw_templates_industry` → SECURITY INVOKER  
-- `vw_templates_m2m` → SECURITY INVOKER
-
-**RLS Policies Hardened:**
-- `agent_action_logs` INSERT → Requires authenticated user
-- `agent_activity_logs` INSERT → Requires agent ownership
-- `contact_expert_logs` INSERT → Links to user_id
-
-**Remaining Warnings (Acceptable):**
-- Service-role-only tables (oauth_states, copilot_memory, etc.) - Intentional for backend ops
-- SELECT policies with USING(true) - Intentional for public read access (templates, departments)
-
-### Bundle Splitting Configuration
-
-```typescript
-// vite.config.ts - manualChunks
-{
-  'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-  'vendor-ui': ['@radix-ui/react-*'],
-  'vendor-charts': ['recharts'],
-  'vendor-3d': ['three', '@react-three/fiber', '@react-three/drei'],
-  'vendor-query': ['@tanstack/react-query'],
-  'vendor-supabase': ['@supabase/supabase-js'],
-  'vendor-motion': ['framer-motion'],
-}
-```
-
----
-
-## Phase 2: High Priority ✅ COMPLETED
-
-| Item | Status | Details |
+**Background Images (in `/public/landing/`):**
+| File | Status | Used In |
 |------|--------|---------|
-| Unit Test Coverage | ✅ Done | 3 new test files (60+ tests): carbonEngine, kpiOverlayEngine, blueprintStore |
-| Architecture Documentation | ✅ Done | Created docs/ARCHITECTURE.md with diagrams |
-| Code Consolidation | ✅ Done | Context dirs already consolidated with deprecation notices |
-| API Rate Limiting | ⏳ Pending | MEDIUM priority - deferred to Phase 3 |
+| `hero-datacenter-bg.jpg` | Good quality | Not currently used in code |
+| `datacenter-control-room.jpg` | Good quality | Not currently used in code |
+| `sustainable-datacenter-campus.jpg` | Good quality | Not currently used in code |
 
-### New Test Files Created
+### Recommended Strategy
 
+**Option A: Capture Real Screenshots (Best Practice)**
+
+For `dashboard-desktop.png` and `twin3d-desktop.png`, navigate to the actual Studio routes (`/dashboard` and the 3D twin view) and capture clean screenshots. This ensures 100% accuracy and follows your established "no marketing buzzwords" principle.
+
+**Option B: Generate Clean AI Images (Fallback)**
+
+If real captures aren't ready, regenerate the two problematic images with explicit instructions:
+- "NO TEXT, NO LABELS, NO UI ELEMENTS"
+- Pure 3D visualization without any overlay panels
+- Abstract server room or thermal heatmap renders
+
+**Option C: Hybrid - Abstract + Real (Recommended)**
+
+1. Use **abstract ambient imagery** for the hero (already have good `hero-datacenter-bg.jpg`)
+2. Capture **real Studio screenshots** for all 6 feature sections
+3. Remove the problematic AI-generated dashboard/twin3d images entirely until real captures are available
+
+### Implementation Steps
+
+1. **Delete the two problematic AI images**:
+   - `public/landing/screenshots/dashboard-desktop.png`
+   - `public/landing/screenshots/twin3d-desktop.png`
+
+2. **Generate new clean ambient images** (no text/UI):
+   - Abstract 3D server visualization for hero
+   - Clean thermal heatmap render for 3D Twin feature
+
+3. **Update manifest version** to bust cache
+
+4. **Update "Customer Outcomes" section** (from your earlier screenshot) to either:
+   - Change to "Platform Capabilities" (what the platform measures)
+   - Add "Target" or "Industry Benchmark" labels instead of "Achieved"
+   - This section currently claims real customer results you don't have yet
+
+### Technical Details
+
+**Files to Modify:**
+- `public/landing/screenshots/dashboard-desktop.png` - Replace with clean image
+- `public/landing/screenshots/twin3d-desktop.png` - Replace with clean image
+- `src/data/studioScreenshots.ts` - Bump manifest version
+- `src/components/landing/TwinStatsBand.tsx` - Update copy to reflect pre-customer status
+
+**Image Generation Prompts (if using AI fallback):**
+```text
+Dashboard: "Photorealistic 3D isometric view of a modern data center server room with blue-teal cooling corridors, glass-enclosed server racks with LED status lights, absolutely no text, no labels, no UI overlays, no signage, clean architectural visualization, dark background, 1440x900"
+
+3D Twin: "Thermal heatmap visualization of data center racks in 3D perspective, gradient from blue (cool) to orange-red (hot), no text, no labels, no UI panels, pure scientific visualization style, dark background, 1440x900"
 ```
-tests/unit/
-├── carbonEngine.test.ts      # 29 tests - Carbon calculations
-├── kpiOverlayEngine.test.ts  # 28 tests - Anomaly detection, forecasting
-└── blueprintStore.test.ts    # 15+ tests - Zustand store state management
-```
 
----
-
-## Phase 3: Medium Priority
-
-| Item | Status |
-|------|--------|
-| Error Tracking (Sentry) | ⏳ Pending |
-| Performance Monitoring | ⏳ Pending |
-| Accessibility Compliance | ⏳ Pending |
-| Feature Flags | ⏳ Pending |
-
----
-
-## Current Security Score
-
-| Linter Issue | Before | After |
-|--------------|--------|-------|
-| Security Definer Views | 3 ERROR | 0 ✅ |
-| Permissive RLS (INSERT/UPDATE/DELETE) | 3 WARN | 0 ✅ |
-| Service-Role Policies | 4 WARN | 4 WARN (acceptable) |
-| Function Search Path | 1 WARN | 1 WARN |
-| Extension in Public | 1 WARN | 1 WARN |
-
-**Security Score: 65% → 80%**
-
----
-
-## Competitive Gap Closure
-
-| Category | Before | After Phase 1 | Target |
-|----------|--------|---------------|--------|
-| Security & Compliance | 65% | 80% | 95% |
-| Performance Optimization | 70% | 78% | 95% |
-| Architecture & Code Quality | 75% | 77% | 90% |
-| Testing Coverage | 60% | 60% | 85% |
-| Developer Experience | 55% | 57% | 85% |
-| Observability | 50% | 50% | 90% |
-| Documentation | 40% | 45% | 80% |
-
----
-
-## Related Documentation
-
-- [TypeScript Strict Migration Roadmap](../docs/TYPESCRIPT_STRICT_MIGRATION.md)
-- [Security Policy](../SECURITY.md)
-
----
-
-## Next Actions
-
-1. **Immediate**: Start TypeScript cleanup (unused imports)
-2. **This Week**: Add unit tests for core stores
-3. **This Month**: Complete architecture documentation
-4. **Ongoing**: Monitor security linter results

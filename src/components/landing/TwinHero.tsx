@@ -161,11 +161,11 @@ export function TwinHero() {
           >
             Live Digital Twin of Your{" "}
             <span className="relative inline-block">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-info to-secondary">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-m2m-gold-dark to-accent">
                 AI Data Centre
               </span>
               <motion.span 
-                className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-primary to-info rounded-full"
+                className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-accent to-m2m-gold-dark rounded-full"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 0.8, delay: 0.9 }}
@@ -217,10 +217,10 @@ export function TwinHero() {
             >
               <Button 
                 size="lg" 
-                className="text-base px-10 h-14 group relative overflow-hidden transition-all duration-300 bg-accent text-accent-foreground hover:bg-accent/90 hover:shadow-2xl hover:shadow-accent/30"
+                className="text-base px-10 h-14 group relative overflow-hidden transition-all duration-300 bg-accent text-m2m-black hover:bg-m2m-gold-dark hover:shadow-2xl hover:shadow-accent/30"
                 onClick={() => navigate("/auth")}
               >
-                <span className="relative z-10 flex items-center">
+                <span className="relative z-10 flex items-center font-semibold">
                   Get Started Free
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </span>

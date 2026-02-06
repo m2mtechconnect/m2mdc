@@ -143,7 +143,7 @@ export function TwinHeader() {
               Sign In
             </Button>
             <Button
-              className="text-sm bg-accent text-accent-foreground hover:bg-accent/90"
+              className="text-sm bg-accent text-m2m-black font-semibold hover:bg-m2m-gold-dark"
               onClick={() => navigate("/auth")}
             >
               Get Started
@@ -229,7 +229,7 @@ export function TwinHeader() {
                   Sign In
                 </Button>
                 <Button
-                  className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+                  className="w-full bg-accent text-m2m-black font-semibold hover:bg-m2m-gold-dark"
                   onClick={() => {
                     navigate("/auth");
                     setIsMobileMenuOpen(false);

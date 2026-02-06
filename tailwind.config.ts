@@ -126,6 +126,13 @@ export default {
           DEFAULT: "hsl(var(--info))",
           foreground: "hsl(var(--info-foreground))",
         },
+        // M2M Brand Colors
+        m2m: {
+          gold: "hsl(var(--m2m-gold))",
+          "gold-light": "hsl(var(--m2m-gold-light))",
+          "gold-dark": "hsl(var(--m2m-gold-dark))",
+          black: "hsl(var(--m2m-black))",
+        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],

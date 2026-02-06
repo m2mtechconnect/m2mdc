@@ -55,7 +55,7 @@ export function CompactAIInsightsPanel({
     power: 'bg-warning/10 text-warning border-warning/20',
     cooling: 'bg-info/10 text-info border-info/20',
     workload: 'bg-accent/10 text-accent border-accent/20',
-    sovereignty: 'bg-primary/10 text-primary border-primary/20',
+    sovereignty: 'bg-accent/10 text-accent border-accent/20',
     carbon: 'bg-success/10 text-success border-success/20',
   };
   
@@ -64,7 +64,7 @@ export function CompactAIInsightsPanel({
       title="AI Insights & Recommendations"
       badge={`${activeInsights.length} active`}
       defaultOpen={true}
-      icon={<Brain className="h-4 w-4 text-primary" />}
+      icon={<Brain className="h-4 w-4 text-accent" />}
     >
       {activeInsights.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
@@ -80,7 +80,7 @@ export function CompactAIInsightsPanel({
             <Card key={insight.id} className="bg-card border-border overflow-hidden">
               <CardContent className="p-3">
                 <div className="flex items-start gap-2">
-                  <div className="p-1.5 rounded-lg bg-primary/10 shrink-0">
+                  <div className="p-1.5 rounded-lg bg-accent/10 shrink-0">
                     {insight.icon}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -201,7 +201,7 @@ function generateInsights(facility: DataCentreFacility): Insight[] {
     insights.push({
       id: 'sovereignty-drift',
       domain: 'sovereignty',
-      icon: <Globe className="h-3.5 w-3.5 text-primary" />,
+      icon: <Globe className="h-3.5 w-3.5 text-accent" />,
       severity: 'warning',
       title: 'Sovereignty compliance drift',
       description: '3 data flows routed through US-East',

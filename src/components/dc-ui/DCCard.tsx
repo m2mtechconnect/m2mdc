@@ -137,7 +137,7 @@ export function DCSectionHeader({
     <div className={cn('flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6', className)}>
       <div className="flex items-center gap-3">
         {icon && (
-          <div className="p-2 rounded-lg bg-primary/10">
+          <div className="p-2 rounded-lg bg-accent/10">
             {icon}
           </div>
         )}

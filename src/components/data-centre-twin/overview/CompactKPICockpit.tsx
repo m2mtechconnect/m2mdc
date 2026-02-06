@@ -125,7 +125,7 @@ export function CompactKPICockpit({
       status: getStatus(pueValue < 1.4, pueValue < 1.6),
       trend: pueValue < 1.5 ? 'down' : 'up',
       delta: getSimulatedDelta('pue', -2.3),
-      icon: <Zap className="h-4 w-4 text-primary" />,
+      icon: <Zap className="h-4 w-4 text-accent" />,
       sparklineData: sparklineData.pue,
       insight: pueValue < 1.4 ? 'PUE is excellent. Cooling optimization is effective.' : 'PUE trending above target.',
       isSimulated: isSimulating,
@@ -138,7 +138,7 @@ export function CompactKPICockpit({
       status: getStatus(gpuUtilValue > 70, gpuUtilValue > 50),
       trend: 'up',
       delta: getSimulatedDelta('gpuUtilization', 5.8),
-      icon: <Cpu className="h-4 w-4 text-primary" />,
+      icon: <Cpu className="h-4 w-4 text-accent" />,
       sparklineData: sparklineData.gpuUtilization,
       insight: 'GPU clusters operating at optimal capacity.',
       isSimulated: isSimulating,
@@ -151,7 +151,7 @@ export function CompactKPICockpit({
       status: getStatus(thermalValue > 80, thermalValue > 60),
       trend: 'stable',
       delta: getSimulatedDelta('thermalStabilityScore', 1.2),
-      icon: <Thermometer className="h-4 w-4 text-primary" />,
+      icon: <Thermometer className="h-4 w-4 text-accent" />,
       sparklineData: sparklineData.thermalStability,
       insight: 'Thermal conditions stable across all zones.',
       isSimulated: isSimulating,
@@ -163,7 +163,7 @@ export function CompactKPICockpit({
       unit: '%',
       status: getStatus(sovereigntyRisk < 10, sovereigntyRisk < 30),
       trend: 'stable',
-      icon: <Globe className="h-4 w-4 text-primary" />,
+      icon: <Globe className="h-4 w-4 text-accent" />,
       sparklineData: sparklineData.sovereignty,
       insight: 'All data flows compliant with sovereignty policies.',
       isSimulated: isSimulating,
@@ -191,7 +191,7 @@ export function CompactKPICockpit({
       value: Math.round(coolingValue),
       unit: '%',
       status: getStatus(coolingValue > 70),
-      icon: <Wind className="h-4 w-4 text-primary" />,
+      icon: <Wind className="h-4 w-4 text-accent" />,
       sparklineData: sparklineData.coolingEfficiency,
       isSimulated: isSimulating,
     },
@@ -201,7 +201,7 @@ export function CompactKPICockpit({
       value: Math.round(networkValue),
       unit: '%',
       status: getStatus(networkValue > 80),
-      icon: <Network className="h-4 w-4 text-primary" />,
+      icon: <Network className="h-4 w-4 text-accent" />,
       sparklineData: sparklineData.networkIntegrity,
       isSimulated: isSimulating,
     },
@@ -211,7 +211,7 @@ export function CompactKPICockpit({
       value: Math.round(safetyValue),
       unit: '%',
       status: getStatus(safetyValue > 90),
-      icon: <Shield className="h-4 w-4 text-primary" />,
+      icon: <Shield className="h-4 w-4 text-accent" />,
       sparklineData: sparklineData.facilitySafety,
       isSimulated: isSimulating,
     },
@@ -221,7 +221,7 @@ export function CompactKPICockpit({
       value: carbonMetrics.carbonEfficiencyScore.toFixed(0),
       unit: '%',
       status: getStatus(carbonMetrics.carbonEfficiencyScore > 70),
-      icon: <Leaf className="h-4 w-4 text-primary" />,
+      icon: <Leaf className="h-4 w-4 text-accent" />,
       sparklineData: sparklineData.carbonEfficiency,
     },
     {
@@ -230,7 +230,7 @@ export function CompactKPICockpit({
       value: financialMetrics.financialHealthScore.toFixed(0),
       unit: '%',
       status: getStatus(financialMetrics.financialHealthScore > 70),
-      icon: <DollarSign className="h-4 w-4 text-primary" />,
+      icon: <DollarSign className="h-4 w-4 text-accent" />,
       sparklineData: sparklineData.financialHealth,
     },
   ];
@@ -242,7 +242,7 @@ export function CompactKPICockpit({
       title="KPI Cockpit" 
       badge="Real-time"
       defaultOpen={true}
-      icon={<Activity className="h-5 w-5 text-primary" />}
+      icon={<Activity className="h-5 w-5 text-accent" />}
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">

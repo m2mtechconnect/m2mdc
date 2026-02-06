@@ -10,6 +10,7 @@ import { ArrowRight, Play, CheckCircle2, Sparkles, TrendingUp, Zap, Leaf, Buildi
 import { useNavigate } from "react-router-dom";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
+import { screenshotManifest } from "@/data/studioScreenshots";
 
 // Power stats - achieved results, not targets
 const powerStats = [
@@ -299,7 +300,7 @@ export function TwinHero() {
             {/* Screenshot content - Use real dashboard screenshot */}
             <div className="aspect-[16/9] bg-gradient-to-br from-muted/80 via-muted/50 to-background rounded-b-xl lg:rounded-b-2xl overflow-hidden relative">
               <img 
-                src="/landing/screenshots/dashboard-desktop.png" 
+                src={`/landing/screenshots/dashboard-desktop.png?v=${encodeURIComponent(screenshotManifest.version)}`} 
                 alt="M2M Digital Twin Dashboard showing 3D rack visualization, PUE metrics, GPU utilization, and carbon intensity KPIs"
                 className="w-full h-full object-cover object-top"
                 loading="eager"

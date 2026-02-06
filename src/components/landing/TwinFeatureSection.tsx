@@ -179,7 +179,7 @@ export function TwinFeatureSection({
               
               <div className="aspect-[16/10] bg-gradient-to-br from-muted/80 via-muted/50 to-background rounded-xl overflow-hidden relative">
                 <motion.img 
-                  src={imageSrc} 
+                  src={resolvedImageSrc} 
                   alt={imageAlt}
                   className="w-full h-full object-cover"
                   initial={{ scale: 1.05 }}

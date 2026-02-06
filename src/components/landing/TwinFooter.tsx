@@ -52,7 +52,7 @@ export function TwinFooter() {
           href={link.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm text-slate-400 hover:text-white transition-colors inline-flex items-center gap-1"
+          className="text-sm text-slate-400 hover:text-accent transition-colors inline-flex items-center gap-1"
         >
           {link.label}
           <ExternalLink className="h-3 w-3 opacity-50" />
@@ -62,7 +62,7 @@ export function TwinFooter() {
     return (
       <a
         href={link.href}
-        className="text-sm text-slate-400 hover:text-white transition-colors"
+        className="text-sm text-slate-400 hover:text-accent transition-colors"
       >
         {link.label}
       </a>
@@ -104,7 +104,7 @@ export function TwinFooter() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="h-9 w-9 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition-colors"
+                  className="h-9 w-9 rounded-lg bg-slate-800 hover:bg-accent/20 hover:text-accent flex items-center justify-center transition-colors"
                   aria-label={social.label}
                 >
                   <social.icon className="h-4 w-4" />
@@ -171,7 +171,7 @@ export function TwinFooter() {
                 <span>SOC 2 Type II</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-green-500">●</span>
+                <span className="text-accent">●</span>
                 <span>Carbon Neutral</span>
               </div>
               <div className="flex items-center gap-1.5">

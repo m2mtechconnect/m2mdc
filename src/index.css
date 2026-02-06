@@ -40,8 +40,8 @@
     --dc-blue: 210 100% 56%;
     --dc-blue-light: 210 100% 66%;
     --dc-cyan: 186 100% 42%;
-    --dc-purple: 262 83% 58%;
-    --dc-purple-light: 262 83% 68%;
+    --dc-teal: 186 100% 42%;
+    --dc-teal-light: 186 100% 52%;
     
     /* ============ NOC Dark Theme Variables (for DC modules) ============ */
     --noc-bg-deep: 222 47% 5%;
@@ -61,9 +61,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
     
-    /* M2M Brand Primary - Purple */
-    --primary: 262 83% 58%;
-    --primary-foreground: 0 0% 100%;
+    /* M2M Brand Primary - Cyan/Teal */
+    --primary: 186 100% 42%;
+    --primary-foreground: 222 47% 5%;
     
     /* M2M Brand Secondary - Blue */
     --secondary: 217 91% 60%;
@@ -90,12 +90,12 @@
     
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 262 83% 58%;
+    --ring: 186 100% 42%;
     
     --radius: 0.5rem;
     
     /* M2M Brand Gradient */
-    --m2m-gradient: linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(217 91% 60%) 100%);
+    --m2m-gradient: linear-gradient(135deg, hsl(186 100% 42%) 0%, hsl(217 91% 60%) 100%);
     
     /* ============ Studio Text Colors (Light Theme) ============ */
     --text-heading: 222 47% 11%;    /* #111827 equivalent - primary headings */
@@ -123,7 +123,7 @@
     --sovereignty-violation: var(--dc-red);
     
     --gpu-saturated: var(--dc-red);
-    --gpu-high: var(--dc-purple);
+    --gpu-high: var(--dc-teal);
     --gpu-normal: var(--dc-green);
     --gpu-idle: var(--text-muted);
     
@@ -132,15 +132,15 @@
     --gradient-card: linear-gradient(135deg, hsl(var(--noc-surface)) 0%, hsl(var(--noc-surface-elevated)) 100%);
     --gradient-thermal: linear-gradient(90deg, hsl(var(--dc-cyan)) 0%, hsl(var(--dc-green)) 25%, hsl(var(--dc-amber)) 75%, hsl(var(--dc-red)) 100%);
     --gradient-power: linear-gradient(90deg, hsl(var(--dc-green)) 0%, hsl(var(--dc-amber)) 70%, hsl(var(--dc-red)) 100%);
-    --gradient-gpu: linear-gradient(135deg, hsl(var(--dc-purple)) 0%, hsl(var(--dc-cyan)) 100%);
-    --gradient-sovereignty: linear-gradient(135deg, hsl(var(--dc-blue)) 0%, hsl(var(--dc-purple)) 100%);
+    --gradient-gpu: linear-gradient(135deg, hsl(var(--dc-teal)) 0%, hsl(var(--dc-cyan)) 100%);
+    --gradient-sovereignty: linear-gradient(135deg, hsl(var(--dc-blue)) 0%, hsl(var(--dc-teal)) 100%);
     
     /* ============ Glows & Shadows ============ */
     --glow-cyan: 0 0 20px hsla(var(--dc-cyan), 0.4);
     --glow-green: 0 0 20px hsla(var(--dc-green), 0.4);
     --glow-amber: 0 0 20px hsla(var(--dc-amber), 0.4);
     --glow-red: 0 0 20px hsla(var(--dc-red), 0.5);
-    --glow-purple: 0 0 20px hsla(var(--dc-purple), 0.4);
+    --glow-teal: 0 0 20px hsla(var(--dc-teal), 0.4);
     --glow-blue: 0 0 20px hsla(var(--dc-blue), 0.4);
     
     --shadow-card: 0 1px 3px hsla(0, 0%, 0%, 0.1), 0 1px 2px hsla(0, 0%, 0%, 0.06);
@@ -185,7 +185,7 @@
     --secondary-foreground: 0 0% 98%;
     --muted: 222 40% 11%;
     --muted-foreground: 222 15% 70%;
-    --accent: 262 83% 58%;
+    --accent: 186 100% 42%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
@@ -276,7 +276,7 @@
   --secondary-foreground: var(--text-primary);
   --muted: var(--noc-surface);
   --muted-foreground: var(--text-secondary);
-  --accent: var(--dc-purple);
+  --accent: var(--dc-teal);
   --accent-foreground: var(--text-primary);
   --border: var(--noc-border);
   --input: var(--noc-surface-elevated);
@@ -302,7 +302,7 @@
   .text-accent-green { color: hsl(142 76% 36%); }
   .text-accent-blue { color: hsl(217 91% 60%); }
   .text-accent-amber { color: hsl(38 92% 50%); }
-  .text-accent-purple { color: hsl(262 83% 58%); }
+  .text-accent-teal { color: hsl(186 100% 42%); }
   .text-accent-orange { color: hsl(25 95% 53%); }
   .text-accent-cyan { color: hsl(186 100% 42%); }
   
@@ -312,7 +312,7 @@
   .status-critical { color: hsl(var(--dc-red)); }
   .status-info { color: hsl(var(--dc-blue)); }
   .status-sovereign { color: hsl(var(--dc-blue)); }
-  .status-gpu { color: hsl(var(--dc-purple)); }
+  .status-gpu { color: hsl(var(--dc-teal)); }
   .status-thermal { color: hsl(var(--dc-cyan)); }
   
   .bg-status-operational { background: hsl(var(--dc-green) / 0.15); }
@@ -439,7 +439,7 @@
   .glow-green { box-shadow: var(--glow-green); }
   .glow-amber { box-shadow: var(--glow-amber); }
   .glow-red { box-shadow: var(--glow-red); }
-  .glow-purple { box-shadow: var(--glow-purple); }
+  .glow-teal { box-shadow: var(--glow-teal); }
   .glow-blue { box-shadow: var(--glow-blue); }
 
   /* Gradient text */

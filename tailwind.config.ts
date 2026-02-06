@@ -80,13 +80,13 @@ export default {
           blue: "hsl(var(--dc-blue))",
           "blue-light": "hsl(var(--dc-blue-light))",
           cyan: "hsl(var(--dc-cyan))",
-          purple: "hsl(var(--dc-purple))",
-          "purple-light": "hsl(var(--dc-purple-light))",
+          teal: "hsl(var(--dc-teal))",
+          "teal-light": "hsl(var(--dc-teal-light))",
           // Domain-specific semantic colors
           thermal: "hsl(var(--dc-red))",
           cooling: "hsl(var(--dc-cyan))",
           power: "hsl(var(--dc-amber))",
-          gpu: "hsl(var(--dc-purple))",
+          gpu: "hsl(var(--dc-teal))",
           sovereignty: "hsl(var(--dc-blue))",
           network: "hsl(var(--dc-cyan))",
           // Status colors
@@ -160,7 +160,7 @@ export default {
         'glow-green': 'var(--glow-green)',
         'glow-amber': 'var(--glow-amber)',
         'glow-red': 'var(--glow-red)',
-        'glow-purple': 'var(--glow-purple)',
+        'glow-teal': 'var(--glow-teal)',
         'glow-blue': 'var(--glow-blue)',
       },
       keyframes: {

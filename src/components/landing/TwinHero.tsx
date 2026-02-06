@@ -63,10 +63,26 @@ export function TwinHero() {
   return (
     <section 
       ref={containerRef}
-      className="relative min-h-[95vh] flex items-center overflow-hidden bg-gradient-to-br from-background via-background to-muted/30"
+      className="relative min-h-[95vh] flex items-center overflow-hidden bg-background"
     >
+      {/* Video background - futuristic data center visualization */}
+      <div className="absolute inset-0 z-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
+        >
+          <source src="/landing/hero-datacenter.mp4" type="video/mp4" />
+        </video>
+        {/* Gradient overlays for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-background/70" />
+      </div>
+
       {/* Premium animated gradient mesh background */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 z-[1] pointer-events-none">
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.02]" />
         
         {/* Mouse-follow spotlight effect */}
@@ -111,7 +127,7 @@ export function TwinHero() {
         />
       </div>
       
-      <div className="relative max-w-7xl mx-auto px-4 lg:px-8 py-16 lg:py-24 w-full">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-8 py-16 lg:py-24 w-full">
         {/* Power Stats Bar - Above headline like Linear/Vercel */}
         <motion.div 
           className="flex flex-wrap justify-center gap-6 lg:gap-10 mb-12"

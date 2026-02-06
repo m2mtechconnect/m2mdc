@@ -4,18 +4,20 @@
  * Captures high-quality screenshots of Studio UI for landing page assets.
  * Uses Playwright to navigate and capture each scene defined in screenshotPresets.
  * 
+ * IMPORTANT: Requires authentication credentials to access protected routes.
+ * 
  * Usage:
- *   npx playwright test scripts/captureMarketingScreenshots.ts --project=chromium
+ *   TEST_EMAIL="your@email.com" TEST_PASSWORD="yourpass" npx playwright test scripts/captureMarketingScreenshots.ts --project=screenshots
  * 
  * Or add to package.json:
- *   "capture:screenshots": "playwright test scripts/captureMarketingScreenshots.ts --project=chromium"
+ *   "capture:screenshots": "playwright test scripts/captureMarketingScreenshots.ts --project=screenshots"
  */
 
-import { test } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Screenshot presets - mirrored from src/constants/screenshotPresets.ts
+// Screenshot presets for authenticated routes
 const SCREENSHOT_PRESETS = [
   {
     id: 'dashboard',
@@ -24,7 +26,7 @@ const SCREENSHOT_PRESETS = [
     selector: '#dashboard-main',
     viewport: { width: 1440, height: 900 },
     darkMode: true,
-    waitFor: 2000,
+    waitFor: 3000,
   },
   {
     id: 'blueprint',
@@ -33,25 +35,25 @@ const SCREENSHOT_PRESETS = [
     selector: '#blueprint-overview',
     viewport: { width: 1440, height: 900 },
     darkMode: true,
-    waitFor: 1500,
+    waitFor: 2500,
   },
   {
     id: 'simulation',
     name: 'Simulation Panel',
-    route: '/data-centre-twin?view=simulation',
+    route: '/data-centre-twin/default?view=simulation&demo=true',
     selector: '#simulation-root',
     viewport: { width: 1440, height: 900 },
     darkMode: true,
-    waitFor: 2000,
+    waitFor: 3000,
   },
   {
     id: 'twin3d',
     name: '3D Data Centre',
-    route: '/data-centre-twin',
+    route: '/data-centre-twin/default?demo=true',
     selector: '#twin-3d-scene',
     viewport: { width: 1440, height: 900 },
     darkMode: true,
-    waitFor: 3000, // Extra time for 3D to render
+    waitFor: 4000, // Extra time for 3D to render
   },
   {
     id: 'agents',
@@ -59,8 +61,8 @@ const SCREENSHOT_PRESETS = [
     route: '/manage-agents',
     selector: '#agents-list',
     viewport: { width: 1440, height: 900 },
-    darkMode: false,
-    waitFor: 1500,
+    darkMode: true,
+    waitFor: 2500,
   },
   {
     id: 'sovereignty',
@@ -69,7 +71,7 @@ const SCREENSHOT_PRESETS = [
     selector: '#sovereignty-grid',
     viewport: { width: 1440, height: 900 },
     darkMode: true,
-    waitFor: 1500,
+    waitFor: 2500,
   },
   {
     id: 'telemetry',
@@ -78,20 +80,46 @@ const SCREENSHOT_PRESETS = [
     selector: '#telemetry-panel',
     viewport: { width: 1440, height: 900 },
     darkMode: true,
-    waitFor: 2000,
-  },
-  {
-    id: 'recommendation',
-    name: 'Recommendation Panel',
-    route: '/recommendation',
-    selector: '#recommendation-panel',
-    viewport: { width: 1440, height: 900 },
-    darkMode: false,
-    waitFor: 1500,
+    waitFor: 3000,
   },
 ];
 
 const OUTPUT_DIR = 'public/landing/screenshots';
+
+// Get credentials from environment variables
+const TEST_EMAIL = process.env.TEST_EMAIL || '';
+const TEST_PASSWORD = process.env.TEST_PASSWORD || '';
+
+/**
+ * Authenticate user before capturing screenshots
+ */
+async function authenticate(page: Page): Promise<boolean> {
+  if (!TEST_EMAIL || !TEST_PASSWORD) {
+    console.error('❌ Missing credentials. Set TEST_EMAIL and TEST_PASSWORD environment variables.');
+    return false;
+  }
+
+  console.log(`\n🔐 Authenticating as ${TEST_EMAIL}...`);
+  
+  await page.goto('/auth', { waitUntil: 'networkidle' });
+  
+  // Fill login form
+  await page.fill('input[type="email"]', TEST_EMAIL);
+  await page.fill('input[type="password"]', TEST_PASSWORD);
+  
+  // Submit
+  await page.click('button[type="submit"]');
+  
+  // Wait for redirect to dashboard (indicates successful login)
+  try {
+    await page.waitForURL(/\/(dashboard|data-centre-twin)/, { timeout: 15000 });
+    console.log('✅ Authentication successful\n');
+    return true;
+  } catch (error) {
+    console.error('❌ Authentication failed. Check your credentials.');
+    return false;
+  }
+}
 
 test.describe('Marketing Screenshot Capture', () => {
   test.beforeAll(async () => {
@@ -101,11 +129,26 @@ test.describe('Marketing Screenshot Capture', () => {
     }
     console.log(`\n📸 Marketing Screenshot Capture`);
     console.log(`   Output: ${OUTPUT_DIR}/`);
-    console.log(`   Presets: ${SCREENSHOT_PRESETS.length} screens\n`);
+    console.log(`   Presets: ${SCREENSHOT_PRESETS.length} screens`);
+    console.log(`   Auth: ${TEST_EMAIL ? 'Credentials provided' : '⚠️ No credentials - set TEST_EMAIL and TEST_PASSWORD'}\n`);
   });
 
-  for (const preset of SCREENSHOT_PRESETS) {
-    test(`Capture: ${preset.name}`, async ({ page }) => {
+  // Single test that authenticates once and captures all screenshots
+  test('Capture all authenticated screenshots', async ({ page }) => {
+    // Set viewport for auth
+    await page.setViewportSize({ width: 1440, height: 900 });
+    
+    // Authenticate first
+    const authenticated = await authenticate(page);
+    if (!authenticated) {
+      test.skip();
+      return;
+    }
+    
+    // Capture each preset
+    for (const preset of SCREENSHOT_PRESETS) {
+      console.log(`\n📸 Capturing: ${preset.name}`);
+      
       // Set viewport
       await page.setViewportSize(preset.viewport);
 
@@ -132,6 +175,16 @@ test.describe('Marketing Screenshot Capture', () => {
         });
       });
 
+      // Hide any onboarding tooltips or modals that might be visible
+      await page.evaluate(() => {
+        const tooltips = document.querySelectorAll('[data-tour], .react-joyride__tooltip, [role="tooltip"]');
+        tooltips.forEach(el => (el as HTMLElement).style.display = 'none');
+        
+        // Also hide any notification toasts
+        const toasts = document.querySelectorAll('[data-sonner-toast]');
+        toasts.forEach(el => (el as HTMLElement).style.display = 'none');
+      });
+
       // Try to find specific selector, fall back to full page
       let screenshotTarget = page;
       if (preset.selector) {
@@ -156,22 +209,10 @@ test.describe('Marketing Screenshot Capture', () => {
         animations: 'disabled',
       });
       console.log(`  ✓ Saved: ${preset.id}-desktop.png`);
-
-      // Capture WebP for better compression
-      const webpPath = path.join(OUTPUT_DIR, `${preset.id}-desktop.webp`);
-      await (screenshotTarget as any).screenshot({
-        path: webpPath,
-        type: 'png', // Playwright outputs PNG, we'll note WebP conversion needed
-        animations: 'disabled',
-      });
-      
-      // Note: For true WebP, you'd use sharp or similar post-processing
-      // For now, we save as PNG and can convert with:
-      // npx sharp-cli -i public/landing/screenshots/*.png -o public/landing/screenshots/ -f webp
-      
-      console.log(`  ✓ Saved: ${preset.id}-desktop.png (convert to WebP separately)`);
-    });
-  }
+    }
+    
+    console.log(`\n✅ All ${SCREENSHOT_PRESETS.length} screenshots captured!`);
+  });
 
   test('Generate manifest', async () => {
     // Generate updated manifest

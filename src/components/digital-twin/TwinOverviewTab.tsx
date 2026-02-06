@@ -82,7 +82,7 @@ export function TwinOverviewTab({ twin }: TwinOverviewTabProps) {
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Network className="h-4 w-4 text-purple-500" />
+              <Network className="h-4 w-4 text-info" />
               Workflow Nodes
             </CardTitle>
           </CardHeader>

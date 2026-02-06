@@ -42,7 +42,7 @@ const getActivityIcon = (action: string) => {
 const getActivityColor = (action: string) => {
   if (action.includes("deploy") || action.includes("deployed")) return "text-secondary";
   if (action.includes("invite") || action.includes("added")) return "text-primary";
-  if (action.includes("permission") || action.includes("role")) return "text-purple-600";
+  if (action.includes("permission") || action.includes("role")) return "text-info";
   if (action.includes("flag") || action.includes("alert")) return "text-orange-600";
   if (action.includes("archive")) return "text-muted-foreground";
   return "text-foreground";

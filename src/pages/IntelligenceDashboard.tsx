@@ -413,7 +413,7 @@ export default function IntelligenceDashboard() {
                       <YAxis className="text-xs" />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="utilization" fill="hsl(262, 83%, 58%)" name="Utilization %" />
+                      <Bar dataKey="utilization" fill="hsl(186, 100%, 42%)" name="Utilization %" />
                       <Bar dataKey="temp" fill="hsl(0, 84%, 60%)" name="Temp °C" />
                     </BarChart>
                   </ResponsiveContainer>

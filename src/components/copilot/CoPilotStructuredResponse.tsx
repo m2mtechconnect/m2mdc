@@ -143,7 +143,7 @@ export function CoPilotStructuredResponse({
       {followUps.length > 0 && (
         <Card className="p-3 bg-muted/30">
           <div className="flex items-center gap-2 mb-2">
-            <MessageCircle className="h-4 w-4 text-purple-500" />
+            <MessageCircle className="h-4 w-4 text-info" />
             <h4 className="text-sm font-semibold">Follow-Up Questions</h4>
           </div>
           <div className="flex flex-wrap gap-2">

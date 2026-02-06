@@ -199,7 +199,7 @@ export function EventTimelineWrapper({ children }: { children: ReactNode }) {
   return (
     <LiveTelemetryPanel 
       title="Event Timeline" 
-      icon={<Clock className="h-4 w-4 text-purple-500" />}
+      icon={<Clock className="h-4 w-4 text-info" />}
     >
       {children}
     </LiveTelemetryPanel>

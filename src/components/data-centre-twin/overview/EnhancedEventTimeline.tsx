@@ -37,7 +37,7 @@ const domainColors: Record<string, { bg: string; border: string; text: string }>
   thermal: { bg: 'bg-destructive/20', border: 'border-destructive/50', text: 'text-destructive' },
   power: { bg: 'bg-warning/20', border: 'border-warning/50', text: 'text-warning' },
   cooling: { bg: 'bg-info/20', border: 'border-info/50', text: 'text-info' },
-  network: { bg: 'bg-purple-500/20', border: 'border-purple-500/50', text: 'text-purple-500' },
+  network: { bg: 'bg-info/20', border: 'border-info/50', text: 'text-info' },
   workload: { bg: 'bg-accent/20', border: 'border-accent/50', text: 'text-accent' },
   sovereignty: { bg: 'bg-primary/20', border: 'border-primary/50', text: 'text-primary' },
   carbon: { bg: 'bg-success/20', border: 'border-success/50', text: 'text-success' },

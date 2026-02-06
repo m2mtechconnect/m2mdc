@@ -51,7 +51,7 @@ export function SovereigntyAnalyticsTab() {
 
   // Data classification distribution
   const classificationData = useMemo(() => [
-    { name: 'Sovereign', value: Math.round(result.dataClassificationDistribution.sovereign), fill: 'hsl(262, 83%, 58%)' },
+    { name: 'Sovereign', value: Math.round(result.dataClassificationDistribution.sovereign), fill: 'hsl(186, 100%, 42%)' },
     { name: 'Sensitive', value: Math.round(result.dataClassificationDistribution.sensitive), fill: 'hsl(48, 96%, 53%)' },
     { name: 'Public', value: Math.round(result.dataClassificationDistribution.public), fill: 'hsl(142, 76%, 36%)' },
   ], [result.dataClassificationDistribution]);
@@ -145,7 +145,7 @@ export function SovereigntyAnalyticsTab() {
                 <Line 
                   type="monotone" 
                   dataKey="score" 
-                  stroke="hsl(262, 83%, 58%)" 
+                  stroke="hsl(186, 100%, 42%)" 
                   strokeWidth={2} 
                   name="Sovereignty Score"
                 />

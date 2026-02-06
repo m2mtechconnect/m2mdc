@@ -53,7 +53,7 @@ const roleColors: Record<string, string> = {
   engineer: "text-muted-foreground border-muted-foreground",
   compliance: "text-green-600 border-green-600",
   data_analyst: "text-blue-600 border-blue-600",
-  marketing: "text-purple-600 border-purple-600",
+  marketing: "text-info border-info",
   sales: "text-orange-600 border-orange-600",
   support: "text-cyan-600 border-cyan-600",
   finance: "text-emerald-600 border-emerald-600",

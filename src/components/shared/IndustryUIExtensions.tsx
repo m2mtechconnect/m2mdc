@@ -468,8 +468,8 @@ interface TierBadgeProps {
 
 export function TierBadge({ tier, className }: TierBadgeProps) {
   const tierColors: Record<string, string> = {
-    "Tier IV": "bg-primary/15 text-primary border-primary/30",
-    "Tier III": "bg-info/15 text-info border-info/30",
+    "Tier IV": "bg-accent/20 text-accent-foreground border-accent/40",
+    "Tier III": "bg-accent/15 text-accent-foreground border-accent/30",
     "Tier II": "bg-muted text-muted-foreground border-muted-foreground/30",
   };
 

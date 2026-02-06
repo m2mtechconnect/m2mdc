@@ -371,9 +371,12 @@ export default function Dashboard() {
           {/* Current Twin Indicator with Status Badges */}
           {twin && (
             <div className="flex items-center justify-center gap-3 flex-wrap">
-              <StatusBadge status="active" customLabel={twin.name} />
-              <Badge variant="secondary" className="text-xs gap-1">
-                <Globe className="h-3 w-3" />
+              <Badge variant="accent" className="text-xs gap-1.5 bg-accent/20 text-foreground border-accent/40">
+                <Server className="h-3 w-3 text-accent" />
+                {twin.name}
+              </Badge>
+              <Badge variant="accent" className="text-xs gap-1 bg-accent/15 text-foreground border-accent/30">
+                <Globe className="h-3 w-3 text-accent" />
                 {twin.city} • {twin.tier}
               </Badge>
               {twin.industry && (

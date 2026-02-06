@@ -69,7 +69,7 @@ export function LastScanBanner({
           <span className="font-medium text-foreground">{displayName}</span>
         </div>
         
-        <Badge variant="secondary" className="text-xs">
+        <Badge variant="outline" className="text-xs bg-accent/15 text-accent-foreground border-accent/30">
           <Building2 className="h-3 w-3 mr-1" />
           {industryLabel}
         </Badge>

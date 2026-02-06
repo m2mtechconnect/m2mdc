@@ -1,13 +1,12 @@
 /**
- * TwinStatsBand - Full-width metrics/ROI band with ACHIEVED results
+ * TwinStatsBand - Full-width metrics/ROI band with PLATFORM CAPABILITIES
  * M2M Tech brand styling with Space Grotesk display font
  * Uses M2M brand design tokens from index.css
  */
 
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp, Zap, Leaf, Clock, Quote, ArrowUp, ArrowDown } from "lucide-react";
+import { TrendingUp, Zap, Leaf, Clock, Target } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
 
 interface StatCard {
   icon: typeof TrendingUp;
@@ -15,67 +14,42 @@ interface StatCard {
   label: string;
   colorClass: string;
   bgClass: string;
-  trend?: { value: string; direction: "up" | "down"; positive: boolean };
-  testimonial?: {
-    quote: string;
-    author: string;
-    role: string;
-  };
+  benchmark?: string;
 }
 
-// ACHIEVED results, not targets - aligns with competitor best practices
+// Platform capabilities with industry benchmarks - not customer claims
 const stats: StatCard[] = [
   {
     icon: TrendingUp,
-    value: "1.28",
-    label: "Average PUE Achieved",
+    value: "<1.3",
+    label: "Target PUE",
     colorClass: "text-success",
     bgClass: "bg-success/10 group-hover:bg-success/20",
-    trend: { value: "19%", direction: "down", positive: true },
-    testimonial: {
-      quote: "The PUE tracking helped us identify cooling inefficiencies and reduce our baseline from 1.6 to 1.28 within 6 months.",
-      author: "VP Infrastructure",
-      role: "Canadian Financial Institution",
-    },
+    benchmark: "Industry avg: 1.58",
   },
   {
     icon: Zap,
-    value: "89%",
-    label: "Avg GPU Utilization",
+    value: ">85%",
+    label: "GPU Utilization Target",
     colorClass: "text-warning",
     bgClass: "bg-warning/10 group-hover:bg-warning/20",
-    trend: { value: "24%", direction: "up", positive: true },
-    testimonial: {
-      quote: "The utilization dashboard showed us exactly where GPU clusters were underutilized. We reclaimed 340 GPU hours weekly.",
-      author: "DC Operations Lead",
-      role: "Enterprise Retailer",
-    },
+    benchmark: "Industry avg: 60%",
   },
   {
     icon: Leaf,
-    value: "28",
-    label: "gCO₂/kWh Achieved",
+    value: "<50",
+    label: "gCO₂/kWh Target",
     colorClass: "text-success",
     bgClass: "bg-success/10 group-hover:bg-success/20",
-    trend: { value: "44%", direction: "down", positive: true },
-    testimonial: {
-      quote: "Real-time carbon tracking gave us the data we needed for our sustainability reports and ESG compliance.",
-      author: "Chief Sustainability Officer",
-      role: "Technology Company",
-    },
+    benchmark: "Industry avg: 400+",
   },
   {
     icon: Clock,
-    value: "99.98%",
-    label: "Uptime Achieved",
+    value: "99.99%",
+    label: "Uptime Target",
     colorClass: "text-info",
     bgClass: "bg-info/10 group-hover:bg-info/20",
-    trend: { value: "0.12%", direction: "up", positive: true },
-    testimonial: {
-      quote: "Simulation of failure scenarios helped us validate our redundancy before going live. Zero unplanned outages since deployment.",
-      author: "Director of Operations",
-      role: "Hyperscale Provider",
-    },
+    benchmark: "Tier IV standard",
   },
 ];
 
@@ -100,100 +74,45 @@ const cardVariants = {
   },
 };
 
-function FlipCard({ stat, index }: { stat: StatCard; index: number }) {
-  const [isFlipped, setIsFlipped] = useState(false);
-
+function StatCardComponent({ stat, index }: { stat: StatCard; index: number }) {
   return (
-    <motion.div 
-      variants={cardVariants}
-      className="perspective-1000"
-      onMouseEnter={() => setIsFlipped(true)}
-      onMouseLeave={() => setIsFlipped(false)}
-    >
-      <motion.div
-        className="relative w-full h-[220px] cursor-pointer preserve-3d transition-transform duration-500"
-        style={{
-          transformStyle: "preserve-3d",
-          transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
-        }}
-      >
-        {/* Front face - Metric */}
-        <Card 
-          className="absolute inset-0 backface-hidden bg-card/60 border-border/50 hover:border-primary/40 transition-all duration-300 group"
-          style={{ backfaceVisibility: "hidden" }}
-        >
-          <CardContent className="h-full flex flex-col items-center justify-center p-6 text-center">
-            <motion.div 
-              className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl ${stat.bgClass} mb-4 transition-colors`}
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ duration: 0.2 }}
-            >
-              <stat.icon className={`h-7 w-7 ${stat.colorClass}`} />
-            </motion.div>
-            <motion.div 
-              className={`text-4xl lg:text-5xl font-bold mb-1 ${stat.colorClass}`}
-              initial={{ scale: 0.5, opacity: 0 }}
-              whileInView={{ scale: 1, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ 
-                duration: 0.5, 
-                delay: 0.3 + index * 0.1,
-                type: "spring",
-                stiffness: 200
-              }}
-            >
-              {stat.value}
-            </motion.div>
-            
-            {/* Trend indicator */}
-            {stat.trend && (
-              <div className={`flex items-center gap-1 text-xs mb-2 ${stat.trend.positive ? 'text-success' : 'text-destructive'}`}>
-                {stat.trend.direction === "up" ? (
-                  <ArrowUp className="h-3 w-3" />
-                ) : (
-                  <ArrowDown className="h-3 w-3" />
-                )}
-                <span>{stat.trend.value} improvement</span>
-              </div>
-            )}
-            
-            <div className="text-sm text-muted-foreground font-medium">
-              {stat.label}
-            </div>
-            {stat.testimonial && (
-              <div className="mt-3 text-xs text-muted-foreground/60">
-                Hover to see testimonial
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Back face - Testimonial */}
-        {stat.testimonial && (
-          <Card 
-            className="absolute inset-0 backface-hidden bg-gradient-to-br from-primary/10 via-card to-card border-primary/30"
-            style={{ 
-              backfaceVisibility: "hidden",
-              transform: "rotateY(180deg)",
+    <motion.div variants={cardVariants}>
+      <Card className="bg-card/60 border-border/50 hover:border-primary/40 transition-all duration-300 group h-[200px]">
+        <CardContent className="h-full flex flex-col items-center justify-center p-6 text-center">
+          <motion.div 
+            className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl ${stat.bgClass} mb-4 transition-colors`}
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            transition={{ duration: 0.2 }}
+          >
+            <stat.icon className={`h-7 w-7 ${stat.colorClass}`} />
+          </motion.div>
+          <motion.div 
+            className={`text-4xl lg:text-5xl font-bold mb-1 ${stat.colorClass}`}
+            initial={{ scale: 0.5, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ 
+              duration: 0.5, 
+              delay: 0.3 + index * 0.1,
+              type: "spring",
+              stiffness: 200
             }}
           >
-            <CardContent className="h-full flex flex-col justify-center p-5">
-              <Quote className="h-6 w-6 text-primary/40 mb-2" />
-              <p className="text-sm text-foreground leading-relaxed mb-4 line-clamp-4">
-                "{stat.testimonial.quote}"
-              </p>
-              <div className="mt-auto">
-                <div className="text-sm font-semibold text-foreground">
-                  {stat.testimonial.author}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {stat.testimonial.role}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </motion.div>
+            {stat.value}
+          </motion.div>
+          
+          <div className="text-sm text-muted-foreground font-medium mb-2">
+            {stat.label}
+          </div>
+          
+          {stat.benchmark && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground/70">
+              <Target className="h-3 w-3" />
+              <span>{stat.benchmark}</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </motion.div>
   );
 }
@@ -220,16 +139,16 @@ export function TwinStatsBand() {
             transition={{ duration: 0.4 }}
             className="inline-block mb-4"
           >
-            <span className="px-4 py-1.5 rounded-full bg-success/10 text-success text-sm font-medium">
-              Proven Results
+            <span className="px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
+              Platform Capabilities
             </span>
           </motion.div>
           <h2 className="font-display text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            Customer Outcomes, Not Promises
+            Designed to Meet Industry Benchmarks
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Real metrics achieved by enterprises using M2M Digital Twin, 
-            verified across 50+ deployments.
+            Target metrics the platform is engineered to help you achieve, 
+            compared against industry standards.
           </p>
         </motion.div>
         
@@ -241,7 +160,7 @@ export function TwinStatsBand() {
           viewport={{ once: true, margin: "-50px" }}
         >
           {stats.map((stat, index) => (
-            <FlipCard key={index} stat={stat} index={index} />
+            <StatCardComponent key={index} stat={stat} index={index} />
           ))}
         </motion.div>
 
@@ -253,8 +172,8 @@ export function TwinStatsBand() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <p className="text-sm text-muted-foreground">
-            📊 Results measured across enterprise deployments • Metrics updated quarterly
+        <p className="text-sm text-muted-foreground">
+            📊 Benchmarks based on Uptime Institute and EPA Energy Star standards
           </p>
         </motion.div>
       </div>

@@ -8,6 +8,7 @@ import { Check, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { screenshotManifest } from "@/data/studioScreenshots";
 
 interface TwinFeatureSectionProps {
   title: string;
@@ -55,7 +56,11 @@ export function TwinFeatureSection({
   const colors = colorMap[accentColor];
   const [textColor, bgColor] = colors.split(" ");
 
-  return (
+  // Cache-bust marketing screenshots so updates propagate immediately.
+  const resolvedImageSrc = imageSrc.includes('/landing/screenshots/')
+    ? `${imageSrc}?v=${encodeURIComponent(screenshotManifest.version)}`
+    : imageSrc;
+
     <section className="py-20 lg:py-28 overflow-hidden bg-background">
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className={cn(

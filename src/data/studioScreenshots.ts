@@ -64,8 +64,8 @@ export const studioScreenshots: Record<string, ScreenshotVariants> = {
 
 // Manifest metadata
 export const screenshotManifest: StudioScreenshotsManifest = {
-  version: '2.0.0',
-  generatedAt: '2026-02-06T15:56:00.000Z',
+  version: '2.1.0',
+  generatedAt: '2026-02-06T16:30:00.000Z',
   screenshots: studioScreenshots,
 };
 

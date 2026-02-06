@@ -29,7 +29,7 @@ const features = [
       "Thermal overlay showing temperature zones and hotspots",
       "Power overlay displaying load distribution per rack",
     ],
-    imageSrc: "/landing/screenshots/dashboard-desktop.png",
+    imageSrc: "/landing/screenshots/twin3d-desktop.png",
     imageAlt: "Live dashboard showing 3D data centre visualization with rack layout, thermal overlays, and real-time KPI metrics",
     accentColor: "primary" as const,
   },

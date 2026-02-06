@@ -27,9 +27,9 @@ export function BackgroundGrid() {
     }> = [];
 
     const colors = [
-      'rgba(0, 188, 212, 0.6)',    // Cyan/Teal
-      'rgba(59, 130, 246, 0.6)',   // Blue
-      'rgba(234, 179, 8, 0.4)',    // Yellow/Gold
+      'rgba(255, 204, 0, 0.6)',    // M2M Gold
+      'rgba(212, 167, 0, 0.6)',    // M2M Gold Dark
+      'rgba(255, 215, 0, 0.4)',    // Gold Light
     ];
 
     const resize = () => {
@@ -58,7 +58,7 @@ export function BackgroundGrid() {
 
     const drawGrid = () => {
       const gridSize = 60;
-      ctx.strokeStyle = 'rgba(0, 188, 212, 0.08)';
+      ctx.strokeStyle = 'rgba(255, 204, 0, 0.08)';
       ctx.lineWidth = 0.5;
 
       // Vertical lines
@@ -78,7 +78,7 @@ export function BackgroundGrid() {
       }
 
       // Grid intersections with subtle glow
-      ctx.fillStyle = 'rgba(0, 188, 212, 0.15)';
+      ctx.fillStyle = 'rgba(255, 204, 0, 0.15)';
       for (let x = 0; x < canvas.offsetWidth; x += gridSize) {
         for (let y = 0; y < canvas.offsetHeight; y += gridSize) {
           ctx.beginPath();
@@ -117,7 +117,7 @@ export function BackgroundGrid() {
       });
 
       // Draw connections between nearby particles
-      ctx.strokeStyle = 'rgba(0, 188, 212, 0.1)';
+      ctx.strokeStyle = 'rgba(255, 204, 0, 0.1)';
       ctx.lineWidth = 0.5;
       particles.forEach((p1, i) => {
         particles.slice(i + 1).forEach((p2) => {
@@ -166,10 +166,11 @@ export function BackgroundGrid() {
       <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F1F]/80 via-transparent to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-r from-[#0A0F1F]/40 via-transparent to-[#0A0F1F]/40" />
       
-      {/* Ambient glow orbs */}
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[120px] animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1.5s' }} />
-      <div className="absolute top-1/2 right-1/3 w-[300px] h-[300px] bg-yellow-500/5 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '3s' }} />
+      {/* Ambient glow orbs - M2M Gold */}
+      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px] animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-m2m-gold-dark/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1.5s' }} />
+      <div className="absolute top-1/2 right-1/3 w-[300px] h-[300px] bg-accent/5 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '3s' }} />
+    
     </>
   );
 }

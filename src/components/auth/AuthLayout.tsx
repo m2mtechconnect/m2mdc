@@ -68,7 +68,7 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
               <span>Carbon Neutral</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+              <div className="w-1.5 h-1.5 rounded-full bg-secondary" />
               <span>Sovereign Cloud</span>
             </div>
             <div className="flex items-center gap-2">

@@ -1,11 +1,11 @@
 /**
- * TwinCTASection - Bottom CTA section
+ * TwinCTASection - Bottom CTA section with correct auth routing
  * M2M Tech brand styling with Space Grotesk display font
  * Uses M2M brand design tokens from index.css
  */
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Mail, Sparkles, Shield, Leaf, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Mail, Sparkles, Shield, Leaf, CheckCircle2, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -99,7 +99,7 @@ export function TwinCTASection() {
               and configure KPI targets for your data centre.
             </motion.p>
             
-            {/* CTA buttons */}
+            {/* CTA buttons - Fixed routing to /auth */}
             <motion.div 
               className="flex flex-col sm:flex-row justify-center gap-4 mb-8"
               initial={{ opacity: 0, y: 20 }}
@@ -115,7 +115,7 @@ export function TwinCTASection() {
                 <Button 
                   size="lg" 
                   className="text-base px-10 h-14 group bg-accent text-accent-foreground hover:bg-accent/90 shadow-xl shadow-accent/20 hover:shadow-accent/30 transition-shadow"
-                  onClick={() => navigate("/contact")}
+                  onClick={() => navigate("/auth")}
                 >
                   Get Started Free
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -130,14 +130,29 @@ export function TwinCTASection() {
                   size="lg" 
                   variant="outline" 
                   className="text-base px-10 h-14 border-border text-foreground hover:bg-muted"
-                  asChild
+                  onClick={() => navigate("/dashboard")}
                 >
-                  <a href="mailto:info@m2mtechconnect.com">
-                    <Mail className="mr-2 h-5 w-5" />
-                    Talk to Our Team
-                  </a>
+                  <Play className="mr-2 h-5 w-5" />
+                  Watch Demo
                 </Button>
               </motion.div>
+            </motion.div>
+
+            {/* Secondary CTA */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.45 }}
+              className="mb-8"
+            >
+              <a 
+                href="mailto:info@m2mtechconnect.com"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Mail className="h-4 w-4" />
+                Or talk to our team
+              </a>
             </motion.div>
             
             {/* Benefits row */}

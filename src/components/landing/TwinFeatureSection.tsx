@@ -61,6 +61,7 @@ export function TwinFeatureSection({
     ? `${imageSrc}?v=${encodeURIComponent(screenshotManifest.version)}`
     : imageSrc;
 
+  return (
     <section className="py-20 lg:py-28 overflow-hidden bg-background">
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className={cn(

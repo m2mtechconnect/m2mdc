@@ -75,7 +75,7 @@ export function EnhancedKPICard({
         onClick={() => setShowDrilldown(true)}
       >
         <div className="flex items-center gap-3">
-          {icon && <div className="p-1.5 rounded bg-primary/10">{icon}</div>}
+          {icon && <div className="p-1.5 rounded bg-accent/10">{icon}</div>}
           <div>
             <p className="text-xs text-muted-foreground">{label}</p>
             <div className="flex items-baseline gap-1">
@@ -108,7 +108,7 @@ export function EnhancedKPICard({
         <CardContent className="p-4 overflow-hidden">
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center gap-2">
-              {icon && <div className="p-2 rounded-lg bg-primary/10">{icon}</div>}
+              {icon && <div className="p-2 rounded-lg bg-accent/10">{icon}</div>}
               <Badge variant="outline" className={statusBadge[status].className}>
                 {statusBadge[status].label}
               </Badge>
@@ -141,7 +141,7 @@ export function EnhancedKPICard({
           {insight && (
             <div className="mt-3 p-2 rounded bg-muted/50 border border-border overflow-hidden">
               <div className="flex items-start gap-2 min-w-0">
-                <Info className="h-3 w-3 text-primary mt-0.5 shrink-0" />
+                <Info className="h-3 w-3 text-accent mt-0.5 shrink-0" />
                 <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-3">{insight}</p>
               </div>
             </div>
@@ -192,10 +192,10 @@ export function EnhancedKPICard({
             
             {/* AI Insight */}
             {insight && (
-              <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+              <div className="p-4 rounded-lg bg-accent/5 border border-accent/20">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-full bg-primary/10">
-                    <Info className="h-4 w-4 text-primary" />
+                  <div className="p-2 rounded-full bg-accent/10">
+                    <Info className="h-4 w-4 text-accent" />
                   </div>
                   <div>
                     <p className="text-sm font-medium mb-1">AI Insight</p>
@@ -210,15 +210,15 @@ export function EnhancedKPICard({
               <p className="text-sm font-medium mb-3">Recommended Actions</p>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
                   Monitor trend for next 2 hours
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
                   Review contributing racks in thermal view
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
                   Check cooling zone efficiency
                 </li>
               </ul>

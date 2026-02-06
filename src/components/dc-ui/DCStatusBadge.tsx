@@ -139,7 +139,7 @@ export function DCEventBadge({ type, label, size = 'md', className }: DCEventBad
     thermal: { bg: 'bg-destructive/15', border: 'border-destructive/30', text: 'text-destructive', icon: Zap },
     power: { bg: 'bg-warning/15', border: 'border-warning/30', text: 'text-warning', icon: Zap },
     cooling: { bg: 'bg-info/15', border: 'border-info/30', text: 'text-info', icon: Zap },
-    network: { bg: 'bg-primary/15', border: 'border-primary/30', text: 'text-primary', icon: Zap },
+    network: { bg: 'bg-accent/15', border: 'border-accent/30', text: 'text-accent', icon: Zap },
     security: { bg: 'bg-destructive/15', border: 'border-destructive/30', text: 'text-destructive', icon: Zap },
     gpu: { bg: 'bg-accent/15', border: 'border-accent/30', text: 'text-accent-foreground', icon: Zap },
     sovereignty: { bg: 'bg-info/15', border: 'border-info/30', text: 'text-info', icon: Zap },

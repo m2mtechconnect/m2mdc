@@ -132,8 +132,8 @@ export function KPICockpit({ facility, twinId = 'default' }: KPICockpitProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <Activity className="h-5 w-5 text-primary" />
+          <div className="p-2 rounded-lg bg-accent/10">
+            <Activity className="h-5 w-5 text-accent" />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-foreground">KPI Cockpit</h2>
@@ -155,7 +155,7 @@ export function KPICockpit({ facility, twinId = 'default' }: KPICockpitProps) {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <DomainCard 
           title="Thermal Stability" 
-          icon={<Thermometer className="h-4 w-4 text-primary" />}
+          icon={<Thermometer className="h-4 w-4 text-accent" />}
           status={kpis.thermalStability.status}
         >
           <KPITile label="Stability Score" value={kpis.thermalStability.value} unit="%" status={kpis.thermalStability.status} delta={kpis.thermalStability.delta} compact />
@@ -164,7 +164,7 @@ export function KPICockpit({ facility, twinId = 'default' }: KPICockpitProps) {
         
         <DomainCard 
           title="Power Reliability" 
-          icon={<Zap className="h-4 w-4 text-primary" />}
+          icon={<Zap className="h-4 w-4 text-accent" />}
           status={kpis.powerReliability.status}
         >
           <KPITile label="Reliability Score" value={kpis.powerReliability.value} unit="%" status={kpis.powerReliability.status} compact />
@@ -173,7 +173,7 @@ export function KPICockpit({ facility, twinId = 'default' }: KPICockpitProps) {
         
         <DomainCard 
           title="Cooling Efficiency" 
-          icon={<Wind className="h-4 w-4 text-primary" />}
+          icon={<Wind className="h-4 w-4 text-accent" />}
           status={kpis.coolingEfficiency.status}
         >
           <KPITile label="Efficiency Index" value={kpis.coolingEfficiency.value} unit="%" status={kpis.coolingEfficiency.status} delta={kpis.coolingEfficiency.delta} compact />
@@ -182,7 +182,7 @@ export function KPICockpit({ facility, twinId = 'default' }: KPICockpitProps) {
         
         <DomainCard 
           title="Network Health" 
-          icon={<Network className="h-4 w-4 text-primary" />}
+          icon={<Network className="h-4 w-4 text-accent" />}
           status={kpis.networkIntegrity.status}
         >
           <KPITile label="Integrity Score" value={kpis.networkIntegrity.value} unit="%" status={kpis.networkIntegrity.status} compact />
@@ -191,7 +191,7 @@ export function KPICockpit({ facility, twinId = 'default' }: KPICockpitProps) {
         
         <DomainCard 
           title="Facility Safety" 
-          icon={<Shield className="h-4 w-4 text-primary" />}
+          icon={<Shield className="h-4 w-4 text-accent" />}
           status={kpis.environmentalSafety.status}
         >
           <KPITile label="Safety Score" value={kpis.environmentalSafety.value} unit="%" status={kpis.environmentalSafety.status} compact />
@@ -200,7 +200,7 @@ export function KPICockpit({ facility, twinId = 'default' }: KPICockpitProps) {
         
         <DomainCard 
           title="Workload Performance" 
-          icon={<Cpu className="h-4 w-4 text-primary" />}
+          icon={<Cpu className="h-4 w-4 text-accent" />}
           status={kpis.gpuUtilization.status}
         >
           <KPITile label="GPU Utilization" value={kpis.gpuUtilization.value} unit="%" status={kpis.gpuUtilization.status} delta={kpis.gpuUtilization.delta} compact />
@@ -209,7 +209,7 @@ export function KPICockpit({ facility, twinId = 'default' }: KPICockpitProps) {
         
         <DomainCard 
           title="Data Sovereignty" 
-          icon={<Globe className="h-4 w-4 text-primary" />}
+          icon={<Globe className="h-4 w-4 text-accent" />}
           status={kpis.sovereigntyRisk.status}
         >
           <KPITile label="Risk Score" value={kpis.sovereigntyRisk.value} unit="%" status={kpis.sovereigntyRisk.status} compact />
@@ -218,7 +218,7 @@ export function KPICockpit({ facility, twinId = 'default' }: KPICockpitProps) {
         
         <DomainCard 
           title="Financial Health" 
-          icon={<DollarSign className="h-4 w-4 text-primary" />}
+          icon={<DollarSign className="h-4 w-4 text-accent" />}
           status={financialMetrics.financialHealthScore > 70 ? 'normal' : financialMetrics.financialHealthScore > 50 ? 'warning' : 'critical'}
         >
           <KPITile 
@@ -240,7 +240,7 @@ export function KPICockpit({ facility, twinId = 'default' }: KPICockpitProps) {
         
         <DomainCard 
           title="Carbon & Sustainability" 
-          icon={<Leaf className="h-4 w-4 text-primary" />}
+          icon={<Leaf className="h-4 w-4 text-accent" />}
           status={carbonMetrics.carbonEfficiencyScore > 70 ? 'normal' : carbonMetrics.carbonEfficiencyScore > 50 ? 'warning' : 'critical'}
         >
           <KPITile 

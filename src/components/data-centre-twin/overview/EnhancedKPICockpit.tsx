@@ -66,7 +66,7 @@ export function EnhancedKPICockpit({
       title="KPI Cockpit" 
       badge="Real-time"
       defaultOpen={true}
-      icon={<Activity className="h-5 w-5 text-primary" />}
+      icon={<Activity className="h-5 w-5 text-accent" />}
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -95,7 +95,7 @@ export function EnhancedKPICockpit({
           status={facility.pue < 1.4 ? 'normal' : facility.pue < 1.6 ? 'warning' : 'critical'}
           trend={facility.pue < 1.5 ? 'down' : 'up'}
           delta={-2.3}
-          icon={<Zap className="h-4 w-4 text-primary" />}
+          icon={<Zap className="h-4 w-4 text-accent" />}
           insight={kpis.pue?.insight}
           sparklineData={sparklineData.pue}
           highlighted={highlightedKPI === 'pue'}
@@ -110,7 +110,7 @@ export function EnhancedKPICockpit({
           status={facility.thermalHardware.kpis.thermalStabilityScore > 80 ? 'normal' : facility.thermalHardware.kpis.thermalStabilityScore > 60 ? 'warning' : 'critical'}
           trend="stable"
           delta={1.2}
-          icon={<Thermometer className="h-4 w-4 text-primary" />}
+          icon={<Thermometer className="h-4 w-4 text-accent" />}
           insight={kpis.thermalStability?.insight}
           sparklineData={sparklineData.thermalStability}
           highlighted={highlightedKPI === 'thermalStability'}
@@ -125,7 +125,7 @@ export function EnhancedKPICockpit({
           status={facility.cooling.kpis.coolingEfficiencyIndex > 70 ? 'normal' : facility.cooling.kpis.coolingEfficiencyIndex > 50 ? 'warning' : 'critical'}
           trend="up"
           delta={3.4}
-          icon={<Wind className="h-4 w-4 text-primary" />}
+          icon={<Wind className="h-4 w-4 text-accent" />}
           insight={kpis.coolingEfficiency?.insight}
           sparklineData={sparklineData.coolingEfficiency}
           highlighted={highlightedKPI === 'coolingEfficiency'}
@@ -140,7 +140,7 @@ export function EnhancedKPICockpit({
           status={facility.workloadGpu.kpis.avgGpuUtilization > 70 ? 'normal' : facility.workloadGpu.kpis.avgGpuUtilization > 50 ? 'warning' : 'critical'}
           trend="up"
           delta={5.8}
-          icon={<Cpu className="h-4 w-4 text-primary" />}
+          icon={<Cpu className="h-4 w-4 text-accent" />}
           insight={kpis.gpuUtilization?.insight}
           sparklineData={sparklineData.gpuUtilization}
           highlighted={highlightedKPI === 'gpuUtilization'}
@@ -154,7 +154,7 @@ export function EnhancedKPICockpit({
           unit="%"
           status={facility.network.kpis.networkIntegrityScore > 80 ? 'normal' : 'warning'}
           trend="stable"
-          icon={<Network className="h-4 w-4 text-primary" />}
+          icon={<Network className="h-4 w-4 text-accent" />}
           insight={kpis.networkIntegrity?.insight}
           sparklineData={sparklineData.networkIntegrity}
           highlighted={highlightedKPI === 'networkIntegrity'}
@@ -168,7 +168,7 @@ export function EnhancedKPICockpit({
           unit="%"
           status={facility.facilitySafety.kpis.environmentalSafetyScore > 90 ? 'normal' : 'warning'}
           trend="stable"
-          icon={<Shield className="h-4 w-4 text-primary" />}
+          icon={<Shield className="h-4 w-4 text-accent" />}
           insight={kpis.facilitySafety?.insight}
           sparklineData={sparklineData.facilitySafety}
           highlighted={highlightedKPI === 'facilitySafety'}
@@ -182,7 +182,7 @@ export function EnhancedKPICockpit({
           unit="%"
           status={facility.sovereignty.kpis.sovereigntyRiskScore < 10 ? 'normal' : facility.sovereignty.kpis.sovereigntyRiskScore < 30 ? 'warning' : 'critical'}
           trend="stable"
-          icon={<Globe className="h-4 w-4 text-primary" />}
+          icon={<Globe className="h-4 w-4 text-accent" />}
           insight={kpis.sovereignty?.insight}
           sparklineData={sparklineData.sovereignty}
           highlighted={highlightedKPI === 'sovereignty'}
@@ -197,7 +197,7 @@ export function EnhancedKPICockpit({
           status={carbonMetrics.carbonEfficiencyScore > 70 ? 'normal' : carbonMetrics.carbonEfficiencyScore > 50 ? 'warning' : 'critical'}
           trend="up"
           delta={3.2}
-          icon={<Leaf className="h-4 w-4 text-primary" />}
+          icon={<Leaf className="h-4 w-4 text-accent" />}
           insight={kpis.carbonEfficiency?.insight}
           sparklineData={sparklineData.carbonEfficiency}
           highlighted={highlightedKPI === 'carbonEfficiency'}
@@ -212,7 +212,7 @@ export function EnhancedKPICockpit({
           status={financialMetrics.financialHealthScore > 70 ? 'normal' : financialMetrics.financialHealthScore > 50 ? 'warning' : 'critical'}
           trend="stable"
           delta={-0.8}
-          icon={<DollarSign className="h-4 w-4 text-primary" />}
+          icon={<DollarSign className="h-4 w-4 text-accent" />}
           insight={kpis.financialHealth?.insight}
           sparklineData={sparklineData.financialHealth}
           highlighted={highlightedKPI === 'financialHealth'}

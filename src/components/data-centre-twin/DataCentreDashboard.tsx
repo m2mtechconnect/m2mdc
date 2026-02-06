@@ -97,7 +97,7 @@ function KPITile({
     <Card className="bg-card border-border">
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-2">
-          <div className="p-2 rounded-lg bg-primary/10">
+          <div className="p-2 rounded-lg bg-accent/10">
             {icon}
           </div>
           {delta !== undefined && (
@@ -317,8 +317,8 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Server className="h-6 w-6 text-primary" />
+            <div className="p-2 rounded-lg bg-accent/10">
+              <Server className="h-6 w-6 text-accent" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-foreground">{facility.name}</h1>
             <Badge 
@@ -332,7 +332,7 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
               {facility.status}
             </Badge>
             {facility.tier && (
-              <Badge variant="outline" className="border-primary/30 text-primary">
+              <Badge variant="outline" className="border-accent/30 text-accent">
                 Tier {facility.tier}
               </Badge>
             )}
@@ -395,7 +395,7 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
             unit=""
             status={pueValue < 1.4 ? 'normal' : pueValue < 1.6 ? 'warning' : 'critical'}
             delta={Number(getSimDelta('pue', -2.3).toFixed(1))}
-            icon={<Zap className="h-4 w-4 text-primary" />}
+            icon={<Zap className="h-4 w-4 text-accent" />}
           />
         </div>
         <div className="relative">
@@ -410,7 +410,7 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
             unit="%"
             status={gpuValue > 70 ? 'normal' : gpuValue > 50 ? 'warning' : 'critical'}
             delta={Number(getSimDelta('gpuUtilization', 5.2).toFixed(1))}
-            icon={<Cpu className="h-4 w-4 text-primary" />}
+            icon={<Cpu className="h-4 w-4 text-accent" />}
           />
         </div>
         <div className="relative">
@@ -425,7 +425,7 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
             unit="g/kWh"
             status={carbonValue < 150 ? 'normal' : carbonValue < 250 ? 'warning' : 'critical'}
             delta={Number(getSimDelta('carbonIntensity', -8.1).toFixed(1))}
-            icon={<Globe className="h-4 w-4 text-primary" />}
+            icon={<Globe className="h-4 w-4 text-accent" />}
           />
         </div>
         <div className="relative">
@@ -439,7 +439,7 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
             value={Math.round(100 - sovereigntyRisk)}
             unit="%"
             status="info"
-            icon={<Shield className="h-4 w-4 text-primary" />}
+            icon={<Shield className="h-4 w-4 text-accent" />}
           />
         </div>
       </div>

@@ -32,7 +32,7 @@ const domainColors: Record<string, string> = {
   thermal: 'bg-destructive text-destructive-foreground',
   power: 'bg-warning text-warning-foreground',
   cooling: 'bg-info text-info-foreground',
-  network: 'bg-purple-500 text-white',
+  network: 'bg-info text-info-foreground',
   workload: 'bg-accent text-accent-foreground',
   sovereignty: 'bg-primary text-primary-foreground',
   carbon: 'bg-success text-success-foreground',

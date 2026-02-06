@@ -24,7 +24,7 @@ const navItems = [
   { id: 'thermal', label: 'Thermal', icon: Thermometer, color: 'text-destructive' },
   { id: 'cooling', label: 'Cooling', icon: Wind, color: 'text-info' },
   { id: 'power', label: 'Power', icon: Zap, color: 'text-warning' },
-  { id: 'network', label: 'Network', icon: Network, color: 'text-purple-500' },
+  { id: 'network', label: 'Network', icon: Network, color: 'text-info' },
   { id: 'sovereignty', label: 'Sovereignty', icon: Shield, color: 'text-accent' },
   { id: 'carbon', label: 'Carbon & Cost', icon: DollarSign, color: 'text-success' },
 ];

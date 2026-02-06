@@ -79,7 +79,7 @@ export function WorkloadDomainView({ facility }: WorkloadDomainViewProps) {
             <div className="flex gap-1">
               {[
                 { key: 'all' as const, label: 'All', color: '' },
-                { key: 'training' as const, label: 'Training', color: 'border-purple-500/30 text-purple-500' },
+                { key: 'training' as const, label: 'Training', color: 'border-primary/30 text-primary' },
                 { key: 'inference' as const, label: 'Inference', color: 'border-blue-500/30 text-blue-500' },
               ].map(({ key, label, color }) => (
                 <Button
@@ -155,7 +155,7 @@ export function WorkloadDomainView({ facility }: WorkloadDomainViewProps) {
           <div className="space-y-4">
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-purple-500" />
+                <div className="w-3 h-3 rounded-full bg-primary" />
                 <span>Training Jobs</span>
               </div>
               <span className="font-bold">

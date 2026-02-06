@@ -153,7 +153,7 @@ export const DOMAIN_INFO: Record<AgentDomain, { label: string; color: string }> 
   cooling: { label: 'Cooling', color: 'text-cyan-500' },
   network: { label: 'Network', color: 'text-blue-500' },
   facility_safety: { label: 'Facility & Safety', color: 'text-orange-500' },
-  workload_gpu: { label: 'Workload & GPU', color: 'text-purple-500' },
+  workload_gpu: { label: 'Workload & GPU', color: 'text-primary' },
   sovereignty: { label: 'Sovereignty', color: 'text-emerald-500' },
   financial_carbon: { label: 'Financial & Carbon', color: 'text-green-500' },
   incident_response: { label: 'Incident Response', color: 'text-rose-500' },

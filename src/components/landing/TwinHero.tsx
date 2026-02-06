@@ -154,18 +154,18 @@ export function TwinHero() {
           
           {/* Main headline - centered with gradient */}
           <motion.h1 
-            className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-slate-900 leading-[1.1] tracking-tight mb-6"
+            className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground leading-[1.1] tracking-tight mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             Live Digital Twin of Your{" "}
             <span className="relative inline-block">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-info to-secondary">
                 AI Data Centre
               </span>
               <motion.span 
-                className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full"
+                className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-primary to-info rounded-full"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 0.8, delay: 0.9 }}
@@ -174,7 +174,7 @@ export function TwinHero() {
           </motion.h1>
           
           <motion.p 
-            className="text-lg lg:text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto mb-8"
+            className="text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}

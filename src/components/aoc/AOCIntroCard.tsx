@@ -74,8 +74,8 @@ export function AOCIntroCard({ onDismiss }: AOCIntroCardProps) {
         </div>
 
         <div className="flex items-start gap-3">
-          <div className="p-1.5 rounded bg-purple-500/10">
-            <LineChart className="h-4 w-4 text-purple-500" />
+          <div className="p-1.5 rounded bg-info/10">
+            <LineChart className="h-4 w-4 text-info" />
           </div>
           <div>
             <p className="font-medium text-sm">Performance Metrics</p>

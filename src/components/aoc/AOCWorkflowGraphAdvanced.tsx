@@ -98,7 +98,7 @@ export function AOCWorkflowGraphAdvanced({
       case 'trigger': return 'border-blue-500 bg-blue-50 dark:bg-blue-950';
       case 'condition': return 'border-yellow-500 bg-yellow-50 dark:bg-yellow-950';
       case 'action': return 'border-green-500 bg-green-50 dark:bg-green-950';
-      case 'integration': return 'border-purple-500 bg-purple-50 dark:bg-purple-950';
+      case 'integration': return 'border-primary bg-primary/5 dark:bg-primary/10';
       default: return 'border-gray-500 bg-gray-50 dark:bg-gray-950';
     }
   };

@@ -40,7 +40,7 @@ const categoryColors: Record<string, string> = {
   thermal: 'bg-orange-500/10 text-orange-500 border-orange-500/30',
   power: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30',
   cooling: 'bg-cyan-500/10 text-cyan-500 border-cyan-500/30',
-  workload: 'bg-purple-500/10 text-purple-500 border-purple-500/30',
+  workload: 'bg-info/10 text-info border-info/30',
   network: 'bg-blue-500/10 text-blue-500 border-blue-500/30',
   sovereignty: 'bg-green-500/10 text-green-500 border-green-500/30',
   carbon: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30',

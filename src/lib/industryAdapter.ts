@@ -73,7 +73,7 @@ export function detectIndustry(url: string, content?: string): SupportedIndustry
 const BASE_DOMAINS: TwinDomain[] = [
   { id: 'infrastructure', name: 'Infrastructure', description: 'Physical infrastructure and facilities', icon: 'Building', color: 'blue', category: 'core', status: 'healthy', healthScore: 95, agentIds: [], kpiIds: [], workflowIds: [] },
   { id: 'operations', name: 'Operations', description: 'Operational processes and monitoring', icon: 'Activity', color: 'green', category: 'core', status: 'healthy', healthScore: 92, agentIds: [], kpiIds: [], workflowIds: [] },
-  { id: 'security', name: 'Security', description: 'Security and compliance', icon: 'Shield', color: 'purple', category: 'core', status: 'healthy', healthScore: 98, agentIds: [], kpiIds: [], workflowIds: [] },
+  { id: 'security', name: 'Security', description: 'Security and compliance', icon: 'Shield', color: 'cyan', category: 'core', status: 'healthy', healthScore: 98, agentIds: [], kpiIds: [], workflowIds: [] },
   { id: 'sustainability', name: 'Sustainability', description: 'Environmental and carbon management', icon: 'Leaf', color: 'emerald', category: 'core', status: 'healthy', healthScore: 88, agentIds: [], kpiIds: [], workflowIds: [] },
   { id: 'financial', name: 'Financial', description: 'Cost and financial optimization', icon: 'DollarSign', color: 'amber', category: 'core', status: 'healthy', healthScore: 90, agentIds: [], kpiIds: [], workflowIds: [] },
 ];
@@ -85,7 +85,7 @@ const INDUSTRY_DOMAINS: Partial<Record<SupportedIndustry, TwinDomain[]>> = {
     { id: 'power', name: 'Power', description: 'Power distribution and UPS', icon: 'Zap', color: 'yellow', category: 'dc', status: 'healthy', healthScore: 97, agentIds: [], kpiIds: [], workflowIds: [] },
     { id: 'cooling', name: 'Cooling', description: 'CRAH/CRAC and cooling systems', icon: 'Wind', color: 'cyan', category: 'dc', status: 'healthy', healthScore: 91, agentIds: [], kpiIds: [], workflowIds: [] },
     { id: 'network', name: 'Network', description: 'Network fabric and connectivity', icon: 'Network', color: 'indigo', category: 'dc', status: 'healthy', healthScore: 99, agentIds: [], kpiIds: [], workflowIds: [] },
-    { id: 'workload', name: 'Workload', description: 'GPU/CPU workload scheduling', icon: 'Cpu', color: 'violet', category: 'dc', status: 'healthy', healthScore: 85, agentIds: [], kpiIds: [], workflowIds: [] },
+    { id: 'workload', name: 'Workload', description: 'GPU/CPU workload scheduling', icon: 'Cpu', color: 'teal', category: 'dc', status: 'healthy', healthScore: 85, agentIds: [], kpiIds: [], workflowIds: [] },
     { id: 'sovereignty', name: 'Sovereignty', description: 'Data residency and compliance', icon: 'Globe', color: 'teal', category: 'dc', status: 'healthy', healthScore: 100, agentIds: [], kpiIds: [], workflowIds: [] },
   ],
   healthcare: [
@@ -100,7 +100,7 @@ const INDUSTRY_DOMAINS: Partial<Record<SupportedIndustry, TwinDomain[]>> = {
   ],
   finance: [
     { id: 'trading', name: 'Trading Systems', description: 'Low-latency trading infrastructure', icon: 'TrendingUp', color: 'green', category: 'finance', status: 'healthy', healthScore: 99, agentIds: [], kpiIds: [], workflowIds: [] },
-    { id: 'regulatory', name: 'Regulatory', description: 'Financial regulatory compliance', icon: 'Scale', color: 'purple', category: 'finance', status: 'healthy', healthScore: 100, agentIds: [], kpiIds: [], workflowIds: [] },
+    { id: 'regulatory', name: 'Regulatory', description: 'Financial regulatory compliance', icon: 'Scale', color: 'teal', category: 'finance', status: 'healthy', healthScore: 100, agentIds: [], kpiIds: [], workflowIds: [] },
     { id: 'risk', name: 'Risk Management', description: 'Risk monitoring and mitigation', icon: 'AlertTriangle', color: 'amber', category: 'finance', status: 'healthy', healthScore: 96, agentIds: [], kpiIds: [], workflowIds: [] },
   ],
 };

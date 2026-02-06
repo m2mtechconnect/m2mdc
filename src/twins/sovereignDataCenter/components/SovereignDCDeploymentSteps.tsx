@@ -255,7 +255,7 @@ export function SovereignDCDeploymentSteps({
                     Cooling Emergency
                   </div>
                   <div className="flex items-center gap-1">
-                    <Shield className="h-3 w-3 text-purple-500" />
+                    <Shield className="h-3 w-3 text-primary" />
                     Sovereignty Violation
                   </div>
                   <div className="flex items-center gap-1">

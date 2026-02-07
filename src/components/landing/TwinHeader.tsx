@@ -92,7 +92,7 @@ export function TwinHeader() {
                 {productItems.map((item) => (
                   <DropdownMenuItem 
                     key={item.label}
-                    onClick={() => navigate(item.href)}
+                    onSelect={() => navigate(item.href)}
                     className="flex flex-col items-start gap-0.5 cursor-pointer py-3"
                   >
                     <span className="font-medium text-foreground">{item.label}</span>
@@ -112,7 +112,13 @@ export function TwinHeader() {
                 {solutionItems.map((item) => (
                   <DropdownMenuItem 
                     key={item.label}
-                    onClick={() => item.href.startsWith('#') ? window.location.hash = item.href : navigate(item.href)}
+                    onSelect={() => {
+                      if (item.href.startsWith('#')) {
+                        document.querySelector(item.href)?.scrollIntoView({ behavior: 'smooth' });
+                      } else {
+                        navigate(item.href);
+                      }
+                    }}
                     className="flex flex-col items-start gap-0.5 cursor-pointer py-3"
                   >
                     <span className="font-medium text-foreground">{item.label}</span>

@@ -24,18 +24,17 @@ const navItems = [
   { label: "Why M2M", href: "#differentiators" },
 ];
 
+// Products require authentication - these link to /auth with redirect
 const productItems = [
-  { label: "Digital Twin Studio", href: "/dashboard", description: "3D visualization & monitoring" },
-  { label: "Blueprint Designer", href: "/blueprint/preview", description: "Configure your data centre" },
-  { label: "Simulation Engine", href: "/simulation/preview", description: "Run operational scenarios" },
-  { label: "Agent Marketplace", href: "/app/agents", description: "AI subsystem agents" },
+  { label: "Digital Twin Studio", href: "/auth", description: "3D visualization & monitoring" },
+  { label: "Blueprint Designer", href: "/auth", description: "Configure your data centre" },
+  { label: "Agent Marketplace", href: "/auth", description: "AI subsystem agents" },
 ];
 
+// Solutions scroll to sections on landing page
 const solutionItems = [
-  { label: "For CIOs & CTOs", href: "#use-cases", description: "Sovereignty & compliance" },
-  { label: "For Data Centre Ops", href: "#use-cases", description: "PUE & thermal management" },
-  { label: "For Sustainability", href: "#use-cases", description: "Carbon tracking & ESG" },
-  { label: "For AI/ML Teams", href: "#use-cases", description: "GPU utilization" },
+  { label: "Enterprise Solutions", href: "#use-cases", description: "For CIOs, CTOs & data centre ops" },
+  { label: "Sustainability", href: "#features", description: "Carbon tracking & ESG reporting" },
 ];
 
 export function TwinHeader() {

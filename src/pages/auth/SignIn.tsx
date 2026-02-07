@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Loader2, Lock, Mail, Eye, EyeOff } from "lucide-react";
+import { Loader2, Lock, Mail, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthLayout, SecurityBadge, SSOButtons } from "@/components/auth";
@@ -219,6 +219,15 @@ export default function SignIn() {
             Contact your M2M administrator
           </a>
         </p>
+
+        {/* Back to Home */}
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mt-4"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to home
+        </Link>
       </div>
     </AuthLayout>
   );

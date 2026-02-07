@@ -88,7 +88,7 @@ export function TwinHeader() {
                 Products
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64 bg-popover border-border">
+              <DropdownMenuContent align="start" className="w-64">
                 {productItems.map((item) => (
                   <DropdownMenuItem 
                     key={item.label}
@@ -108,7 +108,7 @@ export function TwinHeader() {
                 Solutions
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64 bg-popover border-border">
+              <DropdownMenuContent align="start" className="w-64">
                 {solutionItems.map((item) => (
                   <DropdownMenuItem 
                     key={item.label}

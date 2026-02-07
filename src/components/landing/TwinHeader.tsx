@@ -26,9 +26,9 @@ const navItems = [
 
 const productItems = [
   { label: "Digital Twin Studio", href: "/dashboard", description: "3D visualization & monitoring" },
-  { label: "Blueprint Designer", href: "/blueprint", description: "Configure your data centre" },
-  { label: "Simulation Engine", href: "/simulation", description: "Run operational scenarios" },
-  { label: "Agent Marketplace", href: "/agents", description: "AI subsystem agents" },
+  { label: "Blueprint Designer", href: "/blueprint/preview", description: "Configure your data centre" },
+  { label: "Simulation Engine", href: "/simulation/preview", description: "Run operational scenarios" },
+  { label: "Agent Marketplace", href: "/app/agents", description: "AI subsystem agents" },
 ];
 
 const solutionItems = [

@@ -37,7 +37,7 @@ export function KpiTooltip({
       </TooltipTrigger>
       <TooltipContent 
         side="top" 
-        className="max-w-xs p-3 bg-popover border shadow-lg"
+        className="max-w-xs p-3"
       >
         <div className="space-y-2">
           <div className="flex items-center gap-2">

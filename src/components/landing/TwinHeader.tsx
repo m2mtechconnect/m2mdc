@@ -88,14 +88,14 @@ export function TwinHeader() {
                 Products
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64">
+              <DropdownMenuContent align="start" className="w-64 bg-popover border-border">
                 {productItems.map((item) => (
                   <DropdownMenuItem 
                     key={item.label}
                     onClick={() => navigate(item.href)}
-                    className="flex flex-col items-start gap-0.5 cursor-pointer"
+                    className="flex flex-col items-start gap-0.5 cursor-pointer py-3"
                   >
-                    <span className="font-medium">{item.label}</span>
+                    <span className="font-medium text-foreground">{item.label}</span>
                     <span className="text-xs text-muted-foreground">{item.description}</span>
                   </DropdownMenuItem>
                 ))}
@@ -108,14 +108,14 @@ export function TwinHeader() {
                 Solutions
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64">
+              <DropdownMenuContent align="start" className="w-64 bg-popover border-border">
                 {solutionItems.map((item) => (
                   <DropdownMenuItem 
                     key={item.label}
                     onClick={() => item.href.startsWith('#') ? window.location.hash = item.href : navigate(item.href)}
-                    className="flex flex-col items-start gap-0.5 cursor-pointer"
+                    className="flex flex-col items-start gap-0.5 cursor-pointer py-3"
                   >
-                    <span className="font-medium">{item.label}</span>
+                    <span className="font-medium text-foreground">{item.label}</span>
                     <span className="text-xs text-muted-foreground">{item.description}</span>
                   </DropdownMenuItem>
                 ))}

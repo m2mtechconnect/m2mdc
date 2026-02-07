@@ -66,14 +66,15 @@ export function TwinHeader() {
           <a href="/" className="flex items-center gap-3 group">
             <img
               src={m2mLogo}
-              alt="M2M Tech Connect"
+              alt="M2M AURA - Sovereign AI Data Centre Digital Twin"
               className="h-8 lg:h-10 w-auto transition-transform group-hover:scale-105"
             />
             <div className="hidden sm:block">
+              <h1 className="sr-only">M2M AURA - Sovereign AI Data Centre Digital Twin Platform</h1>
               <span className="font-display text-lg font-bold text-foreground">
                 M2M
               </span>
-              <span className="font-display text-lg font-medium text-muted-foreground ml-1">
+              <span className="font-display text-lg font-medium text-accent ml-1">
                 AURA
               </span>
             </div>

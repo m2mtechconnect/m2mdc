@@ -82,10 +82,9 @@ export function TwinCTASection() {
               transition={{ duration: 0.5, delay: 0.2 }}
             >
               Ready to Build Your{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-m2m-gold-dark">
-                Sovereign AI Data Centre Twin
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-m2m-gold-dark whitespace-nowrap">
+                Sovereign AI Data Centre Twin?
               </span>
-              ?
             </motion.h2>
             
             <motion.p 

@@ -172,36 +172,6 @@ export function TwinTrustSection() {
           ))}
         </motion.div>
         
-        {/* Certifications band */}
-        <motion.div 
-          className="p-6 bg-card/30 rounded-2xl border border-border/40"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-sm font-medium text-foreground">
-              Certifications & Compliance
-            </div>
-            <div className="flex flex-wrap justify-center gap-4">
-              {certifications.map((cert, index) => (
-                <motion.div 
-                  key={cert}
-                  className="flex items-center gap-2 text-sm text-muted-foreground"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.3, delay: 0.4 + index * 0.1 }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <CheckCircle2 className="h-4 w-4 text-success" />
-                  <span>{cert}</span>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
 
         {/* Trust logos row */}
         <motion.div 

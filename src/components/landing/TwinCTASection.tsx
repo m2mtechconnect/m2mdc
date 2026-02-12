@@ -193,11 +193,6 @@ export function TwinCTASection() {
         >
           <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4 text-primary" />
-              <span>SOC 2 Type II Compliant</span>
-            </div>
-            <div className="hidden sm:block w-px h-4 bg-border" />
-            <div className="flex items-center gap-2">
               <Leaf className="h-4 w-4 text-success" />
               <span>Carbon Neutral Infrastructure</span>
             </div>

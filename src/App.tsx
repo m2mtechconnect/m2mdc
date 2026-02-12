@@ -50,6 +50,7 @@ import BlueprintPreview from "./pages/BlueprintPreview";
 import SimulationPreview from "./pages/SimulationPreview";
 import DataCentreTwinLanding from "./pages/DataCentreTwinLanding";
 import Onboarding from "./pages/Onboarding";
+import OnboardingSubmissions from "./pages/OnboardingSubmissions";
 import AgentDetail from "./pages/AgentDetail";
 import TwinDebug from "./pages/TwinDebug";
 import Profile from "./pages/account/Profile";
@@ -154,6 +155,7 @@ function AuthenticatedApp() {
         <Route path="/account/profile" element={<Profile />} />
         <Route path="/account/settings" element={<Settings />} />
         <Route path="/account/access-control" element={<AccessControl />} />
+        <Route path="/admin/onboarding-submissions" element={<OnboardingSubmissions />} />
         <Route path="/integrations" element={<Navigate to="/marketplace?tab=integrations" replace />} />
         <Route path="/marketplace/integrations" element={<Marketplace />} />
         <Route path="/compliance" element={<Compliance />} />

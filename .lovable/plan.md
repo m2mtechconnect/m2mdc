@@ -1,83 +1,57 @@
 
 
-## Plan: Replace All Marketing Site Images with Clean Imagery
+## Onboarding Questionnaire Page
 
-### Problem Identified
+### Overview
+Replace the "Get Started Free" buttons on the marketing page with a link to a new `/onboarding` public page. This page will be a multi-step questionnaire that captures prospect information and data centre needs before routing them to sign up.
 
-The AI-generated images contain garbled, non-English text that looks unprofessional:
-- **dashboard-desktop.png**: Shows "Cnaber", "Distarks", "Polvicies", "Gaven trangels", "Pryt Ocheat" 
-- **twin3d-desktop.png**: Shows "Reevel Atliza", "ROTANILTONE", "Doades" etc.
-- These nonsense labels ruin the professional appearance of the marketing site
+### Questionnaire Steps
 
-### Complete Image Inventory
+**Step 1 -- About You**
+- Full name
+- Job title / role (dropdown: CIO, CTO, VP Infrastructure, Data Centre Manager, Operations Lead, Other)
+- Company name
+- Work email
+- Company size (1-50, 51-200, 201-1000, 1000+)
 
-**Product Screenshots (in `/public/landing/screenshots/`):**
-| File | Status | Used In |
-|------|--------|---------|
-| `dashboard-desktop.png` | Bad AI text | Hero section |
-| `twin3d-desktop.png` | Bad AI text | Feature section #1 |
-| `simulation-desktop.png` | Real capture | Feature section #2 |
-| `sovereignty-desktop.png` | Real capture | Feature section #3 |
-| `agents-desktop.png` | Real capture | Feature section #4 |
-| `blueprint-desktop.png` | Real capture | Feature section #5 |
-| `telemetry-desktop.png` | Real capture | Feature section #6 |
-| `recommendation-desktop.png` | Exists but unused | - |
+**Step 2 -- Your Data Centre**
+- Number of data centres (1, 2-5, 6-20, 20+)
+- Total rack count (dropdown ranges)
+- Primary workload type (multi-select: AI/ML Training, HPC, Cloud Hosting, Enterprise IT, Colocation, Other)
+- Current PUE estimate (optional slider or dropdown)
 
-**Background Images (in `/public/landing/`):**
-| File | Status | Used In |
-|------|--------|---------|
-| `hero-datacenter-bg.jpg` | Good quality | Not currently used in code |
-| `datacenter-control-room.jpg` | Good quality | Not currently used in code |
-| `sustainable-datacenter-campus.jpg` | Good quality | Not currently used in code |
+**Step 3 -- Your Goals**
+- What are you looking to achieve? (multi-select: Reduce PUE, Optimize cooling, Carbon/ESG reporting, Capacity planning, Predictive maintenance, Sovereign compliance, Other)
+- Biggest operational challenge (free text)
+- Timeline to deploy (Exploring, 1-3 months, 3-6 months, 6-12 months)
 
-### Recommended Strategy
+**Step 4 -- Summary and Sign Up**
+- Review answers summary card
+- CTA: "Create Your Account" which navigates to `/sign-up` with questionnaire data stored in the database for follow-up
 
-**Option A: Capture Real Screenshots (Best Practice)**
+### Technical Plan
 
-For `dashboard-desktop.png` and `twin3d-desktop.png`, navigate to the actual Studio routes (`/dashboard` and the 3D twin view) and capture clean screenshots. This ensures 100% accuracy and follows your established "no marketing buzzwords" principle.
+1. **Database table** -- Create `onboarding_submissions` table (no auth required, public insert RLS policy):
+   - `id` (uuid), `full_name`, `email`, `job_title`, `company_name`, `company_size`, `num_data_centres`, `rack_count`, `workload_types` (jsonb), `current_pue`, `goals` (jsonb), `challenge` (text), `timeline`, `created_at`
 
-**Option B: Generate Clean AI Images (Fallback)**
+2. **New page** -- `src/pages/Onboarding.tsx`
+   - Multi-step form using `react-hook-form` + `zod` validation
+   - Step indicator/progress bar at top
+   - Each step is a sub-component for clarity
+   - Framer Motion slide transitions between steps
+   - Mobile responsive layout
 
-If real captures aren't ready, regenerate the two problematic images with explicit instructions:
-- "NO TEXT, NO LABELS, NO UI ELEMENTS"
-- Pure 3D visualization without any overlay panels
-- Abstract server room or thermal heatmap renders
+3. **Route** -- Add `/onboarding` to the unauthenticated routes in `App.tsx`
 
-**Option C: Hybrid - Abstract + Real (Recommended)**
+4. **Update CTAs** -- Change all "Get Started Free" `onClick` handlers in:
+   - `TwinHero.tsx` -- navigate to `/onboarding`
+   - `TwinCTASection.tsx` -- navigate to `/onboarding`
+   - `TwinHeader.tsx` -- header CTA button to `/onboarding`
 
-1. Use **abstract ambient imagery** for the hero (already have good `hero-datacenter-bg.jpg`)
-2. Capture **real Studio screenshots** for all 6 feature sections
-3. Remove the problematic AI-generated dashboard/twin3d images entirely until real captures are available
+5. **Form submission flow**:
+   - Validate with zod schema
+   - Insert into `onboarding_submissions` table
+   - Navigate to `/sign-up` on success (or show confirmation with link)
 
-### Implementation Steps
-
-1. **Delete the two problematic AI images**:
-   - `public/landing/screenshots/dashboard-desktop.png`
-   - `public/landing/screenshots/twin3d-desktop.png`
-
-2. **Generate new clean ambient images** (no text/UI):
-   - Abstract 3D server visualization for hero
-   - Clean thermal heatmap render for 3D Twin feature
-
-3. **Update manifest version** to bust cache
-
-4. **Update "Customer Outcomes" section** (from your earlier screenshot) to either:
-   - Change to "Platform Capabilities" (what the platform measures)
-   - Add "Target" or "Industry Benchmark" labels instead of "Achieved"
-   - This section currently claims real customer results you don't have yet
-
-### Technical Details
-
-**Files to Modify:**
-- `public/landing/screenshots/dashboard-desktop.png` - Replace with clean image
-- `public/landing/screenshots/twin3d-desktop.png` - Replace with clean image
-- `src/data/studioScreenshots.ts` - Bump manifest version
-- `src/components/landing/TwinStatsBand.tsx` - Update copy to reflect pre-customer status
-
-**Image Generation Prompts (if using AI fallback):**
-```text
-Dashboard: "Photorealistic 3D isometric view of a modern data center server room with blue-teal cooling corridors, glass-enclosed server racks with LED status lights, absolutely no text, no labels, no UI overlays, no signage, clean architectural visualization, dark background, 1440x900"
-
-3D Twin: "Thermal heatmap visualization of data center racks in 3D perspective, gradient from blue (cool) to orange-red (hot), no text, no labels, no UI panels, pure scientific visualization style, dark background, 1440x900"
-```
+6. **Styling** -- Consistent with existing landing page design tokens (glass-panel cards, accent buttons, M2M branding). Back-to-home link at top (matching sign-in page pattern).
 

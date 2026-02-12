@@ -150,7 +150,7 @@ export function TwinHeader() {
             </Button>
             <Button
               className="text-sm bg-accent text-m2m-black font-semibold hover:bg-m2m-gold-dark"
-              onClick={() => navigate("/auth")}
+             onClick={() => navigate("/onboarding")}
             >
               Get Started
             </Button>
@@ -236,8 +236,8 @@ export function TwinHeader() {
                 </Button>
                 <Button
                   className="w-full bg-accent text-m2m-black font-semibold hover:bg-m2m-gold-dark"
-                  onClick={() => {
-                    navigate("/auth");
+                   onClick={() => {
+                    navigate("/onboarding");
                     setIsMobileMenuOpen(false);
                   }}
                 >

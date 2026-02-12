@@ -49,6 +49,7 @@ import Blueprint from "./pages/Blueprint";
 import BlueprintPreview from "./pages/BlueprintPreview";
 import SimulationPreview from "./pages/SimulationPreview";
 import DataCentreTwinLanding from "./pages/DataCentreTwinLanding";
+import Onboarding from "./pages/Onboarding";
 import AgentDetail from "./pages/AgentDetail";
 import TwinDebug from "./pages/TwinDebug";
 import Profile from "./pages/account/Profile";
@@ -128,6 +129,7 @@ function AuthenticatedApp() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/mfa" element={<MFA />} />
         <Route path="/twin-datacentre" element={<DataCentreTwinLanding />} />
+        <Route path="/onboarding" element={<Onboarding />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );

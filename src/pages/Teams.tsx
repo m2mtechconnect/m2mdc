@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Users,
   UserPlus,
@@ -23,8 +24,10 @@ import {
   Building2,
   HelpCircle,
   Activity,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect, useMemo } from "react";
@@ -34,6 +37,8 @@ import InviteTeamMemberModal from "@/components/teams/InviteTeamMemberModal";
 import RoleBreakdownSection from "@/components/teams/RoleBreakdownSection";
 import ActivityFeed from "@/components/teams/ActivityFeed";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast as sonnerToast } from "sonner";
+import { useUserPermissions } from "@/hooks/useUserPermissions";
 
 const roleIcons: Record<string, any> = {
   executive: Crown,
@@ -67,6 +72,10 @@ export default function Teams() {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("members");
+  const [approvalFilter, setApprovalFilter] = useState<'pending' | 'approved' | 'all'>('pending');
+  const { hasRole } = useUserPermissions();
+  const isAdmin = hasRole('admin');
   
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -230,7 +239,46 @@ export default function Teams() {
     },
   });
 
-  // Calculate stats
+  // User approvals query (admin only)
+  const { data: pendingUsers, isLoading: loadingApprovals } = useQuery({
+    queryKey: ['admin-user-approvals', approvalFilter],
+    enabled: isAuthenticated && isAdmin,
+    queryFn: async () => {
+      let query = supabase
+        .from('profiles')
+        .select('user_id, email, full_name, is_approved, approved_at, created_at')
+        .order('created_at', { ascending: false });
+      if (approvalFilter === 'pending') query = query.eq('is_approved', false);
+      else if (approvalFilter === 'approved') query = query.eq('is_approved', true);
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: async ({ userId, approve }: { userId: string; approve: boolean }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          is_approved: approve,
+          approved_at: approve ? new Date().toISOString() : null,
+          approved_by: approve ? user?.id : null,
+        })
+        .eq('user_id', userId);
+      if (error) throw error;
+    },
+    onSuccess: (_, { approve }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-user-approvals'] });
+      queryClient.invalidateQueries({ queryKey: ['team-members'] });
+      sonnerToast.success(approve ? 'User approved' : 'User approval revoked');
+    },
+    onError: () => sonnerToast.error('Failed to update user approval'),
+  });
+
+  const pendingApprovalCount = pendingUsers?.filter(p => !p.is_approved).length ?? 0;
+
   const activeMembersCount = teamMembers?.length || 0;
   const pendingInvitesCount = invites?.filter((i) => i.status === "pending").length || 0;
   const totalMembers = activeMembersCount + pendingInvitesCount;
@@ -306,201 +354,315 @@ export default function Teams() {
             </Tooltip>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-            {[
-              { label: "Total Members", value: totalMembers, icon: Users },
-              { label: "Active Now", value: activeNow, icon: CheckCircle2 },
-              { label: "Systems", value: totalSystems, icon: Wrench },
-              { label: "Pending", value: pendingInvitesCount, icon: Clock, warning: pendingInvitesCount > 0 },
-              { label: "Roles", value: rolesCount, icon: Shield },
-              { label: "Departments", value: rolesCount, icon: Building2 },
-            ].map((stat) => (
-              <Card key={stat.label} className={stat.warning ? "border-l-4 border-l-warning" : ""}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-muted-foreground">{stat.label}</span>
-                    <stat.icon className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Team Members Table */}
-            <div className="lg:col-span-2 space-y-6">
-              <Card>
-                <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-5 w-5 text-muted-foreground" />
-                      <CardTitle className="text-lg">Team Members</CardTitle>
-                    </div>
-                    <Badge variant="secondary" className="text-sm">
-                      {isInitialLoading ? "..." : `${filteredMembers.length} of ${activeMembersCount}`}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList>
+              <TabsTrigger value="members" className="gap-2">
+                <Users className="h-4 w-4" />
+                Team Members
+              </TabsTrigger>
+              {isAdmin && (
+                <TabsTrigger value="approvals" className="gap-2">
+                  <Shield className="h-4 w-4" />
+                  User Approvals
+                  {pendingApprovalCount > 0 && (
+                    <Badge variant="destructive" className="ml-1 h-5 px-1.5 text-xs">
+                      {pendingApprovalCount}
                     </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {/* Filters */}
-                  <div className="flex flex-wrap gap-3 mb-6">
-                    <div className="flex-1 min-w-[200px]">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          placeholder="Search members..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="pl-10"
-                        />
-                      </div>
-                    </div>
-                  <Select value={roleFilter} onValueChange={setRoleFilter}>
-                    <SelectTrigger className="w-[180px]">
-                      <Filter className="h-4 w-4 mr-2" />
-                      <SelectValue placeholder="All Roles" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Roles</SelectItem>
-                      <SelectItem value="executive">Executive</SelectItem>
-                      <SelectItem value="manager">Manager</SelectItem>
-                      <SelectItem value="engineer">Engineer</SelectItem>
-                      <SelectItem value="compliance">Compliance</SelectItem>
-                      <SelectItem value="data_analyst">Data Analyst</SelectItem>
-                      <SelectItem value="marketing">Marketing</SelectItem>
-                      <SelectItem value="sales">Sales</SelectItem>
-                      <SelectItem value="support">Support</SelectItem>
-                      <SelectItem value="finance">Finance</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-[150px]">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                  )}
+                </TabsTrigger>
+              )}
+            </TabsList>
 
-                  {/* Members List */}
-                  <div className="space-y-3">
-                    {isInitialLoading ? (
-                      [...Array(3)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)
-                    ) : filteredMembers.length > 0 ? (
-                      filteredMembers.map((member) => {
-                      const RoleIcon = roleIcons[member.role] || Wrench;
-                      return (
-                        <Tooltip key={member.email}>
-                          <TooltipTrigger asChild>
-                            <div
-                              className="p-4 rounded-lg border border-border hover:border-secondary/50 transition-smooth cursor-pointer"
-                              onClick={() => handleMemberClick(member)}
-                            >
-                              <div className="flex items-center justify-between">
-                                 <div className="flex items-center gap-3">
-                                  <UserAvatar
-                                    profileImageUrl={member.avatarUrl}
-                                    initials={member.avatarInitials}
-                                    bgColor={member.avatarBgColor}
-                                    size="md"
-                                  />
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <h3 className="font-semibold text-sm">{member.name}</h3>
-                                      <Badge
-                                        variant="outline"
-                                        className={`text-xs capitalize ${
-                                          roleColors[member.role] || "text-muted-foreground"
-                                        }`}
-                                      >
-                                        <RoleIcon className="h-3 w-3 mr-1" />
-                                        {member.role.replace(/_/g, " ")}
-                                      </Badge>
+            <TabsContent value="members" className="space-y-6">
+              {/* Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                {[
+                  { label: "Total Members", value: totalMembers, icon: Users },
+                  { label: "Active Now", value: activeNow, icon: CheckCircle2 },
+                  { label: "Systems", value: totalSystems, icon: Wrench },
+                  { label: "Pending", value: pendingInvitesCount, icon: Clock, warning: pendingInvitesCount > 0 },
+                  { label: "Roles", value: rolesCount, icon: Shield },
+                  { label: "Departments", value: rolesCount, icon: Building2 },
+                ].map((stat) => (
+                  <Card key={stat.label} className={stat.warning ? "border-l-4 border-l-warning" : ""}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-muted-foreground">{stat.label}</span>
+                        <stat.icon className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <div className="text-2xl font-bold">{stat.value}</div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Main Content Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column - Team Members Table */}
+                <div className="lg:col-span-2 space-y-6">
+                  <Card>
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Users className="h-5 w-5 text-muted-foreground" />
+                          <CardTitle className="text-lg">Team Members</CardTitle>
+                        </div>
+                        <Badge variant="secondary" className="text-sm">
+                          {isInitialLoading ? "..." : `${filteredMembers.length} of ${activeMembersCount}`}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {/* Filters */}
+                      <div className="flex flex-wrap gap-3 mb-6">
+                        <div className="flex-1 min-w-[200px]">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              placeholder="Search members..."
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                              className="pl-10"
+                            />
+                          </div>
+                        </div>
+                      <Select value={roleFilter} onValueChange={setRoleFilter}>
+                        <SelectTrigger className="w-[180px]">
+                          <Filter className="h-4 w-4 mr-2" />
+                          <SelectValue placeholder="All Roles" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Roles</SelectItem>
+                          <SelectItem value="executive">Executive</SelectItem>
+                          <SelectItem value="manager">Manager</SelectItem>
+                          <SelectItem value="engineer">Engineer</SelectItem>
+                          <SelectItem value="compliance">Compliance</SelectItem>
+                          <SelectItem value="data_analyst">Data Analyst</SelectItem>
+                          <SelectItem value="marketing">Marketing</SelectItem>
+                          <SelectItem value="sales">Sales</SelectItem>
+                          <SelectItem value="support">Support</SelectItem>
+                          <SelectItem value="finance">Finance</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="w-[150px]">
+                          <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Status</SelectItem>
+                          <SelectItem value="active">Active</SelectItem>
+                          <SelectItem value="inactive">Inactive</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                      {/* Members List */}
+                      <div className="space-y-3">
+                        {isInitialLoading ? (
+                          [...Array(3)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)
+                        ) : filteredMembers.length > 0 ? (
+                          filteredMembers.map((member) => {
+                          const RoleIcon = roleIcons[member.role] || Wrench;
+                          return (
+                            <Tooltip key={member.email}>
+                              <TooltipTrigger asChild>
+                                <div
+                                  className="p-4 rounded-lg border border-border hover:border-secondary/50 transition-smooth cursor-pointer"
+                                  onClick={() => handleMemberClick(member)}
+                                >
+                                  <div className="flex items-center justify-between">
+                                     <div className="flex items-center gap-3">
+                                      <UserAvatar
+                                        profileImageUrl={member.avatarUrl}
+                                        initials={member.avatarInitials}
+                                        bgColor={member.avatarBgColor}
+                                        size="md"
+                                      />
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <h3 className="font-semibold text-sm">{member.name}</h3>
+                                          <Badge
+                                            variant="outline"
+                                            className={`text-xs capitalize ${
+                                              roleColors[member.role] || "text-muted-foreground"
+                                            }`}
+                                          >
+                                            <RoleIcon className="h-3 w-3 mr-1" />
+                                            {member.role.replace(/_/g, " ")}
+                                          </Badge>
+                                        </div>
+                                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                          <span className="flex items-center gap-1">
+                                            <div
+                                              className={`h-2 w-2 rounded-full ${
+                                                member.lastActive === "Online"
+                                                  ? "bg-secondary"
+                                                  : "bg-muted-foreground"
+                                              }`}
+                                            />
+                                            {member.lastActive}
+                                          </span>
+                                          <span>{member.systems} systems</span>
+                                        </div>
+                                      </div>
                                     </div>
-                                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                      <span className="flex items-center gap-1">
-                                        <div
-                                          className={`h-2 w-2 rounded-full ${
-                                            member.lastActive === "Online"
-                                              ? "bg-secondary"
-                                              : "bg-muted-foreground"
-                                          }`}
-                                        />
-                                        {member.lastActive}
-                                      </span>
-                                      <span>{member.systems} systems</span>
-                                    </div>
+                                    <Badge variant="secondary" className="text-xs">
+                                      View Profile
+                                    </Badge>
                                   </div>
                                 </div>
-                                <Badge variant="secondary" className="text-xs">
-                                  View Profile
-                                </Badge>
-                              </div>
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>Click to view full member profile and permissions</TooltipContent>
-                        </Tooltip>
-                      );
-                      })
-                    ) : (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                        <p>No members found matching filters</p>
+                              </TooltipTrigger>
+                              <TooltipContent>Click to view full member profile and permissions</TooltipContent>
+                            </Tooltip>
+                          );
+                          })
+                        ) : (
+                          <div className="text-center py-8 text-muted-foreground">
+                            <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                            <p>No members found matching filters</p>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                    </CardContent>
+                  </Card>
+                </div>
 
-            {/* Right Column - Role Breakdown, Activity & Simulation Runs */}
-            <div className="space-y-6">
-              <RoleBreakdownSection 
-                roleBreakdown={roleBreakdown} 
-                onRoleClick={handleRoleClick}
-              />
-              <ActivityFeed 
-                activities={activityLog || []} 
-                onViewAll={() => navigate("/compliance")}
-              />
-              
-              {/* Recent Simulation Runs */}
-              <Card>
-                <CardHeader className="pb-4">
-                  <div className="flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-muted-foreground" />
-                    <CardTitle className="text-lg">Recent Simulation Runs</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {[
-                      { scenario: 'GPU Spike - Training Job', user: 'Sarah Chen', time: '2 hours ago', runId: 'run-001' },
-                      { scenario: 'CRAH Failure - Hot Aisle', user: 'Michael Wong', time: '5 hours ago', runId: 'run-002' },
-                      { scenario: 'Cross-Border Data Violation', user: 'Alex Johnson', time: '1 day ago', runId: 'run-003' },
-                    ].map((run, idx) => (
-                      <div 
-                        key={idx}
-                        className="p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
-                        onClick={() => navigate(`/data-centre-twin?view=simulation&runId=${run.runId}`)}
-                      >
-                        <div className="font-medium text-sm">{run.scenario}</div>
-                        <div className="text-xs text-muted-foreground">
-                          Run by {run.user} – {run.time}
-                        </div>
+                {/* Right Column - Role Breakdown, Activity & Simulation Runs */}
+                <div className="space-y-6">
+                  <RoleBreakdownSection 
+                    roleBreakdown={roleBreakdown} 
+                    onRoleClick={handleRoleClick}
+                  />
+                  <ActivityFeed 
+                    activities={activityLog || []} 
+                    onViewAll={() => navigate("/compliance")}
+                  />
+                  
+                  {/* Recent Simulation Runs */}
+                  <Card>
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center gap-2">
+                        <Activity className="h-5 w-5 text-muted-foreground" />
+                        <CardTitle className="text-lg">Recent Simulation Runs</CardTitle>
                       </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {[
+                          { scenario: 'GPU Spike - Training Job', user: 'Sarah Chen', time: '2 hours ago', runId: 'run-001' },
+                          { scenario: 'CRAH Failure - Hot Aisle', user: 'Michael Wong', time: '5 hours ago', runId: 'run-002' },
+                          { scenario: 'Cross-Border Data Violation', user: 'Alex Johnson', time: '1 day ago', runId: 'run-003' },
+                        ].map((run, idx) => (
+                          <div 
+                            key={idx}
+                            className="p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
+                            onClick={() => navigate(`/data-centre-twin?view=simulation&runId=${run.runId}`)}
+                          >
+                            <div className="font-medium text-sm">{run.scenario}</div>
+                            <div className="text-xs text-muted-foreground">
+                              Run by {run.user} – {run.time}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </TabsContent>
+
+            {isAdmin && (
+              <TabsContent value="approvals" className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-display font-bold">User Approvals</h2>
+                    <p className="text-muted-foreground">Approve or revoke access for new signups</p>
+                  </div>
+                  {pendingApprovalCount > 0 && (
+                    <Badge variant="destructive" className="text-sm px-3 py-1">
+                      {pendingApprovalCount} pending
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="flex gap-2">
+                  {(['pending', 'approved', 'all'] as const).map((f) => (
+                    <Button
+                      key={f}
+                      variant={approvalFilter === f ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setApprovalFilter(f)}
+                      className="capitalize"
+                    >
+                      {f === 'pending' && <Clock className="h-4 w-4 mr-1" />}
+                      {f === 'approved' && <CheckCircle className="h-4 w-4 mr-1" />}
+                      {f === 'all' && <Users className="h-4 w-4 mr-1" />}
+                      {f}
+                    </Button>
+                  ))}
+                </div>
+
+                {loadingApprovals ? (
+                  <div className="space-y-3">
+                    {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-20 w-full" />)}
+                  </div>
+                ) : !pendingUsers?.length ? (
+                  <Card className="p-8 text-center text-muted-foreground">
+                    <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No {approvalFilter === 'all' ? '' : approvalFilter} users found</p>
+                  </Card>
+                ) : (
+                  <div className="space-y-3">
+                    {pendingUsers.map((profile) => (
+                      <Card key={profile.user_id} className="p-4 flex items-center justify-between gap-4">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium truncate">{profile.full_name || 'No name'}</p>
+                          <p className="text-sm text-muted-foreground truncate">{profile.email || 'No email'}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Signed up: {profile.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Unknown'}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          {profile.is_approved ? (
+                            <>
+                              <Badge variant="secondary" className="gap-1">
+                                <CheckCircle className="h-3 w-3" />
+                                Approved
+                              </Badge>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => approveMutation.mutate({ userId: profile.user_id, approve: false })}
+                                disabled={approveMutation.isPending}
+                              >
+                                <XCircle className="h-4 w-4 mr-1" />
+                                Revoke
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Badge variant="outline" className="gap-1 text-amber-600 border-amber-300">
+                                <Clock className="h-3 w-3" />
+                                Pending
+                              </Badge>
+                              <Button
+                                size="sm"
+                                onClick={() => approveMutation.mutate({ userId: profile.user_id, approve: true })}
+                                disabled={approveMutation.isPending}
+                              >
+                                <CheckCircle className="h-4 w-4 mr-1" />
+                                Approve
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </Card>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+                )}
+              </TabsContent>
+            )}
+          </Tabs>
         </div>
       </div>
 

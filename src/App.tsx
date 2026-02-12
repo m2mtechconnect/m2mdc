@@ -119,16 +119,19 @@ function AuthenticatedApp() {
   }
 
   // If not authenticated, show only Auth pages and public landing pages
+  // Auth pages are gated behind onboarding completion
+  const onboardingDone = localStorage.getItem("onboarding_completed") === "true";
+
   if (!session || !user) {
     return (
       <Routes>
         <Route path="/" element={<DataCentreTwinLanding />} />
-        <Route path="/auth" element={<SignIn />} />
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/auth" element={onboardingDone ? <SignIn /> : <Navigate to="/onboarding" replace />} />
+        <Route path="/sign-in" element={onboardingDone ? <SignIn /> : <Navigate to="/onboarding" replace />} />
+        <Route path="/sign-up" element={onboardingDone ? <SignUp /> : <Navigate to="/onboarding" replace />} />
         <Route path="/sign-out" element={<SignOut />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/mfa" element={<MFA />} />
+        <Route path="/forgot-password" element={onboardingDone ? <ForgotPassword /> : <Navigate to="/onboarding" replace />} />
+        <Route path="/mfa" element={onboardingDone ? <MFA /> : <Navigate to="/onboarding" replace />} />
         <Route path="/twin-datacentre" element={<DataCentreTwinLanding />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="*" element={<Navigate to="/" replace />} />

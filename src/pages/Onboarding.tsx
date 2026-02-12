@@ -118,6 +118,8 @@ export default function Onboarding() {
       return;
     }
 
+    // Mark onboarding as completed so auth pages become accessible
+    localStorage.setItem("onboarding_completed", "true");
     toast({ title: "Welcome aboard!", description: "Let's create your account." });
     navigate("/sign-up");
   };

@@ -139,15 +139,8 @@ export function TwinHeader() {
             ))}
           </nav>
 
-          {/* Desktop CTA Buttons - Fixed to /auth */}
+          {/* Desktop CTA Buttons */}
           <div className="hidden lg:flex items-center gap-3">
-            <Button
-              variant="ghost"
-              className="text-sm text-muted-foreground hover:text-foreground"
-              onClick={() => navigate("/auth")}
-            >
-              Sign In
-            </Button>
             <Button
               className="text-sm bg-accent text-m2m-black font-semibold hover:bg-m2m-gold-dark"
              onClick={() => navigate("/onboarding")}
@@ -224,16 +217,6 @@ export function TwinHeader() {
               ))}
               
               <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border/50">
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
-                    navigate("/auth");
-                    setIsMobileMenuOpen(false);
-                  }}
-                >
-                  Sign In
-                </Button>
                 <Button
                   className="w-full bg-accent text-m2m-black font-semibold hover:bg-m2m-gold-dark"
                    onClick={() => {

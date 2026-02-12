@@ -172,40 +172,6 @@ export function TwinTrustSection() {
           ))}
         </motion.div>
         
-
-        {/* Trust logos row */}
-        <motion.div 
-          className="mt-12 pt-8 border-t border-border/30"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <div className="text-center text-sm text-muted-foreground mb-5">
-            Recognized by industry leaders
-          </div>
-          <motion.div 
-            className="flex flex-wrap justify-center items-center gap-x-10 gap-y-4"
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-          >
-            {["Scale AI", "Upskill Canada", "NRC IRAP", "Enterprise Partners"].map((name, index) => (
-              <motion.span 
-                key={name}
-                className="text-base font-medium text-muted-foreground/70 hover:text-foreground transition-colors cursor-default"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.3, delay: 0.6 + index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                {name}
-              </motion.span>
-            ))}
-          </motion.div>
-        </motion.div>
       </div>
     </section>
   );

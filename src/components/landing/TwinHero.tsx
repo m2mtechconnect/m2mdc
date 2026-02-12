@@ -21,12 +21,6 @@ const powerStats = [
   { value: "50+", label: "Enterprises", icon: Building2, color: "text-primary" },
 ];
 
-const trustedLogos = [
-  { name: "Scale AI", highlight: true },
-  { name: "Upskill Canada", highlight: false },
-  { name: "NRC IRAP", highlight: false },
-  { name: "Enterprise DC Ops", highlight: false },
-];
 
 const quickBenefits = [
   "Canadian data sovereignty",

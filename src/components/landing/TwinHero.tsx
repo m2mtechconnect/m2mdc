@@ -262,30 +262,6 @@ export function TwinHero() {
             </motion.div>
           </motion.div>
 
-          {/* Trust logos - centered */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.9 }}
-          >
-            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-4">
-              Trusted by industry leaders
-            </div>
-            <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-2">
-              {trustedLogos.map((logo, i) => (
-                <motion.span 
-                  key={logo.name}
-                  className={`text-sm font-medium transition-colors ${logo.highlight ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3, delay: 1 + i * 0.1 }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  {logo.name}
-                </motion.span>
-              ))}
-            </div>
-          </motion.div>
         </div>
 
         {/* Hero visual - Full width product screenshot */}

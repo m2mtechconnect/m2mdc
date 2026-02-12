@@ -4,7 +4,7 @@
  */
 
 import { Link } from "react-router-dom";
-import { Shield, Linkedin, Twitter, Mail, ExternalLink } from "lucide-react";
+import { Linkedin, Twitter, Mail, ExternalLink } from "lucide-react";
 import m2mLogo from "@/assets/m2m-logo.png";
 
 // Landing page anchor links
@@ -166,10 +166,6 @@ export function TwinFooter() {
             
             {/* Trust badges */}
             <div className="flex items-center gap-6 text-xs text-slate-500">
-              <div className="flex items-center gap-1.5">
-                <Shield className="h-3.5 w-3.5" />
-                <span>SOC 2 Type II</span>
-              </div>
               <div className="flex items-center gap-1.5">
                 <span className="text-accent">●</span>
                 <span>Carbon Neutral</span>

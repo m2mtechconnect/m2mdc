@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail, Sparkles, Shield, Leaf, CheckCircle2, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { LoomDemoModal } from "./LoomDemoModal";
 
 const benefits = [
   "View live dashboard demo",
@@ -17,8 +19,10 @@ const benefits = [
 
 export function TwinCTASection() {
   const navigate = useNavigate();
+  const [demoOpen, setDemoOpen] = useState(false);
 
   return (
+    <>
     <section className="relative py-24 lg:py-32 overflow-hidden">
       {/* Gradient background */}
       <div className="absolute inset-0 bg-gradient-to-b from-muted/50 via-muted/30 to-background" />
@@ -129,7 +133,7 @@ export function TwinCTASection() {
                   size="lg" 
                   variant="outline" 
                   className="text-base px-10 h-14 border-border text-foreground hover:bg-muted"
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => setDemoOpen(true)}
                 >
                   <Play className="mr-2 h-5 w-5" />
                   Watch Demo
@@ -206,5 +210,7 @@ export function TwinCTASection() {
         </motion.div>
       </div>
     </section>
+    <LoomDemoModal open={demoOpen} onOpenChange={setDemoOpen} />
+    </>
   );
 }

@@ -120,7 +120,7 @@ export function TwinCTASection() {
                   className="text-base px-10 h-14 group bg-accent text-m2m-black font-semibold hover:bg-m2m-gold-dark shadow-xl shadow-accent/20 hover:shadow-accent/30 transition-shadow"
                   onClick={() => navigate("/onboarding")}
                 >
-                  Get Started Free
+                  Start Building Your Twin
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Button>
               </motion.div>

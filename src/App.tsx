@@ -127,6 +127,7 @@ function AuthenticatedApp() {
       <Routes>
         <Route path="/" element={<DataCentreTwinLanding />} />
         <Route path="/auth" element={onboardingDone ? <SignIn /> : <Navigate to="/onboarding" replace />} />
+        <Route path="/login" element={<SignIn />} />
         <Route path="/sign-in" element={onboardingDone ? <SignIn /> : <Navigate to="/onboarding" replace />} />
         <Route path="/sign-up" element={onboardingDone ? <SignUp /> : <Navigate to="/onboarding" replace />} />
         <Route path="/sign-out" element={<SignOut />} />

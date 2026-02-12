@@ -3271,6 +3271,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           avatar_bg_color: string | null
           avatar_initials: string | null
           avatar_url: string | null
@@ -3279,6 +3281,7 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          is_approved: boolean
           job_title: string | null
           locale: string | null
           org_id: string | null
@@ -3288,6 +3291,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           avatar_bg_color?: string | null
           avatar_initials?: string | null
           avatar_url?: string | null
@@ -3296,6 +3301,7 @@ export type Database = {
           email: string
           full_name?: string | null
           id?: string
+          is_approved?: boolean
           job_title?: string | null
           locale?: string | null
           org_id?: string | null
@@ -3305,6 +3311,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           avatar_bg_color?: string | null
           avatar_initials?: string | null
           avatar_url?: string | null
@@ -3313,6 +3321,7 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          is_approved?: boolean
           job_title?: string | null
           locale?: string | null
           org_id?: string | null

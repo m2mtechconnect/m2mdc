@@ -56,6 +56,8 @@ import TwinDebug from "./pages/TwinDebug";
 import Profile from "./pages/account/Profile";
 import Settings from "./pages/account/Settings";
 import AccessControl from "./pages/account/AccessControl";
+import PendingApproval from "./pages/PendingApproval";
+import AdminUserApproval from "./pages/AdminUserApproval";
 
 // Initialize changelog middleware for builder store
 initChangeLogMiddleware();
@@ -86,6 +88,8 @@ function AuthenticatedApp() {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isApproved, setIsApproved] = useState<boolean | null>(null);
+  const [approvalLoading, setApprovalLoading] = useState(true);
 
   // Auto-logout after 30 minutes of inactivity
   useAutoLogout(!!user);
@@ -110,7 +114,37 @@ function AuthenticatedApp() {
     return () => subscription.unsubscribe();
   }, []);
 
-  if (loading) {
+  // Check approval status when user is authenticated
+  useEffect(() => {
+    const checkApproval = async () => {
+      if (!user) {
+        setApprovalLoading(false);
+        return;
+      }
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('is_approved')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (error) {
+        console.error('Error checking approval:', error);
+        setIsApproved(false);
+      } else {
+        setIsApproved(data?.is_approved ?? false);
+      }
+      setApprovalLoading(false);
+    };
+
+    if (user) {
+      checkApproval();
+    } else {
+      setApprovalLoading(false);
+    }
+  }, [user]);
+
+  if (loading || approvalLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -140,7 +174,17 @@ function AuthenticatedApp() {
     );
   }
 
-  // If authenticated, show all protected routes
+  // If authenticated but not approved, show pending approval page
+  if (!isApproved) {
+    return (
+      <Routes>
+        <Route path="/sign-out" element={<SignOut />} />
+        <Route path="*" element={<PendingApproval />} />
+      </Routes>
+    );
+  }
+
+  // If authenticated and approved, show all protected routes
   return (
     <Layout>
       <TourRenderer />
@@ -160,6 +204,7 @@ function AuthenticatedApp() {
         <Route path="/account/settings" element={<Settings />} />
         <Route path="/account/access-control" element={<AccessControl />} />
         <Route path="/admin/onboarding-submissions" element={<OnboardingSubmissions />} />
+        <Route path="/admin/user-approvals" element={<AdminUserApproval />} />
         <Route path="/integrations" element={<Navigate to="/marketplace?tab=integrations" replace />} />
         <Route path="/marketplace/integrations" element={<Marketplace />} />
         <Route path="/compliance" element={<Compliance />} />

@@ -13,6 +13,7 @@ const productLinks = [
   { label: "Use Cases", href: "#use-cases" },
   { label: "Integrations", href: "#integrations" },
   { label: "Why M2M", href: "#differentiators" },
+  { label: "Client Login", href: "/login", internal: true },
 ];
 
 // External M2M website links
@@ -45,7 +46,17 @@ const socialLinks = [
 export function TwinFooter() {
   const currentYear = new Date().getFullYear();
 
-  const renderLink = (link: { label: string; href: string; external?: boolean }) => {
+  const renderLink = (link: { label: string; href: string; external?: boolean; internal?: boolean }) => {
+    if (link.internal) {
+      return (
+        <Link
+          to={link.href}
+          className="text-sm text-slate-400 hover:text-accent transition-colors"
+        >
+          {link.label}
+        </Link>
+      );
+    }
     if (link.external) {
       return (
         <a

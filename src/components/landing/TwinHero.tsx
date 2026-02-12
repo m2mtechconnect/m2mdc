@@ -238,7 +238,7 @@ export function TwinHero() {
               <Button 
                 size="lg" 
                 className="text-base px-10 h-14 group relative overflow-hidden transition-all duration-300 bg-accent text-m2m-black hover:bg-m2m-gold-dark hover:shadow-2xl hover:shadow-accent/30"
-                onClick={() => navigate("/auth")}
+                onClick={() => navigate("/onboarding")}
               >
                 <span className="relative z-10 flex items-center font-semibold">
                   Get Started Free

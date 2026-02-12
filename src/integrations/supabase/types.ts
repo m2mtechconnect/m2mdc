@@ -2958,6 +2958,57 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding_submissions: {
+        Row: {
+          challenge: string | null
+          company_name: string
+          company_size: string
+          created_at: string
+          current_pue: string | null
+          email: string
+          full_name: string
+          goals: Json
+          id: string
+          job_title: string
+          num_data_centres: string
+          rack_count: string
+          timeline: string
+          workload_types: Json
+        }
+        Insert: {
+          challenge?: string | null
+          company_name: string
+          company_size: string
+          created_at?: string
+          current_pue?: string | null
+          email: string
+          full_name: string
+          goals?: Json
+          id?: string
+          job_title: string
+          num_data_centres: string
+          rack_count: string
+          timeline: string
+          workload_types?: Json
+        }
+        Update: {
+          challenge?: string | null
+          company_name?: string
+          company_size?: string
+          created_at?: string
+          current_pue?: string | null
+          email?: string
+          full_name?: string
+          goals?: Json
+          id?: string
+          job_title?: string
+          num_data_centres?: string
+          rack_count?: string
+          timeline?: string
+          workload_types?: Json
+        }
+        Relationships: []
+      }
       organizations: {
         Row: {
           created_at: string | null

@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { screenshotManifest } from "@/data/studioScreenshots";
+import { LoomDemoModal } from "./LoomDemoModal";
 
 // Power stats - achieved results, not targets
 const powerStats = [
@@ -35,6 +36,7 @@ const quickBenefits = [
 
 export function TwinHero() {
   const navigate = useNavigate();
+  const [demoOpen, setDemoOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   
@@ -61,6 +63,7 @@ export function TwinHero() {
   }, [mouseX, mouseY]);
 
   return (
+    <>
     <section 
       ref={containerRef}
       className="relative min-h-[95vh] flex items-center overflow-hidden bg-background"
@@ -251,7 +254,7 @@ export function TwinHero() {
                 size="lg" 
                 variant="outline" 
                 className="text-base px-10 h-14 border-border text-foreground hover:bg-muted/80 transition-all duration-300"
-                onClick={() => navigate("/dashboard")}
+                onClick={() => setDemoOpen(true)}
               >
                 <Play className="mr-2 h-5 w-5" />
                 Watch Demo
@@ -368,5 +371,7 @@ export function TwinHero() {
         </motion.div>
       </div>
     </section>
+    <LoomDemoModal open={demoOpen} onOpenChange={setDemoOpen} />
+    </>
   );
 }

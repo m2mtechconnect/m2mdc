@@ -24,13 +24,6 @@ const navItems = [
   { label: "Why M2M", href: "#differentiators" },
 ];
 
-// Products require authentication - these link to /auth with redirect
-const productItems = [
-  { label: "Digital Twin Studio", href: "/auth", description: "3D visualization & monitoring" },
-  { label: "Blueprint Designer", href: "/auth", description: "Configure your data centre" },
-  { label: "Agent Marketplace", href: "/auth", description: "AI subsystem agents" },
-];
-
 // Solutions scroll to sections on landing page
 const solutionItems = [
   { label: "Enterprise Solutions", href: "#use-cases", description: "For CIOs, CTOs & data centre ops" },
@@ -81,26 +74,6 @@ export function TwinHeader() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-1">
-            {/* Products Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted">
-                Products
-                <ChevronDown className="h-4 w-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64">
-                {productItems.map((item) => (
-                  <DropdownMenuItem 
-                    key={item.label}
-                    onSelect={() => navigate(item.href)}
-                    className="flex flex-col items-start gap-0.5 cursor-pointer py-3"
-                  >
-                    <span className="font-medium text-foreground">{item.label}</span>
-                    <span className="text-xs text-muted-foreground">{item.description}</span>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
             {/* Solutions Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted">
@@ -167,26 +140,6 @@ export function TwinHeader() {
         {isMobileMenuOpen && (
           <div className="lg:hidden py-4 border-t border-border bg-background/95 backdrop-blur-md">
             <nav className="flex flex-col gap-2">
-              {/* Products section */}
-              <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Products
-              </div>
-              {productItems.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-                  onClick={() => {
-                    navigate(item.href);
-                    setIsMobileMenuOpen(false);
-                  }}
-                >
-                  {item.label}
-                </a>
-              ))}
-
-              <div className="h-px bg-border/50 my-2" />
-
               {/* Solutions section */}
               <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Solutions

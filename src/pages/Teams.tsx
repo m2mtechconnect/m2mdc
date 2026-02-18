@@ -256,6 +256,32 @@ export default function Teams() {
     },
   });
 
+  // Track recommended role per user
+  const [selectedRoles, setSelectedRoles] = useState<Record<string, string>>({});
+
+  // Load existing roles for users
+  const { data: existingRoles } = useQuery({
+    queryKey: ['all-user-roles'],
+    enabled: isAuthenticated && isAdmin,
+    queryFn: async () => {
+      const { data } = await supabase.from('user_roles').select('user_id, role');
+      return data || [];
+    },
+  });
+
+  // Sync existing roles into selectedRoles
+  useEffect(() => {
+    if (existingRoles?.length) {
+      setSelectedRoles(prev => {
+        const merged = { ...prev };
+        existingRoles.forEach((r: any) => {
+          if (!merged[r.user_id]) merged[r.user_id] = r.role;
+        });
+        return merged;
+      });
+    }
+  }, [existingRoles]);
+
   const approveMutation = useMutation({
     mutationFn: async ({ userId, approve }: { userId: string; approve: boolean }) => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -268,11 +294,23 @@ export default function Teams() {
         })
         .eq('user_id', userId);
       if (error) throw error;
+
+      // Assign role when approving
+      if (approve) {
+        const role = selectedRoles[userId] || 'engineer';
+        // Remove existing roles first
+        await supabase.from('user_roles').delete().eq('user_id', userId);
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({ user_id: userId, role });
+        if (roleError) console.error('Role assignment error:', roleError);
+      }
     },
     onSuccess: (_, { approve }) => {
       queryClient.invalidateQueries({ queryKey: ['admin-user-approvals'] });
       queryClient.invalidateQueries({ queryKey: ['team-members'] });
-      sonnerToast.success(approve ? 'User approved' : 'User approval revoked');
+      queryClient.invalidateQueries({ queryKey: ['user-roles'] });
+      sonnerToast.success(approve ? 'User approved & role assigned' : 'User approval revoked');
     },
     onError: () => sonnerToast.error('Failed to update user approval'),
   });
@@ -623,6 +661,29 @@ export default function Teams() {
                           </p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
+                          <Select
+                            value={selectedRoles[profile.user_id] || 'engineer'}
+                            onValueChange={(val) => setSelectedRoles(prev => ({ ...prev, [profile.user_id]: val }))}
+                          >
+                            <SelectTrigger className="w-[140px] h-8 text-xs">
+                              <SelectValue placeholder="Assign role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="engineer">
+                                <span className="flex items-center gap-1.5"><Wrench className="h-3 w-3" /> Engineer</span>
+                              </SelectItem>
+                              <SelectItem value="manager">
+                                <span className="flex items-center gap-1.5"><Users className="h-3 w-3" /> Manager</span>
+                              </SelectItem>
+                              <SelectItem value="executive">
+                                <span className="flex items-center gap-1.5"><Crown className="h-3 w-3" /> Executive</span>
+                              </SelectItem>
+                              <SelectItem value="security_admin">
+                                <span className="flex items-center gap-1.5"><Shield className="h-3 w-3" /> Security Admin</span>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+
                           {profile.is_approved ? (
                             <>
                               <Badge variant="secondary" className="gap-1">

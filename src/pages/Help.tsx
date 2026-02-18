@@ -23,6 +23,10 @@ import {
   Compass,
   Layers,
   RefreshCw,
+  UserCog,
+  Users,
+  Wrench,
+  Shield,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
@@ -36,6 +40,10 @@ const tourIcons: Record<TourId, React.ReactNode> = {
   overview: <BookOpen className="h-4 w-4" />,
   simulation: <Activity className="h-4 w-4" />,
   blueprint: <Layers className="h-4 w-4" />,
+  role_executive: <UserCog className="h-4 w-4" />,
+  role_manager: <Users className="h-4 w-4" />,
+  role_engineer: <Wrench className="h-4 w-4" />,
+  role_security_admin: <Shield className="h-4 w-4" />,
 };
 
 // Validation Schema

@@ -26,6 +26,9 @@ import { TrendingUp, Clock, CheckCircle2, Zap } from "lucide-react";
 import { trackKPIClick, trackAnalytics } from '@/lib/analytics/analyticsService';
 import { useBlueprintAgents } from '@/hooks/useBlueprintAgents';
 import { OVERVIEW, TOOLTIPS } from '@/ux';
+import { useRBAC } from '@/contexts/RBACContext';
+import { getRoleDashboardConfig } from '@/config/roleDashboardConfig';
+import { AdaptiveDashboardSections } from '@/components/dashboard/AdaptiveDashboardSections';
 
 // DC-specific imports
 import { DCKPITile } from '@/components/dc-ui';
@@ -82,6 +85,8 @@ export default function Dashboard() {
   const [deleteSystemName, setDeleteSystemName] = useState<string>('');
   const [deleteSystemStatus, setDeleteSystemStatus] = useState<string>('');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const { role } = useRBAC();
+  const roleConfig = getRoleDashboardConfig(role);
   
   // Unified dashboard state
   const [currentTab, setCurrentTab] = useState('all');
@@ -361,11 +366,17 @@ export default function Dashboard() {
               <Server className="h-7 w-7 text-primary" />
             </div>
             <h1 className="text-h1 font-display text-gradient-hero">
-              {OVERVIEW.TITLE}
+              {roleConfig.greeting}
             </h1>
           </div>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Badge variant="outline" className="text-xs gap-1.5 bg-primary/5 border-primary/30">
+              <Shield className="h-3 w-3 text-primary" />
+              {roleConfig.label} View
+            </Badge>
+          </div>
           <p className="text-muted-foreground text-lg sm:text-xl max-w-3xl mx-auto mb-6">
-            {OVERVIEW.PURPOSE_STATEMENT}
+            {roleConfig.description}
           </p>
           
           {/* Current Twin Indicator with Status Badges */}
@@ -565,23 +576,25 @@ export default function Dashboard() {
           </div>
         )}
         
+        {/* Role-Adaptive KPI Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-card-gap mb-8">
-          {kpis.map((kpi) => (
+          {roleConfig.kpis.map((kpi) => (
             <KpiCard
               key={kpi.key}
               label={kpi.label}
-              value={kpi.value}
+              value={kpi.defaultValue}
               change={kpi.change}
               trend={kpi.trend}
               icon={kpi.icon}
-              loading={kpi.loading}
+              loading={false}
               tooltip={kpi.tooltip}
-              onClick={kpi.onClick}
+              onClick={kpi.navigateTo ? () => navigate(kpi.navigateTo!) : undefined}
             />
           ))}
         </div>
 
-        {/* Digital Twins & Subsystem Agents - Accessible via header menu and /manage-agents page */}
+        {/* Role-Adaptive Dashboard Sections */}
+        <AdaptiveDashboardSections sections={roleConfig.sections} />
       </div>
 
       {/* Modals & Drawers */}

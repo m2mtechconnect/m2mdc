@@ -5,6 +5,7 @@ export type AppRole =
   | 'executive' 
   | 'manager' 
   | 'engineer' 
+  | 'security_admin'
   | 'compliance' 
   | 'data_analyst' 
   | 'marketing' 

@@ -41,28 +41,27 @@ import { AOCQuickAccessButton } from "@/components/aoc/AOCQuickAccessButton";
 import { DataCentreSelector } from "@/components/twin-selector";
 import { HelpMenu } from "@/components/header/HelpMenu";
 import { useTourAutoStart } from "@/tours/useTourAutoStart";
+import { useRBAC } from "@/contexts/RBACContext";
+import { getRoleNavigation } from "@/config/roleDashboardConfig";
+import { Badge } from "@/components/ui/badge";
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
-// Data Centre Twin Studio navigation - organized by section
-// Primary navigation items (always visible)
-const primaryNavigation = [
-  { name: "Command", fullName: "Data Centre Command", href: "/", icon: LayoutDashboard },
-  { name: "Build", fullName: "Build Data Centre Twin", href: "/builder", icon: Wrench },
-  { name: "Agents", fullName: "Subsystem Agents", href: "/app/agents", icon: Server },
+// Fallback navigation (used during loading)
+const fallbackPrimary = [
+  { name: "Command", fullName: "Data Centre Command", href: "/", icon: LayoutDashboard, group: 'primary' as const },
+  { name: "Build", fullName: "Build Data Centre Twin", href: "/builder", icon: Wrench, group: 'primary' as const },
+  { name: "Agents", fullName: "Subsystem Agents", href: "/app/agents", icon: Server, group: 'primary' as const },
 ];
 
-// Secondary navigation items (in "More" menu on smaller screens)
-const secondaryNavigation = [
-  { name: "Analytics", fullName: "Telemetry & Analytics", href: "/intelligence", icon: BarChart3 },
-  { name: "Simulation", fullName: "Simulation", href: "/data-centre-twin?view=simulation", icon: Activity },
-  { name: "Audit", fullName: "Sovereignty & Safety Audit", href: "/compliance", icon: Shield },
-  { name: "Teams", fullName: "Teams", href: "/teams", icon: Users },
+const fallbackSecondary = [
+  { name: "Analytics", fullName: "Telemetry & Analytics", href: "/intelligence", icon: BarChart3, group: 'secondary' as const },
+  { name: "Simulation", fullName: "Simulation", href: "/data-centre-twin?view=simulation", icon: Activity, group: 'secondary' as const },
+  { name: "Audit", fullName: "Sovereignty & Safety Audit", href: "/compliance", icon: Shield, group: 'secondary' as const },
+  { name: "Teams", fullName: "Teams", href: "/teams", icon: Users, group: 'secondary' as const },
 ];
-
-const allNavigation = [...primaryNavigation, ...secondaryNavigation];
 
 // Helper function to get time-based greeting
 const getGreeting = () => {
@@ -97,8 +96,14 @@ export function Layout({ children }: LayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-const { isOpen, setIsOpen } = useCoPilot();
+  const { isOpen, setIsOpen } = useCoPilot();
   const [greeting, setGreeting] = useState(getGreeting());
+  const { role, loading: roleLoading } = useRBAC();
+  
+  // Role-adaptive navigation
+  const roleNav = getRoleNavigation(role);
+  const primaryNavigation = roleLoading ? fallbackPrimary : roleNav.primary;
+  const secondaryNavigation = roleLoading ? fallbackSecondary : roleNav.secondary;
   const headerRef = useRef<HTMLElement>(null);
 
   // Auto-start tours based on route and user state

@@ -1,6 +1,7 @@
 import { Step } from 'react-joyride';
 
-export type TourId = 'studioIntro' | 'overview' | 'simulation' | 'blueprint';
+export type TourId = 'studioIntro' | 'overview' | 'simulation' | 'blueprint'
+  | 'role_executive' | 'role_manager' | 'role_engineer' | 'role_security_admin';
 
 export interface TourDefinition {
   id: TourId;
@@ -161,6 +162,106 @@ const blueprintSteps: Step[] = [
   },
 ];
 
+// ═══════════════════════════════════════════════════════════════════
+// ROLE-ADAPTIVE TOURS
+// ═══════════════════════════════════════════════════════════════════
+
+const roleSharedSteps: Step[] = [
+  {
+    target: '[data-tour="role-header"]',
+    title: 'Your Adaptive Dashboard',
+    content: 'This dashboard adapts to your role, showing the KPIs, sections, and navigation most relevant to you.',
+    placement: 'bottom',
+    disableBeacon: true,
+  },
+  {
+    target: '[data-tour="role-search"]',
+    title: 'AI Co-Pilot',
+    content: 'Ask natural-language questions about your data centre. The Co-Pilot understands your role context.',
+    placement: 'bottom',
+    disableBeacon: true,
+  },
+  {
+    target: '[data-tour="role-kpi-dc"]',
+    title: 'Facility KPIs',
+    content: 'Real-time data centre metrics—PUE, GPU saturation, thermal stability, and sovereignty compliance.',
+    placement: 'top',
+    disableBeacon: true,
+  },
+];
+
+const roleExecutiveSteps: Step[] = [
+  ...roleSharedSteps,
+  {
+    target: '[data-tour="role-kpi-row"]',
+    title: 'Executive KPIs',
+    content: 'Track ROI, compliance score, monthly cost savings, and carbon reduction at a glance.',
+    placement: 'top',
+    disableBeacon: true,
+  },
+  {
+    target: '[data-tour="role-sections"]',
+    title: 'Strategic Sections',
+    content: 'Financial summaries, compliance posture, and team performance—tailored for executive decision-making.',
+    placement: 'top',
+    disableBeacon: true,
+  },
+];
+
+const roleManagerSteps: Step[] = [
+  ...roleSharedSteps,
+  {
+    target: '[data-tour="role-kpi-row"]',
+    title: 'Operations KPIs',
+    content: 'Monitor active agents, team size, pending approvals, and average response latency.',
+    placement: 'top',
+    disableBeacon: true,
+  },
+  {
+    target: '[data-tour="role-sections"]',
+    title: 'Operations Sections',
+    content: 'Agent performance, team activity, and the approval queue—everything you need to manage day-to-day operations.',
+    placement: 'top',
+    disableBeacon: true,
+  },
+];
+
+const roleEngineerSteps: Step[] = [
+  ...roleSharedSteps,
+  {
+    target: '[data-tour="role-kpi-row"]',
+    title: 'Engineering KPIs',
+    content: 'Deep technical metrics—PUE, GPU saturation, thermal stability, and sovereign compute ratio.',
+    placement: 'top',
+    disableBeacon: true,
+  },
+  {
+    target: '[data-tour="role-sections"]',
+    title: 'Engineering Workbench',
+    content: 'Live twin preview, subsystem agent access, and a simulation launcher—built for hands-on engineering.',
+    placement: 'top',
+    disableBeacon: true,
+  },
+];
+
+const roleSecurityAdminSteps: Step[] = [
+  ...roleSharedSteps,
+  {
+    target: '[data-tour="role-kpi-row"]',
+    title: 'Security KPIs',
+    content: 'Security score, active alerts, policy compliance, and pending access reviews.',
+    placement: 'top',
+    disableBeacon: true,
+  },
+  {
+    target: '[data-tour="role-sections"]',
+    title: 'Security Operations',
+    content: 'Security posture, audit logs, access control, and data sovereignty status—your security operations centre.',
+    placement: 'top',
+    disableBeacon: true,
+  },
+];
+
 export const tourRegistry: Record<TourId, TourDefinition> = {
   studioIntro: {
     id: 'studioIntro',
@@ -186,9 +287,33 @@ export const tourRegistry: Record<TourId, TourDefinition> = {
     description: 'Configure your digital twin\'s blueprint',
     steps: blueprintSteps,
   },
+  role_executive: {
+    id: 'role_executive',
+    name: 'Executive Dashboard Tour',
+    description: 'Discover your executive command centre with strategic KPIs and insights',
+    steps: roleExecutiveSteps,
+  },
+  role_manager: {
+    id: 'role_manager',
+    name: 'Manager Dashboard Tour',
+    description: 'Learn about your operations dashboard with team and agent management',
+    steps: roleManagerSteps,
+  },
+  role_engineer: {
+    id: 'role_engineer',
+    name: 'Engineer Dashboard Tour',
+    description: 'Explore your engineering workbench with technical deep-dive tools',
+    steps: roleEngineerSteps,
+  },
+  role_security_admin: {
+    id: 'role_security_admin',
+    name: 'Security Admin Dashboard Tour',
+    description: 'Navigate your security operations centre with audit and compliance tools',
+    steps: roleSecurityAdminSteps,
+  },
 };
 
-export const tourIds: TourId[] = ['studioIntro', 'overview', 'simulation', 'blueprint'];
+export const tourIds: TourId[] = ['studioIntro', 'overview', 'simulation', 'blueprint', 'role_executive', 'role_manager', 'role_engineer', 'role_security_admin'];
 
 // Centralized tour routes - maps each tour to its target page
 export const tourRoutes: Record<TourId, string> = {
@@ -196,4 +321,8 @@ export const tourRoutes: Record<TourId, string> = {
   overview: '/',
   simulation: '/data-centre-twin?view=simulation',
   blueprint: '/builder',
+  role_executive: '/',
+  role_manager: '/',
+  role_engineer: '/',
+  role_security_admin: '/',
 };

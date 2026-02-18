@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { HelpCircle, Play, RefreshCw, BookOpen, Compass, Activity, Layers } from 'lucide-react';
+import { HelpCircle, Play, RefreshCw, BookOpen, Compass, Activity, Layers, Shield, Wrench, Users, UserCog } from 'lucide-react';
 import { useTour } from '@/context/TourContext';
 import { tourRegistry, TourId, tourRoutes } from '@/tours/tourRegistry';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -17,6 +17,10 @@ const tourIcons: Record<TourId, React.ReactNode> = {
   overview: <BookOpen className="h-4 w-4" />,
   simulation: <Activity className="h-4 w-4" />,
   blueprint: <Layers className="h-4 w-4" />,
+  role_executive: <UserCog className="h-4 w-4" />,
+  role_manager: <Users className="h-4 w-4" />,
+  role_engineer: <Wrench className="h-4 w-4" />,
+  role_security_admin: <Shield className="h-4 w-4" />,
 };
 
 export function HelpMenu() {

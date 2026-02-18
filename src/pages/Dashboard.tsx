@@ -29,6 +29,7 @@ import { OVERVIEW, TOOLTIPS } from '@/ux';
 import { useRBAC } from '@/contexts/RBACContext';
 import { getRoleDashboardConfig } from '@/config/roleDashboardConfig';
 import { AdaptiveDashboardSections } from '@/components/dashboard/AdaptiveDashboardSections';
+import { useRoleTourAutoStart } from '@/hooks/useRoleTourAutoStart';
 
 // DC-specific imports
 import { DCKPITile } from '@/components/dc-ui';
@@ -87,6 +88,9 @@ export default function Dashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const { role } = useRBAC();
   const roleConfig = getRoleDashboardConfig(role);
+  
+  // Auto-start role-specific onboarding tour on first visit
+  useRoleTourAutoStart();
   
   // Unified dashboard state
   const [currentTab, setCurrentTab] = useState('all');
@@ -360,7 +364,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 sm:py-10 max-w-7xl space-y-8">
         {/* Header Section */}
-        <section className="text-center px-4">
+        <section className="text-center px-4" data-tour="role-header">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="p-3 rounded-xl bg-primary/10">
               <Server className="h-7 w-7 text-primary" />
@@ -404,12 +408,14 @@ export default function Dashboard() {
         </section>
 
         {/* Hero Search Bar */}
+        <div data-tour="role-search">
         <HeroSearchBar 
           onCoPilotQuery={(query) => {
             console.log('[Dashboard] Hero Co-Pilot query:', query);
             askCoPilot(query);
           }}
         />
+        </div>
 
         {/* DC Quick Chips */}
         <div className="flex flex-wrap items-center justify-center gap-2 mt-6 mb-4">
@@ -437,7 +443,7 @@ export default function Dashboard() {
         </div>
 
         {/* DC-Specific KPI Row with Tooltips */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-4" data-tour="role-kpi-dc">
           <KpiTooltip title="Power Usage Effectiveness" description="Measures facility energy efficiency. Lower is better. Industry average is 1.58.">
             <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
               <div className="flex items-center gap-3 mb-3">
@@ -577,7 +583,7 @@ export default function Dashboard() {
         )}
         
         {/* Role-Adaptive KPI Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-card-gap mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-card-gap mb-8" data-tour="role-kpi-row">
           {roleConfig.kpis.map((kpi) => (
             <KpiCard
               key={kpi.key}
@@ -594,7 +600,9 @@ export default function Dashboard() {
         </div>
 
         {/* Role-Adaptive Dashboard Sections */}
-        <AdaptiveDashboardSections sections={roleConfig.sections} />
+        <div data-tour="role-sections">
+          <AdaptiveDashboardSections sections={roleConfig.sections} />
+        </div>
       </div>
 
       {/* Modals & Drawers */}

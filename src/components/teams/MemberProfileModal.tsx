@@ -4,13 +4,15 @@ import { Badge } from "@/components/ui/badge";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { 
   Crown, Shield, Wrench, BarChart3, TrendingUp, 
   Users, ShoppingCart, Headphones, DollarSign, 
   Mail, Calendar, Activity, Settings, Trash2,
-  CheckCircle2, Clock
+  CheckCircle2, Clock, Save
 } from "lucide-react";
-import { AppRole } from "@/contexts/RBACContext";
+import { useState } from "react";
 
 interface MemberProfileModalProps {
   open: boolean;
@@ -29,9 +31,10 @@ interface MemberProfileModalProps {
     avatarBgColor?: string | null;
     avatarInitials?: string | null;
   };
-  onEditRole?: () => void;
-  onManageAccess?: () => void;
-  onRemoveMember?: () => void;
+  onEditRole?: (userId: string, newRole: string) => void;
+  onManageAccess?: (userId: string) => void;
+  onRemoveMember?: (userId: string) => void;
+  isSaving?: boolean;
 }
 
 const roleIcons: Record<string, any> = {
@@ -39,6 +42,7 @@ const roleIcons: Record<string, any> = {
   manager: Users,
   engineer: Wrench,
   compliance: Shield,
+  security_admin: Shield,
   data_analyst: BarChart3,
   marketing: TrendingUp,
   sales: ShoppingCart,
@@ -51,11 +55,28 @@ const roleColors: Record<string, string> = {
   manager: "text-secondary border-secondary",
   engineer: "text-muted-foreground border-muted-foreground",
   compliance: "text-green-600 border-green-600",
+  security_admin: "text-red-600 border-red-600",
   data_analyst: "text-blue-600 border-blue-600",
   marketing: "text-purple-600 border-purple-600",
   sales: "text-orange-600 border-orange-600",
   support: "text-cyan-600 border-cyan-600",
   finance: "text-emerald-600 border-emerald-600",
+};
+
+const availableRoles = [
+  { value: "engineer", label: "Engineer", icon: Wrench },
+  { value: "manager", label: "Manager", icon: Users },
+  { value: "executive", label: "Executive", icon: Crown },
+  { value: "security_admin", label: "Security Admin", icon: Shield },
+];
+
+// Permission matrix by role
+const permissionsByRole: Record<string, { twins: string; workflows: string; compliance: string }> = {
+  engineer: { twins: "View, Edit", workflows: "View Only", compliance: "Limited" },
+  manager: { twins: "Full Access", workflows: "Full Access", compliance: "View Only" },
+  executive: { twins: "Full Access", workflows: "Full Access", compliance: "Full Access" },
+  security_admin: { twins: "View Only", workflows: "View, Audit", compliance: "Full Access" },
+  compliance: { twins: "View Only", workflows: "View Only", compliance: "Full Access" },
 };
 
 export default function MemberProfileModal({
@@ -65,12 +86,30 @@ export default function MemberProfileModal({
   onEditRole,
   onManageAccess,
   onRemoveMember,
+  isSaving = false,
 }: MemberProfileModalProps) {
+  const [isEditingRole, setIsEditingRole] = useState(false);
+  const [selectedRole, setSelectedRole] = useState(member.role);
   const RoleIcon = roleIcons[member.role] || Wrench;
+
+  const permissions = permissionsByRole[selectedRole] || permissionsByRole.engineer;
+
+  const handleSaveRole = () => {
+    if (member.userId && onEditRole) {
+      onEditRole(member.userId, selectedRole);
+    }
+    setIsEditingRole(false);
+  };
+
+  const handleRemove = () => {
+    if (member.userId && onRemoveMember) {
+      onRemoveMember(member.userId);
+    }
+  };
 
   return (
     <TooltipProvider>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={open} onOpenChange={(val) => { onOpenChange(val); if (!val) setIsEditingRole(false); }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-display">Member Profile</DialogTitle>
@@ -89,10 +128,37 @@ export default function MemberProfileModal({
               <div className="flex-1">
                 <h3 className="text-xl font-semibold mb-1">{member.name}</h3>
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="outline" className={`capitalize ${roleColors[member.role]}`}>
-                    <RoleIcon className="h-3 w-3 mr-1" />
-                    {member.role.replace(/_/g, " ")}
-                  </Badge>
+                  {isEditingRole ? (
+                    <div className="flex items-center gap-2">
+                      <Select value={selectedRole} onValueChange={setSelectedRole}>
+                        <SelectTrigger className="w-[160px] h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableRoles.map((r) => (
+                            <SelectItem key={r.value} value={r.value}>
+                              <span className="flex items-center gap-1.5">
+                                <r.icon className="h-3 w-3" />
+                                {r.label}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button size="sm" variant="default" onClick={handleSaveRole} disabled={isSaving} className="h-8 gap-1">
+                        <Save className="h-3 w-3" />
+                        Save
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => { setIsEditingRole(false); setSelectedRole(member.role); }} className="h-8">
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <Badge variant="outline" className={`capitalize ${roleColors[member.role]}`}>
+                      <RoleIcon className="h-3 w-3 mr-1" />
+                      {member.role.replace(/_/g, " ")}
+                    </Badge>
+                  )}
                   <Badge variant={member.status === "active" ? "secondary" : "outline"}>
                     {member.status === "active" ? (
                       <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -172,25 +238,21 @@ export default function MemberProfileModal({
 
             <Separator />
 
-            {/* Permissions Summary */}
+            {/* Permissions Summary — updates dynamically when editing role */}
             <div>
               <h4 className="font-semibold mb-3">Permissions</h4>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between p-2 rounded bg-muted/30">
                   <span>Digital Twins & Agents</span>
-                  <Badge variant="secondary">View, Edit</Badge>
+                  <Badge variant="secondary">{permissions.twins}</Badge>
                 </div>
                 <div className="flex items-center justify-between p-2 rounded bg-muted/30">
                   <span>Workflows</span>
-                  <Badge variant="secondary">
-                    {member.role === "executive" || member.role === "manager" ? "Full Access" : "View Only"}
-                  </Badge>
+                  <Badge variant="secondary">{permissions.workflows}</Badge>
                 </div>
                 <div className="flex items-center justify-between p-2 rounded bg-muted/30">
                   <span>Compliance & Audit</span>
-                  <Badge variant="secondary">
-                    {member.role === "executive" || member.role === "compliance" ? "Full Access" : "Limited"}
-                  </Badge>
+                  <Badge variant="secondary">{permissions.compliance}</Badge>
                 </div>
               </div>
             </div>
@@ -204,7 +266,8 @@ export default function MemberProfileModal({
                   <Button 
                     variant="outline" 
                     className="flex-1"
-                    onClick={onEditRole}
+                    onClick={() => setIsEditingRole(true)}
+                    disabled={isEditingRole}
                   >
                     <Settings className="h-4 w-4 mr-2" />
                     Edit Role
@@ -218,7 +281,7 @@ export default function MemberProfileModal({
                   <Button 
                     variant="outline" 
                     className="flex-1"
-                    onClick={onManageAccess}
+                    onClick={() => member.userId && onManageAccess?.(member.userId)}
                   >
                     <Shield className="h-4 w-4 mr-2" />
                     Manage Access
@@ -227,18 +290,33 @@ export default function MemberProfileModal({
                 <TooltipContent>Configure system-level access permissions</TooltipContent>
               </Tooltip>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="destructive" 
-                    onClick={onRemoveMember}
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Remove
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Remove this member from your workspace</TooltipContent>
-              </Tooltip>
+              <AlertDialog>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive">
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Remove
+                      </Button>
+                    </AlertDialogTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>Remove this member from your workspace</TooltipContent>
+                </Tooltip>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Remove {member.name}?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will revoke their access and remove their role. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleRemove} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Remove Member
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </DialogContent>

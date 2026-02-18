@@ -315,6 +315,39 @@ export default function Teams() {
     onError: () => sonnerToast.error('Failed to update user approval'),
   });
 
+  // Edit role mutation
+  const editRoleMutation = useMutation({
+    mutationFn: async ({ userId, newRole }: { userId: string; newRole: string }) => {
+      await supabase.from('user_roles').delete().eq('user_id', userId);
+      const { error } = await supabase.from('user_roles').insert({ user_id: userId, role: newRole });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['team-members'] });
+      queryClient.invalidateQueries({ queryKey: ['all-user-roles'] });
+      queryClient.invalidateQueries({ queryKey: ['user-roles'] });
+      setProfileModalOpen(false);
+      sonnerToast.success('Role updated successfully');
+    },
+    onError: () => sonnerToast.error('Failed to update role'),
+  });
+
+  // Remove member mutation
+  const removeMemberMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      // Remove roles
+      await supabase.from('user_roles').delete().eq('user_id', userId);
+      // Revoke approval
+      await supabase.from('profiles').update({ is_approved: false, approved_at: null, approved_by: null }).eq('user_id', userId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['team-members'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-user-approvals'] });
+      setProfileModalOpen(false);
+      sonnerToast.success('Member removed and access revoked');
+    },
+    onError: () => sonnerToast.error('Failed to remove member'),
+  });
   const pendingApprovalCount = pendingUsers?.filter(p => !p.is_approved).length ?? 0;
 
   const activeMembersCount = teamMembers?.length || 0;
@@ -739,14 +772,18 @@ export default function Teams() {
           open={profileModalOpen}
           onOpenChange={setProfileModalOpen}
           member={selectedMember}
-          onEditRole={() => {
-            toast({ title: "Edit Role", description: "Role editing coming soon" });
+          isSaving={editRoleMutation.isPending || removeMemberMutation.isPending}
+          onEditRole={(userId, newRole) => {
+            editRoleMutation.mutate({ userId, newRole });
           }}
-          onManageAccess={() => {
-            toast({ title: "Manage Access", description: "Access management coming soon" });
+          onManageAccess={(userId) => {
+            // Navigate to the user approvals tab where access is managed
+            setActiveTab('approvals');
+            setProfileModalOpen(false);
+            sonnerToast.info('Use the role selector and approval controls to manage access');
           }}
-          onRemoveMember={() => {
-            toast({ title: "Remove Member", description: "Member removal coming soon" });
+          onRemoveMember={(userId) => {
+            removeMemberMutation.mutate(userId);
           }}
         />
       )}

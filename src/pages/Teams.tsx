@@ -147,7 +147,7 @@ export default function Teams() {
           role: userRole?.role || "engineer",
           email: profile.email || "",
           status: "active",
-          lastActive: Math.random() > 0.5 ? "Online" : `${Math.floor(Math.random() * 5 + 1)} hours ago`,
+          lastActive: Math.random() > 0.5 ? "Online" : (() => { const h = Math.floor(Math.random() * 5 + 1); return `${h} ${h === 1 ? 'hour' : 'hours'} ago`; })(),
           systems: userSystems,
           userId: profile.user_id,
           joinedDate: new Date(profile.created_at).toLocaleDateString(),

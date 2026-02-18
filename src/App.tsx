@@ -58,6 +58,7 @@ import Settings from "./pages/account/Settings";
 import AccessControl from "./pages/account/AccessControl";
 import PendingApproval from "./pages/PendingApproval";
 import AdminUserApproval from "./pages/AdminUserApproval";
+import AdminSignupsDashboard from "./pages/AdminSignupsDashboard";
 
 // Initialize changelog middleware for builder store
 initChangeLogMiddleware();
@@ -204,7 +205,8 @@ function AuthenticatedApp() {
         <Route path="/account/settings" element={<Settings />} />
         <Route path="/account/access-control" element={<AccessControl />} />
         <Route path="/admin/onboarding-submissions" element={<OnboardingSubmissions />} />
-        <Route path="/admin/user-approvals" element={<AdminUserApproval />} />
+         <Route path="/admin/user-approvals" element={<AdminUserApproval />} />
+                <Route path="/admin/signups-dashboard" element={<AdminSignupsDashboard />} />
         <Route path="/integrations" element={<Navigate to="/marketplace?tab=integrations" replace />} />
         <Route path="/marketplace/integrations" element={<Marketplace />} />
         <Route path="/compliance" element={<Compliance />} />

@@ -527,11 +527,19 @@ export function Step2Intelligence() {
                 </div>
 
                 <div className="grid gap-3">
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border">
+                  <div className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                    detailedExplanations 
+                      ? 'bg-primary/10 border-primary/40 ring-1 ring-primary/20' 
+                      : 'bg-muted/50 border-border'
+                  }`}>
                     <span className="text-sm">Detailed Explanations</span>
                     <Switch checked={detailedExplanations} onCheckedChange={setDetailedExplanations} />
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border">
+                  <div className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                    formalTone 
+                      ? 'bg-primary/10 border-primary/40 ring-1 ring-primary/20' 
+                      : 'bg-muted/50 border-border'
+                  }`}>
                     <span className="text-sm">Formal Technical Tone</span>
                     <Switch checked={formalTone} onCheckedChange={setFormalTone} />
                   </div>
@@ -543,25 +551,46 @@ export function Step2Intelligence() {
           <TabsContent value="advanced" className="space-y-4 mt-6">
             <DCCard title="Safety & Thresholds" icon={<Shield className="h-4 w-4" />}>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border">
+                <div className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                  hallucinationPrevention 
+                    ? 'bg-success/10 border-success/40 ring-1 ring-success/20' 
+                    : 'bg-muted/50 border-border'
+                }`}>
                   <div>
-                    <p className="text-sm font-medium">Hallucination Prevention</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium">Hallucination Prevention</p>
+                      {hallucinationPrevention && <Badge variant="outline" className="text-[10px] bg-success/10 text-success border-success/30">Active</Badge>}
+                    </div>
                     <p className="text-xs text-muted-foreground">Only respond from verified DC knowledge</p>
                   </div>
                   <Switch checked={hallucinationPrevention} onCheckedChange={(v) => handleSafetyToggle('hallucination', v)} />
                 </div>
 
-                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border">
+                <div className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                  knowledgeRestrictions 
+                    ? 'bg-success/10 border-success/40 ring-1 ring-success/20' 
+                    : 'bg-muted/50 border-border'
+                }`}>
                   <div>
-                    <p className="text-sm font-medium">Knowledge Restrictions</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium">Knowledge Restrictions</p>
+                      {knowledgeRestrictions && <Badge variant="outline" className="text-[10px] bg-success/10 text-success border-success/30">Active</Badge>}
+                    </div>
                     <p className="text-xs text-muted-foreground">Limit to indexed sources only</p>
                   </div>
                   <Switch checked={knowledgeRestrictions} onCheckedChange={(v) => handleSafetyToggle('knowledge', v)} />
                 </div>
 
-                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border">
+                <div className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                  requireCitations 
+                    ? 'bg-info/10 border-info/40 ring-1 ring-info/20' 
+                    : 'bg-muted/50 border-border'
+                }`}>
                   <div>
-                    <p className="text-sm font-medium">Require Citations</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium">Require Citations</p>
+                      {requireCitations && <Badge variant="outline" className="text-[10px] bg-info/10 text-info border-info/30">Active</Badge>}
+                    </div>
                     <p className="text-xs text-muted-foreground">Always cite data sources in responses</p>
                   </div>
                   <Switch checked={requireCitations} onCheckedChange={(v) => handleSafetyToggle('citations', v)} />

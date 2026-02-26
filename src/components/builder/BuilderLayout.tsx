@@ -151,10 +151,7 @@ export function BuilderLayout({
             <p className="text-sm text-muted-foreground">Configure your data centre twin</p>
           </div>
 
-          {/* Mode Toggle */}
-          <div className="px-4 py-3 border-b">
-            <BuilderModeToggle />
-          </div>
+          {/* Mode Toggle - hidden from sidebar, available on mobile only */}
 
           {/* Auto-save indicator */}
           {lastSaved && (

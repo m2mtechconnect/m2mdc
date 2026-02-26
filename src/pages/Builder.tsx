@@ -43,7 +43,6 @@ export default function Builder() {
     workflow, 
     modelConfig,
     initializeBuilder,
-    isLoading,
     error,
     lastSaved
   } = useWizardBuilderStore();
@@ -314,8 +313,8 @@ export default function Builder() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [effectiveCurrentStep]);
 
-  // Show loading state while checking auth or initializing
-  if (!authChecked || !isInitialized || isLoading) {
+  // Show loading state while checking auth or first initialization only
+  if (!authChecked || !isInitialized) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center space-y-4">

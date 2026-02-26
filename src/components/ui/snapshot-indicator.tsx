@@ -16,14 +16,14 @@ interface SnapshotBadgeProps {
 
 export function SnapshotBadge({ version, className }: SnapshotBadgeProps) {
   return (
-    <Badge 
-      variant="outline" 
-      className={cn("font-mono text-xs bg-muted/50", className)}
-    >
+    <Badge
+      variant="outline"
+      className={cn("font-mono text-xs bg-muted/50", className)}>
+
       <GitBranch className="h-3 w-3 mr-1" />
       Snapshot {version}
-    </Badge>
-  );
+    </Badge>);
+
 }
 
 interface ChangeIndicatorProps {
@@ -34,25 +34,25 @@ interface ChangeIndicatorProps {
 export function ChangeIndicator({ changesCount, className }: ChangeIndicatorProps) {
   if (changesCount === 0) {
     return (
-      <Badge 
-        variant="outline" 
-        className={cn("text-xs text-success border-success/30", className)}
-      >
+      <Badge
+        variant="outline"
+        className={cn("text-xs text-success border-success/30", className)}>
+
         <CheckCircle2 className="h-3 w-3 mr-1" />
         No changes
-      </Badge>
-    );
+      </Badge>);
+
   }
 
   return (
-    <Badge 
-      variant="outline" 
-      className={cn("text-xs text-warning border-warning/30", className)}
-    >
+    <Badge
+      variant="outline"
+      className={cn("text-xs text-warning border-warning/30", className)}>
+
       <Pencil className="h-3 w-3 mr-1" />
       {changesCount} field{changesCount !== 1 ? 's' : ''} modified
-    </Badge>
-  );
+    </Badge>);
+
 }
 
 interface ModeBadgeProps {
@@ -65,28 +65,28 @@ export function ModeBadge({ mode, className }: ModeBadgeProps) {
     designer: {
       label: 'Blueprint Designer',
       icon: Pencil,
-      variant: 'default' as const,
+      variant: 'default' as const
     },
     snapshot: {
       label: 'Snapshot Mode',
       icon: Eye,
-      variant: 'secondary' as const,
+      variant: 'secondary' as const
     },
     simulation: {
       label: 'Simulation Environment',
       icon: GitBranch,
-      variant: 'outline' as const,
-    },
+      variant: 'outline' as const
+    }
   };
 
   const { label, icon: Icon, variant } = config[mode];
 
   return (
-    <Badge variant={variant} className={cn("text-xs", className)}>
+    <Badge variant={variant} className={cn("text-xs bg-primary-foreground text-primary", className)}>
       <Icon className="h-3 w-3 mr-1" />
       {label}
-    </Badge>
-  );
+    </Badge>);
+
 }
 
 interface LastUpdatedBadgeProps {
@@ -103,10 +103,10 @@ export function LastUpdatedBadge({ timestamp, prefix = 'Updated', className }: L
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Badge 
-          variant="outline" 
-          className={cn("text-xs text-muted-foreground font-normal cursor-help", className)}
-        >
+        <Badge
+          variant="outline"
+          className={cn("text-xs text-muted-foreground font-normal cursor-help", className)}>
+
           <Clock className="h-3 w-3 mr-1" />
           {prefix}: {relativeTime}
         </Badge>
@@ -116,8 +116,8 @@ export function LastUpdatedBadge({ timestamp, prefix = 'Updated', className }: L
           {new Date(timestamp).toLocaleString()}
         </p>
       </TooltipContent>
-    </Tooltip>
-  );
+    </Tooltip>);
+
 }
 
 interface BuilderStateIndicatorProps {
@@ -129,22 +129,22 @@ interface BuilderStateIndicatorProps {
 export function BuilderStateIndicator({ isDirty, lastUpdated, className }: BuilderStateIndicatorProps) {
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      {isDirty ? (
-        <Badge variant="outline" className="text-xs text-warning border-warning/30">
+      {isDirty ?
+      <Badge variant="outline" className="text-xs text-warning border-warning/30">
           <AlertTriangle className="h-3 w-3 mr-1" />
           Unsaved changes
-        </Badge>
-      ) : (
-        <Badge variant="outline" className="text-xs text-success border-success/30">
+        </Badge> :
+
+      <Badge variant="outline" className="text-xs text-success border-success/30">
           <CheckCircle2 className="h-3 w-3 mr-1" />
           Saved
         </Badge>
-      )}
-      {lastUpdated && (
-        <LastUpdatedBadge timestamp={lastUpdated} prefix="Last saved" />
-      )}
-    </div>
-  );
+      }
+      {lastUpdated &&
+      <LastUpdatedBadge timestamp={lastUpdated} prefix="Last saved" />
+      }
+    </div>);
+
 }
 
 interface SnapshotHeaderProps {
@@ -155,12 +155,12 @@ interface SnapshotHeaderProps {
   className?: string;
 }
 
-export function SnapshotHeader({ 
-  version, 
-  mode, 
-  changesCount = 0, 
+export function SnapshotHeader({
+  version,
+  mode,
+  changesCount = 0,
   lastUpdated,
-  className 
+  className
 }: SnapshotHeaderProps) {
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
@@ -168,6 +168,6 @@ export function SnapshotHeader({
       <SnapshotBadge version={version} />
       {mode === 'designer' && <ChangeIndicator changesCount={changesCount} />}
       {lastUpdated && <LastUpdatedBadge timestamp={lastUpdated} />}
-    </div>
-  );
+    </div>);
+
 }

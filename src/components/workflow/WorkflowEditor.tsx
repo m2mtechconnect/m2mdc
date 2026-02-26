@@ -83,11 +83,9 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
   const getNodePortPosition = useCallback((nodeId: string, portType: 'input' | 'output') => {
     const node = nodesRef.current.find(n => n.id === nodeId);
     if (!node) return { x: 0, y: 0 };
-    const cx = node.x + NODE_WIDTH / 2;
-    const cy = node.y + NODE_HEIGHT / 2;
     return portType === 'output'
-      ? { x: cx + NODE_WIDTH / 2 + PORT_RADIUS, y: cy }
-      : { x: cx - NODE_WIDTH / 2 - PORT_RADIUS, y: cy };
+      ? { x: node.x + NODE_WIDTH + PORT_RADIUS, y: node.y + NODE_HEIGHT / 2 }
+      : { x: node.x - PORT_RADIUS, y: node.y + NODE_HEIGHT / 2 };
   }, []);
 
   const makeBezierPath = useCallback((x1: number, y1: number, x2: number, y2: number) => {
@@ -178,13 +176,23 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
       canvas.add(l);
     }
 
-    // ─── Node moving → update edges ───
+    // ─── Node moving → update ports + edges ───
     canvas.on('object:moving', (e) => {
       const obj = e.target;
       if (obj && (obj as any).nodeId) {
         const nodeId = (obj as any).nodeId;
+        const gLeft = obj.left || 0;
+        const gTop = obj.top || 0;
+
+        // Move ports with the node
+        const ports = portMapRef.current.get(nodeId);
+        if (ports) {
+          ports.input.set({ left: gLeft - PORT_RADIUS * 2, top: gTop + NODE_HEIGHT / 2 - PORT_RADIUS });
+          ports.output.set({ left: gLeft + NODE_WIDTH, top: gTop + NODE_HEIGHT / 2 - PORT_RADIUS });
+        }
+
         const updatedNodes = nodesRef.current.map(n =>
-          n.id === nodeId ? { ...n, x: obj.left || n.x, y: obj.top || n.y } : n
+          n.id === nodeId ? { ...n, x: gLeft, y: gTop } : n
         );
         nodesRef.current = updatedNodes;
         setNodes(updatedNodes);
@@ -206,15 +214,15 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
         const fromX = node.x + NODE_WIDTH + PORT_RADIUS;
         const fromY = node.y + NODE_HEIGHT / 2;
         const tempLine = new Line([fromX, fromY, fromX, fromY], {
-          stroke: 'hsl(210, 100%, 70%)',
-          strokeWidth: 2,
-          strokeDashArray: [6, 4],
+          stroke: 'hsl(210, 100%, 80%)',
+          strokeWidth: 2.5,
+          strokeDashArray: [8, 5],
           selectable: false,
           evented: false,
         });
         canvas.add(tempLine);
+        canvas.bringObjectToFront(tempLine);
         connectingRef.current = { nodeId, x: fromX, y: fromY, tempLine };
-        // Prevent canvas selection while connecting
         canvas.selection = false;
       }
     });
@@ -347,21 +355,27 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
     }
   };
 
+  // ─── Port refs for cleanup ───
+  const portMapRef = useRef<Map<string, { input: Circle; output: Circle }>>(new Map());
+
   // ─── Create node group with ports ───
   const createNodeGroup = (type: string, x: number, y: number, nodeId: string, canvas: FabricCanvas): FabricObject => {
     const color = NODE_COLORS[type] || "hsl(227, 100%, 65%)";
     const label = NODE_LABELS[type] || type;
 
+    // Use left/top origin so node.x/y = top-left corner (matches edge math)
     const rect = new Rect({
       width: NODE_WIDTH, height: NODE_HEIGHT,
       fill: color, stroke: "hsl(0, 0%, 90%)", strokeWidth: 2,
-      rx: 10, ry: 10, originX: 'center', originY: 'center',
+      rx: 10, ry: 10,
       shadow: { color: 'rgba(0,0,0,0.35)', blur: 12, offsetX: 0, offsetY: 4 } as any,
     });
 
     const text = new Text(label, {
       fontSize: 13, fill: "hsl(0, 0%, 100%)", fontFamily: "Inter",
-      fontWeight: "600", originX: "center", originY: "center",
+      fontWeight: "600",
+      left: NODE_WIDTH / 2, top: NODE_HEIGHT / 2,
+      originX: "center", originY: "center",
     });
 
     const group = new Group([rect, text], {
@@ -369,64 +383,47 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
       selectable: true, hasControls: false, hasBorders: true,
       lockRotation: true, hoverCursor: 'grab', moveCursor: 'grabbing',
       subTargetCheck: false,
+      originX: 'left', originY: 'top',
     });
     (group as any).nodeId = nodeId;
     (group as any).nodeType = type;
     canvas.add(group);
 
-    // ─── Input port (left) ───
+    // ─── Input port (left center) ───
     const inputPort = new Circle({
       radius: PORT_RADIUS,
       fill: 'hsl(222, 20%, 18%)',
       stroke: 'hsl(210, 100%, 70%)',
-      strokeWidth: 2,
-      left: x - PORT_RADIUS,
+      strokeWidth: 2.5,
+      left: x - PORT_RADIUS * 2,
       top: y + NODE_HEIGHT / 2 - PORT_RADIUS,
       selectable: false,
       evented: true,
       hoverCursor: 'crosshair',
+      originX: 'left', originY: 'top',
     });
     (inputPort as any).portType = 'input';
     (inputPort as any).parentNodeId = nodeId;
     canvas.add(inputPort);
 
-    // ─── Output port (right) ───
+    // ─── Output port (right center) ───
     const outputPort = new Circle({
       radius: PORT_RADIUS,
       fill: 'hsl(222, 20%, 18%)',
       stroke: 'hsl(140, 70%, 50%)',
-      strokeWidth: 2,
+      strokeWidth: 2.5,
       left: x + NODE_WIDTH,
       top: y + NODE_HEIGHT / 2 - PORT_RADIUS,
       selectable: false,
       evented: true,
       hoverCursor: 'crosshair',
+      originX: 'left', originY: 'top',
     });
     (outputPort as any).portType = 'output';
     (outputPort as any).parentNodeId = nodeId;
     canvas.add(outputPort);
 
-    // Keep ports moving with node
-    const originalSet = group.set.bind(group);
-    const patchedSet = function (this: any, ...args: any[]) {
-      const result = originalSet(...args);
-      const gLeft = group.left || 0;
-      const gTop = group.top || 0;
-      inputPort.set({ left: gLeft - PORT_RADIUS, top: gTop + NODE_HEIGHT / 2 - PORT_RADIUS });
-      outputPort.set({ left: gLeft + NODE_WIDTH, top: gTop + NODE_HEIGHT / 2 - PORT_RADIUS });
-      return result;
-    };
-    group.set = patchedSet as any;
-
-    // Also patch on moving
-    canvas.on('object:moving', (e) => {
-      if (e.target === group) {
-        const gLeft = group.left || 0;
-        const gTop = group.top || 0;
-        inputPort.set({ left: gLeft - PORT_RADIUS, top: gTop + NODE_HEIGHT / 2 - PORT_RADIUS });
-        outputPort.set({ left: gLeft + NODE_WIDTH, top: gTop + NODE_HEIGHT / 2 - PORT_RADIUS });
-      }
-    });
+    portMapRef.current.set(nodeId, { input: inputPort, output: outputPort });
 
     canvas.renderAll();
     return group;

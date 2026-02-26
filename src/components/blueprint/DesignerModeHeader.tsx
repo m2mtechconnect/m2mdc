@@ -72,7 +72,7 @@ export function DesignerModeHeader({
             
             <div className="flex flex-wrap items-center gap-2 mt-3">
               {/* Designer Mode Badge - Primary indicator */}
-              <Badge className="bg-gradient-to-r from-success to-success/80 text-success-foreground gap-1.5 px-3 py-1 shadow-md shadow-success/20 hover:shadow-lg hover:shadow-success/30 transition-all duration-300">
+              <Badge variant="outline" className="gap-1.5 px-3 py-1 border-success/40 text-success bg-transparent hover:bg-success/5 transition-all duration-300">
                 <Edit3 className="h-3.5 w-3.5" />
                 Designer Mode
               </Badge>

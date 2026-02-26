@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Canvas as FabricCanvas, Rect, Circle, Text, Line, Group, FabricObject } from "fabric";
+import { Canvas as FabricCanvas, Rect, Text, Line, Group, FabricObject } from "fabric";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -356,22 +356,7 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
     setShowTestResults(true);
 
     try {
-      // If we have a systemId, try the backend simulate function
-      if (systemId) {
-        try {
-          const { data, error } = await supabase.functions.invoke('workflow-simulate', {
-            body: { system_id: systemId }
-          });
-          if (!error && data?.success) {
-            setTestResult(data.simulation);
-            toast({ title: "Simulation complete", description: `${data.simulation.summary.total_nodes} nodes executed in ${data.simulation.summary.duration_ms}ms` });
-            return;
-          }
-        } catch {
-          // Fall through to local simulation
-        }
-      }
-
+      // Always use local simulation (no backend dependency required)
       // Local mock simulation
       const startTime = Date.now();
       const trace = nodes.map((node, idx) => {

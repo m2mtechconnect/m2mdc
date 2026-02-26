@@ -583,24 +583,24 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
                         >
                         <div className="flex items-start justify-between gap-2">
                           <span className={cn(
-                            'font-medium truncate',
+                            'text-sm font-medium truncate text-foreground',
                             isRecent && 'text-primary'
                           )}>{event.title}</span>
                           <span className={cn(
-                            'text-xs shrink-0',
+                            'text-[11px] shrink-0',
                             isRecent ? 'text-primary font-medium' : 'text-muted-foreground'
                           )}>
                             {formatTime(event.timestamp)}
                           </span>
                         </div>
-                        <div className="flex items-center gap-1.5 mt-0.5">
+                        <div className="flex items-center gap-1.5 mt-1">
                           {event.domain && DOMAIN_AGENT_SHORT[event.domain] && (
-                            <Badge variant="outline" className="text-[9px] h-4 px-1 gap-0.5 font-normal border-accent/30 text-accent shrink-0">
+                            <Badge variant="outline" className="text-[9px] h-4 px-1 gap-0.5 font-normal border-primary/30 text-primary shrink-0">
                               <Bot className="h-2.5 w-2.5" />
                               {DOMAIN_AGENT_SHORT[event.domain]}
                             </Badge>
                           )}
-                          <p className="text-xs text-muted-foreground line-clamp-1">
+                          <p className="text-xs text-muted-foreground/90 line-clamp-1">
                             {event.description}
                           </p>
                         </div>

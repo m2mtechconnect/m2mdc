@@ -1,75 +1,77 @@
 
 
-## Builder Multi-Fix Plan
+## Diagnosis
 
-### 1. Agent Modes — Visual UI Feedback on Toggle
+### RLS Error
+The `workflow_nodes` INSERT policy requires a `workflow_id` that maps to a `workflows` row where `created_by = auth.uid()`. The save flow correctly creates a workflow first, but the issue is likely:
+1. The `systemId` passed is a builder ID (not a real UUID), causing the workflow creation to fail silently
+2. The delete-then-reinsert pattern may hit timing issues
+3. The user may not be authenticated when saving
 
-**Current state:** Supervisor and Deep Research toggles save state to store/blueprint but the UI card appearance doesn't change visually when enabled.
+The fix: Guard the save with an auth check, skip DB persistence entirely when no real workflow exists (use local-only mode), and catch/surface errors properly. The auto-save triggers saves even when there's no valid workflow, causing repeated RLS failures.
 
-**Fix:** When a mode is toggled ON, update the card styling (highlight border, colored background, active badge) so users get immediate visual feedback. Add a "Active" badge and transition the icon container color.
+### Missing Features
+The current editor has no visual edge connections between nodes (n8n's core UX). Need to add:
+- Port circles on nodes (input left, output right)
+- Click-drag from output port to input port to create edge
+- Visual Bezier/step lines between connected nodes
+- Edge deletion
+- Edges persist and re-render on load
 
-**Files:** `src/components/builder/steps/Step2Intelligence.tsx` (lines 177-202)
+## Plan
 
----
+### 1. Fix RLS / Save Errors
+**File:** `src/components/workflow/WorkflowEditor.tsx`
 
-### 2. Recommended Tools Settings Button — Replace with Info Tooltip
+- Disable auto-save entirely (remove the auto-save `useEffect`). Only save on explicit "Save Draft" click.
+- In `handleSave`, check `auth.getUser()` first. If not authenticated, show "Please log in to save" toast and return.
+- Guard the delete operations: wrap `workflow_nodes.delete()` and `workflow_edges.delete()` in try/catch so failures don't block the flow.
+- When creating a new workflow, validate that `systemId` is a valid UUID before inserting.
 
-**Current state:** The Settings (gear) icon button on each tool card calls `onConfigureIntegration` which just fires a generic toast saying "Configure X in the Integrations section" — no panel opens.
+### 2. Add Visual Edge Connections (n8n-inspired)
+**File:** `src/components/workflow/WorkflowEditor.tsx`
 
-**Fix:** Replace the Settings button with an Info icon button that opens a `Tooltip` or `Popover` showing the tool's description, required integrations, and domain. This provides useful context without a dead-end click.
+- Add input/output port circles to each node Group (small circles at left-center and right-center of the rect).
+- Track a `connectingFrom` state: when user mousedown on an output port, start drawing a temporary line.
+- On mouseup over an input port, create an edge. On mouseup elsewhere, cancel.
+- Render edges as curved `Path` objects (quadratic bezier) between the output port of source node and input port of target node.
+- On `object:moving`, update all connected edge line positions.
+- Add edge context: click an edge line to select it, press Delete to remove.
+- Store `fromPort: 'output'` and `toPort: 'input'` in the edge data.
 
-**Files:** `src/components/dc-tools/BuilderToolsPanel.tsx` (lines 79-86)
+### 3. Edge Re-rendering on Node Move
+**File:** `src/components/workflow/WorkflowEditor.tsx`
 
----
+- Create a `redrawEdges()` function that recalculates all edge line positions based on current node positions.
+- Call `redrawEdges()` inside the `object:moving` handler and after adding/removing nodes.
 
-### 3. Workflow Editor — Inline Collapsible (No Separate Page)
+### 4. Update Node Creation with Ports
+**File:** `src/components/workflow/WorkflowEditor.tsx`
 
-**Current state:** Step4Workflow has a "Open Visual Workflow Editor" button that toggles `showEditor` state, rendering the full `WorkflowEditor` component inside the same page. However, it replaces the DC Node Types and Configured Actions sections entirely.
+- Modify `createNodeObject` to add two small circles (radius 6) to the Group:
+  - Input port: left-center of the rect, tagged `portType: 'input'`
+  - Output port: right-center of the rect, tagged `portType: 'output'`
+- These circles are non-selectable but evented (for mousedown/mouseup connection handling).
 
-**Fix:** Change the workflow editor to render as a collapsible section using `Collapsible` from Radix UI, so it expands/collapses inline below the Configured Actions section. Both the node list and editor remain visible together. Remove the full-page takeover behavior.
+### 5. Connection Drawing Mode
+**File:** `src/components/workflow/WorkflowEditor.tsx`
 
-**Files:** `src/components/builder/steps/Step4Workflow.tsx`
+- Add state: `connectingFrom: { nodeId, port, x, y } | null` and a temp `Line` ref.
+- On canvas `mouse:down`, check if target is a port circle. If output port, start connection mode.
+- On canvas `mouse:move` during connection mode, update the temp line endpoint.
+- On canvas `mouse:up`, check if target is an input port on a different node. If yes, create edge + render permanent bezier line. If no, remove temp line.
+- Prevent self-connections and duplicate edges.
 
----
+### 6. Visual Polish
+**File:** `src/components/workflow/WorkflowEditor.tsx`
 
-### 4. Workflow Editor — Fix Node Drag-and-Drop
+- Edge lines: white/accent color with slight opacity, animated dash on hover.
+- Port circles: glow on hover during connection mode.
+- When an edge is selected, highlight it with a brighter color.
 
-**Current state:** `createNodeObject` creates a bare `FabricObject` (line 197) which is essentially empty — it creates a `Rect` and `Text` but never adds them as children. The node is not interactive because the base `FabricObject` has no visual content or proper group setup.
+### 7. Workflow Feature Flow Diagram
+Present an end-to-end flow diagram showing how the workflow feature works from user interaction to data persistence.
 
-**Fix:** Use Fabric.js `Group` instead of bare `FabricObject` to properly compose the rect + text. Ensure `selectable: true`, `hasControls: true`, and `hasBorders: true`. Add `object:moving` event listener on the canvas to update node x/y positions in state when dragged. Also wire up `selection:created` to open the NodeConfigDrawer.
-
-**Files:** `src/components/workflow/WorkflowEditor.tsx` (lines 178-227, 60-121)
-
----
-
-### 5. Workflow Test Run — Template-Based Simulation
-
-**Current state:** Test run calls `workflow-run` edge function which may not exist. The `workflow-simulate` edge function exists and does mock simulation per node type, but isn't wired to the UI.
-
-**Fix:** Wire the Test Run button to call the existing `workflow-simulate` edge function instead of `workflow-run`. Pass the `system_id` and display the execution trace results in a collapsible results panel below the canvas, showing each node's status, duration, and output — aligned with the Configured Actions section in Step4.
-
-**Files:** `src/components/workflow/WorkflowEditor.tsx` (lines 413-465)
-
----
-
-### 6. Builder Sections — Audit Selection/Removal Feedback
-
-Across all builder steps, verify and fix that toggling items (subsystems, tools, integrations, scenarios) provides:
-- Visual state change on the card (highlight/unhighlight)
-- Toast confirmation on toggle
-- Badge count updates
-
-**Current state:** Most sections already have this pattern. The Monitored Subsystems section (Step2, lines 211-228) has hardcoded `enabled` values with no toggle handler.
-
-**Fix:** Make Monitored Subsystems interactive with toggle state and persistence. Add click handlers that toggle the subsystem and show toast feedback.
-
-**Files:** `src/components/builder/steps/Step2Intelligence.tsx` (lines 146-228)
-
----
-
-### Summary of Files to Modify
-1. `src/components/builder/steps/Step2Intelligence.tsx` — Agent mode visual feedback + subsystem toggle interactivity
-2. `src/components/dc-tools/BuilderToolsPanel.tsx` — Replace Settings button with Info popover
-3. `src/components/builder/steps/Step4Workflow.tsx` — Inline collapsible workflow editor
-4. `src/components/workflow/WorkflowEditor.tsx` — Fix Fabric.js Group for drag-and-drop + wire test run to simulate function
+### Files to Modify
+1. `src/components/workflow/WorkflowEditor.tsx` — All changes (RLS fix, edge connections, ports, connection mode, edge rendering)
 

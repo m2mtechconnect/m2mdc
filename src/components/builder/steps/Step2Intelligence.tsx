@@ -58,21 +58,48 @@ export function Step2Intelligence() {
     }
   }, [currentBlueprint]);
 
+  useEffect(() => {
+    const policies = modelConfig?.policies ?? {};
+
+    const supervisorFromConfig =
+      typeof (modelConfig as any)?.supervisorEnabled === 'boolean'
+        ? (modelConfig as any).supervisorEnabled
+        : policies.supervisorEnabled;
+
+    const deepResearchFromConfig =
+      typeof (modelConfig as any)?.deepResearchEnabled === 'boolean'
+        ? (modelConfig as any).deepResearchEnabled
+        : policies.deepResearchEnabled;
+
+    if (typeof supervisorFromConfig === 'boolean') setSupervisorEnabled(supervisorFromConfig);
+    if (typeof deepResearchFromConfig === 'boolean') setDeepResearchEnabled(deepResearchFromConfig);
+    if (typeof policies.hallucinationPrevention === 'boolean') setHallucinationPrevention(policies.hallucinationPrevention);
+    if (typeof policies.knowledgeRestrictions === 'boolean') setKnowledgeRestrictions(policies.knowledgeRestrictions);
+    if (typeof policies.requireCitations === 'boolean') setRequireCitations(policies.requireCitations);
+  }, [modelConfig]);
+
   const saveIntelligenceConfig = useCallback(async (updates: Record<string, any>) => {
+    const nextSupervisorEnabled = updates.supervisorEnabled ?? supervisorEnabled;
+    const nextDeepResearchEnabled = updates.deepResearchEnabled ?? deepResearchEnabled;
+    const policyUpdates = updates.policies ?? {};
+
     try {
       await setModelConfig({
         ...modelConfig,
         ...updates,
         rag: { ...modelConfig?.rag, ...updates.rag },
+        supervisorEnabled: nextSupervisorEnabled,
+        deepResearchEnabled: nextDeepResearchEnabled,
         policies: {
           ...modelConfig?.policies,
-          supervisorEnabled,
-          deepResearchEnabled,
-          hallucinationPrevention,
-          knowledgeRestrictions,
-          requireCitations,
+          ...policyUpdates,
+          supervisorEnabled: nextSupervisorEnabled,
+          deepResearchEnabled: nextDeepResearchEnabled,
+          hallucinationPrevention: policyUpdates.hallucinationPrevention ?? hallucinationPrevention,
+          knowledgeRestrictions: policyUpdates.knowledgeRestrictions ?? knowledgeRestrictions,
+          requireCitations: policyUpdates.requireCitations ?? requireCitations,
         },
-      });
+      } as any);
     } catch (error) {
       console.error('[Builder:Step2] Failed to save config:', error);
     }
@@ -98,19 +125,19 @@ export function Step2Intelligence() {
 
   const handleSupervisorToggle = async (enabled: boolean) => {
     setSupervisorEnabled(enabled);
-    await saveIntelligenceConfig({ supervisorEnabled: enabled });
     if (currentBlueprint) {
       updateBlueprint({ model: { ...currentBlueprint.model, supervisorEnabled: enabled } });
     }
+    await saveIntelligenceConfig({ supervisorEnabled: enabled });
     toast.success(enabled ? 'Supervisor Agent enabled' : 'Supervisor Agent disabled');
   };
 
   const handleDeepResearchToggle = async (enabled: boolean) => {
     setDeepResearchEnabled(enabled);
-    await saveIntelligenceConfig({ deepResearchEnabled: enabled });
     if (currentBlueprint) {
       updateBlueprint({ model: { ...currentBlueprint.model, deepResearchEnabled: enabled } });
     }
+    await saveIntelligenceConfig({ deepResearchEnabled: enabled });
     toast.success(enabled ? 'Deep Research Agent enabled' : 'Deep Research Agent disabled');
   };
 

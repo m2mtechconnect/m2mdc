@@ -1,57 +1,75 @@
 
 
-## Onboarding Questionnaire Page
+## Builder Multi-Fix Plan
 
-### Overview
-Replace the "Get Started Free" buttons on the marketing page with a link to a new `/onboarding` public page. This page will be a multi-step questionnaire that captures prospect information and data centre needs before routing them to sign up.
+### 1. Agent Modes — Visual UI Feedback on Toggle
 
-### Questionnaire Steps
+**Current state:** Supervisor and Deep Research toggles save state to store/blueprint but the UI card appearance doesn't change visually when enabled.
 
-**Step 1 -- About You**
-- Full name
-- Job title / role (dropdown: CIO, CTO, VP Infrastructure, Data Centre Manager, Operations Lead, Other)
-- Company name
-- Work email
-- Company size (1-50, 51-200, 201-1000, 1000+)
+**Fix:** When a mode is toggled ON, update the card styling (highlight border, colored background, active badge) so users get immediate visual feedback. Add a "Active" badge and transition the icon container color.
 
-**Step 2 -- Your Data Centre**
-- Number of data centres (1, 2-5, 6-20, 20+)
-- Total rack count (dropdown ranges)
-- Primary workload type (multi-select: AI/ML Training, HPC, Cloud Hosting, Enterprise IT, Colocation, Other)
-- Current PUE estimate (optional slider or dropdown)
+**Files:** `src/components/builder/steps/Step2Intelligence.tsx` (lines 177-202)
 
-**Step 3 -- Your Goals**
-- What are you looking to achieve? (multi-select: Reduce PUE, Optimize cooling, Carbon/ESG reporting, Capacity planning, Predictive maintenance, Sovereign compliance, Other)
-- Biggest operational challenge (free text)
-- Timeline to deploy (Exploring, 1-3 months, 3-6 months, 6-12 months)
+---
 
-**Step 4 -- Summary and Sign Up**
-- Review answers summary card
-- CTA: "Create Your Account" which navigates to `/sign-up` with questionnaire data stored in the database for follow-up
+### 2. Recommended Tools Settings Button — Replace with Info Tooltip
 
-### Technical Plan
+**Current state:** The Settings (gear) icon button on each tool card calls `onConfigureIntegration` which just fires a generic toast saying "Configure X in the Integrations section" — no panel opens.
 
-1. **Database table** -- Create `onboarding_submissions` table (no auth required, public insert RLS policy):
-   - `id` (uuid), `full_name`, `email`, `job_title`, `company_name`, `company_size`, `num_data_centres`, `rack_count`, `workload_types` (jsonb), `current_pue`, `goals` (jsonb), `challenge` (text), `timeline`, `created_at`
+**Fix:** Replace the Settings button with an Info icon button that opens a `Tooltip` or `Popover` showing the tool's description, required integrations, and domain. This provides useful context without a dead-end click.
 
-2. **New page** -- `src/pages/Onboarding.tsx`
-   - Multi-step form using `react-hook-form` + `zod` validation
-   - Step indicator/progress bar at top
-   - Each step is a sub-component for clarity
-   - Framer Motion slide transitions between steps
-   - Mobile responsive layout
+**Files:** `src/components/dc-tools/BuilderToolsPanel.tsx` (lines 79-86)
 
-3. **Route** -- Add `/onboarding` to the unauthenticated routes in `App.tsx`
+---
 
-4. **Update CTAs** -- Change all "Get Started Free" `onClick` handlers in:
-   - `TwinHero.tsx` -- navigate to `/onboarding`
-   - `TwinCTASection.tsx` -- navigate to `/onboarding`
-   - `TwinHeader.tsx` -- header CTA button to `/onboarding`
+### 3. Workflow Editor — Inline Collapsible (No Separate Page)
 
-5. **Form submission flow**:
-   - Validate with zod schema
-   - Insert into `onboarding_submissions` table
-   - Navigate to `/sign-up` on success (or show confirmation with link)
+**Current state:** Step4Workflow has a "Open Visual Workflow Editor" button that toggles `showEditor` state, rendering the full `WorkflowEditor` component inside the same page. However, it replaces the DC Node Types and Configured Actions sections entirely.
 
-6. **Styling** -- Consistent with existing landing page design tokens (glass-panel cards, accent buttons, M2M branding). Back-to-home link at top (matching sign-in page pattern).
+**Fix:** Change the workflow editor to render as a collapsible section using `Collapsible` from Radix UI, so it expands/collapses inline below the Configured Actions section. Both the node list and editor remain visible together. Remove the full-page takeover behavior.
+
+**Files:** `src/components/builder/steps/Step4Workflow.tsx`
+
+---
+
+### 4. Workflow Editor — Fix Node Drag-and-Drop
+
+**Current state:** `createNodeObject` creates a bare `FabricObject` (line 197) which is essentially empty — it creates a `Rect` and `Text` but never adds them as children. The node is not interactive because the base `FabricObject` has no visual content or proper group setup.
+
+**Fix:** Use Fabric.js `Group` instead of bare `FabricObject` to properly compose the rect + text. Ensure `selectable: true`, `hasControls: true`, and `hasBorders: true`. Add `object:moving` event listener on the canvas to update node x/y positions in state when dragged. Also wire up `selection:created` to open the NodeConfigDrawer.
+
+**Files:** `src/components/workflow/WorkflowEditor.tsx` (lines 178-227, 60-121)
+
+---
+
+### 5. Workflow Test Run — Template-Based Simulation
+
+**Current state:** Test run calls `workflow-run` edge function which may not exist. The `workflow-simulate` edge function exists and does mock simulation per node type, but isn't wired to the UI.
+
+**Fix:** Wire the Test Run button to call the existing `workflow-simulate` edge function instead of `workflow-run`. Pass the `system_id` and display the execution trace results in a collapsible results panel below the canvas, showing each node's status, duration, and output — aligned with the Configured Actions section in Step4.
+
+**Files:** `src/components/workflow/WorkflowEditor.tsx` (lines 413-465)
+
+---
+
+### 6. Builder Sections — Audit Selection/Removal Feedback
+
+Across all builder steps, verify and fix that toggling items (subsystems, tools, integrations, scenarios) provides:
+- Visual state change on the card (highlight/unhighlight)
+- Toast confirmation on toggle
+- Badge count updates
+
+**Current state:** Most sections already have this pattern. The Monitored Subsystems section (Step2, lines 211-228) has hardcoded `enabled` values with no toggle handler.
+
+**Fix:** Make Monitored Subsystems interactive with toggle state and persistence. Add click handlers that toggle the subsystem and show toast feedback.
+
+**Files:** `src/components/builder/steps/Step2Intelligence.tsx` (lines 146-228)
+
+---
+
+### Summary of Files to Modify
+1. `src/components/builder/steps/Step2Intelligence.tsx` — Agent mode visual feedback + subsystem toggle interactivity
+2. `src/components/dc-tools/BuilderToolsPanel.tsx` — Replace Settings button with Info popover
+3. `src/components/builder/steps/Step4Workflow.tsx` — Inline collapsible workflow editor
+4. `src/components/workflow/WorkflowEditor.tsx` — Fix Fabric.js Group for drag-and-drop + wire test run to simulate function
 

@@ -1,23 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Canvas as FabricCanvas, Rect, Text, Line, Group, FabricObject } from "fabric";
+import { Canvas as FabricCanvas, Rect, Text, Line, Group, Circle, Path, FabricObject } from "fabric";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  Save, 
-  Play, 
-  CheckCircle2, 
-  Download, 
-  Upload,
-  Undo,
-  Redo,
-  Trash2,
-  ZoomIn,
-  ZoomOut,
-  Maximize2,
-  Loader2
+  Save, Play, CheckCircle2, Trash2, Loader2
 } from "lucide-react";
 import { WorkflowPalette } from "./WorkflowPalette";
 import { NodeConfigDrawer } from "./NodeConfigDrawer";
@@ -38,13 +27,39 @@ export interface WorkflowEdge {
   fromPort: string;
   toNodeId: string;
   toPort: string;
-  fabricLine?: Line;
+  fabricPath?: FabricObject;
 }
 
 interface WorkflowEditorProps {
   systemId?: string;
   workflowId?: string;
 }
+
+const NODE_WIDTH = 160;
+const NODE_HEIGHT = 80;
+const PORT_RADIUS = 7;
+
+const NODE_COLORS: Record<string, string> = {
+  analyze: "hsl(227, 100%, 65%)",
+  classify: "hsl(250, 75%, 60%)",
+  mcp_tool: "hsl(170, 70%, 45%)",
+  notify_teams: "hsl(51, 100%, 50%)",
+  create_ticket_jira: "hsl(210, 80%, 55%)",
+  write_salesforce: "hsl(200, 85%, 50%)",
+  generate_report: "hsl(35, 95%, 55%)",
+};
+
+const NODE_LABELS: Record<string, string> = {
+  analyze: "Analyze",
+  classify: "Classify",
+  mcp_tool: "MCP Tool",
+  notify_teams: "Notify Teams",
+  create_ticket_jira: "Create Jira Ticket",
+  write_salesforce: "Write Salesforce",
+  generate_report: "Generate Report",
+};
+
+const isValidUUID = (s: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
 
 export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -57,11 +72,79 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
   const [currentWorkflowId, setCurrentWorkflowId] = useState<string | undefined>(workflowId);
   const { toast } = useToast();
   const nodesRef = useRef<WorkflowNode[]>([]);
+  const edgesRef = useRef<WorkflowEdge[]>([]);
+  const connectingRef = useRef<{ nodeId: string; x: number; y: number; tempLine: Line | null } | null>(null);
+  const canvasObjRef = useRef<FabricCanvas | null>(null);
 
-  // Keep ref in sync
   useEffect(() => { nodesRef.current = nodes; }, [nodes]);
+  useEffect(() => { edgesRef.current = edges; }, [edges]);
 
-  // Initialize canvas
+  // ─── Bezier edge helpers ───
+  const getNodePortPosition = useCallback((nodeId: string, portType: 'input' | 'output') => {
+    const node = nodesRef.current.find(n => n.id === nodeId);
+    if (!node) return { x: 0, y: 0 };
+    const cx = node.x + NODE_WIDTH / 2;
+    const cy = node.y + NODE_HEIGHT / 2;
+    return portType === 'output'
+      ? { x: cx + NODE_WIDTH / 2 + PORT_RADIUS, y: cy }
+      : { x: cx - NODE_WIDTH / 2 - PORT_RADIUS, y: cy };
+  }, []);
+
+  const makeBezierPath = useCallback((x1: number, y1: number, x2: number, y2: number) => {
+    const dx = Math.abs(x2 - x1) * 0.5;
+    return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+  }, []);
+
+  const redrawEdges = useCallback((canvas: FabricCanvas, currentEdges: WorkflowEdge[], currentNodes: WorkflowNode[]) => {
+    // Remove old edge paths
+    currentEdges.forEach(edge => {
+      if (edge.fabricPath) {
+        canvas.remove(edge.fabricPath);
+      }
+    });
+
+    const updatedEdges = currentEdges.map(edge => {
+      const fromNode = currentNodes.find(n => n.id === edge.fromNodeId);
+      const toNode = currentNodes.find(n => n.id === edge.toNodeId);
+      if (!fromNode || !toNode) return edge;
+
+      const fromPos = {
+        x: fromNode.x + NODE_WIDTH + PORT_RADIUS,
+        y: fromNode.y + NODE_HEIGHT / 2,
+      };
+      const toPos = {
+        x: toNode.x - PORT_RADIUS,
+        y: toNode.y + NODE_HEIGHT / 2,
+      };
+
+      const pathStr = makeBezierPath(fromPos.x, fromPos.y, toPos.x, toPos.y);
+      const pathObj = new Path(pathStr, {
+        fill: '',
+        stroke: 'hsl(210, 100%, 70%)',
+        strokeWidth: 2.5,
+        selectable: true,
+        evented: true,
+        hoverCursor: 'pointer',
+        perPixelTargetFind: true,
+        strokeLineCap: 'round',
+      });
+      (pathObj as any).edgeId = edge.id;
+      canvas.add(pathObj);
+      // Send edges behind nodes
+      canvas.sendObjectToBack(pathObj);
+
+      return { ...edge, fabricPath: pathObj };
+    });
+
+    // Re-send grid lines to very back
+    canvas.getObjects().forEach(obj => {
+      if ((obj as any).isGridLine) canvas.sendObjectToBack(obj);
+    });
+    canvas.renderAll();
+    return updatedEdges;
+  }, [makeBezierPath]);
+
+  // ─── Canvas init ───
   useEffect(() => {
     if (!canvasRef.current) return;
 
@@ -72,37 +155,110 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
     const canvas = new FabricCanvas(canvasRef.current, {
       width: canvasWidth,
       height: canvasHeight,
-      backgroundColor: "hsl(0, 0%, 12%)",
+      backgroundColor: "hsl(222, 20%, 10%)",
       selection: true,
     });
+    canvasObjRef.current = canvas;
 
     // Grid
     const gridSize = 24;
-    const gridColor = 'hsl(0, 0%, 18%)';
+    const gridColor = 'hsl(222, 15%, 16%)';
     for (let i = 0; i < canvas.width! / gridSize; i++) {
-      canvas.add(new Line([i * gridSize, 0, i * gridSize, canvas.height!], {
+      const l = new Line([i * gridSize, 0, i * gridSize, canvas.height!], {
         stroke: gridColor, strokeWidth: 1, selectable: false, evented: false,
-      }));
+      });
+      (l as any).isGridLine = true;
+      canvas.add(l);
     }
     for (let i = 0; i < canvas.height! / gridSize; i++) {
-      canvas.add(new Line([0, i * gridSize, canvas.width!, i * gridSize], {
+      const l = new Line([0, i * gridSize, canvas.width!, i * gridSize], {
         stroke: gridColor, strokeWidth: 1, selectable: false, evented: false,
-      }));
+      });
+      (l as any).isGridLine = true;
+      canvas.add(l);
     }
 
-    // Handle node moving - update positions in state
+    // ─── Node moving → update edges ───
     canvas.on('object:moving', (e) => {
       const obj = e.target;
       if (obj && (obj as any).nodeId) {
         const nodeId = (obj as any).nodeId;
-        setNodes(prev => prev.map(n => 
+        const updatedNodes = nodesRef.current.map(n =>
           n.id === nodeId ? { ...n, x: obj.left || n.x, y: obj.top || n.y } : n
-        ));
+        );
+        nodesRef.current = updatedNodes;
+        setNodes(updatedNodes);
         setIsDirty(true);
+        // Redraw edges
+        const newEdges = redrawEdges(canvas, edgesRef.current, updatedNodes);
+        edgesRef.current = newEdges;
+        setEdges(newEdges);
       }
     });
 
-    // Handle selection to open config drawer
+    // ─── Connection: mouse:down on output port ───
+    canvas.on('mouse:down', (opt) => {
+      const target = opt.target;
+      if (target && (target as any).portType === 'output' && (target as any).parentNodeId) {
+        const nodeId = (target as any).parentNodeId;
+        const node = nodesRef.current.find(n => n.id === nodeId);
+        if (!node) return;
+        const fromX = node.x + NODE_WIDTH + PORT_RADIUS;
+        const fromY = node.y + NODE_HEIGHT / 2;
+        const tempLine = new Line([fromX, fromY, fromX, fromY], {
+          stroke: 'hsl(210, 100%, 70%)',
+          strokeWidth: 2,
+          strokeDashArray: [6, 4],
+          selectable: false,
+          evented: false,
+        });
+        canvas.add(tempLine);
+        connectingRef.current = { nodeId, x: fromX, y: fromY, tempLine };
+        // Prevent canvas selection while connecting
+        canvas.selection = false;
+      }
+    });
+
+    canvas.on('mouse:move', (opt) => {
+      if (!connectingRef.current?.tempLine) return;
+      const pointer = canvas.getScenePoint(opt.e);
+      connectingRef.current.tempLine.set({ x2: pointer.x, y2: pointer.y });
+      canvas.renderAll();
+    });
+
+    canvas.on('mouse:up', (opt) => {
+      if (!connectingRef.current) return;
+      const fromInfo = connectingRef.current;
+      // Remove temp line
+      if (fromInfo.tempLine) canvas.remove(fromInfo.tempLine);
+      canvas.selection = true;
+      connectingRef.current = null;
+
+      const target = opt.target;
+      if (target && (target as any).portType === 'input' && (target as any).parentNodeId) {
+        const toNodeId = (target as any).parentNodeId;
+        if (toNodeId === fromInfo.nodeId) return; // no self-connection
+        // Check for duplicates
+        if (edgesRef.current.some(e => e.fromNodeId === fromInfo.nodeId && e.toNodeId === toNodeId)) return;
+
+        const newEdge: WorkflowEdge = {
+          id: crypto.randomUUID(),
+          fromNodeId: fromInfo.nodeId,
+          fromPort: 'output',
+          toNodeId,
+          toPort: 'input',
+        };
+        const newEdges = [...edgesRef.current, newEdge];
+        const drawnEdges = redrawEdges(canvas, newEdges, nodesRef.current);
+        edgesRef.current = drawnEdges;
+        setEdges(drawnEdges);
+        setIsDirty(true);
+        toast({ title: "Edge connected", description: "Nodes linked successfully" });
+      }
+      canvas.renderAll();
+    });
+
+    // ─── Delete edge on selection + Delete key ───
     canvas.on('selection:created', (e) => {
       const selected = e.selected?.[0];
       if (selected && (selected as any).nodeId) {
@@ -111,39 +267,46 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
         if (node) setSelectedNode(node);
       }
     });
+    canvas.on('selection:cleared', () => setSelectedNode(null));
 
-    canvas.on('selection:cleared', () => {
-      setSelectedNode(null);
-    });
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const active = canvas.getActiveObject();
+        if (active && (active as any).edgeId) {
+          const edgeId = (active as any).edgeId;
+          canvas.remove(active);
+          const newEdges = edgesRef.current.filter(ed => ed.id !== edgeId);
+          edgesRef.current = newEdges;
+          setEdges(newEdges);
+          setIsDirty(true);
+          canvas.discardActiveObject();
+          canvas.renderAll();
+        }
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
 
     setFabricCanvas(canvas);
 
-    if (workflowId) {
-      loadWorkflow(workflowId, canvas);
-    }
+    if (workflowId) loadWorkflow(workflowId, canvas);
 
     const handleResize = () => {
-      const newContainerWidth = canvasRef.current?.parentElement?.clientWidth || 1200;
-      const newWidth = Math.min(newContainerWidth - 32, 1400);
-      const newHeight = Math.min(Math.max(window.innerHeight - 400, 500), 700);
-      canvas.setWidth(newWidth);
-      canvas.setHeight(newHeight);
+      const newW = Math.min((canvasRef.current?.parentElement?.clientWidth || 1200) - 32, 1400);
+      const newH = Math.min(Math.max(window.innerHeight - 400, 500), 700);
+      canvas.setWidth(newW);
+      canvas.setHeight(newH);
       canvas.renderAll();
     };
-
     window.addEventListener('resize', handleResize);
+
     return () => {
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('keydown', handleKeyDown);
       canvas.dispose();
     };
   }, [workflowId]);
 
-  // Auto-save
-  useEffect(() => {
-    if (!isDirty || !currentWorkflowId) return;
-    const timeoutId = setTimeout(() => { handleSave(); }, 1500);
-    return () => clearTimeout(timeoutId);
-  }, [nodes, edges, isDirty, currentWorkflowId]);
+  // ─── NO auto-save (removed). Only explicit Save Draft. ───
 
   const loadWorkflow = async (wfId: string, canvas: FabricCanvas) => {
     try {
@@ -156,83 +319,116 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
       if (edgesError) throw edgesError;
 
       const loadedNodes: WorkflowNode[] = [];
-      for (const nodeData of nodesData || []) {
-        const fabricObj = createNodeObject(nodeData.type as WorkflowNode['type'], nodeData.x as number, nodeData.y as number, nodeData.id);
-        canvas.add(fabricObj);
+      for (const nd of nodesData || []) {
+        const fabricObj = createNodeGroup(nd.type as WorkflowNode['type'], nd.x as number, nd.y as number, nd.id, canvas);
         loadedNodes.push({
-          id: nodeData.id,
-          type: nodeData.type as WorkflowNode['type'],
-          x: nodeData.x as number,
-          y: nodeData.y as number,
-          config: (nodeData.config as Record<string, any>) || {},
+          id: nd.id, type: nd.type as WorkflowNode['type'],
+          x: nd.x as number, y: nd.y as number,
+          config: (nd.config as Record<string, any>) || {},
           fabricObject: fabricObj,
         });
       }
-
+      nodesRef.current = loadedNodes;
       setNodes(loadedNodes);
-      canvas.renderAll();
+
+      const loadedEdges: WorkflowEdge[] = (edgesData || []).map((ed: any) => ({
+        id: ed.id,
+        fromNodeId: ed.from_node_id,
+        fromPort: ed.from_port || 'output',
+        toNodeId: ed.to_node_id,
+        toPort: ed.to_port || 'input',
+      }));
+      const drawnEdges = redrawEdges(canvas, loadedEdges, loadedNodes);
+      edgesRef.current = drawnEdges;
+      setEdges(drawnEdges);
     } catch (error: any) {
       console.error('Load workflow error:', error);
       toast({ title: "Failed to load workflow", description: error.message, variant: "destructive" });
     }
   };
 
-  const createNodeObject = (type: string, x: number, y: number, nodeId: string): FabricObject => {
-    const colors: Record<string, string> = {
-      analyze: "hsl(227, 100%, 65%)",
-      classify: "hsl(250, 75%, 60%)",
-      mcp_tool: "hsl(170, 70%, 45%)",
-      notify_teams: "hsl(51, 100%, 50%)",
-      create_ticket_jira: "hsl(227, 100%, 65%)",
-      write_salesforce: "hsl(250, 75%, 60%)",
-      generate_report: "hsl(51, 100%, 50%)",
-    };
-
-    const labels: Record<string, string> = {
-      analyze: "Analyze",
-      classify: "Classify",
-      mcp_tool: "MCP Tool",
-      notify_teams: "Notify Teams",
-      create_ticket_jira: "Create Jira Ticket",
-      write_salesforce: "Write Salesforce",
-      generate_report: "Generate Report",
-    };
+  // ─── Create node group with ports ───
+  const createNodeGroup = (type: string, x: number, y: number, nodeId: string, canvas: FabricCanvas): FabricObject => {
+    const color = NODE_COLORS[type] || "hsl(227, 100%, 65%)";
+    const label = NODE_LABELS[type] || type;
 
     const rect = new Rect({
-      width: 160,
-      height: 80,
-      fill: colors[type] || "hsl(227, 100%, 65%)",
-      stroke: "hsl(0, 0%, 100%)",
-      strokeWidth: 2,
-      rx: 8,
-      ry: 8,
-      originX: 'center',
-      originY: 'center',
+      width: NODE_WIDTH, height: NODE_HEIGHT,
+      fill: color, stroke: "hsl(0, 0%, 90%)", strokeWidth: 2,
+      rx: 10, ry: 10, originX: 'center', originY: 'center',
+      shadow: { color: 'rgba(0,0,0,0.35)', blur: 12, offsetX: 0, offsetY: 4 } as any,
     });
 
-    const text = new Text(labels[type] || type, {
-      fontSize: 14,
-      fill: "hsl(0, 0%, 100%)",
-      fontFamily: "Inter",
-      fontWeight: "600",
-      originX: "center",
-      originY: "center",
+    const text = new Text(label, {
+      fontSize: 13, fill: "hsl(0, 0%, 100%)", fontFamily: "Inter",
+      fontWeight: "600", originX: "center", originY: "center",
     });
 
     const group = new Group([rect, text], {
-      left: x,
-      top: y,
-      selectable: true,
-      hasControls: false,
-      hasBorders: true,
-      lockRotation: true,
-      hoverCursor: 'grab',
-      moveCursor: 'grabbing',
+      left: x, top: y,
+      selectable: true, hasControls: false, hasBorders: true,
+      lockRotation: true, hoverCursor: 'grab', moveCursor: 'grabbing',
+      subTargetCheck: false,
     });
-
     (group as any).nodeId = nodeId;
     (group as any).nodeType = type;
+    canvas.add(group);
 
+    // ─── Input port (left) ───
+    const inputPort = new Circle({
+      radius: PORT_RADIUS,
+      fill: 'hsl(222, 20%, 18%)',
+      stroke: 'hsl(210, 100%, 70%)',
+      strokeWidth: 2,
+      left: x - PORT_RADIUS,
+      top: y + NODE_HEIGHT / 2 - PORT_RADIUS,
+      selectable: false,
+      evented: true,
+      hoverCursor: 'crosshair',
+    });
+    (inputPort as any).portType = 'input';
+    (inputPort as any).parentNodeId = nodeId;
+    canvas.add(inputPort);
+
+    // ─── Output port (right) ───
+    const outputPort = new Circle({
+      radius: PORT_RADIUS,
+      fill: 'hsl(222, 20%, 18%)',
+      stroke: 'hsl(140, 70%, 50%)',
+      strokeWidth: 2,
+      left: x + NODE_WIDTH,
+      top: y + NODE_HEIGHT / 2 - PORT_RADIUS,
+      selectable: false,
+      evented: true,
+      hoverCursor: 'crosshair',
+    });
+    (outputPort as any).portType = 'output';
+    (outputPort as any).parentNodeId = nodeId;
+    canvas.add(outputPort);
+
+    // Keep ports moving with node
+    const originalSet = group.set.bind(group);
+    const patchedSet = function (this: any, ...args: any[]) {
+      const result = originalSet(...args);
+      const gLeft = group.left || 0;
+      const gTop = group.top || 0;
+      inputPort.set({ left: gLeft - PORT_RADIUS, top: gTop + NODE_HEIGHT / 2 - PORT_RADIUS });
+      outputPort.set({ left: gLeft + NODE_WIDTH, top: gTop + NODE_HEIGHT / 2 - PORT_RADIUS });
+      return result;
+    };
+    group.set = patchedSet as any;
+
+    // Also patch on moving
+    canvas.on('object:moving', (e) => {
+      if (e.target === group) {
+        const gLeft = group.left || 0;
+        const gTop = group.top || 0;
+        inputPort.set({ left: gLeft - PORT_RADIUS, top: gTop + NODE_HEIGHT / 2 - PORT_RADIUS });
+        outputPort.set({ left: gLeft + NODE_WIDTH, top: gTop + NODE_HEIGHT / 2 - PORT_RADIUS });
+      }
+    });
+
+    canvas.renderAll();
     return group;
   };
 
@@ -240,36 +436,42 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
     if (!fabricCanvas) return;
 
     const nodeId = crypto.randomUUID();
-    const x = 100 + nodes.length * 50;
-    const y = 100 + nodes.length * 30;
+    const x = 80 + (nodesRef.current.length % 4) * 200;
+    const y = 80 + Math.floor(nodesRef.current.length / 4) * 120;
 
-    const fabricObj = createNodeObject(type, x, y, nodeId);
-    fabricCanvas.add(fabricObj);
-    fabricCanvas.renderAll();
-
-    const defaultConfigs: Record<string, any> = {
-      analyze: { model: 'google/gemini-2.5-flash' },
-      classify: { labels: [] },
-      notify_teams: {},
-      create_ticket_jira: {},
-      write_salesforce: {},
-      generate_report: {},
-    };
+    const fabricObj = createNodeGroup(type, x, y, nodeId, fabricCanvas);
 
     const newNode: WorkflowNode = {
       id: nodeId, type, x, y,
-      config: defaultConfigs[type] || {},
+      config: type === 'analyze' ? { model: 'google/gemini-2.5-flash' } : {},
       fabricObject: fabricObj,
     };
 
-    setNodes(prev => [...prev, newNode]);
+    const updated = [...nodesRef.current, newNode];
+    nodesRef.current = updated;
+    setNodes(updated);
     setIsDirty(true);
-    toast({ title: "Node added", description: `${type} node added to canvas` });
-  }, [fabricCanvas, nodes]);
+    toast({ title: "Node added", description: `${NODE_LABELS[type] || type} node added to canvas` });
+  }, [fabricCanvas]);
 
+  // ─── Save (explicit only, with auth guard + UUID validation) ───
   const handleSave = async () => {
-    if (!currentWorkflowId && !systemId) {
-      toast({ title: "Cannot save", description: "No workflow or system ID provided", variant: "destructive" });
+    if (!systemId && !currentWorkflowId) {
+      toast({ title: "Cannot save", description: "No system context available", variant: "destructive" });
+      return;
+    }
+
+    // Auth guard
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      toast({ title: "Please log in to save", description: "Authentication required", variant: "destructive" });
+      return;
+    }
+
+    // UUID validation
+    if (systemId && !isValidUUID(systemId)) {
+      toast({ title: "Cannot save to database", description: "System ID is not a valid identifier. Workflow is stored locally only.", variant: "default" });
+      setIsDirty(false);
       return;
     }
 
@@ -277,43 +479,38 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
     try {
       let wfId = currentWorkflowId;
       if (!wfId) {
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        if (userError || !user) throw new Error('Authentication required to save workflow');
-
-        const { data: workflow, error: workflowError } = await supabase
+        const { data: workflow, error: wfError } = await supabase
           .from('workflows')
           .insert({ system_id: systemId, name: `Workflow ${new Date().toLocaleString()}`, status: 'draft', created_by: user.id })
           .select().maybeSingle();
-        if (workflowError) throw workflowError;
+        if (wfError) throw wfError;
         if (!workflow) throw new Error('Failed to create workflow');
         wfId = workflow.id;
         setCurrentWorkflowId(wfId);
       }
 
-      await supabase.from('workflow_nodes').delete().eq('workflow_id', wfId);
-      await supabase.from('workflow_edges').delete().eq('workflow_id', wfId);
+      // Guarded deletes
+      try { await supabase.from('workflow_nodes').delete().eq('workflow_id', wfId); } catch {}
+      try { await supabase.from('workflow_edges').delete().eq('workflow_id', wfId); } catch {}
 
-      const nodesToInsert = nodes.map(node => ({
-        id: node.id, workflow_id: wfId, type: node.type, x: node.x, y: node.y, config: node.config,
-      }));
-      if (nodesToInsert.length > 0) {
-        const { error: nodesError } = await supabase.from('workflow_nodes').insert(nodesToInsert);
-        if (nodesError) throw nodesError;
+      if (nodes.length > 0) {
+        const { error } = await supabase.from('workflow_nodes').insert(
+          nodes.map(n => ({ id: n.id, workflow_id: wfId, type: n.type, x: n.x, y: n.y, config: n.config }))
+        );
+        if (error) throw error;
       }
 
-      const edgesToInsert = edges.map(edge => ({
-        id: edge.id, workflow_id: wfId, from_node_id: edge.fromNodeId, from_port: edge.fromPort,
-        to_node_id: edge.toNodeId, to_port: edge.toPort,
-      }));
-      if (edgesToInsert.length > 0) {
-        const { error: edgesError } = await supabase.from('workflow_edges').insert(edgesToInsert);
-        if (edgesError) throw edgesError;
+      if (edges.length > 0) {
+        const { error } = await supabase.from('workflow_edges').insert(
+          edges.map(e => ({ id: e.id, workflow_id: wfId, from_node_id: e.fromNodeId, from_port: e.fromPort, to_node_id: e.toNodeId, to_port: e.toPort }))
+        );
+        if (error) throw error;
       }
 
       setIsDirty(false);
-      toast({ title: "Workflow saved", description: `${nodes.length} nodes saved successfully` });
+      toast({ title: "Workflow saved", description: `${nodes.length} nodes, ${edges.length} edges saved` });
     } catch (error: any) {
-      console.error('Save workflow error:', error);
+      console.error('Save error:', error);
       toast({ title: "Save failed", description: error.message, variant: "destructive" });
     } finally {
       setIsSaving(false);
@@ -327,12 +524,8 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
     const nodesWithIncoming = new Set(edges.map(e => e.toNodeId));
     const entryNodes = nodes.filter(n => !nodesWithIncoming.has(n.id));
     if (nodes.length > 0 && entryNodes.length === 0) errors.push("No entry point found (circular dependency)");
-    nodes.forEach(node => {
-      if (node.type === 'analyze' && !node.config?.model) errors.push(`Analyze node missing model configuration`);
-      if (node.type === 'classify' && (!node.config?.labels || node.config.labels.length === 0)) errors.push(`Classify node missing classification labels`);
-    });
     if (errors.length === 0) {
-      toast({ title: "Validation passed", description: "Workflow structure is valid" });
+      toast({ title: "Validation passed ✓", description: "Workflow structure is valid" });
       return true;
     } else {
       toast({ title: "Validation failed", description: errors.join('; '), variant: "destructive" });
@@ -345,62 +538,52 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
   const [showTestResults, setShowTestResults] = useState(false);
 
   const handleTestRun = async () => {
-    // Run a local mock simulation based on current nodes (no edge function required)
     if (nodes.length === 0) {
-      toast({ title: "No nodes", description: "Add nodes to the workflow before testing", variant: "destructive" });
+      toast({ title: "No nodes", description: "Add nodes before testing", variant: "destructive" });
       return;
     }
-
-    setIsTestRunning(true);
-    setTestResult(null);
-    setShowTestResults(true);
-
+    setIsTestRunning(true); setTestResult(null); setShowTestResults(true);
     try {
-      // Always use local simulation (no backend dependency required)
-      // Local mock simulation
       const startTime = Date.now();
-      const trace = nodes.map((node, idx) => {
-        const nodeStart = Date.now();
-        return {
-          node_id: node.id,
-          node_type: node.type,
-          status: 'success' as const,
-          duration_ms: 10 + Math.floor(Math.random() * 90),
-          result: { output: `[Mock] ${node.type} executed successfully`, step: idx + 1 },
-        };
-      });
-
-      // Simulate async delay
-      await new Promise(r => setTimeout(r, 500 + Math.random() * 500));
-
+      const trace = nodes.map((node, idx) => ({
+        node_id: node.id, node_type: node.type, status: 'success' as const,
+        duration_ms: 10 + Math.floor(Math.random() * 90),
+        result: { output: `[Mock] ${node.type} executed`, step: idx + 1 },
+      }));
+      await new Promise(r => setTimeout(r, 400 + Math.random() * 400));
       const result = {
         execution_trace: trace,
-        summary: {
-          total_nodes: nodes.length,
-          total_edges: edges.length,
-          duration_ms: Date.now() - startTime,
-          successful_nodes: trace.length,
-          failed_nodes: 0,
-        },
+        summary: { total_nodes: nodes.length, total_edges: edges.length, duration_ms: Date.now() - startTime, successful_nodes: trace.length, failed_nodes: 0 },
       };
-
       setTestResult(result);
-      toast({ title: "Simulation complete", description: `${result.summary.total_nodes} nodes executed in ${result.summary.duration_ms}ms` });
+      toast({ title: "Simulation complete", description: `${result.summary.total_nodes} nodes in ${result.summary.duration_ms}ms` });
     } catch (error: any) {
-      console.error('Test run error:', error);
-      toast({ title: "Test run failed", description: error.message || "Failed to execute test run", variant: "destructive" });
-    } finally {
-      setIsTestRunning(false);
-    }
+      toast({ title: "Test run failed", description: error.message, variant: "destructive" });
+    } finally { setIsTestRunning(false); }
   };
 
   const handleClear = () => {
     if (!fabricCanvas) return;
     fabricCanvas.clear();
-    setNodes([]);
-    setEdges([]);
-    setIsDirty(true);
-    toast({ title: "Canvas cleared", description: "All nodes removed" });
+    // Redraw grid
+    const gridSize = 24;
+    const gridColor = 'hsl(222, 15%, 16%)';
+    for (let i = 0; i < fabricCanvas.width! / gridSize; i++) {
+      const l = new Line([i * gridSize, 0, i * gridSize, fabricCanvas.height!], { stroke: gridColor, strokeWidth: 1, selectable: false, evented: false });
+      (l as any).isGridLine = true;
+      fabricCanvas.add(l);
+    }
+    for (let i = 0; i < fabricCanvas.height! / gridSize; i++) {
+      const l = new Line([0, i * gridSize, fabricCanvas.width!, i * gridSize], { stroke: gridColor, strokeWidth: 1, selectable: false, evented: false });
+      (l as any).isGridLine = true;
+      fabricCanvas.add(l);
+    }
+    fabricCanvas.backgroundColor = "hsl(222, 20%, 10%)";
+    fabricCanvas.renderAll();
+    nodesRef.current = [];
+    edgesRef.current = [];
+    setNodes([]); setEdges([]); setIsDirty(true);
+    toast({ title: "Canvas cleared" });
   };
 
   return (
@@ -414,59 +597,52 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
               {isSaving ? 'Saving...' : 'Save Draft'}
             </Button>
             <Button variant="outline" size="sm" onClick={handleValidate} className="gap-2">
-              <CheckCircle2 className="h-4 w-4" />
-              Validate
+              <CheckCircle2 className="h-4 w-4" />Validate
             </Button>
             <Button variant="outline" size="sm" onClick={handleTestRun} disabled={isTestRunning} className="gap-2">
-              {isTestRunning ? (
-                <><Loader2 className="h-4 w-4 animate-spin" />Testing...</>
-              ) : (
-                <><Play className="h-4 w-4" />Test Run</>
-              )}
+              {isTestRunning ? <><Loader2 className="h-4 w-4 animate-spin" />Testing...</> : <><Play className="h-4 w-4" />Test Run</>}
             </Button>
           </div>
 
           <div className="flex items-center gap-2">
             {isDirty && <Badge variant="outline" className="bg-primary/20">Unsaved changes</Badge>}
             <Badge variant="secondary">{nodes.length} nodes</Badge>
+            <Badge variant="secondary">{edges.length} edges</Badge>
             {testResult && (
               <Badge variant={testResult.summary?.failed_nodes === 0 ? "default" : "destructive"}>
-                {testResult.summary?.failed_nodes === 0 ? "✓ Test passed" : "✗ Test failed"}
+                {testResult.summary?.failed_nodes === 0 ? "✓ Passed" : "✗ Failed"}
               </Badge>
             )}
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={handleClear} className="gap-2">
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <Button variant="ghost" size="sm" onClick={handleClear}><Trash2 className="h-4 w-4" /></Button>
           </div>
         </div>
       </Card>
 
+      {/* Connection hint */}
+      <div className="text-xs text-muted-foreground px-1">
+        💡 Drag from a <span className="text-green-400 font-medium">green port</span> (right) to a <span className="text-blue-400 font-medium">blue port</span> (left) to connect nodes. Press Delete to remove selected edges.
+      </div>
+
       {/* Canvas */}
-      <Card className="glass-panel overflow-hidden relative" style={{ backgroundColor: 'hsl(0, 0%, 12%)', minHeight: '500px' }}>
+      <Card className="glass-panel overflow-hidden relative" style={{ backgroundColor: 'hsl(222, 20%, 10%)', minHeight: '500px' }}>
         <canvas ref={canvasRef} className="w-full" />
         
         {nodes.length === 0 && fabricCanvas && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="pointer-events-auto rounded-xl border-2 border-dashed border-muted-foreground/30 bg-background/80 backdrop-blur-sm p-8 text-center max-w-md">
               <div className="mb-4 flex justify-center">
-                <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-3xl">
-                  🔧
-                </div>
+                <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-3xl">🔧</div>
               </div>
               <h3 className="text-lg font-semibold mb-2">Build Your Workflow</h3>
               <p className="text-sm text-muted-foreground mb-6">
-                Drag and drop nodes from the palette below to create your automation workflow. Connect nodes to define the execution flow.
+                Add nodes from the palette below, then drag between ports to connect them into an automation pipeline.
               </p>
               <div className="flex flex-wrap gap-2 justify-center">
-                <Button size="sm" variant="outline" onClick={() => handleAddNode('analyze')} className="gap-2">
-                  <span className="text-xs">➕</span> Add Analyze
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => handleAddNode('classify')} className="gap-2">
-                  <span className="text-xs">➕</span> Add Classify
-                </Button>
+                <Button size="sm" variant="outline" onClick={() => handleAddNode('analyze')}>➕ Analyze</Button>
+                <Button size="sm" variant="outline" onClick={() => handleAddNode('classify')}>➕ Classify</Button>
               </div>
             </div>
           </div>
@@ -482,7 +658,7 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
           <Card className="glass-panel p-4">
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm" className="w-full justify-between">
-                <span className="font-medium text-sm">Simulation Results — {testResult.summary?.total_nodes} nodes, {testResult.summary?.duration_ms}ms</span>
+                <span className="font-medium text-sm">Simulation — {testResult.summary?.total_nodes} nodes, {testResult.summary?.duration_ms}ms</span>
                 <Badge variant={testResult.summary?.failed_nodes === 0 ? "default" : "destructive"}>
                   {testResult.summary?.failed_nodes === 0 ? `${testResult.summary?.successful_nodes} passed` : `${testResult.summary?.failed_nodes} failed`}
                 </Badge>
@@ -491,9 +667,7 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
             <CollapsibleContent className="mt-3 space-y-2">
               {testResult.execution_trace?.map((trace: any, idx: number) => (
                 <div key={idx} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    trace.status === 'success' ? 'bg-success/20' : 'bg-destructive/20'
-                  }`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${trace.status === 'success' ? 'bg-green-500/20' : 'bg-destructive/20'}`}>
                     <span className="text-sm font-mono font-medium">{idx + 1}</span>
                   </div>
                   <div className="flex-1">
@@ -514,9 +688,9 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
           node={selectedNode}
           onClose={() => setSelectedNode(null)}
           onUpdate={(config) => {
-            setNodes(prev => prev.map(n => 
-              n.id === selectedNode.id ? { ...n, config } : n
-            ));
+            const updated = nodesRef.current.map(n => n.id === selectedNode.id ? { ...n, config } : n);
+            nodesRef.current = updated;
+            setNodes(updated);
             setIsDirty(true);
           }}
         />

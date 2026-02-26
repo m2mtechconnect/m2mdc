@@ -143,12 +143,27 @@ export function Step2Intelligence() {
   };
 
   // DC-specific subsystems that intelligence monitors
+  const [enabledSubsystems, setEnabledSubsystems] = useState<Record<string, boolean>>({
+    thermal: true,
+    power: true,
+    gpu: true,
+    sovereignty: false,
+  });
+
   const dcSubsystems = [
-    { id: 'thermal', label: 'Thermal Management', icon: Thermometer, enabled: true },
-    { id: 'power', label: 'Power & PUE', icon: Zap, enabled: true },
-    { id: 'gpu', label: 'GPU Workloads', icon: Cpu, enabled: true },
-    { id: 'sovereignty', label: 'Sovereignty Compliance', icon: Shield, enabled: false },
+    { id: 'thermal', label: 'Thermal Management', icon: Thermometer },
+    { id: 'power', label: 'Power & PUE', icon: Zap },
+    { id: 'gpu', label: 'GPU Workloads', icon: Cpu },
+    { id: 'sovereignty', label: 'Sovereignty Compliance', icon: Shield },
   ];
+
+  const handleSubsystemToggle = (id: string) => {
+    setEnabledSubsystems(prev => {
+      const next = { ...prev, [id]: !prev[id] };
+      toast.success(next[id] ? `${id} monitoring enabled` : `${id} monitoring disabled`);
+      return next;
+    });
+  };
 
   // DC-specific threshold states
   const [gpuUtilThreshold, setGpuUtilThreshold] = useState([85]);
@@ -174,26 +189,44 @@ export function Step2Intelligence() {
           icon={<Sparkles className="h-4 w-4" />}
         >
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border">
+            <div className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+              supervisorEnabled 
+                ? 'bg-accent/10 border-accent/40 ring-1 ring-accent/20' 
+                : 'bg-muted/50 border-border'
+            }`}>
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center">
-                  <Users className="h-4 w-4 text-accent" />
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
+                  supervisorEnabled ? 'bg-accent/20' : 'bg-accent/10'
+                }`}>
+                  <Users className={`h-4 w-4 ${supervisorEnabled ? 'text-accent' : 'text-muted-foreground'}`} />
                 </div>
                 <div>
-                  <p className="font-medium text-sm">Supervisor Agent</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-sm">Supervisor Agent</p>
+                    {supervisorEnabled && <Badge variant="outline" className="text-[10px] bg-accent/10 text-accent border-accent/30">Active</Badge>}
+                  </div>
                   <p className="text-xs text-muted-foreground">Orchestrates sub-agents for multi-step DC operations</p>
                 </div>
               </div>
               <Switch checked={supervisorEnabled} onCheckedChange={handleSupervisorToggle} />
             </div>
             
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border">
+            <div className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+              deepResearchEnabled 
+                ? 'bg-info/10 border-info/40 ring-1 ring-info/20' 
+                : 'bg-muted/50 border-border'
+            }`}>
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-info/10 flex items-center justify-center">
-                  <Search className="h-4 w-4 text-info" />
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
+                  deepResearchEnabled ? 'bg-info/20' : 'bg-info/10'
+                }`}>
+                  <Search className={`h-4 w-4 ${deepResearchEnabled ? 'text-info' : 'text-muted-foreground'}`} />
                 </div>
                 <div>
-                  <p className="font-medium text-sm">Deep Research Agent</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-sm">Deep Research Agent</p>
+                    {deepResearchEnabled && <Badge variant="outline" className="text-[10px] bg-info/10 text-info border-info/30">Active</Badge>}
+                  </div>
                   <p className="text-xs text-muted-foreground">Performs thorough analysis and synthesizes findings</p>
                 </div>
               </div>
@@ -211,17 +244,20 @@ export function Step2Intelligence() {
           <div className="grid grid-cols-2 gap-3">
             {dcSubsystems.map((sys) => {
               const IconComp = sys.icon;
+              const isEnabled = enabledSubsystems[sys.id];
               return (
                 <div 
                   key={sys.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors cursor-pointer ${
-                    sys.enabled 
-                      ? 'bg-primary/10 border-primary/30' 
+                  onClick={() => handleSubsystemToggle(sys.id)}
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer ${
+                    isEnabled 
+                      ? 'bg-primary/10 border-primary/30 ring-1 ring-primary/20' 
                       : 'bg-muted/50 border-border hover:border-primary/30'
                   }`}
                 >
-                  <IconComp className={`h-4 w-4 ${sys.enabled ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <IconComp className={`h-4 w-4 ${isEnabled ? 'text-primary' : 'text-muted-foreground'}`} />
                   <span className="text-sm font-medium">{sys.label}</span>
+                  {isEnabled && <Badge variant="outline" className="ml-auto text-[10px] bg-primary/10 text-primary border-primary/30">On</Badge>}
                 </div>
               );
             })}
@@ -558,11 +594,7 @@ export function Step2Intelligence() {
             icon={<Settings className="h-5 w-5" />}
           />
           <div className="mt-4">
-            <BuilderToolsPanel 
-              onConfigureIntegration={(integration) => {
-                toast.info(`Configure ${integration} in the Integrations section`);
-              }}
-            />
+            <BuilderToolsPanel />
           </div>
         </div>
       </div>

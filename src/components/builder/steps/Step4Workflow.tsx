@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { GitBranch, Play, AlertCircle, Info, Zap, Thermometer, Wind, Shield, DollarSign, Cpu, Network, AlertTriangle } from 'lucide-react';
+import { GitBranch, Play, AlertCircle, Info, Zap, Thermometer, Wind, Shield, DollarSign, Cpu, Network, AlertTriangle, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
@@ -7,6 +7,7 @@ import { useBlueprintStore } from '@/stores/blueprintStore';
 import { generateWorkflow } from '@/lib/workflow/workflowGenerator';
 import { WorkflowEditor } from '@/components/workflow/WorkflowEditor';
 import { DCCard, DCSectionHeader, DCKPITile } from '@/components/dc-ui';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 const DC_NODE_TYPES = [
   { id: 'gpu-spike', label: 'GPU Spike Trigger', icon: Cpu, color: 'primary' },
@@ -21,7 +22,7 @@ const DC_NODE_TYPES = [
 export function Step4Workflow() {
   const { builderId, goal, industry, department, type, template, workflow, setWorkflow } = useWizardBuilderStore();
   const { currentBlueprint } = useBlueprintStore();
-  const [showEditor, setShowEditor] = useState(false);
+  const [editorOpen, setEditorOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
@@ -95,80 +96,72 @@ export function Step4Workflow() {
         </div>
       )}
 
-      {/* Visual Workflow Editor */}
-      {showEditor ? (
-        <DCCard
-          title="Visual Workflow Editor"
-          headerAction={
-            <Button variant="outline" size="sm" onClick={() => setShowEditor(false)}>
-              Close Editor
-            </Button>
-          }
-          noPadding
-        >
-          <div className="h-[500px] border-t border-border">
-            <WorkflowEditor workflowId={builderId} systemId={builderId} />
+      {/* DC Node Types */}
+      <DCCard 
+        title="Data Centre Workflow Nodes" 
+        subtitle="Drag-and-drop triggers and actions for DC operations"
+        icon={<Cpu className="h-4 w-4" />}
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          {DC_NODE_TYPES.map((node) => {
+            const IconComp = node.icon;
+            return (
+              <div
+                key={node.id}
+                className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border hover:border-primary/30 transition-colors cursor-grab"
+              >
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <IconComp className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm">{node.label}</p>
+                  <p className="text-xs text-muted-foreground">Trigger</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </DCCard>
+
+      {/* Configured Actions */}
+      {workflow?.actions && workflow.actions.length > 0 && (
+        <DCCard title="Configured Actions" icon={<Play className="h-4 w-4" />}>
+          <div className="space-y-2">
+            {workflow.actions.map((action, idx) => (
+              <div key={idx} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-sm font-mono font-medium text-primary">{idx + 1}</span>
+                </div>
+                <span className="text-sm">{action}</span>
+              </div>
+            ))}
           </div>
         </DCCard>
-      ) : (
-        <>
-          {/* DC Node Types */}
-          <DCCard 
-            title="Data Centre Workflow Nodes" 
-            subtitle="Drag-and-drop triggers and actions for DC operations"
-            icon={<Cpu className="h-4 w-4" />}
-          >
-            <div className="grid gap-3 sm:grid-cols-2">
-              {DC_NODE_TYPES.map((node) => {
-                const IconComp = node.icon;
-                return (
-                  <div
-                    key={node.id}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border hover:border-primary/30 transition-colors cursor-grab"
-                  >
-                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <IconComp className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">{node.label}</p>
-                      <p className="text-xs text-muted-foreground">Trigger</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </DCCard>
-
-          {/* Configured Actions */}
-          {workflow?.actions && workflow.actions.length > 0 && (
-            <DCCard title="Configured Actions" icon={<Play className="h-4 w-4" />}>
-              <div className="space-y-2">
-                {workflow.actions.map((action, idx) => (
-                  <div key={idx} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="text-sm font-mono font-medium text-primary">{idx + 1}</span>
-                    </div>
-                    <span className="text-sm">{action}</span>
-                  </div>
-                ))}
-              </div>
-            </DCCard>
-          )}
-
-          {/* Open Editor Button */}
-          <DCCard className="bg-muted/30">
-            <div className="space-y-4">
-              <Button className="w-full" size="lg" onClick={() => setShowEditor(true)}>
-                <Play className="h-4 w-4 mr-2" />
-                Open Visual Workflow Editor
-              </Button>
-              <p className="text-xs text-center text-muted-foreground">
-                Use the visual editor to drag-and-drop nodes, test actions, and add human approval checkpoints
-              </p>
-            </div>
-          </DCCard>
-        </>
       )}
+
+      {/* Inline Collapsible Workflow Editor */}
+      <Collapsible open={editorOpen} onOpenChange={setEditorOpen}>
+        <DCCard className="bg-muted/30">
+          <div className="space-y-4">
+            <CollapsibleTrigger asChild>
+              <Button className="w-full" size="lg" variant={editorOpen ? 'outline' : 'default'}>
+                <ChevronDown className={`h-4 w-4 mr-2 transition-transform ${editorOpen ? 'rotate-180' : ''}`} />
+                {editorOpen ? 'Close Visual Workflow Editor' : 'Open Visual Workflow Editor'}
+              </Button>
+            </CollapsibleTrigger>
+            <p className="text-xs text-center text-muted-foreground">
+              Use the visual editor to drag-and-drop nodes, test actions, and add human approval checkpoints
+            </p>
+          </div>
+        </DCCard>
+        <CollapsibleContent className="mt-4">
+          <DCCard noPadding>
+            <div className="border-t border-border">
+              <WorkflowEditor workflowId={builderId} systemId={builderId} />
+            </div>
+          </DCCard>
+        </CollapsibleContent>
+      </Collapsible>
 
       {/* Workflow Features */}
       <DCCard title="Workflow Capabilities" icon={<Info className="h-4 w-4" />}>

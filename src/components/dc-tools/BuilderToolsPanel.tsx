@@ -2,16 +2,21 @@
  * BuilderToolsPanel - Recommended Tools panel for Builder Step 2
  */
 
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   Cpu,
   Zap,
   Wind,
   Shield,
   Leaf,
-  Settings,
+  Info,
   LucideIcon,
 } from 'lucide-react';
 import { dcToolRegistry, getDomainDisplayName } from '@/data/dcToolRegistry';
@@ -24,11 +29,7 @@ const iconMap: Record<string, LucideIcon> = {
   Leaf,
 };
 
-interface BuilderToolsPanelProps {
-  onConfigureIntegration?: (integrationName: string) => void;
-}
-
-export function BuilderToolsPanel({ onConfigureIntegration }: BuilderToolsPanelProps) {
+export function BuilderToolsPanel() {
   return (
     <Card className="p-4">
       <div className="space-y-4">
@@ -67,8 +68,7 @@ export function BuilderToolsPanel({ onConfigureIntegration }: BuilderToolsPanelP
                         <Badge
                           key={integration}
                           variant="secondary"
-                          className="text-[10px] cursor-pointer hover:bg-secondary/80"
-                          onClick={() => onConfigureIntegration?.(integration)}
+                          className="text-[10px]"
                         >
                           {integration}
                         </Badge>
@@ -76,14 +76,35 @@ export function BuilderToolsPanel({ onConfigureIntegration }: BuilderToolsPanelP
                     </div>
                   )}
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0"
-                  onClick={() => onConfigureIntegration?.(tool.requiredIntegrations?.[0] || '')}
-                >
-                  <Settings className="h-3 w-3" />
-                </Button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0"
+                    >
+                      <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent side="left" className="w-64 text-sm space-y-2">
+                    <p className="font-medium">{tool.name}</p>
+                    <p className="text-xs text-muted-foreground">{tool.description}</p>
+                    <div className="pt-1 border-t border-border space-y-1">
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Domain</p>
+                      <Badge variant="outline" className="text-[10px]">{getDomainDisplayName(tool.domain)}</Badge>
+                    </div>
+                    {tool.requiredIntegrations && tool.requiredIntegrations.length > 0 && (
+                      <div className="space-y-1">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Required Integrations</p>
+                        <div className="flex flex-wrap gap-1">
+                          {tool.requiredIntegrations.map((i) => (
+                            <Badge key={i} variant="secondary" className="text-[10px]">{i}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </PopoverContent>
+                </Popover>
               </div>
             );
           })}

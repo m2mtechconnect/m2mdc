@@ -19,7 +19,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { 
   PlayCircle, Pause, RotateCcw, 
   Clock, AlertTriangle, Sparkles, ChevronRight,
-  Info, Activity, CheckCircle2, TrendingUp, TrendingDown
+  Info, Activity, CheckCircle2, TrendingUp, TrendingDown, Bot
 } from 'lucide-react';
 import { useSimulation } from '@/simulation/useSimulation';
 import { useTwinContext } from '@/hooks/useTwinContext';
@@ -45,6 +45,31 @@ const categoryColors: Record<string, string> = {
   sovereignty: 'bg-green-500/10 text-green-500 border-green-500/30',
   carbon: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30',
   financial: 'bg-amber-500/10 text-amber-500 border-amber-500/30',
+};
+
+// Domain → Agent name mapping (from MasterTemplate DOMAIN_DEFINITIONS)
+const DOMAIN_AGENT_MAP: Record<string, string> = {
+  thermal_hardware: 'Thermal Guardian',
+  power_ups: 'Power & UPS Monitor',
+  cooling: 'Cooling Optimization Agent',
+  network: 'Network Fabric Analyzer',
+  facility_safety: 'Facility Safety Monitor',
+  workload_gpu: 'Workload Orchestrator',
+  sovereignty: 'Sovereignty Sentinel',
+  carbon_emissions: 'Carbon Intelligence Agent',
+  financial_carbon: 'Financial Performance Optimizer',
+};
+
+const DOMAIN_AGENT_SHORT: Record<string, string> = {
+  thermal_hardware: 'Thermal Guardian',
+  power_ups: 'Power Monitor',
+  cooling: 'Cooling Agent',
+  network: 'Network Analyzer',
+  facility_safety: 'Safety Monitor',
+  workload_gpu: 'Workload Orchestrator',
+  sovereignty: 'Sovereignty Sentinel',
+  carbon_emissions: 'Carbon Agent',
+  financial_carbon: 'Financial Optimizer',
 };
 
 // KPI definitions for the comparison panel
@@ -568,9 +593,17 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
                             {formatTime(event.timestamp)}
                           </span>
                         </div>
-                        <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
-                          {event.description}
-                        </p>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          {event.domain && DOMAIN_AGENT_SHORT[event.domain] && (
+                            <Badge variant="outline" className="text-[9px] h-4 px-1 gap-0.5 font-normal border-accent/30 text-accent shrink-0">
+                              <Bot className="h-2.5 w-2.5" />
+                              {DOMAIN_AGENT_SHORT[event.domain]}
+                            </Badge>
+                          )}
+                          <p className="text-xs text-muted-foreground line-clamp-1">
+                            {event.description}
+                          </p>
+                        </div>
                         </div>
                       );
                     })}

@@ -302,24 +302,19 @@ const InfrastructurePage = () => {
                     for PUE optimization, capacity planning, cooling management, and full autonomous operations.
                   </p>
 
-                  {/* Value proposition box */}
-                  <div className="p-4 rounded-lg border border-primary/15 bg-primary/[0.03] mb-5 max-w-xl">
-                    <p className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
-                      <Zap className="h-3.5 w-3.5 text-primary" /> Why design a pod?
-                    </p>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { icon: DollarSign, text: "12-18% reduction in PUE energy costs" },
-                        { icon: Gauge, text: "Autonomous cooling with sub-50ms response" },
-                        { icon: ShieldCheck, text: "Predict failures 72 hours before they occur" },
-                        { icon: Activity, text: "Living digital twin synced every 2 seconds" },
-                      ].map(vp => (
-                        <div key={vp.text} className="flex items-start gap-1.5">
-                          <vp.icon className="h-3 w-3 text-primary/70 mt-0.5 shrink-0" />
-                          <span className="text-xs text-muted-foreground leading-snug">{vp.text}</span>
-                        </div>
-                      ))}
-                    </div>
+                  {/* Quick stats strip */}
+                  <div className="flex flex-wrap items-center gap-4 mb-5">
+                    {[
+                      { value: "12-18%", label: "PUE savings" },
+                      { value: "<50ms", label: "Edge latency" },
+                      { value: "72h", label: "Failure prediction" },
+                      { value: "2.1s", label: "Twin sync" },
+                    ].map(stat => (
+                      <div key={stat.label} className="flex items-baseline gap-1.5">
+                        <span className="text-lg font-bold font-mono text-primary">{stat.value}</span>
+                        <span className="text-xs text-muted-foreground font-sans">{stat.label}</span>
+                      </div>
+                    ))}
                   </div>
 
                   <div className="flex items-center gap-3">
@@ -959,9 +954,9 @@ const InfrastructurePage = () => {
                               <span className="text-xs font-mono font-bold text-primary">{sl.value}{sl.suffix}</span>
                             </div>
                             <input
-                              type="range" min={1} max={sl.max} value={sl.value}
+                              type="range" min={sl.key === "edgeFleet" ? 1 : sl.key === "retention" ? 1 : 1} max={sl.max} value={sl.value}
                               onChange={e => setWizard(p => ({ ...p, [sl.key]: Number(e.target.value) }))}
-                              className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                              className="w-full h-2 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-background [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer"
                               style={{ background: `linear-gradient(to right, hsl(var(--primary)) ${(sl.value / sl.max) * 100}%, hsl(var(--muted)) ${(sl.value / sl.max) * 100}%)` }}
                             />
                           </div>
@@ -1106,64 +1101,101 @@ const InfrastructurePage = () => {
               </div>
 
               {/* Right: Rack Preview Sidebar */}
-              <div className="hidden lg:flex flex-col w-[260px] shrink-0 border-l border-border bg-card/50 p-4 overflow-y-auto">
+              <div className="hidden lg:flex flex-col w-[280px] shrink-0 border-l border-border bg-card/50 p-4 overflow-y-auto">
                 {/* Rack Preview */}
                 <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground font-sans mb-3">Rack Preview</p>
-                <div className="space-y-1 mb-4">
-                  {Array.from({ length: Math.min(wSpecs.rackU, 20) }).map((_, i) => {
-                    const isTrainGpu = i < wSpecs.trainGpus;
-                    const isInferGpu = i >= wSpecs.trainGpus && i < wSpecs.trainGpus + wSpecs.inferGpus;
-                    const isEdge = i >= wSpecs.trainGpus + wSpecs.inferGpus && i < wSpecs.trainGpus + wSpecs.inferGpus + Math.min(wSpecs.edgeCount, 6);
-                    return (
-                      <div
-                        key={i}
-                        className="h-3 rounded-sm flex items-center px-1.5"
-                        style={{
-                          background: isTrainGpu ? "hsl(var(--primary) / 0.2)" : isInferGpu ? "hsl(var(--success) / 0.2)" : isEdge ? "hsl(var(--warning) / 0.2)" : "hsl(var(--muted) / 0.3)",
-                          border: `1px solid ${isTrainGpu ? "hsl(var(--primary) / 0.3)" : isInferGpu ? "hsl(var(--success) / 0.3)" : isEdge ? "hsl(var(--warning) / 0.3)" : "hsl(var(--border))"}`,
-                        }}
-                      >
-                        {(isTrainGpu || isInferGpu) && (
-                          <div className="flex gap-px">
-                            {Array.from({ length: 4 }).map((_, j) => (
-                              <div key={j} className="w-1.5 h-1.5 rounded-[1px]" style={{ background: isTrainGpu ? "hsl(var(--primary) / 0.5)" : "hsl(var(--success) / 0.5)" }} />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                <div className="rounded-lg border border-border bg-background p-3 mb-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-mono text-foreground font-semibold">RACK-01 . {wSpecs.rackU}U</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-success" />
+                      <span className="text-xs text-muted-foreground font-sans">PWR OK</span>
+                    </div>
+                  </div>
+                  <div className="space-y-0.5">
+                    {Array.from({ length: Math.min(wSpecs.rackU, 20) }).map((_, i) => {
+                      const isTrainGpu = i < wSpecs.trainGpus;
+                      const isInferGpu = i >= wSpecs.trainGpus && i < wSpecs.trainGpus + wSpecs.inferGpus;
+                      const isEdge = i >= wSpecs.trainGpus + wSpecs.inferGpus && i < wSpecs.trainGpus + wSpecs.inferGpus + Math.min(wSpecs.edgeCount, 6);
+                      const slotType = isTrainGpu ? "train" : isInferGpu ? "infer" : isEdge ? "edge" : "empty";
+                      const slotLabel = isTrainGpu ? `GPU-${i}` : isInferGpu ? `INF-${i - wSpecs.trainGpus}` : isEdge ? `EDGE-${i - wSpecs.trainGpus - wSpecs.inferGpus}` : null;
+                      return (
+                        <div
+                          key={i}
+                          className="h-4 rounded-sm flex items-center justify-between px-2"
+                          style={{
+                            background: isTrainGpu ? "hsl(var(--primary) / 0.12)" : isInferGpu ? "hsl(var(--success) / 0.12)" : isEdge ? "hsl(var(--warning) / 0.12)" : "hsl(var(--muted) / 0.15)",
+                            border: `1px solid ${isTrainGpu ? "hsl(var(--primary) / 0.25)" : isInferGpu ? "hsl(var(--success) / 0.25)" : isEdge ? "hsl(var(--warning) / 0.25)" : "hsl(var(--border))"}`,
+                          }}
+                        >
+                          {slotLabel ? (
+                            <>
+                              <div className="flex items-center gap-1">
+                                <span className="text-[10px] font-mono text-foreground/70">{slotLabel}</span>
+                                {(isTrainGpu || isInferGpu) && (
+                                  <Badge variant="outline" className="text-[8px] py-0 px-1 h-3 leading-none border-current/20"
+                                    style={{ color: isTrainGpu ? "hsl(var(--primary))" : "hsl(var(--success))" }}>
+                                    GPU
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="flex gap-[2px]">
+                                {Array.from({ length: isEdge ? 2 : 4 }).map((_, j) => (
+                                  <div key={j} className="w-2 h-2 rounded-[1px]"
+                                    style={{ background: isTrainGpu ? "hsl(var(--primary) / 0.6)" : isInferGpu ? "hsl(var(--success) / 0.6)" : "hsl(var(--warning) / 0.6)" }} />
+                                ))}
+                              </div>
+                            </>
+                          ) : (
+                            <span className="text-[10px] font-mono text-muted-foreground/40 mx-auto">- EMPTY -</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="flex gap-3 text-[11px] text-muted-foreground font-sans mb-4">
-                  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{ background: "hsl(var(--primary) / 0.3)" }} /> Train</span>
-                  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{ background: "hsl(var(--success) / 0.3)" }} /> Infer</span>
-                  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{ background: "hsl(var(--warning) / 0.3)" }} /> Edge</span>
+                <div className="flex gap-3 text-xs text-muted-foreground font-sans mb-4">
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: "hsl(var(--primary) / 0.4)" }} /> Train</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: "hsl(var(--success) / 0.4)" }} /> Infer</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: "hsl(var(--warning) / 0.4)" }} /> Edge</span>
                 </div>
 
                 {/* Readiness */}
                 <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground font-sans mb-2">Readiness Score</p>
                 <div className="mb-1">
-                  <Progress value={wSpecs.readiness} className="h-2" />
+                  <div className="relative h-3 w-full rounded-full overflow-hidden bg-muted/30">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{
+                        width: `${wSpecs.readiness}%`,
+                        background: wSpecs.readiness >= 80
+                          ? "linear-gradient(90deg, hsl(var(--primary)), hsl(var(--success)))"
+                          : wSpecs.readiness >= 50
+                            ? "linear-gradient(90deg, hsl(var(--primary)), hsl(var(--warning)))"
+                            : "linear-gradient(90deg, hsl(var(--destructive)), hsl(var(--warning)))"
+                      }}
+                    />
+                  </div>
                 </div>
-                <p className="text-xs font-bold font-mono text-primary mb-4">{wSpecs.readiness}%</p>
+                <p className="text-sm font-bold font-mono text-primary mb-4">{wSpecs.readiness}%</p>
 
                 {/* Cost */}
                 <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground font-sans mb-2">Cost Estimator</p>
-                <div className="p-3 rounded-md border border-border mb-2">
-                  <div className="flex justify-between mb-0.5">
+                <div className="p-3 rounded-lg border border-border mb-2 space-y-2">
+                  <div className="flex justify-between items-center">
                     <span className="text-xs text-muted-foreground font-sans">$/kW</span>
-                    <span className="text-xs font-bold font-mono text-foreground">$0.12</span>
+                    <span className="text-sm font-bold font-mono text-foreground">$0.12</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center">
                     <span className="text-xs text-muted-foreground font-sans">Monthly</span>
-                    <span className="text-xs font-bold font-mono text-primary">${wSpecs.monthlyCost}</span>
+                    <span className="text-sm font-bold font-mono text-primary">${wSpecs.monthlyCost}</span>
                   </div>
                 </div>
 
                 {/* DDN Recommendation */}
                 {wizard.scenario && SCENARIO_DDN_REC[wizard.scenario] && (
-                  <div className="p-3 rounded-md border border-primary/20 bg-primary/5 mt-2">
-                    <p className="text-xs uppercase tracking-wider font-semibold text-primary font-sans mb-1">DDN Recommendation</p>
+                  <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 mt-3">
+                    <p className="text-xs uppercase tracking-wider font-bold text-primary font-sans mb-1.5">DDN Recommendation</p>
                     <p className="text-xs text-muted-foreground leading-relaxed">
                       {SCENARIO_DDN_REC[wizard.scenario].reason}
                     </p>

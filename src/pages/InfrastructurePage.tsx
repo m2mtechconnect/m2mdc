@@ -13,7 +13,6 @@ import {
   Pencil, Trash2, Thermometer, MemoryStick,
   Gauge, DollarSign, ShieldCheck, Box, Wifi, Link2,
 } from "lucide-react";
-import dcHeroVisual from "@/assets/dc-hero-visual.png";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -288,67 +287,50 @@ const InfrastructurePage = () => {
         {/* ════════ 1. HERO CTA ════════ */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <Card className="overflow-hidden border-primary/20">
-            <div className="relative min-h-[280px] md:min-h-[320px]">
-              {/* Background image - right side */}
-              <div className="absolute inset-0 overflow-hidden">
-                <div
-                  className="absolute right-0 top-0 bottom-0 w-[45%] hidden lg:block"
-                  style={{
-                    backgroundImage: `url(${dcHeroVisual})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center right",
-                  }}
-                />
-                {/* Left-edge gradient blend into card background */}
-                <div className="absolute inset-0 hidden lg:block" style={{
-                  background: "linear-gradient(to right, hsl(var(--card)) 50%, hsl(var(--card) / 0.7) 60%, hsl(var(--card) / 0.2) 75%, transparent 85%)",
-                }} />
-              </div>
-
-              {/* Content */}
-              <div className="relative z-10 p-6 md:p-8 lg:p-10 max-w-xl">
-                <Badge variant="outline" className="mb-4 text-xs font-sans border-primary/30 text-primary">
-                  PHYSICAL AI · DIGITAL TWIN
-                </Badge>
-                <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
-                  Ready to build your infrastructure?
-                </h1>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-                  Use the Pod Designer to configure your NVIDIA + DDN hardware stack for your specific
-                  data centre scenario. Get recommendations, cost estimates, and deploy in minutes.
-                </p>
-
-                {/* How it comes together */}
-                <div className="rounded-lg border border-border/50 bg-muted/30 px-4 py-2.5 mb-5">
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    <span className="font-semibold text-foreground">How it comes together:</span>{" "}
-                    Sensors collect facility data, GPUs train AI models, a living digital twin is synthesized, and
-                    edge devices act autonomously.
+            <div className="p-6 md:p-8 lg:p-10" style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.04), hsl(var(--accent) / 0.03))" }}>
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                {/* Left: Text */}
+                <div className="flex-1 max-w-2xl">
+                  <Badge variant="outline" className="mb-4 text-xs font-sans border-primary/30 text-primary">
+                    PHYSICAL AI · DIGITAL TWIN
+                  </Badge>
+                  <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+                    Ready to build your infrastructure?
+                  </h1>
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                    Use the Pod Designer to configure your NVIDIA + DDN hardware stack for your specific
+                    data centre scenario. Get recommendations, cost estimates, and deploy in minutes.
                   </p>
-                </div>
-
-                {/* Quick metrics strip */}
-                <div className="flex flex-wrap items-center gap-4 mb-5">
-                  {[
-                    { value: "12-18%", label: "PUE savings" },
-                    { value: "<50ms", label: "Edge latency" },
-                    { value: "72h", label: "Failure prediction" },
-                    { value: "2.1s", label: "Twin sync" },
-                  ].map(stat => (
-                    <div key={stat.label} className="flex items-baseline gap-1.5">
-                      <span className="text-base font-bold font-mono text-primary">{stat.value}</span>
-                      <span className="text-xs text-muted-foreground font-sans">{stat.label}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <Button onClick={openWizard} size="sm">
-                    <Plus className="h-4 w-4 mr-1" /> Design Your Pod
-                  </Button>
+                  <div className="rounded-lg border border-border/50 bg-muted/30 px-4 py-2.5 mb-4">
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      <span className="font-semibold text-foreground">How it comes together:</span>{" "}
+                      Sensors collect facility data, GPUs train AI models, a living digital twin is synthesized, and
+                      edge devices act autonomously.
+                    </p>
+                  </div>
                   <Button variant="outline" size="sm" onClick={scrollToFlow}>
                     <Link2 className="h-4 w-4 mr-1" /> Data Flow
                   </Button>
+                </div>
+
+                {/* Right: CTA + Metrics */}
+                <div className="flex flex-col items-center lg:items-end gap-4 shrink-0">
+                  <Button onClick={openWizard} size="lg" className="text-base px-8">
+                    <Rocket className="h-5 w-5 mr-2" /> Design Your Pod
+                  </Button>
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                    {[
+                      { value: "12-18%", label: "PUE savings" },
+                      { value: "<50ms", label: "Edge latency" },
+                      { value: "72h", label: "Failure prediction" },
+                      { value: "2.1s", label: "Twin sync" },
+                    ].map(stat => (
+                      <div key={stat.label} className="flex items-baseline gap-1.5">
+                        <span className="text-sm font-bold font-mono text-primary">{stat.value}</span>
+                        <span className="text-xs text-muted-foreground font-sans">{stat.label}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

@@ -11,8 +11,9 @@ import {
   ArrowDown, RotateCcw, Plus, Rocket, Save, X, Server, HardDrive,
   Activity, Zap, Clock, CheckCircle, AlertTriangle, MoreHorizontal,
   Pencil, Trash2, Thermometer, MemoryStick,
-  Gauge, DollarSign, ShieldCheck, Box, Wifi,
+  Gauge, DollarSign, ShieldCheck, Box, Wifi, Link2,
 } from "lucide-react";
+import dcHeroVisual from "@/assets/dc-hero-visual.png";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -287,108 +288,56 @@ const InfrastructurePage = () => {
         {/* ════════ 1. HERO CTA ════════ */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <Card className="overflow-hidden border-primary/20">
-            <div className="relative p-6 md:p-8" style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--accent) / 0.06))" }}>
-              <div className="flex flex-col lg:flex-row lg:items-start lg:gap-8">
-                {/* Left: Text content */}
-                <div className="flex-1">
-                  <Badge variant="outline" className="mb-3 text-xs font-sans border-primary/30 text-primary">
-                    Physical AI . Data Centre Twin
-                  </Badge>
-                  <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                    Ready to build your data centre infrastructure?
-                  </h1>
-                  <p className="text-sm text-muted-foreground max-w-2xl mb-4 leading-relaxed">
-                    Use the Pod Designer to configure NVIDIA B3100, RTX PRO 6000, and Jetson hardware with DDN storage
-                    for PUE optimization, capacity planning, cooling management, and full autonomous operations.
+            <div className="relative min-h-[280px] md:min-h-[320px]">
+              {/* Background image - right side */}
+              <div className="absolute inset-0 overflow-hidden">
+                <div
+                  className="absolute right-0 top-0 bottom-0 w-[55%] hidden lg:block"
+                  style={{
+                    backgroundImage: `url(${dcHeroVisual})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                />
+                {/* Gradient overlay to blend image into card */}
+                <div className="absolute inset-0 hidden lg:block" style={{
+                  background: "linear-gradient(to right, hsl(var(--card)) 40%, hsl(var(--card) / 0.85) 55%, transparent 75%)",
+                }} />
+                {/* Dark overlay on image for contrast */}
+                <div className="absolute inset-0 hidden lg:block" style={{
+                  background: "linear-gradient(135deg, transparent 50%, hsl(var(--background) / 0.3) 100%)",
+                }} />
+              </div>
+
+              {/* Content */}
+              <div className="relative z-10 p-6 md:p-8 lg:p-10 max-w-xl">
+                <Badge variant="outline" className="mb-4 text-xs font-sans border-primary/30 text-primary">
+                  PHYSICAL AI · DIGITAL TWIN
+                </Badge>
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+                  Ready to build your infrastructure?
+                </h1>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+                  Use the Pod Designer to configure your NVIDIA + DDN hardware stack for your specific
+                  data centre scenario. Get recommendations, cost estimates, and deploy in minutes.
+                </p>
+
+                {/* How it comes together */}
+                <div className="rounded-lg border border-border/50 bg-muted/30 px-4 py-2.5 mb-5">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    <span className="font-semibold text-foreground">How it comes together:</span>{" "}
+                    Sensors collect facility data, GPUs train AI models, a living digital twin is synthesized, and
+                    edge devices act autonomously.
                   </p>
-
-                  {/* Quick stats strip */}
-                  <div className="flex flex-wrap items-center gap-4 mb-5">
-                    {[
-                      { value: "12-18%", label: "PUE savings" },
-                      { value: "<50ms", label: "Edge latency" },
-                      { value: "72h", label: "Failure prediction" },
-                      { value: "2.1s", label: "Twin sync" },
-                    ].map(stat => (
-                      <div key={stat.label} className="flex items-baseline gap-1.5">
-                        <span className="text-lg font-bold font-mono text-primary">{stat.value}</span>
-                        <span className="text-xs text-muted-foreground font-sans">{stat.label}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Button onClick={openWizard} size="sm">
-                      <Plus className="h-4 w-4 mr-1" /> Design Your Pod
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={scrollToFlow}>
-                      Data Flow
-                    </Button>
-                  </div>
                 </div>
 
-                {/* Right: Data flow visual (desktop only) */}
-                <div className="hidden lg:flex flex-col items-center gap-3 w-[280px] shrink-0 pt-4">
-                  {/* Sensors/Robots */}
-                  <div className="flex items-center gap-4">
-                    <motion.div animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 2.5, delay: 0 }}
-                      className="flex flex-col items-center gap-1">
-                      <div className="w-10 h-10 rounded-lg bg-warning/10 border border-warning/20 flex items-center justify-center">
-                        <Wifi className="h-5 w-5 text-warning" />
-                      </div>
-                      <span className="text-[11px] font-sans text-muted-foreground">Sensors</span>
-                    </motion.div>
-                    <motion.div animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 2.5, delay: 0.3 }}
-                      className="flex flex-col items-center gap-1">
-                      <div className="w-10 h-10 rounded-lg bg-info/10 border border-info/20 flex items-center justify-center">
-                        <Bot className="h-5 w-5 text-info" />
-                      </div>
-                      <span className="text-[11px] font-sans text-muted-foreground">Robots</span>
-                    </motion.div>
-                    <motion.div animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 2.5, delay: 0.6 }}
-                      className="flex flex-col items-center gap-1">
-                      <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
-                        <Radio className="h-5 w-5 text-accent-foreground" />
-                      </div>
-                      <span className="text-[11px] font-sans text-muted-foreground">DCIM</span>
-                    </motion.div>
-                  </div>
-
-                  {/* Animated connecting line */}
-                  <div className="relative h-8 w-px bg-border">
-                    <motion.div className="absolute w-2 h-2 rounded-full bg-primary left-1/2 -translate-x-1/2"
-                      animate={{ top: [0, 28, 0] }} transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }} />
-                  </div>
-
-                  {/* DDN Storage */}
-                  <motion.div animate={{ scale: [1, 1.03, 1] }} transition={{ repeat: Infinity, duration: 3 }}
-                    className="w-full p-3 rounded-lg border border-primary/20 bg-primary/[0.04] flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-                      <HardDrive className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold text-foreground font-sans">DDN Storage Layer</p>
-                      <p className="text-[11px] text-muted-foreground font-sans">A3I / Infinia / EXAScaler</p>
-                    </div>
-                  </motion.div>
-
-                  {/* Animated connecting line */}
-                  <div className="relative h-8 w-px bg-border">
-                    <motion.div className="absolute w-2 h-2 rounded-full bg-success left-1/2 -translate-x-1/2"
-                      animate={{ top: [0, 28, 0] }} transition={{ repeat: Infinity, duration: 1.5, ease: "linear", delay: 0.7 }} />
-                  </div>
-
-                  {/* Digital Twin */}
-                  <motion.div animate={{ scale: [1, 1.03, 1] }} transition={{ repeat: Infinity, duration: 3, delay: 1.5 }}
-                    className="w-full p-3 rounded-lg border border-success/20 bg-success/[0.04] flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-success/10 border border-success/20 flex items-center justify-center shrink-0">
-                      <Box className="h-5 w-5 text-success" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold text-foreground font-sans">Digital Twin</p>
-                      <p className="text-[11px] text-muted-foreground font-sans">3D Omniverse replica</p>
-                    </div>
-                  </motion.div>
+                <div className="flex items-center gap-3">
+                  <Button onClick={openWizard} size="sm">
+                    <Plus className="h-4 w-4 mr-1" /> Design Your Pod
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={scrollToFlow}>
+                    <Link2 className="h-4 w-4 mr-1" /> Data Flow
+                  </Button>
                 </div>
               </div>
             </div>

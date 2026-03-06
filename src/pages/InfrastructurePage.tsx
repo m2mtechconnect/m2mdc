@@ -5,6 +5,7 @@
  * Deployed Pods CRUD, Data Flow Pipeline, Pod Designer Wizard.
  */
 import React, { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import RackPreview2D, { RackDetailPanel, type RackUnitInfo } from "@/components/platform/RackPreview2D";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Radio, Cpu, Eye, Bot, Layers, ChevronRight, ChevronLeft, ChevronDown,
@@ -38,7 +39,7 @@ const STAGES: Stage[] = [
   { id: "collect", label: "Collect", icon: Radio, color: "hsl(var(--accent-foreground))", short: "DDN ingests DCIM telemetry, BMS feeds, power/cooling sensor streams at high throughput.", full: "DDN A3I storage appliances ingest telemetry from DCIM platforms, Building Management Systems, and thousands of environmental sensors (temperature, humidity, power draw, airflow). Data arrives at wire speed via GPUDirect Storage, bypassing CPU bottlenecks entirely.", specs: ["DDN A3I TLC", "120 GB/s ingest", "NVMe-oF"] },
   { id: "train", label: "Train", icon: Cpu, color: "hsl(var(--warning))", short: "NVIDIA B3100 trains AI models for PUE optimization, capacity planning, and failure prediction.", full: "Blackwell B3100 GPU clusters train transformer and graph neural network models on historical facility data. Models learn PUE patterns, predict cooling failures 72 hours ahead, and optimize workload placement across racks. Training runs complete in under 4 hours on 8-GPU pods.", specs: ["B3100 x8", "FP8 inference", "72h lookahead"] },
   { id: "synthesize", label: "Synthesize", icon: Eye, color: "hsl(var(--success))", short: "RTX PRO 6000 creates a living 3D digital twin of racks, cooling, and power distribution.", full: "NVIDIA RTX PRO 6000 workstations render a photorealistic, physics-accurate 3D digital twin of the entire facility. Every rack, CRAH unit, PDU, and cable tray is modeled. The twin updates in real time as sensors stream new data, enabling operators to visualize thermal hotspots and airflow patterns.", specs: ["RTX PRO 6000", "Omniverse USD", "Real-time sync"] },
-  { id: "act", label: "Act", icon: Bot, color: "hsl(var(--info))", short: "NVIDIA Jetson runs edge inference on each rack row for real-time thermal and power management.", full: "NVIDIA Jetson Orin modules deployed at the edge of each rack row execute lightweight inference models locally. They adjust fan speeds, shift workloads between racks, and trigger cooling pre-emptively, all within 50ms latency. No round-trip to the cloud required.", specs: ["Jetson Orin", "<50ms latency", "Per-row control"] },
+  { id: "act", label: "Act", icon: Bot, color: "hsl(var(--info))", short: "Edge inference nodes run real-time thermal and power management per rack row.", full: "Dedicated edge inference nodes deployed at each rack row execute lightweight AI models locally. They adjust fan speeds, shift workloads between racks, and trigger cooling pre-emptively — all within 50ms latency. No round-trip to the cloud required.", specs: ["Edge Nodes", "<50ms latency", "Per-row control"] },
   { id: "simulate", label: "Simulate", icon: Layers, color: "hsl(var(--primary))", short: "NVIDIA Omniverse enables what-if scenarios for expansion, failover, and cooling optimization.", full: "Omniverse simulation engine runs thousands of what-if scenarios: adding new racks, switching to liquid cooling, failing over an entire hall, or doubling GPU density. Each scenario completes in minutes, giving operators confidence before committing capital.", specs: ["Omniverse", "What-if engine", "Minutes per scenario"] },
 ];
 
@@ -52,7 +53,7 @@ const CLUSTERS = [
 const GPU_POOL = [
   { model: "NVIDIA B3100", count: 64, allocated: 48, utilAvg: 78, power: "700W", temp: "72C" },
   { model: "RTX PRO 6000", count: 96, allocated: 72, utilAvg: 65, power: "350W", temp: "68C" },
-  { model: "Jetson Orin", count: 48, allocated: 42, utilAvg: 91, power: "15W", temp: "55C" },
+  { model: "Edge Inference", count: 48, allocated: 42, utilAvg: 91, power: "15W", temp: "55C" },
 ];
 
 const STORAGE_POOLS = [
@@ -67,7 +68,7 @@ const HEALTH_CHECKS = [
   { service: "GPU Scheduler", status: "ok" as const, latency: "1ms" },
   { service: "Omniverse Sync", status: "ok" as const, latency: "12ms" },
   { service: "DDN StorageLink", status: "ok" as const, latency: "3ms" },
-  { service: "Jetson Fleet Mgr", status: "warning" as const, latency: "48ms" },
+  { service: "Edge Fleet Mgr", status: "warning" as const, latency: "48ms" },
   { service: "Power Monitoring", status: "ok" as const, latency: "4ms" },
   { service: "Cooling Controller", status: "ok" as const, latency: "6ms" },
 ];
@@ -81,7 +82,7 @@ const INITIAL_PODS: Pod[] = [
   { id: "1", name: "twin-inference", scenario: "PUE Optimization", cluster: "dc-infer-01", gpuType: "RTX PRO 6000", gpus: 8, memory: "384 GB", status: "running", created: "2026-03-01" },
   { id: "2", name: "pue-training", scenario: "Capacity Planning", cluster: "dc-train-01", gpuType: "B3100", gpus: 16, memory: "1.2 TB", status: "running", created: "2026-02-28" },
   { id: "3", name: "cooling-finetune", scenario: "Cooling Management", cluster: "dc-train-01", gpuType: "B3100", gpus: 4, memory: "320 GB", status: "queued", created: "2026-03-04" },
-  { id: "4", name: "rack-edge", scenario: "Full DC Autonomy", cluster: "edge-fleet", gpuType: "Jetson Orin", gpus: 12, memory: "96 GB", status: "stopped", created: "2026-02-20" },
+  { id: "4", name: "rack-edge", scenario: "Full DC Autonomy", cluster: "edge-fleet", gpuType: "Edge Node", gpus: 12, memory: "96 GB", status: "stopped", created: "2026-02-20" },
 ];
 
 // Wizard scenarios
@@ -152,8 +153,10 @@ function deriveWizardSpecs(w: WizardState) {
   const trainGpus = sc ? sc.gpus : Math.round(w.gpuUtil / 6);
   const inferGpus = Math.round(trainGpus * 0.75);
   const edgeCount = w.edgeFleet;
-  const rackU = trainGpus * 2 + inferGpus + edgeCount + 6;
-  const powerW = trainGpus * 700 + inferGpus * 350 + edgeCount * 15 + 500;
+  const storageNodes = w.ddnProduct ? (w.ddnProduct === 'exascaler' ? 4 : w.ddnProduct === 'infinia' ? 3 : 2) : 1;
+  const computeNodes = trainGpus + inferGpus;
+  const rackU = trainGpus * 2 + inferGpus + edgeCount + storageNodes * 2 + 6;
+  const powerW = trainGpus * 700 + inferGpus * 350 + edgeCount * 15 + storageNodes * 200 + 500;
   const costPerKw = 0.12;
   const monthlyCost = Math.round((powerW / 1000) * costPerKw * 730);
   let readiness = 0;
@@ -164,7 +167,7 @@ function deriveWizardSpecs(w: WizardState) {
   if (w.ddnFabric) readiness += 10;
   readiness += 10; // throughput always has default
   readiness += 10; // review
-  return { trainGpus, inferGpus, edgeCount, rackU, powerW, monthlyCost, readiness: Math.min(100, readiness) };
+  return { trainGpus, inferGpus, edgeCount, storageNodes, computeNodes, rackU, powerW, monthlyCost, readiness: Math.min(100, readiness) };
 }
 
 const WIZARD_STEPS = ["Scenario", "Infrastructure", "Capacity", "Storage", "Throughput", "Review"];
@@ -188,6 +191,7 @@ const InfrastructurePage = () => {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [wizardStep, setWizardStep] = useState(0);
   const [wizard, setWizard] = useState<WizardState>({ ...WIZARD_INIT });
+  const [selectedRackUnit, setSelectedRackUnit] = useState<RackUnitInfo | null>(null);
 
   // Operations collapsibles
   const [openOps, setOpenOps] = useState<Record<string, boolean>>({ clusters: true, gpu: false, storage: false, health: false });
@@ -432,7 +436,7 @@ const InfrastructurePage = () => {
             {[
               { label: "Training GPUs (B3100)", value: "48 / 64", pct: 75, icon: Cpu, color: "primary" },
               { label: "Inference GPUs (RTX PRO 6000)", value: "72 / 96", pct: 75, icon: Eye, color: "primary" },
-              { label: "Edge Devices (Jetson)", value: "42 / 48", pct: 87, icon: Bot, color: "primary" },
+              { label: "Edge Devices", value: "42 / 48", pct: 87, icon: Bot, color: "primary" },
               { label: "DDN Throughput", value: "320 GB/s", pct: 64, icon: HardDrive, color: "primary" },
               { label: "Twin Freshness", value: "2.1s", pct: 95, icon: Activity, color: "primary" },
             ].map(m => (
@@ -853,7 +857,7 @@ const InfrastructurePage = () => {
                           { label: "DDN Storage", spec: "A3I / Infinia / EXAScaler", role: "High-throughput data ingestion and tiered storage", icon: HardDrive },
                           { label: "NVIDIA B3100", spec: "Blackwell Architecture", role: "Training GPU cluster for facility AI models", icon: Cpu },
                           { label: "RTX PRO 6000", spec: "Ada Lovelace", role: "Inference and 3D digital twin rendering", icon: Eye },
-                          { label: "NVIDIA Jetson", spec: "Orin NX/AGX", role: "Edge inference per rack row, sub-50ms latency", icon: Bot },
+                          { label: "Edge Inference", spec: "Dedicated Nodes", role: "Edge inference per rack row, sub-50ms latency", icon: Bot },
                         ].map((node, i) => (
                           <React.Fragment key={node.label}>
                             <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card">
@@ -1017,7 +1021,7 @@ const InfrastructurePage = () => {
                         <div className="p-3 rounded-md border border-border text-center">
                           <Bot className="h-4 w-4 mx-auto mb-1 text-primary" />
                           <p className="text-lg font-bold font-mono text-foreground">{wSpecs.edgeCount}</p>
-                          <p className="text-xs text-muted-foreground font-sans">Jetson Nodes</p>
+                          <p className="text-xs text-muted-foreground font-sans">Edge Nodes</p>
                         </div>
                       </div>
 
@@ -1044,106 +1048,80 @@ const InfrastructurePage = () => {
                 </div>
               </div>
 
-              {/* Right: Rack Preview Sidebar */}
-              <div className="hidden lg:flex flex-col w-[280px] shrink-0 border-l border-border bg-card/50 p-4 overflow-y-auto">
-                {/* Rack Preview */}
-                <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground font-sans mb-3">Rack Preview</p>
-                <div className="rounded-lg border border-border bg-background p-3 mb-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-mono text-foreground font-semibold">RACK-01 . {wSpecs.rackU}U</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-success" />
-                      <span className="text-xs text-muted-foreground font-sans">PWR OK</span>
-                    </div>
-                  </div>
-                  <div className="space-y-0.5">
-                    {Array.from({ length: Math.min(wSpecs.rackU, 20) }).map((_, i) => {
-                      const isTrainGpu = i < wSpecs.trainGpus;
-                      const isInferGpu = i >= wSpecs.trainGpus && i < wSpecs.trainGpus + wSpecs.inferGpus;
-                      const isEdge = i >= wSpecs.trainGpus + wSpecs.inferGpus && i < wSpecs.trainGpus + wSpecs.inferGpus + Math.min(wSpecs.edgeCount, 6);
-                      const slotType = isTrainGpu ? "train" : isInferGpu ? "infer" : isEdge ? "edge" : "empty";
-                      const slotLabel = isTrainGpu ? `GPU-${i}` : isInferGpu ? `INF-${i - wSpecs.trainGpus}` : isEdge ? `EDGE-${i - wSpecs.trainGpus - wSpecs.inferGpus}` : null;
-                      return (
-                        <div
-                          key={i}
-                          className="h-4 rounded-sm flex items-center justify-between px-2"
-                          style={{
-                            background: isTrainGpu ? "hsl(var(--primary) / 0.12)" : isInferGpu ? "hsl(var(--success) / 0.12)" : isEdge ? "hsl(var(--warning) / 0.12)" : "hsl(var(--muted) / 0.15)",
-                            border: `1px solid ${isTrainGpu ? "hsl(var(--primary) / 0.25)" : isInferGpu ? "hsl(var(--success) / 0.25)" : isEdge ? "hsl(var(--warning) / 0.25)" : "hsl(var(--border))"}`,
-                          }}
-                        >
-                          {slotLabel ? (
-                            <>
-                              <div className="flex items-center gap-1">
-                                <span className="text-[10px] font-mono text-foreground/70">{slotLabel}</span>
-                                {(isTrainGpu || isInferGpu) && (
-                                  <Badge variant="outline" className="text-[8px] py-0 px-1 h-3 leading-none border-current/20"
-                                    style={{ color: isTrainGpu ? "hsl(var(--primary))" : "hsl(var(--success))" }}>
-                                    GPU
-                                  </Badge>
-                                )}
-                              </div>
-                              <div className="flex gap-[2px]">
-                                {Array.from({ length: isEdge ? 2 : 4 }).map((_, j) => (
-                                  <div key={j} className="w-2 h-2 rounded-[1px]"
-                                    style={{ background: isTrainGpu ? "hsl(var(--primary) / 0.6)" : isInferGpu ? "hsl(var(--success) / 0.6)" : "hsl(var(--warning) / 0.6)" }} />
-                                ))}
-                              </div>
-                            </>
-                          ) : (
-                            <span className="text-[10px] font-mono text-muted-foreground/40 mx-auto">- EMPTY -</span>
-                          )}
+              {/* Right: Interactive Rack Preview Sidebar */}
+              <div
+                className="hidden lg:flex flex-col w-[340px] shrink-0"
+                style={{ background: "hsl(var(--muted) / 0.15)", borderLeft: "1px solid hsl(var(--border))" }}
+              >
+                <div className="px-4 py-3" style={{ borderBottom: "1px solid hsl(var(--border))" }}>
+                  <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    Rack Preview
+                  </span>
+                </div>
+                <div className="flex-1 relative overflow-hidden">
+                  <RackPreview2D
+                    computeNodes={wSpecs.computeNodes}
+                    storageNodes={wSpecs.storageNodes}
+                    ddnProduct={wizard.ddnProduct}
+                    selectedUnit={selectedRackUnit?.id ?? null}
+                    onSelectUnit={setSelectedRackUnit}
+                  />
+                </div>
+                {selectedRackUnit && (
+                  <RackDetailPanel
+                    unit={selectedRackUnit}
+                    ddnProduct={wizard.ddnProduct}
+                    onClose={() => setSelectedRackUnit(null)}
+                  />
+                )}
+                {!selectedRackUnit && (
+                  <>
+                    {/* Readiness */}
+                    <div className="px-4 py-3" style={{ borderTop: "1px solid hsl(var(--border))" }}>
+                      <p className="text-[9px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">Readiness Score</p>
+                      <div className="mb-1">
+                        <div className="relative h-2.5 w-full rounded-full overflow-hidden bg-muted/30">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${wSpecs.readiness}%`,
+                              background: wSpecs.readiness >= 80
+                                ? "linear-gradient(90deg, hsl(var(--primary)), hsl(var(--success)))"
+                                : wSpecs.readiness >= 50
+                                  ? "linear-gradient(90deg, hsl(var(--primary)), hsl(var(--warning)))"
+                                  : "linear-gradient(90deg, hsl(var(--destructive)), hsl(var(--warning)))"
+                            }}
+                          />
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-                <div className="flex gap-3 text-xs text-muted-foreground font-sans mb-4">
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: "hsl(var(--primary) / 0.4)" }} /> Train</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: "hsl(var(--success) / 0.4)" }} /> Infer</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: "hsl(var(--warning) / 0.4)" }} /> Edge</span>
-                </div>
+                      </div>
+                      <p className="text-xs font-bold font-mono text-primary">{wSpecs.readiness}%</p>
+                    </div>
 
-                {/* Readiness */}
-                <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground font-sans mb-2">Readiness Score</p>
-                <div className="mb-1">
-                  <div className="relative h-3 w-full rounded-full overflow-hidden bg-muted/30">
-                    <div
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{
-                        width: `${wSpecs.readiness}%`,
-                        background: wSpecs.readiness >= 80
-                          ? "linear-gradient(90deg, hsl(var(--primary)), hsl(var(--success)))"
-                          : wSpecs.readiness >= 50
-                            ? "linear-gradient(90deg, hsl(var(--primary)), hsl(var(--warning)))"
-                            : "linear-gradient(90deg, hsl(var(--destructive)), hsl(var(--warning)))"
-                      }}
-                    />
-                  </div>
-                </div>
-                <p className="text-sm font-bold font-mono text-primary mb-4">{wSpecs.readiness}%</p>
+                    {/* Cost */}
+                    <div className="px-4 py-3 space-y-1.5" style={{ borderTop: "1px solid hsl(var(--border))" }}>
+                      <p className="text-[9px] uppercase tracking-widest font-semibold text-muted-foreground">Cost Estimator</p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-mono text-muted-foreground">$/kW</span>
+                        <span className="text-[11px] font-bold font-mono text-foreground">$0.12</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-mono text-muted-foreground">Monthly</span>
+                        <span className="text-[11px] font-bold font-mono text-primary">${wSpecs.monthlyCost}</span>
+                      </div>
+                    </div>
 
-                {/* Cost */}
-                <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground font-sans mb-2">Cost Estimator</p>
-                <div className="p-3 rounded-lg border border-border mb-2 space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground font-sans">$/kW</span>
-                    <span className="text-sm font-bold font-mono text-foreground">$0.12</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground font-sans">Monthly</span>
-                    <span className="text-sm font-bold font-mono text-primary">${wSpecs.monthlyCost}</span>
-                  </div>
-                </div>
-
-                {/* DDN Recommendation */}
-                {wizard.scenario && SCENARIO_DDN_REC[wizard.scenario] && (
-                  <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 mt-3">
-                    <p className="text-xs uppercase tracking-wider font-bold text-primary font-sans mb-1.5">DDN Recommendation</p>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {SCENARIO_DDN_REC[wizard.scenario].reason}
-                    </p>
-                  </div>
+                    {/* DDN Recommendation */}
+                    {wizard.scenario && SCENARIO_DDN_REC[wizard.scenario] && (
+                      <div className="px-4 py-3" style={{ borderTop: "1px solid hsl(var(--border))" }}>
+                        <div className="p-3 rounded-lg border border-primary/20 bg-primary/5">
+                          <p className="text-[9px] uppercase tracking-wider font-bold text-primary font-sans mb-1.5">DDN Recommendation</p>
+                          <p className="text-[10px] text-muted-foreground leading-relaxed">
+                            {SCENARIO_DDN_REC[wizard.scenario].reason}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>

@@ -11,6 +11,7 @@ import {
   ArrowDown, RotateCcw, Plus, Rocket, Save, X, Server, HardDrive,
   Activity, Zap, Clock, CheckCircle, AlertTriangle, MoreHorizontal,
   Pencil, Trash2, Thermometer, MemoryStick,
+  Gauge, DollarSign, ShieldCheck, Box, Wifi,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -287,23 +288,113 @@ const InfrastructurePage = () => {
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <Card className="overflow-hidden border-primary/20">
             <div className="relative p-6 md:p-8" style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--accent) / 0.06))" }}>
-              <Badge variant="outline" className="mb-3 text-xs border-primary/30 text-primary">
-                Physical AI . Data Centre Twin
-              </Badge>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                Ready to build your data centre infrastructure?
-              </h1>
-              <p className="text-sm text-muted-foreground max-w-2xl mb-5 leading-relaxed">
-                Use the Pod Designer to configure NVIDIA B3100, RTX PRO 6000, and Jetson hardware with DDN storage
-                for PUE optimization, capacity planning, cooling management, and full autonomous operations.
-              </p>
-              <div className="flex items-center gap-3">
-                <Button onClick={openWizard} size="sm">
-                  <Plus className="h-4 w-4 mr-1" /> Design Your Pod
-                </Button>
-                <Button variant="outline" size="sm" onClick={scrollToFlow}>
-                  Data Flow
-                </Button>
+              <div className="flex flex-col lg:flex-row lg:items-start lg:gap-8">
+                {/* Left: Text content */}
+                <div className="flex-1">
+                  <Badge variant="outline" className="mb-3 text-xs font-sans border-primary/30 text-primary">
+                    Physical AI . Data Centre Twin
+                  </Badge>
+                  <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                    Ready to build your data centre infrastructure?
+                  </h1>
+                  <p className="text-sm text-muted-foreground max-w-2xl mb-4 leading-relaxed">
+                    Use the Pod Designer to configure NVIDIA B3100, RTX PRO 6000, and Jetson hardware with DDN storage
+                    for PUE optimization, capacity planning, cooling management, and full autonomous operations.
+                  </p>
+
+                  {/* Value proposition box */}
+                  <div className="p-4 rounded-lg border border-primary/15 bg-primary/[0.03] mb-5 max-w-xl">
+                    <p className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
+                      <Zap className="h-3.5 w-3.5 text-primary" /> Why design a pod?
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { icon: DollarSign, text: "12-18% reduction in PUE energy costs" },
+                        { icon: Gauge, text: "Autonomous cooling with sub-50ms response" },
+                        { icon: ShieldCheck, text: "Predict failures 72 hours before they occur" },
+                        { icon: Activity, text: "Living digital twin synced every 2 seconds" },
+                      ].map(vp => (
+                        <div key={vp.text} className="flex items-start gap-1.5">
+                          <vp.icon className="h-3 w-3 text-primary/70 mt-0.5 shrink-0" />
+                          <span className="text-xs text-muted-foreground leading-snug">{vp.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Button onClick={openWizard} size="sm">
+                      <Plus className="h-4 w-4 mr-1" /> Design Your Pod
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={scrollToFlow}>
+                      Data Flow
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Right: Data flow visual (desktop only) */}
+                <div className="hidden lg:flex flex-col items-center gap-3 w-[280px] shrink-0 pt-4">
+                  {/* Sensors/Robots */}
+                  <div className="flex items-center gap-4">
+                    <motion.div animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 2.5, delay: 0 }}
+                      className="flex flex-col items-center gap-1">
+                      <div className="w-10 h-10 rounded-lg bg-warning/10 border border-warning/20 flex items-center justify-center">
+                        <Wifi className="h-5 w-5 text-warning" />
+                      </div>
+                      <span className="text-[11px] font-sans text-muted-foreground">Sensors</span>
+                    </motion.div>
+                    <motion.div animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 2.5, delay: 0.3 }}
+                      className="flex flex-col items-center gap-1">
+                      <div className="w-10 h-10 rounded-lg bg-info/10 border border-info/20 flex items-center justify-center">
+                        <Bot className="h-5 w-5 text-info" />
+                      </div>
+                      <span className="text-[11px] font-sans text-muted-foreground">Robots</span>
+                    </motion.div>
+                    <motion.div animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 2.5, delay: 0.6 }}
+                      className="flex flex-col items-center gap-1">
+                      <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
+                        <Radio className="h-5 w-5 text-accent-foreground" />
+                      </div>
+                      <span className="text-[11px] font-sans text-muted-foreground">DCIM</span>
+                    </motion.div>
+                  </div>
+
+                  {/* Animated connecting line */}
+                  <div className="relative h-8 w-px bg-border">
+                    <motion.div className="absolute w-2 h-2 rounded-full bg-primary left-1/2 -translate-x-1/2"
+                      animate={{ top: [0, 28, 0] }} transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }} />
+                  </div>
+
+                  {/* DDN Storage */}
+                  <motion.div animate={{ scale: [1, 1.03, 1] }} transition={{ repeat: Infinity, duration: 3 }}
+                    className="w-full p-3 rounded-lg border border-primary/20 bg-primary/[0.04] flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                      <HardDrive className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-foreground font-sans">DDN Storage Layer</p>
+                      <p className="text-[11px] text-muted-foreground font-sans">A3I / Infinia / EXAScaler</p>
+                    </div>
+                  </motion.div>
+
+                  {/* Animated connecting line */}
+                  <div className="relative h-8 w-px bg-border">
+                    <motion.div className="absolute w-2 h-2 rounded-full bg-success left-1/2 -translate-x-1/2"
+                      animate={{ top: [0, 28, 0] }} transition={{ repeat: Infinity, duration: 1.5, ease: "linear", delay: 0.7 }} />
+                  </div>
+
+                  {/* Digital Twin */}
+                  <motion.div animate={{ scale: [1, 1.03, 1] }} transition={{ repeat: Infinity, duration: 3, delay: 1.5 }}
+                    className="w-full p-3 rounded-lg border border-success/20 bg-success/[0.04] flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-success/10 border border-success/20 flex items-center justify-center shrink-0">
+                      <Box className="h-5 w-5 text-success" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-foreground font-sans">Digital Twin</p>
+                      <p className="text-[11px] text-muted-foreground font-sans">3D Omniverse replica</p>
+                    </div>
+                  </motion.div>
+                </div>
               </div>
             </div>
           </Card>
@@ -311,39 +402,59 @@ const InfrastructurePage = () => {
 
         {/* ════════ 2. HOW IT WORKS STRIP ════════ */}
         <div>
-          <h2 className="text-lg font-bold text-foreground mb-3">How It Works</h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <h2 className="text-lg md:text-xl font-bold text-foreground mb-3">How It Works</h2>
+          <div className="grid grid-cols-5 gap-2 md:gap-3 relative">
             {STAGES.map((s, i) => {
               const Icon = s.icon;
               const isActive = i === activeStage;
+              const stageColorVar = s.id === "collect" ? "--accent-foreground" : s.id === "train" ? "--warning" : s.id === "synthesize" ? "--success" : s.id === "act" ? "--info" : "--primary";
               return (
                 <React.Fragment key={s.id}>
                   <button
                     onClick={() => selectStage(i)}
                     className={cn(
-                      "relative p-3 rounded-lg border text-left transition-all",
-                      isActive ? "border-primary/50 bg-primary/5" : "border-border bg-card hover:border-primary/20"
+                      "relative p-2 md:p-3 rounded-lg border text-left transition-all duration-300",
+                      isActive
+                        ? "border-primary/50 ring-2 ring-primary/20 shadow-[0_0_20px_-4px_hsl(var(--primary)/0.25)]"
+                        : "border-border bg-card hover:border-primary/20"
                     )}
+                    style={{
+                      background: isActive
+                        ? `linear-gradient(135deg, hsl(${stageColorVar === "--accent-foreground" ? "var(--accent)" : `var(${stageColorVar})`} / 0.08), hsl(var(--card)))`
+                        : `hsl(${stageColorVar === "--accent-foreground" ? "var(--accent)" : `var(${stageColorVar})`} / 0.02)`,
+                    }}
                   >
-                    <div className="flex items-center gap-2 mb-1.5">
+                    <div className="flex items-center gap-1.5 md:gap-2 mb-1 md:mb-1.5">
                       <Icon className="h-4 w-4 shrink-0" style={{ color: s.color }} />
-                      <span className={cn("text-xs font-semibold", isActive ? "text-primary" : "text-foreground")}>{s.label}</span>
+                      <span className={cn("text-xs font-semibold font-sans truncate", isActive ? "text-primary" : "text-foreground")}>{s.label}</span>
                     </div>
-                    <p className="text-[10px] text-muted-foreground line-clamp-2">{s.short}</p>
-                    {isActive && (
-                      <div className="absolute bottom-0 left-0 right-0 h-1 rounded-b-lg overflow-hidden bg-muted/30">
-                        <div className="h-full bg-primary transition-all duration-100" style={{ width: `${progress}%` }} />
-                      </div>
-                    )}
+                    <p className="text-xs text-muted-foreground line-clamp-2 hidden md:block">{s.short}</p>
+                    <p className="text-[11px] text-muted-foreground line-clamp-1 md:hidden">{s.label}</p>
+                    {/* Progress bar */}
+                    <div className="absolute bottom-0 left-0 right-0 h-1 rounded-b-lg overflow-hidden bg-muted/20">
+                      {isActive && (
+                        <motion.div
+                          className="h-full rounded-b-lg"
+                          style={{ background: s.color }}
+                          initial={{ width: "0%" }}
+                          animate={{ width: `${progress}%` }}
+                          transition={{ duration: 0.1, ease: "linear" }}
+                        />
+                      )}
+                    </div>
                   </button>
-                  {i < STAGES.length - 1 && (
-                    <div className="hidden md:flex items-center justify-center -mx-3">
-                      <ChevronRight className="h-4 w-4 text-muted-foreground/40" />
-                    </div>
-                  )}
                 </React.Fragment>
               );
             })}
+            {/* Connecting arrows overlaid between cards (desktop) */}
+            {[0, 1, 2, 3].map(i => (
+              <div key={`arrow-${i}`} className="hidden md:flex absolute items-center justify-center pointer-events-none"
+                style={{ top: "50%", left: `${(i + 1) * 20}%`, transform: "translate(-50%, -50%)", zIndex: 10 }}>
+                <motion.div animate={{ x: [0, 3, 0] }} transition={{ repeat: Infinity, duration: 1.2, delay: i * 0.15 }}>
+                  <ChevronRight className="h-4 w-4 text-primary/30" />
+                </motion.div>
+              </div>
+            ))}
           </div>
 
           {/* Detail panel */}
@@ -354,16 +465,19 @@ const InfrastructurePage = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.2 }}
-              className="mt-3 p-4 rounded-lg border border-primary/10 bg-card"
+              className="mt-3 p-4 rounded-lg border border-primary/15 bg-card"
+              style={{ background: `linear-gradient(135deg, hsl(var(--card)), hsl(var(--primary) / 0.03))` }}
             >
               <div className="flex items-start gap-3">
-                <stage.icon className="h-5 w-5 shrink-0 mt-0.5" style={{ color: stage.color }} />
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${stage.color}15`, border: `1px solid ${stage.color}30` }}>
+                  <stage.icon className="h-6 w-6" style={{ color: stage.color }} />
+                </div>
                 <div>
                   <p className="text-sm font-semibold text-foreground mb-1">{stage.label}</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed mb-2">{stage.full}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-2">{stage.full}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {stage.specs.map(sp => (
-                      <Badge key={sp} variant="secondary" className="text-[10px] font-mono">{sp}</Badge>
+                      <Badge key={sp} variant="secondary" className="text-xs font-mono font-sans">{sp}</Badge>
                     ))}
                   </div>
                 </div>
@@ -374,7 +488,7 @@ const InfrastructurePage = () => {
 
         {/* ════════ 3. OPERATIONAL METRICS ════════ */}
         <div>
-          <h2 className="text-lg font-bold text-foreground mb-3">Operational Metrics</h2>
+          <h2 className="text-lg md:text-xl font-bold text-foreground mb-3">Operational Metrics</h2>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {[
               { label: "Training GPUs (B3100)", value: "48 / 64", pct: 75, icon: Cpu, color: "primary" },
@@ -386,7 +500,7 @@ const InfrastructurePage = () => {
               <Card key={m.label} className="p-3">
                 <div className="flex items-center gap-2 mb-2">
                   <m.icon className="h-4 w-4" style={{ color: `hsl(var(--${m.color}))` }} />
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">{m.label}</span>
+                  <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold font-sans truncate">{m.label}</span>
                 </div>
                 <p className="text-lg font-bold font-mono text-foreground mb-1">{m.value}</p>
                 <Progress value={m.pct} className="h-1.5" />
@@ -397,7 +511,7 @@ const InfrastructurePage = () => {
 
         {/* ════════ 4. OPERATIONS SECTION ════════ */}
         <div className="space-y-3">
-          <h2 className="text-lg font-bold text-foreground">Operations</h2>
+          <h2 className="text-lg md:text-xl font-bold text-foreground">Operations</h2>
 
           {/* Cluster Management */}
           <Collapsible open={openOps.clusters} onOpenChange={v => setOpenOps(p => ({ ...p, clusters: v }))}>
@@ -420,7 +534,7 @@ const InfrastructurePage = () => {
                           <span className={cn("w-2 h-2 rounded-full", c.status === "healthy" ? "bg-green-500" : "bg-amber-500")} />
                           <span className="text-xs font-semibold text-foreground">{c.name}</span>
                         </div>
-                        <div className="space-y-1 text-[10px] font-mono text-muted-foreground">
+                        <div className="space-y-1 text-xs font-mono text-muted-foreground">
                           <div className="flex justify-between"><span>Region</span><span className="text-foreground">{c.region}</span></div>
                           <div className="flex justify-between"><span>Nodes</span><span className="text-foreground">{c.nodes}</span></div>
                           <div className="flex justify-between"><span>GPUs</span><span className="text-foreground">{c.gpuUsed}/{c.gpuTotal}</span></div>
@@ -452,7 +566,7 @@ const InfrastructurePage = () => {
                     <div key={g.model}>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs font-semibold text-foreground">{g.model}</span>
-                        <span className="text-[10px] font-mono text-muted-foreground">{g.allocated}/{g.count} allocated - {g.utilAvg}% avg</span>
+                        <span className="text-xs font-mono text-muted-foreground">{g.allocated}/{g.count} allocated - {g.utilAvg}% avg</span>
                       </div>
                       <Progress value={(g.allocated / g.count) * 100} className="h-1.5" />
                     </div>
@@ -480,7 +594,7 @@ const InfrastructurePage = () => {
                     <div key={sp.name}>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs font-semibold text-foreground">{sp.name}</span>
-                        <span className="text-[10px] font-mono text-muted-foreground">{sp.used} / {sp.total} - {sp.throughput}</span>
+                        <span className="text-xs font-mono text-muted-foreground">{sp.used} / {sp.total} - {sp.throughput}</span>
                       </div>
                       <Progress value={sp.usedPct} className="h-1.5" />
                     </div>
@@ -498,7 +612,7 @@ const InfrastructurePage = () => {
                   <div className="flex items-center gap-2">
                     <Activity className="h-4 w-4 text-green-500" />
                     <CardTitle className="text-sm">System Health</CardTitle>
-                    <Badge variant="secondary" className="ml-2 text-[9px]">
+                    <Badge variant="secondary" className="ml-2 text-xs font-sans">
                       {HEALTH_CHECKS.filter(h => h.status === "ok").length}/{HEALTH_CHECKS.length} OK
                     </Badge>
                     <ChevronDown className={cn("h-4 w-4 ml-auto text-muted-foreground transition-transform", openOps.health && "rotate-180")} />
@@ -512,7 +626,7 @@ const InfrastructurePage = () => {
                       <div key={h.service} className="flex items-center gap-2 py-1.5 px-2">
                         {h.status === "ok" ? <CheckCircle className="h-3.5 w-3.5 text-green-500" /> : <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />}
                         <span className="text-xs text-foreground flex-1 truncate">{h.service}</span>
-                        <span className="text-[10px] font-mono text-muted-foreground">{h.latency}</span>
+                        <span className="text-xs font-mono text-muted-foreground">{h.latency}</span>
                       </div>
                     ))}
                   </div>
@@ -529,7 +643,7 @@ const InfrastructurePage = () => {
               <div className="flex items-center gap-2">
                 <Rocket className="h-4 w-4 text-primary" />
                 <CardTitle className="text-sm">Deployed Pods</CardTitle>
-                <Badge variant="secondary" className="text-[9px]">{pods.length} total</Badge>
+                <Badge variant="secondary" className="text-xs font-sans">{pods.length} total</Badge>
               </div>
               <Button size="sm" variant="outline" onClick={openWizard}>
                 <Plus className="h-3.5 w-3.5 mr-1" /> New Pod
@@ -540,7 +654,7 @@ const InfrastructurePage = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="border-b border-border text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <tr className="border-b border-border text-xs uppercase tracking-wider text-muted-foreground font-sans">
                     <th className="text-left py-2 px-2">Pod</th>
                     <th className="text-left py-2 px-2">Scenario</th>
                     <th className="text-left py-2 px-2 hidden md:table-cell">Cluster</th>
@@ -564,7 +678,7 @@ const InfrastructurePage = () => {
                       <td className="py-2 px-2 text-center">
                         <span className="inline-flex items-center gap-1">
                           <span className={cn("w-2 h-2 rounded-full", statusColor(pod.status), (pod.status === "running" || pod.status === "error") && "animate-pulse")} />
-                          <span className="text-[10px] capitalize">{pod.status}</span>
+                          <span className="text-xs capitalize font-sans">{pod.status}</span>
                         </span>
                       </td>
                       <td className="py-2 px-2 text-right text-muted-foreground hidden lg:table-cell">{pod.created}</td>
@@ -608,53 +722,66 @@ const InfrastructurePage = () => {
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <CardContent className="pt-0 space-y-0">
+                  {/* Closed-loop banner - TOP */}
+                  <div className="mb-4 p-3 rounded-lg border-2 border-dashed border-primary/30 bg-primary/[0.04] flex items-center gap-3">
+                    <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 4, ease: "linear" }}>
+                      <RotateCcw className="h-5 w-5 text-primary" />
+                    </motion.div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground font-sans">Closed-Loop Feedback</p>
+                      <p className="text-xs text-muted-foreground font-sans">Act telemetry feeds back into Collect for continuous retraining. Every cycle improves model accuracy.</p>
+                    </div>
+                  </div>
+
                   {STAGES.map((s, i) => {
                     const Icon = s.icon;
+                    const stageColorVar = s.id === "collect" ? "--accent-foreground" : s.id === "train" ? "--warning" : s.id === "synthesize" ? "--success" : s.id === "act" ? "--info" : "--primary";
                     return (
                       <React.Fragment key={s.id}>
                         <motion.div
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: i * 0.1 }}
-                          className="p-4 rounded-lg border border-border/50 bg-card"
+                          className="p-4 rounded-lg border transition-all hover:shadow-md"
+                          style={{
+                            borderColor: `${s.color}30`,
+                            background: `linear-gradient(90deg, ${s.color}08, transparent)`,
+                          }}
                         >
                           <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-md flex items-center justify-center shrink-0" style={{ background: `${s.color}20`, color: s.color }}>
-                              <Icon className="h-4 w-4" />
+                            <div className="w-10 h-10 rounded-md flex items-center justify-center shrink-0" style={{ background: `${s.color}15`, color: s.color, border: `1px solid ${s.color}25` }}>
+                              <Icon className="h-5 w-5" />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
-                                <Badge variant="outline" className="text-[9px] font-mono">{i + 1}/5</Badge>
+                                <Badge variant="outline" className="text-xs font-mono font-sans">{i + 1}/5</Badge>
                                 <span className="text-sm font-semibold text-foreground">{s.label}</span>
                               </div>
-                              <p className="text-xs text-muted-foreground leading-relaxed mb-2">{s.full}</p>
+                              <p className="text-sm text-muted-foreground leading-relaxed mb-2">{s.full}</p>
                               <div className="flex flex-wrap gap-1.5">
                                 {s.specs.map(sp => (
-                                  <Badge key={sp} variant="secondary" className="text-[9px] font-mono">{sp}</Badge>
+                                  <Badge key={sp} variant="secondary" className="text-xs font-mono font-sans">{sp}</Badge>
                                 ))}
                               </div>
                             </div>
                           </div>
                         </motion.div>
                         {i < STAGES.length - 1 && (
-                          <div className="flex justify-center py-1">
-                            <motion.div animate={{ y: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>
-                              <ArrowDown className="h-4 w-4 text-primary/40" />
-                            </motion.div>
+                          <div className="flex justify-center py-1.5 relative">
+                            {/* Vertical line with flowing dot */}
+                            <div className="relative h-6 w-px bg-border">
+                              <motion.div
+                                className="absolute w-2 h-2 rounded-full left-1/2 -translate-x-1/2"
+                                style={{ background: s.color }}
+                                animate={{ top: [0, 20, 0] }}
+                                transition={{ repeat: Infinity, duration: 1.5, ease: "linear", delay: i * 0.2 }}
+                              />
+                            </div>
                           </div>
                         )}
                       </React.Fragment>
                     );
                   })}
-                  {/* Feedback loop */}
-                  <div className="flex items-center justify-center gap-2 pt-4 pb-2">
-                    <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 4, ease: "linear" }}>
-                      <RotateCcw className="h-4 w-4 text-primary/60" />
-                    </motion.div>
-                    <span className="text-[11px] text-muted-foreground italic">
-                      Closed loop: Act telemetry feeds back into Collect for continuous retraining
-                    </span>
-                  </div>
                 </CardContent>
               </CollapsibleContent>
             </Card>
@@ -720,7 +847,7 @@ const InfrastructurePage = () => {
                 </div>
                 <div>
                   <h2 className="text-sm font-bold text-foreground">Pod Designer</h2>
-                  <p className="text-[10px] text-muted-foreground">Configure NVIDIA + DDN infrastructure</p>
+                  <p className="text-xs text-muted-foreground font-sans">Configure NVIDIA + DDN infrastructure</p>
                 </div>
               </div>
               {/* Stepper */}
@@ -730,7 +857,7 @@ const InfrastructurePage = () => {
                     <button
                       onClick={() => i <= wizardStep && setWizardStep(i)}
                       className={cn(
-                        "px-2.5 py-1 rounded-full text-[10px] font-semibold transition-colors",
+                        "px-2.5 py-1 rounded-full text-xs font-semibold font-sans transition-colors",
                         i === wizardStep ? "bg-primary text-primary-foreground" : i < wizardStep ? "bg-primary/10 text-primary" : "text-muted-foreground"
                       )}
                     >
@@ -764,11 +891,11 @@ const InfrastructurePage = () => {
                             >
                               <Icon className="h-5 w-5 mb-2" style={{ color: active ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }} />
                               <p className={cn("text-xs font-semibold mb-1", active ? "text-primary" : "text-foreground")}>{sc.label}</p>
-                              <p className="text-[10px] text-muted-foreground mb-2">{sc.desc}</p>
+                              <p className="text-xs text-muted-foreground mb-2">{sc.desc}</p>
                               <div className="flex gap-1.5 flex-wrap">
-                                <Badge variant="secondary" className="text-[8px]">{sc.gpus} GPUs</Badge>
-                                <Badge variant="secondary" className="text-[8px]">{sc.edge} Edge</Badge>
-                                <Badge variant="secondary" className="text-[8px]">{sc.storage}</Badge>
+                                <Badge variant="secondary" className="text-[11px] font-sans">{sc.gpus} GPUs</Badge>
+                                <Badge variant="secondary" className="text-[11px] font-sans">{sc.edge} Edge</Badge>
+                                <Badge variant="secondary" className="text-[11px] font-sans">{sc.storage}</Badge>
                               </div>
                             </button>
                           );
@@ -796,8 +923,8 @@ const InfrastructurePage = () => {
                               </div>
                               <div>
                                 <p className="text-xs font-semibold text-foreground">{node.label}</p>
-                                <p className="text-[10px] font-mono text-primary/70">{node.spec}</p>
-                                <p className="text-[10px] text-muted-foreground mt-0.5">{node.role}</p>
+                                <p className="text-xs font-mono text-primary/70">{node.spec}</p>
+                                <p className="text-xs text-muted-foreground mt-0.5">{node.role}</p>
                               </div>
                             </div>
                             {i < 3 && (
@@ -848,7 +975,7 @@ const InfrastructurePage = () => {
                     <div>
                       <h3 className="text-base font-bold text-foreground mb-1">Storage and Pipeline</h3>
                       <p className="text-xs text-muted-foreground mb-4">Select DDN storage product and data fabric configuration.</p>
-                      <p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">DDN Product</p>
+                      <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground font-sans mb-2">DDN Product</p>
                       <div className="grid grid-cols-2 gap-3 mb-6">
                         {DDN_PRODUCTS.map(p => (
                           <button
@@ -858,12 +985,12 @@ const InfrastructurePage = () => {
                           >
                             <HardDrive className="h-4 w-4 mb-1.5" style={{ color: wizard.ddnProduct === p.id ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }} />
                             <p className={cn("text-xs font-semibold", wizard.ddnProduct === p.id ? "text-primary" : "text-foreground")}>{p.label}</p>
-                            <p className="text-[10px] text-muted-foreground">{p.desc}</p>
-                            <p className="text-[9px] font-mono text-primary/60 mt-1">{p.specs}</p>
+                            <p className="text-xs text-muted-foreground">{p.desc}</p>
+                            <p className="text-xs font-mono text-primary/60 mt-1">{p.specs}</p>
                           </button>
                         ))}
                       </div>
-                      <p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">Data Fabric</p>
+                      <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground font-sans mb-2">Data Fabric</p>
                       <div className="space-y-2">
                         {DDN_FABRICS.map(f => (
                           <button
@@ -872,7 +999,7 @@ const InfrastructurePage = () => {
                             className={cn("w-full p-3 rounded-lg border text-left transition-all", wizard.ddnFabric === f.id ? "border-primary/50 bg-primary/5" : "border-border bg-card")}
                           >
                             <p className={cn("text-xs font-semibold", wizard.ddnFabric === f.id ? "text-primary" : "text-foreground")}>{f.label}</p>
-                            <p className="text-[10px] text-muted-foreground">{f.desc}</p>
+                            <p className="text-xs text-muted-foreground">{f.desc}</p>
                           </button>
                         ))}
                       </div>
@@ -884,7 +1011,7 @@ const InfrastructurePage = () => {
                     <div>
                       <h3 className="text-base font-bold text-foreground mb-1">Throughput and Sync</h3>
                       <p className="text-xs text-muted-foreground mb-4">Configure throughput tier and synchronization window.</p>
-                      <p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">Throughput Tier</p>
+                      <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground font-sans mb-2">Throughput Tier</p>
                       <div className="grid grid-cols-4 gap-2 mb-6">
                         {THROUGHPUT_TIERS.map(t => (
                           <button
@@ -893,11 +1020,11 @@ const InfrastructurePage = () => {
                             className={cn("p-2.5 rounded-md text-center transition-all border", wizard.throughputTier === t.id ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-border")}
                           >
                             <p className="text-xs font-semibold">{t.label}</p>
-                            <p className="text-[9px] opacity-70">{t.sub}</p>
+                            <p className="text-[11px] opacity-70 font-sans">{t.sub}</p>
                           </button>
                         ))}
                       </div>
-                      <p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">Sync Window</p>
+                      <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground font-sans mb-2">Sync Window</p>
                       <div className="grid grid-cols-4 gap-2 mb-6">
                         {SYNC_WINDOWS.map(sw => (
                           <button
@@ -906,16 +1033,16 @@ const InfrastructurePage = () => {
                             className={cn("p-2.5 rounded-md text-center transition-all border", wizard.syncWindow === sw.id ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-border")}
                           >
                             <p className="text-xs font-semibold">{sw.label}</p>
-                            <p className="text-[9px] opacity-70">{sw.sub}</p>
+                            <p className="text-[11px] opacity-70 font-sans">{sw.sub}</p>
                           </button>
                         ))}
                       </div>
                       {/* Pipeline flow viz */}
-                      <p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">Data Pipeline</p>
+                      <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground font-sans mb-2">Data Pipeline</p>
                       <div className="flex items-center gap-2 flex-wrap">
                         {["Ingest", "Train", "Infer", "Deploy"].map((st, i) => (
                           <React.Fragment key={st}>
-                            <Badge variant="outline" className="text-[10px]">{st}</Badge>
+                            <Badge variant="outline" className="text-xs font-sans">{st}</Badge>
                             {i < 3 && <ChevronRight className="h-3 w-3 text-muted-foreground/40" />}
                           </React.Fragment>
                         ))}
@@ -931,7 +1058,7 @@ const InfrastructurePage = () => {
 
                       {/* ROI Card */}
                       <div className="p-4 rounded-lg border border-primary/20 bg-primary/5 mb-4">
-                        <p className="text-[10px] uppercase tracking-wider font-semibold text-primary mb-1">Estimated Impact</p>
+                        <p className="text-xs uppercase tracking-wider font-semibold text-primary font-sans mb-1">Estimated Impact</p>
                         <p className="text-lg font-bold text-foreground">12-18% PUE improvement</p>
                         <p className="text-xs text-muted-foreground">Based on your scenario and infrastructure selection</p>
                       </div>
@@ -941,17 +1068,17 @@ const InfrastructurePage = () => {
                         <div className="p-3 rounded-md border border-border text-center">
                           <Cpu className="h-4 w-4 mx-auto mb-1 text-primary" />
                           <p className="text-lg font-bold font-mono text-foreground">{wSpecs.trainGpus}</p>
-                          <p className="text-[9px] text-muted-foreground">B3100 GPUs</p>
+                          <p className="text-xs text-muted-foreground font-sans">B3100 GPUs</p>
                         </div>
                         <div className="p-3 rounded-md border border-border text-center">
                           <Eye className="h-4 w-4 mx-auto mb-1 text-primary" />
                           <p className="text-lg font-bold font-mono text-foreground">{wSpecs.inferGpus}</p>
-                          <p className="text-[9px] text-muted-foreground">RTX PRO 6000</p>
+                          <p className="text-xs text-muted-foreground font-sans">RTX PRO 6000</p>
                         </div>
                         <div className="p-3 rounded-md border border-border text-center">
                           <Bot className="h-4 w-4 mx-auto mb-1 text-primary" />
                           <p className="text-lg font-bold font-mono text-foreground">{wSpecs.edgeCount}</p>
-                          <p className="text-[9px] text-muted-foreground">Jetson Nodes</p>
+                          <p className="text-xs text-muted-foreground font-sans">Jetson Nodes</p>
                         </div>
                       </div>
 
@@ -964,7 +1091,7 @@ const InfrastructurePage = () => {
                           { label: "Readiness", value: `${wSpecs.readiness}%` },
                         ].map(m => (
                           <div key={m.label} className="p-2 rounded-md border border-border flex justify-between items-center">
-                            <span className="text-[10px] text-muted-foreground">{m.label}</span>
+                            <span className="text-xs text-muted-foreground font-sans">{m.label}</span>
                             <span className="text-xs font-bold font-mono text-foreground">{m.value}</span>
                           </div>
                         ))}
@@ -981,7 +1108,7 @@ const InfrastructurePage = () => {
               {/* Right: Rack Preview Sidebar */}
               <div className="hidden lg:flex flex-col w-[260px] shrink-0 border-l border-border bg-card/50 p-4 overflow-y-auto">
                 {/* Rack Preview */}
-                <p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-3">Rack Preview</p>
+                <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground font-sans mb-3">Rack Preview</p>
                 <div className="space-y-1 mb-4">
                   {Array.from({ length: Math.min(wSpecs.rackU, 20) }).map((_, i) => {
                     const isTrainGpu = i < wSpecs.trainGpus;
@@ -1007,28 +1134,28 @@ const InfrastructurePage = () => {
                     );
                   })}
                 </div>
-                <div className="flex gap-3 text-[8px] text-muted-foreground mb-4">
+                <div className="flex gap-3 text-[11px] text-muted-foreground font-sans mb-4">
                   <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{ background: "hsl(var(--primary) / 0.3)" }} /> Train</span>
                   <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{ background: "hsl(var(--success) / 0.3)" }} /> Infer</span>
                   <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{ background: "hsl(var(--warning) / 0.3)" }} /> Edge</span>
                 </div>
 
                 {/* Readiness */}
-                <p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">Readiness Score</p>
+                <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground font-sans mb-2">Readiness Score</p>
                 <div className="mb-1">
                   <Progress value={wSpecs.readiness} className="h-2" />
                 </div>
                 <p className="text-xs font-bold font-mono text-primary mb-4">{wSpecs.readiness}%</p>
 
                 {/* Cost */}
-                <p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">Cost Estimator</p>
+                <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground font-sans mb-2">Cost Estimator</p>
                 <div className="p-3 rounded-md border border-border mb-2">
                   <div className="flex justify-between mb-0.5">
-                    <span className="text-[10px] text-muted-foreground">$/kW</span>
+                    <span className="text-xs text-muted-foreground font-sans">$/kW</span>
                     <span className="text-xs font-bold font-mono text-foreground">$0.12</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[10px] text-muted-foreground">Monthly</span>
+                    <span className="text-xs text-muted-foreground font-sans">Monthly</span>
                     <span className="text-xs font-bold font-mono text-primary">${wSpecs.monthlyCost}</span>
                   </div>
                 </div>
@@ -1036,8 +1163,8 @@ const InfrastructurePage = () => {
                 {/* DDN Recommendation */}
                 {wizard.scenario && SCENARIO_DDN_REC[wizard.scenario] && (
                   <div className="p-3 rounded-md border border-primary/20 bg-primary/5 mt-2">
-                    <p className="text-[9px] uppercase tracking-wider font-semibold text-primary mb-1">DDN Recommendation</p>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">
+                    <p className="text-xs uppercase tracking-wider font-semibold text-primary font-sans mb-1">DDN Recommendation</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
                       {SCENARIO_DDN_REC[wizard.scenario].reason}
                     </p>
                   </div>
@@ -1047,7 +1174,7 @@ const InfrastructurePage = () => {
 
             {/* Wizard Bottom Bar */}
             <div className="flex items-center justify-between px-5 py-3 border-t border-border shrink-0">
-              <div className="flex items-center gap-4 text-[10px] font-mono text-muted-foreground">
+              <div className="flex items-center gap-4 text-xs font-mono text-muted-foreground">
                 <span>Rack <strong className="text-foreground">{wSpecs.rackU}U</strong></span>
                 <span>Power <strong className="text-foreground">{wSpecs.powerW}W</strong></span>
                 <span>$/kW <strong className="text-foreground">$0.12</strong></span>

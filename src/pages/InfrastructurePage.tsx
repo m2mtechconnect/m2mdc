@@ -140,38 +140,67 @@ interface WizardState {
   retention: number;
   throughputTier: string;
   syncWindow: string;
+  regulatory: string[];
+  dataClassification: string;
+  networkIsolation: string;
 }
 
 const WIZARD_INIT: WizardState = {
   scenario: null, ddnProduct: null, ddnFabric: null,
   gpuUtil: 50, storageThroughput: 50, edgeFleet: 8, retention: 30,
   throughputTier: "medium", syncWindow: "realtime",
+  regulatory: [], dataClassification: "internal", networkIsolation: "connected",
 };
+
+// Regulatory profile options
+const REGULATORY_FRAMEWORKS = [
+  { id: "soc2", label: "SOC 2 Type II" },
+  { id: "iso27001", label: "ISO 27001" },
+  { id: "hipaa", label: "HIPAA" },
+  { id: "pci_dss", label: "PCI DSS" },
+  { id: "gdpr", label: "GDPR" },
+  { id: "fedramp", label: "FedRAMP" },
+];
+const DATA_CLASSIFICATIONS = [
+  { id: "public", label: "Public / Open" },
+  { id: "internal", label: "Internal Only" },
+  { id: "confidential", label: "Confidential" },
+  { id: "restricted", label: "Restricted / Sovereign" },
+];
+const NETWORK_ISOLATIONS = [
+  { id: "connected", label: "Connected" },
+  { id: "restricted", label: "Restricted" },
+  { id: "air_gapped", label: "Air-Gapped" },
+];
 
 function deriveWizardSpecs(w: WizardState) {
   const sc = SCENARIOS.find(s => s.id === w.scenario);
-  // Base GPU count from scenario, scaled by capacity gpuUtil slider (50% = 1x, 100% = 2x, 25% = 0.5x)
   const baseGpus = sc ? sc.gpus : 4;
-  const scaleFactor = w.gpuUtil / 50; // 50 is the default "1x"
+  const scaleFactor = w.gpuUtil / 50;
   const computeNodes = Math.max(1, Math.round(baseGpus * scaleFactor));
   const edgeCount = w.edgeFleet;
-  const storageNodes = w.ddnProduct ? (w.ddnProduct === 'exascaler' ? 4 : w.ddnProduct === 'infinia' ? 3 : 2) : 1;
+  // Storage nodes influenced by DDN product + throughput tier + storageThroughput slider
+  const productBase = w.ddnProduct ? (w.ddnProduct === 'exascaler' ? 4 : w.ddnProduct === 'infinia' ? 3 : 2) : 1;
+  const throughputMultiplier = w.throughputTier === 'max' ? 2.0 : w.throughputTier === 'high' ? 1.5 : w.throughputTier === 'medium' ? 1.0 : 0.75;
+  const storageScale = w.storageThroughput / 50; // 50 = 1x
+  const storageNodes = Math.max(1, Math.round(productBase * throughputMultiplier * storageScale));
   const rackU = computeNodes * 2 + edgeCount + storageNodes * 2 + 6;
   const powerW = computeNodes * 700 + edgeCount * 15 + storageNodes * 200 + 500;
   const costPerKw = 0.12;
   const monthlyCost = Math.round((powerW / 1000) * costPerKw * 730);
   let readiness = 0;
-  if (w.scenario) readiness += 20;
-  readiness += 15; // infra always shown
-  readiness += 15; // capacity always has defaults
-  if (w.ddnProduct) readiness += 20;
+  if (w.scenario) readiness += 15;
+  readiness += 10; // infra
+  readiness += 10; // capacity
+  if (w.ddnProduct) readiness += 15;
   if (w.ddnFabric) readiness += 10;
-  readiness += 10; // throughput always has default
-  readiness += 10; // review
+  readiness += 10; // throughput
+  if (w.regulatory && w.regulatory.length > 0) readiness += 15;
+  readiness += 10; // review always
   return { computeNodes, edgeCount, storageNodes, rackU, powerW, monthlyCost, readiness: Math.min(100, readiness) };
 }
 
-const WIZARD_STEPS = ["Scenario", "Infrastructure", "Capacity", "Storage", "Throughput", "Review"];
+const WIZARD_STEPS = ["Scenario", "Infrastructure", "Capacity", "Storage", "Throughput", "Regulatory", "Review"];
 
 /* ═══════════════════════════════════════════════════════════
    MAIN COMPONENT
@@ -782,7 +811,7 @@ const InfrastructurePage = () => {
 
         {/* ════════ 7. POD DESIGNER WIZARD ════════ */}
         <Dialog open={wizardOpen} onOpenChange={setWizardOpen}>
-          <DialogContent className="max-w-6xl h-[90vh] flex flex-col p-0 gap-0">
+          <DialogContent className="max-w-6xl h-[90vh] flex flex-col p-0 gap-0 [&>button.absolute]:hidden">
             {/* Wizard Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b border-border shrink-0">
               <div className="flex items-center gap-3">
@@ -801,7 +830,7 @@ const InfrastructurePage = () => {
                     <button
                       onClick={() => i <= wizardStep && setWizardStep(i)}
                       className={cn(
-                        "px-2.5 py-1 rounded-full text-xs font-semibold font-sans transition-colors",
+                        "px-2 py-1 rounded-full text-[11px] font-semibold font-sans transition-colors",
                         i === wizardStep ? "bg-primary text-primary-foreground" : i < wizardStep ? "bg-primary/10 text-primary" : "text-muted-foreground"
                       )}
                     >
@@ -811,6 +840,9 @@ const InfrastructurePage = () => {
                   </div>
                 ))}
               </div>
+              <button onClick={() => setWizardOpen(false)} className="ml-3 p-1.5 rounded-md hover:bg-muted transition-colors shrink-0">
+                <X className="h-4 w-4 text-muted-foreground" />
+              </button>
             </div>
 
             {/* Wizard Body */}
@@ -994,20 +1026,136 @@ const InfrastructurePage = () => {
                     </div>
                   )}
 
-                  {/* Step 5: Review */}
+                  {/* Step 5: Regulatory & Integration Profile */}
                   {wizardStep === 5 && (
+                    <div>
+                      <div className="p-4 rounded-lg border border-primary/20 bg-primary/5 mb-5">
+                        <p className="text-xs uppercase tracking-wider font-bold text-primary font-sans mb-1">Step 6: Regulatory & Integration Profile</p>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          Define compliance requirements, data classification, and network isolation — DDN auto-configures encryption, audit trails, and ingest adapters.
+                        </p>
+                      </div>
+
+                      <h3 className="text-base font-bold text-foreground mb-3">Regulatory & Integration Profile</h3>
+                      <p className="text-xs text-muted-foreground mb-5">Define compliance requirements and network isolation level for your pod infrastructure.</p>
+
+                      <div className="mb-5">
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <ShieldCheck className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">Regulatory</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {REGULATORY_FRAMEWORKS.map(r => {
+                            const active = wizard.regulatory.includes(r.id);
+                            return (
+                              <button
+                                key={r.id}
+                                onClick={() => setWizard(p => ({
+                                  ...p,
+                                  regulatory: active
+                                    ? p.regulatory.filter(x => x !== r.id)
+                                    : [...p.regulatory, r.id]
+                                }))}
+                                className={cn(
+                                  "px-3 py-1.5 rounded-full text-xs font-semibold transition-all border",
+                                  active
+                                    ? "bg-primary text-primary-foreground border-primary"
+                                    : "bg-card text-foreground border-border hover:border-primary/30"
+                                )}
+                              >
+                                {r.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div className="mb-5">
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <Box className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">Data Classification</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {DATA_CLASSIFICATIONS.map(d => {
+                            const active = wizard.dataClassification === d.id;
+                            return (
+                              <button
+                                key={d.id}
+                                onClick={() => setWizard(p => ({ ...p, dataClassification: d.id }))}
+                                className={cn(
+                                  "px-3 py-1.5 rounded-full text-xs font-semibold transition-all border",
+                                  active
+                                    ? "bg-primary text-primary-foreground border-primary"
+                                    : "bg-card text-foreground border-border hover:border-primary/30"
+                                )}
+                              >
+                                {d.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div className="mb-5">
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <Wifi className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">Network Isolation</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {NETWORK_ISOLATIONS.map(n => {
+                            const active = wizard.networkIsolation === n.id;
+                            return (
+                              <button
+                                key={n.id}
+                                onClick={() => setWizard(p => ({ ...p, networkIsolation: n.id }))}
+                                className={cn(
+                                  "px-3 py-1.5 rounded-full text-xs font-semibold transition-all border",
+                                  active
+                                    ? "bg-primary text-primary-foreground border-primary"
+                                    : "bg-card text-foreground border-border hover:border-primary/30"
+                                )}
+                              >
+                                {n.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div className="mt-4">
+                        <p className="text-xs text-muted-foreground mb-2">Active Profile:</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {wizard.regulatory.map(r => (
+                            <Badge key={r} variant="outline" className="text-[11px]">
+                              <ShieldCheck className="h-3 w-3 mr-1" />
+                              {REGULATORY_FRAMEWORKS.find(f => f.id === r)?.label}
+                            </Badge>
+                          ))}
+                          <Badge variant="outline" className="text-[11px]">
+                            <Box className="h-3 w-3 mr-1" />
+                            {DATA_CLASSIFICATIONS.find(d => d.id === wizard.dataClassification)?.label}
+                          </Badge>
+                          <Badge variant="outline" className="text-[11px]">
+                            <Wifi className="h-3 w-3 mr-1" />
+                            {NETWORK_ISOLATIONS.find(n => n.id === wizard.networkIsolation)?.label}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 6: Review */}
+                  {wizardStep === 6 && (
                     <div>
                       <h3 className="text-base font-bold text-foreground mb-1">Review and Deploy</h3>
                       <p className="text-xs text-muted-foreground mb-4">Verify your pod configuration before deployment.</p>
 
-                      {/* ROI Card */}
                       <div className="p-4 rounded-lg border border-primary/20 bg-primary/5 mb-4">
                         <p className="text-xs uppercase tracking-wider font-semibold text-primary font-sans mb-1">Estimated Impact</p>
                         <p className="text-lg font-bold text-foreground">12-18% PUE improvement</p>
                         <p className="text-xs text-muted-foreground">Based on your scenario and infrastructure selection</p>
                       </div>
 
-                      {/* Infra summary cards */}
                       <div className="grid grid-cols-3 gap-3 mb-4">
                         <div className="p-3 rounded-md border border-border text-center">
                           <Cpu className="h-4 w-4 mx-auto mb-1 text-primary" />
@@ -1026,7 +1174,25 @@ const InfrastructurePage = () => {
                         </div>
                       </div>
 
-                      {/* Metrics */}
+                      {wizard.regulatory.length > 0 && (
+                        <div className="p-3 rounded-md border border-border mb-4">
+                          <p className="text-xs font-semibold text-foreground mb-2">Compliance Profile</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {wizard.regulatory.map(r => (
+                              <Badge key={r} variant="secondary" className="text-[11px]">
+                                {REGULATORY_FRAMEWORKS.find(f => f.id === r)?.label}
+                              </Badge>
+                            ))}
+                            <Badge variant="secondary" className="text-[11px]">
+                              {DATA_CLASSIFICATIONS.find(d => d.id === wizard.dataClassification)?.label}
+                            </Badge>
+                            <Badge variant="secondary" className="text-[11px]">
+                              {NETWORK_ISOLATIONS.find(n => n.id === wizard.networkIsolation)?.label}
+                            </Badge>
+                          </div>
+                        </div>
+                      )}
+
                       <div className="grid grid-cols-2 gap-3 mb-4">
                         {[
                           { label: "Rack Units", value: `${wSpecs.rackU}U` },

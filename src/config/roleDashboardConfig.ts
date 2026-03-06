@@ -9,7 +9,7 @@ import {
   LayoutDashboard, Wrench, BarChart3, Shield, Users, Server,
   Activity, Cpu, Thermometer, Globe, Zap, TrendingUp, Clock,
   DollarSign, FileCheck, AlertTriangle, Lock, Eye, UserCheck,
-  Leaf, ShieldCheck, Gauge, Network,
+  Leaf, ShieldCheck, Gauge, Network, HardDrive,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { AppRole } from '@/contexts/RBACContext';
@@ -84,6 +84,7 @@ const executiveConfig: RoleDashboardConfig = {
     { name: 'Compliance', fullName: 'Sovereignty & Compliance', href: '/compliance', icon: Shield, group: 'primary' },
     { name: 'Teams', fullName: 'Team Management', href: '/teams', icon: Users, group: 'secondary' },
     { name: 'Approvals', fullName: 'User Approvals', href: '/admin/signups-dashboard', icon: UserCheck, group: 'secondary' },
+    { name: 'Infra', fullName: 'Infrastructure', href: '/infrastructure', icon: HardDrive, group: 'secondary' },
   ],
 };
 
@@ -114,6 +115,7 @@ const managerConfig: RoleDashboardConfig = {
     { name: 'Teams', fullName: 'Team Management', href: '/teams', icon: Users, group: 'secondary' },
     { name: 'Approvals', fullName: 'User Approvals', href: '/admin/signups-dashboard', icon: UserCheck, group: 'secondary' },
     { name: 'Build', fullName: 'Build Twin', href: '/builder', icon: Wrench, group: 'secondary' },
+    { name: 'Infra', fullName: 'Infrastructure', href: '/infrastructure', icon: HardDrive, group: 'secondary' },
   ],
 };
 
@@ -145,6 +147,7 @@ const engineerConfig: RoleDashboardConfig = {
     { name: 'Simulation', fullName: 'Simulation', href: '/data-centre-twin?view=simulation', icon: Activity, group: 'secondary' },
     { name: 'Audit', fullName: 'Sovereignty & Safety Audit', href: '/compliance', icon: Shield, group: 'secondary' },
     { name: 'Teams', fullName: 'Teams', href: '/teams', icon: Users, group: 'secondary' },
+    { name: 'Infra', fullName: 'Infrastructure', href: '/infrastructure', icon: HardDrive, group: 'secondary' },
   ],
 };
 
@@ -175,6 +178,7 @@ const securityAdminConfig: RoleDashboardConfig = {
     { name: 'Approvals', fullName: 'User Approvals', href: '/admin/signups-dashboard', icon: UserCheck, group: 'secondary' },
     { name: 'Analytics', fullName: 'Security Analytics', href: '/intelligence', icon: BarChart3, group: 'secondary' },
     { name: 'Agents', fullName: 'Agent Oversight', href: '/app/agents', icon: Server, group: 'secondary' },
+    { name: 'Infra', fullName: 'Infrastructure', href: '/infrastructure', icon: HardDrive, group: 'secondary' },
   ],
 };
 

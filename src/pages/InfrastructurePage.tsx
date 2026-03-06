@@ -5,7 +5,7 @@
  * Deployed Pods CRUD, Data Flow Pipeline, Pod Designer Wizard.
  */
 import React, { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import RackPreview2D, { RackDetailPanel, type RackUnitInfo } from "@/components/platform/RackPreview2D";
+import RackPreview2D from "@/components/platform/RackPreview2D";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Radio, Cpu, Eye, Bot, Layers, ChevronRight, ChevronLeft, ChevronDown,
@@ -150,13 +150,14 @@ const WIZARD_INIT: WizardState = {
 
 function deriveWizardSpecs(w: WizardState) {
   const sc = SCENARIOS.find(s => s.id === w.scenario);
-  const trainGpus = sc ? sc.gpus : Math.round(w.gpuUtil / 6);
-  const inferGpus = Math.round(trainGpus * 0.75);
+  // Base GPU count from scenario, scaled by capacity gpuUtil slider (50% = 1x, 100% = 2x, 25% = 0.5x)
+  const baseGpus = sc ? sc.gpus : 4;
+  const scaleFactor = w.gpuUtil / 50; // 50 is the default "1x"
+  const computeNodes = Math.max(1, Math.round(baseGpus * scaleFactor));
   const edgeCount = w.edgeFleet;
   const storageNodes = w.ddnProduct ? (w.ddnProduct === 'exascaler' ? 4 : w.ddnProduct === 'infinia' ? 3 : 2) : 1;
-  const computeNodes = trainGpus + inferGpus;
-  const rackU = trainGpus * 2 + inferGpus + edgeCount + storageNodes * 2 + 6;
-  const powerW = trainGpus * 700 + inferGpus * 350 + edgeCount * 15 + storageNodes * 200 + 500;
+  const rackU = computeNodes * 2 + edgeCount + storageNodes * 2 + 6;
+  const powerW = computeNodes * 700 + edgeCount * 15 + storageNodes * 200 + 500;
   const costPerKw = 0.12;
   const monthlyCost = Math.round((powerW / 1000) * costPerKw * 730);
   let readiness = 0;
@@ -167,7 +168,7 @@ function deriveWizardSpecs(w: WizardState) {
   if (w.ddnFabric) readiness += 10;
   readiness += 10; // throughput always has default
   readiness += 10; // review
-  return { trainGpus, inferGpus, edgeCount, storageNodes, computeNodes, rackU, powerW, monthlyCost, readiness: Math.min(100, readiness) };
+  return { computeNodes, edgeCount, storageNodes, rackU, powerW, monthlyCost, readiness: Math.min(100, readiness) };
 }
 
 const WIZARD_STEPS = ["Scenario", "Infrastructure", "Capacity", "Storage", "Throughput", "Review"];
@@ -191,7 +192,7 @@ const InfrastructurePage = () => {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [wizardStep, setWizardStep] = useState(0);
   const [wizard, setWizard] = useState<WizardState>({ ...WIZARD_INIT });
-  const [selectedRackUnit, setSelectedRackUnit] = useState<RackUnitInfo | null>(null);
+  
 
   // Operations collapsibles
   const [openOps, setOpenOps] = useState<Record<string, boolean>>({ clusters: true, gpu: false, storage: false, health: false });
@@ -260,14 +261,14 @@ const InfrastructurePage = () => {
       scenario: sc?.label || "Custom",
       cluster: "dc-train-01",
       gpuType: "B3100",
-      gpus: specs.trainGpus,
-      memory: `${specs.trainGpus * 80} GB`,
+      gpus: specs.computeNodes,
+      memory: `${specs.computeNodes * 80} GB`,
       status: "queued",
       created: new Date().toISOString().slice(0, 10),
     };
     setPods(prev => [newPod, ...prev]);
     setWizardOpen(false);
-    toast.success(`Pod "${newPod.name}" deployed`, { description: `${specs.trainGpus} GPUs, ${specs.rackU}U rack space` });
+    toast.success(`Pod "${newPod.name}" deployed`, { description: `${specs.computeNodes} GPUs, ${specs.rackU}U rack space` });
   }, [wizard]);
 
   const wSpecs = useMemo(() => deriveWizardSpecs(wizard), [wizard]);
@@ -1010,13 +1011,13 @@ const InfrastructurePage = () => {
                       <div className="grid grid-cols-3 gap-3 mb-4">
                         <div className="p-3 rounded-md border border-border text-center">
                           <Cpu className="h-4 w-4 mx-auto mb-1 text-primary" />
-                          <p className="text-lg font-bold font-mono text-foreground">{wSpecs.trainGpus}</p>
-                          <p className="text-xs text-muted-foreground font-sans">B3100 GPUs</p>
+                          <p className="text-lg font-bold font-mono text-foreground">{wSpecs.computeNodes}</p>
+                          <p className="text-xs text-muted-foreground font-sans">GPU Nodes</p>
                         </div>
                         <div className="p-3 rounded-md border border-border text-center">
-                          <Eye className="h-4 w-4 mx-auto mb-1 text-primary" />
-                          <p className="text-lg font-bold font-mono text-foreground">{wSpecs.inferGpus}</p>
-                          <p className="text-xs text-muted-foreground font-sans">RTX PRO 6000</p>
+                          <HardDrive className="h-4 w-4 mx-auto mb-1 text-primary" />
+                          <p className="text-lg font-bold font-mono text-foreground">{wSpecs.storageNodes}</p>
+                          <p className="text-xs text-muted-foreground font-sans">Storage Nodes</p>
                         </div>
                         <div className="p-3 rounded-md border border-border text-center">
                           <Bot className="h-4 w-4 mx-auto mb-1 text-primary" />
@@ -1063,65 +1064,58 @@ const InfrastructurePage = () => {
                     computeNodes={wSpecs.computeNodes}
                     storageNodes={wSpecs.storageNodes}
                     ddnProduct={wizard.ddnProduct}
-                    selectedUnit={selectedRackUnit?.id ?? null}
-                    onSelectUnit={setSelectedRackUnit}
                   />
                 </div>
-                {selectedRackUnit && (
-                  <RackDetailPanel
-                    unit={selectedRackUnit}
-                    ddnProduct={wizard.ddnProduct}
-                    onClose={() => setSelectedRackUnit(null)}
-                  />
-                )}
-                {!selectedRackUnit && (
-                  <>
-                    {/* Readiness */}
-                    <div className="px-4 py-3" style={{ borderTop: "1px solid hsl(var(--border))" }}>
-                      <p className="text-[9px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">Readiness Score</p>
-                      <div className="mb-1">
-                        <div className="relative h-2.5 w-full rounded-full overflow-hidden bg-muted/30">
-                          <div
-                            className="h-full rounded-full transition-all duration-500"
-                            style={{
-                              width: `${wSpecs.readiness}%`,
-                              background: wSpecs.readiness >= 80
-                                ? "linear-gradient(90deg, hsl(var(--primary)), hsl(var(--success)))"
-                                : wSpecs.readiness >= 50
-                                  ? "linear-gradient(90deg, hsl(var(--primary)), hsl(var(--warning)))"
-                                  : "linear-gradient(90deg, hsl(var(--destructive)), hsl(var(--warning)))"
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <p className="text-xs font-bold font-mono text-primary">{wSpecs.readiness}%</p>
-                    </div>
 
-                    {/* Cost */}
-                    <div className="px-4 py-3 space-y-1.5" style={{ borderTop: "1px solid hsl(var(--border))" }}>
-                      <p className="text-[9px] uppercase tracking-widest font-semibold text-muted-foreground">Cost Estimator</p>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-mono text-muted-foreground">$/kW</span>
-                        <span className="text-[11px] font-bold font-mono text-foreground">$0.12</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-mono text-muted-foreground">Monthly</span>
-                        <span className="text-[11px] font-bold font-mono text-primary">${wSpecs.monthlyCost}</span>
-                      </div>
+                {/* Always-visible summary panel */}
+                {/* Readiness */}
+                <div className="px-4 py-3" style={{ borderTop: "1px solid hsl(var(--border))" }}>
+                  <p className="text-[9px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">Readiness Score</p>
+                  <div className="mb-1">
+                    <div className="relative h-2.5 w-full rounded-full overflow-hidden bg-muted/30">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${wSpecs.readiness}%`,
+                          background: wSpecs.readiness >= 80
+                            ? "linear-gradient(90deg, hsl(var(--primary)), hsl(var(--success)))"
+                            : wSpecs.readiness >= 50
+                              ? "linear-gradient(90deg, hsl(var(--primary)), hsl(var(--warning)))"
+                              : "linear-gradient(90deg, hsl(var(--destructive)), hsl(var(--warning)))"
+                        }}
+                      />
                     </div>
+                  </div>
+                  <p className="text-xs font-bold font-mono text-primary">{wSpecs.readiness}%</p>
+                </div>
 
-                    {/* DDN Recommendation */}
-                    {wizard.scenario && SCENARIO_DDN_REC[wizard.scenario] && (
-                      <div className="px-4 py-3" style={{ borderTop: "1px solid hsl(var(--border))" }}>
-                        <div className="p-3 rounded-lg border border-primary/20 bg-primary/5">
-                          <p className="text-[9px] uppercase tracking-wider font-bold text-primary font-sans mb-1.5">DDN Recommendation</p>
-                          <p className="text-[10px] text-muted-foreground leading-relaxed">
-                            {SCENARIO_DDN_REC[wizard.scenario].reason}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </>
+                {/* Cost */}
+                <div className="px-4 py-3 space-y-1.5" style={{ borderTop: "1px solid hsl(var(--border))" }}>
+                  <p className="text-[9px] uppercase tracking-widest font-semibold text-muted-foreground">Cost Estimator</p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-mono text-muted-foreground">GPU Nodes</span>
+                    <span className="text-[11px] font-bold font-mono text-foreground">{wSpecs.computeNodes}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-mono text-muted-foreground">Power Draw</span>
+                    <span className="text-[11px] font-bold font-mono text-foreground">{wSpecs.powerW}W</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-mono text-muted-foreground">Monthly</span>
+                    <span className="text-[11px] font-bold font-mono text-primary">${wSpecs.monthlyCost}</span>
+                  </div>
+                </div>
+
+                {/* DDN Recommendation */}
+                {wizard.scenario && SCENARIO_DDN_REC[wizard.scenario] && (
+                  <div className="px-4 py-3" style={{ borderTop: "1px solid hsl(var(--border))" }}>
+                    <div className="p-3 rounded-lg border border-primary/20 bg-primary/5">
+                      <p className="text-[9px] uppercase tracking-wider font-bold text-primary font-sans mb-1.5">DDN Recommendation</p>
+                      <p className="text-[10px] text-muted-foreground leading-relaxed">
+                        {SCENARIO_DDN_REC[wizard.scenario].reason}
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

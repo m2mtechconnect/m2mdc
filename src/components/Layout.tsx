@@ -225,8 +225,8 @@ export function Layout({ children }: LayoutProps) {
               {/* Separator */}
               <div className="h-4 w-px bg-border mx-1" />
 
-              {/* Secondary navigation - full on 2xl, dropdown on lg-xl */}
-              <div className="hidden 2xl:flex items-center gap-0.5">
+              {/* Secondary navigation - full on xl+, dropdown on lg only */}
+              <div className="hidden xl:flex items-center gap-0.5">
                 {secondaryNavigation.map((item) => {
                   const isActive = item.href.includes('?') 
                     ? location.pathname + location.search === item.href
@@ -259,8 +259,8 @@ export function Layout({ children }: LayoutProps) {
                 })}
               </div>
 
-              {/* More dropdown - visible on lg-xl only */}
-              <div className="2xl:hidden">
+              {/* More dropdown - visible on lg only */}
+              <div className="xl:hidden">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button

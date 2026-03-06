@@ -1,62 +1,38 @@
 
 
-## Plan: Create InfrastructurePage with Route and Navigation
+## Plan: Enhance Infrastructure Page - Hero, How It Works, Pipeline, Typography
 
-### Overview
-Build a single-file, self-contained `InfrastructurePage.tsx` (~900 lines) with 7 sections themed for data centre infrastructure (NVIDIA + DDN hardware), add it as a route at `/infrastructure`, and add a navigation item to the role-based nav config.
+### Changes to `src/pages/InfrastructurePage.tsx`
 
-### Files to Create
+#### 1. Hero CTA Enhancement
+- Add a value proposition text box below the description explaining why users should create a pod (cost savings, operational efficiency, autonomous cooling, etc.)
+- Add a right-side visual on desktop: an SVG/CSS illustration showing the data flow concept (sensors/robots -> DDN storage -> digital twin) using lucide icons arranged in a flowing layout with animated connecting lines and framer-motion
 
-**`src/pages/InfrastructurePage.tsx`** - Single-file component containing:
+#### 2. How It Works - Single Row + Better Animations
+- Change grid from `grid-cols-2 md:grid-cols-5` to `grid-cols-5` (always single row) with responsive `gap-2` on mobile
+- Replace simple border highlight with the Agritwin-style ring, glow shadow, and gradient background per active card
+- Add a framer-motion progress bar at bottom of active card (like Agritwin's `motion.div` with width 0->100% over 10s)
+- Add animated connecting arrows between cards (desktop overlay, positioned absolutely between card gaps)
+- Use color-coded stage backgrounds matching stage color tokens (`bg-${color}/[0.03]` idle, `bg-${color}/[0.08]` active)
+- Upgrade detail panel below to use gradient border + larger icon (w-12 h-12) matching Agritwin style
 
-1. **Hero CTA** - Full-width gradient card with "Physical AI . Data Centre Twin" badge, headline, description about Pod Designer, two CTAs ("Design Your Pod" opens wizard, "Data Flow" scrolls to pipeline)
+#### 3. Physical AI Pipeline - Active Animations
+- Add animated flowing dots between pipeline stage cards (vertical line with a dot that travels top to bottom, like Agritwin)
+- Add color-coded borders and gradient backgrounds per stage (`border-${color}/30 bg-gradient-to-r from-${color}/5`)
+- Add hover shadow effect on pipeline cards
+- Move the closed-loop feedback indicator to the TOP of the pipeline (before the 5 stages), styled as a prominent banner with dashed border, rotating icon, and bold text
 
-2. **How It Works Auto-Cycling Strip** - 5 stage cards (Collect/Train/Synthesize/Act/Simulate) in 2-col mobile / 5-col desktop grid. Each card has icon, label, description, and 10-second progress bar. Auto-cycles with timer reset on click. Persistent detail panel below shows full description and spec badges. Connecting chevron arrows between cards on desktop. Stage mapping:
-   - Collect (Radio, accent): DDN ingests DCIM telemetry, BMS feeds, sensor streams
-   - Train (Cpu, warning): B3100 trains PUE/capacity/failure models
-   - Synthesize (Eye, success): RTX PRO 6000 creates living 3D digital twin
-   - Act (Bot, info): Jetson edge inference per rack/row
-   - Simulate (Layers, primary): Omniverse what-if scenarios
-
-3. **Operational Metrics** - 5 KPI cards: Training GPUs (B3100), Inference GPUs (RTX PRO 6000), Edge Devices (Jetson), DDN Throughput, Twin Freshness. Progress bars for allocated/total.
-
-4. **Operations Section** - 4 Collapsible panels: Cluster Management (table), GPU Pool Allocation (progress bars), Storage Pools DDN (progress bars), System Health (status grid with CheckCircle/AlertTriangle icons). Mock data for dc-train-01, dc-infer-01, edge-fleet clusters.
-
-5. **Deployed Pods Table (CRUD)** - Table with Pod Name, Scenario, Cluster, GPU Type, GPUs, Memory, Status, Created, Actions. Status dots (running=green pulse, queued=amber, stopped=muted, error=red pulse). DropdownMenu per row with Edit/Delete. Edit dialog with form fields. Delete confirmation dialog. "New Pod" button opens wizard. Mock pods: twin-inference, pue-training, cooling-finetune, rack-edge.
-
-6. **Data Flow Pipeline (Collapsible)** - Scroll target for "Data Flow" CTA. 5 stage cards with animated ArrowDown between them. Each has icon with counter (1/5..2/5), badge, title, full description, spec badges. Animated RotateCcw feedback loop indicator at bottom.
-
-7. **Pod Designer Wizard (Dialog)** - Full-screen overlay with stepper header, 2-column layout (content + rack preview sidebar), bottom bar. 6 steps:
-   - Step 0 Scenario: 4 scenario cards with GPU/edge/storage requirements
-   - Step 1 Infrastructure: Auto-cycling architecture nodes (DDN, B3100, RTX PRO 6000, Jetson)
-   - Step 2 Capacity: 4 sliders (GPU Util %, Storage Throughput %, Edge Fleet 1-24, Retention 1-365)
-   - Step 3 Storage & Pipeline: DDN product selector + Data Fabric selector
-   - Step 4 Throughput: Tier selector + Sync Window selector + pipeline flow viz
-   - Step 5 Review: ROI card, 3 infra summary cards, 4 metrics, cost, Deploy button
-   - Right sidebar: Rack Preview (color-coded GPU slots), Readiness Score (progress bar), Cost Estimator ($/kW), DDN recommendation
-   - Bottom bar: Aggregate stats + Back/Next/Save Draft buttons
-
-All data hardcoded inline. Uses framer-motion, shadcn/ui, lucide-react, cn(). React.memo + useMemo + useCallback throughout.
-
-### Files to Modify
-
-**`src/App.tsx`** (line ~246)
-- Add import: `import InfrastructurePage from "./pages/InfrastructurePage";`
-- Add route: `<Route path="/infrastructure" element={<InfrastructurePage />} />`
-
-**`src/config/roleDashboardConfig.ts`**
-- Import `HardDrive` from lucide-react (already imported set includes `Server`)
-- Add Infrastructure nav item to engineer config navigation array:
-  ```
-  { name: 'Infra', fullName: 'Infrastructure', href: '/infrastructure', icon: HardDrive, group: 'secondary' }
-  ```
-- Also add to manager and executive configs as secondary nav items so all roles can access it
+#### 4. Typography & Accessibility Fixes
+- Bump all `text-[10px]` instances to `text-xs` (12px) for WCAG AA compliance (minimum 12px for body text)
+- Bump all `text-[9px]` and `text-[8px]` instances to at least `text-[11px]`
+- Add `font-sans` (Inter) to all badge/chip text to ensure Inter font is used
+- Ensure headings use proper hierarchy: h1 for hero (already), h2 for sections, h3 for subsections
+- Set consistent readable sizes: section titles `text-lg md:text-xl`, body text `text-sm`, labels `text-xs`
 
 ### Technical Details
-- Pattern follows the reference `GlobalInfrastructure.tsx` from AI Factory Accelerate project (operations panels, cluster tables, GPU pool, storage pools, health checks)
-- Navigation uses existing role-based top-bar system (not a sidebar - this project uses header nav)
-- All semantic color tokens (hsl(var(--primary)), etc.) for dark theme compatibility
-- Responsive: 2-col mobile grids, 5-col desktop grids, wizard sidebar hidden on mobile
-- No em dashes in content
-- No external data files or API calls
+- All changes in single file `src/pages/InfrastructurePage.tsx`
+- No new files, no API calls
+- Uses existing framer-motion, lucide-react, shadcn components
+- Maintains dark theme compatibility with semantic color tokens
+- Hero visual built with positioned divs + lucide icons + framer-motion (no external images needed)
 

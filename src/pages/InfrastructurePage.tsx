@@ -292,20 +292,16 @@ const InfrastructurePage = () => {
               {/* Background image - right side */}
               <div className="absolute inset-0 overflow-hidden">
                 <div
-                  className="absolute right-0 top-0 bottom-0 w-[55%] hidden lg:block"
+                  className="absolute right-0 top-0 bottom-0 w-[45%] hidden lg:block"
                   style={{
                     backgroundImage: `url(${dcHeroVisual})`,
                     backgroundSize: "cover",
-                    backgroundPosition: "center",
+                    backgroundPosition: "center right",
                   }}
                 />
-                {/* Gradient overlay to blend image into card */}
+                {/* Left-edge gradient blend into card background */}
                 <div className="absolute inset-0 hidden lg:block" style={{
-                  background: "linear-gradient(to right, hsl(var(--card)) 40%, hsl(var(--card) / 0.85) 55%, transparent 75%)",
-                }} />
-                {/* Dark overlay on image for contrast */}
-                <div className="absolute inset-0 hidden lg:block" style={{
-                  background: "linear-gradient(135deg, transparent 50%, hsl(var(--background) / 0.3) 100%)",
+                  background: "linear-gradient(to right, hsl(var(--card)) 50%, hsl(var(--card) / 0.7) 60%, hsl(var(--card) / 0.2) 75%, transparent 85%)",
                 }} />
               </div>
 

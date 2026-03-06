@@ -327,6 +327,21 @@ const InfrastructurePage = () => {
                   </p>
                 </div>
 
+                {/* Quick metrics strip */}
+                <div className="flex flex-wrap items-center gap-4 mb-5">
+                  {[
+                    { value: "12-18%", label: "PUE savings" },
+                    { value: "<50ms", label: "Edge latency" },
+                    { value: "72h", label: "Failure prediction" },
+                    { value: "2.1s", label: "Twin sync" },
+                  ].map(stat => (
+                    <div key={stat.label} className="flex items-baseline gap-1.5">
+                      <span className="text-base font-bold font-mono text-primary">{stat.value}</span>
+                      <span className="text-xs text-muted-foreground font-sans">{stat.label}</span>
+                    </div>
+                  ))}
+                </div>
+
                 <div className="flex items-center gap-3">
                   <Button onClick={openWizard} size="sm">
                     <Plus className="h-4 w-4 mr-1" /> Design Your Pod

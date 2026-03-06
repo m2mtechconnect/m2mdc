@@ -287,8 +287,8 @@ const InfrastructurePage = () => {
         {/* ════════ 1. HERO CTA ════════ */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <Card className="overflow-hidden border-primary/20">
-            <div className="p-6 md:p-8 lg:p-10" style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.04), hsl(var(--accent) / 0.03))" }}>
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="p-6 md:p-8 lg:p-10" style={{ background: "linear-gradient(135deg, hsl(var(--background)), hsl(var(--muted) / 0.6) 50%, hsl(var(--primary) / 0.08) 100%)" }}>
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
                 {/* Left: Text */}
                 <div className="flex-1 max-w-2xl">
                   <Badge variant="outline" className="mb-4 text-xs font-sans border-primary/30 text-primary">
@@ -301,24 +301,26 @@ const InfrastructurePage = () => {
                     Use the Pod Designer to configure your NVIDIA + DDN hardware stack for your specific
                     data centre scenario. Get recommendations, cost estimates, and deploy in minutes.
                   </p>
-                  <div className="rounded-lg border border-border/50 bg-muted/30 px-4 py-2.5 mb-4">
+                  <div className="rounded-lg border border-border/40 bg-background/60 backdrop-blur-sm px-4 py-2.5">
                     <p className="text-xs text-muted-foreground leading-relaxed">
                       <span className="font-semibold text-foreground">How it comes together:</span>{" "}
                       Sensors collect facility data, GPUs train AI models, a living digital twin is synthesized, and
                       edge devices act autonomously.
                     </p>
                   </div>
-                  <Button variant="outline" size="sm" onClick={scrollToFlow}>
-                    <Link2 className="h-4 w-4 mr-1" /> Data Flow
-                  </Button>
                 </div>
 
-                {/* Right: CTA + Metrics */}
-                <div className="flex flex-col items-center lg:items-end gap-4 shrink-0">
-                  <Button onClick={openWizard} size="lg" className="text-base px-8">
-                    <Rocket className="h-5 w-5 mr-2" /> Design Your Pod
-                  </Button>
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                {/* Right: CTAs + Metrics */}
+                <div className="flex flex-col items-center lg:items-end gap-5 shrink-0">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button onClick={openWizard} size="lg" className="text-base px-8">
+                      <Rocket className="h-5 w-5 mr-2" /> Design Your Pod
+                    </Button>
+                    <Button variant="outline" size="lg" onClick={scrollToFlow} className="text-base px-6">
+                      <Link2 className="h-5 w-5 mr-2" /> Data Flow
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 p-3 rounded-lg border border-border/30 bg-background/40 backdrop-blur-sm">
                     {[
                       { value: "12-18%", label: "PUE savings" },
                       { value: "<50ms", label: "Edge latency" },

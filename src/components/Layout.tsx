@@ -65,12 +65,12 @@ const fallbackSecondary = [
   { name: "Teams", fullName: "Teams", href: "/teams", icon: Users, group: 'secondary' as const },
 ];
 
-// Helper function to get time-based greeting
-const getGreeting = () => {
+// Helper function to get time-based greeting key
+const getGreetingKey = () => {
   const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
+  if (hour < 12) return "layout.goodMorning";
+  if (hour < 18) return "layout.goodAfternoon";
+  return "layout.goodEvening";
 };
 
 // Helper function to extract first name from user

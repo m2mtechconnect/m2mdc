@@ -152,7 +152,7 @@ export function TwinHeader() {
             <nav className="flex flex-col gap-2">
               {/* Solutions section */}
               <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Solutions
+                {t('landing.solutions')}
               </div>
               {solutionItems.map((item) => (
                 <a
@@ -180,6 +180,7 @@ export function TwinHeader() {
               ))}
               
               <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border/50">
+                <LanguageSwitcher variant="outline" />
                 <Button
                   variant="outline"
                   className="w-full"
@@ -188,7 +189,7 @@ export function TwinHeader() {
                     setIsMobileMenuOpen(false);
                   }}
                 >
-                  Login
+                  {t('auth.login')}
                 </Button>
                 <Button
                   className="w-full bg-accent text-m2m-black font-semibold hover:bg-m2m-gold-dark"
@@ -197,7 +198,7 @@ export function TwinHeader() {
                     setIsMobileMenuOpen(false);
                   }}
                 >
-                  Get Started
+                  {t('auth.getStarted')}
                 </Button>
               </div>
             </nav>

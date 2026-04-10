@@ -183,7 +183,7 @@ export function Layout({ children }: LayoutProps) {
 
             {/* Dynamic Greeting */}
             <div className="hidden md:flex items-center text-sm text-muted-foreground">
-              {greeting}, <span className="ml-1 font-medium text-foreground">{getFirstName(user)}</span>
+              {t(greeting)}, <span className="ml-1 font-medium text-foreground">{getFirstName(user)}</span>
             </div>
 
             {/* Data Centre Twin Selector */}

@@ -116,18 +116,19 @@ export function TwinHeader() {
 
           {/* Desktop CTA Buttons */}
           <div className="hidden lg:flex items-center gap-3">
+            <LanguageSwitcher />
             <Button
               variant="ghost"
               className="text-sm font-medium text-muted-foreground hover:text-foreground"
               onClick={() => navigate("/login")}
             >
-              Login
+              {t('auth.login')}
             </Button>
             <Button
               className="text-sm bg-accent text-m2m-black font-semibold hover:bg-m2m-gold-dark"
               onClick={() => navigate("/onboarding")}
             >
-              Get Started
+              {t('auth.getStarted')}
             </Button>
           </div>
 

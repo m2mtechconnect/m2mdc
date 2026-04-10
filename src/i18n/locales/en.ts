@@ -1,5 +1,5 @@
 /**
- * English locale — mirrors UX_STRINGS structure for i18n
+ * English locale — comprehensive i18n for M2M AURA platform
  */
 
 const en = {
@@ -38,26 +38,48 @@ const en = {
     intelligence: 'Intelligence',
     builder: 'Builder',
     infrastructure: 'Infrastructure',
+    dataCentre: 'Data Centre',
+    analyticsCompliance: 'Analytics & Compliance',
+    support: 'Support',
+    more: 'More',
   },
 
   // Auth
   auth: {
     login: 'Login',
     signUp: 'Sign Up',
+    signIn: 'Sign In',
     signOut: 'Sign Out',
     forgotPassword: 'Forgot Password',
     email: 'Email',
+    emailAddress: 'Email Address',
     password: 'Password',
     confirmPassword: 'Confirm Password',
     resetPassword: 'Reset Password',
     sendResetLink: 'Send Reset Link',
     createAccount: 'Create Account',
-    alreadyHaveAccount: 'Already have an account?',
-    dontHaveAccount: "Don't have an account?",
+    createYourAccount: 'Create Your Account',
+    alreadyHaveAccount: 'Already have an account? Sign in',
+    dontHaveAccount: "Don't have an account? Sign up",
     welcomeBack: 'Welcome back',
+    welcomeToAura: 'Welcome to AURA',
     getStarted: 'Get Started',
     loginSubtitle: 'Sign in to your Data Centre Twin',
     signUpSubtitle: 'Create your Sovereign Green AI Data Centre Twin',
+    signInToAccount: 'Sign in to your account',
+    createYourAccountSubtitle: 'Get started with AURA today',
+    enterCredentials: 'Enter your credentials to continue',
+    minChars: 'Minimum {{count}} characters',
+    signedInSuccess: 'Signed in successfully!',
+    accountCreated: 'Account created successfully! You can now sign in.',
+    invalidCredentials: 'Invalid email or password. Please try again.',
+    alreadyRegistered: 'This email is already registered. Please sign in instead.',
+    signedOutSuccess: 'Signed out successfully',
+    failedSignOut: 'Failed to sign out',
+    learnAboutTwin: 'Learn about the Sovereign Green AI Data Centre Twin',
+    authFailed: 'Authentication failed',
+    signUpFailed: 'Sign up failed',
+    validationError: 'Validation error',
   },
 
   // Landing Page
@@ -95,6 +117,153 @@ const en = {
     carbonNeutral: 'Carbon Neutral',
     madeInCanada: 'Made in Canada',
     footerDescription: 'Sovereign AI Data Centre Twins for sustainable, compliant infrastructure operations.',
+  },
+
+  // Onboarding
+  onboarding: {
+    stepOf: 'Step {{current}} of {{total}}',
+    aboutYou: 'About You',
+    yourDataCentre: 'Your Data Centre',
+    yourGoals: 'Your Goals',
+    summary: 'Summary',
+    continue: 'Continue',
+    back: 'Back',
+    submitting: 'Submitting…',
+    createYourAccount: 'Create Your Account',
+    somethingWentWrong: 'Something went wrong',
+    pleaseTryAgain: 'Please try again.',
+    welcomeAboard: 'Welcome aboard!',
+    letsCreateAccount: "Let's create your account.",
+    // About You step
+    aboutYouTitle: 'About You',
+    aboutYouDesc: 'Tell us a bit about yourself and your organization.',
+    fullName: 'Full Name',
+    workEmail: 'Work Email',
+    jobTitleRole: 'Job Title / Role',
+    selectYourRole: 'Select your role',
+    companyName: 'Company Name',
+    companySize: 'Company Size',
+    numberOfEmployees: 'Number of employees',
+    employees: 'employees',
+    // Data Centre step
+    dataCentreTitle: 'Your Data Centre',
+    dataCentreDesc: 'Help us understand your infrastructure.',
+    numberOfDataCentres: 'Number of Data Centres',
+    totalRackCount: 'Total Rack Count',
+    selectRange: 'Select range',
+    racks: 'racks',
+    primaryWorkloadType: 'Primary Workload Type',
+    currentPueEstimate: 'Current PUE Estimate',
+    optional: 'optional',
+    select: 'Select',
+    // Goals step
+    goalsTitle: 'Your Goals',
+    goalsDesc: 'What do you want to achieve with M2M AURA?',
+    whatLookingToAchieve: 'What are you looking to achieve?',
+    biggestChallenge: 'Biggest Operational Challenge',
+    challengePlaceholder: 'e.g. We struggle with cooling efficiency during peak GPU workloads…',
+    timelineToDeploy: 'Timeline to Deploy',
+    timelinePlaceholder: 'When are you looking to get started?',
+    // Summary step
+    reviewSubmit: 'Review & Submit',
+    confirmDetails: 'Confirm your details before creating your account.',
+    aboutYouSection: 'About You',
+    name: 'Name',
+    email: 'Email',
+    role: 'Role',
+    company: 'Company',
+    dataCentreSection: 'Data Centre',
+    dataCentres: 'Data Centres',
+    rackCount: 'Rack Count',
+    workloads: 'Workloads',
+    currentPue: 'Current PUE',
+    goalsSection: 'Goals',
+    goals: 'Goals',
+    challenge: 'Challenge',
+    timeline: 'Timeline',
+    // Options
+    jobTitles: {
+      cio: 'CIO',
+      cto: 'CTO',
+      vpInfra: 'VP Infrastructure',
+      dcManager: 'Data Centre Manager',
+      opsLead: 'Operations Lead',
+      other: 'Other',
+    },
+    workloadTypes: {
+      aiMl: 'AI/ML Training',
+      hpc: 'HPC',
+      cloudHosting: 'Cloud Hosting',
+      enterpriseIt: 'Enterprise IT',
+      colocation: 'Colocation',
+      other: 'Other',
+    },
+    goalOptions: {
+      reducePue: 'Reduce PUE',
+      optimizeCooling: 'Optimize cooling',
+      carbonEsg: 'Carbon/ESG reporting',
+      capacityPlanning: 'Capacity planning',
+      predictiveMaintenance: 'Predictive maintenance',
+      sovereignCompliance: 'Sovereign compliance',
+      other: 'Other',
+    },
+    timelineOptions: {
+      exploring: 'Exploring',
+      oneToThree: '1-3 months',
+      threeToSix: '3-6 months',
+      sixToTwelve: '6-12 months',
+    },
+  },
+
+  // Dashboard
+  dashboard: {
+    totalDataCentreTwins: 'Total Data Centre Twins',
+    configured: '{{count}} configured',
+    activeTwins: 'Active Twins',
+    draftTwins: 'Draft Twins',
+    averagePue: 'Average PUE',
+    improvement: 'improvement',
+    globalPue: 'Global PUE',
+    gpuSaturationRisk: 'GPU Saturation Risk',
+    carbonIntensity: 'Carbon Intensity',
+    sovereignCompliance: 'Sovereign Compliance',
+    view: '{{role}} View',
+    debug: 'Debug',
+    pueTooltip: 'Measures facility energy efficiency. Lower is better. Industry average is 1.58.',
+    gpuTooltip: 'Percentage of GPU clusters approaching capacity limits. High values indicate scaling needs.',
+    carbonTooltip: 'Grams of CO₂ per GPU-hour. Critical for ESG reporting and carbon credit calculations.',
+    sovereignTooltip: 'Percentage of compute workloads processed within sovereign data boundaries.',
+    pueTrend: 'PUE trend (24h)',
+    gpuHotspots: 'GPU saturation hotspots',
+    coolingIncidents: 'Cooling incidents today',
+    sovereignComputeRatio: 'Sovereign compute ratio',
+    carbonCostForecast: 'Carbon cost forecast',
+    runScenario: 'Run a scenario',
+    systemDeleted: 'System deleted successfully',
+    systemDeletedDesc: '{{name}} has been permanently removed.',
+    errorDeletingSystem: 'Error deleting system',
+    twinsInDevelopment: 'Twins in development',
+    currentlyActive: 'Currently active and running twins',
+    totalConfigured: 'Total number of Data Centre Twins configured',
+    avgPueTooltip: 'Average Power Usage Effectiveness across all facilities',
+  },
+
+  // Marketplace
+  marketplace: {
+    title: 'Template Marketplace',
+    subtitle: 'Discover Digital Twin & AI Agent Blueprints tailored to your industry and department',
+    certifiedTemplates: 'M2M Certified Templates',
+    heroTitle: 'Template Marketplace',
+    heroSubtitle: 'Production-ready templates for digital twins and AI agents. Certified by industry experts.',
+    searchPlaceholder: 'Search templates by name, industry, or capability...',
+  },
+
+  // Layout
+  layout: {
+    dataCentreTwinStudio: 'Data Centre Twin Studio',
+    goodMorning: 'Good morning',
+    goodAfternoon: 'Good afternoon',
+    goodEvening: 'Good evening',
   },
 
   // Overview Tab
@@ -338,6 +507,32 @@ const en = {
     label: 'Language',
     en: 'English',
     'fr-CA': 'Français (Québec)',
+  },
+
+  // Teams
+  teams: {
+    title: 'Teams',
+    inviteMember: 'Invite Team Member',
+    sendInvite: 'Send Invite',
+    role: 'Role',
+    status: 'Status',
+    joined: 'Joined',
+    pending: 'Pending',
+    active: 'Active',
+  },
+
+  // Compliance
+  compliance: {
+    title: 'Sovereignty & Safety Audit',
+    subtitle: 'Regulatory compliance and data sovereignty monitoring',
+  },
+
+  // Help
+  help: {
+    title: 'Help & Documentation',
+    gettingStarted: 'Getting Started',
+    faq: 'FAQ',
+    contactSupport: 'Contact Support',
   },
 };
 

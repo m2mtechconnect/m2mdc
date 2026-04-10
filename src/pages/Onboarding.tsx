@@ -1,6 +1,7 @@
 /**
  * Onboarding Questionnaire - Multi-step lead capture form
  * Captures prospect info before routing to sign-up
+ * i18n-enabled for English and Quebec French
  */
 
 import { useState } from "react";
@@ -19,6 +20,7 @@ import { StepAboutYou } from "@/components/onboarding/StepAboutYou";
 import { StepDataCentre } from "@/components/onboarding/StepDataCentre";
 import { StepGoals } from "@/components/onboarding/StepGoals";
 import { StepSummary } from "@/components/onboarding/StepSummary";
+import { useTranslation } from "react-i18next";
 
 const onboardingSchema = z.object({
   full_name: z.string().trim().min(1, "Full name is required").max(100),
@@ -45,13 +47,19 @@ const stepFields: (keyof OnboardingFormData)[][] = [
   [], // summary step - no validation needed
 ];
 
-const stepTitles = ["About You", "Your Data Centre", "Your Goals", "Summary"];
-
 export default function Onboarding() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [direction, setDirection] = useState(1);
+
+  const stepTitles = [
+    t('onboarding.aboutYou'),
+    t('onboarding.yourDataCentre'),
+    t('onboarding.yourGoals'),
+    t('onboarding.summary'),
+  ];
 
   const form = useForm<OnboardingFormData>({
     resolver: zodResolver(onboardingSchema),
@@ -114,13 +122,13 @@ export default function Onboarding() {
     setSubmitting(false);
 
     if (error) {
-      toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
+      toast({ title: t('onboarding.somethingWentWrong'), description: t('onboarding.pleaseTryAgain'), variant: "destructive" });
       return;
     }
 
     // Mark onboarding as completed so auth pages become accessible
     localStorage.setItem("onboarding_completed", "true");
-    toast({ title: "Welcome aboard!", description: "Let's create your account." });
+    toast({ title: t('onboarding.welcomeAboard'), description: t('onboarding.letsCreateAccount') });
     navigate("/sign-up");
   };
 
@@ -140,7 +148,7 @@ export default function Onboarding() {
             <img src={m2mLogo} alt="M2M" className="h-6 w-auto" />
           </a>
           <span className="text-sm text-muted-foreground">
-            Step {step + 1} of {stepTitles.length}
+            {t('onboarding.stepOf', { current: step + 1, total: stepTitles.length })}
           </span>
         </div>
       </header>
@@ -205,12 +213,12 @@ export default function Onboarding() {
                   className="text-muted-foreground"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back
+                  {t('onboarding.back')}
                 </Button>
 
                 {step < stepTitles.length - 1 ? (
                   <Button onClick={goNext} className="bg-accent text-accent-foreground hover:bg-accent/90">
-                    Continue
+                    {t('onboarding.continue')}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 ) : (
@@ -222,10 +230,10 @@ export default function Onboarding() {
                     {submitting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Submitting…
+                        {t('onboarding.submitting')}
                       </>
                     ) : (
-                      "Create Your Account"
+                      t('onboarding.createYourAccount')
                     )}
                   </Button>
                 )}

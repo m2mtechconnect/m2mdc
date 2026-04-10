@@ -99,7 +99,8 @@ export function Layout({ children }: LayoutProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const { isOpen, setIsOpen } = useCoPilot();
-  const [greeting, setGreeting] = useState(getGreeting());
+  const [greeting, setGreeting] = useState(getGreetingKey());
+  const { t } = useTranslation();
   const { role, loading: roleLoading } = useRBAC();
   
   // Role-adaptive navigation
@@ -125,7 +126,7 @@ export function Layout({ children }: LayoutProps) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setGreeting(getGreeting());
+      setGreeting(getGreetingKey());
     }, 60000);
     return () => clearInterval(interval);
   }, []);

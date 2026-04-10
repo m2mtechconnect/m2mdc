@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import m2mLogo from "@/assets/m2m-logo.png";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 
 // Validation schema
 const authSchema = z.object({
@@ -28,6 +29,7 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -45,7 +47,6 @@ export default function Auth() {
     setLoading(true);
 
     try {
-      // Validate input
       const validatedData = authSchema.parse({
         email: email.trim(),
         password
@@ -58,18 +59,18 @@ export default function Auth() {
 
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
-          throw new Error('Invalid email or password. Please try again.');
+          throw new Error(t('auth.invalidCredentials'));
         }
         throw error;
       }
 
-      toast.success("Signed in successfully!");
+      toast.success(t('auth.signedInSuccess'));
       navigate("/");
     } catch (error) {
       if (error instanceof z.ZodError) {
-        toast.error(error.errors?.[0]?.message || 'Validation error');
+        toast.error(error.errors?.[0]?.message || t('auth.validationError'));
       } else {
-        toast.error(error instanceof Error ? error.message : "Authentication failed");
+        toast.error(error instanceof Error ? error.message : t('auth.authFailed'));
       }
     } finally {
       setLoading(false);
@@ -81,7 +82,6 @@ export default function Auth() {
     setLoading(true);
 
     try {
-      // Validate input
       const validatedData = authSchema.parse({
         email: email.trim(),
         password
@@ -97,19 +97,19 @@ export default function Auth() {
 
       if (error) {
         if (error.message.includes('already registered')) {
-          throw new Error('This email is already registered. Please sign in instead.');
+          throw new Error(t('auth.alreadyRegistered'));
         }
         throw error;
       }
 
-      toast.success("Account created successfully! You can now sign in.");
+      toast.success(t('auth.accountCreated'));
       setIsSignUp(false);
       setPassword("");
     } catch (error) {
       if (error instanceof z.ZodError) {
-        toast.error(error.errors?.[0]?.message || 'Validation error');
+        toast.error(error.errors?.[0]?.message || t('auth.validationError'));
       } else {
-        toast.error(error instanceof Error ? error.message : "Sign up failed");
+        toast.error(error instanceof Error ? error.message : t('auth.signUpFailed'));
       }
     } finally {
       setLoading(false);
@@ -180,10 +180,10 @@ export default function Auth() {
             className="h-20 mx-auto mb-8"
           />
           <h1 className="text-4xl font-bold text-white mb-4">
-            Welcome to AURA
+            {t('auth.welcomeToAura')}
           </h1>
           <p className="text-lg text-white/70 max-w-md mx-auto">
-            Building autonomous AI systems for enterprise. Transform your data centre operations with intelligent automation.
+            {t('landing.heroSubtitle')}
           </p>
         </div>
       </div>
@@ -198,21 +198,21 @@ export default function Auth() {
               alt="M2M Logo" 
               className="h-16 mx-auto mb-4"
             />
-            <h1 className="text-2xl font-bold text-foreground">Welcome to AURA</h1>
+            <h1 className="text-2xl font-bold text-foreground">{t('auth.welcomeToAura')}</h1>
           </div>
 
           <div className="lg:mb-8">
             <h2 className="text-2xl font-bold text-foreground mb-2">
-              {isSignUp ? "Create your account" : "Sign in to your account"}
+              {isSignUp ? t('auth.createAccount') : t('auth.signInToAccount')}
             </h2>
             <p className="text-muted-foreground">
-              {isSignUp ? "Get started with AURA today" : "Enter your credentials to continue"}
+              {isSignUp ? t('auth.createYourAccountSubtitle') : t('auth.enterCredentials')}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5 mt-6">
             <div>
-              <Label htmlFor="signin-email" className="text-sm font-semibold">Email Address</Label>
+              <Label htmlFor="signin-email" className="text-sm font-semibold">{t('auth.emailAddress')}</Label>
               <Input
                 id="signin-email"
                 type="email"
@@ -227,7 +227,7 @@ export default function Auth() {
             </div>
 
             <div>
-              <Label htmlFor="signin-password" className="text-sm font-semibold">Password</Label>
+              <Label htmlFor="signin-password" className="text-sm font-semibold">{t('auth.password')}</Label>
               <Input
                 id="signin-password"
                 type="password"
@@ -241,7 +241,7 @@ export default function Auth() {
                 maxLength={128}
               />
               <p className="text-xs text-muted-foreground mt-2">
-                Minimum 6 characters
+                {t('auth.minChars', { count: 6 })}
               </p>
             </div>
 
@@ -252,7 +252,7 @@ export default function Auth() {
               size="lg"
             >
               {loading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
-              {isSignUp ? "Sign Up" : "Sign In"}
+              {isSignUp ? t('auth.signUp') : t('auth.signIn')}
             </Button>
           </form>
 
@@ -266,8 +266,8 @@ export default function Auth() {
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               {isSignUp 
-                ? "Already have an account? Sign in" 
-                : "Don't have an account? Sign up"}
+                ? t('auth.alreadyHaveAccount')
+                : t('auth.dontHaveAccount')}
             </button>
             
             {/* Landing page link */}
@@ -276,7 +276,7 @@ export default function Auth() {
                 href="/twin-datacentre"
                 className="text-sm text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
               >
-                Learn about the Sovereign Green AI Data Centre Twin →
+                {t('auth.learnAboutTwin')} →
               </a>
             </div>
           </div>

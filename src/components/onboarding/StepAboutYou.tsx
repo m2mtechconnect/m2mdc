@@ -4,12 +4,22 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { OnboardingFormData } from "@/pages/Onboarding";
 import { User, Building2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-const jobTitles = ["CIO", "CTO", "VP Infrastructure", "Data Centre Manager", "Operations Lead", "Other"];
 const companySizes = ["1-50", "51-200", "201-1,000", "1,000+"];
 
 export function StepAboutYou() {
   const { control } = useFormContext<OnboardingFormData>();
+  const { t } = useTranslation();
+
+  const jobTitles = [
+    t('onboarding.jobTitles.cio'),
+    t('onboarding.jobTitles.cto'),
+    t('onboarding.jobTitles.vpInfra'),
+    t('onboarding.jobTitles.dcManager'),
+    t('onboarding.jobTitles.opsLead'),
+    t('onboarding.jobTitles.other'),
+  ];
 
   return (
     <div className="space-y-6">
@@ -18,8 +28,8 @@ export function StepAboutYou() {
           <User className="h-5 w-5 text-accent-foreground" />
         </div>
         <div>
-          <h2 className="text-xl font-display font-bold text-foreground">About You</h2>
-          <p className="text-sm text-muted-foreground">Tell us a bit about yourself and your organization.</p>
+          <h2 className="text-xl font-display font-bold text-foreground">{t('onboarding.aboutYouTitle')}</h2>
+          <p className="text-sm text-muted-foreground">{t('onboarding.aboutYouDesc')}</p>
         </div>
       </div>
 
@@ -29,7 +39,7 @@ export function StepAboutYou() {
           name="full_name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Full Name</FormLabel>
+              <FormLabel>{t('onboarding.fullName')}</FormLabel>
               <FormControl>
                 <Input placeholder="Jane Smith" {...field} />
               </FormControl>
@@ -42,7 +52,7 @@ export function StepAboutYou() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Work Email</FormLabel>
+              <FormLabel>{t('onboarding.workEmail')}</FormLabel>
               <FormControl>
                 <Input type="email" placeholder="jane@company.com" {...field} />
               </FormControl>
@@ -57,16 +67,16 @@ export function StepAboutYou() {
         name="job_title"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Job Title / Role</FormLabel>
+            <FormLabel>{t('onboarding.jobTitleRole')}</FormLabel>
             <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select your role" />
+                  <SelectValue placeholder={t('onboarding.selectYourRole')} />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                {jobTitles.map((t) => (
-                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                {jobTitles.map((title) => (
+                  <SelectItem key={title} value={title}>{title}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -81,7 +91,7 @@ export function StepAboutYou() {
           name="company_name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Company Name</FormLabel>
+              <FormLabel>{t('onboarding.companyName')}</FormLabel>
               <FormControl>
                 <Input placeholder="Acme Corp" {...field} />
               </FormControl>
@@ -94,16 +104,16 @@ export function StepAboutYou() {
           name="company_size"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Company Size</FormLabel>
+              <FormLabel>{t('onboarding.companySize')}</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Number of employees" />
+                    <SelectValue placeholder={t('onboarding.numberOfEmployees')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   {companySizes.map((s) => (
-                    <SelectItem key={s} value={s}>{s} employees</SelectItem>
+                    <SelectItem key={s} value={s}>{s} {t('onboarding.employees')}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

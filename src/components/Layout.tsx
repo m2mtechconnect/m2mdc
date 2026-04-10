@@ -307,6 +307,9 @@ export function Layout({ children }: LayoutProps) {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+            
             {/* Help Menu with Tours */}
             <HelpMenu />
             

@@ -1,7 +1,7 @@
 /**
  * TwinHeader - Landing page header with M2M logo and navigation
  * Premium sticky header with glassmorphism effect
- * Fixed CTAs to route to /auth
+ * i18n-enabled for English and Quebec French
  */
 
 import { useState, useEffect } from "react";
@@ -10,6 +10,14 @@ import { useNavigate } from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import m2mLogo from "@/assets/m2m-logo.png";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,23 +25,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const navItems = [
-  { label: "Features", href: "#features" },
-  { label: "Use Cases", href: "#use-cases" },
-  { label: "Integrations", href: "#integrations" },
-  { label: "Why M2M", href: "#differentiators" },
-];
-
-// Solutions scroll to sections on landing page
-const solutionItems = [
-  { label: "Enterprise Solutions", href: "#use-cases", description: "For CIOs, CTOs & data centre ops" },
-  { label: "Sustainability", href: "#features", description: "Carbon tracking & ESG reporting" },
-];
-
 export function TwinHeader() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const navItems = [
+    { label: t('landing.features'), href: "#features" },
+    { label: t('landing.useCases'), href: "#use-cases" },
+    { label: t('landing.integrations'), href: "#integrations" },
+    { label: t('landing.whyM2M'), href: "#differentiators" },
+  ];
+
+  const solutionItems = [
+    { label: t('landing.enterpriseSolutions'), href: "#use-cases", description: t('landing.enterpriseDesc') },
+    { label: t('landing.sustainability'), href: "#features", description: t('landing.sustainabilityDesc') },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {

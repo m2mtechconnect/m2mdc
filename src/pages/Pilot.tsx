@@ -56,13 +56,13 @@ export default function Pilot() {
         </Button>
 
         <DCSectionHeader
-          title={t('pilot.title')
+          title={t('pilot.title')}
           subtitle={`Start a small-scale pilot to validate ${initiativeTitle} before full deployment`}
           icon={<Rocket className="h-6 w-6" />}
         />
 
         <DCCard
-          title={t('pilot.pilotSetup')
+          title={t('pilot.pilotSetup')}
           icon={<Play className="h-5 w-5" />}
           status="operational"
         >

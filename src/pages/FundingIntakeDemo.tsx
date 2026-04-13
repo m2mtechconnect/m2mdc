@@ -105,16 +105,16 @@ export default function FundingIntakeDemo() {
     <div className="container mx-auto py-8 space-y-6 max-w-5xl">
       {/* Header */}
       <DCSectionHeader
-        title=t('fundingIntake.title')
-        subtitle=t('fundingIntake.subtitle')
+        title={t('fundingIntake.title')
+        subtitle={t('fundingIntake.subtitle')
         icon={<FileText className="h-6 w-6 text-info" />}
       />
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Form */}
         <DCCard
-          title=t('fundingIntake.companyIntakeForm')
-          subtitle=t('fundingIntake.formSubtitle')
+          title={t('fundingIntake.companyIntakeForm')
+          subtitle={t('fundingIntake.formSubtitle')
         >
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Company Name */}
@@ -232,7 +232,7 @@ export default function FundingIntakeDemo() {
           {result ? (
             <>
               <DCCard
-                title=t('fundingIntake.triageResult')
+                title={t('fundingIntake.triageResult')
                 status={getStatusVariant(result.status)}
                 headerAction={
                   <Badge className={result.status === "completed" ? "bg-green-500/10 text-green-400" : "bg-yellow-500/10 text-yellow-400"}>

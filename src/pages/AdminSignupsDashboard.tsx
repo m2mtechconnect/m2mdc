@@ -129,21 +129,21 @@ function SignupsDashboardContent() {
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-1">
             <Users className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">Total Users</span>
+            <span className="text-xs text-muted-foreground">{t('adminSignups.totalUsers')}</span>
           </div>
           <div className="text-2xl font-bold">{totalUsers}</div>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-1">
             <Clock className="h-4 w-4 text-amber-500" />
-            <span className="text-xs text-muted-foreground">Pending Approval</span>
+            <span className="text-xs text-muted-foreground">{t('adminSignups.pendingApproval')}</span>
           </div>
           <div className="text-2xl font-bold text-amber-600">{pendingCount}</div>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-1">
             <ShieldCheck className="h-4 w-4 text-green-500" />
-            <span className="text-xs text-muted-foreground">Approved</span>
+            <span className="text-xs text-muted-foreground">{t('adminSignups.approved')}</span>
           </div>
           <div className="text-2xl font-bold text-green-600">{approvedCount}</div>
         </Card>

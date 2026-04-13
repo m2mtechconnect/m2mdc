@@ -111,9 +111,9 @@ export default function ConnectMonitor() {
               </SelectTrigger>
               <SelectContent className="bg-card z-50">
                 <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="running">Running</SelectItem>
+                <SelectItem value="running">{t('connectMonitor.running')}</SelectItem>
                 <SelectItem value="success">Success</SelectItem>
-                <SelectItem value="failed">Failed</SelectItem>
+                <SelectItem value="failed">{t('connectMonitor.failed')}</SelectItem>
               </SelectContent>
             </Select>
             <Button variant="outline" size="icon">

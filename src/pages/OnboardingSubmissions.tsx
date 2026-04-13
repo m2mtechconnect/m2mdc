@@ -143,7 +143,7 @@ export default function OnboardingSubmissions() {
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <Users className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Total Leads</span>
+              <span className="text-xs text-muted-foreground">{t('onboardingSubmissions.totalLeads')}</span>
             </div>
             <div className="text-2xl font-bold">{submissions.length}</div>
           </Card>

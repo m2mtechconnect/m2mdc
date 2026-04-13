@@ -328,8 +328,8 @@ export default function Help() {
 
             {/* Section 3: ROI Calculator */}
             <DCCard 
-              title="ROI Calculator"
-              subtitle="Estimate your AI automation ROI in real-time"
+              title=t('help.roiCalculator')
+              subtitle=t('help.roiCalculatorDesc')
               icon={<Calculator className="h-5 w-5" />}
               status="operational"
             >

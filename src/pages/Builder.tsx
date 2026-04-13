@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { BuilderLayout } from '@/components/builder/BuilderLayout';
 import { Step1Summary } from '@/components/builder/steps/Step1Summary';
 import { Step2Intelligence } from '@/components/builder/steps/Step2Intelligence';

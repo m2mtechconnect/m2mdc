@@ -123,7 +123,7 @@ export default function AgentWorkspace() {
     return (
       <div className="min-h-screen bg-background section-padding-lg">
         <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-2xl font-semibold mb-4 text-foreground">Agent not found</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-foreground">{t("agentWorkspace.notFound")}</h2>
           <Button onClick={() => navigate('/dashboard')} className="bg-primary hover:bg-primary/80">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Dashboard

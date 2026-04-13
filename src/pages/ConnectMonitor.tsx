@@ -51,8 +51,8 @@ export default function ConnectMonitor() {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <DCSectionHeader
-          title="Sync Monitor"
-          subtitle="Real-time status of all data connections and background jobs."
+          title={t("connectMonitor.title")}
+          subtitle={t("connectMonitor.subtitle")}
           icon={<Activity className="h-5 w-5 text-primary" />}
           action={
             <Button variant="outline" onClick={() => navigate("/connect/health")}>

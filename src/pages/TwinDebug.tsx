@@ -103,8 +103,8 @@ export default function TwinDebug() {
         <div className="flex items-center gap-3">
           <Bug className="h-8 w-8 text-primary" />
           <div>
-            <h1 className="text-2xl font-bold">Twin Debug Console</h1>
-            <p className="text-muted-foreground">Multi-tenant isolation debugging</p>
+            <h1 className="text-2xl font-bold">{t("twinDebug.title")}</h1>
+            <p className="text-muted-foreground">{t("twinDebug.subtitle")}</p>
           </div>
         </div>
         <Button onClick={() => refreshTwins()} variant="outline">

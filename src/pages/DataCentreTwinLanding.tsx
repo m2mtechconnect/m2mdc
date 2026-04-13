@@ -101,12 +101,12 @@ export default function DataCentreTwinLanding() {
       
       {/* Feature Sections */}
       <div id="features">
-        {features.map((feature, index) => (
+        {featureDefs.map((feature, index) => (
           <ScrollReveal key={index} delay={index * 0.1} direction={feature.flip ? "right" : "left"}>
             <TwinFeatureSection
-              title={feature.title}
-              subtitle={feature.subtitle}
-              bullets={feature.bullets}
+              title={t(feature.titleKey)}
+              subtitle={t(feature.subtitleKey)}
+              bullets={feature.bulletKeys.map(k => t(k))}
               imageSrc={feature.imageSrc}
               imageAlt={feature.imageAlt}
               flip={feature.flip}

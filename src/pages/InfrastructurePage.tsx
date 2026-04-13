@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * InfrastructurePage - Data Centre Infrastructure Management
  * Self-contained single-file component with 7 sections:
@@ -206,6 +207,7 @@ const WIZARD_STEPS = ["Scenario", "Infrastructure", "Capacity", "Storage", "Thro
    MAIN COMPONENT
    ═══════════════════════════════════════════════════════════ */
 const InfrastructurePage = () => {
+  const { t } = useTranslation();
   // Auto-cycling stage
   const [activeStage, setActiveStage] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);

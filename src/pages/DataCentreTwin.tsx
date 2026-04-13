@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useState, lazy, Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -46,6 +47,7 @@ function VisualizationSkeleton() {
 }
 
 export default function DataCentreTwin() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id?: string }>();
   const [searchParams] = useSearchParams();
   const { twin, activeTwinId, setActiveTwin, isLoading, twins, isInitialized } = useActiveTwin();
@@ -113,7 +115,7 @@ export default function DataCentreTwin() {
   
   // Loading state - skip in demo mode
   if (!isDemoMode && (isLoading || !isInitialized)) {
-    return <LoadingState message="Loading Twin Data..." />;
+    return <LoadingState message={t('dataCentreTwin.loadingTwinData')} />;
   }
   
   // Still loading if we're about to auto-select a twin

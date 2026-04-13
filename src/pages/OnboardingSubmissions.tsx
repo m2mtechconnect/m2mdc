@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * Admin view for onboarding questionnaire submissions
  * Only accessible to users with 'admin' role via RLS
@@ -100,6 +101,7 @@ function ExpandableRow({ submission }: { submission: OnboardingSubmission }) {
 }
 
 export default function OnboardingSubmissions() {
+  const { t } = useTranslation();
   const { data: submissions, isLoading, isError } = useQuery({
     queryKey: ["onboarding-submissions"],
     queryFn: async () => {

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +15,7 @@ import { TwinRunsTab } from "@/components/digital-twin/TwinRunsTab";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui";
 
 export default function DigitalTwinDetail() {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [twin, setTwin] = useState<DigitalTwin | null>(null);

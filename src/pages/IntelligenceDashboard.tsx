@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeEdgeFunction } from '@/hooks/useEdgeFunction';
 import { useKpi } from '@/hooks/useKpi';
@@ -61,6 +62,7 @@ interface System {
 }
 
 export default function IntelligenceDashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [dateRange, setDateRange] = useState('7');
   const [facility, setFacility] = useState('all');

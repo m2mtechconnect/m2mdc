@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -18,6 +19,7 @@ const healthMetrics = [
 ];
 
 export default function ConnectHealth() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const overallHealth = healthMetrics.length > 0 

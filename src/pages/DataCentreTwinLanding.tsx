@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * DataCentreTwinLanding - Marketing landing page for Sovereign Green AI Data Centre Twin
  * Public, read-only page showcasing the platform capabilities
@@ -111,6 +112,7 @@ const features = [
 ];
 
 export default function DataCentreTwinLanding() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-background text-foreground scroll-smooth">
       {/* Header Navigation */}

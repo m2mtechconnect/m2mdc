@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * AdminUserApproval - Admin page to approve/reject new user signups
  * Accessible only to users with 'admin' role
@@ -175,6 +176,7 @@ function UserApprovalContent() {
 }
 
 export default function AdminUserApproval() {
+  const { t } = useTranslation();
   return (
     <ProtectedRoute allowedRoles={['executive', 'manager', 'admin' as any]}>
       <UserApprovalContent />

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * AdminSignupsDashboard - Real-time dashboard for user registrations & approval status
  * Combines profiles data with onboarding submissions for a unified view
@@ -269,6 +270,7 @@ function SignupsDashboardContent() {
 }
 
 export default function AdminSignupsDashboard() {
+  const { t } = useTranslation();
   return (
     <ProtectedRoute allowedRoles={['executive', 'manager', 'admin' as any]}>
       <SignupsDashboardContent />

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,7 @@ interface HealthStatus {
 }
 
 export default function AISettings() {
+  const { t } = useTranslation();
   const [projectId, setProjectId] = useState("");
   const [region, setRegion] = useState("northamerica-northeast1");
   const [model, setModel] = useState("gemini-1.5-pro");

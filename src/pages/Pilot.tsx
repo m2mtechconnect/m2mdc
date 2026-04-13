@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
@@ -12,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
 
 export default function Pilot() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();

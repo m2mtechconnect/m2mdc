@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -98,6 +99,7 @@ const FEATURED_INTEGRATIONS: Omit<Integration, "id" | "status" | "connected">[] 
 ];
 
 export default function IntegrationHub() {
+  const { t } = useTranslation();
   const [selectedIntegration, setSelectedIntegration] = useState<Integration | null>(null);
   const [zapierModalOpen, setZapierModalOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);

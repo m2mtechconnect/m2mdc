@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search as SearchIcon, Clock, FileSearch } from "lucide-react";
@@ -38,6 +39,7 @@ const mockSearchResults = [
 ];
 
 export default function Search() {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<Array<{ id: string; label: string; value: string }>>([]);
   const [searchStartTime, setSearchStartTime] = useState<number | null>(null);
@@ -78,8 +80,8 @@ export default function Search() {
     <div className="min-h-screen bg-background section-padding-lg">
       <div className="max-w-7xl mx-auto">
         <DCSectionHeader
-          title="Search"
-          subtitle="Find documents, pages, and apps across all your connected sources."
+          title={t('search.title')}
+          subtitle={t('search.subtitle')}
           icon={<FileSearch className="h-5 w-5" />}
         />
 
@@ -87,7 +89,7 @@ export default function Search() {
         {searchLatency && showResults && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <DCKPITile
-              label="Latency"
+              label={t('search.latency')}
               value={searchLatency.toString()}
               unit="ms"
               status={searchLatency < 200 ? "normal" : searchLatency < 400 ? "warning" : "critical"}
@@ -95,14 +97,14 @@ export default function Search() {
               compact
             />
             <DCKPITile
-              label="Results Found"
+              label={t('search.resultsFound')}
               value={filteredResults.length.toString()}
               status="normal"
               icon={<SearchIcon className="h-4 w-4" />}
               compact
             />
             <DCKPITile
-              label="Sources Searched"
+              label={t('search.sourcesSearched')}
               value="3"
               status="normal"
               compact
@@ -121,13 +123,13 @@ export default function Search() {
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value.slice(0, 500))}
-                    placeholder="Search across all sources..."
+                    placeholder={t('search.searchPlaceholder')}
                     className="pl-12 h-12 text-body bg-card border-border"
                     maxLength={500}
                   />
                 </div>
                 <Button type="submit" className="glow-yellow h-12 min-w-[120px]">
-                  Search
+                  {t('search.searchButton')}
                 </Button>
               </div>
             </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * TwinDebug - Debug View for Multi-Tenant Twin System
  * Shows current twinId, queries, telemetry sources, and errors
@@ -50,6 +51,7 @@ interface QueryLog {
 }
 
 export default function TwinDebug() {
+  const { t } = useTranslation();
   const { activeTwinId: twinId, twin, twins, refreshTwins } = useActiveTwin();
   const { toast } = useToast();
   const [queryLogs, setQueryLogs] = useState<QueryLog[]>([]);

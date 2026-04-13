@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * Simulation Preview Page - READ-ONLY preview of recommendation simulation
  * This page displays a recommendation's simulation config WITHOUT creating a twin
@@ -60,6 +61,7 @@ const previewScenarios = [
 ];
 
 export default function SimulationPreview() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { recommendation, sourceUrl, isPreviewMode } = useRecommendationStore();

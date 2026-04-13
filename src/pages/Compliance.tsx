@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import { DecisionReplayModal } from "@/components/rag/DecisionReplayModal";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useBlueprint } from "@/hooks/useBlueprint";
@@ -139,6 +140,7 @@ const dcRiskCategories = [
 ];
 
 export default function Compliance() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [replayModalOpen, setReplayModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
@@ -216,15 +218,15 @@ export default function Compliance() {
             <div>
               <h1 className="text-2xl font-semibold mb-2 flex items-center gap-3">
                 <Shield className="h-6 w-6 text-primary" />
-                Sovereignty & Safety Audit
+                {t('compliance.title')}
               </h1>
               <p className="text-muted-foreground">
-                {twin ? `${twin.name} - ${twin.city}` : 'Data Centre compliance, thermal safety, and operational governance'}
+                {twin ? `${twin.name} - ${twin.city}` : t('compliance.subtitle')}
               </p>
             </div>
             <Button variant="outline">
               <Download className="h-4 w-4 mr-2" />
-              Export Audit Report
+              {t('compliance.exportAuditReport')}
             </Button>
           </div>
 

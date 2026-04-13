@@ -29,6 +29,7 @@ import {
   Shield,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
 import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 import { useTour } from "@/context/TourContext";
@@ -87,6 +88,7 @@ const helpSections = [
 ];
 
 export default function Help() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { startTour, resetAllTours, isTourSeen } = useTour();
   

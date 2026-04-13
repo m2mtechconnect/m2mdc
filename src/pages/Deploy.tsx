@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -57,6 +58,7 @@ interface DeploymentStage {
 }
 
 export default function Deploy() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const systemId = searchParams.get('id');
@@ -76,8 +78,8 @@ export default function Deploy() {
   useEffect(() => {
     if (!systemId) {
       toast({
-        title: "No system selected",
-        description: "Please select a system to deploy",
+        title: t('deploy.noSystemSelected'),
+        description: t('deploy.selectSystem'),
         variant: "destructive",
       });
       navigate('/builder');
@@ -90,8 +92,8 @@ export default function Deploy() {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error || !session) {
           toast({
-            title: "Authentication required",
-            description: "Please sign in to deploy systems",
+            title: t('auth.authRequired'),
+            description: t('auth.pleaseSignIn'),
             variant: "destructive",
           });
           navigate('/auth');
@@ -211,8 +213,8 @@ export default function Deploy() {
   const handleDeploy = async () => {
     if (!canDeploy) {
       toast({
-        title: "Permission denied",
-        description: "Only managers and executives can deploy systems",
+        title: t('deploy.permissionDenied'),
+        description: t('deploy.onlyManagersCanDeploy'),
         variant: "destructive",
       });
       return;
@@ -222,8 +224,8 @@ export default function Deploy() {
     const criticalErrors = validationIssues.filter(issue => issue.severity === 'error');
     if (criticalErrors.length > 0) {
       toast({
-        title: "Validation failed",
-        description: "Please fix all critical errors before deploying",
+        title: t('deploy.validation'),
+        description: t('deploy.criticalErrors'),
         variant: "destructive",
       });
       return;
@@ -233,11 +235,11 @@ export default function Deploy() {
     setShowProgressModal(true);
 
     const stages: DeploymentStage[] = [
-      { name: 'Validate Configuration', status: 'running' },
-      { name: 'Package Workflow', status: 'pending' },
-      { name: 'Provision Runtime', status: 'pending' },
-      { name: 'Register Webhooks', status: 'pending' },
-      { name: 'Warm AI Model', status: 'pending' },
+      { name: t('deploy.stages.validateConfig'), status: 'running' },
+      { name: t('deploy.stages.packageWorkflow'), status: 'pending' },
+      { name: t('deploy.stages.provisionRuntime'), status: 'pending' },
+      { name: t('deploy.stages.registerWebhooks'), status: 'pending' },
+      { name: t('deploy.stages.warmModel'), status: 'pending' },
     ];
 
     setDeploymentStages([...stages]);
@@ -422,8 +424,8 @@ export default function Deploy() {
       });
 
       toast({
-        title: "Deployment successful",
-        description: "Your system is now live and ready to use",
+        title: t('deploy.deploymentSuccessful'),
+        description: t('deploy.systemLive'),
       });
 
       setTimeout(() => {
@@ -486,16 +488,16 @@ export default function Deploy() {
             className="text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Builder
+            {t('nav.backToBuilder')}
           </Button>
           <div className="flex-1">
             <h1 className="text-2xl font-semibold flex items-center gap-3 text-foreground">
               <div className="p-2 rounded-lg bg-primary/10 border border-primary/30">
                 <Rocket className="h-6 w-6 text-primary" />
               </div>
-              Final Review & Deploy
+              {t('deploy.title')}
             </h1>
-            <p className="text-muted-foreground text-sm mt-1">Review configuration and deploy to production</p>
+            <p className="text-muted-foreground text-sm mt-1">{t('deploy.subtitle')}</p>
           </div>
           <Button
             variant="outline"

@@ -226,7 +226,7 @@ export default function Compliance() {
             </div>
             <Button variant="outline">
               <Download className="h-4 w-4 mr-2" />
-              {t('compliance.exportReport')}
+              {t('compliance.exportAuditReport')}
             </Button>
           </div>
 

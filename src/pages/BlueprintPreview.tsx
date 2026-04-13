@@ -66,9 +66,9 @@ export default function BlueprintPreview() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Card className="max-w-md p-6 text-center">
           <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-lg font-semibold mb-2">No Recommendation to Preview</h2>
+          <h2 className="text-lg font-semibold mb-2">{t('blueprintPreview.noRecommendation')}</h2>
           <p className="text-muted-foreground mb-4">
-            Scan a website URL first to generate a recommendation, then preview the blueprint.
+            {t('blueprintPreview.noRecommendationDesc')}
           </p>
           <Button onClick={() => navigate('/dashboard')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -80,7 +80,7 @@ export default function BlueprintPreview() {
   }
   
   if (!recommendation) {
-    return <LoadingState message="Loading recommendation..." />;
+    return <LoadingState message={t('blueprintPreview.loadingRecommendation')} />;
   }
   
   const agents = getDefaultAgentsForIndustry(recommendation.industry);
@@ -158,42 +158,42 @@ export default function BlueprintPreview() {
           <div className="p-3 rounded-lg border bg-card">
             <div className="flex items-center gap-2 mb-1">
               <Bot className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Agents</span>
+              <span className="text-xs text-muted-foreground">{t('blueprintPreview.agents')}</span>
             </div>
             <p className="text-lg font-semibold">{agents.length}</p>
           </div>
           <div className="p-3 rounded-lg border bg-card">
             <div className="flex items-center gap-2 mb-1">
               <Database className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Data Sources</span>
+              <span className="text-xs text-muted-foreground">{t('blueprintPreview.dataSources')}</span>
             </div>
             <p className="text-lg font-semibold">8</p>
           </div>
           <div className="p-3 rounded-lg border bg-card">
             <div className="flex items-center gap-2 mb-1">
               <Activity className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">KPIs</span>
+              <span className="text-xs text-muted-foreground">{t('blueprintPreview.kpis')}</span>
             </div>
             <p className="text-lg font-semibold">24</p>
           </div>
           <div className="p-3 rounded-lg border bg-card">
             <div className="flex items-center gap-2 mb-1">
               <GitBranch className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Workflows</span>
+              <span className="text-xs text-muted-foreground">{t('blueprintPreview.workflows')}</span>
             </div>
             <p className="text-lg font-semibold">12</p>
           </div>
           <div className="p-3 rounded-lg border bg-card">
             <div className="flex items-center gap-2 mb-1">
               <Users className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Roles</span>
+              <span className="text-xs text-muted-foreground">{t('blueprintPreview.roles')}</span>
             </div>
             <p className="text-lg font-semibold">4</p>
           </div>
           <div className="p-3 rounded-lg border bg-card">
             <div className="flex items-center gap-2 mb-1">
               <PlayCircle className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Scenarios</span>
+              <span className="text-xs text-muted-foreground">{t('blueprintPreview.scenarios')}</span>
             </div>
             <p className="text-lg font-semibold">8</p>
           </div>
@@ -226,24 +226,24 @@ export default function BlueprintPreview() {
             <TabsContent value="overview" className="m-0">
               <Card>
                 <CardHeader>
-                  <CardTitle>Recommendation Overview</CardTitle>
+                  <CardTitle>{t('blueprintPreview.recommendationOverview')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h4 className="font-medium mb-2">Industry</h4>
+                    <h4 className="font-medium mb-2">{t('blueprintPreview.industry')}</h4>
                     <p className="text-muted-foreground">{recommendation.industry}</p>
                   </div>
                   <div>
-                    <h4 className="font-medium mb-2">Archetype</h4>
+                    <h4 className="font-medium mb-2">{t('blueprintPreview.archetype')}</h4>
                     <p className="text-muted-foreground">{recommendation.archetypeId || 'Green Data Centre'}</p>
                   </div>
                   <div>
-                    <h4 className="font-medium mb-2">Region</h4>
+                    <h4 className="font-medium mb-2">{t('common.region')}</h4>
                     <p className="text-muted-foreground">{regionDisplay}</p>
                   </div>
                   {recommendation.objectives && recommendation.objectives.length > 0 && (
                     <div>
-                      <h4 className="font-medium mb-2">Objectives</h4>
+                      <h4 className="font-medium mb-2">{t('blueprintPreview.objectives')}</h4>
                       <ul className="list-disc list-inside text-muted-foreground space-y-1">
                         {recommendation.objectives.map((obj, idx) => (
                           <li key={idx}>{obj}</li>
@@ -258,7 +258,7 @@ export default function BlueprintPreview() {
             <TabsContent value="agents" className="m-0">
               <Card>
                 <CardHeader>
-                  <CardTitle>Recommended Subsystem Agents</CardTitle>
+                  <CardTitle>{t('blueprintPreview.recommendedSubsystemAgents')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -284,7 +284,7 @@ export default function BlueprintPreview() {
             <TabsContent value="kpis" className="m-0">
               <Card>
                 <CardHeader>
-                  <CardTitle>Target KPIs</CardTitle>
+                  <CardTitle>{t('blueprintPreview.targetKpis')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -293,35 +293,35 @@ export default function BlueprintPreview() {
                         <Card className="p-4">
                           <div className="flex items-center gap-2 mb-2">
                             <Activity className="h-4 w-4 text-primary" />
-                            <span className="font-medium">PUE Target</span>
+                            <span className="font-medium">{t('blueprintPreview.pueTarget')}</span>
                           </div>
                           <p className="text-2xl font-bold">{recommendation.kpiTargets.pueTarget}</p>
                         </Card>
                         <Card className="p-4">
                           <div className="flex items-center gap-2 mb-2">
                             <Activity className="h-4 w-4 text-primary" />
-                            <span className="font-medium">Renewable Share</span>
+                            <span className="font-medium">{t('blueprintPreview.renewableShare')}</span>
                           </div>
                           <p className="text-2xl font-bold">{recommendation.kpiTargets.renewableShareTargetPct}%</p>
                         </Card>
                         <Card className="p-4">
                           <div className="flex items-center gap-2 mb-2">
                             <Activity className="h-4 w-4 text-primary" />
-                            <span className="font-medium">Sovereignty Score</span>
+                            <span className="font-medium">{t('blueprintPreview.sovereigntyScore')}</span>
                           </div>
                           <p className="text-2xl font-bold">{recommendation.kpiTargets.sovereigntyScoreTargetPct}%</p>
                         </Card>
                         <Card className="p-4">
                           <div className="flex items-center gap-2 mb-2">
                             <Activity className="h-4 w-4 text-primary" />
-                            <span className="font-medium">Carbon Intensity</span>
+                            <span className="font-medium">{t('blueprintPreview.carbonIntensity')}</span>
                           </div>
                           <p className="text-2xl font-bold">{recommendation.kpiTargets.carbonIntensityTargetGPerKwh} g/kWh</p>
                         </Card>
                         <Card className="p-4">
                           <div className="flex items-center gap-2 mb-2">
                             <Activity className="h-4 w-4 text-primary" />
-                            <span className="font-medium">Uptime Target</span>
+                            <span className="font-medium">{t('blueprintPreview.uptimeTarget')}</span>
                           </div>
                           <p className="text-2xl font-bold">{recommendation.kpiTargets.uptimeTargetPct}%</p>
                         </Card>
@@ -329,7 +329,7 @@ export default function BlueprintPreview() {
                     )}
                     {!recommendation.kpiTargets && (
                       <p className="text-muted-foreground col-span-full">
-                        KPI targets will be configured when you create this twin.
+                        {t('blueprintPreview.kpiTargetsNotConfigured')}
                       </p>
                     )}
                   </div>

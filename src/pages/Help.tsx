@@ -155,8 +155,8 @@ export default function Help() {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
           {/* Header */}
           <DCSectionHeader
-            title="Learning Hub"
-            subtitle="Resources, tutorials, and expert support to accelerate your AI transformation"
+            title=t('help.title')
+            subtitle=t('help.subtitle')
             icon={<GraduationCap className="h-6 w-6" />}
           />
 

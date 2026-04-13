@@ -168,7 +168,7 @@ export default function SimulationPreview() {
             <div className="flex items-start gap-3">
               <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
               <div>
-                <h4 className="font-medium text-amber-700">Preview Mode</h4>
+                <h4 className="font-medium text-amber-700">{t('simulationPreview.previewMode')}</h4>
                 <p className="text-sm text-amber-600">
                   This is a preview of available simulation scenarios. To run simulations with real-time KPI tracking, 
                   create a Data Centre Twin first.
@@ -221,7 +221,7 @@ export default function SimulationPreview() {
         {/* KPI Impact Preview */}
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Expected KPI Impacts</CardTitle>
+            <CardTitle>{t('simulationPreview.expectedKpiImpacts')}</CardTitle>
             <p className="text-sm text-muted-foreground">
               Simulations will track these KPIs in real-time
             </p>
@@ -234,7 +234,7 @@ export default function SimulationPreview() {
                   <span className="text-xs text-muted-foreground">PUE</span>
                 </div>
                 <p className="text-lg font-semibold">~1.35</p>
-                <p className="text-xs text-muted-foreground">Target baseline</p>
+                <p className="text-xs text-muted-foreground">{t('simulationPreview.targetBaseline')}</p>
               </div>
               <div className="p-3 rounded-lg border bg-card">
                 <div className="flex items-center gap-2 mb-1">
@@ -242,7 +242,7 @@ export default function SimulationPreview() {
                   <span className="text-xs text-muted-foreground">Thermal Events</span>
                 </div>
                 <p className="text-lg font-semibold">0-5</p>
-                <p className="text-xs text-muted-foreground">Per scenario</p>
+                <p className="text-xs text-muted-foreground">{t('simulationPreview.perScenario')}</p>
               </div>
               <div className="p-3 rounded-lg border bg-card">
                 <div className="flex items-center gap-2 mb-1">
@@ -250,7 +250,7 @@ export default function SimulationPreview() {
                   <span className="text-xs text-muted-foreground">Sovereignty</span>
                 </div>
                 <p className="text-lg font-semibold">99%+</p>
-                <p className="text-xs text-muted-foreground">Compliance target</p>
+                <p className="text-xs text-muted-foreground">{t('simulationPreview.complianceTarget')}</p>
               </div>
               <div className="p-3 rounded-lg border bg-card">
                 <div className="flex items-center gap-2 mb-1">
@@ -258,7 +258,7 @@ export default function SimulationPreview() {
                   <span className="text-xs text-muted-foreground">Uptime</span>
                 </div>
                 <p className="text-lg font-semibold">99.99%</p>
-                <p className="text-xs text-muted-foreground">SLA target</p>
+                <p className="text-xs text-muted-foreground">{t('simulationPreview.slaTarget')}</p>
               </div>
             </div>
           </CardContent>

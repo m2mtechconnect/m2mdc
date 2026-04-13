@@ -33,16 +33,16 @@ export default function PendingApproval() {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-display font-bold">Account Pending Approval</h1>
+          <h1 className="text-2xl font-display font-bold">{t('pendingApproval.title')}</h1>
           <p className="text-muted-foreground">
-            Your account has been created successfully. An administrator will review and approve your access shortly.
+            {t('pendingApproval.description')}
           </p>
         </div>
 
         <div className="bg-muted/30 rounded-lg p-4 text-sm text-muted-foreground flex items-start gap-3">
           <Shield className="h-5 w-5 text-primary shrink-0 mt-0.5" />
           <p className="text-left">
-            For security, all new accounts require admin approval before accessing the Data Centre Studio.
+            {t('pendingApproval.securityNote')}
           </p>
         </div>
 
@@ -52,7 +52,7 @@ export default function PendingApproval() {
           className="gap-2"
         >
           <LogOut className="h-4 w-4" />
-          Sign Out
+          {t('auth.signOut')}
         </Button>
       </Card>
     </div>

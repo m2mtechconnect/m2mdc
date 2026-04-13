@@ -33,6 +33,7 @@ interface ProfileRow {
 }
 
 function SignupsDashboardContent() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<'all' | 'pending' | 'approved'>('all');
 

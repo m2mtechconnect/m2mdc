@@ -12,27 +12,27 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { screenshotManifest } from "@/data/studioScreenshots";
 import { LoomDemoModal } from "./LoomDemoModal";
-
-// Power stats - achieved results, not targets
-const powerStats = [
-  { value: "1.28", label: "Avg PUE Achieved", icon: TrendingUp, color: "text-success" },
-  { value: "89%", label: "GPU Utilization", icon: Zap, color: "text-warning" },
-  { value: "28", label: "gCO₂/kWh Avg", icon: Leaf, color: "text-success" },
-  { value: "50+", label: "Enterprises", icon: Building2, color: "text-primary" },
-];
-
-
-const quickBenefits = [
-  "Canadian data sovereignty",
-  "Real-time KPI monitoring",
-  "Scenario simulation",
-];
+import { useTranslation } from "react-i18next";
 
 export function TwinHero() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [demoOpen, setDemoOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  const powerStats = [
+    { value: "1.28", label: t('landing.avgPueAchieved'), icon: TrendingUp, color: "text-success" },
+    { value: "89%", label: t('landing.gpuUtilization'), icon: Zap, color: "text-warning" },
+    { value: "28", label: t('landing.gco2KwhAvg'), icon: Leaf, color: "text-success" },
+    { value: "50+", label: t('landing.enterprises'), icon: Building2, color: "text-primary" },
+  ];
+
+  const quickBenefits = [
+    t('landing.canadianSovereignty'),
+    t('landing.realtimeKpi'),
+    t('landing.scenarioSimulation'),
+  ];
   
   // Mouse follow effect for premium parallax
   const mouseX = useMotionValue(0);
@@ -62,18 +62,11 @@ export function TwinHero() {
       ref={containerRef}
       className="relative min-h-[95vh] flex items-center overflow-hidden bg-background"
     >
-      {/* Video background - futuristic data center visualization */}
+      {/* Video background */}
       <div className="absolute inset-0 z-0">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-40"
-        >
+        <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-40">
           <source src="/landing/hero-datacenter.mp4" type="video/mp4" />
         </video>
-        {/* Gradient overlays for text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
         <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-background/70" />
       </div>
@@ -81,51 +74,32 @@ export function TwinHero() {
       {/* Premium animated gradient mesh background */}
       <div className="absolute inset-0 z-[1] pointer-events-none">
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.02]" />
-        
-        {/* Mouse-follow spotlight effect */}
         <motion.div 
           className="absolute w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl pointer-events-none"
-          style={{
-            left: mousePosition.x - 300,
-            top: mousePosition.y - 300,
-          }}
-          animate={{ 
-            opacity: [0.03, 0.06, 0.03],
-          }}
+          style={{ left: mousePosition.x - 300, top: mousePosition.y - 300 }}
+          animate={{ opacity: [0.03, 0.06, 0.03] }}
           transition={{ duration: 3, repeat: Infinity }}
         />
-        
         <motion.div 
           className="absolute top-0 right-0 w-[60%] h-[70%] bg-gradient-to-bl from-primary/8 via-primary/5 to-transparent rounded-full blur-3xl"
           style={{ x: springX, y: springY }}
-          animate={{ 
-            scale: [1, 1.1, 1],
-            opacity: [0.08, 0.12, 0.08],
-          }}
+          animate={{ scale: [1, 1.1, 1], opacity: [0.08, 0.12, 0.08] }}
           transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
           className="absolute bottom-0 left-0 w-[50%] h-[60%] bg-gradient-to-tr from-success/6 via-success/3 to-transparent rounded-full blur-3xl"
-          animate={{ 
-            scale: [1, 1.15, 1],
-            opacity: [0.06, 0.1, 0.06],
-            y: [0, -20, 0],
-          }}
+          animate={{ scale: [1, 1.15, 1], opacity: [0.06, 0.1, 0.06], y: [0, -20, 0] }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         />
-        {/* Subtle accent orb */}
         <motion.div 
           className="absolute top-1/3 left-1/3 w-64 h-64 bg-info/5 rounded-full blur-3xl"
-          animate={{ 
-            scale: [1, 1.2, 1],
-            opacity: [0.05, 0.08, 0.05],
-          }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.05, 0.08, 0.05] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 4 }}
         />
       </div>
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-8 py-16 lg:py-24 w-full">
-        {/* Power Stats Bar - Above headline like Linear/Vercel */}
+        {/* Power Stats Bar */}
         <motion.div 
           className="flex flex-wrap justify-center gap-6 lg:gap-10 mb-12"
           initial={{ opacity: 0, y: -20 }}
@@ -150,33 +124,23 @@ export function TwinHero() {
 
         {/* Center-aligned hero content */}
         <div className="text-center max-w-4xl mx-auto mb-16">
-          {/* Eyebrow badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="mb-6"
-          >
-            <Badge 
-              variant="outline" 
-              className="border-primary/40 text-primary bg-primary/5 px-4 py-1.5 text-sm font-medium"
-            >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }} className="mb-6">
+            <Badge variant="outline" className="border-primary/40 text-primary bg-primary/5 px-4 py-1.5 text-sm font-medium">
               <Sparkles className="h-3.5 w-3.5 mr-2" />
-              Enterprise Digital Twin Platform
+              {t('landing.enterpriseDigitalTwinPlatform')}
             </Badge>
           </motion.div>
           
-          {/* Main headline - centered with gradient */}
           <motion.h1 
             className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground leading-[1.1] tracking-tight mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            Live Digital Twin of Your{" "}
+            {t('landing.heroHeadline1')}{" "}
             <span className="relative inline-block">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-m2m-gold-dark to-accent">
-                AI Data Centre
+                {t('landing.heroHeadline2')}
               </span>
               <motion.span 
                 className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-accent to-m2m-gold-dark rounded-full"
@@ -193,11 +157,10 @@ export function TwinHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, 
-            and Sovereignty Status in a single operational dashboard.
+            {t('landing.heroDescription')}
           </motion.p>
 
-          {/* Quick benefits - centered */}
+          {/* Quick benefits */}
           <motion.div 
             className="flex flex-wrap justify-center gap-4 mb-10"
             initial={{ opacity: 0, y: 20 }}
@@ -218,32 +181,26 @@ export function TwinHero() {
             ))}
           </motion.div>
 
-          {/* CTA buttons - centered with premium styling */}
+          {/* CTA buttons */}
           <motion.div 
             className="flex flex-col sm:flex-row justify-center gap-4 mb-10"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7 }}
           >
-            <motion.div
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-            >
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
               <Button 
                 size="lg" 
                 className="text-base px-10 h-14 group relative overflow-hidden transition-all duration-300 bg-accent text-m2m-black hover:bg-m2m-gold-dark hover:shadow-2xl hover:shadow-accent/30"
                 onClick={() => navigate("/onboarding")}
               >
                 <span className="relative z-10 flex items-center font-semibold">
-                  Get Started Free
+                  {t('landing.getStartedFree')}
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </span>
               </Button>
             </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-            >
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
               <Button 
                 size="lg" 
                 variant="outline" 
@@ -251,14 +208,13 @@ export function TwinHero() {
                 onClick={() => setDemoOpen(true)}
               >
                 <Play className="mr-2 h-5 w-5" />
-                Watch Demo
+                {t('landing.watchDemo')}
               </Button>
             </motion.div>
           </motion.div>
-
         </div>
 
-        {/* Hero visual - Full width product screenshot */}
+        {/* Hero visual */}
         <motion.div 
           className="relative max-w-5xl mx-auto"
           initial={{ opacity: 0, y: 60, scale: 0.95 }}
@@ -266,13 +222,11 @@ export function TwinHero() {
           transition={{ duration: 0.9, delay: 0.5, ease: "easeOut" }}
           style={{ x: springX, y: springY }}
         >
-          {/* Main product screenshot with premium frame */}
           <motion.div 
             className="relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm rounded-2xl lg:rounded-3xl border border-border/40 p-2 shadow-2xl shadow-black/20"
             whileHover={{ scale: 1.01 }}
             transition={{ duration: 0.4 }}
           >
-            {/* Browser chrome */}
             <div className="flex items-center gap-2 px-4 py-3 border-b border-border/30 bg-muted/30 rounded-t-xl lg:rounded-t-2xl">
               <div className="flex gap-1.5">
                 <div className="w-3 h-3 rounded-full bg-destructive/60" />
@@ -285,8 +239,6 @@ export function TwinHero() {
                 </div>
               </div>
             </div>
-
-            {/* Screenshot content - Use real dashboard screenshot */}
             <div className="aspect-[16/9] bg-gradient-to-br from-muted/80 via-muted/50 to-background rounded-b-xl lg:rounded-b-2xl overflow-hidden relative">
               <img 
                 src={`/landing/screenshots/dashboard-desktop.png?v=${encodeURIComponent(screenshotManifest.version)}`} 
@@ -294,13 +246,11 @@ export function TwinHero() {
                 className="w-full h-full object-cover object-top"
                 loading="eager"
               />
-              
-              {/* Gradient overlay for depth */}
               <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent pointer-events-none" />
             </div>
           </motion.div>
 
-          {/* Floating stat cards with parallax */}
+          {/* Floating stat cards */}
           <motion.div 
             className="absolute -bottom-6 -left-6 bg-card/95 backdrop-blur-sm rounded-xl border border-border/50 p-4 shadow-xl"
             initial={{ opacity: 0, y: 20, x: -20 }}
@@ -310,7 +260,7 @@ export function TwinHero() {
             style={{ x: useTransform(springX, v => v * -0.5), y: useTransform(springY, v => v * -0.5) }}
           >
             <div className="text-3xl font-bold text-success">6,970</div>
-            <div className="text-xs text-muted-foreground">Hours saved monthly</div>
+            <div className="text-xs text-muted-foreground">{t('landing.hoursSavedMonthly')}</div>
           </motion.div>
           
           <motion.div 
@@ -322,10 +272,9 @@ export function TwinHero() {
             style={{ x: useTransform(springX, v => v * 0.5), y: useTransform(springY, v => v * 0.5) }}
           >
             <div className="text-3xl font-bold text-primary">+32%</div>
-            <div className="text-xs text-muted-foreground">Efficiency gains</div>
+            <div className="text-xs text-muted-foreground">{t('landing.efficiencyGains')}</div>
           </motion.div>
 
-          {/* Side floating card */}
           <motion.div 
             className="absolute top-1/2 -right-8 transform -translate-y-1/2 bg-card/95 backdrop-blur-sm rounded-xl border border-border/50 p-3 shadow-lg hidden xl:block"
             initial={{ opacity: 0, x: 20 }}
@@ -335,7 +284,7 @@ export function TwinHero() {
           >
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              <span className="text-xs font-medium text-foreground">Live Monitoring</span>
+              <span className="text-xs font-medium text-foreground">{t('landing.liveMonitoring')}</span>
             </div>
           </motion.div>
         </motion.div>

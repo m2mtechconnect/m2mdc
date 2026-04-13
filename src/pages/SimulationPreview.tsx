@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * Simulation Preview Page - READ-ONLY preview of recommendation simulation
  * This page displays a recommendation's simulation config WITHOUT creating a twin

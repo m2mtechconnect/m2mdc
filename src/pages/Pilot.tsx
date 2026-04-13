@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 

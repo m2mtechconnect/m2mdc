@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * Agent Detail Page - Full editor for agent definitions
  */

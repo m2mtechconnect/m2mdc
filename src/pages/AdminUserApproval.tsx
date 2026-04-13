@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * AdminUserApproval - Admin page to approve/reject new user signups
  * Accessible only to users with 'admin' role

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * InfrastructurePage - Data Centre Infrastructure Management
  * Self-contained single-file component with 7 sections:

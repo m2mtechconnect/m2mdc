@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { SectionHeader } from "@/components/ui/section-header";
 import { EnhancedSearchBar } from "@/components/search/EnhancedSearchBar";

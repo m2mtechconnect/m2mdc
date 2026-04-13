@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * PendingApproval - Shown to authenticated users who haven't been approved by admin yet
  */

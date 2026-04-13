@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * AdminSignupsDashboard - Real-time dashboard for user registrations & approval status
  * Combines profiles data with onboarding submissions for a unified view

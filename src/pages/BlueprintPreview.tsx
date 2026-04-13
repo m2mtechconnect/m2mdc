@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * Blueprint Preview Page - READ-ONLY preview of recommendation blueprint
  * This page displays a recommendation's blueprint WITHOUT creating a twin

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * TwinDebug - Debug View for Multi-Tenant Twin System
  * Shows current twinId, queries, telemetry sources, and errors

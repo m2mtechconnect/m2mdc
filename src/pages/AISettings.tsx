@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Label } from "@/components/ui/label";

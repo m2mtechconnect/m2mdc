@@ -20,6 +20,7 @@ import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 
 export default function Builder() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -232,8 +233,8 @@ export default function Builder() {
           // Show more helpful error message
           const errorMsg = err instanceof Error ? err.message : 'Unknown error';
           toast({
-            title: 'Failed to Load Builder',
-            description: `${errorMsg}. Please try again or go back to the dashboard.`,
+            title: t('builder.failedToLoad'),
+            description: `${errorMsg}. ${t('onboarding.pleaseTryAgain')}`,
             variant: 'destructive',
           });
         });
@@ -283,8 +284,8 @@ export default function Builder() {
     
     if (!valid) {
       toast({
-        title: 'Incomplete',
-        description: 'Please complete all required fields before continuing.',
+        title: t('builder.incomplete'),
+        description: t('builder.completeFields'),
         variant: 'destructive',
       });
       return;
@@ -321,8 +322,8 @@ export default function Builder() {
         <div className="text-center space-y-4">
           <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" />
           <div>
-            <p className="font-medium">Loading Twin Builder...</p>
-            <p className="text-sm text-muted-foreground">Preparing your configuration</p>
+            <p className="font-medium">{t('builder.loadingTitle')}</p>
+            <p className="text-sm text-muted-foreground">{t('builder.loadingDesc')}</p>
           </div>
         </div>
       </div>
@@ -376,7 +377,7 @@ export default function Builder() {
         onNext={handleNext}
         onBack={handleBack}
         nextDisabled={!isValid}
-        nextLabel={effectiveCurrentStep === 5 ? 'Deploy to Production' : 'Next'}
+        nextLabel={effectiveCurrentStep === 5 ? t('builder.deployToProduction') : undefined}
         lastSaved={fromScanner ? dcTwinStore.lastSaved : lastSaved}
         onDeploy={effectiveCurrentStep === 5 ? handleDeployClick : undefined}
         currentStep={effectiveCurrentStep}

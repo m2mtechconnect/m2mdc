@@ -66,6 +66,7 @@ const roleColors: Record<string, string> = {
 };
 
 export default function Teams() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -406,10 +407,10 @@ export default function Teams() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-4xl font-display font-bold mb-2 text-gradient-hero">
-                Teams & Collaboration
+                {t('teams.title')}
               </h1>
               <p className="text-muted-foreground text-lg">
-                Manage team members, roles, and access controls
+                {t('teams.subtitle')}
               </p>
             </div>
             <Tooltip>
@@ -419,10 +420,10 @@ export default function Teams() {
                   onClick={() => setInviteModalOpen(true)}
                 >
                   <UserPlus className="h-4 w-4" />
-                  Invite Team Member
+                  {t('teams.inviteMember')}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Add new members to your workspace</TooltipContent>
+              <TooltipContent>{t('teams.addMembers')}</TooltipContent>
             </Tooltip>
           </div>
 
@@ -430,12 +431,12 @@ export default function Teams() {
             <TabsList>
               <TabsTrigger value="members" className="gap-2">
                 <Users className="h-4 w-4" />
-                Team Members
+                {t('teams.teamMembers')}
               </TabsTrigger>
               {isAdmin && (
                 <TabsTrigger value="approvals" className="gap-2">
                   <Shield className="h-4 w-4" />
-                  User Approvals
+                  {t('teams.userApprovals')}
                   {pendingApprovalCount > 0 && (
                     <Badge variant="destructive" className="ml-1 h-5 px-1.5 text-xs">
                       {pendingApprovalCount}
@@ -449,12 +450,12 @@ export default function Teams() {
               {/* Stats */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 {[
-                  { label: "Total Members", value: totalMembers, icon: Users },
-                  { label: "Active Now", value: activeNow, icon: CheckCircle2 },
-                  { label: "Systems", value: totalSystems, icon: Wrench },
-                  { label: "Pending", value: pendingInvitesCount, icon: Clock, warning: pendingInvitesCount > 0 },
-                  { label: "Roles", value: rolesCount, icon: Shield },
-                  { label: "Departments", value: rolesCount, icon: Building2 },
+                  { label: t('teams.totalMembers'), value: totalMembers, icon: Users },
+                  { label: t('teams.activeNow'), value: activeNow, icon: CheckCircle2 },
+                  { label: t('teams.systems'), value: totalSystems, icon: Wrench },
+                  { label: t('teams.pending'), value: pendingInvitesCount, icon: Clock, warning: pendingInvitesCount > 0 },
+                  { label: t('teams.roles'), value: rolesCount, icon: Shield },
+                  { label: t('teams.departments'), value: rolesCount, icon: Building2 },
                 ].map((stat) => (
                   <Card key={stat.label} className={stat.warning ? "border-l-4 border-l-warning" : ""}>
                     <CardContent className="p-4">

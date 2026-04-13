@@ -39,6 +39,7 @@ const mockSearchResults = [
 ];
 
 export default function Search() {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<Array<{ id: string; label: string; value: string }>>([]);
   const [searchStartTime, setSearchStartTime] = useState<number | null>(null);

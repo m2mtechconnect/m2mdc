@@ -31,6 +31,7 @@ interface Message {
 }
 
 export default function AgentChat() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { id: agentId } = useParams<{ id: string }>();

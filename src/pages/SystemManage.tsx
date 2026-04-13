@@ -14,6 +14,7 @@ import type { DeployedSystem } from '@/types/system';
  * that is shared with marketplace template previews
  */
 export default function SystemManage() {
+  const { t } = useTranslation();
   const { systemId } = useParams<{ systemId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();

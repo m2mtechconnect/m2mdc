@@ -62,6 +62,7 @@ interface System {
 }
 
 export default function IntelligenceDashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [dateRange, setDateRange] = useState('7');
   const [facility, setFacility] = useState('all');

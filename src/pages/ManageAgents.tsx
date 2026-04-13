@@ -21,6 +21,7 @@ import { useTwinAgents } from '@/hooks/useTwinAgentsCatalog';
 import { AGENT_CATALOG, type AgentDefinitionCatalog } from '@/domain/greenDc/agentsCatalog';
 
 export default function ManageAgents() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { updateContext } = useCoPilotContext();

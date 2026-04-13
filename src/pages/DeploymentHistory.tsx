@@ -58,6 +58,7 @@ interface Deployment {
 }
 
 export default function DeploymentHistory() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [deployments, setDeployments] = useState<Deployment[]>([]);

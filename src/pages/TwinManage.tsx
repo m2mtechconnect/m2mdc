@@ -24,6 +24,7 @@ import { useCoPilotContext } from '@/contexts/CoPilotContext';
  * Canonical Route: /app/agents/:agentId/manage
  */
 export default function TwinManage() {
+  const { t } = useTranslation();
   const { instanceId, agentId } = useParams<{ instanceId?: string; agentId?: string }>();
   const resolvedId = agentId || instanceId;
   const navigate = useNavigate();

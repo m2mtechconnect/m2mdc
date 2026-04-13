@@ -11,6 +11,7 @@ import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 
 export default function PendingApproval() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {

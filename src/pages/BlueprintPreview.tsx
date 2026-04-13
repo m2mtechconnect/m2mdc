@@ -50,6 +50,7 @@ const getDefaultAgentsForIndustry = (industry: string) => {
 };
 
 export default function BlueprintPreview() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { recommendation, sourceUrl, isPreviewMode } = useRecommendationStore();

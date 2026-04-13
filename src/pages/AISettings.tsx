@@ -29,6 +29,7 @@ interface HealthStatus {
 }
 
 export default function AISettings() {
+  const { t } = useTranslation();
   const [projectId, setProjectId] = useState("");
   const [region, setRegion] = useState("northamerica-northeast1");
   const [model, setModel] = useState("gemini-1.5-pro");

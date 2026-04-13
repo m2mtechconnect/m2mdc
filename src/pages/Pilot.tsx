@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
 
 export default function Pilot() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();

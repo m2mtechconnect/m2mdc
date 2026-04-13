@@ -99,6 +99,7 @@ const FEATURED_INTEGRATIONS: Omit<Integration, "id" | "status" | "connected">[] 
 ];
 
 export default function IntegrationHub() {
+  const { t } = useTranslation();
   const [selectedIntegration, setSelectedIntegration] = useState<Integration | null>(null);
   const [zapierModalOpen, setZapierModalOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);

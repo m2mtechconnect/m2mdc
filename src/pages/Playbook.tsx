@@ -12,6 +12,7 @@ import { useCoPilotContext } from "@/contexts/CoPilotContext";
 import ReactMarkdown from 'react-markdown';
 
 export default function Playbook() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { updateContext } = useCoPilotContext();

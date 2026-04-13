@@ -112,6 +112,7 @@ const features = [
 ];
 
 export default function DataCentreTwinLanding() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-background text-foreground scroll-smooth">
       {/* Header Navigation */}

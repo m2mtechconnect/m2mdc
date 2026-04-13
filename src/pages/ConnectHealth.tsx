@@ -19,6 +19,7 @@ const healthMetrics = [
 ];
 
 export default function ConnectHealth() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const overallHealth = healthMetrics.length > 0 

@@ -25,6 +25,7 @@ import { DCSectionHeader } from "@/components/dc-ui/DCSectionHeader";
 import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 
 export default function AgentWorkspace() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();

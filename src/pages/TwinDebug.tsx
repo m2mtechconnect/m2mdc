@@ -51,6 +51,7 @@ interface QueryLog {
 }
 
 export default function TwinDebug() {
+  const { t } = useTranslation();
   const { activeTwinId: twinId, twin, twins, refreshTwins } = useActiveTwin();
   const { toast } = useToast();
   const [queryLogs, setQueryLogs] = useState<QueryLog[]>([]);

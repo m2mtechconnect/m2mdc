@@ -61,6 +61,7 @@ const previewScenarios = [
 ];
 
 export default function SimulationPreview() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { recommendation, sourceUrl, isPreviewMode } = useRecommendationStore();

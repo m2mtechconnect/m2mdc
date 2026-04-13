@@ -28,6 +28,7 @@ const syncJobs: Array<{
 ];
 
 export default function ConnectMonitor() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedJob, setSelectedJob] = useState<string | null>(null);

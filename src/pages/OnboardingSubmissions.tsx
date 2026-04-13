@@ -101,6 +101,7 @@ function ExpandableRow({ submission }: { submission: OnboardingSubmission }) {
 }
 
 export default function OnboardingSubmissions() {
+  const { t } = useTranslation();
   const { data: submissions, isLoading, isError } = useQuery({
     queryKey: ["onboarding-submissions"],
     queryFn: async () => {

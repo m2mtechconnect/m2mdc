@@ -176,6 +176,7 @@ function UserApprovalContent() {
 }
 
 export default function AdminUserApproval() {
+  const { t } = useTranslation();
   return (
     <ProtectedRoute allowedRoles={['executive', 'manager', 'admin' as any]}>
       <UserApprovalContent />

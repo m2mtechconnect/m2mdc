@@ -8,6 +8,7 @@ import { Search as SearchIcon } from "lucide-react";
 import { toast } from "sonner";
 
 export default function UniversalSearch() {
+  const { t } = useTranslation();
   const [searchResult, setSearchResult] = useState<any>(null);
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     try {

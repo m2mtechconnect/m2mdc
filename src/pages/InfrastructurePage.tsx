@@ -207,6 +207,7 @@ const WIZARD_STEPS = ["Scenario", "Infrastructure", "Capacity", "Storage", "Thro
    MAIN COMPONENT
    ═══════════════════════════════════════════════════════════ */
 const InfrastructurePage = () => {
+  const { t } = useTranslation();
   // Auto-cycling stage
   const [activeStage, setActiveStage] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);

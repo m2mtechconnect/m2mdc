@@ -24,6 +24,7 @@ interface IntakeFormData {
 }
 
 export default function FundingIntakeDemo() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<TwinRunResult | null>(null);

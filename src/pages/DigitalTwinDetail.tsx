@@ -15,6 +15,7 @@ import { TwinRunsTab } from "@/components/digital-twin/TwinRunsTab";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui";
 
 export default function DigitalTwinDetail() {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [twin, setTwin] = useState<DigitalTwin | null>(null);

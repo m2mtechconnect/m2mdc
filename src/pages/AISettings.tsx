@@ -126,13 +126,13 @@ export default function AISettings() {
     <Layout>
       <div className="container mx-auto py-8 px-4 space-y-8">
         <DCSectionHeader
-          title="AI Engine Settings"
-          subtitle="Configure Google Gemini (Vertex AI) for M2M Co-Pilot"
+          title={t("aiSettings.title")}
+          subtitle={t("aiSettings.subtitle")}
           icon={<Settings className="h-5 w-5 text-primary" />}
         />
 
         <DCCard
-          title="Google Cloud Configuration"
+          title={t("aiSettings.gcpConfig")}
           icon={<Sparkles className="h-5 w-5 text-primary" />}
           status="operational"
         >

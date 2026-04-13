@@ -59,8 +59,8 @@ export default function UniversalSearch() {
     <div className="min-h-screen bg-background section-padding-lg">
       <div className="max-w-7xl mx-auto">
         <SectionHeader
-          title="Universal Search"
-          description="Ask anything or paste a website URL for instant answers with citations."
+          title={t("universalSearch.title")}
+          description={t("universalSearch.subtitle")}
         />
 
         <div className="mb-8">
@@ -72,8 +72,8 @@ export default function UniversalSearch() {
         ) : (
           <EmptyState
             icon={SearchIcon}
-            title="Start Searching"
-            description="Enter a natural language query or paste a website URL to get instant answers with citations."
+            title={t("universalSearch.startSearching")}
+            description={t("universalSearch.startSearchingDesc")}
           >
             {recentSearches.length > 0 && (
               <div className="mt-6">

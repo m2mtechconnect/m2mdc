@@ -124,7 +124,7 @@ export default function OnboardingSubmissions() {
             <Users className="h-6 w-6 text-accent-foreground" />
           </div>
           <div>
-            <h1 className="text-h2 font-display font-bold">Onboarding Submissions</h1>
+            <h1 className="text-h2 font-display font-bold">{t("onboardingSubmissions.title")}</h1>
             <p className="text-sm text-muted-foreground">
               Prospect questionnaire responses from the marketing page
             </p>

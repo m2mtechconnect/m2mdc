@@ -24,6 +24,7 @@ interface ProfileRow {
 }
 
 function UserApprovalContent() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<'pending' | 'approved' | 'all'>('pending');
 

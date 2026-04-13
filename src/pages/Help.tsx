@@ -88,6 +88,7 @@ const helpSections = [
 ];
 
 export default function Help() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { startTour, resetAllTours, isTourSeen } = useTour();
   

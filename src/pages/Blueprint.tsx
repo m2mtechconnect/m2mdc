@@ -120,6 +120,7 @@ function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: any }) {
 }
 
 export default function Blueprint() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -179,7 +180,7 @@ export default function Blueprint() {
                     className="text-muted-foreground hover:text-foreground"
                   >
                     <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back
+                    {t('blueprint.back')}
                   </Button>
                   
                   {/* Co-Pilot Mode Header */}
@@ -195,12 +196,12 @@ export default function Blueprint() {
                     {showCoPilotPanel ? (
                       <>
                         <PanelRightClose className="h-4 w-4" />
-                        Hide Assistant
+                        {t('blueprint.hideAssistant')}
                       </>
                     ) : (
                       <>
                         <PanelRightOpen className="h-4 w-4" />
-                        Show Assistant
+                        {t('blueprint.showAssistant')}
                       </>
                     )}
                   </Button>
@@ -210,7 +211,7 @@ export default function Blueprint() {
                   )}
                   <Button variant="outline" onClick={downloadBlueprint}>
                     <Download className="h-4 w-4 mr-2" />
-                    Download JSON
+                    {t('blueprint.downloadJson')}
                   </Button>
                 </div>
               </div>
@@ -269,7 +270,7 @@ export default function Blueprint() {
                 <div className="p-2 rounded-lg bg-primary/10">
                   <Sparkles className="h-4 w-4 text-primary animate-pulse" />
                 </div>
-                <span className="text-sm font-medium text-foreground">Ask Co-Pilot:</span>
+                <span className="text-sm font-medium text-foreground">{t('blueprint.askCoPilot')}</span>
                 <div className="flex flex-wrap gap-2">
                   <Button
                     variant="ghost"
@@ -278,7 +279,7 @@ export default function Blueprint() {
                     onClick={() => handleAskCoPilot('Which agents manage thermal safety in this data centre?')}
                   >
                     <MessageCircle className="h-3 w-3 mr-1 group-hover:scale-110 transition-transform" />
-                    Thermal Agents
+                    {t('blueprint.thermalAgents')}
                   </Button>
                   <Button
                     variant="ghost"
@@ -287,7 +288,7 @@ export default function Blueprint() {
                     onClick={() => handleAskCoPilot('Show all workflows related to UPS failures in this blueprint.')}
                   >
                     <MessageCircle className="h-3 w-3 mr-1 group-hover:scale-110 transition-transform" />
-                    UPS Workflows
+                    {t('blueprint.upsWorkflows')}
                   </Button>
                   <Button
                     variant="ghost"
@@ -296,7 +297,7 @@ export default function Blueprint() {
                     onClick={() => handleAskCoPilot('What KPIs relate to carbon and cost in this data centre?')}
                   >
                     <MessageCircle className="h-3 w-3 mr-1 group-hover:scale-110 transition-transform" />
-                    Carbon KPIs
+                    {t('blueprint.carbonKpis')}
                   </Button>
                 </div>
               </div>
@@ -356,28 +357,28 @@ export default function Blueprint() {
                         <CardHeader>
                           <CardTitle className="text-base flex items-center gap-2">
                             <Activity className="h-4 w-4" />
-                            Deployment Readiness
+                            {t('blueprint.deploymentReadiness')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
                           <p className="text-sm text-muted-foreground mb-4">
-                            Review validation issues before deploying this blueprint to production.
+                            {t('blueprint.deploymentReadinessDesc')}
                           </p>
                           <div className="space-y-3">
                             <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                              <span className="text-sm">Agents Configured</span>
+                              <span className="text-sm">{t('blueprint.agentsConfigured')}</span>
                               <Badge variant="outline">{blueprint.agents.length}</Badge>
                             </div>
                             <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                              <span className="text-sm">KPIs Tracked</span>
+                              <span className="text-sm">{t('blueprint.kpisTracked')}</span>
                               <Badge variant="outline">{blueprint.kpis.length}</Badge>
                             </div>
                             <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                              <span className="text-sm">Workflows Active</span>
+                              <span className="text-sm">{t('blueprint.workflowsActive')}</span>
                               <Badge variant="outline">{blueprint.workflows.filter(w => w.enabled).length}</Badge>
                             </div>
                             <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                              <span className="text-sm">Scenarios Ready</span>
+                              <span className="text-sm">{t('blueprint.scenariosReady')}</span>
                               <Badge variant="outline">{blueprint.simulationScenarios.length}</Badge>
                             </div>
                           </div>

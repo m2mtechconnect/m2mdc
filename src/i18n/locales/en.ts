@@ -1207,20 +1207,6 @@ const en = {
     heroSubtitle: 'End-to-end GPU compute, DDN storage, and edge inference for autonomous data centre operations.',
   },
 
-  // Pending Approval
-  pendingApproval: {
-    title: 'Account Pending Approval',
-    description: 'Your account has been created successfully. An administrator will review and approve your access shortly.',
-    securityNote: 'For security, all new accounts require admin approval before accessing the Data Centre Studio.',
-  },
-
-  // Not Found
-  notFound: {
-    title: '404',
-    message: 'Oops! Page not found',
-    returnHome: 'Return to Home',
-  },
-
   // Language selector
   language: {
     label: 'Language',

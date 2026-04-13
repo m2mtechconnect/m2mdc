@@ -240,9 +240,9 @@ export default function IntelligenceDashboard() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">Last 24h</SelectItem>
-                  <SelectItem value="7">Last 7 days</SelectItem>
-                  <SelectItem value="30">Last 30 days</SelectItem>
+                  <SelectItem value="1">{t('intelligenceDashboard.last24h')}</SelectItem>
+                  <SelectItem value="7">{t('intelligenceDashboard.last7days')}</SelectItem>
+                  <SelectItem value="30">{t('intelligenceDashboard.last30days')}</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -251,7 +251,7 @@ export default function IntelligenceDashboard() {
                   <SelectValue placeholder="Facility" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Facilities</SelectItem>
+                  <SelectItem value="all">{t('intelligenceDashboard.allFacilities')}</SelectItem>
                   <SelectItem value="mtl-1">MTL-1</SelectItem>
                   <SelectItem value="tor-1">TOR-1</SelectItem>
                   <SelectItem value="van-1">VAN-1</SelectItem>

@@ -252,7 +252,7 @@ export default function AgentWorkspace() {
                     <p className="text-2xl font-semibold text-foreground">{stats.totalRuns}</p>
                   </div>
                   <div className="p-4 bg-muted rounded-lg border border-border">
-                    <p className="text-xs text-muted-foreground mb-1">Success Rate</p>
+                    <p className="text-xs text-muted-foreground mb-1">{t('agentWorkspace.successRate')}</p>
                     <p className="text-2xl font-semibold text-success">{stats.successRate.toFixed(1)}%</p>
                   </div>
                 </div>

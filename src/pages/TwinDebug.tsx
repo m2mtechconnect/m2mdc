@@ -124,7 +124,7 @@ export default function TwinDebug() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <p className="text-sm text-muted-foreground">Twin ID</p>
+              <p className="text-sm text-muted-foreground">{t('twinDebug.twinId')}</p>
               <div className="flex items-center gap-2">
                 <code className="text-xs bg-muted px-2 py-1 rounded truncate max-w-[200px]">
                   {twinId || 'null'}
@@ -137,7 +137,7 @@ export default function TwinDebug() {
               </div>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Twin Name</p>
+              <p className="text-sm text-muted-foreground">{t('twinDebug.twinName')}</p>
               <p className="font-medium">{twin?.name || 'Not selected'}</p>
             </div>
             <div>
@@ -145,7 +145,7 @@ export default function TwinDebug() {
               <p className="font-medium">{twin?.region_code || 'N/A'}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Twins</p>
+              <p className="text-sm text-muted-foreground">{t('twinDebug.totalTwins')}</p>
               <p className="font-medium">{twins.length}</p>
             </div>
           </div>
@@ -179,9 +179,9 @@ export default function TwinDebug() {
       <Tabs defaultValue="queries" className="space-y-4">
         <TabsList>
           <TabsTrigger value="queries">Query Status</TabsTrigger>
-          <TabsTrigger value="telemetry">Telemetry</TabsTrigger>
-          <TabsTrigger value="errors">Errors</TabsTrigger>
-          <TabsTrigger value="twins">All Twins</TabsTrigger>
+          <TabsTrigger value="telemetry">{t('twinDebug.telemetry')}</TabsTrigger>
+          <TabsTrigger value="errors">{t('twinDebug.errors')}</TabsTrigger>
+          <TabsTrigger value="twins">{t('twinDebug.allTwins')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="queries">

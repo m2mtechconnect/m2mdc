@@ -372,61 +372,139 @@ export default function IntelligenceDashboard() {
           </CardContent>
         </Card>
 
-        {/* DC KPI Strip - Using real simulation data */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-          <KpiCard
-            label={KPI_CATALOG[KPIKey.PUE]?.label || "PUE Trend"}
-            value={simulationKpis[KPIKey.PUE]?.toFixed(2) || "1.38"}
-            change="-2.1%"
-            icon={Zap}
-            trend="down"
-            tooltip={KPI_CATALOG[KPIKey.PUE]?.description || "Power Usage Effectiveness - lower is better"}
-            onClick={() => navigate('/data-centre-twin')}
-          />
-          <KpiCard
-            label={KPI_CATALOG[KPIKey.GPU_UTILIZATION]?.label || "GPU Utilization"}
-            value={simulationKpis[KPIKey.GPU_UTILIZATION] ? `${simulationKpis[KPIKey.GPU_UTILIZATION]}%` : "78%"}
-            change="+5%"
-            icon={Cpu}
-            trend="up"
-            tooltip={KPI_CATALOG[KPIKey.GPU_UTILIZATION]?.description || "Average GPU cluster utilization"}
-            onClick={() => navigate('/data-centre-twin')}
-          />
-          <KpiCard
-            label={KPI_CATALOG[KPIKey.THERMAL_INCIDENTS]?.label || "Thermal Incidents"}
-            value={simulationKpis[KPIKey.THERMAL_INCIDENTS]?.toString() || "8"}
-            change="-3"
-            icon={Thermometer}
-            trend="down"
-            tooltip={KPI_CATALOG[KPIKey.THERMAL_INCIDENTS]?.description || "Thermal events in last 24h"}
-            onClick={() => navigate('/data-centre-twin')}
-          />
-          <KpiCard
-            label={KPI_CATALOG[KPIKey.CARBON_INTENSITY]?.label || "Emissions vs Target"}
-            value={simulationKpis[KPIKey.CARBON_INTENSITY] ? `${(100 - (simulationKpis[KPIKey.CARBON_INTENSITY] / 0.7)).toFixed(0)}%` : "94%"}
-            change="+2%"
-            icon={Flame}
-            trend="up"
-            tooltip={KPI_CATALOG[KPIKey.CARBON_INTENSITY]?.description || "On track for carbon targets"}
-          />
-          <KpiCard
-            label={KPI_CATALOG[KPIKey.SOVEREIGN_COMPLIANCE]?.label || "Sovereign Compute"}
-            value={simulationKpis[KPIKey.SOVEREIGN_COMPLIANCE] ? `${simulationKpis[KPIKey.SOVEREIGN_COMPLIANCE]}%` : "98%"}
-            change="0%"
-            icon={Globe}
-            trend="neutral"
-            tooltip={KPI_CATALOG[KPIKey.SOVEREIGN_COMPLIANCE]?.description || "Data residency compliance"}
-            onClick={() => navigate('/compliance')}
-          />
-          <KpiCard
-            label={KPI_CATALOG[KPIKey.UPTIME]?.label || "System Uptime"}
-            value={simulationKpis[KPIKey.UPTIME] ? `${simulationKpis[KPIKey.UPTIME]}%` : "99.97%"}
-            change="+0.02%"
-            icon={Activity}
-            trend="up"
-            tooltip={KPI_CATALOG[KPIKey.UPTIME]?.description || "Overall system availability"}
-          />
+        {/* Data Trust strip (Lucas feedback: trust the data before the insight) */}
+        <div className="mb-6">
+          <DataTrustStrip state={dataTrust} />
         </div>
+
+        {/*
+          DC KPI Strip with explicit metric basis.
+          Each card declares grain, time window, aggregation, target, source,
+          and quality so users do not read the same number in different ways.
+          References:
+            - PUE / DCIE: The Green Grid PUE v3 spec; Uptime Institute 2024.
+            - Tier uptime: Uptime Institute Tier Standard (Tier III 99.982%).
+            - GPU util band 70-90%: NVIDIA DGX SuperPOD reference.
+            - Carbon: IEA 2024 + electricityMap; gCO2eq/kWh at grid-region grain.
+            - Sovereignty: compliant_workloads / in-scope_workloads.
+        */}
+        {(() => {
+          const pueValue = simulationKpis[KPIKey.PUE] ?? 1.28;
+          const gpuValue = simulationKpis[KPIKey.GPU_UTILIZATION] ?? 78;
+          const thermalValue = simulationKpis[KPIKey.THERMAL_INCIDENTS] ?? 4;
+          const sovereigntyValue = simulationKpis[KPIKey.SOVEREIGN_COMPLIANCE] ?? 98;
+          const uptimeValue = simulationKpis[KPIKey.UPTIME] ?? 99.97;
+          const carbonValue = grid.intensity;
+          return (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+              <KpiCard
+                label="PUE"
+                value={pueValue.toFixed(2)}
+                unit=""
+                grain="Facility"
+                window={windowLabel}
+                aggregation="Weighted avg"
+                source="DCIM · BMS"
+                formula="Total facility power / IT equipment power"
+                status={pueStatus(pueValue)}
+                statusLabel={`Target ≤ ${pueTarget.toFixed(2)}`}
+                quality="good"
+                change="-2.1%"
+                trend="down"
+                icon={Zap}
+                tooltip="Power Usage Effectiveness over the selected period. Lower is better. Industry avg 1.58 (Uptime Institute 2024)."
+                onClick={() => navigate('/data-centre-twin')}
+              />
+              <KpiCard
+                label="GPU Utilization"
+                value={`${Math.round(gpuValue)}`}
+                unit="%"
+                grain="Cluster"
+                window={windowLabel}
+                aggregation="Avg across selected"
+                source="IPMI · Workload scheduler"
+                formula="mean(GPU_busy%) over filtered clusters"
+                status={gpuStatus(gpuValue)}
+                statusLabel="Target 70-90%"
+                quality="good"
+                change="+5%"
+                trend="up"
+                icon={Cpu}
+                tooltip="Average GPU compute utilization across clusters in scope. Optimal band 70-90% per NVIDIA DGX SuperPOD reference."
+                onClick={() => navigate('/data-centre-twin')}
+              />
+              <KpiCard
+                label="Thermal Incidents"
+                value={String(thermalValue)}
+                unit="events"
+                grain="Event"
+                window={windowLabel}
+                aggregation="Count"
+                source="BMS · Thermal sensors"
+                formula="count(threshold_breach) in window"
+                status={thermalStatus(thermalValue)}
+                statusLabel="Target 0 critical"
+                quality="good"
+                change="-3"
+                trend="down"
+                icon={Thermometer}
+                tooltip="Active and new thermal threshold breaches in the selected period. ASHRAE A1 envelope 18-27 °C."
+                onClick={() => navigate('/data-centre-twin')}
+              />
+              <KpiCard
+                label="Carbon Intensity"
+                value={String(carbonValue)}
+                unit="gCO₂/kWh"
+                badge={grid.label}
+                grain="Grid Region"
+                window="Current"
+                aggregation="Latest"
+                source={grid.source}
+                formula="Operational gCO₂eq per kWh at grid region"
+                status={carbonStatus(carbonValue)}
+                statusLabel={`Target ≤ ${CARBON_INTENSITY_TARGET}`}
+                quality="good"
+                icon={Flame}
+                tooltip="Live grid carbon intensity for the selected region. Lower is better. IEA 2024 + electricityMap convention."
+              />
+              <KpiCard
+                label="Sovereignty"
+                value={`${Math.round(sovereigntyValue)}`}
+                unit="%"
+                grain="Policy"
+                window={windowLabel}
+                aggregation="Compliant ÷ in-scope"
+                source="Policy engine · Workload registry"
+                formula="compliant_workloads / in_scope_workloads"
+                status={sovereigntyStatus(sovereigntyValue)}
+                statusLabel="Target 100%"
+                quality="good"
+                change="0%"
+                trend="neutral"
+                icon={Globe}
+                tooltip="Share of in-scope workloads meeting data residency and sovereignty policy. CCCS / Bill 25 / GDPR aligned."
+                onClick={() => navigate('/compliance')}
+              />
+              <KpiCard
+                label="System Uptime"
+                value={uptimeValue.toFixed(2)}
+                unit="%"
+                grain="Service"
+                window={windowLabel}
+                aggregation="Uptime ÷ window"
+                source="Service monitor · DCIM"
+                formula="(window - downtime_minutes) / window"
+                status={uptimeStatus(uptimeValue)}
+                statusLabel="SLA Tier III 99.982%"
+                quality="good"
+                change="+0.02%"
+                trend="up"
+                icon={Activity}
+                tooltip="Service availability over the selected period. Tier III SLA 99.982%, Tier IV 99.995% (Uptime Institute Tier Standard)."
+              />
+            </div>
+          );
+        })()}
 
         {/* Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">

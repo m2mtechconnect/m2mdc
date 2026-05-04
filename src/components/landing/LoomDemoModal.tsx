@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import * as VisuallyHiddenPrimitive from "@radix-ui/react-dialog";
-const VisuallyHidden = ({ children }: { children: React.ReactNode }) => (
+import type { ReactNode } from "react";
+
+const VisuallyHidden = ({ children }: { children: ReactNode }) => (
   <span className="sr-only">{children}</span>
 );
 

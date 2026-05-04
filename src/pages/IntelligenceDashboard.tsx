@@ -279,11 +279,22 @@ export default function IntelligenceDashboard() {
               <BarChart3 className="h-6 w-6 text-primary" />
               Telemetry & Analytics
             </h1>
-            <p className="text-muted-foreground">
-              {twin ? `${twin.name} - ${twin.city}` : 'Data Centre performance monitoring and insights'}
+            <p className="text-muted-foreground text-sm max-w-3xl">
+              {twin
+                ? `${twin.name} - ${twin.city}. ${t('intelligenceDashboard.defaultSubtitle')}`
+                : t('intelligenceDashboard.defaultSubtitle')}
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <div
+              className="hidden md:flex items-center gap-2 text-xs text-muted-foreground border border-border rounded-md px-2.5 py-1.5"
+              title={dataTrust.lastRefreshed.toLocaleString()}
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              <span>{t('telemetry.basis.lastRefreshed')}: 2 min ago</span>
+              <span className="text-muted-foreground/60">|</span>
+              <span>{t('telemetry.basis.autoRefresh')}</span>
+            </div>
             <Button variant="outline" className="gap-2" onClick={() => navigate('/blueprint/default')}>
               <FileText className="h-4 w-4" />
               Blueprint

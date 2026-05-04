@@ -1356,7 +1356,7 @@ const en = {
   // Intelligence Dashboard
   intelligenceDashboard: {
     title: 'Telemetry & Analytics',
-    defaultSubtitle: 'Data Centre performance monitoring and insights',
+    defaultSubtitle: 'Executive and operations overview. Drill into Thermal, Power, GPU, Sovereignty, and Carbon tabs for engineering detail.',
     exportReport: 'Export Report',
     last24h: 'Last 24h',
     last7days: 'Last 7 days',
@@ -1364,6 +1364,41 @@ const en = {
     allFacilities: 'All Facilities',
     allSubsystems: 'All Subsystems',
     allRegions: 'All Regions',
+  },
+
+  // Telemetry basis labels (Lucas feedback: explicit grain/window/aggregation)
+  telemetry: {
+    basis: {
+      lastRefreshed: 'Last refreshed',
+      autoRefresh: 'Auto-refresh 60s',
+      sensorCoverage: 'Sensor coverage',
+      sourceHealth: 'Source health',
+      qualityFlags: 'Quality flags',
+      dataTrust: 'Data trust',
+      grainFacility: 'Facility',
+      grainZone: 'Zone',
+      grainEvent: 'Event',
+      grainWorkload: 'Workload',
+      grainCluster: 'Cluster',
+      grainPolicy: 'Policy',
+      grainService: 'Service',
+      grainGrid: 'Grid Region',
+    },
+    story: {
+      step1: 'Are we running efficiently?',
+      step1Desc: 'Power efficiency and IT load against target.',
+      step2: 'What is driving demand?',
+      step2Desc: 'GPU workload pressure and zone utilization.',
+      step3: 'Is demand creating risk?',
+      step3Desc: 'Hotspot zones against ASHRAE A1 inlet envelope.',
+      step4: 'Where should we act first?',
+      step4Desc: 'Active events ranked by severity and age.',
+      step5: 'Can we trust the data?',
+      step5Desc: 'Coverage, freshness, and source health for the digital twin.',
+      step6: 'Are we compliant and sustainable?',
+      step6Desc: 'Sovereignty coverage and grid carbon intensity.',
+      drill: 'Drill into',
+    },
   },
 
   // Infrastructure Page

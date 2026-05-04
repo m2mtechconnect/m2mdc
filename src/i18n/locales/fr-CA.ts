@@ -1357,7 +1357,7 @@ const frCA = {
   // Tableau de bord de renseignement
   intelligenceDashboard: {
     title: 'Télémétrie et analytique',
-    defaultSubtitle: 'Surveillance et informations sur la performance du centre de données',
+    defaultSubtitle: 'Vue d\u2019ensemble pour la direction et l\u2019exploitation. Approfondissez les onglets Thermique, Énergie, GPU, Souveraineté et Carbone pour les détails techniques.',
     exportReport: 'Exporter le rapport',
     last24h: 'Dernières 24h',
     last7days: '7 derniers jours',
@@ -1365,6 +1365,41 @@ const frCA = {
     allFacilities: 'Toutes les installations',
     allSubsystems: 'Tous les sous-systèmes',
     allRegions: 'Toutes les régions',
+  },
+
+  // Étiquettes de base des indicateurs de télémétrie
+  telemetry: {
+    basis: {
+      lastRefreshed: 'Dernière actualisation',
+      autoRefresh: 'Actualisation auto 60 s',
+      sensorCoverage: 'Couverture des capteurs',
+      sourceHealth: 'Santé des sources',
+      qualityFlags: 'Indicateurs de qualité',
+      dataTrust: 'Fiabilité des données',
+      grainFacility: 'Installation',
+      grainZone: 'Zone',
+      grainEvent: 'Événement',
+      grainWorkload: 'Charge de travail',
+      grainCluster: 'Grappe',
+      grainPolicy: 'Politique',
+      grainService: 'Service',
+      grainGrid: 'Région du réseau',
+    },
+    story: {
+      step1: 'Fonctionnons-nous efficacement?',
+      step1Desc: 'Efficacité énergétique et charge TI par rapport à la cible.',
+      step2: 'Qu\u2019est-ce qui génère la demande?',
+      step2Desc: 'Pression des charges GPU et utilisation par zone.',
+      step3: 'La demande crée-t-elle un risque?',
+      step3Desc: 'Zones chaudes par rapport à l\u2019enveloppe ASHRAE A1.',
+      step4: 'Où devons-nous agir en premier?',
+      step4Desc: 'Événements actifs classés par gravité et ancienneté.',
+      step5: 'Pouvons-nous faire confiance aux données?',
+      step5Desc: 'Couverture, fraîcheur et santé des sources pour le jumeau numérique.',
+      step6: 'Sommes-nous conformes et durables?',
+      step6Desc: 'Couverture de souveraineté et intensité carbone du réseau.',
+      drill: 'Approfondir',
+    },
   },
 
   // Page d'infrastructure

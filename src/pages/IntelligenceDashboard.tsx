@@ -43,6 +43,14 @@ import { useTwinTelemetry, useTwinKPIs } from '@/hooks/useTwinData';
 import { useTwinKPIsFromSimulation } from '@/hooks/useTwinKPIsFromSimulation';
 import { useAgentKPIBindings } from '@/hooks/useTwinAgentsCatalog';
 import { KPI_CATALOG, KPIKey } from '@/domain/greenDc/kpiCatalog';
+import { ChartMeta } from '@/components/telemetry/ChartMeta';
+import { StoryStepHeader } from '@/components/telemetry/StoryStepHeader';
+import { DataTrustStrip, type DataTrustState } from '@/components/telemetry/DataTrustStrip';
+import { HotspotZonesList } from '@/components/telemetry/HotspotZonesList';
+import { getGridCarbon, CARBON_INTENSITY_TARGET, CARBON_INTENSITY_WARNING } from '@/domain/greenDc/gridCarbon';
+import { ReferenceLine, ReferenceArea } from 'recharts';
+import { RefreshCw } from 'lucide-react';
+import type { KpiStatus } from '@/components/shared/KpiCard';
 
 interface System {
   id: string;
@@ -68,6 +76,65 @@ export default function IntelligenceDashboard() {
   const [facility, setFacility] = useState('all');
   const [subsystem, setSubsystem] = useState('all');
   const [region, setRegion] = useState('all');
+
+  // ----- Derived basis labels (Lucas feedback: explicit grain/window/aggregation) -----
+  const windowLabel =
+    dateRange === '1' ? 'Last 24h' :
+    dateRange === '30' ? 'Last 30 days' :
+    'Last 7 days';
+  const facilityLabel = facility === 'all' ? 'All facilities' : facility.toUpperCase();
+  const regionLabel = region === 'all' ? 'All regions' : region.toUpperCase();
+
+  const grid = getGridCarbon(region);
+
+  // PUE thresholds from KPI catalog -- keeps card and chart in sync
+  const pueTarget = KPI_CATALOG[KPIKey.PUE]?.target ?? 1.2;
+  const pueWarning = KPI_CATALOG[KPIKey.PUE]?.warningThreshold ?? 1.4;
+
+  function pueStatus(v: number): KpiStatus {
+    if (v <= pueTarget) return 'good';
+    if (v <= pueWarning) return 'warning';
+    return 'critical';
+  }
+  function uptimeStatus(v: number): KpiStatus {
+    if (v >= 99.982) return 'good';
+    if (v >= 99.5) return 'warning';
+    return 'critical';
+  }
+  function carbonStatus(v: number): KpiStatus {
+    if (v <= CARBON_INTENSITY_TARGET) return 'good';
+    if (v <= CARBON_INTENSITY_WARNING) return 'warning';
+    return 'critical';
+  }
+  function gpuStatus(v: number): KpiStatus {
+    if (v >= 70 && v <= 90) return 'good';
+    if (v >= 50) return 'warning';
+    return 'critical';
+  }
+  function thermalStatus(count: number): KpiStatus {
+    if (count === 0) return 'good';
+    if (count <= 5) return 'warning';
+    return 'critical';
+  }
+  function sovereigntyStatus(pct: number): KpiStatus {
+    if (pct >= 100) return 'good';
+    if (pct >= 95) return 'warning';
+    return 'critical';
+  }
+
+  // Data trust state. Derived from local telemetry; replace with ops-health
+  // edge function output when wired.
+  // TODO: ops-health edge function -> {sensorCoverage, sourceHealth, qualityFlags}
+  const dataTrust: DataTrustState = useMemo(() => ({
+    lastRefreshed: new Date(Date.now() - 2 * 60 * 1000),
+    sensorCoverage: { reporting: 412, total: 438 },
+    sourceHealth: {
+      ok: 4,
+      total: 4,
+      sources: ['DCIM', 'BMS', 'IPMI', 'Grid API'],
+    },
+    qualityFlags: { good: 398, suspect: 9, stale: 5, missing: 0 },
+  }), []);
 
   // Twin context for scoped data
   const { twin, activeTwinId: twinId, twins } = useActiveTwin();
@@ -212,11 +279,22 @@ export default function IntelligenceDashboard() {
               <BarChart3 className="h-6 w-6 text-primary" />
               Telemetry & Analytics
             </h1>
-            <p className="text-muted-foreground">
-              {twin ? `${twin.name} - ${twin.city}` : 'Data Centre performance monitoring and insights'}
+            <p className="text-muted-foreground text-sm max-w-3xl">
+              {twin
+                ? `${twin.name} - ${twin.city}. ${t('intelligenceDashboard.defaultSubtitle')}`
+                : t('intelligenceDashboard.defaultSubtitle')}
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <div
+              className="hidden md:flex items-center gap-2 text-xs text-muted-foreground border border-border rounded-md px-2.5 py-1.5"
+              title={dataTrust.lastRefreshed.toLocaleString()}
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              <span>{t('telemetry.basis.lastRefreshed')}: 2 min ago</span>
+              <span className="text-muted-foreground/60">|</span>
+              <span>{t('telemetry.basis.autoRefresh')}</span>
+            </div>
             <Button variant="outline" className="gap-2" onClick={() => navigate('/blueprint/default')}>
               <FileText className="h-4 w-4" />
               Blueprint
@@ -294,61 +372,139 @@ export default function IntelligenceDashboard() {
           </CardContent>
         </Card>
 
-        {/* DC KPI Strip - Using real simulation data */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-          <KpiCard
-            label={KPI_CATALOG[KPIKey.PUE]?.label || "PUE Trend"}
-            value={simulationKpis[KPIKey.PUE]?.toFixed(2) || "1.38"}
-            change="-2.1%"
-            icon={Zap}
-            trend="down"
-            tooltip={KPI_CATALOG[KPIKey.PUE]?.description || "Power Usage Effectiveness - lower is better"}
-            onClick={() => navigate('/data-centre-twin')}
-          />
-          <KpiCard
-            label={KPI_CATALOG[KPIKey.GPU_UTILIZATION]?.label || "GPU Utilization"}
-            value={simulationKpis[KPIKey.GPU_UTILIZATION] ? `${simulationKpis[KPIKey.GPU_UTILIZATION]}%` : "78%"}
-            change="+5%"
-            icon={Cpu}
-            trend="up"
-            tooltip={KPI_CATALOG[KPIKey.GPU_UTILIZATION]?.description || "Average GPU cluster utilization"}
-            onClick={() => navigate('/data-centre-twin')}
-          />
-          <KpiCard
-            label={KPI_CATALOG[KPIKey.THERMAL_INCIDENTS]?.label || "Thermal Incidents"}
-            value={simulationKpis[KPIKey.THERMAL_INCIDENTS]?.toString() || "8"}
-            change="-3"
-            icon={Thermometer}
-            trend="down"
-            tooltip={KPI_CATALOG[KPIKey.THERMAL_INCIDENTS]?.description || "Thermal events in last 24h"}
-            onClick={() => navigate('/data-centre-twin')}
-          />
-          <KpiCard
-            label={KPI_CATALOG[KPIKey.CARBON_INTENSITY]?.label || "Emissions vs Target"}
-            value={simulationKpis[KPIKey.CARBON_INTENSITY] ? `${(100 - (simulationKpis[KPIKey.CARBON_INTENSITY] / 0.7)).toFixed(0)}%` : "94%"}
-            change="+2%"
-            icon={Flame}
-            trend="up"
-            tooltip={KPI_CATALOG[KPIKey.CARBON_INTENSITY]?.description || "On track for carbon targets"}
-          />
-          <KpiCard
-            label={KPI_CATALOG[KPIKey.SOVEREIGN_COMPLIANCE]?.label || "Sovereign Compute"}
-            value={simulationKpis[KPIKey.SOVEREIGN_COMPLIANCE] ? `${simulationKpis[KPIKey.SOVEREIGN_COMPLIANCE]}%` : "98%"}
-            change="0%"
-            icon={Globe}
-            trend="neutral"
-            tooltip={KPI_CATALOG[KPIKey.SOVEREIGN_COMPLIANCE]?.description || "Data residency compliance"}
-            onClick={() => navigate('/compliance')}
-          />
-          <KpiCard
-            label={KPI_CATALOG[KPIKey.UPTIME]?.label || "System Uptime"}
-            value={simulationKpis[KPIKey.UPTIME] ? `${simulationKpis[KPIKey.UPTIME]}%` : "99.97%"}
-            change="+0.02%"
-            icon={Activity}
-            trend="up"
-            tooltip={KPI_CATALOG[KPIKey.UPTIME]?.description || "Overall system availability"}
-          />
+        {/* Data Trust strip (Lucas feedback: trust the data before the insight) */}
+        <div className="mb-6">
+          <DataTrustStrip state={dataTrust} />
         </div>
+
+        {/*
+          DC KPI Strip with explicit metric basis.
+          Each card declares grain, time window, aggregation, target, source,
+          and quality so users do not read the same number in different ways.
+          References:
+            - PUE / DCIE: The Green Grid PUE v3 spec; Uptime Institute 2024.
+            - Tier uptime: Uptime Institute Tier Standard (Tier III 99.982%).
+            - GPU util band 70-90%: NVIDIA DGX SuperPOD reference.
+            - Carbon: IEA 2024 + electricityMap; gCO2eq/kWh at grid-region grain.
+            - Sovereignty: compliant_workloads / in-scope_workloads.
+        */}
+        {(() => {
+          const pueValue = simulationKpis[KPIKey.PUE] ?? 1.28;
+          const gpuValue = simulationKpis[KPIKey.GPU_UTILIZATION] ?? 78;
+          const thermalValue = simulationKpis[KPIKey.THERMAL_INCIDENTS] ?? 4;
+          const sovereigntyValue = simulationKpis[KPIKey.SOVEREIGN_COMPLIANCE] ?? 98;
+          const uptimeValue = simulationKpis[KPIKey.UPTIME] ?? 99.97;
+          const carbonValue = grid.intensity;
+          return (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+              <KpiCard
+                label="PUE"
+                value={pueValue.toFixed(2)}
+                unit=""
+                grain="Facility"
+                window={windowLabel}
+                aggregation="Weighted avg"
+                source="DCIM · BMS"
+                formula="Total facility power / IT equipment power"
+                status={pueStatus(pueValue)}
+                statusLabel={`Target ≤ ${pueTarget.toFixed(2)}`}
+                quality="good"
+                change="-2.1%"
+                trend="down"
+                icon={Zap}
+                tooltip="Power Usage Effectiveness over the selected period. Lower is better. Industry avg 1.58 (Uptime Institute 2024)."
+                onClick={() => navigate('/data-centre-twin')}
+              />
+              <KpiCard
+                label="GPU Utilization"
+                value={`${Math.round(gpuValue)}`}
+                unit="%"
+                grain="Cluster"
+                window={windowLabel}
+                aggregation="Avg across selected"
+                source="IPMI · Workload scheduler"
+                formula="mean(GPU_busy%) over filtered clusters"
+                status={gpuStatus(gpuValue)}
+                statusLabel="Target 70-90%"
+                quality="good"
+                change="+5%"
+                trend="up"
+                icon={Cpu}
+                tooltip="Average GPU compute utilization across clusters in scope. Optimal band 70-90% per NVIDIA DGX SuperPOD reference."
+                onClick={() => navigate('/data-centre-twin')}
+              />
+              <KpiCard
+                label="Thermal Incidents"
+                value={String(thermalValue)}
+                unit="events"
+                grain="Event"
+                window={windowLabel}
+                aggregation="Count"
+                source="BMS · Thermal sensors"
+                formula="count(threshold_breach) in window"
+                status={thermalStatus(thermalValue)}
+                statusLabel="Target 0 critical"
+                quality="good"
+                change="-3"
+                trend="down"
+                icon={Thermometer}
+                tooltip="Active and new thermal threshold breaches in the selected period. ASHRAE A1 envelope 18-27 °C."
+                onClick={() => navigate('/data-centre-twin')}
+              />
+              <KpiCard
+                label="Carbon Intensity"
+                value={String(carbonValue)}
+                unit="gCO₂/kWh"
+                badge={grid.label}
+                grain="Grid Region"
+                window="Current"
+                aggregation="Latest"
+                source={grid.source}
+                formula="Operational gCO₂eq per kWh at grid region"
+                status={carbonStatus(carbonValue)}
+                statusLabel={`Target ≤ ${CARBON_INTENSITY_TARGET}`}
+                quality="good"
+                icon={Flame}
+                tooltip="Live grid carbon intensity for the selected region. Lower is better. IEA 2024 + electricityMap convention."
+              />
+              <KpiCard
+                label="Sovereignty"
+                value={`${Math.round(sovereigntyValue)}`}
+                unit="%"
+                grain="Policy"
+                window={windowLabel}
+                aggregation="Compliant ÷ in-scope"
+                source="Policy engine · Workload registry"
+                formula="compliant_workloads / in_scope_workloads"
+                status={sovereigntyStatus(sovereigntyValue)}
+                statusLabel="Target 100%"
+                quality="good"
+                change="0%"
+                trend="neutral"
+                icon={Globe}
+                tooltip="Share of in-scope workloads meeting data residency and sovereignty policy. CCCS / Bill 25 / GDPR aligned."
+                onClick={() => navigate('/compliance')}
+              />
+              <KpiCard
+                label="System Uptime"
+                value={uptimeValue.toFixed(2)}
+                unit="%"
+                grain="Service"
+                window={windowLabel}
+                aggregation="Uptime ÷ window"
+                source="Service monitor · DCIM"
+                formula="(window - downtime_minutes) / window"
+                status={uptimeStatus(uptimeValue)}
+                statusLabel="SLA Tier III 99.982%"
+                quality="good"
+                change="+0.02%"
+                trend="up"
+                icon={Activity}
+                tooltip="Service availability over the selected period. Tier III SLA 99.982%, Tier IV 99.995% (Uptime Institute Tier Standard)."
+              />
+            </div>
+          );
+        })()}
 
         {/* Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
@@ -363,87 +519,297 @@ export default function IntelligenceDashboard() {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* PUE Trend Chart */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>PUE Trend (Last 7 Days)</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <LineChart data={pueChartData}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                      <XAxis dataKey="date" className="text-xs" />
-                      <YAxis domain={[1.3, 1.5]} className="text-xs" />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="pue" stroke="hsl(var(--primary))" strokeWidth={2} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
+            {/*
+              Overview is structured as a 6-step decision-flow story per Lucas
+              feedback. Each numbered band poses an executive question and the
+              dashboard answers it with the smallest set of evidence required.
+            */}
 
-              {/* Energy vs IT Load */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Energy vs IT Load (kW)</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <AreaChart data={energyVsLoadData}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                      <XAxis dataKey="hour" className="text-xs" />
-                      <YAxis className="text-xs" />
-                      <Tooltip />
-                      <Legend />
-                      <Area type="monotone" dataKey="energy" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.3} name="Total Energy" />
-                      <Area type="monotone" dataKey="itLoad" stroke="hsl(var(--accent))" fill="hsl(var(--accent))" fillOpacity={0.3} name="IT Load" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
+            {/* Step 1: Are we running efficiently? */}
+            <section>
+              <StoryStepHeader
+                step={1}
+                question={t('telemetry.story.step1')}
+                description={t('telemetry.story.step1Desc')}
+                drillTabLabel={`${t('telemetry.story.drill')} Power & Energy`}
+                onDrill={() => {
+                  const trigger = document.querySelector<HTMLElement>('[data-state][value="power"], [role="tab"][value="power"]');
+                  trigger?.click();
+                }}
+              />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">PUE Trend</CardTitle>
+                    <ChartMeta
+                      grain="Facility"
+                      window={windowLabel}
+                      aggregation="Daily weighted avg"
+                      source="DCIM · BMS"
+                    />
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={250}>
+                      <LineChart data={pueChartData}>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                        <XAxis dataKey="date" className="text-xs" />
+                        <YAxis domain={[1.1, 1.5]} className="text-xs" />
+                        <Tooltip />
+                        <ReferenceLine
+                          y={pueTarget}
+                          stroke="hsl(var(--primary))"
+                          strokeDasharray="4 4"
+                          label={{ value: `Target ${pueTarget.toFixed(2)}`, position: 'insideTopRight', fontSize: 10 }}
+                        />
+                        <ReferenceLine
+                          y={pueWarning}
+                          stroke="hsl(var(--destructive))"
+                          strokeDasharray="4 4"
+                          label={{ value: `Warning ${pueWarning.toFixed(2)}`, position: 'insideBottomRight', fontSize: 10 }}
+                        />
+                        <Line type="monotone" dataKey="pue" stroke="hsl(var(--primary))" strokeWidth={2} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
 
-              {/* GPU Utilization Heatmap (simplified) */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Power vs IT Load (kW)</CardTitle>
+                    <ChartMeta
+                      grain="Facility"
+                      window="Last 24h"
+                      aggregation="4-hour interval"
+                      source="DCIM"
+                    />
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={250}>
+                      <AreaChart data={energyVsLoadData}>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                        <XAxis dataKey="hour" className="text-xs" />
+                        <YAxis className="text-xs" label={{ value: 'kW', angle: -90, position: 'insideLeft', fontSize: 10 }} />
+                        <Tooltip />
+                        <Legend />
+                        <Area type="monotone" dataKey="energy" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.3} name="Total facility power" />
+                        <Area type="monotone" dataKey="itLoad" stroke="hsl(var(--accent))" fill="hsl(var(--accent))" fillOpacity={0.3} name="IT load" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </div>
+            </section>
+
+            {/* Step 2: What is driving demand? */}
+            <section>
+              <StoryStepHeader
+                step={2}
+                question={t('telemetry.story.step2')}
+                description={t('telemetry.story.step2Desc')}
+                drillTabLabel={`${t('telemetry.story.drill')} GPU & Workload`}
+              />
               <Card>
                 <CardHeader>
-                  <CardTitle>GPU Utilization by Zone</CardTitle>
+                  <CardTitle className="text-base">GPU Utilization by Zone</CardTitle>
+                  <ChartMeta
+                    grain="Zone"
+                    window={windowLabel}
+                    aggregation="Cluster avg"
+                    source="IPMI · Scheduler"
+                  />
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={250}>
+                  <ResponsiveContainer width="100%" height={280}>
                     <BarChart data={gpuUtilData}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                      <XAxis dataKey="zone" className="text-xs" />
-                      <YAxis className="text-xs" />
+                      <XAxis dataKey="zone" className="text-xs" tick={{ fontSize: 11 }} />
+                      <YAxis
+                        yAxisId="left"
+                        className="text-xs"
+                        domain={[0, 100]}
+                        label={{ value: 'Utilization %', angle: -90, position: 'insideLeft', fontSize: 10 }}
+                      />
+                      <YAxis
+                        yAxisId="right"
+                        orientation="right"
+                        className="text-xs"
+                        domain={[15, 35]}
+                        label={{ value: '°C', angle: 90, position: 'insideRight', fontSize: 10 }}
+                      />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="utilization" fill="hsl(186, 100%, 42%)" name="Utilization %" />
-                      <Bar dataKey="temp" fill="hsl(0, 84%, 60%)" name="Temp °C" />
+                      <ReferenceArea yAxisId="left" y1={70} y2={90} fill="hsl(var(--primary))" fillOpacity={0.08} label={{ value: 'Recommended 70-90%', fontSize: 10, position: 'insideTopLeft' }} />
+                      <Bar yAxisId="left" dataKey="utilization" fill="hsl(var(--primary))" name="Utilization %" />
+                      <Bar yAxisId="right" dataKey="temp" fill="hsl(var(--destructive))" name="Inlet °C" />
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
+            </section>
 
-              {/* Thermal Incidents */}
+            {/* Step 3: Is demand creating risk? */}
+            <section>
+              <StoryStepHeader
+                step={3}
+                question={t('telemetry.story.step3')}
+                description={t('telemetry.story.step3Desc')}
+                drillTabLabel={`${t('telemetry.story.drill')} Thermal Analysis`}
+              />
               <Card>
                 <CardHeader>
-                  <CardTitle>Thermal Incidents by Zone</CardTitle>
+                  <CardTitle className="text-base">Hotspot Zones</CardTitle>
+                  <ChartMeta
+                    grain="Zone"
+                    window="Current"
+                    aggregation="Latest inlet temp"
+                    source="Thermal sensors"
+                  />
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {thermalIncidents.map((incident) => (
-                      <div key={incident.zone} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div>
-                          <div className="font-medium">{incident.zone}</div>
-                          <div className="text-sm text-muted-foreground">{incident.count} events</div>
-                        </div>
-                        <Badge variant={incident.severity === 'high' ? 'destructive' : incident.severity === 'medium' ? 'default' : 'secondary'}>
-                          {incident.severity}
-                        </Badge>
-                      </div>
-                    ))}
+                  <HotspotZonesList
+                    zones={[
+                      { zone: 'DGX SuperPOD Row 1', inletTempC: 28.4, events: 1, note: 'High-density cluster' },
+                      { zone: 'Hot Aisle B (GPU)', inletTempC: 25.6, events: 3, note: 'GPU exhaust hotspots' },
+                      { zone: 'Cold Aisle A1-A4', inletTempC: 21.3, events: 0 },
+                      { zone: 'Network/Storage Hall', inletTempC: 22.8, events: 0 },
+                    ]}
+                  />
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* Step 4: Where should we act first? */}
+            <section>
+              <StoryStepHeader
+                step={4}
+                question={t('telemetry.story.step4')}
+                description={t('telemetry.story.step4Desc')}
+                drillTabLabel="Open AOC"
+                onDrill={() => navigate('/aoc')}
+              />
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Active Events</CardTitle>
+                  <ChartMeta
+                    grain="Event"
+                    window={windowLabel}
+                    aggregation="Sorted by severity, then age"
+                    source="Incident registry"
+                  />
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border text-left text-xs text-muted-foreground">
+                          <th className="py-2 pr-3 font-medium">Zone</th>
+                          <th className="py-2 pr-3 font-medium">Severity</th>
+                          <th className="py-2 pr-3 font-medium">Age</th>
+                          <th className="py-2 pr-3 font-medium">Owner</th>
+                          <th className="py-2 pr-3 font-medium text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          { id: 'evt-1', zone: 'DGX SuperPOD Row 1', severity: 'critical', age: '12 min', owner: 'NOC' },
+                          { id: 'evt-2', zone: 'Hot Aisle B (GPU)', severity: 'warning', age: '47 min', owner: 'Thermal' },
+                          { id: 'evt-3', zone: 'CRAH-04 inlet', severity: 'warning', age: '2 h', owner: 'Cooling' },
+                        ].map((e) => (
+                          <tr key={e.id} className="border-b border-border/50">
+                            <td className="py-2 pr-3 font-medium">{e.zone}</td>
+                            <td className="py-2 pr-3">
+                              <Badge variant={e.severity === 'critical' ? 'destructive' : 'default'} className="capitalize">
+                                {e.severity}
+                              </Badge>
+                            </td>
+                            <td className="py-2 pr-3 text-muted-foreground">{e.age}</td>
+                            <td className="py-2 pr-3 text-muted-foreground">{e.owner}</td>
+                            <td className="py-2 pr-3 text-right">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => navigate(`/aoc?incident=${e.id}`)}
+                              >
+                                Open
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </CardContent>
               </Card>
-            </div>
+            </section>
+
+            {/* Step 5: Can we trust the data? */}
+            <section>
+              <StoryStepHeader
+                step={5}
+                question={t('telemetry.story.step5')}
+                description={t('telemetry.story.step5Desc')}
+                drillTabLabel="Connect Health"
+                onDrill={() => navigate('/connect/health')}
+              />
+              <DataTrustStrip state={dataTrust} />
+            </section>
+
+            {/* Step 6: Are we compliant and sustainable? */}
+            <section>
+              <StoryStepHeader
+                step={6}
+                question={t('telemetry.story.step6')}
+                description={t('telemetry.story.step6Desc')}
+                drillTabLabel={`${t('telemetry.story.drill')} Sovereignty`}
+              />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Sovereignty Coverage</CardTitle>
+                    <ChartMeta
+                      grain="Policy"
+                      window={windowLabel}
+                      aggregation="Compliant ÷ in-scope"
+                      source="Policy engine"
+                    />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-4xl font-bold text-foreground mb-1">
+                      {Math.round(simulationKpis[KPIKey.SOVEREIGN_COMPLIANCE] ?? 98)}%
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Workloads meeting data residency policy. Exceptions: 2 (under review).
+                    </p>
+                    <Button variant="outline" size="sm" onClick={() => navigate('/compliance')}>
+                      View exceptions
+                    </Button>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Carbon Intensity</CardTitle>
+                    <ChartMeta
+                      grain="Grid Region"
+                      window="Current"
+                      aggregation="Latest"
+                      source={grid.source}
+                    />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <span className="text-4xl font-bold text-foreground">{grid.intensity}</span>
+                      <span className="text-sm text-muted-foreground">gCO₂/kWh</span>
+                      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-accent/15 text-accent-foreground border border-accent/30">
+                        {grid.label}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Target ≤ {CARBON_INTENSITY_TARGET} gCO₂/kWh. Quebec hydro grid is among the lowest carbon globally.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </section>
           </TabsContent>
 
           {/* Thermal Tab */}

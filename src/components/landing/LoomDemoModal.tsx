@@ -1,5 +1,9 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import type { ReactNode } from "react";
+
+const VisuallyHidden = ({ children }: { children: ReactNode }) => (
+  <span className="sr-only">{children}</span>
+);
 
 interface LoomDemoModalProps {
   open: boolean;

@@ -254,5 +254,6 @@ export default function Onboarding() {
         </div>
       </main>
     </div>
+    </>
   );
 }

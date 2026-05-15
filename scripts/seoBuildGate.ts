@@ -13,7 +13,8 @@
  */
 
 import { readFileSync, existsSync } from "fs";
-import { resolve } from "path";
+import { writeFileSync, mkdirSync } from "fs";
+import { resolve, dirname } from "path";
 import type { Plugin } from "vite";
 
 type Severity = "error" | "warn";
@@ -145,17 +146,61 @@ export function seoBuildGate(): Plugin {
       const errors = findings.filter((f) => f.severity === "error");
       const warns = findings.filter((f) => f.severity === "warn");
 
-      console.log("\n[seo-build-gate] Validating built SEO artifacts...");
-      for (const f of [...errors, ...warns]) {
-        const tag = f.severity === "error" ? "FAIL" : "WARN";
-        console.log(`  [${tag}] ${f.id} - ${f.message}`);
-      }
-      console.log(`[seo-build-gate] ${errors.length} error(s), ${warns.length} warning(s).\n`);
+      const passed = errors.length === 0;
+      const report = {
+        generatedAt: new Date().toISOString(),
+        status: passed ? "pass" : "fail",
+        summary: {
+          errors: errors.length,
+          warnings: warns.length,
+          total: findings.length,
+        },
+        artifacts: {
+          indexHtml: existsSync(indexPath),
+          robotsTxt: existsSync(robotsPath),
+          sitemapXml: existsSync(sitemapPath),
+        },
+        findings,
+      };
 
-      if (errors.length > 0) {
+      // Write JSON report (always, so users can inspect even on pass)
+      const reportPath = resolve(dist, "seo-report.json");
+      try {
+        mkdirSync(dirname(reportPath), { recursive: true });
+        writeFileSync(reportPath, JSON.stringify(report, null, 2), "utf8");
+      } catch (e) {
+        console.warn(`[seo-build-gate] Failed to write report: ${(e as Error).message}`);
+      }
+
+      // Human-readable console report
+      const bar = "─".repeat(64);
+      console.log("\n" + bar);
+      console.log(" SEO Validation Report");
+      console.log(bar);
+      console.log(` Status   : ${passed ? "PASS ✓" : "FAIL ✗"}`);
+      console.log(` Errors   : ${errors.length}`);
+      console.log(` Warnings : ${warns.length}`);
+      console.log(` Artifacts: index.html=${report.artifacts.indexHtml}  robots.txt=${report.artifacts.robotsTxt}  sitemap.xml=${report.artifacts.sitemapXml}`);
+      console.log(` Report   : ${reportPath}`);
+      console.log(bar);
+      if (errors.length) {
+        console.log(" Errors:");
+        for (const f of errors) console.log(`   ✗ [${f.id}] ${f.message}`);
+      }
+      if (warns.length) {
+        console.log(" Warnings:");
+        for (const f of warns) console.log(`   ! [${f.id}] ${f.message}`);
+      }
+      if (passed && warns.length === 0) {
+        console.log(" All SEO checks passed. Safe to publish.");
+      }
+      console.log(bar + "\n");
+
+      if (!passed) {
         this.error(
           `SEO build gate FAILED with ${errors.length} error(s). ` +
-          `Fix the issues above or set SKIP_SEO_GATE=1 to bypass (not recommended).`
+          `See report at ${reportPath} or fix issues above. ` +
+          `Set SKIP_SEO_GATE=1 to bypass (not recommended).`
         );
       }
     },

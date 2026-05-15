@@ -157,8 +157,7 @@ describe("seoBuildGate integration - duplicate OG/Twitter aborts the build", () 
   it("does NOT fail the build when og:image is duplicated (warn-only)", () => {
     // og:image is intentionally a warning since the spec allows multiple
     // images. Build must still pass when this is the only duplicate.
-    const html = baseHead(`<meta property="og:image" content="https://auradc.m2mtechconnect.com/og2.png">
-    <meta property="og:image:alt" content="Second image">`);
+    const html = baseHead(`<meta property="og:image" content="https://auradc.m2mtechconnect.com/og2.png">`);
     const result = runGate(html);
 
     expect(result.errored).toBe(false);

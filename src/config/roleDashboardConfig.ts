@@ -80,7 +80,6 @@ const executiveConfig: RoleDashboardConfig = {
   ],
   navigation: [
     { name: 'Command', fullName: 'Executive Command Centre', href: '/', icon: LayoutDashboard, group: 'primary' },
-    { name: 'Omniverse', fullName: 'Omniverse Live Scene', href: '/omniverse-scene', icon: Monitor, group: 'primary' },
     { name: 'Analytics', fullName: 'Strategic Analytics', href: '/intelligence', icon: BarChart3, group: 'primary' },
     { name: 'Compliance', fullName: 'Sovereignty & Compliance', href: '/compliance', icon: Shield, group: 'primary' },
     { name: 'Teams', fullName: 'Team Management', href: '/teams', icon: Users, group: 'secondary' },
@@ -110,7 +109,6 @@ const managerConfig: RoleDashboardConfig = {
   ],
   navigation: [
     { name: 'Command', fullName: 'Operations Dashboard', href: '/', icon: LayoutDashboard, group: 'primary' },
-    { name: 'Omniverse', fullName: 'Omniverse Live Scene', href: '/omniverse-scene', icon: Monitor, group: 'primary' },
     { name: 'Agents', fullName: 'Subsystem Agents', href: '/app/agents', icon: Server, group: 'primary' },
     { name: 'Analytics', fullName: 'Performance Analytics', href: '/intelligence', icon: BarChart3, group: 'primary' },
     { name: 'Teams', fullName: 'Team Management', href: '/teams', icon: Users, group: 'secondary' },
@@ -141,7 +139,6 @@ const engineerConfig: RoleDashboardConfig = {
   ],
   navigation: [
     { name: 'Command', fullName: 'Engineering Workbench', href: '/', icon: LayoutDashboard, group: 'primary' },
-    { name: 'Omniverse', fullName: 'Omniverse Live Scene', href: '/omniverse-scene', icon: Monitor, group: 'primary' },
     { name: 'Build', fullName: 'Build Data Centre Twin', href: '/builder', icon: Wrench, group: 'primary' },
     { name: 'Agents', fullName: 'Subsystem Agents', href: '/app/agents', icon: Server, group: 'primary' },
     { name: 'Analytics', fullName: 'Telemetry & Analytics', href: '/intelligence', icon: BarChart3, group: 'secondary' },
@@ -173,7 +170,6 @@ const securityAdminConfig: RoleDashboardConfig = {
   ],
   navigation: [
     { name: 'Command', fullName: 'Security Operations Centre', href: '/', icon: LayoutDashboard, group: 'primary' },
-    { name: 'Omniverse', fullName: 'Omniverse Live Scene', href: '/omniverse-scene', icon: Monitor, group: 'primary' },
     { name: 'Audit', fullName: 'Sovereignty & Safety Audit', href: '/compliance', icon: Shield, group: 'primary' },
     { name: 'Teams', fullName: 'Access Management', href: '/teams', icon: Users, group: 'primary' },
     { name: 'Approvals', fullName: 'User Approvals', href: '/admin/signups-dashboard', icon: UserCheck, group: 'secondary' },

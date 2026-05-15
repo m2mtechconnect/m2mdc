@@ -53,7 +53,6 @@ interface LayoutProps {
 // Fallback navigation (used during loading)
 const fallbackPrimary = [
   { name: "Command", fullName: "Data Centre Command", href: "/", icon: LayoutDashboard, group: 'primary' as const },
-  { name: "Omniverse", fullName: "Omniverse Live Scene", href: "/omniverse-scene", icon: Monitor, group: 'primary' as const },
   { name: "Build", fullName: "Build Data Centre Twin", href: "/builder", icon: Wrench, group: 'primary' as const },
   { name: "Agents", fullName: "Subsystem Agents", href: "/app/agents", icon: Server, group: 'primary' as const },
 ];

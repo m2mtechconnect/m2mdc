@@ -18,8 +18,9 @@ i18n
       en: { translation: en },
       'fr-CA': { translation: frCA },
     },
-    lng: 'en',
     fallbackLng: 'en',
+    supportedLngs: ['en', 'fr-CA'],
+    nonExplicitSupportedLngs: false,
     interpolation: {
       escapeValue: false, // React already escapes
     },

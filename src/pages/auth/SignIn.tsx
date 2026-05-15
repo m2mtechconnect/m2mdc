@@ -14,6 +14,7 @@ import { Loader2, Lock, Mail, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthLayout, SecurityBadge, SSOButtons } from "@/components/auth";
+import { Helmet } from "react-helmet-async";
 
 const signInSchema = z.object({
   email: z.string()
@@ -103,6 +104,16 @@ export default function SignIn() {
   };
 
   return (
+    <>
+    <Helmet>
+      <title>Sign In | M2M AURA</title>
+      <meta name="description" content="Access the M2M AURA Sovereign AI Data Centre Digital Twin platform. Sign in to monitor PUE, GPU utilization, thermals, and compliance." />
+      <link rel="canonical" href="https://auradc.m2mtechconnect.com/login" />
+      <meta property="og:title" content="Sign In | M2M AURA" />
+      <meta property="og:description" content="Access the M2M AURA platform for sovereign data centre operations." />
+      <meta property="og:url" content="https://auradc.m2mtechconnect.com/login" />
+      <meta property="og:type" content="website" />
+    </Helmet>
     <AuthLayout
       title="Sign in to your account"
       subtitle="Enter your credentials to access the studio"

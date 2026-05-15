@@ -38,9 +38,39 @@ function findAllLinks(html: string, rel: string): string[] {
   return [...html.matchAll(re)].map((m) => pickAttr(m[0], "href") ?? "");
 }
 
+const DEFAULT_PROD_BASE_URL = "https://auradc.m2mtechconnect.com";
+
+function getProdBaseUrl(): { url: string; source: string } {
+  const raw =
+    process.env.PROD_BASE_URL ||
+    process.env.VITE_PROD_BASE_URL ||
+    process.env.SITE_URL ||
+    "";
+  const source = process.env.PROD_BASE_URL
+    ? "PROD_BASE_URL"
+    : process.env.VITE_PROD_BASE_URL
+    ? "VITE_PROD_BASE_URL"
+    : process.env.SITE_URL
+    ? "SITE_URL"
+    : "default";
+  const url = (raw || DEFAULT_PROD_BASE_URL).replace(/\/+$/, "");
+  return { url, source };
+}
+
+function originOf(u: string): string | null {
+  try {
+    return new URL(u).origin;
+  } catch {
+    return null;
+  }
+}
+
 function validateHtml(html: string, findings: Finding[]) {
   const add = (id: string, severity: Severity, message: string) =>
     findings.push({ id, severity, message });
+
+  const { url: prodBase, source: prodBaseSource } = getProdBaseUrl();
+  const prodOrigin = originOf(prodBase);
 
   const title = html.match(/<title>([^<]*)<\/title>/i)?.[1]?.trim() ?? "";
   if (!title) add("title.missing", "error", "Missing <title>.");
@@ -70,6 +100,16 @@ function validateHtml(html: string, findings: Finding[]) {
     const href = canonicals[0];
     if (!/^https?:\/\//i.test(href)) {
       add("canonical.relative", "error", `Canonical must be absolute (got "${href}").`);
+    } else if (prodOrigin) {
+      const hrefOrigin = originOf(href);
+      if (hrefOrigin && hrefOrigin !== prodOrigin) {
+        add(
+          "canonical.origin-mismatch",
+          "error",
+          `Canonical origin "${hrefOrigin}" does not match production base URL "${prodOrigin}" (from ${prodBaseSource}). ` +
+            `Staging/dev builds must not publish a canonical pointing to a different origin.`,
+        );
+      }
     }
   }
 
@@ -77,6 +117,16 @@ function validateHtml(html: string, findings: Finding[]) {
   const ogUrl = findMeta(html, "property", "og:url");
   if (ogUrl && !/^https?:\/\//i.test(ogUrl)) {
     add("og.url-relative", "error", `og:url must be absolute (got "${ogUrl}").`);
+  }
+  if (ogUrl && /^https?:\/\//i.test(ogUrl) && prodOrigin) {
+    const ogUrlOrigin = originOf(ogUrl);
+    if (ogUrlOrigin && ogUrlOrigin !== prodOrigin) {
+      add(
+        "og.url-origin-mismatch",
+        "warn",
+        `og:url origin "${ogUrlOrigin}" does not match production base URL "${prodOrigin}" (from ${prodBaseSource}).`,
+      );
+    }
   }
 
   // og:image (warn if missing - optional but recommended)

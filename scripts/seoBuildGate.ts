@@ -29,6 +29,15 @@ function findMeta(html: string, key: "name" | "property", value: string): string
   return m ? pickAttr(m[0], "content") : null;
 }
 
+function findLink(html: string, rel: string): string | null {
+  const m = html.match(new RegExp(`<link[^>]*rel\\s*=\\s*"${rel}"[^>]*>`, "i"));
+  return m ? pickAttr(m[0], "href") : null;
+}
+function findAllLinks(html: string, rel: string): string[] {
+  const re = new RegExp(`<link[^>]*rel\\s*=\\s*"${rel}"[^>]*>`, "gi");
+  return [...html.matchAll(re)].map((m) => pickAttr(m[0], "href") ?? "");
+}
+
 function validateHtml(html: string, findings: Finding[]) {
   const add = (id: string, severity: Severity, message: string) =>
     findings.push({ id, severity, message });
@@ -50,6 +59,57 @@ function validateHtml(html: string, findings: Finding[]) {
   const ogRequired = ["og:title", "og:description", "og:type"];
   const ogMissing = ogRequired.filter((p) => !findMeta(html, "property", p));
   if (ogMissing.length) add("og.missing", "warn", `Missing OG tags: ${ogMissing.join(", ")}.`);
+
+  // Canonical
+  const canonicals = findAllLinks(html, "canonical");
+  if (canonicals.length === 0) {
+    add("canonical.missing", "error", 'Missing <link rel="canonical">.');
+  } else if (canonicals.length > 1) {
+    add("canonical.duplicate", "error", `Found ${canonicals.length} canonical links; only one is allowed.`);
+  } else {
+    const href = canonicals[0];
+    if (!/^https?:\/\//i.test(href)) {
+      add("canonical.relative", "error", `Canonical must be absolute (got "${href}").`);
+    }
+  }
+
+  // og:url should be absolute when present
+  const ogUrl = findMeta(html, "property", "og:url");
+  if (ogUrl && !/^https?:\/\//i.test(ogUrl)) {
+    add("og.url-relative", "error", `og:url must be absolute (got "${ogUrl}").`);
+  }
+
+  // og:image (warn if missing - optional but recommended)
+  const ogImage = findMeta(html, "property", "og:image");
+  if (!ogImage) {
+    add("og.image-missing", "warn", "Missing og:image (recommended for social previews).");
+  } else {
+    if (!/^https?:\/\//i.test(ogImage)) {
+      add("og.image-relative", "error", `og:image must be an absolute URL (got "${ogImage}").`);
+    }
+    const ogImageAlt = findMeta(html, "property", "og:image:alt");
+    if (!ogImageAlt) add("og.image-alt-missing", "warn", "Missing og:image:alt (improves accessibility).");
+  }
+
+  // Twitter card tags
+  const twitterCard = findMeta(html, "name", "twitter:card");
+  if (!twitterCard) {
+    add("twitter.card-missing", "error", 'Missing <meta name="twitter:card">.');
+  } else {
+    const allowed = ["summary", "summary_large_image", "app", "player"];
+    if (!allowed.includes(twitterCard)) {
+      add("twitter.card-invalid", "error", `Invalid twitter:card "${twitterCard}". Expected one of: ${allowed.join(", ")}.`);
+    }
+    if (twitterCard === "summary_large_image" && !ogImage && !findMeta(html, "name", "twitter:image")) {
+      add("twitter.image-missing", "error", 'twitter:card="summary_large_image" requires twitter:image or og:image.');
+    }
+  }
+  if (!findMeta(html, "name", "twitter:title") && !findMeta(html, "property", "og:title")) {
+    add("twitter.title-missing", "warn", "Missing twitter:title (falls back to og:title if present).");
+  }
+  if (!findMeta(html, "name", "twitter:description") && !findMeta(html, "property", "og:description")) {
+    add("twitter.description-missing", "warn", "Missing twitter:description (falls back to og:description if present).");
+  }
 
   const ldBlocks = [...html.matchAll(/<script[^>]*type\s*=\s*"application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)];
   ldBlocks.forEach((m, i) => {

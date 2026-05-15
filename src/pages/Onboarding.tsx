@@ -21,6 +21,7 @@ import { StepDataCentre } from "@/components/onboarding/StepDataCentre";
 import { StepGoals } from "@/components/onboarding/StepGoals";
 import { StepSummary } from "@/components/onboarding/StepSummary";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 const onboardingSchema = z.object({
   full_name: z.string().trim().min(1, "Full name is required").max(100),
@@ -139,6 +140,16 @@ export default function Onboarding() {
   };
 
   return (
+    <>
+    <Helmet>
+      <title>Start Onboarding | M2M AURA</title>
+      <meta name="description" content="Begin your M2M AURA journey. Tell us about your data centre and goals to configure your Sovereign AI Digital Twin." />
+      <link rel="canonical" href="https://auradc.m2mtechconnect.com/onboarding" />
+      <meta property="og:title" content="Start Onboarding | M2M AURA" />
+      <meta property="og:description" content="Configure your Sovereign AI Data Centre Digital Twin in a few guided steps." />
+      <meta property="og:url" content="https://auradc.m2mtechconnect.com/onboarding" />
+      <meta property="og:type" content="website" />
+    </Helmet>
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b border-border/50 bg-background/95 backdrop-blur-sm sticky top-0 z-50">
@@ -243,5 +254,6 @@ export default function Onboarding() {
         </div>
       </main>
     </div>
+    </>
   );
 }

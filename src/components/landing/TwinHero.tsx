@@ -20,6 +20,7 @@ export function TwinHero() {
   const [demoOpen, setDemoOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [showVideo, setShowVideo] = useState(false);
 
   const powerStats = [
     { value: "1.28", label: t('landing.avgPueAchieved'), icon: TrendingUp, color: "text-success" },
@@ -56,6 +57,28 @@ export function TwinHero() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [mouseX, mouseY]);
 
+  // Defer the heavy hero video so it doesn't block LCP. Only load it on
+  // larger screens, when the user hasn't requested reduced motion or
+  // data-saver, and after the browser is idle.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mql = window.matchMedia('(min-width: 768px)');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    const saveData = conn?.saveData === true;
+    const slow = conn?.effectiveType === 'slow-2g' || conn?.effectiveType === '2g';
+    if (!mql.matches || reduceMotion || saveData || slow) return;
+    const ric: (cb: () => void) => number =
+      (window as Window & { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback ??
+      ((cb) => window.setTimeout(cb, 1500));
+    const id = ric(() => setShowVideo(true));
+    return () => {
+      const cic = (window as Window & { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback;
+      if (cic) cic(id);
+      else window.clearTimeout(id);
+    };
+  }, []);
+
   return (
     <>
     <section 
@@ -64,9 +87,28 @@ export function TwinHero() {
     >
       {/* Video background */}
       <div className="absolute inset-0 z-0">
-        <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-40">
-          <source src="/landing/hero-datacenter.mp4" type="video/mp4" />
-        </video>
+        {/* LCP poster - always painted first */}
+        <img
+          src="/landing/hero-datacenter-bg.jpg"
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
+        />
+        {showVideo && (
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="none"
+            poster="/landing/hero-datacenter-bg.jpg"
+            className="absolute inset-0 w-full h-full object-cover opacity-40"
+          >
+            <source src="/landing/hero-datacenter.mp4" type="video/mp4" />
+          </video>
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
         <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-background/70" />
       </div>

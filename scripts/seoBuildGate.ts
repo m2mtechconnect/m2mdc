@@ -20,22 +20,67 @@ import type { Plugin } from "vite";
 type Severity = "error" | "warn";
 interface Finding { id: string; severity: Severity; message: string; }
 
-function pickAttr(tag: string, attr: string): string | null {
-  const m = tag.match(new RegExp(`${attr}\\s*=\\s*"([^"]*)"`, "i"));
-  return m ? m[1] : null;
-}
-function findMeta(html: string, key: "name" | "property", value: string): string | null {
-  const m = html.match(new RegExp(`<meta[^>]*${key}\\s*=\\s*"${value}"[^>]*>`, "i"));
-  return m ? pickAttr(m[0], "content") : null;
+/**
+ * Robust HTML attribute parser.
+ *
+ * Handles real-world variation in `index.html` and bundled output:
+ *  - attribute order (`<meta content="x" name="description">` vs the
+ *    other way round)
+ *  - case variation on tag names AND attribute names
+ *    (`<META Property="OG:Image" CONTENT="...">`)
+ *  - quoting style: double quotes, single quotes, or unquoted values
+ *  - extra whitespace, newlines, and self-closing slashes
+ *  - boolean attributes (no `=value`)
+ *
+ * Note: comparison values for `name`/`property`/`rel` are matched
+ * case-insensitively to mirror how social crawlers normalize them.
+ * The original-case value is preserved in `content` since URLs and
+ * alt text are case-sensitive.
+ */
+interface ParsedTag {
+  tagName: string;
+  attrs: Record<string, string>; // attr name lowercased -> value (original case)
+  raw: string;
 }
 
-function findLink(html: string, rel: string): string | null {
-  const m = html.match(new RegExp(`<link[^>]*rel\\s*=\\s*"${rel}"[^>]*>`, "i"));
-  return m ? pickAttr(m[0], "href") : null;
+function parseAttrs(attrText: string): Record<string, string> {
+  const attrs: Record<string, string> = {};
+  // name (with optional value). Supports: name="v" | name='v' | name=v | name
+  const re = /([a-zA-Z_:][-a-zA-Z0-9_:.]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(attrText)) !== null) {
+    const name = m[1].toLowerCase();
+    const value = m[2] ?? m[3] ?? m[4] ?? "";
+    if (!(name in attrs)) attrs[name] = value;
+  }
+  return attrs;
 }
-function findAllLinks(html: string, rel: string): string[] {
-  const re = new RegExp(`<link[^>]*rel\\s*=\\s*"${rel}"[^>]*>`, "gi");
-  return [...html.matchAll(re)].map((m) => pickAttr(m[0], "href") ?? "");
+
+function findTags(html: string, tagName: string): ParsedTag[] {
+  const re = new RegExp(`<${tagName}\\b([^>]*)>`, "gi");
+  const out: ParsedTag[] = [];
+  for (const m of html.matchAll(re)) {
+    out.push({
+      tagName: tagName.toLowerCase(),
+      attrs: parseAttrs(m[1]),
+      raw: m[0],
+    });
+  }
+  return out;
+}
+
+function findMeta(
+  html: string,
+  key: "name" | "property",
+  value: string,
+): string | null {
+  const target = value.toLowerCase();
+  for (const tag of findTags(html, "meta")) {
+    if ((tag.attrs[key] ?? "").toLowerCase() === target) {
+      return tag.attrs.content ?? null;
+    }
+  }
+  return null;
 }
 
 function findAllMeta(
@@ -43,8 +88,25 @@ function findAllMeta(
   key: "name" | "property",
   value: string,
 ): string[] {
-  const re = new RegExp(`<meta[^>]*${key}\\s*=\\s*"${value}"[^>]*>`, "gi");
-  return [...html.matchAll(re)].map((m) => pickAttr(m[0], "content") ?? "");
+  const target = value.toLowerCase();
+  const out: string[] = [];
+  for (const tag of findTags(html, "meta")) {
+    if ((tag.attrs[key] ?? "").toLowerCase() === target) {
+      out.push(tag.attrs.content ?? "");
+    }
+  }
+  return out;
+}
+
+function findAllLinks(html: string, rel: string): string[] {
+  const target = rel.toLowerCase();
+  const out: string[] = [];
+  for (const tag of findTags(html, "link")) {
+    // rel can be space-separated list (e.g. rel="canonical alternate")
+    const rels = (tag.attrs.rel ?? "").toLowerCase().split(/\s+/);
+    if (rels.includes(target)) out.push(tag.attrs.href ?? "");
+  }
+  return out;
 }
 
 /**
@@ -142,14 +204,14 @@ function checkDuplicateSocialTags(html: string, findings: Finding[]) {
  */
 function checkOgImageGroupConsistency(html: string, findings: Finding[]) {
   // Walk every og:* meta tag in document order so we can group
-  // structured properties under their parent og:image.
-  const re = /<meta\b[^>]*\bproperty\s*=\s*"(og:[^"]+)"[^>]*>/gi;
+  // structured properties under their parent og:image. Uses the
+  // robust parser so attribute order/case/quoting variation cannot
+  // hide an og:image:* tag from the grouping logic.
   const ordered: { prop: string; content: string }[] = [];
-  for (const m of html.matchAll(re)) {
-    ordered.push({
-      prop: m[1].toLowerCase(),
-      content: pickAttr(m[0], "content") ?? "",
-    });
+  for (const tag of findTags(html, "meta")) {
+    const prop = (tag.attrs.property ?? "").toLowerCase();
+    if (!prop.startsWith("og:")) continue;
+    ordered.push({ prop, content: tag.attrs.content ?? "" });
   }
 
   interface Group {

@@ -38,6 +38,89 @@ function findAllLinks(html: string, rel: string): string[] {
   return [...html.matchAll(re)].map((m) => pickAttr(m[0], "href") ?? "");
 }
 
+function findAllMeta(
+  html: string,
+  key: "name" | "property",
+  value: string,
+): string[] {
+  const re = new RegExp(`<meta[^>]*${key}\\s*=\\s*"${value}"[^>]*>`, "gi");
+  return [...html.matchAll(re)].map((m) => pickAttr(m[0], "content") ?? "");
+}
+
+/**
+ * Tags where multiple instances are legitimately allowed by the
+ * spec (e.g. og:image can repeat for multi-image previews) and
+ * should NOT be flagged as duplicates.
+ */
+const REPEATABLE_OG_TAGS = new Set<string>([
+  // og:image group can repeat (each image gets its own image:width etc.)
+  // but we still warn so the user is aware.
+]);
+
+function checkDuplicateSocialTags(html: string, findings: Finding[]) {
+  const ogTags = [
+    "og:title",
+    "og:description",
+    "og:type",
+    "og:url",
+    "og:site_name",
+    "og:locale",
+    "og:image",
+    "og:image:alt",
+    "og:image:width",
+    "og:image:height",
+  ] as const;
+  const twitterTags = [
+    "twitter:card",
+    "twitter:site",
+    "twitter:creator",
+    "twitter:title",
+    "twitter:description",
+    "twitter:image",
+    "twitter:image:alt",
+  ] as const;
+
+  for (const tag of ogTags) {
+    const values = findAllMeta(html, "property", tag);
+    if (values.length <= 1) continue;
+    const unique = new Set(values.map((v) => v.trim()));
+    const severity: Severity =
+      tag === "og:image" ? "warn" : "error";
+    const detail =
+      unique.size === 1
+        ? `${values.length} identical copies`
+        : `${values.length} tags with ${unique.size} different values: ${[...unique]
+            .map((v) => `"${v}"`)
+            .join(", ")}`;
+    findings.push({
+      id: `og.duplicate.${tag}`,
+      severity,
+      message: `Duplicate <meta property="${tag}"> found (${detail}). ${
+        tag === "og:image"
+          ? "Multiple og:image tags are allowed but social crawlers pick one unpredictably."
+          : "Only one is allowed; social crawlers will pick one unpredictably."
+      }`,
+    });
+  }
+
+  for (const tag of twitterTags) {
+    const values = findAllMeta(html, "name", tag);
+    if (values.length <= 1) continue;
+    const unique = new Set(values.map((v) => v.trim()));
+    const detail =
+      unique.size === 1
+        ? `${values.length} identical copies`
+        : `${values.length} tags with ${unique.size} different values: ${[...unique]
+            .map((v) => `"${v}"`)
+            .join(", ")}`;
+    findings.push({
+      id: `twitter.duplicate.${tag}`,
+      severity: "error",
+      message: `Duplicate <meta name="${tag}"> found (${detail}). Only one is allowed; X/Twitter will pick one unpredictably.`,
+    });
+  }
+}
+
 const DEFAULT_PROD_BASE_URL = "https://auradc.m2mtechconnect.com";
 
 function getProdBaseUrl(): { url: string; source: string } {
@@ -68,6 +151,11 @@ function originOf(u: string): string | null {
 function validateHtml(html: string, findings: Finding[]) {
   const add = (id: string, severity: Severity, message: string) =>
     findings.push({ id, severity, message });
+
+  // Duplicate Open Graph / Twitter meta detection.
+  // Inconsistent or repeated tags cause unpredictable previews on
+  // Facebook/LinkedIn/Slack/X.
+  checkDuplicateSocialTags(html, findings);
 
   const { url: prodBase, source: prodBaseSource } = getProdBaseUrl();
   const prodOrigin = originOf(prodBase);

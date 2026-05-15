@@ -152,6 +152,11 @@ function validateHtml(html: string, findings: Finding[]) {
   const add = (id: string, severity: Severity, message: string) =>
     findings.push({ id, severity, message });
 
+  // Duplicate Open Graph / Twitter meta detection.
+  // Inconsistent or repeated tags cause unpredictable previews on
+  // Facebook/LinkedIn/Slack/X.
+  checkDuplicateSocialTags(html, findings);
+
   const { url: prodBase, source: prodBaseSource } = getProdBaseUrl();
   const prodOrigin = originOf(prodBase);
 

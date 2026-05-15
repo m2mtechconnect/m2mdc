@@ -121,6 +121,167 @@ function checkDuplicateSocialTags(html: string, findings: Finding[]) {
   }
 }
 
+/**
+ * Validate og:image group consistency.
+ *
+ * Per the Open Graph protocol, structured image properties
+ * (og:image:url, og:image:secure_url, og:image:type, og:image:width,
+ * og:image:height, og:image:alt) attach to the most recent og:image
+ * declared above them. So for N og:image tags we expect at most N of
+ * each supporting tag, and they should appear in document order
+ * grouped under their parent og:image.
+ *
+ * Common breakages we catch here:
+ *  - og:image:width without a matching og:image:height (or vice
+ *    versa) — Facebook/LinkedIn require both to skip the re-fetch.
+ *  - og:image:alt missing on one or more images in a multi-image
+ *    group (accessibility regression).
+ *  - More og:image:width/height/alt tags than og:image tags
+ *    (orphans that attach to the wrong parent).
+ *  - Non-numeric og:image:width / og:image:height values.
+ */
+function checkOgImageGroupConsistency(html: string, findings: Finding[]) {
+  // Walk every og:* meta tag in document order so we can group
+  // structured properties under their parent og:image.
+  const re = /<meta\b[^>]*\bproperty\s*=\s*"(og:[^"]+)"[^>]*>/gi;
+  const ordered: { prop: string; content: string }[] = [];
+  for (const m of html.matchAll(re)) {
+    ordered.push({
+      prop: m[1].toLowerCase(),
+      content: pickAttr(m[0], "content") ?? "",
+    });
+  }
+
+  interface Group {
+    url: string;
+    width?: string;
+    height?: string;
+    alt?: string;
+    type?: string;
+    secureUrl?: string;
+  }
+  const groups: Group[] = [];
+  const orphans: { prop: string; content: string }[] = [];
+
+  for (const tag of ordered) {
+    if (tag.prop === "og:image" || tag.prop === "og:image:url") {
+      groups.push({ url: tag.content });
+      continue;
+    }
+    const current = groups[groups.length - 1];
+    switch (tag.prop) {
+      case "og:image:width":
+        if (!current) orphans.push(tag);
+        else current.width = tag.content;
+        break;
+      case "og:image:height":
+        if (!current) orphans.push(tag);
+        else current.height = tag.content;
+        break;
+      case "og:image:alt":
+        if (!current) orphans.push(tag);
+        else current.alt = tag.content;
+        break;
+      case "og:image:type":
+        if (!current) orphans.push(tag);
+        else current.type = tag.content;
+        break;
+      case "og:image:secure_url":
+        if (!current) orphans.push(tag);
+        else current.secureUrl = tag.content;
+        break;
+      default:
+        // Other og:* tags (og:title, og:url, etc.) are unrelated.
+        break;
+    }
+  }
+
+  if (groups.length === 0) return; // og.image-missing is handled elsewhere
+
+  for (const orphan of orphans) {
+    findings.push({
+      id: `og.image-group.orphan.${orphan.prop}`,
+      severity: "error",
+      message: `<meta property="${orphan.prop}" content="${orphan.content}"> appears before any og:image. Structured image properties must follow their parent og:image.`,
+    });
+  }
+
+  const multi = groups.length > 1;
+  groups.forEach((g, i) => {
+    const label = multi ? `og:image #${i + 1} ("${g.url}")` : `og:image ("${g.url}")`;
+    const idSuffix = multi ? `.${i}` : "";
+
+    // width <-> height must come as a pair.
+    if (g.width && !g.height) {
+      findings.push({
+        id: `og.image-group.height-missing${idSuffix}`,
+        severity: "error",
+        message: `${label} declares og:image:width=${g.width} but no og:image:height. Facebook/LinkedIn require both to skip a server-side re-fetch.`,
+      });
+    }
+    if (g.height && !g.width) {
+      findings.push({
+        id: `og.image-group.width-missing${idSuffix}`,
+        severity: "error",
+        message: `${label} declares og:image:height=${g.height} but no og:image:width. Facebook/LinkedIn require both to skip a server-side re-fetch.`,
+      });
+    }
+
+    // Numeric sanity for dimensions.
+    if (g.width && !/^\d+$/.test(g.width.trim())) {
+      findings.push({
+        id: `og.image-group.width-invalid${idSuffix}`,
+        severity: "error",
+        message: `${label} has non-numeric og:image:width="${g.width}".`,
+      });
+    }
+    if (g.height && !/^\d+$/.test(g.height.trim())) {
+      findings.push({
+        id: `og.image-group.height-invalid${idSuffix}`,
+        severity: "error",
+        message: `${label} has non-numeric og:image:height="${g.height}".`,
+      });
+    }
+
+    // alt is a warning at the per-image level — og.image-alt-missing
+    // already flags the first og:image; we extend coverage to every
+    // image in a multi-image group so none silently lose their alt.
+    if (multi && !g.alt) {
+      findings.push({
+        id: `og.image-group.alt-missing${idSuffix}`,
+        severity: "warn",
+        message: `${label} is missing og:image:alt (other images in the group declare one — keep the set consistent).`,
+      });
+    }
+
+    // secure_url should be HTTPS when present.
+    if (g.secureUrl && !/^https:\/\//i.test(g.secureUrl)) {
+      findings.push({
+        id: `og.image-group.secure-url-not-https${idSuffix}`,
+        severity: "error",
+        message: `${label} has og:image:secure_url="${g.secureUrl}" which is not HTTPS.`,
+      });
+    }
+  });
+
+  // Cross-group consistency: if SOME images in a multi-image set
+  // declare width/height/alt and others don't, flag the mismatch so
+  // crawlers don't render an inconsistent carousel.
+  if (multi) {
+    const fields: (keyof Group)[] = ["width", "height", "alt"];
+    for (const field of fields) {
+      const withField = groups.filter((g) => g[field]).length;
+      if (withField > 0 && withField < groups.length) {
+        findings.push({
+          id: `og.image-group.mismatched-${field}`,
+          severity: "warn",
+          message: `Inconsistent og:image:${field} coverage: ${withField}/${groups.length} og:image tags declare it. Either set it on every image or none.`,
+        });
+      }
+    }
+  }
+}
+
 const DEFAULT_PROD_BASE_URL = "https://auradc.m2mtechconnect.com";
 
 function getProdBaseUrl(): { url: string; source: string } {
@@ -156,6 +317,9 @@ function validateHtml(html: string, findings: Finding[]) {
   // Inconsistent or repeated tags cause unpredictable previews on
   // Facebook/LinkedIn/Slack/X.
   checkDuplicateSocialTags(html, findings);
+  // Per-image structured-property consistency (width/height pairs,
+  // alt coverage, orphaned children, secure_url scheme).
+  checkOgImageGroupConsistency(html, findings);
 
   const { url: prodBase, source: prodBaseSource } = getProdBaseUrl();
   const prodOrigin = originOf(prodBase);

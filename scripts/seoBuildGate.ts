@@ -17,8 +17,8 @@ import { writeFileSync, mkdirSync } from "fs";
 import { resolve, dirname } from "path";
 import type { Plugin } from "vite";
 
-type Severity = "error" | "warn";
-interface Finding { id: string; severity: Severity; message: string; }
+export type Severity = "error" | "warn";
+export interface Finding { id: string; severity: Severity; message: string; }
 
 /**
  * Robust HTML attribute parser.
@@ -119,7 +119,7 @@ const REPEATABLE_OG_TAGS = new Set<string>([
   // but we still warn so the user is aware.
 ]);
 
-function checkDuplicateSocialTags(html: string, findings: Finding[]) {
+export function checkDuplicateSocialTags(html: string, findings: Finding[]) {
   const ogTags = [
     "og:title",
     "og:description",

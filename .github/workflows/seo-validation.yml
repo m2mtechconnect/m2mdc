@@ -1,0 +1,47 @@
+name: SEO Validation
+
+# Runs the automated SEO validator against the published site.
+# Triggers:
+#   - Manually from the Actions tab (workflow_dispatch) — supply a target URL.
+#   - Daily at 06:00 UTC so post-publish drift is caught even if a publish
+#     event isn't available.
+#   - On pushes to main that touch SEO-relevant files.
+#
+# To run after every Lovable publish, trigger this workflow via repository_dispatch
+# from your publish hook with event_type: "lovable-published".
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: "URL to validate"
+        required: false
+        default: "https://auradc.m2mtechconnect.com"
+  schedule:
+    - cron: "0 6 * * *"
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "public/robots.txt"
+      - "public/sitemap.xml"
+      - "scripts/validateSeo.ts"
+      - ".github/workflows/seo-validation.yml"
+  repository_dispatch:
+    types: [lovable-published]
+
+jobs:
+  validate:
+    name: Validate published SEO
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install tsx
+        run: npm install -g tsx
+      - name: Run SEO validator
+        env:
+          SEO_TARGET_URL: ${{ github.event.inputs.target_url || github.event.client_payload.url || 'https://auradc.m2mtechconnect.com' }}
+        run: tsx scripts/validateSeo.ts "$SEO_TARGET_URL"

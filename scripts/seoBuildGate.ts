@@ -93,6 +93,7 @@ function validateHtml(html: string, findings: Finding[]) {
 
   // Twitter card tags
   const twitterCard = findMeta(html, "name", "twitter:card");
+  const twitterImage = findMeta(html, "name", "twitter:image");
   if (!twitterCard) {
     add("twitter.card-missing", "error", 'Missing <meta name="twitter:card">.');
   } else {
@@ -100,8 +101,50 @@ function validateHtml(html: string, findings: Finding[]) {
     if (!allowed.includes(twitterCard)) {
       add("twitter.card-invalid", "error", `Invalid twitter:card "${twitterCard}". Expected one of: ${allowed.join(", ")}.`);
     }
-    if (twitterCard === "summary_large_image" && !ogImage && !findMeta(html, "name", "twitter:image")) {
-      add("twitter.image-missing", "error", 'twitter:card="summary_large_image" requires twitter:image or og:image.');
+    if (twitterCard === "summary_large_image") {
+      // Hard requirement: twitter:image must be present (og:image is no longer
+      // an acceptable fallback for the large-image card per X/Twitter docs).
+      if (!twitterImage) {
+        if (ogImage) {
+          add(
+            "twitter.image-missing",
+            "error",
+            'twitter:card="summary_large_image" requires <meta name="twitter:image">. og:image is not a guaranteed fallback.',
+          );
+        } else {
+          add(
+            "twitter.image-missing",
+            "error",
+            'twitter:card="summary_large_image" requires <meta name="twitter:image"> (og:image also missing).',
+          );
+        }
+      }
+    }
+  }
+
+  // twitter:image-specific validation (independent of card type so summary cards
+  // that opt into a custom image are still checked).
+  if (twitterImage) {
+    if (!/^https?:\/\//i.test(twitterImage)) {
+      add(
+        "twitter.image-relative",
+        "error",
+        `twitter:image must be an absolute URL (got "${twitterImage}").`,
+      );
+    }
+    const twitterImageAlt = findMeta(html, "name", "twitter:image:alt");
+    if (!twitterImageAlt) {
+      add(
+        "twitter.image-alt-missing",
+        "warn",
+        "Missing twitter:image:alt (improves accessibility for screen readers on social previews).",
+      );
+    } else if (twitterImageAlt.length > 420) {
+      add(
+        "twitter.image-alt-long",
+        "warn",
+        `twitter:image:alt is ${twitterImageAlt.length} chars (>420, X truncates).`,
+      );
     }
   }
   if (!findMeta(html, "name", "twitter:title") && !findMeta(html, "property", "og:title")) {

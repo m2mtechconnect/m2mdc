@@ -9,7 +9,7 @@ import {
   LayoutDashboard, Wrench, BarChart3, Shield, Users, Server,
   Activity, Cpu, Thermometer, Globe, Zap, TrendingUp, Clock,
   DollarSign, FileCheck, AlertTriangle, Lock, Eye, UserCheck,
-  Leaf, ShieldCheck, Gauge, Network,
+  Leaf, ShieldCheck, Gauge, Network, Monitor,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { AppRole } from '@/contexts/RBACContext';

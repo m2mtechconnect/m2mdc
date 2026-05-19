@@ -13,6 +13,7 @@ const productLinks = [
   { label: "Use Cases", href: "#use-cases" },
   { label: "Integrations", href: "#integrations" },
   { label: "Why M2M", href: "#differentiators" },
+  { label: "Omniverse Live Scene", href: "/omniverse-scene", internal: true },
   { label: "Client Login", href: "/login", internal: true },
 ];
 

@@ -24,6 +24,7 @@ import {
   LogOut,
   Server,
   Activity,
+  Monitor,
   MoreHorizontal,
 } from "lucide-react";
 import { User } from '@supabase/supabase-js';

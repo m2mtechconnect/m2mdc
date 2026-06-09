@@ -34,7 +34,7 @@ import Search from "./pages/Search";
 import UniversalSearch from "./pages/UniversalSearch";
 import AISettings from "./pages/AISettings";
 import Auth from "./pages/Auth";
-import { SignIn, SignUp, SignOut, ForgotPassword, MFA } from "./pages/auth";
+import { SignIn, SignUp, SignOut, ForgotPassword, MFA } from "./pages/auth/index";
 import NotFound from "./pages/NotFound";
 import AgentWorkspace from "./pages/AgentWorkspace";
 import AgentChat from "./pages/AgentChat";
@@ -50,6 +50,7 @@ import BlueprintPreview from "./pages/BlueprintPreview";
 import SimulationPreview from "./pages/SimulationPreview";
 import InfrastructurePage from "./pages/InfrastructurePage";
 import DataCentreTwinLanding from "./pages/DataCentreTwinLanding";
+import OmniverseScene from "./pages/OmniverseScene";
 import Onboarding from "./pages/Onboarding";
 import OnboardingSubmissions from "./pages/OnboardingSubmissions";
 import AgentDetail from "./pages/AgentDetail";
@@ -170,6 +171,8 @@ function AuthenticatedApp() {
         <Route path="/forgot-password" element={onboardingDone ? <ForgotPassword /> : <Navigate to="/onboarding" replace />} />
         <Route path="/mfa" element={onboardingDone ? <MFA /> : <Navigate to="/onboarding" replace />} />
         <Route path="/twin-datacentre" element={<DataCentreTwinLanding />} />
+        <Route path="/data-centre-twin" element={<DataCentreTwin />} />
+        <Route path="/omniverse-scene" element={<OmniverseScene />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -246,6 +249,8 @@ function AuthenticatedApp() {
         {/* Data Centre Twin */}
         <Route path="/data-centre-twin" element={<DataCentreTwin />} />
         <Route path="/data-centre-twin/:id" element={<DataCentreTwin />} />
+        {/* Omniverse Live Scene */}
+        <Route path="/omniverse-scene" element={<OmniverseScene />} />
         {/* Public Landing Page (also accessible when authenticated) */}
         <Route path="/twin-datacentre" element={<DataCentreTwinLanding />} />
         {/* Twin Debug Page */}

@@ -9,6 +9,13 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      '/kit-api': {
+        target: process.env.VITE_OMNIVERSE_KIT_URL || 'http://54.70.43.198:8011',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/kit-api/, ''),
+      },
+    },
   },
   plugins: [
     react(),

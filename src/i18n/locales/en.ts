@@ -111,6 +111,7 @@ const en = {
     useCases: 'Use Cases',
     integrations: 'Integrations',
     whyM2M: 'Why M2M',
+    omniverseLiveScene: 'Omniverse Live Scene',
     solutions: 'Solutions',
     product: 'Product',
     company: 'Company',

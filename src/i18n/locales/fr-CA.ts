@@ -112,6 +112,7 @@ const frCA = {
     useCases: "Cas d'utilisation",
     integrations: 'Intégrations',
     whyM2M: 'Pourquoi M2M',
+    omniverseLiveScene: 'Scène Omniverse en direct',
     solutions: 'Solutions',
     product: 'Produit',
     company: 'Entreprise',

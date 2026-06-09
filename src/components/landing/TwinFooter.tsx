@@ -24,6 +24,7 @@ export function TwinFooter() {
     { label: t('landing.useCases'), href: "#use-cases" },
     { label: t('landing.integrations'), href: "#integrations" },
     { label: t('landing.whyM2M'), href: "#differentiators" },
+    { label: t('landing.omniverseLiveScene'), href: "/omniverse-scene", internal: true },
     { label: t('landing.clientLogin'), href: "/login", internal: true },
   ];
 

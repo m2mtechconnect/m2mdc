@@ -45,6 +45,8 @@ import { useTourAutoStart } from "@/tours/useTourAutoStart";
 import { useRBAC } from "@/contexts/RBACContext";
 import { getRoleNavigation } from "@/config/roleDashboardConfig";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -64,12 +66,12 @@ const fallbackSecondary = [
   { name: "Teams", fullName: "Teams", href: "/teams", icon: Users, group: 'secondary' as const },
 ];
 
-// Helper function to get time-based greeting
-const getGreeting = () => {
+// Helper function to get time-based greeting key
+const getGreetingKey = () => {
   const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
+  if (hour < 12) return "layout.goodMorning";
+  if (hour < 18) return "layout.goodAfternoon";
+  return "layout.goodEvening";
 };
 
 // Helper function to extract first name from user
@@ -98,7 +100,8 @@ export function Layout({ children }: LayoutProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const { isOpen, setIsOpen } = useCoPilot();
-  const [greeting, setGreeting] = useState(getGreeting());
+  const [greeting, setGreeting] = useState(getGreetingKey());
+  const { t } = useTranslation();
   const { role, loading: roleLoading } = useRBAC();
   
   // Role-adaptive navigation
@@ -124,7 +127,7 @@ export function Layout({ children }: LayoutProps) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setGreeting(getGreeting());
+      setGreeting(getGreetingKey());
     }, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -181,7 +184,7 @@ export function Layout({ children }: LayoutProps) {
 
             {/* Dynamic Greeting */}
             <div className="hidden md:flex items-center text-sm text-muted-foreground">
-              {greeting}, <span className="ml-1 font-medium text-foreground">{getFirstName(user)}</span>
+              {t(greeting)}, <span className="ml-1 font-medium text-foreground">{getFirstName(user)}</span>
             </div>
 
             {/* Data Centre Twin Selector */}
@@ -226,8 +229,8 @@ export function Layout({ children }: LayoutProps) {
               {/* Separator */}
               <div className="h-4 w-px bg-border mx-1" />
 
-              {/* Secondary navigation - full on 2xl, dropdown on lg-xl */}
-              <div className="hidden 2xl:flex items-center gap-0.5">
+              {/* Secondary navigation - full on xl+, dropdown on lg only */}
+              <div className="hidden xl:flex items-center gap-0.5">
                 {secondaryNavigation.map((item) => {
                   const isActive = item.href.includes('?') 
                     ? location.pathname + location.search === item.href
@@ -260,8 +263,8 @@ export function Layout({ children }: LayoutProps) {
                 })}
               </div>
 
-              {/* More dropdown - visible on lg-xl only */}
-              <div className="2xl:hidden">
+              {/* More dropdown - visible on lg only */}
+              <div className="xl:hidden">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -305,6 +308,9 @@ export function Layout({ children }: LayoutProps) {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+            
             {/* Help Menu with Tours */}
             <HelpMenu />
             

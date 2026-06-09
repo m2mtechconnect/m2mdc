@@ -1,7 +1,7 @@
 /**
  * TwinHeader - Landing page header with M2M logo and navigation
  * Premium sticky header with glassmorphism effect
- * Fixed CTAs to route to /auth
+ * i18n-enabled for English and Quebec French
  */
 
 import { useState, useEffect } from "react";
@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import m2mLogo from "@/assets/m2m-logo.png";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,23 +19,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const navItems = [
-  { label: "Features", href: "#features" },
-  { label: "Use Cases", href: "#use-cases" },
-  { label: "Integrations", href: "#integrations" },
-  { label: "Why M2M", href: "#differentiators" },
-];
-
-// Solutions scroll to sections on landing page
-const solutionItems = [
-  { label: "Enterprise Solutions", href: "#use-cases", description: "For CIOs, CTOs & data centre ops" },
-  { label: "Sustainability", href: "#features", description: "Carbon tracking & ESG reporting" },
-];
-
 export function TwinHeader() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const navItems = [
+    { label: t('landing.features'), href: "#features" },
+    { label: t('landing.useCases'), href: "#use-cases" },
+    { label: t('landing.integrations'), href: "#integrations" },
+    { label: t('landing.whyM2M'), href: "#differentiators" },
+  ];
+
+  const solutionItems = [
+    { label: t('landing.enterpriseSolutions'), href: "#use-cases", description: t('landing.enterpriseDesc') },
+    { label: t('landing.sustainability'), href: "#features", description: t('landing.sustainabilityDesc') },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -77,7 +79,7 @@ export function TwinHeader() {
             {/* Solutions Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted">
-                Solutions
+                {t('landing.solutions')}
                 <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-64">
@@ -114,18 +116,19 @@ export function TwinHeader() {
 
           {/* Desktop CTA Buttons */}
           <div className="hidden lg:flex items-center gap-3">
+            <LanguageSwitcher />
             <Button
               variant="ghost"
               className="text-sm font-medium text-muted-foreground hover:text-foreground"
               onClick={() => navigate("/login")}
             >
-              Login
+              {t('auth.login')}
             </Button>
             <Button
               className="text-sm bg-accent text-m2m-black font-semibold hover:bg-m2m-gold-dark"
               onClick={() => navigate("/onboarding")}
             >
-              Get Started
+              {t('auth.getStarted')}
             </Button>
           </div>
 
@@ -149,7 +152,7 @@ export function TwinHeader() {
             <nav className="flex flex-col gap-2">
               {/* Solutions section */}
               <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Solutions
+                {t('landing.solutions')}
               </div>
               {solutionItems.map((item) => (
                 <a
@@ -177,6 +180,7 @@ export function TwinHeader() {
               ))}
               
               <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border/50">
+                <LanguageSwitcher variant="outline" />
                 <Button
                   variant="outline"
                   className="w-full"
@@ -185,7 +189,7 @@ export function TwinHeader() {
                     setIsMobileMenuOpen(false);
                   }}
                 >
-                  Login
+                  {t('auth.login')}
                 </Button>
                 <Button
                   className="w-full bg-accent text-m2m-black font-semibold hover:bg-m2m-gold-dark"
@@ -194,7 +198,7 @@ export function TwinHeader() {
                     setIsMobileMenuOpen(false);
                   }}
                 >
-                  Get Started
+                  {t('auth.getStarted')}
                 </Button>
               </div>
             </nav>

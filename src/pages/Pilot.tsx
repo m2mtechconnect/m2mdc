@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
@@ -12,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
 
 export default function Pilot() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -54,13 +56,13 @@ export default function Pilot() {
         </Button>
 
         <DCSectionHeader
-          title="Launch Pilot Program"
+          title={t('pilot.title')}
           subtitle={`Start a small-scale pilot to validate ${initiativeTitle} before full deployment`}
           icon={<Rocket className="h-6 w-6" />}
         />
 
         <DCCard
-          title="Pilot Program Setup"
+          title={t('pilot.pilotSetup')}
           icon={<Play className="h-5 w-5" />}
           status="operational"
         >
@@ -73,7 +75,7 @@ export default function Pilot() {
                 </h3>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="projectName">Project Name</Label>
+                  <Label htmlFor="projectName">{t('pilot.projectName')}</Label>
                   <Input
                     id="projectName"
                     value={formData.projectName}
@@ -85,7 +87,7 @@ export default function Pilot() {
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="department">Department</Label>
+                    <Label htmlFor="department">{t('pilot.department')}</Label>
                     <Select
                       value={formData.department}
                       onValueChange={(value) => setFormData({ ...formData, department: value })}
@@ -105,7 +107,7 @@ export default function Pilot() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="teamSize">Team Size</Label>
+                    <Label htmlFor="teamSize">{t('pilot.teamSize')}</Label>
                     <Select
                       value={formData.teamSize}
                       onValueChange={(value) => setFormData({ ...formData, teamSize: value })}
@@ -133,7 +135,7 @@ export default function Pilot() {
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="startDate">Proposed Start Date</Label>
+                    <Label htmlFor="startDate">{t('pilot.proposedStartDate')}</Label>
                     <Input
                       id="startDate"
                       type="date"
@@ -144,7 +146,7 @@ export default function Pilot() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="duration">Pilot Duration</Label>
+                    <Label htmlFor="duration">{t('pilot.pilotDuration')}</Label>
                     <Select
                       value={formData.duration}
                       onValueChange={(value) => setFormData({ ...formData, duration: value })}
@@ -171,7 +173,7 @@ export default function Pilot() {
                 </h3>
 
                 <div className="space-y-2">
-                  <Label htmlFor="objectives">Pilot Objectives</Label>
+                  <Label htmlFor="objectives">{t('pilot.pilotObjectives')}</Label>
                   <Textarea
                     id="objectives"
                     value={formData.objectives}
@@ -183,7 +185,7 @@ export default function Pilot() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="successCriteria">Success Criteria</Label>
+                  <Label htmlFor="successCriteria">{t('pilot.successCriteria')}</Label>
                   <Textarea
                     id="successCriteria"
                     value={formData.successCriteria}
@@ -195,7 +197,7 @@ export default function Pilot() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="stakeholders">Key Stakeholders</Label>
+                  <Label htmlFor="stakeholders">{t('pilot.keyStakeholders')}</Label>
                   <Input
                     id="stakeholders"
                     value={formData.stakeholders}
@@ -206,7 +208,7 @@ export default function Pilot() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="budget">Estimated Budget</Label>
+                  <Label htmlFor="budget">{t('pilot.estimatedBudget')}</Label>
                   <Select
                     value={formData.budget}
                     onValueChange={(value) => setFormData({ ...formData, budget: value })}

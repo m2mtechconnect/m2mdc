@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from 'react-i18next';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -76,6 +77,7 @@ interface AISystem {
 }
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -316,47 +318,47 @@ export default function Dashboard() {
   const kpis = [
     {
       key: 'total_twins',
-      label: 'Total Data Centre Twins',
+      label: t('dashboard.totalDataCentreTwins'),
       value: totalTwins.toString(),
-      change: twins.length > 0 ? `${twins.length} configured` : '',
+      change: twins.length > 0 ? t('dashboard.configured', { count: twins.length }) : '',
       trend: "neutral" as const,
       icon: Server,
       loading: twinsLoading || systemsLoading,
       onClick: () => navigate('/data-centre-twin'),
-      tooltip: 'Total number of Data Centre Twins configured',
+      tooltip: t('dashboard.totalConfigured'),
     },
     {
       key: 'active_twins',
-      label: 'Active Twins',
+      label: t('dashboard.activeTwins'),
       value: activeTwins.toString(),
       change: '',
       trend: "up" as const,
       icon: Activity,
       loading: systemsLoading,
       onClick: () => handleStatClick('running'),
-      tooltip: 'Currently active and running twins',
+      tooltip: t('dashboard.currentlyActive'),
     },
     {
       key: 'draft_twins',
-      label: 'Draft Twins',
+      label: t('dashboard.draftTwins'),
       value: draftTwins.toString(),
       change: '',
       trend: "neutral" as const,
       icon: Clock,
       loading: systemsLoading,
       onClick: () => handleStatClick('draft'),
-      tooltip: 'Twins in development',
+      tooltip: t('dashboard.twinsInDevelopment'),
     },
     {
       key: 'avg_pue',
-      label: 'Average PUE',
+      label: t('dashboard.averagePue'),
       value: avgPue,
       change: '-2.1%',
       trend: "down" as const,
       icon: ZapIcon,
       loading: twinsLoading,
       onClick: () => navigate('/data-centre-twin'),
-      tooltip: 'Average Power Usage Effectiveness across all facilities',
+      tooltip: t('dashboard.avgPueTooltip'),
     },
   ];
 
@@ -420,12 +422,12 @@ export default function Dashboard() {
         {/* DC Quick Chips */}
         <div className="flex flex-wrap items-center justify-center gap-2 mt-6 mb-4">
           {[
-            { label: 'PUE trend (24h)', query: 'What is the PUE trend over the last 24 hours?' },
-            { label: 'GPU saturation hotspots', query: 'Identify GPU saturation hotspots across all clusters.' },
-            { label: 'Cooling incidents today', query: 'List all cooling incidents that occurred today.' },
-            { label: 'Sovereign compute ratio', query: 'What is the current sovereign compute ratio?' },
-            { label: 'Carbon cost forecast', query: 'Forecast carbon costs for the next 7 days.' },
-            { label: 'Run a scenario', isSimulation: true },
+            { label: t('dashboard.pueTrend'), query: 'What is the PUE trend over the last 24 hours?' },
+            { label: t('dashboard.gpuHotspots'), query: 'Identify GPU saturation hotspots across all clusters.' },
+            { label: t('dashboard.coolingIncidents'), query: 'List all cooling incidents that occurred today.' },
+            { label: t('dashboard.sovereignComputeRatio'), query: 'What is the current sovereign compute ratio?' },
+            { label: t('dashboard.carbonCostForecast'), query: 'Forecast carbon costs for the next 7 days.' },
+            { label: t('dashboard.runScenario'), isSimulation: true },
           ].map((chip: { label: string; query?: string; isSimulation?: boolean }) => (
             <button
               key={chip.label}
@@ -444,63 +446,63 @@ export default function Dashboard() {
 
         {/* DC-Specific KPI Row with Tooltips */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4" data-tour="role-kpi-dc">
-          <KpiTooltip title="Power Usage Effectiveness" description="Measures facility energy efficiency. Lower is better. Industry average is 1.58.">
+          <KpiTooltip title={t('dashboard.pueTooltip')} description="">
             <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 rounded-lg bg-success/10">
                   <ZapIcon className="h-4 w-4 text-success" />
                 </div>
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Global PUE</span>
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('dashboard.globalPue')}</span>
               </div>
               <div className="font-mono text-2xl font-bold">1.38</div>
               <div className="text-xs text-success flex items-center gap-1 mt-2">
-                ↓ 2.1% improvement
+                ↓ 2.1% {t('global.improvement')}
               </div>
             </Card>
           </KpiTooltip>
           
-          <KpiTooltip title="GPU Saturation Risk" description="Percentage of GPU clusters approaching capacity limits. High values indicate scaling needs.">
+          <KpiTooltip title={t('dashboard.gpuTooltip')} description="">
             <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 rounded-lg bg-primary/10">
                   <Cpu className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">GPU Saturation</span>
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('dashboard.gpuSaturation')}</span>
               </div>
               <div className="font-mono text-2xl font-bold">23%</div>
               <div className="text-xs text-warning flex items-center gap-1 mt-2">
-                ↑ 4.2% from baseline
+                ↑ 4.2% {t('global.fromBaseline')}
               </div>
             </Card>
           </KpiTooltip>
           
-          <KpiTooltip title="Thermal Stability Index" description="Measures temperature consistency across cooling zones. Target is >90%.">
+          <KpiTooltip title={t('dashboard.thermalTooltip')} description="">
             <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 rounded-lg bg-info/10">
                   <Thermometer className="h-4 w-4 text-info" />
                 </div>
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Thermal Stability</span>
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('dashboard.thermalStability')}</span>
               </div>
               <div className="font-mono text-2xl font-bold">94%</div>
               <div className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
-                <StatusBadge status="active" customLabel="Stable" showIcon={false} />
+                <StatusBadge status="active" customLabel={t('global.stable')} showIcon={false} />
               </div>
             </Card>
           </KpiTooltip>
           
-          <KpiTooltip title="Sovereign Compute" description="Workloads processed within Canadian jurisdiction. Critical for data residency compliance.">
+          <KpiTooltip title={t('dashboard.sovereignTooltip')} description="">
             <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 rounded-lg bg-info/10">
                   <Shield className="h-4 w-4 text-info" />
                 </div>
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Sovereign Compute</span>
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('dashboard.sovereignCompute')}</span>
               </div>
               <div className="font-mono text-2xl font-bold">98%</div>
               <div className="text-xs text-info flex items-center gap-1 mt-2">
                 <Leaf className="h-3 w-3" />
-                Canada-compliant
+                {t('global.canadaCompliant')}
               </div>
             </Card>
           </KpiTooltip>
@@ -512,7 +514,7 @@ export default function Dashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <Activity className="h-4 w-4 text-primary" />
-                Live Twin Preview
+                {t('dashboard.liveTwinPreview')}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4">
@@ -532,10 +534,10 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <h3 className="font-semibold group-hover:text-primary transition-colors">
-                      Open Data Centre Twin Dashboard
+                      {t('dashboard.openDcTwinDashboard')}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Full NOC view with 8 domain twins, real-time telemetry, and simulation controls
+                      {t('dashboard.nocViewDescription')}
                     </p>
                   </div>
                 </div>
@@ -550,7 +552,7 @@ export default function Dashboard() {
                     className="gap-2"
                   >
                     <Server className="h-4 w-4" />
-                    View Blueprint
+                    {t('dashboard.viewBlueprint')}
                   </Button>
                   <Button 
                     variant="secondary" 
@@ -562,7 +564,7 @@ export default function Dashboard() {
                     className="gap-2"
                   >
                     <Activity className="h-4 w-4" />
-                    Run Simulation
+                    {t('dashboard.runSimulation')}
                   </Button>
                   <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
@@ -577,7 +579,7 @@ export default function Dashboard() {
         {isEmpty && (
           <div className="mb-6 p-4 rounded-lg bg-muted/50 border border-border">
             <p className="text-sm text-center text-muted-foreground">
-              No live telemetry yet. Connect a facility or start the Data Centre Simulation.
+              {t('dashboard.noTelemetry')}
             </p>
           </div>
         )}

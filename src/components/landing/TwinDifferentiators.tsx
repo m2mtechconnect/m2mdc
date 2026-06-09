@@ -7,83 +7,82 @@
 import { Shield, Box, Leaf, Cpu, Check, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface Differentiator {
   icon: typeof Shield;
-  title: string;
-  description: string;
-  metric: string;
-  metricLabel: string;
+  titleKey: string;
+  descKey: string;
+  metricKey: string;
+  metricLabelKey: string;
   colorClass: string;
   bgClass: string;
 }
 
-const differentiators: Differentiator[] = [
+const differentiatorDefs: Differentiator[] = [
   {
     icon: Shield,
-    title: "Sovereignty Score Dashboard",
-    description: "View data residency status and Sovereignty Score percentage directly in the dashboard. Track compliance indicators for OSFI, HIPAA, and PIPEDA.",
-    metric: "100%",
-    metricLabel: "Sovereignty visibility",
+    titleKey: "landing.sovereigntyScoreDashboard",
+    descKey: "landing.sovereigntyScoreDashboardDesc",
+    metricKey: "100%",
+    metricLabelKey: "landing.sovereigntyVisibility",
     colorClass: "text-primary",
     bgClass: "bg-primary/10 hover:bg-primary/20",
   },
   {
     icon: Box,
-    title: "3D Rack Visualization",
-    description: "Inspect racks, aisles, and zones in a 3D model. Apply thermal, power, and cooling overlays to identify hotspots and load distribution.",
-    metric: "8",
-    metricLabel: "Domain overlays available",
+    titleKey: "landing.rackVisualization3dTitle",
+    descKey: "landing.rackVisualization3dDesc",
+    metricKey: "8",
+    metricLabelKey: "landing.domainOverlays",
     colorClass: "text-info",
     bgClass: "bg-info/10 hover:bg-info/20",
   },
   {
     icon: Leaf,
-    title: "Carbon Intensity Tracking",
-    description: "Monitor Carbon Intensity (gCO₂/kWh) as a live KPI. Run simulation scenarios to compare carbon outcomes before making changes.",
-    metric: "<50",
-    metricLabel: "gCO₂/kWh target",
+    titleKey: "landing.carbonIntensityTracking",
+    descKey: "landing.carbonIntensityTrackingDesc",
+    metricKey: "<50",
+    metricLabelKey: "landing.gco2Target2",
     colorClass: "text-success",
     bgClass: "bg-success/10 hover:bg-success/20",
   },
   {
     icon: Cpu,
-    title: "Subsystem Agents Panel",
-    description: "View status of domain-specific agents: Thermal Guardian, Power Monitor, Workload Orchestrator, and Sovereignty Sentinel.",
-    metric: "9",
-    metricLabel: "Subsystem agents",
+    titleKey: "landing.subsystemAgentsPanel",
+    descKey: "landing.subsystemAgentsPanelDesc",
+    metricKey: "9",
+    metricLabelKey: "landing.subsystemAgents",
     colorClass: "text-warning",
     bgClass: "bg-warning/10 hover:bg-warning/20",
   },
 ];
 
-const capabilities = [
-  "PUE trend indicator",
-  "GPU Utilization metrics",
-  "Run Scenario button",
-  "Thermal overlay toggle",
-  "Sovereignty Score display",
-  "Blueprint Designer",
-  "KPI delta comparison",
-  "Timeline playback controls",
+const capabilityKeys = [
+  "landing.pueTrendIndicator",
+  "landing.gpuUtilMetrics",
+  "landing.runScenarioButton",
+  "landing.thermalOverlayToggle",
+  "landing.sovereigntyScoreDisplay",
+  "landing.blueprintDesigner",
+  "landing.kpiDeltaComparison",
+  "landing.timelinePlaybackControls",
 ];
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.1,
-    },
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
   },
 };
 
 function DifferentiatorCard({ diff, index }: { diff: Differentiator; index: number }) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { t } = useTranslation();
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, x: -30 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
@@ -93,34 +92,27 @@ function DifferentiatorCard({ diff, index }: { diff: Differentiator; index: numb
       }`}
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
-      style={{
-        minHeight: isExpanded ? '240px' : '160px',
-      }}
+      style={{ minHeight: isExpanded ? '240px' : '160px' }}
     >
-      {/* Colored accent bar */}
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${diff.bgClass.replace('/10', '/60').replace('/20', '/80')}`} />
-      
       <div className="p-6 pl-8">
         <div className="flex items-start gap-4">
-          <motion.div 
+          <motion.div
             className={`flex-shrink-0 w-12 h-12 rounded-xl ${diff.bgClass} flex items-center justify-center transition-colors`}
             animate={{ rotate: isExpanded ? [0, -5, 5, 0] : 0 }}
             transition={{ duration: 0.4 }}
           >
             <diff.icon className={`h-6 w-6 ${diff.colorClass}`} />
           </motion.div>
-          
           <div className="flex-1 min-w-0">
             <h3 className={`text-lg font-semibold mb-2 transition-colors ${isExpanded ? diff.colorClass : 'text-foreground group-hover:' + diff.colorClass}`}>
-              {diff.title}
+              {t(diff.titleKey)}
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              {diff.description}
+              {t(diff.descKey)}
             </p>
           </div>
         </div>
-
-        {/* Expanded metric reveal */}
         <AnimatePresence>
           {isExpanded && (
             <motion.div
@@ -132,12 +124,8 @@ function DifferentiatorCard({ diff, index }: { diff: Differentiator; index: numb
             >
               <div className={`p-4 rounded-xl ${diff.bgClass} flex items-center justify-between`}>
                 <div>
-                  <div className={`text-3xl font-bold ${diff.colorClass}`}>
-                    {diff.metric}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {diff.metricLabel}
-                  </div>
+                  <div className={`text-3xl font-bold ${diff.colorClass}`}>{diff.metricKey}</div>
+                  <div className="text-sm text-muted-foreground">{t(diff.metricLabelKey)}</div>
                 </div>
                 <ArrowRight className={`h-5 w-5 ${diff.colorClass}`} />
               </div>
@@ -150,10 +138,12 @@ function DifferentiatorCard({ diff, index }: { diff: Differentiator; index: numb
 }
 
 export function TwinDifferentiators() {
+  const { t } = useTranslation();
+
   return (
     <section className="py-20 lg:py-28 bg-gradient-to-b from-background via-muted/20 to-background overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 lg:px-8">
-        <motion.div 
+        <motion.div
           className="text-center mb-14"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -168,25 +158,24 @@ export function TwinDifferentiators() {
             className="inline-block mb-4"
           >
             <span className="px-4 py-1.5 rounded-full bg-muted text-foreground text-sm font-medium">
-              The M2M Difference
+              {t('landing.theM2MDifference')}
             </span>
           </motion.div>
           <h2 className="font-display text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            Key Dashboard Features
+            {t('landing.keyDashboardFeatures')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Features visible in the dashboard interface, accessible immediately after login.
+            {t('landing.differentiatorDescription')}
           </p>
         </motion.div>
-        
+
         <div className="grid md:grid-cols-2 gap-6 mb-14">
-          {differentiators.map((diff, index) => (
+          {differentiatorDefs.map((diff, index) => (
             <DifferentiatorCard key={index} diff={diff} index={index} />
           ))}
         </div>
-        
-        {/* Capabilities grid */}
-        <motion.div 
+
+        <motion.div
           className="p-8 bg-card/40 rounded-2xl border border-border/50"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -194,18 +183,18 @@ export function TwinDifferentiators() {
           transition={{ duration: 0.5, delay: 0.3 }}
         >
           <h3 className="text-xl font-semibold text-foreground mb-6 text-center">
-            UI Controls Available in Dashboard
+            {t('landing.uiControlsAvailable')}
           </h3>
-          <motion.div 
+          <motion.div
             className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
           >
-            {capabilities.map((cap, index) => (
-              <motion.div 
-                key={index} 
+            {capabilityKeys.map((key, index) => (
+              <motion.div
+                key={index}
                 className="flex items-center gap-3 text-sm text-muted-foreground group cursor-default p-2 rounded-lg hover:bg-muted/50 transition-colors"
                 initial={{ opacity: 0, x: -10 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -213,14 +202,10 @@ export function TwinDifferentiators() {
                 transition={{ duration: 0.3, delay: 0.4 + index * 0.04 }}
                 whileHover={{ x: 3 }}
               >
-                <motion.div
-                  whileHover={{ scale: 1.2 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex-shrink-0"
-                >
+                <motion.div whileHover={{ scale: 1.2 }} transition={{ duration: 0.2 }} className="flex-shrink-0">
                   <Check className="h-4 w-4 text-success" />
                 </motion.div>
-                <span className="group-hover:text-foreground transition-colors">{cap}</span>
+                <span className="group-hover:text-foreground transition-colors">{t(key)}</span>
               </motion.div>
             ))}
           </motion.div>

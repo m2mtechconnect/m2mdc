@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * Admin view for onboarding questionnaire submissions
  * Only accessible to users with 'admin' role via RLS
@@ -100,6 +101,7 @@ function ExpandableRow({ submission }: { submission: OnboardingSubmission }) {
 }
 
 export default function OnboardingSubmissions() {
+  const { t } = useTranslation();
   const { data: submissions, isLoading, isError } = useQuery({
     queryKey: ["onboarding-submissions"],
     queryFn: async () => {
@@ -122,7 +124,7 @@ export default function OnboardingSubmissions() {
             <Users className="h-6 w-6 text-accent-foreground" />
           </div>
           <div>
-            <h1 className="text-h2 font-display font-bold">Onboarding Submissions</h1>
+            <h1 className="text-h2 font-display font-bold">{t("onboardingSubmissions.title")}</h1>
             <p className="text-sm text-muted-foreground">
               Prospect questionnaire responses from the marketing page
             </p>
@@ -141,7 +143,7 @@ export default function OnboardingSubmissions() {
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <Users className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Total Leads</span>
+              <span className="text-xs text-muted-foreground">{t('onboardingSubmissions.totalLeads')}</span>
             </div>
             <div className="text-2xl font-bold">{submissions.length}</div>
           </Card>

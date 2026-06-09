@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,7 @@ const syncJobs: Array<{
 ];
 
 export default function ConnectMonitor() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
@@ -49,8 +51,8 @@ export default function ConnectMonitor() {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <DCSectionHeader
-          title="Sync Monitor"
-          subtitle="Real-time status of all data connections and background jobs."
+          title={t("connectMonitor.title")}
+          subtitle={t("connectMonitor.subtitle")}
           icon={<Activity className="h-5 w-5 text-primary" />}
           action={
             <Button variant="outline" onClick={() => navigate("/connect/health")}>
@@ -109,9 +111,9 @@ export default function ConnectMonitor() {
               </SelectTrigger>
               <SelectContent className="bg-card z-50">
                 <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="running">Running</SelectItem>
+                <SelectItem value="running">{t('connectMonitor.running')}</SelectItem>
                 <SelectItem value="success">Success</SelectItem>
-                <SelectItem value="failed">Failed</SelectItem>
+                <SelectItem value="failed">{t('connectMonitor.failed')}</SelectItem>
               </SelectContent>
             </Select>
             <Button variant="outline" size="icon">

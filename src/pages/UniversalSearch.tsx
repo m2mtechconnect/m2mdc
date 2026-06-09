@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { SectionHeader } from "@/components/ui/section-header";
 import { EnhancedSearchBar } from "@/components/search/EnhancedSearchBar";
@@ -7,6 +8,7 @@ import { Search as SearchIcon } from "lucide-react";
 import { toast } from "sonner";
 
 export default function UniversalSearch() {
+  const { t } = useTranslation();
   const [searchResult, setSearchResult] = useState<any>(null);
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     try {
@@ -57,8 +59,8 @@ export default function UniversalSearch() {
     <div className="min-h-screen bg-background section-padding-lg">
       <div className="max-w-7xl mx-auto">
         <SectionHeader
-          title="Universal Search"
-          description="Ask anything or paste a website URL for instant answers with citations."
+          title={t("universalSearch.title")}
+          description={t("universalSearch.subtitle")}
         />
 
         <div className="mb-8">
@@ -70,8 +72,8 @@ export default function UniversalSearch() {
         ) : (
           <EmptyState
             icon={SearchIcon}
-            title="Start Searching"
-            description="Enter a natural language query or paste a website URL to get instant answers with citations."
+            title={t("universalSearch.startSearching")}
+            description={t("universalSearch.startSearchingDesc")}
           >
             {recentSearches.length > 0 && (
               <div className="mt-6">

@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
@@ -20,6 +21,7 @@ import { useTwinAgents } from '@/hooks/useTwinAgentsCatalog';
 import { AGENT_CATALOG, type AgentDefinitionCatalog } from '@/domain/greenDc/agentsCatalog';
 
 export default function ManageAgents() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { updateContext } = useCoPilotContext();
@@ -156,7 +158,7 @@ export default function ManageAgents() {
             className="mb-4 -ml-2 text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Command
+            {t('nav.backToCommand')}
           </Button>
           
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -165,7 +167,7 @@ export default function ManageAgents() {
                 <div className="p-2 rounded-lg bg-primary/10">
                   <Server className="h-6 w-6 text-primary" />
                 </div>
-                Subsystem Agents
+                {t('agents.subsystemAgents')}
               </h1>
               <p className="text-sm text-muted-foreground">
                 {AGENTS.SECTION_INTRO}
@@ -175,7 +177,7 @@ export default function ManageAgents() {
               onClick={() => navigate('/builder?source=manage-agents&template=blank')}
             >
               <Wrench className="h-4 w-4 mr-2" />
-              Deploy New Agent
+              {t('agents.deployNewAgent')}
             </Button>
           </div>
         </div>

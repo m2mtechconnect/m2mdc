@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { DigitalTwinTemplatesGrid } from '@/components/marketplace/DigitalTwinTemplatesGrid';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from 'react-i18next';
 import { StandardFilters, StandardFiltersState } from '@/components/shared/StandardFilters';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 
@@ -76,16 +77,18 @@ export default function Marketplace() {
     });
   };
 
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-background">
       <div className="border-b border-border/40 bg-card/50 backdrop-blur-sm sticky top-0 z-40">
         <div className="container mx-auto px-6 py-6">
           <div className="mb-6">
             <h1 className="text-3xl font-bold font-display text-foreground mb-1">
-              Template Marketplace
+              {t('marketplace.title')}
             </h1>
             <p className="text-muted-foreground">
-              Discover Digital Twin & AI Agent Blueprints tailored to your industry and department
+              {t('marketplace.subtitle')}
             </p>
           </div>
 

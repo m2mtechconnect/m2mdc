@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -18,6 +19,7 @@ const healthMetrics = [
 ];
 
 export default function ConnectHealth() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const overallHealth = healthMetrics.length > 0 
@@ -33,8 +35,8 @@ export default function ConnectHealth() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <DCSectionHeader
-            title="Data Health"
-            subtitle="Monitor quality, freshness, and issues across all data sources"
+            title={t("connectHealth.title")}
+            subtitle={t("connectHealth.subtitle")}
             icon={<Activity className="h-6 w-6" />}
           />
           <Button variant="outline" onClick={() => navigate("/connect/monitor")}>
@@ -45,7 +47,7 @@ export default function ConnectHealth() {
 
         {/* Overall Health Card */}
         <DCCard
-          title="Overall System Health"
+          title={t("connectHealth.overallHealth")}
           subtitle="Aggregate health score across all data sources"
           icon={<CheckCircle className="h-5 w-5" />}
           status={overallHealth >= 90 ? "operational" : overallHealth >= 70 ? "warning" : "critical"}

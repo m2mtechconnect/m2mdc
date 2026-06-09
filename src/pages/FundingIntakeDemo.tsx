@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ interface IntakeFormData {
 }
 
 export default function FundingIntakeDemo() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<TwinRunResult | null>(null);
@@ -50,10 +52,10 @@ export default function FundingIntakeDemo() {
       });
 
       setResult(runResult);
-      toast.success("Intake submission processed successfully");
+      toast.success(t('fundingIntake.intakeSuccess'));
     } catch (error) {
       console.error("Error submitting intake:", error);
-      toast.error("Failed to process intake submission");
+      toast.error(t('fundingIntake.intakeFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -103,21 +105,21 @@ export default function FundingIntakeDemo() {
     <div className="container mx-auto py-8 space-y-6 max-w-5xl">
       {/* Header */}
       <DCSectionHeader
-        title="Funding Intake & Triage Twin – Demo"
-        subtitle="Submit a company funding intake form to see the Digital Twin in action. The system will automatically classify the opportunity, check eligibility, and generate a triage summary."
+        title={t('fundingIntake.title')}
+        subtitle={t('fundingIntake.subtitle')}
         icon={<FileText className="h-6 w-6 text-info" />}
       />
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Form */}
         <DCCard
-          title="Company Intake Form"
-          subtitle="Fill out the form below to simulate a funding opportunity submission"
+          title={t('fundingIntake.companyIntakeForm')}
+          subtitle={t('fundingIntake.formSubtitle')}
         >
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Company Name */}
             <div className="space-y-2">
-              <Label htmlFor="company_name">Company Name *</Label>
+              <Label htmlFor="company_name">{t('fundingIntake.companyName')} *</Label>
               <Input
                 id="company_name"
                 {...register("company_name", { required: "Company name is required" })}
@@ -130,7 +132,7 @@ export default function FundingIntakeDemo() {
 
             {/* Website */}
             <div className="space-y-2">
-              <Label htmlFor="website">Website URL *</Label>
+              <Label htmlFor="website">{t('fundingIntake.websiteUrl')} *</Label>
               <Input
                 id="website"
                 type="url"
@@ -150,7 +152,7 @@ export default function FundingIntakeDemo() {
 
             {/* Sector */}
             <div className="space-y-2">
-              <Label htmlFor="sector">Sector *</Label>
+              <Label htmlFor="sector">{t('fundingIntake.sector')} *</Label>
               <Select value={watchedSector} onValueChange={(value) => setValue("sector", value)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -168,7 +170,7 @@ export default function FundingIntakeDemo() {
 
             {/* Company Size */}
             <div className="space-y-2">
-              <Label htmlFor="size">Company Size *</Label>
+              <Label htmlFor="size">{t('fundingIntake.companySize')} *</Label>
               <Select value={watchedSize} onValueChange={(value) => setValue("size", value)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -184,7 +186,7 @@ export default function FundingIntakeDemo() {
 
             {/* Country */}
             <div className="space-y-2">
-              <Label htmlFor="country">Country *</Label>
+              <Label htmlFor="country">{t('fundingIntake.country')} *</Label>
               <Input
                 id="country"
                 {...register("country", { required: "Country is required" })}
@@ -197,7 +199,7 @@ export default function FundingIntakeDemo() {
 
             {/* Description */}
             <div className="space-y-2">
-              <Label htmlFor="description">AI/Funding Needs Description *</Label>
+              <Label htmlFor="description">{t('fundingIntake.description')} *</Label>
               <Textarea
                 id="description"
                 {...register("description", { required: "Description is required" })}
@@ -230,7 +232,7 @@ export default function FundingIntakeDemo() {
           {result ? (
             <>
               <DCCard
-                title="Triage Result"
+                title={t('fundingIntake.triageResult')}
                 status={getStatusVariant(result.status)}
                 headerAction={
                   <Badge className={result.status === "completed" ? "bg-green-500/10 text-green-400" : "bg-yellow-500/10 text-yellow-400"}>
@@ -248,7 +250,7 @@ export default function FundingIntakeDemo() {
                       {/* Program Fit */}
                       {data.programFit.length > 0 && (
                         <div>
-                          <h4 className="text-sm font-semibold mb-2">Recommended Programs</h4>
+                          <h4 className="text-sm font-semibold mb-2">{t('fundingIntake.recommendedPrograms')}</h4>
                           <div className="flex flex-wrap gap-2">
                             {data.programFit.map((program: string, idx: number) => (
                               <Badge key={idx} variant="outline">{program}</Badge>
@@ -259,7 +261,7 @@ export default function FundingIntakeDemo() {
 
                       {/* Readiness Score */}
                       <div>
-                        <h4 className="text-sm font-semibold mb-2">AI Readiness Score</h4>
+                        <h4 className="text-sm font-semibold mb-2">{t('fundingIntake.aiReadinessScore')}</h4>
                         <div className="flex items-center gap-3">
                           <div className="flex-1 bg-muted rounded-full h-3">
                             <div
@@ -273,7 +275,7 @@ export default function FundingIntakeDemo() {
 
                       {/* Priority */}
                       <div>
-                        <h4 className="text-sm font-semibold mb-2">Priority</h4>
+                        <h4 className="text-sm font-semibold mb-2">{t('fundingIntake.priority')}</h4>
                         <Badge className={getPriorityColor(data.priority)}>
                           {data.priority.toUpperCase()}
                         </Badge>
@@ -282,7 +284,7 @@ export default function FundingIntakeDemo() {
                       {/* Rationale */}
                       {data.rationale && (
                         <div>
-                          <h4 className="text-sm font-semibold mb-2">Assessment Rationale</h4>
+                          <h4 className="text-sm font-semibold mb-2">{t('fundingIntake.assessmentRationale')}</h4>
                           <p className="text-sm text-muted-foreground">{data.rationale}</p>
                         </div>
                       )}
@@ -293,7 +295,7 @@ export default function FundingIntakeDemo() {
                           <div className="flex items-start gap-3">
                             <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
                             <div>
-                              <h4 className="text-sm font-semibold mb-1">Human Review Required</h4>
+                              <h4 className="text-sm font-semibold mb-1">{t('fundingIntake.humanReviewRequired')}</h4>
                               <p className="text-sm text-muted-foreground">
                                 This case has been flagged for review by a{" "}
                                 <span className="font-medium">{result.humanTasks[0].role}</span>.
@@ -322,9 +324,9 @@ export default function FundingIntakeDemo() {
             <DCCard status="neutral">
               <div className="py-8 text-center">
                 <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">No Results Yet</h3>
+                <h3 className="text-lg font-semibold mb-2">{t('fundingIntake.noResultsYet')}</h3>
                 <p className="text-muted-foreground">
-                  Submit the form to see the triage results
+                  {t('fundingIntake.noResultsDesc')}
                 </p>
               </div>
             </DCCard>

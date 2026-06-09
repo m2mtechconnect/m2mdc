@@ -48,6 +48,7 @@ import DataCentreTwin from "./pages/DataCentreTwin";
 import Blueprint from "./pages/Blueprint";
 import BlueprintPreview from "./pages/BlueprintPreview";
 import SimulationPreview from "./pages/SimulationPreview";
+import InfrastructurePage from "./pages/InfrastructurePage";
 import DataCentreTwinLanding from "./pages/DataCentreTwinLanding";
 import OmniverseScene from "./pages/OmniverseScene";
 import Onboarding from "./pages/Onboarding";
@@ -258,6 +259,7 @@ function AuthenticatedApp() {
         <Route path="/digital-twins" element={<Navigate to="/" replace />} />
         <Route path="/digital-twins/:slug" element={<Navigate to="/" replace />} />
         <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
+        <Route path="/infrastructure" element={<InfrastructurePage />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

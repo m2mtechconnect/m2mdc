@@ -1,0 +1,15 @@
+# M2M AURA
+
+> M2M AURA is an AI-powered Digital Twin platform for sovereign data centres. It monitors PUE, GPU utilization, thermals, carbon emissions, and compliance in real time.
+
+M2M AURA helps operators of Sovereign AI data centres design, simulate, and operate their facilities through a unified Digital Twin. The platform provides telemetry and analytics grounded in industry standards (Uptime Institute, ASHRAE TC 9.9, IEA), agent orchestration, blueprint-driven configuration, and Quebec/Canadian data sovereignty controls.
+
+## Pages
+
+- [Home](/): Platform overview, features, integrations, and use cases for the Sovereign AI Data Centre Digital Twin.
+- [Onboarding](/onboarding): Guided 4-step questionnaire to configure a new Digital Twin for your facility.
+- [Sign In](/login): Access the M2M AURA studio for existing customers.
+
+## Optional
+
+- [M2M Tech Connect](https://m2mtechconnect.com): Parent company website.

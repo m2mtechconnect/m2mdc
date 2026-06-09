@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ import type { DeployedSystem } from '@/types/system';
  * that is shared with marketplace template previews
  */
 export default function SystemManage() {
+  const { t } = useTranslation();
   const { systemId } = useParams<{ systemId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();

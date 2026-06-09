@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ import { DCSectionHeader } from "@/components/dc-ui/DCSectionHeader";
 import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 
 export default function AgentWorkspace() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -121,7 +123,7 @@ export default function AgentWorkspace() {
     return (
       <div className="min-h-screen bg-background section-padding-lg">
         <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-2xl font-semibold mb-4 text-foreground">Agent not found</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-foreground">{t("agentWorkspace.notFound")}</h2>
           <Button onClick={() => navigate('/dashboard')} className="bg-primary hover:bg-primary/80">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Dashboard
@@ -250,7 +252,7 @@ export default function AgentWorkspace() {
                     <p className="text-2xl font-semibold text-foreground">{stats.totalRuns}</p>
                   </div>
                   <div className="p-4 bg-muted rounded-lg border border-border">
-                    <p className="text-xs text-muted-foreground mb-1">Success Rate</p>
+                    <p className="text-xs text-muted-foreground mb-1">{t('agentWorkspace.successRate')}</p>
                     <p className="text-2xl font-semibold text-success">{stats.successRate.toFixed(1)}%</p>
                   </div>
                 </div>

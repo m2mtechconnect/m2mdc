@@ -5,27 +5,29 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import type { OnboardingFormData } from "@/pages/Onboarding";
 import { Target } from "lucide-react";
-
-const goalOptions = [
-  "Reduce PUE",
-  "Optimize cooling",
-  "Carbon/ESG reporting",
-  "Capacity planning",
-  "Predictive maintenance",
-  "Sovereign compliance",
-  "Other",
-];
-
-const timelineOptions = [
-  "Exploring",
-  "1-3 months",
-  "3-6 months",
-  "6-12 months",
-];
+import { useTranslation } from "react-i18next";
 
 export function StepGoals() {
   const { control, setValue, watch } = useFormContext<OnboardingFormData>();
+  const { t } = useTranslation();
   const selectedGoals = watch("goals") || [];
+
+  const goalOptions = [
+    t('onboarding.goalOptions.reducePue'),
+    t('onboarding.goalOptions.optimizeCooling'),
+    t('onboarding.goalOptions.carbonEsg'),
+    t('onboarding.goalOptions.capacityPlanning'),
+    t('onboarding.goalOptions.predictiveMaintenance'),
+    t('onboarding.goalOptions.sovereignCompliance'),
+    t('onboarding.goalOptions.other'),
+  ];
+
+  const timelineOptions = [
+    t('onboarding.timelineOptions.exploring'),
+    t('onboarding.timelineOptions.oneToThree'),
+    t('onboarding.timelineOptions.threeToSix'),
+    t('onboarding.timelineOptions.sixToTwelve'),
+  ];
 
   const toggleGoal = (goal: string) => {
     const updated = selectedGoals.includes(goal)
@@ -41,8 +43,8 @@ export function StepGoals() {
           <Target className="h-5 w-5 text-accent-foreground" />
         </div>
         <div>
-          <h2 className="text-xl font-display font-bold text-foreground">Your Goals</h2>
-          <p className="text-sm text-muted-foreground">What do you want to achieve with M2M AURA?</p>
+          <h2 className="text-xl font-display font-bold text-foreground">{t('onboarding.goalsTitle')}</h2>
+          <p className="text-sm text-muted-foreground">{t('onboarding.goalsDesc')}</p>
         </div>
       </div>
 
@@ -52,7 +54,7 @@ export function StepGoals() {
         name="goals"
         render={() => (
           <FormItem>
-            <FormLabel>What are you looking to achieve?</FormLabel>
+            <FormLabel>{t('onboarding.whatLookingToAchieve')}</FormLabel>
             <div className="grid grid-cols-2 gap-3 mt-2">
               {goalOptions.map((goal) => (
                 <label
@@ -82,11 +84,11 @@ export function StepGoals() {
         render={({ field }) => (
           <FormItem>
             <FormLabel>
-              Biggest Operational Challenge <span className="text-muted-foreground font-normal">(optional)</span>
+              {t('onboarding.biggestChallenge')} <span className="text-muted-foreground font-normal">({t('onboarding.optional')})</span>
             </FormLabel>
             <FormControl>
               <Textarea
-                placeholder="e.g. We struggle with cooling efficiency during peak GPU workloads…"
+                placeholder={t('onboarding.challengePlaceholder')}
                 className="min-h-[100px]"
                 {...field}
               />
@@ -101,16 +103,16 @@ export function StepGoals() {
         name="timeline"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Timeline to Deploy</FormLabel>
+            <FormLabel>{t('onboarding.timelineToDeploy')}</FormLabel>
             <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder="When are you looking to get started?" />
+                  <SelectValue placeholder={t('onboarding.timelinePlaceholder')} />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                {timelineOptions.map((t) => (
-                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                {timelineOptions.map((option) => (
+                  <SelectItem key={option} value={option}>{option}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

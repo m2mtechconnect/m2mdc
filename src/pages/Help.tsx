@@ -29,6 +29,7 @@ import {
   Shield,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
 import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 import { useTour } from "@/context/TourContext";
@@ -87,6 +88,7 @@ const helpSections = [
 ];
 
 export default function Help() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { startTour, resetAllTours, isTourSeen } = useTour();
   
@@ -153,8 +155,8 @@ export default function Help() {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
           {/* Header */}
           <DCSectionHeader
-            title="Learning Hub"
-            subtitle="Resources, tutorials, and expert support to accelerate your AI transformation"
+            title={t('help.title')}
+            subtitle={t('help.subtitle')}
             icon={<GraduationCap className="h-6 w-6" />}
           />
 
@@ -326,8 +328,8 @@ export default function Help() {
 
             {/* Section 3: ROI Calculator */}
             <DCCard 
-              title="ROI Calculator"
-              subtitle="Estimate your AI automation ROI in real-time"
+              title={t('help.roiCalculator')}
+              subtitle={t('help.roiCalculatorDesc')}
               icon={<Calculator className="h-5 w-5" />}
               status="operational"
             >

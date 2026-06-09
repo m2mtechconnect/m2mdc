@@ -5,22 +5,25 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import type { OnboardingFormData } from "@/pages/Onboarding";
 import { Server } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const dataCentreOptions = ["1", "2-5", "6-20", "20+"];
 const rackOptions = ["1-50", "51-200", "201-500", "500-1,000", "1,000+"];
-const workloadOptions = [
-  "AI/ML Training",
-  "HPC",
-  "Cloud Hosting",
-  "Enterprise IT",
-  "Colocation",
-  "Other",
-];
 
 export function StepDataCentre() {
   const { control, setValue, watch } = useFormContext<OnboardingFormData>();
+  const { t } = useTranslation();
   const selectedWorkloads = watch("workload_types") || [];
   const currentPue = watch("current_pue");
+
+  const workloadOptions = [
+    t('onboarding.workloadTypes.aiMl'),
+    t('onboarding.workloadTypes.hpc'),
+    t('onboarding.workloadTypes.cloudHosting'),
+    t('onboarding.workloadTypes.enterpriseIt'),
+    t('onboarding.workloadTypes.colocation'),
+    t('onboarding.workloadTypes.other'),
+  ];
 
   const toggleWorkload = (workload: string) => {
     const updated = selectedWorkloads.includes(workload)
@@ -36,8 +39,8 @@ export function StepDataCentre() {
           <Server className="h-5 w-5 text-accent-foreground" />
         </div>
         <div>
-          <h2 className="text-xl font-display font-bold text-foreground">Your Data Centre</h2>
-          <p className="text-sm text-muted-foreground">Help us understand your infrastructure.</p>
+          <h2 className="text-xl font-display font-bold text-foreground">{t('onboarding.dataCentreTitle')}</h2>
+          <p className="text-sm text-muted-foreground">{t('onboarding.dataCentreDesc')}</p>
         </div>
       </div>
 
@@ -47,11 +50,11 @@ export function StepDataCentre() {
           name="num_data_centres"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Number of Data Centres</FormLabel>
+              <FormLabel>{t('onboarding.numberOfDataCentres')}</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select" />
+                    <SelectValue placeholder={t('onboarding.select')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -69,16 +72,16 @@ export function StepDataCentre() {
           name="rack_count"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Total Rack Count</FormLabel>
+              <FormLabel>{t('onboarding.totalRackCount')}</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select range" />
+                    <SelectValue placeholder={t('onboarding.selectRange')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   {rackOptions.map((o) => (
-                    <SelectItem key={o} value={o}>{o} racks</SelectItem>
+                    <SelectItem key={o} value={o}>{o} {t('onboarding.racks')}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -94,7 +97,7 @@ export function StepDataCentre() {
         name="workload_types"
         render={() => (
           <FormItem>
-            <FormLabel>Primary Workload Type</FormLabel>
+            <FormLabel>{t('onboarding.primaryWorkloadType')}</FormLabel>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
               {workloadOptions.map((workload) => (
                 <label
@@ -125,7 +128,7 @@ export function StepDataCentre() {
         render={() => (
           <FormItem>
             <FormLabel>
-              Current PUE Estimate <span className="text-muted-foreground font-normal">(optional)</span>
+              {t('onboarding.currentPueEstimate')} <span className="text-muted-foreground font-normal">({t('onboarding.optional')})</span>
             </FormLabel>
             <div className="pt-2">
               <Slider

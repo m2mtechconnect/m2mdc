@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -98,6 +99,7 @@ const FEATURED_INTEGRATIONS: Omit<Integration, "id" | "status" | "connected">[] 
 ];
 
 export default function IntegrationHub() {
+  const { t } = useTranslation();
   const [selectedIntegration, setSelectedIntegration] = useState<Integration | null>(null);
   const [zapierModalOpen, setZapierModalOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -196,10 +198,10 @@ export default function IntegrationHub() {
               <div className="p-2 rounded-lg bg-primary/10 border border-primary/30">
                 <Plug className="h-6 w-6 text-primary" />
               </div>
-              Integration Hub
+              {t('integrationHub.title')}
             </h1>
             <p className="text-sm text-muted-foreground">
-              Connect external systems to your data centre digital twin
+              {t('integrationHub.subtitle')}
             </p>
           </div>
         </div>

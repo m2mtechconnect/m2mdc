@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +15,7 @@ import { TwinRunsTab } from "@/components/digital-twin/TwinRunsTab";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui";
 
 export default function DigitalTwinDetail() {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [twin, setTwin] = useState<DigitalTwin | null>(null);
@@ -117,10 +119,10 @@ export default function DigitalTwinDetail() {
         <Tabs defaultValue="overview" className="w-full">
           <div className="border-b border-border/50 px-6">
             <TabsList className="bg-transparent border-0">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="workflow">Workflow</TabsTrigger>
-              <TabsTrigger value="entities-events">Entities & Events</TabsTrigger>
-              <TabsTrigger value="runs">Runs</TabsTrigger>
+              <TabsTrigger value="overview">{t("digitalTwinDetail.overview")}</TabsTrigger>
+              <TabsTrigger value="workflow">{t("digitalTwinDetail.workflow")}</TabsTrigger>
+              <TabsTrigger value="entities-events">{t("digitalTwinDetail.entitiesEvents")}</TabsTrigger>
+              <TabsTrigger value="runs">{t("digitalTwinDetail.runs")}</TabsTrigger>
             </TabsList>
           </div>
 

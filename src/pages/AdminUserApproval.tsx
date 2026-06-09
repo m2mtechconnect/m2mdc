@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * AdminUserApproval - Admin page to approve/reject new user signups
  * Accessible only to users with 'admin' role
@@ -23,6 +24,7 @@ interface ProfileRow {
 }
 
 function UserApprovalContent() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<'pending' | 'approved' | 'all'>('pending');
 
@@ -77,9 +79,9 @@ function UserApprovalContent() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-display font-bold">User Approvals</h1>
+          <h1 className="text-2xl font-display font-bold">{t("adminUserApproval.title")}</h1>
           <p className="text-muted-foreground">
-            Manage access for new user signups
+            {t("adminUserApproval.subtitle")}
           </p>
         </div>
         {pendingCount > 0 && (
@@ -175,6 +177,7 @@ function UserApprovalContent() {
 }
 
 export default function AdminUserApproval() {
+  const { t } = useTranslation();
   return (
     <ProtectedRoute allowedRoles={['executive', 'manager', 'admin' as any]}>
       <UserApprovalContent />

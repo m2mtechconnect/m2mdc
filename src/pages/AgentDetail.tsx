@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /**
  * Agent Detail Page - Full editor for agent definitions
  */
@@ -27,6 +28,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 const AgentDetail: React.FC = () => {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
@@ -58,7 +60,7 @@ const AgentDetail: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center h-screen gap-4">
         <AlertTriangle className="h-12 w-12 text-destructive" />
-        <p className="text-lg">Agent not found</p>
+        <p className="text-lg">{t("agentDetail.notFound")}</p>
         <Button variant="outline" onClick={() => navigate('/subsystem-agents')}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Agents

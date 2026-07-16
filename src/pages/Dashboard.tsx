@@ -40,6 +40,8 @@ import { DataCentreSelector } from '@/components/twin-selector';
 // UI Polish imports
 import { StatusBadge, KpiTooltip, NoTwinSelectedEmptyState, LoadingState, ScannerEmptyState } from '@/components/ui';
 import { IndustryComplianceBadges } from '@/components/shared';
+import { MetricValue } from '@/components/provenance/MetricValue';
+import { demoMetric } from '@/lib/provenance';
 
 // 3D Twin Visualization
 import { TwinVisualizationLayout } from '@/components/twin-visualization';
@@ -446,64 +448,63 @@ export default function Dashboard() {
 
         {/* DC-Specific KPI Row with Tooltips */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4" data-tour="role-kpi-dc">
+          {/*
+            Phase 1A.1 §3: these tiles were hard-coded literal strings
+            ("1.38", "23%", "94%", "98%") with no data source. They now use
+            `MetricValue` with `demoMetric` so users never mistake a
+            demonstration fixture for a live reading. When a validated
+            telemetry source is wired in Phase 1B, swap `demoMetric(...)` for
+            the source-appropriate factory.
+          */}
           <KpiTooltip title={t('dashboard.pueTooltip')} description="">
             <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 rounded-lg bg-success/10">
-                  <ZapIcon className="h-4 w-4 text-success" />
-                </div>
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('dashboard.globalPue')}</span>
-              </div>
-              <div className="font-mono text-2xl font-bold">1.38</div>
-              <div className="text-xs text-success flex items-center gap-1 mt-2">
-                ↓ 2.1% {t('global.improvement')}
-              </div>
+              <MetricValue
+                id="dashboard-pue"
+                label={t('dashboard.globalPue')}
+                metric={demoMetric<number>(1.38, 'demo-fixture')}
+                format={(v) => (typeof v === 'number' ? v.toFixed(2) : String(v))}
+                icon={<ZapIcon className="h-4 w-4 text-success" />}
+              />
             </Card>
           </KpiTooltip>
-          
+
           <KpiTooltip title={t('dashboard.gpuTooltip')} description="">
             <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Cpu className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('dashboard.gpuSaturation')}</span>
-              </div>
-              <div className="font-mono text-2xl font-bold">23%</div>
-              <div className="text-xs text-warning flex items-center gap-1 mt-2">
-                ↑ 4.2% {t('global.fromBaseline')}
-              </div>
+              <MetricValue
+                id="dashboard-gpu"
+                label={t('dashboard.gpuSaturation')}
+                metric={demoMetric<number>(23, 'demo-fixture')}
+                unit="%"
+                icon={<Cpu className="h-4 w-4 text-primary" />}
+              />
             </Card>
           </KpiTooltip>
-          
+
           <KpiTooltip title={t('dashboard.thermalTooltip')} description="">
             <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 rounded-lg bg-info/10">
-                  <Thermometer className="h-4 w-4 text-info" />
-                </div>
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('dashboard.thermalStability')}</span>
-              </div>
-              <div className="font-mono text-2xl font-bold">94%</div>
-              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
-                <StatusBadge status="active" customLabel={t('global.stable')} showIcon={false} />
-              </div>
+              <MetricValue
+                id="dashboard-thermal"
+                label={t('dashboard.thermalStability')}
+                metric={demoMetric<number>(94, 'demo-fixture')}
+                unit="%"
+                icon={<Thermometer className="h-4 w-4 text-info" />}
+                footer={<StatusBadge status="active" customLabel={t('global.stable')} showIcon={false} />}
+              />
             </Card>
           </KpiTooltip>
-          
+
           <KpiTooltip title={t('dashboard.sovereignTooltip')} description="">
             <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 rounded-lg bg-info/10">
-                  <Shield className="h-4 w-4 text-info" />
-                </div>
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('dashboard.sovereignCompute')}</span>
-              </div>
-              <div className="font-mono text-2xl font-bold">98%</div>
-              <div className="text-xs text-info flex items-center gap-1 mt-2">
-                <Leaf className="h-3 w-3" />
-                {t('global.canadaCompliant')}
-              </div>
+              <MetricValue
+                id="dashboard-sovereign"
+                label={t('dashboard.sovereignCompute')}
+                metric={demoMetric<number>(98, 'demo-fixture')}
+                unit="%"
+                icon={<Shield className="h-4 w-4 text-info" />}
+                footer={
+                  <span className="inline-flex items-center gap-1"><Leaf className="h-3 w-3" />Applicable frameworks configured</span>
+                }
+              />
             </Card>
           </KpiTooltip>
         </section>

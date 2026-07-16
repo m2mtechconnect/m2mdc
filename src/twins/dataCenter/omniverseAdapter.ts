@@ -153,7 +153,7 @@ function synthesizeServers(rack: KitRackHealth, serversPerRack: number = 10): Se
       temperature: randomInt(32, 42),
       remainingLife: randomInt(80, 100),
     },
-    thermalThrottling: rack.status === 'critical' && Math.random() > 0.5,
+    thermalThrottling: rack.status === 'critical' && __rng() > 0.5,
     airflowVelocityMps: randomInRange(1.8, 3.5),
   }));
 }

@@ -13,10 +13,14 @@ import { StreamStatusBanner } from '@/components/provenance/ProvenanceBadge';
 import type { SourceConnectionState } from '@/lib/provenance/types';
 
 // AppStreamer is loaded globally via index.html <script> tag
+// The NVIDIA AppStreamer library ships without TS types; the `any` here is a
+// documented boundary shim. Widening it would require re-declaring the entire
+// AppStreamer API which is out of scope for Phase 1A.
 declare global {
   interface Window {
     OVWebStreamingLibrary?: {
       AppStreamer: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         connect: (config: any) => Promise<void>;
         disconnect: () => Promise<void>;
       };
@@ -78,6 +82,7 @@ export function OmniverseStreamViewer({
           width: 1920,
           height: 1080,
           fps: 60,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           onStart: (msg: any) => {
             if (msg.action === 'start' && msg.status === 'success') {
               setStatus('connected');

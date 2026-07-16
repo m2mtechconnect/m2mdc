@@ -90,7 +90,7 @@ export type StreamBannerReason =
   | 'stream-degraded'
   | 'stream-demo';
 
-const BANNER_MESSAGES: Record<StreamBannerReason, string> = {
+export const STREAM_BANNER_MESSAGES: Record<StreamBannerReason, string> = {
   // Verbatim strings mandated by Phase 1A.1 spec.
   'kit-invalid':       'Kit response invalid — displaying local demonstration data.',
   'kit-unavailable':   'Kit unavailable — displaying local demonstration data.',
@@ -138,7 +138,7 @@ export function StreamStatusBanner({
       data-banner-reason={resolved}
       className="w-full rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-900 dark:text-amber-200"
     >
-      {BANNER_MESSAGES[resolved]}
+      {STREAM_BANNER_MESSAGES[resolved]}
     </div>
   );
 }

@@ -429,44 +429,59 @@ function buildNetwork(racks: KitRackHealth[]): NetworkTwin {
 }
 
 function buildFacilitySafety(): FacilitySafetyTwin {
-  const zones = ['Main Hall', 'UPS Room', 'Cooling Plant'].map((name, i) => ({
+  type ZoneSpec = { name: string; type: EnvironmentalZone['type'] };
+  const zoneSpecs: ZoneSpec[] = [
+    { name: 'Main Hall',     type: 'server_hall' },
+    { name: 'UPS Room',      type: 'electrical' },
+    { name: 'Cooling Plant', type: 'mechanical' },
+  ];
+
+  const zones: EnvironmentalZone[] = zoneSpecs.map((spec, i) => ({
     id: `env-zone-${i}`,
-    name,
+    name: spec.name,
+    type: spec.type,
     tempC: addNoise(22, 5),
     humidityPct: randomInRange(40, 55),
-    dewPointC: randomInRange(8, 14),
-    particulatePm25: randomInRange(5, 15),
-    waterLeakDetected: false,
-    smokeDetected: false,
-  })) as unknown as (EnvironmentalZone & { dewPointC: number; particulatePm25: number })[];
+    pm25: randomInRange(5, 15),
+    pm10: randomInRange(10, 30),
+    status: 'normal',
+  }));
 
-  const sensors = zones.flatMap(z => [
-    { id: `${z.id}-temp`, zoneId: z.id, type: 'temperature' as const, value: z.tempC, unit: '°C', status: 'normal' as const, lastReading: new Date() },
-    { id: `${z.id}-humid`, zoneId: z.id, type: 'humidity' as const, value: z.humidityPct, unit: '%', status: 'normal' as const, lastReading: new Date() },
-  ]) as unknown as SafetySensor[];
+  const safetySensors: SafetySensor[] = zones.flatMap(z => [
+    { id: `${z.id}-smoke`, type: 'smoke',      zone: z.id, value: 0, threshold: 1, triggered: false, status: 'normal' },
+    { id: `${z.id}-leak`,  type: 'water_leak', zone: z.id, value: 0, threshold: 1, triggered: false, status: 'normal' },
+  ]);
 
-  const fireSuppression: FireSuppressionSystem = {
+  const now = Date.now();
+  const fireSuppressionSystems: FireSuppressionSystem[] = zones.map(z => ({
+    id: `fs-${z.id}`,
+    zone: z.id,
     type: 'Novec',
-    agent: 'Novec 1230',
-    status: 'armed' as const,
-    lastInspection: new Date(Date.now() - randomInt(7, 60) * 86400000),
-    zonesCovered: zones.map(z => z.id),
     tankPressurePsi: randomInRange(340, 370),
-  } as unknown as FireSuppressionSystem;
+    targetPressurePsi: 360,
+    status: 'armed',
+    lastInspection: new Date(now - randomInt(7, 60) * 86400000),
+    nextInspection: new Date(now + randomInt(30, 180) * 86400000),
+  }));
 
   return {
     environmentalZones: zones,
-    sensors,
-    fireSuppression,
-    kpis: ({
+    safetySensors,
+    fireSuppressionSystems,
+    accessControl: {
+      activePersonnel: randomInt(0, 6),
+      recentAccess: [],
+    },
+    kpis: {
       environmentalSafetyScore: 94,
-      waterLeakRisk: 'low',
-      fireSuppressionReady: true,
-      avgDewPointC: zones.reduce((s, z) => s + z.dewPointC, 0) / zones.length,
-      particulateLevel: zones.reduce((s, z) => s + z.particulatePm25, 0) / zones.length,
-      lastIncidentDays: randomInt(90, 365),
-    } as unknown as FacilitySafetyTwin['kpis']),
-  } as unknown as FacilitySafetyTwin;
+      earlyWarningIndex: 88,
+      avgAmbientTemp: zones.reduce((s, z) => s + z.tempC, 0) / zones.length,
+      avgHumidity: zones.reduce((s, z) => s + z.humidityPct, 0) / zones.length,
+      airQualityIndex: 92,
+      waterLeakRisk: 5,
+      fireSuppressionReadiness: 98,
+    },
+  };
 }
 
 function buildWorkloadGpu(kit: KitStatusResponse): WorkloadGpuTwin {

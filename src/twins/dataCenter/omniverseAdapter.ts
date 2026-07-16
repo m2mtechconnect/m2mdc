@@ -23,9 +23,17 @@
  *      shape is defined by `@/types/dataCenterTwin`. Mapping is explicit.
  *   3. Synthetic values live behind named helpers so callers can identify
  *      and later replace them (grep for `synth` / `demo`).
+ *   4. Phase 1A: NO `Math.random()` inside the adapter. All demo variance
+ *      comes from a seeded PRNG derived from the Kit payload so identical
+ *      inputs produce byte-identical output (adapter is a pure function).
+ *   5. Phase 1A: operational scores (sovereignty, audit-readiness,
+ *      compliance status, carbon intensity, PUE, GPU util) are either
+ *      Kit-passthrough or fixed deterministic fixtures; no random score is
+ *      surfaced as an operational KPI.
  */
 
 import type { KitStatusResponse, KitRackHealth } from '@/integrations/omniverseKit/client';
+import type { FacilityProvenanceMap, ProvenanceMeta } from '@/lib/provenance/types';
 import type {
   DataCentreFacility,
   ThermalHardwareTwin,
@@ -62,12 +70,43 @@ import type {
   FacilityAlert,
 } from '@/types/dataCenterTwin';
 
+// ---------------------------------------------------------------------------
+// Deterministic PRNG (mulberry32) — seeded per call from the Kit payload.
+// This module exposes `randomInRange`/`randomInt`/`addNoise` names identical
+// to the previous non-deterministic helpers so the rest of the file is
+// unchanged; the difference is that every value is now reproducible.
+// ---------------------------------------------------------------------------
+let __rng: () => number = Math.random;
+
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seedFromKit(kit: KitStatusResponse): number {
+  // Combine a few stable Kit fields into a 32-bit seed. `tick` alone would
+  // make the output vary with time; we prefer a seed that reflects payload
+  // shape so identical payloads → identical output.
+  const s =
+    (kit.rack_count | 0) * 2654435761 ^
+    Math.round((kit.total_power_kw || 0) * 1000) ^
+    Math.round((kit.pue || 0) * 1000) * 40503 ^
+    Math.round((kit.gpu_utilization_pct || 0) * 100) * 486187739;
+  return s >>> 0 || 0xDEADBEEF;
+}
+
 function addNoise(value: number, pct: number = 3): number {
-  return value + value * (pct / 100) * (Math.random() - 0.5) * 2;
+  return value + value * (pct / 100) * (__rng() - 0.5) * 2;
 }
 
 function randomInRange(min: number, max: number): number {
-  return Math.random() * (max - min) + min;
+  return __rng() * (max - min) + min;
 }
 
 function randomInt(min: number, max: number): number {

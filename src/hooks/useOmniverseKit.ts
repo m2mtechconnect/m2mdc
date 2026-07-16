@@ -68,7 +68,14 @@ export interface OmniverseKitData {
   cameraTourActive: boolean;
 }
 
-function deriveMetrics(data: KitStatusResponse | undefined): Omit<OmniverseKitData, 'raw' | 'isConnected' | 'isLoading' | 'error'> {
+type DerivedMetrics = Omit<
+  OmniverseKitData,
+  'raw' | 'isConnected' | 'isLoading' | 'error'
+  | 'connectionState' | 'provenance' | 'validationIssues'
+  | 'disabledReason' | 'unavailableReason'
+>;
+
+function deriveMetrics(data: KitStatusResponse | undefined): DerivedMetrics {
   if (!data || !data.stage_ready) {
     return {
       rackCount: 0,

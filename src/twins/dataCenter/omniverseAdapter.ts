@@ -228,37 +228,44 @@ function buildPowerUps(kit: KitStatusResponse): PowerUpsTwin {
     efficiency: randomInRange(0.94, 0.97),
   }));
 
-  const generators = Array.from({ length: 2 }, (_, i) => ({
+  const generators: Generator[] = Array.from({ length: 2 }, (_, i) => ({
     id: `gen-${i}`,
     name: `Generator ${i + 1}`,
-    model: 'Caterpillar C32',
     capacityKw: 1200,
     fuelLevelPct: randomInt(70, 100),
+    runtimeHours: randomInt(100, 800),
+    failoverState: 'standby',
     lastTestDate: new Date(Date.now() - randomInt(3, 14) * 86400000),
-    hoursRun: randomInt(100, 800),
-    status: 'standby' as const,
-  })) as unknown as Generator[];
+    status: 'normal',
+  }));
 
-  return ({
+  const totalPowerDrawMw = kit.total_power_kw / 1000;
+  const avgUpsLoad = upsBanks.reduce((s, u) => s + u.loadPct, 0) / upsBanks.length;
+  const avgBatteryHealth = upsBanks.reduce((s, u) => s + u.batteryHealthPct, 0) / upsBanks.length;
+  const avgUpsRuntime = upsBanks.reduce((s, u) => s + u.runtimeMinutes, 0) / upsBanks.length;
+
+  return {
     pdus,
     busways,
     upsBanks,
     generators,
-    kpis: ({
-      pue: kit.pue,
-      totalPowerDrawKw: kit.total_power_kw,
-      totalItLoadKw: kit.total_power_kw / kit.pue,
-      upsEfficiency: randomInRange(0.94, 0.97),
-      avgUpsLoad: upsBanks.reduce((s, u) => s + u.loadPct, 0) / upsBanks.length,
+    gridConnection: {
+      status: 'stable',
+      voltageV: addNoise(480, 1),
+      frequencyHz: addNoise(60, 0.3),
+      powerFactorPct: randomInRange(95, 99),
+    },
+    kpis: {
       powerReliabilityScore: 97,
-      redundancyStatus: 'N+1',
-      transferSwitchReady: true,
-      avgBatteryHealth: upsBanks.reduce((s, u) => s + u.batteryHealthPct, 0) / upsBanks.length,
-      avgBatteryRuntime: upsBanks.reduce((s, u) => s + u.runtimeMinutes, 0) / upsBanks.length,
-      powerHistory: generateTimeSeries(24, kit.total_power_kw),
-      pueHistory: generateTimeSeries(24, kit.pue),
-    } as unknown as PowerUpsTwin['kpis']),
-  } as unknown as PowerUpsTwin);
+      upsHealthIndex: avgBatteryHealth,
+      redundancyLevel: 'N+1',
+      totalPowerDrawMw,
+      powerCapacityMw: 2.0,
+      utilizationPct: (totalPowerDrawMw / 2.0) * 100,
+      avgUpsRuntime,
+      generatorReadiness: generators.reduce((s, g) => s + g.fuelLevelPct, 0) / generators.length,
+    },
+  };
 }
 
 function buildCooling(kit: KitStatusResponse): CoolingTwin {

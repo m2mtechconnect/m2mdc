@@ -5,7 +5,17 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { fetchStatus, type KitStatusResponse, type KitRackHealth } from '@/integrations/omniverseKit/client';
+import {
+  fetchStatusValidated,
+  type KitFetchOutcome,
+  type KitStatusResponse,
+  type KitRackHealth,
+} from '@/integrations/omniverseKit/client';
+import type { KitValidationIssue } from '@/integrations/omniverseKit/schema';
+import type {
+  DataProvenance,
+  SourceConnectionState,
+} from '@/lib/provenance/types';
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -14,6 +24,13 @@ export interface OmniverseKitData {
   isConnected: boolean;
   isLoading: boolean;
   error: Error | null;
+
+  // Phase 1A.1 — runtime-validated connection state.
+  connectionState: SourceConnectionState;
+  provenance: DataProvenance;
+  validationIssues: KitValidationIssue[];
+  disabledReason: string | null;
+  unavailableReason: string | null;
 
   // Derived metrics
   rackCount: number;
@@ -51,7 +68,14 @@ export interface OmniverseKitData {
   cameraTourActive: boolean;
 }
 
-function deriveMetrics(data: KitStatusResponse | undefined): Omit<OmniverseKitData, 'raw' | 'isConnected' | 'isLoading' | 'error'> {
+type DerivedMetrics = Omit<
+  OmniverseKitData,
+  'raw' | 'isConnected' | 'isLoading' | 'error'
+  | 'connectionState' | 'provenance' | 'validationIssues'
+  | 'disabledReason' | 'unavailableReason'
+>;
+
+function deriveMetrics(data: KitStatusResponse | undefined): DerivedMetrics {
   if (!data || !data.stage_ready) {
     return {
       rackCount: 0,
@@ -118,21 +142,72 @@ function deriveMetrics(data: KitStatusResponse | undefined): Omit<OmniverseKitDa
 }
 
 export function useOmniverseKit(): OmniverseKitData {
-  const { data, isLoading, error } = useQuery({
+  const { data: outcome, isLoading } = useQuery<KitFetchOutcome>({
     queryKey: ['omniverseKit', 'status'],
-    queryFn: fetchStatus,
+    // `fetchStatusValidated` never throws — it returns a discriminated
+    // outcome. We do NOT let react-query retry: retrying an invalid payload
+    // just re-fails identically, and network failures are polled naturally
+    // by `refetchInterval`.
+    queryFn: ({ signal }) => fetchStatusValidated(signal),
     refetchInterval: POLL_INTERVAL_MS,
-    retry: 2,
+    retry: false,
     staleTime: POLL_INTERVAL_MS - 500,
   });
 
-  const metrics = deriveMetrics(data);
+  let validated: KitStatusResponse | undefined;
+  let connectionState: SourceConnectionState = 'connecting';
+  let provenance: DataProvenance = 'unavailable';
+  let validationIssues: KitValidationIssue[] = [];
+  let disabledReason: string | null = null;
+  let unavailableReason: string | null = null;
+
+  if (!outcome) {
+    connectionState = 'connecting';
+    provenance = 'unavailable';
+  } else if (outcome.ok) {
+    // Zod stripped any extras; the schema is a strict subset of KitStatusResponse.
+    validated = outcome.data as unknown as KitStatusResponse;
+    connectionState = validated.stage_ready ? 'connected' : 'degraded';
+    provenance = validated.stage_ready ? 'live' : 'demo';
+  } else {
+    // Narrow to the failure union. TS's control-flow narrowing on
+    // discriminated unions inside `else if` chains has been flaky with the
+    // exact `KitFetchOutcome` shape; a single-branch discriminator on
+    // `reason` is the most defensive path.
+    const failure = outcome as Exclude<KitFetchOutcome, { ok: true }>;
+    switch (failure.reason) {
+      case 'disabled':
+        connectionState = 'disabled';
+        provenance = 'demo';
+        disabledReason = failure.message;
+        break;
+      case 'invalid':
+        // Schema mismatch — MUST NOT map to live. Fall back to demo scaffolding.
+        connectionState = 'unavailable';
+        provenance = 'demo';
+        validationIssues = failure.issues;
+        break;
+      case 'unavailable':
+      default:
+        connectionState = 'unavailable';
+        provenance = 'unavailable';
+        unavailableReason = (failure as { message: string }).message;
+        break;
+    }
+  }
+
+  const metrics = deriveMetrics(validated);
 
   return {
-    raw: data ?? null,
-    isConnected: !!data?.stage_ready,
+    raw: validated ?? null,
+    isConnected: connectionState === 'connected',
     isLoading,
-    error: error as Error | null,
+    error: null,
+    connectionState,
+    provenance,
+    validationIssues,
+    disabledReason,
+    unavailableReason,
     ...metrics,
   };
 }

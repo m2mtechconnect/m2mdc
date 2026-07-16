@@ -106,18 +106,38 @@ export default function OmniverseScene() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {kit.isConnected ? (
+            {/* Phase 1A.1 — the badge reflects the validated REST connection
+                state, not just fetch success. `connected` requires a schema-
+                valid payload; `unavailable` covers both unreachable and
+                schema-mismatched responses. */}
+            {kit.connectionState === 'connected' && (
               <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">
                 <span className="relative flex h-2 w-2 mr-2">
                   <span className="animate-ping absolute h-full w-full rounded-full bg-green-400 opacity-75" />
                   <span className="relative h-2 w-2 rounded-full bg-green-500" />
                 </span>
-                Connected
+                Kit connected · validated
               </Badge>
-            ) : kit.isLoading ? (
-              <Badge variant="outline" className="bg-amber-500/10 text-amber-500">Connecting...</Badge>
-            ) : (
-              <Badge variant="outline" className="bg-red-500/10 text-red-500">Disconnected</Badge>
+            )}
+            {kit.connectionState === 'connecting' && (
+              <Badge variant="outline" className="bg-amber-500/10 text-amber-500">Connecting…</Badge>
+            )}
+            {kit.connectionState === 'disabled' && (
+              <Badge variant="outline" className="bg-slate-500/10 text-slate-500">Kit disabled</Badge>
+            )}
+            {kit.connectionState === 'unavailable' && kit.validationIssues.length > 0 && (
+              <Badge variant="outline" className="bg-rose-500/10 text-rose-500" title={`${kit.validationIssues.length} schema issue(s)`}>
+                Kit response invalid
+              </Badge>
+            )}
+            {kit.connectionState === 'unavailable' && kit.validationIssues.length === 0 && (
+              <Badge variant="outline" className="bg-rose-500/10 text-rose-500">Kit unavailable</Badge>
+            )}
+            {kit.connectionState === 'demo' && (
+              <Badge variant="outline" className="bg-amber-500/10 text-amber-600">Local demonstration</Badge>
+            )}
+            {kit.connectionState === 'degraded' && (
+              <Badge variant="outline" className="bg-orange-500/10 text-orange-500">Kit degraded</Badge>
             )}
             {phase && (
               <Badge variant="outline" className={phase.color}>{phase.label}</Badge>

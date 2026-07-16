@@ -17,6 +17,9 @@ import {
 } from 'lucide-react';
 import { OmniverseStreamViewer } from '@/components/twin-visualization/OmniverseStreamViewer';
 import { useOmniverseKit } from '@/hooks/useOmniverseKit';
+import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
+import { kitMetric, targetMetric, notAssessedMetric, type KitMetricContext } from '@/lib/provenance/kitMetrics';
+import type { ProvenancedMetric } from '@/lib/provenance/types';
 import {
   setCameraPreset,
   triggerScenario,
@@ -62,20 +65,65 @@ const SCENARIOS = [
 
 const LIGHT_PRESETS = ['normal', 'emergency', 'night', 'maintenance', 'blackout'];
 
-function MetricCard({ label, value, unit, icon: Icon, status = 'normal' }: {
-  label: string; value: string | number; unit?: string;
-  icon: React.ElementType; status?: 'normal' | 'warning' | 'critical';
+/**
+ * MetricCard — Phase 1A.1 item 4: renders a ProvenancedMetric alongside a
+ * ProvenanceBadge. When the metric is `unavailable`, we show "N/A" instead
+ * of a fabricated number, and the badge explains why.
+ *
+ * Accessible-name contract:
+ *   - The badge's `aria-label` includes "Provenance: <label>. Source: …" so
+ *     screen readers announce provenance per KPI.
+ *   - A stable `data-testid="metric-<slug>"` wraps each card so tests can
+ *     assert value+badge pairing.
+ */
+function MetricCard({
+  label,
+  metric,
+  formatter,
+  unit,
+  icon: Icon,
+  status = 'normal',
+  testId,
+}: {
+  label: string;
+  metric: ProvenancedMetric<number>;
+  formatter: (v: number) => string;
+  unit?: string;
+  icon: React.ElementType;
+  status?: 'normal' | 'warning' | 'critical';
+  testId: string;
 }) {
   const statusColor = status === 'critical' ? 'text-red-400' : status === 'warning' ? 'text-amber-400' : 'text-emerald-400';
+  const display = metric.value === null ? 'N/A' : formatter(metric.value);
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-card border">
+    <div
+      className="flex items-center gap-3 p-3 rounded-lg bg-card border"
+      data-testid={`metric-${testId}`}
+      data-provenance={metric.provenance}
+    >
       <div className={`p-2 rounded-lg bg-accent/10 ${statusColor}`}>
         <Icon className="h-4 w-4" />
       </div>
-      <div className="min-w-0">
-        <p className="text-xs text-muted-foreground truncate">{label}</p>
-        <p className={`text-lg font-bold font-mono ${statusColor}`}>
-          {value}{unit && <span className="text-xs text-muted-foreground ml-1">{unit}</span>}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-xs text-muted-foreground truncate" id={`metric-label-${testId}`}>{label}</p>
+          <ProvenanceBadge
+            compact
+            className="shrink-0"
+            meta={{
+              provenance: metric.provenance,
+              source: metric.sourceName ?? 'unknown',
+              at: metric.sourceTimestamp ? new Date(metric.sourceTimestamp) : undefined,
+              stale: metric.isStale,
+              note: metric.description ?? metric.derivation,
+            }}
+          />
+        </div>
+        <p
+          aria-labelledby={`metric-label-${testId}`}
+          className={`text-lg font-bold font-mono ${metric.value === null ? 'text-muted-foreground' : statusColor}`}
+        >
+          {display}{unit && metric.value !== null && <span className="text-xs text-muted-foreground ml-1">{unit}</span>}
         </p>
       </div>
     </div>
@@ -87,6 +135,22 @@ export default function OmniverseScene() {
   const [activeTab, setActiveTab] = useState('metrics');
 
   const phase = kit.phase ? PHASE_LABELS[kit.phase] || { label: kit.phase, color: '' } : null;
+
+  // Every KPI card below reads from this single provenance context so the
+  // badge cannot drift from the true Kit connection state.
+  const ctx: KitMetricContext = {
+    connectionState: kit.connectionState,
+    provenance: kit.provenance,
+    observedAt: new Date(),
+  };
+  const pueMetric        = kitMetric(kit.raw?.pue, ctx, { description: 'Power Usage Effectiveness' });
+  const gpuUtilMetric    = kitMetric(kit.raw?.gpu_utilization_pct, ctx, { description: 'GPU utilization %' });
+  const avgTempMetric    = kitMetric(kit.raw ? kit.avgTemp : undefined, ctx, { description: 'Mean rack outlet temp' });
+  const totalPowerMetric = kitMetric(kit.raw?.total_power_kw, ctx, { description: 'Total facility power (kW)' });
+  const coolingEffMetric = kitMetric(kit.raw?.cooling_efficiency, ctx, { description: 'Cooling efficiency index' });
+  const tokensPerWatt    = kitMetric(kit.raw?.tokens_per_watt, ctx, { description: 'Workload efficiency' });
+  const pueTarget        = targetMetric(1.30, 'kpi-config', 'PUE target (lower is better)');
+  const sovereignty      = notAssessedMetric<string>('sovereignty-engine', 'Sovereignty assessment not wired in this build');
 
   return (
     <div className="min-h-screen bg-background">
@@ -195,15 +259,33 @@ export default function OmniverseScene() {
               {/* Metrics Tab */}
               <TabsContent value="metrics" className="space-y-3 mt-3">
                 <div className="grid grid-cols-2 gap-2">
-                  <MetricCard label="PUE" value={kit.pue.toFixed(2)} icon={Zap}
-                    status={kit.pue > 1.5 ? 'warning' : 'normal'} />
-                  <MetricCard label="GPU Utilization" value={`${kit.gpuUtilizationPct.toFixed(0)}`} unit="%" icon={Cpu}
-                    status={kit.gpuUtilizationPct > 90 ? 'warning' : 'normal'} />
-                  <MetricCard label="Avg Temperature" value={kit.avgTemp.toFixed(1)} unit="°C" icon={Thermometer}
-                    status={kit.avgTemp > 35 ? 'critical' : kit.avgTemp > 28 ? 'warning' : 'normal'} />
-                  <MetricCard label="Total Power" value={kit.totalPowerKw.toFixed(0)} unit="kW" icon={Zap} />
-                  <MetricCard label="Cooling Eff." value={`${(kit.coolingEfficiency * 100).toFixed(0)}`} unit="%" icon={Leaf} />
-                  <MetricCard label="Tokens/Watt" value={kit.tokensPerWatt.toFixed(2)} icon={Cpu} />
+                  <MetricCard testId="pue" label="PUE" metric={pueMetric} formatter={v => v.toFixed(2)} icon={Zap}
+                    status={(pueMetric.value ?? 0) > 1.5 ? 'warning' : 'normal'} />
+                  <MetricCard testId="gpu-util" label="GPU Utilization" metric={gpuUtilMetric} formatter={v => v.toFixed(0)} unit="%" icon={Cpu}
+                    status={(gpuUtilMetric.value ?? 0) > 90 ? 'warning' : 'normal'} />
+                  <MetricCard testId="avg-temp" label="Avg Temperature" metric={avgTempMetric} formatter={v => v.toFixed(1)} unit="°C" icon={Thermometer}
+                    status={(avgTempMetric.value ?? 0) > 35 ? 'critical' : (avgTempMetric.value ?? 0) > 28 ? 'warning' : 'normal'} />
+                  <MetricCard testId="total-power" label="Total Power" metric={totalPowerMetric} formatter={v => v.toFixed(0)} unit="kW" icon={Zap} />
+                  <MetricCard testId="cooling-eff" label="Cooling Eff." metric={coolingEffMetric} formatter={v => (v * 100).toFixed(0)} unit="%" icon={Leaf} />
+                  <MetricCard testId="tokens-per-watt" label="Tokens/Watt" metric={tokensPerWatt} formatter={v => v.toFixed(2)} icon={Cpu} />
+                </div>
+                {/* Targets & unassessed KPIs — distinct provenance surfaces. */}
+                <div className="grid grid-cols-2 gap-2">
+                  <MetricCard testId="pue-target" label="Target PUE" metric={pueTarget} formatter={v => `<${v.toFixed(2)}`} icon={Gauge} />
+                  <div
+                    className="flex items-center justify-between gap-3 p-3 rounded-lg bg-card border"
+                    data-testid="metric-sovereignty"
+                    data-provenance={sovereignty.provenance}
+                  >
+                    <div className="min-w-0">
+                      <p className="text-xs text-muted-foreground truncate" id="metric-label-sovereignty">Sovereignty assessment</p>
+                      <p aria-labelledby="metric-label-sovereignty" className="text-sm text-muted-foreground italic">Not assessed</p>
+                    </div>
+                    <ProvenanceBadge
+                      compact
+                      meta={{ provenance: 'unavailable', source: sovereignty.sourceName ?? 'unknown', note: sovereignty.description }}
+                    />
+                  </div>
                 </div>
 
                 {/* DDN Storage */}

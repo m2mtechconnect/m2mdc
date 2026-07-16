@@ -135,11 +135,15 @@ describe('kitStatusToFacility — deterministic output', () => {
   it('produces byte-identical structural output for identical Kit inputs', () => {
     const a = kitStatusToFacility(kit());
     const b = kitStatusToFacility(kit());
-
-    // Timestamps are wall-clock and expected to differ; strip before comparing.
-    const strip = (f: ReturnType<typeof kitStatusToFacility>) => JSON.parse(
-      JSON.stringify(f, (_k, v) => (v instanceof Date ? '<<DATE>>' : v)),
-    );
+    // Timestamps are wall-clock and expected to differ; strip them before
+    // comparing. `JSON.stringify` calls `Date#toJSON` before any replacer,
+    // so we scrub ISO strings from the serialized form instead of using an
+    // `instanceof Date` replacer.
+    const strip = (f: ReturnType<typeof kitStatusToFacility>) =>
+      JSON.stringify(f).replace(
+        /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/g,
+        '<<DATE>>',
+      );
     expect(strip(a)).toEqual(strip(b));
   });
 

@@ -269,49 +269,85 @@ function buildPowerUps(kit: KitStatusResponse): PowerUpsTwin {
 }
 
 function buildCooling(kit: KitStatusResponse): CoolingTwin {
-  const units = Array.from({ length: 6 }, (_, i) => ({
-    id: `crac-${i}`,
-    name: `CRAC Unit ${i + 1}`,
-    type: i < 2 ? 'crah' as const : 'inrow' as const,
-    model: i < 2 ? 'Liebert DS165' : 'Liebert CRV',
-    supplyTempC: addNoise(14, 5),
-    returnTempC: addNoise(28, 5),
-    flowRateLpm: randomInRange(200, 400),
-    powerDrawKw: randomInRange(15, 40),
-    setpointC: 18,
-    fanSpeedPct: randomInt(50, 80),
-    status: 'running' as const,
-    filterCondition: randomInt(70, 100),
-    refrigerantLevelPct: randomInt(85, 100),
-  })) as unknown as CoolingUnit[];
+  const zoneNames = ['A', 'B', 'C'] as const;
+  const units: CoolingUnit[] = Array.from({ length: 6 }, (_, i) => {
+    const supply = addNoise(14, 5);
+    const ret = addNoise(28, 5);
+    return {
+      id: `crac-${i}`,
+      name: `CRAC Unit ${i + 1}`,
+      type: i < 2 ? 'CRAH' : 'InRow',
+      zone: zoneNames[Math.floor(i / 2)],
+      supplyAirTempC: supply,
+      returnAirTempC: ret,
+      deltaT: ret - supply,
+      humidityPct: randomInRange(40, 55),
+      refrigerantPressurePsi: randomInRange(120, 180),
+      compressorCurrentA: randomInRange(20, 60),
+      coolingCoilDeltaT: randomInRange(6, 12),
+      damperPositionPct: randomInt(40, 90),
+      fanSpeedRpm: randomInt(1200, 2400),
+      fanAmps: randomInRange(4, 9),
+      capacityKw: 120,
+      utilizationPct: randomInRange(45, 80),
+      status: 'normal',
+    };
+  });
 
-  const zones = ['A', 'B', 'C'].map((z, i) => ({
-    id: `zone-${z}`,
-    name: `Zone ${z}`,
-    coldAisleTempC: addNoise(20, 5),
-    hotAisleTempC: addNoise(32, 5),
-    humidityPct: randomInRange(40, 55),
-    airflowCfm: randomInRange(8000, 15000),
-    containmentType: 'cold-aisle' as const,
-    rackCount: 7,
-    assignedUnits: units.slice(i * 2, i * 2 + 2).map(u => u.id),
-    status: 'optimal' as const,
-  })) as unknown as (CoolingZoneDetail & { coldAisleTempC: number; hotAisleTempC: number })[];
+  const zones: CoolingZoneDetail[] = zoneNames.map((z, i) => {
+    const zoneUnits = units.filter(u => u.zone === z);
+    return {
+      id: `zone-${z}`,
+      name: `Zone ${z}`,
+      units: zoneUnits,
+      ambientTempC: addNoise(22, 3),
+      targetTempC: 22,
+      humidityPct: randomInRange(40, 55),
+      targetHumidityPct: 45,
+      airflowCfm: randomInRange(8000, 15000),
+      pueContribution: randomInRange(0.08, 0.14),
+      status: 'normal',
+    };
+  });
 
-  return ({
-    units,
+  const totalCoolingCapacityKw = units.reduce((s, u) => s + u.capacityKw, 0);
+  const activeCoolingLoadKw = units.reduce((s, u) => s + u.capacityKw * u.utilizationPct / 100, 0);
+  const avgSupply = units.reduce((s, u) => s + u.supplyAirTempC, 0) / units.length;
+  const avgReturn = units.reduce((s, u) => s + u.returnAirTempC, 0) / units.length;
+
+  return {
     zones,
-    kpis: ({
+    units,
+    chillerPlant: {
+      chillers: Array.from({ length: 2 }, (_, i) => ({
+        id: `chiller-${i}`,
+        name: `Chiller ${i + 1}`,
+        capacityTons: 500,
+        loadPct: randomInRange(40, 70),
+        supplyTempC: addNoise(7, 1),
+        returnTempC: addNoise(13, 1),
+        status: 'normal',
+      })),
+      coolingTowers: Array.from({ length: 2 }, (_, i) => ({
+        id: `ct-${i}`,
+        name: `Cooling Tower ${i + 1}`,
+        wetBulbTempC: addNoise(18, 3),
+        approachTempC: randomInRange(3, 6),
+        fanSpeedPct: randomInt(50, 90),
+        status: 'normal',
+      })),
+    },
+    kpis: {
       coolingEfficiencyIndex: Math.round(kit.cooling_efficiency * 100),
-      avgColdAisleTemp: zones.reduce((s, z) => s + z.coldAisleTempC, 0) / zones.length,
-      avgHotAisleTemp: zones.reduce((s, z) => s + z.hotAisleTempC, 0) / zones.length,
-      waterUsageEffectiveness: randomInRange(0.4, 0.8),
-      totalCoolingCapacityKw: units.reduce((s, u) => s + ((u as unknown as { powerDrawKw: number }).powerDrawKw ?? 0) * 4, 0),
-      freeHoursPerYear: randomInt(3000, 5000),
-      avgHumidity: zones.reduce((s, z) => s + z.humidityPct, 0) / zones.length,
-      coolingHistory: generateTimeSeries(24, kit.cooling_efficiency * 100),
-    } as unknown as CoolingTwin['kpis']),
-  } as unknown as CoolingTwin);
+      coolingCostPerKw: randomInRange(0.03, 0.06),
+      coolingRedundancyScore: 92,
+      avgSupplyTemp: avgSupply,
+      avgReturnTemp: avgReturn,
+      totalCoolingCapacityKw,
+      activeCoolingLoadKw,
+      pueFromCooling: 1 + zones.reduce((s, z) => s + z.pueContribution, 0) / zones.length,
+    },
+  };
 }
 
 function buildNetwork(racks: KitRackHealth[]): NetworkTwin {

@@ -12,6 +12,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { fetchStatusValidated, type KitFetchOutcome } from '@/integrations/omniverseKit/client';
+import * as configModule from '@/integrations/omniverseKit/config';
 import {
   kitStatusToFacilityWithProvenance,
   demoFacilityProvenance,
@@ -49,14 +50,20 @@ describe('fetchStatusValidated — end-to-end runtime path', () => {
   const originalFetch = globalThis.fetch;
 
   beforeEach(() => {
-    // Point config at a well-formed URL so `readKitConfig()` reports enabled.
-    // Use `vi.stubEnv` so the change survives Vite's env plumbing.
-    vi.stubEnv(KIT_URL_ENV, 'http://kit.test:8011');
+    // Force `readKitConfig()` into an ENABLED state so the fetch path runs.
+    // Stubbing the config module directly is more reliable than mutating
+    // `import.meta.env`, which Vite may have inlined at compile time.
+    vi.spyOn(configModule, 'readKitConfig').mockReturnValue({
+      enabled: true,
+      restBaseUrl: 'http://kit.test:8011',
+      streamEnabled: false,
+      signalingHost: 'kit.test',
+      signalingPort: 49100,
+    });
   });
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
-    vi.unstubAllEnvs();
     vi.restoreAllMocks();
   });
 
@@ -137,7 +144,14 @@ describe('fetchStatusValidated — end-to-end runtime path', () => {
   });
 
   it('disabled config → disabled reason, fetch is never called', async () => {
-    vi.stubEnv(KIT_URL_ENV, '');
+    (configModule.readKitConfig as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      enabled: false,
+      restBaseUrl: null,
+      streamEnabled: false,
+      signalingHost: null,
+      signalingPort: 49100,
+      reason: 'VITE_OMNIVERSE_KIT_URL is not set — Kit disabled.',
+    });
     const spy = vi.fn();
     globalThis.fetch = spy;
     const outcome = await fetchStatusValidated();

@@ -1,11 +1,28 @@
 /**
- * Omniverse Kit → DataCentreFacility Adapter
- * Transforms live Kit /demo/status data into the DataCentreFacility shape
- * that all existing dashboard components consume.
+ * Omniverse Kit → DataCentreFacility Adapter (demo scaffolding).
  *
- * Rack-level telemetry comes from Kit API. Domain-level data (servers,
- * sensors, PDUs, cooling units, etc.) is synthesized from rack-level
- * metrics to fill the full DataCentreFacility interface.
+ * INPUT  (real, external):  `KitStatusResponse` — the subset of fields the
+ *                           Kit `/demo/status` endpoint returns
+ *                           (rack health, aggregate power, PUE, GPU util,
+ *                           cooling efficiency).
+ * OUTPUT (mostly synthetic): the internal `DataCentreFacility` shape used by
+ *                           the dashboard, which is far richer than Kit
+ *                           exposes.
+ *
+ * Only the following fields on the output are derived from real Kit data:
+ *   - `currentPowerDrawKw`, `currentLoadMw`, per-rack `outletTempC`, `status`
+ *   - `pue`, aggregate GPU utilization, cooling-efficiency index
+ *   - alert list (derived from rack status)
+ * Every other field is a **synthetic demo default** produced by the
+ * `synth*` / `build*` helpers below and MUST be treated as demo scaffolding
+ * until a real inventory + telemetry source lands (Phase 3+).
+ *
+ * Design rules for this file:
+ *   1. No `as unknown as` — every object literal fully satisfies its type.
+ *   2. External payload shape is defined by `KitStatusResponse`; internal
+ *      shape is defined by `@/types/dataCenterTwin`. Mapping is explicit.
+ *   3. Synthetic values live behind named helpers so callers can identify
+ *      and later replace them (grep for `synth` / `demo`).
  */
 
 import type { KitStatusResponse, KitRackHealth } from '@/integrations/omniverseKit/client';

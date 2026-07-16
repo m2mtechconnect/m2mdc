@@ -46,6 +46,39 @@ export interface Provenanced<T> {
 }
 
 /**
+ * Metric-level provenance envelope (Phase 1A.1).
+ *
+ * Every KPI, gauge, or scalar surfaced in the UI SHOULD be represented as a
+ * `ProvenancedMetric<T>` so that the value cannot be rendered without a
+ * provenance tag. A `null` `value` is legal and REQUIRED when provenance is
+ * `unavailable` — components must render an "unavailable" affordance rather
+ * than a fabricated number.
+ *
+ * Fields:
+ *  - `value`           — numeric/string reading, or `null` when unavailable.
+ *  - `provenance`      — canonical provenance tag.
+ *  - `sourceName`      — human/system identifier of the ultimate source.
+ *  - `sourceTimestamp` — ISO-8601 timestamp of the source observation.
+ *  - `isStale`         — true when timestamp exceeds freshness budget.
+ *  - `derivation`      — short expression describing how `derived`/`simulated`
+ *                        values are computed, referenced back to `live`
+ *                        inputs.
+ *  - `modelVersion`    — simulation / scoring model identifier for
+ *                        `simulated` and `derived` values.
+ *  - `description`     — optional human context (units, caveats).
+ */
+export interface ProvenancedMetric<T> {
+  value: T | null;
+  provenance: DataProvenance;
+  sourceName?: string;
+  sourceTimestamp?: string;
+  isStale?: boolean;
+  derivation?: string;
+  modelVersion?: string;
+  description?: string;
+}
+
+/**
  * Section-level provenance map for a `DataCentreFacility`.
  * Each key corresponds to a top-level facility section or KPI cluster.
  * Missing keys imply `unavailable` — see `getProvenance()`.

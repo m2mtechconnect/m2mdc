@@ -72,25 +72,73 @@ export function ProvenanceBadge({ meta, compact = false, className }: Provenance
 }
 
 /**
+ * Explicit banner-reason discriminator (Phase 1A.1).
+ *
+ * We intentionally do NOT derive the banner text from the meta object alone,
+ * because the caller needs to distinguish between:
+ *   - Kit REST invalid (schema mismatch — payload was rejected)
+ *   - Kit REST unreachable / non-2xx
+ *   - Kit disabled by configuration
+ *   - WebRTC stream demo fallback (Kit REST may still be healthy)
+ * Collapsing these into a generic "demo" banner hides operational cause.
+ */
+export type StreamBannerReason =
+  | 'kit-invalid'
+  | 'kit-unavailable'
+  | 'kit-disabled'
+  | 'stream-connecting'
+  | 'stream-degraded'
+  | 'stream-demo';
+
+export const STREAM_BANNER_MESSAGES: Record<StreamBannerReason, string> = {
+  // Verbatim strings mandated by Phase 1A.1 spec.
+  'kit-invalid':       'Kit response invalid — displaying local demonstration data.',
+  'kit-unavailable':   'Kit unavailable — displaying local demonstration data.',
+  'kit-disabled':      'Kit disabled by configuration — displaying local demonstration data.',
+  'stream-connecting': 'Connecting to Omniverse stream…',
+  'stream-degraded':   'Omniverse stream degraded — displaying local demonstration data.',
+  'stream-demo':       'Local demonstration scene — Omniverse stream unavailable.',
+};
+
+/**
  * StreamStatusBanner — one-line banner shown above the visualization when
  * the Omniverse Kit connection is not `connected`. Replaces the silent
- * "Omniverse RTX Viewport" label with an honest state string.
+ * "Omniverse RTX Viewport" label with an honest, cause-specific state string.
+ *
+ * The `reason` prop is authoritative — pass `null` to hide the banner (e.g.
+ * when the Kit is connected and the stream is live). The legacy `meta` prop
+ * is retained for compatibility; when `reason` is omitted it maps
+ * `meta.connection` to the closest reason, defaulting to `stream-demo`.
  */
-export function StreamStatusBanner({ meta }: { meta: ProvenanceMeta }) {
-  if (meta.connection === 'connected') return null;
-  const message =
-    meta.connection === 'demo'         ? 'Local demonstration scene — Omniverse stream unavailable.' :
-    meta.connection === 'connecting'   ? 'Connecting to Omniverse stream…' :
-    meta.connection === 'degraded'     ? 'Omniverse stream degraded — showing local demonstration scene.' :
-    meta.connection === 'disabled'     ? 'Omniverse stream disabled by configuration — showing local demonstration scene.' :
-    /* unavailable */                    'Local demonstration scene — Omniverse stream unavailable.';
+export function StreamStatusBanner({
+  reason,
+  meta,
+}: {
+  reason?: StreamBannerReason | null;
+  meta?: ProvenanceMeta;
+}) {
+  if (reason === null) return null;
+  const resolved: StreamBannerReason | null =
+    reason !== undefined
+      ? reason
+      : meta
+        ? meta.connection === 'connected'   ? null
+        : meta.connection === 'disabled'    ? 'kit-disabled'
+        : meta.connection === 'connecting'  ? 'stream-connecting'
+        : meta.connection === 'degraded'    ? 'stream-degraded'
+        : meta.connection === 'unavailable' ? 'kit-unavailable'
+        :                                     'stream-demo'
+        : 'stream-demo';
+
+  if (resolved === null) return null;
 
   return (
     <div
       role="status"
+      data-banner-reason={resolved}
       className="w-full rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-900 dark:text-amber-200"
     >
-      {message}
+      {STREAM_BANNER_MESSAGES[resolved]}
     </div>
   );
 }

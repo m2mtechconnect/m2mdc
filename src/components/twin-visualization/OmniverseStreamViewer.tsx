@@ -9,8 +9,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Play, Square, Monitor, Maximize2, Minimize2 } from 'lucide-react';
 import { readKitConfig } from '@/integrations/omniverseKit/config';
-import { StreamStatusBanner } from '@/components/provenance/ProvenanceBadge';
+import { StreamStatusBanner, type StreamBannerReason } from '@/components/provenance/ProvenanceBadge';
 import type { SourceConnectionState } from '@/lib/provenance/types';
+import { useOmniverseKit } from '@/hooks/useOmniverseKit';
 
 // AppStreamer is loaded globally via index.html <script> tag
 // The NVIDIA AppStreamer library ships without TS types; the `any` here is a
@@ -40,6 +41,10 @@ export function OmniverseStreamViewer({
   onConnectionChange,
 }: OmniverseStreamViewerProps) {
   const cfg = useMemo(() => readKitConfig(), []);
+  // Kit REST outcome — banner cause takes precedence over the WebRTC stream
+  // state, because a bad REST payload/endpoint is the operationally relevant
+  // failure to surface first.
+  const kit = useOmniverseKit();
   const initialState: SourceConnectionState =
     !cfg.enabled           ? 'disabled' :
     !cfg.streamEnabled     ? 'disabled' :
@@ -147,7 +152,7 @@ export function OmniverseStreamViewer({
     <div className={containerClass}>
       <div className="absolute top-14 left-3 right-3 z-20 pointer-events-none">
         <div className="pointer-events-auto">
-          <StreamStatusBanner meta={{ provenance: status === 'connected' ? 'live' : 'demo', source: 'omniverse-kit', connection: status }} />
+          <StreamStatusBanner reason={resolveBannerReason(kit.connectionState, kit.validationIssues.length > 0, status)} />
         </div>
       </div>
       {/* Toolbar — pointer-events-none so mouse goes through to video, buttons re-enable pointer */}
@@ -220,4 +225,25 @@ export function OmniverseStreamViewer({
       )}
     </div>
   );
+}
+
+/**
+ * Prioritise Kit REST cause over stream state so the user learns the true
+ * reason for demo fallback. Returns `null` when everything is healthy (Kit
+ * connected AND stream connected) so no banner is rendered.
+ */
+function resolveBannerReason(
+  kitState: SourceConnectionState,
+  kitInvalid: boolean,
+  streamState: SourceConnectionState,
+): StreamBannerReason | null {
+  if (kitState === 'disabled')    return 'kit-disabled';
+  if (kitInvalid)                 return 'kit-invalid';
+  if (kitState === 'unavailable') return 'kit-unavailable';
+  if (kitState === 'degraded')    return 'stream-degraded';
+  // Kit REST healthy: surface the stream state.
+  if (streamState === 'connected')  return null;
+  if (streamState === 'connecting') return 'stream-connecting';
+  if (streamState === 'unavailable') return 'stream-demo';
+  return 'stream-demo';
 }

@@ -13,6 +13,14 @@ import {
   Zap, Cpu, Thermometer, Shield, Globe, Wind, DollarSign, Battery
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
+
+// Phase 1A.2 §4 — Simulation surface disclosure.
+// The values rendered here come from the deterministic demonstration
+// estimator (see `src/simulation/*`). Baseline is a demo fixture; current
+// value is simulation output. Nothing on this card is a measurement.
+const SIM_SOURCE = 'aura-estimator';
+const SIM_MODEL = 'aura-estimator@v0-demo';
 
 interface KPIDelta {
   id: string;
@@ -92,7 +100,10 @@ const KPICard = memo(function KPICard({
   
   if (compact) {
     return (
-      <div className={cn(
+      <div
+        data-testid={`sim-kpi-${kpi.id}`}
+        data-provenance={isRunning ? 'simulated' : 'demo'}
+        className={cn(
         'flex items-center justify-between p-2 rounded-lg bg-card border border-border transition-all duration-300',
         isRunning && 'ring-1 ring-primary/30 shadow-sm shadow-primary/10'
       )}>
@@ -126,7 +137,10 @@ const KPICard = memo(function KPICard({
   }
   
   return (
-    <Card className={cn(
+    <Card
+      data-testid={`sim-kpi-${kpi.id}`}
+      data-provenance={isRunning ? 'simulated' : 'demo'}
+      className={cn(
       'bg-card border-border transition-all duration-300 overflow-hidden relative',
       isRunning && !isNeutral && 'border-primary/50 shadow-lg shadow-primary/5',
       isRunning && isGoodDelta && 'border-success/50',

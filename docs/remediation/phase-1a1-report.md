@@ -149,8 +149,13 @@ capture straightforward once fixtures are added.
 
 ## Remaining synthetic metrics on active operational screens
 
-- `IntelligenceDashboard` KPI tiles (6) and chart arrays (`pueChartData`,
-  `energyChartData`) — still untagged; retrofit deferred.
+- `IntelligenceDashboard` chart arrays (`pueChartData`, `energyChartData`)
+  and lower-half analytics widgets — still untagged; retrofit deferred to
+  Phase 1A.2. The six top KPI tiles (PUE, GPU Utilization, Thermal
+  Incidents, Carbon Intensity, Sovereignty, System Uptime) were RETROFITTED
+  in Phase 1A.2 (see `phase-1a2-report.md`). Earlier drafts of this report
+  described those tiles as already-done; that wording was incorrect and has
+  been corrected here.
 - Nine data-centre domain views + rack widgets — still untagged.
 - `DCSimulationPanel` and its 6 KPI child components — still untagged.
 - `InfrastructurePage`, `Pilot`, `Playbook` — still untagged.

@@ -68,16 +68,26 @@ listed in aggregate.
 
 ## Deferred (Phase 1A.2)
 
-- `IntelligenceDashboard` KPI strip (six tiles) + `pueChartData` /
-  `energyChartData` chart arrays.
+- `IntelligenceDashboard` KPI strip (six tiles) — RETROFITTED in Phase
+  1A.2 (see `phase-1a2-report.md` §2). Fallback values now flow through
+  `demoMetric()` so a missing simulation key can no longer surface as
+  `live`. The `pueChartData` / `energyChartData` chart arrays remain
+  deferred to Phase 1A.3.
 - Nine domain views under `src/components/data-centre-twin/domains/*` and
   rack/thermal utility widgets.
-- `DCSimulationPanel` family (`DCKPIDeltas`, `EnterpriseKPICard`,
-  `AnimatedKPIStrip`, `LiveInsightsKPIPanel`, `MultiKPIOverlay`,
-  `EnhancedKPIChartsPanel`).
+- `DCSimulationPanel` family:
+  - `DCKPIDeltas` — RETROFITTED in Phase 1A.2 (each card carries
+    `data-provenance="simulated"` while a run is active, `demo`
+    otherwise).
+  - `EnterpriseKPICard`, `AnimatedKPIStrip`, `LiveInsightsKPIPanel`,
+    `MultiKPIOverlay`, `EnhancedKPIChartsPanel` — still deferred.
 - Builder step 5 simulation engines.
-- `InfrastructurePage` rack tiles.
-- `Pilot`, `Playbook` KPI recap panels.
+- `InfrastructurePage` marketing panels — excluded from the retrofit lane
+  (see `phase-1a2-report.md` §4); either delete or replace with live DCIM
+  data in a future pass.
+- `Pilot` — excluded: form-only surface, no operational KPIs.
+- `Playbook` KPI grid — excluded: planning template (baselines/targets),
+  not readings.
 
 No indiscriminate repository-wide `Math.random` replacement was performed.
 Harmless-animation and non-operational sites were intentionally preserved.

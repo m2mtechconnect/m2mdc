@@ -32,6 +32,14 @@ import { useNavigate } from 'react-router-dom';
 import { Line, LineChart, Bar, BarChart, Area, AreaChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 import { Badge } from '@/components/ui/badge';
 import KpiCard from '@/components/shared/KpiCard';
+import { KpiCardProvenance } from '@/components/provenance/KpiCardProvenance';
+import {
+  demoMetric,
+  staticMetric,
+  unavailableMetric,
+} from '@/lib/provenance';
+import { simulatedMetric } from '@/lib/provenance/kitMetrics';
+import type { ProvenancedMetric } from '@/lib/provenance/types';
 import DataTable, { Column } from '@/components/shared/DataTable';
 import { useBlueprint } from '@/hooks/useBlueprint';
 import { useBlueprintScenarios } from '@/hooks/useBlueprintScenarios';

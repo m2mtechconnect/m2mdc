@@ -654,7 +654,9 @@ function buildFinancialCarbon(kit: KitStatusResponse): FinancialCarbonTwin {
     kpis: {
       effectivePue: kit.pue,
       dcie: (1 / kit.pue) * 100,
-      wue: randomInRange(0.4, 0.8),
+      // WUE is not sourced from Kit or from a facility BMS in Phase 1A.
+      // Fixed deterministic fixture; provenance reported as `demo`.
+      wue: 0.5,
       cue: 0.012,
       economicEfficiencyScore: 86,
       carbonNeutralProgress: 65,
@@ -668,6 +670,19 @@ function buildFinancialCarbon(kit: KitStatusResponse): FinancialCarbonTwin {
 // ============================================================================
 
 export function kitStatusToFacility(kit: KitStatusResponse): DataCentreFacility {
+  // Seed the module PRNG so every synthetic value is a deterministic
+  // function of the Kit payload. Restored to Math.random on exit so the
+  // adapter does not leak state to other callers of the shared helpers.
+  const prev = __rng;
+  __rng = mulberry32(seedFromKit(kit));
+  try {
+    return buildFacility(kit);
+  } finally {
+    __rng = prev;
+  }
+}
+
+function buildFacility(kit: KitStatusResponse): DataCentreFacility {
   const racks = kit.rack_health;
   const totalPower = kit.total_power_kw;
   const criticalCount = racks.filter(r => r.status === 'critical').length;
@@ -744,5 +759,90 @@ export function kitStatusToFacility(kit: KitStatusResponse): DataCentreFacility 
     financialCarbon: buildFinancialCarbon(kit),
     createdAt: new Date(),
     updatedAt: new Date(),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Provenance-aware adapter entry point (Phase 1A)
+// ---------------------------------------------------------------------------
+
+export interface FacilityWithProvenance {
+  facility: DataCentreFacility;
+  provenance: FacilityProvenanceMap;
+}
+
+function liveMeta(at: Date, note?: string): ProvenanceMeta {
+  return { provenance: 'live', source: 'omniverse-kit', at, connection: 'connected', note };
+}
+function derivedMeta(at: Date, note?: string): ProvenanceMeta {
+  return { provenance: 'derived', source: 'omniverse-kit', at, connection: 'connected', note };
+}
+function demoMeta(at: Date, note?: string): ProvenanceMeta {
+  return { provenance: 'demo', source: 'omniverse-kit-adapter (synthetic)', at, connection: 'connected', note };
+}
+function staticMeta(note?: string): ProvenanceMeta {
+  return { provenance: 'static', source: 'aura-config', note };
+}
+
+/**
+ * Preferred adapter entry: returns the facility PLUS a provenance map so UI
+ * surfaces can tag every KPI truthfully. Never surface a value from
+ * `facility` without consulting the matching entry in `provenance`.
+ */
+export function kitStatusToFacilityWithProvenance(
+  kit: KitStatusResponse,
+): FacilityWithProvenance {
+  const facility = kitStatusToFacility(kit);
+  const at = facility.updatedAt;
+  const provenance: FacilityProvenanceMap = {
+    facility:        derivedMeta(at, 'Aggregated from Kit /demo/status.'),
+    pue:             liveMeta(at,    'Kit total_power_kw / total_it_power_kw.'),
+    totalPower:      liveMeta(at,    'Kit total_power_kw.'),
+    gpuUtilization:  liveMeta(at,    'Kit gpu_utilization_pct.'),
+    thermal:         derivedMeta(at, 'Rack outlet temps from Kit rack_health.'),
+    cooling:         derivedMeta(at, 'Cooling efficiency index from Kit; unit/zone details are demo.'),
+    network:         demoMeta(at,    'Kit does not expose network telemetry; spine/leaf topology is demo scaffolding.'),
+    facilitySafety:  demoMeta(at,    'No BMS integration in Phase 1A; safety readings are demo scaffolding.'),
+    sovereignty:     staticMeta('Fixed policy fixture; no live compliance evidence collector in Phase 1A.'),
+    carbon:          demoMeta(at,    'Carbon values derived from Kit power * fixed factor; not audited.'),
+    auditReadiness:  staticMeta('Fixed fixture score; no evidence pipeline in Phase 1A.'),
+    alerts:          derivedMeta(at, 'Constructed from Kit rack_health status.'),
+    timeSeries:      demoMeta(at,    'Time-series arrays are synthesized from current values; no historian in Phase 1A.'),
+  };
+  return { facility, provenance };
+}
+
+/**
+ * Provenance map to attach to the mock/demo `DataCentreFacility` when Kit is
+ * unavailable. Every section is marked `demo` (or `unavailable` for values
+ * that would otherwise be live). Never returns `live` provenance.
+ */
+export function demoFacilityProvenance(reason: string): FacilityProvenanceMap {
+  const meta: ProvenanceMeta = {
+    provenance: 'demo',
+    source: 'demo-fixture',
+    connection: 'demo',
+    note: reason,
+  };
+  const unavail: ProvenanceMeta = {
+    provenance: 'unavailable',
+    source: 'omniverse-kit',
+    connection: 'unavailable',
+    note: reason,
+  };
+  return {
+    facility:       meta,
+    pue:            unavail,
+    totalPower:     unavail,
+    gpuUtilization: unavail,
+    thermal:        meta,
+    cooling:        meta,
+    network:        meta,
+    facilitySafety: meta,
+    sovereignty:    staticMeta(reason),
+    carbon:         meta,
+    auditReadiness: staticMeta(reason),
+    alerts:         meta,
+    timeSeries:     meta,
   };
 }

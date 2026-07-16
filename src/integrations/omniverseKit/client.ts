@@ -2,12 +2,30 @@
  * Omniverse Kit REST API Client
  * Connects to the DDN Data Center Digital Twin running on NVIDIA Kit 109
  * Polls /demo/status for real-time rack health, simulation, and telemetry data
+ *
+ * Phase 1A hardening: the client no longer carries a hard-coded IP fallback.
+ * Configuration is read via `readKitConfig()` which validates
+ * `VITE_OMNIVERSE_KIT_URL`. When the env is missing or invalid, every fetch
+ * fails closed with a `KitDisabledError` — callers must treat this as
+ * `unavailable` / `demo` and MUST NOT synthesize a "connected" state.
  */
 
-// In dev mode, Vite proxy at /kit-api avoids CORS. In production, hit the Kit server directly.
-const KIT_BASE_URL = import.meta.env.DEV
-  ? '/kit-api'
-  : (import.meta.env.VITE_OMNIVERSE_KIT_URL || 'http://54.70.43.198:8011');
+import { readKitConfig } from './config';
+
+export class KitDisabledError extends Error {
+  constructor(reason: string) {
+    super(`Omniverse Kit disabled: ${reason}`);
+    this.name = 'KitDisabledError';
+  }
+}
+
+function currentBaseUrl(): string {
+  const cfg = readKitConfig();
+  if (!cfg.enabled || !cfg.restBaseUrl) {
+    throw new KitDisabledError(cfg.reason ?? 'no VITE_OMNIVERSE_KIT_URL configured');
+  }
+  return cfg.restBaseUrl;
+}
 
 // ============================================================================
 // API RESPONSE TYPES (match factory_demo_nucleus.py api_status output)
@@ -77,7 +95,7 @@ export interface KitLightsStatus {
 // ============================================================================
 
 async function kitFetch<T>(path: string, options?: RequestInit): Promise<T> {
-  const url = `${KIT_BASE_URL}${path}`;
+  const url = `${currentBaseUrl()}${path}`;
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -174,4 +192,11 @@ export async function toggleSceneElement(element: string): Promise<{ ok: boolean
   return kitFetch(`/demo/scene/toggle?element=${element}`, { method: 'POST' });
 }
 
-export { KIT_BASE_URL };
+/**
+ * Runtime-read base URL. Prefer this over the removed `KIT_BASE_URL` constant;
+ * throws `KitDisabledError` when the env is missing so callers cannot silently
+ * ship a hard-coded target.
+ */
+export function getKitBaseUrl(): string {
+  return currentBaseUrl();
+}

@@ -4,18 +4,33 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { seoBuildGate } from "./scripts/seoBuildGate";
 
+// Phase 1A hardening: no hard-coded Kit endpoint. The dev proxy is registered
+// only when `VITE_OMNIVERSE_KIT_URL` is set; otherwise `/kit-api` requests
+// return the default Vite 404 (fail-closed) and the app runs in demo mode.
+function kitProxy() {
+  const target = process.env.VITE_OMNIVERSE_KIT_URL?.trim();
+  if (!target) return undefined;
+  try {
+    const u = new URL(target);
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return undefined;
+  } catch {
+    return undefined;
+  }
+  return {
+    '/kit-api': {
+      target,
+      changeOrigin: true,
+      rewrite: (p: string) => p.replace(/^\/kit-api/, ''),
+    },
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    proxy: {
-      '/kit-api': {
-        target: process.env.VITE_OMNIVERSE_KIT_URL || 'http://54.70.43.198:8011',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/kit-api/, ''),
-      },
-    },
+    ...(kitProxy() ? { proxy: kitProxy() } : {}),
   },
   plugins: [
     react(),

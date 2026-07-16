@@ -4,16 +4,23 @@
  * Shows the real 3D data center scene (racks, Carter bot, Franka arm, etc.)
  */
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Play, Square, Monitor, Maximize2, Minimize2 } from 'lucide-react';
+import { readKitConfig } from '@/integrations/omniverseKit/config';
+import { StreamStatusBanner } from '@/components/provenance/ProvenanceBadge';
+import type { SourceConnectionState } from '@/lib/provenance/types';
 
 // AppStreamer is loaded globally via index.html <script> tag
+// The NVIDIA AppStreamer library ships without TS types; the `any` here is a
+// documented boundary shim. Widening it would require re-declaring the entire
+// AppStreamer API which is out of scope for Phase 1A.
 declare global {
   interface Window {
     OVWebStreamingLibrary?: {
       AppStreamer: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         connect: (config: any) => Promise<void>;
         disconnect: () => Promise<void>;
       };
@@ -32,19 +39,30 @@ export function OmniverseStreamViewer({
   className = '',
   onConnectionChange,
 }: OmniverseStreamViewerProps) {
-  const [status, setStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
+  const cfg = useMemo(() => readKitConfig(), []);
+  const initialState: SourceConnectionState =
+    !cfg.enabled           ? 'disabled' :
+    !cfg.streamEnabled     ? 'disabled' :
+                             'demo';
+  const [status, setStatus] = useState<SourceConnectionState>(initialState);
   const [expanded, setExpanded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Get host from env or prop
-  const kitUrl = import.meta.env.VITE_OMNIVERSE_KIT_URL || 'http://54.70.43.198:8011';
-  const host = hostProp || new URL(kitUrl).hostname;
+  const host = hostProp || cfg.signalingHost || '';
+  const canConnect = cfg.enabled && cfg.streamEnabled && Boolean(cfg.signalingHost);
 
   const connect = useCallback(async () => {
+    if (!canConnect) {
+      setStatus('unavailable');
+      onConnectionChange?.(false);
+      return;
+    }
     const OV = window.OVWebStreamingLibrary;
     if (!OV) {
       console.error('[OmniverseStream] AppStreamer library not loaded');
+      setStatus('unavailable');
+      onConnectionChange?.(false);
       return;
     }
 
@@ -54,7 +72,7 @@ export function OmniverseStreamViewer({
       await OV.AppStreamer.connect({
         streamConfig: {
           signalingServer: host,
-          signalingPort: 49100,
+          signalingPort: cfg.signalingPort,
           mediaServer: host,
           videoElementId: 'omni-stream-video',
           audioElementId: 'omni-stream-audio',
@@ -64,6 +82,7 @@ export function OmniverseStreamViewer({
           width: 1920,
           height: 1080,
           fps: 60,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           onStart: (msg: any) => {
             if (msg.action === 'start' && msg.status === 'success') {
               setStatus('connected');
@@ -71,12 +90,12 @@ export function OmniverseStreamViewer({
             }
             if (msg.status === 'error') {
               console.error('[OmniverseStream] start error:', msg);
-              setStatus('disconnected');
+              setStatus('unavailable');
               onConnectionChange?.(false);
             }
           },
           onStop: () => {
-            setStatus('disconnected');
+            setStatus('demo');
             onConnectionChange?.(false);
           },
         },
@@ -84,10 +103,10 @@ export function OmniverseStreamViewer({
       });
     } catch (err) {
       console.error('[OmniverseStream] connect error:', err);
-      setStatus('disconnected');
+      setStatus('unavailable');
       onConnectionChange?.(false);
     }
-  }, [host, onConnectionChange]);
+  }, [host, onConnectionChange, canConnect, cfg.signalingPort]);
 
   const disconnect = useCallback(async () => {
     const OV = window.OVWebStreamingLibrary;
@@ -97,7 +116,7 @@ export function OmniverseStreamViewer({
     } catch (err) {
       console.error('[OmniverseStream] disconnect error:', err);
     }
-    setStatus('disconnected');
+    setStatus('demo');
     onConnectionChange?.(false);
   }, [onConnectionChange]);
 
@@ -108,11 +127,17 @@ export function OmniverseStreamViewer({
     };
   }, [disconnect]);
 
-  const statusColors = {
-    disconnected: 'bg-muted text-muted-foreground',
-    connecting: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30',
-    connected: 'bg-green-500/10 text-green-500 border-green-500/30',
+  const statusColors: Record<SourceConnectionState, string> = {
+    disabled:     'bg-muted text-muted-foreground',
+    demo:         'bg-amber-500/10 text-amber-700 border-amber-500/30',
+    connecting:   'bg-yellow-500/10 text-yellow-600 border-yellow-500/30',
+    connected:    'bg-emerald-500/10 text-emerald-600 border-emerald-500/30',
+    degraded:     'bg-orange-500/10 text-orange-600 border-orange-500/30',
+    unavailable:  'bg-rose-500/10 text-rose-600 border-rose-500/30',
   };
+
+  const streamLabel =
+    status === 'connected' ? 'Omniverse RTX Viewport' : 'Local demonstration scene';
 
   const containerClass = expanded
     ? 'fixed inset-4 z-50 bg-background rounded-xl border shadow-2xl'
@@ -120,20 +145,25 @@ export function OmniverseStreamViewer({
 
   return (
     <div className={containerClass}>
+      <div className="absolute top-14 left-3 right-3 z-20 pointer-events-none">
+        <div className="pointer-events-auto">
+          <StreamStatusBanner meta={{ provenance: status === 'connected' ? 'live' : 'demo', source: 'omniverse-kit', connection: status }} />
+        </div>
+      </div>
       {/* Toolbar — pointer-events-none so mouse goes through to video, buttons re-enable pointer */}
       <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-3 bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
         <div className="flex items-center gap-2">
           <Monitor className="h-4 w-4 text-white/70" />
-          <span className="text-sm font-medium text-white/90">Omniverse RTX Viewport</span>
+          <span className="text-sm font-medium text-white/90">{streamLabel}</span>
           <Badge variant="outline" className={`text-xs ${statusColors[status]}`}>
             {status === 'connected' && <span className="relative flex h-1.5 w-1.5 mr-1"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span></span>}
             {status}
           </Badge>
         </div>
         <div className="flex items-center gap-2 pointer-events-auto">
-          {status === 'disconnected' && (
-            <Button size="sm" variant="secondary" onClick={connect} className="h-7 gap-1 text-xs">
-              <Play className="h-3 w-3" /> Connect
+          {(status === 'demo' || status === 'unavailable') && (
+            <Button size="sm" variant="secondary" onClick={connect} className="h-7 gap-1 text-xs" disabled={!canConnect}>
+              <Play className="h-3 w-3" /> {canConnect ? 'Connect' : 'Kit not configured'}
             </Button>
           )}
           {status === 'connecting' && (
@@ -165,18 +195,24 @@ export function OmniverseStreamViewer({
       <audio id="omni-stream-audio" ref={audioRef} autoPlay />
 
       {/* Placeholder when disconnected — only shows when not streaming */}
-      {status === 'disconnected' && (
+      {status !== 'connected' && status !== 'connecting' && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 pointer-events-auto">
           <div className="text-center space-y-3">
             <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
               <Monitor className="h-8 w-8 text-primary/60" />
             </div>
             <div>
-              <p className="text-sm font-medium text-white/80">NVIDIA Omniverse RTX Stream</p>
-              <p className="text-xs text-white/50 mt-1">Real-time ray-traced 3D data center visualization</p>
-              <p className="text-xs text-white/30 mt-0.5 font-mono">{host}:49100</p>
+              <p className="text-sm font-medium text-white/80">Local demonstration scene</p>
+              <p className="text-xs text-white/50 mt-1">
+                {canConnect
+                  ? 'Real-time ray-traced Omniverse stream available on connect.'
+                  : 'Omniverse stream unavailable — configure VITE_OMNIVERSE_KIT_URL and VITE_OMNIVERSE_STREAM_ENABLED to enable.'}
+              </p>
+              {canConnect && host && (
+                <p className="text-xs text-white/30 mt-0.5 font-mono">{host}:{cfg.signalingPort}</p>
+              )}
             </div>
-            <Button size="sm" onClick={connect} className="gap-2">
+            <Button size="sm" onClick={connect} className="gap-2" disabled={!canConnect}>
               <Play className="h-4 w-4" /> Connect to Stream
             </Button>
           </div>

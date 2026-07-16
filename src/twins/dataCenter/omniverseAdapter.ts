@@ -23,9 +23,17 @@
  *      shape is defined by `@/types/dataCenterTwin`. Mapping is explicit.
  *   3. Synthetic values live behind named helpers so callers can identify
  *      and later replace them (grep for `synth` / `demo`).
+ *   4. Phase 1A: NO `Math.random()` inside the adapter. All demo variance
+ *      comes from a seeded PRNG derived from the Kit payload so identical
+ *      inputs produce byte-identical output (adapter is a pure function).
+ *   5. Phase 1A: operational scores (sovereignty, audit-readiness,
+ *      compliance status, carbon intensity, PUE, GPU util) are either
+ *      Kit-passthrough or fixed deterministic fixtures; no random score is
+ *      surfaced as an operational KPI.
  */
 
 import type { KitStatusResponse, KitRackHealth } from '@/integrations/omniverseKit/client';
+import type { FacilityProvenanceMap, ProvenanceMeta } from '@/lib/provenance/types';
 import type {
   DataCentreFacility,
   ThermalHardwareTwin,
@@ -62,12 +70,43 @@ import type {
   FacilityAlert,
 } from '@/types/dataCenterTwin';
 
+// ---------------------------------------------------------------------------
+// Deterministic PRNG (mulberry32) — seeded per call from the Kit payload.
+// This module exposes `randomInRange`/`randomInt`/`addNoise` names identical
+// to the previous non-deterministic helpers so the rest of the file is
+// unchanged; the difference is that every value is now reproducible.
+// ---------------------------------------------------------------------------
+let __rng: () => number = Math.random;
+
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seedFromKit(kit: KitStatusResponse): number {
+  // Combine a few stable Kit fields into a 32-bit seed. `tick` alone would
+  // make the output vary with time; we prefer a seed that reflects payload
+  // shape so identical payloads → identical output.
+  const s =
+    (kit.rack_count | 0) * 2654435761 ^
+    Math.round((kit.total_power_kw || 0) * 1000) ^
+    Math.round((kit.pue || 0) * 1000) * 40503 ^
+    Math.round((kit.gpu_utilization_pct || 0) * 100) * 486187739;
+  return s >>> 0 || 0xDEADBEEF;
+}
+
 function addNoise(value: number, pct: number = 3): number {
-  return value + value * (pct / 100) * (Math.random() - 0.5) * 2;
+  return value + value * (pct / 100) * (__rng() - 0.5) * 2;
 }
 
 function randomInRange(min: number, max: number): number {
-  return Math.random() * (max - min) + min;
+  return __rng() * (max - min) + min;
 }
 
 function randomInt(min: number, max: number): number {
@@ -114,7 +153,7 @@ function synthesizeServers(rack: KitRackHealth, serversPerRack: number = 10): Se
       temperature: randomInt(32, 42),
       remainingLife: randomInt(80, 100),
     },
-    thermalThrottling: rack.status === 'critical' && Math.random() > 0.5,
+    thermalThrottling: rack.status === 'critical' && __rng() > 0.5,
     airflowVelocityMps: randomInRange(1.8, 3.5),
   }));
 }
@@ -615,7 +654,9 @@ function buildFinancialCarbon(kit: KitStatusResponse): FinancialCarbonTwin {
     kpis: {
       effectivePue: kit.pue,
       dcie: (1 / kit.pue) * 100,
-      wue: randomInRange(0.4, 0.8),
+      // WUE is not sourced from Kit or from a facility BMS in Phase 1A.
+      // Fixed deterministic fixture; provenance reported as `demo`.
+      wue: 0.5,
       cue: 0.012,
       economicEfficiencyScore: 86,
       carbonNeutralProgress: 65,
@@ -629,6 +670,19 @@ function buildFinancialCarbon(kit: KitStatusResponse): FinancialCarbonTwin {
 // ============================================================================
 
 export function kitStatusToFacility(kit: KitStatusResponse): DataCentreFacility {
+  // Seed the module PRNG so every synthetic value is a deterministic
+  // function of the Kit payload. Restored to Math.random on exit so the
+  // adapter does not leak state to other callers of the shared helpers.
+  const prev = __rng;
+  __rng = mulberry32(seedFromKit(kit));
+  try {
+    return buildFacility(kit);
+  } finally {
+    __rng = prev;
+  }
+}
+
+function buildFacility(kit: KitStatusResponse): DataCentreFacility {
   const racks = kit.rack_health;
   const totalPower = kit.total_power_kw;
   const criticalCount = racks.filter(r => r.status === 'critical').length;
@@ -705,5 +759,90 @@ export function kitStatusToFacility(kit: KitStatusResponse): DataCentreFacility 
     financialCarbon: buildFinancialCarbon(kit),
     createdAt: new Date(),
     updatedAt: new Date(),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Provenance-aware adapter entry point (Phase 1A)
+// ---------------------------------------------------------------------------
+
+export interface FacilityWithProvenance {
+  facility: DataCentreFacility;
+  provenance: FacilityProvenanceMap;
+}
+
+function liveMeta(at: Date, note?: string): ProvenanceMeta {
+  return { provenance: 'live', source: 'omniverse-kit', at, connection: 'connected', note };
+}
+function derivedMeta(at: Date, note?: string): ProvenanceMeta {
+  return { provenance: 'derived', source: 'omniverse-kit', at, connection: 'connected', note };
+}
+function demoMeta(at: Date, note?: string): ProvenanceMeta {
+  return { provenance: 'demo', source: 'omniverse-kit-adapter (synthetic)', at, connection: 'connected', note };
+}
+function staticMeta(note?: string): ProvenanceMeta {
+  return { provenance: 'static', source: 'aura-config', note };
+}
+
+/**
+ * Preferred adapter entry: returns the facility PLUS a provenance map so UI
+ * surfaces can tag every KPI truthfully. Never surface a value from
+ * `facility` without consulting the matching entry in `provenance`.
+ */
+export function kitStatusToFacilityWithProvenance(
+  kit: KitStatusResponse,
+): FacilityWithProvenance {
+  const facility = kitStatusToFacility(kit);
+  const at = facility.updatedAt;
+  const provenance: FacilityProvenanceMap = {
+    facility:        derivedMeta(at, 'Aggregated from Kit /demo/status.'),
+    pue:             liveMeta(at,    'Kit total_power_kw / total_it_power_kw.'),
+    totalPower:      liveMeta(at,    'Kit total_power_kw.'),
+    gpuUtilization:  liveMeta(at,    'Kit gpu_utilization_pct.'),
+    thermal:         derivedMeta(at, 'Rack outlet temps from Kit rack_health.'),
+    cooling:         derivedMeta(at, 'Cooling efficiency index from Kit; unit/zone details are demo.'),
+    network:         demoMeta(at,    'Kit does not expose network telemetry; spine/leaf topology is demo scaffolding.'),
+    facilitySafety:  demoMeta(at,    'No BMS integration in Phase 1A; safety readings are demo scaffolding.'),
+    sovereignty:     staticMeta('Fixed policy fixture; no live compliance evidence collector in Phase 1A.'),
+    carbon:          demoMeta(at,    'Carbon values derived from Kit power * fixed factor; not audited.'),
+    auditReadiness:  staticMeta('Fixed fixture score; no evidence pipeline in Phase 1A.'),
+    alerts:          derivedMeta(at, 'Constructed from Kit rack_health status.'),
+    timeSeries:      demoMeta(at,    'Time-series arrays are synthesized from current values; no historian in Phase 1A.'),
+  };
+  return { facility, provenance };
+}
+
+/**
+ * Provenance map to attach to the mock/demo `DataCentreFacility` when Kit is
+ * unavailable. Every section is marked `demo` (or `unavailable` for values
+ * that would otherwise be live). Never returns `live` provenance.
+ */
+export function demoFacilityProvenance(reason: string): FacilityProvenanceMap {
+  const meta: ProvenanceMeta = {
+    provenance: 'demo',
+    source: 'demo-fixture',
+    connection: 'demo',
+    note: reason,
+  };
+  const unavail: ProvenanceMeta = {
+    provenance: 'unavailable',
+    source: 'omniverse-kit',
+    connection: 'unavailable',
+    note: reason,
+  };
+  return {
+    facility:       meta,
+    pue:            unavail,
+    totalPower:     unavail,
+    gpuUtilization: unavail,
+    thermal:        meta,
+    cooling:        meta,
+    network:        meta,
+    facilitySafety: meta,
+    sovereignty:    staticMeta(reason),
+    carbon:         meta,
+    auditReadiness: staticMeta(reason),
+    alerts:         meta,
+    timeSeries:     meta,
   };
 }

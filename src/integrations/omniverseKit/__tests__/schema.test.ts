@@ -1,5 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { validateKitStatus, unavailableOutcome } from '@/integrations/omniverseKit/schema';
+import {
+  validateKitStatus,
+  unavailableOutcome,
+  type KitValidationOutcome,
+} from '@/integrations/omniverseKit/schema';
+
+// Narrowing helpers — `strict` is off in tsconfig.app.json, so control-flow
+// narrowing across `throw` is not applied. Cast explicitly instead.
+type InvalidOutcome    = Extract<KitValidationOutcome, { reason: 'invalid' }>;
+type UnavailableOutcome = Extract<KitValidationOutcome, { reason: 'unavailable' }>;
 
 function validPayload() {
   return {
@@ -24,11 +33,11 @@ describe('validateKitStatus', () => {
   it('rejects an invalid enum without throwing, returning compact issues', () => {
     const bad = { ...validPayload(), scenario: 'not-a-scenario' };
     const r = validateKitStatus(bad);
-    if (r.ok) throw new Error('expected invalid outcome');
-    expect(r.reason).toBe('invalid');
-    if (r.reason !== 'invalid') return;
-    expect(r.issues.length).toBeGreaterThan(0);
-    expect(r.issues[0].path).toBe('scenario');
+    expect(r.ok).toBe(false);
+    const inv = r as InvalidOutcome;
+    expect(inv.reason).toBe('invalid');
+    expect(inv.issues.length).toBeGreaterThan(0);
+    expect(inv.issues[0].path).toBe('scenario');
   });
 
   it('rejects a payload missing required top-level fields', () => {
@@ -51,9 +60,9 @@ describe('validateKitStatus', () => {
   it('does not include raw payload data in the issue list', () => {
     const secretish = { ...validPayload(), nucleus_server: 'nucleus.internal:secret-token' };
     const r = validateKitStatus({ ...secretish, pue: 'oops' });
-    if (r.ok) throw new Error('expected invalid outcome');
-    if (r.reason !== 'invalid') return;
-    const joined = JSON.stringify(r.issues);
+    expect(r.ok).toBe(false);
+    const inv = r as InvalidOutcome;
+    const joined = JSON.stringify(inv.issues);
     expect(joined).not.toContain('secret-token');
   });
 });
@@ -61,7 +70,7 @@ describe('validateKitStatus', () => {
 describe('unavailableOutcome', () => {
   it('produces an unavailable outcome that callers can pattern-match', () => {
     const r = unavailableOutcome('fetch timeout');
-    if (r.ok) throw new Error('expected unavailable');
-    expect(r.reason).toBe('unavailable');
+    expect(r.ok).toBe(false);
+    expect((r as UnavailableOutcome).reason).toBe('unavailable');
   });
 });

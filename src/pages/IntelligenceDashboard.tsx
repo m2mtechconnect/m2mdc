@@ -405,9 +405,11 @@ export default function IntelligenceDashboard() {
           const carbonValue = grid.intensity;
           return (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-              <KpiCard
+              <KpiCardProvenance
+                id="pue"
+                metric={pueMetric}
+                format={(v) => (v as number).toFixed(2)}
                 label="PUE"
-                value={pueValue.toFixed(2)}
                 unit=""
                 grain="Facility"
                 window={windowLabel}
@@ -423,9 +425,11 @@ export default function IntelligenceDashboard() {
                 tooltip="Power Usage Effectiveness over the selected period. Lower is better. Industry avg 1.58 (Uptime Institute 2024)."
                 onClick={() => navigate('/data-centre-twin')}
               />
-              <KpiCard
+              <KpiCardProvenance
+                id="gpu-utilization"
+                metric={gpuMetric}
+                format={(v) => `${Math.round(v as number)}`}
                 label="GPU Utilization"
-                value={`${Math.round(gpuValue)}`}
                 unit="%"
                 grain="Cluster"
                 window={windowLabel}
@@ -441,9 +445,11 @@ export default function IntelligenceDashboard() {
                 tooltip="Average GPU compute utilization across clusters in scope. Optimal band 70-90% per NVIDIA DGX SuperPOD reference."
                 onClick={() => navigate('/data-centre-twin')}
               />
-              <KpiCard
+              <KpiCardProvenance
+                id="thermal-incidents"
+                metric={thermalMetric}
+                format={(v) => String(v)}
                 label="Thermal Incidents"
-                value={String(thermalValue)}
                 unit="events"
                 grain="Event"
                 window={windowLabel}
@@ -459,9 +465,11 @@ export default function IntelligenceDashboard() {
                 tooltip="Active and new thermal threshold breaches in the selected period. ASHRAE A1 envelope 18-27 °C."
                 onClick={() => navigate('/data-centre-twin')}
               />
-              <KpiCard
+              <KpiCardProvenance
+                id="carbon-intensity"
+                metric={carbonMetric}
+                format={(v) => String(v)}
                 label="Carbon Intensity"
-                value={String(carbonValue)}
                 unit="gCO₂/kWh"
                 badge={grid.label}
                 grain="Grid Region"
@@ -475,9 +483,11 @@ export default function IntelligenceDashboard() {
                 icon={Flame}
                 tooltip="Live grid carbon intensity for the selected region. Lower is better. IEA 2024 + electricityMap convention."
               />
-              <KpiCard
+              <KpiCardProvenance
+                id="sovereignty"
+                metric={sovereigntyMetric}
+                format={(v) => `${Math.round(v as number)}`}
                 label="Sovereignty"
-                value={`${Math.round(sovereigntyValue)}`}
                 unit="%"
                 grain="Policy"
                 window={windowLabel}
@@ -493,9 +503,11 @@ export default function IntelligenceDashboard() {
                 tooltip="Share of in-scope workloads meeting data residency and sovereignty policy. CCCS / Bill 25 / GDPR aligned."
                 onClick={() => navigate('/compliance')}
               />
-              <KpiCard
+              <KpiCardProvenance
+                id="uptime"
+                metric={uptimeMetric}
+                format={(v) => (v as number).toFixed(2)}
                 label="System Uptime"
-                value={uptimeValue.toFixed(2)}
                 unit="%"
                 grain="Service"
                 window={windowLabel}

@@ -397,12 +397,34 @@ export default function IntelligenceDashboard() {
             - Sovereignty: compliant_workloads / in-scope_workloads.
         */}
         {(() => {
-          const pueValue = simulationKpis[KPIKey.PUE] ?? 1.28;
-          const gpuValue = simulationKpis[KPIKey.GPU_UTILIZATION] ?? 78;
-          const thermalValue = simulationKpis[KPIKey.THERMAL_INCIDENTS] ?? 4;
-          const sovereigntyValue = simulationKpis[KPIKey.SOVEREIGN_COMPLIANCE] ?? 98;
-          const uptimeValue = simulationKpis[KPIKey.UPTIME] ?? 99.97;
-          const carbonValue = grid.intensity;
+          // Metric-level provenance (Phase 1A.2).
+          // simulationKpis originate from useTwinKPIsFromSimulation (persisted
+          // simulation runs); missing keys fall back to deterministic demo
+          // fixtures. Nothing here is `live` today.
+          const SIM_MODEL = 'twin-simulation-kpis@1.0';
+          const mkSim = (key: KPIKey, fallback: number): ProvenancedMetric<number> => {
+            const v = simulationKpis[key];
+            if (v === undefined || v === null || Number.isNaN(v as number)) {
+              return demoMetric<number>(fallback, 'intelligence-dashboard-fixture');
+            }
+            return simulatedMetric<number>(v as number, 'twin-simulation', SIM_MODEL, `key=${key}`);
+          };
+          const pueMetric = mkSim(KPIKey.PUE, 1.28);
+          const gpuMetric = mkSim(KPIKey.GPU_UTILIZATION, 78);
+          const thermalMetric = mkSim(KPIKey.THERMAL_INCIDENTS, 4);
+          const sovereigntyMetric = mkSim(KPIKey.SOVEREIGN_COMPLIANCE, 98);
+          const uptimeMetric = mkSim(KPIKey.UPTIME, 99.97);
+          const carbonMetric = demoMetric<number>(
+            grid.intensity,
+            `grid-carbon:${grid.label}`,
+            'Grid carbon intensity comes from a static regional table, not a live grid feed.',
+          );
+          const pueValue = (pueMetric.value ?? 1.28) as number;
+          const gpuValue = (gpuMetric.value ?? 78) as number;
+          const thermalValue = (thermalMetric.value ?? 4) as number;
+          const sovereigntyValue = (sovereigntyMetric.value ?? 98) as number;
+          const uptimeValue = (uptimeMetric.value ?? 99.97) as number;
+          const carbonValue = (carbonMetric.value ?? grid.intensity) as number;
           return (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
               <KpiCardProvenance

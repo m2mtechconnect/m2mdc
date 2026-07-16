@@ -33,11 +33,7 @@ import { Line, LineChart, Bar, BarChart, Area, AreaChart, ResponsiveContainer, X
 import { Badge } from '@/components/ui/badge';
 import KpiCard from '@/components/shared/KpiCard';
 import { KpiCardProvenance } from '@/components/provenance/KpiCardProvenance';
-import {
-  demoMetric,
-  staticMetric,
-  unavailableMetric,
-} from '@/lib/provenance';
+import { demoMetric } from '@/lib/provenance';
 import { simulatedMetric } from '@/lib/provenance/kitMetrics';
 import type { ProvenancedMetric } from '@/lib/provenance/types';
 import DataTable, { Column } from '@/components/shared/DataTable';

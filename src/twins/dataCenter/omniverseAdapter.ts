@@ -222,7 +222,7 @@ function buildPowerUps(kit: KitStatusResponse): PowerUpsTwin {
     status: 'standby' as const,
   })) as unknown as Generator[];
 
-  return {
+  return ({
     pdus,
     busways,
     upsBanks,
@@ -241,7 +241,7 @@ function buildPowerUps(kit: KitStatusResponse): PowerUpsTwin {
       powerHistory: generateTimeSeries(24, kit.total_power_kw),
       pueHistory: generateTimeSeries(24, kit.pue),
     } as unknown as PowerUpsTwin['kpis']),
-  };
+  } as unknown as PowerUpsTwin);
 }
 
 function buildCooling(kit: KitStatusResponse): CoolingTwin {
@@ -274,7 +274,7 @@ function buildCooling(kit: KitStatusResponse): CoolingTwin {
     status: 'optimal' as const,
   })) as unknown as (CoolingZoneDetail & { coldAisleTempC: number; hotAisleTempC: number })[];
 
-  return {
+  return ({
     units,
     zones,
     kpis: ({
@@ -287,7 +287,7 @@ function buildCooling(kit: KitStatusResponse): CoolingTwin {
       avgHumidity: zones.reduce((s, z) => s + z.humidityPct, 0) / zones.length,
       coolingHistory: generateTimeSeries(24, kit.cooling_efficiency * 100),
     } as unknown as CoolingTwin['kpis']),
-  };
+  } as unknown as CoolingTwin);
 }
 
 function buildNetwork(racks: KitRackHealth[]): NetworkTwin {

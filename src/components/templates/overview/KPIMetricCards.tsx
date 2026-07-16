@@ -1,6 +1,8 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
+import type { DataProvenance } from '@/lib/provenance/types';
 
 interface KPI {
   name?: string;
@@ -10,13 +12,22 @@ interface KPI {
   direction?: 'higher' | 'lower';
   current_value?: number;
   target_value?: number;
+  /** Optional metric-level provenance for the current_value field. */
+  current_provenance?: DataProvenance;
+  /** Optional metric-level provenance for the target field (defaults to static). */
+  target_provenance?: DataProvenance;
+  /** Source identifier for the current_value observation. */
+  source?: string;
 }
 
 interface KPIMetricCardsProps {
   kpis: (KPI | string)[];
 }
 
-// Industry-accurate default KPIs for Sovereign Green AI Data Centre
+// Industry-reference default KPIs for the demo data-centre template.
+// Phase 1A.1 §2: current_value fields are DEMONSTRATION fixtures, not
+// measured values — every card renders a `demo` provenance badge so users
+// are never misled. Target values render a `static` badge.
 const DEFAULT_DC_KPIS: KPI[] = [
   {
     name: 'Power Usage Effectiveness (PUE)',
@@ -25,6 +36,9 @@ const DEFAULT_DC_KPIS: KPI[] = [
     direction: 'lower',
     current_value: 1.25,
     target_value: 1.20,
+    current_provenance: 'demo',
+    target_provenance: 'static',
+    source: 'template-fixture',
   },
   {
     name: 'Carbon Intensity',
@@ -33,6 +47,9 @@ const DEFAULT_DC_KPIS: KPI[] = [
     direction: 'lower',
     current_value: 28,
     target_value: 20,
+    current_provenance: 'demo',
+    target_provenance: 'static',
+    source: 'template-fixture',
   },
   {
     name: 'GPU Utilization',
@@ -41,14 +58,20 @@ const DEFAULT_DC_KPIS: KPI[] = [
     direction: 'higher',
     current_value: 76,
     target_value: 85,
+    current_provenance: 'demo',
+    target_provenance: 'static',
+    source: 'template-fixture',
   },
   {
     name: 'Sovereign Compute Ratio',
     unit: '%',
-    target: '100% (PIPEDA Compliant)',
+    target: '100% (PIPEDA applicable)',
     direction: 'higher',
     current_value: 97,
     target_value: 100,
+    current_provenance: 'demo',
+    target_provenance: 'static',
+    source: 'template-fixture',
   },
   {
     name: 'Renewable Energy Mix',
@@ -57,6 +80,9 @@ const DEFAULT_DC_KPIS: KPI[] = [
     direction: 'higher',
     current_value: 98,
     target_value: 100,
+    current_provenance: 'demo',
+    target_provenance: 'static',
+    source: 'template-fixture',
   },
   {
     name: 'Thermal Stability Score',
@@ -65,6 +91,9 @@ const DEFAULT_DC_KPIS: KPI[] = [
     direction: 'higher',
     current_value: 92,
     target_value: 95,
+    current_provenance: 'demo',
+    target_provenance: 'static',
+    source: 'template-fixture',
   },
 ];
 
@@ -92,14 +121,28 @@ export function KPIMetricCards({ kpis }: KPIMetricCardsProps) {
           const direction = kpiData.direction;
           const currentValue = kpiData.current_value;
           const targetValue = kpiData.target_value;
+          // Phase 1A.1 §2: never default to `live` — missing provenance
+          // means the caller did not source the value, which we treat as
+          // demo when a value is present and unavailable when it is not.
+          const currentProvenance: DataProvenance = kpiData.current_provenance
+            ?? (currentValue !== undefined ? 'demo' : 'unavailable');
+          const targetProvenance: DataProvenance = kpiData.target_provenance ?? 'static';
+          const source = kpiData.source ?? 'template-fixture';
           
           // Calculate progress if we have both values
           const progress = currentValue && targetValue 
             ? Math.min((currentValue / targetValue) * 100, 100)
             : null;
+          const testId = (kpiData.label || kpiData.name || `kpi-${idx}`)
+            .toString().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
           
           return (
-            <Card key={idx} className="p-4 bg-card border-border border-l-4 border-l-primary/50">
+            <Card
+              key={idx}
+              className="p-4 bg-card border-border border-l-4 border-l-primary/50"
+              data-testid={`kpi-metric-${testId}`}
+              data-provenance={currentProvenance}
+            >
               <div className="space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
@@ -108,25 +151,32 @@ export function KPIMetricCards({ kpis }: KPIMetricCardsProps) {
                       <p className="text-xs text-muted-foreground">Unit: {unit}</p>
                     )}
                   </div>
-                  {direction && (
-                    <Badge 
-                      variant="outline" 
-                      className="text-xs shrink-0"
-                    >
-                      {direction === 'higher' ? (
-                        <TrendingUp className="h-3 w-3 mr-1" />
-                      ) : (
-                        <TrendingDown className="h-3 w-3 mr-1" />
-                      )}
-                      {direction === 'higher' ? 'Higher' : 'Lower'} is better
-                    </Badge>
-                  )}
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <ProvenanceBadge
+                      meta={{ provenance: currentProvenance, source }}
+                      compact
+                    />
+                    {direction && (
+                      <Badge variant="outline" className="text-xs">
+                        {direction === 'higher' ? (
+                          <TrendingUp className="h-3 w-3 mr-1" />
+                        ) : (
+                          <TrendingDown className="h-3 w-3 mr-1" />
+                        )}
+                        {direction === 'higher' ? 'Higher' : 'Lower'} is better
+                      </Badge>
+                    )}
+                  </div>
                 </div>
                 
                 {target && (
-                  <p className="text-sm text-muted-foreground">
-                    Target: <span className="font-medium text-foreground">{target}</span>
-                  </p>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span>Target: <span className="font-medium text-foreground">{target}</span></span>
+                    <ProvenanceBadge
+                      meta={{ provenance: targetProvenance, source: 'user-config' }}
+                      compact
+                    />
+                  </div>
                 )}
                 
                 {/* Mini progress bar */}

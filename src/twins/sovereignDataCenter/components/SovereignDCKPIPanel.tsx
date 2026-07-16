@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import type { SovereignKpis } from '@/types/sovereignDataCenterTwin';
 import { cn } from '@/lib/utils';
+import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
+import type { DataProvenance } from '@/lib/provenance/types';
 
 interface SovereignDCKPIPanelProps {
   kpis: SovereignKpis;
@@ -19,6 +21,7 @@ interface SovereignDCKPIPanelProps {
 }
 
 interface KPICardProps {
+  id: string;
   label: string;
   value: number;
   unit: string;
@@ -27,10 +30,14 @@ interface KPICardProps {
   icon: React.ReactNode;
   thresholds: { warning: number; critical: number };
   format?: (v: number) => string;
+  provenance: DataProvenance;
+  sourceName: string;
+  modelVersion?: string;
 }
 
 function KPICard({ 
-  label, value, unit, previousValue, direction, icon, thresholds, format 
+  id, label, value, unit, previousValue, direction, icon, thresholds, format,
+  provenance, sourceName, modelVersion,
 }: KPICardProps) {
   const delta = previousValue !== undefined ? value - previousValue : 0;
   const deltaPercent = previousValue ? ((delta / previousValue) * 100).toFixed(1) : '0';
@@ -54,24 +61,37 @@ function KPICard({
       "transition-all duration-300",
       severity === 'critical' && "border-destructive/50 bg-destructive/5",
       severity === 'warning' && "border-yellow-500/50 bg-yellow-500/5"
-    )}>
+    )}
+      data-testid={`sovereign-kpi-${id}`}
+      data-provenance={provenance}
+    >
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-2">
           <div className="p-2 rounded-lg bg-muted">
             {icon}
           </div>
-          <Badge variant={
-            severity === 'critical' ? 'destructive' : 
-            severity === 'warning' ? 'secondary' : 
-            'outline'
-          }>
-            {severity === 'critical' ? '🔴' : severity === 'warning' ? '🟡' : '🟢'}
-          </Badge>
+          <div className="flex items-center gap-1">
+            <ProvenanceBadge
+              meta={{
+                provenance,
+                source: sourceName,
+                note: modelVersion ? `model ${modelVersion}` : undefined,
+              }}
+              compact
+            />
+            <Badge variant={
+              severity === 'critical' ? 'destructive' :
+              severity === 'warning' ? 'secondary' :
+              'outline'
+            }>
+              {severity === 'critical' ? '🔴' : severity === 'warning' ? '🟡' : '🟢'}
+            </Badge>
+          </div>
         </div>
         
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground font-medium">{label}</p>
-          <div className="flex items-baseline gap-1">
+          <div className="flex items-baseline gap-1" data-testid={`sovereign-kpi-${id}-value`}>
             <span className="text-2xl font-bold">{formattedValue}</span>
             <span className="text-sm text-muted-foreground">{unit}</span>
           </div>
@@ -95,6 +115,14 @@ function KPICard({
 }
 
 export function SovereignDCKPIPanel({ kpis, previousKpis, isSimulating }: SovereignDCKPIPanelProps) {
+  // Phase 1A.1 §4: this panel renders scenario-estimator output. Values are
+  // NOT physics-based, NOT DSX/Modulus/Cadence/Ansys — they are the AURA
+  // demonstration estimator, so we tag every card as `simulated` when a run
+  // is active and `demo` otherwise so users cannot mistake the baseline
+  // fixture for live telemetry.
+  const cardProvenance: DataProvenance = isSimulating ? 'simulated' : 'demo';
+  const sourceName = isSimulating ? 'aura-estimator' : 'demo-fixture';
+  const modelVersion = isSimulating ? 'aura-estimator@v0-demo' : undefined;
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -108,6 +136,7 @@ export function SovereignDCKPIPanel({ kpis, previousKpis, isSimulating }: Sovere
       
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <KPICard
+          id="sovereign-compute-ratio"
           label="Sovereign Compute Ratio"
           value={kpis.sovereignComputeRatioPct}
           unit="%"
@@ -115,9 +144,13 @@ export function SovereignDCKPIPanel({ kpis, previousKpis, isSimulating }: Sovere
           direction="up"
           icon={<Shield className="h-4 w-4 text-primary" />}
           thresholds={{ warning: 80, critical: 60 }}
+          provenance={cardProvenance}
+          sourceName={sourceName}
+          modelVersion={modelVersion}
         />
         
         <KPICard
+          id="effective-ai-pue"
           label="Effective AI PUE"
           value={kpis.effectiveAiPue}
           unit=""
@@ -126,9 +159,13 @@ export function SovereignDCKPIPanel({ kpis, previousKpis, isSimulating }: Sovere
           icon={<Zap className="h-4 w-4 text-yellow-500" />}
           thresholds={{ warning: 1.4, critical: 1.6 }}
           format={(v) => v.toFixed(2)}
+          provenance={cardProvenance}
+          sourceName={sourceName}
+          modelVersion={modelVersion}
         />
         
         <KPICard
+          id="gco2-per-gpu-hour"
           label="gCO₂e per GPU-hour"
           value={kpis.gco2PerGpuHour}
           unit="g"
@@ -136,9 +173,13 @@ export function SovereignDCKPIPanel({ kpis, previousKpis, isSimulating }: Sovere
           direction="down"
           icon={<Leaf className="h-4 w-4 text-green-500" />}
           thresholds={{ warning: 60, critical: 100 }}
+          provenance={cardProvenance}
+          sourceName={sourceName}
+          modelVersion={modelVersion}
         />
         
         <KPICard
+          id="sovereign-risk"
           label="Sovereign Risk Score"
           value={kpis.sovereignRiskScore}
           unit="/100"
@@ -146,9 +187,13 @@ export function SovereignDCKPIPanel({ kpis, previousKpis, isSimulating }: Sovere
           direction="down"
           icon={<AlertTriangle className="h-4 w-4 text-orange-500" />}
           thresholds={{ warning: 30, critical: 50 }}
+          provenance={cardProvenance}
+          sourceName={sourceName}
+          modelVersion={modelVersion}
         />
         
         <KPICard
+          id="economic-efficiency"
           label="Economic Efficiency"
           value={kpis.economicEfficiencyScore}
           unit="/100"
@@ -156,6 +201,9 @@ export function SovereignDCKPIPanel({ kpis, previousKpis, isSimulating }: Sovere
           direction="up"
           icon={<TrendingUp className="h-4 w-4 text-blue-500" />}
           thresholds={{ warning: 60, critical: 40 }}
+          provenance={cardProvenance}
+          sourceName={sourceName}
+          modelVersion={modelVersion}
         />
       </div>
     </div>

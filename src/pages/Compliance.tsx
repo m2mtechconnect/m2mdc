@@ -36,6 +36,9 @@ import { DOMAINS } from "@/ux";
 import { getSovereigntyRulesForContext, type SovereigntyRule } from "@/domain/greenDc/sovereigntyConfig";
 import { useTwinKPIsFromSimulation } from "@/hooks/useTwinKPIsFromSimulation";
 import { KPI_CATALOG, KPIKey } from "@/domain/greenDc/kpiCatalog";
+import { MetricValue } from "@/components/provenance/MetricValue";
+import { notAssessedMetric } from "@/lib/provenance/kitMetrics";
+import { staticMetric, demoMetric } from "@/lib/provenance";
 
 // DC-specific audit timeline
 const auditTimeline = [
@@ -232,44 +235,58 @@ export default function Compliance() {
 
           {/* DC-Specific KPIs - Now powered by Sovereignty Engine */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {/*
+              Phase 1A.1 §5: sovereignty score, audit readiness score and
+              "certified frameworks" count are NOT sourced from an audited
+              evidence store. They must render as "Not assessed" until real
+              evidence collection exists (Phase 1B). Cross-border flow count
+              and violation count come from the demo sovereignty fixture and
+              are labelled `demo`.
+            */}
             <Card className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Globe className="h-4 w-4 text-blue-500" />
-                <span className="text-xs text-muted-foreground uppercase">Sovereign Compliance</span>
-              </div>
-              <div className="text-2xl font-bold">{sovereignty.sovereigntyScore}%</div>
-              <div className={`text-xs ${sovereignty.sovereigntyScore >= 95 ? 'text-green-600' : 'text-amber-600'}`}>
-                {sovereignty.riskLevel === 'low' ? 'Excellent' : sovereignty.riskLevel === 'medium' ? 'Good' : 'Needs attention'}
-              </div>
+              <MetricValue
+                id="compliance-sovereign"
+                label="Sovereign compliance"
+                metric={notAssessedMetric<number>(
+                  'sovereignty-evidence-store',
+                  'Not assessed — no wired evidence collection.',
+                )}
+                icon={<Globe className="h-4 w-4 text-blue-500" />}
+                footer="Applicable frameworks: PIPEDA, Quebec Law 25 (configured, not achieved)."
+              />
             </Card>
-            
+
             <Card className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Shield className="h-4 w-4 text-purple-500" />
-                <span className="text-xs text-muted-foreground uppercase">Cross-Border Flows</span>
-              </div>
-              <div className="text-2xl font-bold">{sovereignty.crossBorderFlows}</div>
-              <div className="text-xs text-muted-foreground">Monitored flows</div>
+              <MetricValue
+                id="compliance-cross-border"
+                label="Cross-border flows (demo)"
+                metric={demoMetric<number>(sovereignty.crossBorderFlows, 'sovereignty-demo-fixture')}
+                icon={<Shield className="h-4 w-4 text-purple-500" />}
+                footer="Monitored flows from demonstration fixture."
+              />
             </Card>
-            
+
             <Card className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Target className="h-4 w-4 text-green-500" />
-                <span className="text-xs text-muted-foreground uppercase">Audit Readiness</span>
-              </div>
-              <div className="text-2xl font-bold">{sovereignty.auditReadinessScore}%</div>
-              <div className="text-xs text-green-600">{sovereignty.certifiedFrameworks} certified</div>
+              <MetricValue
+                id="compliance-audit-readiness"
+                label="Audit readiness"
+                metric={notAssessedMetric<number>(
+                  'audit-evidence-store',
+                  'Not assessed — evidence not collected.',
+                )}
+                icon={<Target className="h-4 w-4 text-green-500" />}
+                footer="Evidence not collected. Customer validation required."
+              />
             </Card>
-            
+
             <Card className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <AlertTriangle className="h-4 w-4 text-red-500" />
-                <span className="text-xs text-muted-foreground uppercase">Violations</span>
-              </div>
-              <div className="text-2xl font-bold">{sovereignty.violationCount}</div>
-              <div className={`text-xs ${sovereignty.violationCount === 0 ? 'text-green-600' : 'text-amber-600'}`}>
-                {sovereignty.violationCount === 0 ? 'All clear' : 'Active violations'}
-              </div>
+              <MetricValue
+                id="compliance-violations"
+                label="Policy violations (demo)"
+                metric={demoMetric<number>(sovereignty.violationCount, 'sovereignty-demo-fixture')}
+                icon={<AlertTriangle className="h-4 w-4 text-red-500" />}
+                footer={sovereignty.violationCount === 0 ? 'None in demonstration fixture.' : 'Active in demonstration fixture.'}
+              />
             </Card>
           </div>
 
@@ -309,7 +326,7 @@ export default function Compliance() {
                         {isCompliant !== null && (
                           <Badge variant={isCompliant ? 'default' : 'destructive'} className={isCompliant ? 'bg-green-600' : ''}>
                             {isCompliant ? <CheckCircle2 className="h-3 w-3 mr-1" /> : <AlertTriangle className="h-3 w-3 mr-1" />}
-                            {isCompliant ? 'Compliant' : 'At Risk'}
+                            {isCompliant ? 'Meets configured threshold' : 'Below configured threshold'}
                           </Badge>
                         )}
                       </div>

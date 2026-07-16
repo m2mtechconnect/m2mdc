@@ -24,11 +24,11 @@ describe('validateKitStatus', () => {
   it('rejects an invalid enum without throwing, returning compact issues', () => {
     const bad = { ...validPayload(), scenario: 'not-a-scenario' };
     const r = validateKitStatus(bad);
-    expect(r.ok).toBe(false);
-    if (!r.ok && r.reason === 'invalid') {
-      expect(r.issues.length).toBeGreaterThan(0);
-      expect(r.issues[0].path).toBe('scenario');
-    }
+    if (r.ok) throw new Error('expected invalid outcome');
+    expect(r.reason).toBe('invalid');
+    if (r.reason !== 'invalid') return;
+    expect(r.issues.length).toBeGreaterThan(0);
+    expect(r.issues[0].path).toBe('scenario');
   });
 
   it('rejects a payload missing required top-level fields', () => {
@@ -50,19 +50,18 @@ describe('validateKitStatus', () => {
 
   it('does not include raw payload data in the issue list', () => {
     const secretish = { ...validPayload(), nucleus_server: 'nucleus.internal:secret-token' };
-    // Inject a bad field to trigger validation failure.
     const r = validateKitStatus({ ...secretish, pue: 'oops' });
-    if (!r.ok && r.reason === 'invalid') {
-      const joined = JSON.stringify(r.issues);
-      expect(joined).not.toContain('secret-token');
-    }
+    if (r.ok) throw new Error('expected invalid outcome');
+    if (r.reason !== 'invalid') return;
+    const joined = JSON.stringify(r.issues);
+    expect(joined).not.toContain('secret-token');
   });
 });
 
 describe('unavailableOutcome', () => {
   it('produces an unavailable outcome that callers can pattern-match', () => {
     const r = unavailableOutcome('fetch timeout');
-    expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.reason).toBe('unavailable');
+    if (r.ok) throw new Error('expected unavailable');
+    expect(r.reason).toBe('unavailable');
   });
 });

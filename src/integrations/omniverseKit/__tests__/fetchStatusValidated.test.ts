@@ -11,11 +11,18 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { fetchStatusValidated } from '@/integrations/omniverseKit/client';
+import { fetchStatusValidated, type KitFetchOutcome } from '@/integrations/omniverseKit/client';
 import {
   kitStatusToFacilityWithProvenance,
   demoFacilityProvenance,
 } from '@/twins/dataCenter/omniverseAdapter';
+
+// `strict` is off in tsconfig.app.json, so control-flow narrowing on
+// discriminated unions across early `return` statements is unreliable.
+// Use explicit `Extract` casts, matching the pattern in the schema tests.
+type Invalid     = Extract<KitFetchOutcome, { reason: 'invalid' }>;
+type Unavailable = Extract<KitFetchOutcome, { reason: 'unavailable' }>;
+type Disabled    = Extract<KitFetchOutcome, { reason: 'disabled' }>;
 
 // Shape helper — mirrors the schema; kept in-file so a schema drift breaks
 // this test rather than being silently absorbed.
@@ -85,7 +92,7 @@ describe('fetchStatusValidated — end-to-end runtime path', () => {
     const outcome = await fetchStatusValidated();
     expect(outcome.ok).toBe(false);
     if (outcome.ok) return;
-    expect(outcome.reason).toBe('invalid');
+    expect((outcome as Invalid).reason).toBe('invalid');
 
     // The demo-provenance fallback used by the hook when validation fails
     // must never surface `live` on any Kit-sourced KPI.
@@ -103,8 +110,9 @@ describe('fetchStatusValidated — end-to-end runtime path', () => {
     );
     const outcome = await fetchStatusValidated();
     expect(outcome.ok).toBe(false);
-    if (outcome.ok || outcome.reason !== 'invalid') return;
-    const flat = JSON.stringify(outcome.issues);
+    const failure = outcome as Invalid;
+    if (outcome.ok || failure.reason !== 'invalid') return;
+    const flat = JSON.stringify(failure.issues);
     expect(flat).not.toContain('super-secret-abc123');
   });
 
@@ -115,8 +123,9 @@ describe('fetchStatusValidated — end-to-end runtime path', () => {
     const outcome = await fetchStatusValidated();
     expect(outcome.ok).toBe(false);
     if (outcome.ok) return;
-    expect(outcome.reason).toBe('unavailable');
-    expect(outcome.message).not.toContain('kit.internal');
+    const failure = outcome as Unavailable;
+    expect(failure.reason).toBe('unavailable');
+    expect(failure.message).not.toContain('kit.internal');
   });
 
   it('network error → unavailable', async () => {
@@ -124,9 +133,9 @@ describe('fetchStatusValidated — end-to-end runtime path', () => {
     const outcome = await fetchStatusValidated();
     expect(outcome.ok).toBe(false);
     if (outcome.ok) return;
-    expect(outcome.reason).toBe('unavailable');
-    // Message must NOT include the raw URL/hostname from the underlying error.
-    expect(outcome.message).not.toContain('kit.internal');
+    const failure = outcome as Unavailable;
+    expect(failure.reason).toBe('unavailable');
+    expect(failure.message).not.toContain('kit.internal');
   });
 
   it('disabled config → disabled reason, fetch is never called', async () => {
@@ -137,7 +146,7 @@ describe('fetchStatusValidated — end-to-end runtime path', () => {
     const outcome = await fetchStatusValidated();
     expect(outcome.ok).toBe(false);
     if (outcome.ok) return;
-    expect(outcome.reason).toBe('disabled');
+    expect((outcome as Disabled).reason).toBe('disabled');
     expect(spy).not.toHaveBeenCalled();
   });
 });

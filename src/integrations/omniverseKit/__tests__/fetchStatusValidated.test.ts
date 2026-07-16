@@ -50,15 +50,13 @@ describe('fetchStatusValidated — end-to-end runtime path', () => {
 
   beforeEach(() => {
     // Point config at a well-formed URL so `readKitConfig()` reports enabled.
-    // The test never actually hits the network; `fetch` is stubbed below.
-    (import.meta as unknown as { env: Record<string, string | undefined> })
-      .env[KIT_URL_ENV] = 'http://kit.test:8011';
+    // Use `vi.stubEnv` so the change survives Vite's env plumbing.
+    vi.stubEnv(KIT_URL_ENV, 'http://kit.test:8011');
   });
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
-    delete (import.meta as unknown as { env: Record<string, string | undefined> })
-      .env[KIT_URL_ENV];
+    vi.unstubAllEnvs();
     vi.restoreAllMocks();
   });
 
@@ -139,8 +137,7 @@ describe('fetchStatusValidated — end-to-end runtime path', () => {
   });
 
   it('disabled config → disabled reason, fetch is never called', async () => {
-    delete (import.meta as unknown as { env: Record<string, string | undefined> })
-      .env[KIT_URL_ENV];
+    vi.stubEnv(KIT_URL_ENV, '');
     const spy = vi.fn();
     globalThis.fetch = spy;
     const outcome = await fetchStatusValidated();

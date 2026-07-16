@@ -11,6 +11,11 @@
  */
 
 import { readKitConfig } from './config';
+import {
+  validateKitStatus,
+  type KitStatusValidated,
+  type KitValidationIssue,
+} from './schema';
 
 export class KitDisabledError extends Error {
   constructor(reason: string) {
@@ -111,6 +116,82 @@ async function kitFetch<T>(path: string, options?: RequestInit): Promise<T> {
 
 export async function fetchStatus(): Promise<KitStatusResponse> {
   return kitFetch<KitStatusResponse>('/demo/status');
+}
+
+// ============================================================================
+// VALIDATED FETCH (Phase 1A.1)
+// ----------------------------------------------------------------------------
+// `fetchStatusValidated()` is the ONLY entry point that runtime callers
+// (hooks, adapters, UI) should use. It:
+//   1. Fails closed to `disabled` when Kit env is not configured.
+//   2. Fails closed to `unavailable` on network / non-2xx / non-JSON errors.
+//   3. Runs the payload through `validateKitStatus()` — an invalid payload
+//      never produces `connected` or `live` provenance downstream.
+//   4. Never surfaces the raw payload, headers, or server-provided error
+//      text on the failure path; only a compact issue summary is returned.
+// ============================================================================
+
+export type KitFetchOutcome =
+  | { ok: true; data: KitStatusValidated; at: Date }
+  | { ok: false; reason: 'disabled'; message: string }
+  | { ok: false; reason: 'unavailable'; message: string }
+  | { ok: false; reason: 'invalid'; issues: KitValidationIssue[] };
+
+/** Redact any payload-derived text before it leaves this module. */
+function safeNetworkMessage(err: unknown): string {
+  if (err instanceof KitDisabledError) return err.message;
+  if (err instanceof Error) {
+    // Strip anything that looks like a URL, IP, or token from the message so
+    // we cannot leak internal Kit hostnames into console/telemetry.
+    return err.name === 'AbortError'
+      ? 'Kit request aborted'
+      : 'Kit endpoint unreachable';
+  }
+  return 'Kit endpoint unreachable';
+}
+
+export async function fetchStatusValidated(
+  signal?: AbortSignal,
+): Promise<KitFetchOutcome> {
+  // (1) Config gate — never attempt a fetch when disabled.
+  let baseUrl: string;
+  try {
+    baseUrl = currentBaseUrl();
+  } catch (err) {
+    return {
+      ok: false,
+      reason: 'disabled',
+      message: err instanceof KitDisabledError
+        ? err.message
+        : 'Omniverse Kit disabled',
+    };
+  }
+
+  // (2) Network — any failure collapses to `unavailable` without leaking the
+  //     raw response body or Kit hostname.
+  let payload: unknown;
+  try {
+    const response = await fetch(`${baseUrl}/demo/status`, {
+      signal,
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) {
+      return { ok: false, reason: 'unavailable', message: `Kit responded ${response.status}` };
+    }
+    payload = await response.json();
+  } catch (err) {
+    return { ok: false, reason: 'unavailable', message: safeNetworkMessage(err) };
+  }
+
+  // (3) Validation — a schema-mismatched payload MUST NOT reach the adapter.
+  const outcome = validateKitStatus(payload);
+  if (!outcome.ok) {
+    if (outcome.reason === 'invalid') {
+      return { ok: false, reason: 'invalid', issues: outcome.issues };
+    }
+    return { ok: false, reason: 'unavailable', message: outcome.message };
+  }
+  return { ok: true, data: outcome.data, at: new Date() };
 }
 
 export async function fetchSimState(): Promise<KitSimState> {

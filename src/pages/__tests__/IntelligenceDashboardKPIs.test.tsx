@@ -64,7 +64,7 @@ describe('IntelligenceDashboard KPI strip — provenance wrapper', () => {
     );
     const tile = screen.getByTestId('metric-thermal-incidents');
     expect(tile).toHaveAttribute('data-provenance', 'unavailable');
-    expect(within(tile).getByText(/Not available/i)).toBeInTheDocument();
+    expect(tile.textContent).toMatch(/Not available/i);
   });
 
   it('never allows a demo-fallback tile to render as live', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { MetricValue } from '../MetricValue';
 import {
   liveMetric,
@@ -9,9 +9,17 @@ import {
 } from '@/lib/provenance';
 import { simulatedMetric, notAssessedMetric } from '@/lib/provenance/kitMetrics';
 
+function q<T extends Element = HTMLElement>(root: HTMLElement, sel: string): T | null {
+  return root.querySelector<T>(sel);
+}
+function required<T extends Element>(el: T | null, hint: string): T {
+  if (!el) throw new Error(`Expected element for ${hint}`);
+  return el;
+}
+
 describe('MetricValue', () => {
   it('renders a live value with a Live badge and data-provenance="live"', () => {
-    render(
+    const { container } = render(
       <MetricValue
         id="pue"
         label="PUE"
@@ -19,14 +27,14 @@ describe('MetricValue', () => {
         format={(v) => (typeof v === 'number' ? v.toFixed(2) : String(v))}
       />,
     );
-    const card = screen.getByTestId('metric-pue');
+    const card = required(q<HTMLElement>(container, '[data-testid="metric-pue"]'), 'card');
     expect(card.getAttribute('data-provenance')).toBe('live');
-    expect(screen.getByTestId('metric-pue-value').textContent).toContain('1.24');
-    expect(screen.getByLabelText(/Provenance: Live/)).toBeInTheDocument();
+    expect(q<HTMLElement>(container, '[data-testid="metric-pue-value"]')?.textContent).toContain('1.24');
+    expect(q<HTMLElement>(container, '[aria-label*="Provenance: Live"]')).not.toBeNull();
   });
 
   it('renders a demo value with a Demo data badge and NEVER "Live"', () => {
-    render(
+    const { container } = render(
       <MetricValue
         id="gpu"
         label="GPU utilization"
@@ -34,13 +42,13 @@ describe('MetricValue', () => {
         unit="%"
       />,
     );
-    expect(screen.getByTestId('metric-gpu').getAttribute('data-provenance')).toBe('demo');
-    expect(screen.getByLabelText(/Provenance: Demo data/)).toBeInTheDocument();
-    expect(screen.queryByLabelText(/Provenance: Live/)).toBeNull();
+    expect(q<HTMLElement>(container, '[data-testid="metric-gpu"]')?.getAttribute('data-provenance')).toBe('demo');
+    expect(q<HTMLElement>(container, '[aria-label*="Provenance: Demo data"]')).not.toBeNull();
+    expect(q<HTMLElement>(container, '[aria-label*="Provenance: Live"]')).toBeNull();
   });
 
   it('renders a static target with the Configured target chip', () => {
-    render(
+    const { container } = render(
       <MetricValue
         id="pue-target"
         label="Target PUE"
@@ -48,13 +56,13 @@ describe('MetricValue', () => {
         format={(v) => (typeof v === 'number' ? v.toFixed(2) : String(v))}
       />,
     );
-    const card = screen.getByTestId('metric-pue-target');
+    const card = required(q<HTMLElement>(container, '[data-testid="metric-pue-target"]'), 'card');
     expect(card.getAttribute('data-provenance')).toBe('static');
-    expect(screen.getByText(/Configured target/i)).toBeInTheDocument();
+    expect(container.textContent).toMatch(/Configured target/i);
   });
 
   it('renders unavailable metric as "Not available", never a number', () => {
-    render(
+    const { container } = render(
       <MetricValue
         id="carbon"
         label="Carbon intensity"
@@ -62,24 +70,24 @@ describe('MetricValue', () => {
         unit="gCO₂/kWh"
       />,
     );
-    expect(screen.getByTestId('metric-carbon').getAttribute('data-provenance')).toBe('unavailable');
-    expect(screen.getByTestId('metric-carbon-value').textContent).toContain('Not available');
+    expect(q<HTMLElement>(container, '[data-testid="metric-carbon"]')?.getAttribute('data-provenance')).toBe('unavailable');
+    expect(q<HTMLElement>(container, '[data-testid="metric-carbon-value"]')?.textContent).toContain('Not available');
   });
 
   it('renders a not-assessed sovereignty metric as "Not assessed"', () => {
-    render(
+    const { container } = render(
       <MetricValue
         id="sovereignty"
         label="Sovereignty assessment"
         metric={notAssessedMetric<number>('sovereignty-engine')}
       />,
     );
-    expect(screen.getByTestId('metric-sovereignty').getAttribute('data-provenance')).toBe('unavailable');
-    expect(screen.getByTestId('metric-sovereignty-value').textContent).toContain('Not assessed');
+    expect(q<HTMLElement>(container, '[data-testid="metric-sovereignty"]')?.getAttribute('data-provenance')).toBe('unavailable');
+    expect(q<HTMLElement>(container, '[data-testid="metric-sovereignty-value"]')?.textContent).toContain('Not assessed');
   });
 
   it('renders a simulated metric with the Simulation badge', () => {
-    render(
+    const { container } = render(
       <MetricValue
         id="cooling-delta"
         label="Cooling-failure impact"
@@ -87,13 +95,13 @@ describe('MetricValue', () => {
         unit="°C"
       />,
     );
-    expect(screen.getByTestId('metric-cooling-delta').getAttribute('data-provenance')).toBe('simulated');
-    expect(screen.getByLabelText(/Provenance: Simulation/)).toBeInTheDocument();
+    expect(q<HTMLElement>(container, '[data-testid="metric-cooling-delta"]')?.getAttribute('data-provenance')).toBe('simulated');
+    expect(q<HTMLElement>(container, '[aria-label*="Provenance: Simulation"]')).not.toBeNull();
   });
 
   it('exposes stale timestamp when isStale is true', () => {
     const at = new Date(Date.now() - 60_000).toISOString();
-    render(
+    const { container } = render(
       <MetricValue
         id="gpu-stale"
         label="GPU utilization"
@@ -101,7 +109,7 @@ describe('MetricValue', () => {
         unit="%"
       />,
     );
-    expect(screen.getByTestId('metric-gpu-stale').getAttribute('data-stale')).toBe('true');
-    expect(screen.getByTestId('metric-gpu-stale-stale').textContent).toMatch(/Stale/);
+    expect(q<HTMLElement>(container, '[data-testid="metric-gpu-stale"]')?.getAttribute('data-stale')).toBe('true');
+    expect(q<HTMLElement>(container, '[data-testid="metric-gpu-stale-stale"]')?.textContent).toMatch(/Stale/);
   });
 });

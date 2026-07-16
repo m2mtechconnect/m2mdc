@@ -351,55 +351,81 @@ function buildCooling(kit: KitStatusResponse): CoolingTwin {
 }
 
 function buildNetwork(racks: KitRackHealth[]): NetworkTwin {
-  const switches = ([
-    { id: 'spine-1', name: 'Spine Switch 1', model: 'SN3700', role: 'spine' as const, portCount: 32, activePortCount: 28, throughputGbps: 12.8, latencyUs: 0.5, status: 'normal' as const, uptimeDays: randomInt(30, 365), cpuUtilPct: randomInt(15, 40), memUtilPct: randomInt(20, 50) },
-    { id: 'spine-2', name: 'Spine Switch 2', model: 'SN3700', role: 'spine' as const, portCount: 32, activePortCount: 26, throughputGbps: 11.2, latencyUs: 0.5, status: 'normal' as const, uptimeDays: randomInt(30, 365), cpuUtilPct: randomInt(15, 40), memUtilPct: randomInt(20, 50) },
-    { id: 'leaf-1', name: 'Leaf Switch 1', model: 'SN2700', role: 'leaf' as const, portCount: 48, activePortCount: 42, throughputGbps: 6.4, latencyUs: 0.3, status: 'normal' as const, uptimeDays: randomInt(30, 365), cpuUtilPct: randomInt(20, 50), memUtilPct: randomInt(25, 55) },
-    { id: 'leaf-2', name: 'Leaf Switch 2', model: 'SN2700', role: 'leaf' as const, portCount: 48, activePortCount: 40, throughputGbps: 5.8, latencyUs: 0.3, status: 'normal' as const, uptimeDays: randomInt(30, 365), cpuUtilPct: randomInt(20, 50), memUtilPct: randomInt(25, 55) },
-  ]) as unknown as (NetworkSwitch & { role: 'spine' | 'leaf' })[];
+  const _rackCount = racks.length;
+  type SwitchSpec = { id: string; name: string; type: NetworkSwitch['type']; model: string; portSpeed: NetworkPort['speed'] };
+  const switchSpecs: SwitchSpec[] = [
+    { id: 'spine-1', name: 'Spine Switch 1', type: 'Spine', model: 'SN3700', portSpeed: '100G' },
+    { id: 'spine-2', name: 'Spine Switch 2', type: 'Spine', model: 'SN3700', portSpeed: '100G' },
+    { id: 'leaf-1',  name: 'Leaf Switch 1',  type: 'Leaf',  model: 'SN2700', portSpeed: '25G'  },
+    { id: 'leaf-2',  name: 'Leaf Switch 2',  type: 'Leaf',  model: 'SN2700', portSpeed: '25G'  },
+  ];
 
-  const ports = switches.flatMap(sw =>
-    Array.from({ length: 4 }, (_, i) => ({
-      id: `${sw.id}-port-${i}`,
-      switchId: sw.id,
+  const switches: NetworkSwitch[] = switchSpecs.map(spec => {
+    const ports: NetworkPort[] = Array.from({ length: 4 }, (_, i) => ({
+      id: `${spec.id}-port-${i}`,
+      switchId: spec.id,
       portNumber: i + 1,
-      speedGbps: sw.role === 'spine' ? 100 : 25,
+      speed: spec.portSpeed,
       utilizationPct: randomInRange(20, 70),
-      errorsPerHour: randomInt(0, 2),
-      status: 'up' as const,
-    }))
-  ) as unknown as NetworkPort[];
+      packetErrors: randomInt(0, 2),
+      crcErrors: randomInt(0, 1),
+      linkFlaps: randomInt(0, 1),
+      status: 'up',
+    }));
+    return {
+      id: spec.id,
+      name: spec.name,
+      type: spec.type,
+      model: spec.model,
+      ports,
+      cpuUtilization: randomInt(15, 50),
+      memoryUtilization: randomInt(20, 55),
+      temperature: randomInRange(30, 45),
+      uptime: randomInt(30, 365) * 86400,
+      status: 'normal',
+    };
+  });
 
-  const fabric = ({
-    topology: 'spine-leaf',
-    totalBandwidthTbps: 3.2,
-    oversubscriptionRatio: '3:1',
-    latencyP50Us: 0.4,
-    latencyP99Us: 1.2,
-    packetLossPct: 0.001,
-  } as unknown as NetworkFabric);
+  const fabric: NetworkFabric = {
+    id: 'fabric-primary',
+    name: 'Primary Spine-Leaf Fabric',
+    type: 'Ethernet',
+    switches,
+    latencyMs: 0.4,
+    jitterMs: 0.1,
+    throughputGbps: 1200,
+    maxThroughputGbps: 3200,
+  };
 
-  const firewalls = ([{
-    id: 'fw-1', name: 'Core Firewall', model: 'Palo Alto PA-5250',
-    throughputGbps: 20, activeSessions: randomInt(5000, 20000),
-    maxSessions: 64000, status: 'normal' as const,
-  }]) as unknown as Firewall[];
+  const firewalls: Firewall[] = [{
+    id: 'fw-1',
+    name: 'Core Firewall',
+    throughputGbps: 12,
+    maxThroughputGbps: 20,
+    connectionsPerSec: randomInt(500, 2000),
+    activeSessions: randomInt(5000, 20000),
+    cpuUtilization: randomInt(20, 55),
+    status: 'normal',
+  }];
+
+  const allPorts = switches.flatMap(s => s.ports);
+  const portUtilizationAvg = allPorts.reduce((s, p) => s + p.utilizationPct, 0) / allPorts.length;
 
   return {
+    fabrics: [fabric],
     switches,
-    ports,
-    fabric,
     firewalls,
-    kpis: ({
+    kpis: {
       networkIntegrityScore: 98.5,
-      avgLatencyUs: 0.6,
-      p99LatencyUs: 1.2,
-      packetLossPct: 0.001,
-      fabricUtilization: randomInRange(35, 55),
-      portErrorRate: randomInRange(0, 0.5),
-      bandwidthUtilHistory: generateTimeSeries(24, 45),
-    } as unknown as NetworkTwin['kpis']),
-  } as unknown as NetworkTwin;
+      fabricSaturationIndex: (fabric.throughputGbps / fabric.maxThroughputGbps) * 100,
+      avgLatencyMs: 0.4,
+      maxLatencyMs: 1.2,
+      totalThroughputGbps: fabric.throughputGbps,
+      packetLossRate: 0.001,
+      portUtilizationAvg,
+      linkFlapRate: allPorts.reduce((s, p) => s + p.linkFlaps, 0) / allPorts.length,
+    },
+  };
 }
 
 function buildFacilitySafety(): FacilitySafetyTwin {

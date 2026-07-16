@@ -644,7 +644,7 @@ export function kitStatusToFacility(kit: KitStatusResponse): DataCentreFacility 
         title: `${rackName} Critical Temperature`,
         description: `${rackName} at ${r.temp}°C — exceeds thermal threshold`,
         severity: 'critical',
-        domain: 'thermal' as any,
+        domain: 'thermal_hardware',
         status: 'active',
         triggeredAt: new Date(),
       });
@@ -655,7 +655,7 @@ export function kitStatusToFacility(kit: KitStatusResponse): DataCentreFacility 
         title: `${rackName} Temperature Warning`,
         description: `${rackName} at ${r.temp}°C — cascade heat spread detected`,
         severity: 'warning',
-        domain: 'thermal' as any,
+        domain: 'thermal_hardware',
         status: 'active',
         triggeredAt: new Date(),
       });
@@ -666,7 +666,7 @@ export function kitStatusToFacility(kit: KitStatusResponse): DataCentreFacility 
         title: `${rackName} Power Failure`,
         description: `${rackName} offline — power supply disruption`,
         severity: 'critical',
-        domain: 'power' as any,
+        domain: 'power_ups',
         status: 'active',
         triggeredAt: new Date(),
       });
@@ -680,7 +680,7 @@ export function kitStatusToFacility(kit: KitStatusResponse): DataCentreFacility 
   return {
     id: 'omniverse-dsx-datacenter',
     name: 'DSX AI Factory Digital Twin',
-    region: 'CA-QC' as any,
+    region: 'CA-QC',
     description: 'NVIDIA Omniverse-powered live digital twin with DDN storage, 21 racks across 3 rows',
     tier: 3,
     totalCapacityMw: 2.0,

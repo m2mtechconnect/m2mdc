@@ -1,11 +1,28 @@
 /**
- * Omniverse Kit → DataCentreFacility Adapter
- * Transforms live Kit /demo/status data into the DataCentreFacility shape
- * that all existing dashboard components consume.
+ * Omniverse Kit → DataCentreFacility Adapter (demo scaffolding).
  *
- * Rack-level telemetry comes from Kit API. Domain-level data (servers,
- * sensors, PDUs, cooling units, etc.) is synthesized from rack-level
- * metrics to fill the full DataCentreFacility interface.
+ * INPUT  (real, external):  `KitStatusResponse` — the subset of fields the
+ *                           Kit `/demo/status` endpoint returns
+ *                           (rack health, aggregate power, PUE, GPU util,
+ *                           cooling efficiency).
+ * OUTPUT (mostly synthetic): the internal `DataCentreFacility` shape used by
+ *                           the dashboard, which is far richer than Kit
+ *                           exposes.
+ *
+ * Only the following fields on the output are derived from real Kit data:
+ *   - `currentPowerDrawKw`, `currentLoadMw`, per-rack `outletTempC`, `status`
+ *   - `pue`, aggregate GPU utilization, cooling-efficiency index
+ *   - alert list (derived from rack status)
+ * Every other field is a **synthetic demo default** produced by the
+ * `synth*` / `build*` helpers below and MUST be treated as demo scaffolding
+ * until a real inventory + telemetry source lands (Phase 3+).
+ *
+ * Design rules for this file:
+ *   1. No `as unknown as` — every object literal fully satisfies its type.
+ *   2. External payload shape is defined by `KitStatusResponse`; internal
+ *      shape is defined by `@/types/dataCenterTwin`. Mapping is explicit.
+ *   3. Synthetic values live behind named helpers so callers can identify
+ *      and later replace them (grep for `synth` / `demo`).
  */
 
 import type { KitStatusResponse, KitRackHealth } from '@/integrations/omniverseKit/client';
@@ -211,176 +228,260 @@ function buildPowerUps(kit: KitStatusResponse): PowerUpsTwin {
     efficiency: randomInRange(0.94, 0.97),
   }));
 
-  const generators = Array.from({ length: 2 }, (_, i) => ({
+  const generators: Generator[] = Array.from({ length: 2 }, (_, i) => ({
     id: `gen-${i}`,
     name: `Generator ${i + 1}`,
-    model: 'Caterpillar C32',
     capacityKw: 1200,
     fuelLevelPct: randomInt(70, 100),
+    runtimeHours: randomInt(100, 800),
+    failoverState: 'standby',
     lastTestDate: new Date(Date.now() - randomInt(3, 14) * 86400000),
-    hoursRun: randomInt(100, 800),
-    status: 'standby' as const,
-  })) as unknown as Generator[];
+    status: 'normal',
+  }));
 
-  return ({
+  const totalPowerDrawMw = kit.total_power_kw / 1000;
+  const avgUpsLoad = upsBanks.reduce((s, u) => s + u.loadPct, 0) / upsBanks.length;
+  const avgBatteryHealth = upsBanks.reduce((s, u) => s + u.batteryHealthPct, 0) / upsBanks.length;
+  const avgUpsRuntime = upsBanks.reduce((s, u) => s + u.runtimeMinutes, 0) / upsBanks.length;
+
+  return {
     pdus,
     busways,
     upsBanks,
     generators,
-    kpis: ({
-      pue: kit.pue,
-      totalPowerDrawKw: kit.total_power_kw,
-      totalItLoadKw: kit.total_power_kw / kit.pue,
-      upsEfficiency: randomInRange(0.94, 0.97),
-      avgUpsLoad: upsBanks.reduce((s, u) => s + u.loadPct, 0) / upsBanks.length,
+    gridConnection: {
+      status: 'stable',
+      voltageV: addNoise(480, 1),
+      frequencyHz: addNoise(60, 0.3),
+      powerFactorPct: randomInRange(95, 99),
+    },
+    kpis: {
       powerReliabilityScore: 97,
-      redundancyStatus: 'N+1',
-      transferSwitchReady: true,
-      avgBatteryHealth: upsBanks.reduce((s, u) => s + u.batteryHealthPct, 0) / upsBanks.length,
-      avgBatteryRuntime: upsBanks.reduce((s, u) => s + u.runtimeMinutes, 0) / upsBanks.length,
-      powerHistory: generateTimeSeries(24, kit.total_power_kw),
-      pueHistory: generateTimeSeries(24, kit.pue),
-    } as unknown as PowerUpsTwin['kpis']),
-  } as unknown as PowerUpsTwin);
+      upsHealthIndex: avgBatteryHealth,
+      redundancyLevel: 'N+1',
+      totalPowerDrawMw,
+      powerCapacityMw: 2.0,
+      utilizationPct: (totalPowerDrawMw / 2.0) * 100,
+      avgUpsRuntime,
+      generatorReadiness: generators.reduce((s, g) => s + g.fuelLevelPct, 0) / generators.length,
+    },
+  };
 }
 
 function buildCooling(kit: KitStatusResponse): CoolingTwin {
-  const units = Array.from({ length: 6 }, (_, i) => ({
-    id: `crac-${i}`,
-    name: `CRAC Unit ${i + 1}`,
-    type: i < 2 ? 'crah' as const : 'inrow' as const,
-    model: i < 2 ? 'Liebert DS165' : 'Liebert CRV',
-    supplyTempC: addNoise(14, 5),
-    returnTempC: addNoise(28, 5),
-    flowRateLpm: randomInRange(200, 400),
-    powerDrawKw: randomInRange(15, 40),
-    setpointC: 18,
-    fanSpeedPct: randomInt(50, 80),
-    status: 'running' as const,
-    filterCondition: randomInt(70, 100),
-    refrigerantLevelPct: randomInt(85, 100),
-  })) as unknown as CoolingUnit[];
+  const zoneNames = ['A', 'B', 'C'] as const;
+  const units: CoolingUnit[] = Array.from({ length: 6 }, (_, i) => {
+    const supply = addNoise(14, 5);
+    const ret = addNoise(28, 5);
+    return {
+      id: `crac-${i}`,
+      name: `CRAC Unit ${i + 1}`,
+      type: i < 2 ? 'CRAH' : 'InRow',
+      zone: zoneNames[Math.floor(i / 2)],
+      supplyAirTempC: supply,
+      returnAirTempC: ret,
+      deltaT: ret - supply,
+      humidityPct: randomInRange(40, 55),
+      refrigerantPressurePsi: randomInRange(120, 180),
+      compressorCurrentA: randomInRange(20, 60),
+      coolingCoilDeltaT: randomInRange(6, 12),
+      damperPositionPct: randomInt(40, 90),
+      fanSpeedRpm: randomInt(1200, 2400),
+      fanAmps: randomInRange(4, 9),
+      capacityKw: 120,
+      utilizationPct: randomInRange(45, 80),
+      status: 'normal',
+    };
+  });
 
-  const zones = ['A', 'B', 'C'].map((z, i) => ({
-    id: `zone-${z}`,
-    name: `Zone ${z}`,
-    coldAisleTempC: addNoise(20, 5),
-    hotAisleTempC: addNoise(32, 5),
-    humidityPct: randomInRange(40, 55),
-    airflowCfm: randomInRange(8000, 15000),
-    containmentType: 'cold-aisle' as const,
-    rackCount: 7,
-    assignedUnits: units.slice(i * 2, i * 2 + 2).map(u => u.id),
-    status: 'optimal' as const,
-  })) as unknown as (CoolingZoneDetail & { coldAisleTempC: number; hotAisleTempC: number })[];
+  const zones: CoolingZoneDetail[] = zoneNames.map((z, i) => {
+    const zoneUnits = units.filter(u => u.zone === z);
+    return {
+      id: `zone-${z}`,
+      name: `Zone ${z}`,
+      units: zoneUnits,
+      ambientTempC: addNoise(22, 3),
+      targetTempC: 22,
+      humidityPct: randomInRange(40, 55),
+      targetHumidityPct: 45,
+      airflowCfm: randomInRange(8000, 15000),
+      pueContribution: randomInRange(0.08, 0.14),
+      status: 'normal',
+    };
+  });
 
-  return ({
-    units,
+  const totalCoolingCapacityKw = units.reduce((s, u) => s + u.capacityKw, 0);
+  const activeCoolingLoadKw = units.reduce((s, u) => s + u.capacityKw * u.utilizationPct / 100, 0);
+  const avgSupply = units.reduce((s, u) => s + u.supplyAirTempC, 0) / units.length;
+  const avgReturn = units.reduce((s, u) => s + u.returnAirTempC, 0) / units.length;
+
+  return {
     zones,
-    kpis: ({
+    units,
+    chillerPlant: {
+      chillers: Array.from({ length: 2 }, (_, i) => ({
+        id: `chiller-${i}`,
+        name: `Chiller ${i + 1}`,
+        capacityTons: 500,
+        loadPct: randomInRange(40, 70),
+        supplyTempC: addNoise(7, 1),
+        returnTempC: addNoise(13, 1),
+        status: 'normal',
+      })),
+      coolingTowers: Array.from({ length: 2 }, (_, i) => ({
+        id: `ct-${i}`,
+        name: `Cooling Tower ${i + 1}`,
+        wetBulbTempC: addNoise(18, 3),
+        approachTempC: randomInRange(3, 6),
+        fanSpeedPct: randomInt(50, 90),
+        status: 'normal',
+      })),
+    },
+    kpis: {
       coolingEfficiencyIndex: Math.round(kit.cooling_efficiency * 100),
-      avgColdAisleTemp: zones.reduce((s, z) => s + z.coldAisleTempC, 0) / zones.length,
-      avgHotAisleTemp: zones.reduce((s, z) => s + z.hotAisleTempC, 0) / zones.length,
-      waterUsageEffectiveness: randomInRange(0.4, 0.8),
-      totalCoolingCapacityKw: units.reduce((s, u) => s + ((u as unknown as { powerDrawKw: number }).powerDrawKw ?? 0) * 4, 0),
-      freeHoursPerYear: randomInt(3000, 5000),
-      avgHumidity: zones.reduce((s, z) => s + z.humidityPct, 0) / zones.length,
-      coolingHistory: generateTimeSeries(24, kit.cooling_efficiency * 100),
-    } as unknown as CoolingTwin['kpis']),
-  } as unknown as CoolingTwin);
+      coolingCostPerKw: randomInRange(0.03, 0.06),
+      coolingRedundancyScore: 92,
+      avgSupplyTemp: avgSupply,
+      avgReturnTemp: avgReturn,
+      totalCoolingCapacityKw,
+      activeCoolingLoadKw,
+      pueFromCooling: 1 + zones.reduce((s, z) => s + z.pueContribution, 0) / zones.length,
+    },
+  };
 }
 
 function buildNetwork(racks: KitRackHealth[]): NetworkTwin {
-  const switches = ([
-    { id: 'spine-1', name: 'Spine Switch 1', model: 'SN3700', role: 'spine' as const, portCount: 32, activePortCount: 28, throughputGbps: 12.8, latencyUs: 0.5, status: 'normal' as const, uptimeDays: randomInt(30, 365), cpuUtilPct: randomInt(15, 40), memUtilPct: randomInt(20, 50) },
-    { id: 'spine-2', name: 'Spine Switch 2', model: 'SN3700', role: 'spine' as const, portCount: 32, activePortCount: 26, throughputGbps: 11.2, latencyUs: 0.5, status: 'normal' as const, uptimeDays: randomInt(30, 365), cpuUtilPct: randomInt(15, 40), memUtilPct: randomInt(20, 50) },
-    { id: 'leaf-1', name: 'Leaf Switch 1', model: 'SN2700', role: 'leaf' as const, portCount: 48, activePortCount: 42, throughputGbps: 6.4, latencyUs: 0.3, status: 'normal' as const, uptimeDays: randomInt(30, 365), cpuUtilPct: randomInt(20, 50), memUtilPct: randomInt(25, 55) },
-    { id: 'leaf-2', name: 'Leaf Switch 2', model: 'SN2700', role: 'leaf' as const, portCount: 48, activePortCount: 40, throughputGbps: 5.8, latencyUs: 0.3, status: 'normal' as const, uptimeDays: randomInt(30, 365), cpuUtilPct: randomInt(20, 50), memUtilPct: randomInt(25, 55) },
-  ]) as unknown as (NetworkSwitch & { role: 'spine' | 'leaf' })[];
+  const _rackCount = racks.length;
+  type SwitchSpec = { id: string; name: string; type: NetworkSwitch['type']; model: string; portSpeed: NetworkPort['speed'] };
+  const switchSpecs: SwitchSpec[] = [
+    { id: 'spine-1', name: 'Spine Switch 1', type: 'Spine', model: 'SN3700', portSpeed: '100G' },
+    { id: 'spine-2', name: 'Spine Switch 2', type: 'Spine', model: 'SN3700', portSpeed: '100G' },
+    { id: 'leaf-1',  name: 'Leaf Switch 1',  type: 'Leaf',  model: 'SN2700', portSpeed: '25G'  },
+    { id: 'leaf-2',  name: 'Leaf Switch 2',  type: 'Leaf',  model: 'SN2700', portSpeed: '25G'  },
+  ];
 
-  const ports = switches.flatMap(sw =>
-    Array.from({ length: 4 }, (_, i) => ({
-      id: `${sw.id}-port-${i}`,
-      switchId: sw.id,
+  const switches: NetworkSwitch[] = switchSpecs.map(spec => {
+    const ports: NetworkPort[] = Array.from({ length: 4 }, (_, i) => ({
+      id: `${spec.id}-port-${i}`,
+      switchId: spec.id,
       portNumber: i + 1,
-      speedGbps: sw.role === 'spine' ? 100 : 25,
+      speed: spec.portSpeed,
       utilizationPct: randomInRange(20, 70),
-      errorsPerHour: randomInt(0, 2),
-      status: 'up' as const,
-    }))
-  ) as unknown as NetworkPort[];
+      packetErrors: randomInt(0, 2),
+      crcErrors: randomInt(0, 1),
+      linkFlaps: randomInt(0, 1),
+      status: 'up',
+    }));
+    return {
+      id: spec.id,
+      name: spec.name,
+      type: spec.type,
+      model: spec.model,
+      ports,
+      cpuUtilization: randomInt(15, 50),
+      memoryUtilization: randomInt(20, 55),
+      temperature: randomInRange(30, 45),
+      uptime: randomInt(30, 365) * 86400,
+      status: 'normal',
+    };
+  });
 
-  const fabric = ({
-    topology: 'spine-leaf',
-    totalBandwidthTbps: 3.2,
-    oversubscriptionRatio: '3:1',
-    latencyP50Us: 0.4,
-    latencyP99Us: 1.2,
-    packetLossPct: 0.001,
-  } as unknown as NetworkFabric);
+  const fabric: NetworkFabric = {
+    id: 'fabric-primary',
+    name: 'Primary Spine-Leaf Fabric',
+    type: 'Ethernet',
+    switches,
+    latencyMs: 0.4,
+    jitterMs: 0.1,
+    throughputGbps: 1200,
+    maxThroughputGbps: 3200,
+  };
 
-  const firewalls = ([{
-    id: 'fw-1', name: 'Core Firewall', model: 'Palo Alto PA-5250',
-    throughputGbps: 20, activeSessions: randomInt(5000, 20000),
-    maxSessions: 64000, status: 'normal' as const,
-  }]) as unknown as Firewall[];
+  const firewalls: Firewall[] = [{
+    id: 'fw-1',
+    name: 'Core Firewall',
+    throughputGbps: 12,
+    maxThroughputGbps: 20,
+    connectionsPerSec: randomInt(500, 2000),
+    activeSessions: randomInt(5000, 20000),
+    cpuUtilization: randomInt(20, 55),
+    status: 'normal',
+  }];
+
+  const allPorts = switches.flatMap(s => s.ports);
+  const portUtilizationAvg = allPorts.reduce((s, p) => s + p.utilizationPct, 0) / allPorts.length;
 
   return {
+    fabrics: [fabric],
     switches,
-    ports,
-    fabric,
     firewalls,
-    kpis: ({
+    kpis: {
       networkIntegrityScore: 98.5,
-      avgLatencyUs: 0.6,
-      p99LatencyUs: 1.2,
-      packetLossPct: 0.001,
-      fabricUtilization: randomInRange(35, 55),
-      portErrorRate: randomInRange(0, 0.5),
-      bandwidthUtilHistory: generateTimeSeries(24, 45),
-    } as unknown as NetworkTwin['kpis']),
-  } as unknown as NetworkTwin;
+      fabricSaturationIndex: (fabric.throughputGbps / fabric.maxThroughputGbps) * 100,
+      avgLatencyMs: 0.4,
+      maxLatencyMs: 1.2,
+      totalThroughputGbps: fabric.throughputGbps,
+      packetLossRate: 0.001,
+      portUtilizationAvg,
+      linkFlapRate: allPorts.reduce((s, p) => s + p.linkFlaps, 0) / allPorts.length,
+    },
+  };
 }
 
 function buildFacilitySafety(): FacilitySafetyTwin {
-  const zones = ['Main Hall', 'UPS Room', 'Cooling Plant'].map((name, i) => ({
+  type ZoneSpec = { name: string; type: EnvironmentalZone['type'] };
+  const zoneSpecs: ZoneSpec[] = [
+    { name: 'Main Hall',     type: 'server_hall' },
+    { name: 'UPS Room',      type: 'electrical' },
+    { name: 'Cooling Plant', type: 'mechanical' },
+  ];
+
+  const zones: EnvironmentalZone[] = zoneSpecs.map((spec, i) => ({
     id: `env-zone-${i}`,
-    name,
+    name: spec.name,
+    type: spec.type,
     tempC: addNoise(22, 5),
     humidityPct: randomInRange(40, 55),
-    dewPointC: randomInRange(8, 14),
-    particulatePm25: randomInRange(5, 15),
-    waterLeakDetected: false,
-    smokeDetected: false,
-  })) as unknown as (EnvironmentalZone & { dewPointC: number; particulatePm25: number })[];
+    pm25: randomInRange(5, 15),
+    pm10: randomInRange(10, 30),
+    status: 'normal',
+  }));
 
-  const sensors = zones.flatMap(z => [
-    { id: `${z.id}-temp`, zoneId: z.id, type: 'temperature' as const, value: z.tempC, unit: '°C', status: 'normal' as const, lastReading: new Date() },
-    { id: `${z.id}-humid`, zoneId: z.id, type: 'humidity' as const, value: z.humidityPct, unit: '%', status: 'normal' as const, lastReading: new Date() },
-  ]) as unknown as SafetySensor[];
+  const safetySensors: SafetySensor[] = zones.flatMap(z => [
+    { id: `${z.id}-smoke`, type: 'smoke',      zone: z.id, value: 0, threshold: 1, triggered: false, status: 'normal' },
+    { id: `${z.id}-leak`,  type: 'water_leak', zone: z.id, value: 0, threshold: 1, triggered: false, status: 'normal' },
+  ]);
 
-  const fireSuppression: FireSuppressionSystem = {
+  const now = Date.now();
+  const fireSuppressionSystems: FireSuppressionSystem[] = zones.map(z => ({
+    id: `fs-${z.id}`,
+    zone: z.id,
     type: 'Novec',
-    agent: 'Novec 1230',
-    status: 'armed' as const,
-    lastInspection: new Date(Date.now() - randomInt(7, 60) * 86400000),
-    zonesCovered: zones.map(z => z.id),
     tankPressurePsi: randomInRange(340, 370),
-  } as unknown as FireSuppressionSystem;
+    targetPressurePsi: 360,
+    status: 'armed',
+    lastInspection: new Date(now - randomInt(7, 60) * 86400000),
+    nextInspection: new Date(now + randomInt(30, 180) * 86400000),
+  }));
 
   return {
     environmentalZones: zones,
-    sensors,
-    fireSuppression,
-    kpis: ({
+    safetySensors,
+    fireSuppressionSystems,
+    accessControl: {
+      activePersonnel: randomInt(0, 6),
+      recentAccess: [],
+    },
+    kpis: {
       environmentalSafetyScore: 94,
-      waterLeakRisk: 'low',
-      fireSuppressionReady: true,
-      avgDewPointC: zones.reduce((s, z) => s + z.dewPointC, 0) / zones.length,
-      particulateLevel: zones.reduce((s, z) => s + z.particulatePm25, 0) / zones.length,
-      lastIncidentDays: randomInt(90, 365),
-    } as unknown as FacilitySafetyTwin['kpis']),
-  } as unknown as FacilitySafetyTwin;
+      earlyWarningIndex: 88,
+      avgAmbientTemp: zones.reduce((s, z) => s + z.tempC, 0) / zones.length,
+      avgHumidity: zones.reduce((s, z) => s + z.humidityPct, 0) / zones.length,
+      airQualityIndex: 92,
+      waterLeakRisk: 5,
+      fireSuppressionReadiness: 98,
+    },
+  };
 }
 
 function buildWorkloadGpu(kit: KitStatusResponse): WorkloadGpuTwin {
@@ -543,7 +644,7 @@ export function kitStatusToFacility(kit: KitStatusResponse): DataCentreFacility 
         title: `${rackName} Critical Temperature`,
         description: `${rackName} at ${r.temp}°C — exceeds thermal threshold`,
         severity: 'critical',
-        domain: 'thermal' as any,
+        domain: 'thermal_hardware',
         status: 'active',
         triggeredAt: new Date(),
       });
@@ -554,7 +655,7 @@ export function kitStatusToFacility(kit: KitStatusResponse): DataCentreFacility 
         title: `${rackName} Temperature Warning`,
         description: `${rackName} at ${r.temp}°C — cascade heat spread detected`,
         severity: 'warning',
-        domain: 'thermal' as any,
+        domain: 'thermal_hardware',
         status: 'active',
         triggeredAt: new Date(),
       });
@@ -565,7 +666,7 @@ export function kitStatusToFacility(kit: KitStatusResponse): DataCentreFacility 
         title: `${rackName} Power Failure`,
         description: `${rackName} offline — power supply disruption`,
         severity: 'critical',
-        domain: 'power' as any,
+        domain: 'power_ups',
         status: 'active',
         triggeredAt: new Date(),
       });
@@ -579,7 +680,7 @@ export function kitStatusToFacility(kit: KitStatusResponse): DataCentreFacility 
   return {
     id: 'omniverse-dsx-datacenter',
     name: 'DSX AI Factory Digital Twin',
-    region: 'CA-QC' as any,
+    region: 'CA-QC',
     description: 'NVIDIA Omniverse-powered live digital twin with DDN storage, 21 racks across 3 rows',
     tier: 3,
     totalCapacityMw: 2.0,

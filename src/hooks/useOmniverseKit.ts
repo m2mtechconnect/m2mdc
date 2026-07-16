@@ -162,19 +162,31 @@ export function useOmniverseKit(): OmniverseKitData {
     validated = outcome.data as unknown as KitStatusResponse;
     connectionState = validated.stage_ready ? 'connected' : 'degraded';
     provenance = validated.stage_ready ? 'live' : 'demo';
-  } else if (outcome.reason === 'disabled') {
-    connectionState = 'disabled';
-    provenance = 'demo';
-    disabledReason = outcome.message;
-  } else if (outcome.reason === 'invalid') {
-    // Schema mismatch — MUST NOT map to live. Fall back to demo scaffolding.
-    connectionState = 'unavailable';
-    provenance = 'demo';
-    validationIssues = outcome.issues;
   } else {
-    connectionState = 'unavailable';
-    provenance = 'unavailable';
-    unavailableReason = outcome.message;
+    // Narrow to the failure union. TS's control-flow narrowing on
+    // discriminated unions inside `else if` chains has been flaky with the
+    // exact `KitFetchOutcome` shape; a single-branch discriminator on
+    // `reason` is the most defensive path.
+    const failure = outcome as Exclude<KitFetchOutcome, { ok: true }>;
+    switch (failure.reason) {
+      case 'disabled':
+        connectionState = 'disabled';
+        provenance = 'demo';
+        disabledReason = failure.message;
+        break;
+      case 'invalid':
+        // Schema mismatch — MUST NOT map to live. Fall back to demo scaffolding.
+        connectionState = 'unavailable';
+        provenance = 'demo';
+        validationIssues = failure.issues;
+        break;
+      case 'unavailable':
+      default:
+        connectionState = 'unavailable';
+        provenance = 'unavailable';
+        unavailableReason = (failure as { message: string }).message;
+        break;
+    }
   }
 
   const metrics = deriveMetrics(validated);

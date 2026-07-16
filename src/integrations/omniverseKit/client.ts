@@ -185,13 +185,13 @@ export async function fetchStatusValidated(
 
   // (3) Validation — a schema-mismatched payload MUST NOT reach the adapter.
   const outcome = validateKitStatus(payload);
-  if (!outcome.ok) {
-    if (outcome.reason === 'invalid') {
-      return { ok: false, reason: 'invalid', issues: outcome.issues };
-    }
-    return { ok: false, reason: 'unavailable', message: outcome.message };
+  if (outcome.ok) {
+    return { ok: true, data: outcome.data, at: new Date() };
   }
-  return { ok: true, data: outcome.data, at: new Date() };
+  if (outcome.reason === 'invalid') {
+    return { ok: false, reason: 'invalid', issues: outcome.issues };
+  }
+  return { ok: false, reason: 'unavailable', message: outcome.message };
 }
 
 export async function fetchSimState(): Promise<KitSimState> {

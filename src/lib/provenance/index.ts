@@ -106,28 +106,12 @@ export function demoMetric<T>(value: T, sourceName = 'demo-fixture', description
 }
 
 /**
- * Build a `simulated` metric — value comes from a scenario estimator
- * (`sovereignDataCenter/simulationEngine` or `enhancedSimulationEngine`).
- * Callers MUST use this for every value that came out of a running scenario
- * so it can never be presented as `live`. `modelVersion` should be the
- * engine identifier or scenario id so the tooltip can attribute the number.
- */
-export function simulatedMetric<T>(
-  value: T,
-  modelVersion: string,
-  sourceTimestamp?: Date | string,
-  description?: string,
-): ProvenancedMetric<T> {
-  return {
-    value,
-    provenance: 'simulated',
-    sourceName: modelVersion,
-    sourceTimestamp: sourceTimestamp
-      ? (typeof sourceTimestamp === 'string' ? sourceTimestamp : sourceTimestamp.toISOString())
-      : undefined,
-    description,
-  };
-}
+// `simulatedMetric<T>` lives in `./kitMetrics` and is re-exported here so
+// there is exactly one canonical implementation in the codebase. Phase
+// 1A.3.b2 collapsed a parallel copy that had drifted from the 5-arg
+// (value, sourceName, modelVersion, derivation?, description?) shape used
+// by every real caller.
+export { simulatedMetric } from './kitMetrics';
 
 /** Static configured target / benchmark. Values here are user/config supplied. */
 export function staticMetric<T>(value: T, sourceName: string, description?: string): ProvenancedMetric<T> {

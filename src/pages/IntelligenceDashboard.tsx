@@ -35,6 +35,7 @@ import KpiCard from '@/components/shared/KpiCard';
 import { KpiCardProvenance } from '@/components/provenance/KpiCardProvenance';
 import { demoMetric } from '@/lib/provenance';
 import { simulatedMetric } from '@/lib/provenance/kitMetrics';
+import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
 import type { ProvenancedMetric } from '@/lib/provenance/types';
 import DataTable, { Column } from '@/components/shared/DataTable';
 import { useBlueprint } from '@/hooks/useBlueprint';

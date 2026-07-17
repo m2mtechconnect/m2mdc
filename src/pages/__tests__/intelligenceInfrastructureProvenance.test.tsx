@@ -14,6 +14,10 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import {
+  INTELLIGENCE_CHART_METRICS,
+  INFRASTRUCTURE_OPERATIONAL_METRICS,
+} from '@/components/data-centre-twin/domains/metricCatalogs';
 
 const intelligenceSrc = readFileSync(
   resolve(__dirname, '../IntelligenceDashboard.tsx'),
@@ -46,6 +50,21 @@ describe('IntelligenceDashboard — chart-array provenance retrofit', () => {
     // spurious `live` classification.
     expect(intelligenceSrc).not.toMatch(/data-provenance="live"/);
   });
+
+  it('chart series attribution names AURA demonstration fixture as the source', () => {
+    // Requirement 1A.3.c.1: if the arrays are local fixtures, label
+    // their source as "AURA demonstration fixture". Uptime Institute
+    // / ASHRAE may appear only as reference context.
+    expect(intelligenceSrc).toMatch(/AURA demonstration fixture/);
+    for (const m of INTELLIGENCE_CHART_METRICS) {
+      expect(m.source).toBe('AURA demonstration fixture');
+    }
+    // Reference material is optional and non-authoritative — surfaced
+    // via the `reference` field, never the `source` field.
+    for (const m of INTELLIGENCE_CHART_METRICS) {
+      expect(m.reference ?? '').not.toBe(m.source);
+    }
+  });
 });
 
 describe('InfrastructurePage — Operational Metrics retrofit', () => {
@@ -67,5 +86,21 @@ describe('InfrastructurePage — Operational Metrics retrofit', () => {
     expect(start).toBeGreaterThan(-1);
     const window = infraSrc.slice(start, start + 4000);
     expect(window).not.toMatch(/data-provenance="live"/);
+  });
+
+  it('operational metrics catalog enumerates 5 metrics with expected provenance mix', () => {
+    // Enumeration test — every id and its classification is asserted.
+    const expected: Record<string, string> = {
+      'infra.training-gpus':  'demo',
+      'infra.inference-gpus': 'demo',
+      'infra.edge-devices':   'demo',
+      'infra.ddn-throughput': 'demo',
+      'infra.twin-freshness': 'unavailable',
+    };
+    expect(INFRASTRUCTURE_OPERATIONAL_METRICS).toHaveLength(5);
+    for (const m of INFRASTRUCTURE_OPERATIONAL_METRICS) {
+      expect(expected[m.id], `unexpected metric id ${m.id}`).toBeDefined();
+      expect(m.provenance).toBe(expected[m.id]);
+    }
   });
 });

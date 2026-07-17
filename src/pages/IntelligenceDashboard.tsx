@@ -39,6 +39,21 @@ import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenance
 import { MetricProvenanceManifest } from '@/components/provenance/MetricProvenanceManifest';
 import { INTELLIGENCE_CHART_METRICS } from '@/components/data-centre-twin/domains/metricCatalogs';
 import type { ProvenancedMetric } from '@/lib/provenance/types';
+import {
+  downloadPayload,
+  openPrintWindow,
+  toExportRecord,
+  EXPORT_SCHEMA_VERSION,
+  type ExportPayload,
+} from '@/lib/provenance/exporters';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import DataTable, { Column } from '@/components/shared/DataTable';
 import { useBlueprint } from '@/hooks/useBlueprint';
 import { useBlueprintScenarios } from '@/hooks/useBlueprintScenarios';
@@ -266,6 +281,84 @@ export default function IntelligenceDashboard() {
     { hour: '20:00', energy: 3150, itLoad: 2520 },  // Evening batch job initiation
   ];
 
+  // ---------- Phase 1A.3.d: build provenance-preserving export payload -------
+  // Fixture-driven chart series must always export as `demo`, no matter what
+  // format a caller picks. `toExportRecord` enforces the invariant.
+  const buildIntelligenceChartsPayload = (): ExportPayload => {
+    const now = new Date().toISOString();
+    const records = [
+      ...pueChartData.map((p, i) =>
+        toExportRecord({
+          catalog: {
+            id: `intelligence.pue-trend.${p.date.toLowerCase()}`,
+            label: `PUE — ${p.date}`,
+            provenance: 'demo',
+            source: 'AURA demonstration fixture',
+            reference: 'Uptime Institute Global DC Survey 2024 (context only)',
+          },
+          metric: {
+            value: p.pue,
+            provenance: 'demo',
+            // Fixture observation stamps are synthetic but stable per-index.
+            sourceTimestamp: new Date(Date.parse('2026-07-13T00:00:00Z') + i * 86400000).toISOString(),
+          },
+          unit: 'ratio',
+        }),
+      ),
+      ...energyVsLoadData.flatMap((p, i) => [
+        toExportRecord({
+          catalog: {
+            id: `intelligence.energy.${p.hour.replace(':', '')}.facility`,
+            label: `Facility power — ${p.hour}`,
+            provenance: 'demo',
+            source: 'AURA demonstration fixture',
+            reference: 'ASHRAE TC 9.9 datacom guidelines (context only)',
+          },
+          metric: {
+            value: p.energy,
+            provenance: 'demo',
+            sourceTimestamp: new Date(Date.parse('2026-07-17T00:00:00Z') + i * 4 * 3600000).toISOString(),
+          },
+          unit: 'kW',
+        }),
+        toExportRecord({
+          catalog: {
+            id: `intelligence.energy.${p.hour.replace(':', '')}.itload`,
+            label: `IT load — ${p.hour}`,
+            provenance: 'demo',
+            source: 'AURA demonstration fixture',
+          },
+          metric: {
+            value: p.itLoad,
+            provenance: 'demo',
+            sourceTimestamp: new Date(Date.parse('2026-07-17T00:00:00Z') + i * 4 * 3600000).toISOString(),
+          },
+          unit: 'kW',
+        }),
+      ]),
+    ];
+    return {
+      schemaVersion: EXPORT_SCHEMA_VERSION,
+      surface: 'intelligence.charts',
+      title: 'Intelligence Dashboard — Chart Series Export',
+      generatedAt: now,
+      note:
+        'All chart series are AURA demonstration fixtures. Uptime Institute / ASHRAE mentions are reference context only — the specific values are not directly traceable to those publications.',
+      records,
+    };
+  };
+
+  const handleExportChartsReport = (format: 'csv' | 'json' | 'print') => {
+    const payload = buildIntelligenceChartsPayload();
+    if (format === 'print') {
+      openPrintWindow(payload);
+      return;
+    }
+    const filename = `aura-intelligence-charts-${payload.generatedAt.replace(/[:.]/g, '-')}.${format}`;
+    downloadPayload(payload, format, filename);
+  };
+  // --------------------------------------------------------------------------
+
   /**
    * GPU Utilization by Zone - Industry Reference
    * Based on NVIDIA DGX SuperPOD deployment guidelines
@@ -327,10 +420,36 @@ export default function IntelligenceDashboard() {
               Blueprint
               <Badge variant="secondary" className="text-[10px]">{totalKpis} KPIs</Badge>
             </Button>
-            <Button className="gap-2">
-              <Download className="h-4 w-4" />
-              Export Report
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  className="gap-2"
+                  data-testid="intelligence-export-trigger"
+                  aria-label="Export chart data with per-metric provenance"
+                >
+                  <Download className="h-4 w-4" />
+                  Export Report
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuLabel>
+                  Provenance-preserving export
+                  <div className="text-[10px] font-normal text-muted-foreground">
+                    Schema v{EXPORT_SCHEMA_VERSION} · every row is classified per-metric.
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => handleExportChartsReport('csv')}>
+                  Download CSV (chart series)
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => handleExportChartsReport('json')}>
+                  Download JSON (schema-versioned)
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => handleExportChartsReport('print')}>
+                  Print / Save as PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 

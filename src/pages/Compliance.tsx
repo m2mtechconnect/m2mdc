@@ -38,6 +38,7 @@ import { useTwinKPIsFromSimulation } from "@/hooks/useTwinKPIsFromSimulation";
 import { KPI_CATALOG, KPIKey } from "@/domain/greenDc/kpiCatalog";
 import { MetricValue } from "@/components/provenance/MetricValue";
 import { notAssessedMetric } from "@/lib/provenance/kitMetrics";
+import { describeExportBlock } from "@/lib/provenance/exporters";
 import { staticMetric, demoMetric } from "@/lib/provenance";
 
 // DC-specific audit timeline
@@ -227,10 +228,26 @@ export default function Compliance() {
                 {twin ? `${twin.name} - ${twin.city}` : t('compliance.subtitle')}
               </p>
             </div>
-            <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" />
-              {t('compliance.exportAuditReport')}
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span tabIndex={0} data-testid="compliance-export-audit-blocked">
+                    <Button
+                      variant="outline"
+                      disabled
+                      aria-disabled="true"
+                      data-export-blocked="sovereignty-not-assessed"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      {t('compliance.exportAuditReport')}
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-sm">
+                  {describeExportBlock('sovereignty-not-assessed')}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
 
           {/* DC-Specific KPIs - Now powered by Sovereignty Engine */}
@@ -495,22 +512,37 @@ export default function Compliance() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Download className="h-4 w-4 mr-2" />
-                    Sovereignty Audit Report
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <Download className="h-4 w-4 mr-2" />
-                    Thermal Safety Summary
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <Download className="h-4 w-4 mr-2" />
-                    Carbon Emissions Report
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <Download className="h-4 w-4 mr-2" />
-                    Power Stability Log
-                  </Button>
+                  <TooltipProvider>
+                    {[
+                      { label: 'Sovereignty Audit Report', reason: 'sovereignty-not-assessed' as const },
+                      { label: 'Thermal Safety Summary', reason: 'no-audited-source' as const },
+                      { label: 'Carbon Emissions Report', reason: 'no-audited-source' as const },
+                      { label: 'Power Stability Log', reason: 'no-audited-source' as const },
+                    ].map((r) => (
+                      <Tooltip key={r.label}>
+                        <TooltipTrigger asChild>
+                          <span tabIndex={0} className="block">
+                            <Button
+                              variant="outline"
+                              className="w-full justify-start"
+                              disabled
+                              aria-disabled="true"
+                              data-export-blocked={r.reason}
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              {r.label}
+                            </Button>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-sm">
+                          {describeExportBlock(r.reason)}
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                    <p className="text-[10px] text-muted-foreground pt-1">
+                      These reports will be enabled in Phase 1B once an audited data source is wired.
+                    </p>
+                  </TooltipProvider>
                 </CardContent>
               </Card>
 

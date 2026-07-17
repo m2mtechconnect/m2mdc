@@ -168,3 +168,61 @@ Revised sizing after answers: ~15 ed (was ~13.25) — chart arrays add ~0.5,
 screenshots +1, InfrastructurePage +0.25.
 
 No source files were modified to produce this document.
+
+## Phase 1A.3.d — Provenance-preserving exports (2026-07-17) — COMPLETE
+
+**Canonical export schema** (`src/lib/provenance/exporters/schema.ts`):
+`ExportRecord` = `{ metricId, metricName, value, unit, provenance,
+source, observedAt, stale, description?, downgradeReason? }`. Wrapped in
+an `ExportPayload` envelope carrying `schemaVersion` (1.0.0),
+`surface`, `title`, `generatedAt`, `note`, `records[]`. Export
+generation time (`generatedAt`) is deliberately separate from metric
+observation time (`observedAt`).
+
+**Fail-closed invariants enforced by `toExportRecord()`:**
+- `unavailable` provenance ⇒ `value: null`, `observedAt: null`.
+- `static` provenance ⇒ `observedAt: null` even if a caller supplies one.
+- Stale `live` / `derived` ⇒ downgraded to `unavailable`,
+  `downgradeReason: 'stale'`.
+- Metric value `null` under any non-static provenance ⇒ downgraded to
+  `unavailable`, `downgradeReason: 'unavailable-input'`.
+- Catalog provenance dominates — a caller-supplied `metric.provenance`
+  cannot upgrade a `demo`/`static` catalog record.
+
+**Serializers**
+- `toCsv()` — RFC-4180 CSV with schema-version comment header, ten
+  explicit provenance columns, CSV injection defense (leading
+  `=`/`+`/`-`/`@`/TAB/CR prefixed with `'`).
+- `toJson()` — schema-versioned (`$schema: aura.export/v1`,
+  `schemaVersion: 1.0.0`).
+- `toPrintHtml()` — self-contained HTML with a provenance badge on
+  **every row** (not only in the footer). Unavailable rows render the
+  literal string "Unavailable". Consumed via `openPrintWindow()` +
+  `window.print()` (browser is the PDF engine — no extra dependency).
+
+**Active-surface inventory (only paths touched)**
+| Surface | Path | Action |
+|---|---|---|
+| Intelligence Dashboard "Export Report" | `src/pages/IntelligenceDashboard.tsx` | Wired to `DropdownMenu` → CSV / JSON / Print. Payload contains 7 PUE-trend + 12 energy-vs-load records, all `demo`. |
+| Compliance main "Export Audit Report" | `src/pages/Compliance.tsx` | **Disabled** with tooltip (`sovereignty-not-assessed`). |
+| Compliance 4 report stubs (Sovereignty / Thermal / Carbon / Power) | `src/pages/Compliance.tsx` | **Disabled** with tooltip (`sovereignty-not-assessed` / `no-audited-source`). |
+| Compliance "Download Blueprint JSON" | `src/pages/Compliance.tsx` | Left as-is — exports the blueprint schema, not KPIs; not in scope. |
+| Simulation result / Sovereign playbook exports | `src/components/simulation/SimulationResultPanel.tsx`, `src/twins/sovereignDataCenter/...` | **Deferred** to 1A.3.d.1 — these are simulation-result exports, not active KPI-surface exports; Playbook is a documented Pilot exclusion. |
+| Blueprint / Builder JSON exports | `src/hooks/useBlueprint.ts`, `src/components/builder/...` | Out of scope — exports configuration, not metrics. |
+
+**Tests (parse the serializer output — not helpers)**
+- `src/lib/provenance/exporters/__tests__/exporters.test.ts` (23):
+  CSV parsed via mini RFC-4180 parser, JSON via `JSON.parse`, print HTML
+  via `DOMParser`. Covers all fail-closed invariants + CSV injection.
+- `src/pages/__tests__/exportWiring.test.ts` (12): asserts Compliance
+  disabled attributes / reasons, Intelligence dropdown wiring, and a
+  round-trip proving a caller-forged "live" claim cannot beat a demo
+  catalog through any of the three serializers.
+
+**Deferred to 1A.3.d.1**: Simulation-result JSON/Markdown exports
+(`SimulationResultPanel`, `SovereignDCSimulationDashboard`) are
+scenario artefacts, not metric-surface exports. They will adopt the
+canonical schema once the simulation KPI catalog is stable.
+
+**Suite result**: 16 files / **212 passed / 0 failed** (was 179).
+`tsgo --noEmit` clean.

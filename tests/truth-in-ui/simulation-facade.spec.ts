@@ -14,7 +14,10 @@
 
 import { test, expect } from './_setup/fixtures';
 
-test.describe('simulation surfaces — no misleading live provenance', () => {
+const FACADE_ON = process.env.AURA_TRUTH_FACADE === 'on';
+const MODE_LABEL = FACADE_ON ? 'facade=on' : 'legacy';
+
+test.describe(`simulation surfaces — no misleading live provenance (${MODE_LABEL})`, () => {
   test('/simulation/preview does not declare data-provenance=live', async ({ page }) => {
     await page.goto('/simulation/preview', { waitUntil: 'domcontentloaded' });
     const liveEls = page.locator('[data-provenance="live"]');
@@ -26,5 +29,17 @@ test.describe('simulation surfaces — no misleading live provenance', () => {
     // Legacy chrome removed in Phase 1A.3.f — regression guard.
     const liveText = page.getByText(/^\s*LIVE\s*$/, { exact: false });
     await expect(liveText).toHaveCount(0);
+  });
+
+  // Phase 1B.2a.1 — parity check across the rollback flag. Both configs
+  // must render an app that boots cleanly and never emits `live`
+  // provenance from simulation chrome. Under facade=on this proves the
+  // migrated code path also holds the truth-in-UI invariant.
+  test(`app boots under ${MODE_LABEL} and simulation preview never fabricates live`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await page.goto('/simulation/preview', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-provenance="live"]')).toHaveCount(0);
+    expect(errors, `no page errors under ${MODE_LABEL}`).toEqual([]);
   });
 });

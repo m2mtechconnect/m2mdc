@@ -54,8 +54,13 @@ describe('printHtml — no raw script or event handlers survive', () => {
     expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
   });
 
-  it('does not emit an onerror= attribute', () => {
-    expect(html).not.toMatch(/\sonerror\s*=/i);
+  it('does not emit an onerror= attribute inside a real HTML tag', () => {
+    // `onerror=` may appear inside escaped text (`&lt;img … onerror=…&gt;`)
+    // — that is harmless because `<` is entity-encoded. The dangerous
+    // form is a real opening tag containing an on-handler. Assert there
+    // is no `<img …>` (raw) and no unescaped tag with an on* handler.
+    expect(html).not.toMatch(/<img\b/i);
+    expect(html).not.toMatch(/<[a-z][^>]*\son\w+\s*=/i);
     expect(html).toContain('&lt;img src=x onerror=alert(1)&gt;');
   });
 

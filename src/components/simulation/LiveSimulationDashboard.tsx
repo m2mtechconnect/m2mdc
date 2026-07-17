@@ -292,13 +292,26 @@ export const LiveSimulationDashboard = memo(function LiveSimulationDashboard({
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.3 }}
+          data-testid="live-simulation-dashboard"
+          data-provenance="simulated"
         >
           <CollapsibleSection
-            title="Live Simulation Dashboard"
-            badge="Active"
+            title="Simulation Dashboard"
+            badge="Simulation"
             defaultOpen={true}
             icon={<Activity className="h-5 w-5 text-success animate-pulse" />}
           >
+            <div className="flex justify-end mb-2">
+              <ProvenanceBadge
+                meta={{
+                  provenance: 'simulated',
+                  source: `sim-dashboard/tick-${currentTime}`,
+                  stale: false,
+                  note: 'Deterministic simulation output — seeded PRNG keyed to current simulation time.',
+                }}
+                compact
+              />
+            </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Thermal Heatmap */}
               <Card className="bg-card border-border">

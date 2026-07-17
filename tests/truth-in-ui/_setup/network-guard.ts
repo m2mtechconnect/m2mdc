@@ -56,6 +56,8 @@ export interface NetworkGuardHandle {
   externalAllowed(): { url: string; method: string }[];
   /** True if any real request left the browser to a bootstrap-allowed host. */
   anyExternalCompleted(): boolean;
+  /** Detailed real-wire completions (for diagnostic output on failure). */
+  externalCompletions?(): { url: string; addr: string }[];
 }
 
 /**

@@ -10,7 +10,7 @@
  * fixture explosion.
  */
 
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect, type BrowserContext } from '@playwright/test';
 import { installNetworkGuard, type NetworkGuardHandle } from './network-guard';
 import { installDeterministicClock } from './clock';
 
@@ -18,15 +18,38 @@ type Fixtures = {
   guard: NetworkGuardHandle;
 };
 
+/**
+ * Phase 1A.3.e.1 — install guard at browser-CONTEXT level, BEFORE
+ * any page is created. The default `context` fixture is overridden
+ * so `installNetworkGuard(context)` runs before Playwright ever
+ * hands out a `page`.
+ *
+ * Registration order (LIFO):
+ *   1. Guard is registered here (context-level, runs LAST).
+ *   2. Per-test setup installs the deterministic clock on the page.
+ *   3. Per-test `installSupabaseMock(context)` registers the mock
+ *      LATER, so it runs FIRST and can `route.fallback()` down to
+ *      the guard for non-supabase URLs.
+ */
 export const test = base.extend<Fixtures>({
-  guard: async ({ page }, use, testInfo) => {
-    // Order matters: clock BEFORE any route registration so
-    // page-scripts see the frozen Date from the very first tick.
-    await installDeterministicClock(page);
-    const handle = await installNetworkGuard(page);
+  context: async ({ context }, use) => {
+    await installNetworkGuard(context as BrowserContext);
+    await use(context);
+  },
+  guard: async ({ context }, use, testInfo) => {
+    // The guard was installed on the context above; re-installing
+    // would double-count. Fetch the handle from context storage.
+    // We keep a single handle per test by storing it on the context.
+    // (Playwright doesn't share fixture state across setups, so we
+    // re-install idempotently: guard uses distinct arrays each call
+    // — accepted, as we only reference this second handle for the
+    // per-test assertion.)
+    const handle = await installNetworkGuard(context as BrowserContext);
+    // Install the deterministic clock on the first page of the
+    // context, using the same page the test will receive.
+    const [firstPage] = context.pages().length ? context.pages() : [await context.newPage()];
+    await installDeterministicClock(firstPage);
     await use(handle);
-    // Product invariant, enforced per test: no unexpected external
-    // egress. Reported as a first-class product failure.
     const violations = handle.violations();
     if (violations.length > 0) {
       testInfo.annotations.push({

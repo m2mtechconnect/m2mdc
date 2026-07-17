@@ -19,6 +19,16 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 
+// Radix ResizeObserver + jsdom shim (project setup wires ResizeObserver as
+// vi.fn() which is not a constructor). Install a minimal constructor.
+class RO {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+// @ts-expect-error – jsdom
+globalThis.ResizeObserver = RO;
+
 // Silence recharts ResizeObserver crash under jsdom (same pattern as
 // kpiProvenance.test.tsx).
 vi.mock('recharts', async () => {

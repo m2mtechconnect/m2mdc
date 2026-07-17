@@ -69,7 +69,9 @@ test.describe('Kit runtime states — /omniverse-scene', () => {
     await page.route('**/kit-api/**', r => r.abort('failed'));
     await open(page);
     await expect(page.getByText(/Kit connected/)).toHaveCount(0);
-    await expect(page.getByText(/Kit unavailable|Kit response invalid/)).toBeVisible();
+    // Both the compact badge AND the disclosure banner announce the
+    // failure — the presence of either is sufficient truth-in-UI.
+    await expect(page.getByText(/Kit unavailable|Kit response invalid/).first()).toBeVisible();
     await assertNoMisleadingLive(page);
     void guard;
   });
@@ -77,7 +79,7 @@ test.describe('Kit runtime states — /omniverse-scene', () => {
   test('3) network unavailable — badge "Kit unavailable", metrics N/A', async ({ page, guard }) => {
     await mockKit(page, 'network-unavailable');
     await open(page);
-    await expect(page.getByText('Kit unavailable')).toBeVisible();
+    await expect(page.getByText('Kit unavailable').first()).toBeVisible();
     await expect(page.getByTestId('metric-pue')).toHaveAttribute('data-provenance', 'unavailable');
     // No fabricated number when unavailable — the card shows "N/A".
     await expect(page.getByTestId('metric-pue')).toContainText('N/A');
@@ -88,7 +90,7 @@ test.describe('Kit runtime states — /omniverse-scene', () => {
   test('4) schema-invalid — badge "Kit response invalid", provenance=demo', async ({ page, guard }) => {
     await mockKit(page, 'schema-invalid');
     await open(page);
-    await expect(page.getByText('Kit response invalid')).toBeVisible();
+    await expect(page.getByText('Kit response invalid').first()).toBeVisible();
     // Per the hook contract: invalid → connectionState=unavailable,
     // provenance=demo (falls back to scaffolding, NEVER live).
     await expect(page.getByTestId('metric-pue')).toHaveAttribute('data-provenance', 'demo');
@@ -97,16 +99,66 @@ test.describe('Kit runtime states — /omniverse-scene', () => {
   });
 
   test('5) stale response — served, but no "Live" claim on stale ticks', async ({ page, guard }) => {
-    // A successful-but-slow response still yields live provenance on
-    // arrival. The stale invariant we assert here is UI-observable:
-    // when the fetch aborts on unmount before completing, no live
-    // badge appears. Full staleness math is covered by
-    // `src/lib/provenance/__tests__/staleness.test.ts`.
-    await mockKit(page, 'stale');
-    await open(page);
-    // Either "Kit connected · validated" or "Connecting…" is
-    // acceptable during the initial tick; misleading Live is not.
+    // Phase 1A.3.e.1: this test doubles as the deliberately-delayed
+    // valid-response guard. We hold the Kit response indefinitely,
+    // navigate, and assert the UI NEVER declares `live` while the
+    // fetch is in flight. The transition-to-live path is covered by
+    // the sibling test "11) delayed valid-response transitions to live".
+    let release: () => void = () => {};
+    const held = new Promise<void>(r => { release = r; });
+    await page.route('**/kit-api/**', async route => {
+      if (!/\/demo\/status(\?|$)/.test(route.request().url())) {
+        return route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
+      }
+      await held;
+      return route.abort('failed'); // request only ever completes on teardown
+    });
+    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByTestId('metric-pue')).toBeVisible();
+    // Give the app a full second — no live badge may appear while the
+    // Kit response has not yet validated.
+    await page.waitForTimeout(1000);
     await assertNoMisleadingLive(page);
+    // Metrics must be `unavailable` (never fabricated) during connect.
+    await expect(page.getByTestId('metric-pue')).toHaveAttribute('data-provenance', 'unavailable');
+    release();
+    void guard;
+  });
+
+  test('11) delayed valid-response — transitions to live only after validation', async ({ page, guard }) => {
+    // Hold the first status call for ~800ms then serve a valid payload.
+    // Prior to release: no `data-provenance="live"` anywhere.
+    // After release: metric-pue upgrades to `live`.
+    let release: () => void = () => {};
+    const held = new Promise<void>(r => { release = r; });
+    let served = false;
+    await page.route('**/kit-api/**', async route => {
+      const url = route.request().url();
+      if (!/\/demo\/status(\?|$)/.test(url)) {
+        return route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
+      }
+      if (!served) {
+        served = true;
+        await held;
+      }
+      // deferred (or subsequent) requests serve the valid live payload.
+      const { VALID_STATUS } = await import('./_setup/kit-mock');
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(VALID_STATUS),
+      });
+    });
+    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByTestId('metric-pue')).toBeVisible();
+    // Pre-release invariant: NEVER live while the response is pending.
+    await expect(page.locator('[data-provenance="live"]')).toHaveCount(0);
+    await expect(page.getByTestId('metric-pue'))
+      .toHaveAttribute('data-provenance', 'unavailable');
+    release();
+    // Post-release invariant: the KPI upgrades to live once validated.
+    await expect(page.getByTestId('metric-pue'))
+      .toHaveAttribute('data-provenance', 'live', { timeout: 8000 });
     void guard;
   });
 

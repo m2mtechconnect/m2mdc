@@ -27,7 +27,7 @@ export type KitMockState =
   | 'baseline'
   | 'running';
 
-const VALID_STATUS = {
+export const VALID_STATUS = {
   ok: true,
   stage_ready: true,
   tick: 42,

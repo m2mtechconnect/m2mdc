@@ -90,6 +90,7 @@ export type StreamBannerReason =
   | 'stream-degraded'
   | 'stream-demo';
 
+// eslint-disable-next-line react-refresh/only-export-components -- Phase 1A.3.g.1: co-exported constant map is imported by consumers; moving it to a separate module would fragment the banner contract. Fast-refresh is not a concern in tests/prod.
 export const STREAM_BANNER_MESSAGES: Record<StreamBannerReason, string> = {
   // Verbatim strings mandated by Phase 1A.1 spec.
   'kit-invalid':       'Kit response invalid — displaying local demonstration data.',

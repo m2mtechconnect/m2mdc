@@ -38,6 +38,7 @@ import { useTwinKPIsFromSimulation } from "@/hooks/useTwinKPIsFromSimulation";
 import { KPI_CATALOG, KPIKey } from "@/domain/greenDc/kpiCatalog";
 import { MetricValue } from "@/components/provenance/MetricValue";
 import { notAssessedMetric } from "@/lib/provenance/kitMetrics";
+import { describeExportBlock } from "@/lib/provenance/exporters";
 import { staticMetric, demoMetric } from "@/lib/provenance";
 
 // DC-specific audit timeline

@@ -10,7 +10,7 @@
  *   expect(guard.violations(), 'no external network egress').toEqual([]);
  */
 
-import type { Page, Request } from '@playwright/test';
+import type { BrowserContext, Request } from '@playwright/test';
 
 /** Schemes we always allow (never leave the browser). */
 const ALLOWED_SCHEMES = new Set(['data:', 'blob:', 'about:', 'chrome:', 'chrome-extension:']);
@@ -54,15 +54,41 @@ export interface NetworkGuardHandle {
   violations(): { url: string; method: string; reason: string }[];
   /** Requests explicitly allow-listed by hostname (for auditing). */
   externalAllowed(): { url: string; method: string }[];
+  /** True if any real request left the browser to a bootstrap-allowed host. */
+  anyExternalCompleted(): boolean;
 }
 
-export async function installNetworkGuard(page: Page): Promise<NetworkGuardHandle> {
+/**
+ * Install the guard at BROWSER-CONTEXT level so it applies to every
+ * page in the context — including any pop-ups or embedded iframes —
+ * and is present before any page-scoped script runs.
+ *
+ * Registration order (per user directive): the guard is registered
+ * FIRST. Playwright resolves routes in reverse registration order,
+ * so any specific mock installed LATER (e.g. Supabase) runs first.
+ * The guard here calls `route.fallback()` for bootstrap-allowed
+ * hosts so those specific mocks can actually handle them; it only
+ * aborts (a) explicitly forbidden hosts, and (b) requests that no
+ * later handler claimed.
+ */
+export async function installNetworkGuard(context: BrowserContext): Promise<NetworkGuardHandle> {
   const violations: { url: string; method: string; reason: string }[] = [];
   const externalAllowed: { url: string; method: string }[] = [];
+  let externalCompleted = false;
+
+  // Track requests that actually finished on the wire (i.e. weren't
+  // aborted by any handler). Any completion to a non-local host is a
+  // hard violation of "no real Supabase request completed".
+  context.on('requestfinished', req => {
+    try {
+      const host = new URL(req.url()).hostname;
+      if (!ALLOWED_HOSTS.has(host)) externalCompleted = true;
+    } catch { /* opaque */ }
+  });
 
   // `**/*` catches http(s), ws, wss. `route.abort()` prevents any
   // real egress even if a match slips through.
-  await page.route('**/*', async route => {
+  await context.route('**/*', async route => {
     const req: Request = route.request();
     const url = req.url();
     let host = '';
@@ -80,9 +106,11 @@ export async function installNetworkGuard(page: Page): Promise<NetworkGuardHandl
 
     const bootstrap = BOOTSTRAP_ALLOWED_SUFFIXES.find(e => host.endsWith(e.host));
     if (bootstrap) {
-      // Blocked at the wire but recorded as allowed for audit.
+      // Delegate to any later-registered specific mock. If no mock
+      // fulfils, Playwright falls back to this handler again with no
+      // more registered routes to try → we abort at the wire.
       externalAllowed.push({ url, method: req.method() });
-      return route.abort('blockedbyclient');
+      return route.fallback();
     }
 
     // Any other external host is also a violation — the truth suite
@@ -94,5 +122,6 @@ export async function installNetworkGuard(page: Page): Promise<NetworkGuardHandl
   return {
     violations: () => violations.slice(),
     externalAllowed: () => externalAllowed.slice(),
+    anyExternalCompleted: () => externalCompleted,
   };
 }

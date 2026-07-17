@@ -44,22 +44,42 @@ import { SovereigntyDomainView } from '../SovereigntyDomainView';
 import { CarbonDomainView } from '../CarbonDomainView';
 import { FinancialDomainView } from '../FinancialDomainView';
 import { ThermalDomainView } from '../ThermalDomainView';
+import {
+  POWER_METRICS,
+  COOLING_METRICS,
+  THERMAL_METRICS,
+  NETWORK_METRICS,
+  FACILITY_METRICS,
+  WORKLOAD_METRICS,
+  SOVEREIGNTY_METRICS,
+  CARBON_METRICS,
+  FINANCIAL_METRICS,
+} from '../metricCatalogs';
+import type { MetricCatalogEntry } from '@/lib/provenance/metricCatalog';
 
-const cases: Array<[string, React.FC<{ facility: typeof facility }>, string]> = [
-  ['thermal-domain-view',     ThermalDomainView,     'demo'],
-  ['power-domain-view',       PowerDomainView,       'demo'],
-  ['cooling-domain-view',     CoolingDomainView,     'demo'],
-  ['network-domain-view',     NetworkDomainView,     'demo'],
-  ['facility-domain-view',    FacilityDomainView,    'demo'],
-  ['workload-domain-view',    WorkloadDomainView,    'demo'],
-  ['sovereignty-domain-view', SovereigntyDomainView, 'unavailable'],
-  ['carbon-domain-view',      CarbonDomainView,      'demo'],
-  ['financial-domain-view',   FinancialDomainView,   'demo'],
+interface DomainCase {
+  testId: string;
+  Comp: React.FC<{ facility: typeof facility }>;
+  rootProvenance: string;
+  domainName: string;
+  metrics: MetricCatalogEntry[];
+}
+
+const cases: DomainCase[] = [
+  { testId: 'thermal-domain-view',     Comp: ThermalDomainView,     rootProvenance: 'demo',        domainName: 'thermal',     metrics: THERMAL_METRICS },
+  { testId: 'power-domain-view',       Comp: PowerDomainView,       rootProvenance: 'demo',        domainName: 'power',       metrics: POWER_METRICS },
+  { testId: 'cooling-domain-view',     Comp: CoolingDomainView,     rootProvenance: 'demo',        domainName: 'cooling',     metrics: COOLING_METRICS },
+  { testId: 'network-domain-view',     Comp: NetworkDomainView,     rootProvenance: 'demo',        domainName: 'network',     metrics: NETWORK_METRICS },
+  { testId: 'facility-domain-view',    Comp: FacilityDomainView,    rootProvenance: 'demo',        domainName: 'facility',    metrics: FACILITY_METRICS },
+  { testId: 'workload-domain-view',    Comp: WorkloadDomainView,    rootProvenance: 'demo',        domainName: 'workload',    metrics: WORKLOAD_METRICS },
+  { testId: 'sovereignty-domain-view', Comp: SovereigntyDomainView, rootProvenance: 'unavailable', domainName: 'sovereignty', metrics: SOVEREIGNTY_METRICS },
+  { testId: 'carbon-domain-view',      Comp: CarbonDomainView,      rootProvenance: 'demo',        domainName: 'carbon',      metrics: CARBON_METRICS },
+  { testId: 'financial-domain-view',   Comp: FinancialDomainView,   rootProvenance: 'demo',        domainName: 'financial',   metrics: FINANCIAL_METRICS },
 ];
 
 describe('Domain views — Phase 1A.3.c provenance retrofit', () => {
-  for (const [testId, Comp, expected] of cases) {
-    it(`${testId} root exposes data-provenance="${expected}" and no "live" descendants`, () => {
+  for (const { testId, Comp, rootProvenance, domainName, metrics } of cases) {
+    it(`${testId} root exposes data-provenance="${rootProvenance}", manifest is present, and no descendant is live`, () => {
       const { container } = render(
         <MemoryRouter>
           <Comp facility={facility} />
@@ -67,15 +87,42 @@ describe('Domain views — Phase 1A.3.c provenance retrofit', () => {
       );
       const root = container.querySelector(`[data-testid="${testId}"]`);
       expect(root).not.toBeNull();
-      expect(root?.getAttribute('data-provenance')).toBe(expected);
-      // No element in the entire subtree may claim live provenance.
+      expect(root?.getAttribute('data-provenance')).toBe(rootProvenance);
+      // No element anywhere in the subtree may claim `live` provenance.
       expect(root?.querySelector('[data-provenance="live"]')).toBeNull();
-      // Header primitive is present exactly once.
       const headers = container.querySelectorAll('[data-testid="domain-provenance-header"]');
       expect(headers.length).toBe(1);
-      // Screen-reader accessible description is present.
+      const manifest = container.querySelector(
+        `[data-testid="metric-provenance-manifest"][data-domain="${domainName}"]`,
+      );
+      expect(manifest).not.toBeNull();
+      expect(manifest?.getAttribute('data-metric-count')).toBe(String(metrics.length));
       const sr = container.querySelector('[aria-live="polite"]');
       expect(sr?.textContent ?? '').toMatch(/measurement|reference|unavailable|Live/i);
+    });
+
+    // Per-metric enumeration: every catalog entry must render with its
+    // exact `data-provenance` value. This is the "enumerate expected
+    // metric IDs and verify each" acceptance criterion.
+    describe(`${testId} — per-metric provenance enumeration`, () => {
+      for (const m of metrics) {
+        it(`renders metric ${m.id} with data-provenance="${m.provenance}"`, () => {
+          const { container } = render(
+            <MemoryRouter>
+              <Comp facility={facility} />
+            </MemoryRouter>,
+          );
+          const el = container.querySelector(
+            `[data-metric-id="${m.id}"]`,
+          ) as HTMLElement | null;
+          expect(el, `metric ${m.id} not rendered`).not.toBeNull();
+          expect(el?.getAttribute('data-provenance')).toBe(m.provenance);
+          expect(el?.getAttribute('data-provenance-source')).toBe(m.source);
+          // Never `live`, even by accident — this is the fail-closed
+          // guarantee at the individual-metric level.
+          expect(el?.getAttribute('data-provenance')).not.toBe('live');
+        });
+      }
     });
   }
 

@@ -34,6 +34,7 @@ import { AnimatedRackHeatmap } from './AnimatedRackHeatmap';
 import { ScenarioContextSidebar } from './ScenarioContextSidebar';
 import { createCustomScenario } from '@/simulation/customScenarioBuilder';
 import { generateSimulationResult, generateRackMetrics } from '@/simulation/generateSimulationResult';
+import { createSimulationFacade } from '@/simulation/api';
 import { DcToolsRow } from '@/components/dc-tools';
 import type { CustomScenarioConfig, SimulationResultSummary, RackMetrics } from '@/simulation/types';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -98,6 +99,26 @@ export const DCSimulationPanel = memo(function DCSimulationPanel({ compact = fal
   const [liveRackMetrics, setLiveRackMetrics] = useState<RackMetrics[]>(baseRacks);
   const runIdRef = useRef<string>('');
   const hasSavedRef = useRef<string>(''); // Track which run has been saved to prevent duplicates
+
+  // Phase 1B.2a — rollback flag for facade migration. Default OFF so the
+  // legacy synchronous code path is used unless the operator opts in.
+  // Enabling the flag routes result generation through the SimulationFacade,
+  // which delegates to the SAME `generateSimulationResult` engine, so
+  // output is byte-equivalent to the legacy path.
+  const useFacade = useMemo(
+    () =>
+      (import.meta as { env?: Record<string, string | undefined> }).env
+        ?.VITE_AURA_SIM_FACADE_DCPANEL === 'on',
+    [],
+  );
+  const facade = useMemo(
+    () => (useFacade ? createSimulationFacade() : null),
+    [useFacade],
+  );
+  // Race guard: increment on each scenario start; only the latest run may
+  // commit a result to state. Prevents an in-flight facade call from
+  // overwriting a newer scenario's result.
+  const runTokenRef = useRef(0);
   
   // Get Blueprint scenarios
   const { blueprint } = useBlueprint(twinId);
@@ -161,18 +182,45 @@ export const DCSimulationPanel = memo(function DCSimulationPanel({ compact = fal
   // Generate result and PERSIST when simulation completes - P0 FIX
   useEffect(() => {
     if (status === 'completed' && activeScenario) {
-      const result = generateSimulationResult(
-        activeScenario,
-        events,
-        baselineKpis,
-        currentKpis,
-        elapsedTime
-      );
+      const token = ++runTokenRef.current;
+      let result: SimulationResultSummary | null = null;
+
+      if (facade) {
+        const outcome = facade.generatePanelResult({
+          scenario: activeScenario,
+          events,
+          baselineKpis,
+          currentKpis,
+          durationSec: elapsedTime,
+        });
+        if (outcome.kind === 'ok') {
+          result = outcome.value;
+        } else {
+          // Fail-closed: do NOT fabricate a summary. Log for diagnostics
+          // and leave `simulationResult` null so the truth-in-UI layer
+          // renders the unavailable state.
+          console.warn(
+            '[DCSimulationPanel] facade generatePanelResult non-ok:',
+            outcome.kind,
+          );
+        }
+      } else {
+        result = generateSimulationResult(
+          activeScenario,
+          events,
+          baselineKpis,
+          currentKpis,
+          elapsedTime,
+        );
+      }
+
+      // Race guard: only commit if this is still the latest run.
+      if (token !== runTokenRef.current) return;
       setSimulationResult(result);
       
       // P0 FIX: Persist simulation run to database
       const runKey = `${activeScenarioId}-${elapsedTime}`;
-      if (activeTwinId && hasSavedRef.current !== runKey) {
+      if (result && activeTwinId && hasSavedRef.current !== runKey) {
         hasSavedRef.current = runKey;
         saveSimulationRun({
           twinId: activeTwinId,
@@ -192,6 +240,9 @@ export const DCSimulationPanel = memo(function DCSimulationPanel({ compact = fal
         });
       }
     } else if (status === 'idle' || status === 'running') {
+      // Bump token so any in-flight facade result from a prior run cannot
+      // land after reset/restart.
+      runTokenRef.current++;
       setSimulationResult(null);
     }
   }, [status, activeScenario, events, baselineKpis, currentKpis, elapsedTime]);

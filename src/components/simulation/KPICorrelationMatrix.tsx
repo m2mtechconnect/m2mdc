@@ -14,6 +14,9 @@ import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import type { KPISnapshot, ScenarioImpactScore } from '@/simulation/types';
 import { calculateCorrelationMatrix, DEFAULT_KPI_CONFIGS } from '@/engines/kpi/KPIOverlayEngine';
+import { seededRng } from '@/lib/provenance/prng';
+import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
+import type { DataProvenance } from '@/lib/provenance/types';
 
 interface KPICorrelationMatrixProps {
   snapshots: KPISnapshot[];
@@ -34,18 +37,27 @@ export function KPICorrelationMatrix({
     return calculateCorrelationMatrix(snapshots, kpiIds);
   }, [snapshots, kpiIds]);
 
-  // Generate mock impact data if not provided
+  // Generate deterministic fixture impact data if none provided.
+  //
+  // Phase 1A.3.b2: previous implementation used `Math.random()` and produced
+  // different impact scores on every render. Fixture values are now derived
+  // from a seeded PRNG keyed to the kpi id set so the correlation card is
+  // reproducible. Impact rows sourced from fixture MUST be presented as
+  // `demo`; caller-supplied `scenarioImpacts` are presented as `simulated`.
+  const usedFallback = scenarioImpacts.length === 0;
   const impacts = useMemo(() => {
     if (scenarioImpacts.length > 0) return scenarioImpacts;
-    
+    const rng = seededRng(`kpi-correlation-impact/${kpiIds.join(',')}`);
     return kpiIds.map(kpiId => ({
       scenarioId: 'current',
       kpiId,
-      impactScore: Math.random() * 200 - 100,
+      impactScore: rng() * 200 - 100,
       impactCategory: 'neutral' as const,
       explanation: `${DEFAULT_KPI_CONFIGS[kpiId].name} impact based on current scenario`,
     }));
   }, [scenarioImpacts, kpiIds]);
+
+  const resolvedProvenance: DataProvenance = usedFallback ? 'demo' : 'simulated';
 
   // Calculate overall impact score
   const overallImpact = useMemo(() => {
@@ -68,24 +80,43 @@ export function KPICorrelationMatrix({
   };
 
   return (
-    <Card className={cn("", className)}>
+    <Card
+      className={cn("", className)}
+      data-testid="kpi-correlation-matrix"
+      data-provenance={resolvedProvenance}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base">
             <GitMerge className="h-4 w-4 text-primary" />
             KPI Correlation & Impact
           </CardTitle>
-          <Badge 
-            variant="outline" 
-            className={cn(
-              "text-xs",
-              overallImpact.category === 'positive' ? 'text-success border-success/30' :
-              overallImpact.category === 'negative' ? 'text-destructive border-destructive/30' :
-              'text-muted-foreground'
-            )}
-          >
-            Impact: {overallImpact.score > 0 ? '+' : ''}{overallImpact.score.toFixed(1)}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <ProvenanceBadge
+              meta={{
+                provenance: resolvedProvenance,
+                source: usedFallback
+                  ? 'kpi-correlation/fixture'
+                  : 'kpi-correlation/scenario-impacts',
+                stale: false,
+                note: usedFallback
+                  ? 'Deterministic fixture — seeded PRNG, not scenario output.'
+                  : 'Impact scores supplied by caller.',
+              }}
+              compact
+            />
+            <Badge
+              variant="outline"
+              className={cn(
+                "text-xs",
+                overallImpact.category === 'positive' ? 'text-success border-success/30' :
+                overallImpact.category === 'negative' ? 'text-destructive border-destructive/30' :
+                'text-muted-foreground'
+              )}
+            >
+              Impact: {overallImpact.score > 0 ? '+' : ''}{overallImpact.score.toFixed(1)}
+            </Badge>
+          </div>
         </div>
       </CardHeader>
 

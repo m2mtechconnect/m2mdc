@@ -106,11 +106,14 @@ export async function installNetworkGuard(context: BrowserContext): Promise<Netw
 
     const bootstrap = BOOTSTRAP_ALLOWED_SUFFIXES.find(e => host.endsWith(e.host));
     if (bootstrap) {
-      // Delegate to any later-registered specific mock. If no mock
-      // fulfils, Playwright falls back to this handler again with no
-      // more registered routes to try → we abort at the wire.
+      // The guard is registered FIRST → runs LAST in Playwright's
+      // LIFO chain. Any specific mock registered later (e.g. the
+      // Supabase mock) has already had its turn and either fulfilled
+      // the request or called `route.fallback()` down to us. As the
+      // terminal safety net, we abort at the wire so nothing ever
+      // leaves the browser to a bootstrap host.
       externalAllowed.push({ url, method: req.method() });
-      return route.fallback();
+      return route.abort('blockedbyclient');
     }
 
     // Any other external host is also a violation — the truth suite

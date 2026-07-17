@@ -138,11 +138,18 @@ approved hard-stop cadence.
 
 ## 6. Open questions carried from the plan
 
-1. Include `IntelligenceDashboard` chart arrays (`pueChartData`,
-   `energyChartData`) in 1A.3.c? Currently **excluded** — awaiting decision.
-2. Screenshot bundle: 12 (spec minimum, current plan) vs one-per-surface
-   (~25)? Currently **12**.
-3. Do you want the exclusion of `InfrastructurePage`, `Pilot`, `Playbook`
-   from 1A.3 confirmed, or should any of them be retrofitted in place?
+**Resolved by user (2026-07-17):**
+
+1. `IntelligenceDashboard` `pueChartData` / `energyChartData` → **included**
+   in 1A.3.c with series-level provenance (`demo` today).
+2. Screenshot bundle → **one-per-surface (~25)** in 1A.3.f. Every
+   retrofitted domain view and sim-chrome component gets its own shot in
+   addition to the nine Kit-state shots on `/omniverse-scene`.
+3. `InfrastructurePage.tsx` → **retrofitted anyway** in 1A.3.c with `demo`
+   provenance, even though the page is a Phase 1B removal candidate. `Pilot`
+   and `Playbook` remain excluded (form / target-only surfaces).
+
+Revised sizing after answers: ~15 ed (was ~13.25) — chart arrays add ~0.5,
+screenshots +1, InfrastructurePage +0.25.
 
 No source files were modified to produce this document.

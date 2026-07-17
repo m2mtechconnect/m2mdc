@@ -105,6 +105,30 @@ export function demoMetric<T>(value: T, sourceName = 'demo-fixture', description
   return { value, provenance: 'demo', sourceName, description };
 }
 
+/**
+ * Build a `simulated` metric — value comes from a scenario estimator
+ * (`sovereignDataCenter/simulationEngine` or `enhancedSimulationEngine`).
+ * Callers MUST use this for every value that came out of a running scenario
+ * so it can never be presented as `live`. `modelVersion` should be the
+ * engine identifier or scenario id so the tooltip can attribute the number.
+ */
+export function simulatedMetric<T>(
+  value: T,
+  modelVersion: string,
+  sourceTimestamp?: Date | string,
+  description?: string,
+): ProvenancedMetric<T> {
+  return {
+    value,
+    provenance: 'simulated',
+    sourceName: modelVersion,
+    sourceTimestamp: sourceTimestamp
+      ? (typeof sourceTimestamp === 'string' ? sourceTimestamp : sourceTimestamp.toISOString())
+      : undefined,
+    description,
+  };
+}
+
 /** Static configured target / benchmark. Values here are user/config supplied. */
 export function staticMetric<T>(value: T, sourceName: string, description?: string): ProvenancedMetric<T> {
   return { value, provenance: 'static', sourceName, description };

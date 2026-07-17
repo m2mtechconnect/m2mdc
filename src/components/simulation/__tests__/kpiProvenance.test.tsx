@@ -4,11 +4,22 @@
  * fixture data, must expose `data-provenance` for e2e assertions, and must
  * be deterministic across renders.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { AnimatedKPIStrip } from '../AnimatedKPIStrip';
 import { MultiKPIOverlay } from '../MultiKPIOverlay';
 import { KPIKey } from '@/domain/greenDc/kpiCatalog';
+
+// recharts' ResponsiveContainer instantiates ResizeObserver which is missing
+// in jsdom. Provide a no-op implementation before any render.
+beforeAll(() => {
+  class RO {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  (globalThis as unknown as { ResizeObserver: typeof RO }).ResizeObserver = RO;
+});
 
 describe('AnimatedKPIStrip provenance', () => {
   const kpis = {

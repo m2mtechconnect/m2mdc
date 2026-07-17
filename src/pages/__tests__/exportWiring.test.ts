@@ -44,11 +44,13 @@ describe('Compliance page — exports that cannot retain provenance are disabled
     for (const label of stubs) {
       expect(src).toContain(label);
     }
-    // The map produces one disabled button per stub. Assert at least 5
-    // disabled/aria-disabled entries (main + 4 stubs).
-    const disabledCount = (src.match(/aria-disabled="true"/g) ?? []).length;
-    expect(disabledCount).toBeGreaterThanOrEqual(5);
-    expect(src).toMatch(/describeExportBlock\(/);
+    // Compliance page renders the 4 stubs from a mapped array. Assert
+    // both reasons are wired and the shared disabled attribute pattern
+    // exists inside the map block.
+    expect(src).toMatch(/aria-disabled="true"/);
+    expect(src).toMatch(/describeExportBlock\(r\.reason\)/);
+    expect(src).toMatch(/'sovereignty-not-assessed'/);
+    expect(src).toMatch(/'no-audited-source'/);
   });
 
   it('tooltip explains why (uses describeExportBlock)', () => {

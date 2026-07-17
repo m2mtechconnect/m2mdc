@@ -594,9 +594,17 @@ export default function IntelligenceDashboard() {
                 }}
               />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
+                <Card data-provenance="demo" data-testid="intelligence-pue-trend-card">
                   <CardHeader>
-                    <CardTitle className="text-base">PUE Trend</CardTitle>
+                    <div className="flex items-center justify-between gap-2">
+                      <CardTitle className="text-base">PUE Trend</CardTitle>
+                      <DomainProvenanceHeader
+                        provenance={pueChartProvenance.provenance}
+                        sourceName={pueChartProvenance.source}
+                        description={pueChartProvenance.note}
+                        ariaContext="PUE Trend chart data provenance"
+                      />
+                    </div>
                     <ChartMeta
                       grain="Facility"
                       window={windowLabel}
@@ -629,9 +637,17 @@ export default function IntelligenceDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card data-provenance="demo" data-testid="intelligence-energy-vs-load-card">
                   <CardHeader>
-                    <CardTitle className="text-base">Power vs IT Load (kW)</CardTitle>
+                    <div className="flex items-center justify-between gap-2">
+                      <CardTitle className="text-base">Power vs IT Load (kW)</CardTitle>
+                      <DomainProvenanceHeader
+                        provenance={energyChartProvenance.provenance}
+                        sourceName={energyChartProvenance.source}
+                        description={energyChartProvenance.note}
+                        ariaContext="Power vs IT Load chart data provenance"
+                      />
+                    </div>
                     <ChartMeta
                       grain="Facility"
                       window="Last 24h"

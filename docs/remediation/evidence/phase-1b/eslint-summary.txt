@@ -1,0 +1,123 @@
+# ESLint summary
+# errors=1331 warnings=136 files_with_violations=421
+
+## By rule (rule,severity,count)
+@typescript-eslint/no-explicit-any	error	1238
+react-hooks/exhaustive-deps	warning	73
+react-refresh/only-export-components	warning	63
+prefer-const	error	31
+no-case-declarations	error	17
+no-useless-escape	error	12
+no-empty	error	7
+@typescript-eslint/no-unsafe-function-type	error	6
+react-hooks/rules-of-hooks	error	4
+@typescript-eslint/no-require-imports	error	3
+@typescript-eslint/ban-ts-comment	error	3
+@typescript-eslint/no-unused-expressions	error	2
+@typescript-eslint/no-empty-object-type	error	2
+no-control-regex	error	2
+(parser)	error	2
+@typescript-eslint/prefer-as-const	error	1
+no-constant-condition	error	1
+
+## By file (top 100)
+40	supabase/functions/copilot-stream/index.ts
+37	src/components/workflow/WorkflowEditor.tsx
+21	supabase/functions/url-recommendations/index.ts
+20	src/lib/digitalTwin/runtime.ts
+18	src/components/builder/step5/SimulationEngine.ts
+18	src/stores/wizardBuilderStore.ts
+17	supabase/functions/copilot-search/index.ts
+16	src/contexts/CoPilotContext.tsx
+16	tests/unit/yvr-template-integrity.test.ts
+15	src/components/search/RecommendationsPanel.tsx
+15	src/lib/builder/templateToBlueprint.ts
+15	src/stores/builderStore.ts
+15	tests/integration/yvr-preview-tabs.test.ts
+14	supabase/functions/url-capture/index.ts
+14	tests/api/workflow-engine.spec.ts
+13	src/components/workflow/EnhancedWorkflowEditor.tsx
+13	src/hooks/useRecommendations.ts
+13	src/lib/builderValidation.ts
+13	src/lib/intake/sessionManager.ts
+13	supabase/functions/workflow-run/index.ts
+13	tests/e2e/regression-navigation.spec.ts
+12	supabase/functions/ai-systems-unified/index.ts
+11	src/components/builder/step5/MockSimulationEngine.ts
+11	src/components/marketplace/TemplateDetailDrawer.tsx
+11	src/hooks/useDocumentAnalysis.ts
+11	src/lib/playbook/playbookGenerator.ts
+11	src/stores/marketplaceStore.ts
+11	supabase/functions/policy-evaluate/index.ts
+11	supabase/functions/url-turbo-capture/index.ts
+11	tests/unit/useBuilderAutosave.test.ts
+10	scripts/__tests__/seoBuildGate.integration.test.ts
+10	src/components/marketplace/TemplateSimulation.tsx
+9	src/components/HeroSearchBar.tsx
+9	src/components/templates/preview/TemplateChatInterface.tsx
+9	src/context/BlueprintViewContext.tsx
+9	src/stores/industryAgentsStore.ts
+9	src/twins/sovereignDataCenter/components/SovereignDCDeploymentChecklist.tsx
+9	supabase/functions/builder-generate-summary/index.ts
+8	src/components/builder/IndustryMarketplaceStep.tsx
+8	src/components/recommendation/UnifiedRecommendationPanel.tsx
+8	src/hooks/useBuilderPrefill.ts
+8	src/lib/apiClient.ts
+8	src/lib/digitalTwin/validators.ts
+8	supabase/functions/policy-validate/index.ts
+8	tests/e2e/digital-twin-rest-api.spec.ts
+8	tests/e2e/performance-budgets.spec.ts
+7	src/components/builder/step5/SimulationDashboard.tsx
+7	src/components/marketplace/DigitalTwinTemplateCard.tsx
+7	src/components/simulation/SimulationFeedback.tsx
+7	src/lib/copilot/contextBuilder.ts
+7	src/lib/digitalTwin/enhancedValidators.ts
+7	supabase/functions/analytics-overview/index.ts
+7	supabase/functions/ops-overview/index.ts
+7	supabase/functions/reco-selftest/index.ts
+6	src/components/CoPilotVoice.tsx
+6	src/components/builder/MCPToolsPlayground.tsx
+6	src/components/builder/step5/KPIChartsPanel.tsx
+6	src/components/builder/steps/Step2Intelligence.tsx
+6	src/components/builder/steps/Step5Deploy.tsx
+6	src/components/templates/StandardizedTemplatePreview.tsx
+6	src/context/TwinOverlayContext.tsx
+6	src/contexts/CoPilotCommandContext.tsx
+6	src/contexts/TwinContext.tsx
+6	src/hooks/useCopilotHistory.ts
+6	src/hooks/useDigitalTwinSync.ts
+6	src/lib/marketplaceNormalizer.ts
+6	src/pages/Deploy.tsx
+6	src/pages/Integrations.tsx
+6	src/stores/builderSelectionStore.ts
+6	src/stores/catalogStore.ts
+6	src/stores/changeLogStore.ts
+6	src/stores/templatesCatalogStore.ts
+6	supabase/functions/analytics-export/index.ts
+6	supabase/functions/green-dc-recommend/index.ts
+5	src/components/aoc/AOCWorkflowGraphAdvanced.tsx
+5	src/components/builder/SystemSummaryCard.tsx
+5	src/components/builder/step5/deploy/ReadinessChecklist.tsx
+5	src/components/dashboard/TemplateLibraryModal.tsx
+5	src/components/shared/StandardFilters.tsx
+5	src/components/templates/blueprint/WorkflowBlock.tsx
+5	src/hooks/useDCScanSessions.ts
+5	src/lib/digitalTwin/api.ts
+5	src/lib/templateLoader.ts
+5	src/lib/templates/unifiedTemplateService.ts
+5	src/pages/AgentWorkspace.tsx
+5	src/pages/Builder.tsx
+5	src/pages/Teams.tsx
+5	supabase/functions/_shared/handler.ts
+5	supabase/functions/arcade-servers/index.ts
+5	supabase/functions/digital-twin-event/index.ts
+5	supabase/functions/manual-recommendations/index.ts
+5	supabase/functions/ops-systems/index.ts
+5	supabase/functions/recommendations-generate/index.ts
+5	supabase/functions/url-crawl/index.ts
+5	tests/integration/yvr-template-integration.test.ts
+5	tests/unit/blueprint-helpers.test.ts
+4	src/components/search/SearchResultsPanel.tsx
+4	src/components/simulation/EnhancedKPIChartsPanel.tsx
+4	src/components/templates/deploy/DeploymentReadinessChecklist.tsx
+4	src/components/twin-visualization/hooks/useTwinVisualizationData.ts

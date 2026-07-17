@@ -1,0 +1,307 @@
+# Vitest failures manifest
+# total pass=907 fail=236 skip=103 suites=197
+
+
+## tests/unit/yvr-template-integrity.test.ts  (52)
+- YVR Template Backend Integrity > Template Existence > should exist in agent_templates table
+- YVR Template Backend Integrity > Template Existence > should have correct id and slug
+- YVR Template Backend Integrity > Template Existence > should have correct name
+- YVR Template Backend Integrity > Template Existence > should be in Aviation & Transportation category
+- YVR Template Backend Integrity > Core Metadata > should be certified
+- YVR Template Backend Integrity > Core Metadata > should have high rating
+- YVR Template Backend Integrity > Core Metadata > should have substantial downloads
+- YVR Template Backend Integrity > Core Metadata > should have positive ROI
+- YVR Template Backend Integrity > Core Metadata > should have relevant tags
+- YVR Template Backend Integrity > Default Configuration > should have complete default_config object
+- YVR Template Backend Integrity > Default Configuration > should have industry and department arrays
+- YVR Template Backend Integrity > Default Configuration > should have AI model configuration
+- YVR Template Backend Integrity > Default Configuration > should have system prompt
+- YVR Template Backend Integrity > Default Configuration > should have RAG configuration
+- YVR Template Backend Integrity > Preview Sections > should have preview_sections object
+- YVR Template Backend Integrity > Preview Sections > should have overview section
+- YVR Template Backend Integrity > Preview Sections > should have preview_capabilities section
+- YVR Template Backend Integrity > Preview Sections > should have day_in_the_life section with roles
+- YVR Template Backend Integrity > Preview Sections > should have scenarios section
+- YVR Template Backend Integrity > KPI Block > should have kpi_block object
+- YVR Template Backend Integrity > KPI Block > should have headline
+- YVR Template Backend Integrity > KPI Block > should have at least 4 KPIs
+- YVR Template Backend Integrity > KPI Block > should have well-formed KPI objects
+- YVR Template Backend Integrity > ROI Block > should have roi_block object
+- YVR Template Backend Integrity > ROI Block > should have headline
+- YVR Template Backend Integrity > ROI Block > should have benefits array
+- YVR Template Backend Integrity > ROI Block > should have example impact estimates
+- YVR Template Backend Integrity > ROI Block > should have total estimated annual ROI
+- YVR Template Backend Integrity > Workflows > should have workflows array
+- YVR Template Backend Integrity > Workflows > should have delay prediction workflow
+- YVR Template Backend Integrity > Workflows > should have baggage optimization workflow
+- YVR Template Backend Integrity > Workflows > should have passenger flow workflow
+- YVR Template Backend Integrity > Blueprint JSON > should have blueprint_json object
+- YVR Template Backend Integrity > Blueprint JSON > should have agents array
+- YVR Template Backend Integrity > Blueprint JSON > should have data_sources array
+- YVR Template Backend Integrity > Blueprint JSON > should have integrations array
+- YVR Template Backend Integrity > Blueprint JSON > should have workflow_steps array
+- YVR Template Backend Integrity > Blueprint JSON > should have human_approval_points
+- YVR Template Backend Integrity > Blueprint JSON > should have kpis
+- YVR Template Backend Integrity > Cloud Metadata > should have cloud_metadata object
+- YVR Template Backend Integrity > Cloud Metadata > should have AWS configuration
+- YVR Template Backend Integrity > Cloud Metadata > should have Azure configuration
+- YVR Template Backend Integrity > Cloud Metadata > should have GCP configuration
+- YVR Template Backend Integrity > Cloud Metadata > should have cost estimates for all clouds
+- YVR Template Backend Integrity > Cloud Metadata > should have learn more links
+- YVR Template Backend Integrity > Sample Prompts > should have sample prompts array
+- YVR Template Backend Integrity > Sample Prompts > should have aviation-specific prompts
+- YVR Template Backend Integrity > Recommended Models > should have recommended models array
+- YVR Template Backend Integrity > Recommended Models > should include Gemini models
+- YVR Template Backend Integrity > Schema Validation > should pass schema validation
+- YVR Template Backend Integrity > Uniqueness > should be the only template with this ID
+- YVR Template Backend Integrity > Uniqueness > should be the only template with this slug
+
+## tests/integration/yvr-intake-flows.test.ts  (30)
+- YVR Template Intake Recommendations > URL Scanner Intake > should recommend YVR for airport URLs
+- YVR Template Intake Recommendations > URL Scanner Intake > should recommend YVR for aviation keywords
+- YVR Template Intake Recommendations > URL Scanner Intake > should recommend YVR for airline content
+- YVR Template Intake Recommendations > URL Scanner Intake > should recommend YVR for transportation hubs
+- YVR Template Intake Recommendations > Document Upload Intake > should recommend YVR for airport operation docs
+- YVR Template Intake Recommendations > Document Upload Intake > should recommend YVR for aviation safety docs
+- YVR Template Intake Recommendations > Document Upload Intake > should recommend YVR for ground operations docs
+- YVR Template Intake Recommendations > Questionnaire Intake > should recommend YVR for aviation industry
+- YVR Template Intake Recommendations > Questionnaire Intake > should recommend YVR for airport industry
+- YVR Template Intake Recommendations > Questionnaire Intake > should recommend YVR for transportation industry with complexity
+- YVR Template Intake Recommendations > Questionnaire Intake > should recommend YVR for passenger-related use cases
+- YVR Template Intake Recommendations > Questionnaire Intake > should recommend YVR for baggage use cases
+- YVR Template Intake Recommendations > Recommendation Quality > should provide reasons for recommendations
+- YVR Template Intake Recommendations > Recommendation Quality > should have confidence scores
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: airport
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: aviation
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: flight
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: airline
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: runway
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: terminal
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: passenger
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: baggage
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: gate
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: aircraft
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: departure
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: arrival
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: security screening
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: ground operations
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: cargo
+- YVR Template Intake Recommendations > Keyword Detection Accuracy > should detect aviation keyword: customs
+
+## tests/integration/industryDepartmentPipeline.test.ts  (13)
+- Full Pipeline - Industry + Department Classification → Twin Generation > Pipeline for walmart.com > should correctly classify industry
+- Full Pipeline - Industry + Department Classification → Twin Generation > Pipeline for walmart.com > should generate context profile
+- Full Pipeline - Industry + Department Classification → Twin Generation > Pipeline for pfizer.com > should generate context profile
+- Full Pipeline - Industry + Department Classification → Twin Generation > Pipeline for sap.com > should generate context profile
+- Full Pipeline - Industry + Department Classification → Twin Generation > Pipeline for verizon.com > should correctly classify department
+- Full Pipeline - Industry + Department Classification → Twin Generation > Pipeline for verizon.com > should generate context profile
+- Full Pipeline - Industry + Department Classification → Twin Generation > Pipeline for td.com > should generate context profile
+- Full Pipeline - Filtering and Ranking > should respect industry-specific rules for Pharma Compliance
+- Full Pipeline - Cross-Industry Coverage > should have valid twin templates for Enterprise Retail + Global Supply Chain
+- Full Pipeline - Cross-Industry Coverage > should have valid twin templates for Pharmaceuticals & Life Sciences
+- Full Pipeline - Cross-Industry Coverage > should have valid twin templates for Financial Services / Banking
+- Full Pipeline - Cross-Industry Coverage > should have valid twin templates for Manufacturing – Automotive
+- Full Pipeline - Cross-Industry Coverage > should have valid twin templates for Software / Enterprise SaaS
+
+## tests/integration/builder-with-seeds.test.ts  (12)
+- Builder Flow with Seed Helpers > Quick Seed Scenarios > should load pre-seeded system data
+- Builder Flow with Seed Helpers > Quick Seed Scenarios > should handle multiple system states
+- Builder Flow with Seed Helpers > Quick Seed Scenarios > should load connected integrations
+- Builder Flow with Seed Helpers > Quick Seed Scenarios > should complete builder flow scenario
+- Builder Flow with Seed Helpers > Full Environment Seeding > should create complete test environment
+- Builder Flow with Seed Helpers > Full Environment Seeding > should handle custom seed configuration
+- Builder Flow with Seed Helpers > Test Data Factory > should generate realistic agent configs
+- Builder Flow with Seed Helpers > Test Data Factory > should generate realistic runs
+- Builder Flow with Seed Helpers > Builder Store Integration with Seeds > should load seeded system into builder store
+- Builder Flow with Seed Helpers > Builder Store Integration with Seeds > should update seeded system
+- Builder Flow with Seed Helpers > Performance with Large Datasets > should handle large number of runs efficiently
+- Builder Flow with Seed Helpers > Performance with Large Datasets > should handle multiple systems with workflows
+
+## tests/integration/yvr-template-integration.test.ts  (11)
+- YVR Template Integration > should load YVR template from database
+- YVR Template Integration > should have complete template structure
+- YVR Template Integration > should have 4 workflows defined
+- YVR Template Integration > should have Day in the Life with 3 roles
+- YVR Template Integration > should have cloud metadata for all 3 providers
+- YVR Template Integration > should convert YVR template to blueprint
+- YVR Template Integration > should extract workflow actions from YVR template
+- YVR Template Integration > should handle multiple industries and departments
+- YVR Template Integration > should extract KPIs correctly
+- YVR Template Integration > should extract ROI information
+- YVR Template Integration > should extract scenarios
+
+## tests/rbac/rbac-permissions.test.ts  (10)
+- AOC RBAC Permissions > Role Hierarchy > should correctly identify admin role
+- AOC RBAC Permissions > Role Hierarchy > should correctly identify operator role
+- AOC RBAC Permissions > Role Hierarchy > should correctly identify viewer role
+- AOC RBAC Permissions > Agent Access Permissions > owner should have full access to their agent
+- AOC RBAC Permissions > Agent Access Permissions > global admin should have access to all agents
+- AOC RBAC Permissions > Agent Access Permissions > operator should have operate permission but not admin
+- AOC RBAC Permissions > Agent Access Permissions > viewer should have view permission only
+- AOC RBAC Permissions > RLS Enforcement > should allow owner to access their agent data
+- AOC RBAC Permissions > Scope-Based Access > should respect agent-scoped permissions
+- AOC RBAC Permissions > Scope-Based Access > should deny access to agents outside scope
+
+## tests/integration/analytics-with-seeds.test.ts  (9)
+- Analytics with Realistic Seed Data > Dashboard Analytics > should calculate metrics from seeded data
+- Analytics with Realistic Seed Data > Dashboard Analytics > should handle time-based queries
+- Analytics with Realistic Seed Data > System Health Monitoring > should track error rates from runs
+- Analytics with Realistic Seed Data > System Health Monitoring > should identify slow-performing systems
+- Analytics with Realistic Seed Data > Integration Health > should track integration usage
+- Analytics with Realistic Seed Data > Data Quality Validation > should validate seeded run data integrity
+- Analytics with Realistic Seed Data > Data Quality Validation > should validate workflow data completeness
+- Analytics with Realistic Seed Data > Stress Testing with Large Datasets > should handle querying large result sets
+- Analytics with Realistic Seed Data > Stress Testing with Large Datasets > should handle complex aggregation queries
+
+## tests/unit/builderValidation.test.ts  (9)
+- Builder Validation > Step 1 Validation > should fail with empty system name
+- Builder Validation > Step 1 Validation > should fail with short outcome
+- Builder Validation > Step 1 Validation > should fail with empty success metric
+- Builder Validation > Step 3 Validation > should fail when template requires grounding but no sources
+- Builder Validation > Step 4 Validation > should fail without model selected
+- Builder Validation > Step 4 Validation > should fail without system prompt
+- Builder Validation > Step 4 Validation > should fail with invalid temperature
+- Builder Validation > Step 4 Validation > should fail with invalid topK
+- Builder Validation > Step 4 Validation > should fail with invalid topN
+
+## tests/unit/industryClassifier.test.ts  (9)
+- Industry Classifier - Top 20 Industries > should classify walmart.com as Enterprise Retail + Global Supply Chain
+- Industry Classifier - Top 20 Industries > should classify costco.com as Grocery & Food Retail
+- Industry Classifier - Top 20 Industries > should classify clevelandclinic.org as Healthcare / Hospitals
+- Industry Classifier - Top 20 Industries > should classify manulife.com as Insurance
+- Industry Classifier - Top 20 Industries > should classify coursera.org as Education / EdTech
+- Industry Classifier - Top 20 Industries > should classify canada.ca as Government / Public Sector
+- Industry Classifier - Top 20 Industries > should always return exactly one of the 20 valid industries
+- Industry Classifier - Top 20 Industries > should handle domain variations (www, https, paths)
+- Industry Classifier - Content-Based Classification > should classify based on content when domain is ambiguous
+
+## tests/integration/integrations.test.ts  (8)
+- Integrations API > should list available integrations
+- Integrations API > should connect a new integration
+- Integrations API > should test integration connection
+- Integrations API > should disconnect integration
+- Integrations API > should handle Zapier webhook setup
+- Integrations API > should update integration settings
+- Integrations API > should handle OAuth callback flow
+- Integrations API > should track last sync time
+
+## tests/integration/template-url-loading.test.ts  (8)
+- Template URL Loading Integration > should detect templateId in URL and load from JSON
+- Template URL Loading Integration > should fall back to database if template not in JSON
+- Template URL Loading Integration > should handle missing template gracefully
+- Template URL Loading Integration > should prioritize blueprint over templateId
+- Template URL Loading Integration > should convert template to builder state correctly
+- Template URL Loading Integration > should set correct currentStep based on step param
+- Template URL Loading Integration > should load all available templates from JSON
+- Template URL Loading Integration > should handle concurrent templateId loads
+
+## tests/unit/twinTemplateValidation.test.ts  (7)
+- Digital Twin Template Validation - Required Elements > should require digital twin mention or operational process
+- Digital Twin Template Validation - Required Elements > should require data sources or systems integration
+- Digital Twin Template Validation - Required Elements > should require events or KPIs
+- Digital Twin Template Validation - Industry Rules > should reject CX personalization for Enterprise Retail
+- Digital Twin Template Validation - Industry Rules > should enforce industry-specific allowed types
+- Digital Twin Template Validation - Scoring Components > should score integration depth correctly
+- Digital Twin Template Validation - Scoring Components > should apply generic penalty for vague phrasing
+
+## tests/integration/analytics.test.ts  (6)
+- Analytics API Integration > should fetch ROI metrics
+- Analytics API Integration > should fetch time saved metrics
+- Analytics API Integration > should fetch compliance accuracy
+- Analytics API Integration > should fetch agents deployed count
+- Analytics API Integration > should query agent runs with filters
+- Analytics API Integration > should export analytics data
+
+## tests/unit/blueprint-converters.test.ts  (6)
+- questionnaireToBlueprint > should generate appropriate system prompts
+- templateToBlueprint > should convert inventory optimization template to blueprint
+- templateToBlueprint > should convert customer support template to blueprint
+- templateToBlueprint > should detect model provider from model name
+- templateToBlueprint > should preserve all template metadata
+- templateToBlueprint > should handle JSON file schema with nested blueprint object
+
+## tests/unit/useBuilderAutosave.test.ts  (6)
+- useBuilderAutosave > should autosave after 500ms debounce when isDirty and has systemName
+- useBuilderAutosave > should autosave after 500ms debounce when isDirty and has department
+- useBuilderAutosave > should debounce rapid changes
+- useBuilderAutosave > should show error toast only once on autosave failure
+- useBuilderAutosave > should handle non-Error exceptions in autosave
+- useBuilderAutosave > should reset error flag on successful save after failure
+
+## tests/digitalTwinRuntime.test.ts  (5)
+- Digital Twin Runtime > should execute a simple twin workflow
+- Digital Twin Runtime > should capture errors and return failed status
+- Digital Twin Runtime > should handle human approval nodes
+- Digital Twin Runtime > should validate that logs contain timestamps and node IDs
+- Digital Twin Runtime > should handle rule-based decisions
+
+## tests/unit/builderStore.test.ts  (5)
+- Builder Store > Current Step Management > should clamp step to valid range
+- Builder Store > Save Operation > should set saving state during save
+- Builder Store > Save Operation > should update lastSaved after successful save
+- Builder Store > Save Operation > should clear dirty state after successful save
+- Builder Store > Load Operation > should load system state from database
+
+## tests/unit/unified-store.test.ts  (5)
+- UnifiedStore > Filter Management > should update filters without mutation
+- UnifiedStore > Filter Management > should preserve filters across updates
+- UnifiedStore > Filter Parity (Marketplace ↔ Builder) > should maintain same filters for templates
+- UnifiedStore > Filter Parity (Marketplace ↔ Builder) > should maintain same filters for industry apps
+- UnifiedStore > Filter Parity (Marketplace ↔ Builder) > should maintain same filters for MCP servers
+
+## tests/unit/useBuilderHistory.test.ts  (4)
+- useBuilderHistory > should add entry to history
+- useBuilderHistory > should limit history to 50 entries
+- useBuilderHistory > should remove future history when adding entry in middle
+- useBuilderHistory > should maintain correct canUndo and canRedo state
+
+## tests/simulationEngine.test.ts  (3)
+- Simulation State Validation > should fail when twinId is missing for running simulation
+- Simulation State Validation > should fail when scenarioId is missing for running simulation
+- Simulation State Validation > should pass for idle status without twinId
+
+## src/lib/utils/normalizeCompanyName.test.ts  (3)
+- normalizeCompanyName > should convert hyphens to spaces and capitalize
+- extractCompanyNameFromUrl > should handle malformed URLs gracefully
+- sanitizeTwinName > should fix malformed twin names
+
+## tests/integration/builder.test.ts  (2)
+- Builder API Integration > should create workflow for system
+- Builder API Integration > should validate system before deployment
+
+## src/lib/__tests__/simulationTemplates.test.ts  (2)
+- simulationTemplates > SIMULATION_TEMPLATES > each template should have required fields
+- simulationTemplates > getSimulationTemplateForIndustry > should handle loose matching for common variations
+
+## tests/integration/intake-blueprint-flow.test.ts  (1)
+- Blueprint Store Integration > should store and retrieve template blueprint
+
+## tests/integration/operations.test.ts  (1)
+- Operations Monitor API > should fetch operations overview
+
+## tests/integration/template-to-builder.test.ts  (1)
+- Template to Builder Integration > should clear previous blueprint data when loading new template
+
+## tests/performance/load.test.ts  (1)
+- Performance Tests > should debounce search input efficiently
+
+## tests/rbac/rbac-audit.test.ts  (1)
+- RBAC Regression Tests > should not have conflicting RLS policies
+
+## tests/unit/builder-navigation.test.ts  (1)
+- Builder Navigation > should not exceed step boundaries
+
+## tests/unit/digitalTwinValidators.test.ts  (1)
+- Digital Twin Validators > isOperationallyRelevant > should require operational focus for retail
+
+## tests/unit/open-builder-with-template.test.ts  (1)
+- openBuilderWithTemplate > should map all template fields to blueprint
+
+## tests/unit/recommendationEngine.test.ts  (1)
+- Recommendation Engine - Scoring > should apply correct weight distribution for enterprise retail
+
+## tests/unit/url-turbo-capture-config.test.ts  (1)
+- URL Turbo Capture - Configuration Audit > should verify cache hit optimization logic
+
+## src/lib/__tests__/twinNameMigration.test.ts  (1)
+- twinNameMigration > migrateTwinBuilderState > migrates broken state using sourceRecommendation url

@@ -1,0 +1,39 @@
+tests/truth-in-ui/auth-surfaces.spec.ts	78	  test('/dashboard renders with mocked session and no live provenance', async ({ page, guard }) => {
+tests/truth-in-ui/auth-surfaces.spec.ts	84	  test('/intelligence exposes active export controls and no live provenance', async ({ page, guard }) => {
+tests/truth-in-ui/auth-surfaces.spec.ts	95	  test('/compliance exposes DISABLED audit-export control with reason', async ({ page, guard }) => {
+tests/truth-in-ui/auth-surfaces.spec.ts	109	  test('/infrastructure renders provenance manifest and no live provenance', async ({ page, guard }) => {
+tests/truth-in-ui/auth-surfaces.spec.ts	121	  test('data-centre-twin ?demo=true — no live provenance on retrofitted domains', async ({ context, page, guard }) => {
+tests/truth-in-ui/manifest-a11y.spec.ts	21	  test('manifest on the sovereignty domain view is keyboard-openable and lists rows', async ({ page, guard }) => {
+tests/truth-in-ui/manifest-a11y.spec.ts	46	  test('every KPI card on /omniverse-scene has accessible provenance disclosure', async ({ page, guard }) => {
+tests/truth-in-ui/runtime-states.spec.ts	48	  test('1) validated live — connected badge, per-metric provenance=live', async ({ page, guard }) => {
+tests/truth-in-ui/runtime-states.spec.ts	60	  test('2) Kit disabled — no fetch happens, badge says "Kit disabled"', async ({ page, guard }) => {
+tests/truth-in-ui/runtime-states.spec.ts	79	  test('3) network unavailable — badge "Kit unavailable", metrics N/A', async ({ page, guard }) => {
+tests/truth-in-ui/runtime-states.spec.ts	90	  test('4) schema-invalid — badge "Kit response invalid", provenance=demo', async ({ page, guard }) => {
+tests/truth-in-ui/runtime-states.spec.ts	101	  test('5) stale response — served, but no "Live" claim on stale ticks', async ({ page, guard }) => {
+tests/truth-in-ui/runtime-states.spec.ts	128	  test('11) delayed valid-response — transitions to live only after validation', async ({ page, guard }) => {
+tests/truth-in-ui/runtime-states.spec.ts	165	  test('6) demo fallback — non-live cards, target still static', async ({ page, guard }) => {
+tests/truth-in-ui/runtime-states.spec.ts	177	  test('7) simulation running — phase badge exposes the running phase', async ({ page, guard }) => {
+tests/truth-in-ui/runtime-states.spec.ts	185	  test('8) simulation baseline — steady phase, no anomaly copy in header', async ({ page, guard }) => {
+tests/truth-in-ui/runtime-states.spec.ts	192	  test('9) static target — target PUE card always carries data-provenance="static"', async ({ page, guard }) => {
+tests/truth-in-ui/runtime-states.spec.ts	204	  test('10) unavailable/not-assessed — sovereignty never fabricates a value', async ({ page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	62	  test('01 connecting (delayed response, unavailable)', async ({ page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	79	  test('02 validated live', async ({ page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	87	  test('03 kit disabled (aborted before validation)', async ({ page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	95	  test('04 network unavailable', async ({ page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	103	  test('05 schema invalid (demo fallback)', async ({ page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	111	  test('06 stale (held response, no live claim)', async ({ page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	128	  test('07 demo fallback (invalid → demo, sovereignty=Not assessed)', async ({ page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	136	  test('08 simulation running (anomaly phase)', async ({ page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	144	  test('09 simulation baseline (steady phase)', async ({ page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	152	  test('10 static target (target PUE card)', async ({ page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	162	  test('11 unavailable / not assessed (sovereignty)', async ({ page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	177	  test('12 dashboard (mocked session)', async ({ context, page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	200	  test('13 intelligence (charts + export trigger visible)', async ({ context, page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	209	  test('14 intelligence export menu open', async ({ context, page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	223	  test('15 intelligence PUE chart (scrolled)', async ({ context, page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	234	  test('16 intelligence energy chart (scrolled further)', async ({ context, page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	244	  test('17 compliance blocked export with reason', async ({ context, page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	255	  test('18 infrastructure operational metrics (demo)', async ({ context, page, guard }) => {
+tests/truth-in-ui/screenshots.spec.ts	284	    test(`${d.file}`, async ({ page, guard }) => {
+tests/truth-in-ui/surface-inventory.spec.ts	39	  test('landing page renders no fabricated live provenance', async ({ page, guard }) => {
+tests/truth-in-ui/surface-inventory.spec.ts	47	  test('data-centre-twin demo mode exposes 9 domain views with correct provenance', async ({ page, guard }) => {

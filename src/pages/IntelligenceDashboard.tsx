@@ -342,10 +342,36 @@ export default function IntelligenceDashboard() {
               Blueprint
               <Badge variant="secondary" className="text-[10px]">{totalKpis} KPIs</Badge>
             </Button>
-            <Button className="gap-2">
-              <Download className="h-4 w-4" />
-              Export Report
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  className="gap-2"
+                  data-testid="intelligence-export-trigger"
+                  aria-label="Export chart data with per-metric provenance"
+                >
+                  <Download className="h-4 w-4" />
+                  Export Report
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuLabel>
+                  Provenance-preserving export
+                  <div className="text-[10px] font-normal text-muted-foreground">
+                    Schema v{EXPORT_SCHEMA_VERSION} · every row is classified per-metric.
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => handleExportChartsReport('csv')}>
+                  Download CSV (chart series)
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => handleExportChartsReport('json')}>
+                  Download JSON (schema-versioned)
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => handleExportChartsReport('print')}>
+                  Print / Save as PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 

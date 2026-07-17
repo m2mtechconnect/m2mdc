@@ -13,6 +13,7 @@ the next slice is authorized.
 | **1B.0** | Baseline anchor + design (this doc) | complete | n/a — docs only |
 | **1B.1** | Provider contract + fail-closed facade (no consumer migration) | complete | delete `src/simulation/{api.ts,providers/**}` |
 | **1B.2a** | First consumer vertical slice — `DCSimulationPanel` behind `VITE_AURA_SIM_FACADE_DCPANEL` (default OFF); unknown-config → typed unavailable | complete | unset flag; revert `DCSimulationPanel`, `api.ts`, `registry.ts` deltas |
+| **1B.2b** | Extend facade migration to remaining simulation consumers | **closed — docs-only (1B.2b-null)**; see `phase-1b2b-finding.md` | n/a |
 | **1B.2** | Characterization tests for the 7 simulation engines | 1–2 turns | delete new test files |
 | **1B.3** | Introduce `src/simulation/api.ts` facade + provider interface (no consumer migration) | 1 turn | delete new files |
 | **1B.4** | Codemod: consumers of `SimulationEngine` → `api.ts`; `compat/*` re-exports for `twins/**` | 1–2 turns | revert codemod commit |

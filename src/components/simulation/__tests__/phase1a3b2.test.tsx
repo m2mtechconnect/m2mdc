@@ -55,7 +55,13 @@ describe('EnhancedKPIChartsPanel (Phase 1A.3.b2)', () => {
       <EnhancedKPIChartsPanel data={[]} isRunning industry="data-centre" />,
     );
     expect(screen.getByText('Simulation Metrics')).toBeInTheDocument();
-    expect(screen.queryByText('Live')).toBeNull();
+    // The legacy pulsing "Live" pill previously rendered as a bare
+    // <span>Live</span>. Assert it is gone by looking for that exact node
+    // shape, not any substring occurrence.
+    const liveSpans = Array.from(document.querySelectorAll('span')).filter(
+      (n) => n.textContent?.trim() === 'Live',
+    );
+    expect(liveSpans.length).toBe(0);
   });
 
   it('exposes provenance="simulated" at the root when a run is active', () => {

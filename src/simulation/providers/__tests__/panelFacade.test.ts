@@ -80,8 +80,7 @@ describe('facade.generatePanelResult — engine delegation', () => {
     const outcome = facade.generatePanelResult({
       scenario: null,
       events: [],
-      // @ts-expect-error intentionally invalid
-      baselineKpis: null,
+      baselineKpis: null as unknown as Record<string, number>,
       currentKpis: current,
       durationSec: 60,
     });

@@ -80,3 +80,14 @@ The following Phase 1 items depend on **no** external blocker above and can proc
 **Explicitly out of scope for Phase 1:** telemetry ingest, OpenUSD registry, Kit farm, DSX integration, edge gateway, compliance-evidence store, agent write actions. Those depend on the blockers above.
 
 **Await approval before starting.**
+
+---
+
+## Phase 1A.3.g addendum — unresolved findings (2026-07-17)
+
+| # | Finding | Owner | Phase | Acceptance |
+|---|---|---|---|---|
+| A | Public-route third-party egress (Supabase session probe, Google Fonts, GCS favicon, three.js example HDR, Microsoft Clarity, Bing beacon, Lovable badge) fires from the client bundle on unauthenticated pages. Aborted at the wire in the truth harness (`tests/truth-in-ui/_setup/network-guard.ts` `BOOTSTRAP_ALLOWED_SUFFIXES`) but reaches the network in production. | Platform | 1B | Zero unsolicited third-party egress on pre-auth landing; auth traffic goes only to Lovable Cloud backend. |
+| B | Playwright Chromium fails to launch in current sandbox runner (`libglib-2.0.so.0` missing). 47/47 green run recorded on the same source tree in 1A.3.e.1 / 1A.3.f; 1A.3.g re-run blocked by the runner image. | Platform (CI) | 1A.3.g follow-up → 1B kick-off | `npx playwright test --config playwright.truth.config.ts` reports 47/47 in the Phase 1B CI runner. |
+| C | Full Vitest suite still red (236 failed / 907 passed / 103 skipped). 198-failure Phase 0 baseline unresolved; +38 delta attributable to `vitest-pool` fork-runner timeouts under concurrent gate load — targeted provenance run is 194/194 green on the same tree. | Platform | 1B P0 | Full suite green in isolation. |
+| D | Full ESLint still red (1472 problems vs 1471 baseline). Legacy `no-explicit-any` majority; no Phase 1A source file introduces a new error class. | Platform | 1B P1 | Baseline reduction plan approved and executed. |

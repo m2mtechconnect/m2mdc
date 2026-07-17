@@ -10,7 +10,7 @@
  * fixture explosion.
  */
 
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect, type BrowserContext } from '@playwright/test';
 import { installNetworkGuard, type NetworkGuardHandle } from './network-guard';
 import { installDeterministicClock } from './clock';
 
@@ -18,15 +18,38 @@ type Fixtures = {
   guard: NetworkGuardHandle;
 };
 
+/**
+ * Phase 1A.3.e.1 — install guard at browser-CONTEXT level, BEFORE
+ * any page is created. The default `context` fixture is overridden
+ * so `installNetworkGuard(context)` runs before Playwright ever
+ * hands out a `page`.
+ *
+ * Registration order (LIFO):
+ *   1. Guard is registered here (context-level, runs LAST).
+ *   2. Per-test setup installs the deterministic clock on the page.
+ *   3. Per-test `installSupabaseMock(context)` registers the mock
+ *      LATER, so it runs FIRST and can `route.fallback()` down to
+ *      the guard for non-supabase URLs.
+ */
+// Shared handle key so `guard` and `context` fixtures see the same
+// install. We store it on the context object under a private symbol.
+const GUARD_KEY = Symbol.for('truth-suite.network-guard');
+
 export const test = base.extend<Fixtures>({
-  guard: async ({ page }, use, testInfo) => {
-    // Order matters: clock BEFORE any route registration so
-    // page-scripts see the frozen Date from the very first tick.
+  context: async ({ context }, use) => {
+    const handle = await installNetworkGuard(context as BrowserContext);
+    (context as unknown as Record<symbol, NetworkGuardHandle>)[GUARD_KEY] = handle;
+    await use(context);
+  },
+  page: async ({ page }, use) => {
+    // Clock is per-page — install it before the first navigation.
     await installDeterministicClock(page);
-    const handle = await installNetworkGuard(page);
+    await use(page);
+  },
+  guard: async ({ context }, use, testInfo) => {
+    const handle = (context as unknown as Record<symbol, NetworkGuardHandle>)[GUARD_KEY];
+    if (!handle) throw new Error('network guard fixture not installed on context');
     await use(handle);
-    // Product invariant, enforced per test: no unexpected external
-    // egress. Reported as a first-class product failure.
     const violations = handle.violations();
     if (violations.length > 0) {
       testInfo.annotations.push({

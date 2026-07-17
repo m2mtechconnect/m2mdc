@@ -2,39 +2,36 @@
  * Phase 1A.3.e.1 — Supabase session + REST mock for the truth-in-UI
  * suite. Playwright-only. No production auth bypass.
  *
- * What this does:
- *   1. Mints a self-signed-looking (but harmless) JWT with the
- *      `sub` claim the app requires (see `validateJWT` in
- *      `authBootstrap.ts`) and a far-future `exp`.
- *   2. Primes localStorage with the exact `sb-<ref>-auth-token`
- *      shape the Supabase JS client reads on boot.
- *   3. Installs `page.route()` on every `*.supabase.co/**` URL,
- *      returning canned auth/REST/RPC responses so the app renders
- *      instead of redirecting to `/auth`.
- *   4. All external calls are aborted at the wire by the network
- *      guard — the mock only fulfils requests locally, no real egress.
- *
- * The mocks intentionally return empty datasets (`[]`) rather than
- * fixtures — the truth-in-UI assertion is that provenance badges
- * are correctly rendered, NOT that data is present.
+ * Design (per user directive):
+ *   • Registered at BROWSER-CONTEXT level, BEFORE any page in the
+ *     context navigates. Applies to every page in the context.
+ *   • Matched on parsed origin + pathname (never a whole-URL regex).
+ *   • Handles OPTIONS, HEAD, and GET explicitly.
+ *   • Registered AFTER the network guard so it wins Playwright's
+ *     LIFO route chain. Non-supabase URLs are `route.fallback()`'d
+ *     down to the guard.
+ *   • Sanitized logging only: method, origin, pathname, and query
+ *     parameter NAMES. No headers, tokens, UUIDs, or query values.
+ *   • Exposes `profileHits()` so tests can assert the profiles
+ *     mock was actually reached.
  */
 
-import type { Page } from '@playwright/test';
+import type { BrowserContext, Page, Route } from '@playwright/test';
 
 // Supabase project ref used by the Vite env — the storage key is
-// `sb-<ref>-auth-token`. Keeping this in sync with `.env` is fine:
-// the value is a public identifier, not a secret.
+// `sb-<ref>-auth-token`. This is a public identifier, not a secret.
 export const SUPABASE_REF = 'psfvrskpnwcshvajzeix';
 export const STORAGE_KEY = `sb-${SUPABASE_REF}-auth-token`;
 const SUPABASE_HOST = `${SUPABASE_REF}.supabase.co`;
 
+function isSupabaseHost(host: string): boolean {
+  return host === SUPABASE_HOST || host.endsWith('.supabase.co') || host.endsWith('.supabase.io');
+}
+
 function b64url(obj: unknown): string {
   const s = typeof obj === 'string' ? obj : JSON.stringify(obj);
-  return Buffer.from(s, 'utf8')
-    .toString('base64')
-    .replace(/=+$/, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_');
+  return Buffer.from(s, 'utf8').toString('base64')
+    .replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
 }
 
 /** Mint a JWT-shaped string. Signature is meaningless — the app only
@@ -91,103 +88,170 @@ export function buildFakeSession(userId?: string): FakeSession {
   return { userId: uid, accessToken, refreshToken, storagePayload: JSON.stringify(session) };
 }
 
-/**
- * Install the Supabase route mock + prime session. Must be called
- * BEFORE navigating to any auth-gated route. `page.route()` for
- * `*.supabase.co/**` is fully local — nothing leaves the browser.
- */
+export interface SanitizedRequest {
+  method: string;
+  origin: string;
+  pathname: string;
+  queryKeys: string[];
+}
+
+export interface SupabaseMockHandle {
+  session: FakeSession;
+  /** Sanitized log of every request the mock saw (supabase hosts only
+   *  after filtering — non-supabase hosts are delegated via fallback). */
+  requests(): SanitizedRequest[];
+  /** How many times a `/rest/v1/profiles*` request was fulfilled. */
+  profileHits(): number;
+  /** Storage entry for pre-navigation localStorage priming. */
+  storage(): { key: string; value: string };
+}
+
 export async function installSupabaseMock(
-  page: Page,
+  target: BrowserContext | Page,
   opts: { session?: FakeSession; profileRole?: 'admin' | 'user' } = {},
-): Promise<FakeSession> {
+): Promise<SupabaseMockHandle> {
   const session = opts.session ?? buildFakeSession();
+  const log: SanitizedRequest[] = [];
+  let profileHits = 0;
 
-  await page.route(/^https?:\/\/[^/]*supabase\.co\/.*$/i, async route => {
-    const url = new URL(route.request().url());
-    const path = url.pathname;
-    const method = route.request().method();
+  const profileRow = {
+    id: session.userId,
+    user_id: session.userId,
+    email: 'truth-suite@aura.local',
+    approved: true,
+    is_approved: true,
+    role: opts.profileRole ?? 'admin',
+    created_at: new Date().toISOString(),
+  };
 
-    // Auth endpoints ------------------------------------------------
-    if (path.startsWith('/auth/v1/token')) {
+  async function handle(route: Route): Promise<void> {
+    const req = route.request();
+    let parsed: URL;
+    try { parsed = new URL(req.url()); }
+    catch { return route.fallback(); }
+
+    // Parse first, match on origin+pathname second.
+    const host = parsed.hostname;
+    if (!isSupabaseHost(host)) return route.fallback();
+
+    const method = req.method().toUpperCase();
+    const pathname = parsed.pathname;
+    const queryKeys = Array.from(parsed.searchParams.keys()).sort();
+    // Sanitized only: no headers, tokens, UUIDs, or query values.
+    log.push({ method, origin: parsed.origin, pathname, queryKeys });
+
+    // ---- OPTIONS preflight -------------------------------------
+    if (method === 'OPTIONS') {
       return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.parse(session.storagePayload) as never,
+        status: 204,
+        headers: {
+          'access-control-allow-origin': '*',
+          'access-control-allow-methods': 'GET,POST,PATCH,DELETE,HEAD,OPTIONS',
+          'access-control-allow-headers':
+            'authorization,apikey,content-type,accept,accept-profile,content-profile,prefer,x-client-info',
+        },
+        body: '',
       });
     }
-    if (path.startsWith('/auth/v1/user')) {
+
+    // ---- Auth endpoints ----------------------------------------
+    if (pathname.startsWith('/auth/v1/token')) {
       return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(JSON.parse(session.storagePayload).user),
+        status: 200, contentType: 'application/json', body: session.storagePayload,
       });
     }
-    if (path.startsWith('/auth/v1/logout')) {
+    if (pathname.startsWith('/auth/v1/user')) {
+      return route.fulfill({
+        status: 200, contentType: 'application/json',
+        body: JSON.stringify((JSON.parse(session.storagePayload) as { user: unknown }).user),
+      });
+    }
+    if (pathname.startsWith('/auth/v1/logout')) {
       return route.fulfill({ status: 204, body: '' });
     }
 
-    // Realtime: reject the websocket upgrade so the client falls back
-    // silently. `page.route` does not intercept ws upgrades reliably —
-    // network-guard aborts them at the wire.
-    if (path.startsWith('/realtime/')) {
+    // Realtime — WS upgrades aren't reliably interceptable; the
+    // network guard aborts them at the wire.
+    if (pathname.startsWith('/realtime/')) {
       return route.abort('blockedbyclient');
     }
 
-    // Profiles / RBAC lookups: return the truth-suite admin profile
-    // so RBAC-gated UI renders. The profile role does NOT grant any
-    // real capability — no server ever sees the fake JWT.
-    if (path.startsWith('/rest/v1/profiles') && method === 'GET') {
-      const profile = {
-        id: session.userId,
-        user_id: session.userId,
-        email: 'truth-suite@aura.local',
-        approved: true,
-        is_approved: true,
-        role: opts.profileRole ?? 'admin',
-        created_at: new Date().toISOString(),
-      };
-      // supabase-js .maybeSingle()/.single() send
-      // `Accept: application/vnd.pgrst.object+json`; PostgREST then
-      // returns a single object, NOT an array. Detect that here so
-      // both shapes work.
-      // Always return a single object with pgrst.object content type
-      // so `.maybeSingle()` and `.single()` both resolve to the row.
-      // Array-shaped consumers on this project don't hit /profiles.
+    // ---- Profiles / RBAC ---------------------------------------
+    if (pathname.startsWith('/rest/v1/profiles')) {
+      if (method === 'HEAD') {
+        profileHits += 1;
+        return route.fulfill({ status: 200, body: '' });
+      }
+      if (method === 'GET') {
+        profileHits += 1;
+        const acceptHeader = (req.headers()['accept'] ?? '').toLowerCase();
+        const wantsSingle = acceptHeader.includes('pgrst.object');
+        return route.fulfill({
+          status: 200,
+          contentType: wantsSingle
+            ? 'application/vnd.pgrst.object+json'
+            : 'application/json',
+          body: JSON.stringify(wantsSingle ? profileRow : [profileRow]),
+        });
+      }
+      // Writes are unexpected on this surface — reply row-shaped so
+      // no code path hangs.
       return route.fulfill({
-        status: 200,
-        contentType: 'application/vnd.pgrst.object+json',
-        body: JSON.stringify(profile),
+        status: 200, contentType: 'application/json', body: JSON.stringify(profileRow),
       });
     }
-    if (path.startsWith('/rest/v1/user_roles') && method === 'GET') {
+
+    if (pathname.startsWith('/rest/v1/user_roles')) {
+      if (method === 'HEAD') return route.fulfill({ status: 200, body: '' });
       return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
+        status: 200, contentType: 'application/json',
         body: JSON.stringify([{ user_id: session.userId, role: opts.profileRole ?? 'admin' }]),
       });
     }
 
-    // RPC / other REST: empty payload so the UI renders skeletons
-    // rather than pending forever.
-    if (path.startsWith('/rest/v1/') || path.startsWith('/rpc/')) {
+    // ---- RPC / other REST --------------------------------------
+    if (pathname.startsWith('/rest/v1/') || pathname.startsWith('/rpc/')) {
+      if (method === 'HEAD') return route.fulfill({ status: 200, body: '' });
       return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
+        status: 200, contentType: 'application/json',
         body: method === 'GET' ? '[]' : '{}',
       });
     }
 
-    // Anything else from supabase.co — return 200 empty. The
-    // network-guard still records the request for audit.
+    // Any other supabase.co path — reply empty so nothing hangs.
     return route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
-  });
+  }
 
-  // Prime localStorage BEFORE navigating to the auth-gated route.
-  await page.addInitScript(([storageKey, payload]) => {
-    try {
-      window.localStorage.setItem(storageKey, payload);
-    } catch { /* storage disabled */ }
-  }, [STORAGE_KEY, session.storagePayload] as const);
+  // Register at context level so the mock is in force before any
+  // page navigates. Route registered AFTER the guard fixture → runs
+  // FIRST in Playwright's LIFO route chain.
+  const asContext = target as Partial<BrowserContext>;
+  if (typeof asContext.addInitScript === 'function' && 'route' in asContext) {
+    const ctx = target as BrowserContext;
+    await ctx.route('**/*', handle);
+    await ctx.addInitScript(
+      ([storageKey, payload]) => {
+        try { window.localStorage.setItem(storageKey, payload); }
+        catch { /* storage disabled */ }
+      },
+      [STORAGE_KEY, session.storagePayload] as const,
+    );
+  } else {
+    const page = target as Page;
+    await page.route('**/*', handle);
+    await page.addInitScript(
+      ([storageKey, payload]) => {
+        try { window.localStorage.setItem(storageKey, payload); }
+        catch { /* storage disabled */ }
+      },
+      [STORAGE_KEY, session.storagePayload] as const,
+    );
+  }
 
-  return session;
+  return {
+    session,
+    requests: () => log.slice(),
+    profileHits: () => profileHits,
+    storage: () => ({ key: STORAGE_KEY, value: session.storagePayload }),
+  };
 }

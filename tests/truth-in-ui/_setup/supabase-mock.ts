@@ -158,7 +158,6 @@ export async function installSupabaseMock(
         body: JSON.stringify(single ? profile : [profile]),
       });
     }
-    }
     if (path.startsWith('/rest/v1/user_roles') && method === 'GET') {
       return route.fulfill({
         status: 200,

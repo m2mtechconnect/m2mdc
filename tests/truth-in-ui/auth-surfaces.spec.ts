@@ -55,6 +55,13 @@ test.describe('Auth-gated surfaces — mocked session, zero external egress', ()
   });
 
   test.afterEach(async ({ guard }) => {
+    // Sanitized diagnostic dump on failure (no headers, tokens,
+    // UUIDs, or query values — just method/origin/pathname/keys).
+    if (mock.profileHits() === 0) {
+      // eslint-disable-next-line no-console
+      console.error('[truth-suite] supabase mock requests seen:',
+        JSON.stringify(mock.requests(), null, 2));
+    }
     // Hard invariants for every auth-gated spec.
     expect(mock.profileHits(),
       'profiles mock must be hit at least once (approval gate).').toBeGreaterThan(0);

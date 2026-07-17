@@ -29,6 +29,8 @@ import { cn } from '@/lib/utils';
 import type { SimulationResultSummary, SimulationKpiDelta, SimulationEvent } from '@/simulation/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SIMULATION } from '@/ux';
+import { downloadPayload, toMarkdown } from '@/lib/provenance/exporters';
+import { buildSimulationResultPayload } from './exportSimulationResult';
 
 interface SimulationResultPanelProps {
   result: SimulationResultSummary;
@@ -119,41 +121,14 @@ export function SimulationResultPanel({
   const badDeltas = result.kpiDeltas.filter(d => !d.isGood);
 
   const handleDownloadJson = () => {
-    const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `simulation-result-${result.scenarioId}-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const { payload } = buildSimulationResultPayload(result);
+    downloadPayload(payload, 'json', `simulation-result-${result.scenarioId}-${Date.now()}.json`);
     onDownloadJson?.();
   };
 
   const handleDownloadReport = () => {
-    const reportContent = `# Simulation Report: ${result.scenarioName}
-
-## Summary
-- **Duration**: ${result.durationSec} seconds
-- **Scenario ID**: ${result.scenarioId}
-- **Events Triggered**: ${result.events.length}
-
-## KPI Impact Summary
-
-### Improvements
-${goodDeltas.map(d => `- **${d.label}**: ${d.before.toFixed(1)} → ${d.after.toFixed(1)} ${d.unit || ''}`).join('\n')}
-
-### Degradations
-${badDeltas.map(d => `- **${d.label}**: ${d.before.toFixed(1)} → ${d.after.toFixed(1)} ${d.unit || ''}`).join('\n')}
-
-## Root Cause Analysis
-${result.rcaMarkdown}
-
-## Recommendations
-${result.recommendationsMarkdown}
-
----
-*Report generated on ${new Date().toISOString()}*
-`;
+    const { payload, narrative } = buildSimulationResultPayload(result);
+    const reportContent = toMarkdown(payload, { narrative });
     const blob = new Blob([reportContent], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

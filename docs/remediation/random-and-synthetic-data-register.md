@@ -152,6 +152,25 @@ carries its own classification via an enumerated catalog.
 
 ## Verification
 
+## Phase 1A.3.d additions (2026-07-17)
+
+Exports now go through `src/lib/provenance/exporters/`. No export path
+can serialize a stale live source as `live` — `toExportRecord()`
+downgrades stale live / derived values to `unavailable` with
+`downgradeReason: 'stale'`, and metric values of `null` become
+`unavailable` with `downgradeReason: 'unavailable-input'`. Fixture
+catalogs (Intelligence PUE / energy series) always export as `demo`
+regardless of what the caller supplies for `metric.provenance`.
+
+CSV output escapes `= + - @ TAB CR` prefixes with a leading `'` to
+defeat spreadsheet formula injection. JSON output carries
+`$schema: aura.export/v1` + `schemaVersion: 1.0.0`. Print HTML shows a
+per-row provenance badge — not only in the footer.
+
+Compliance report stubs that cannot retain provenance
+(Sovereignty / Thermal / Carbon / Power) are **disabled** with a
+`describeExportBlock()` tooltip citing the exact reason.
+
 Sweep command used:
 
 ```

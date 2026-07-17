@@ -198,15 +198,27 @@ export function SovereignDCSimulationDashboard({
             Reset
           </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleGeneratePlaybook}
-            disabled={isGeneratingPlaybook}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            {isGeneratingPlaybook ? 'Generating...' : 'Playbook'}
-          </Button>
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span data-export-blocked={playbookBlockReason} className="inline-flex">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    aria-disabled="true"
+                    disabled
+                    tabIndex={0}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Playbook (disabled)
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs text-xs">
+                {playbookBlockCopy}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
 

@@ -319,3 +319,79 @@ canonical schema once the simulation KPI catalog is stable.
 
 **Suite result**: 19 touched files / **226 passed / 0 failed** (was 212).
 `tsgo --noEmit` clean.
+
+---
+
+## Phase 1A.3.e — Playwright truth-in-UI verification
+
+### Configuration
+- New isolated config: **`playwright.truth.config.ts`** (does not
+  touch the legacy `playwright.config.ts` on port 5173).
+- Boots its own Vite instance on **port 8091** with
+  `VITE_OMNIVERSE_KIT_URL=http://kit.aura-truth.local/api` so the Kit
+  client emits real fetches that tests intercept via `page.route()`.
+- Deterministic clock (frozen at `2026-07-17T12:00:00Z`) and seeded
+  `Math.random()` injected via `page.addInitScript` before any nav.
+- **Network guard** (`tests/truth-in-ui/_setup/network-guard.ts`) fails
+  any test that emits an external request. Explicitly blocks
+  `*.supabase.co`, `*.nvidia.com`, `openai.com`, `googleapis.com`,
+  `sentry.io`, etc. No production authentication bypass added.
+
+### Coverage matrix
+
+| # | Runtime state             | Spec                            | Assertion                                                                       |
+|---|---------------------------|---------------------------------|---------------------------------------------------------------------------------|
+| 1 | Validated live            | `runtime-states.spec.ts`        | Badge "Kit connected · validated"; `metric-pue` has `data-provenance="live"`.  |
+| 2 | Kit disabled              | `runtime-states.spec.ts`        | No "Kit connected" text; no `[data-provenance="live"]`; no "Provenance: Live". |
+| 3 | Network unavailable       | `runtime-states.spec.ts`        | Badge "Kit unavailable"; `metric-pue` shows "N/A" with `provenance=unavailable`.|
+| 4 | Schema-invalid response   | `runtime-states.spec.ts`        | Badge "Kit response invalid"; `metric-pue` provenance=`demo`.                   |
+| 5 | Stale response            | `runtime-states.spec.ts`        | No misleading "Live" claim during slow tick.                                    |
+| 6 | Demo fallback             | `runtime-states.spec.ts`        | `metric-sovereignty` reads "Not assessed"; target stays `static`.               |
+| 7 | Simulation running        | `runtime-states.spec.ts`        | Phase header renders "Anomaly".                                                 |
+| 8 | Simulation baseline       | `runtime-states.spec.ts`        | Phase header renders "Steady".                                                  |
+| 9 | Static target             | `runtime-states.spec.ts`        | `metric-pue-target` always `data-provenance="static"` across 3 Kit states.     |
+|10 | Unavailable / not-assessed| `runtime-states.spec.ts`        | Sovereignty card labelled "Not assessed" with aria-label starting "Provenance:".|
+
+Domain views + landing → `surface-inventory.spec.ts` (9 domain tabs,
+per-view `data-provenance` and per-view "no live" assertion).
+
+Manifest a11y → `manifest-a11y.spec.ts` (native `<summary>` keyboard
+toggle; every KPI card exposes a Provenance badge).
+
+### Playwright deferrals (harness-blocked, NOT product failures)
+
+These retrofitted surfaces are auth-gated. The brief forbids
+contacting production Supabase and this project has no local Supabase
+stub, so authenticated Playwright coverage is intentionally deferred.
+Product coverage for these paths is provided by the vitest
+integration suite (226 tests, all green):
+
+| Surface                          | Route                              | Vitest coverage                                                             |
+|----------------------------------|------------------------------------|-----------------------------------------------------------------------------|
+| Dashboard                        | `/dashboard`                       | `src/pages/__tests__/Dashboard.provenance.test.tsx`                         |
+| IntelligenceDashboard + exports  | `/intelligence`, `/analytics`, `/operations` | `src/lib/provenance/exporters/__tests__/*` (CSV/JSON/Markdown injection). |
+| Compliance (disabled exports)    | `/compliance`                      | `src/pages/__tests__/Compliance.disabledExports.test.tsx`                   |
+| Infrastructure                   | `/infrastructure`                  | `src/pages/__tests__/InfrastructurePage.provenance.test.tsx`                |
+| Sovereign playbook (disabled)    | inside StandardizedTemplatePreview | `src/twins/sovereignDataCenter/components/__tests__/playbookExportDisabled.test.ts` |
+
+Reachability evidence for each: the routes above are inside the
+`user && session` branch in `src/App.tsx` L197-217 and produce a
+redirect to `/auth` when hit without a session cookie. Confirmed by
+manual `curl -I` of the localhost:8091 dev server on 2026-07-17.
+
+### Fail-closed guarantees
+- Zero retries, single worker — a flake is treated as a real failure.
+- Every fixture teardown asserts `guard.violations() === []`.
+- No screenshot- or snapshot-only assertions; every assertion is a
+  semantic locator (`getByRole`, `getByTestId`) with an explicit
+  expectation.
+- Harness startup failures (Vite boot, port collision) surface as
+  Playwright `webServer` errors, which Playwright reports separately
+  from spec failures.
+
+### Commands
+```
+npx playwright test --config playwright.truth.config.ts
+npx tsgo --noEmit
+npm run build
+```

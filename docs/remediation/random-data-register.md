@@ -66,6 +66,74 @@ listed in aggregate.
 - `KPIMetricCards.DEFAULT_DC_KPIS` current-values are labelled `demo` and
   targets are labelled `static`; each card exposes `data-provenance`.
 
+## Phase 1A.3.b2 additions
+
+Retrofits landed for the remaining simulation-chrome surfaces:
+
+- `EnhancedKPIChartsPanel.tsx` — 18 `Math.random()` sites removed. Baseline
+  generators now accept an injected seeded PRNG keyed to
+  `enhanced-kpi/${industry}/${scenario}/${kpi.label}/${idx}`. Root exposes
+  `data-testid="enhanced-kpi-charts-panel"` and `data-provenance`. Each
+  tile wrapper exposes `data-testid="enhanced-kpi-tile-<n>"`,
+  `data-provenance`, and renders a compact `ProvenanceBadge`. Header
+  string changed from "Live Metrics" to "Simulation Metrics"; the
+  animated white-dot "Live" pill is replaced by a `ProvenanceBadge`.
+  Fixture series stay `demo` even inside a running scenario.
+- `LiveInsightsKPIPanel.tsx` — no `Math.random()` in file; header renamed
+  from "Live Insights" to "Simulation Insights"; animated "LIVE" pill
+  replaced by `ProvenanceBadge` (`simulated` while running, `demo`
+  otherwise). Root exposes `data-testid="live-insights-panel"` and
+  `data-provenance`.
+- `LiveSimulationDashboard.tsx` — `fanSpeed` and `upsValues` `Math.random`
+  calls replaced with seeded PRNGs keyed to `currentTime` (and index for
+  UPS). Section title renamed from "Live Simulation Dashboard" to
+  "Simulation Dashboard"; badge changed from "Active" to "Simulation".
+  Root exposes `data-testid="live-simulation-dashboard"` and
+  `data-provenance="simulated"`. Bar-waveform animation retains its
+  `Math.sin/Math.cos(Date.now())` — classified `harmless-animation` (no
+  displayed value; the tile shows `throughput` / `saturation` which are
+  deterministic).
+- `AnimatedRackHeatmap.tsx` — `generateDefaultRacks` seeded on rack count.
+  Animated "LIVE" pill replaced by `ProvenanceBadge`. Fixture fallback is
+  always `demo`; caller-supplied racks resolve to `simulated` while
+  running, `demo` otherwise.
+- `KPICorrelationMatrix.tsx` — fallback `impacts` `Math.random` replaced
+  with a seeded PRNG keyed to the kpi id set. Root exposes
+  `data-testid="kpi-correlation-matrix"` and `data-provenance`; fixture is
+  `demo`, caller-supplied impacts are `simulated`.
+
+### Retained run-ID randomness (harmless-animation)
+
+- `src/components/simulation/DCSimulationPanel.tsx:234` —
+  `` `run-${Date.now()}-${Math.random().toString(36).slice(2, 8)}` ``.
+  Kept intentionally.
+  - **Purpose:** unique identifier for a scenario run captured into
+    `runIdRef` and passed to `captureSnapshot()`.
+  - **Cannot affect displayed values:** the value is never rendered as a
+    KPI, never derived into a metric, and never fed into a chart series.
+    Grep for `runIdRef.current` shows it flows only into the simulation
+    snapshot store (bookkeeping) and CoPilot context (correlation id).
+  - **Cannot affect provenance:** provenance for every KPI in the panel
+    is resolved from `simulatedMetric()`/`demoMetric()` factories and
+    from the seeded rack generator introduced in 1A.3.b1 — none of them
+    read `runIdRef`. Provenance badges rendered by this panel resolve
+    strictly from `isRunning`/`scenarioId`, not from the run id.
+  - **Classification:** `harmless-animation` (identity token, not a
+    reading).
+
+### `simulatedMetric()` canonicalization
+
+`src/lib/provenance/index.ts:115-130` remains the single implementation
+of `simulatedMetric<T>()`. `rg -n "export function simulatedMetric"
+src/` returns exactly one match. Sub-slice 1A.3.b2 did not introduce a
+parallel helper; retrofitted panels either use the existing factory
+indirectly (via `ProvenancedMetric<T>` wrappers in earlier sub-slices)
+or construct inline `ProvenanceMeta` objects that pass the
+`provenance: 'simulated' | 'demo'` discriminator directly into
+`<ProvenanceBadge>`. `deriveMetric()` and `deriveIfFresh()` remain the
+only paths that could ever upgrade provenance, and both refuse to
+upgrade a `simulated`/`demo`/`static`/`unavailable` source.
+
 ## Deferred (Phase 1A.2)
 
 - `IntelligenceDashboard` KPI strip (six tiles) — RETROFITTED in Phase

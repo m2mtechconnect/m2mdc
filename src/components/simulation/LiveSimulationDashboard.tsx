@@ -15,6 +15,8 @@ import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { RackMetrics, SimulationEvent } from '@/simulation/types';
+import { seededRng } from '@/lib/provenance/prng';
+import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
 
 interface LiveSimulationDashboardProps {
   isVisible: boolean;
@@ -242,9 +244,10 @@ export const LiveSimulationDashboard = memo(function LiveSimulationDashboard({
   // CRAC/CRAH fan speeds: 800-2200 RPM typical, higher during thermal events
   // Reference: Schneider Electric CRAC specifications
   const fanSpeed = useMemo(() => {
+    const rng = seededRng(`sim-dashboard/fan/${currentTime}`);
     const baseRpm = 1400; // Normal operating range midpoint
     const thermalLoad = Math.sin(currentTime * 0.1) * 300; // ±300 RPM variation
-    const noise = (Math.random() - 0.5) * 100;
+    const noise = (rng() - 0.5) * 100;
     return Math.round(Math.max(800, Math.min(2200, baseRpm + thermalLoad + noise)));
   }, [currentTime]);
   
@@ -260,9 +263,10 @@ export const LiveSimulationDashboard = memo(function LiveSimulationDashboard({
   // Reference: IEEE 1100-2005 Powering and Grounding Electronic Equipment
   const upsValues = useMemo(() => 
     Array.from({ length: 20 }, (_, i) => {
+      const rng = seededRng(`sim-dashboard/ups/${currentTime}/${i}`);
       const baseVoltage = 480;
       const ripple = Math.sin((currentTime + i) * 0.2) * 4; // ±4V ripple
-      const noise = (Math.random() - 0.5) * 3;
+      const noise = (rng() - 0.5) * 3;
       return Math.round((baseVoltage + ripple + noise) * 10) / 10;
     }),
     [currentTime]
@@ -292,13 +296,26 @@ export const LiveSimulationDashboard = memo(function LiveSimulationDashboard({
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.3 }}
+          data-testid="live-simulation-dashboard"
+          data-provenance="simulated"
         >
           <CollapsibleSection
-            title="Live Simulation Dashboard"
-            badge="Active"
+            title="Simulation Dashboard"
+            badge="Simulation"
             defaultOpen={true}
             icon={<Activity className="h-5 w-5 text-success animate-pulse" />}
           >
+            <div className="flex justify-end mb-2">
+              <ProvenanceBadge
+                meta={{
+                  provenance: 'simulated',
+                  source: `sim-dashboard/tick-${currentTime}`,
+                  stale: false,
+                  note: 'Deterministic simulation output — seeded PRNG keyed to current simulation time.',
+                }}
+                compact
+              />
+            </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Thermal Heatmap */}
               <Card className="bg-card border-border">

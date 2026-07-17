@@ -23,6 +23,8 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { KPISnapshot, SimulationEvent, LiveInsight } from '@/simulation/types';
 import { DEFAULT_KPI_CONFIGS, generateHoverInsight } from '@/engines/kpi/KPIOverlayEngine';
+import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
+import type { DataProvenance } from '@/lib/provenance/types';
 
 interface LiveInsightsKPIPanelProps {
   snapshots: KPISnapshot[];
@@ -188,19 +190,29 @@ export function LiveInsightsKPIPanel({
   };
 
   return (
-    <Card className={cn("", className)}>
+    <Card
+      className={cn("", className)}
+      data-testid="live-insights-panel"
+      data-provenance={(isRunning ? 'simulated' : 'demo') as DataProvenance}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base">
             <Lightbulb className="h-4 w-4 text-warning" />
-            Live Insights
+            Simulation Insights
           </CardTitle>
           <div className="flex items-center gap-2">
-            {isRunning && (
-              <Badge variant="outline" className="text-[10px] animate-pulse bg-success/10 text-success">
-                LIVE
-              </Badge>
-            )}
+            <ProvenanceBadge
+              meta={{
+                provenance: isRunning ? 'simulated' : 'demo',
+                source: 'simulation-insights-engine',
+                stale: false,
+                note: isRunning
+                  ? 'Insights derived from the running simulation engine.'
+                  : 'No active simulation — insights list is empty or fixture.',
+              }}
+              compact
+            />
             <Badge variant="secondary" className="text-xs">
               {insights.length} active
             </Badge>

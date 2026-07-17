@@ -361,7 +361,7 @@ export function EnhancedKPITile({
             {isRunning && (
               <div className="flex items-center gap-1">
                 <Activity className="h-3 w-3 animate-pulse text-primary" />
-                <span>Live</span>
+                <span>Simulation</span>
               </div>
             )}
             {lastUpdatedText && (

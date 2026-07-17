@@ -13,6 +13,8 @@ import { Thermometer, AlertTriangle, Zap, Cpu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { RackMetrics } from '@/simulation/types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { seededRng } from '@/lib/provenance/prng';
+import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
 
 interface AnimatedRackHeatmapProps {
   rackMetrics: RackMetrics[];
@@ -21,13 +23,18 @@ interface AnimatedRackHeatmapProps {
   compact?: boolean;
 }
 
-// Generate default rack data if none provided
+// Generate default rack data if none provided.
+//
+// Phase 1A.3.b2: seeded PRNG keyed to rack count so the same "22.7°C, 9.3kW"
+// tile appears on every reload. This is fixture data — the parent surface
+// MUST render `demo` provenance for these values.
 function generateDefaultRacks(count: number = 20): RackMetrics[] {
+  const rng = seededRng(`animated-rack-heatmap/${count}`);
   return Array.from({ length: count }, (_, i) => ({
     rackId: `Rack-${String(i + 1).padStart(2, '0')}`,
-    tempC: 22 + Math.random() * 8,
-    powerKw: 8 + Math.random() * 4,
-    gpuUtilPct: 60 + Math.random() * 30,
+    tempC: 22 + rng() * 8,
+    powerKw: 8 + rng() * 4,
+    gpuUtilPct: 60 + rng() * 30,
     alertLevel: 'normal' as const,
   }));
 }
@@ -158,12 +165,19 @@ export const AnimatedRackHeatmap = memo(function AnimatedRackHeatmap({
   onRackClick,
   compact = false,
 }: AnimatedRackHeatmapProps) {
+  const usedFallback = rackMetrics.length === 0;
   const racks = useMemo(() => {
     if (rackMetrics.length === 0) {
       return generateDefaultRacks(20);
     }
     return rackMetrics;
   }, [rackMetrics]);
+
+  // Provenance resolution:
+  //   • Fixture fallback → always `demo`, regardless of `isRunning`.
+  //   • Caller-supplied racks → `simulated` when a run is active, otherwise
+  //     `demo`. Live telemetry is not a supported input on this surface.
+  const resolvedProvenance = usedFallback ? 'demo' : (isRunning ? 'simulated' : 'demo');
 
   // Memoize calculations
   const { hotRacks, avgTemp, optimalCount, elevatedCount } = useMemo(() => ({
@@ -179,7 +193,11 @@ export const AnimatedRackHeatmap = memo(function AnimatedRackHeatmap({
   }, [onRackClick]);
 
   return (
-    <Card className={cn('bg-card border-border', isRunning && 'ring-1 ring-primary/20')}>
+    <Card
+      className={cn('bg-card border-border', isRunning && 'ring-1 ring-primary/20')}
+      data-testid="animated-rack-heatmap"
+      data-provenance={resolvedProvenance}
+    >
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -187,11 +205,19 @@ export const AnimatedRackHeatmap = memo(function AnimatedRackHeatmap({
             Rack Thermal Map
           </CardTitle>
           <div className="flex items-center gap-2">
-            {isRunning && (
-              <Badge variant="outline" className="text-[10px] animate-pulse bg-success/10 text-success">
-                LIVE
-              </Badge>
-            )}
+            <ProvenanceBadge
+              meta={{
+                provenance: resolvedProvenance,
+                source: usedFallback
+                  ? 'animated-rack-heatmap/fixture'
+                  : 'animated-rack-heatmap/simulation',
+                stale: false,
+                note: usedFallback
+                  ? 'Deterministic fixture — seeded PRNG, not telemetry.'
+                  : 'Rack metrics sourced from caller-supplied simulation output.',
+              }}
+              compact
+            />
             <Badge variant="outline" className="text-xs">
               Avg: {avgTemp.toFixed(1)}°C
             </Badge>

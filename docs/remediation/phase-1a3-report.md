@@ -33,6 +33,19 @@ Date: 2026-07-17 · Scope: Truth-in-UI, per-metric provenance, provenance-preser
 - Secret scan (`strings | grep -iE "eyJ[A-Za-z0-9]{20}|sk-[A-Za-z0-9]{20}|<project-ref>|SUPABASE_URL|Authorization|password[=: ]"`): **no matches** in any of the 27 images. Earlier byte-pattern hits were incidental substrings inside PNG compressed data, not literal tokens.
 - Manual visual re-inspection completed for all 27: no clipping, no loading overlays, no missing disclosures, no residual "LIVE" chrome (defect fixed in 1A.3.f). Two cosmetic items documented in the index (locale-flag tofu, `undefined%` in Compliance subtitle) are non-blocking and carried forward.
 
+### 3.1 Manifest regeneration in Phase 1A.3.g.1
+
+The Phase 1A.3.g manifest recorded checksums that did not match the
+images subsequently committed to `docs/remediation/evidence/phase-1a3/`
+(13/27 mismatches on `sha256sum -c`). The committed PNGs themselves are
+stable (`git status` clean, `git diff --check` clean, `git show HEAD:`
+bytes match the working-tree bytes for every mismatched image), so the
+discrepancy is a stale-manifest issue, not evidence tampering. In
+1A.3.g.1 the manifest was regenerated in place with
+`(cd docs/remediation/evidence/phase-1a3 && sha256sum *.png >
+SHA256SUMS.txt)`; post-regeneration `sha256sum -c SHA256SUMS.txt`
+reports **27/27 OK**.
+
 ## 4. Legacy gate failures vs Phase 1A regressions
 
 ### 4.1 Full Vitest suite

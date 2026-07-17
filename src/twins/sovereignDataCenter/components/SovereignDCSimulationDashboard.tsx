@@ -33,6 +33,8 @@ import { SOVEREIGN_DC_COPILOT_CHIPS } from '../copilotContext';
 import { sovereignDCAnalytics } from '../analytics';
 import type { EnhancedSimulationType } from '../enhancedSimulationEngine';
 import { cn } from '@/lib/utils';
+import { describeExportBlock } from '@/lib/provenance/exporters';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface SovereignDCSimulationDashboardProps {
   facilityId?: string;
@@ -94,40 +96,14 @@ export function SovereignDCSimulationDashboard({
     changeSpeed(newSpeed as 1 | 2 | 4);
   }, [speed, changeSpeed]);
 
-  const handleGeneratePlaybook = useCallback(async () => {
-    if (!facility || !facilityKpis) return;
-    
-    setIsGeneratingPlaybook(true);
-    sovereignDCAnalytics.playbookGenerated(facility.id);
-    
-    try {
-      const playbook = generatePlaybook({
-        facility,
-        enabledModels: {
-          energyEmissions: true,
-          gpuCapacity: true,
-          sovereigntyDataResidency: true,
-          financialPolicy: true,
-          incidentEmergency: true,
-        },
-        recentSimulations: [],
-        targetKpis: facilityKpis,
-      });
-      const markdown = playbookToMarkdown(playbook);
-      
-      const blob = new Blob([markdown], { type: 'text/markdown' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${facility.name.replace(/\s+/g, '_')}_playbook.md`;
-      a.click();
-      URL.revokeObjectURL(url);
-      
-      sovereignDCAnalytics.playbookExported(facility.id, 'markdown');
-    } finally {
-      setIsGeneratingPlaybook(false);
-    }
-  }, [facility, facilityKpis]);
+  // Phase 1A.3.d.1 — Playbook export is disabled with a visible reason.
+  // The playbook is generated from a demonstration fixture facility +
+  // fixture target KPIs (no audited data source). Exporting it as a
+  // deliverable would present demonstration values as a plan. Re-enable
+  // once a defensible simulation metric catalog and audited data source
+  // are wired (Phase 1B).
+  const playbookBlockReason: 'no-audited-source' = 'no-audited-source';
+  const playbookBlockCopy = describeExportBlock(playbookBlockReason);
 
   const handleFacilitySwitch = useCallback((newFacilityId: string) => {
     const newFacility = allFacilities.find(f => f.id === newFacilityId);

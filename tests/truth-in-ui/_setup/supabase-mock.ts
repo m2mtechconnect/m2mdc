@@ -144,6 +144,7 @@ export async function installSupabaseMock(
           id: session.userId,
           email: 'truth-suite@aura.local',
           approved: true,
+          is_approved: true,
           role: opts.profileRole ?? 'admin',
           created_at: new Date().toISOString(),
         }]),

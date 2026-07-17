@@ -13,6 +13,8 @@ import { SummaryCard } from '@/components/shared/SummaryCard';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
+import { MetricProvenanceManifest } from '@/components/provenance/MetricProvenanceManifest';
+import { POWER_METRICS } from './metricCatalogs';
 
 interface PowerDomainViewProps {
   facility: DataCentreFacility;
@@ -48,6 +50,7 @@ export function PowerDomainView({ facility }: PowerDomainViewProps) {
   return (
     <div className="space-y-6" data-provenance="demo" data-testid="power-domain-view">
       <DomainProvenanceHeader provenance="demo" sourceName="sovereignDataCenter/mockData" ariaContext="Power domain data provenance" />
+      <MetricProvenanceManifest domain="power" metrics={POWER_METRICS} />
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <SummaryCard

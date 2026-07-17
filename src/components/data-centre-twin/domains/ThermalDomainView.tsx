@@ -9,6 +9,8 @@ import { Filter, Eye, Camera } from 'lucide-react';
 import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
+import { MetricProvenanceManifest } from '@/components/provenance/MetricProvenanceManifest';
+import { THERMAL_METRICS } from './metricCatalogs';
 
 // Thermal components
 import { ThermalKPIs } from '../thermal/ThermalKPIs';
@@ -68,6 +70,7 @@ export function ThermalDomainView({ facility }: ThermalDomainViewProps) {
             sourceName="sovereignDataCenter/mockData"
             ariaContext="Thermal domain data provenance"
           />
+      <MetricProvenanceManifest domain="thermal" metrics={THERMAL_METRICS} />
         </div>
         <Button variant="outline" size="sm" onClick={() => setShowAirflow(!showAirflow)}>
           {showAirflow ? 'Hide' : 'Show'} Airflow

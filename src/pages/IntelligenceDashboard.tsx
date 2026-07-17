@@ -36,6 +36,8 @@ import { KpiCardProvenance } from '@/components/provenance/KpiCardProvenance';
 import { demoMetric } from '@/lib/provenance';
 import { simulatedMetric } from '@/lib/provenance/kitMetrics';
 import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
+import { MetricProvenanceManifest } from '@/components/provenance/MetricProvenanceManifest';
+import { INTELLIGENCE_CHART_METRICS } from '@/components/data-centre-twin/domains/metricCatalogs';
 import type { ProvenancedMetric } from '@/lib/provenance/types';
 import DataTable, { Column } from '@/components/shared/DataTable';
 import { useBlueprint } from '@/hooks/useBlueprint';
@@ -225,10 +227,13 @@ export default function IntelligenceDashboard() {
    * DCIM feed must overwrite the whole series and its `__provenance`
    * companion — a per-point wrapper stays out of the recharts render path.
    */
+  // Chart arrays are AURA demonstration fixtures. Uptime Institute /
+  // ASHRAE are cited only as reference context — the specific numbers
+  // below are not directly traceable to those publications.
   const pueChartProvenance = {
     provenance: 'demo' as const,
-    source: 'uptime-institute-2024',
-    note: 'PUE trend reference (Uptime Institute Global DC Survey 2024).',
+    source: 'AURA demonstration fixture',
+    note: 'Demonstration fixture. Reference range: Uptime Institute Global DC Survey 2024.',
   };
   const pueChartData = [
     { date: 'Mon', pue: 1.28 },  // Start of week, baseline operations
@@ -249,8 +254,8 @@ export default function IntelligenceDashboard() {
    */
   const energyChartProvenance = {
     provenance: 'demo' as const,
-    source: 'ashrae-tc-9.9',
-    note: 'Facility power vs IT load reference (ASHRAE TC 9.9).',
+    source: 'AURA demonstration fixture',
+    note: 'Demonstration fixture. Reference range: ASHRAE TC 9.9 datacom guidelines.',
   };
   const energyVsLoadData = [
     { hour: '00:00', energy: 2850, itLoad: 2280 },  // Night batch processing (LLM training)
@@ -611,6 +616,13 @@ export default function IntelligenceDashboard() {
                       aggregation="Daily weighted avg"
                       source="DCIM · BMS"
                     />
+                    <div className="mt-2">
+                      <MetricProvenanceManifest
+                        domain="intelligence-charts"
+                        metrics={INTELLIGENCE_CHART_METRICS}
+                        title="Chart series provenance"
+                      />
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={250}>

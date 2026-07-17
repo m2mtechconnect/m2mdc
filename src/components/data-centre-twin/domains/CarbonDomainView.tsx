@@ -12,6 +12,8 @@ import type { DataCentreFacility } from '@/types/dataCenterTwin';
 import { useCarbonEngine } from '@/hooks/useCarbonEngine';
 
 import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
+import { MetricProvenanceManifest } from '@/components/provenance/MetricProvenanceManifest';
+import { CARBON_METRICS } from './metricCatalogs';
 
 interface CarbonDomainViewProps {
   facility: DataCentreFacility;
@@ -29,6 +31,7 @@ export function CarbonDomainView({ facility }: CarbonDomainViewProps) {
   return (
     <div className="space-y-6" data-provenance="demo" data-testid="carbon-domain-view">
       <DomainProvenanceHeader provenance="demo" sourceName="sovereignDataCenter/mockData" ariaContext="Carbon domain data provenance" />
+      <MetricProvenanceManifest domain="carbon" metrics={CARBON_METRICS} />
       {/* Carbon KPI Hero Row */}
       <div className="grid gap-4 md:grid-cols-4">
         <CarbonMetricCard

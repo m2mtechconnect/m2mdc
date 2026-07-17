@@ -1,5 +1,23 @@
 # Vitest failures manifest
 # total pass=907 fail=236 skip=103 suites=197
+#
+# CLASSIFICATION NOTE (Phase 1B.1 correction):
+#   Category totals (DRIFT 137 + MOCK 61 + LEAK 41 + OBSOLETE 5 + ENV 9 +
+#   UNKNOWN 5 = 258) exceed the failure count (236) because classification
+#   is MULTI-LABEL: a single failing test may carry more than one root-cause
+#   category (e.g. MOCK+DRIFT). The 22-unit gap reflects label overlap, not
+#   double-counted tests.
+#
+# DEFECT ATTRIBUTION (Phase 1B.1 correction):
+#   Confirmed defects introduced by Phase 1A: 0.
+#   Uninvestigated / suspected defects: unknown — the 236 failures were
+#   categorized by symptom, not individually root-caused. A defect audit
+#   of the legacy failure surface is out of scope for Phase 1B.
+#
+# Machine-readable identity list of every failing test (post-Phase-1B.1):
+#   `vitest-failures-identities.txt` (235 lines; one identity per line).
+# Machine-readable Playwright runtime identities (all 47):
+#   `playwright-runtime.json`.
 
 
 ## tests/unit/yvr-template-integrity.test.ts  (52)

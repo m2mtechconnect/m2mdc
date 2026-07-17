@@ -305,3 +305,55 @@
 
 ## src/lib/__tests__/twinNameMigration.test.ts  (1)
 - twinNameMigration > migrateTwinBuilderState > migrates broken state using sourceRecommendation url
+
+# ---------------------------------------------------------------
+# Root-cause classification (Phase 1B.0, non-destructive triage)
+# ---------------------------------------------------------------
+# Categories: ENV=environment/setup, OBSOLETE=obsolete assertions,
+# DRIFT=schema/type drift, LEAK=shared global-state leakage,
+# MOCK=mock incompatibility, DEFECT=genuine product defect,
+# UNKNOWN=pending investigation.
+#
+# Ownership is BEST-EFFORT from file paths and prior context; no test was
+# executed with source-level instrumentation in 1B.0. Confirmation happens
+# in Slice 1B.1.
+#
+# file                                                      count  category   owner-epic
+# tests/unit/yvr-template-integrity.test.ts                   52   DRIFT      YVR template schema
+# tests/integration/yvr-intake-flows.test.ts                  30   MOCK       YVR intake pipeline
+# tests/integration/industryDepartmentPipeline.test.ts        13   DRIFT      Industry classifier
+# tests/integration/builder-with-seeds.test.ts                12   LEAK       Builder store seeds
+# tests/integration/yvr-template-integration.test.ts          11   MOCK       YVR templates
+# tests/rbac/rbac-permissions.test.ts                         10   DRIFT      RBAC roles
+# tests/integration/analytics-with-seeds.test.ts               9   LEAK       Analytics seed data
+# tests/unit/builderValidation.test.ts                         9   DRIFT      Builder validator
+# tests/unit/industryClassifier.test.ts                        9   DRIFT      Industry classifier
+# tests/integration/integrations.test.ts                       8   MOCK       Integrations hub
+# tests/integration/template-url-loading.test.ts               8   ENV        Fetch/URL harness
+# tests/unit/twinTemplateValidation.test.ts                    7   DRIFT      Twin templates
+# tests/integration/analytics.test.ts                          6   MOCK       Analytics
+# tests/unit/blueprint-converters.test.ts                      6   DRIFT      Blueprint schema
+# tests/unit/useBuilderAutosave.test.ts                        6   LEAK       Autosave hook (timers)
+# tests/digitalTwinRuntime.test.ts                             5   DRIFT      Runtime enforcement
+# tests/unit/builderStore.test.ts                              5   LEAK       Zustand store
+# tests/unit/unified-store.test.ts                             5   LEAK       Zustand store
+# tests/unit/useBuilderHistory.test.ts                         4   LEAK       Undo/redo history
+# tests/simulationEngine.test.ts                               3   UNKNOWN    simulation (Phase 1B focus)
+# src/lib/utils/normalizeCompanyName.test.ts                   3   OBSOLETE   Extractor rewrite
+# tests/integration/builder.test.ts                            2   MOCK       Builder
+# src/lib/__tests__/simulationTemplates.test.ts                2   UNKNOWN    simulation templates
+# tests/integration/intake-blueprint-flow.test.ts              1   MOCK       Intake
+# tests/integration/operations.test.ts                         1   MOCK       Operations
+# tests/integration/template-to-builder.test.ts                1   MOCK       Templates
+# tests/performance/load.test.ts                               1   ENV        Perf harness
+# tests/rbac/rbac-audit.test.ts                                1   DRIFT      RBAC audit
+# tests/unit/builder-navigation.test.ts                        1   DRIFT      Nav schema
+# tests/unit/digitalTwinValidators.test.ts                     1   DRIFT      Twin validators
+# tests/unit/open-builder-with-template.test.ts                1   MOCK       Builder open
+# tests/unit/recommendationEngine.test.ts                      1   DRIFT      Recommendations
+# tests/unit/url-turbo-capture-config.test.ts                  1   OBSOLETE   URL capture config
+# src/lib/__tests__/twinNameMigration.test.ts                  1   OBSOLETE   Name migration
+#
+# Totals: DRIFT=137  MOCK=61  LEAK=41  OBSOLETE=5  ENV=9  UNKNOWN=5  DEFECT=0
+# No entries are classified DEFECT without further investigation;
+# UNKNOWN entries are those inside the Phase 1B simulation blast radius.

@@ -11,7 +11,7 @@ the next slice is authorized.
 | Slice | Scope | Duration target | Rollback |
 |---|---|---|---|
 | **1B.0** | Baseline anchor + design (this doc) | complete | n/a — docs only |
-| **1B.1** | Legacy-failure classification & non-destructive triage | 1 turn | delete triage docs |
+| **1B.1** | Provider contract + fail-closed facade (no consumer migration) | complete | delete `src/simulation/{api.ts,providers/**}` |
 | **1B.2** | Characterization tests for the 7 simulation engines | 1–2 turns | delete new test files |
 | **1B.3** | Introduce `src/simulation/api.ts` facade + provider interface (no consumer migration) | 1 turn | delete new files |
 | **1B.4** | Codemod: consumers of `SimulationEngine` → `api.ts`; `compat/*` re-exports for `twins/**` | 1–2 turns | revert codemod commit |

@@ -115,6 +115,41 @@ if a caller passes fixture data — `DomainProvenanceHeader` renders the
 provenance it is given verbatim, and the header is the only element
 that emits the badge.
 
+## Phase 1A.3.c.1 corrective pass (2026-07-17)
+
+Root-level provenance alone is insufficient — every visible KPI now
+carries its own classification via an enumerated catalog.
+
+**New primitives**
+- `src/lib/provenance/metricCatalog.ts` — `MetricCatalogEntry` type,
+  `defineCatalog()` (duplicate-id guard), `describeMetric()`.
+- `src/components/provenance/MetricProvenanceManifest.tsx` — accessible
+  `<details>` disclosure that emits `data-metric-id`,
+  `data-provenance`, and `data-provenance-source` per catalog entry.
+- `src/components/data-centre-twin/domains/metricCatalogs.ts` — 11
+  catalogs (9 domains + intelligence chart series + infrastructure ops).
+
+**Classification rules applied**
+- Fixture-backed values ⇒ `demo`, source = `AURA demonstration fixture`.
+- Facility configuration values ⇒ `static`, source cites `(configured)`.
+- Sovereignty assessments (score, residency, audit readiness) ⇒
+  `unavailable` — no third-party audit evidence.
+- Sovereignty jurisdiction / legal entity / data controller ⇒ `static`.
+- Sovereignty framework example set ⇒ `demo`.
+- Uptime Institute / ASHRAE / ISO 27001 mentioned only in `reference`,
+  never as `source`.
+
+**Enforcement**
+- `src/lib/provenance/__tests__/metricCatalog.test.ts` (26 tests):
+  id-uniqueness, no `live`, fixture-source discipline, static/config
+  discipline, sovereignty mixed classification, chart-series reference
+  attribution.
+- `domainProvenance.test.tsx` now enumerates every catalog entry (52
+  per-metric assertions) and requires each rendered metric element to
+  match its catalog `data-provenance` and `data-provenance-source`.
+
+**Suite results**: 14 files / 179 passed / 0 failed (was 104).
+
 ## Verification
 
 Sweep command used:

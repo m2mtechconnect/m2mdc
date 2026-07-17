@@ -1,0 +1,287 @@
+{
+  "total": 47,
+  "tests": [
+    {
+      "file": "auth-surfaces.spec.ts",
+      "line": 78,
+      "title": "auth-surfaces.spec.ts > Auth-gated surfaces \u2014 mocked session, zero external egress > /dashboard renders with mocked session and no live provenance",
+      "projectName": "chromium"
+    },
+    {
+      "file": "auth-surfaces.spec.ts",
+      "line": 84,
+      "title": "auth-surfaces.spec.ts > Auth-gated surfaces \u2014 mocked session, zero external egress > /intelligence exposes active export controls and no live provenance",
+      "projectName": "chromium"
+    },
+    {
+      "file": "auth-surfaces.spec.ts",
+      "line": 95,
+      "title": "auth-surfaces.spec.ts > Auth-gated surfaces \u2014 mocked session, zero external egress > /compliance exposes DISABLED audit-export control with reason",
+      "projectName": "chromium"
+    },
+    {
+      "file": "auth-surfaces.spec.ts",
+      "line": 109,
+      "title": "auth-surfaces.spec.ts > Auth-gated surfaces \u2014 mocked session, zero external egress > /infrastructure renders provenance manifest and no live provenance",
+      "projectName": "chromium"
+    },
+    {
+      "file": "auth-surfaces.spec.ts",
+      "line": 121,
+      "title": "auth-surfaces.spec.ts > Sovereign export control \u2014 reachable via demo route > data-centre-twin ?demo=true \u2014 no live provenance on retrofitted domains",
+      "projectName": "chromium"
+    },
+    {
+      "file": "manifest-a11y.spec.ts",
+      "line": 21,
+      "title": "manifest-a11y.spec.ts > MetricProvenanceManifest \u2014 a11y > manifest on the sovereignty domain view is keyboard-openable and lists rows",
+      "projectName": "chromium"
+    },
+    {
+      "file": "manifest-a11y.spec.ts",
+      "line": 46,
+      "title": "manifest-a11y.spec.ts > MetricProvenanceManifest \u2014 a11y > every KPI card on /omniverse-scene has accessible provenance disclosure",
+      "projectName": "chromium"
+    },
+    {
+      "file": "runtime-states.spec.ts",
+      "line": 48,
+      "title": "runtime-states.spec.ts > Kit runtime states \u2014 /omniverse-scene > 1) validated live \u2014 connected badge, per-metric provenance=live",
+      "projectName": "chromium"
+    },
+    {
+      "file": "runtime-states.spec.ts",
+      "line": 60,
+      "title": "runtime-states.spec.ts > Kit runtime states \u2014 /omniverse-scene > 2) Kit disabled \u2014 no fetch happens, badge says \"Kit disabled\"",
+      "projectName": "chromium"
+    },
+    {
+      "file": "runtime-states.spec.ts",
+      "line": 79,
+      "title": "runtime-states.spec.ts > Kit runtime states \u2014 /omniverse-scene > 3) network unavailable \u2014 badge \"Kit unavailable\", metrics N/A",
+      "projectName": "chromium"
+    },
+    {
+      "file": "runtime-states.spec.ts",
+      "line": 90,
+      "title": "runtime-states.spec.ts > Kit runtime states \u2014 /omniverse-scene > 4) schema-invalid \u2014 badge \"Kit response invalid\", provenance=demo",
+      "projectName": "chromium"
+    },
+    {
+      "file": "runtime-states.spec.ts",
+      "line": 101,
+      "title": "runtime-states.spec.ts > Kit runtime states \u2014 /omniverse-scene > 5) stale response \u2014 served, but no \"Live\" claim on stale ticks",
+      "projectName": "chromium"
+    },
+    {
+      "file": "runtime-states.spec.ts",
+      "line": 128,
+      "title": "runtime-states.spec.ts > Kit runtime states \u2014 /omniverse-scene > 11) delayed valid-response \u2014 transitions to live only after validation",
+      "projectName": "chromium"
+    },
+    {
+      "file": "runtime-states.spec.ts",
+      "line": 165,
+      "title": "runtime-states.spec.ts > Kit runtime states \u2014 /omniverse-scene > 6) demo fallback \u2014 non-live cards, target still static",
+      "projectName": "chromium"
+    },
+    {
+      "file": "runtime-states.spec.ts",
+      "line": 177,
+      "title": "runtime-states.spec.ts > Kit runtime states \u2014 /omniverse-scene > 7) simulation running \u2014 phase badge exposes the running phase",
+      "projectName": "chromium"
+    },
+    {
+      "file": "runtime-states.spec.ts",
+      "line": 185,
+      "title": "runtime-states.spec.ts > Kit runtime states \u2014 /omniverse-scene > 8) simulation baseline \u2014 steady phase, no anomaly copy in header",
+      "projectName": "chromium"
+    },
+    {
+      "file": "runtime-states.spec.ts",
+      "line": 192,
+      "title": "runtime-states.spec.ts > Kit runtime states \u2014 /omniverse-scene > 9) static target \u2014 target PUE card always carries data-provenance=\"static\"",
+      "projectName": "chromium"
+    },
+    {
+      "file": "runtime-states.spec.ts",
+      "line": 204,
+      "title": "runtime-states.spec.ts > Kit runtime states \u2014 /omniverse-scene > 10) unavailable/not-assessed \u2014 sovereignty never fabricates a value",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 62,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Kit runtime states > 01 connecting (delayed response, unavailable)",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 79,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Kit runtime states > 02 validated live",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 87,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Kit runtime states > 03 kit disabled (aborted before validation)",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 95,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Kit runtime states > 04 network unavailable",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 103,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Kit runtime states > 05 schema invalid (demo fallback)",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 111,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Kit runtime states > 06 stale (held response, no live claim)",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 128,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Kit runtime states > 07 demo fallback (invalid \u2192 demo, sovereignty=Not assessed)",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 136,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Kit runtime states > 08 simulation running (anomaly phase)",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 144,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Kit runtime states > 09 simulation baseline (steady phase)",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 152,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Kit runtime states > 10 static target (target PUE card)",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 162,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Kit runtime states > 11 unavailable / not assessed (sovereignty)",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 177,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Auth-gated surfaces > 12 dashboard (mocked session)",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 200,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Auth-gated surfaces > 13 intelligence (charts + export trigger visible)",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 209,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Auth-gated surfaces > 14 intelligence export menu open",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 223,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Auth-gated surfaces > 15 intelligence PUE chart (scrolled)",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 234,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Auth-gated surfaces > 16 intelligence energy chart (scrolled further)",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 244,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Auth-gated surfaces > 17 compliance blocked export with reason",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 255,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Auth-gated surfaces > 18 infrastructure operational metrics (demo)",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 284,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Nine domain views > 19-domain-thermal.png",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 284,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Nine domain views > 20-domain-power.png",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 284,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Nine domain views > 21-domain-cooling.png",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 284,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Nine domain views > 22-domain-network.png",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 284,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Nine domain views > 23-domain-facility.png",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 284,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Nine domain views > 24-domain-workload.png",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 284,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Nine domain views > 25-domain-sovereignty.png",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 284,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Nine domain views > 26-domain-carbon.png",
+      "projectName": "chromium"
+    },
+    {
+      "file": "screenshots.spec.ts",
+      "line": 284,
+      "title": "screenshots.spec.ts > Phase 1A.3.f \u2014 Nine domain views > 27-domain-financial.png",
+      "projectName": "chromium"
+    },
+    {
+      "file": "surface-inventory.spec.ts",
+      "line": 39,
+      "title": "surface-inventory.spec.ts > Surface inventory \u2014 public retrofitted routes > landing page renders no fabricated live provenance",
+      "projectName": "chromium"
+    },
+    {
+      "file": "surface-inventory.spec.ts",
+      "line": 47,
+      "title": "surface-inventory.spec.ts > Surface inventory \u2014 public retrofitted routes > data-centre-twin demo mode exposes 9 domain views with correct provenance",
+      "projectName": "chromium"
+    }
+  ]
+}

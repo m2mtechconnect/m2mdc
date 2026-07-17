@@ -1,6 +1,7 @@
 # ADR-0007: Simulation provider boundary
 
-Status: Proposed (Phase 1B.0). Supersedes the deferred parts of ADR-0001.
+Status: Accepted (Phase 1B.1) with revisions — see §Revisions.
+Supersedes the deferred parts of ADR-0001.
 
 ## Context
 
@@ -35,6 +36,28 @@ Adopt a **provider boundary**:
    provenance yields `unavailable`, never `live`.
 5. The `omniverse` provider is present but throws `NotImplemented`. Its
    existence does **not** constitute a live NVIDIA integration.
+
+## Revisions (Phase 1B.1)
+
+- **Omniverse provider does NOT throw.** Item 5 above is superseded: the
+  provider is config-gated and returns typed `disabled` (default) or
+  `not-implemented` (when `VITE_AURA_OMNIVERSE_PROVIDER=enabled`) outcomes.
+  All outcomes carry `provenance: 'unavailable'`, so UI code can never
+  fabricate a value from this provider. This preserves fail-closed
+  semantics without exposing UI code to raised exceptions.
+- **Discriminated outcome envelope.** The provider return type is now a
+  `ProviderOutcome<T>` discriminated union with kinds
+  `ok | disabled | not-implemented | unavailable | cancelled | invalid-input | error`.
+  `ok` values are restricted at the type level to `provenance ∈ {simulated, demo}`;
+  all non-`ok` outcomes are restricted to `provenance: 'unavailable'`.
+  `assertOutcomeIntegrity` enforces this at runtime so a JS caller cannot
+  smuggle a live-tagged value past the facade.
+- **Facade never throws.** Errors raised inside a provider are converted
+  to sanitized `kind: 'error'` outcomes (message truncated to 200 chars,
+  no stack).
+- **No consumer migration in this slice.** `src/simulation/index.ts` is
+  unchanged; the facade is opt-in via `src/simulation/api.ts` and today
+  only the contract tests exercise it.
 6. `twins/dataCenter` and `twins/sovereignDataCenter` retain their public
    exports through `src/simulation/compat/*` re-export modules. Consumer
    codemods happen in one dedicated slice.

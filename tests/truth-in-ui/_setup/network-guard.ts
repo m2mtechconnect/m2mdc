@@ -74,16 +74,22 @@ export interface NetworkGuardHandle {
 export async function installNetworkGuard(context: BrowserContext): Promise<NetworkGuardHandle> {
   const violations: { url: string; method: string; reason: string }[] = [];
   const externalAllowed: { url: string; method: string }[] = [];
-  let externalCompleted = false;
+  const externalCompletions: { url: string; addr: string }[] = [];
 
-  // Track requests that actually finished on the wire (i.e. weren't
-  // aborted by any handler). Any completion to a non-local host is a
-  // hard violation of "no real Supabase request completed".
-  context.on('requestfinished', req => {
+  // Detect real-wire completions: Playwright's `route.fulfill()`
+  // returns a response with `serverAddr() === null`, whereas a real
+  // network response carries the origin's IP + port. Any non-local
+  // response with a serverAddr is a hard "the browser talked to the
+  // outside world" violation.
+  context.on('response', async resp => {
     try {
-      const host = new URL(req.url()).hostname;
-      if (!ALLOWED_HOSTS.has(host)) externalCompleted = true;
-    } catch { /* opaque */ }
+      const host = new URL(resp.url()).hostname;
+      if (ALLOWED_HOSTS.has(host)) return;
+      const addr = await resp.serverAddr();
+      if (addr && addr.ipAddress) {
+        externalCompletions.push({ url: resp.url(), addr: `${addr.ipAddress}:${addr.port}` });
+      }
+    } catch { /* opaque or aborted */ }
   });
 
   // `**/*` catches http(s), ws, wss. `route.abort()` prevents any
@@ -125,6 +131,7 @@ export async function installNetworkGuard(context: BrowserContext): Promise<Netw
   return {
     violations: () => violations.slice(),
     externalAllowed: () => externalAllowed.slice(),
-    anyExternalCompleted: () => externalCompleted,
+    anyExternalCompleted: () => externalCompletions.length > 0,
+    externalCompletions: () => externalCompletions.slice(),
   };
 }

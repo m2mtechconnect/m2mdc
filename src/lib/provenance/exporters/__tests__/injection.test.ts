@@ -85,9 +85,19 @@ describe('printHtml — no raw script or event handlers survive', () => {
 describe('markdown — HTML-encoded so downstream MD→HTML renderers cannot execute injected content', () => {
   const md = toMarkdown(payload, { narrative: [{ heading: `H ${XSS}`, body: `B ${IMG}` }] });
 
-  it('never emits a raw <script> or onerror handler', () => {
+  it('never emits a raw HTML tag opener with an event handler', () => {
+    // Any executable HTML injection would require an unescaped `<`
+    // starting a tag. All hostile `<` inputs must arrive as `&lt;`.
     expect(md).not.toMatch(/<script\b/i);
-    expect(md).not.toMatch(/\sonerror\s*=/i);
+    expect(md).not.toMatch(/<[a-z][^>]*\son\w+\s*=/i);
+  });
+
+  it('encodes all raw `<` characters supplied by hostile input', () => {
+    // Count occurrences of every hostile-input `<` — they must all
+    // appear as `&lt;` and never as raw `<`.
+    const rawLt = (md.match(/<img\b/gi) ?? []).length;
+    expect(rawLt).toBe(0);
+    expect(md).toContain('&lt;img src=x onerror=alert(1)&gt;');
   });
 
   it('encodes all interpolated fields (title, note, name, value, unit, source, appendix)', () => {

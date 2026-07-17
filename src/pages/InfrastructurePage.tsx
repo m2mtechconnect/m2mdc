@@ -27,6 +27,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { DomainProvenanceHeader } from "@/components/provenance/DomainProvenanceHeader";
+import { MetricProvenanceManifest } from "@/components/provenance/MetricProvenanceManifest";
+import { INFRASTRUCTURE_OPERATIONAL_METRICS } from "@/components/data-centre-twin/domains/metricCatalogs";
 
 /* ═══════════════════════════════════════════════════════════
    MOCK DATA
@@ -477,6 +479,12 @@ const InfrastructurePage = () => {
               sourceName="InfrastructurePage/mock"
               description="Static mock. No live DCIM/BMS feed wired on this route."
               ariaContext="Infrastructure operational metrics data provenance"
+            />
+          </div>
+          <div className="mb-3">
+            <MetricProvenanceManifest
+              domain="infrastructure-operational"
+              metrics={INFRASTRUCTURE_OPERATIONAL_METRICS}
             />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">

@@ -27,7 +27,6 @@ import { AIRecommendationsPanel } from '@/components/simulation/AIRecommendation
 import { MultiRunComparison } from '@/components/simulation/MultiRunComparison';
 import { useEnhancedSimulation } from '../hooks/useEnhancedSimulation';
 import { useSovereignDCTwin } from '../hooks/useSovereignDCTwin';
-import { generatePlaybook, playbookToMarkdown } from '../generatePlaybook';
 import { getAllDemoFacilities } from '../mockData';
 import { SOVEREIGN_DC_COPILOT_CHIPS } from '../copilotContext';
 import { sovereignDCAnalytics } from '../analytics';
@@ -71,7 +70,6 @@ export function SovereignDCSimulationDashboard({
     changeSpeed,
   } = useEnhancedSimulation({ facility });
 
-  const [isGeneratingPlaybook, setIsGeneratingPlaybook] = useState(false);
   const [activeTab, setActiveTab] = useState('scenarios');
 
   const allFacilities = getAllDemoFacilities();

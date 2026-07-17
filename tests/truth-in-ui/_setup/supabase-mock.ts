@@ -137,18 +137,27 @@ export async function installSupabaseMock(
     // so RBAC-gated UI renders. The profile role does NOT grant any
     // real capability — no server ever sees the fake JWT.
     if (path.startsWith('/rest/v1/profiles') && method === 'GET') {
+      const profile = {
+        id: session.userId,
+        user_id: session.userId,
+        email: 'truth-suite@aura.local',
+        approved: true,
+        is_approved: true,
+        role: opts.profileRole ?? 'admin',
+        created_at: new Date().toISOString(),
+      };
+      // supabase-js .maybeSingle()/.single() send
+      // `Accept: application/vnd.pgrst.object+json`; PostgREST then
+      // returns a single object, NOT an array. Detect that here so
+      // both shapes work.
+      const accept = route.request().headers()['accept'] ?? '';
+      const single = accept.includes('pgrst.object');
       return route.fulfill({
         status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify([{
-          id: session.userId,
-          email: 'truth-suite@aura.local',
-          approved: true,
-          is_approved: true,
-          role: opts.profileRole ?? 'admin',
-          created_at: new Date().toISOString(),
-        }]),
+        contentType: single ? 'application/vnd.pgrst.object+json' : 'application/json',
+        body: JSON.stringify(single ? profile : [profile]),
       });
+    }
     }
     if (path.startsWith('/rest/v1/user_roles') && method === 'GET') {
       return route.fulfill({

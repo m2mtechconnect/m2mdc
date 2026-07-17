@@ -39,6 +39,21 @@ import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenance
 import { MetricProvenanceManifest } from '@/components/provenance/MetricProvenanceManifest';
 import { INTELLIGENCE_CHART_METRICS } from '@/components/data-centre-twin/domains/metricCatalogs';
 import type { ProvenancedMetric } from '@/lib/provenance/types';
+import {
+  downloadPayload,
+  openPrintWindow,
+  toExportRecord,
+  EXPORT_SCHEMA_VERSION,
+  type ExportPayload,
+} from '@/lib/provenance/exporters';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import DataTable, { Column } from '@/components/shared/DataTable';
 import { useBlueprint } from '@/hooks/useBlueprint';
 import { useBlueprintScenarios } from '@/hooks/useBlueprintScenarios';

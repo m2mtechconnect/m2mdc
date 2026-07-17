@@ -19,6 +19,7 @@ import {
   toPrintHtml,
   toExportRecord,
   EXPORT_SCHEMA_VERSION,
+  type ExportPayload,
 } from '@/lib/provenance/exporters';
 
 function read(rel: string) {
@@ -103,13 +104,13 @@ describe('End-to-end payload → CSV/JSON/HTML round-trip (fixture-source discip
     expect(rec.observedAt).toBe('2026-07-13T00:00:00.000Z');
   });
 
-  const payload = {
+  const payload: ExportPayload = {
     schemaVersion: EXPORT_SCHEMA_VERSION,
     surface: 'intelligence.charts',
     title: 'Intelligence charts',
     generatedAt: '2026-07-17T14:30:00.000Z',
     records: [rec],
-  } as const;
+  };
 
   it('CSV output preserves demo classification', () => {
     const csv = toCsv(payload);

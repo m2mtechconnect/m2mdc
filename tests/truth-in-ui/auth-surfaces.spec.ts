@@ -25,10 +25,14 @@ import { installSupabaseMock } from './_setup/supabase-mock';
 
 async function goto(page: import('@playwright/test').Page, path: string) {
   await page.goto(path, { waitUntil: 'domcontentloaded' });
-  // If a redirect to /auth occurred, the session mock failed — surface
-  // that as a proper test failure rather than a downstream selector miss.
   await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
   expect(page.url(), 'must not redirect to /auth').not.toContain('/auth');
+  // The approval gate must actually be satisfied. If we see the
+  // Pending Approval screen, the mock never reached the profiles
+  // handler and the test would otherwise fail with a confusing
+  // "element not found". Fail loudly instead.
+  await expect(page.locator('text=Account Pending Approval'),
+    'profiles mock must satisfy the approval gate').toHaveCount(0);
 }
 
 async function assertNoLive(page: import('@playwright/test').Page) {
@@ -39,8 +43,23 @@ async function assertNoLive(page: import('@playwright/test').Page) {
 }
 
 test.describe('Auth-gated surfaces — mocked session, zero external egress', () => {
-  test.beforeEach(async ({ page }) => {
-    await installSupabaseMock(page);
+  // Per-test handle so each spec can assert the profile mock was
+  // hit AND that nothing left the browser to a real Supabase host.
+  let mock: Awaited<ReturnType<typeof installSupabaseMock>>;
+
+  test.beforeEach(async ({ context }) => {
+    // Context-level install — happens BEFORE the page fixture is
+    // resolved by any per-test code. Registered AFTER the guard so
+    // it runs first in Playwright's LIFO route chain.
+    mock = await installSupabaseMock(context);
+  });
+
+  test.afterEach(async ({ guard }) => {
+    // Hard invariants for every auth-gated spec.
+    expect(mock.profileHits(),
+      'profiles mock must be hit at least once (approval gate).').toBeGreaterThan(0);
+    expect(guard.anyExternalCompleted(),
+      'no real external request may complete during an auth-gated spec.').toBe(false);
   });
 
   test('/dashboard renders with mocked session and no live provenance', async ({ page, guard }) => {
@@ -86,8 +105,8 @@ test.describe('Auth-gated surfaces — mocked session, zero external egress', ()
 });
 
 test.describe('Sovereign export control — reachable via demo route', () => {
-  test('data-centre-twin ?demo=true — no live provenance on retrofitted domains', async ({ page, guard }) => {
-    await installSupabaseMock(page);
+  test('data-centre-twin ?demo=true — no live provenance on retrofitted domains', async ({ context, page, guard }) => {
+    await installSupabaseMock(context);
     await page.goto('/data-centre-twin?demo=true', { waitUntil: 'domcontentloaded' });
     await assertNoLive(page);
     void guard;

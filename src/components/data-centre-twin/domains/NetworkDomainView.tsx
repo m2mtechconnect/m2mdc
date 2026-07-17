@@ -11,6 +11,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Network, Activity, AlertTriangle, Wifi, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
+import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
+
 interface NetworkDomainViewProps {
   facility: DataCentreFacility;
 }
@@ -118,7 +120,8 @@ export function NetworkDomainView({ facility }: NetworkDomainViewProps) {
   };
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-provenance="demo" data-testid="network-domain-view">
+      <DomainProvenanceHeader provenance="demo" sourceName="sovereignDataCenter/mockData" ariaContext="Network domain data provenance" />
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <SummaryCard

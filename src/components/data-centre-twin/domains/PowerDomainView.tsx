@@ -12,6 +12,8 @@ import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
 import { SummaryCard } from '@/components/shared/SummaryCard';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
+import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
+
 interface PowerDomainViewProps {
   facility: DataCentreFacility;
 }
@@ -44,7 +46,8 @@ export function PowerDomainView({ facility }: PowerDomainViewProps) {
   };
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-provenance="demo" data-testid="power-domain-view">
+      <DomainProvenanceHeader provenance="demo" sourceName="sovereignDataCenter/mockData" ariaContext="Power domain data provenance" />
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <SummaryCard

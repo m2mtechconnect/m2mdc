@@ -218,6 +218,18 @@ export default function IntelligenceDashboard() {
    * - Green DC target: 1.20-1.40
    * Source: uptimeinstitute.com/resources/research-and-reports
    */
+  /**
+   * Series-level provenance (Phase 1A.3.c). These arrays are Uptime
+   * Institute reference values, not live DCIM readings, so every point
+   * carries `demo` provenance. A consumer that wants to render a real
+   * DCIM feed must overwrite the whole series and its `__provenance`
+   * companion — a per-point wrapper stays out of the recharts render path.
+   */
+  const pueChartProvenance = {
+    provenance: 'demo' as const,
+    source: 'uptime-institute-2024',
+    note: 'PUE trend reference (Uptime Institute Global DC Survey 2024).',
+  };
   const pueChartData = [
     { date: 'Mon', pue: 1.28 },  // Start of week, baseline operations
     { date: 'Tue', pue: 1.26 },  // Optimal cooling after Monday adjustments
@@ -235,6 +247,11 @@ export default function IntelligenceDashboard() {
    * - Typical IT load density: 5-15 kW per rack (hyperscale: 20-40 kW)
    * Source: ashrae.org/technical-resources/bookstore/datacom-series
    */
+  const energyChartProvenance = {
+    provenance: 'demo' as const,
+    source: 'ashrae-tc-9.9',
+    note: 'Facility power vs IT load reference (ASHRAE TC 9.9).',
+  };
   const energyVsLoadData = [
     { hour: '00:00', energy: 2850, itLoad: 2280 },  // Night batch processing (LLM training)
     { hour: '04:00', energy: 2680, itLoad: 2144 },  // Low activity window (maintenance)

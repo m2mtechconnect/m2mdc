@@ -194,39 +194,38 @@ describe('invalid input handling', () => {
 // --------------------------------------------------------------------------
 describe('assertOutcomeIntegrity', () => {
   it('downgrades an ok outcome that claims live provenance', () => {
-    const guarded = assertOutcomeIntegrity({
+    const forged = {
       kind: 'ok',
       providerId: 'compatibility',
-      // @ts-expect-error — the type forbids this at compile time; the guard
-      //                    protects against runtime forgery from JS callers.
       provenance: 'live',
       observedAt: new Date().toISOString(),
       value: {} as SimulationRunPayload,
-    } as ProviderOutcome<SimulationRunPayload>);
+    } as unknown as ProviderOutcome<SimulationRunPayload>;
+    const guarded = assertOutcomeIntegrity(forged);
     expect(guarded.kind).toBe('invalid-input');
     expect(guarded.provenance).toBe('unavailable');
   });
 
   it('downgrades an ok outcome missing observedAt', () => {
-    const guarded = assertOutcomeIntegrity({
+    const forged = {
       kind: 'ok',
       providerId: 'compatibility',
       provenance: 'simulated',
-      // @ts-expect-error runtime forgery guard
       observedAt: undefined,
       value: {} as SimulationRunPayload,
-    } as ProviderOutcome<SimulationRunPayload>);
+    } as unknown as ProviderOutcome<SimulationRunPayload>;
+    const guarded = assertOutcomeIntegrity(forged);
     expect(guarded.kind).toBe('invalid-input');
   });
 
   it('rejects a non-ok outcome that claims non-unavailable provenance', () => {
-    const guarded = assertOutcomeIntegrity({
+    const forged = {
       kind: 'unavailable',
       providerId: 'omniverse',
-      // @ts-expect-error runtime forgery guard
       provenance: 'simulated',
       reason: 'x',
-    } as unknown as ProviderOutcome<SimulationRunPayload>);
+    } as unknown as ProviderOutcome<SimulationRunPayload>;
+    const guarded = assertOutcomeIntegrity(forged);
     expect(guarded.kind).toBe('invalid-input');
   });
 });

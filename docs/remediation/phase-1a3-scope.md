@@ -87,6 +87,17 @@ unavailable / schema-invalid / stale / demo-fallback) with a deterministic
 
 ## 3. Random / synthetic sources feeding in-scope surfaces
 
+> **Correction (2026-07-17):** The earlier claim that "no in-scope source
+> uses `Math.random()` inside a component render path" is withdrawn — an
+> escape bug in the initial ripgrep pattern hid 40+ render-path sites
+> inside `src/components/simulation/*` and `src/components/data-centre-twin/*`.
+> The corrected inventory now lives in
+> `random-and-synthetic-data-register.md`. The material consequence is that
+> 1A.3.b and 1A.3.c must **replace** render-path randomness with a seeded
+> PRNG (`mulberry32` from the omniverse adapter is a suitable base) at the
+> same time as they add provenance wrapping — a wrapper alone cannot make a
+> non-deterministic value truthful.
+
 Live sweep on `src/twins/**` + `src/pages/**` + `src/components/**`
 (excluding `__tests__/`). Files that materially feed in-scope surfaces:
 
@@ -103,6 +114,10 @@ No in-scope source uses `Math.random()` inside a component render path; all
 randomness is confined to the fixture modules above and one Vitest setup.
 `omniverseAdapter.ts` is explicitly `Math.random()`-free (asserted at L26
 and by tests) — the Kit path remains deterministic.
+
+~~The paragraph above was inaccurate — see the correction box at the top of
+§3.~~ The `omniverseAdapter.ts` claim (last sentence) remains true and
+asserted by its tests.
 
 ## 4. Provenance-classification decision table
 
@@ -125,13 +140,13 @@ Rough sizing for the remaining sub-slices, based on LOC + wrap density:
 
 | Sub-slice | Files touched | Effort (ed) |
 |---|---:|---:|
-| 1A.3.b Simulation chrome | 6 | 3 |
-| 1A.3.c Nine domain views + rack helpers | ~14 | 6 |
+| 1A.3.b Simulation chrome (seed PRNG + provenance for 6+3 components) | 9 | 4.5 |
+| 1A.3.c Nine domain views + rack helpers + chart arrays + InfrastructurePage | ~18 | 7.5 |
 | 1A.3.d Staleness + Kit-state tests | 1 new + 1 edit | 1 |
 | 1A.3.e Reports/exports | 0 (nothing active) | 0.25 |
-| 1A.3.f Playwright + screenshots | 1 spec + 12 shots | 2 |
+| 1A.3.f Playwright + screenshots (~25 shots) | 1 spec + ~25 shots | 3 |
 | 1A.3.g A11y + final report | ~docs + assertions | 1 |
-| **Total** | **~22** | **13.25 ed** |
+| **Total** | **~30** | **17.25 ed** |
 
 This is > one working day of implementation; delivery will remain in the
 approved hard-stop cadence.

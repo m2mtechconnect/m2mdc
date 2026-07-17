@@ -17,8 +17,32 @@ non-operational noise.
 
 ## Reachable from active routes
 
+> **Register correction (2026-07-17 during 1A.3.a).** A re-run of the
+> sweep with a correctly escaped ripgrep pattern surfaced 40+ additional
+> `Math.random()` sites inside `src/components/simulation/` and
+> `src/components/data-centre-twin/` that the initial pass missed. The
+> table below is the corrected inventory. The claim in
+> `phase-1a3-scope.md` §3 that "no in-scope source uses `Math.random()`
+> inside a component render path" is **withdrawn**; several
+> sim-chrome components and domain views generate randomness at
+> render/`useMemo` time.
+
 | File:line | Symbol / expression | Consumer route(s) | User-visible effect | Class | Provenance today | Owner |
 |---|---|---|---|---|---|---|
+| `src/components/simulation/MultiKPIOverlay.tsx:69,76,84` | `generateRealisticData` noise, thermal jitter, uptime jitter | `/simulation/preview` | Chart series values (PUE / thermal / carbon / renewable / uptime) | demo-fixture (render-path) | untagged | 1A.3.b — replace with seeded PRNG, tag series `demo` |
+| `src/components/simulation/EnhancedKPIChartsPanel.tsx:32-114` | 14× `baselineGenerator` lambdas | `/simulation/preview` | Baseline strip for every chart | demo-fixture (render-path) | untagged | 1A.3.b — seeded PRNG + series `demo` |
+| `src/components/simulation/EnhancedKPIChartsPanel.tsx:177,185-193` | historical/predicted synthesis | `/simulation/preview` | Historical + prediction ribbon | demo-fixture (render-path) | untagged | 1A.3.b — seeded PRNG + series `demo` |
+| `src/components/simulation/DCSimulationPanel.tsx:70-77` | rack inlet/power/util synth | `/simulation/preview`, twin sim tab | Rack-level demo baseline | demo-fixture (render-path) | untagged | 1A.3.b — seeded PRNG + `demo` |
+| `src/components/simulation/DCSimulationPanel.tsx:234` | run-id suffix | Sim panels | Internal id | harmless-animation | n/a | keep |
+| `src/components/simulation/ScenarioSimulationPanel.tsx:163` | run-id suffix | Sim scenario | Internal id | harmless-animation | n/a | keep |
+| `src/components/simulation/AnimatedRackHeatmap.tsx:28-30` | tempC / powerKw / gpuUtilPct seed | `/simulation/preview` | Animated rack tiles | demo-fixture (render-path) | untagged | 1A.3.b — seeded PRNG + `demo` |
+| `src/components/simulation/LiveSimulationDashboard.tsx:247,265` | series noise | `/simulation/preview` | "Live" dashboard chart jitter | demo-fixture (render-path) | untagged | 1A.3.b — seeded PRNG; **strip "Live" copy** |
+| `src/components/simulation/KPICorrelationMatrix.tsx:44` | impact score synth | `/simulation/preview` | Correlation-matrix impact bars | demo-fixture (render-path) | untagged | 1A.3.b — seeded PRNG + `demo` |
+| `src/components/data-centre-twin/domains/NetworkDomainView.tsx:28-44` | 12× switch synth (util/temp/uptime/ports) | `/data-centre-twin` | Every Network view value | demo-fixture (render-path) | untagged | 1A.3.c — seeded PRNG + `demo` per-metric |
+| `src/components/data-centre-twin/thermal/ThermalHeatmapUtils.ts:131` | sparkline delta jitter | `/data-centre-twin` (D1) | Thermal sparkline path | harmless-animation | n/a | keep (decorative) |
+| `src/components/data-centre-twin/overview/EnhancedRackOverview.tsx:56,73` | outlet-temp + cooling-zone synth | `/data-centre-twin` overview | Per-rack outlet temp + zone letter | demo-fixture (render-path) | untagged | 1A.3.c — seeded PRNG + `demo` |
+| `src/components/data-centre-twin/overview/CompactRackOverview.tsx:35` | outlet-temp synth | `/data-centre-twin` overview | Per-rack outlet temp | demo-fixture (render-path) | untagged | 1A.3.c — seeded PRNG + `demo` |
+| `src/components/data-centre-twin/overview/SparklineChart.tsx:112` | sparkline jitter | Multiple | Decorative sparkline | harmless-animation | n/a | keep |
 | `src/pages/IntelligenceDashboard.tsx:203-205` | `roi`, `accuracy`, `total_runs` fallback | `/analytics`, `/operations`, `/intelligence` | KPI tile values when Supabase RPC missing | demo-fixture | `demo` (via `demoMetric` per 1A.2) | 1A.2 done — verify in 1A.3.c |
 | `src/pages/InfrastructurePage.tsx:238` | telemetry `setInterval` mutation | `/infrastructure` | Live-mutating rack tiles | demo-fixture | untagged | **excluded** (page slated for removal) |
 | `src/pages/InfrastructurePage.tsx:258` | `setTimeout` scroll | `/infrastructure` | Scroll behaviour only | harmless-animation | n/a | keep |

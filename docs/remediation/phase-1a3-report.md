@@ -129,26 +129,32 @@ explicitly logged.
   landing route; auth-related egress goes to the Lovable-Cloud backend
   only.
 
-### Finding B — Playwright Chromium missing shared library in current runner
+### Finding B — Playwright Chromium missing shared libraries in sandbox
 
-The current sandbox runner is missing `libglib-2.0.so.0`, so
-`chromium.launch()` fails with "Target page, context or browser has
-been closed". This affected the 1A.3.g re-run only; the 47/47 green
-result and the 27 evidence images were captured on the identical
-source tree during 1A.3.e.1 / 1A.3.f.
+The base sandbox image ships Playwright's Chromium binary but not its
+glibc / GTK / X11 runtime dependencies (glib, pango, fontconfig, nss,
+nspr, atk, gdk-pixbuf, gtk3, xorg libs, libgbm, libudev). In Phase
+1A.3.g.1 the gap was closed at run-time by assembling
+`LD_LIBRARY_PATH` from `nix eval --raw nixpkgs#<pkg>` outputs; the
+47/47 green run is on that basis (§9). This is a runner-image gap,
+not a code defect, but the workaround must be codified.
 
 - Owner: Platform (CI).
-- Phase: 1A.3.g follow-up (runner image fix) → automatic re-verification
-  in Phase 1B kick-off.
+- Phase: 1B P1 — bake the library set into the CI image or ship a
+  `scripts/pw-env.sh` wrapper.
 - Acceptance: `npx playwright test --config playwright.truth.config.ts`
-  reports 47/47 in the CI runner used for Phase 1B.
+  reports 47/47 without an ad-hoc `LD_LIBRARY_PATH`.
 
 ## 7. Residual Phase 1A acceptance gaps
 
-1. Full Vitest suite still red (198 baseline + fork-runner timeouts).
-   Owner: Platform; target: Phase 1B P0.
-2. Full ESLint still red (1472). Owner: Platform; target: Phase 1B P1.
-3. Playwright re-run pending the runner-image fix in Finding B.
+1. Full Vitest suite still red: 236 deterministic failures across two
+   identical runs. Regression comparison against the Phase 0 baseline
+   is **unproven** (no baseline SHA recorded — see §4.1). Owner:
+   Platform; target: Phase 1B P0, starting by re-recording the Phase 0
+   baseline SHA so identity-level comparison becomes possible.
+2. Full ESLint still red at 1467 (4 below Phase 0 baseline; net
+   improvement). Owner: Platform; target: Phase 1B P1.
+3. Chromium runtime libraries not baked into the CI image (Finding B).
 4. Cosmetic: locale-flag glyph fallback, Compliance subtitle
    `undefined%` string. Owner: Platform (UX); target: Phase 1B.
 
@@ -157,14 +163,29 @@ legacy or infrastructure items, individually tracked.
 
 ## 8. Go / no-go recommendation for Phase 1B
 
-**GO — with the four residual items in §7 tracked as Phase 1B intake.**
+**CONDITIONAL GO — with one caveat.**
 
-Rationale: every Phase 1A.3 exit-criterion is met on the source under
-audit — typecheck clean, production build clean, targeted provenance
-tests 194/194 green, evidence bundle intact and secret-free,
-per-metric provenance and provenance-preserving exports wired,
-capability-traceability held honest. The red gates are demonstrably
-legacy (baseline-attested) or infrastructure (missing sandbox lib);
-neither is caused by Phase 1A code, and both are Phase 1B intake.
+Rationale (proven on the current tree):
 
-Phase 1B remains **unauthorized**; this recommendation is advisory.
+- Typecheck: PASS (§9).
+- Production build: PASS, SEO gate PASS, 23.05s (§9).
+- Targeted provenance/component tests: 194/194 PASS.
+- Playwright truth suite: **47/47 PASS** (§9) — reproduced this
+  checkpoint, not carried forward.
+- Evidence checksums: **27/27 OK** after the Phase 1A.3.g.1 manifest
+  regeneration (see §3.1); pixel content of the committed images is
+  unchanged (`git status` clean, `git diff --check` clean).
+- ESLint: net improvement (-4 vs Phase 0 baseline); zero new
+  violations from Phase 1A code.
+- Full Vitest: deterministic 236-failure red across two runs; failing
+  set dominated by pre-existing legacy suites.
+
+**Caveat.** Phase 0 did not record a commit SHA, so the 236-failure
+set cannot be identity-diffed against the Phase 0 baseline within this
+checkpoint. The recommendation is therefore **conditional**: Phase 1B
+kick-off should re-record the Phase 0 baseline SHA (or replay the
+baseline command on a known commit) and complete the identity diff
+before opening any Phase 1B branch that touches shared Phase 1A code.
+
+Phase 1B remains **unauthorized** pending user approval; this
+recommendation is advisory.

@@ -245,7 +245,7 @@ export const DCSimulationPanel = memo(function DCSimulationPanel({ compact = fal
       runTokenRef.current++;
       setSimulationResult(null);
     }
-  }, [status, activeScenario, events, baselineKpis, currentKpis, elapsedTime]);
+  }, [status, activeScenario, events, baselineKpis, currentKpis, elapsedTime, facade]);
   
   // Build KPI deltas from current state
   // Map alternate KPI IDs to their canonical forms for display

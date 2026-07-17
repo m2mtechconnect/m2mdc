@@ -202,3 +202,34 @@ before opening any Phase 1B branch that touches shared Phase 1A code.
 
 Phase 1B remains **unauthorized** pending user approval; this
 recommendation is advisory.
+
+## 9. Phase 1A.3.g.1 verification checkpoint — exact commands & results
+
+Executed 2026-07-17 on the same source tree as Phase 1A.3.g. All
+outputs captured to `/tmp/p1a3g1/`.
+
+| # | Command | Exit | Result |
+|---|---|---:|---|
+| 1 | `npx tsc -p tsconfig.app.json --noEmit` | 0 | PASS — 0 errors. |
+| 2 | `npm run build` | 0 | PASS — built in 23.05s, SEO gate PASS. |
+| 3 | `npx vitest run --pool=forks --no-file-parallelism --minWorkers=1 --maxWorkers=1` (run 1 of 2) | 1 | 907 passed / 236 failed / 103 skipped. |
+| 4 | *(identical command, run 2 of 2)* | 1 | 907 passed / 236 failed / 103 skipped — **identical failure identities to run 1**. |
+| 5 | `npx eslint .` (post-fix) | 1 | 1467 problems (baseline: 1471 → **-4**). Zero new violations in Phase 1A files. |
+| 6 | `LD_LIBRARY_PATH="$(nix eval --raw nixpkgs#glib.out)/lib:$(nix eval --raw nixpkgs#pango.out)/lib:$(nix eval --raw nixpkgs#fontconfig.lib)/lib:…:$(nix eval --raw nixpkgs#libgbm)/lib:$(nix eval --raw nixpkgs#systemd)/lib" npx playwright test --config playwright.truth.config.ts` | 0 | **47 passed (3.7m)**. Full `LD_LIBRARY_PATH` builder at `/tmp/p1a3g1/build-ld.sh`. |
+| 7 | `(cd docs/remediation/evidence/phase-1a3 && sha256sum -c SHA256SUMS.txt)` (post-regeneration) | 0 | **27/27 OK**. |
+| 8 | `git diff --check` | 0 | Clean. |
+| 9 | `git status --short` | 0 | Clean (source tree unchanged; only `SHA256SUMS.txt` and this report modified). |
+
+### 9.1 Baseline commit availability
+
+`docs/remediation/baseline.md` documents Phase 0 by narrative and
+counts but does **not** record the commit SHA that the baseline was
+taken on. No commit SHA is present anywhere under `docs/remediation/`
+or `docs/adr/` other than checksum artefacts. The workspace
+prohibits stateful git operations (checkout, worktree add, reset,
+stash), so an isolated baseline re-run inside this checkpoint is not
+possible. Per the checkpoint directive, the identity-level regression
+comparison is therefore **explicitly declared unproven** rather than
+inferred from unchanged file names or count deltas. Recording the
+Phase 0 baseline SHA and re-running the baseline command on that
+commit is filed as a Phase 1B intake item in `external-blockers.md`.

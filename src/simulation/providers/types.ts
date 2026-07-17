@@ -172,13 +172,16 @@ export function assertOutcomeIntegrity<T>(
         message: 'provider outcome missing observedAt timestamp',
       };
     }
-  } else if (outcome.provenance !== 'unavailable') {
-    return {
-      kind: 'invalid-input',
-      providerId: outcome.providerId,
-      provenance: 'unavailable',
-      message: 'non-ok outcome must carry unavailable provenance',
-    };
+  } else {
+    const nonOk = outcome as Exclude<ProviderOutcome<T>, { kind: 'ok' }>;
+    if (nonOk.provenance !== 'unavailable') {
+      return {
+        kind: 'invalid-input',
+        providerId: nonOk.providerId,
+        provenance: 'unavailable',
+        message: 'non-ok outcome must carry unavailable provenance',
+      };
+    }
   }
   return outcome;
 }

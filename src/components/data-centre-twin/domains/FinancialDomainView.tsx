@@ -12,6 +12,8 @@ import { useFinancialEngine } from '@/hooks/useFinancialEngine';
 import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
 import { SummaryCard } from '@/components/shared/SummaryCard';
 
+import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
+
 interface FinancialDomainViewProps {
   facility: DataCentreFacility;
 }
@@ -21,7 +23,8 @@ export function FinancialDomainView({ facility }: FinancialDomainViewProps) {
   const { metrics: financialMetrics, assumptions } = useFinancialEngine(facility);
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-provenance="demo" data-testid="financial-domain-view">
+      <DomainProvenanceHeader provenance="demo" sourceName="sovereignDataCenter/mockData" ariaContext="Financial domain data provenance" />
       {/* Top KPI Row */}
       <div className="grid gap-4 md:grid-cols-4">
         <SummaryCard

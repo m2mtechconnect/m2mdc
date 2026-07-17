@@ -12,6 +12,8 @@ import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
 import { SummaryCard } from '@/components/shared/SummaryCard';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
+import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
+
 interface WorkloadDomainViewProps {
   facility: DataCentreFacility;
 }
@@ -40,7 +42,8 @@ export function WorkloadDomainView({ facility }: WorkloadDomainViewProps) {
   };
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-provenance="demo" data-testid="workload-domain-view">
+      <DomainProvenanceHeader provenance="demo" sourceName="sovereignDataCenter/mockData" ariaContext="Workload domain data provenance" />
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <SummaryCard

@@ -11,6 +11,8 @@ import { Leaf, TrendingUp, TrendingDown, Zap, Globe, Target, Activity, BarChart3
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 import { useCarbonEngine } from '@/hooks/useCarbonEngine';
 
+import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
+
 interface CarbonDomainViewProps {
   facility: DataCentreFacility;
 }
@@ -25,7 +27,8 @@ export function CarbonDomainView({ facility }: CarbonDomainViewProps) {
   const albertaComparison = compareToRegion('CA-AB');
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-provenance="demo" data-testid="carbon-domain-view">
+      <DomainProvenanceHeader provenance="demo" sourceName="sovereignDataCenter/mockData" ariaContext="Carbon domain data provenance" />
       {/* Carbon KPI Hero Row */}
       <div className="grid gap-4 md:grid-cols-4">
         <CarbonMetricCard

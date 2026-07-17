@@ -35,6 +35,7 @@ import KpiCard from '@/components/shared/KpiCard';
 import { KpiCardProvenance } from '@/components/provenance/KpiCardProvenance';
 import { demoMetric } from '@/lib/provenance';
 import { simulatedMetric } from '@/lib/provenance/kitMetrics';
+import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
 import type { ProvenancedMetric } from '@/lib/provenance/types';
 import DataTable, { Column } from '@/components/shared/DataTable';
 import { useBlueprint } from '@/hooks/useBlueprint';
@@ -217,6 +218,18 @@ export default function IntelligenceDashboard() {
    * - Green DC target: 1.20-1.40
    * Source: uptimeinstitute.com/resources/research-and-reports
    */
+  /**
+   * Series-level provenance (Phase 1A.3.c). These arrays are Uptime
+   * Institute reference values, not live DCIM readings, so every point
+   * carries `demo` provenance. A consumer that wants to render a real
+   * DCIM feed must overwrite the whole series and its `__provenance`
+   * companion — a per-point wrapper stays out of the recharts render path.
+   */
+  const pueChartProvenance = {
+    provenance: 'demo' as const,
+    source: 'uptime-institute-2024',
+    note: 'PUE trend reference (Uptime Institute Global DC Survey 2024).',
+  };
   const pueChartData = [
     { date: 'Mon', pue: 1.28 },  // Start of week, baseline operations
     { date: 'Tue', pue: 1.26 },  // Optimal cooling after Monday adjustments
@@ -234,6 +247,11 @@ export default function IntelligenceDashboard() {
    * - Typical IT load density: 5-15 kW per rack (hyperscale: 20-40 kW)
    * Source: ashrae.org/technical-resources/bookstore/datacom-series
    */
+  const energyChartProvenance = {
+    provenance: 'demo' as const,
+    source: 'ashrae-tc-9.9',
+    note: 'Facility power vs IT load reference (ASHRAE TC 9.9).',
+  };
   const energyVsLoadData = [
     { hour: '00:00', energy: 2850, itLoad: 2280 },  // Night batch processing (LLM training)
     { hour: '04:00', energy: 2680, itLoad: 2144 },  // Low activity window (maintenance)
@@ -576,9 +594,17 @@ export default function IntelligenceDashboard() {
                 }}
               />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
+                <Card data-provenance="demo" data-testid="intelligence-pue-trend-card">
                   <CardHeader>
-                    <CardTitle className="text-base">PUE Trend</CardTitle>
+                    <div className="flex items-center justify-between gap-2">
+                      <CardTitle className="text-base">PUE Trend</CardTitle>
+                      <DomainProvenanceHeader
+                        provenance={pueChartProvenance.provenance}
+                        sourceName={pueChartProvenance.source}
+                        description={pueChartProvenance.note}
+                        ariaContext="PUE Trend chart data provenance"
+                      />
+                    </div>
                     <ChartMeta
                       grain="Facility"
                       window={windowLabel}
@@ -611,9 +637,17 @@ export default function IntelligenceDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card data-provenance="demo" data-testid="intelligence-energy-vs-load-card">
                   <CardHeader>
-                    <CardTitle className="text-base">Power vs IT Load (kW)</CardTitle>
+                    <div className="flex items-center justify-between gap-2">
+                      <CardTitle className="text-base">Power vs IT Load (kW)</CardTitle>
+                      <DomainProvenanceHeader
+                        provenance={energyChartProvenance.provenance}
+                        sourceName={energyChartProvenance.source}
+                        description={energyChartProvenance.note}
+                        ariaContext="Power vs IT Load chart data provenance"
+                      />
+                    </div>
                     <ChartMeta
                       grain="Facility"
                       window="Last 24h"

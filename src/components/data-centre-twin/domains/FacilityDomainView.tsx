@@ -13,6 +13,8 @@ import { SummaryCard } from '@/components/shared/SummaryCard';
 import { motion } from 'framer-motion';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
+import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
+
 interface FacilityDomainViewProps {
   facility: DataCentreFacility;
 }
@@ -68,7 +70,8 @@ export function FacilityDomainView({ facility }: FacilityDomainViewProps) {
   };
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-provenance="demo" data-testid="facility-domain-view">
+      <DomainProvenanceHeader provenance="demo" sourceName="sovereignDataCenter/mockData" ariaContext="Facility domain data provenance" />
       {/* Safety Score */}
       <div className="grid gap-4 md:grid-cols-4">
         <SummaryCard

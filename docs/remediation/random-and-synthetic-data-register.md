@@ -83,8 +83,6 @@ non-operational noise.
 
 ## Excluded from Phase 1A.3 (with rationale)
 
-- `src/pages/InfrastructurePage.tsx` — slated for removal or replacement in
-  Phase 1B; retrofitting perpetuates a page the roadmap intends to delete.
 - `src/pages/Pilot.tsx`, `src/pages/Playbook.tsx` — no operational KPI
   tiles; the values that exist are configured targets and are already
   presented as targets.
@@ -92,6 +90,30 @@ non-operational noise.
   `src/data/industryAccurateDefaults.ts` — out of DC operational scope.
 - `src/components/builder/step5/*Simulation*.ts` — Builder design-time
   preview; not an operational dashboard.
+
+## Phase 1A.3.c additions (2026-07-17)
+
+Chart-array and domain-view surfaces classified this sub-slice. None of
+these sources are live telemetry; every point is a fixture or a
+hard-coded reference value.
+
+| Surface | Data source | Classification | Enforcement |
+| --- | --- | --- | --- |
+| `IntelligenceDashboard.pueChartData` | Uptime Institute 2024 reference | `demo` | `pueChartProvenance` + `DomainProvenanceHeader` on card root |
+| `IntelligenceDashboard.energyVsLoadData` | ASHRAE TC 9.9 reference | `demo` | `energyChartProvenance` + `DomainProvenanceHeader` on card root |
+| `InfrastructurePage` Operational Metrics grid (4 tiles) | Static mock literals | `demo` | Section `data-provenance="demo"` + per-tile `data-provenance` |
+| `InfrastructurePage` "Twin Freshness" tile | No telemetry signal exists | `unavailable` | Tile `data-provenance="unavailable"`, value literal `"Unavailable"` |
+| 9 domain views (`Thermal`, `Power`, `Cooling`, `Network`, `Facility`, `Workload`, `Carbon`, `Financial`) | `generateDataCentreFacility()` fixture | `demo` | Root `data-provenance="demo"` + `DomainProvenanceHeader` |
+| `SovereigntyDomainView` | Compliance scores not assessed | `unavailable` | Root `data-provenance="unavailable"` |
+| `ThermalDomainView` "Live" pill | Renamed to `Snapshot` | n/a | Regression asserted in `domainProvenance.test.tsx` |
+
+Fail-closed guarantees are verified by
+`src/components/data-centre-twin/domains/__tests__/domainProvenance.test.tsx`
+and `src/pages/__tests__/intelligenceInfrastructureProvenance.test.tsx`.
+No surface in this sub-slice can render `data-provenance="live"`, even
+if a caller passes fixture data — `DomainProvenanceHeader` renders the
+provenance it is given verbatim, and the header is the only element
+that emits the badge.
 
 ## Verification
 

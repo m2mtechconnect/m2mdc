@@ -65,7 +65,7 @@ export function buildSimulationResultPayload(
     const metric: ProvenancedMetric<string | number> = {
       value: m.value,
       provenance: 'static',
-      source: scenarioSource,
+      sourceName: scenarioSource,
     };
     records.push(toExportRecord({ catalog, metric, unit: m.unit }));
   }

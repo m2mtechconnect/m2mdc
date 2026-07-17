@@ -48,10 +48,25 @@ export function kitMetric(
   const description = opts?.description;
   const missing = value === null || value === undefined || Number.isNaN(value);
 
-  // Connection took precedence: schema-invalid / network-down → unavailable.
+  // Phase 1A.3.e.1 — classification precedence:
+  //   1. If the hook classified the source as `demo` (disabled config
+  //      OR schema-invalid response), render `demo` — never `unavailable` —
+  //      so the UI carries a fallback disclosure rather than a
+  //      generic "N/A". Missing values still show N/A, but with a
+  //      demo badge so the classification is truthful.
+  if (ctx.provenance === 'demo') {
+    return {
+      value: missing ? null : (value as number),
+      provenance: 'demo',
+      sourceName: source,
+      description,
+    };
+  }
+  //   2. Network-down / true unavailable → unavailable, value null.
   if (ctx.connectionState === 'unavailable') {
     return { value: null, provenance: 'unavailable', sourceName: source, description };
   }
+  //   3. Connected but the reading itself is missing → unavailable.
   if (missing) {
     return { value: null, provenance: 'unavailable', sourceName: source, description };
   }

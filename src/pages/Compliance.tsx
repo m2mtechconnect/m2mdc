@@ -228,10 +228,26 @@ export default function Compliance() {
                 {twin ? `${twin.name} - ${twin.city}` : t('compliance.subtitle')}
               </p>
             </div>
-            <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" />
-              {t('compliance.exportAuditReport')}
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span tabIndex={0} data-testid="compliance-export-audit-blocked">
+                    <Button
+                      variant="outline"
+                      disabled
+                      aria-disabled="true"
+                      data-export-blocked="sovereignty-not-assessed"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      {t('compliance.exportAuditReport')}
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-sm">
+                  {describeExportBlock('sovereignty-not-assessed')}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
 
           {/* DC-Specific KPIs - Now powered by Sovereignty Engine */}

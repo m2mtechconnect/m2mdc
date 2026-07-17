@@ -26,8 +26,7 @@ class RO {
   unobserve() {}
   disconnect() {}
 }
-// @ts-expect-error – jsdom
-globalThis.ResizeObserver = RO;
+(globalThis as unknown as { ResizeObserver: typeof RO }).ResizeObserver = RO;
 
 // Silence recharts ResizeObserver crash under jsdom (same pattern as
 // kpiProvenance.test.tsx).

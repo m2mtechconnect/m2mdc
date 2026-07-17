@@ -31,24 +31,24 @@ type Fixtures = {
  *      LATER, so it runs FIRST and can `route.fallback()` down to
  *      the guard for non-supabase URLs.
  */
+// Shared handle key so `guard` and `context` fixtures see the same
+// install. We store it on the context object under a private symbol.
+const GUARD_KEY = Symbol.for('truth-suite.network-guard');
+
 export const test = base.extend<Fixtures>({
   context: async ({ context }, use) => {
-    await installNetworkGuard(context as BrowserContext);
+    const handle = await installNetworkGuard(context as BrowserContext);
+    (context as unknown as Record<symbol, NetworkGuardHandle>)[GUARD_KEY] = handle;
     await use(context);
   },
+  page: async ({ page }, use) => {
+    // Clock is per-page — install it before the first navigation.
+    await installDeterministicClock(page);
+    await use(page);
+  },
   guard: async ({ context }, use, testInfo) => {
-    // The guard was installed on the context above; re-installing
-    // would double-count. Fetch the handle from context storage.
-    // We keep a single handle per test by storing it on the context.
-    // (Playwright doesn't share fixture state across setups, so we
-    // re-install idempotently: guard uses distinct arrays each call
-    // — accepted, as we only reference this second handle for the
-    // per-test assertion.)
-    const handle = await installNetworkGuard(context as BrowserContext);
-    // Install the deterministic clock on the first page of the
-    // context, using the same page the test will receive.
-    const [firstPage] = context.pages().length ? context.pages() : [await context.newPage()];
-    await installDeterministicClock(firstPage);
+    const handle = (context as unknown as Record<symbol, NetworkGuardHandle>)[GUARD_KEY];
+    if (!handle) throw new Error('network guard fixture not installed on context');
     await use(handle);
     const violations = handle.violations();
     if (violations.length > 0) {

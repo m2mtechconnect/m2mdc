@@ -37,6 +37,7 @@ import { generateSimulationResult, generateRackMetrics } from '@/simulation/gene
 import { DcToolsRow } from '@/components/dc-tools';
 import type { CustomScenarioConfig, SimulationResultSummary, RackMetrics } from '@/simulation/types';
 import { AnimatePresence, motion } from 'framer-motion';
+import { seededRng, rngRange } from '@/lib/provenance/prng';
 
 // Lazy load 3D visualization for performance
 const TwinVisualizationLayout = lazy(() => 
@@ -62,20 +63,19 @@ interface DCSimulationPanelProps {
 // Generate industry-accurate rack data based on ASHRAE thermal guidelines
 // ASHRAE A1: 18-27°C recommended inlet, 15-32°C allowable
 // Typical GPU rack: 15-25kW, H100 racks: 35-70kW
-function generateBaseRacks(count: number = 20): RackMetrics[] {
+//
+// Phase 1A.3.b: seeded so the same `twinId` produces byte-identical racks
+// across renders and reloads. Reload no longer redistributes rack power.
+function generateBaseRacks(count: number = 20, seedText: string = 'default'): RackMetrics[] {
+  const rng = seededRng(`dc-sim-panel/racks/${seedText}/${count}`);
   return Array.from({ length: count }, (_, i) => {
-    // Simulate realistic temperature distribution across hot/cold aisles
-    // Cold aisle inlet: 18-22°C, Hot aisle outlet: 28-35°C
     const isHighDensity = i % 4 === 0; // Every 4th rack is high-density GPU
-    const baseTemp = 19 + Math.random() * 4; // 19-23°C inlet (ASHRAE A1)
-    const tempVariance = isHighDensity ? Math.random() * 3 : Math.random() * 2;
-    
-    // Power: Standard IT rack 5-10kW, GPU rack 15-25kW, H100 rack 35-50kW
-    const basePower = isHighDensity ? 28 + Math.random() * 18 : 6 + Math.random() * 6;
-    
-    // GPU utilization: Typical range 65-85%, with variance
-    const baseUtil = 68 + Math.random() * 16;
-    
+    const baseTemp = 19 + rng() * 4; // 19-23°C inlet (ASHRAE A1)
+    const tempVariance = isHighDensity ? rng() * 3 : rng() * 2;
+
+    const basePower = isHighDensity ? 28 + rng() * 18 : 6 + rng() * 6;
+    const baseUtil = 68 + rng() * 16;
+
     return {
       rackId: `Rack-${String(i + 1).padStart(2, '0')}`,
       tempC: baseTemp + tempVariance,
@@ -94,7 +94,7 @@ export const DCSimulationPanel = memo(function DCSimulationPanel({ compact = fal
   const [showCustomBuilder, setShowCustomBuilder] = useState(false);
   const [activeTab, setActiveTab] = useState<'scenarios' | 'timeline' | 'kpis' | 'heatmap'>('scenarios');
   const [simulationResult, setSimulationResult] = useState<SimulationResultSummary | null>(null);
-  const [baseRacks] = useState<RackMetrics[]>(() => generateBaseRacks(20));
+  const [baseRacks] = useState<RackMetrics[]>(() => generateBaseRacks(20, twinId));
   const [liveRackMetrics, setLiveRackMetrics] = useState<RackMetrics[]>(baseRacks);
   const runIdRef = useRef<string>('');
   const hasSavedRef = useRef<string>(''); // Track which run has been saved to prevent duplicates

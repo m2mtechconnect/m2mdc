@@ -10,12 +10,14 @@ import { useMemo, useEffect, useRef, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { TrendingUp, TrendingDown, Minus, Target, AlertTriangle, Info, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Target, AlertTriangle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence, useSpring, useTransform } from 'framer-motion';
 import type { KPISnapshot } from '@/simulation/types';
 import { DEFAULT_KPI_CONFIGS, getThresholdZoneForValue, getDistanceToTarget } from '@/engines/kpi/KPIOverlayEngine';
 import { useTwinOverlaySafe, isKpiDomainMatchingOverlay } from '@/context/TwinOverlayContext';
+import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
+import type { DataProvenance } from '@/lib/provenance/types';
 
 // Animated number component with smooth counting
 function AnimatedNumber({ 
@@ -101,7 +103,27 @@ interface EnterpriseKPICardProps {
   previousValue?: number;
   baseline?: number;
   history?: number[];
+  /**
+   * @deprecated (Phase 1A.3.b) — use `provenance` instead. When both are
+   * omitted the card defaults to `demo`. When only `isLive` is provided the
+   * card infers `simulated` (true) or `demo` (false); a `LIVE` label is
+   * never rendered because the value is not sourced from validated
+   * telemetry.
+   */
   isLive?: boolean;
+  /**
+   * Explicit provenance for this KPI. `simulated` is correct while a
+   * simulation run is active; `demo` when the value came from a fixture;
+   * `derived` / `live` only when the value truly came from a validated
+   * source. Never pass `live` for values produced by `useSimulation`.
+   */
+  provenance?: DataProvenance;
+  /**
+   * Human-readable source identifier for the provenance badge tooltip
+   * (e.g. scenario id, "sovereignDataCenter/simulationEngine").
+   */
+  provenanceSource?: string;
+  provenanceAt?: Date;
   compact?: boolean;
   onClick?: () => void;
 }
@@ -113,6 +135,9 @@ export function EnterpriseKPICard({
   baseline,
   history = [],
   isLive = false,
+  provenance,
+  provenanceSource,
+  provenanceAt,
   compact = false,
   onClick,
 }: EnterpriseKPICardProps) {
@@ -134,6 +159,22 @@ export function EnterpriseKPICard({
     }
     prevValueRef.current = currentValue;
   }, [currentValue]);
+
+  // Resolve provenance: explicit prop wins; else infer from legacy isLive.
+  // Simulation output is `simulated`, never `live` — the value is not a
+  // validated telemetry reading.
+  const resolvedProvenance: DataProvenance =
+    provenance ?? (isLive ? 'simulated' : 'demo');
+  const provenanceMeta = {
+    provenance: resolvedProvenance,
+    source: provenanceSource ?? (resolvedProvenance === 'simulated'
+      ? 'sovereignDataCenter/simulationEngine'
+      : 'demo-fixture'),
+    at: provenanceAt,
+    stale: false,
+    note: config.description,
+  };
+  const testId = `metric-kpi-${kpiId}`;
 
   const zone = getThresholdZoneForValue(kpiId, currentValue);
   const distanceToTarget = getDistanceToTarget(kpiId, currentValue);
@@ -157,7 +198,7 @@ export function EnterpriseKPICard({
     ? 'shadow-[0_0_15px_-3px_hsl(var(--destructive)/0.4)]'
     : zone?.severity === 'warning'
       ? 'shadow-[0_0_15px_-3px_hsl(var(--warning)/0.4)]'
-      : isLive 
+      : resolvedProvenance === 'live' || resolvedProvenance === 'derived'
         ? 'shadow-[0_0_15px_-3px_hsl(var(--success)/0.3)]'
         : '';
 
@@ -189,21 +230,16 @@ export function EnterpriseKPICard({
         className={cn(
           "p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md overflow-hidden",
           severityColor,
-          isLive && glowColor
+          (resolvedProvenance === 'live' || resolvedProvenance === 'derived') && glowColor
         )}
         onClick={onClick}
+        data-testid={testId}
+        data-provenance={resolvedProvenance}
       >
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-medium truncate">{config.name}</span>
-            {isLive && (
-              <motion.div
-                animate={{ opacity: [1, 0.5, 1] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
-                <Activity className="h-3 w-3 text-success" />
-              </motion.div>
-            )}
+            <ProvenanceBadge meta={provenanceMeta} compact />
           </div>
         </div>
         
@@ -281,10 +317,12 @@ export function EnterpriseKPICard({
           className={cn(
             "cursor-pointer transition-all hover:shadow-lg overflow-hidden",
             severityColor,
-            isLive && "ring-1 ring-primary/30",
-            isLive && glowColor
+            (resolvedProvenance === 'live' || resolvedProvenance === 'derived') && "ring-1 ring-primary/30",
+            (resolvedProvenance === 'live' || resolvedProvenance === 'derived') && glowColor
           )}
           onClick={onClick}
+          data-testid={testId}
+          data-provenance={resolvedProvenance}
         >
           <CardContent className="p-4 overflow-hidden">
             {/* Header */}
@@ -306,17 +344,7 @@ export function EnterpriseKPICard({
                   {config.description}
                 </p>
               </div>
-              {isLive && (
-                <motion.div
-                  animate={{ opacity: [1, 0.6, 1] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  <Badge variant="outline" className="text-[10px] bg-success/10 text-success shrink-0 gap-1">
-                    <Activity className="h-2.5 w-2.5" />
-                    LIVE
-                  </Badge>
-                </motion.div>
-              )}
+              <ProvenanceBadge meta={provenanceMeta} />
             </div>
 
             {/* Value with animated number */}
@@ -508,7 +536,7 @@ export function EnterpriseKPICardGrid({ snapshots, isLive, onKpiClick }: Enterpr
             previousValue={previousSnapshot?.[kpiId]}
             baseline={baselineSnapshot?.[kpiId]}
             history={kpiHistories[kpiId]}
-            isLive={isLive}
+            provenance={isLive ? 'simulated' : 'demo'}
             compact
             onClick={() => onKpiClick?.(kpiId)}
           />

@@ -14,6 +14,9 @@ import {
   generateIndustryBaselineKpis, 
   REGIONAL_ENERGY_PROFILES 
 } from '@/data/industryAccurateDefaults';
+import { seededRng } from '@/lib/provenance/prng';
+import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
+import type { DataProvenance } from '@/lib/provenance/types';
 
 interface KPIDataPoint {
   time: string;
@@ -30,6 +33,13 @@ interface MultiKPIOverlayProps {
   className?: string;
   region?: string;
   industry?: string;
+  /**
+   * Provenance for the chart series. When callers pass real telemetry via
+   * `data` they should also pass `provenance="live"` (or `"derived"`).
+   * Defaults to `demo` because the generator below produces deterministic
+   * fixture data — never a validated reading.
+   */
+  provenance?: DataProvenance;
 }
 
 const KPI_CONFIG = {
@@ -42,13 +52,20 @@ const KPI_CONFIG = {
 };
 
 /**
- * Generate industry-accurate time series data
- * Based on real operational patterns from sovereign AI data centres
+ * Generate a deterministic demo time series.
+ *
+ * Phase 1A.3.b: previous implementation used `Math.random()` at render time,
+ * which made the same "PUE 1.24" tile appear differently every reload. All
+ * randomness is now driven by a `mulberry32` PRNG seeded from
+ * `${region}/${industry}`, so identical inputs produce byte-identical output
+ * across renders and test runs. This is fixture data — the returned series
+ * MUST be presented with `demo` provenance.
  */
 const generateRealisticData = (region: string = 'CA-QC', industry: string = 'ai_hpc'): KPIDataPoint[] => {
   const baselineKpis = generateIndustryBaselineKpis(industry, region);
   const energyProfile = REGIONAL_ENERGY_PROFILES[region] || REGIONAL_ENERGY_PROFILES['CA-QC'];
   const data: KPIDataPoint[] = [];
+  const rng = seededRng(`multi-kpi-overlay/${region}/${industry}`);
   
   for (let i = 0; i < 24; i++) {
     const hour = i;
@@ -65,15 +82,15 @@ const generateRealisticData = (region: string = 'CA-QC', industry: string = 'ai_
     // Afternoon cooling load peak
     const pueMultiplier = (hour >= 14 && hour <= 17) ? 1.04 : 1.0;
     
-    // Realistic noise: ±3-5% variation
-    const noise = () => 1 + (Math.random() * 0.08 - 0.04);
+    // Realistic noise: ±3-5% variation (seeded so results are reproducible)
+    const noise = () => 1 + (rng() * 0.08 - 0.04);
     
     data.push({
       time: `${hour.toString().padStart(2, '0')}:00`,
       // PUE: Quebec baseline 1.18-1.25 range
       pue: Number((baselineKpis.pue.current * pueMultiplier * noise()).toFixed(3)),
       // Thermal: ASHRAE A1 inlet range 18-27°C
-      thermal: Number((baselineKpis.avgServerTemp.current + (thermalMultiplier - 1) * 8 + (Math.random() * 2 - 1)).toFixed(1)),
+      thermal: Number((baselineKpis.avgServerTemp.current + (thermalMultiplier - 1) * 8 + (rng() * 2 - 1)).toFixed(1)),
       // GPU utilization: 65-92% typical for AI workloads
       utilization: Number((Math.min(100, baselineKpis.gpuUtilization.current * workloadMultiplier * noise())).toFixed(1)),
       // Carbon: Quebec ~1.2 g/kWh (99.8% hydro)
@@ -81,15 +98,35 @@ const generateRealisticData = (region: string = 'CA-QC', industry: string = 'ai_
       // Renewable: Quebec 99.8%, varies slightly with grid imports
       renewable: Number((Math.min(100, energyProfile.renewablePercentage * noise())).toFixed(1)),
       // Uptime: Tier III target 99.982%
-      uptime: Number((99.95 + Math.random() * 0.05).toFixed(3)),
+      uptime: Number((99.95 + rng() * 0.05).toFixed(3)),
     });
   }
   return data;
 };
 
-export function MultiKPIOverlay({ data, className, region = 'CA-QC', industry = 'ai_hpc' }: MultiKPIOverlayProps) {
+export function MultiKPIOverlay({
+  data,
+  className,
+  region = 'CA-QC',
+  industry = 'ai_hpc',
+  provenance,
+}: MultiKPIOverlayProps) {
   const [selectedKPIs, setSelectedKPIs] = useState<string[]>(['pue', 'thermal', 'utilization']);
   const chartData = useMemo(() => data || generateRealisticData(region, industry), [data, region, industry]);
+  // When the caller did not pass real `data`, the series is fixture — force
+  // `demo` regardless of what was requested. This mirrors the truth-in-UI
+  // rule that missing provenance can never default to `live`.
+  const resolvedProvenance: DataProvenance = data
+    ? (provenance ?? 'demo')
+    : 'demo';
+  const provenanceMeta = {
+    provenance: resolvedProvenance,
+    source: data ? 'caller-supplied' : `multi-kpi-overlay/${region}/${industry}`,
+    stale: false,
+    note: data
+      ? 'Series values supplied by caller.'
+      : 'Deterministic fixture — seeded PRNG, not telemetry.',
+  };
 
   const toggleKPI = (kpi: string) => {
     setSelectedKPIs(prev => 
@@ -100,16 +137,23 @@ export function MultiKPIOverlay({ data, className, region = 'CA-QC', industry = 
   };
 
   return (
-    <Card className={className}>
+    <Card
+      className={className}
+      data-testid="multi-kpi-overlay"
+      data-provenance={resolvedProvenance}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base">
             <TrendingUp className="h-4 w-4 text-primary" />
             Multi-KPI Overlay
           </CardTitle>
-          <Badge variant="outline" className="text-xs">
-            {selectedKPIs.length} KPIs selected
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-xs">
+              {selectedKPIs.length} KPIs selected
+            </Badge>
+            <ProvenanceBadge meta={provenanceMeta} />
+          </div>
         </div>
         
         {/* KPI Selection */}

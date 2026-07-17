@@ -109,7 +109,7 @@ describe('End-to-end payload → CSV/JSON/HTML round-trip (fixture-source discip
     title: 'Intelligence charts',
     generatedAt: '2026-07-17T14:30:00.000Z',
     records: [rec],
-  };
+  } as const;
 
   it('CSV output preserves demo classification', () => {
     const csv = toCsv(payload);

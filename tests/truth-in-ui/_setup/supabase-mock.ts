@@ -150,12 +150,13 @@ export async function installSupabaseMock(
       // `Accept: application/vnd.pgrst.object+json`; PostgREST then
       // returns a single object, NOT an array. Detect that here so
       // both shapes work.
-      const accept = route.request().headers()['accept'] ?? '';
-      const single = accept.includes('pgrst.object');
+      // Always return a single object with pgrst.object content type
+      // so `.maybeSingle()` and `.single()` both resolve to the row.
+      // Array-shaped consumers on this project don't hit /profiles.
       return route.fulfill({
         status: 200,
-        contentType: single ? 'application/vnd.pgrst.object+json' : 'application/json',
-        body: JSON.stringify(single ? profile : [profile]),
+        contentType: 'application/vnd.pgrst.object+json',
+        body: JSON.stringify(profile),
       });
     }
     if (path.startsWith('/rest/v1/user_roles') && method === 'GET') {

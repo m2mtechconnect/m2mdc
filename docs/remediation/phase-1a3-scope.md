@@ -226,3 +226,96 @@ canonical schema once the simulation KPI catalog is stable.
 
 **Suite result**: 16 files / **212 passed / 0 failed** (was 179).
 `tsgo --noEmit` clean.
+
+## Phase 1A.3.d.1 — Simulation-result exports (2026-07-17) — COMPLETE
+
+**Reachability**
+- `SimulationResultPanel` — **reachable** via `DCSimulationPanel` →
+  `Builder Step5Simulation` and `SystemSimulation`. JSON + Markdown
+  download controls are visible on simulation completion.
+- `SovereignDCSimulationDashboard` — **reachable** via
+  `StandardizedTemplatePreview` → `TemplatePreviewModal` /
+  `StandardizedTemplatePreviewModal` (Marketplace, Builder templates,
+  shared preview). "Playbook" download control was visible in the
+  header actions row.
+- `generatePlaybook` / `playbookToMarkdown` remain as library modules
+  but are no longer wired to a UI control (import removed from the
+  dashboard).
+
+**SimulationResultPanel → canonical schema (JSON + Markdown)**
+- New: `src/components/simulation/exportSimulationResult.ts`
+  `buildSimulationResultPayload(result, { now? })` returns
+  `{ payload, narrative }` where every record is classified:
+  - Scenario metadata (`sim.scenario.id / .name / .duration / .event-count`)
+    → `static`, source `"AURA simulation scenario (user-configured)"`,
+    `observedAt: null`.
+  - KPI `before` values (`sim.kpi.<slug>.before`) → `demo`, source
+    `"AURA baseline fixture"`, `observedAt = generatedAt`.
+  - KPI `after` values (`sim.kpi.<slug>.after`) → `simulated`, source
+    `"AURA simulation estimator"`, `observedAt = generatedAt`.
+  - Payload envelope: `surface = simulation.result.<scenarioId>`,
+    schema-versioned, note declares "no row is live telemetry".
+- New: `src/lib/provenance/exporters/markdown.ts` — canonical
+  Markdown serializer with a per-row provenance column, schema-fenced
+  YAML front matter, Appendix section for narrative (RCA / actions).
+  Every interpolated field is HTML-escaped and pipe-escaped.
+- `SimulationResultPanel.tsx` — `handleDownloadJson()` and
+  `handleDownloadReport()` rewritten to use `buildSimulationResultPayload`
+  + `downloadPayload` / `toMarkdown`. The legacy handwritten template
+  is gone. No output path can serialize a value as `live`.
+
+**SovereignDCSimulationDashboard → disabled with visible reason**
+- The Playbook control is now a `Tooltip`-wrapped disabled `Button`
+  labelled "Playbook (disabled)" with:
+  - `disabled` + `aria-disabled="true"`
+  - `data-export-blocked="no-audited-source"`
+  - Tooltip copy from `describeExportBlock('no-audited-source')`.
+- Rationale (documented on-hover): the playbook is generated from a
+  fixture facility and fixture target KPIs — there is no audited data
+  source and no defensible simulation metric catalog for it yet.
+  Re-enable once Phase 1B wires an audited source.
+- All download-pipe code (`URL.createObjectURL`, `generatePlaybook`,
+  `playbookToMarkdown`) is removed from the dashboard. Analytics
+  events `playbookGenerated` / `playbookExported` are no longer fired
+  from a disabled control.
+
+**HTML/script injection defense (printHtml + markdown)**
+- `esc()` in `printHtml.ts` already encodes `& < > "`. Every
+  interpolated field (title, generatedAt, surface, note, metric name,
+  value, unit, source, description, observedAt, downgradeReason) flows
+  through `esc()`.
+- `markdown.ts` uses `escHtml()` on every interpolated field and
+  additionally escapes `|` inside table cells so hostile input cannot
+  break the metric table.
+- YAML front matter now escapes `payload.surface` and
+  `payload.generatedAt`. This was the one gap surfaced by the tests.
+
+**Tests**
+- `src/lib/provenance/exporters/__tests__/injection.test.ts` (9):
+  hostile fixtures with `<script>alert(1)</script>` and
+  `"><img src=x onerror=alert(1)>` supplied for every interpolated
+  field. Asserts:
+  - No raw `<script`, `<img`, or `<tag …on\w+=…>` in printHtml.
+  - `data-surface` attribute is not broken by an injected `"`.
+  - No raw `<script` or unescaped tag-with-handler in markdown.
+  - Markdown table pipes are escaped.
+- `src/components/simulation/__tests__/exportSimulationResult.test.ts` (3):
+  parses JSON + markdown to prove classification (scenario→static,
+  before→demo, after→simulated) and that no output row is `live`.
+  Envelope carries `surface = simulation.result.<scenarioId>` and
+  `generatedAt`.
+- `src/twins/sovereignDataCenter/components/__tests__/playbookExportDisabled.test.ts` (3):
+  source-level check that the Playbook control renders as
+  `aria-disabled="true"` with `data-export-blocked="no-audited-source"`,
+  cites `describeExportBlock`, and does not still call
+  `URL.createObjectURL` / `generatePlaybook` / `playbookToMarkdown`.
+
+**Reachability evidence for other simulation-adjacent modules**
+- `generatePlaybook.ts`, `playbookToMarkdown` — library modules; no
+  remaining UI import. Excluded from Phase 1A.3.d.1 scope with the
+  UI control disabled.
+- Blueprint / Builder JSON exports — configuration, not KPIs.
+  Excluded (matches 1A.3.d matrix).
+
+**Suite result**: 19 touched files / **226 passed / 0 failed** (was 212).
+`tsgo --noEmit` clean.

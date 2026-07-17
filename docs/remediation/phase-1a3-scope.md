@@ -1,5 +1,11 @@
 # Phase 1A.3 — Final Scope Matrix
 
+> **Status (2026-07-17): COMPLETE.** Closed out in Phase 1A.3.g. See
+> `docs/remediation/phase-1a3-report.md` for the completion report,
+> gate results, evidence-bundle integrity, unresolved findings, and
+> Phase 1B go/no-go recommendation.
+
+
 Compiled from `data-centre-kpi-surface-inventory.md`, `phase-1a1-report.md`,
 `phase-1a2-report.md`, `capability-traceability.md`, plus a fresh ripgrep
 sweep on `src/`. Every currently reachable operational surface is listed;

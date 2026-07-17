@@ -206,3 +206,20 @@ A row is **never** serialized as `live`. The envelope carries
 and defensible metric catalog are wired in Phase 1B. Legacy
 `generatePlaybook` / `playbookToMarkdown` remain as library modules
 with no UI wiring.
+
+---
+
+## Phase 1A.3.g closeout (2026-07-17)
+
+All in-scope render-path randomness identified above is now routed
+through `simulatedMetric()` / `kitMetric()` with per-metric provenance
+(`demo` / `simulated` / `static` / `unavailable`). Kit-boundary
+randomness is confined to a seeded PRNG (`mulberry32`); no
+`Math.random()` remains in an in-scope component render path (asserted
+by `src/lib/provenance/__tests__/prng.test.ts` and by
+`src/components/data-centre-twin/domains/__tests__/domainProvenance.test.tsx`
+which exercises 59 metric IDs across the 9 domain views). Fixture
+modules (`mockData.ts`) retain their generators but are wrapped at the
+consumer boundary with `demo` provenance. Upstream capability status
+is deliberately unchanged (see `capability-traceability.md` Phase 1A.3
+addendum).

@@ -28,22 +28,11 @@ vi.mock('recharts', async () => {
   };
 });
 
-// Minimal fixture that satisfies the surface area used by the domain
-// views below. Only the accessed fields matter — the retrofit under test
-// is on the root wrapper, not deep tile logic.
-const facility = {
-  thermalHardware: { racks: [] },
-  powerHardware: { pdus: [], upsUnits: [], generators: [], mainFeeds: [] },
-  coolingHardware: { chillers: [], crahUnits: [], liquidLoops: [] },
-  networkHardware: { switches: [], routers: [], firewalls: [], links: [] },
-  computeHardware: { racks: [], nodes: [], gpus: [] },
-  facilityInfo: { name: 'Test', region: 'ca-central-1', tier: 'III' as const,
-                  siteAreaSqm: 1000, whiteSpaceSqm: 500, designPUE: 1.3,
-                  designITLoadKW: 1000 },
-  sovereignty: { residencyRegion: 'ca', jurisdictionControls: [], certifications: [] },
-  carbon: { gridIntensityGCO2PerKWh: 0, scope2TCO2: 0, renewablePercent: 0 },
-  financial: { monthlyOpEx: 0, energyCostUSD: 0, contractPricingUSD: 0 },
-} as unknown as import('@/types/dataCenterTwin').DataCentreFacility;
+// Real demo facility from the sovereign DC fixture. Using it here also
+// exercises the domain views through the same shape the app renders in
+// production, so structural regressions are caught by these tests.
+import { generateDataCentreFacility } from '@/twins/dataCenter/mockData';
+const facility = generateDataCentreFacility('test-facility', 'Test');
 
 import { PowerDomainView } from '../PowerDomainView';
 import { CoolingDomainView } from '../CoolingDomainView';

@@ -5,9 +5,10 @@
 import { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Filter, Eye, Activity } from 'lucide-react';
+import { Filter, Eye, Camera } from 'lucide-react';
 import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
+import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
 
 // Thermal components
 import { ThermalKPIs } from '../thermal/ThermalKPIs';
@@ -32,7 +33,9 @@ interface ThermalDomainViewProps {
 
 export function ThermalDomainView({ facility }: ThermalDomainViewProps) {
   const [activeFilter, setActiveFilter] = useState<ThermalFilter>('all');
-  const [viewMode, setViewMode] = useState<'live' | 'simulation'>('live');
+  // Phase 1A.3.c: renamed from 'live' to 'snapshot' — the underlying
+  // facility fixture is demonstration data, not a live source.
+  const [viewMode, setViewMode] = useState<'snapshot' | 'simulation'>('snapshot');
   const [showAirflow, setShowAirflow] = useState(true);
   
   // Process racks with aisle metadata
@@ -48,18 +51,23 @@ export function ThermalDomainView({ facility }: ThermalDomainViewProps) {
   );
   
   return (
-    <div className="space-y-6">
-      {/* Mode Switch */}
+    <div className="space-y-6" data-provenance="demo" data-testid="thermal-domain-view">
+      {/* Mode Switch + provenance header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Badge variant={viewMode === 'live' ? 'default' : 'outline'} 
-            className="cursor-pointer" onClick={() => setViewMode('live')}>
-            <Activity className="h-3 w-3 mr-1" /> Live
+          <Badge variant={viewMode === 'snapshot' ? 'default' : 'outline'}
+            className="cursor-pointer" onClick={() => setViewMode('snapshot')}>
+            <Camera className="h-3 w-3 mr-1" /> Snapshot
           </Badge>
           <Badge variant={viewMode === 'simulation' ? 'default' : 'outline'}
             className="cursor-pointer" onClick={() => setViewMode('simulation')}>
             <Eye className="h-3 w-3 mr-1" /> Simulation
           </Badge>
+          <DomainProvenanceHeader
+            provenance="demo"
+            sourceName="sovereignDataCenter/mockData"
+            ariaContext="Thermal domain data provenance"
+          />
         </div>
         <Button variant="outline" size="sm" onClick={() => setShowAirflow(!showAirflow)}>
           {showAirflow ? 'Hide' : 'Show'} Airflow

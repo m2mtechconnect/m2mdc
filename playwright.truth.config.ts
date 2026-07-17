@@ -17,7 +17,14 @@
 
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = Number(process.env.AURA_TRUTH_PORT ?? 8091);
+// Phase 1B.2a.1 — parameterize this config so the same suite can be
+// exercised against both the legacy default path and the facade-on path
+// without duplicating the whole config. Toggle with:
+//   AURA_TRUTH_FACADE=on npx playwright test --config=playwright.truth.config.ts
+const FACADE_ON = process.env.AURA_TRUTH_FACADE === 'on';
+const DEFAULT_PORT = FACADE_ON ? 8092 : 8091;
+const PORT = Number(process.env.AURA_TRUTH_PORT ?? DEFAULT_PORT);
+const FACADE_ENV = FACADE_ON ? 'VITE_AURA_SIM_FACADE_DCPANEL=on ' : '';
 
 export default defineConfig({
   testDir: './tests/truth-in-ui',
@@ -57,6 +64,7 @@ export default defineConfig({
     // via `page.route('**/kit-api/**', …)`.
     command:
       'VITE_OMNIVERSE_KIT_URL=http://kit.aura-truth.local/api ' +
+      FACADE_ENV +
       `npx vite --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,

@@ -55,7 +55,10 @@ export interface SimulationFacade {
    * output in a `ProviderOutcome<SimulationResultSummary>`. This is the
    * migration seam for `DCSimulationPanel`; no new estimator is added.
    */
-  generatePanelResult(input: PanelResultInput): ProviderOutcome<SimulationResultSummary>;
+  generatePanelResult(
+    input: PanelResultInput,
+    signal?: AbortSignal,
+  ): ProviderOutcome<SimulationResultSummary>;
 }
 
 export interface PanelResultInput {
@@ -149,9 +152,20 @@ export function createSimulationFacade(opts: FacadeOptions = {}): SimulationFaca
       }
     },
 
-    generatePanelResult(input) {
+    generatePanelResult(input, signal) {
       if (!isConfigured) {
         return unknownConfigOutcome<SimulationResultSummary>(unknownRaw);
+      }
+      // Phase 1B.2a.1 — honour caller cancellation. Cheap sync check
+      // before and after engine invocation so a caller that aborted
+      // between scheduling and effect flush receives a typed
+      // `cancelled` outcome (never a stale `ok`).
+      if (signal?.aborted) {
+        return {
+          kind: 'cancelled',
+          providerId: provider.id,
+          provenance: 'unavailable',
+        };
       }
       // Input guard — the panel supplies these values from useSimulation,
       // so we validate defensively without leaking payload contents.
@@ -177,6 +191,13 @@ export function createSimulationFacade(opts: FacadeOptions = {}): SimulationFaca
           input.currentKpis,
           input.durationSec,
         );
+        if (signal?.aborted) {
+          return {
+            kind: 'cancelled',
+            providerId: provider.id,
+            provenance: 'unavailable',
+          };
+        }
         const observedAt = input.observedAt ?? new Date().toISOString();
         return assertOutcomeIntegrity({
           kind: 'ok',

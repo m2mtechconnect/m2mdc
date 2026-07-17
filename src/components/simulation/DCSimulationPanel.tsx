@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Activity, Clock, Sparkles, BarChart3, Grid3X3, FileText, Info, Box } from 'lucide-react';
+import { Activity, AlertTriangle, Clock, Sparkles, BarChart3, Grid3X3, FileText, Info, Box } from 'lucide-react';
 import { useSimulation } from '@/simulation/useSimulation';
 import { useBlueprint } from '@/hooks/useBlueprint';
 import { useSimulationSnapshotStore } from '@/stores/simulationSnapshotStore';
@@ -33,10 +33,11 @@ import { AnimatedKPIChartGrid } from './AnimatedKPIChart';
 import { AnimatedRackHeatmap } from './AnimatedRackHeatmap';
 import { ScenarioContextSidebar } from './ScenarioContextSidebar';
 import { createCustomScenario } from '@/simulation/customScenarioBuilder';
-import { generateSimulationResult, generateRackMetrics } from '@/simulation/generateSimulationResult';
+import { generateRackMetrics } from '@/simulation/generateSimulationResult';
 import { createSimulationFacade } from '@/simulation/api';
+import { useSimulationCompletion } from '@/simulation/useSimulationCompletion';
 import { DcToolsRow } from '@/components/dc-tools';
-import type { CustomScenarioConfig, SimulationResultSummary, RackMetrics } from '@/simulation/types';
+import type { CustomScenarioConfig, RackMetrics } from '@/simulation/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { seededRng, rngRange } from '@/lib/provenance/prng';
 
@@ -93,8 +94,8 @@ export const DCSimulationPanel = memo(function DCSimulationPanel({ compact = fal
   const batchUpdate = useBatchedUpdates();
   
   const [showCustomBuilder, setShowCustomBuilder] = useState(false);
-  const [activeTab, setActiveTab] = useState<'scenarios' | 'timeline' | 'kpis' | 'heatmap'>('scenarios');
-  const [simulationResult, setSimulationResult] = useState<SimulationResultSummary | null>(null);
+  type PanelTab = 'scenarios' | '3d-view' | 'timeline' | 'kpis' | 'heatmap';
+  const [activeTab, setActiveTab] = useState<PanelTab>('scenarios');
   const [baseRacks] = useState<RackMetrics[]>(() => generateBaseRacks(20, twinId));
   const [liveRackMetrics, setLiveRackMetrics] = useState<RackMetrics[]>(baseRacks);
   const runIdRef = useRef<string>('');
@@ -115,11 +116,7 @@ export const DCSimulationPanel = memo(function DCSimulationPanel({ compact = fal
     () => (useFacade ? createSimulationFacade() : null),
     [useFacade],
   );
-  // Race guard: increment on each scenario start; only the latest run may
-  // commit a result to state. Prevents an in-flight facade call from
-  // overwriting a newer scenario's result.
-  const runTokenRef = useRef(0);
-  
+
   // Get Blueprint scenarios
   const { blueprint } = useBlueprint(twinId);
   
@@ -178,75 +175,46 @@ export const DCSimulationPanel = memo(function DCSimulationPanel({ compact = fal
       setLiveRackMetrics(baseRacks);
     }
   }, [status, events, debouncedTime, baseRacks, batchUpdate]);
-  
-  // Generate result and PERSIST when simulation completes - P0 FIX
-  useEffect(() => {
-    if (status === 'completed' && activeScenario) {
-      const token = ++runTokenRef.current;
-      let result: SimulationResultSummary | null = null;
 
-      if (facade) {
-        const outcome = facade.generatePanelResult({
-          scenario: activeScenario,
-          events,
-          baselineKpis,
-          currentKpis,
-          durationSec: elapsedTime,
-        });
-        if (outcome.kind === 'ok') {
-          result = outcome.value;
-        } else {
-          // Fail-closed: do NOT fabricate a summary. Log for diagnostics
-          // and leave `simulationResult` null so the truth-in-UI layer
-          // renders the unavailable state.
-          console.warn(
-            '[DCSimulationPanel] facade generatePanelResult non-ok:',
-            outcome.kind,
-          );
-        }
-      } else {
-        result = generateSimulationResult(
-          activeScenario,
-          events,
-          baselineKpis,
-          currentKpis,
-          elapsedTime,
-        );
-      }
+  // Phase 1B.2a.1 — completion effect extracted into a testable hook.
+  // Handles: facade vs legacy engine, AbortController lifecycle (replace
+  // and unmount), race token, and typed error surfacing.
+  const { result: simulationResult, error: simulationError, clearResult } =
+    useSimulationCompletion({
+      facade,
+      status,
+      activeScenario: activeScenario ?? null,
+      events,
+      baselineKpis,
+      currentKpis,
+      elapsedTime,
+      onPersist: useCallback(
+        (result) => {
+          if (!activeTwinId || !activeScenario) return;
+          const runKey = `${activeScenarioId}-${elapsedTime}`;
+          if (hasSavedRef.current === runKey) return;
+          hasSavedRef.current = runKey;
+          void saveSimulationRun({
+            twinId: activeTwinId,
+            scenarioKey: activeScenarioId || 'custom',
+            scenarioName: activeScenario.name,
+            runLabel: `${activeScenario.name} - ${new Date().toLocaleString()}`,
+            baselineKpis,
+            finalKpis: currentKpis,
+            kpiSnapshots: kpiSnapshots.map(snap => ({ timestamp: snap.timestamp, kpis: snap.kpis })),
+            events: events.map(e => ({ id: e.id, timestamp: e.timestamp, type: e.type, severity: e.severity, title: e.title })),
+            durationMs: elapsedTime * 1000,
+            metadata: {
+              scenarioCategory: activeScenario.category,
+              severity: activeScenario.severity,
+              resultScenarioId: result.scenarioId,
+            },
+          });
+        },
+        [activeTwinId, activeScenario, activeScenarioId, elapsedTime, baselineKpis, currentKpis, kpiSnapshots, events, saveSimulationRun],
+      ),
+    });
 
-      // Race guard: only commit if this is still the latest run.
-      if (token !== runTokenRef.current) return;
-      setSimulationResult(result);
-      
-      // P0 FIX: Persist simulation run to database
-      const runKey = `${activeScenarioId}-${elapsedTime}`;
-      if (result && activeTwinId && hasSavedRef.current !== runKey) {
-        hasSavedRef.current = runKey;
-        saveSimulationRun({
-          twinId: activeTwinId,
-          scenarioKey: activeScenarioId || 'custom',
-          scenarioName: activeScenario.name,
-          runLabel: `${activeScenario.name} - ${new Date().toLocaleString()}`,
-          baselineKpis,
-          finalKpis: currentKpis,
-          kpiSnapshots: kpiSnapshots.map(snap => ({ timestamp: snap.timestamp, kpis: snap.kpis })),
-          events: events.map(e => ({ id: e.id, timestamp: e.timestamp, type: e.type, severity: e.severity, title: e.title })),
-          durationMs: elapsedTime * 1000,
-          metadata: { scenarioCategory: activeScenario.category, severity: activeScenario.severity },
-        }).then(runId => {
-          if (runId) {
-            console.log('[DCSimulationPanel] Simulation run persisted:', runId);
-          }
-        });
-      }
-    } else if (status === 'idle' || status === 'running') {
-      // Bump token so any in-flight facade result from a prior run cannot
-      // land after reset/restart.
-      runTokenRef.current++;
-      setSimulationResult(null);
-    }
-  }, [status, activeScenario, events, baselineKpis, currentKpis, elapsedTime, facade]);
-  
   // Build KPI deltas from current state
   // Map alternate KPI IDs to their canonical forms for display
   const kpiDeltas = useMemo(() => {
@@ -278,7 +246,7 @@ export const DCSimulationPanel = memo(function DCSimulationPanel({ compact = fal
     if (status === 'running') {
       pause();
     }
-    setSimulationResult(null);
+    clearResult();
     
     // Generate a unique run ID and capture blueprint snapshot
     if (blueprint) {
@@ -293,7 +261,7 @@ export const DCSimulationPanel = memo(function DCSimulationPanel({ compact = fal
     }
     
     startScenario(scenarioId);
-  }, [status, pause, startScenario, blueprint, captureSnapshot]);
+  }, [status, pause, startScenario, blueprint, captureSnapshot, clearResult]);
   
   const handlePlay = useCallback(() => {
     if (activeScenarioId) {
@@ -302,10 +270,10 @@ export const DCSimulationPanel = memo(function DCSimulationPanel({ compact = fal
   }, [activeScenarioId, startScenario]);
   
   const handleReset = useCallback(() => {
-    setSimulationResult(null);
+    clearResult();
     clearCurrentSnapshot();
     reset();
-  }, [reset, clearCurrentSnapshot]);
+  }, [reset, clearCurrentSnapshot, clearResult]);
   
   const handleViewBlueprintSnapshot = useCallback(() => {
     setSnapshotPanelOpen(true);
@@ -399,7 +367,7 @@ export const DCSimulationPanel = memo(function DCSimulationPanel({ compact = fal
       <div className="flex gap-6">
         {/* Main content tabs */}
         <div className="flex-1 min-w-0">
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as PanelTab)}>
             <TabsList>
               <TabsTrigger value="scenarios" className="gap-1">
                 <Sparkles className="h-3.5 w-3.5" />
@@ -491,10 +459,37 @@ export const DCSimulationPanel = memo(function DCSimulationPanel({ compact = fal
         {status === 'completed' && simulationResult && (
           <SimulationResultPanel
             result={simulationResult}
-            onClose={() => setSimulationResult(null)}
+            onClose={clearResult}
           />
         )}
       </AnimatePresence>
+
+      {/* Phase 1B.2a.1 — Accessible unavailable state. Rendered whenever
+          the completion pipeline surfaces a non-ok facade outcome. The
+          alert is role=alert + aria-live=polite so assistive tech is
+          notified; data-provenance="unavailable" keeps truth-in-UI. */}
+      {simulationError && (
+        <div
+          role="alert"
+          aria-live="polite"
+          data-testid="simulation-unavailable-alert"
+          data-provenance="unavailable"
+          className="rounded-md border border-destructive/40 bg-destructive/10 p-4 flex items-start gap-3"
+        >
+          <AlertTriangle className="h-5 w-5 text-destructive mt-0.5 shrink-0" aria-hidden="true" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-destructive">
+              Simulation result unavailable
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {simulationError.message}
+            </p>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              No result was committed and no run was persisted.
+            </p>
+          </div>
+        </div>
+      )}
       
       {/* Tools for this Simulation */}
       <DcToolsRow

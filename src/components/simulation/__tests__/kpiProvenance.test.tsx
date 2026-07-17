@@ -4,22 +4,27 @@
  * fixture data, must expose `data-provenance` for e2e assertions, and must
  * be deterministic across renders.
  */
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+
+// The project's test setup wires ResizeObserver to `vi.fn()` which is not a
+// constructor, so recharts crashes on mount. Replace ResponsiveContainer
+// with a passthrough — the tests below assert on our own DOM attributes,
+// never on chart geometry.
+vi.mock('recharts', async () => {
+  const actual = await vi.importActual<typeof import('recharts')>('recharts');
+  return {
+    ...actual,
+    ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="responsive-container">{children}</div>
+    ),
+  };
+});
+
 import { AnimatedKPIStrip } from '../AnimatedKPIStrip';
 import { MultiKPIOverlay } from '../MultiKPIOverlay';
 import { KPIKey } from '@/domain/greenDc/kpiCatalog';
-
-// recharts' ResponsiveContainer instantiates ResizeObserver which is missing
-// in jsdom. Provide a no-op implementation before any render.
-beforeAll(() => {
-  class RO {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  }
-  (globalThis as unknown as { ResizeObserver: typeof RO }).ResizeObserver = RO;
-});
+import React from 'react';
 
 describe('AnimatedKPIStrip provenance', () => {
   const kpis = {

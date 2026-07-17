@@ -61,8 +61,8 @@ export function toMarkdown(payload: ExportPayload, options: MarkdownOptions = {}
   lines.push('');
   lines.push('```yaml');
   lines.push(`schemaVersion: ${EXPORT_SCHEMA_VERSION}`);
-  lines.push(`surface: ${payload.surface}`);
-  lines.push(`generatedAt: ${payload.generatedAt}`);
+  lines.push(`surface: ${escHtml(payload.surface)}`);
+  lines.push(`generatedAt: ${escHtml(payload.generatedAt)}`);
   lines.push('```');
   lines.push('');
   if (payload.note) {

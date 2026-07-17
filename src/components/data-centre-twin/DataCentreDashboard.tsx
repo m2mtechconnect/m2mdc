@@ -365,8 +365,8 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
               </Badge>
             )}
           </Button>
-          <Badge variant="outline" className="font-mono text-xs">
-            LIVE • {new Date().toLocaleTimeString()}
+          <Badge variant="outline" className="font-mono text-xs" data-provenance="simulated">
+            SIMULATION • {new Date().toLocaleTimeString()}
           </Badge>
         </div>
       </div>

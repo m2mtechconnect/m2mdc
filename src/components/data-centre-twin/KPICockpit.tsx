@@ -142,12 +142,11 @@ export function KPICockpit({ facility, twinId = 'default' }: KPICockpitProps) {
             )}
           </div>
         </div>
-        <Badge variant="outline" className="font-mono text-xs text-success border-success/30">
+        <Badge variant="outline" className="font-mono text-xs" data-provenance="simulated">
           <span className="relative flex h-2 w-2 mr-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-muted-foreground"></span>
           </span>
-          LIVE • {new Date().toLocaleTimeString()}
+          SIMULATION • {new Date().toLocaleTimeString()}
         </Badge>
       </div>
       

@@ -103,3 +103,20 @@ Status legend:
 | UTV — Unable to verify | 2 |
 
 Runtime-verified capabilities are foundational plumbing (auth, RBAC, RLS, SEO gate, i18n, build). Every capability needed to call AURA an *operational* digital twin is currently PROTO, MOCK, SCAF, or NI.
+
+---
+
+## Phase 1A.3 addendum (2026-07-17)
+
+| Capability | Status | Evidence | Notes |
+|---|---|---|---|
+| Truth-in-UI provenance layer | **IV** | `src/lib/provenance/**`, `docs/remediation/evidence/phase-1a3/` (27 images + SHA256SUMS), targeted vitest 194/194, Playwright truth suite 47/47 (last green run 1A.3.f) | Per-metric provenance, fail-closed states, provenance-preserving exports, ADR 0006. |
+| Provenance-preserving exports (CSV / JSON / Markdown / Print) | **IV** | `src/lib/provenance/exporters/*`, schema v1.0.0 | Ad-hoc export writers disallowed. |
+
+**Non-upgrades (explicit).** Truthful UI provenance does NOT upgrade the
+underlying capabilities. Omniverse Kit REST client remains `SCAF`,
+AppStreamer viewer remains `SCAF`, simulation engines remain `PROTO`,
+BMS/DCIM/EPMS/DCGM telemetry remain `NI`, KPI values remain `MOCK` from an
+upstream perspective, and compliance claims remain `SCAF/UNVERIFIED`
+(UI now shows "Not assessed" per ADR 0005; no audit-evidence pipeline
+exists).

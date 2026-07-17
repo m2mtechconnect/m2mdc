@@ -23,14 +23,21 @@
 import { test, expect } from './_setup/fixtures';
 import { installSupabaseMock } from './_setup/supabase-mock';
 
-async function goto(page: import('@playwright/test').Page, path: string) {
+async function goto(
+  page: import('@playwright/test').Page,
+  path: string,
+  mock: Awaited<ReturnType<typeof installSupabaseMock>>,
+) {
   await page.goto(path, { waitUntil: 'domcontentloaded' });
+  // Wait until the app has issued the approval-gate profile query
+  // AND settled its render. Without this the fastest tests (e.g.
+  // /dashboard which shows a spinner while the query is in flight)
+  // race the afterEach and appear as "profile mock never hit".
+  await expect
+    .poll(() => mock.profileHits(), { timeout: 5_000, message: 'approval-gate profile query must be issued' })
+    .toBeGreaterThan(0);
   await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
   expect(page.url(), 'must not redirect to /auth').not.toContain('/auth');
-  // The approval gate must actually be satisfied. If we see the
-  // Pending Approval screen, the mock never reached the profiles
-  // handler and the test would otherwise fail with a confusing
-  // "element not found". Fail loudly instead.
   await expect(page.locator('text=Account Pending Approval'),
     'profiles mock must satisfy the approval gate').toHaveCount(0);
 }
@@ -70,13 +77,13 @@ test.describe('Auth-gated surfaces — mocked session, zero external egress', ()
   });
 
   test('/dashboard renders with mocked session and no live provenance', async ({ page, guard }) => {
-    await goto(page, '/dashboard');
+    await goto(page, '/dashboard', mock);
     await assertNoLive(page);
     void guard;
   });
 
   test('/intelligence exposes active export controls and no live provenance', async ({ page, guard }) => {
-    await goto(page, '/intelligence');
+    await goto(page, '/intelligence', mock);
     await assertNoLive(page);
     // Export dropdown trigger is present, enabled, and a11y-labelled.
     const trigger = page.getByTestId('intelligence-export-trigger');
@@ -87,7 +94,7 @@ test.describe('Auth-gated surfaces — mocked session, zero external egress', ()
   });
 
   test('/compliance exposes DISABLED audit-export control with reason', async ({ page, guard }) => {
-    await goto(page, '/compliance');
+    await goto(page, '/compliance', mock);
     await assertNoLive(page);
     // Sovereign playbook / audit export is intentionally disabled
     // because no audited source is wired. The control MUST expose
@@ -101,7 +108,7 @@ test.describe('Auth-gated surfaces — mocked session, zero external egress', ()
   });
 
   test('/infrastructure renders provenance manifest and no live provenance', async ({ page, guard }) => {
-    await goto(page, '/infrastructure');
+    await goto(page, '/infrastructure', mock);
     await assertNoLive(page);
     // The InfrastructurePage carries an operational metrics wrapper
     // classified as `demo`.

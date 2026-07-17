@@ -88,7 +88,7 @@ export function buildSimulationResultPayload(
         metric: {
           value: d.before,
           provenance: 'demo',
-          source: 'AURA baseline fixture',
+          sourceName: 'AURA baseline fixture',
           sourceTimestamp: observedAt,
         },
         unit,
@@ -108,7 +108,7 @@ export function buildSimulationResultPayload(
         metric: {
           value: d.after,
           provenance: 'simulated',
-          source: 'AURA simulation estimator',
+          sourceName: 'AURA simulation estimator',
           sourceTimestamp: observedAt,
         },
         unit,

@@ -7,7 +7,7 @@
  * document its current dependency on `Math.random` (which is exactly
  * what motivates the Phase 1A.3.b seeded-PRNG remediation).
  */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
 
 import {
   generateRackMetrics,
@@ -30,10 +30,10 @@ const finalKpis = {
 };
 
 describe('generateSimulationResult — characterization', () => {
-  let randSpy: ReturnType<typeof vi.spyOn>;
+  let randSpy: MockInstance<() => number>;
   beforeEach(() => {
     // Pin the non-determinism so `actualVsExpected` is reproducible.
-    randSpy = vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    randSpy = vi.spyOn(Math, 'random').mockReturnValue(0.5) as MockInstance<() => number>;
   });
   afterEach(() => randSpy.mockRestore());
 
@@ -88,7 +88,7 @@ describe('generateSimulationResult — characterization', () => {
 
   it('provenance: raw engine output declares no provenance field (facade adds it)', () => {
     const result = generateSimulationResult(null, [], baseline, finalKpis, 60);
-    expect(result as Record<string, unknown>).not.toHaveProperty('provenance');
+    expect(result as unknown as Record<string, unknown>).not.toHaveProperty('provenance');
   });
 
   it('cancellation: pure function — no side effect after invocation', () => {
@@ -104,9 +104,9 @@ describe('generateSimulationResult — characterization', () => {
 });
 
 describe('generateRackMetrics — characterization', () => {
-  let randSpy: ReturnType<typeof vi.spyOn>;
+  let randSpy: MockInstance<() => number>;
   beforeEach(() => {
-    randSpy = vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    randSpy = vi.spyOn(Math, 'random').mockReturnValue(0.5) as MockInstance<() => number>;
   });
   afterEach(() => randSpy.mockRestore());
 
@@ -154,7 +154,7 @@ describe('generateRackMetrics — characterization', () => {
       } as unknown as SimulationEvent,
     ];
     // Force temp deltas to bias toward hotter racks.
-    randSpy.mockReturnValue(0.99);
+    randSpy.mockReturnValue(0.99 as never);
     const out = generateRackMetrics(baseRacks, thermalEvents, 5);
     const hot = out.some((r) => r.alertLevel !== 'normal');
     expect(hot).toBe(true);

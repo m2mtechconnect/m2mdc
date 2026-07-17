@@ -7,7 +7,7 @@
  * document its current dependency on `Math.random` (which is exactly
  * what motivates the Phase 1A.3.b seeded-PRNG remediation).
  */
-import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   generateRackMetrics,
@@ -30,12 +30,13 @@ const finalKpis = {
 };
 
 describe('generateSimulationResult — characterization', () => {
-  let randSpy: MockInstance<() => number>;
+  const randSource = { next: () => 0.5 };
   beforeEach(() => {
     // Pin the non-determinism so `actualVsExpected` is reproducible.
-    randSpy = vi.spyOn(Math, 'random').mockReturnValue(0.5) as MockInstance<() => number>;
+    randSource.next = () => 0.5;
+    vi.spyOn(Math, 'random').mockImplementation(() => randSource.next());
   });
-  afterEach(() => randSpy.mockRestore());
+  afterEach(() => vi.restoreAllMocks());
 
   it('typed outcome: returns SimulationResultSummary with canonical keys', () => {
     const result = generateSimulationResult(null, [], baseline, finalKpis, 300);
@@ -104,11 +105,12 @@ describe('generateSimulationResult — characterization', () => {
 });
 
 describe('generateRackMetrics — characterization', () => {
-  let randSpy: MockInstance<() => number>;
+  const randSource = { next: () => 0.5 };
   beforeEach(() => {
-    randSpy = vi.spyOn(Math, 'random').mockReturnValue(0.5) as MockInstance<() => number>;
+    randSource.next = () => 0.5;
+    vi.spyOn(Math, 'random').mockImplementation(() => randSource.next());
   });
-  afterEach(() => randSpy.mockRestore());
+  afterEach(() => vi.restoreAllMocks());
 
   const baseRacks: RackMetrics[] = Array.from({ length: 3 }, (_, i) => ({
     rackId: `Rack-${i + 1}`,
@@ -154,7 +156,7 @@ describe('generateRackMetrics — characterization', () => {
       } as unknown as SimulationEvent,
     ];
     // Force temp deltas to bias toward hotter racks.
-    randSpy.mockReturnValue(0.99 as never);
+    randSource.next = () => 0.99;
     const out = generateRackMetrics(baseRacks, thermalEvents, 5);
     const hot = out.some((r) => r.alertLevel !== 'normal');
     expect(hot).toBe(true);

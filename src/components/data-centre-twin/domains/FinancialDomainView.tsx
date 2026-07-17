@@ -13,6 +13,8 @@ import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
 import { SummaryCard } from '@/components/shared/SummaryCard';
 
 import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
+import { MetricProvenanceManifest } from '@/components/provenance/MetricProvenanceManifest';
+import { FINANCIAL_METRICS } from './metricCatalogs';
 
 interface FinancialDomainViewProps {
   facility: DataCentreFacility;
@@ -25,6 +27,7 @@ export function FinancialDomainView({ facility }: FinancialDomainViewProps) {
   return (
     <div className="space-y-6" data-provenance="demo" data-testid="financial-domain-view">
       <DomainProvenanceHeader provenance="demo" sourceName="sovereignDataCenter/mockData" ariaContext="Financial domain data provenance" />
+      <MetricProvenanceManifest domain="financial" metrics={FINANCIAL_METRICS} />
       {/* Top KPI Row */}
       <div className="grid gap-4 md:grid-cols-4">
         <SummaryCard

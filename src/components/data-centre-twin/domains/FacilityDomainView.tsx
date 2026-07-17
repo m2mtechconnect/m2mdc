@@ -14,6 +14,8 @@ import { motion } from 'framer-motion';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
+import { MetricProvenanceManifest } from '@/components/provenance/MetricProvenanceManifest';
+import { FACILITY_METRICS } from './metricCatalogs';
 
 interface FacilityDomainViewProps {
   facility: DataCentreFacility;
@@ -72,6 +74,7 @@ export function FacilityDomainView({ facility }: FacilityDomainViewProps) {
   return (
     <div className="space-y-6" data-provenance="demo" data-testid="facility-domain-view">
       <DomainProvenanceHeader provenance="demo" sourceName="sovereignDataCenter/mockData" ariaContext="Facility domain data provenance" />
+      <MetricProvenanceManifest domain="facility" metrics={FACILITY_METRICS} />
       {/* Safety Score */}
       <div className="grid gap-4 md:grid-cols-4">
         <SummaryCard

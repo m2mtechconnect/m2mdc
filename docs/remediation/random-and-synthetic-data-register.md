@@ -186,3 +186,23 @@ adapter characterization tests). The Kit runtime path remains deterministic.
 
 `random-data-register.md` (Phase 1A.1) remains for historical continuity but
 is superseded by this file for Phase 1A.3 planning purposes.
+
+## Phase 1A.3.d.1 — simulation export provenance rules
+
+Simulation result exports (`SimulationResultPanel` JSON + Markdown) now
+classify per row via `buildSimulationResultPayload()`:
+
+| Row family                          | Provenance  | Source string                              |
+|-------------------------------------|-------------|--------------------------------------------|
+| Scenario inputs (id, name, secs)    | `static`    | AURA simulation scenario (user-configured) |
+| Baseline KPI (`before`)             | `demo`      | AURA baseline fixture                      |
+| Post-scenario KPI (`after`)         | `simulated` | AURA simulation estimator                  |
+
+A row is **never** serialized as `live`. The envelope carries
+`surface = simulation.result.<scenarioId>` and a schema version.
+
+`SovereignDCSimulationDashboard` "Playbook" download is disabled
+(`describeExportBlock('no-audited-source')`) until an audited source
+and defensible metric catalog are wired in Phase 1B. Legacy
+`generatePlaybook` / `playbookToMarkdown` remain as library modules
+with no UI wiring.

@@ -18,6 +18,8 @@ export { CSV_COLUMNS, toCsv } from './csv';
 export { toJson } from './json';
 export type { SerializedJsonPayload } from './json';
 export { toPrintHtml, openPrintWindow } from './printHtml';
+export { toMarkdown } from './markdown';
+export type { MarkdownOptions } from './markdown';
 
 import { toCsv } from './csv';
 import { toJson } from './json';

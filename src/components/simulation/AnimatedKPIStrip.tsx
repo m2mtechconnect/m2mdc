@@ -12,11 +12,22 @@ import {
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { KPI_CATALOG, KPIKey, type KPIDefinition } from '@/domain/greenDc/kpiCatalog';
+import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
+import type { DataProvenance } from '@/lib/provenance/types';
 
 interface AnimatedKPIStripProps {
   kpis: Record<string, number>;
   baselineKpis: Record<string, number>;
   isRunning: boolean;
+  /**
+   * Explicit provenance for the strip. When omitted the strip renders
+   * `simulated` while a run is active and `demo` otherwise. `live` is not
+   * a supported value here — the underlying KPIs come from `useSimulation`,
+   * not validated telemetry.
+   */
+  provenance?: Extract<DataProvenance, 'simulated' | 'demo'>;
+  /** Optional scenario id for the badge tooltip. */
+  scenarioId?: string;
 }
 
 interface KPIConfig {
@@ -67,12 +78,16 @@ const AnimatedKPICard = memo(function AnimatedKPICard({
   config,
   value,
   baseline,
-  isRunning
+  isRunning,
+  provenance,
+  scenarioId,
 }: {
   config: KPIConfig;
   value: number;
   baseline: number;
   isRunning: boolean;
+  provenance: Extract<DataProvenance, 'simulated' | 'demo'>;
+  scenarioId?: string;
 }) {
   const [prevValue, setPrevValue] = useState(value);
   const [isChanging, setIsChanging] = useState(false);
@@ -96,12 +111,23 @@ const AnimatedKPICard = memo(function AnimatedKPICard({
 
   const Icon = config.icon;
 
+  const meta = {
+    provenance,
+    source: provenance === 'simulated'
+      ? (scenarioId ?? 'sovereignDataCenter/simulationEngine')
+      : 'demo-fixture',
+    stale: false,
+    note: config.label,
+  };
+
   return (
     <motion.div
       animate={{
         scale: isChanging && isSignificantChange ? [1, 1.05, 1] : 1,
       }}
       transition={{ duration: 0.3 }}
+      data-testid={`metric-strip-${config.id}`}
+      data-provenance={provenance}
     >
       <Card className={cn(
         'bg-card border-border transition-all duration-300',
@@ -114,6 +140,9 @@ const AnimatedKPICard = memo(function AnimatedKPICard({
             <div className={cn('p-1.5 rounded-lg bg-muted/50', config.color)}>
               <Icon className="h-4 w-4" />
             </div>
+            <ProvenanceBadge meta={meta} compact className="ml-auto" />
+          </div>
+          <div className="flex items-center justify-end mb-1 min-h-[16px]">
             {isRunning && delta !== 0 && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -157,10 +186,14 @@ const AnimatedKPICard = memo(function AnimatedKPICard({
 export const AnimatedKPIStrip = memo(function AnimatedKPIStrip({
   kpis,
   baselineKpis,
-  isRunning
+  isRunning,
+  provenance,
+  scenarioId,
 }: AnimatedKPIStripProps) {
+  const resolvedProvenance: Extract<DataProvenance, 'simulated' | 'demo'> =
+    provenance ?? (isRunning ? 'simulated' : 'demo');
   return (
-    <div className="grid grid-cols-5 gap-3">
+    <div className="grid grid-cols-5 gap-3" data-provenance={resolvedProvenance}>
       {kpiConfigs.map((config) => (
         <AnimatedKPICard
           key={config.id}
@@ -168,6 +201,8 @@ export const AnimatedKPIStrip = memo(function AnimatedKPIStrip({
           value={kpis[config.id] ?? baselineKpis[config.id] ?? 0}
           baseline={baselineKpis[config.id] ?? 0}
           isRunning={isRunning}
+          provenance={resolvedProvenance}
+          scenarioId={scenarioId}
         />
       ))}
     </div>

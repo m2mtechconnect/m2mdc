@@ -13,6 +13,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
 
 // Radix / recharts ResizeObserver shim.
 class RO { observe() {} unobserve() {} disconnect() {} }
@@ -59,7 +60,11 @@ const cases: Array<[string, React.FC<{ facility: typeof facility }>, string]> = 
 describe('Domain views — Phase 1A.3.c provenance retrofit', () => {
   for (const [testId, Comp, expected] of cases) {
     it(`${testId} root exposes data-provenance="${expected}" and no "live" descendants`, () => {
-      const { container } = render(<Comp facility={facility} />);
+      const { container } = render(
+        <MemoryRouter>
+          <Comp facility={facility} />
+        </MemoryRouter>,
+      );
       const root = container.querySelector(`[data-testid="${testId}"]`);
       expect(root).not.toBeNull();
       expect(root?.getAttribute('data-provenance')).toBe(expected);
@@ -75,7 +80,11 @@ describe('Domain views — Phase 1A.3.c provenance retrofit', () => {
   }
 
   it('ThermalDomainView no longer renders a "Live" pill (renamed to Snapshot)', () => {
-    const { container } = render(<ThermalDomainView facility={facility} />);
+    const { container } = render(
+      <MemoryRouter>
+        <ThermalDomainView facility={facility} />
+      </MemoryRouter>,
+    );
     // The former legacy pill was a Badge whose accessible text was "Live".
     // Assert that no interactive Badge in the mode-switch header carries that copy.
     const pills = Array.from(container.querySelectorAll('div, span, button'));

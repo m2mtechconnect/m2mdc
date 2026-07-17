@@ -47,3 +47,32 @@ export function resolveConfiguredProviderId(
   const normalized = raw.trim().toLowerCase() as SimulationProviderId;
   return KNOWN_IDS.includes(normalized) ? normalized : 'compatibility';
 }
+
+/**
+ * Phase 1B.2a — richer selection helper used by the facade.
+ *
+ * Unlike `resolveConfiguredProviderId` (which fails closed to
+ * `compatibility` for back-compat with Phase 1B.1 tests and callers),
+ * this returns a discriminated result so the facade can convert an
+ * unknown configuration into a typed `unavailable` outcome instead of
+ * silently selecting compatibility.
+ */
+export type ProviderSelection =
+  | { kind: 'default'; id: SimulationProviderId }
+  | { kind: 'known'; id: SimulationProviderId; raw: string }
+  | { kind: 'unknown'; raw: string };
+
+export function resolveProviderSelection(
+  env?: Record<string, string | undefined>,
+): ProviderSelection {
+  const raw = (env ?? (import.meta as { env?: Record<string, string | undefined> }).env)
+    ?.VITE_AURA_SIM_PROVIDER;
+  if (typeof raw !== 'string' || raw.trim() === '') {
+    return { kind: 'default', id: 'compatibility' };
+  }
+  const normalized = raw.trim().toLowerCase() as SimulationProviderId;
+  if (KNOWN_IDS.includes(normalized)) {
+    return { kind: 'known', id: normalized, raw };
+  }
+  return { kind: 'unknown', raw };
+}

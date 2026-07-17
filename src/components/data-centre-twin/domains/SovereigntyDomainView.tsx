@@ -26,6 +26,8 @@ import { SummaryCard } from '@/components/shared/SummaryCard';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
+import { MetricProvenanceManifest } from '@/components/provenance/MetricProvenanceManifest';
+import { SOVEREIGNTY_METRICS } from './metricCatalogs';
 
 interface SovereigntyDomainViewProps {
   facility: DataCentreFacility;
@@ -63,6 +65,7 @@ export function SovereigntyDomainView({ facility }: SovereigntyDomainViewProps) 
   return (
     <div className="space-y-6" data-provenance="unavailable" data-testid="sovereignty-domain-view">
       <DomainProvenanceHeader provenance="unavailable" sourceName="not-assessed" ariaContext="Sovereignty domain data provenance" />
+      <MetricProvenanceManifest domain="sovereignty" metrics={SOVEREIGNTY_METRICS} />
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <SummaryCard

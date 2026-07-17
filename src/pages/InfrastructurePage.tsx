@@ -26,6 +26,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { DomainProvenanceHeader } from "@/components/provenance/DomainProvenanceHeader";
 
 /* ═══════════════════════════════════════════════════════════
    MOCK DATA
@@ -462,17 +463,36 @@ const InfrastructurePage = () => {
         </div>
 
         {/* ════════ 3. OPERATIONAL METRICS ════════ */}
-        <div>
-          <h2 className="text-lg md:text-xl font-bold text-foreground mb-3">Operational Metrics</h2>
+        {/*
+         * Phase 1A.3.c retrofit. Every tile in this grid is a static
+         * mock — no BMS/DCIM feed is wired. Synthetic operational values
+         * → `demo`. `Twin Freshness` is not backed by any real telemetry
+         * signal today, so it is downgraded to `unavailable`.
+         */}
+        <div data-provenance="demo" data-testid="infrastructure-operational-metrics">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg md:text-xl font-bold text-foreground">Operational Metrics</h2>
+            <DomainProvenanceHeader
+              provenance="demo"
+              sourceName="InfrastructurePage/mock"
+              description="Static mock. No live DCIM/BMS feed wired on this route."
+              ariaContext="Infrastructure operational metrics data provenance"
+            />
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {[
-              { label: "Training GPUs (B3100)", value: "48 / 64", pct: 75, icon: Cpu, color: "primary" },
-              { label: "Inference GPUs (RTX PRO 6000)", value: "72 / 96", pct: 75, icon: Eye, color: "primary" },
-              { label: "Edge Devices", value: "42 / 48", pct: 87, icon: Bot, color: "primary" },
-              { label: "DDN Throughput", value: "320 GB/s", pct: 64, icon: HardDrive, color: "primary" },
-              { label: "Twin Freshness", value: "2.1s", pct: 95, icon: Activity, color: "primary" },
+              { label: "Training GPUs (B3100)",           value: "48 / 64",   pct: 75, icon: Cpu,        color: "primary", provenance: "demo" as const },
+              { label: "Inference GPUs (RTX PRO 6000)",   value: "72 / 96",   pct: 75, icon: Eye,        color: "primary", provenance: "demo" as const },
+              { label: "Edge Devices",                    value: "42 / 48",   pct: 87, icon: Bot,        color: "primary", provenance: "demo" as const },
+              { label: "DDN Throughput",                  value: "320 GB/s",  pct: 64, icon: HardDrive,  color: "primary", provenance: "demo" as const },
+              { label: "Twin Freshness",                  value: "Unavailable", pct: 0, icon: Activity,  color: "muted",   provenance: "unavailable" as const },
             ].map(m => (
-              <Card key={m.label} className="p-3">
+              <Card
+                key={m.label}
+                className="p-3"
+                data-provenance={m.provenance}
+                data-metric-label={m.label}
+              >
                 <div className="flex items-center gap-2 mb-2">
                   <m.icon className="h-4 w-4" style={{ color: `hsl(var(--${m.color}))` }} />
                   <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold font-sans truncate">{m.label}</span>

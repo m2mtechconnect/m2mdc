@@ -4,8 +4,10 @@ import type {
   FacilityProvenanceMap,
   ProvenancedMetric,
 } from './types';
+import { simulatedMetric } from './kitMetrics';
 
 export * from './types';
+export { simulatedMetric };
 
 /**
  * Default meta used when a lookup finds no entry — enforces the
@@ -106,12 +108,11 @@ export function demoMetric<T>(value: T, sourceName = 'demo-fixture', description
 }
 
 /**
-// `simulatedMetric<T>` lives in `./kitMetrics` and is re-exported here so
-// there is exactly one canonical implementation in the codebase. Phase
-// 1A.3.b2 collapsed a parallel copy that had drifted from the 5-arg
-// (value, sourceName, modelVersion, derivation?, description?) shape used
-// by every real caller.
-export { simulatedMetric } from './kitMetrics';
+// `simulatedMetric<T>` lives in `./kitMetrics` and is re-exported at the
+// top of this file. Phase 1A.3.b2 collapsed a parallel copy that had
+// drifted from the 5-arg (value, sourceName, modelVersion, derivation?,
+// description?) shape used by every real caller. There is now exactly one
+// canonical implementation in the codebase.
 
 /** Static configured target / benchmark. Values here are user/config supplied. */
 export function staticMetric<T>(value: T, sourceName: string, description?: string): ProvenancedMetric<T> {

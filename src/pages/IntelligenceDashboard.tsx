@@ -616,6 +616,13 @@ export default function IntelligenceDashboard() {
                       aggregation="Daily weighted avg"
                       source="DCIM · BMS"
                     />
+                    <div className="mt-2">
+                      <MetricProvenanceManifest
+                        domain="intelligence-charts"
+                        metrics={INTELLIGENCE_CHART_METRICS}
+                        title="Chart series provenance"
+                      />
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={250}>

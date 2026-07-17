@@ -43,6 +43,10 @@ const BOOTSTRAP_ALLOWED_SUFFIXES: { host: string; reason: string }[] = [
   { host: 'fonts.google.com',   reason: 'Google Fonts stylesheet loaded from index.html; aborted at wire.' },
   { host: 'githack.com',        reason: 'drei/three example HDR asset for procedural scene; aborted at wire.' },
   { host: 'jsdelivr.net',       reason: 'CDN-hosted three.js example assets; aborted at wire.' },
+  { host: 'clarity.ms',         reason: 'Microsoft Clarity analytics tag loaded from index.html; aborted at wire.' },
+  { host: 'bing.com',           reason: 'Clarity companion beacon (bat.bing.com); aborted at wire.' },
+  { host: 'lovable.dev',        reason: 'Lovable preview badge script; aborted at wire.' },
+  { host: 'lovable.app',        reason: 'Lovable preview asset; aborted at wire.' },
 ];
 
 export interface NetworkGuardHandle {

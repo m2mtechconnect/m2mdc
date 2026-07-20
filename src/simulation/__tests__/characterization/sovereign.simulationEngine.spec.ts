@@ -1,6 +1,7 @@
 /**
  * Phase 1B.2 characterization — legacy Sovereign DC engine
- * (`src/twins/sovereignDataCenter/simulationEngine.ts`).
+ * Canonical implementation now at
+ * `src/simulation/compat/sovereignDataCenterEngine.ts` (Phase 1B.6).
  *
  * This is a synchronous switch-based estimator; cancellation is not
  * modelled (which is the reason `useEnhancedSimulation` is the deferred
@@ -9,7 +10,7 @@
  */
 import { describe, expect, it } from 'vitest';
 
-import { runSimulation } from '../../../twins/sovereignDataCenter/simulationEngine';
+import { runSimulation } from '../../compat/sovereignDataCenterEngine';
 import type { SovereignKpis } from '@/types/sovereignDataCenterTwin';
 
 const base: SovereignKpis = {
@@ -24,7 +25,7 @@ const base: SovereignKpis = {
   activeWorkloads: 156,
 };
 
-describe('twins/sovereignDataCenter/simulationEngine — characterization', () => {
+describe('simulation/compat/sovereignDataCenterEngine — characterization', () => {
   it('typed outcome: SimulationResult carries {kpiDeltas, resultsSummary, warnings, recommendations}', () => {
     const r = runSimulation(base, 'gpu_overload');
     expect(r).toEqual(

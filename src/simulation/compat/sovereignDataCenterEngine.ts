@@ -1,4 +1,12 @@
 /**
+ * Phase 1B.6 — canonical Sovereign DC pure-function engine.
+ *
+ * Moved from `src/twins/sovereignDataCenter/simulationEngine.ts` behind the
+ * simulation provider boundary (ADR-0007). Consumers must depend on the
+ * simulation facade (`src/simulation/api.ts`) or, transitionally, on this
+ * compat module directly.
+ */
+/**
  * Sovereign Data Center Simulation Engine
  * Deterministic frontend logic for simulating KPI changes
  */

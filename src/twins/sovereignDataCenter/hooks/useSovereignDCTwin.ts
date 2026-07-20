@@ -39,10 +39,10 @@ import type {
   SimulationType,
   SovereignKpis 
 } from '@/types/sovereignDataCenterTwin';
-import { 
-  runSimulation, 
-  createSimulationRun 
-} from '../simulationEngine';
+import {
+  runSimulation,
+  createSimulationRun,
+} from '@/simulation/compat/sovereignDataCenterEngine';
 import { 
   getDemoFacilityById, 
   getDemoSimulationRuns,

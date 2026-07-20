@@ -30,8 +30,10 @@ export {
   SCENARIO_CATEGORIES,
 } from './simulationScenarios';
 
-// Simulation Engine
-export { 
+// Simulation Engine — re-exported from the compat module behind the
+// simulation provider boundary (ADR-0007, Phase 1B.4). New consumers must
+// depend on `src/simulation/api.ts` instead of this barrel.
+export {
   calculateBaseKpis,
   applyScenarioDeltas,
   generateScenarioEvents,
@@ -39,7 +41,7 @@ export {
   updateSimulationRun,
   generatePlaybook,
   playbookToMarkdown,
-} from './simulationEngine';
+} from '@/simulation/compat/dataCenterEngine';
 
 // Master Template Configuration
 export { 

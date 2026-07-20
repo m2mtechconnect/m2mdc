@@ -10,7 +10,7 @@ import type {
   SimulationEvent,
   DomainType,
 } from '@/types/dataCenterTwin';
-import { SIMULATION_SCENARIOS, getScenarioById } from './simulationScenarios';
+import { getScenarioById } from '@/twins/dataCenter/simulationScenarios';
 
 // ============================================================================
 // SIMULATION STATE

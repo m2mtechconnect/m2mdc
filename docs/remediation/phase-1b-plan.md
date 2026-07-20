@@ -19,7 +19,7 @@ the next slice is authorized.
 | **1B.4** | Fold `twins/dataCenter/simulationEngine.ts` behind `src/simulation/compat/dataCenterEngine.ts`; shim historical path; identity tests | complete | restore file from git; delete `src/simulation/compat/**` |
 | **1B.5** | Fold `PRESET_SCENARIOS` + `SIMULATION_SCENARIOS` + `ENHANCED_SCENARIOS` behind read-only `scenarioLibraryProvider` (namespaced ids `preset:*` / `dc:*` / `sovereign:*`); source constants untouched | complete | delete `src/simulation/providers/scenarioLibraryProvider.ts` and revert registry/contract-test to Phase 1B.4 wiring |
 | **1B.6** | Delete duplicate engines (`twins/dataCenter/simulationEngine.ts`, `twins/sovereignDataCenter/simulationEngine.ts`); Sovereign engine moved to `src/simulation/compat/sovereignDataCenterEngine.ts`; barrels + characterization tests + `useSovereignDCTwin` re-pointed to compat; re-export identity spec added | complete | restore from git |
-| **1B.7** | Rename builder `SimulationEngine` class to resolve name clash; migrate builder to `fixtures/builderMock` | 1 turn | rename back |
+| **1B.7** | Renamed `src/components/builder/step5/SimulationEngine.ts` → `BuilderPreviewEngine.ts` (class `SimulationEngine` → `BuilderPreviewEngine`, `SimulationEvent` → `BuilderPreviewEvent`); moved `MockSimulationEngine.ts` → `fixtures/builderMock.ts`; consumers (`SimulationDashboard`, `EventLogPanel`) and both characterization specs re-pointed | complete | rename back |
 | **1B.8** | `omniverseProvider` stub wired behind `VITE_AURA_SIM_PROVIDER`; provider-selection unit tests | 1 turn | remove flag branch |
 | **1B.9** | Consolidation report + updated capability-traceability + Playwright rerun + evidence bundle | 1 turn | docs-only |
 

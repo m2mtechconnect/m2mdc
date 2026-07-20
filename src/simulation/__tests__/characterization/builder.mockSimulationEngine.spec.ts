@@ -1,14 +1,15 @@
 /**
  * Phase 1B.2 characterization — Builder Step 5 `MockSimulationEngine`
- * (`src/components/builder/step5/MockSimulationEngine.ts`).
+ * (canonical path now `src/components/builder/step5/fixtures/builderMock.ts`
+ * after the Phase 1B.7 migration).
  *
  * Config-scripted preview engine used when no backend endpoint is
- * configured. Slice 1B.7 will migrate the builder off this file to a
- * `fixtures/builderMock` shim; today we pin the wire format.
+ * configured. Phase 1B.7 relocated the source under `fixtures/builderMock`;
+ * this spec pins the wire format.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { MockSimulationEngine } from '../../../components/builder/step5/MockSimulationEngine';
+import { MockSimulationEngine } from '../../../components/builder/step5/fixtures/builderMock';
 
 const previewConfig = {
   baseline_metrics: {

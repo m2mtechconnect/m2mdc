@@ -1,6 +1,6 @@
 /**
  * Phase 1B.2 characterization — Builder Step 5 `SimulationEngine`
- * (`src/components/builder/step5/SimulationEngine.ts`).
+ * (`src/components/builder/step5/BuilderPreviewEngine.ts` — renamed in Phase 1B.7).
  *
  * This class shares a name with `src/simulation/SimulationEngine.ts` but
  * has a distinct API surface. The rename is scoped for slice 1B.7. This
@@ -8,7 +8,7 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { SimulationEngine as BuilderSimulationEngine } from '../../../components/builder/step5/SimulationEngine';
+import { BuilderPreviewEngine as BuilderSimulationEngine } from '../../../components/builder/step5/BuilderPreviewEngine';
 
 const config = {
   scenario: { id: 's1', name: 'unit' },
@@ -20,7 +20,7 @@ const config = {
   speed: 1 as const,
 };
 
-describe('components/builder/step5/SimulationEngine — characterization', () => {
+describe('components/builder/step5/BuilderPreviewEngine — characterization', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     // Pin workflow event randomness.

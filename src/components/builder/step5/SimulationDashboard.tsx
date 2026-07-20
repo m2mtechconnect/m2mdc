@@ -23,7 +23,7 @@ import {
 import { BuilderPreviewEngine, BuilderPreviewEvent } from './BuilderPreviewEngine';
 import { MockSimulationEngine, SimulationPreviewConfig } from './fixtures/builderMock';
 import { EnhancedKPIChartsPanel } from '@/components/simulation/EnhancedKPIChartsPanel';
-import { EnhancedEventLogPanel, type BuilderPreviewEvent as EnhancedSimulationEvent } from '@/components/simulation/EnhancedEventLogPanel';
+import { EnhancedEventLogPanel, type SimulationEvent as EnhancedSimulationEvent } from '@/components/simulation/EnhancedEventLogPanel';
 import { ScenarioPicker } from './ScenarioPicker';
 import { DayInLifeNarrative } from './DayInLifeNarrative';
 import { AnimatedDeployButton } from './AnimatedDeployButton';

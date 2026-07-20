@@ -288,7 +288,9 @@ describe('no consumer migration in Phase 1B.1', () => {
 
   it('default registry is constructable and returns compatibility for unknown ids', () => {
     const reg = createDefaultRegistry();
-    expect(reg.get('scenario-library').id).toBe('compatibility');
+    // Phase 1B.5 — `scenario-library` is now instantiated.
+    expect(reg.get('scenario-library').id).toBe('scenario-library');
+    // `blueprint` remains not-instantiated; falls closed to compatibility.
     expect(reg.get('blueprint').id).toBe('compatibility');
     expect(reg.get('omniverse').id).toBe('omniverse');
   });

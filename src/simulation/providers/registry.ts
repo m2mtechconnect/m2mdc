@@ -5,6 +5,7 @@
 import type { SimulationProvider, SimulationProviderId } from './types';
 import { createCompatibilityProvider } from './compatibilityProvider';
 import { createOmniverseProvider } from './omniverseProvider';
+import { createScenarioLibraryProvider } from './scenarioLibraryProvider';
 
 export interface ProviderRegistry {
   get(id: SimulationProviderId): SimulationProvider;
@@ -15,8 +16,11 @@ export function createDefaultRegistry(): ProviderRegistry {
   const providers = new Map<SimulationProviderId, SimulationProvider>();
   providers.set('compatibility', createCompatibilityProvider());
   providers.set('omniverse', createOmniverseProvider());
-  // `scenario-library` and `blueprint` are declared but not instantiated;
-  // requests for them fail closed to compatibility below.
+  // Phase 1B.5 — read-only scenario library provider (folds the three
+  // historical scenario constants behind the facade seam).
+  providers.set('scenario-library', createScenarioLibraryProvider());
+  // `blueprint` remains declared-but-not-instantiated; requests for it
+  // fail closed to compatibility below (Phase 1B.6+).
   return {
     get(id) {
       return providers.get(id) ?? providers.get('compatibility')!;

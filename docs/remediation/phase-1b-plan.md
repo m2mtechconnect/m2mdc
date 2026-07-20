@@ -16,7 +16,7 @@ the next slice is authorized.
 | **1B.2b** | Extend facade migration to remaining simulation consumers | **closed — docs-only (1B.2b-null)**; see `phase-1b2b-finding.md` | n/a |
 | **1B.2** | Characterization tests for the 7 simulation engines | 1–2 turns | delete new test files |
 | **1B.3** | Introduce `src/simulation/api.ts` facade + provider interface (no consumer migration) | 1 turn | delete new files |
-| **1B.4** | Codemod: consumers of `SimulationEngine` → `api.ts`; `compat/*` re-exports for `twins/**` | 1–2 turns | revert codemod commit |
+| **1B.4** | Fold `twins/dataCenter/simulationEngine.ts` behind `src/simulation/compat/dataCenterEngine.ts`; shim historical path; identity tests | complete | restore file from git; delete `src/simulation/compat/**` |
 | **1B.5** | Fold `enhancedSimulationEngine` scenarios into `scenarioLibraryProvider` | 1 turn | keep old file until deletion slice |
 | **1B.6** | Delete duplicate engines (`twins/dataCenter/simulationEngine.ts`, `twins/sovereignDataCenter/simulationEngine.ts`) once #1B.2 tests are green through `compat/*` | 1 turn | restore from git |
 | **1B.7** | Rename builder `SimulationEngine` class to resolve name clash; migrate builder to `fixtures/builderMock` | 1 turn | rename back |

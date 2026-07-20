@@ -1,6 +1,7 @@
 /**
  * Phase 1B.2 characterization — legacy DC engine
- * (`src/twins/dataCenter/simulationEngine.ts`).
+ * Canonical implementation now at
+ * `src/simulation/compat/dataCenterEngine.ts` (Phase 1B.6).
  *
  * Exports pure functions rather than a class. There is no in-flight
  * state to cancel; the "cancellation" characterization here pins the
@@ -15,13 +16,13 @@ import {
   createSimulationRun,
   generateScenarioEvents,
   updateSimulationRun,
-} from '../../../twins/dataCenter/simulationEngine';
+} from '../../compat/dataCenterEngine';
 import { montrealSovereignDC } from '../../../twins/dataCenter/mockData';
 import { SIMULATION_SCENARIOS } from '../../../twins/dataCenter/simulationScenarios';
 
 const scenario = SIMULATION_SCENARIOS[0]!;
 
-describe('twins/dataCenter/simulationEngine — characterization', () => {
+describe('simulation/compat/dataCenterEngine — characterization', () => {
   beforeEach(() => vi.useFakeTimers().setSystemTime(new Date('2026-07-17T00:00:00Z')));
   afterEach(() => vi.useRealTimers());
 

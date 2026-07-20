@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { 
-  runSimulation, 
-  createSimulationRun, 
-  getScenarioSuggestions 
-} from '../simulationEngine';
+import {
+  runSimulation,
+  createSimulationRun,
+  getScenarioSuggestions,
+} from '@/simulation/compat/sovereignDataCenterEngine';
 import { telusSovereignFacility } from '../mockData';
 import type { SovereignKpis } from '@/types/sovereignDataCenterTwin';
 

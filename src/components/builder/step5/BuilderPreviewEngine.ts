@@ -1,12 +1,12 @@
 /**
- * Simulation Engine - Local Timeline Generator
+ * Builder Preview Engine (Phase 1B.7 rename of former SimulationEngine)
  * Generates synthetic KPI updates and event logs
  * Driven by workflow structure, KPI thresholds, and scenario metadata
  */
 
 type SpeedFactor = 1 | 2 | 4;
 
-export interface SimulationEvent {
+export interface BuilderPreviewEvent {
   id: string;
   timestamp: string;
   type: 'detect' | 'decision' | 'action' | 'resolved' | 'alert' | 'info';
@@ -23,16 +23,16 @@ interface SimulationEngineConfig {
   speed: SpeedFactor;
 }
 
-type EventListener = (event: SimulationEvent) => void;
+type EventListener = (event: BuilderPreviewEvent) => void;
 type KPIListener = (data: any) => void;
 type CompleteListener = () => void;
 
-export class SimulationEngine {
+export class BuilderPreviewEngine {
   private config: SimulationEngineConfig;
   private intervalId: number | null = null;
   private tick: number = 0;
   private baseTickInterval = 300; // 300ms base interval
-  private events: SimulationEvent[] = [];
+  private events: BuilderPreviewEvent[] = [];
   private listeners: Map<string, Function[]> = new Map();
 
   constructor(config: SimulationEngineConfig) {
@@ -102,7 +102,7 @@ export class SimulationEngine {
     this.emit('complete');
     
     // Final summary event
-    const summaryEvent: SimulationEvent = {
+    const summaryEvent: BuilderPreviewEvent = {
       id: `event-${Date.now()}`,
       timestamp: this.formatTimestamp(this.tick),
       type: 'resolved',
@@ -161,13 +161,13 @@ export class SimulationEngine {
     this.emit('event', event);
   }
 
-  private generateWorkflowEvent(workflow: any): SimulationEvent {
-    const eventTypes: SimulationEvent['type'][] = ['detect', 'decision', 'action', 'resolved'];
+  private generateWorkflowEvent(workflow: any): BuilderPreviewEvent {
+    const eventTypes: BuilderPreviewEvent['type'][] = ['detect', 'decision', 'action', 'resolved'];
     const currentPhase = this.tick % 20; // Cycle through phases
     
-    let type: SimulationEvent['type'];
+    let type: BuilderPreviewEvent['type'];
     let message: string;
-    let severity: SimulationEvent['severity'];
+    let severity: BuilderPreviewEvent['severity'];
 
     if (currentPhase < 5) {
       type = 'detect';
@@ -207,7 +207,7 @@ export class SimulationEngine {
 
     const selected = messages[Math.floor(Math.random() * messages.length)];
 
-    const event: SimulationEvent = {
+    const event: BuilderPreviewEvent = {
       id: `event-${Date.now()}-${Math.random()}`,
       timestamp: this.formatTimestamp(this.tick),
       type: selected.type,

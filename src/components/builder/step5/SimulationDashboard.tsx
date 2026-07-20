@@ -20,8 +20,8 @@ import {
   Play, Pause, RotateCcw, Zap, TrendingUp, Clock, 
   Activity, AlertTriangle, CheckCircle2, Info, Rocket, Brain
 } from 'lucide-react';
-import { SimulationEngine, SimulationEvent } from './SimulationEngine';
-import { MockSimulationEngine, SimulationPreviewConfig } from './MockSimulationEngine';
+import { BuilderPreviewEngine, BuilderPreviewEvent } from './BuilderPreviewEngine';
+import { MockSimulationEngine, SimulationPreviewConfig } from './fixtures/builderMock';
 import { EnhancedKPIChartsPanel } from '@/components/simulation/EnhancedKPIChartsPanel';
 import { EnhancedEventLogPanel, type SimulationEvent as EnhancedSimulationEvent } from '@/components/simulation/EnhancedEventLogPanel';
 import { ScenarioPicker } from './ScenarioPicker';
@@ -53,9 +53,9 @@ export function SimulationDashboard({
   const [status, setStatus] = useState<SimulationStatus>('idle');
   const [speed, setSpeed] = useState<SpeedFactor>(1);
   const [selectedScenario, setSelectedScenario] = useState<any>(null);
-  const [events, setEvents] = useState<SimulationEvent[]>([]);
+  const [events, setEvents] = useState<BuilderPreviewEvent[]>([]);
   const [kpiData, setKPIData] = useState<any[]>([]);
-  const [engine, setEngine] = useState<SimulationEngine | MockSimulationEngine | null>(null);
+  const [engine, setEngine] = useState<BuilderPreviewEngine | MockSimulationEngine | null>(null);
   
   // Bi-directional linking state
   const [highlightedEventId, setHighlightedEventId] = useState<string | null>(null);
@@ -94,7 +94,7 @@ export function SimulationDashboard({
     setEvents([]);
     setStatus('idle');
 
-    let newEngine: SimulationEngine | MockSimulationEngine;
+    let newEngine: BuilderPreviewEngine | MockSimulationEngine;
 
     if (useMockSimulation && simulationPreviewConfig) {
       // Map scenario from preview section to simulation_preview_config
@@ -139,7 +139,7 @@ export function SimulationDashboard({
       setKPIData([baselineData]);
     } else {
       // Use real simulation engine
-      newEngine = new SimulationEngine({
+      newEngine = new BuilderPreviewEngine({
         scenario: selectedScenario,
         workflows,
         kpis: kpiBlock.kpis || [],
@@ -149,7 +149,7 @@ export function SimulationDashboard({
     }
 
     // Subscribe to engine events
-    newEngine.on('event', (event: SimulationEvent) => {
+    newEngine.on('event', (event: BuilderPreviewEvent) => {
       setEvents(prev => [...prev, event]);
     });
 

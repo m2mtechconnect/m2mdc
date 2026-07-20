@@ -8,11 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, CheckCircle2, Info, Zap, Activity } from 'lucide-react';
-import { SimulationEvent } from './SimulationEngine';
+import { BuilderPreviewEvent } from './BuilderPreviewEngine';
 import { cn } from '@/lib/utils';
 
 interface EventLogPanelProps {
-  events: SimulationEvent[];
+  events: BuilderPreviewEvent[];
   isRunning: boolean;
 }
 
@@ -29,7 +29,7 @@ export function EventLogPanel({ events, isRunning }: EventLogPanelProps) {
     }
   }, [events]);
 
-  const getEventConfig = (event: SimulationEvent) => {
+  const getEventConfig = (event: BuilderPreviewEvent) => {
     switch (event.type) {
       case 'detect':
         return {

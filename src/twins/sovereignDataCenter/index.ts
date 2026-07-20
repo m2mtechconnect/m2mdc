@@ -15,12 +15,14 @@ export {
   getAllDemoFacilities
 } from './mockData';
 
-// Simulation Engine
-export { 
-  runSimulation, 
+// Simulation Engine — re-exported from the compat module behind the
+// simulation provider boundary (ADR-0007, Phase 1B.6). New consumers must
+// depend on `src/simulation/api.ts` instead of this barrel.
+export {
+  runSimulation,
   createSimulationRun,
-  getScenarioSuggestions 
-} from './simulationEngine';
+  getScenarioSuggestions,
+} from '@/simulation/compat/sovereignDataCenterEngine';
 
 // Playbook Generator
 export { 

@@ -83,7 +83,7 @@ export function GeminiChatInterface({ templateContext }: GeminiChatInterfaceProp
         if (response.status === 402) {
           toast({
             title: 'Payment Required',
-            description: 'Please add credits to your Lovable workspace.',
+            description: 'Please add credits to your workspace.',
             variant: 'destructive',
           });
           setMessages(prev => prev.slice(0, -1));

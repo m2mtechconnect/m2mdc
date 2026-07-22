@@ -49,7 +49,7 @@ export const CoPilotVoice = ({ onTranscript }: CoPilotVoiceProps) => {
       setIsProcessing(true);
       
       try {
-        // Call copilot-chat edge function with Lovable AI
+        // Call copilot-chat edge function with the managed AI gateway
         const data = await invokeEdgeFunction('copilot-chat-simple', {
           messages: [{ role: 'user', content: transcript }],
           role: 'architect'

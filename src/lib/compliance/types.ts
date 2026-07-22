@@ -68,7 +68,7 @@ export const DEFAULT_COMPLIANCE_REGISTRY: Record<ComplianceFrameworkId, Complian
   'SOC-2':          { framework: 'SOC-2',          status: 'not-assessed', notAssessedReason: 'No SOC 2 Type I or Type II report on file for the AURA product.' },
   'HIPAA':          { framework: 'HIPAA',          status: 'not-assessed', notAssessedReason: 'HIPAA applicability depends on customer PHI handling; not evaluated at product level.' },
   'OSFI-B13':       { framework: 'OSFI-B13',       status: 'not-assessed', notAssessedReason: 'OSFI B-13 attestation requires customer-specific technology-risk assessment.' },
-  'CA-RESIDENCY':   { framework: 'CA-RESIDENCY',   status: 'configured',   scope: 'Backend hosted in Lovable Cloud region as configured by project.', notAssessedReason: 'Requirement configured; residency evidence pipeline pending (Phase 2).' },
+  'CA-RESIDENCY':   { framework: 'CA-RESIDENCY',   status: 'configured',   scope: 'Backend hosted in the managed cloud region as configured by project.', notAssessedReason: 'Requirement configured; residency evidence pipeline pending (Phase 2).' },
   'CARBON-NEUTRAL': { framework: 'CARBON-NEUTRAL', status: 'not-assessed', notAssessedReason: 'Carbon reporting is currently derived from demo fixtures; not audited.' },
   'UPTIME-TIER':    { framework: 'UPTIME-TIER',    status: 'not-assessed', notAssessedReason: 'Uptime Institute tier certification is a facility property; product does not certify facilities.' },
 };

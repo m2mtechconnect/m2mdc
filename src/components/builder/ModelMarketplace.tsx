@@ -421,7 +421,7 @@ export function ModelMarketplace({
     if (!model.requiresAuth) {
       toast({
         title: "No Auth Required",
-        description: `${model.name} is available via Lovable AI without additional setup`,
+        description: `${model.name} is available via the managed AI gateway without additional setup`,
       });
       return;
     }

@@ -272,7 +272,7 @@ export function IntegrationDrawer({
           <TabsContent value="credentials" className="space-y-6">
             <Card className="p-4 bg-muted/50">
               <p className="text-caption">
-                Credentials are automatically managed through Lovable Cloud. Your API keys are
+                Credentials are automatically managed through the platform backend. Your API keys are
                 securely stored and never exposed.
               </p>
             </Card>

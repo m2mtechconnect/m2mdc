@@ -1,6 +1,6 @@
 /**
  * Centralized LLM Client for AURA Agent Studio
- * Uses Lovable AI Gateway with Latest Gemini 3.x Models
+ * Uses the managed AI Gateway with Latest Gemini 3.x Models
  * 
  * ENFORCES: All Co-Pilot interactions use Gemini 3.x or later
  */
@@ -52,7 +52,7 @@ export function getAIClient(options: AIClientOptions = {}) {
   enforceGemini3x(resolvedModel);
 
   return {
-    endpoint: 'https://ai.gateway.lovable.dev/v1/chat/completions',
+    endpoint: 'https://ai.gateway.lovable.dev/v1/chat/completions', // managed AI gateway endpoint
     model: resolvedModel,
     temperature,
     maxTokens,
@@ -70,9 +70,9 @@ export async function makeAICompletion(
   
   // Get API key from environment
   const apiKey = import.meta.env.VITE_LOVABLE_API_KEY;
-  
+
   if (!apiKey) {
-    throw new Error('LOVABLE_API_KEY not configured');
+    throw new Error('AI gateway API key not configured');
   }
 
   const response = await fetch(client.endpoint, {

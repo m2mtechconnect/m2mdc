@@ -241,7 +241,7 @@ export function DiagnosticsModal({ open, onOpenChange }: DiagnosticsModalProps) 
                 <Card>
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-base">Lovable AI Gateway</CardTitle>
+                      <CardTitle className="text-base">AI Gateway</CardTitle>
                       {getStatusBadge(report.checks.ai.ok)}
                     </div>
                   </CardHeader>

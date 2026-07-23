@@ -36,6 +36,14 @@ test.describe('UserMenu — Sign Out flow', () => {
       userMenuButtons: Array.from(document.querySelectorAll('button[aria-label="User menu"]')).length,
       allAria: Array.from(document.querySelectorAll('[aria-label]')).map(e => e.getAttribute('aria-label')).slice(0, 40),
     })));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sb = await page.evaluate(async () => {
+      const mod = await import('/src/integrations/supabase/client.ts');
+      const s = await mod.supabase.auth.getSession();
+      const u = await mod.supabase.auth.getUser();
+      return { session: !!s.data.session, user: !!u.data.user, err: u.error?.message ?? null };
+    });
+    console.log('sb=', sb);
 
     const trigger = page.getByRole('button', { name: 'User menu' });
     await expect(trigger).toBeVisible({ timeout: 10_000 });

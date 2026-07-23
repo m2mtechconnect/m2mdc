@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeEdgeFunction } from '@/hooks/useEdgeFunction';
+import { logger } from '@/lib/logger';
 import { useKpi } from '@/hooks/useKpi';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -187,16 +188,44 @@ export default function IntelligenceDashboard() {
   const { data: opsOverview } = useQuery({
     queryKey: ['ops-overview', facility],
     queryFn: async () => {
-      return await invokeEdgeFunction(`ops-overview?env=${facility}`);
+      try {
+        return await invokeEdgeFunction(`ops-overview?env=${facility}`, undefined, { logErrors: false });
+      } catch (err) {
+        logger.debug('ops-overview unavailable, using empty fallback', {
+          component: 'IntelligenceDashboard',
+          metadata: { facility, error: (err as Error)?.message },
+        });
+        return { data: { overview: null } };
+      }
     },
+    retry: false,
+    staleTime: 60_000,
   });
 
   // Fetch systems
   const { data: systemsData } = useQuery({
     queryKey: ['ops-systems', facility],
     queryFn: async () => {
-      return await invokeEdgeFunction(`ops-systems?env=${facility}&page=1&pageSize=50`);
+      try {
+        return await invokeEdgeFunction(
+          `ops-systems?env=${facility}&page=1&pageSize=50`,
+          undefined,
+          { logErrors: false },
+        );
+      } catch (err) {
+        // Graceful fallback: edge function may be unreachable in preview or
+        // when auth/service-role is unavailable. Keep the UI functional by
+        // returning an empty systems list; upstream consumers already tolerate
+        // an empty array (see `opsSystems` mapping below).
+        logger.debug('ops-systems unavailable, using empty fallback', {
+          component: 'IntelligenceDashboard',
+          metadata: { facility, error: (err as Error)?.message },
+        });
+        return { data: { systems: [], total: 0, page: 1, pageSize: 50 } };
+      }
     },
+    retry: false,
+    staleTime: 60_000,
   });
 
   // Fetch all agents for additional data

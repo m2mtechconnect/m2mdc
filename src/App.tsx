@@ -262,6 +262,7 @@ function AuthenticatedApp() {
         <Route path="/digital-twins/:slug" element={<Navigate to="/" replace />} />
         <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
         <Route path="/infrastructure" element={<InfrastructurePage />} />
+        <Route path="/test/overlay-fixtures" element={<OverlayFixtures />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

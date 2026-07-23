@@ -751,6 +751,21 @@
   .dark .text-accent { color: hsl(48 100% 62%); }
   .dark .text-red-600 { color: hsl(0 84% 72%); }
 
+  /* NOC dark surfaces don't carry the `.dark` class but still need
+     the lighter neutral text so slate/gray text stays legible. */
+  .bg-noc-bg-deep .text-slate-400,
+  .bg-noc-bg-deep .text-slate-500,
+  .bg-noc-bg-deep .text-gray-400,
+  .bg-noc-bg-deep .text-gray-500,
+  .bg-noc-bg .text-slate-400,
+  .bg-noc-bg .text-slate-500,
+  .bg-noc-bg .text-gray-400,
+  .bg-noc-bg .text-gray-500,
+  .bg-noc-surface .text-slate-400,
+  .bg-noc-surface .text-slate-500,
+  .bg-noc-surface .text-gray-400,
+  .bg-noc-surface .text-gray-500 { color: hsl(220 15% 78%); }
+
   /* White text on the DC cyan brand surface only reaches ~2.2:1.
      Force near-black text on cyan-branded backgrounds to clear AA. */
   .bg-dc-cyan,

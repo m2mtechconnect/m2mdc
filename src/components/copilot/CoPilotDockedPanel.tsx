@@ -517,6 +517,7 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
           <span>⌘/ to open</span>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

@@ -96,7 +96,9 @@ test.describe('Axe a11y — auth-gated surfaces', () => {
     // as dashboard hydration completes, which can detach the DOM node.
     await page.waitForLoadState('networkidle').catch(() => {});
     await page.waitForTimeout(500);
-    await trigger.click({ timeout: 10_000, trial: false });
+    // Force click bypasses actionability re-checks that fail when React
+    // re-mounts the launcher during dashboard hydration.
+    await trigger.click({ timeout: 10_000, force: true });
 
     // Wait for the overlay to attach — panel/drawer/dialog with the
     // CoPilot heading. Best-effort: don't fail here, axe below will

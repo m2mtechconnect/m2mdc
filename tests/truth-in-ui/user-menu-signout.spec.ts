@@ -26,30 +26,13 @@ test.describe('UserMenu — Sign Out flow', () => {
     });
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    // UserMenu is only rendered at ≥ xl (1280px). The shared context
+    // fixture doesn't forward `test.use({ viewport })`, so resize the
+    // page directly to guarantee the desktop trigger mounts.
     await page.setViewportSize({ width: 1440, height: 900 });
     await expect
       .poll(() => mock.profileHits(), { timeout: 5_000 })
       .toBeGreaterThan(0);
-    console.log('probe=', await page.evaluate(() => ({
-      vw: window.innerWidth,
-      matches1280: window.matchMedia('(min-width: 1280px)').matches,
-      userMenuButtons: Array.from(document.querySelectorAll('button[aria-label="User menu"]')).length,
-      allAria: Array.from(document.querySelectorAll('[aria-label]')).map(e => e.getAttribute('aria-label')).slice(0, 40),
-    })));
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sb = await page.evaluate(async () => {
-      const mod = await import('/src/integrations/supabase/client.ts');
-      const s = await mod.supabase.auth.getSession();
-      const u = await mod.supabase.auth.getUser();
-      return { session: !!s.data.session, user: !!u.data.user, err: u.error?.message ?? null };
-    });
-    console.log('sb=', sb);
-    await page.waitForTimeout(2000);
-    const after = await page.evaluate(() => ({
-      userMenuButtons: document.querySelectorAll('button[aria-label="User menu"]').length,
-      xlBlock: document.querySelectorAll('div.hidden.xl\\:block').length,
-    }));
-    console.log('after=', after);
 
     const trigger = page.getByRole('button', { name: 'User menu' });
     await expect(trigger).toBeVisible({ timeout: 10_000 });

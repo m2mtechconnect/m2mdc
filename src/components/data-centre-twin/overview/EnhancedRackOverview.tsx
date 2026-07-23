@@ -141,7 +141,7 @@ export function EnhancedRackOverview({
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
           <Select value={filterBy} onValueChange={(v) => setFilterBy(v as FilterOption)}>
-            <SelectTrigger className="w-[140px] h-8 text-xs">
+            <SelectTrigger className="w-[140px] h-8 text-xs" aria-label="Filter racks">
               <SelectValue placeholder="Filter by" />
             </SelectTrigger>
             <SelectContent>
@@ -155,7 +155,7 @@ export function EnhancedRackOverview({
         </div>
         
         <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
-          <SelectTrigger className="w-[140px] h-8 text-xs">
+          <SelectTrigger className="w-[140px] h-8 text-xs" aria-label="Sort racks">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>

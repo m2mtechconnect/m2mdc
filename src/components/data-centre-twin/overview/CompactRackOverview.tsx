@@ -70,7 +70,7 @@ export function CompactRackOverview({
         <div className="flex items-center gap-2">
           <Filter className="h-3.5 w-3.5 text-muted-foreground" />
           <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
-            <SelectTrigger className="w-[110px] h-7 text-xs">
+            <SelectTrigger className="w-[110px] h-7 text-xs" aria-label="Sort racks">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

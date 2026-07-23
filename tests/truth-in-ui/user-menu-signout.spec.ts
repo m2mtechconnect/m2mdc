@@ -13,12 +13,11 @@ import { test, expect } from './_setup/fixtures';
 import { installSupabaseMock, STORAGE_KEY } from './_setup/supabase-mock';
 
 test.describe('UserMenu — Sign Out flow', () => {
-  // UserMenu is only rendered at ≥ xl (1280px) — Layout hides it below
-  // that breakpoint in favour of the mobile sheet. Force a comfortably
-  // wide viewport so the desktop trigger is guaranteed to mount.
-  test.use({ viewport: { width: 1440, height: 900 } });
-
   test('Sign Out item uses semantic text-destructive styling and clears session', async ({ context, page, guard }) => {
+    // UserMenu is only rendered at ≥ xl (1280px). The shared context
+    // fixture doesn't forward `test.use({ viewport })`, so resize the
+    // page directly to guarantee the desktop trigger mounts.
+    await page.setViewportSize({ width: 1440, height: 900 });
     const mock = await installSupabaseMock(context);
     let logoutHits = 0;
     await context.route('**/auth/v1/logout*', async (route) => {

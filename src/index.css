@@ -257,12 +257,89 @@
     font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
   }
 
-  /* Focus states for accessibility */
-  *:focus-visible {
-    outline: 2px solid hsl(var(--ring));
-    outline-offset: 2px;
-  }
+  /* placeholder — see unlayered focus block below */
+}
 
+/* -----------------------------------------------------------------
+   * Focus states for accessibility (WCAG 2.4.7)
+   *
+   * Many shadcn/Radix components set `focus-visible:outline-none`
+   * and swap in a component-local ring. Icon-only buttons and some
+   * overlay triggers omit that ring, leaving keyboard users with no
+   * visible focus indicator. To guarantee coverage:
+   *
+   *  1. Every focusable element gets a solid 2px outline in the
+   *     ring color as a base.
+   *  2. Additionally we paint a `box-shadow` ring — this survives
+   *     even when a component forces `outline: none`, and stacks
+   *     next to existing shadcn rings without breaking their look.
+   *
+   * These rules are intentionally UNLAYERED (declared outside any
+   * `@layer`) so they beat Tailwind's utility layer for both
+   * `!important` and normal cascade — otherwise
+   * `focus-visible:outline-none` on shadcn components would wipe
+   * our indicator.
+   * ----------------------------------------------------------------- */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+[role="button"]:focus-visible,
+[role="link"]:focus-visible,
+[role="menuitem"]:focus-visible,
+[role="menuitemcheckbox"]:focus-visible,
+[role="menuitemradio"]:focus-visible,
+[role="tab"]:focus-visible,
+[role="option"]:focus-visible,
+[role="switch"]:focus-visible,
+[role="checkbox"]:focus-visible,
+[role="radio"]:focus-visible,
+[role="combobox"]:focus-visible,
+[role="treeitem"]:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible,
+a:focus,
+button:focus,
+summary:focus,
+[role="button"]:focus,
+[role="link"]:focus,
+[role="menuitem"]:focus,
+[role="menuitemcheckbox"]:focus,
+[role="menuitemradio"]:focus,
+[role="tab"]:focus,
+[role="option"]:focus,
+[role="switch"]:focus,
+[role="checkbox"]:focus,
+[role="radio"]:focus,
+[role="combobox"]:focus,
+[role="treeitem"]:focus,
+[tabindex]:not([tabindex="-1"]):focus {
+  outline: 2px solid hsl(var(--ring)) !important;
+  outline-offset: 2px !important;
+  box-shadow:
+    0 0 0 2px hsl(var(--background)),
+    0 0 0 4px hsl(var(--ring)) !important;
+  border-radius: var(--radius, 6px);
+  /* Kill any inherited `transition-all` on outline / box-shadow so the
+     focus ring appears instantly. shadcn components ship
+     `transition-all` which otherwise animates the ring in and defeats
+     both keyboard perception and automated audits. */
+  transition-property: none !important;
+}
+
+/* Inputs already sit inside a bordered chrome; flush the ring so
+   the layout does not shift when focused. */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid hsl(var(--ring)) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 2px hsl(var(--ring)) !important;
+  transition-property: none !important;
+}
+
+@layer base {
   /* Touch targets */
   button, a, [role="button"], [role="link"] {
     min-height: 36px;

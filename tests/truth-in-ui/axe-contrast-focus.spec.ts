@@ -188,6 +188,13 @@ async function probeFocusIndicators(
       el.focus({ preventScroll: true });
       // Give the browser a paint tick.
       await new Promise((r) => requestAnimationFrame(() => r(null)));
+      // If focus never landed on this element (e.g. Radix roving-tabindex
+      // widgets like Tabs redirect focus to the active item; anchors
+      // without href are not focusable), it cannot render a :focus ring
+      // and is not a legitimate failure of the app's focus styles.
+      if (document.activeElement !== el || !el.isConnected) {
+        continue;
+      }
       const focused = fingerprint(el);
 
       if (resting === focused) {

@@ -223,7 +223,7 @@ export default function Dashboard() {
   }, [queryClient]);
 
   // Group items by department
-  const groupedByDepartment = unifiedData?.items.reduce((acc, item) => {
+  const groupedByDepartment = (unifiedData?.items ?? []).reduce((acc, item) => {
     if (!acc[item.department]) {
       acc[item.department] = [];
     }

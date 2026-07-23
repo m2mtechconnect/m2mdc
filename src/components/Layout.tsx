@@ -205,7 +205,7 @@ export function Layout({ children }: LayoutProps) {
                 return (
                   <Tooltip key={item.name}>
                     <TooltipTrigger asChild>
-                      <Link to={item.href} data-tour={tourId}>
+                      <Link to={item.href} data-tour={tourId} aria-label={item.fullName}>
                         <Button
                           variant={isActive ? "secondary" : "ghost"}
                           size="sm"
@@ -213,6 +213,7 @@ export function Layout({ children }: LayoutProps) {
                             isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
                           }`}
                           aria-current={isActive ? "page" : undefined}
+                          aria-label={item.fullName}
                         >
                           <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
                           <span className="hidden xl:inline whitespace-nowrap">{item.name}</span>
@@ -241,7 +242,7 @@ export function Layout({ children }: LayoutProps) {
                   return (
                     <Tooltip key={item.name}>
                       <TooltipTrigger asChild>
-                        <Link to={item.href} data-tour={tourId}>
+                        <Link to={item.href} data-tour={tourId} aria-label={item.fullName}>
                           <Button
                             variant={isActive ? "secondary" : "ghost"}
                             size="sm"
@@ -249,6 +250,7 @@ export function Layout({ children }: LayoutProps) {
                               isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
                             }`}
                             aria-current={isActive ? "page" : undefined}
+                            aria-label={item.fullName}
                           >
                             <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
                             <span className="whitespace-nowrap">{item.name}</span>
@@ -271,6 +273,7 @@ export function Layout({ children }: LayoutProps) {
                       variant="ghost"
                       size="sm"
                       className="gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:text-foreground min-h-[36px]"
+                      aria-label="More navigation"
                     >
                       <MoreHorizontal className="h-3.5 w-3.5" />
                       <span className="hidden xl:inline">More</span>

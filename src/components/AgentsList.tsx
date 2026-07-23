@@ -91,7 +91,7 @@ export function AgentsList() {
           />
         </div>
         <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px]" aria-label="Filter agents by status">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>

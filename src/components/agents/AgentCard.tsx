@@ -154,8 +154,9 @@ export function AgentCard({
                   variant="ghost"
                   onClick={() => onDelete(agent)}
                   className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  aria-label={`Delete agent ${agent.name}`}
                 >
-                  <Trash2 className="h-3 w-3" />
+                  <Trash2 className="h-3 w-3" aria-hidden="true" />
                 </Button>
               )}
             </div>

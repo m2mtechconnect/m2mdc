@@ -166,10 +166,14 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
 
   // Focus input when opened
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      console.log('[CoPilot] Panel opened, context:', context, 'isDCPage:', isDCPage);
-      setTimeout(() => inputRef.current?.focus(), 100);
-    }
+    if (!isOpen || !inputRef.current) return;
+    const t = setTimeout(() => {
+      // Guard against late fires after the drawer has been closed —
+      // otherwise this steals focus away from the launcher during
+      // return-focus restoration.
+      if (isOpen && inputRef.current) inputRef.current.focus();
+    }, 100);
+    return () => clearTimeout(t);
   }, [isOpen, context, isDCPage]);
 
   // Save the previously focused element when opening, and restore it on close.
@@ -194,7 +198,6 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
     setTimeout(() => {
       if (prev && typeof prev.focus === 'function' && document.contains(prev)) {
         prev.focus();
-        console.log('[CoPilot] restore prev', prev.tagName, prev.getAttribute('aria-label'), 'active after:', document.activeElement?.tagName, document.activeElement?.getAttribute('aria-label'));
         return;
       }
       if (restoreLabel) {
@@ -202,7 +205,6 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
           `[aria-label="${restoreLabel.replace(/"/g, '\\"')}"]`,
         );
         fallback?.focus();
-        console.log('[CoPilot] restore fallback', restoreLabel, 'found?', !!fallback, 'active after:', document.activeElement?.tagName, document.activeElement?.getAttribute('aria-label'));
       }
     }, 0);
     previouslyFocusedRef.current = null;

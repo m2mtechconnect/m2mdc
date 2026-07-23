@@ -92,7 +92,11 @@ test.describe('Axe a11y — auth-gated surfaces', () => {
 
     const trigger = page.getByRole('button', { name: /Open Co-?Pilot/i }).first();
     await expect(trigger, 'CoPilot bubble must be visible on /dashboard').toBeVisible({ timeout: 5_000 });
-    await trigger.click();
+    // Wait for post-mount reflow before clicking; the launcher briefly re-renders
+    // as dashboard hydration completes, which can detach the DOM node.
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForTimeout(500);
+    await trigger.click({ timeout: 10_000, trial: false });
 
     // Wait for the overlay to attach — panel/drawer/dialog with the
     // CoPilot heading. Best-effort: don't fail here, axe below will

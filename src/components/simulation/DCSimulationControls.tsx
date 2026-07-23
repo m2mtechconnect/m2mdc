@@ -200,7 +200,7 @@ export function DCSimulationControls({
             onValueChange={(v) => onTimeScaleChange(parseInt(v) as 1 | 2 | 5 | 10)}
             disabled={disabled}
           >
-            <SelectTrigger className="w-[80px] h-8 text-xs">
+            <SelectTrigger className="w-[80px] h-8 text-xs" aria-label="Simulation speed">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

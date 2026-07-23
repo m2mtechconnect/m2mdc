@@ -768,6 +768,38 @@
   .bg-noc-surface .text-gray-400,
   .bg-noc-surface .text-gray-500 { color: hsl(220 15% 78%); }
 
+  /* -----------------------------------------------------------------
+   * Opacity-modified text tokens (Tailwind `text-foo/50` etc.) drop
+   * their contrast below AA even when the base token passes. The
+   * audit rejects those pairs regardless, so we snap the semantic
+   * text utilities back to their solid AA-safe color whenever an
+   * opacity modifier is present.
+   * ----------------------------------------------------------------- */
+  [class*="text-muted-foreground/"] { color: hsl(220 13% 32%) !important; }
+  [class*="text-success/"],
+  [class*="text-dc-green/"],
+  [class*="text-dc-success/"] { color: hsl(142 71% 26%) !important; }
+  [class*="text-warning/"],
+  [class*="text-dc-amber/"],
+  [class*="text-dc-warning/"] { color: hsl(28 90% 32%) !important; }
+  [class*="text-destructive/"],
+  [class*="text-dc-red/"],
+  [class*="text-dc-critical/"] { color: hsl(0 74% 42%) !important; }
+  [class*="text-info/"],
+  [class*="text-dc-blue/"],
+  [class*="text-dc-info/"] { color: hsl(217 79% 40%) !important; }
+  [class*="text-accent/"],
+  [class*="text-m2m-gold/"] { color: hsl(42 100% 26%) !important; }
+  [class*="text-foreground/"] { color: hsl(var(--foreground)) !important; }
+
+  /* Same treatment in dark mode. */
+  .dark [class*="text-muted-foreground/"] { color: hsl(220 15% 72%) !important; }
+  .dark [class*="text-success/"] { color: hsl(142 71% 60%) !important; }
+  .dark [class*="text-warning/"] { color: hsl(38 92% 62%) !important; }
+  .dark [class*="text-destructive/"] { color: hsl(0 84% 72%) !important; }
+  .dark [class*="text-info/"] { color: hsl(217 91% 72%) !important; }
+  .dark [class*="text-accent/"] { color: hsl(48 100% 62%) !important; }
+
   /* White text on the DC cyan brand surface only reaches ~2.2:1.
      Force near-black text on cyan-branded backgrounds to clear AA. */
   .bg-dc-cyan,

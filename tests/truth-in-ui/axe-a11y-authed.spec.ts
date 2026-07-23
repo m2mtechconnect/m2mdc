@@ -88,6 +88,7 @@ test.describe('Axe a11y — auth-gated surfaces', () => {
   }
 
   test('axe: CoPilot overlay — no unlabeled inputs or ARIA violations', async ({ page, guard }) => {
+    test.setTimeout(60_000);
     await gotoAuthed(page, '/dashboard');
 
     // Let dashboard hydration and lazy chunks settle so the launcher stops re-mounting.

@@ -43,8 +43,9 @@ export function AOCIntroCard({ onDismiss }: AOCIntroCardProps) {
           size="sm"
           onClick={handleDismiss}
           className="h-8 w-8 p-0"
+          aria-label="Dismiss introduction"
         >
-          <X className="h-4 w-4" />
+          <X className="h-4 w-4" aria-hidden="true" />
         </Button>
       </div>
 

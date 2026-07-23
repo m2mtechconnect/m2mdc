@@ -110,7 +110,10 @@ jobs:
       
       - name: Run accessibility tests
         run: npx playwright test --grep "@a11y"
-      
+
+      - name: Run contrast + focus a11y suite
+        run: npx playwright test tests/truth-in-ui/axe-contrast-focus.spec.ts --config=playwright.truth.config.ts
+
       - name: Upload accessibility report
         if: always()
         uses: actions/upload-artifact@v4

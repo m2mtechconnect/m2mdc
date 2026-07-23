@@ -26,9 +26,13 @@ test.describe('UserMenu — Sign Out flow', () => {
     });
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    await page.setViewportSize({ width: 1440, height: 900 });
     await expect
       .poll(() => mock.profileHits(), { timeout: 5_000 })
       .toBeGreaterThan(0);
+    // Debug: capture viewport + presence to disambiguate CSS breakpoint.
+    // eslint-disable-next-line no-console
+    console.log('vw=', await page.evaluate(() => window.innerWidth));
 
     const trigger = page.getByRole('button', { name: 'User menu' });
     await expect(trigger).toBeVisible({ timeout: 10_000 });

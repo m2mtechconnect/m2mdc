@@ -339,6 +339,76 @@ textarea:focus {
   transition-property: none !important;
 }
 
+/* -----------------------------------------------------------------
+   * Overlay + glow hardening (WCAG 2.4.7 / 2.4.11)
+   *
+   * Inside overlays (CoPilot drawer, Dialog, Sheet, Popover,
+   * DropdownMenu, Toast) and in areas decorated with glow / gradient
+   * layers, the base focus ring can get:
+   *
+   *  - clipped by an ancestor with `overflow: hidden`
+   *  - painted behind a sibling glow / gradient with a higher paint
+   *    order or a `blur` filter
+   *  - washed out against a same-hue overlay background
+   *
+   * We harden by promoting the focused element into its own stacking
+   * context, forcing decorative glow layers below the interactive
+   * layer, and thickening the ring inside overlay containers so it
+   * remains visible against darker / gradient backdrops.
+   * ----------------------------------------------------------------- */
+
+/* 1. Any focused interactive control paints above adjacent decorative
+      glow / gradient siblings by getting its own stacking context. */
+:focus-visible,
+:focus {
+  position: relative;
+  z-index: 2;
+}
+
+/* 2. Decorative-only layers must never intercept the focus ring or
+      pointer events. Apps commonly mark glow / gradient wrappers with
+      `aria-hidden="true"` or `data-decorative`; enforce it here so a
+      missed `pointer-events-none` cannot swallow a focus target. */
+[aria-hidden="true"][class*="glow"],
+[aria-hidden="true"][class*="gradient"],
+[data-decorative="true"],
+[data-provenance-glow] {
+  pointer-events: none !important;
+}
+
+/* 3. Inside overlays, use a thicker double-ring so the indicator
+      survives against gradient / dark backdrops (CoPilot drawer,
+      Sheet, Dialog, Popover, DropdownMenu, HoverCard, Sonner toast). */
+[role="dialog"] :focus-visible,
+[role="alertdialog"] :focus-visible,
+[data-radix-popper-content-wrapper] :focus-visible,
+[data-sonner-toast] :focus-visible,
+[data-vaul-drawer] :focus-visible,
+[data-state="open"][role="menu"] :focus-visible,
+[role="dialog"] :focus,
+[role="alertdialog"] :focus,
+[data-radix-popper-content-wrapper] :focus,
+[data-sonner-toast] :focus,
+[data-vaul-drawer] :focus,
+[data-state="open"][role="menu"] :focus {
+  outline: 3px solid hsl(var(--ring)) !important;
+  outline-offset: 2px !important;
+  box-shadow:
+    0 0 0 2px hsl(var(--popover, var(--background))),
+    0 0 0 5px hsl(var(--ring)) !important;
+}
+
+/* 4. Overlay chrome itself (close buttons, dismiss handles) is often
+      absolutely positioned near the overlay edge where an ancestor's
+      `overflow: hidden` can clip a 2px offset outline. Flush the
+      indicator to zero offset for those affordances. */
+[role="dialog"] > button[aria-label*="lose" i]:focus-visible,
+[role="dialog"] > button[aria-label*="lose" i]:focus,
+[data-vaul-drawer] > button[aria-label*="lose" i]:focus-visible,
+[data-vaul-drawer] > button[aria-label*="lose" i]:focus {
+  outline-offset: 0 !important;
+}
+
 @layer base {
   /* Touch targets */
   button, a, [role="button"], [role="link"] {

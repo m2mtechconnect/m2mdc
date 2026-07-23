@@ -34,7 +34,7 @@ test.describe('UserMenu — Sign Out flow', () => {
       .poll(() => mock.profileHits(), { timeout: 5_000 })
       .toBeGreaterThan(0);
 
-    const trigger = page.getByRole('button', { name: 'User menu' });
+    const trigger = page.locator('button[aria-label="User menu"]');
     await expect(trigger).toBeVisible({ timeout: 10_000 });
     await trigger.click();
 
@@ -71,7 +71,7 @@ test.describe('UserMenu — Sign Out flow', () => {
 
     // UserMenu is only rendered when a session exists — after sign out
     // it must be gone.
-    await expect(page.getByRole('button', { name: 'User menu' })).toHaveCount(0);
+    await expect(page.locator('button[aria-label="User menu"]')).toHaveCount(0);
 
     // (d) No external egress leaked through the guard.
     expect(guard.anyExternalCompleted(),

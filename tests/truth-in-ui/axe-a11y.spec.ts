@@ -19,32 +19,9 @@
 import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from './_setup/fixtures';
 import { mockKit } from './_setup/kit-mock';
+import { A11Y_BLOCKING_RULES } from './_setup/a11y-rules';
 
-// Rules we treat as merge-blocking. Kept narrow on purpose: this
-// suite is a regression net for the two categories the user asked
-// for, not a full WCAG audit. Exported so auth-gated + overlay
-// specs can share the same rule set.
-export const A11Y_BLOCKING_RULES = [
-  // Unlabeled inputs / selects / textareas.
-  'label',
-  'form-field-multiple-labels',
-  'select-name',
-  'aria-input-field-name',
-  // ARIA correctness.
-  'aria-allowed-attr',
-  'aria-required-attr',
-  'aria-required-children',
-  'aria-required-parent',
-  'aria-roles',
-  'aria-valid-attr',
-  'aria-valid-attr-value',
-  'aria-hidden-focus',
-  'aria-hidden-body',
-  'button-name',
-  'link-name',
-  'image-alt',
-  'duplicate-id-aria',
-];
+// See `_setup/a11y-rules.ts` for the curated rule list and rationale.
 const BLOCKING_RULES = A11Y_BLOCKING_RULES;
 
 interface Surface {

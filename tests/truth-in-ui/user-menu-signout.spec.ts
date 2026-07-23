@@ -33,6 +33,7 @@ test.describe('UserMenu — Sign Out flow', () => {
     await expect
       .poll(() => mock.profileHits(), { timeout: 5_000 })
       .toBeGreaterThan(0);
+    await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
 
     const trigger = page.locator('button[aria-label="User menu"]');
     await expect(trigger).toBeVisible({ timeout: 10_000 });

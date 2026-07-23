@@ -318,15 +318,19 @@ export default function Builder() {
   // Show loading state while checking auth or first initialization only
   if (!authChecked || !isInitialized) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
+      <main
+        className="flex items-center justify-center min-h-dvh bg-background"
+        role="status"
+        aria-live="polite"
+      >
         <div className="text-center space-y-4">
-          <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" />
+          <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" aria-hidden="true" />
           <div>
-            <p className="font-medium">{t('builder.loadingTitle')}</p>
+            <h1 className="text-base font-medium">{t('builder.loadingTitle')}</h1>
             <p className="text-sm text-muted-foreground">{t('builder.loadingDesc')}</p>
           </div>
         </div>
-      </div>
+      </main>
     );
   }
 

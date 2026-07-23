@@ -84,7 +84,8 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { updateContext, askCoPilot } = useCoPilotContext();
-  const { twin, activeTwinId, twins, isLoading: twinsLoading } = useActiveTwin();
+  const { twin, activeTwinId, twins: twinsRaw, isLoading: twinsLoading } = useActiveTwin();
+  const twins = Array.isArray(twinsRaw) ? twinsRaw : [];
   const [selectedSystem, setSelectedSystem] = useState<string | null>(null);
   const [deleteSystemId, setDeleteSystemId] = useState<string | null>(null);
   const [deleteSystemName, setDeleteSystemName] = useState<string>('');
@@ -222,7 +223,7 @@ export default function Dashboard() {
   }, [queryClient]);
 
   // Group items by department
-  const groupedByDepartment = unifiedData?.items.reduce((acc, item) => {
+  const groupedByDepartment = (unifiedData?.items ?? []).reduce((acc, item) => {
     if (!acc[item.department]) {
       acc[item.department] = [];
     }
@@ -304,13 +305,13 @@ export default function Dashboard() {
   };
 
   // Check if we have any data
-  const hasData = unifiedData && unifiedData.stats.total > 0;
+  const hasData = !!(unifiedData?.stats?.total && unifiedData.stats.total > 0);
   const isEmpty = !roiKpi.loading && !timeSavedKpi.loading && !complianceKpi.loading && !agentsKpi.loading && !hasData;
 
   // KPIs for Dashboard - Use twins from TwinContext for accurate counts
   const totalTwins = twins.length || 0;
   const activeTwins = blueprintAgents.filter(a => a.status === 'running' || a.status === 'active').length || 9;
-  const draftTwins = unifiedData?.stats.draft || 0;
+  const draftTwins = unifiedData?.stats?.draft || 0;
   
   // Calculate average PUE from twins
   const avgPue = twins.length > 0 

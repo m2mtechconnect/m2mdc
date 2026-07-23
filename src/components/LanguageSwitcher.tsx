@@ -13,8 +13,8 @@ import {
 import { Button } from '@/components/ui/button';
 
 const languages = [
-  { code: 'en', label: 'English', flag: '🇬🇧' },
-  { code: 'fr-CA', label: 'Français (QC)', flag: '🇨🇦' },
+  { code: 'en', label: 'English', short: 'EN' },
+  { code: 'fr-CA', label: 'Français (QC)', short: 'FR' },
 ] as const;
 
 export function LanguageSwitcher({ variant = 'ghost' }: { variant?: 'ghost' | 'outline' }) {
@@ -24,9 +24,15 @@ export function LanguageSwitcher({ variant = 'ghost' }: { variant?: 'ghost' | 'o
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size="sm" className="gap-1.5 text-sm">
-          <Globe className="h-4 w-4" />
-          <span className="hidden sm:inline">{current.flag} {current.label}</span>
+        <Button
+          variant={variant}
+          size="sm"
+          className="gap-1.5 text-sm"
+          aria-label={`Change language, current: ${current.label}`}
+        >
+          <Globe className="h-4 w-4" aria-hidden="true" />
+          <span className="hidden sm:inline">{current.short}</span>
+          <span className="hidden lg:inline">· {current.label}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -36,7 +42,9 @@ export function LanguageSwitcher({ variant = 'ghost' }: { variant?: 'ghost' | 'o
             onSelect={() => i18n.changeLanguage(lang.code)}
             className={i18n.language === lang.code ? 'bg-accent/10 font-medium' : ''}
           >
-            <span className="mr-2">{lang.flag}</span>
+            <span className="mr-2 inline-block w-6 text-xs font-semibold tracking-wide text-muted-foreground">
+              {lang.short}
+            </span>
             {lang.label}
           </DropdownMenuItem>
         ))}

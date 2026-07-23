@@ -73,7 +73,9 @@
     
     /* M2M Brand Secondary - Cyan/Teal for DC operations */
     --secondary: 186 100% 42%;
-    --secondary-foreground: 0 0% 100%;
+    /* Near-black foreground so white-on-cyan (contrast 2.18) is
+       replaced with an AA-passing pair (>= 7:1). */
+    --secondary-foreground: 222 47% 8%;
     
     --muted: 220 14% 96%;
     --muted-foreground: 220 9% 46%;
@@ -189,7 +191,7 @@
     --primary: 0 0% 98%;
     --primary-foreground: 222 47% 8%;
     --secondary: 186 100% 42%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary-foreground: 222 47% 8%;
     --muted: 222 40% 11%;
     --muted-foreground: 222 15% 70%;
     --accent: 48 100% 50%;
@@ -611,5 +613,139 @@
     .gap-card-gap {
       gap: 1.5rem;
     }
+  }
+}
+
+/* ------------------------------------------------------------------
+ * WCAG AA text-contrast overrides
+ *
+ * Applied in a late @layer utilities so they override Tailwind's
+ * default palette utilities without touching backgrounds or borders.
+ * Only text-color utilities are darkened — bg-* / border-* keep the
+ * original palette so brand surfaces remain intact.
+ *
+ * Rationale: several components use raw Tailwind palette utilities
+ * (text-green-500, text-amber-400, text-red-500, text-gray-500, …)
+ * that fail axe-core color-contrast on the light theme. Rather than
+ * chasing every call-site, we remap the specific text utilities to
+ * AA-safe darker equivalents.
+ * ------------------------------------------------------------------ */
+@layer utilities {
+  .text-green-400,
+  .text-green-500,
+  .text-green-600 { color: #15803d; }
+
+  .text-emerald-300,
+  .text-emerald-400,
+  .text-emerald-500,
+  .text-emerald-600 { color: #047857; }
+
+  .text-yellow-400,
+  .text-yellow-500,
+  .text-yellow-600 { color: #a16207; }
+
+  .text-amber-400,
+  .text-amber-500,
+  .text-amber-600 { color: #b45309; }
+
+  .text-red-400,
+  .text-red-500 { color: #b91c1c; }
+
+  .text-rose-400,
+  .text-rose-500 { color: #be123c; }
+
+  .text-gray-400,
+  .text-gray-500,
+  .text-slate-400,
+  .text-slate-500,
+  .text-zinc-400,
+  .text-zinc-500,
+  .text-neutral-400,
+  .text-neutral-500 { color: #475569; }
+
+  /* Semantic status text tokens — dedicated AA-compliant text
+     colors so background utilities (bg-success, bg-warning, …) keep
+     their vivid brand values while text utilities pass WCAG AA on
+     the light theme. */
+  .text-muted-foreground { color: hsl(220 13% 38%); }
+  .text-success,
+  .text-dc-green,
+  .text-dc-success { color: hsl(142 71% 26%); }
+  .text-warning,
+  .text-dc-amber,
+  .text-dc-warning,
+  .text-dc-power { color: hsl(28 90% 32%); }
+  .text-destructive,
+  .text-dc-red,
+  .text-dc-critical,
+  .text-dc-thermal { color: hsl(0 74% 42%); }
+  .text-info,
+  .text-dc-blue,
+  .text-dc-info,
+  .text-dc-sovereignty { color: hsl(217 79% 40%); }
+  .text-dc-cyan,
+  .text-dc-primary,
+  .text-dc-cooling,
+  .text-dc-network { color: hsl(186 100% 26%); }
+  .text-dc-teal,
+  .text-dc-gpu,
+  .text-dc-teal-light { color: hsl(172 66% 26%); }
+  /* Gold on white cannot reach AA at its brand hue; route text
+     usages to a much darker gold. bg-m2m-gold is unaffected. */
+  .text-m2m-gold { color: hsl(42 100% 26%); }
+
+  /* On the deep NOC dark surface, invert the neutrals so they stay
+     legible without regressing the light-theme fixes above. */
+  .dark .text-gray-400,
+  .dark .text-gray-500,
+  .dark .text-slate-400,
+  .dark .text-slate-500,
+  .dark .text-zinc-400,
+  .dark .text-zinc-500,
+  .dark .text-neutral-400,
+  .dark .text-neutral-500 { color: #cbd5e1; }
+
+  .dark .text-green-400,
+  .dark .text-green-500 { color: #4ade80; }
+  .dark .text-emerald-400,
+  .dark .text-emerald-500 { color: #34d399; }
+  .dark .text-yellow-400,
+  .dark .text-yellow-500 { color: #facc15; }
+  .dark .text-amber-400,
+  .dark .text-amber-500 { color: #fbbf24; }
+  .dark .text-red-400,
+  .dark .text-red-500 { color: #f87171; }
+  .dark .text-rose-400,
+  .dark .text-rose-500 { color: #fb7185; }
+
+  .dark .text-muted-foreground { color: hsl(220 15% 72%); }
+  .dark .text-success,
+  .dark .text-dc-green,
+  .dark .text-dc-success { color: hsl(142 71% 60%); }
+  .dark .text-warning,
+  .dark .text-dc-amber,
+  .dark .text-dc-warning,
+  .dark .text-dc-power { color: hsl(38 92% 62%); }
+  .dark .text-destructive,
+  .dark .text-dc-red,
+  .dark .text-dc-critical,
+  .dark .text-dc-thermal { color: hsl(0 84% 72%); }
+  .dark .text-info,
+  .dark .text-dc-blue,
+  .dark .text-dc-info { color: hsl(217 91% 72%); }
+  .dark .text-dc-cyan,
+  .dark .text-dc-primary { color: hsl(186 100% 60%); }
+  .dark .text-dc-teal,
+  .dark .text-dc-gpu { color: hsl(172 66% 60%); }
+  .dark .text-m2m-gold { color: hsl(48 100% 62%); }
+
+  /* White text on the DC cyan brand surface only reaches ~2.2:1.
+     Force near-black text on cyan-branded backgrounds to clear AA. */
+  .bg-dc-cyan,
+  .bg-dc-teal,
+  .bg-dc-primary,
+  .bg-\[hsl\(var\(--dc-cyan\)\)\],
+  .bg-\[hsl\(var\(--dc-teal\)\)\] {
+    color: hsl(var(--noc-bg-deep));
   }
 }

@@ -127,7 +127,11 @@ async function probeFocusInside(
         // directly (outline width > 0 or box-shadow with a ring
         // color counts as a visible ring) instead of relying on a
         // blur/focus diff that will be immediately undone.
-        if (document.activeElement === el) {
+        // cmdk auto-refocuses its search input; verify its focus
+        // ring statically instead of relying on a blur/focus diff.
+        if (document.activeElement === el || el.hasAttribute('cmdk-input')) {
+          el.focus({ preventScroll: true });
+          await new Promise((r) => requestAnimationFrame(() => r(null)));
           const s = window.getComputedStyle(el);
           const hasOutline =
             s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0;

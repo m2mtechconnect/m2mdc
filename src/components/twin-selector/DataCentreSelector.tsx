@@ -221,7 +221,7 @@ export function DataCentreSelector() {
       <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
       
       <Select value={activeTwinId || ''} onValueChange={handleTwinChange}>
-        <SelectTrigger className="w-[220px] lg:w-[260px] bg-background">
+        <SelectTrigger className="w-[220px] lg:w-[260px] bg-background" aria-label="Select data centre twin">
           <SelectValue placeholder="Select Data Centre">
             {twin && (
               <div className="flex items-center gap-2">

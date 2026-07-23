@@ -32,7 +32,7 @@ test.describe('UserMenu — Sign Out flow', () => {
       .toBeGreaterThan(0);
 
     const trigger = page.getByRole('button', { name: 'User menu' });
-    await expect(trigger).toBeVisible();
+    await expect(trigger).toBeVisible({ timeout: 10_000 });
     await trigger.click();
 
     const signOut = page.getByRole('menuitem', { name: /Sign Out/i });

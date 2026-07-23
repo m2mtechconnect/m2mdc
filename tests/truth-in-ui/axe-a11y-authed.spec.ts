@@ -91,12 +91,10 @@ test.describe('Axe a11y — auth-gated surfaces', () => {
     test.setTimeout(60_000);
     await gotoAuthed(page, '/dashboard');
 
-    // Let dashboard hydration and lazy chunks settle so the launcher stops re-mounting.
-    await page.waitForLoadState('networkidle').catch(() => {});
-    await page.waitForTimeout(1500);
-
     const trigger = page.getByRole('button', { name: /Open Co-?Pilot/i }).first();
     await expect(trigger, 'CoPilot bubble must be visible on /dashboard').toBeVisible({ timeout: 15_000 });
+    // Let dashboard hydration settle so the launcher stops re-mounting.
+    await page.waitForTimeout(1500);
     // Force click bypasses actionability re-checks that fail when React
     // re-mounts the launcher during dashboard hydration.
     await trigger.click({ timeout: 10_000, force: true });

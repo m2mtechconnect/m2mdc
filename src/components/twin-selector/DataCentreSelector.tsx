@@ -282,8 +282,13 @@ export function DataCentreSelector() {
       {twin && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="flex-shrink-0 h-8 w-8">
-              <MoreVertical className="h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="flex-shrink-0 h-8 w-8"
+              aria-label="Twin actions"
+            >
+              <MoreVertical className="h-4 w-4" aria-hidden="true" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
@@ -320,8 +325,13 @@ export function DataCentreSelector() {
       {/* Create Twin Dialog */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" size="icon" className="flex-shrink-0">
-            <Plus className="h-4 w-4" />
+          <Button
+            variant="outline"
+            size="icon"
+            className="flex-shrink-0"
+            aria-label="Create new twin"
+          >
+            <Plus className="h-4 w-4" aria-hidden="true" />
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[500px]">

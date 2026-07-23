@@ -22,8 +22,9 @@ import { mockKit } from './_setup/kit-mock';
 
 // Rules we treat as merge-blocking. Kept narrow on purpose: this
 // suite is a regression net for the two categories the user asked
-// for, not a full WCAG audit.
-const BLOCKING_RULES = [
+// for, not a full WCAG audit. Exported so auth-gated + overlay
+// specs can share the same rule set.
+export const A11Y_BLOCKING_RULES = [
   // Unlabeled inputs / selects / textareas.
   'label',
   'form-field-multiple-labels',
@@ -44,6 +45,7 @@ const BLOCKING_RULES = [
   'image-alt',
   'duplicate-id-aria',
 ];
+const BLOCKING_RULES = A11Y_BLOCKING_RULES;
 
 interface Surface {
   name: string;

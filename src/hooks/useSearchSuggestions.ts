@@ -45,8 +45,17 @@ export function useSearchSuggestions({
         setSuggestions([]);
       }
     } catch (err: any) {
-      console.error('[useSearchSuggestions] Error:', err);
-      setError(err.message || 'Failed to fetch suggestions');
+      // Non-fatal: suggestions are an enhancement, not a required feature.
+      // Downgrade to debug so console isn't spammed when the edge function
+      // is unavailable in local/preview environments.
+      const message = err?.message || 'Failed to fetch suggestions';
+      const isNetwork = /Failed to send a request|FunctionsFetchError|NetworkError/i.test(message);
+      if (isNetwork) {
+        console.debug('[useSearchSuggestions] suggestions unavailable:', message);
+      } else {
+        console.warn('[useSearchSuggestions] error:', err);
+      }
+      setError(message);
       setSuggestions([]);
     } finally {
       setIsLoading(false);

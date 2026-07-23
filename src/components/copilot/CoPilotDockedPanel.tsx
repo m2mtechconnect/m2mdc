@@ -84,6 +84,8 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
   const [sessionId] = useState(() => crypto.randomUUID());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   
   const { isDCPage, activeTab, pageContext } = useDCPageContext();
   const { executeCommand } = useCoPilotCommands();
@@ -149,6 +151,90 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
     }
   }, [isOpen, context, isDCPage]);
 
+  // Save the previously focused element when opening, and restore it on close.
+  useEffect(() => {
+    if (isOpen) {
+      previouslyFocusedRef.current =
+        (document.activeElement as HTMLElement | null) ?? null;
+      return;
+    }
+    const prev = previouslyFocusedRef.current;
+    if (prev && typeof prev.focus === 'function' && document.contains(prev)) {
+      // Defer so React finishes unmounting the panel content first.
+      setTimeout(() => prev.focus(), 0);
+    }
+    previouslyFocusedRef.current = null;
+  }, [isOpen]);
+
+  // Focus trap: keep Tab / Shift+Tab within the drawer, and close on Escape.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const FOCUSABLE_SELECTOR = [
+      'a[href]',
+      'button:not([disabled])',
+      'input:not([disabled]):not([type="hidden"])',
+      'select:not([disabled])',
+      'textarea:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])',
+      'summary',
+      '[role="button"]:not([aria-disabled="true"])',
+    ].join(',');
+
+    const getFocusable = (): HTMLElement[] => {
+      const root = panelRef.current;
+      if (!root) return [];
+      return Array.from(
+        root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      ).filter(
+        (el) =>
+          !el.hasAttribute('disabled') &&
+          el.getAttribute('aria-hidden') !== 'true' &&
+          // rough visibility check
+          (el.offsetWidth > 0 || el.offsetHeight > 0 || el === document.activeElement),
+      );
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+
+      const focusables = getFocusable();
+      if (focusables.length === 0) {
+        e.preventDefault();
+        panelRef.current?.focus();
+        return;
+      }
+
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      const panel = panelRef.current;
+
+      // If focus escaped the panel entirely, pull it back.
+      if (!panel || !active || !panel.contains(active)) {
+        e.preventDefault();
+        (e.shiftKey ? last : first).focus();
+        return;
+      }
+
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => document.removeEventListener('keydown', handleKeyDown, true);
+  }, [isOpen, onClose]);
+
   const handleSend = useCallback(async (overrideMessage?: string) => {
     const text = (overrideMessage ?? input).trim();
     if (!text) return;
@@ -197,6 +283,11 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
 
   return (
     <div
+      ref={panelRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label={COPILOT.TITLE}
+      tabIndex={-1}
       className={cn(
         'fixed right-0 top-0 h-full bg-background border-l border-border shadow-2xl transition-transform duration-300 ease-in-out z-50',
         'flex flex-col',

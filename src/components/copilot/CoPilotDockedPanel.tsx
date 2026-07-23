@@ -342,12 +342,12 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
             className="flex-1"
           />
           {isStreaming ? (
-            <Button onClick={handleStop} size="icon" variant="destructive">
-              <StopCircle className="h-4 w-4" />
+            <Button onClick={handleStop} size="icon" variant="destructive" aria-label="Stop response">
+              <StopCircle className="h-4 w-4" aria-hidden="true" />
             </Button>
           ) : (
-            <Button onClick={() => handleSend()} size="icon" disabled={!input.trim()}>
-              <Send className="h-4 w-4" />
+            <Button onClick={() => handleSend()} size="icon" disabled={!input.trim()} aria-label="Send message">
+              <Send className="h-4 w-4" aria-hidden="true" />
             </Button>
           )}
         </div>

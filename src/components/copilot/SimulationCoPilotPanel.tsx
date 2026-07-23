@@ -271,6 +271,7 @@ export function SimulationCoPilotPanel({
               onClick={handleSend}
               disabled={!input.trim() || isStreaming}
               className="h-[60px] w-[60px]"
+              aria-label={isStreaming ? "Sending message" : "Send message"}
             >
               {isStreaming ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

@@ -199,6 +199,8 @@ export const CoPilotVoice = ({ onTranscript }: CoPilotVoiceProps) => {
         size="icon"
         onClick={toggleSpeaking}
         disabled={!isSpeaking}
+        aria-label={isSpeaking ? "Mute assistant voice" : "Assistant voice output"}
+        aria-pressed={isSpeaking}
       >
         {isSpeaking ? (
           <VolumeX className="h-4 w-4" />

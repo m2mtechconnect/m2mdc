@@ -27,6 +27,27 @@ import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useCoPilotSimulationContext } from '@/hooks/useCoPilotSimulationContext';
 import { COPILOT } from '@/ux';
 
+// Global tracker: the last element that received focus before the
+// CoPilot drawer captured it. A launcher (e.g. CoPilotBubble) that
+// conditionally unmounts on open would otherwise be lost by the time
+// the drawer's effect reads `document.activeElement`.
+let lastFocusedBeforeCoPilot: HTMLElement | null = null;
+if (typeof document !== 'undefined') {
+  document.addEventListener(
+    'focusin',
+    (event) => {
+      const target = event.target as HTMLElement | null;
+      if (!target || target === document.body) return;
+      // Ignore focus that lands inside the CoPilot drawer itself.
+      if (target.closest?.('[role="dialog"][aria-label="' + 'Data Centre Co-Pilot' + '"]')) {
+        return;
+      }
+      lastFocusedBeforeCoPilot = target;
+    },
+    true,
+  );
+}
+
 interface CoPilotDockedPanelProps {
   isOpen: boolean;
   onClose: () => void;
@@ -154,15 +175,36 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
   // Save the previously focused element when opening, and restore it on close.
   useEffect(() => {
     if (isOpen) {
+      // At the moment this effect fires, React has already committed the
+      // parent's re-render — if the launcher (e.g. CoPilotBubble) is
+      // conditionally unmounted while `isOpen`, `document.activeElement`
+      // will be <body> and the true launcher is lost. Use the last
+      // element that received focus BEFORE the drawer captured it.
+      const active = document.activeElement as HTMLElement | null;
       previouslyFocusedRef.current =
-        (document.activeElement as HTMLElement | null) ?? null;
+        active && active !== document.body ? active : lastFocusedBeforeCoPilot;
       return;
     }
     const prev = previouslyFocusedRef.current;
-    if (prev && typeof prev.focus === 'function' && document.contains(prev)) {
-      // Defer so React finishes unmounting the panel content first.
-      setTimeout(() => prev.focus(), 0);
-    }
+    const restoreLabel =
+      prev?.getAttribute?.('aria-label') ?? null;
+    // Defer so React finishes re-mounting the launcher (e.g. the
+    // CoPilotBubble unmounts while the drawer is open and re-mounts on
+    // close, so `prev` may point to a detached DOM node).
+    setTimeout(() => {
+      if (prev && typeof prev.focus === 'function' && document.contains(prev)) {
+        prev.focus();
+        console.log('[CoPilot] restore prev', prev.tagName, prev.getAttribute('aria-label'), 'active after:', document.activeElement?.tagName, document.activeElement?.getAttribute('aria-label'));
+        return;
+      }
+      if (restoreLabel) {
+        const fallback = document.querySelector<HTMLElement>(
+          `[aria-label="${restoreLabel.replace(/"/g, '\\"')}"]`,
+        );
+        fallback?.focus();
+        console.log('[CoPilot] restore fallback', restoreLabel, 'found?', !!fallback, 'active after:', document.activeElement?.tagName, document.activeElement?.getAttribute('aria-label'));
+      }
+    }, 0);
     previouslyFocusedRef.current = null;
   }, [isOpen]);
 

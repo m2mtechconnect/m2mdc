@@ -305,13 +305,13 @@ export default function Dashboard() {
   };
 
   // Check if we have any data
-  const hasData = unifiedData && unifiedData.stats.total > 0;
+  const hasData = !!(unifiedData?.stats?.total && unifiedData.stats.total > 0);
   const isEmpty = !roiKpi.loading && !timeSavedKpi.loading && !complianceKpi.loading && !agentsKpi.loading && !hasData;
 
   // KPIs for Dashboard - Use twins from TwinContext for accurate counts
   const totalTwins = twins.length || 0;
   const activeTwins = blueprintAgents.filter(a => a.status === 'running' || a.status === 'active').length || 9;
-  const draftTwins = unifiedData?.stats.draft || 0;
+  const draftTwins = unifiedData?.stats?.draft || 0;
   
   // Calculate average PUE from twins
   const avgPue = twins.length > 0 

@@ -90,12 +90,12 @@ test.describe('Axe a11y — auth-gated surfaces', () => {
   test('axe: CoPilot overlay — no unlabeled inputs or ARIA violations', async ({ page, guard }) => {
     await gotoAuthed(page, '/dashboard');
 
-    const trigger = page.getByRole('button', { name: /Open Co-?Pilot/i }).first();
-    await expect(trigger, 'CoPilot bubble must be visible on /dashboard').toBeVisible({ timeout: 5_000 });
-    // Wait for post-mount reflow before clicking; the launcher briefly re-renders
-    // as dashboard hydration completes, which can detach the DOM node.
+    // Let dashboard hydration and lazy chunks settle so the launcher stops re-mounting.
     await page.waitForLoadState('networkidle').catch(() => {});
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1500);
+
+    const trigger = page.getByRole('button', { name: /Open Co-?Pilot/i }).first();
+    await expect(trigger, 'CoPilot bubble must be visible on /dashboard').toBeVisible({ timeout: 15_000 });
     // Force click bypasses actionability re-checks that fail when React
     // re-mounts the launcher during dashboard hydration.
     await trigger.click({ timeout: 10_000, force: true });

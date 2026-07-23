@@ -84,7 +84,8 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { updateContext, askCoPilot } = useCoPilotContext();
-  const { twin, activeTwinId, twins, isLoading: twinsLoading } = useActiveTwin();
+  const { twin, activeTwinId, twins: twinsRaw, isLoading: twinsLoading } = useActiveTwin();
+  const twins = Array.isArray(twinsRaw) ? twinsRaw : [];
   const [selectedSystem, setSelectedSystem] = useState<string | null>(null);
   const [deleteSystemId, setDeleteSystemId] = useState<string | null>(null);
   const [deleteSystemName, setDeleteSystemName] = useState<string>('');

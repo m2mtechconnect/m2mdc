@@ -181,6 +181,8 @@ export const CoPilotVoice = ({ onTranscript }: CoPilotVoiceProps) => {
         onClick={toggleListening}
         disabled={isProcessing}
         className="relative"
+        aria-label={isListening ? "Stop listening" : "Start voice input"}
+        aria-pressed={isListening}
       >
         {isListening ? (
           <>

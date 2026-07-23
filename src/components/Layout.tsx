@@ -326,6 +326,12 @@ export function Layout({ children }: LayoutProps) {
               size="sm"
               className="hidden xl:flex gap-1.5 text-muted-foreground min-h-[36px] hover:bg-accent/10 transition-smooth"
               aria-label="Open command palette"
+              onClick={() => {
+                // Dispatch the same keyboard shortcut that GlobalSearchBar listens for
+                document.dispatchEvent(
+                  new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
+                );
+              }}
             >
               <Command className="h-3.5 w-3.5" aria-hidden="true" />
               <span className="text-xs">Ctrl+K</span>
@@ -459,7 +465,7 @@ export function Layout({ children }: LayoutProps) {
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border bg-card">
             <Button
               variant="outline"
-              className="w-full justify-start gap-3 min-h-[44px] text-red-600 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
+              className="w-full justify-start gap-3 min-h-[44px] text-destructive hover:text-destructive hover:bg-destructive/10"
               onClick={() => {
                 setMobileMenuOpen(false);
                 handleSignOut();
@@ -488,15 +494,12 @@ export function Layout({ children }: LayoutProps) {
               <BuildVersion />
             </div>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-foreground transition-smooth">
-                Privacy Policy
-              </a>
-              <a href="#" className="hover:text-foreground transition-smooth">
-                Terms of Service
-              </a>
-              <a href="#" className="hover:text-foreground transition-smooth">
+              <Link to="/help" className="hover:text-foreground transition-smooth">
                 Documentation
-              </a>
+              </Link>
+              <Link to="/compliance" className="hover:text-foreground transition-smooth">
+                Compliance
+              </Link>
             </div>
           </div>
         </div>

@@ -326,7 +326,21 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
   };
 
   return (
-    <div
+    <>
+      {/* Backdrop — click to close. Rendered as sibling so it does not
+          intercept focus inside the drawer. Only interactive while open. */}
+      <div
+        data-testid="copilot-backdrop"
+        aria-hidden="true"
+        onClick={() => {
+          if (isOpen) onClose();
+        }}
+        className={cn(
+          'fixed inset-0 z-40 bg-background/40 backdrop-blur-[1px] transition-opacity duration-300',
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
+        )}
+      />
+      <div
       ref={panelRef}
       role="dialog"
       aria-modal="true"

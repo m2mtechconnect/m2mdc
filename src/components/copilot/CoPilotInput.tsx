@@ -38,8 +38,9 @@ export function CoPilotInput({
           size="icon"
           disabled={!input.trim()}
           className="absolute right-1 h-9 w-9"
+          aria-label="Send message"
         >
-          <Send className="h-4 w-4" />
+          <Send className="h-4 w-4" aria-hidden="true" />
         </Button>
       </div>
     </form>

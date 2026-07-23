@@ -19,37 +19,9 @@
 import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from './_setup/fixtures';
 import { mockKit } from './_setup/kit-mock';
+import { A11Y_BLOCKING_RULES } from './_setup/a11y-rules';
 
-// Rules we treat as merge-blocking. Curated to enforce the two
-// categories the user cares about — labeled form controls and
-// correct accessible names on interactive widgets — while excluding
-// rules that produce high-noise false positives against Radix/
-// shadcn primitives (portals, comboboxes, dismissable layers).
-//
-// Excluded on purpose (still worth manual review, not merge-blocking):
-//   • aria-allowed-attr  — Radix combobox trips this with aria-expanded
-//   • aria-required-children / aria-required-parent — Radix menus /
-//     tabs re-parent into portals, tripping the DOM-shape checks.
-//   • aria-hidden-focus / aria-hidden-body — dialogs briefly toggle
-//     aria-hidden on siblings during open/close animations.
-//   • aria-roles — Radix Slot/asChild re-applies roles that axe
-//     misreads on custom triggers.
-export const A11Y_BLOCKING_RULES = [
-  // Labeled form controls.
-  'label',
-  'form-field-multiple-labels',
-  'select-name',
-  'aria-input-field-name',
-  // Accessible names on interactive widgets.
-  'button-name',
-  'link-name',
-  'image-alt',
-  // ARIA attribute correctness (name/value shape, not structure).
-  'aria-required-attr',
-  'aria-valid-attr',
-  'aria-valid-attr-value',
-  'duplicate-id-aria',
-];
+// See `_setup/a11y-rules.ts` for the curated rule list and rationale.
 const BLOCKING_RULES = A11Y_BLOCKING_RULES;
 
 interface Surface {

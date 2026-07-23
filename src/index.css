@@ -84,7 +84,9 @@
     --accent: 48 100% 50%;
     --accent-foreground: 0 0% 0%;
     
-    --destructive: 0 84% 60%;
+    /* Darkened so `bg-destructive` + `text-destructive-foreground`
+       clears WCAG AA (was 3.6:1 at 0 84% 60%). */
+    --destructive: 0 74% 42%;
     --destructive-foreground: 0 0% 98%;
     
     --success: 142 76% 36%;
@@ -196,7 +198,7 @@
     --muted-foreground: 222 15% 70%;
     --accent: 48 100% 50%;
     --accent-foreground: 0 0% 0%;
-    --destructive: 0 84% 60%;
+    --destructive: 0 74% 45%;
     --destructive-foreground: 0 0% 98%;
     --border: 222 30% 18%;
     --input: 222 35% 14%;

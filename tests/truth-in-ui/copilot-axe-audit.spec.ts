@@ -22,7 +22,8 @@ test('axe: CoPilot drawer — no violations on blocking rules', async ({ page, c
 
   const launcher = page.getByRole('button', { name: /Open Co-?Pilot/i }).first();
   await launcher.waitFor({ state: 'visible', timeout: 15_000 });
-  await launcher.click({ force: true });
+  await launcher.focus();
+  await launcher.press("Enter");
 
   await page.waitForFunction(
     (sel) => {

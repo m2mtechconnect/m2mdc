@@ -44,6 +44,12 @@ test.describe('UserMenu — Sign Out flow', () => {
       return { session: !!s.data.session, user: !!u.data.user, err: u.error?.message ?? null };
     });
     console.log('sb=', sb);
+    await page.waitForTimeout(2000);
+    const after = await page.evaluate(() => ({
+      userMenuButtons: document.querySelectorAll('button[aria-label="User menu"]').length,
+      xlBlock: document.querySelectorAll('div.hidden.xl\\:block').length,
+    }));
+    console.log('after=', after);
 
     const trigger = page.getByRole('button', { name: 'User menu' });
     await expect(trigger).toBeVisible({ timeout: 10_000 });

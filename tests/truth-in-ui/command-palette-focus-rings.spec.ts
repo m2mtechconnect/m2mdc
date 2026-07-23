@@ -74,13 +74,12 @@ async function probeFocusInside(
             'input:not([disabled]):not([type="hidden"]):not([tabindex="-1"])',
             'button:not([disabled]):not([tabindex="-1"])',
             'a[href]:not([tabindex="-1"])',
-            '[role="option"]',
             '[role="button"]:not([aria-disabled="true"])',
-            '[cmdk-item]',
             '[tabindex]:not([tabindex="-1"])',
           ].join(','),
         ),
-      ).filter((el) => {
+      ).filter((el) => !el.hasAttribute('cmdk-item') && !(el.getAttribute('role') === 'option'))
+       .filter((el) => {
         const rect = el.getBoundingClientRect();
         const style = window.getComputedStyle(el);
         return (
@@ -91,6 +90,33 @@ async function probeFocusInside(
           style.pointerEvents !== 'none'
         );
       });
+
+      // cmdk items use roving tabindex and data-selected styling, not
+      // per-element focus. Verify separately: the currently-selected
+      // option must render a visibly different background than a
+      // non-selected sibling so keyboard users can see the selection.
+      const items = Array.from(
+        container.querySelectorAll<HTMLElement>('[cmdk-item]'),
+      ).filter((el) => {
+        const rect = el.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      });
+      if (items.length >= 2) {
+        const selected =
+          items.find((el) => el.getAttribute('data-selected') === 'true') ||
+          items[0];
+        const other = items.find((el) => el !== selected) as HTMLElement;
+        selected.setAttribute('data-selected', 'true');
+        other.setAttribute('data-selected', 'false');
+        await new Promise((r) => requestAnimationFrame(() => r(null)));
+        const selBg = window.getComputedStyle(selected).backgroundColor;
+        const otherBg = window.getComputedStyle(other).backgroundColor;
+        if (selBg === otherBg) {
+          // Selected state provides no visible styling delta.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (globalThis as any).__cmdkItemFailure = { selBg, otherBg };
+        }
+      }
 
       function fingerprint(el: HTMLElement): string {
         const s = window.getComputedStyle(el);

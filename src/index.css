@@ -667,7 +667,7 @@
      colors so background utilities (bg-success, bg-warning, …) keep
      their vivid brand values while text utilities pass WCAG AA on
      the light theme. */
-  .text-muted-foreground { color: hsl(220 13% 38%); }
+  .text-muted-foreground { color: hsl(220 13% 32%); }
   .text-success,
   .text-dc-green,
   .text-dc-success { color: hsl(142 71% 26%); }
@@ -691,8 +691,18 @@
   .text-dc-gpu,
   .text-dc-teal-light { color: hsl(172 66% 26%); }
   /* Gold on white cannot reach AA at its brand hue; route text
-     usages to a much darker gold. bg-m2m-gold is unaffected. */
-  .text-m2m-gold { color: hsl(42 100% 26%); }
+     usages (both `text-m2m-gold` and the accent alias) to a much
+     darker gold. bg-m2m-gold / bg-accent are unaffected. */
+  .text-m2m-gold,
+  .text-accent { color: hsl(42 100% 26%); }
+
+  /* Extend Tailwind red overrides to text-red-600 (used on light
+     info tint backgrounds where it fell to 4.43:1). */
+  .text-red-600 { color: hsl(0 74% 38%); }
+
+  /* Bump raw Tailwind red-500 backgrounds one shade darker so the
+     white text they carry clears AA (was 3.62:1). */
+  .bg-red-500 { background-color: hsl(0 74% 42%); }
 
   /* On the deep NOC dark surface, invert the neutrals so they stay
      legible without regressing the light-theme fixes above. */
@@ -737,7 +747,9 @@
   .dark .text-dc-primary { color: hsl(186 100% 60%); }
   .dark .text-dc-teal,
   .dark .text-dc-gpu { color: hsl(172 66% 60%); }
-  .dark .text-m2m-gold { color: hsl(48 100% 62%); }
+  .dark .text-m2m-gold,
+  .dark .text-accent { color: hsl(48 100% 62%); }
+  .dark .text-red-600 { color: hsl(0 84% 72%); }
 
   /* White text on the DC cyan brand surface only reaches ~2.2:1.
      Force near-black text on cyan-branded backgrounds to clear AA. */

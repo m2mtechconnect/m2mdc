@@ -80,7 +80,7 @@ export function WorkflowExamplesDropdown({ onSelectExample }: WorkflowExamplesDr
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-80">
-        <DropdownMenuLabel>🧩 Template Workflows</DropdownMenuLabel>
+        <DropdownMenuLabel>Template Workflows</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {examples.map((example) => (
           <DropdownMenuItem

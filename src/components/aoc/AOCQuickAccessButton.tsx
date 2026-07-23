@@ -63,9 +63,12 @@ export function AOCQuickAccessButton() {
             className="cursor-pointer"
           >
             <div className="flex items-center gap-2 w-full">
-              <div className={`w-2 h-2 rounded-full ${
-                agent.status === 'active' ? 'bg-green-500' : 'bg-blue-500'
-              }`} />
+              <div
+                aria-hidden="true"
+                className={`w-2 h-2 rounded-full ${
+                  agent.status === 'active' ? 'bg-emerald-500' : 'bg-primary'
+                }`}
+              />
               <span className="truncate">{agent.name}</span>
             </div>
           </DropdownMenuItem>

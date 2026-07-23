@@ -5,10 +5,17 @@
  * UPGRADED: Added domain-specific overlay support (KPI tab binding)
  */
 
-import { Suspense, useState, useRef, useEffect, useCallback, WheelEvent } from 'react';
+import { Suspense, useState, useRef, useEffect, useCallback, useMemo, WheelEvent } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls, Grid, Environment, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
+import { AlertTriangle, Cpu, MonitorX, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  detectWebGLCapability,
+  type WebGLCapabilityReport,
+  type WebGLCapabilityStatus,
+} from './webglCapability';
 import type { 
   RackVisual, 
   RowVisual, 
@@ -275,23 +282,100 @@ function LoadingFallback() {
   );
 }
 
-function WebGLFallback() {
+interface WebGLFallbackProps {
+  report: WebGLCapabilityReport;
+  compact?: boolean;
+  onRetry?: () => void;
+}
+
+const STATUS_COPY: Record<
+  WebGLCapabilityStatus,
+  { title: string; hint: string; icon: 'monitor' | 'cpu' | 'alert' }
+> = {
+  ok: {
+    title: '3D twin ready',
+    hint: '',
+    icon: 'monitor',
+  },
+  'webgl1-only': {
+    title: '3D twin needs WebGL 2',
+    hint: 'Update your browser or enable hardware acceleration in browser settings, then reload.',
+    icon: 'monitor',
+  },
+  software: {
+    title: '3D twin unavailable (software renderer)',
+    hint: 'Enable "Use hardware acceleration when available" in your browser settings and reload. On desktops, update your GPU driver.',
+    icon: 'cpu',
+  },
+  blocklisted: {
+    title: '3D twin blocked by browser',
+    hint: 'Your browser has WebGL disabled or is blocking your GPU. Enable hardware acceleration and reload, or open the twin on a different device.',
+    icon: 'alert',
+  },
+  unsupported: {
+    title: '3D twin not supported on this device',
+    hint: 'This browser does not support WebGL. Try the latest Chrome, Edge, Firefox, or Safari on a device with a modern GPU.',
+    icon: 'monitor',
+  },
+  unknown: {
+    title: '3D twin could not initialise',
+    hint: 'We could not verify WebGL support in this environment. Reload the page or open the twin on another browser.',
+    icon: 'alert',
+  },
+};
+
+function WebGLFallback({ report, compact, onRetry }: WebGLFallbackProps) {
+  const copy = STATUS_COPY[report.status] ?? STATUS_COPY.unknown;
+  const Icon =
+    copy.icon === 'cpu' ? Cpu : copy.icon === 'alert' ? AlertTriangle : MonitorX;
+  const height = compact ? 'h-72' : 'h-[450px]';
+
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-slate-900/90 p-4">
-      <div className="text-center max-w-sm">
-        <div className="text-4xl mb-3">🏢</div>
-        <h3 className="font-semibold text-slate-100 mb-1">3D View Unavailable</h3>
-        <p className="text-sm text-slate-400">
-          Interactive 3D twin is not available on this device. 
-          Showing topology data in 2D instead.
-        </p>
+    <div
+      className={`relative ${height} w-full rounded-lg overflow-hidden border border-slate-700/50 bg-[#0a0a14] flex items-center justify-center p-6`}
+      role="status"
+      aria-live="polite"
+    >
+      <div className="text-center max-w-md space-y-3">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10 text-amber-400">
+          <Icon className="h-6 w-6" aria-hidden="true" />
+        </div>
+        <div>
+          <h3 className="font-semibold text-slate-100">{copy.title}</h3>
+          <p className="text-sm text-slate-400 mt-1">{report.reason}</p>
+          {copy.hint && (
+            <p className="text-xs text-slate-500 mt-2">{copy.hint}</p>
+          )}
+        </div>
+        {report.renderer && (
+          <p className="text-[11px] text-slate-600 font-mono truncate">
+            Renderer: {report.renderer}
+          </p>
+        )}
+        {onRetry && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onRetry}
+            className="gap-2 border-slate-700 bg-slate-900/60 text-slate-200 hover:bg-slate-800"
+          >
+            <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+            Recheck WebGL
+          </Button>
+        )}
       </div>
     </div>
   );
 }
 
 export function DataCenter3DScene(props: DataCenter3DSceneProps) {
-  const [hasWebGL, setHasWebGL] = useState(true);
+  const [capability, setCapability] = useState<WebGLCapabilityReport>(() => ({
+    status: 'ok',
+    reason: 'Pending detection.',
+  }));
+  const [runtimeError, setRuntimeError] = useState<WebGLCapabilityReport | null>(
+    null,
+  );
   const [contextLost, setContextLost] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [lastInteractionTime, setLastInteractionTime] = useState(Date.now());
@@ -300,6 +384,19 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   const baseDistance = props.compact ? 22 : 30;
   const [targetDistance, setTargetDistance] = useState(baseDistance);
   
+  // Proactive capability detection - runs before mounting <Canvas />.
+  useEffect(() => {
+    setCapability(detectWebGLCapability());
+  }, []);
+
+  const recheckCapability = useCallback(() => {
+    setRuntimeError(null);
+    setCapability(detectWebGLCapability());
+  }, []);
+
+  const activeReport = runtimeError ?? capability;
+  const canRender3D = activeReport.status === 'ok';
+
   // Handle WebGL context lost/restored
   useEffect(() => {
     const handleContextLost = () => {
@@ -322,7 +419,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
         canvas.removeEventListener('webglcontextrestored', handleContextRestored);
       };
     }
-  }, [hasWebGL]);
+  }, [canRender3D]);
   
   // Mark user interaction
   const markInteraction = useCallback(() => {
@@ -376,9 +473,15 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
     }
   }, [baseDistance, markInteraction]);
 
-  // Check for WebGL support
-  if (typeof window !== 'undefined' && !hasWebGL) {
-    return <WebGLFallback />;
+  // Fail early with an informative fallback if WebGL2 isn't usable.
+  if (!canRender3D) {
+    return (
+      <WebGLFallback
+        report={activeReport}
+        compact={props.compact}
+        onRetry={recheckCapability}
+      />
+    );
   }
 
   const height = props.compact ? 'h-72' : 'h-[450px]';
@@ -424,10 +527,22 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             }}
             onCreated={({ gl }) => {
               if (!gl.capabilities.isWebGL2) {
-                setHasWebGL(false);
+                setRuntimeError({
+                  status: 'webgl1-only',
+                  reason:
+                    'The 3D renderer initialised without WebGL 2 support.',
+                });
               }
             }}
-            onError={() => setHasWebGL(false)}
+            onError={(event) => {
+              const message =
+                (event as unknown as { message?: string })?.message ||
+                'WebGL context creation failed.';
+              setRuntimeError({
+                status: 'unknown',
+                reason: message,
+              });
+            }}
           >
             <Scene 
               {...props} 

@@ -276,7 +276,7 @@ function LoadingFallback() {
     <div className="absolute inset-0 flex items-center justify-center bg-slate-900/80">
       <div className="text-center">
         <div className="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-sm text-slate-400">Loading 3D Twin...</p>
+        <p className="text-sm text-slate-300">Loading 3D Twin...</p>
       </div>
     </div>
   );
@@ -342,9 +342,9 @@ function WebGLFallback({ report, compact, onRetry }: WebGLFallbackProps) {
         </div>
         <div>
           <h3 className="font-semibold text-slate-100">{copy.title}</h3>
-          <p className="text-sm text-slate-400 mt-1">{report.reason}</p>
+          <p className="text-sm text-slate-300 mt-1">{report.reason}</p>
           {copy.hint && (
-            <p className="text-xs text-slate-500 mt-2">{copy.hint}</p>
+            <p className="text-xs text-slate-300 mt-2">{copy.hint}</p>
           )}
         </div>
         {report.renderer && (
@@ -503,7 +503,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
           <div className="text-center p-4">
             <div className="text-2xl mb-2">⚠️</div>
             <p className="text-sm text-slate-300 mb-2">3D rendering paused</p>
-            <p className="text-xs text-slate-500">WebGL context will restore automatically</p>
+            <p className="text-xs text-slate-300">WebGL context will restore automatically</p>
           </div>
         </div>
       )}
@@ -560,7 +560,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
       <div className="absolute bottom-3 left-3 flex gap-2 pointer-events-none">
         {props.showThermal && (
           <div className="bg-slate-900/90 backdrop-blur-sm border border-slate-700/50 rounded-md px-2.5 py-1.5 text-xs flex items-center gap-2 animate-fade-in pointer-events-auto">
-            <span className="text-slate-400 font-medium">Thermal:</span>
+            <span className="text-slate-300 font-medium">Thermal:</span>
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-sm bg-blue-500 shadow-sm shadow-blue-500/30" />
               <span className="text-slate-300">Cool</span>
@@ -573,7 +573,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
         )}
         {props.showPower && (
           <div className="bg-slate-900/90 backdrop-blur-sm border border-slate-700/50 rounded-md px-2.5 py-1.5 text-xs flex items-center gap-2 animate-fade-in pointer-events-auto">
-            <span className="text-slate-400 font-medium">Power:</span>
+            <span className="text-slate-300 font-medium">Power:</span>
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-sm bg-emerald-500 shadow-sm shadow-emerald-500/30" />
               <span className="text-slate-300">OK</span>

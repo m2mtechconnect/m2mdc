@@ -63,8 +63,14 @@ export function MiniTwinPreview({ onExpand, className }: MiniTwinPreviewProps) {
             </Badge>
           )}
           {onExpand && (
-            <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={onExpand}>
-              <Maximize2 className="h-3.5 w-3.5" />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0"
+              onClick={onExpand}
+              aria-label="Expand twin preview"
+            >
+              <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" />
             </Button>
           )}
         </div>

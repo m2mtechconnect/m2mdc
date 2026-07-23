@@ -14,10 +14,11 @@ import { installSupabaseMock, STORAGE_KEY } from './_setup/supabase-mock';
 
 test.describe('UserMenu — Sign Out flow', () => {
   test('Sign Out item uses semantic text-destructive styling and clears session', async ({ context, page, guard }) => {
-    // UserMenu is only rendered at ≥ xl (1280px). The shared context
-    // fixture doesn't forward `test.use({ viewport })`, so resize the
-    // page directly to guarantee the desktop trigger mounts.
-    await page.setViewportSize({ width: 1440, height: 900 });
+    // UserMenu is only rendered at ≥ Tailwind `xl` (1536px, per
+    // tailwind.config.ts). The shared context fixture doesn't forward
+    // `test.use({ viewport })`, so resize the page directly to
+    // guarantee the desktop trigger mounts.
+    await page.setViewportSize({ width: 1600, height: 900 });
     const mock = await installSupabaseMock(context);
     let logoutHits = 0;
     await context.route('**/auth/v1/logout*', async (route) => {
@@ -29,7 +30,7 @@ test.describe('UserMenu — Sign Out flow', () => {
     // UserMenu is only rendered at ≥ xl (1280px). The shared context
     // fixture doesn't forward `test.use({ viewport })`, so resize the
     // page directly to guarantee the desktop trigger mounts.
-    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.setViewportSize({ width: 1600, height: 900 });
     await expect
       .poll(() => mock.profileHits(), { timeout: 5_000 })
       .toBeGreaterThan(0);

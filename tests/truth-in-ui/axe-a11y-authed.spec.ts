@@ -16,7 +16,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from './_setup/fixtures';
 import { installSupabaseMock } from './_setup/supabase-mock';
-import { A11Y_BLOCKING_RULES } from './axe-a11y.spec';
+import { A11Y_BLOCKING_RULES } from './_setup/a11y-rules';
 
 type AxeExclude = string | { role: string };
 

@@ -61,6 +61,7 @@ import AccessControl from "./pages/account/AccessControl";
 import PendingApproval from "./pages/PendingApproval";
 import AdminUserApproval from "./pages/AdminUserApproval";
 import AdminSignupsDashboard from "./pages/AdminSignupsDashboard";
+import OverlayFixtures from "./pages/test/OverlayFixtures";
 
 // Initialize changelog middleware for builder store
 initChangeLogMiddleware();
@@ -174,6 +175,7 @@ function AuthenticatedApp() {
         <Route path="/data-centre-twin" element={<DataCentreTwin />} />
         <Route path="/omniverse-scene" element={<OmniverseScene />} />
         <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/test/overlay-fixtures" element={<OverlayFixtures />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
@@ -260,6 +262,7 @@ function AuthenticatedApp() {
         <Route path="/digital-twins/:slug" element={<Navigate to="/" replace />} />
         <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
         <Route path="/infrastructure" element={<InfrastructurePage />} />
+        <Route path="/test/overlay-fixtures" element={<OverlayFixtures />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

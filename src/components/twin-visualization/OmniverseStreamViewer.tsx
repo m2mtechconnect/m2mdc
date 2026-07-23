@@ -181,8 +181,14 @@ export function OmniverseStreamViewer({
               <Square className="h-3 w-3" /> Disconnect
             </Button>
           )}
-          <Button size="sm" variant="ghost" onClick={() => setExpanded(!expanded)} className="h-7 w-7 p-0 text-white/70 hover:text-white">
-            {expanded ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setExpanded(!expanded)}
+            className="h-7 w-7 p-0 text-white/70 hover:text-white"
+            aria-label={expanded ? 'Collapse stream viewer' : 'Expand stream viewer'}
+          >
+            {expanded ? <Minimize2 className="h-3.5 w-3.5" aria-hidden="true" /> : <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" />}
           </Button>
         </div>
       </div>

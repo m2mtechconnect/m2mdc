@@ -1,0 +1,63 @@
+{
+  "checkpoint": "PR-0.1 B7.6 Infrastructure Provisioning Request",
+  "date_utc": "2026-07-24",
+  "verdict": "INFRASTRUCTURE BLOCKED — PROVISIONING AUTHORITY REQUIRED",
+  "sandbox_probe": {
+    "host": "sandbox-pool-6777f4dc95-qcmrx",
+    "kernel": "Linux 4.4.0 x86_64",
+    "uid": "0 (root, unprivileged pool worker)",
+    "docker": "absent",
+    "podman": "absent",
+    "colima": "absent",
+    "supabase_cli": "absent",
+    "docker_socket": "/var/run/docker.sock: not present",
+    "local_postgres_version": "17.9 (forbidden — not PG 15.x)",
+    "container_privilege": "none — cannot install runtime, no daemon socket"
+  },
+  "gates": {
+    "runtime_available": false,
+    "supabase_cli_available": false,
+    "pg15_image_available": false,
+    "approved_image_allowlist_supplied": false,
+    "immutable_digests_supplied": false,
+    "managed_schemas_available": false,
+    "extensions_available": {
+      "pg_cron": false,
+      "pg_graphql": false,
+      "supabase_vault": false,
+      "pgsodium": false,
+      "pgvector": false
+    },
+    "credential_scan": "no production/staging/Lovable secrets loaded"
+  },
+  "actions_taken": [],
+  "actions_not_taken": [
+    "no image pulled",
+    "no 'latest' selected",
+    "no PG 17.9 retrofit",
+    "no fabricated Supabase-managed objects",
+    "no container created",
+    "no volume created",
+    "no network created",
+    "no migrations executed",
+    "no remote infrastructure contacted",
+    "no repository/migration/function/allowlist/CI change",
+    "no Retry-02 attempted",
+    "no Checkpoint C started",
+    "no B7.6-E1 readiness claimed"
+  ],
+  "prior_evidence_preserved": [
+    "docs/remediation/evidence/pr-0.1/checkpoint-b7/b7.6/",
+    "docs/remediation/evidence/pr-0.1/checkpoint-b7/b7.6/retry-01/",
+    "docs/remediation/evidence/pr-0.1/checkpoint-b7/b7.6-e1/",
+    "docs/remediation/evidence/pr-0.1/checkpoint-b7/b7.6-infra-handoff/"
+  ],
+  "external_blockers_retained": [
+    "credential rotation",
+    "effective remote RLS and approved-user authorization verification",
+    "remote function-undeployment verification",
+    "accidental remote migration reconciliation",
+    "confirmation that suitable validated pilot records exist remotely"
+  ],
+  "required_authority": "Infrastructure owner must approve container images, package versions, trusted artifact sources, immutable image digests, Replay A/B resource names, network isolation boundaries, and teardown procedure before any provisioning may proceed."
+}

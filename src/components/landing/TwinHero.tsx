@@ -92,7 +92,7 @@ export function TwinHero() {
           src="/landing/hero-datacenter-bg.jpg"
           alt=""
           aria-hidden="true"
-          fetchPriority="high"
+          {...({ fetchpriority: 'high' } as Record<string, string>)}
           decoding="async"
           className="absolute inset-0 w-full h-full object-cover opacity-40"
         />

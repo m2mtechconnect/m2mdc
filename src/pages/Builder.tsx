@@ -49,7 +49,9 @@ export default function Builder() {
     modelConfig,
     initializeBuilder,
     error,
-    lastSaved
+    lastSaved,
+    builderId,
+    isLoading,
   } = useWizardBuilderStore();
   const { toast } = useToast();
   const { updateContext } = useCoPilotContext();
@@ -361,8 +363,10 @@ export default function Builder() {
   }
 
   // Honest starter state: no intent OR init failed → don't render the wizard
-  // against a phantom draft. Give the user real actions.
-  if (!hasIntent || initError || !useWizardBuilderStore.getState().builderId) {
+  // against a phantom draft. Give the user real actions. Note: read
+  // builderId/isLoading from the reactive hook so the wizard re-renders when
+  // initializeBuilder finishes (getState() alone did not trigger a re-render).
+  if (!hasIntent || initError || (!isLoading && !builderId)) {
     const startBlank = () => {
       setInitError(null);
       setIsInitialized(false);

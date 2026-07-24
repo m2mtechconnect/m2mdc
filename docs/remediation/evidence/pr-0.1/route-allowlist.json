@@ -44,6 +44,7 @@
   ],
   "production_blocked_routes": [
     "/dashboard",
+    "/onboarding",
     "/builder",
     "/deploy",
     "/deployments",

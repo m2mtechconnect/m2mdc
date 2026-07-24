@@ -133,8 +133,6 @@ export async function installSupabaseMock(
     // Parse first, match on origin+pathname second.
     const host = parsed.hostname;
     if (!isSupabaseHost(host)) return route.fallback();
-    // eslint-disable-next-line no-console
-    console.log(`[MOCK] ${req.method()} ${parsed.pathname}`);
 
     const method = req.method().toUpperCase();
     const pathname = parsed.pathname;

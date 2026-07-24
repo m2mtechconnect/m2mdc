@@ -229,6 +229,49 @@ if (existsSync(workflowDir)) {
   }
 }
 
+// 8. NEG-A — every <Route path="..."> declared in src/App.tsx must be
+// classified in the route-allowlist as exactly one of: production_routes,
+// production_blocked_routes, development_only_routes, redirect_only_routes,
+// or match a forbidden_production_routes pattern. DEV-gated routes are
+// exempt.
+{
+  const prod       = new Set(allowlist.production_routes || []);
+  const blocked    = new Set(allowlist.production_blocked_routes || []);
+  const devOnly    = new Set(allowlist.development_only_routes || []);
+  const redirect   = new Set(allowlist.redirect_only_routes || []);
+  const forbidden  = allowlist.forbidden_production_routes || [];
+  const forbiddenRe = forbidden.map((p) => new RegExp('^' + p.replace(/\*/g, '.*') + '$'));
+  const pathRe = /<Route[^>]*path=["']([^"']+)["']/g;
+  const lines = appSrc.split('\n');
+  const seen = new Set();
+  let m;
+  const pathAndDev = /<Route[^>]*path=["']([^"']+)["']/;
+  for (const line of lines) {
+    const lm = pathAndDev.exec(line);
+    if (!lm) continue;
+    const p = lm[1];
+    if (seen.has(p)) continue;
+    seen.add(p);
+    const isDevGated = /import\.meta\.env\.DEV/.test(line);
+    if (isDevGated) continue;
+    if (prod.has(p) || blocked.has(p) || devOnly.has(p) || redirect.has(p)) continue;
+    if (forbiddenRe.some((re) => re.test(p))) continue;
+    fail(`App.tsx declares unclassified route: ${p}`);
+  }
+}
+
+// 9. NEG-D — a function may not appear in both production_functions and
+// disabled_functions. Disabled functions must first be removed from the
+// disabled list (with justification) before re-allowlist.
+{
+  const prodFn = new Set(allowlist.production_functions || []);
+  for (const name of allowlist.disabled_functions || []) {
+    if (prodFn.has(name)) {
+      fail(`allowlist: disabled function "${name}" is also present in production_functions`);
+    }
+  }
+}
+
 if (failures.length) {
   console.error('PR-0.1 production-perimeter enforcement FAILED:');
   for (const f of failures) console.error('  - ' + f);

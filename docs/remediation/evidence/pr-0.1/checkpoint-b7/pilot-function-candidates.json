@@ -1,38 +1,23 @@
 {
-  "schema_version": 1,
-  "checkpoint": "B7.4A",
-  "assessment_mode": "read-only; no function was hardened, allowlisted or deployed",
-  "pilot_scope_source": "docs/remediation/evidence/pr-0.1/route-allowlist.json (production_routes = [/, /login, /onboarding, /reset-password])",
-  "pilot_scope_status": "UNDEFINED — /reset-password is not a declared React route; unauth and authed router branches expose ~50 additional production-reachable routes not classified in the allowlist",
+  "schema_version": 2,
+  "checkpoint": "B7.4B",
+  "assessment_mode": "read-only; no function was hardened, allowlisted, or deployed",
+  "pilot_scope_source": "docs/remediation/evidence/pr-0.1/checkpoint-b7/pilot-scope-decision.json",
+  "pilot_routes": ["/", "/login", "/forgot-password", "/sign-out", "/onboarding"],
   "pilot_required_candidates": [],
   "pilot_required_candidate_count": 0,
-  "typed_accessible_unavailable_candidates": [
-    {
-      "function": "health",
-      "reason": "already rendered by HealthBadges/HealthCheck in Layout; blocked calls produce a red badge that is accessible and typed. Not required for pilot but useful to keep as an unavailable-visible signal if Layout is ever mounted on a pilot route.",
-      "current_state": "not allowlisted; call returns non-2xx which the badge treats as failed",
-      "remediation_before_allowlist_if_pursued": "add _shared/authz + is_approved check; explicit CORS; sanitized error envelope; positive + denial tests"
-    },
-    {
-      "function": "copilot-health",
-      "reason": "AISettings page shows an error state on failure; safe under default-deny",
-      "current_state": "not allowlisted; not on pilot routes"
-    },
-    {
-      "function": "ops-overview",
-      "reason": "IntelligenceDashboard already passes logErrors:false and renders placeholders; would need explicit typed-unavailable badge before allowlisting",
-      "current_state": "not allowlisted; not on pilot routes"
-    }
+  "typed_accessible_unavailable_on_pilot_routes": [],
+  "rationale": [
+    "Every pilot route renders without invoking any edge function.",
+    "Pilot pages use the Supabase Auth SDK (signIn, signOut, resetPasswordForEmail) and a direct supabase.from('profiles').insert for onboarding. Auth-SDK calls hit Supabase Auth GoTrue, not the Edge Functions runtime, and are outside the function allowlist scope.",
+    "The Layout component that mounts Copilot, health, search-suggestions and zapier background hooks is NOT rendered on any pilot route. The unauth branch of src/App.tsx renders routes bare, without <Layout>.",
+    "Therefore zero functions are pilot-required. No 14-column per-candidate assessment matrix is required at this checkpoint."
   ],
-  "assessment_matrix_columns": [
-    "gateway_jwt", "authenticated_user_enforcement", "approved_user_enforcement", "minimum_role",
-    "object_ownership_or_tenant_authz", "request_validation", "cors_policy",
-    "outbound_connectivity", "timeouts_and_response_size_bounds", "error_sanitization",
-    "shared_authz_guard_usage", "positive_tests", "denial_tests", "remediation_required"
+  "assessment_matrix_columns_if_needed": [
+    "gateway_jwt","authenticated_user_enforcement","approved_user_enforcement","minimum_role",
+    "object_ownership_or_tenant_authz","request_validation","cors_policy",
+    "outbound_connectivity","timeouts_and_response_size_bounds","error_sanitization",
+    "shared_authz_guard_usage","positive_tests","denial_tests","remediation_required"
   ],
-  "per_candidate_assessment": {
-    "note": "No function is currently a pilot-required candidate because none of the four documented pilot routes invokes any edge function. Per-candidate assessment matrices are therefore empty. If pilot scope is redefined to include /dashboard, /operations or other routes, this file must be regenerated with a full 14-column matrix per newly-in-scope function.",
-    "not_to_be_confused_with": "importing _shared/authz != exercising it on every execution path; any future candidate must be proven by positive + denial tests, not import presence."
-  },
-  "verdict": "PILOT_REQUIRES_ZERO_FUNCTIONS — all 63 browser-invoked functions are reachable only through non-pilot routes. If those non-pilot routes are considered production surface, they must be gated/removed OR the pilot scope must be redefined and each newly-in-scope function assessed."
+  "future_note": "If B7.5 re-scopes the pilot to include an approved-user overview, ai-systems-unified (Dashboard) is the smallest candidate set (1 function); ops-overview (IntelligenceDashboard) is a second candidate for analytics/operations. Both require the full 14-column assessment, positive + denial tests, and Layout de-coupling before allowlisting."
 }

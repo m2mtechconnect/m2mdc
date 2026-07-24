@@ -1,0 +1,76 @@
+{
+  "checkpoint": "B7.6-E1",
+  "phase": "environment-attestation",
+  "baseline_anchor": "d7c3da3e",
+  "purpose": "Attest presence of an approved Supabase-compatible disposable environment before any B7.6 Retry-02 replay.",
+  "container_runtime": {
+    "docker_present": false,
+    "podman_present": false,
+    "colima_present": false,
+    "docker_socket_present": false
+  },
+  "supabase_cli": {"present": false, "version": null},
+  "approved_images": [],
+  "postgres": {
+    "local_binary_present": true,
+    "local_binary_path": "/bin/postgres",
+    "local_binary_version": "17.9",
+    "required_major": "15",
+    "version_matches_requirement": false,
+    "note": "Local PG 17.9 explicitly disallowed by directive; must not be adapted."
+  },
+  "supabase_platform": {
+    "compatible_stack_running": false,
+    "managed_schemas_present": {"auth": false, "storage": false, "realtime": false, "vault": false, "graphql": false, "extensions": false},
+    "managed_roles_present": {"anon": false, "authenticated": false, "service_role": false, "authenticator": false, "supabase_admin": false, "supabase_auth_admin": false, "supabase_storage_admin": false},
+    "managed_functions_present": {"auth.uid": false, "auth.role": false}
+  },
+  "extensions": {
+    "required": ["pg_cron", "pg_graphql", "supabase_vault", "pgsodium", "vector", "pgcrypto", "uuid-ossp", "pg_stat_statements", "plpgsql"],
+    "installed_in_approved_stack": [],
+    "missing": ["pg_cron", "pg_graphql", "supabase_vault", "pgsodium", "vector"]
+  },
+  "database_endpoints": {
+    "loopback_only": null,
+    "isolated_container_only": null,
+    "detail": "No approved disposable stack provisioned; no endpoints to enumerate."
+  },
+  "credential_scan": {
+    "production_credentials_loaded": false,
+    "staging_credentials_loaded": false,
+    "lovable_cloud_credentials_loaded": false,
+    "scan_method": "env inspection; no PGHOST/PGURI pointing at hosted infra loaded into attestation context"
+  },
+  "proposed_replay_environments": {
+    "env_a": {"name": null, "volume": null, "status": "not_provisioned"},
+    "env_b": {"name": null, "volume": null, "status": "not_provisioned"}
+  },
+  "teardown_procedure": {
+    "defined": false,
+    "affects_shared_infrastructure": null,
+    "detail": "No environment exists to define teardown against."
+  },
+  "replay_preflight_rerun": {
+    "executed": false,
+    "all_gates_pass": false,
+    "reason": "Preflight requires an approved disposable stack; none available."
+  },
+  "migrations_executed": 0,
+  "application_tests_executed": 0,
+  "remote_infrastructure_contacted": false,
+  "repository_source_modified": false,
+  "unapproved_tooling_downloaded": false,
+  "gate_evaluation": [
+    {"gate": "container runtime (docker or podman) present", "pass": false},
+    {"gate": "approved version-pinned Supabase-compatible PG15 image approved and pulled", "pass": false},
+    {"gate": "official Supabase managed schemas/roles/authorization bootstrap available", "pass": false},
+    {"gate": "pg_cron, pg_graphql, supabase_vault(+pgsodium), pgvector installable from approved image", "pass": false},
+    {"gate": "auth/storage/realtime managed platform objects present", "pass": false},
+    {"gate": "loopback- or isolated-container-only DB connectivity", "pass": false},
+    {"gate": "capacity to create and destroy two independent blank replay environments", "pass": false},
+    {"gate": "image and tooling versions/digests approved before execution", "pass": false},
+    {"gate": "no production/staging/Lovable Cloud credentials loaded", "pass": true}
+  ],
+  "verdict": "B7.6-E1 BLOCKED — APPROVED ENVIRONMENT STILL UNAVAILABLE",
+  "authority": "Directive §Authorized work and §Hard boundary: fail-closed when any environmental prerequisite is absent; do not adapt PG 17.9; do not fabricate managed objects; do not download unapproved tooling."
+}

@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export function useAgentMetrics(agentId: string, timeRange: '1h' | '24h' | '7d' | '30d' = '24h') {
-  const useMock = import.meta.env.VITE_USE_MOCK_AOC === 'true' && import.meta.env.DEV;
+  const useMock = false /* PR-0.1 B7: VITE_USE_MOCK_AOC removed from allowlist */;
 
   return useQuery({
     queryKey: ['agent-metrics', agentId, timeRange],

@@ -17,7 +17,7 @@ export function AOCCloudDeployments({ agentId }: AOCCloudDeploymentsProps) {
   const { trackEvent } = useAnalytics();
   const [actioningId, setActioningId] = useState<string | null>(null);
 
-  const useMock = import.meta.env.VITE_USE_MOCK_AOC === 'true' && import.meta.env.DEV;
+  const useMock = false /* PR-0.1 B7: VITE_USE_MOCK_AOC removed from allowlist */;
 
   const { data: deployments = [] } = useQuery({
     queryKey: ['cloud-deployments', agentId],

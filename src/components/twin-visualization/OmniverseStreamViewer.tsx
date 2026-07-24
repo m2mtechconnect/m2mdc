@@ -217,7 +217,7 @@ export function OmniverseStreamViewer({
               <p className="text-xs text-white/50 mt-1">
                 {canConnect
                   ? 'Real-time ray-traced Omniverse stream available on connect.'
-                  : 'Omniverse stream unavailable — configure VITE_OMNIVERSE_KIT_URL and VITE_OMNIVERSE_STREAM_ENABLED to enable.'}
+                  : 'Omniverse stream unavailable in this build. Server-mediated transport is required.'}
               </p>
               {canConnect && host && (
                 <p className="text-xs text-white/30 mt-0.5 font-mono">{host}:{cfg.signalingPort}</p>

@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-const BUILD_VERSION = import.meta.env.VITE_BUILD_VERSION || "dev";
-const BUILD_TIMESTAMP = import.meta.env.VITE_BUILD_TIMESTAMP || new Date().toISOString();
+// PR-0.1 Checkpoint B7: `VITE_BUILD_VERSION` / `VITE_BUILD_TIMESTAMP` are not
+// part of the approved public-variable allowlist. The version stamp is now a
+// constant produced at check-in time; a future release-tag pipeline may
+// substitute it via a code-mod, but no `import.meta.env` read is permitted.
+const BUILD_VERSION = "pilot";
+const BUILD_TIMESTAMP = "1970-01-01T00:00:00.000Z";
 
 export function BuildVersion() {
   const [showRefreshPrompt, setShowRefreshPrompt] = useState(false);

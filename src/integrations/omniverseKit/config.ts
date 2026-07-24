@@ -1,16 +1,23 @@
 /**
- * Validated Omniverse Kit configuration + connection state machine.
+ * Omniverse Kit configuration — PR-0.1 Checkpoint B7 lockdown.
  *
- * All Kit endpoints MUST be read through this module. No hard-coded fallback
- * IPs; a missing / malformed `VITE_OMNIVERSE_KIT_URL` fails closed.
+ * The browser client is NOT permitted to read Omniverse endpoints from
+ * `import.meta.env`. Any Omniverse endpoint value present at build time would
+ * be inlined into the production bundle by Vite, exposing infrastructure to
+ * every anonymous visitor. The Omniverse client is therefore held in a
+ * typed-unavailable state on all builds until an approved, server-mediated
+ * transport is delivered in Checkpoint C.
  *
- * Envs consumed:
- *   - VITE_OMNIVERSE_KIT_URL         (required to enable Kit REST)
- *   - VITE_OMNIVERSE_SIGNALING_HOST  (optional; derived from KIT_URL when absent)
- *   - VITE_OMNIVERSE_STREAM_ENABLED  ('true'/'1' to enable WebRTC stream)
+ * No `VITE_OMNIVERSE_*` variable is read here or anywhere else in the client
+ * build graph. The enforcer in `scripts/verify-production-perimeter.mjs`
+ * blocks reintroduction.
  */
 
 import type { SourceConnectionState } from '@/lib/provenance/types';
+
+/** Public reason returned to UI when Kit is queried. Does not disclose config. */
+const UNAVAILABLE_REASON =
+  'Omniverse Kit is unavailable in this build. Server-mediated transport is required.';
 
 export interface KitConfig {
   enabled: boolean;               // Kit REST usage allowed (env valid).
@@ -27,73 +34,26 @@ export interface KitConfig {
  */
 export const DEV_PROXY_PREFIX = '/kit-api';
 
-function isHttpUrl(u: string): boolean {
-  try {
-    const parsed = new URL(u);
-    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-  } catch {
-    return false;
-  }
-}
-
-function readEnv(key: string): string | undefined {
-  // Vite exposes VITE_* at build time via import.meta.env; guarded for tests.
-  const meta = (import.meta as unknown as { env?: Record<string, string | undefined> }).env;
-  const v = meta?.[key];
-  return v && v.trim() !== '' ? v : undefined;
-}
-
-function isDev(): boolean {
-  const meta = (import.meta as unknown as { env?: { DEV?: boolean } }).env;
-  return Boolean(meta?.DEV);
-}
-
 /**
- * Read + validate the Kit configuration from the current Vite env.
- * Never throws; returns a disabled config with `reason` on any misconfig.
+ * Return the Kit configuration. In every build variant this returns a
+ * typed-unavailable, disabled configuration — no environment access.
+ *
+ * Any future re-enablement MUST route through an authenticated server-side
+ * proxy (Checkpoint C). Direct browser access to Kit endpoints is forbidden.
  */
 export function readKitConfig(): KitConfig {
-  const url = readEnv('VITE_OMNIVERSE_KIT_URL');
-  const streamFlag = readEnv('VITE_OMNIVERSE_STREAM_ENABLED');
-  const signalingEnv = readEnv('VITE_OMNIVERSE_SIGNALING_HOST');
-
-  if (!url) {
-    return {
-      enabled: false,
-      restBaseUrl: null,
-      streamEnabled: false,
-      signalingHost: null,
-      signalingPort: 49100,
-      reason: 'VITE_OMNIVERSE_KIT_URL is not set — Kit disabled, demo scaffolding active.',
-    };
-  }
-  if (!isHttpUrl(url)) {
-    return {
-      enabled: false,
-      restBaseUrl: null,
-      streamEnabled: false,
-      signalingHost: null,
-      signalingPort: 49100,
-      reason: 'VITE_OMNIVERSE_KIT_URL is not a valid http(s) URL — Kit disabled.',
-    };
-  }
-
-  const parsed = new URL(url);
-  const streamEnabled = streamFlag === 'true' || streamFlag === '1';
-  const signalingHost = signalingEnv ?? parsed.hostname;
-
   return {
-    enabled: true,
-    // In dev, browser fetches use the Vite proxy path to avoid CORS.
-    restBaseUrl: isDev() ? DEV_PROXY_PREFIX : parsed.origin,
-    streamEnabled,
-    signalingHost,
+    enabled: false,
+    restBaseUrl: null,
+    streamEnabled: false,
+    signalingHost: null,
     signalingPort: 49100,
+    reason: UNAVAILABLE_REASON,
   };
 }
 
 /** Machine-readable connection-state helper for UI badges. */
-export function connectionStateForConfig(cfg: KitConfig): SourceConnectionState {
-  if (!cfg.enabled) return 'demo';
-  return 'connecting';
+export function connectionStateForConfig(_cfg: KitConfig): SourceConnectionState {
+  // Always 'demo' — Kit is typed-unavailable in the browser build.
+  return 'demo';
 }

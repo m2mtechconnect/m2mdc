@@ -19,7 +19,7 @@
  * Namespacing guarantees round-trippable lookup and prevents id collisions
  * across sources. Existing consumers keep importing the original constants;
  * this provider is a NEW read surface exposed via
- * `VITE_AURA_SIM_PROVIDER=scenario-library`. `runScenario` returns a typed
+ * `the simulation-provider selector=scenario-library`. `runScenario` returns a typed
  * `not-implemented` outcome — actual execution stays with `compatibility`
  * (or a future engine-specific provider) per ADR-0007.
  *

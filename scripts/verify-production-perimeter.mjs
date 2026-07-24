@@ -89,9 +89,101 @@ function walk(dir) {
   }
   return out;
 }
+const ALLOWED_VITE = new Set([
+  'VITE_SUPABASE_URL',
+  'VITE_SUPABASE_PUBLISHABLE_KEY',
+  'VITE_SUPABASE_PROJECT_ID',
+]);
+// Identifiers that must NEVER appear in production source (including as
+// bare string literals, error messages, or comments) because the presence
+// of the string in the shipped bundle is itself a signal to attackers.
+const FORBIDDEN_ANYWHERE = [
+  /VITE_LOVABLE_API_KEY/,
+  /VITE_OMNIVERSE_[A-Z_]+/,
+];
+function isTestFile(p) {
+  return /\/__tests__\//.test(p) || /\.(test|spec)\.(ts|tsx|js|jsx)$/.test(p);
+}
 for (const f of walk(join(REPO, 'src'))) {
-  if (/VITE_LOVABLE_API_KEY/.test(readFileSync(f, 'utf8'))) {
-    fail(`browser secret: ${f} references VITE_LOVABLE_API_KEY`);
+  if (isTestFile(f)) continue; // tests are excluded from the production bundle
+  const src = readFileSync(f, 'utf8');
+  // Strip comments so documentation doesn't false-fail on identifier checks.
+  const code = src
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+  for (const re of FORBIDDEN_ANYWHERE) {
+    if (re.test(code)) {
+      fail(`browser identifier: ${f} references forbidden ${re}`);
+    }
+  }
+  // Enforce env-read allowlist: only Supabase-3 and Vite built-ins may be
+  // read via `import.meta.env.<KEY>`.
+  const envReadRe = /import\.meta\.env\.([A-Za-z_][A-Za-z0-9_]*)/g;
+  const ALLOWED_BUILTIN = new Set(['DEV', 'PROD', 'MODE', 'BASE_URL', 'SSR']);
+  let m;
+  while ((m = envReadRe.exec(code))) {
+    const key = m[1];
+    if (!ALLOWED_VITE.has(key) && !ALLOWED_BUILTIN.has(key)) {
+      fail(`browser env: ${f} reads non-allowlisted import.meta.env.${key}`);
+    }
+  }
+  // Ban unsafe access patterns that force Vite to inline the full env object.
+  if (/import\.meta\.env\s*\[/.test(code)) {
+    fail(`browser env: ${f} uses computed import.meta.env[...] access (leaks full env)`);
+  }
+  if (/\.\.\.\s*import\.meta\.env\b/.test(code)) {
+    fail(`browser env: ${f} spreads import.meta.env (leaks full env)`);
+  }
+  if (/(?:const|let|var)\s*\{[^}]*\}\s*=\s*import\.meta\.env\b/.test(code)) {
+    fail(`browser env: ${f} destructures import.meta.env (leaks full env)`);
+  }
+  if (/Object\.(?:keys|values|entries|assign)\s*\(\s*import\.meta\.env\b/.test(code)) {
+    fail(`browser env: ${f} enumerates import.meta.env (leaks full env)`);
+  }
+  // Bare `import.meta.env` without an immediate `.KEY` or `[` (allowed
+  // pattern is `import.meta.env.KEY`; anything else forces the whole env
+  // object to be inlined).
+  const bareRe = /import\.meta\.env(?!\s*\.[A-Za-z_])(?!\s*\[)/g;
+  if (bareRe.test(code)) {
+    fail(`browser env: ${f} uses bare import.meta.env reference (leaks full env)`);
+  }
+}
+
+// 4b. Bundle canary scan — verify the built artifact does not contain any
+// forbidden secret material. Only runs when dist/ exists (post-build).
+const distDir = join(REPO, 'dist');
+if (existsSync(distDir)) {
+  const CANARY_STRINGS = process.env.PERIMETER_CANARIES
+    ? process.env.PERIMETER_CANARIES.split(',')
+    : [];
+  const FORBIDDEN_NAMES = [
+    'VITE_LOVABLE_API_KEY',
+    'VITE_OMNIVERSE_KIT_URL',
+    'VITE_OMNIVERSE_SIGNALING_HOST',
+    'VITE_OMNIVERSE_STREAM_ENABLED',
+    'VITE_OMNIVERSE_HOST',
+  ];
+  const distFiles = [];
+  (function walkDist(d) {
+    for (const n of readdirSync(d)) {
+      const p = join(d, n);
+      const s = statSync(p);
+      if (s.isDirectory()) walkDist(p);
+      else if (/\.(js|css|html|map|json)$/.test(n)) distFiles.push(p);
+    }
+  })(distDir);
+  for (const f of distFiles) {
+    const content = readFileSync(f, 'utf8');
+    for (const name of FORBIDDEN_NAMES) {
+      if (content.includes(name)) {
+        fail(`bundle leak: ${f} contains forbidden identifier ${name}`);
+      }
+    }
+    for (const canary of CANARY_STRINGS) {
+      if (canary && content.includes(canary)) {
+        fail(`bundle leak: ${f} contains build-time canary value`);
+      }
+    }
   }
 }
 

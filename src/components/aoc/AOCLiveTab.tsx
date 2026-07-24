@@ -20,7 +20,7 @@ export function AOCLiveTab({ agentId }: AOCLiveTabProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
 
-  const useMock = import.meta.env.VITE_USE_MOCK_AOC === 'true' && import.meta.env.DEV;
+  const useMock = false /* PR-0.1 B7: VITE_USE_MOCK_AOC removed from allowlist */;
 
   const { data: logs = [], refetch } = useQuery({
     queryKey: ['agent-activity-logs', agentId, filterType],

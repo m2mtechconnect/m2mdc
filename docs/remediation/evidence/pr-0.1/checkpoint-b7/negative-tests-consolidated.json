@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "checkpoint": "B7.3 (consolidated)",
+  "anchor": {
+    "git_head": "749da2bcf4c943b236f8fc5047b658193e533ee7",
+    "working_tree_clean_note": "unrelated in-progress edits preserved; enforcer + allowlist + inventory unchanged this pass",
+    "fingerprints_sha256": {
+      "scripts/verify-production-perimeter.mjs": "47acf855c082293a5c02fa4eca0722e9e065db8c43bc7c88ff7cf25584674262",
+      "docs/remediation/evidence/pr-0.1/route-allowlist.json": "4531852ce76d5f27ed3df51b4957882791f98c4f6d788a71ef913fff6afc5288",
+      "docs/remediation/evidence/pr-0.1/edge-function-inventory.json": "e0f7a74c402504ec5e00ef2f67a0955b5a8c3a5347581468b54b0bbcfa2e8416"
+    }
+  },
+  "harnesses": {
+    "isolated_fixture_harness": "scripts/__tests__/perimeter-negative.mjs",
+    "in_repo_enforcer_run": "node scripts/verify-production-perimeter.mjs (cwd = repo root, real inventory + allowlist)"
+  },
+  "required_cases": [
+    { "id": "NEG-A", "axis": "unclassified route",              "status": "NOT-IMPLEMENTED", "note": "not exercised by current harness; enforcer has no route-inventory rule beyond forbidden-route detector (NEG-G) and no allowlist entry for pilot routes is enforced. Rule gap, not a test gap." },
+    { "id": "NEG-B", "axis": "unclassified function",           "status": "COVERED-IN-ENFORCER",   "evidence": "enforcer rule #1 fails on any supabase/functions/<x>/index.ts missing an inventory entry; exercised implicitly by real-repo run (155 inventoried, 0 unknown)." },
+    { "id": "NEG-C", "axis": "wildcard function deployment",    "status": "COVERED-IN-ENFORCER",   "evidence": "enforcer rule #7 rejects `supabase functions deploy` without a function name or with `--all`; real-repo run passes because no workflow uses wildcard." },
+    { "id": "NEG-D", "axis": "blocked/disabled function deployment", "status": "NOT-IMPLEMENTED", "note": "no negative fixture proves disabled functions in allowlist.disabled_functions[] are rejected from re-allowlist; rule gap." },
+    { "id": "NEG-E", "axis": "allowlisted function missing authz guard", "status": "PASS", "code": 1, "expected_stderr_substring": "allowlist/pilot-fn: missing \"_shared/authz\" import", "harness_case": "runNegE()" },
+    { "id": "NEG-F", "axis": "forbidden browser environment reference", "status": "COVERED-IN-ENFORCER", "evidence": "enforcer rule #4 blocks VITE_LOVABLE_API_KEY / VITE_OMNIVERSE_* identifiers, non-allowlisted import.meta.env.<KEY> reads, computed/spread/destructure/enumerate/bare env access; real-repo run passes (155 inventoried, 0 allowlisted)." },
+    { "id": "NEG-G", "axis": "production test/debug route",     "status": "PASS", "code": 1, "expected_stderr_substring": "App.tsx declares forbidden production route: /test/*", "harness_case": "runNegG()" },
+    { "id": "NEG-I", "axis": "unauthorized verify_jwt=false",   "status": "COVERED-IN-ENFORCER",   "evidence": "enforcer rule #5 fails config.toml entries with verify_jwt=false whose inventory disposition is not `signed-webhook`; real-repo run passes because no function currently sets verify_jwt=false." }
+  ],
+  "positive_control": {
+    "id": "NEG-H",
+    "axis": "DEV-gated forbidden route (must PASS)",
+    "status": "PASS",
+    "code": 0,
+    "harness_case": "runNegH()"
+  },
+  "consolidated_verdict": "PARTIAL — 6 of 8 negative axes exercised (3 as enforcer-rule-only via real-repo run, 3 as dedicated fixtures). NEG-A and NEG-D have no negative fixture AND no enforcer rule. B7.3 is not fully closed."
+}

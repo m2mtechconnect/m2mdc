@@ -1,0 +1,23 @@
+{
+  "checkpoint": "B7.4E",
+  "supersedes_scope_decision_for": ["approved-user pilot surface"],
+  "preserves_verdicts": {
+    "B7.4B": "corrected to BLOCKED by B7.4C",
+    "B7.4C": "BLOCKED - APPROVED-USER WORKFLOW NOT OPERABLE (unchanged)",
+    "B7.4D": "BLOCKED - NO TRUTHFUL READ-ONLY DATA PATH (unchanged; this checkpoint is a narrow authorized expansion, not a rewrite)"
+  },
+  "pilot_routes": ["/pilot/overview", "/pilot/asset/:twinId"],
+  "route_splat_classification": { "/pilot/*": "production_routes" },
+  "shell": "src/pilot/PilotLayout.tsx (renders outside src/components/Layout)",
+  "read_models": ["public.data_centre_twins", "public.twin_kpi_snapshots"],
+  "edge_functions_required": [],
+  "writes_required": [],
+  "external_blockers_retained": [
+    "credential rotation",
+    "effective remote RLS and authorization verification",
+    "remote function-undeployment verification",
+    "accidental migration change-management reconciliation",
+    "complete migration-chain replay in an approved Supabase-compatible environment",
+    "verification that the selected read model contains suitable validated records"
+  ]
+}

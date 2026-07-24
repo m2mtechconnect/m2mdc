@@ -89,28 +89,42 @@ function walk(dir) {
   }
   return out;
 }
+const ALLOWED_VITE = new Set([
+  'VITE_SUPABASE_URL',
+  'VITE_SUPABASE_PUBLISHABLE_KEY',
+  'VITE_SUPABASE_PROJECT_ID',
+]);
+// Identifiers that must NEVER appear in production source (including as
+// bare string literals, error messages, or comments) because the presence
+// of the string in the shipped bundle is itself a signal to attackers.
+const FORBIDDEN_ANYWHERE = [
+  /VITE_LOVABLE_API_KEY/,
+  /VITE_OMNIVERSE_[A-Z_]+/,
+];
+function isTestFile(p) {
+  return /\/__tests__\//.test(p) || /\.(test|spec)\.(ts|tsx|js|jsx)$/.test(p);
+}
 for (const f of walk(join(REPO, 'src'))) {
+  if (isTestFile(f)) continue; // tests are excluded from the production bundle
   const src = readFileSync(f, 'utf8');
-  // Strip block + line comments so documentation doesn't false-fail.
+  // Strip comments so documentation doesn't false-fail on identifier checks.
   const code = src
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/(^|[^:])\/\/[^\n]*/g, '$1');
-  if (/VITE_LOVABLE_API_KEY/.test(code)) {
-    fail(`browser secret: ${f} references VITE_LOVABLE_API_KEY`);
+  for (const re of FORBIDDEN_ANYWHERE) {
+    if (re.test(code)) {
+      fail(`browser identifier: ${f} references forbidden ${re}`);
+    }
   }
-  if (/VITE_OMNIVERSE_[A-Z_]+/.test(code)) {
-    fail(`browser env: ${f} references a forbidden VITE_OMNIVERSE_* variable`);
-  }
-  // Forbidden application-specific VITE_* client reads (allowlist below).
-  const ALLOWED_VITE = new Set([
-    'VITE_SUPABASE_URL',
-    'VITE_SUPABASE_PUBLISHABLE_KEY',
-    'VITE_SUPABASE_PROJECT_ID',
-  ]);
-  const viteRefs = code.match(/VITE_[A-Z0-9_]+/g) || [];
-  for (const ref of viteRefs) {
-    if (!ALLOWED_VITE.has(ref)) {
-      fail(`browser env: ${f} references non-allowlisted client variable ${ref}`);
+  // Enforce env-read allowlist: only Supabase-3 and Vite built-ins may be
+  // read via `import.meta.env.<KEY>`.
+  const envReadRe = /import\.meta\.env\.([A-Za-z_][A-Za-z0-9_]*)/g;
+  const ALLOWED_BUILTIN = new Set(['DEV', 'PROD', 'MODE', 'BASE_URL', 'SSR']);
+  let m;
+  while ((m = envReadRe.exec(code))) {
+    const key = m[1];
+    if (!ALLOWED_VITE.has(key) && !ALLOWED_BUILTIN.has(key)) {
+      fail(`browser env: ${f} reads non-allowlisted import.meta.env.${key}`);
     }
   }
   // Ban unsafe access patterns that force Vite to inline the full env object.
@@ -126,9 +140,9 @@ for (const f of walk(join(REPO, 'src'))) {
   if (/Object\.(?:keys|values|entries|assign)\s*\(\s*import\.meta\.env\b/.test(code)) {
     fail(`browser env: ${f} enumerates import.meta.env (leaks full env)`);
   }
-  // Bare `import.meta.env` without an immediate `.KEY` or `[` (allowed pattern
-  // is `import.meta.env.KEY`; anything else is either enumeration or an
-  // assignment to a variable that will be enumerated later).
+  // Bare `import.meta.env` without an immediate `.KEY` or `[` (allowed
+  // pattern is `import.meta.env.KEY`; anything else forces the whole env
+  // object to be inlined).
   const bareRe = /import\.meta\.env(?!\s*\.[A-Za-z_])(?!\s*\[)/g;
   if (bareRe.test(code)) {
     fail(`browser env: ${f} uses bare import.meta.env reference (leaks full env)`);

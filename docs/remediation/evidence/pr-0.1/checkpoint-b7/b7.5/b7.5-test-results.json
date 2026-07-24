@@ -1,0 +1,31 @@
+{
+  "checkpoint": "B7.5",
+  "baseline_anchor": "47b2ef8ca8bbf8d407cfa46086c78b5f23a70a6e",
+  "working_tree_dirty": false,
+  "migrations": {
+    "total": 18,
+    "deterministic_order": true,
+    "duplicate_versions": [],
+    "malformed_timestamps": [],
+    "empty_or_near_empty": [],
+    "b1_migration": "20260724005954_e17e6492-dc51-46f8-bb87-642071501b8b.sql",
+    "b1_position": 18
+  },
+  "b1_static_reconciliation": {
+    "pass": true,
+    "total_checks": 26,
+    "failing_checks": 0
+  },
+  "production_perimeter_enforcer": {
+    "pass": true,
+    "functions_inventoried": 155,
+    "allowlisted": 0
+  },
+  "git_diff_check": {
+    "pass": true
+  },
+  "b7_4g_evidence_verified": true,
+  "remote_infrastructure_contacted": false,
+  "migrations_executed": false,
+  "verdict": "STATIC ORDER VERIFIED - COMPLETE-CHAIN EXECUTION PENDING"
+}

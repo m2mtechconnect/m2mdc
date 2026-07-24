@@ -40,7 +40,8 @@ export class RealAuthUnavailableError extends Error {
 
 export async function installRealSupabaseAuth(
   context: BrowserContext,
-  originUrl = 'http://localhost:8080',
+  originUrl: string = process.env.AURA_TARGET_ORIGIN
+    ?? `http://localhost:${process.env.AURA_BUILDER_PORT ?? '8080'}`,
 ): Promise<RealAuthHandle> {
   const storageKey = process.env.LOVABLE_BROWSER_SUPABASE_STORAGE_KEY;
   const sessionJson = process.env.LOVABLE_BROWSER_SUPABASE_SESSION_JSON;

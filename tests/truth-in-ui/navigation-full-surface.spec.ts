@@ -90,6 +90,10 @@ guardedTest.describe('AURA DC full-surface deep-link coverage', () => {
       page.on('console', (msg) => {
         if (msg.type() === 'error') consoleErrors.push(`console.error: ${msg.text()}`);
       });
+      page.on('requestfailed', (req) => {
+        // eslint-disable-next-line no-console
+        console.log(`[DBG] requestfailed ${req.method()} ${req.url()} :: ${req.failure()?.errorText}`);
+      });
 
       await openAuthed(context, page, route);
 

@@ -1,0 +1,9 @@
+PASS T1 anon direct insert — denied: ERROR:  permission denied for table user_roles
+PASS T2 authenticated self-insert (privilege-escalation) — denied: ERROR:  permission denied for table user_roles
+PASS T3 authenticated self-update — denied: ERROR:  permission denied for table user_roles
+PASS T4 authenticated self-delete — denied: ERROR:  permission denied for table user_roles
+PASS T5 unapproved security_admin -> admin_assign_role — denied: ERROR:  caller not approved
+PASS T6 approved non-admin -> admin_assign_role — denied: ERROR:  caller not security_admin
+PASS T7 approved security_admin -> assign engineer — allowed
+PASS T8 approved security_admin -> revoke engineer — allowed
+PASS T11 approved security_admin -> self-revoke security_admin (deny) — denied: ERROR:  cannot revoke own security_admin role

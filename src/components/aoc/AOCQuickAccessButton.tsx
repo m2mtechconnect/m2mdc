@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Activity } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +16,6 @@ import { supabase } from '@/integrations/supabase/client';
  * Quick access button for AOC - shows recently accessed agents
  */
 export function AOCQuickAccessButton() {
-  const navigate = useNavigate();
   const location = useLocation();
 
   // Fetch user's active agents
@@ -57,12 +56,8 @@ export function AOCQuickAccessButton() {
         <DropdownMenuLabel>Active Agents</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {agents.map((agent) => (
-          <DropdownMenuItem
-            key={agent.id}
-            onClick={() => navigate(`/app/agents/${agent.id}/manage`)}
-            className="cursor-pointer"
-          >
-            <div className="flex items-center gap-2 w-full">
+          <DropdownMenuItem key={agent.id} asChild className="cursor-pointer">
+            <Link to={`/app/agents/${agent.id}/manage`} className="flex items-center gap-2 w-full">
               <div
                 aria-hidden="true"
                 className={`w-2 h-2 rounded-full ${
@@ -70,7 +65,7 @@ export function AOCQuickAccessButton() {
                 }`}
               />
               <span className="truncate">{agent.name}</span>
-            </div>
+            </Link>
           </DropdownMenuItem>
         ))}
         {agents.length === 0 && (

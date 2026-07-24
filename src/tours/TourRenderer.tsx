@@ -84,7 +84,7 @@ export function TourRenderer() {
       showSkipButton
       showProgress
       scrollToFirstStep
-      disableOverlayClose
+      disableOverlay
       spotlightClicks
       callback={handleCallback}
       styles={{

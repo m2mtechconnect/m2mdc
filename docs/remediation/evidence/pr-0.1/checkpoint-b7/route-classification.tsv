@@ -1,0 +1,62 @@
+route	classification	source_line	min_role	pilot_capability	production_reachable	functions_invoked	blocked_behaviour	evidence
+/	public-pilot	src/App.tsx:172,205	anonymous	Public landing (DataCentreTwinLanding)	yes	none	n/a — renders truthfully	rg on src/pages/DataCentreTwinLanding.tsx returns zero functions.invoke/invokeEdgeFunction sites
+/login	public-pilot	src/App.tsx:174	anonymous	Password sign-in (Supabase Auth SDK)	yes (unauth branch only)	none	n/a	src/pages/auth/SignIn.tsx uses supabase.auth.signInWithPassword directly
+/forgot-password	public-pilot	src/App.tsx:178,253	anonymous	Password-recovery entry (redirectTo /reset-password)	yes (unauth branch, gated by onboarding_completed=true)	none	n/a	src/pages/auth/ForgotPassword.tsx uses supabase.auth.resetPasswordForEmail
+/sign-out	public-pilot	src/App.tsx:177,194,252	anonymous or approved	Logout	yes (all three branches)	none	n/a	src/pages/auth/SignOut.tsx uses supabase.auth.signOut only
+/onboarding	public-pilot	src/App.tsx:183	anonymous	4-step lead capture — writes public.profiles	yes (unauth branch; authed users are Navigated to / when they hit /onboarding via other paths)	none	relies on public.profiles insert grants	src/pages/Onboarding.tsx uses supabase client insert; no edge functions
+/dashboard	production-blocked	src/App.tsx:206	approved user	Primary AURA overview (DEFERRED — needs Layout de-coupling)	yes	ai-systems-unified, systems-delete (via SystemDeleteDialog)	non-2xx returned by default-deny; ai-systems-unified query throws; Dashboard falls back to empty state	src/pages/Dashboard.tsx:172,236; Layout also transitively mounts health/copilot-*/search-suggestions/zapier-*
+/builder	production-blocked	src/App.tsx:207	approved user	excluded (mutation surface)	yes	builders-create/get/update/deploy, builder-test, builder-generate-summary, agent-execute, agent-export, agent-suggestions, mcp-*, models-test, systems-create/update, workflow-run, recommendations-generate, templates-list	non-2xx; page renders empty state	scoped to non-pilot per exclusion list
+/deploy	production-blocked	src/App.tsx:208	approved user	excluded (deployment)	yes	builders-deploy	non-2xx	excluded
+/deployments	production-blocked	src/App.tsx:209	approved user	excluded	yes	unknown (page-local reads)	non-2xx	excluded
+/agent/:id	production-blocked	src/App.tsx:210	approved user	excluded (agent workspace)	yes	agent-run, agent-suggestions, templates-list	non-2xx	excluded
+/agents/:id/chat	production-blocked	src/App.tsx:211	approved user	excluded (chat)	yes	agent-plan-chat, agent-run, mcp-test-tool	non-2xx	excluded
+/agent-chat	production-blocked	src/App.tsx:212	approved user	excluded	yes	same as /agents/:id/chat	non-2xx	excluded
+/analytics	production-blocked	src/App.tsx:213	approved user	excluded	yes	ops-overview	silent fallback (logErrors:false); typed-unavailable retrofit required before pilot	src/pages/IntelligenceDashboard.tsx:192
+/operations	production-blocked	src/App.tsx:214	approved user	excluded	yes	ops-overview	same	shares IntelligenceDashboard
+/intelligence	production-blocked	src/App.tsx:215	approved user	excluded	yes	ops-overview	same	shares IntelligenceDashboard
+/account/profile	production-blocked	src/App.tsx:216	approved user	excluded (account admin)	yes	none direct; hooks may	non-2xx	excluded
+/account/settings	production-blocked	src/App.tsx:217	approved user	excluded	yes	unknown	non-2xx	excluded
+/account/access-control	production-blocked	src/App.tsx:218	approved user	excluded (role admin)	yes	unknown	non-2xx	excluded
+/admin/onboarding-submissions	production-blocked	src/App.tsx:219	admin	excluded (user admin)	yes	direct DB	n/a	excluded
+/admin/user-approvals	production-blocked	src/App.tsx:220	admin	excluded (user admin)	yes	direct DB	n/a	excluded
+/admin/signups-dashboard	production-blocked	src/App.tsx:221	admin	excluded	yes	direct DB	n/a	excluded
+/integrations	redirect-only	src/App.tsx:222	approved user	Navigate to /marketplace?tab=integrations	yes	none (redirect only)	Navigate	pure <Navigate>
+/marketplace/integrations	production-blocked	src/App.tsx:223	approved user	excluded (integrations mgmt)	yes	integrations-*, zapier-*, mcp-*	non-2xx	excluded
+/compliance	production-blocked	src/App.tsx:224	approved user	excluded	yes	unknown	non-2xx	excluded
+/teams	production-blocked	src/App.tsx:225	approved user	excluded	yes	teams-invite	non-2xx	excluded
+/marketplace	production-blocked	src/App.tsx:226	approved user	excluded	yes	arcade-servers	non-2xx	excluded
+/app/agents	production-blocked	src/App.tsx:228	approved user	excluded (agents list)	yes	agents-list, systems-delete	non-2xx	excluded
+/agents	redirect-only	src/App.tsx:229	approved user	Navigate to /app/agents	yes	none	Navigate	pure <Navigate>
+/subsystem-agents	redirect-only	src/App.tsx:230	approved user	Navigate to /app/agents	yes	none	Navigate	pure <Navigate>
+/app/agents/:slug/detail	production-blocked	src/App.tsx:231	approved user	excluded (agent detail)	yes	unknown	non-2xx	excluded
+/app/agents/:agentId/manage	production-blocked	src/App.tsx:232	approved user	excluded (agent management)	yes	agents-rollback via drawer	non-2xx	excluded
+/app/agents/:agentId/operations	redirect-only	src/App.tsx:234	approved user	Navigate to /app/agents/:agentId/manage	yes	none	Navigate	AgentOperationsRedirect helper
+/twins/:instanceId/manage	redirect-only	src/App.tsx:235	approved user	Navigate to /app/agents/:instanceId/manage	yes	none	Navigate	TwinManageRedirect helper
+/studio/systems/:systemId/manage	production-blocked	src/App.tsx:236	approved user	excluded	yes	agents-rollback	non-2xx	excluded
+/data-centre-twin/:id/blueprint	production-blocked	src/App.tsx:239	approved user	excluded (blueprint editor)	yes	unknown	non-2xx	excluded
+/blueprint/:id	production-blocked	src/App.tsx:240	approved user	excluded	yes	unknown	non-2xx	excluded
+/blueprint/preview	production-blocked	src/App.tsx:241	approved user	excluded	yes	unknown	non-2xx	excluded
+/simulation/preview	production-blocked	src/App.tsx:242	approved user	excluded (simulation)	yes	unknown	non-2xx	excluded per simulation-migration exclusion
+/help	production-blocked	src/App.tsx:243	approved user	excluded (static help page)	yes	none direct	n/a	page reachable only via Layout — Layout is excluded, so route is production-blocked pending Layout de-coupling
+/connect/monitor	production-blocked	src/App.tsx:244	approved user	excluded (live integrations)	yes	unknown	non-2xx	excluded (BMS/DCIM live integrations)
+/connect/health	production-blocked	src/App.tsx:245	approved user	excluded	yes	unknown	non-2xx	excluded
+/search	production-blocked	src/App.tsx:246	approved user	excluded (search)	yes	manual-recommendations, reco-selftest, knowledge-index, url-*, website-*	non-2xx	excluded
+/universal-search	production-blocked	src/App.tsx:247	approved user	excluded	yes	same	non-2xx	excluded
+/settings/ai	production-blocked	src/App.tsx:248	approved user	excluded (Copilot config)	yes	copilot-health, models-test	non-2xx	excluded (browser-side AI)
+/auth	redirect-only	src/App.tsx:173,249	both	unauth: Navigate to /onboarding OR SignIn; authed: Navigate to /	yes	none	Navigate	dual mount; both paths are Navigate under B7.4B classification
+/sign-in	redirect-only	src/App.tsx:175,250	both	same pattern as /auth	yes	none	Navigate	dual mount
+/sign-up	production-blocked	src/App.tsx:176,251	anonymous	SignUp (unauth branch); Navigate (authed)	yes	unknown	non-2xx	classified as production-blocked because unauth branch renders SignUp page which is excluded from pilot (registration workflow not in scope)
+/mfa	production-blocked	src/App.tsx:179,254	anonymous	MFA challenge (unauth); Navigate (authed)	yes	unknown	non-2xx	classified as production-blocked; not in pilot workflow list
+/playbook	production-blocked	src/App.tsx:255	approved user	excluded	yes	unknown	non-2xx	excluded
+/pilot	production-blocked	src/App.tsx:256	approved user	excluded (pilot-request form, unrelated to "controlled pilot")	yes	none direct	non-2xx	src/pages/Pilot.tsx is a lead form, distinct from B7.4B controlled-pilot scope
+/data-centre-twin	production-blocked	src/App.tsx:181,258	both	Unauth-branch exposes the Data Centre Twin surface; excluded from pilot	yes	none direct; hooks may transitively pull from providers	non-2xx	excluded
+/data-centre-twin/:id	production-blocked	src/App.tsx:259	approved user	excluded	yes	unknown	non-2xx	excluded
+/omniverse-scene	production-blocked	src/App.tsx:182,261	both	Excluded (Omniverse)	yes	unknown	non-2xx	explicit Omniverse exclusion
+/twin-datacentre	production-blocked	src/App.tsx:180,263	both	DataCentreTwinLanding alias — not required for pilot when / is the canonical landing	yes	none	n/a	dedupe: keep / as the pilot landing, block the alias to reduce surface
+/twin-debug	production-blocked	src/App.tsx:265	approved user	excluded (debug)	yes	unknown	non-2xx	excluded
+/digital-twins	redirect-only	src/App.tsx:267	approved user	Navigate to /	yes	none	Navigate	pure <Navigate>
+/digital-twins/:slug	redirect-only	src/App.tsx:268	approved user	Navigate to /	yes	none	Navigate	pure <Navigate>
+/digital-twins-demo/funding-intake	production-blocked	src/App.tsx:269	approved user	excluded	yes	funding-scraper	non-2xx	excluded
+/infrastructure	production-blocked	src/App.tsx:270	approved user	excluded	yes	unknown	non-2xx	excluded
+/dev-overlays	development-only	src/App.tsx:184,271	n/a	DEV-only; excluded from production bundle	no	n/a	unreachable in prod	Gated by `import.meta.env.DEV && OverlayFixtures`; OverlayFixtures import is behind the same DEV guard so it tree-shakes out of production. Confirmed by real-repo enforcer PASS (which rejects any non-DEV-gated forbidden route).
+*	production-blocked	src/App.tsx:185,195,273	n/a	Catch-all: unauth → Navigate to /; not-approved → PendingApproval; authed → NotFound	yes	none	n/a	default catch-all, no functions

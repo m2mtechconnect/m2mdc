@@ -156,35 +156,56 @@ export function ActiveTwinProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
-  // Fetch specific location
+  // Fetch specific location.
+  //
+  // Uses `.maybeSingle()` so a legitimately missing row (e.g. a stored
+  // `location_id` whose row was deleted, or a value the current user
+  // cannot see under RLS) resolves to `null` — a truthful "unavailable"
+  // state — rather than surfacing PGRST116 as a console error. Aborts
+  // triggered by React unmount / history navigation are handled the same
+  // way. Genuine transport or authorization errors are still logged.
   const fetchLocation = useCallback(async (locationId: string) => {
     try {
       const { data, error } = await supabase
         .from('data_centre_locations')
         .select('*')
         .eq('id', locationId)
-        .single();
-      
-      if (error) throw error;
-      return data as DataCentreLocation;
+        .maybeSingle();
+
+      if (error) {
+        // PGRST116 = "no rows"; already handled by maybeSingle returning
+        // null, but defensively skip logging if it slips through.
+        if ((error as { code?: string }).code === 'PGRST116') return null;
+        console.error('Failed to fetch location:', error);
+        return null;
+      }
+      return (data as DataCentreLocation | null) ?? null;
     } catch (err) {
+      const name = (err as { name?: string })?.name;
+      if (name === 'AbortError') return null;
       console.error('Failed to fetch location:', err);
       return null;
     }
   }, []);
 
-  // Fetch specific twin
+  // Fetch specific twin. Same semantics as `fetchLocation`.
   const fetchTwin = useCallback(async (twinId: string) => {
     try {
       const { data, error } = await supabase
         .from('data_centre_twins')
         .select('*')
         .eq('id', twinId)
-        .single();
-      
-      if (error) throw error;
-      return data as DataCentreTwin;
+        .maybeSingle();
+
+      if (error) {
+        if ((error as { code?: string }).code === 'PGRST116') return null;
+        console.error('Failed to fetch twin:', error);
+        return null;
+      }
+      return (data as DataCentreTwin | null) ?? null;
     } catch (err) {
+      const name = (err as { name?: string })?.name;
+      if (name === 'AbortError') return null;
       console.error('Failed to fetch twin:', err);
       return null;
     }

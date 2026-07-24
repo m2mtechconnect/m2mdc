@@ -24,7 +24,7 @@ import { Link } from 'react-router-dom';
 
 export default function Builder() {
   const { t } = useTranslation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -368,6 +368,7 @@ export default function Builder() {
   // builderId/isLoading from the reactive hook so the wizard re-renders when
   // initializeBuilder finishes (getState() alone did not trigger a re-render).
   if (!hasIntent || initError || (!isLoading && !builderId)) {
+    console.log('[BUILDER:starter-branch]', { hasIntent, initError, isLoading, builderId, routerSearch: location.search, spDraft: searchParams.get('draft'), winUrl: typeof window !== 'undefined' ? window.location.href : '' });
     // Deterministic user-initiated creation: bypass the effect entirely so
     // there is no race between `setIsInitialized(false)` and the effect deps.
     // Guaranteed to issue exactly one create request; duplicate clicks are
@@ -387,7 +388,11 @@ export default function Builder() {
         // Consume `?new=true` exactly once: replace with `?draft=<id>` so
         // refresh/back reloads the same draft rather than creating another.
         setIsInitialized(true);
-        navigate(`/builder?draft=${encodeURIComponent(newId)}`, { replace: true });
+        // Use setSearchParams instead of navigate() — under `v7_startTransition`,
+        // navigate() to the same pathname with a new query can fail to update
+        // the router's location snapshot on the next render, leaving
+        // `useSearchParams()` stuck on the previous (empty) value.
+        setSearchParams({ draft: newId }, { replace: true });
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'Failed to create draft';
         setInitError(msg);

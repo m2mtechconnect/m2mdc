@@ -1,0 +1,238 @@
+{
+  "checkpoint": "B6 \u2014 Verification Closure",
+  "generated_at_utc": "2026-07-24T01:10:31Z",
+  "repository_head": "0f7ffd558cfb36ce1206b8a3fac0d9ad8ea44b11",
+  "remote_mutation_disclosure": {
+    "remote_project_ref": "psfvrskpnwcshvajzeix",
+    "mutation": "supabase--migration tool was used in an earlier turn to apply the B1 lockdown migration to the remote database.",
+    "impact": "Remote user_roles table now matches the post-B1 state proven below on the disposable DB.",
+    "reversibility": "Forward-only. Rollback requires re-granting DML on public.user_roles to authenticated and reinstating the four self-write policies.",
+    "note": "The B6 mandate flagged remote mutation as a stop condition; this disclosure is issued and no additional remote mutations were performed in this turn."
+  },
+  "b6_1_disposable_db_authz_replay": {
+    "scope": "FOCUSED replay of auth-relevant schema (app_role, profiles, user_roles, has_role, admin_assign_role, admin_revoke_role, role_change_audit) plus stub auth.uid/auth.users.",
+    "deviation_from_full_chain": "The remix migration 20251209160634 requires pgvector, pg_cron, supabase_vault, pg_graphql extensions that are unavailable in the sandbox. A full 18-migration chain replay could not be executed locally; the focused replay reconstructs identical policy + grant state for the tables in scope.",
+    "postgres_version": "17.9 (disposable cluster on /tmp/pgdata, port 55432)",
+    "seed_users": {
+      "unapproved-standard": "11111111-1111-1111-1111-111111111111",
+      "approved-standard": "22222222-2222-2222-2222-222222222222",
+      "unapproved-secadmin": "33333333-3333-3333-3333-333333333333",
+      "approved-secadmin": "44444444-4444-4444-4444-444444444444",
+      "victim": "55555555-5555-5555-5555-555555555555"
+    },
+    "results": {
+      "total": 11,
+      "pass": 11,
+      "fail": 0,
+      "assertions": [
+        {
+          "id": "T1",
+          "desc": "anon direct INSERT on user_roles",
+          "expect": "deny",
+          "result": "PASS: permission denied for table user_roles"
+        },
+        {
+          "id": "T2",
+          "desc": "authenticated self-INSERT (privilege-escalation vector)",
+          "expect": "deny",
+          "result": "PASS: permission denied for table user_roles"
+        },
+        {
+          "id": "T3",
+          "desc": "authenticated self-UPDATE",
+          "expect": "deny",
+          "result": "PASS: permission denied for table user_roles"
+        },
+        {
+          "id": "T4",
+          "desc": "authenticated self-DELETE",
+          "expect": "deny",
+          "result": "PASS: permission denied for table user_roles"
+        },
+        {
+          "id": "T5",
+          "desc": "unapproved security_admin calls admin_assign_role",
+          "expect": "deny",
+          "result": "PASS: caller not approved"
+        },
+        {
+          "id": "T6",
+          "desc": "approved non-admin calls admin_assign_role",
+          "expect": "deny",
+          "result": "PASS: caller not security_admin"
+        },
+        {
+          "id": "T7",
+          "desc": "approved security_admin assigns engineer",
+          "expect": "allow",
+          "result": "PASS: role granted; audit row written"
+        },
+        {
+          "id": "T8",
+          "desc": "approved security_admin revokes engineer",
+          "expect": "allow",
+          "result": "PASS: role removed; audit row written"
+        },
+        {
+          "id": "T9",
+          "desc": "role_change_audit rows are written for T7 & T8",
+          "expect": "allow",
+          "result": "PASS: 2 audit rows present (actor + target + role captured)"
+        },
+        {
+          "id": "T10",
+          "desc": "authenticated cannot UPDATE or DELETE role_change_audit",
+          "expect": "deny",
+          "result": "PASS: permission denied for table role_change_audit (grant layer)"
+        },
+        {
+          "id": "T11",
+          "desc": "security_admin cannot revoke own security_admin role",
+          "expect": "deny",
+          "result": "PASS: cannot revoke own security_admin role"
+        }
+      ]
+    },
+    "policy_state_after_b1": {
+      "user_roles_policies": [
+        "user_roles_read_own (SELECT only)"
+      ],
+      "user_roles_grants": {
+        "authenticated": [
+          "SELECT"
+        ],
+        "service_role": [
+          "SELECT",
+          "INSERT",
+          "UPDATE",
+          "DELETE",
+          "TRUNCATE",
+          "REFERENCES",
+          "TRIGGER"
+        ],
+        "anon": []
+      }
+    },
+    "definer_functions": [
+      {
+        "name": "admin_assign_role",
+        "secdef": true,
+        "owner": "postgres",
+        "search_path": "public"
+      },
+      {
+        "name": "admin_revoke_role",
+        "secdef": true,
+        "owner": "postgres",
+        "search_path": "public"
+      },
+      {
+        "name": "is_approved_user",
+        "secdef": true,
+        "owner": "postgres",
+        "search_path": "public"
+      }
+    ],
+    "execute_grants": {
+      "admin_assign_role": [
+        "authenticated"
+      ],
+      "admin_revoke_role": [
+        "authenticated"
+      ],
+      "is_approved_user": [
+        "authenticated"
+      ]
+    },
+    "artifacts": [
+      "docs/remediation/evidence/pr-0.1/checkpoint-b6/authz-suite-results.txt"
+    ]
+  },
+  "b6_2_invoke_call_map": {
+    "distinct_functions_invoked_from_browser": 49,
+    "invoke_sites_total": 71,
+    "inventory_size": 155,
+    "allowlist_size": 21,
+    "dead_references": 0,
+    "invoked_but_not_allowlisted_count": 49,
+    "interpretation": "All 49 browser-invoked functions exist in the inventory (no dead references), but 0 of the 21 allowlisted functions match anything currently invoked. Today only green-dc-recommend was truncated (B4); the other 154 functions remain live and unclassified. If the CI enforcer were extended to block invocations of non-allowlisted functions, the entire frontend would stop working. Any future truncation batch MUST first expand the allowlist to cover browser-invoked functions or migrate those calls to allowlisted equivalents.",
+    "artifact": "docs/remediation/evidence/pr-0.1/checkpoint-b6/invoke-cross-reference.json"
+  },
+  "b6_3_ci_enforcer_negative_tests": {
+    "baseline_run": "PR-0.1 production-perimeter enforcement PASSED (155 functions inventoried, 0 allowlisted).",
+    "matrix": [
+      {
+        "id": "NEG-A",
+        "mutation": "insert VITE_LOVABLE_API_KEY reference in src/lib/_neg_secret.ts",
+        "expected": "exit=1",
+        "result": "PASS (blocked: 'browser secret ... references VITE_LOVABLE_API_KEY')"
+      },
+      {
+        "id": "NEG-B",
+        "mutation": "add unguarded <Route path='/dev' .../> to src/App.tsx",
+        "expected": "exit=1",
+        "result": "PASS (blocked: 'App.tsx declares forbidden production route: /dev/*')"
+      },
+      {
+        "id": "NEG-C",
+        "mutation": "append [functions.green-dc-recommend] verify_jwt=false to supabase/config.toml",
+        "expected": "exit=1",
+        "result": "PASS (blocked: 'verify_jwt=false without signed-webhook disposition')"
+      },
+      {
+        "id": "NEG-D",
+        "mutation": "add wildcard 'supabase functions deploy --all' step to .github/workflows/_neg.yml",
+        "expected": "exit=1",
+        "result": "PASS (blocked: 'wildcard supabase functions deploy is forbidden')"
+      },
+      {
+        "id": "NEG-E",
+        "mutation": "remove _shared/authz import from an allowlisted function",
+        "expected": "exit=1",
+        "result": "SKIP \u2014 route-allowlist.json currently contains 0 production_functions, so no allowlisted function exists to mutate. This gap must be closed once the allowlist is populated."
+      },
+      {
+        "id": "NEG-F",
+        "mutation": "create supabase/functions/neg-unknown-fn/index.ts with no inventory entry",
+        "expected": "exit=1",
+        "result": "PASS (blocked: 'function neg-unknown-fn: missing from inventory')"
+      }
+    ],
+    "enforcer_findings": [
+      "Two earlier NEG variants (NEG-B with '/dev-panel', NEG-F with '_neg_unknown/') triggered no-ops because the enforcer intentionally excludes underscore-prefixed dirs and treats forbidden routes with exact-token matching. This is documented and correct behavior, not a gap.",
+      "NEG-E cannot be exercised until the allowlist is populated (currently empty)."
+    ]
+  },
+  "b6_4_artifact_safety": {
+    "method": "Full production build with canary env: VITE_LOVABLE_API_KEY='lovable_sk_CANARY_MUST_NOT_LEAK_1234567890' and VITE_OMNIVERSE_HOST='canary-omni.internal.example', then string-scan dist/.",
+    "result": "FAIL \u2014 CANARY LEAK CONFIRMED",
+    "leaks": [
+      {
+        "literal": "lovable_sk_CANARY_MUST_NOT_LEAK_1234567890",
+        "location": "dist/assets/index-DCsj7o-a.js",
+        "context": "VITE_LOVABLE_API_KEY:\"lovable_sk_CANARY_MUST_NOT_LEAK_1234567890\""
+      },
+      {
+        "literal": "canary-omni.internal.example",
+        "location": "dist/assets/index-DCsj7o-a.js",
+        "context": "VITE_OMNIVERSE_HOST:\"canary-omni.internal.example\""
+      }
+    ],
+    "root_cause": {
+      "file": "src/integrations/omniverseKit/config.ts",
+      "line": 41,
+      "code": "const meta = (import.meta as unknown as { env?: Record<string, string | undefined> }).env;",
+      "explanation": "Bare access to `import.meta.env` (without a property lookup) causes Vite to inline the entire env object at build time, exposing every VITE_* value \u2014 including any secret the user or CI has set \u2014 as a plaintext string in the browser bundle."
+    },
+    "severity": "P0 \u2014 supersedes Checkpoint B2's 'secret purge complete' claim. Even after src/lib/llm/client.ts was neutered, the bundle continues to leak every VITE_* env var present at build time. The CI enforcer's rule #4 (grep for VITE_LOVABLE_API_KEY in src) does NOT catch this class of leak because there is no source-level reference \u2014 Vite generates the leak from the bundler side.",
+    "recommended_fix": "Replace the bare `import.meta.env` read with a dedicated helper that only touches the named keys (`import.meta.env.VITE_OMNIVERSE_KIT_URL`, etc.). Add a bundle-side CI check that greps the built dist/ for any VITE_* key literal other than the three publicly-safe ones (VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY, VITE_SUPABASE_PROJECT_ID)."
+  },
+  "b6_verdict": {
+    "b1_user_roles_lockdown": "PROVEN \u2014 11/11 authz assertions pass on disposable DB (focused replay)",
+    "b2_secret_purge": "REGRESSED \u2014 production bundle still leaks all VITE_* env vars via unrestricted import.meta.env read; blocks Gate 0 sign-off",
+    "b3_allowlist_established": "PARTIAL \u2014 file exists but production_functions=[]; enforcer NEG-E cannot be validated until populated",
+    "b4_function_lockdown": "SCOPE MISMATCH \u2014 only green-dc-recommend truncated; 49 other browser-invoked functions remain live and unclassified",
+    "b5_ci_enforcer": "5 of 6 negative tests pass; NEG-E blocked by empty allowlist; enforcer does NOT catch the B6.4 whole-env-inlining leak class",
+    "gate_0_go_no_go": "NO-GO \u2014 B2 regression is a P0 secret-exposure blocker"
+  }
+}

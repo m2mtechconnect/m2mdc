@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "harness": "scripts/__tests__/perimeter-negative.mjs",
+  "invocation": "node scripts/__tests__/perimeter-negative.mjs",
+  "enforcer": "scripts/verify-production-perimeter.mjs",
+  "isolation": "each case builds a self-contained scratch dir under os.tmpdir() containing only the skeleton the enforcer reads; no repository files are mutated",
+  "run_result": "exit=0 — all 3 fixtures behaved as expected",
+  "cases": [
+    {
+      "id": "NEG-E",
+      "name": "allowlisted-authz-guard",
+      "mutation": "allowlist a function named 'pilot-fn' with disposition 'production-allowlisted', then write its index.ts without importing '_shared/authz'",
+      "expected_exit": 1,
+      "expected_stderr_substring": "allowlist/pilot-fn: missing \"_shared/authz\" import",
+      "observed_exit": 1,
+      "result": "PASS"
+    },
+    {
+      "id": "NEG-G",
+      "name": "dev-test-route-detector",
+      "mutation": "declare an unguarded <Route path=\"/test/overlay-fixtures\" .../> in src/App.tsx while '/test/*' is in forbidden_production_routes",
+      "expected_exit": 1,
+      "expected_stderr_substring": "App.tsx declares forbidden production route: /test/*",
+      "observed_exit": 1,
+      "result": "PASS"
+    },
+    {
+      "id": "NEG-H",
+      "name": "dev-test-route-detector-control",
+      "mutation": "same route as NEG-G but gated by 'import.meta.env.DEV ?' on the same JSX expression",
+      "expected_exit": 0,
+      "note": "control case — proves the DEV-gate exemption path in enforcer rule #6 works and does not over-block",
+      "observed_exit": 0,
+      "result": "PASS"
+    }
+  ],
+  "closes_b6_gaps": [
+    "NEG-E was previously SKIP because the real allowlist is empty; the isolated harness populates a scratch allowlist to exercise rule #3 without mutating the production allowlist.",
+    "NEG-G/H add explicit coverage for enforcer rule #6 (forbidden-route detector) beyond the existing NEG-B '/dev' case, extending coverage to '/test/*' and verifying the DEV-gate exemption path."
+  ]
+}

@@ -89,6 +89,8 @@ function baseSkeleton(root, { functions = [], allowlisted = [] } = {}) {
   for (const name of functions) {
     writeFile(root, `supabase/functions/${name}/index.ts`, '// stub\n');
   }
+  // Always ensure the functions directory exists (enforcer readdirs it).
+  mkdirSync(join(root, 'supabase/functions'), { recursive: true });
 }
 
 // ---- NEG-E: allowlisted function missing _shared/authz import ----

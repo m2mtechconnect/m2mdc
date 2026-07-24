@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { LucideIcon, ArrowUpRight, ArrowDownRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 /**
  * KPI metric-basis metadata.
@@ -36,6 +37,7 @@ interface KpiCardProps {
   subtext?: string;
   tooltip?: string;
   onClick?: () => void;
+  to?: string;
   /** Metric-basis metadata (Lucas feedback) */
   unit?: string;
   grain?: KpiGrain;
@@ -61,6 +63,7 @@ export default function KpiCard({
   subtext,
   tooltip,
   onClick,
+  to,
   unit,
   grain,
   window,
@@ -74,6 +77,7 @@ export default function KpiCard({
 }: KpiCardProps) {
   const trendColor = trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-studio-muted';
   const TrendIcon = trend === 'up' ? ArrowUpRight : trend === 'down' ? ArrowDownRight : null;
+  const isInteractive = Boolean(to || onClick);
 
   const statusColor: Record<KpiStatus, string> = {
     good: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30',
@@ -95,13 +99,13 @@ export default function KpiCard({
     <Card 
       className={cn(
         "p-6 bg-secondary/5 border-secondary/10 transition-all group relative",
-        onClick && "cursor-pointer hover:shadow-lg hover:border-secondary/30 hover:-translate-y-0.5 hover:bg-secondary/10",
+        isInteractive && "cursor-pointer hover:shadow-lg hover:border-secondary/30 hover:-translate-y-0.5 hover:bg-secondary/10",
         className
       )}
-      onClick={onClick}
-      role={onClick ? "button" : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      onKeyDown={onClick ? (e) => {
+      onClick={to ? undefined : onClick}
+      role={!to && onClick ? "button" : undefined}
+      tabIndex={!to && onClick ? 0 : undefined}
+      onKeyDown={!to && onClick ? (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           onClick();
@@ -111,11 +115,11 @@ export default function KpiCard({
       <div className="flex items-start justify-between mb-4">
         <div className={cn(
           "p-2.5 rounded-lg bg-secondary/10 transition-colors",
-          onClick && "group-hover:bg-secondary/20"
+          isInteractive && "group-hover:bg-secondary/20"
         )}>
           <Icon className={cn(
             "h-5 w-5 text-primary transition-transform",
-            onClick && "group-hover:scale-110"
+            isInteractive && "group-hover:scale-110"
           )} />
         </div>
         {loading ? (
@@ -137,7 +141,7 @@ export default function KpiCard({
               title={`Data quality: ${quality}`}
             />
           )}
-          {onClick && (
+          {isInteractive && (
             <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-studio-muted" />
           )}
         </p>
@@ -175,7 +179,7 @@ export default function KpiCard({
           <p className="text-xs text-studio-subtle mt-1">{subtext}</p>
         )}
       </div>
-      {onClick && !tooltip && (
+      {isInteractive && !tooltip && (
         <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <ArrowUpRight className="h-4 w-4 text-studio-muted" />
         </div>
@@ -200,12 +204,21 @@ export default function KpiCard({
     </div>
   ) : null;
 
+  const interactiveContent = to ? (
+    <Link
+      to={to}
+      className="block rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    >
+      {cardContent}
+    </Link>
+  ) : cardContent;
+
   if (tooltipBody) {
     return (
       <TooltipProvider delayDuration={200}>
         <Tooltip>
           <TooltipTrigger asChild>
-            {cardContent}
+            {interactiveContent}
           </TooltipTrigger>
           <TooltipContent side="top" className="max-w-xs">
             {tooltipBody}
@@ -215,5 +228,5 @@ export default function KpiCard({
     );
   }
 
-  return cardContent;
+  return interactiveContent;
 }

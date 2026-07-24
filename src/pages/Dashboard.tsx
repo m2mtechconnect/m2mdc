@@ -317,6 +317,12 @@ export default function Dashboard() {
   const avgPue = twins.length > 0 
     ? (twins.reduce((sum, t) => sum + (t.pue_target || 1.4), 0) / twins.length).toFixed(2)
     : '1.38';
+
+  const twinOverviewPath = activeTwinId ? `/data-centre-twin/${activeTwinId}` : '/data-centre-twin';
+  const twinBlueprintPath = activeTwinId ? `/data-centre-twin/${activeTwinId}/blueprint` : '/blueprint/default';
+  const twinSimulationPath = activeTwinId
+    ? `/data-centre-twin/${activeTwinId}?view=simulation`
+    : '/data-centre-twin/default?view=simulation&demo=true';
   
   const kpis = [
     {
@@ -402,12 +408,12 @@ export default function Dashboard() {
               {twin.industry && (
                 <IndustryComplianceBadges industry={twin.industry} />
               )}
-              <Link to="/twin-debug">
-                <Button variant="ghost" size="sm" className="text-xs gap-1 text-muted-foreground hover:text-foreground">
+              <Button asChild variant="ghost" size="sm" className="text-xs gap-1 text-muted-foreground hover:text-foreground">
+                <Link to="/twin-debug">
                   <Bug className="h-3 w-3" />
                   Debug
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           )}
         </section>
@@ -432,10 +438,13 @@ export default function Dashboard() {
             { label: t('dashboard.carbonCostForecast'), query: 'Forecast carbon costs for the next 7 days.' },
             { label: t('dashboard.runScenario'), isSimulation: true },
           ].map((chip: { label: string; query?: string; isSimulation?: boolean }) => (
-            <button
+            <Button
               key={chip.label}
+              type="button"
+              variant={chip.isSimulation ? "secondary" : "outline"}
+              size="sm"
               onClick={() => chip.isSimulation ? navigate('/data-centre-twin/default?view=simulation&demo=true') : askCoPilot(chip.query || '')}
-              className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
+              className={`h-auto rounded-full px-3 py-1.5 text-xs transition-all ${
                 chip.isSimulation 
                   ? 'border-primary/50 bg-primary/10 text-primary hover:bg-primary/20' 
                   : 'border-border bg-muted/50 hover:bg-primary/10 hover:border-primary/50 text-muted-foreground hover:text-foreground'
@@ -443,7 +452,7 @@ export default function Dashboard() {
             >
               {chip.isSimulation && <Activity className="h-3 w-3 inline mr-1" />}
               {chip.label}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -458,7 +467,8 @@ export default function Dashboard() {
             the source-appropriate factory.
           */}
           <KpiTooltip title={t('dashboard.pueTooltip')} description="">
-            <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
+            <Link to={twinOverviewPath} aria-label={`${t('dashboard.globalPue')} - open data centre twin`}>
+            <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50">
               <MetricValue
                 id="dashboard-pue"
                 label={t('dashboard.globalPue')}
@@ -467,10 +477,12 @@ export default function Dashboard() {
                 icon={<ZapIcon className="h-4 w-4 text-success" />}
               />
             </Card>
+            </Link>
           </KpiTooltip>
 
           <KpiTooltip title={t('dashboard.gpuTooltip')} description="">
-            <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
+            <Link to={twinOverviewPath} aria-label={`${t('dashboard.gpuSaturation')} - open data centre twin`}>
+            <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50">
               <MetricValue
                 id="dashboard-gpu"
                 label={t('dashboard.gpuSaturation')}
@@ -479,10 +491,12 @@ export default function Dashboard() {
                 icon={<Cpu className="h-4 w-4 text-primary" />}
               />
             </Card>
+            </Link>
           </KpiTooltip>
 
           <KpiTooltip title={t('dashboard.thermalTooltip')} description="">
-            <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
+            <Link to={twinOverviewPath} aria-label={`${t('dashboard.thermalStability')} - open data centre twin`}>
+            <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50">
               <MetricValue
                 id="dashboard-thermal"
                 label={t('dashboard.thermalStability')}
@@ -492,10 +506,12 @@ export default function Dashboard() {
                 footer={<StatusBadge status="active" customLabel={t('global.stable')} showIcon={false} />}
               />
             </Card>
+            </Link>
           </KpiTooltip>
 
           <KpiTooltip title={t('dashboard.sovereignTooltip')} description="">
-            <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50" onClick={() => navigate('/data-centre-twin')}>
+            <Link to={twinOverviewPath} aria-label={`${t('dashboard.sovereignCompute')} - open data centre twin`}>
+            <Card className="p-5 border hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50">
               <MetricValue
                 id="dashboard-sovereign"
                 label={t('dashboard.sovereignCompute')}
@@ -507,6 +523,7 @@ export default function Dashboard() {
                 }
               />
             </Card>
+            </Link>
           </KpiTooltip>
         </section>
 
@@ -527,10 +544,12 @@ export default function Dashboard() {
 
         {/* Quick Link to DC Twin */}
         <div className="mb-8">
-          <Link to="/data-centre-twin">
-            <Card className="p-4 cursor-pointer group border hover:border-primary/50 hover:shadow-md transition-all">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
+          <Card className="p-4 border hover:border-primary/50 hover:shadow-md transition-all">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <Link
+                  to={twinOverviewPath}
+                  className="group flex min-w-0 flex-1 items-center gap-4 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
                   <div className="p-3 rounded-lg bg-primary/10">
                     <Activity className="h-6 w-6 text-primary" />
                   </div>
@@ -542,37 +561,34 @@ export default function Dashboard() {
                       {t('dashboard.nocViewDescription')}
                     </p>
                   </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Button 
+                  <ArrowUpRight className="ml-auto h-5 w-5 flex-shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
+                </Link>
+                <div className="flex flex-wrap items-center gap-3 lg:flex-shrink-0">
+                  <Button
+                    asChild
                     variant="outline" 
                     size="sm"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigate('/blueprint/default');
-                    }}
                     className="gap-2"
                   >
-                    <Server className="h-4 w-4" />
-                    {t('dashboard.viewBlueprint')}
+                    <Link to={twinBlueprintPath}>
+                      <Server className="h-4 w-4" />
+                      {t('dashboard.viewBlueprint')}
+                    </Link>
                   </Button>
-                  <Button 
+                  <Button
+                    asChild
                     variant="secondary" 
                     size="sm"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigate('/data-centre-twin/default?view=simulation&demo=true');
-                    }}
                     className="gap-2"
                   >
-                    <Activity className="h-4 w-4" />
-                    {t('dashboard.runSimulation')}
+                    <Link to={twinSimulationPath}>
+                      <Activity className="h-4 w-4" />
+                      {t('dashboard.runSimulation')}
+                    </Link>
                   </Button>
-                  <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
               </div>
             </Card>
-          </Link>
         </div>
 
         {/* Green DC Twin Scanner - Now unified in HeroSearchBar above */}
@@ -598,7 +614,7 @@ export default function Dashboard() {
               icon={kpi.icon}
               loading={false}
               tooltip={kpi.tooltip}
-              onClick={kpi.navigateTo ? () => navigate(kpi.navigateTo!) : undefined}
+              to={kpi.navigateTo}
             />
           ))}
         </div>

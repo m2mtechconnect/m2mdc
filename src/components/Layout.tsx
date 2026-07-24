@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -36,7 +36,6 @@ import { HealthBadges } from "@/components/HealthBadges";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { BuildVersion } from "@/components/BuildVersion";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AOCQuickAccessButton } from "@/components/aoc/AOCQuickAccessButton";
 import { DataCentreSelector } from "@/components/twin-selector";
@@ -205,20 +204,24 @@ export function Layout({ children }: LayoutProps) {
                 return (
                   <Tooltip key={item.name}>
                     <TooltipTrigger asChild>
-                      <Link to={item.href} data-tour={tourId} aria-label={item.fullName}>
-                        <Button
-                          variant={isActive ? "secondary" : "ghost"}
-                          size="sm"
-                          className={`gap-1.5 px-2 xl:px-2.5 text-xs font-medium transition-smooth min-h-[36px] ${
-                            isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
-                          }`}
-                          aria-current={isActive ? "page" : undefined}
+                      <Button
+                        asChild
+                        variant={isActive ? "secondary" : "ghost"}
+                        size="sm"
+                        className={`gap-1.5 px-2 xl:px-2.5 text-xs font-medium transition-smooth min-h-[36px] ${
+                          isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <Link
+                          to={item.href}
+                          data-tour={tourId}
                           aria-label={item.fullName}
+                          aria-current={isActive ? "page" : undefined}
                         >
                           <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
                           <span className="hidden xl:inline whitespace-nowrap">{item.name}</span>
-                        </Button>
-                      </Link>
+                        </Link>
+                      </Button>
                     </TooltipTrigger>
                     <TooltipContent side="bottom">
                       <p>{item.fullName}</p>
@@ -242,20 +245,24 @@ export function Layout({ children }: LayoutProps) {
                   return (
                     <Tooltip key={item.name}>
                       <TooltipTrigger asChild>
-                        <Link to={item.href} data-tour={tourId} aria-label={item.fullName}>
-                          <Button
-                            variant={isActive ? "secondary" : "ghost"}
-                            size="sm"
-                            className={`gap-1.5 px-2.5 text-xs font-medium transition-smooth min-h-[36px] ${
-                              isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
-                            }`}
-                            aria-current={isActive ? "page" : undefined}
+                        <Button
+                          asChild
+                          variant={isActive ? "secondary" : "ghost"}
+                          size="sm"
+                          className={`gap-1.5 px-2.5 text-xs font-medium transition-smooth min-h-[36px] ${
+                            isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          <Link
+                            to={item.href}
+                            data-tour={tourId}
                             aria-label={item.fullName}
+                            aria-current={isActive ? "page" : undefined}
                           >
                             <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
                             <span className="whitespace-nowrap">{item.name}</span>
-                          </Button>
-                        </Link>
+                          </Link>
+                        </Button>
                       </TooltipTrigger>
                       <TooltipContent side="bottom">
                         <p>{item.fullName}</p>
@@ -377,7 +384,7 @@ export function Layout({ children }: LayoutProps) {
             </SheetTitle>
           </SheetHeader>
 
-          <nav className="mt-6 space-y-1" role="menu">
+          <nav className="mt-6 space-y-1" aria-label="Mobile navigation">
             {/* Data Centre Selector - Mobile */}
             <div className="px-3 mb-4">
               <DataCentreSelector />
@@ -392,21 +399,21 @@ export function Layout({ children }: LayoutProps) {
                 const isActive = location.pathname === item.href || 
                   (item.href.includes('?') && location.pathname + location.search === item.href);
                 return (
-                  <Link
+                  <Button
                     key={item.name}
-                    to={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    role="menuitem"
+                    asChild
+                    variant={isActive ? "secondary" : "ghost"}
+                    className="w-full justify-start gap-3 min-h-[44px] text-base"
                   >
-                    <Button
-                      variant={isActive ? "secondary" : "ghost"}
-                      className="w-full justify-start gap-3 min-h-[44px] text-base"
+                    <Link
+                      to={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
                       aria-current={isActive ? "page" : undefined}
                     >
                       <item.icon className="h-5 w-5" aria-hidden="true" />
                       {item.fullName}
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 );
               })}
             </div>
@@ -420,21 +427,21 @@ export function Layout({ children }: LayoutProps) {
                 const isActive = location.pathname === item.href || 
                   (item.href.includes('?') && location.pathname + location.search === item.href);
                 return (
-                  <Link
+                  <Button
                     key={item.name}
-                    to={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    role="menuitem"
+                    asChild
+                    variant={isActive ? "secondary" : "ghost"}
+                    className="w-full justify-start gap-3 min-h-[44px] text-base"
                   >
-                    <Button
-                      variant={isActive ? "secondary" : "ghost"}
-                      className="w-full justify-start gap-3 min-h-[44px] text-base"
+                    <Link
+                      to={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
                       aria-current={isActive ? "page" : undefined}
                     >
                       <item.icon className="h-5 w-5" aria-hidden="true" />
                       {item.fullName}
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 );
               })}
             </div>
@@ -444,20 +451,20 @@ export function Layout({ children }: LayoutProps) {
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Support
               </h3>
-              <Link
-                to="/help"
-                onClick={() => setMobileMenuOpen(false)}
-                role="menuitem"
+              <Button
+                asChild
+                variant={location.pathname === '/help' ? "secondary" : "ghost"}
+                className="w-full justify-start gap-3 min-h-[44px] text-base"
               >
-                <Button
-                  variant={location.pathname === '/help' ? "secondary" : "ghost"}
-                  className="w-full justify-start gap-3 min-h-[44px] text-base"
+                <Link
+                  to="/help"
+                  onClick={() => setMobileMenuOpen(false)}
                   aria-current={location.pathname === '/help' ? "page" : undefined}
                 >
                   <HelpCircle className="h-5 w-5" aria-hidden="true" />
                   Help
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           </nav>
 

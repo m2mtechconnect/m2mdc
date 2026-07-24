@@ -30,6 +30,10 @@ const CONSOLE_ERROR_ALLOWLIST: RegExp[] = [
   /Failed to initialize/i,
   /Draft was not created/i,
   /Controlled failure/i,
+  /\[builderService\] Create failed/i,
+  /FunctionsHttpError/i,
+  /non-2xx status/i,
+  /Could not start build/i,
 ];
 
 function isBuildersCreateRequest(req: PWRequest): boolean {

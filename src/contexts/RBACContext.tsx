@@ -18,6 +18,7 @@ interface RBACContextType {
   loading: boolean;
   hasAccess: (requiredRoles: AppRole[]) => boolean;
   userId: string | null;
+  isInternal: boolean;
 }
 
 const RBACContext = createContext<RBACContextType>({
@@ -25,6 +26,7 @@ const RBACContext = createContext<RBACContextType>({
   loading: true,
   hasAccess: () => false,
   userId: null,
+  isInternal: false,
 });
 
 export const useRBAC = () => useContext(RBACContext);
@@ -33,6 +35,9 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
   const [role, setRole] = useState<AppRole | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  // Fail-closed: internal access requires an explicit row in the
+  // server-backed user_roles table. Absence of a row = pilot/customer.
+  const [isInternal, setIsInternal] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchUserRole = async () => {
@@ -66,12 +71,17 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
 
         if (userRoles) {
           setRole(userRoles.role as AppRole);
+          setIsInternal(true);
         } else {
-          // Default role if no role assigned
-          setRole('engineer');
+          // No server-backed role => treat as restricted pilot user.
+          setRole(null);
+          setIsInternal(false);
         }
       } catch (error) {
         console.error('Error fetching user role:', error);
+        // Fail-closed on lookup failure.
+        setRole(null);
+        setIsInternal(false);
       } finally {
         setLoading(false);
       }
@@ -86,6 +96,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setUserId(null);
         setRole(null);
+        setIsInternal(false);
       }
       
       // Defer async operations to avoid deadlock
@@ -103,7 +114,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <RBACContext.Provider value={{ role, loading, hasAccess, userId }}>
+    <RBACContext.Provider value={{ role, loading, hasAccess, userId, isInternal }}>
       {children}
     </RBACContext.Provider>
   );

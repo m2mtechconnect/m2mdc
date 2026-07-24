@@ -1,0 +1,65 @@
+function	source_file_and_line	owning_route_or_capability	production_reachable	pilot_required	triggering_user_action	current_blocked_behaviour	proposed_disposition	evidence
+agent-plan-chat	src/components/AgentChatModal.tsx:82	/agent-chat, /agents/:id/chat (MainAppLayout)	yes (non-pilot route)	no	open agent chat modal, send message	invoke() returns non-2xx; UI shows generic error toast (not typed unavailable)	production-unreachable	pilot pages do not import AgentChatModal; route requires auth+approved
+agent-run	src/components/AgentPlayground.tsx:53	/agent/:id	yes (non-pilot)	no	run agent from playground	non-2xx error; no typed-unavailable state	production-unreachable	route behind auth
+agent-execute	src/components/builder/AgentChat.tsx:61	/builder	yes (non-pilot)	no	execute agent step in builder	non-2xx error toast	production-unreachable	route behind auth
+agent-export	src/components/builder/AgentChat.tsx:108	/builder	yes (non-pilot)	no	export agent config	non-2xx error toast	production-unreachable	route behind auth
+agent-suggestions	src/components/SmartAgentInput.tsx:98	/builder, agent editors	yes (non-pilot)	no	type in smart agent input	silent fail (suggestions empty)	production-unreachable	route behind auth
+agents-list	src/components/AgentsList.tsx:52	/app/agents	yes (non-pilot)	no	load agents list	non-2xx; empty list	production-unreachable	route behind auth
+agents-rollback	src/components/SystemDetailsDrawer.tsx:163	system detail drawer under /studio, /app/agents	yes (non-pilot)	no	rollback agent version	non-2xx error toast	production-unreachable	route behind auth
+ai-systems-unified	src/pages/Dashboard.tsx:172	/dashboard	yes (non-pilot)	no	dashboard load	non-2xx; unified list empty; page still renders	production-unreachable	route behind auth
+aoc-runtime-action	src/components/aoc/AOCEnvironmentPipeline.tsx:71; src/hooks/useRuntimeControl.ts:43	AOC panels under /operations, /pilot	yes (non-pilot)	no	trigger runtime action	non-2xx error	production-unreachable	non-pilot
+aoc-simulate-test	src/components/aoc/AOCSimulationSandbox.tsx:39	AOC sandbox	yes (non-pilot)	no	run simulation test	non-2xx error	production-unreachable	non-pilot
+arcade-servers	src/stores/unifiedStore.ts:107; src/stores/mcpServersStore.ts:44; src/stores/marketplaceStore.ts:189	/marketplace, MCP stores	yes (non-pilot)	no	load marketplace / MCP list	non-2xx; empty list	production-unreachable	route behind auth
+builder-generate-summary	src/components/builder/SystemSummaryCard.tsx:72	/builder	yes (non-pilot)	no	generate system summary	non-2xx error	production-unreachable	non-pilot
+builder-test	src/components/builder/TestQueryPanel.tsx:78	/builder	yes (non-pilot)	no	run test query	non-2xx error	production-unreachable	non-pilot
+builders-create	src/services/builderService.ts:49	/builder	yes (non-pilot)	no	create builder	non-2xx error	production-unreachable	non-pilot
+builders-deploy	src/services/builderService.ts:129	/deploy	yes (non-pilot)	no	deploy builder	non-2xx error	production-unreachable	non-pilot
+builders-get	src/services/builderService.ts:74	/builder	yes (non-pilot)	no	load builder	non-2xx error	production-unreachable	non-pilot
+builders-update	src/services/builderService.ts:99	/builder	yes (non-pilot)	no	update builder	non-2xx error	production-unreachable	non-pilot
+copilot-chat-simple	src/components/CoPilotVoice.tsx:53	CoPilot dock across app	yes (non-pilot)	no	voice input	non-2xx; no typed-unavailable card	production-unreachable	non-pilot
+copilot-health	src/pages/AISettings.tsx:106	/settings/ai	yes (non-pilot)	no	health probe	non-2xx; badge shows error	typed-accessible-unavailable	badge already renders an error state
+copilot-router	src/components/copilot/README.md:128	DOCUMENTATION ONLY (README)	no (not a real call site)	no	n/a	n/a	production-unreachable	string appears only in README markdown, not a compiled invocation
+copilot-search	src/components/CoPilotDrawer.tsx:107, 388	CoPilot drawer	yes (non-pilot)	no	open CoPilot search	non-2xx; empty results	production-unreachable	non-pilot
+dc-scan-url	src/components/dc-scan/DCScannerPanel.tsx:82	scanner panel (non-pilot)	yes (non-pilot)	no	scan URL	non-2xx error	production-unreachable	non-pilot
+document-analysis-start	src/hooks/useDocumentAnalysis.ts:356	document workflows	yes (non-pilot)	no	start analysis	non-2xx error	production-unreachable	non-pilot
+document-analysis-status	src/hooks/useDocumentAnalysis.ts:139	document workflows	yes (non-pilot)	no	poll status	non-2xx error	production-unreachable	non-pilot
+funding-scraper	src/lib/funding/queryClient.ts:147	/digital-twins-demo/funding-intake	yes (non-pilot demo route)	no	load funding programs	non-2xx; empty list	production-unreachable	non-pilot
+health	src/components/HealthBadges.tsx:18; src/components/HealthCheck.tsx:18	health badges	yes (rendered by Layout)	no	page load	non-2xx; red badge	typed-accessible-unavailable	badges already render a fail state; safe under default-deny
+integrations-connect	src/pages/Integrations.tsx:591; src/components/builder/ModelMarketplace.tsx:432	/marketplace/integrations	yes (non-pilot)	no	connect integration	non-2xx error	production-unreachable	non-pilot
+integrations-disconnect	src/pages/Integrations.tsx:681	/marketplace/integrations	yes (non-pilot)	no	disconnect	non-2xx error	production-unreachable	non-pilot
+integrations-list	src/pages/Integrations.tsx:469	/marketplace/integrations	yes (non-pilot)	no	load list	non-2xx; empty	production-unreachable	non-pilot
+integrations-test	src/pages/Integrations.tsx:636	/marketplace/integrations	yes (non-pilot)	no	test integration	non-2xx error	production-unreachable	non-pilot
+knowledge-index	src/components/search/InsightActionPanel.tsx:94	search insight actions	yes (non-pilot)	no	insight action	non-2xx error	production-unreachable	non-pilot
+manual-recommendations	src/hooks/useRecommendations.ts:626	/search, recommendations	yes (non-pilot)	no	manual reco fetch	non-2xx error	production-unreachable	non-pilot
+mcp-register	src/components/builder/MCPMarketplace.tsx:165; src/components/builder/MCPServerManager.tsx:149; src/components/builder/UnifiedMarketplace.tsx:165	MCP registration UI	yes (non-pilot)	no	register MCP server	non-2xx error	production-unreachable	non-pilot
+mcp-test-tool	src/components/builder/MCPServerManager.tsx:281; src/components/builder/MCPToolsPlayground.tsx:55; src/components/agent-chat/AgentMCPServers.tsx:137	MCP tools	yes (non-pilot)	no	test tool	non-2xx error	production-unreachable	non-pilot
+mcp-validate	src/components/builder/MCPServerManager.tsx:198; src/components/builder/UnifiedMarketplace.tsx:180	MCP registration	yes (non-pilot)	no	validate MCP	non-2xx error	production-unreachable	non-pilot
+models-test	src/components/builder/ModelMarketplace.tsx:385	model marketplace	yes (non-pilot)	no	test model	non-2xx error	production-unreachable	non-pilot
+ops-overview	src/pages/IntelligenceDashboard.tsx:192	/analytics, /operations, /intelligence	yes (non-pilot)	no	load ops overview	silent fail; page renders with placeholders (see logErrors:false)	typed-accessible-unavailable	call site already uses logErrors:false + graceful fallback; retrofit to explicit unavailable badge before allowlisting
+rag-upload	src/components/rag/RAGUploadTabs.tsx:55	RAG uploads	yes (non-pilot)	no	upload doc	non-2xx error	production-unreachable	non-pilot
+rag-urls	src/components/rag/RAGUploadTabs.tsx:89	RAG uploads	yes (non-pilot)	no	add URL	non-2xx error	production-unreachable	non-pilot
+reco-selftest	src/components/search/DiagnosticsModal.tsx:71	/search diagnostics	yes (non-pilot)	no	selftest	non-2xx error	production-unreachable	non-pilot
+recommendations-generate	src/components/builder/GroundedRecommendationsCard.tsx:113	/builder	yes (non-pilot)	no	generate recos	non-2xx error	production-unreachable	non-pilot; also on allowlist.disabled_functions[]
+recommendations-generate-stream	src/components/shared/QuickRecommendations.tsx:43	quick recos card	yes (non-pilot; card mounted on non-pilot pages)	no	quick recos	non-2xx; empty card	production-unreachable	non-pilot
+search-suggestions	src/hooks/useSearchSuggestions.ts:36	global search bar	yes (present in Layout header for authed layout)	no	type in search	silent fail; suggestions empty	production-unreachable	Layout only mounts in MainAppLayout branch
+systems-create	src/stores/builderStore.ts:208, 300	/builder	yes (non-pilot)	no	save system	non-2xx error	production-unreachable	non-pilot
+systems-delete	src/lib/api/twins.ts:8; src/pages/Dashboard.tsx:236; src/pages/ManageAgents.tsx:71	/dashboard, /app/agents	yes (non-pilot)	no	delete system	non-2xx error	production-unreachable	non-pilot
+systems-update	src/stores/builderStore.ts:399	/builder	yes (non-pilot)	no	update system	non-2xx error	production-unreachable	non-pilot
+teams-invite	src/components/teams/InviteTeamMemberModal.tsx:68	/teams	yes (non-pilot)	no	invite member	non-2xx error	production-unreachable	non-pilot
+templates-list	src/components/builder/TemplateLibrary.tsx:42; src/pages/AgentWorkspace.tsx:70	/builder, /agent/:id	yes (non-pilot)	no	load templates	non-2xx; empty	production-unreachable	non-pilot
+url-capture	src/components/search/HealthCheckBadge.tsx:25	search health	yes (non-pilot)	no	badge probe	non-2xx; red badge	production-unreachable	non-pilot
+url-recommendations	src/components/search/RecommendationsPanel.tsx:227; src/hooks/useRecommendations.ts:485, 539	recommendations panel	yes (non-pilot)	no	fetch reco	non-2xx error	production-unreachable	non-pilot
+website-cache-clear	src/components/search/CacheStatusBanner.tsx:66	search cache	yes (non-pilot)	no	clear cache	non-2xx error	production-unreachable	non-pilot
+website-cache-status	src/components/search/CacheStatusBanner.tsx:42	search cache	yes (non-pilot)	no	poll cache	non-2xx; empty state	production-unreachable	non-pilot
+website-scan	src/components/scanner/WebsiteScanner.tsx:39	scanner	yes (non-pilot)	no	scan	non-2xx error	production-unreachable	non-pilot
+workflow-run	src/components/workflow/EnhancedWorkflowEditor.tsx:464	/builder workflow editor	yes (non-pilot)	no	run workflow	non-2xx error	production-unreachable	non-pilot
+zapier-app-connect	src/components/integrations/ZapierMarketplace.tsx:155	/marketplace/integrations	yes (non-pilot)	no	connect app	non-2xx error	production-unreachable	non-pilot
+zapier-app-disconnect	src/components/integrations/ZapierMarketplace.tsx:180	/marketplace/integrations	yes (non-pilot)	no	disconnect	non-2xx error	production-unreachable	non-pilot
+zapier-apps-list	src/components/integrations/ZapierMarketplace.tsx:135	/marketplace/integrations	yes (non-pilot)	no	list apps	non-2xx; empty	production-unreachable	non-pilot
+zapier-apps-sync	src/components/integrations/ZapierMarketplace.tsx:101	/marketplace/integrations	yes (non-pilot)	no	sync	non-2xx error	production-unreachable	non-pilot
+zapier-auto-refresh	src/hooks/useTokenRefresh.ts:21	background hook mounted in Layout	yes (Layout in MainAppLayout branch)	no	background refresh	silent fail	production-unreachable	non-pilot
+zapier-integration-status	src/components/builder/BuilderIntegrationsHub.tsx:41; src/components/integrations/IntegrationStatusBadge.tsx:16	integrations badges	yes (non-pilot)	no	badge poll	non-2xx; red badge	production-unreachable	non-pilot
+zapier-oauth-connect	src/components/integrations/ZapierIntegrationCard.tsx:67	integrations card	yes (non-pilot)	no	oauth connect	non-2xx error	production-unreachable	non-pilot
+zapier-refresh-token	src/hooks/useTokenRefresh.ts:78	token hook	yes (Layout)	no	background refresh	silent fail	production-unreachable	non-pilot
+zapier-test-connection	src/components/integrations/ZapierIntegrationCard.tsx:101	integrations card	yes (non-pilot)	no	test conn	non-2xx error	production-unreachable	non-pilot
+---SUMMARY---	distinct functions = 63 (was 49 in B6 invoke-cross-reference.json)	distinct call sites = 92 (was 71 in B6)	drift_delta = +14 functions, +21 sites	NEW-vs-B6: copilot-health, copilot-router (README-only, not a real site), zapier-apps-list, zapier-apps-sync, zapier-app-connect, zapier-app-disconnect, zapier-oauth-connect, zapier-test-connection, knowledge-index, reco-selftest, workflow-run, funding-scraper, ops-overview (path variant), url-capture, url-recommendations (extra sites)	pilot-required-candidates = 0	typed-accessible-unavailable = 3 (health, copilot-health, ops-overview)	production-unreachable = 59	documentation-only = 1 (copilot-router)	See per-row evidence columns above.

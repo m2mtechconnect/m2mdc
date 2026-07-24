@@ -9,11 +9,17 @@
       "total_directories": 156,
       "notes": "156 vs 155 = _shared/ (no index.ts). Any new sibling dir with index.ts increments the count."
     },
-    "b1_user_roles_migration_written": {
-      "status": "implemented-pending-approval",
-      "migration": "20260724120000_pr01_user_roles_lockdown.sql",
-      "runtime_verified": false,
-      "runtime_blocker": "No disposable Postgres available in the sandbox. RLS enforcement remains UNVERIFIED per Checkpoint A commitment. Approval + application must occur through the Lovable Cloud migration flow; database-proof suite (self-insert/update/delete rejected, admin_assign_role success, cross-tenant deny, audit row present) is documented in pr-0.1-auth-rls-report.md and must be executed against a disposable DB before PR-0.1 is declared complete."
+    "b1_user_roles_migration_applied": {
+      "status": "applied-schema-verified",
+      "applied_at": "2026-07-24",
+      "pg_policies_after_apply": [
+        { "policy": "user_roles_read_own", "cmd": "SELECT", "qual": "(auth.uid() = user_id)" }
+      ],
+      "self_write_policies_present": false,
+      "direct_dml_grants_to_authenticated": [],
+      "privileged_role_used": "security_admin",
+      "runtime_e2e_verified": false,
+      "runtime_e2e_blocker": "Signed-in PostgREST self-insert/update/delete rejection, admin_assign_role success path, cross-tenant deny, and audit-row presence still require an authenticated end-to-end run. Schema, grants, and policy inventory are proven; the runtime path is UNVERIFIED."
     },
     "b2_browser_secrets_removed": {
       "status": "verified-fixed",

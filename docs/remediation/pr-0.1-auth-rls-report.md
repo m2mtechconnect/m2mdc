@@ -35,7 +35,19 @@ returns `true` for that user, so every subsequent `has_role`-gated policy
 **Verdict:** the approval workflow is UX-only; the database and edge
 functions treat approved and unapproved users identically.
 
-## Planned forward-only migration (Checkpoint B - not yet applied)
+## Applied forward-only migration (Checkpoint B - APPLIED 2026-07-24)
+
+Note: `app_role` enum in this project is `executive | manager | engineer | security_admin` — the privileged role is `security_admin`, not `admin`. The applied migration uses `security_admin` accordingly.
+
+Verification after apply (via `pg_policies` on `public.user_roles`):
+
+| Policy | Cmd | Predicate |
+| --- | --- | --- |
+| `user_roles_read_own` | SELECT | `auth.uid() = user_id` |
+
+No INSERT/UPDATE/DELETE policies remain, and `INSERT, UPDATE, DELETE` on `public.user_roles` are revoked from `anon` and `authenticated`. Role changes now go exclusively through `public.admin_assign_role` / `public.admin_revoke_role` (approved `security_admin` only), and every change appends to `public.role_change_audit` (RLS: only `security_admin` can read; no write policy — writes only via the two SECURITY DEFINER functions).
+
+### Applied SQL (as-applied, condensed)
 
 ```sql
 -- Remove self-role assignment vectors
@@ -56,7 +68,13 @@ AS $$
 $$;
 REVOKE ALL ON FUNCTION public.is_approved_user(uuid) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.is_approved_user(uuid) TO authenticated;
+-- plus role_change_audit table + admin_assign_role / admin_revoke_role
+-- SECURITY DEFINER functions, REVOKE FROM PUBLIC, GRANT EXECUTE TO authenticated.
 ```
+
+### Runtime verification status
+
+The database schema and grants are proven by `pg_policies` inspection above. End-to-end runtime proof (authenticated self-INSERT rejected via PostgREST, admin_assign_role success path, cross-tenant read denial, audit row present) still requires a disposable Postgres run and is tracked as UNVERIFIED in `gate-results.json`.
 
 Every RLS policy on user-facing tables will then compose approval:
 `auth.uid() = owner AND public.is_approved_user(auth.uid())`. Enumeration

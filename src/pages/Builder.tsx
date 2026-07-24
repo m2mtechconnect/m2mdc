@@ -1,5 +1,4 @@
-import { useEffect, useState, useMemo, startTransition } from 'react';
-import { flushSync } from 'react-dom';
+import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BuilderLayout } from '@/components/builder/BuilderLayout';
@@ -369,7 +368,6 @@ export default function Builder() {
   // builderId/isLoading from the reactive hook so the wizard re-renders when
   // initializeBuilder finishes (getState() alone did not trigger a re-render).
   if (!hasIntent || initError || (!isLoading && !builderId)) {
-    console.log('[BUILDER:starter-branch]', { hasIntent, initError, isLoading, builderId, routerSearch: location.search, spDraft: searchParams.get('draft'), winUrl: typeof window !== 'undefined' ? window.location.href : '' });
     // Deterministic user-initiated creation: bypass the effect entirely so
     // there is no race between `setIsInitialized(false)` and the effect deps.
     // Guaranteed to issue exactly one create request; duplicate clicks are
@@ -388,16 +386,11 @@ export default function Builder() {
         }
         // Consume `?new=true` exactly once: replace with `?draft=<id>` so
         // refresh/back reloads the same draft rather than creating another.
-        // React Router v7 `startTransition` future flag defers location
-        // updates. Combined with a Zustand `subscribe()` that triggers
-        // an eager `setState` on every store change (the `isValid`
-        // effect below), the router transition never gets to commit —
-        // `useSearchParams()` stays stuck on `?`. Force a synchronous
-        // commit around the router update, then a paint, before
-        // returning control.
-        flushSync(() => {
-          setIsInitialized(true);
-        });
+        setIsInitialized(true);
+        // Use setSearchParams instead of navigate() for a same-path
+        // query-only update: it produces a reliable router location
+        // sync where a full navigate() to the same pathname can miss
+        // an update under concurrent renders.
         setSearchParams({ draft: newId }, { replace: true });
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'Failed to create draft';

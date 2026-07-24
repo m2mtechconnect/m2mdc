@@ -1,0 +1,3 @@
+route	shell	auth_required	approval_required	role_required	writes	edge_functions	excluded_capabilities_mounted	classification
+/pilot/overview	src/pilot/PilotLayout.tsx (outside src/components/Layout)	yes	yes (profiles.is_approved via AuthenticatedApp gate)	standard authenticated user	none	none	none (no HealthBadges, useTokenRefresh, GlobalSearchBar, CoPilot*, Zapier*, search-suggestions)	production_routes (via /pilot/* splat)
+/pilot/asset/:twinId	src/pilot/PilotLayout.tsx	yes	yes	standard authenticated user	none (auth.signOut is session-only)	none	none	production_routes (via /pilot/* splat)

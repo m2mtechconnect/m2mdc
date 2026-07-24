@@ -1,0 +1,10 @@
+route	action	request	data_source	read_or_write	authorization_control	rls_ownership_control	failure_behaviour	pilot_disposition	evidence
+/pilot/overview	mount	supabase.auth.getUser()	Supabase Auth (GoTrue)	read	Bearer JWT	n/a	denied → banner	OK	src/pilot/pilotReadAdapter.ts:listPilotTwins
+/pilot/overview	mount	SELECT id,name,city,region_code,tier,capacity_kw,pue_target,updated_at,created_at,created_by_user FROM data_centre_twins WHERE created_by_user=auth.uid() ORDER BY updated_at DESC LIMIT 25	public.data_centre_twins	read	RLS SELECT policy: created_by_user = auth.uid()	created_by_user	empty/denied/unavailable — no fabricated rows	OK	src/pilot/pilotReadAdapter.ts:listPilotTwins
+/pilot/overview	navigate	<Link to=/pilot/asset/:id>	client router	n/a	n/a	n/a	404 handled by PilotShell splat → overview	OK	src/pilot/PilotShell.tsx
+/pilot/asset/:twinId	mount	supabase.auth.getUser()	Supabase Auth	read	Bearer JWT	n/a	denied → banner	OK	src/pilot/pilotReadAdapter.ts:getPilotTwin
+/pilot/asset/:twinId	mount	SELECT ... FROM data_centre_twins WHERE id=:twinId AND created_by_user=auth.uid()	public.data_centre_twins	read	RLS SELECT policy	created_by_user	empty (no such row visible) / denied / unavailable	OK	src/pilot/pilotReadAdapter.ts:getPilotTwin
+/pilot/asset/:twinId	mount	SELECT id,twin_id,kpi_key,kpi_value,kpi_unit,domain,snapshot_at FROM twin_kpi_snapshots WHERE twin_id=:twinId ORDER BY snapshot_at DESC LIMIT 50	public.twin_kpi_snapshots	read	RLS SELECT policy via twin subselect	twin_id → data_centre_twins.created_by_user	empty / denied / unavailable — no fabricated rows	OK	src/pilot/pilotReadAdapter.ts:listPilotKpis
+/pilot/asset/:twinId	sign-out	supabase.auth.signOut()	Supabase Auth	write (session only, not application data)	Bearer JWT	n/a	navigate('/')	OK	src/pilot/PilotLayout.tsx
+
+Aggregate: edge-function invocations=0; application-data writes=0; RPC calls=0; storage mutations=0; realtime subscriptions=0; unapproved external requests=0.

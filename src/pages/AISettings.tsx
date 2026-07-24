@@ -173,6 +173,16 @@ export default function AISettings() {
           icon={<Settings className="h-5 w-5 text-primary" />}
         />
 
+        <div
+          role="note"
+          className="rounded-md border border-border bg-muted/30 p-3 text-xs text-muted-foreground"
+        >
+          These settings are stored in your current browser only. They are
+          not synced to a server, are not shared with other users, and
+          clearing browser storage removes them. No credentials or API
+          keys are stored here.
+        </div>
+
         {loadError && (
           <div
             role="alert"

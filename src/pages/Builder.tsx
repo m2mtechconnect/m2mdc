@@ -18,6 +18,9 @@ import { DeploymentProgressModal } from '@/components/deployment/DeploymentProgr
 import { trackBuilderStep, trackDeployment, trackAnalytics } from '@/lib/analytics/analyticsService';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { Button } from '@/components/ui/button';
+import { Sparkles, LayoutTemplate, AlertTriangle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Builder() {
   const { t } = useTranslation();
@@ -54,6 +57,23 @@ export default function Builder() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [showDeploymentProgress, setShowDeploymentProgress] = useState(false);
+  const [initError, setInitError] = useState<string | null>(null);
+
+  // Detect explicit intent to start/resume a build. Without any intent we must
+  // NOT auto-create a draft row on mount (previously every visit to /builder
+  // silently invoked `builders-create`, producing empty `agents` rows in prod
+  // and a hard error whenever the edge function was unavailable).
+  const hasIntent = useMemo(() => {
+    if (fromScanner) return true;
+    const state = (location.state ?? {}) as Record<string, unknown>;
+    if (state.blueprint || state.geminiAnalysis || state.prefilled) return true;
+    const intentParams = [
+      'draft', 'builderId', 'templateId', 'template',
+      'session', 'from', 'source', 'goal', 'industry',
+      'department', 'type', 'new',
+    ];
+    return intentParams.some((k) => searchParams.get(k));
+  }, [fromScanner, location.state, searchParams]);
   
   // Use DC Twin Builder Store step when from scanner
   const effectiveCurrentStep = fromScanner ? dcTwinStore.currentStep : currentStep;
@@ -186,6 +206,11 @@ export default function Builder() {
 
   useEffect(() => {
     if (!authChecked || isInitialized) return;
+      // Honest empty state: no intent means "show the starter", don't create.
+      if (!hasIntent) {
+        setIsInitialized(true);
+        return;
+      }
       const builderId = searchParams.get('draft') || searchParams.get('builderId');
       const geminiAnalysis = (location.state as any)?.geminiAnalysis;
       const prefilled = (location.state as any)?.prefilled;
@@ -232,13 +257,14 @@ export default function Builder() {
           
           // Show more helpful error message
           const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+          setInitError(errorMsg);
           toast({
             title: t('builder.failedToLoad'),
             description: `${errorMsg}. ${t('onboarding.pleaseTryAgain')}`,
             variant: 'destructive',
           });
         });
-  }, [searchParams, location.state, initializeBuilder, isInitialized, authChecked, navigate, toast]);
+  }, [searchParams, location.state, initializeBuilder, isInitialized, authChecked, navigate, toast, hasIntent, t]);
 
   // Show error toast if any
   useEffect(() => {
@@ -328,6 +354,53 @@ export default function Builder() {
           <div>
             <h1 className="text-base font-medium">{t('builder.loadingTitle')}</h1>
             <p className="text-sm text-muted-foreground">{t('builder.loadingDesc')}</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // Honest starter state: no intent OR init failed → don't render the wizard
+  // against a phantom draft. Give the user real actions.
+  if (!hasIntent || initError || !useWizardBuilderStore.getState().builderId) {
+    const startBlank = () => {
+      setInitError(null);
+      setIsInitialized(false);
+      navigate('/builder?new=true', { replace: true });
+    };
+    return (
+      <main className="min-h-dvh bg-background section-padding-lg" aria-labelledby="builder-start-heading">
+        <div className="max-w-2xl mx-auto text-center space-y-6">
+          <div className="space-y-2">
+            <h1 id="builder-start-heading" className="text-2xl font-semibold">
+              {t('builder.startTitle', 'Start a new build')}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {initError
+                ? t('builder.startErrorDesc', 'We could not load a draft. Choose how you want to start.')
+                : t('builder.startDesc', 'Pick a template from the marketplace, resume a saved draft, or begin from scratch.')}
+            </p>
+          </div>
+          {initError && (
+            <div
+              role="alert"
+              className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-left text-sm text-destructive"
+            >
+              <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
+              <span>{initError}</span>
+            </div>
+          )}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Button asChild size="lg" variant="outline">
+              <Link to="/marketplace">
+                <LayoutTemplate className="h-4 w-4 mr-2" aria-hidden="true" />
+                {t('builder.chooseTemplate', 'Choose a template')}
+              </Link>
+            </Button>
+            <Button size="lg" onClick={startBlank}>
+              <Sparkles className="h-4 w-4 mr-2" aria-hidden="true" />
+              {t('builder.startBlank', 'Start blank')}
+            </Button>
           </div>
         </div>
       </main>

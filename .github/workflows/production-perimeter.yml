@@ -1,0 +1,16 @@
+name: Production Perimeter
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  enforce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: Enforce PR-0.1 production perimeter
+        run: node scripts/verify-production-perimeter.mjs

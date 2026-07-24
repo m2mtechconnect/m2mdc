@@ -1,0 +1,55 @@
+{
+  "checkpoint": "B7.6",
+  "attempt": "retry-01",
+  "phase": "preflight",
+  "baseline_anchor_recorded": "d7c3da3e",
+  "git_head_observed": "5e2918003f21fe2405cc57b2d0330de5c454f2a0",
+  "anchor_note": "HEAD advanced only by evidence-only changes accepted between B7.6 blocked attempt and this retry; no application, migration, function, allowlist or CI source has been modified in this retry.",
+  "preserved_evidence_verification": {
+    "directory": "docs/remediation/evidence/pr-0.1/checkpoint-b7/b7.6/",
+    "sha256sums_present": true,
+    "non_log_files_verified_ok": 16,
+    "log_files_missing_from_prior_sandbox": [
+      "git-diff-check.log",
+      "migration-replay-run-a.log",
+      "migration-replay-run-b.log",
+      "perimeter.log",
+      "pilot-bundle-canary.log"
+    ],
+    "preserved_files_modified_by_retry": 0,
+    "preserved_files_overwritten_by_retry": 0,
+    "note": "Missing .log files were runtime artifacts not carried forward into the retry sandbox. All checksummed structured evidence (.json, .tsv, .md) for the blocked attempt is intact and unchanged. Original blocked report preserved verbatim per user directive."
+  },
+  "environment_probes": {
+    "docker_present": false,
+    "podman_present": false,
+    "colima_present": false,
+    "supabase_cli_present": false,
+    "docker_socket_present": false,
+    "local_postgres_binary": {"present": true, "path": "/usr/bin/postgres", "version": "17.9"},
+    "required_postgres_major": "15",
+    "postgres_version_mismatch": true,
+    "extensions_locally_missing": ["pg_cron", "pg_graphql", "supabase_vault", "vector"],
+    "managed_schemas_available": false,
+    "reachable_db_endpoint_class": "none_loopback_supabase_stack_available",
+    "production_or_staging_credentials_scanned": true,
+    "production_or_staging_credentials_used": false
+  },
+  "fail_closed_gates_evaluated": [
+    {"gate": "docker or podman available", "pass": false},
+    {"gate": "approved version-pinned Supabase-compatible PG15 image approved and pulled", "pass": false},
+    {"gate": "official Supabase schema/role/authorization bootstrap available", "pass": false},
+    {"gate": "pg_cron, pg_graphql, supabase_vault(+pgsodium), pgvector installable from approved image", "pass": false},
+    {"gate": "auth/storage/realtime managed platform objects present", "pass": false},
+    {"gate": "loopback or isolated-container DB connectivity only", "pass": false, "detail": "no isolatable stack could be provisioned"},
+    {"gate": "capacity to create and destroy two independent clean replay environments", "pass": false},
+    {"gate": "image and tooling versions or digests approved before execution", "pass": false, "detail": "no approved image list supplied to this sandbox"},
+    {"gate": "no production/staging/Lovable Cloud credentials in use", "pass": true}
+  ],
+  "migrations_executed": 0,
+  "disposable_environments_created": 0,
+  "disposable_environments_destroyed": 0,
+  "remote_infrastructure_contacted": false,
+  "verdict": "BLOCKED — APPROVED SUPABASE-COMPATIBLE ENVIRONMENT UNAVAILABLE",
+  "verdict_authority": "User directive §Required environment and §Preflight: fail-closed when any preflight gate fails; do not download replacement tooling; do not fabricate managed schemas; do not use local PG 17.9."
+}

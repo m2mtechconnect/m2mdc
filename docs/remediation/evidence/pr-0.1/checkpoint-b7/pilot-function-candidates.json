@@ -1,0 +1,23 @@
+{
+  "schema_version": 2,
+  "checkpoint": "B7.4B",
+  "assessment_mode": "read-only; no function was hardened, allowlisted, or deployed",
+  "pilot_scope_source": "docs/remediation/evidence/pr-0.1/checkpoint-b7/pilot-scope-decision.json",
+  "pilot_routes": ["/", "/login", "/forgot-password", "/sign-out", "/onboarding"],
+  "pilot_required_candidates": [],
+  "pilot_required_candidate_count": 0,
+  "typed_accessible_unavailable_on_pilot_routes": [],
+  "rationale": [
+    "Every pilot route renders without invoking any edge function.",
+    "Pilot pages use the Supabase Auth SDK (signIn, signOut, resetPasswordForEmail) and a direct supabase.from('profiles').insert for onboarding. Auth-SDK calls hit Supabase Auth GoTrue, not the Edge Functions runtime, and are outside the function allowlist scope.",
+    "The Layout component that mounts Copilot, health, search-suggestions and zapier background hooks is NOT rendered on any pilot route. The unauth branch of src/App.tsx renders routes bare, without <Layout>.",
+    "Therefore zero functions are pilot-required. No 14-column per-candidate assessment matrix is required at this checkpoint."
+  ],
+  "assessment_matrix_columns_if_needed": [
+    "gateway_jwt","authenticated_user_enforcement","approved_user_enforcement","minimum_role",
+    "object_ownership_or_tenant_authz","request_validation","cors_policy",
+    "outbound_connectivity","timeouts_and_response_size_bounds","error_sanitization",
+    "shared_authz_guard_usage","positive_tests","denial_tests","remediation_required"
+  ],
+  "future_note": "If B7.5 re-scopes the pilot to include an approved-user overview, ai-systems-unified (Dashboard) is the smallest candidate set (1 function); ops-overview (IntelligenceDashboard) is a second candidate for analytics/operations. Both require the full 14-column assessment, positive + denial tests, and Layout de-coupling before allowlisting."
+}

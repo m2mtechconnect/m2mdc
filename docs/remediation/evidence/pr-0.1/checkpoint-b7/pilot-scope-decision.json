@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "checkpoint": "B7.4B",
+  "decision_authority": "user message authorizing B7.4B",
+  "authorized_decisions": {
+    "canonical_password_recovery_route": "/forgot-password",
+    "reset_password_route_status": "STALE - not added to pilot; existing recovery-completion flow is BROKEN (see password-recovery-reconciliation.md)",
+    "pilot_mode": "approved-user, read-only subset",
+    "default_policy": "default-deny for every route and every function unless explicitly included via evidence process"
+  },
+  "pilot_routes": {
+    "public-pilot": ["/", "/login", "/forgot-password", "/sign-out", "/onboarding"],
+    "approved-user-pilot": [],
+    "approved-user-pilot_deferred_reason": "The current Layout (mounted on every authenticated route) transitively invokes excluded capabilities: Copilot (copilot-search, copilot-chat-simple), health probes (health), global search (search-suggestions), Zapier background refresh (zapier-auto-refresh, zapier-refresh-token). These are on the explicit exclusion list. Enabling approved-user pilot requires either (a) B7.5 refactors Layout to gate excluded mounts behind a pilot flag, or (b) each affected function is fully assessed and allowlisted. Neither is authorized in B7.4B."
+  },
+  "excluded_capabilities": [
+    "user or role administration",
+    "system configuration changes",
+    "data ingestion",
+    "approval or mutation workflows",
+    "browser-side AI or Copilot",
+    "Omniverse",
+    "BMS/DCIM or other live integrations",
+    "simulation migration",
+    "synthetic or fabricated fallback metrics",
+    "debug, test and evidence routes",
+    "every write operation (except supabase.auth.* SDK writes required for sign-in / sign-out / password-reset / onboarding profile insert, which are outside the edge-function surface)"
+  ],
+  "verdict": "ZERO-FUNCTION public pilot is operable; approved-user pilot is DEFERRED to B7.5 pending Layout de-coupling. No function is added to the real allowlist by this checkpoint."
+}

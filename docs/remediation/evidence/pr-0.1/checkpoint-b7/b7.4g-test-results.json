@@ -1,0 +1,86 @@
+{
+  "checkpoint": "B7.4G",
+  "baseline_anchor": "5e39cdb5",
+  "unit_tests": {
+    "file": "tests/pilot/pilotReadAdapter.test.ts",
+    "passed": 18,
+    "failed": 0
+  },
+  "playwright": {
+    "scenarios": 11,
+    "failures": []
+  },
+  "network": {
+    "by_class": {
+      "allowed": 175,
+      "unexpected": 0,
+      "forbidden": 0
+    },
+    "endpoints": [
+      [
+        "GET",
+        "/auth/v1/user"
+      ],
+      [
+        "GET",
+        "/rest/v1/data_centre_locations"
+      ],
+      [
+        "GET",
+        "/rest/v1/data_centre_twins"
+      ],
+      [
+        "GET",
+        "/rest/v1/profiles"
+      ],
+      [
+        "GET",
+        "/rest/v1/twin_kpi_snapshots"
+      ],
+      [
+        "GET",
+        "/rest/v1/user_roles"
+      ],
+      [
+        "POST",
+        "/auth/v1/logout"
+      ]
+    ],
+    "forbidden": []
+  },
+  "accessibility": {
+    "runs": [
+      {
+        "scenario": "unapproved_denied",
+        "violations": 0
+      },
+      {
+        "scenario": "approved_overview",
+        "violations": 0
+      },
+      {
+        "scenario": "approved_inspection",
+        "violations": 0
+      },
+      {
+        "scenario": "cross_owner_empty",
+        "violations": 0
+      },
+      {
+        "scenario": "empty_overview",
+        "violations": 0
+      },
+      {
+        "scenario": "unavailable_overview",
+        "violations": 0
+      }
+    ],
+    "total_violations": 0
+  },
+  "bundle_canary": {
+    "result": "PASS",
+    "forbidden_reachable": 0,
+    "modules_scanned": 7
+  },
+  "verdict": "PASS"
+}

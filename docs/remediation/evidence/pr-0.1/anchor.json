@@ -26,8 +26,16 @@
     "20260323173624_97384e28-beb3-4f8d-8d4b-dbadd65d6f9e.sql"
   ],
   "edge_function_count": 155,
-  "verify_jwt_false": [
-    "green-dc-recommend"
-  ],
-  "checkpoint": "A"
+  "verify_jwt_false": [],
+  "verify_jwt_false_previous": ["green-dc-recommend"],
+  "denominator_note": "156 = total directories under supabase/functions/. 155 = deployable (has index.ts). The remaining 1 is `_shared/` (helpers, no index.ts). Adding a new function increments the denominator only if a new sibling directory with an index.ts is created; helper additions under _shared/ do not.",
+  "checkpoint": "B",
+  "checkpoint_b_deltas": {
+    "user_roles_self_write_policies_dropped": true,
+    "browser_llm_key_removed": true,
+    "omniverse_plaintext_endpoint_removed": true,
+    "green_dc_recommend_disposition": "disabled",
+    "production_allowlist_size": 0,
+    "ci_enforcer_added": "scripts/verify-production-perimeter.mjs"
+  }
 }

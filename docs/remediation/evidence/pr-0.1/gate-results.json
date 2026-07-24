@@ -1,0 +1,60 @@
+{
+  "checkpoint": "B",
+  "generated_at": "2026-07-24T12:00:00Z",
+  "gates": {
+    "b0_denominator_resolved": {
+      "status": "verified",
+      "deployable_functions": 155,
+      "helper_directories": 1,
+      "total_directories": 156,
+      "notes": "156 vs 155 = _shared/ (no index.ts). Any new sibling dir with index.ts increments the count."
+    },
+    "b1_user_roles_migration_written": {
+      "status": "implemented-pending-approval",
+      "migration": "20260724120000_pr01_user_roles_lockdown.sql",
+      "runtime_verified": false,
+      "runtime_blocker": "No disposable Postgres available in the sandbox. RLS enforcement remains UNVERIFIED per Checkpoint A commitment. Approval + application must occur through the Lovable Cloud migration flow; database-proof suite (self-insert/update/delete rejected, admin_assign_role success, cross-tenant deny, audit row present) is documented in pr-0.1-auth-rls-report.md and must be executed against a disposable DB before PR-0.1 is declared complete."
+    },
+    "b2_browser_secrets_removed": {
+      "status": "verified-fixed",
+      "removed_symbols": ["VITE_LOVABLE_API_KEY"],
+      "client_call_sites_neutered": ["src/lib/llm/client.ts"],
+      "typed_unavailable_error": "LlmUnavailableError",
+      "omniverse_endpoint_removed_from_env": true,
+      "credential_rotation": "external — see pr-0.1-external-deployment-checklist.md"
+    },
+    "b3_production_allowlist": {
+      "status": "verified-fixed",
+      "allowlisted_functions": 0,
+      "disabled_functions": 2,
+      "unknown_blocked_functions": 153,
+      "policy": "default-deny"
+    },
+    "b4_green_dc_recommend_disabled": {
+      "status": "verified-disabled",
+      "verify_jwt_gateway": true,
+      "runtime_returns_503": true,
+      "outbound_requests_removed": true,
+      "remote_undeployment": "external — see pr-0.1-external-deployment-checklist.md"
+    },
+    "b5_ci_enforcement": {
+      "status": "verified-fixed",
+      "enforcer": "scripts/verify-production-perimeter.mjs",
+      "workflow": ".github/workflows/production-perimeter.yml",
+      "checks": [
+        "every function has a valid disposition",
+        "allowlisted functions match inventory",
+        "allowlisted functions import _shared/authz.ts",
+        "no client source references VITE_LOVABLE_API_KEY",
+        "verify_jwt=false requires signed-webhook disposition",
+        "no forbidden production routes",
+        "no wildcard function deployment"
+      ]
+    }
+  },
+  "unverified_or_deferred": [
+    "database-level RLS proof against disposable Postgres (B1) — blocked by sandbox constraint",
+    "remote credential rotation and remote function undeployment — external checklist",
+    "Playwright permission-matrix suite against real DB — deferred until B1 disposable-DB run is possible"
+  ]
+}

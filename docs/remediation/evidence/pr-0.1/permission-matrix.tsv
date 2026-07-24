@@ -1,0 +1,7 @@
+role	profiles.select_own	profiles.select_others	user_roles.select_own	user_roles.insert_direct	user_roles.update_direct	user_roles.delete_direct	admin_assign_role	admin_revoke_role	role_change_audit.select
+anon	deny	deny	deny	deny	deny	deny	deny	deny	deny
+authenticated_unapproved	allow	deny	allow	deny	deny	deny	deny	deny	deny
+authenticated_approved_viewer	allow	deny	allow	deny	deny	deny	deny	deny	deny
+authenticated_approved_operator	allow	deny	allow	deny	deny	deny	deny	deny	deny
+authenticated_approved_admin	allow	deny	allow	deny	deny	deny	allow	allow	allow
+service_role	allow	allow	allow	allow	allow	allow	n/a	n/a	allow

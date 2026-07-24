@@ -119,7 +119,7 @@ test.describe('/builder success regression (real backend)', () => {
     // subscription + router search-params update can take an extra
     // React commit cycle to propagate on the real backend.
     await expect(starterHeading).toBeHidden({ timeout: 15_000 });
-    await expect(page.locator('main')).toBeVisible();
+    await expect(page.locator('main').first()).toBeVisible();
 
     // ---- Refresh: same draft, no extra create request. ----
     createRequests.length = 0;

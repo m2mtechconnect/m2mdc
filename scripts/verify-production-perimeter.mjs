@@ -114,8 +114,14 @@ if (existsSync(configPath)) {
 const appSrc = existsSync(join(REPO, 'src/App.tsx')) ? readFileSync(join(REPO, 'src/App.tsx'), 'utf8') : '';
 for (const pat of allowlist.forbidden_production_routes || []) {
   const literal = pat.replace('/*', '');
-  const re = new RegExp(`path=["']${literal.replace(/\//g, '\\/')}`);
-  if (re.test(appSrc)) {
+  // Match the literal followed by "/" (subroute) or the closing quote (exact),
+  // so e.g. `/dev` does not falsely match `/dev-overlays`.
+  const re = new RegExp(`path=["']${literal.replace(/\//g, '\\/')}(?:["']|\\/)`);
+  const matches = appSrc.match(new RegExp(re, 'g')) || [];
+  // Allow occurrences that are gated by `import.meta.env.DEV` on the same
+  // JSX expression.
+  const gated = (appSrc.match(new RegExp(`import\\.meta\\.env\\.DEV[^\\n]*${re.source}`, 'g')) || []).length;
+  if (matches.length > gated) {
     fail(`App.tsx declares forbidden production route: ${pat}`);
   }
 }

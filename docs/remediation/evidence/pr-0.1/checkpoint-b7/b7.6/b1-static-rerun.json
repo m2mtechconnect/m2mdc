@@ -1,0 +1,138 @@
+{
+  "b1_file": "20260724005954_e17e6492-dc51-46f8-bb87-642071501b8b.sql",
+  "pass": true,
+  "total": 26,
+  "failing": 0,
+  "checks": [
+    {
+      "name": "b1_is_last_migration",
+      "ok": true,
+      "detail": "last=20260724005954_e17e6492-dc51-46f8-bb87-642071501b8b.sql"
+    },
+    {
+      "name": "b1_drops_user_roles_insert_own",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "b1_drops_user_roles_update_own",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "b1_drops_user_roles_delete_own",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "b1_revokes_dml_user_roles",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "b1_grant_select_authenticated",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "b1_grant_all_service_role",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "admin_assign_role_created",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "admin_assign_role_security_definer",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "admin_assign_role_safe_search_path",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "admin_assign_role_requires_security_admin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "admin_assign_role_requires_approved",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "admin_revoke_role_created",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "admin_revoke_role_security_definer",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "admin_revoke_role_safe_search_path",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "admin_revoke_role_requires_security_admin",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "admin_revoke_role_requires_approved",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "role_change_audit_created_before_admin_fns",
+      "ok": true,
+      "detail": "audit_pos=1569, assign_pos=2337"
+    },
+    {
+      "name": "is_approved_user_uses_profiles",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no_later_migrations_exist",
+      "ok": true,
+      "detail": "later=0"
+    },
+    {
+      "name": "no_regression_between_p0_and_b1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "read_policy_scoped_to_owner",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "admin_assign_role_revoke_public",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "admin_assign_role_grant_authenticated",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "admin_revoke_role_revoke_public",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "admin_revoke_role_grant_authenticated",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

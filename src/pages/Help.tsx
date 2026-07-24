@@ -268,13 +268,13 @@ export default function Help() {
               <ul className="space-y-3 mb-4">
                 {helpSections[0].items.map((item, idx) => (
                   <li key={idx}>
-                    <a
-                      href="#"
-                      className="text-sm text-muted-foreground hover:text-foreground transition-smooth flex items-start gap-2"
+                    <span
+                      className="text-sm text-muted-foreground flex items-start gap-2"
+                      aria-disabled="true"
                     >
                       <span className="text-secondary mt-1">•</span>
                       <span>{item}</span>
-                    </a>
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -292,13 +292,13 @@ export default function Help() {
               <ul className="space-y-3 mb-4">
                 {helpSections[1].items.map((item, idx) => (
                   <li key={idx}>
-                    <a
-                      href="#"
-                      className="text-sm text-muted-foreground hover:text-foreground transition-smooth flex items-start gap-2"
+                    <span
+                      className="text-sm text-muted-foreground flex items-start gap-2"
+                      aria-disabled="true"
                     >
                       <span className="text-secondary mt-1">•</span>
                       <span>{item}</span>
-                    </a>
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -310,13 +310,13 @@ export default function Help() {
                 <ul className="space-y-2 mb-4">
                   {helpSections[2].items.map((item, idx) => (
                     <li key={idx}>
-                      <a
-                        href="#"
-                        className="text-xs text-muted-foreground hover:text-foreground transition-smooth flex items-start gap-2"
+                      <span
+                        className="text-xs text-muted-foreground flex items-start gap-2"
+                        aria-disabled="true"
                       >
                         <span className="text-secondary mt-0.5">•</span>
                         <span>{item}</span>
-                      </a>
+                      </span>
                     </li>
                   ))}
                 </ul>

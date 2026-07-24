@@ -1,0 +1,12 @@
+id	severity	category	description	remediation	owner
+B7.6-BLK-01	P0	platform	No container runtime (docker/podman/colima) in sandbox to run supabase/postgres image	Provide approved local Supabase-compatible environment (Supabase CLI, docker-compose, or ephemeral Supabase project outside production)	Platform
+B7.6-BLK-02	P0	platform	No `supabase` CLI available	Install approved Supabase CLI in the replay environment	Platform
+B7.6-BLK-03	P0	extension	Extensions missing locally: pg_cron, pg_graphql, supabase_vault, vector	Use Supabase-compatible image that ships these extensions; do NOT hand-substitute	Platform
+B7.6-BLK-04	P0	managed-schema	auth/storage/vault/realtime/graphql schemas and supabase_* roles require managed Supabase stack (baseline dump references auth.users, auth.uid, auth.role, vault.*)	Provision Supabase-compatible stack; rule §3 forbids hand-written substitutes	Platform
+B7.6-BLK-05	P1	version	Local Postgres is 17.9; B7.5 spec requires 15.x parity with production	Match production major version (15) in replay image	Platform
+B7.6-BLK-06	P0	network	Only reachable DB host is production pooler; using it is explicitly forbidden by B7.6 hard boundary	Provide loopback-only DB endpoint	Platform
+B7.5-EXT-01	P0	credentials	Credential rotation retained	Rotate on authorization	Security
+B7.5-EXT-02	P0	remote-rls	Effective remote RLS + approved-user authorization verification retained	Requires separate authorization	Security
+B7.5-EXT-03	P0	remote-functions	Remote function undeployment verification (155 fns) retained	Requires separate authorization	Platform
+B7.5-EXT-04	P1	migration-history	Accidental remote migration reconciliation retained	Requires read of authoritative remote history	Platform
+B7.5-EXT-05	P1	pilot-data	Confirm suitable validated pilot records exist remotely	Requires remote read of data_centre_twins/twin_kpi_snapshots	Product

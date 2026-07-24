@@ -1,0 +1,7 @@
+{
+  "executed": false,
+  "reason": "requires replayed database from \u00a74 and disposable fixture identities",
+  "adapter_unit_tests_pass": true,
+  "adapter_unit_tests_source": "src/pilot/pilotReadAdapter.test.ts (18/18 passing, verified B7.4G)",
+  "runtime_rls_verified": false
+}

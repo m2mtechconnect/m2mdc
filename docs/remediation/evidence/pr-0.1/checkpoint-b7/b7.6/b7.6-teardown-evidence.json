@@ -1,0 +1,12 @@
+{
+  "disposable_databases_created": 0,
+  "disposable_containers_created": 0,
+  "disposable_volumes_created": 0,
+  "resources_destroyed": 0,
+  "shared_development_infrastructure_touched": false,
+  "repository_migrations_unchanged": true,
+  "application_source_unchanged": true,
+  "ci_config_unchanged": true,
+  "function_allowlist_unchanged": true,
+  "function_allowlist_count": 0
+}

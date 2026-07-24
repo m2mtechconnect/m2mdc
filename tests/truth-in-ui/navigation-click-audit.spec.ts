@@ -39,11 +39,6 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
       { name: 'Engineering Workbench', path: '/' },
       { name: 'Build Data Centre Twin', path: '/builder' },
       { name: 'Subsystem Agents', path: '/app/agents' },
-      { name: 'Telemetry & Analytics', path: '/intelligence' },
-      { name: 'Simulation', path: '/data-centre-twin?view=simulation' },
-      { name: 'Sovereignty & Safety Audit', path: '/compliance' },
-      { name: 'Teams', path: '/teams' },
-      { name: 'Infrastructure', path: '/infrastructure' },
     ];
 
     for (const item of matrix) {
@@ -70,6 +65,14 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await page.getByRole('menuitem', { name: /Simulation/i }).click();
     await expectPath(page, '/data-centre-twin?view=simulation');
 
+    await page.getByRole('button', { name: 'More navigation' }).click();
+    await page.getByRole('menuitem', { name: /Teams/i }).click();
+    await expectPath(page, '/teams');
+
+    await page.getByRole('button', { name: 'More navigation' }).click();
+    await page.getByRole('menuitem', { name: /Infrastructure/i }).click();
+    await expectPath(page, '/infrastructure');
+
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 
@@ -94,7 +97,7 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await expectPath(page, '/data-centre-twin');
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await page.getByRole('link', { name: /Open DC Twin Dashboard/i }).click();
+    await page.getByRole('link', { name: /Open Data Centre Twin Dashboard/i }).click();
     await expectPath(page, '/data-centre-twin');
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });

@@ -7,13 +7,15 @@ This matrix captures the authenticated internal shell routes and the repaired cl
 | Desktop header | Engineering Workbench / Command | `/` | Role navigation | Active |
 | Desktop header | Build Data Centre Twin | `/builder` | Role navigation | Active |
 | Desktop header | Subsystem Agents | `/app/agents` | Role navigation | Active |
-| Desktop header | Telemetry & Analytics | `/intelligence` | Role navigation | Active |
-| Desktop header | Simulation | `/data-centre-twin?view=simulation` | Role navigation | Active |
-| Desktop header | Sovereignty & Safety Audit | `/compliance` | Role navigation | Active |
-| Desktop header | Teams | `/teams` | Role navigation | Active |
-| Desktop header | Infrastructure | `/infrastructure` | Role navigation | Active |
-| Desktop submenu | More > Telemetry & Analytics | `/intelligence` | Role navigation | Active below xl |
-| Desktop submenu | More > Simulation | `/data-centre-twin?view=simulation` | Role navigation | Active below xl |
+| Desktop header | Telemetry & Analytics | `/intelligence` | Role navigation | Active at 2xl and wider |
+| Desktop header | Simulation | `/data-centre-twin?view=simulation` | Role navigation | Active at 2xl and wider |
+| Desktop header | Sovereignty & Safety Audit | `/compliance` | Role navigation | Active at 2xl and wider |
+| Desktop header | Teams | `/teams` | Role navigation | Active at 2xl and wider |
+| Desktop header | Infrastructure | `/infrastructure` | Role navigation | Active at 2xl and wider |
+| Desktop submenu | More > Telemetry & Analytics | `/intelligence` | Role navigation | Active below 2xl |
+| Desktop submenu | More > Simulation | `/data-centre-twin?view=simulation` | Role navigation | Active below 2xl |
+| Desktop submenu | More > Teams | `/teams` | Role navigation | Active below 2xl |
+| Desktop submenu | More > Infrastructure | `/infrastructure` | Role navigation | Active below 2xl |
 | Mobile drawer | Build Data Centre Twin | `/builder` | Role navigation | Active |
 | Dashboard KPI cards | Global PUE / GPU / Thermal / Sovereignty | `/data-centre-twin` or active twin path | Dashboard links | Active |
 | Dashboard quick link | Open DC Twin Dashboard | `/data-centre-twin` or active twin path | Dashboard card | Active |

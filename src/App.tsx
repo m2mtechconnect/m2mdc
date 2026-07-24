@@ -12,7 +12,6 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
 import { initChangeLogMiddleware } from "@/stores/dcBuilderChangeLogMiddleware";
-import Auth from "./pages/Auth";
 import { SignIn, SignUp, SignOut, ForgotPassword, MFA } from "./pages/auth/index";
 import DataCentreTwin from "./pages/DataCentreTwin";
 import DataCentreTwinLanding from "./pages/DataCentreTwinLanding";

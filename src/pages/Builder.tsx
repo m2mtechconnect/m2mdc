@@ -49,7 +49,9 @@ export default function Builder() {
     modelConfig,
     initializeBuilder,
     error,
-    lastSaved
+    lastSaved,
+    builderId,
+    isLoading,
   } = useWizardBuilderStore();
   const { toast } = useToast();
   const { updateContext } = useCoPilotContext();

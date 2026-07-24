@@ -30,10 +30,11 @@ import type {
 
 const PROVIDER_ID = 'omniverse' as const;
 
+// PR-0.1 Checkpoint B7: browser-side feature flags are not permitted for
+// Omniverse. The provider is always disabled in the client build; any
+// re-enablement must ship through an authenticated server-side facade.
 function isEnabled(): boolean {
-  const raw = (import.meta as { env?: Record<string, string | undefined> }).env
-    ?.VITE_AURA_OMNIVERSE_PROVIDER;
-  return typeof raw === 'string' && raw.toLowerCase() === 'enabled';
+  return false;
 }
 
 export function createOmniverseProvider(
@@ -46,7 +47,7 @@ export function createOmniverseProvider(
     providerId: PROVIDER_ID,
     provenance: 'unavailable',
     reason:
-      'omniverse provider is disabled (set VITE_AURA_OMNIVERSE_PROVIDER=enabled to route requests to the not-implemented stub)',
+      'omniverse provider is disabled in this build; a server-mediated transport is required to enable it.',
   });
 
   const notImplementedOutcome = <T>(op: string): ProviderOutcome<T> => ({

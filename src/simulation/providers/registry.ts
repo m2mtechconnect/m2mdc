@@ -42,11 +42,13 @@ const KNOWN_IDS: readonly SimulationProviderId[] = [
  * Resolve the configured provider id. Unknown / missing values fail closed
  * to `compatibility`. Only place env parsing happens.
  */
+// PR-0.1 Checkpoint B7: browser env access is forbidden for provider
+// selection. Tests still pass an explicit `env` map; production callers
+// always see the default (`compatibility`) provider.
 export function resolveConfiguredProviderId(
   env?: Record<string, string | undefined>,
 ): SimulationProviderId {
-  const raw = (env ?? (import.meta as { env?: Record<string, string | undefined> }).env)
-    ?.VITE_AURA_SIM_PROVIDER;
+  const raw = env?.VITE_AURA_SIM_PROVIDER;
   if (typeof raw !== 'string') return 'compatibility';
   const normalized = raw.trim().toLowerCase() as SimulationProviderId;
   return KNOWN_IDS.includes(normalized) ? normalized : 'compatibility';
@@ -69,8 +71,7 @@ export type ProviderSelection =
 export function resolveProviderSelection(
   env?: Record<string, string | undefined>,
 ): ProviderSelection {
-  const raw = (env ?? (import.meta as { env?: Record<string, string | undefined> }).env)
-    ?.VITE_AURA_SIM_PROVIDER;
+  const raw = env?.VITE_AURA_SIM_PROVIDER;
   if (typeof raw !== 'string' || raw.trim() === '') {
     return { kind: 'default', id: 'compatibility' };
   }

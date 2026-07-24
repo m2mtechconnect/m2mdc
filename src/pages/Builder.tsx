@@ -1,4 +1,5 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, startTransition } from 'react';
+import { flushSync } from 'react-dom';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BuilderLayout } from '@/components/builder/BuilderLayout';
@@ -387,11 +388,16 @@ export default function Builder() {
         }
         // Consume `?new=true` exactly once: replace with `?draft=<id>` so
         // refresh/back reloads the same draft rather than creating another.
-        setIsInitialized(true);
-        // Use setSearchParams instead of navigate() — under `v7_startTransition`,
-        // navigate() to the same pathname with a new query can fail to update
-        // the router's location snapshot on the next render, leaving
-        // `useSearchParams()` stuck on the previous (empty) value.
+        // React Router v7 `startTransition` future flag defers location
+        // updates. Combined with a Zustand `subscribe()` that triggers
+        // an eager `setState` on every store change (the `isValid`
+        // effect below), the router transition never gets to commit —
+        // `useSearchParams()` stays stuck on `?`. Force a synchronous
+        // commit around the router update, then a paint, before
+        // returning control.
+        flushSync(() => {
+          setIsInitialized(true);
+        });
         setSearchParams({ draft: newId }, { replace: true });
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'Failed to create draft';

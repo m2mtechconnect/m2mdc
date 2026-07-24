@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export type AppRole = 
@@ -13,12 +13,25 @@ export type AppRole =
   | 'support' 
   | 'finance';
 
+/**
+ * Explicit authorization resolution state. Replaces the ambiguous
+ * boolean-only isInternal flag so that a failed lookup can no longer be
+ * conflated with a successful "no role row" (pilot) result.
+ */
+export type RoleResolution =
+  | { status: 'loading' }
+  | { status: 'internal'; role: AppRole }
+  | { status: 'pilot' }
+  | { status: 'error'; error: unknown };
+
 interface RBACContextType {
   role: AppRole | null;
   loading: boolean;
   hasAccess: (requiredRoles: AppRole[]) => boolean;
   userId: string | null;
   isInternal: boolean;
+  resolution: RoleResolution;
+  retry: () => void;
 }
 
 const RBACContext = createContext<RBACContextType>({
@@ -27,37 +40,44 @@ const RBACContext = createContext<RBACContextType>({
   hasAccess: () => false,
   userId: null,
   isInternal: false,
+  resolution: { status: 'loading' },
+  retry: () => {},
 });
 
 export const useRBAC = () => useContext(RBACContext);
 
 export const RBACProvider = ({ children }: { children: ReactNode }) => {
-  const [role, setRole] = useState<AppRole | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  // Fail-closed: internal access requires an explicit row in the
-  // server-backed user_roles table. Absence of a row = pilot/customer.
-  const [isInternal, setIsInternal] = useState<boolean>(false);
+  const [resolution, setResolution] = useState<RoleResolution>({ status: 'loading' });
+  const [retryTick, setRetryTick] = useState(0);
+
+  const retry = useCallback(() => {
+    setResolution({ status: 'loading' });
+    setRetryTick((n) => n + 1);
+  }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchUserRole = async () => {
       try {
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
+
         if (userError) {
-          console.error('Error fetching user:', userError);
-          setLoading(false);
+          if (!cancelled) setResolution({ status: 'error', error: userError });
           return;
         }
-        
+
         if (!user) {
-          setLoading(false);
+          if (!cancelled) {
+            setUserId(null);
+            setResolution({ status: 'loading' });
+          }
           return;
         }
 
-        setUserId(user.id);
+        if (!cancelled) setUserId(user.id);
 
-        // Fetch user role
         const { data: userRoles, error: rolesError } = await supabase
           .from('user_roles')
           .select('role')
@@ -66,47 +86,49 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
           .maybeSingle();
 
         if (rolesError) {
+          // Lookup FAILURE is distinct from "no row". Do NOT silently
+          // downgrade to pilot — surface an authorization-error state.
           console.error('Error fetching user roles:', rolesError);
+          if (!cancelled) setResolution({ status: 'error', error: rolesError });
+          return;
         }
 
-        if (userRoles) {
-          setRole(userRoles.role as AppRole);
-          setIsInternal(true);
-        } else {
-          // No server-backed role => treat as restricted pilot user.
-          setRole(null);
-          setIsInternal(false);
+        if (!cancelled) {
+          if (userRoles) {
+            setResolution({ status: 'internal', role: userRoles.role as AppRole });
+          } else {
+            setResolution({ status: 'pilot' });
+          }
         }
       } catch (error) {
         console.error('Error fetching user role:', error);
-        // Fail-closed on lookup failure.
-        setRole(null);
-        setIsInternal(false);
-      } finally {
-        setLoading(false);
+        if (!cancelled) setResolution({ status: 'error', error });
       }
     };
 
     fetchUserRole();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      // Synchronously update user ID
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUserId(session.user.id);
+        setResolution({ status: 'loading' });
+        setTimeout(() => fetchUserRole(), 0);
       } else {
         setUserId(null);
-        setRole(null);
-        setIsInternal(false);
-      }
-      
-      // Defer async operations to avoid deadlock
-      if (session?.user) {
-        setTimeout(() => fetchUserRole(), 0);
+        setResolution({ status: 'loading' });
       }
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+  }, [retryTick]);
+
+  const role: AppRole | null =
+    resolution.status === 'internal' ? resolution.role : null;
+  const isInternal = resolution.status === 'internal';
+  const loading = resolution.status === 'loading';
 
   const hasAccess = (requiredRoles: AppRole[]) => {
     if (!role) return false;
@@ -114,7 +136,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <RBACContext.Provider value={{ role, loading, hasAccess, userId, isInternal }}>
+    <RBACContext.Provider value={{ role, loading, hasAccess, userId, isInternal, resolution, retry }}>
       {children}
     </RBACContext.Provider>
   );

@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_at": "2026-07-24T21:00:00Z",
   "policy": "default-deny",
-  "checkpoint": "B7.4C",
+  "checkpoint": "B7.4E",
   "notes": [
     "PR-0.1 Checkpoint B7.4C: B7.4B verdict corrected to BLOCKED because the",
     "authorized controlled pilot is an approved-user, read-only AURA",
@@ -24,14 +24,22 @@
     "imported and exercised; (2) explicit is_approved + role check;",
     "(3) explicit CORS origin; (4) request schema validation;",
     "(5) sanitized error envelopes; (6) inventory disposition set to",
-    "'production-allowlisted'."
+    "'production-allowlisted'.",
+    "B7.4E: Adds a single approved-user pilot splat route (/pilot/*) to",
+    "production_routes. The splat mounts src/pilot/PilotShell.tsx OUTSIDE",
+    "the shared <Layout>; PilotShell nests /pilot/overview and",
+    "/pilot/asset/:twinId which serve read-only projections of",
+    "public.data_centre_twins and public.twin_kpi_snapshots gated by",
+    "existing owner-scoped RLS. No edge function is invoked; the",
+    "production_functions allowlist remains empty."
   ],
   "production_functions": [],
   "production_routes": [
     "/",
     "/login",
     "/forgot-password",
-    "/sign-out"
+    "/sign-out",
+    "/pilot/*"
   ],
   "write_deferred_routes": [
     "/onboarding"

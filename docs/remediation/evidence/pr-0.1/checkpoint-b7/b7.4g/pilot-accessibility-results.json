@@ -1,0 +1,34 @@
+{
+  "runs": [
+    {
+      "scenario": "unapproved_denied",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "scenario": "approved_overview",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "scenario": "approved_inspection",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "scenario": "empty_overview",
+      "violation_count": 0,
+      "violations": []
+    },
+    {
+      "scenario": "unavailable_overview",
+      "violation_count": 0,
+      "violations": []
+    }
+  ]
+}

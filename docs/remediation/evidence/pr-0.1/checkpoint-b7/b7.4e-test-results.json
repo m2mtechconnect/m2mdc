@@ -1,0 +1,24 @@
+{
+  "checkpoint": "B7.4E",
+  "anchor": "b1f26438195f141fbc5130f18a3bd6e0133e5ac5",
+  "inherits_from": "B7.4D:5f616cb0dfa547bc33534b5625b5d7214869c2e2fb0830be72de94d67ac2a7f7",
+  "local_checks": {
+    "typecheck": { "cmd": "bunx tsgo --noEmit", "status": "PASS" },
+    "lint_touched": { "cmd": "bunx eslint src/pilot/ src/App.tsx --max-warnings 0", "status": "PASS" },
+    "perimeter_enforcer": { "cmd": "node scripts/verify-production-perimeter.mjs", "status": "PASS", "note": "155 functions inventoried, 0 allowlisted" }
+  },
+  "deferred_checks": [
+    "Playwright pilot-route suite: not yet authored under this checkpoint - deferred to B7.5",
+    "Bundle canary scanner: no standalone scripts/bundle-canary present in repo; static verification via perimeter enforcer only",
+    "Remote effective-RLS verification: EXTERNAL BLOCKER (see docs/remediation/external-blockers.md)"
+  ],
+  "runtime_dependencies": {
+    "edge_function_invocations": 0,
+    "application_data_writes": 0,
+    "rpc_calls": 0,
+    "storage_mutations": 0,
+    "realtime_subscriptions": 0,
+    "select_calls": ["data_centre_twins x1 (overview)", "data_centre_twins x1 (inspection)", "twin_kpi_snapshots x1 (inspection)"],
+    "auth_calls": ["auth.getUser (overview)", "auth.getUser (inspection)", "auth.signOut (layout)"]
+  }
+}

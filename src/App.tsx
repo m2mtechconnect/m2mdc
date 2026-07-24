@@ -61,6 +61,10 @@ import AccessControl from "./pages/account/AccessControl";
 import PendingApproval from "./pages/PendingApproval";
 import AdminUserApproval from "./pages/AdminUserApproval";
 import AdminSignupsDashboard from "./pages/AdminSignupsDashboard";
+// PR-0.1 Checkpoint B7.4E - Controlled approved-user pilot shell.
+// Imported at module scope so lint can enforce the pilot module's
+// isolation, but only mounted for /pilot/* routes below.
+import PilotShell from "./pilot/PilotShell";
 // PR-0.1 Checkpoint B: test-only route removed from the production bundle.
 // OverlayFixtures is loaded lazily and only when import.meta.env.DEV is true,
 // so it never ships in the production tree.
@@ -199,9 +203,32 @@ function AuthenticatedApp() {
 
   // If authenticated and approved, show all protected routes
   return (
+    <Routes>
+      <Route path="/pilot/*" element={<PilotShell />} />
+      <Route
+        path="*"
+        element={
+          <ApprovedUserLayout>
+            <ApprovedUserRoutes />
+          </ApprovedUserLayout>
+        }
+      />
+    </Routes>
+  );
+}
+
+function ApprovedUserLayout({ children }: { children: React.ReactNode }) {
+  return (
     <Layout>
       <TourRenderer />
-      <Routes>
+      {children}
+    </Layout>
+  );
+}
+
+function ApprovedUserRoutes() {
+  return (
+    <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/builder" element={<Builder />} />
@@ -272,7 +299,6 @@ function AuthenticatedApp() {
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </Layout>
   );
 }
 

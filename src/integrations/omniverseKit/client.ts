@@ -5,7 +5,7 @@
  *
  * Phase 1A hardening: the client no longer carries a hard-coded IP fallback.
  * Configuration is read via `readKitConfig()` which validates
- * `VITE_OMNIVERSE_KIT_URL`. When the env is missing or invalid, every fetch
+ * the Omniverse Kit endpoint. When the env is missing or invalid, every fetch
  * fails closed with a `KitDisabledError` — callers must treat this as
  * `unavailable` / `demo` and MUST NOT synthesize a "connected" state.
  */
@@ -27,7 +27,7 @@ export class KitDisabledError extends Error {
 function currentBaseUrl(): string {
   const cfg = readKitConfig();
   if (!cfg.enabled || !cfg.restBaseUrl) {
-    throw new KitDisabledError(cfg.reason ?? 'no VITE_OMNIVERSE_KIT_URL configured');
+    throw new KitDisabledError(cfg.reason ?? 'Omniverse Kit is not available in this build');
   }
   return cfg.restBaseUrl;
 }

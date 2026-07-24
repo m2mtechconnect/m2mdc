@@ -1,7 +1,7 @@
 /**
  * Phase 1B.1 — Compatibility Provider
  *
- * Default provider selected when `VITE_AURA_SIM_PROVIDER` is unset or set to
+ * Default provider selected when `the simulation-provider selector` is unset or set to
  * `compatibility`. Preserves the current deterministic demo/simulation
  * behaviour: scenarios come from the existing registry; a `runScenario` call
  * synthesizes a deterministic result envelope using a seeded PRNG.

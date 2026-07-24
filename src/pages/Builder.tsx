@@ -60,6 +60,7 @@ export default function Builder() {
   const [authChecked, setAuthChecked] = useState(false);
   const [showDeploymentProgress, setShowDeploymentProgress] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
 
   // Detect explicit intent to start/resume a build. Without any intent we must
   // NOT auto-create a draft row on mount (previously every visit to /builder
@@ -367,10 +368,37 @@ export default function Builder() {
   // builderId/isLoading from the reactive hook so the wizard re-renders when
   // initializeBuilder finishes (getState() alone did not trigger a re-render).
   if (!hasIntent || initError || (!isLoading && !builderId)) {
-    const startBlank = () => {
+    // Deterministic user-initiated creation: bypass the effect entirely so
+    // there is no race between `setIsInitialized(false)` and the effect deps.
+    // Guaranteed to issue exactly one create request; duplicate clicks are
+    // blocked by both the local `starting` flag and the store's in-flight
+    // guard.
+    const startBlank = async () => {
+      if (starting) return;
+      setStarting(true);
       setInitError(null);
-      setIsInitialized(false);
-      navigate('/builder?new=true', { replace: true });
+      try {
+        const createParams = new URLSearchParams({ new: 'true' });
+        await initializeBuilder(createParams);
+        const newId = useWizardBuilderStore.getState().builderId;
+        if (!newId) {
+          throw new Error('Draft was not created');
+        }
+        // Consume `?new=true` exactly once: replace with `?draft=<id>` so
+        // refresh/back reloads the same draft rather than creating another.
+        setIsInitialized(true);
+        navigate(`/builder?draft=${encodeURIComponent(newId)}`, { replace: true });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Failed to create draft';
+        setInitError(msg);
+        toast({
+          title: t('builder.failedToLoad', 'Could not start build'),
+          description: msg,
+          variant: 'destructive',
+        });
+      } finally {
+        setStarting(false);
+      }
     };
     return (
       <main className="min-h-dvh bg-background section-padding-lg" aria-labelledby="builder-start-heading">
@@ -395,15 +423,23 @@ export default function Builder() {
             </div>
           )}
           <div className="grid gap-3 sm:grid-cols-2">
-            <Button asChild size="lg" variant="outline">
+            <Button asChild size="lg" variant="outline" disabled={starting}>
               <Link to="/marketplace">
                 <LayoutTemplate className="h-4 w-4 mr-2" aria-hidden="true" />
                 {t('builder.chooseTemplate', 'Choose a template')}
               </Link>
             </Button>
-            <Button size="lg" onClick={startBlank}>
-              <Sparkles className="h-4 w-4 mr-2" aria-hidden="true" />
-              {t('builder.startBlank', 'Start blank')}
+            <Button size="lg" onClick={startBlank} disabled={starting} aria-busy={starting}>
+              {starting ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
+              ) : (
+                <Sparkles className="h-4 w-4 mr-2" aria-hidden="true" />
+              )}
+              {starting
+                ? t('builder.startingBlank', 'Creating draft…')
+                : initError
+                  ? t('builder.retry', 'Retry')
+                  : t('builder.startBlank', 'Start blank')}
             </Button>
           </div>
         </div>

@@ -106,6 +106,18 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
   ...initialState,
 
   initializeBuilder: async (params, geminiAnalysis, prefilled, blueprint) => {
+    // In-flight guard: prevent duplicate creation from React Strict Mode
+    // double-invocation, effect re-fires, or rapid double-clicks.
+    if (get().isLoading) {
+      console.log('⏭️ [STORE] initializeBuilder skipped — already in flight');
+      return;
+    }
+    // Idempotency guard: if a draft is already loaded and no new intent
+    // params request a fresh one, do nothing.
+    if (get().builderId && !params.get('new') && !params.get('draft') && !params.get('builderId') && !params.get('templateId') && !params.get('session') && !blueprint) {
+      console.log('⏭️ [STORE] initializeBuilder skipped — draft already loaded');
+      return;
+    }
     set({ isLoading: true, error: null });
     
     try {

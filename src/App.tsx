@@ -22,6 +22,7 @@ import PendingApproval from "./pages/PendingApproval";
 // the only authenticated surface allowed to render on /pilot/*. It has no
 // blocked-consumer imports (verified by scripts/pilot-bundle-canary.mjs).
 import PilotShell from "./pilot/PilotShell";
+import AuthorizationError from "./pages/AuthorizationError";
 // Role-Aware Application Routing - Approved *internal* users (users with
 // an explicit row in public.user_roles) receive the full AURA DC
 // application via the legacy AuthenticatedShell, loaded lazily so that
@@ -162,15 +163,24 @@ function LoadingScreen() {
 }
 
 function ApprovedUserRouter() {
-  const { isInternal, loading: rbacLoading } = useRBAC();
+  const { resolution } = useRBAC();
 
   // Wait for RBAC to resolve before rendering any privileged shell.
-  // Prevents flashing the pilot shell to internal users and vice versa.
-  if (rbacLoading) {
+  if (resolution.status === 'loading') {
     return <LoadingScreen />;
   }
 
-  if (isInternal) {
+  // Lookup FAILURE must not silently downgrade to the pilot shell.
+  if (resolution.status === 'error') {
+    return (
+      <Routes>
+        <Route path="/sign-out" element={<SignOut />} />
+        <Route path="*" element={<AuthorizationError />} />
+      </Routes>
+    );
+  }
+
+  if (resolution.status === 'internal') {
     return (
       <Suspense fallback={<LoadingScreen />}>
         <Routes>

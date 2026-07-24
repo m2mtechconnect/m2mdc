@@ -15,7 +15,7 @@
  * No file outside the scratch dir is touched. Scratch dirs are removed
  * on success and preserved on failure for post-mortem.
  */
-import { mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdirSync, writeFileSync, rmSync, readFileSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -94,7 +94,7 @@ function baseSkeleton(root, { functions = [], allowlisted = [] } = {}) {
 
 function writeAllowlist(root, patch) {
   const p = join(root, 'docs/remediation/evidence/pr-0.1/route-allowlist.json');
-  const cur = JSON.parse(require('node:fs').readFileSync(p, 'utf8'));
+  const cur = JSON.parse(readFileSync(p, 'utf8'));
   writeFile(root, 'docs/remediation/evidence/pr-0.1/route-allowlist.json',
     JSON.stringify({ ...cur, ...patch }, null, 2));
 }

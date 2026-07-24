@@ -140,12 +140,25 @@ export async function installSupabaseMock(
     // Sanitized only: no headers, tokens, UUIDs, or query values.
     log.push({ method, origin: parsed.origin, pathname, queryKeys });
 
+    // Cross-origin fulfill responses require CORS headers or the
+    // browser rejects them and supabase-js logs "Failed to fetch".
+    const CORS_HEADERS: Record<string, string> = {
+      'access-control-allow-origin': '*',
+      'access-control-expose-headers': 'content-range,content-profile',
+    };
+    const fulfillJson = (body: string, contentType = 'application/json', extraHeaders: Record<string, string> = {}) =>
+      route.fulfill({
+        status: 200,
+        headers: { ...CORS_HEADERS, 'content-type': contentType, ...extraHeaders },
+        body,
+      });
+
     // ---- OPTIONS preflight -------------------------------------
     if (method === 'OPTIONS') {
       return route.fulfill({
         status: 204,
         headers: {
-          'access-control-allow-origin': '*',
+          ...CORS_HEADERS,
           'access-control-allow-methods': 'GET,POST,PATCH,DELETE,HEAD,OPTIONS',
           'access-control-allow-headers':
             'authorization,apikey,content-type,accept,accept-profile,content-profile,prefer,x-client-info',
@@ -156,18 +169,13 @@ export async function installSupabaseMock(
 
     // ---- Auth endpoints ----------------------------------------
     if (pathname.startsWith('/auth/v1/token')) {
-      return route.fulfill({
-        status: 200, contentType: 'application/json', body: session.storagePayload,
-      });
+      return fulfillJson(session.storagePayload);
     }
     if (pathname.startsWith('/auth/v1/user')) {
-      return route.fulfill({
-        status: 200, contentType: 'application/json',
-        body: JSON.stringify((JSON.parse(session.storagePayload) as { user: unknown }).user),
-      });
+      return fulfillJson(JSON.stringify((JSON.parse(session.storagePayload) as { user: unknown }).user));
     }
     if (pathname.startsWith('/auth/v1/logout')) {
-      return route.fulfill({ status: 204, body: '' });
+      return route.fulfill({ status: 204, headers: CORS_HEADERS, body: '' });
     }
 
     // Realtime — WS upgrades aren't reliably interceptable; the
@@ -180,46 +188,37 @@ export async function installSupabaseMock(
     if (pathname.startsWith('/rest/v1/profiles')) {
       if (method === 'HEAD') {
         profileHits += 1;
-        return route.fulfill({ status: 200, body: '' });
+        return route.fulfill({ status: 200, headers: CORS_HEADERS, body: '' });
       }
       if (method === 'GET') {
         profileHits += 1;
         const acceptHeader = (req.headers()['accept'] ?? '').toLowerCase();
         const wantsSingle = acceptHeader.includes('pgrst.object');
-        return route.fulfill({
-          status: 200,
-          contentType: wantsSingle
-            ? 'application/vnd.pgrst.object+json'
-            : 'application/json',
-          body: JSON.stringify(wantsSingle ? profileRow : [profileRow]),
-        });
+        return fulfillJson(
+          JSON.stringify(wantsSingle ? profileRow : [profileRow]),
+          wantsSingle ? 'application/vnd.pgrst.object+json' : 'application/json',
+        );
       }
       // Writes are unexpected on this surface — reply row-shaped so
       // no code path hangs.
-      return route.fulfill({
-        status: 200, contentType: 'application/json', body: JSON.stringify(profileRow),
-      });
+      return fulfillJson(JSON.stringify(profileRow));
     }
 
     if (pathname.startsWith('/rest/v1/user_roles')) {
-      if (method === 'HEAD') return route.fulfill({ status: 200, body: '' });
-      return route.fulfill({
-        status: 200, contentType: 'application/json',
-        body: JSON.stringify([{ user_id: session.userId, role: opts.profileRole ?? 'admin' }]),
-      });
+      if (method === 'HEAD') return route.fulfill({ status: 200, headers: CORS_HEADERS, body: '' });
+      return fulfillJson(
+        JSON.stringify([{ user_id: session.userId, role: opts.profileRole ?? 'admin' }]),
+      );
     }
 
     // ---- RPC / other REST --------------------------------------
     if (pathname.startsWith('/rest/v1/') || pathname.startsWith('/rpc/')) {
-      if (method === 'HEAD') return route.fulfill({ status: 200, body: '' });
-      return route.fulfill({
-        status: 200, contentType: 'application/json',
-        body: method === 'GET' ? '[]' : '{}',
-      });
+      if (method === 'HEAD') return route.fulfill({ status: 200, headers: CORS_HEADERS, body: '' });
+      return fulfillJson(method === 'GET' ? '[]' : '{}');
     }
 
     // Any other supabase.co path — reply empty so nothing hangs.
-    return route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
+    return fulfillJson('{}');
   }
 
   // Register at context level so the mock is in force before any

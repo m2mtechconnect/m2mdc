@@ -1,0 +1,19 @@
+Order	Filename	Risk	Severity	Mitigation
+01	20251209160634_remix_migration_from_pg_dump.sql	very large single file, non-transactional CREATE EXTENSION statements, embedded platform grants; replay requires Supabase-compatible superuser to install pg_cron/supabase_vault/pg_graphql	P3	See summary
+02	20251210005210_d6487de0-0ce4-48bc-9f18-9ab49c8f5358.sql	idempotent; safe	P3	See summary
+03	20251210010204_696d7788-e514-4dd6-b244-44913022649d.sql	low	P3	See summary
+04	20251210032625_0243a383-7873-4785-9fba-35924b2719a1.sql	non-idempotent CREATE POLICY without IF NOT EXISTS on some (verify)	P1	See summary
+05	20251210033908_baac1120-6f3f-4a70-8a97-b6243ee72d47.sql	non-idempotent policy names	P1	See summary
+06	20251210035930_9d8461f8-bf20-4982-b2b3-e7b541f01390.sql	non-idempotent policy names	P1	See summary
+07	20251210154256_1d3d5af4-7144-4e93-867c-590124704414.sql	non-idempotent	P1	See summary
+08	20251210161218_24842690-23ac-4584-b6a3-c4d5e4de2284.sql	low	P3	See summary
+09	20251211160930_a2b70e13-b985-4f8c-b6b1-3176e8ad8fb6.sql	non-idempotent	P1	See summary
+10	20251211234933_b6d2e072-6b68-461f-b36d-dfed0429f21d.sql	P0 privilege-escalation surface introduced (self INSERT of admin roles). Corrected by B1 (last migration).	P0	See summary
+11	20251215025535_d8b5f197-92b4-4311-ac40-6fc76d311db7.sql	low	P3	See summary
+12	20260206150808_4cb276a5-a341-4b08-a939-83ac1e9b5bcc.sql	low	P3	See summary
+13	20260212035209_61e2d774-6a40-4d87-9762-b503050b64ad.sql	anonymous insert path; ensure rate-limit applied elsewhere	P3	See summary
+14	20260212133602_bf66e00b-576a-44ac-bed1-89ab3179b68f.sql	low	P3	See summary
+15	20260218142636_a59bb8cb-5e00-4e13-b63d-19eb97d7d4bb.sql	low	P3	See summary
+16	20260218143534_31cc19e1-4fb9-4966-a613-ae0ca9085c16.sql	empty/near-empty; verify not accidental	P3	See summary
+17	20260323173624_97384e28-beb3-4f8d-8d4b-dbadd65d6f9e.sql	low	P3	See summary
+18	20260724005954_e17e6492-dc51-46f8-bb87-642071501b8b.sql	CREATE POLICY guarded with DO block; CREATE TABLE IF NOT EXISTS; forward-only; safe replay	P3	See summary

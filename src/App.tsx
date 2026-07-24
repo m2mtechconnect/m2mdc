@@ -211,7 +211,7 @@ const App = () => (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <RBACProvider>
-            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <BrowserRouter future={{ v7_relativeSplatPath: true }}>
               <ActiveTwinProvider>
                       <Toaster />
                       <Sonner />

@@ -1,4 +1,10 @@
 project_id = "psfvrskpnwcshvajzeix"
 
+# PR-0.1 Checkpoint B: green-dc-recommend is DISABLED for the pilot surface.
+# Gateway JWT verification is restored to the default (true) as defense in
+# depth. The function is excluded from the production allowlist
+# (docs/remediation/evidence/pr-0.1/route-allowlist.json) and its runtime
+# path fails closed. Do NOT re-add `verify_jwt = false` without an
+# explicitly approved signed-webhook classification.
 [functions.green-dc-recommend]
-verify_jwt = false
+verify_jwt = true

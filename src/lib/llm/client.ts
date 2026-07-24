@@ -1,14 +1,20 @@
 /**
- * Centralized LLM Client for AURA Agent Studio
- * Uses the managed AI Gateway with Latest Gemini 3.x Models
- * 
- * ENFORCES: All Co-Pilot interactions use Gemini 3.x or later
+ * Centralized LLM Client (client-side stub).
+ *
+ * PR-0.1 Checkpoint B: browser-side LLM calls are disabled. The prior
+ * implementation embedded the AI-gateway browser key into the production
+ * bundle, so the provider credential shipped to every visitor. That
+ * behaviour has been removed until a server-mediated LLM edge function is
+ * introduced in a later checkpoint.
+ *
+ * This module now returns a typed `LlmUnavailableError`. Callers MUST
+ * render an accessible "AI unavailable" state — never a fabricated or
+ * synthetic completion. Do NOT reintroduce any browser-side gateway
+ * credential here or in any other client-side module.
  */
 
-import { resolveLatestGeminiModel, getFallbackGeminiModel, enforceGemini3x } from './modelResolver';
-
 export interface AIClientOptions {
-  model?: 'pro' | 'fallback'; // Removed 'fast' and 'lite' - only Gemini 3.x
+  model?: 'pro' | 'fallback';
   temperature?: number;
   maxTokens?: number;
 }
@@ -20,10 +26,7 @@ export interface AIMessage {
 
 export interface AICompletionResponse {
   choices: Array<{
-    message: {
-      content: string;
-      role: string;
-    };
+    message: { content: string; role: string };
     finish_reason: string;
   }>;
   usage?: {
@@ -33,66 +36,25 @@ export interface AICompletionResponse {
   };
 }
 
-/**
- * Get AI client configuration
- * ALWAYS uses latest Gemini 3.x model
- */
-export function getAIClient(options: AIClientOptions = {}) {
-  const { model = 'pro', temperature = 0.7, maxTokens = 2048 } = options;
-
-  // Resolve to latest Gemini 3.x model
-  let resolvedModel: string;
-  if (model === 'fallback') {
-    resolvedModel = getFallbackGeminiModel();
-  } else {
-    resolvedModel = resolveLatestGeminiModel();
+export class LlmUnavailableError extends Error {
+  readonly code = 'LLM_CLIENT_DISABLED' as const;
+  constructor(message = 'Browser-side LLM calls are disabled (PR-0.1).') {
+    super(message);
+    this.name = 'LlmUnavailableError';
   }
-
-  // Enforce Gemini 3.x usage
-  enforceGemini3x(resolvedModel);
-
-  return {
-    endpoint: 'https://ai.gateway.lovable.dev/v1/chat/completions', // managed AI gateway endpoint
-    model: resolvedModel,
-    temperature,
-    maxTokens,
-  };
 }
 
-/**
- * Make an AI completion request
- */
+export function isLlmAvailable(): false {
+  return false;
+}
+
+export function getAIClient(_options: AIClientOptions = {}): never {
+  throw new LlmUnavailableError();
+}
+
 export async function makeAICompletion(
-  messages: AIMessage[],
-  options: AIClientOptions = {}
+  _messages: AIMessage[],
+  _options: AIClientOptions = {}
 ): Promise<AICompletionResponse> {
-  const client = getAIClient(options);
-  
-  // Get API key from environment
-  const apiKey = import.meta.env.VITE_LOVABLE_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('AI gateway API key not configured');
-  }
-
-  const response = await fetch(client.endpoint, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: client.model,
-      messages,
-      temperature: client.temperature,
-      max_tokens: client.maxTokens,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`AI Gateway error: ${response.status} - ${error}`);
-  }
-
-  return await response.json();
+  throw new LlmUnavailableError();
 }

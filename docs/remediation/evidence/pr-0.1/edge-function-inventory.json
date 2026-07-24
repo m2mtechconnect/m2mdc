@@ -887,7 +887,7 @@
     "checks_is_approved": false,
     "webhook_signature_verification": false,
     "uses_service_role_key": false,
-    "production_disposition": "unknown-blocked"
+    "production_disposition": "disabled"
   },
   {
     "function": "generate-ctas",
@@ -915,7 +915,7 @@
     "checks_is_approved": false,
     "webhook_signature_verification": false,
     "uses_service_role_key": false,
-    "production_disposition": "unknown-blocked"
+    "production_disposition": "disabled"
   },
   {
     "function": "grounded-summary",

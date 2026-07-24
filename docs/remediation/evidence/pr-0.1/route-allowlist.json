@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-24T12:00:00Z",
+  "policy": "default-deny",
+  "notes": [
+    "PR-0.1 Checkpoint B: the controlled-pilot production surface is EMPTY.",
+    "This is intentional. No function has been proven to enforce approval,",
+    "role, tenant, request-validation and error-sanitization requirements",
+    "end-to-end against a disposable database. Adding a function here",
+    "REQUIRES: (1) _shared/authz.ts guard imported and exercised;",
+    "(2) explicit is_approved + role check; (3) explicit CORS origin;",
+    "(4) request schema validation; (5) sanitized error envelopes;",
+    "(6) inventory disposition set to 'production-allowlisted'."
+  ],
+  "production_functions": [],
+  "production_routes": [
+    "/",
+    "/login",
+    "/onboarding",
+    "/reset-password"
+  ],
+  "forbidden_production_routes": [
+    "/test/*",
+    "/debug/*",
+    "/dev/*",
+    "/fixtures/*",
+    "/evidence/*",
+    "/aoc/dev",
+    "/qa/*"
+  ],
+  "disabled_functions": [
+    "green-dc-recommend",
+    "generate-ai-recommendations"
+  ]
+}

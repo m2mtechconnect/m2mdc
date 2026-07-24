@@ -48,7 +48,7 @@ test.describe('/builder success regression (real backend)', () => {
   }) => {
     // ---- Phase C: auth installed BEFORE any page navigation. ----
     try {
-      await installRealSupabaseAuth(context, 'http://localhost:8080');
+      await installRealSupabaseAuth(context);
     } catch (err) {
       if (err instanceof RealAuthUnavailableError) {
         test.skip(true, err.message);

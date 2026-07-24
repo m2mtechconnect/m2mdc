@@ -47,7 +47,7 @@ test.describe('/builder failure-and-Retry regression (real backend recovery)', (
     page,
   }) => {
     try {
-      await installRealSupabaseAuth(context, 'http://localhost:8080');
+      await installRealSupabaseAuth(context);
     } catch (err) {
       if (err instanceof RealAuthUnavailableError) {
         test.skip(true, err.message);

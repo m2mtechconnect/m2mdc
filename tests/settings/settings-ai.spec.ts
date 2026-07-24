@@ -26,7 +26,7 @@ const CONSOLE_ERROR_ALLOWLIST: RegExp[] = [
 test.describe('/settings/ai', () => {
   test('authorized load, validation, save success and persistence', async ({ context, page }) => {
     try {
-      await installRealSupabaseAuth(context, 'http://localhost:8080');
+      await installRealSupabaseAuth(context);
     } catch (err) {
       if (err instanceof RealAuthUnavailableError) test.skip(true, err.message);
       throw err;

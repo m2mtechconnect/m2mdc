@@ -26,14 +26,17 @@ export default function PendingApproval() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="glass-panel p-8 max-w-md text-center space-y-6">
+    <main
+      className="min-h-screen bg-background flex items-center justify-center p-4"
+      aria-labelledby="pending-approval-heading"
+    >
+      <Card className="glass-panel p-8 max-w-md text-center space-y-6" role="region" aria-label="Account pending approval">
         <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
           <Clock className="h-8 w-8 text-primary" />
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-display font-bold">{t('pendingApproval.title')}</h1>
+          <h1 id="pending-approval-heading" className="text-2xl font-display font-bold">{t('pendingApproval.title')}</h1>
           <p className="text-muted-foreground">
             {t('pendingApproval.description')}
           </p>
@@ -55,6 +58,6 @@ export default function PendingApproval() {
           {t('auth.signOut')}
         </Button>
       </Card>
-    </div>
+    </main>
   );
 }

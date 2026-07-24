@@ -16,7 +16,11 @@ export default function PilotShell() {
       <Route element={<PilotLayout />}>
         <Route path="overview" element={<PilotOverview />} />
         <Route path="asset/:twinId" element={<PilotAssetInspection />} />
-        <Route path="*" element={<Navigate to="overview" replace />} />
+        {/* PR-0.1 Checkpoint B7.4G - use absolute redirect target. A
+         * relative `to="overview"` under the `/pilot/*` splat concatenates
+         * "overview" to whatever the current URL is, producing an
+         * unbounded redirect loop when an unknown pilot subpath is hit. */}
+        <Route path="*" element={<Navigate to="/pilot/overview" replace />} />
       </Route>
     </Routes>
   );

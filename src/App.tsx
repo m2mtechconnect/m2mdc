@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense, lazy } from "react";
+import { useState, useEffect, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,12 +22,11 @@ import PendingApproval from "./pages/PendingApproval";
 // the only authenticated surface allowed to render on /pilot/*. It has no
 // blocked-consumer imports (verified by scripts/pilot-bundle-canary.mjs).
 import PilotShell from "./pilot/PilotShell";
-// PR-0.1 Checkpoint B7.4F - Legacy authenticated shell is lazy-loaded so
-// its dependency graph (Layout, CoPilotPanel, CoPilotBubble, HealthBadges,
-// GlobalSearchBar, useTokenRefresh, and all legacy pages that invoke
-// blocked edge functions) is NOT reachable from the /pilot/* initial
-// chunk. Do not convert to a static import.
-const AuthenticatedShell = lazy(() => import("./AuthenticatedShell"));
+// PR-0.1 Checkpoint B7.4G - Legacy AuthenticatedShell is no longer
+// mounted at any approved-user route. It remains in the source tree so
+// the codebase can be revived in later phases, but must never be
+// re-imported here (statically or lazily) without a new checkpoint
+// authorization. Approved users see only /pilot/*.
 const OverlayFixtures = import.meta.env.DEV
   ? lazy(() => import("./pages/test/OverlayFixtures"))
   : null;
@@ -153,19 +152,17 @@ function AuthenticatedApp() {
   return (
     <Routes>
       <Route path="/pilot/*" element={<PilotShell />} />
+      {/*
+       * PR-0.1 Checkpoint B7.4G - Sealed approved-user surface.
+       * The controlled pilot is /pilot/*. Approved users may also sign
+       * out; every other path redirects to the pilot overview. This
+       * prevents production-blocked legacy routes (/dashboard, /builder,
+       * /operations, etc.) from mounting AuthenticatedShell at runtime.
+       */}
+      <Route path="/sign-out" element={<SignOut />} />
       <Route
         path="*"
-        element={
-          <Suspense
-            fallback={
-              <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-              </div>
-            }
-          >
-            <AuthenticatedShell />
-          </Suspense>
-        }
+        element={<Navigate to="/pilot/overview" replace />}
       />
     </Routes>
   );

@@ -1,0 +1,1441 @@
+{
+  "total_requests_to_supabase_host": 175,
+  "forbidden_hits": [],
+  "by_class": {
+    "allowed": 175,
+    "unexpected": 0,
+    "forbidden": 0
+  },
+  "endpoints": [
+    [
+      "GET",
+      "/auth/v1/user"
+    ],
+    [
+      "GET",
+      "/rest/v1/data_centre_locations"
+    ],
+    [
+      "GET",
+      "/rest/v1/data_centre_twins"
+    ],
+    [
+      "GET",
+      "/rest/v1/profiles"
+    ],
+    [
+      "GET",
+      "/rest/v1/twin_kpi_snapshots"
+    ],
+    [
+      "GET",
+      "/rest/v1/user_roles"
+    ],
+    [
+      "POST",
+      "/auth/v1/logout"
+    ]
+  ],
+  "requests": [
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000bbbb",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000bbbb",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000bbbb",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000bbbb&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000bbbb&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unapproved_denied",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000bbbb&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=id%2Cname%2Ccity%2Cregion_code%2Ctier%2Ccapacity_kw%2Cpue_target%2Cupdated_at%2Ccreated_at%2Ccreated_by_user&created_by_user=eq.00000000-0000-0000-0000-00000000aaaa&order=updated_at.desc&limit=25",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_inspection",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_inspection",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_inspection",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=id%2Cname%2Ccity%2Cregion_code%2Ctier%2Ccapacity_kw%2Cpue_target%2Cupdated_at%2Ccreated_at%2Ccreated_by_user&id=eq.11111111-1111-1111-1111-111111111111&created_by_user=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "approved_inspection",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/twin_kpi_snapshots?select=id%2Ctwin_id%2Ckpi_key%2Ckpi_value%2Ckpi_unit%2Cdomain%2Csnapshot_at&twin_id=eq.11111111-1111-1111-1111-111111111111&order=snapshot_at.desc&limit=50",
+      "method": "GET",
+      "path": "/rest/v1/twin_kpi_snapshots",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=id%2Cname%2Ccity%2Cregion_code%2Ctier%2Ccapacity_kw%2Cpue_target%2Cupdated_at%2Ccreated_at%2Ccreated_by_user&id=eq.22222222-2222-2222-2222-222222222222&created_by_user=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/twin_kpi_snapshots?select=id%2Ctwin_id%2Ckpi_key%2Ckpi_value%2Ckpi_unit%2Cdomain%2Csnapshot_at&twin_id=eq.22222222-2222-2222-2222-222222222222&order=snapshot_at.desc&limit=50",
+      "method": "GET",
+      "path": "/rest/v1/twin_kpi_snapshots",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "cross_owner_empty",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=id%2Cname%2Ccity%2Cregion_code%2Ctier%2Ccapacity_kw%2Cpue_target%2Cupdated_at%2Ccreated_at%2Ccreated_by_user&created_by_user=eq.00000000-0000-0000-0000-00000000aaaa&order=updated_at.desc&limit=25",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "empty_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=id%2Cname%2Ccity%2Cregion_code%2Ctier%2Ccapacity_kw%2Cpue_target%2Cupdated_at%2Ccreated_at%2Ccreated_by_user&created_by_user=eq.00000000-0000-0000-0000-00000000aaaa&order=updated_at.desc&limit=25",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unavailable_overview",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=id%2Cname%2Ccity%2Cregion_code%2Ctier%2Ccapacity_kw%2Cpue_target%2Cupdated_at%2Ccreated_at%2Ccreated_by_user&created_by_user=eq.00000000-0000-0000-0000-00000000aaaa&order=updated_at.desc&limit=25",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "unknown_pilot_route",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "blocked_dashboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=id%2Cname%2Ccity%2Cregion_code%2Ctier%2Ccapacity_kw%2Cpue_target%2Cupdated_at%2Ccreated_at%2Ccreated_by_user&created_by_user=eq.00000000-0000-0000-0000-00000000aaaa&order=updated_at.desc&limit=25",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=id%2Cname%2Ccity%2Cregion_code%2Ctier%2Ccapacity_kw%2Cpue_target%2Cupdated_at%2Ccreated_at%2Ccreated_by_user&created_by_user=eq.00000000-0000-0000-0000-00000000aaaa&order=updated_at.desc&limit=25",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "logout",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/logout?scope=global",
+      "method": "POST",
+      "path": "/auth/v1/logout",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=id%2Cname%2Ccity%2Cregion_code%2Ctier%2Ccapacity_kw%2Cpue_target%2Cupdated_at%2Ccreated_at%2Ccreated_by_user&created_by_user=eq.00000000-0000-0000-0000-00000000aaaa&order=updated_at.desc&limit=25",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.00000000-0000-0000-0000-00000000aaaa",
+      "method": "GET",
+      "path": "/rest/v1/profiles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_locations",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+      "method": "GET",
+      "path": "/rest/v1/data_centre_twins",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+      "method": "GET",
+      "path": "/auth/v1/user",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    },
+    {
+      "scenario": "keyboard",
+      "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/user_roles?select=role&user_id=eq.00000000-0000-0000-0000-00000000aaaa&limit=1",
+      "method": "GET",
+      "path": "/rest/v1/user_roles",
+      "class": "allowed",
+      "resource_type": "fetch"
+    }
+  ]
+}

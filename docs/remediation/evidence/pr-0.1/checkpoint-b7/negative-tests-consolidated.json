@@ -1,52 +1,24 @@
 {
-  "schema_version": 2,
-  "checkpoint": "B7.4B",
-  "anchor": {
-    "git_head": "a1da5a1f01e673209579b3a95a574d50d834f0dc",
-    "working_tree_note": "unrelated in-progress edits preserved; B7.4B modifies only route-allowlist.json (adds classification fields), verify-production-perimeter.mjs (adds NEG-A and NEG-D rules), perimeter-negative.mjs (adds NEG-A/B/C/D/F/I and clean control), and the checkpoint-b7 evidence dir",
-    "fingerprints_sha256": {
-      "src/App.tsx":                                                  "7df6c301d368fcf910e7ee1d53f361cb2bc4d6eeaf8ff092fd08277090e7eae1",
-      "docs/remediation/evidence/pr-0.1/route-allowlist.json":        "8881062bf373edd65af6555f0756bdcbce9fa23fa1fe65a7e27dc9cca952f5bf",
-      "docs/remediation/evidence/pr-0.1/edge-function-inventory.json":"e0f7a74c402504ec5e00ef2f67a0955b5a8c3a5347581468b54b0bbcfa2e8416",
-      "scripts/verify-production-perimeter.mjs":                      "694c0ebef375b2261765a9941d711b319b4b30e8ca0c10f8489a19541cd9d762",
-      "scripts/__tests__/perimeter-negative.mjs":                     "d4cb60166534815bd202185d8d0e1226f57b802e5b301dbcfe5fbc831fd6cc9a"
-    }
-  },
-  "reconciliation_baseline": {
-    "authoritative": "63 distinct edge functions across 92 browser call sites",
-    "prior_b6_count_reason": "docs/remediation/evidence/pr-0.1/checkpoint-b6/invoke-cross-reference.json enumerated 49 functions and 71 sites because it filtered by supabase.functions.invoke() ONLY. It missed: (a) invokeEdgeFunction() call sites in the useEdgeFunction wrapper (adds copilot-health, ops-overview and secondary rag-* + zapier-* sites); (b) the newer zapier-app-* / zapier-oauth-* / zapier-test-connection surface added after B6; (c) knowledge-index, reco-selftest, workflow-run, funding-scraper which post-date B6; (d) additional call sites for url-capture and url-recommendations in the search insight panels. B7.4A recount using rg -n 'functions\\.invoke|invokeEdgeFunction' produced 63/92. One entry (copilot-router) appears in a component README as documentation-only and is not counted as a real call site."
-  },
-  "harnesses": {
-    "isolated_fixture_harness": "scripts/__tests__/perimeter-negative.mjs",
-    "in_repo_enforcer_run":      "scripts/verify-production-perimeter.mjs (real repo tree, HEAD a1da5a1f)"
-  },
-  "command": "node scripts/__tests__/perimeter-negative.mjs",
-  "run_result": "exit=0 — 10/10 fixtures behaved as expected",
-  "cases": [
-    { "id": "NEG-A", "axis": "unclassified route",              "expected_exit": 1, "expected_stderr_substring": "App.tsx declares unclassified route: /rogue-uncategorized",                                  "observed_exit": 1, "result": "PASS" },
-    { "id": "NEG-B", "axis": "unclassified function",           "expected_exit": 1, "expected_stderr_substring": "function rogue-fn: missing from inventory",                                                  "observed_exit": 1, "result": "PASS" },
-    { "id": "NEG-C", "axis": "wildcard function deployment",    "expected_exit": 1, "expected_stderr_substring": "deploy.yml: wildcard \"supabase functions deploy\" is forbidden",                             "observed_exit": 1, "result": "PASS" },
-    { "id": "NEG-D", "axis": "disabled-function re-allowlist",  "expected_exit": 1, "expected_stderr_substring": "allowlist: disabled function \"blocked-fn\" is also present in production_functions",         "observed_exit": 1, "result": "PASS" },
-    { "id": "NEG-E", "axis": "allowlisted fn missing authz",    "expected_exit": 1, "expected_stderr_substring": "allowlist/pilot-fn: missing \"_shared/authz\" import",                                        "observed_exit": 1, "result": "PASS" },
-    { "id": "NEG-F", "axis": "forbidden browser env identifier","expected_exit": 1, "expected_stderr_substring": "references forbidden /VITE_LOVABLE_API_KEY/",                                                 "observed_exit": 1, "result": "PASS" },
-    { "id": "NEG-G", "axis": "production test/debug route",     "expected_exit": 1, "expected_stderr_substring": "App.tsx declares forbidden production route: /test/*",                                        "observed_exit": 1, "result": "PASS" },
-    { "id": "NEG-I", "axis": "unauthorized verify_jwt=false",   "expected_exit": 1, "expected_stderr_substring": "config.toml: [webhook-fn] verify_jwt=false without signed-webhook disposition",              "observed_exit": 1, "result": "PASS" }
+  "schema_version": 3,
+  "checkpoint": "B7.4C",
+  "harness": "scripts/__tests__/perimeter-negative.mjs",
+  "enforcer": "scripts/verify-production-perimeter.mjs",
+  "generated_at": "2026-07-24T21:00:00Z",
+  "notes": [
+    "Re-run against post-B7.4C allowlist (schema_version 2, checkpoint B7.4C).",
+    "The real repo tree (CLEAN control) still passes because /onboarding was moved from production_routes to production_blocked_routes when reclassified as write-deferred, keeping the NEG-A route-classification rule satisfied."
   ],
-  "positive_control": {
-    "id": "NEG-H",
-    "axis": "DEV-gated forbidden route (must PASS)",
-    "expected_exit": 0,
-    "observed_exit": 0,
-    "result": "PASS"
-  },
-  "clean_control": {
-    "id": "CLEAN",
-    "axis": "real repo tree at HEAD",
-    "command": "node scripts/verify-production-perimeter.mjs (cwd=repo root)",
-    "expected_exit": 0,
-    "observed_exit": 0,
-    "result": "PASS",
-    "note": "Confirms the two new rules (NEG-A route classification, NEG-D disabled/allowlisted intersection) do not regress the real repo. Real allowlist adds production_blocked_routes[], development_only_routes[], redirect_only_routes[] to satisfy NEG-A; disabled_functions and production_functions have no intersection."
-  },
-  "verdict": "CLOSED — all eight required negative axes exercised, none SKIP, none NOT-IMPLEMENTED; positive control and clean control both PASS; scratch dirs cleaned on success and preserved on failure for post-mortem"
+  "fixtures": [
+    { "case": "NEG-A", "axis": "unclassified route",              "expected_exit": 1, "observed_exit": 1, "result": "PASS", "expected_message": "App.tsx declares unclassified route: /rogue-uncategorized" },
+    { "case": "NEG-B", "axis": "unclassified function",           "expected_exit": 1, "observed_exit": 1, "result": "PASS", "expected_message": "function rogue-fn: missing from inventory" },
+    { "case": "NEG-C", "axis": "wildcard function deployment",    "expected_exit": 1, "observed_exit": 1, "result": "PASS", "expected_message": "deploy.yml: wildcard \"supabase functions deploy\" is forbidden" },
+    { "case": "NEG-D", "axis": "disabled fn re-allowlist",        "expected_exit": 1, "observed_exit": 1, "result": "PASS", "expected_message": "allowlist: disabled function \"blocked-fn\" is also present in production_functions" },
+    { "case": "NEG-E", "axis": "allowlisted fn missing authz",    "expected_exit": 1, "observed_exit": 1, "result": "PASS", "expected_message": "allowlist/pilot-fn: missing \"_shared/authz\" import" },
+    { "case": "NEG-F", "axis": "forbidden browser env identifier","expected_exit": 1, "observed_exit": 1, "result": "PASS", "expected_message": "references forbidden /VITE_LOVABLE_API_KEY/" },
+    { "case": "NEG-G", "axis": "production test/debug route",     "expected_exit": 1, "observed_exit": 1, "result": "PASS", "expected_message": "App.tsx declares forbidden production route: /test/*" },
+    { "case": "NEG-I", "axis": "verify_jwt=false unauthorized",   "expected_exit": 1, "observed_exit": 1, "result": "PASS", "expected_message": "config.toml: [webhook-fn] verify_jwt=false without signed-webhook disposition" },
+    { "case": "NEG-H", "axis": "DEV-gated route (positive)",      "expected_exit": 0, "observed_exit": 0, "result": "PASS", "expected_message": "exit=0 (DEV-gated route is exempt)" },
+    { "case": "CLEAN", "axis": "real repo tree at HEAD",          "expected_exit": 0, "observed_exit": 0, "result": "PASS", "expected_message": "exit=0 (real repo tree passes at HEAD)" }
+  ],
+  "summary": { "total": 10, "pass": 10, "fail": 0, "skip": 0 }
 }

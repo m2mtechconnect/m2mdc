@@ -1,18 +1,32 @@
 {
-  "schema_version": 1,
-  "checkpoint": "B7.4B",
-  "decision_authority": "user message authorizing B7.4B",
+  "schema_version": 2,
+  "checkpoint": "B7.4C",
+  "decision_authority": "user message authorizing B7.4C",
+  "b7_4b_verdict_correction": "B7.4B BLOCKED - SELECTED WORKFLOW NOT OPERABLE. Five public routes alone do not constitute the authorized controlled pilot. The controlled pilot is an approved-user, read-only AURA experience.",
   "authorized_decisions": {
     "canonical_password_recovery_route": "/forgot-password",
-    "reset_password_route_status": "STALE - not added to pilot; existing recovery-completion flow is BROKEN (see password-recovery-reconciliation.md)",
+    "reset_password_route_status": "ABSENT - not declared in src/App.tsx; recovery-completion is BROKEN",
+    "recovery_workflow_status": "NOT OPERABLE - entry page functions; completion page missing; overall workflow is not counted as a completed pilot workflow",
     "pilot_mode": "approved-user, read-only subset",
+    "minimum_role": "standard non-privileged approved user (no security_admin, no elevated role introduced)",
     "default_policy": "default-deny for every route and every function unless explicitly included via evidence process"
   },
-  "pilot_routes": {
-    "public-pilot": ["/", "/login", "/forgot-password", "/sign-out", "/onboarding"],
-    "approved-user-pilot": [],
-    "approved-user-pilot_deferred_reason": "The current Layout (mounted on every authenticated route) transitively invokes excluded capabilities: Copilot (copilot-search, copilot-chat-simple), health probes (health), global search (search-suggestions), Zapier background refresh (zapier-auto-refresh, zapier-refresh-token). These are on the explicit exclusion list. Enabling approved-user pilot requires either (a) B7.5 refactors Layout to gate excluded mounts behind a pilot flag, or (b) each affected function is fully assessed and allowlisted. Neither is authorized in B7.4B."
+  "public_pilot_routes": ["/", "/login", "/forgot-password", "/sign-out"],
+  "write_deferred_routes": {
+    "/onboarding": "performs supabase.from('onboarding_submissions').insert(...); a write-enabled route cannot be a read-only public-pilot route and is deferred until write authorization is separately in-scope"
   },
+  "recovery_entry_only_routes": ["/forgot-password"],
+  "recovery_broken_routes": ["/reset-password (route not declared; page missing)"],
+  "approved_user_pilot_routes": [],
+  "approved_user_pilot_status": "BLOCKED",
+  "approved_user_pilot_blocking_reasons": [
+    "Every candidate approved-user route in src/App.tsx renders inside <Layout>, which mounts CoPilotPanel/CoPilotBubble (copilot-search, copilot-chat-simple), HealthBadges (health), useTokenRefresh (zapier-auto-refresh, zapier-refresh-token) and GlobalSearchBar suggestions (search-suggestions) plus AOCQuickAccessButton and DataCentreSelector. These are on the explicit exclusion list.",
+    "The nearest AURA overview (Dashboard) invokes ai-systems-unified on initial render and offers systems-delete as a permitted action; the fallback path renders fabricated rows and hardcoded metrics on non-2xx.",
+    "The nearest telemetry surfaces (/analytics, /operations, /intelligence) invoke ops-overview on initial render.",
+    "No existing approved-user route provides a truthful read-only asset or metric inspection without either mounting Layout or invoking a blocked function.",
+    "Making the approved-user pilot operable requires: (a) a new pilot-safe layout shell that does not import CoPilot providers, health badges, zapier hooks or search suggestions; AND (b) new read-only overview and inspection pages that source from direct RLS-guarded table reads or from allowlisted functions. Neither exists. The user's guidance permits a minimal pilot-safe shell but not new product capabilities; the required overview/inspection pages are product capabilities.",
+    "Effective remote RLS cannot be verified locally in the sandbox; any 'zero-edge-function' claim that relies on direct table reads would still be UNVERIFIED against production and is classified as an external blocker."
+  ],
   "excluded_capabilities": [
     "user or role administration",
     "system configuration changes",
@@ -21,10 +35,10 @@
     "browser-side AI or Copilot",
     "Omniverse",
     "BMS/DCIM or other live integrations",
-    "simulation migration",
+    "simulations",
     "synthetic or fabricated fallback metrics",
     "debug, test and evidence routes",
-    "every write operation (except supabase.auth.* SDK writes required for sign-in / sign-out / password-reset / onboarding profile insert, which are outside the edge-function surface)"
+    "every write operation (except supabase.auth.* SDK writes for sign-in / sign-out / password-reset entry)"
   ],
-  "verdict": "ZERO-FUNCTION public pilot is operable; approved-user pilot is DEFERRED to B7.5 pending Layout de-coupling. No function is added to the real allowlist by this checkpoint."
+  "verdict": "APPROVED-USER PILOT BLOCKED. Public shell (4 read-only routes) is operable; that does not satisfy the controlled pilot definition."
 }

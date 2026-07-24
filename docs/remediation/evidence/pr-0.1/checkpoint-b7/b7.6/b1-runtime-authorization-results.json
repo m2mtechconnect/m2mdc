@@ -1,0 +1,7 @@
+{
+  "executed": false,
+  "reason": "requires replayed database from \u00a74",
+  "static_reconciliation_pass": true,
+  "static_reconciliation_source": "scripts/verify-b1-static-reconciliation.mjs (26/26 checks pass)",
+  "runtime_verified": false
+}

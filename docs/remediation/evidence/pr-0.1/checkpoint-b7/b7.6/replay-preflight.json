@@ -1,0 +1,137 @@
+{
+  "checkpoint": "B7.6",
+  "phase": "preflight",
+  "baseline_anchor": "3c101d6f42df0c2ed341aa7e50372f926fdbf56a",
+  "working_tree_dirty": false,
+  "b7_5_checksums_verified": true,
+  "b7_4g_checksums_verified": true,
+  "production_perimeter_enforcer": {
+    "pass": true,
+    "functions_inventoried": 155,
+    "allowlisted": 0
+  },
+  "git_diff_check_pass": true,
+  "b1_static_reconciliation_rerun_pass": true,
+  "migration_count": 18,
+  "migration_checksums": {
+    "20251209160634_remix_migration_from_pg_dump.sql": "78feddaaf5f1c23f99868730f2b530a80aa8b928ba6972f24ab22ddf865ed69c",
+    "20251210005210_d6487de0-0ce4-48bc-9f18-9ab49c8f5358.sql": "8953dba3ae3bf616a1da1bf1ebeebe892ad27468ef74425c4479af1bc5e0f24e",
+    "20251210010204_696d7788-e514-4dd6-b244-44913022649d.sql": "9af5ac4fe7ebd564e5669636c5d9dae5d4a608b0b4523ac52e25bf21d0a1f58f",
+    "20251210032625_0243a383-7873-4785-9fba-35924b2719a1.sql": "f3d30f71e4b0e526fa42c2e9255ec09ce9a40b17307e416304c4527e2bd4c00c",
+    "20251210033908_baac1120-6f3f-4a70-8a97-b6243ee72d47.sql": "64f76302178ae35f0352860c394d263e9b8ea0a2796cfe1c4038500e6b8d2f52",
+    "20251210035930_9d8461f8-bf20-4982-b2b3-e7b541f01390.sql": "8f555810ae6e40fd4938fef9f5526c607ed5c3ca710be75f3c3be75eb17eaf55",
+    "20251210154256_1d3d5af4-7144-4e93-867c-590124704414.sql": "d5445c4b81462f800a1df9397503a8b4b9edc37045b356d9adcf2525011097c7",
+    "20251210161218_24842690-23ac-4584-b6a3-c4d5e4de2284.sql": "f94a9dc4c12b1f6bec1a1add4a39dbc32332c144f1317bf8cd14dd97057f2551",
+    "20251211160930_a2b70e13-b985-4f8c-b6b1-3176e8ad8fb6.sql": "2beba4e796e59b4f19b39a318b008bd3b4ee0af8d0cb260854c1685e0751bb66",
+    "20251211234933_b6d2e072-6b68-461f-b36d-dfed0429f21d.sql": "0905a2a11c77555a1b26a6e67263e762b352cc86334fb7251b44e099fdbfa6ca",
+    "20251215025535_d8b5f197-92b4-4311-ac40-6fc76d311db7.sql": "39d12e9908a0694e55a078e70e38b63e83c3988eb2d5b900ce12b707a0cb94a8",
+    "20260206150808_4cb276a5-a341-4b08-a939-83ac1e9b5bcc.sql": "a100fe44048877237b50f90f78d08bb1d61eb1a0e2402d34a70ed4e30a1cbb34",
+    "20260212035209_61e2d774-6a40-4d87-9762-b503050b64ad.sql": "59ccdc8fb7431c179b70fbd6c9bee37a2ed0fb23f301d5110907ad866af05fef",
+    "20260212133602_bf66e00b-576a-44ac-bed1-89ab3179b68f.sql": "5d50ddcccdfc73e94eaa88fd4d7624a834e946aff86b1175b65c65adb3f55df8",
+    "20260218142636_a59bb8cb-5e00-4e13-b63d-19eb97d7d4bb.sql": "8610cb83e00586c45a402567d53045936e0f6a4ca92d7173a2cd590a7d9148d0",
+    "20260218143534_31cc19e1-4fb9-4966-a613-ae0ca9085c16.sql": "829b36af0e0cf8d1ffe9d8b9fa03f1ca5057e91b353eb557b09710de67c4f9f5",
+    "20260323173624_97384e28-beb3-4f8d-8d4b-dbadd65d6f9e.sql": "fe4794dd3d686c07bc679d2fae4e3b2eecf6e694e177647c8f21aea4554cccce",
+    "20260724005954_e17e6492-dc51-46f8-bb87-642071501b8b.sql": "d943d072e1c50d23e2d1ae3af369c1742a84ce382ab6cdd7f099af139e6dfcea"
+  },
+  "remote_infrastructure_contacted": false,
+  "environment_probes": {
+    "local_postgres_binary": {
+      "present": true,
+      "path": "/bin/postgres",
+      "version": "17.9"
+    },
+    "required_postgres_major": "15",
+    "postgres_version_mismatch": true,
+    "docker_present": false,
+    "podman_present": false,
+    "colima_present": false,
+    "supabase_cli_present": false,
+    "nixpkgs_supabase_cli": "unavailable",
+    "reachable_db_host_env": "aws-1-eu-west-2.pooler.supabase.com",
+    "reachable_db_classification": "production_pooler_forbidden_for_b7.6",
+    "loopback_or_container_supabase_stack": "unavailable"
+  },
+  "prerequisites_from_b7_5": {
+    "extensions_required": [
+      "pg_cron",
+      "pg_graphql",
+      "pg_stat_statements",
+      "pgcrypto",
+      "plpgsql",
+      "supabase_vault",
+      "uuid-ossp",
+      "vector"
+    ],
+    "extensions_locally_available": [
+      "pg_stat_statements",
+      "pgcrypto",
+      "plpgsql",
+      "uuid-ossp"
+    ],
+    "extensions_locally_missing": [
+      "pg_cron",
+      "pg_graphql",
+      "supabase_vault",
+      "vector"
+    ],
+    "managed_schemas_required": [
+      "auth",
+      "storage",
+      "vault",
+      "graphql",
+      "extensions",
+      "realtime"
+    ],
+    "managed_schemas_provided_by_stack": "GoTrue + Storage + Realtime + Vault (Supabase services, not standalone Postgres)",
+    "managed_objects_referenced_by_baseline_dump": [
+      "auth.users",
+      "auth.uid()",
+      "auth.role()",
+      "vault.secrets",
+      "vault.decrypted_secrets"
+    ],
+    "roles_required": [
+      "anon",
+      "authenticated",
+      "service_role",
+      "authenticator",
+      "supabase_admin",
+      "supabase_auth_admin",
+      "supabase_storage_admin"
+    ]
+  },
+  "fail_closed_gates_evaluated": [
+    {
+      "gate": "database host resolves only to loopback / isolated container network",
+      "pass": false,
+      "detail": "Only reachable DB host is production Supabase pooler (13.41.42.138 / 13.43.174.140). No loopback Postgres provisioned; no container runtime available to isolate one."
+    },
+    {
+      "gate": "unique disposable database and container names for B7.6",
+      "pass": false,
+      "detail": "No container runtime present."
+    },
+    {
+      "gate": "no remote Supabase project reference configured",
+      "pass": false,
+      "detail": "Environment carries PGHOST/PGUSER pointing at production project; using them would violate hard boundary."
+    },
+    {
+      "gate": "required schemas and roles supplied by approved local Supabase-compatible baseline",
+      "pass": false,
+      "detail": "auth/storage/vault/realtime/graphql schemas and supabase_* roles require the Supabase managed stack; standalone Postgres cannot supply them without hand-written substitutes that rule \u00a73 forbids."
+    },
+    {
+      "gate": "required extensions installable",
+      "pass": false,
+      "detail": "pg_cron, pg_graphql, supabase_vault, vector absent from local Postgres. Rule \u00a72 forbids downloading unapproved tooling merely to pass."
+    },
+    {
+      "gate": "teardown can remove database and volumes without affecting another environment",
+      "pass": false,
+      "detail": "Not applicable; no isolated environment could be created."
+    }
+  ],
+  "verdict": "BLOCKED \u2014 APPROVED SUPABASE-COMPATIBLE ENVIRONMENT UNAVAILABLE",
+  "verdict_authority": "B7.6 \u00a72 fail-closed rule and \u00a73 (no hand-written managed-prereq substitute), \u00a72 (no unapproved tooling)."
+}

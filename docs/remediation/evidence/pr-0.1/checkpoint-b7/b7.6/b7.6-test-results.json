@@ -1,0 +1,56 @@
+{
+  "checkpoint": "B7.6",
+  "baseline_anchor": "3c101d6f42df0c2ed341aa7e50372f926fdbf56a",
+  "working_tree_dirty": false,
+  "verdict": "BLOCKED \u2014 APPROVED SUPABASE-COMPATIBLE ENVIRONMENT UNAVAILABLE",
+  "replay_a": {
+    "executed": false
+  },
+  "replay_b": {
+    "executed": false
+  },
+  "schema_fingerprint_match": null,
+  "b1_runtime_authorization": {
+    "executed": false,
+    "static_pass": true
+  },
+  "pilot_rls_runtime": {
+    "executed": false,
+    "adapter_unit_tests_pass": true
+  },
+  "full_vitest": {
+    "executed": false
+  },
+  "full_playwright": {
+    "executed": false
+  },
+  "full_lint": {
+    "executed": false
+  },
+  "production_perimeter": {
+    "pass": true,
+    "functions_inventoried": 155,
+    "allowlisted": 0
+  },
+  "pilot_bundle_canary": {
+    "pass": true,
+    "modules_scanned": 7,
+    "forbidden_imports_reachable": 0
+  },
+  "b1_static_reconciliation": {
+    "pass": true,
+    "checks": 26
+  },
+  "git_diff_check": {
+    "pass": true
+  },
+  "b7_5_checksums_verified": true,
+  "b7_4g_checksums_verified": true,
+  "remote_infrastructure_contacted": false,
+  "migrations_executed": false,
+  "disposable_environments_created": 0,
+  "network_guard_prohibited_hits": 0,
+  "app_source_changed": false,
+  "migration_files_changed": false,
+  "function_allowlist_count": 0
+}

@@ -2,15 +2,15 @@
  * Centralized LLM Client (client-side stub).
  *
  * PR-0.1 Checkpoint B: browser-side LLM calls are disabled. The prior
- * implementation embedded VITE_LOVABLE_API_KEY into the production bundle,
- * which meant the provider credential shipped to every visitor. That
+ * implementation embedded the AI-gateway browser key into the production
+ * bundle, so the provider credential shipped to every visitor. That
  * behaviour has been removed until a server-mediated LLM edge function is
  * introduced in a later checkpoint.
  *
- * This module now returns a typed `LlmUnavailableError`. Callers MUST render
- * an accessible "AI unavailable" state — never a fabricated or synthetic
- * completion. Do NOT reintroduce `import.meta.env.VITE_LOVABLE_API_KEY`
- * here or in any other client-side module.
+ * This module now returns a typed `LlmUnavailableError`. Callers MUST
+ * render an accessible "AI unavailable" state — never a fabricated or
+ * synthetic completion. Do NOT reintroduce any browser-side gateway
+ * credential here or in any other client-side module.
  */
 
 export interface AIClientOptions {

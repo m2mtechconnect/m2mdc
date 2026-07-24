@@ -61,7 +61,13 @@ import AccessControl from "./pages/account/AccessControl";
 import PendingApproval from "./pages/PendingApproval";
 import AdminUserApproval from "./pages/AdminUserApproval";
 import AdminSignupsDashboard from "./pages/AdminSignupsDashboard";
-import OverlayFixtures from "./pages/test/OverlayFixtures";
+// PR-0.1 Checkpoint B: test-only route removed from the production bundle.
+// OverlayFixtures is loaded lazily and only when import.meta.env.DEV is true,
+// so it never ships in the production tree.
+import { lazy } from "react";
+const OverlayFixtures = import.meta.env.DEV
+  ? lazy(() => import("./pages/test/OverlayFixtures"))
+  : null;
 
 // Initialize changelog middleware for builder store
 initChangeLogMiddleware();

@@ -24,7 +24,7 @@ import { Link } from 'react-router-dom';
 
 export default function Builder() {
   const { t } = useTranslation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -387,7 +387,11 @@ export default function Builder() {
         // Consume `?new=true` exactly once: replace with `?draft=<id>` so
         // refresh/back reloads the same draft rather than creating another.
         setIsInitialized(true);
-        navigate(`/builder?draft=${encodeURIComponent(newId)}`, { replace: true });
+        // Use setSearchParams instead of navigate() for a same-path
+        // query-only update: it produces a reliable router location
+        // sync where a full navigate() to the same pathname can miss
+        // an update under concurrent renders.
+        setSearchParams({ draft: newId }, { replace: true });
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'Failed to create draft';
         setInitError(msg);

@@ -1,16 +1,25 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-07-24T18:00:00Z",
+  "generated_at": "2026-07-24T21:00:00Z",
   "policy": "default-deny",
-  "checkpoint": "B7.4B",
+  "checkpoint": "B7.4C",
   "notes": [
-    "PR-0.1 Checkpoint B7.4B: the controlled-pilot production surface is",
-    "explicit and read-only. Public pilot routes render truthfully without",
-    "any edge function invocation. Approved-user pilot capability is",
-    "DEFERRED to B7.5 because the current Layout mounts excluded",
-    "capabilities (Copilot, Zapier, health probes). No function is",
-    "allowlisted. All other application routes are classified as",
-    "production-blocked, development-only, or redirect-only.",
+    "PR-0.1 Checkpoint B7.4C: B7.4B verdict corrected to BLOCKED because the",
+    "authorized controlled pilot is an approved-user, read-only AURA",
+    "experience and five public routes do not constitute that pilot.",
+    "Onboarding (/onboarding) is reclassified from public-pilot to",
+    "write-deferred: it performs a supabase.from('onboarding_submissions')",
+    "INSERT and therefore is not a read-only public-pilot route. Password",
+    "recovery is split honestly: /forgot-password is a recovery-entry page,",
+    "/reset-password is absent, and the overall recovery workflow is NOT",
+    "operable. Approved-user pilot capability is BLOCKED: no existing",
+    "approved-user route can be loaded without either mounting Layout",
+    "(which initializes Copilot, Zapier, health probes and search",
+    "suggestions) or invoking blocked edge functions (ai-systems-unified,",
+    "systems-delete on Dashboard). Building the approved-user surface",
+    "would require new overview / inspection pages and a pilot-safe layout",
+    "shell; that is an architectural expansion beyond decoupling and is",
+    "not authorized in B7.4C. No function is allowlisted.",
     "Adding a production function REQUIRES: (1) _shared/authz.ts guard",
     "imported and exercised; (2) explicit is_approved + role check;",
     "(3) explicit CORS origin; (4) request schema validation;",
@@ -22,8 +31,16 @@
     "/",
     "/login",
     "/forgot-password",
-    "/sign-out",
+    "/sign-out"
+  ],
+  "write_deferred_routes": [
     "/onboarding"
+  ],
+  "recovery_entry_only_routes": [
+    "/forgot-password"
+  ],
+  "recovery_broken_routes": [
+    "/reset-password"
   ],
   "production_blocked_routes": [
     "/dashboard",

@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { invokeEdgeFunction } from "@/hooks/useEdgeFunction";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Shield, Database, CheckCircle, XCircle, Loader, Settings } from "lucide-react";
+import { Sparkles, Shield, Database, CheckCircle, XCircle, Loader, Settings, Loader2, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui";
@@ -48,6 +48,11 @@ export default function AISettings() {
   });
   const [isChecking, setIsChecking] = useState(false);
   const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ projectId?: string; dataStoreId?: string }>({});
 
   // Load saved settings on mount
   useEffect(() => {
@@ -69,17 +74,32 @@ export default function AISettings() {
       }
     } catch (error) {
       console.error('Failed to load AI settings:', error);
+      setLoadError('Stored configuration was unreadable and has been reset.');
       localStorage.removeItem('copilot_settings');
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
+  const validate = (): boolean => {
+    const errs: { projectId?: string; dataStoreId?: string } = {};
+    if (!projectId.trim()) errs.projectId = 'Project ID is required';
+    if (groundingEnabled && !dataStoreId.trim()) {
+      errs.dataStoreId = 'Data Store ID is required when grounding is enabled';
+    }
+    setFieldErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
   const handleSave = async () => {
-    if (!projectId || !model) {
-      toast.error("Please configure Project ID and select an AI model");
+    if (isSaving) return;
+    setSaveError(null);
+    if (!validate()) {
+      toast.error('Please fix validation errors before saving');
       return;
     }
+    setIsSaving(true);
     try {
-      // Store settings in localStorage for now (in production, you'd store these server-side)
       const settings = {
         projectId,
         region,
@@ -94,11 +114,33 @@ export default function AISettings() {
         safetySettings
       };
       localStorage.setItem('copilot_settings', JSON.stringify(settings));
-      toast.success("AI settings saved successfully");
+      toast.success('AI settings saved successfully');
     } catch (error) {
-      toast.error("Failed to save settings");
+      const msg = error instanceof Error ? error.message : 'Failed to save settings';
+      setSaveError(msg);
+      toast.error(msg);
+    } finally {
+      setIsSaving(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <main
+          className="flex items-center justify-center min-h-[60vh]"
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <div className="text-center space-y-3">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" aria-hidden="true" />
+            <p className="text-sm text-muted-foreground">Loading AI configuration…</p>
+          </div>
+        </main>
+      </Layout>
+    );
+  }
 
   const handleHealthCheck = async () => {
     setIsChecking(true);
@@ -131,6 +173,16 @@ export default function AISettings() {
           icon={<Settings className="h-5 w-5 text-primary" />}
         />
 
+        {loadError && (
+          <div
+            role="alert"
+            className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive"
+          >
+            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
+            <span>{loadError}</span>
+          </div>
+        )}
+
         <DCCard
           title={t("aiSettings.gcpConfig")}
           icon={<Sparkles className="h-5 w-5 text-primary" />}
@@ -138,12 +190,23 @@ export default function AISettings() {
         >
           <div className="grid gap-6">
             <div className="space-y-2">
-              <Label>Google Cloud Project ID</Label>
+              <Label htmlFor="ai-project-id">Google Cloud Project ID</Label>
               <Input 
+                id="ai-project-id"
                 value={projectId}
-                onChange={(e) => setProjectId(e.target.value)}
+                onChange={(e) => {
+                  setProjectId(e.target.value);
+                  if (fieldErrors.projectId) setFieldErrors((p) => ({ ...p, projectId: undefined }));
+                }}
                 placeholder="your-project-id"
+                aria-invalid={!!fieldErrors.projectId}
+                aria-describedby={fieldErrors.projectId ? 'ai-project-id-error' : undefined}
               />
+              {fieldErrors.projectId && (
+                <p id="ai-project-id-error" role="alert" className="text-xs text-destructive">
+                  {fieldErrors.projectId}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -191,12 +254,23 @@ export default function AISettings() {
           {groundingEnabled && (
             <div className="space-y-6 pl-4 border-l-2 border-primary/20">
               <div className="space-y-2">
-                <Label>Data Store / Index ID</Label>
+                <Label htmlFor="ai-datastore-id">Data Store / Index ID</Label>
                 <Input 
+                  id="ai-datastore-id"
                   value={dataStoreId}
-                  onChange={(e) => setDataStoreId(e.target.value)}
+                  onChange={(e) => {
+                    setDataStoreId(e.target.value);
+                    if (fieldErrors.dataStoreId) setFieldErrors((p) => ({ ...p, dataStoreId: undefined }));
+                  }}
                   placeholder="your-data-store-id"
+                  aria-invalid={!!fieldErrors.dataStoreId}
+                  aria-describedby={fieldErrors.dataStoreId ? 'ai-datastore-id-error' : undefined}
                 />
+                {fieldErrors.dataStoreId && (
+                  <p id="ai-datastore-id-error" role="alert" className="text-xs text-destructive">
+                    {fieldErrors.dataStoreId}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -256,14 +330,37 @@ export default function AISettings() {
         </DCCard>
 
         <div className="flex gap-4">
-          <Button onClick={handleSave} size="lg" className="flex-1">
-            Save Configuration
+          <Button
+            onClick={handleSave}
+            size="lg"
+            className="flex-1"
+            disabled={isSaving}
+            aria-busy={isSaving}
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
+                Saving…
+              </>
+            ) : (
+              'Save Configuration'
+            )}
           </Button>
           <Button onClick={handleHealthCheck} size="lg" variant="outline" disabled={isChecking}>
             {isChecking ? <Loader className="h-4 w-4 animate-spin mr-2" /> : null}
             Run Health Check
           </Button>
         </div>
+
+        {saveError && (
+          <div
+            role="alert"
+            className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive"
+          >
+            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
+            <span>{saveError}</span>
+          </div>
+        )}
 
         {healthStatus && (
           <DCCard

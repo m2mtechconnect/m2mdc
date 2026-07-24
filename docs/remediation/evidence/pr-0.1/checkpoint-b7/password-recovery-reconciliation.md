@@ -1,50 +1,49 @@
-# Password-Recovery Reconciliation - PR-0.1 B7.4B
+# Password-Recovery Reconciliation - PR-0.1 B7.4C
 
-**Anchor:** git HEAD `a1da5a1f01e673209579b3a95a574d50d834f0dc`
+**Anchor:** git HEAD `15bc43860593053c739230df0f2a3b9891ab5b55`
 **Mode:** read-only. No remote authentication request was performed. No configuration was mutated.
+**Supersedes:** the B7.4B version, which still counted `/forgot-password` toward pilot workflows.
 
-## Declared recovery-entry route
+## Split classification (authoritative)
 
-`/forgot-password` - `src/App.tsx:178` (unauth branch) and `src/App.tsx:253` (authed branch).
+| Route              | Role                | Status         | Counts toward pilot workflows? |
+|--------------------|---------------------|----------------|--------------------------------|
+| `/forgot-password` | recovery-entry page | FUNCTIONAL     | NO - entry only                |
+| `/reset-password`  | recovery-completion | ABSENT/BROKEN  | NO                             |
+| overall recovery   | end-to-end flow     | NOT OPERABLE   | NO                             |
 
-Renders `src/pages/auth/ForgotPassword.tsx`, which calls:
+The overall password-recovery workflow is NOT operable and is NOT counted as a completed pilot workflow at B7.4C.
 
-```
-supabase.auth.resetPasswordForEmail(email, {
-  redirectTo: `${window.location.origin}/reset-password`,
-});
-```
+## `/forgot-password`
 
-No edge function is invoked. The call is an Auth-SDK request to Supabase GoTrue.
+- Declared: `src/App.tsx:178` (unauth branch, gated by `onboarding_completed=true`) and `src/App.tsx:253` (authed branch, redirected to `/`).
+- Renders: `src/pages/auth/ForgotPassword.tsx`.
+- Backend call: `supabase.auth.resetPasswordForEmail(email, { redirectTo: ${origin}/reset-password })`. This is an Auth SDK request to GoTrue. No edge function is invoked.
 
-## `/reset-password` status
+## `/reset-password`
 
-- Not declared in `src/App.tsx`. A production hit for `/reset-password` matches the wildcard (`*`) route.
-- No page component exists to complete the recovery. There is no `ResetPassword.tsx` in `src/pages/`.
-- Removed from `route-allowlist.json.production_routes` as of B7.4B. Not added anywhere in the classification tables.
-- No new route added. Per the authorized decisions, `/reset-password` is not created in this checkpoint.
+- NOT declared in `src/App.tsx`.
+- No page component exists in `src/pages/`.
+- Any hit resolves to the wildcard `*` route: `<Navigate to="/" replace />` (unauth), `<PendingApproval />` (not-approved), `<NotFound />` (authed-approved).
+- Consequently, the URL sent by GoTrue's magic-link email lands on a route with no completion UI.
 
-## Where the user lands after clicking a recovery link
+## Recovery-completion failure modes
 
-| Client state              | Route match                   | Rendered outcome |
-|---------------------------|-------------------------------|------------------|
-| Not signed in             | wildcard, unauth branch       | `<Navigate to="/" replace />` - lands on public landing without recovery UI. |
-| Signed in, not approved   | wildcard, not-approved branch | `<PendingApproval />` - no recovery UI. |
-| Signed in and approved    | wildcard, authed branch       | `<NotFound />` - no recovery UI. |
+| Client state              | Route match                   | Outcome                                                 |
+|---------------------------|-------------------------------|---------------------------------------------------------|
+| Not signed in             | wildcard, unauth branch       | `<Navigate to="/" replace />` - public landing, no UI   |
+| Signed in, not approved   | wildcard, not-approved branch | `<PendingApproval />` - no recovery UI                  |
+| Signed in and approved    | wildcard, authed branch       | `<NotFound />` - no recovery UI                         |
 
-## Classification of recovery completion
+## What was NOT done in B7.4C
 
-**BROKEN.** The recovery-entry route works truthfully (email is sent), but there is no completion surface.
-
-## Consequence for B7.4B
-
-- Pilot capability "password-recovery entry" is included and operable at `/forgot-password`.
-- Pilot capability "password-recovery completion" is NOT included and NOT claimed as working.
-- B7.5/B7.6 must decide whether to (a) build a `/reset-password` page and add it to the pilot after full a11y + provenance review, or (b) change the `redirectTo` to a route that clearly communicates recovery is not yet available.
-
-## What was not done
-
+- No `/reset-password` page or route was created.
+- No `redirectTo` copy in `ForgotPassword.tsx` was changed.
 - No remote GoTrue authentication request was issued.
 - No Supabase project setting was changed.
-- No new route or page was created.
-- No copy was rewritten in `ForgotPassword.tsx`.
+
+## Consequence for the B7.4C verdict
+
+- Password recovery does NOT contribute to the approved-user pilot workflow set.
+- `/forgot-password` remains classified as a `recovery-entry` public route in the allowlist (`recovery_entry_only_routes`).
+- `/reset-password` is enumerated in `recovery_broken_routes` for traceability only; it is NOT added as a route.

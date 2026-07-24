@@ -164,6 +164,20 @@ export function ActiveTwinProvider({ children }: { children: ReactNode }) {
   // state — rather than surfacing PGRST116 as a console error. Aborts
   // triggered by React unmount / history navigation are handled the same
   // way. Genuine transport or authorization errors are still logged.
+  const isAbortLikeError = (err: unknown): boolean => {
+    const name = (err as { name?: string })?.name;
+    const message = String((err as { message?: string })?.message ?? '');
+    // React Router / browser history navigation cancels in-flight
+    // fetch() calls. Chromium surfaces that cancellation as either
+    // an AbortError or as `TypeError: Failed to fetch`. In this
+    // context both are legitimately-obsolete requests, not
+    // application failures — the caller has already unmounted or
+    // moved on, and the returned `null` is a truthful empty state.
+    if (name === 'AbortError') return true;
+    if (name === 'TypeError' && /failed to fetch/i.test(message)) return true;
+    return false;
+  };
+
   const fetchLocation = useCallback(async (locationId: string) => {
     try {
       const { data, error } = await supabase
@@ -173,16 +187,15 @@ export function ActiveTwinProvider({ children }: { children: ReactNode }) {
         .maybeSingle();
 
       if (error) {
-        // PGRST116 = "no rows"; already handled by maybeSingle returning
-        // null, but defensively skip logging if it slips through.
+        // PGRST116 = "no rows"; maybeSingle already returns null, but
+        // some client versions still surface it as `error`.
         if ((error as { code?: string }).code === 'PGRST116') return null;
         console.error('Failed to fetch location:', error);
         return null;
       }
       return (data as DataCentreLocation | null) ?? null;
     } catch (err) {
-      const name = (err as { name?: string })?.name;
-      if (name === 'AbortError') return null;
+      if (isAbortLikeError(err)) return null;
       console.error('Failed to fetch location:', err);
       return null;
     }
@@ -204,8 +217,7 @@ export function ActiveTwinProvider({ children }: { children: ReactNode }) {
       }
       return (data as DataCentreTwin | null) ?? null;
     } catch (err) {
-      const name = (err as { name?: string })?.name;
-      if (name === 'AbortError') return null;
+      if (isAbortLikeError(err)) return null;
       console.error('Failed to fetch twin:', err);
       return null;
     }

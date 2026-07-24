@@ -9,7 +9,7 @@ interface AOCWorkflowTabProps {
 }
 
 export function AOCWorkflowTab({ agentId }: AOCWorkflowTabProps) {
-  const useMock = import.meta.env.VITE_USE_MOCK_AOC === 'true' && import.meta.env.DEV;
+  const useMock = false /* PR-0.1 B7: VITE_USE_MOCK_AOC removed from allowlist */;
 
   const { data: workflows = [] } = useQuery({
     queryKey: ['agent-workflows', agentId],

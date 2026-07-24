@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export function useAgentData(agentId: string) {
-  const useMock = import.meta.env.VITE_USE_MOCK_AOC === 'true' && import.meta.env.DEV;
+  const useMock = false /* PR-0.1 B7: VITE_USE_MOCK_AOC removed from allowlist */;
 
   return useQuery({
     queryKey: ['agent', agentId],

@@ -20,7 +20,7 @@ export function AOCGovernancePanel({ agentId }: AOCGovernancePanelProps) {
     trackEvent('governance_accessed', { agentId });
   }, [agentId]);
 
-  const useMock = import.meta.env.VITE_USE_MOCK_AOC === 'true' && import.meta.env.DEV;
+  const useMock = false /* PR-0.1 B7: VITE_USE_MOCK_AOC removed from allowlist */;
 
   const { data: auditLogs } = useQuery({
     queryKey: ['aoc-audit-logs', agentId],

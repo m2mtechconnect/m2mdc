@@ -1,10 +1,10 @@
-import { useState, useEffect, lazy } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { RBACProvider } from "@/contexts/RBACContext";
+import { RBACProvider, useRBAC } from "@/contexts/RBACContext";
 import { ActiveTwinProvider } from "@/context/ActiveTwinContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemeProvider } from "next-themes";
@@ -22,11 +22,12 @@ import PendingApproval from "./pages/PendingApproval";
 // the only authenticated surface allowed to render on /pilot/*. It has no
 // blocked-consumer imports (verified by scripts/pilot-bundle-canary.mjs).
 import PilotShell from "./pilot/PilotShell";
-// PR-0.1 Checkpoint B7.4G - Legacy AuthenticatedShell is no longer
-// mounted at any approved-user route. It remains in the source tree so
-// the codebase can be revived in later phases, but must never be
-// re-imported here (statically or lazily) without a new checkpoint
-// authorization. Approved users see only /pilot/*.
+// Role-Aware Application Routing - Approved *internal* users (users with
+// an explicit row in public.user_roles) receive the full AURA DC
+// application via the legacy AuthenticatedShell, loaded lazily so that
+// pilot users' bundle graph is unaffected. Approved users *without* a
+// user_roles row remain sealed inside /pilot/*.
+const AuthenticatedShell = lazy(() => import("./AuthenticatedShell"));
 const OverlayFixtures = import.meta.env.DEV
   ? lazy(() => import("./pages/test/OverlayFixtures"))
   : null;
@@ -148,22 +149,45 @@ function AuthenticatedApp() {
     );
   }
 
-  // If authenticated and approved, show all protected routes
+  // Approved user: branch on server-backed internal vs pilot classification.
+  return <ApprovedUserRouter />;
+}
+
+function LoadingScreen() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>
+  );
+}
+
+function ApprovedUserRouter() {
+  const { isInternal, loading: rbacLoading } = useRBAC();
+
+  // Wait for RBAC to resolve before rendering any privileged shell.
+  // Prevents flashing the pilot shell to internal users and vice versa.
+  if (rbacLoading) {
+    return <LoadingScreen />;
+  }
+
+  if (isInternal) {
+    return (
+      <Suspense fallback={<LoadingScreen />}>
+        <Routes>
+          <Route path="/pilot/*" element={<PilotShell />} />
+          <Route path="/sign-out" element={<SignOut />} />
+          <Route path="/*" element={<AuthenticatedShell />} />
+        </Routes>
+      </Suspense>
+    );
+  }
+
+  // Restricted pilot / customer user - sealed inside /pilot/*.
   return (
     <Routes>
       <Route path="/pilot/*" element={<PilotShell />} />
-      {/*
-       * PR-0.1 Checkpoint B7.4G - Sealed approved-user surface.
-       * The controlled pilot is /pilot/*. Approved users may also sign
-       * out; every other path redirects to the pilot overview. This
-       * prevents production-blocked legacy routes (/dashboard, /builder,
-       * /operations, etc.) from mounting AuthenticatedShell at runtime.
-       */}
       <Route path="/sign-out" element={<SignOut />} />
-      <Route
-        path="*"
-        element={<Navigate to="/pilot/overview" replace />}
-      />
+      <Route path="*" element={<Navigate to="/pilot/overview" replace />} />
     </Routes>
   );
 }

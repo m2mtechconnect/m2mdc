@@ -1,0 +1,56 @@
+{
+  "checkpoint": "B7.4F",
+  "inherits_from": "B7.4E:b1f26438195f141fbc5130f18a3bd6e0133e5ac5",
+  "verdict": "PARTIAL_PASS_VERIFICATION_INCOMPLETE",
+  "local_checks": {
+    "typecheck": { "cmd": "bunx tsgo --noEmit", "status": "PASS" },
+    "perimeter_enforcer": {
+      "cmd": "node scripts/verify-production-perimeter.mjs",
+      "status": "PASS",
+      "note": "155 functions inventoried, 0 allowlisted"
+    },
+    "production_build": {
+      "cmd": "bunx vite build",
+      "status": "PASS",
+      "note": "AuthenticatedShell emitted as distinct lazy chunk (2.04 MB)"
+    },
+    "pilot_bundle_canary": {
+      "cmd": "node scripts/pilot-bundle-canary.mjs",
+      "status": "PASS",
+      "note": "7 modules scanned from PilotShell entry, 0 forbidden imports"
+    }
+  },
+  "boundary_repair": {
+    "new_file": "src/AuthenticatedShell.tsx",
+    "changed_file": "src/App.tsx",
+    "mechanism": "React.lazy(() => import('./AuthenticatedShell')) inside Suspense; /pilot/* mounts PilotShell without traversing this lazy graph",
+    "runtime_effect": "/pilot/* does not fetch AuthenticatedShell-*.js; Layout, CoPilotProvider, CoPilotCommandProvider, TourProvider, HealthBadges, GlobalSearchBar, useTokenRefresh and every blocked-function consumer live in that lazy chunk only"
+  },
+  "bundle_scan": {
+    "root_chunk": "dist/assets/index-C06-KyJ2.js",
+    "identifiers_absent": [
+      "CoPilotBubble",
+      "HealthBadges",
+      "GlobalSearchBar",
+      "useTokenRefresh",
+      "components/Layout",
+      "ai-systems-unified",
+      "systems-delete",
+      "ops-overview"
+    ],
+    "identifiers_present": [
+      {
+        "id": "[CoPilotPanel] (string literal)",
+        "origin": "src/pages/DataCentreTwin.tsx -> DataCentreDashboard",
+        "route": "/data-centre-twin (public, production_blocked_routes)",
+        "pilot_reachable": false
+      }
+    ]
+  },
+  "deferred_checks": [
+    "Playwright pilot-route suite (network-guard proving 0 edge-function invocations, 0 writes)",
+    "axe a11y run against /pilot/overview and /pilot/asset/:twinId",
+    "Unit tests for classifyKpi + sanitizeError in src/pilot/pilotReadAdapter.ts",
+    "Remote effective-RLS proof for twin_kpi_snapshots under pilot identity (EXTERNAL BLOCKER)"
+  ]
+}

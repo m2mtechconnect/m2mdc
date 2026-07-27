@@ -297,6 +297,9 @@ function serviceClient() {
 async function resolveConnectionForSubject(
   sub: string,
 ): Promise<ResolvedConnection | 'not_found' | 'ambiguous'> {
+  if (testAdapters.resolveConnectionForSubject) {
+    return testAdapters.resolveConnectionForSubject(sub);
+  }
   const supabase = serviceClient();
   const { data, error } = await supabase
     .from('dsx_connections')
@@ -307,6 +310,24 @@ async function resolveConnectionForSubject(
   if (!data || data.length === 0) return 'not_found';
   if (data.length > 1) return 'ambiguous';
   return data[0] as ResolvedConnection;
+}
+
+// Test-only injection points. Never referenced in production code paths
+// unless a test explicitly sets them. Reset with __resetTestAdapters().
+interface TestAdapters {
+  resolveConnectionForSubject?: (
+    sub: string,
+  ) => Promise<ResolvedConnection | 'not_found' | 'ambiguous'>;
+  invokeIngestRpc?: (
+    args: Record<string, unknown>,
+  ) => Promise<{ decision: string; reason_code?: string; event_pk?: string }>;
+}
+const testAdapters: TestAdapters = {};
+export function __setTestAdapters(a: TestAdapters): void {
+  Object.assign(testAdapters, a);
+}
+export function __resetTestAdapters(): void {
+  for (const k of Object.keys(testAdapters)) delete (testAdapters as Record<string, unknown>)[k];
 }
 
 // ---------------------------------------------------------------------------

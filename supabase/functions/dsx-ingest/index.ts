@@ -426,8 +426,7 @@ export async function handleRequest(req: Request): Promise<Response> {
 
   let rpcResult: { decision: string; reason_code?: string; event_pk?: string } | null = null;
   try {
-    const supabase = serviceClient();
-    const { data, error } = await supabase.rpc('dsx_ingest_event', {
+    const rpcArgs = {
       p_connection_id: resolved.id,
       p_event_id: env.event_id,
       p_observed_at: env.observed_at,
@@ -441,9 +440,15 @@ export async function handleRequest(req: Request): Promise<Response> {
       p_external_asset_ref: env.source_subject,
       p_envelope: env as unknown as Record<string, unknown>,
       p_request_id: requestId,
-    });
-    if (error) throw new Error(error.message);
-    rpcResult = data as typeof rpcResult;
+    };
+    if (testAdapters.invokeIngestRpc) {
+      rpcResult = await testAdapters.invokeIngestRpc(rpcArgs);
+    } else {
+      const supabase = serviceClient();
+      const { data, error } = await supabase.rpc('dsx_ingest_event', rpcArgs);
+      if (error) throw new Error(error.message);
+      rpcResult = data as typeof rpcResult;
+    }
   } catch (e) {
     console.log(`[dsx-ingest] rpc_fail request_id=${requestId} reason=${(e as Error).message}`);
     return errorResponse(503, 'unavailable', requestId);

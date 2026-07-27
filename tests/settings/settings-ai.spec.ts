@@ -21,6 +21,11 @@ const CONSOLE_ERROR_ALLOWLIST: RegExp[] = [
   // Ambient app noise unrelated to /settings/ai (documented pre-existing).
   /Failed to fetch location/i,
   /Failed to fetch twins/i,
+  // Vendor Supabase auth (`_getUser`) navigation-abort noise emitted in
+  // the production preview bundle when the app tears down mid-request.
+  // Owned by an external module; scoped to a narrow signature so this
+  // does not paper over app-owned failures.
+  /TypeError: Failed to fetch[\s\S]*vendor-supabase/i,
 ];
 
 test.describe('/settings/ai', () => {

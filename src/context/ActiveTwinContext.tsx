@@ -7,7 +7,7 @@
  * The dropdown selector controls the entire studio context.
  */
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import { useRecommendationStore } from '@/stores/recommendationStore';
@@ -84,6 +84,17 @@ const ActiveTwinContext = createContext<ActiveTwinContextValue | undefined>(unde
 
 export function ActiveTwinProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  // Lifecycle tracking. `mountedRef` is cleared on provider unmount so
+  // late resolutions from disposed fetches do not update state or log
+  // errors. `fetchGenRef` tracks the currently-authoritative request per
+  // resource; older generations are treated as superseded.
+  const mountedRef = useRef(true);
+  const locationGenRef = useRef(0);
+  const twinGenRef = useRef(0);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
   
   // State
   const [activeLocationId, setActiveLocationIdState] = useState<string | null>(() => {
@@ -156,29 +167,19 @@ export function ActiveTwinProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
-  // Fetch specific location.
-  //
-  // Uses `.maybeSingle()` so a legitimately missing row (e.g. a stored
-  // `location_id` whose row was deleted, or a value the current user
-  // cannot see under RLS) resolves to `null` — a truthful "unavailable"
-  // state — rather than surfacing PGRST116 as a console error. Aborts
-  // triggered by React unmount / history navigation are handled the same
-  // way. Genuine transport or authorization errors are still logged.
-  const isAbortLikeError = (err: unknown): boolean => {
-    const name = (err as { name?: string })?.name;
-    const message = String((err as { message?: string })?.message ?? '');
-    // React Router / browser history navigation cancels in-flight
-    // fetch() calls. Chromium surfaces that cancellation as either
-    // an AbortError or as `TypeError: Failed to fetch`. In this
-    // context both are legitimately-obsolete requests, not
-    // application failures — the caller has already unmounted or
-    // moved on, and the returned `null` is a truthful empty state.
-    if (name === 'AbortError') return true;
-    if (name === 'TypeError' && /failed to fetch/i.test(message)) return true;
-    return false;
-  };
+  // Lifecycle-aware cancellation. A rejection is treated as an expected
+  // cancellation ONLY when we can prove the request is obsolete via
+  // explicit lifecycle state (provider unmounted OR a newer generation
+  // has been issued). Message-text inspection alone is NOT sufficient —
+  // a genuine offline / CORS / DNS failure on a live request must still
+  // surface as an error so operators see it.
+  const isSupersededOrDisposed = (
+    genRef: React.MutableRefObject<number>,
+    localGen: number,
+  ): boolean => !mountedRef.current || genRef.current !== localGen;
 
   const fetchLocation = useCallback(async (locationId: string) => {
+    const gen = ++locationGenRef.current;
     try {
       const { data, error } = await supabase
         .from('data_centre_locations')
@@ -186,29 +187,33 @@ export function ActiveTwinProvider({ children }: { children: ReactNode }) {
         .eq('id', locationId)
         .maybeSingle();
 
+      if (isSupersededOrDisposed(locationGenRef, gen)) return null;
+
       if (error) {
-        // PGRST116 = "no rows"; maybeSingle already returns null, but
-        // some client versions still surface it as `error`.
         if ((error as { code?: string }).code === 'PGRST116') return null;
         console.error('Failed to fetch location:', error);
         return null;
       }
       return (data as DataCentreLocation | null) ?? null;
     } catch (err) {
-      if (isAbortLikeError(err)) return null;
+      // Only swallow when the request is provably obsolete. A genuine
+      // transport failure on a live/current request still logs.
+      if (isSupersededOrDisposed(locationGenRef, gen)) return null;
       console.error('Failed to fetch location:', err);
       return null;
     }
   }, []);
 
-  // Fetch specific twin. Same semantics as `fetchLocation`.
   const fetchTwin = useCallback(async (twinId: string) => {
+    const gen = ++twinGenRef.current;
     try {
       const { data, error } = await supabase
         .from('data_centre_twins')
         .select('*')
         .eq('id', twinId)
         .maybeSingle();
+
+      if (isSupersededOrDisposed(twinGenRef, gen)) return null;
 
       if (error) {
         if ((error as { code?: string }).code === 'PGRST116') return null;
@@ -217,7 +222,7 @@ export function ActiveTwinProvider({ children }: { children: ReactNode }) {
       }
       return (data as DataCentreTwin | null) ?? null;
     } catch (err) {
-      if (isAbortLikeError(err)) return null;
+      if (isSupersededOrDisposed(twinGenRef, gen)) return null;
       console.error('Failed to fetch twin:', err);
       return null;
     }

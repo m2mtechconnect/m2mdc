@@ -18,7 +18,7 @@
 // parsed, quarantined, or stored. Responses never leak keys, alg,
 // kid, connection ids, tenant ids, claim values, or Zod issues.
 
-import { createClient } from 'npm:@supabase/supabase-js@2.45.0';
+import { createClient } from '@supabase/supabase-js';
 import { jwtVerify, importJWK, decodeProtectedHeader } from 'jose';
 import {
   parseDsxEvent,

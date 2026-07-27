@@ -52,11 +52,11 @@ const REQUIRED_FUNCTIONS = [
 ];
 
 function refFromUrl(url) {
-  const m = /https?:\/\/([a-z0-9]+)\.supabase\.co/i.exec(url ?? "");
+  const m = /https?:\/\/([a-z0-9-]+)\.supabase\.co/i.exec(url ?? "");
   return m ? m[1] : null;
 }
 function refFromDbUrl(url) {
-  const m = /db\.([a-z0-9]+)\.supabase\.co/i.exec(url ?? "");
+  const m = /db\.([a-z0-9-]+)\.supabase\.co/i.exec(url ?? "");
   return m ? m[1] : null;
 }
 

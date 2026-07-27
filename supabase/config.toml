@@ -8,3 +8,11 @@ project_id = "psfvrskpnwcshvajzeix"
 # explicitly approved signed-webhook classification.
 [functions.green-dc-recommend]
 verify_jwt = true
+
+# Phase 2.b DSX ingest boundary. The DSX gateway signs its own JWT with a
+# key that Supabase cannot verify, so the platform's JWT check must be
+# bypassed. The handler performs mandatory in-code verification of the
+# custom gateway token (algorithm pin, signature, iss/aud/sub/exp/iat/skew,
+# connection status, subject allowlist) before any state read or ingest.
+[functions.dsx-ingest]
+verify_jwt = false

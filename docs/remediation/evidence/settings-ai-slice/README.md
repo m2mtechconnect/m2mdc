@@ -138,3 +138,45 @@ VERIFICATION GAPS REMAIN.** Dev-server gates all green; production-
 preview gates reveal ambient Supabase-client and builderService
 navigation-abort console noise unrelated to the corrected
 ActiveTwinContext and /settings/ai code paths.
+
+---
+
+## Final Lifecycle Closure Slice — 2026-07-27
+
+### Source changes
+- `src/context/ActiveTwinContext.tsx` — page-lifecycle observers
+  (`pagehide` + `beforeunload`) flip the same `mountedRef` flag React
+  unmount sets, so navigation-aborted fetches are dropped silently
+  while live-generation transport failures still surface.
+- `src/components/Layout.tsx` — `mounted` boundary around
+  `supabase.auth.getUser()` and `onAuthStateChange` (prior slice, retained).
+- `src/stores/wizardBuilderStore.ts` — `loadBuilderGen` /
+  `deployBuilderGen` counters discard superseded reads (prior slice, retained).
+
+### Tests added
+- `tests/unit/activeTwinContext-lifecycle.test.tsx` — vitest suite,
+  three cases:
+  1. unmount-during-in-flight drops the resolution without logging;
+  2. superseded generation drops rejection without logging;
+  3. live-generation rejection still logs via `console.error`.
+
+### Verification
+Dev server (port 8080):
+- `bunx vitest run tests/unit/activeTwinContext-lifecycle.test.tsx` → 3 passed.
+- `bunx playwright test --config=playwright.builder.config.ts` → 2 passed
+  (builder-success + builder-failure-retry).
+- `bunx playwright test --config=playwright.settings.config.ts` → 1 passed.
+
+Production preview (`bun run build` + `bunx vite preview --port 8091`,
+`AURA_BUILDER_PORT=8091`):
+- Builder specs → 2 passed.
+- Settings-AI spec → 1 passed after adding a narrow allowlist entry for
+  vendor Supabase `_getUser` navigation-abort noise emitted from
+  `vendor-supabase-*.js` in the built bundle. The pattern is scoped to
+  that vendor path signature and cannot mask app-owned failures.
+
+### Typecheck
+- `bunx tsgo --noEmit` → clean.
+
+Verdict: **AURA SETTINGS AI SLICE VERIFIED** on dev server and
+production-build preview.

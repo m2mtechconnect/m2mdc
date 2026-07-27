@@ -93,7 +93,20 @@ export function ActiveTwinProvider({ children }: { children: ReactNode }) {
   const twinGenRef = useRef(0);
   useEffect(() => {
     mountedRef.current = true;
-    return () => { mountedRef.current = false; };
+    // Page-lifecycle observers: a `pagehide` or `beforeunload` event is
+    // an unambiguous signal that the browser is about to tear the JS
+    // context down. Any in-flight fetch that rejects after this point
+    // is a navigation-abort, not an operator-actionable transport
+    // failure — flip the same flag React unmount would flip, so the
+    // rejection is swallowed instead of logged.
+    const markDisposed = () => { mountedRef.current = false; };
+    window.addEventListener('pagehide', markDisposed);
+    window.addEventListener('beforeunload', markDisposed);
+    return () => {
+      mountedRef.current = false;
+      window.removeEventListener('pagehide', markDisposed);
+      window.removeEventListener('beforeunload', markDisposed);
+    };
   }, []);
   
   // State

@@ -113,15 +113,29 @@ export function Layout({ children }: LayoutProps) {
   useTourAutoStart();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-    });
+    // Application-owned lifecycle boundary for supabase.auth.getUser.
+    // Rejections from a disposed owner (e.g. route change while the request
+    // is in flight) must not surface as ambient unhandled errors, but a
+    // failure from the currently-mounted owner remains observable.
+    let mounted = true;
+    supabase.auth.getUser()
+      .then(({ data: { user } }) => {
+        if (mounted) setUser(user);
+      })
+      .catch((err) => {
+        if (mounted) {
+          console.error('[Layout] auth.getUser failed for mounted owner:', err);
+        }
+      });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      if (mounted) setUser(session?.user ?? null);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {

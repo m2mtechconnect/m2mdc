@@ -3,6 +3,15 @@ import { builderService, BuilderConfig } from '@/services/builderService';
 import { AgentBlueprint } from '@/types/agentBlueprint';
 import { useBlueprintStore } from '@/stores/blueprintStore';
 
+// Module-level request generation counters. Every call to a Builder read
+// (loadBuilder or a deploy-path readback) captures the counter at start;
+// only the newest generation is allowed to mutate store state. Older
+// generations are treated as disposed/superseded owners and are dropped
+// silently — while a failure from the CURRENT generation remains
+// observable via the normal error surface.
+let loadBuilderGen = 0;
+let deployBuilderGen = 0;
+
 export interface BuilderTool {
   id: string;
   type: 'integration' | 'mcp' | 'api';
@@ -481,11 +490,20 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
   },
 
   loadBuilder: async (builderId) => {
+    const myGen = ++loadBuilderGen;
     set({ isLoading: true, error: null });
-    
+
     try {
-      console.log('[Builder] Loading draft:', builderId);
+      console.log('[Builder] Loading draft:', builderId, 'gen:', myGen);
       const { builder } = await builderService.get(builderId);
+
+      // Superseded by a newer load (e.g. draft search param changed,
+      // navigation swapped owners). Drop silently — the newer generation
+      // is the source of truth.
+      if (myGen !== loadBuilderGen) {
+        console.info('[Builder] loadBuilder gen', myGen, 'superseded by', loadBuilderGen, '- discarding stale result');
+        return;
+      }
       const config = builder.config as BuilderConfig;
 
       console.log('[Builder] Draft loaded:', { builderId, config });
@@ -527,6 +545,11 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
         error: null,
       });
     } catch (error) {
+      // Superseded loads must not surface as an error on the current owner.
+      if (myGen !== loadBuilderGen) {
+        console.info('[Builder] loadBuilder gen', myGen, 'superseded during error; discarding');
+        return;
+      }
       console.error('[Builder] Failed to load draft:', builderId, error);
       
       // If draft doesn't exist, create a new one instead of failing
@@ -821,7 +844,10 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
       return { success: false, message: 'No builder to deploy' };
     }
 
+    const myDeployGen = ++deployBuilderGen;
     set({ isLoading: true, error: null });
+
+    const isSuperseded = () => myDeployGen !== deployBuilderGen;
 
     try {
       // Ensure workflow actions exist on the backend before deploying
@@ -844,8 +870,13 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
           // Update local state immediately
           set({ workflow: effectiveWorkflow, lastSaved: new Date() });
           
-          // Verify workflow was saved by reading it back
+          // Verify workflow was saved by reading it back. If a newer
+          // deploy attempt has superseded this one, drop the result.
           const { builder } = await builderService.get(builderId);
+          if (isSuperseded()) {
+            console.info('[Builder] deploy readback superseded; discarding');
+            return { success: false, message: 'Deploy superseded' };
+          }
           const savedConfig = builder.config as BuilderConfig;
           if (!savedConfig.workflow?.actions || savedConfig.workflow.actions.length === 0) {
             throw new Error('Workflow was not properly saved to backend');
@@ -862,6 +893,10 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
         console.log('[Builder] Verifying existing workflow on backend...');
         try {
           const { builder } = await builderService.get(builderId);
+          if (isSuperseded()) {
+            console.info('[Builder] deploy readback superseded; discarding');
+            return { success: false, message: 'Deploy superseded' };
+          }
           const savedConfig = builder.config as BuilderConfig;
           if (!savedConfig.workflow?.actions || savedConfig.workflow.actions.length === 0) {
             console.warn('[Builder] Backend workflow is empty, re-saving...');

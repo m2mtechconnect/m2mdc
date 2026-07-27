@@ -490,11 +490,20 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
   },
 
   loadBuilder: async (builderId) => {
+    const myGen = ++loadBuilderGen;
     set({ isLoading: true, error: null });
-    
+
     try {
-      console.log('[Builder] Loading draft:', builderId);
+      console.log('[Builder] Loading draft:', builderId, 'gen:', myGen);
       const { builder } = await builderService.get(builderId);
+
+      // Superseded by a newer load (e.g. draft search param changed,
+      // navigation swapped owners). Drop silently — the newer generation
+      // is the source of truth.
+      if (myGen !== loadBuilderGen) {
+        console.info('[Builder] loadBuilder gen', myGen, 'superseded by', loadBuilderGen, '- discarding stale result');
+        return;
+      }
       const config = builder.config as BuilderConfig;
 
       console.log('[Builder] Draft loaded:', { builderId, config });
@@ -536,6 +545,11 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
         error: null,
       });
     } catch (error) {
+      // Superseded loads must not surface as an error on the current owner.
+      if (myGen !== loadBuilderGen) {
+        console.info('[Builder] loadBuilder gen', myGen, 'superseded during error; discarding');
+        return;
+      }
       console.error('[Builder] Failed to load draft:', builderId, error);
       
       // If draft doesn't exist, create a new one instead of failing

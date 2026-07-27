@@ -14,6 +14,8 @@
 //   node scripts/dsx-resume-gate.mjs           # CLI check, exits 0/1
 //   import { assertDsxResumeAllowed } from ... # programmatic guard
 
+import { appendAuditEntry } from "./dsx-audit-log.mjs";
+
 const PRODUCTION_PROJECT_REF = "psfvrskpnwcshvajzeix";
 
 const REQUIRED_SECRETS = [
@@ -61,6 +63,19 @@ export function evaluateDsxResumeGate(env = process.env) {
 
 export function assertDsxResumeAllowed(env = process.env) {
   const result = evaluateDsxResumeGate(env);
+  try {
+    appendAuditEntry({
+      kind: "resume_gate",
+      action: "evaluated",
+      decision: result.allowed ? "allowed" : "blocked",
+      phase: "phase-2-closure",
+      target_ref: env.DSX_DISPOSABLE_PROJECT_REF ?? null,
+      detail: result.allowed
+        ? "resume gate allowed disposable operations"
+        : `resume gate blocked: ${result.reasons.join("; ")}`,
+      context: { reasons: result.reasons },
+    });
+  } catch { /* audit failure must not mask gate decision */ }
   if (!result.allowed) {
     const err = new Error(
       `DSX resume gate BLOCKED: ${result.reasons.join("; ")}`,
@@ -76,6 +91,17 @@ export function assertDsxResumeAllowed(env = process.env) {
 const isCli = import.meta.url === `file://${process.argv[1]}`;
 if (isCli) {
   const result = evaluateDsxResumeGate();
+  try {
+    appendAuditEntry({
+      kind: "resume_gate",
+      action: "cli_invocation",
+      decision: result.allowed ? "allowed" : "blocked",
+      phase: "phase-2-closure",
+      target_ref: process.env.DSX_DISPOSABLE_PROJECT_REF ?? null,
+      detail: result.allowed ? "cli invocation allowed" : `cli invocation blocked: ${result.reasons.join("; ")}`,
+      context: { reasons: result.reasons },
+    });
+  } catch { /* ignore */ }
   if (!result.allowed) {
     console.error("DSX resume gate: BLOCKED");
     for (const reason of result.reasons) console.error(`  - ${reason}`);

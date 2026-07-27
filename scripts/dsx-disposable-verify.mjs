@@ -18,6 +18,7 @@
 // Fails closed. Never mutates any row. Never contacts production.
 
 import { evaluateDsxResumeGate } from "./dsx-resume-gate.mjs";
+import { appendAuditEntry } from "./dsx-audit-log.mjs";
 
 const PRODUCTION_PROJECT_REF = "psfvrskpnwcshvajzeix";
 
@@ -242,6 +243,28 @@ export async function verifyDisposable(env = process.env) {
   const findings = [];
   checkEnvIdentity(env, findings);
   if (!findings.every((f) => f.pass)) {
+    for (const f of findings) {
+      try {
+        appendAuditEntry({
+          kind: "verify_check",
+          action: f.check,
+          decision: f.pass ? "allowed" : "blocked",
+          phase: "phase-2-closure",
+          target_ref: env.DSX_DISPOSABLE_PROJECT_REF ?? null,
+          detail: f.detail ?? "",
+        });
+      } catch { /* ignore */ }
+    }
+    try {
+      appendAuditEntry({
+        kind: "verify_run",
+        action: "aborted",
+        decision: "blocked",
+        phase: "phase-2-closure",
+        target_ref: env.DSX_DISPOSABLE_PROJECT_REF ?? null,
+        detail: "identity_or_gate_failed; no network probes issued",
+      });
+    } catch { /* ignore */ }
     return { allowed: false, findings, aborted: "identity_or_gate_failed" };
   }
   await checkExtensions(env, findings);
@@ -249,7 +272,31 @@ export async function verifyDisposable(env = process.env) {
   await checkFunctions(env, findings);
   await checkAuth(env, findings);
   await checkDsxIngestEdge(env, findings);
-  return { allowed: findings.every((f) => f.pass), findings };
+  const allowed = findings.every((f) => f.pass);
+  for (const f of findings) {
+    try {
+      appendAuditEntry({
+        kind: "verify_check",
+        action: f.check,
+        decision: f.pass ? "allowed" : "blocked",
+        phase: "phase-2-closure",
+        target_ref: env.DSX_DISPOSABLE_PROJECT_REF ?? null,
+        detail: f.detail ?? "",
+      });
+    } catch { /* ignore */ }
+  }
+  try {
+    appendAuditEntry({
+      kind: "verify_run",
+      action: "completed",
+      decision: allowed ? "allowed" : "blocked",
+      phase: "phase-2-closure",
+      target_ref: env.DSX_DISPOSABLE_PROJECT_REF ?? null,
+      detail: allowed ? "all disposable checks passed" : "one or more disposable checks failed",
+      context: { total: findings.length, failed: findings.filter((f) => !f.pass).length },
+    });
+  } catch { /* ignore */ }
+  return { allowed, findings };
 }
 
 const isCli = import.meta.url === `file://${process.argv[1]}`;

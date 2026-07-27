@@ -3,6 +3,15 @@ import { builderService, BuilderConfig } from '@/services/builderService';
 import { AgentBlueprint } from '@/types/agentBlueprint';
 import { useBlueprintStore } from '@/stores/blueprintStore';
 
+// Module-level request generation counters. Every call to a Builder read
+// (loadBuilder or a deploy-path readback) captures the counter at start;
+// only the newest generation is allowed to mutate store state. Older
+// generations are treated as disposed/superseded owners and are dropped
+// silently — while a failure from the CURRENT generation remains
+// observable via the normal error surface.
+let loadBuilderGen = 0;
+let deployBuilderGen = 0;
+
 export interface BuilderTool {
   id: string;
   type: 'integration' | 'mcp' | 'api';

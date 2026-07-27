@@ -42,7 +42,6 @@ describe('DsxEventEnvelopeV1Schema', () => {
   it('rejects unknown fields (strict)', () => {
     const r = DsxEventEnvelopeV1Schema.safeParse({
       ...validEnvelope(),
-      // @ts-expect-error smuggling
       extra_field: 'nope',
     });
     expect(r.success).toBe(false);
@@ -104,10 +103,11 @@ describe('parseDsxEvent — fail-closed', () => {
   it('returns schema_invalid with Zod issues on structural failure', () => {
     const r = parseDsxEvent({ ...validEnvelope(), event_id: 'not-a-uuid' });
     expect(r.ok).toBe(false);
-    if (!r.ok) {
-      expect(r.reason).toBe('schema_invalid');
+    if (!r.ok && r.reason === 'schema_invalid') {
       expect(Array.isArray(r.issues)).toBe(true);
-      expect(r.issues!.length).toBeGreaterThan(0);
+      expect((r.issues ?? []).length).toBeGreaterThan(0);
+    } else {
+      throw new Error('expected schema_invalid');
     }
   });
 

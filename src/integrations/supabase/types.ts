@@ -2004,6 +2004,342 @@ export type Database = {
         }
         Relationships: []
       }
+      dsx_asset_mappings: {
+        Row: {
+          active: boolean
+          connection_id: string
+          created_at: string
+          external_asset_ref: string
+          id: string
+          internal_asset_ref: string
+          metadata: Json
+          metric_kind: string
+          org_id: string
+          twin_id: string
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          connection_id: string
+          created_at?: string
+          external_asset_ref: string
+          id?: string
+          internal_asset_ref: string
+          metadata?: Json
+          metric_kind: string
+          org_id: string
+          twin_id: string
+          unit: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          connection_id?: string
+          created_at?: string
+          external_asset_ref?: string
+          id?: string
+          internal_asset_ref?: string
+          metadata?: Json
+          metric_kind?: string
+          org_id?: string
+          twin_id?: string
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dsx_asset_mappings_connection_fk"
+            columns: ["connection_id", "org_id", "twin_id"]
+            isOneToOne: false
+            referencedRelation: "dsx_connections"
+            referencedColumns: ["id", "org_id", "twin_id"]
+          },
+        ]
+      }
+      dsx_connections: {
+        Row: {
+          allowed_source_subjects: string[]
+          created_at: string
+          created_by: string | null
+          freshness_budget_ms: number
+          gateway_jwt_audience: string | null
+          gateway_jwt_issuer: string | null
+          gateway_jwt_key_ref: string | null
+          gateway_version: string | null
+          id: string
+          metadata: Json
+          name: string
+          org_id: string
+          status: string
+          twin_id: string
+          updated_at: string
+        }
+        Insert: {
+          allowed_source_subjects?: string[]
+          created_at?: string
+          created_by?: string | null
+          freshness_budget_ms?: number
+          gateway_jwt_audience?: string | null
+          gateway_jwt_issuer?: string | null
+          gateway_jwt_key_ref?: string | null
+          gateway_version?: string | null
+          id?: string
+          metadata?: Json
+          name: string
+          org_id: string
+          status?: string
+          twin_id: string
+          updated_at?: string
+        }
+        Update: {
+          allowed_source_subjects?: string[]
+          created_at?: string
+          created_by?: string | null
+          freshness_budget_ms?: number
+          gateway_jwt_audience?: string | null
+          gateway_jwt_issuer?: string | null
+          gateway_jwt_key_ref?: string | null
+          gateway_version?: string | null
+          id?: string
+          metadata?: Json
+          name?: string
+          org_id?: string
+          status?: string
+          twin_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dsx_connections_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dsx_connections_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_twins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dsx_events: {
+        Row: {
+          asset_mapping_id: string
+          connection_id: string
+          envelope: Json
+          event_id: string
+          gateway_id: string | null
+          id: string
+          ingested_at: string
+          ingestion_version: number
+          numeric_value: number | null
+          observed_at: string
+          org_id: string
+          quality: string
+          received_at: string
+          schema_version: number
+          source_subject: string | null
+          twin_id: string
+          unit: string | null
+        }
+        Insert: {
+          asset_mapping_id: string
+          connection_id: string
+          envelope: Json
+          event_id: string
+          gateway_id?: string | null
+          id?: string
+          ingested_at?: string
+          ingestion_version?: number
+          numeric_value?: number | null
+          observed_at: string
+          org_id: string
+          quality: string
+          received_at: string
+          schema_version: number
+          source_subject?: string | null
+          twin_id: string
+          unit?: string | null
+        }
+        Update: {
+          asset_mapping_id?: string
+          connection_id?: string
+          envelope?: Json
+          event_id?: string
+          gateway_id?: string | null
+          id?: string
+          ingested_at?: string
+          ingestion_version?: number
+          numeric_value?: number | null
+          observed_at?: string
+          org_id?: string
+          quality?: string
+          received_at?: string
+          schema_version?: number
+          source_subject?: string | null
+          twin_id?: string
+          unit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dsx_events_connection_fk"
+            columns: ["connection_id", "org_id", "twin_id"]
+            isOneToOne: false
+            referencedRelation: "dsx_connections"
+            referencedColumns: ["id", "org_id", "twin_id"]
+          },
+          {
+            foreignKeyName: "dsx_events_mapping_fk"
+            columns: ["asset_mapping_id", "connection_id", "org_id", "twin_id"]
+            isOneToOne: false
+            referencedRelation: "dsx_asset_mappings"
+            referencedColumns: ["id", "connection_id", "org_id", "twin_id"]
+          },
+        ]
+      }
+      dsx_events_quarantine: {
+        Row: {
+          connection_id: string | null
+          envelope_snippet: Json | null
+          id: string
+          metadata_retain_until: string
+          org_id: string | null
+          raw_payload_purge_after: string
+          reason_code: string
+          received_at: string
+          restricted_payload: Json | null
+          sanitized_reason: string
+          source_subject_hash: string | null
+          twin_id: string | null
+        }
+        Insert: {
+          connection_id?: string | null
+          envelope_snippet?: Json | null
+          id?: string
+          metadata_retain_until?: string
+          org_id?: string | null
+          raw_payload_purge_after?: string
+          reason_code: string
+          received_at?: string
+          restricted_payload?: Json | null
+          sanitized_reason: string
+          source_subject_hash?: string | null
+          twin_id?: string | null
+        }
+        Update: {
+          connection_id?: string | null
+          envelope_snippet?: Json | null
+          id?: string
+          metadata_retain_until?: string
+          org_id?: string | null
+          raw_payload_purge_after?: string
+          reason_code?: string
+          received_at?: string
+          restricted_payload?: Json | null
+          sanitized_reason?: string
+          source_subject_hash?: string | null
+          twin_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dsx_events_quarantine_connection_fk"
+            columns: ["connection_id", "org_id", "twin_id"]
+            isOneToOne: false
+            referencedRelation: "dsx_connections"
+            referencedColumns: ["id", "org_id", "twin_id"]
+          },
+        ]
+      }
+      dsx_gateway_heartbeats: {
+        Row: {
+          connection_id: string
+          gateway_id: string
+          gateway_version: string | null
+          id: string
+          metrics: Json
+          org_id: string
+          received_at: string
+          status: string
+          twin_id: string
+        }
+        Insert: {
+          connection_id: string
+          gateway_id: string
+          gateway_version?: string | null
+          id?: string
+          metrics?: Json
+          org_id: string
+          received_at?: string
+          status: string
+          twin_id: string
+        }
+        Update: {
+          connection_id?: string
+          gateway_id?: string
+          gateway_version?: string | null
+          id?: string
+          metrics?: Json
+          org_id?: string
+          received_at?: string
+          status?: string
+          twin_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dsx_gateway_heartbeats_connection_fk"
+            columns: ["connection_id", "org_id", "twin_id"]
+            isOneToOne: false
+            referencedRelation: "dsx_connections"
+            referencedColumns: ["id", "org_id", "twin_id"]
+          },
+        ]
+      }
+      dsx_ingestion_audit: {
+        Row: {
+          connection_id: string | null
+          decision: string
+          event_id: string | null
+          id: string
+          latency_ms: number | null
+          metadata: Json
+          occurred_at: string
+          org_id: string | null
+          reason_code: string | null
+          request_id: string | null
+          source_subject_hash: string | null
+        }
+        Insert: {
+          connection_id?: string | null
+          decision: string
+          event_id?: string | null
+          id?: string
+          latency_ms?: number | null
+          metadata?: Json
+          occurred_at?: string
+          org_id?: string | null
+          reason_code?: string | null
+          request_id?: string | null
+          source_subject_hash?: string | null
+        }
+        Update: {
+          connection_id?: string | null
+          decision?: string
+          event_id?: string | null
+          id?: string
+          latency_ms?: number | null
+          metadata?: Json
+          occurred_at?: string
+          org_id?: string | null
+          reason_code?: string | null
+          request_id?: string | null
+          source_subject_hash?: string | null
+        }
+        Relationships: []
+      }
       environments: {
         Row: {
           created_at: string | null
@@ -4958,6 +5294,38 @@ export type Database = {
       }
     }
     Views: {
+      dsx_current_state: {
+        Row: {
+          asset_mapping_id: string | null
+          connection_id: string | null
+          event_id: string | null
+          ingested_at: string | null
+          numeric_value: number | null
+          observed_at: string | null
+          org_id: string | null
+          quality: string | null
+          received_at: string | null
+          schema_version: number | null
+          twin_id: string | null
+          unit: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dsx_events_connection_fk"
+            columns: ["connection_id", "org_id", "twin_id"]
+            isOneToOne: false
+            referencedRelation: "dsx_connections"
+            referencedColumns: ["id", "org_id", "twin_id"]
+          },
+          {
+            foreignKeyName: "dsx_events_mapping_fk"
+            columns: ["asset_mapping_id", "connection_id", "org_id", "twin_id"]
+            isOneToOne: false
+            referencedRelation: "dsx_asset_mappings"
+            referencedColumns: ["id", "connection_id", "org_id", "twin_id"]
+          },
+        ]
+      }
       mv_ops_overview: {
         Row: {
           active_systems: number | null
@@ -5179,6 +5547,29 @@ export type Database = {
       delete_secret_from_vault: {
         Args: { vault_id: string }
         Returns: undefined
+      }
+      dsx_current_user_in_org: { Args: { p_org_id: string }; Returns: boolean }
+      dsx_current_user_is_operator_in_org: {
+        Args: { p_org_id: string }
+        Returns: boolean
+      }
+      dsx_ingest_event: {
+        Args: {
+          p_connection_id: string
+          p_envelope: Json
+          p_event_id: string
+          p_external_asset_ref: string
+          p_gateway_id: string
+          p_numeric_value: number
+          p_observed_at: string
+          p_quality: string
+          p_received_at: string
+          p_request_id: string
+          p_schema_version: number
+          p_source_subject: string
+          p_unit: string
+        }
+        Returns: Json
       }
       generate_avatar_color: {
         Args: { user_id_input: string }

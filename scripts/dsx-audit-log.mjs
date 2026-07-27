@@ -193,8 +193,59 @@ if (isCli) {
     const lines = readFileSync(DEFAULT_LOG_PATH, "utf8").split("\n").filter(Boolean).slice(-n);
     for (const l of lines) console.log(l);
     process.exit(0);
+  } else if (cmd === "summary") {
+    // Machine-readable verification summary. Always exits 0 (unless the
+    // log file itself cannot be read); consumers inspect `ok` in JSON.
+    const r = verifyAuditChain();
+    const summary = {
+      schema: "dsx-audit-summary/v1",
+      generated_at: new Date().toISOString(),
+      log_path: DEFAULT_LOG_PATH,
+      exists: existsSync(DEFAULT_LOG_PATH),
+      ok: r.ok,
+      entries: r.entries,
+      broken_at: r.brokenAt ?? null,
+      reason: r.reason ?? null,
+      last_entry: null,
+    };
+    if (summary.exists && r.ok && r.entries > 0) {
+      try {
+        const last = JSON.parse(readLastLine(DEFAULT_LOG_PATH));
+        summary.last_entry = {
+          ts: last.ts,
+          seq: last.seq,
+          kind: last.kind,
+          action: last.action,
+          decision: last.decision,
+          phase: last.phase,
+          entry_hash: last.entry_hash,
+        };
+      } catch { /* leave last_entry null */ }
+    }
+    const outPath = arg;
+    const payload = JSON.stringify(summary, null, 2);
+    if (outPath) {
+      mkdirSync(dirname(resolve(outPath)), { recursive: true });
+      appendFileSync(resolve(outPath), ""); // ensure file exists
+      // overwrite atomically-ish: truncate via writeFileSync
+      // (import lazily to avoid touching top-level imports)
+      // eslint-disable-next-line no-undef
+      (globalThis.require ? globalThis.require("node:fs") : null);
+    }
+    if (outPath) {
+      // use writeFileSync for a clean overwrite
+      // (imported here to keep the diff local)
+      import("node:fs").then(({ writeFileSync }) => {
+        writeFileSync(resolve(outPath), payload + "\n", { mode: 0o644 });
+        console.log(payload);
+        process.exit(summary.ok ? 0 : 1);
+      });
+    } else {
+      console.log(payload);
+      process.exit(summary.ok ? 0 : 1);
+    }
   } else {
-    console.error("usage: dsx-audit-log.mjs [verify|tail N]");
+    console.error("usage: dsx-audit-log.mjs [verify|tail N|summary [outPath]]");
     process.exit(2);
   }
 }

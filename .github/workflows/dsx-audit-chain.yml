@@ -26,6 +26,35 @@ jobs:
       - name: Verify audit chain
         run: node scripts/dsx-audit-log.mjs verify
 
+      - name: Generate machine-readable summary
+        id: dsx_audit_summary
+        if: always()
+        run: |
+          mkdir -p docs/remediation/evidence/dsx-audit
+          set +e
+          node scripts/dsx-audit-log.mjs summary docs/remediation/evidence/dsx-audit/summary.json
+          status=$?
+          set -e
+          summary_path=docs/remediation/evidence/dsx-audit/summary.json
+          {
+            echo "summary_path=$summary_path"
+            echo "verify_status=$status"
+            echo "ok=$(jq -r '.ok' "$summary_path")"
+            echo "entries=$(jq -r '.entries' "$summary_path")"
+            echo "reason=$(jq -r '.reason // ""' "$summary_path")"
+            echo "broken_at=$(jq -r '.broken_at // ""' "$summary_path")"
+            echo "last_seq=$(jq -r '.last_entry.seq // ""' "$summary_path")"
+            echo "last_hash=$(jq -r '.last_entry.entry_hash // ""' "$summary_path")"
+          } >> "$GITHUB_OUTPUT"
+          {
+            echo "### DSX audit chain summary"
+            echo ""
+            echo '```json'
+            cat "$summary_path"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $status
+
       - name: Tail audit log on failure
         if: failure()
         run: node scripts/dsx-audit-log.mjs tail 20 || true
@@ -35,6 +64,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dsx-audit-log
-          path: docs/remediation/evidence/dsx-audit/audit.jsonl
+          path: |
+            docs/remediation/evidence/dsx-audit/audit.jsonl
+            docs/remediation/evidence/dsx-audit/summary.json
           if-no-files-found: ignore
           retention-days: 30

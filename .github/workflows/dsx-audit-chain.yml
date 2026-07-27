@@ -1,0 +1,40 @@
+name: DSX Audit Chain
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  verify-audit-chain:
+    name: Verify DSX audit chain integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Read-only chain verification. Exits non-zero on:
+      #   - seq gaps (missing / out-of-order entries)
+      #   - prev_hash mismatches (chain break)
+      #   - entry_hash mismatches (tampered body)
+      #   - unparseable JSONL lines
+      - name: Verify audit chain
+        run: node scripts/dsx-audit-log.mjs verify
+
+      - name: Tail audit log on failure
+        if: failure()
+        run: node scripts/dsx-audit-log.mjs tail 20 || true
+
+      - name: Upload audit log artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsx-audit-log
+          path: docs/remediation/evidence/dsx-audit/audit.jsonl
+          if-no-files-found: ignore
+          retention-days: 30

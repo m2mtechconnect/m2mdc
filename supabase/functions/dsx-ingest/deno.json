@@ -1,6 +1,7 @@
 {
   "imports": {
     "zod": "npm:zod@3.25.76",
-    "jose": "npm:jose@5.9.6"
+    "jose": "npm:jose@5.9.6",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2.45.0"
   }
 }

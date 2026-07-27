@@ -17,7 +17,7 @@
 // verifyAuditChain(). Reserved secret names are dropped before write.
 
 import { createHash } from "node:crypto";
-import { mkdirSync, appendFileSync, readFileSync, existsSync, statSync } from "node:fs";
+import { mkdirSync, appendFileSync, readFileSync, writeFileSync, existsSync, statSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -222,28 +222,14 @@ if (isCli) {
         };
       } catch { /* leave last_entry null */ }
     }
-    const outPath = arg;
     const payload = JSON.stringify(summary, null, 2);
-    if (outPath) {
-      mkdirSync(dirname(resolve(outPath)), { recursive: true });
-      appendFileSync(resolve(outPath), ""); // ensure file exists
-      // overwrite atomically-ish: truncate via writeFileSync
-      // (import lazily to avoid touching top-level imports)
-      // eslint-disable-next-line no-undef
-      (globalThis.require ? globalThis.require("node:fs") : null);
+    if (arg) {
+      const outPath = resolve(arg);
+      mkdirSync(dirname(outPath), { recursive: true });
+      writeFileSync(outPath, payload + "\n", { mode: 0o644 });
     }
-    if (outPath) {
-      // use writeFileSync for a clean overwrite
-      // (imported here to keep the diff local)
-      import("node:fs").then(({ writeFileSync }) => {
-        writeFileSync(resolve(outPath), payload + "\n", { mode: 0o644 });
-        console.log(payload);
-        process.exit(summary.ok ? 0 : 1);
-      });
-    } else {
-      console.log(payload);
-      process.exit(summary.ok ? 0 : 1);
-    }
+    console.log(payload);
+    process.exit(summary.ok ? 0 : 1);
   } else {
     console.error("usage: dsx-audit-log.mjs [verify|tail N|summary [outPath]]");
     process.exit(2);

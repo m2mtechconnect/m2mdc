@@ -390,7 +390,7 @@ export async function handleRequest(req: Request): Promise<Response> {
     console.log(`[dsx-ingest] envelope_reject request_id=${requestId} reason=${parsed.reason}`);
     return errorResponse(400, 'invalid_request', requestId);
   }
-  const env = parsed.event;
+  const env = parsed.envelope;
 
   // Server-side cross-check: envelope must claim same connection_id we
   // resolved from the verified sub. Do not trust envelope tenant/site.

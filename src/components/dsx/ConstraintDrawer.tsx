@@ -34,7 +34,9 @@ export function ConstraintDrawer() {
 
               {c.blocking_capability && (
                 <p className="text-muted-foreground">
-                  Blocked by missing capability: {c.blocking_capability}.
+                  Blocked by missing capability: {c.blocking_capability.label}. {c.blocking_capability.reason}
+                  {c.blocking_capability.missing_inputs.length > 0 &&
+                    ` Missing inputs: ${c.blocking_capability.missing_inputs.join(', ')}.`}
                 </p>
               )}
 

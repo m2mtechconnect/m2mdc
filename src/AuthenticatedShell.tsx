@@ -58,6 +58,11 @@ import AdminUserApproval from "./pages/AdminUserApproval";
 import AdminSignupsDashboard from "./pages/AdminSignupsDashboard";
 import { lazy } from "react";
 const EvidenceBetaShell = lazy(() => import("./pages/dsx/EvidenceBetaShell"));
+import {
+  OverviewWorkspace, ThermalWorkspace, PowerWorkspace, CoolingWorkspace, NetworkWorkspace,
+  FacilityWorkspace, WorkloadWorkspace, SovereigntyWorkspace, CarbonWorkspace,
+  FinancialWorkspace, EvidenceWorkspace,
+} from "./pages/dsx/workspaces";
 const OverlayFixtures = import.meta.env.DEV
   ? lazy(() => import("./pages/test/OverlayFixtures"))
   : null;

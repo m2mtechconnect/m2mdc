@@ -10,7 +10,6 @@ const baseEnv = () => ({
   DSX_DISPOSABLE_DB_URL: `postgres://postgres@db.${OK_REF}.supabase.co/postgres`,
   DSX_DISPOSABLE_ANON_KEY: "anon",
   DSX_DISPOSABLE_URL: `https://${OK_REF}.supabase.co`,
-  DSX_DISPOSABLE_JWT_SECRET: "jwt",
 });
 
 describe("verifyDisposable", () => {

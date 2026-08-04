@@ -44,7 +44,7 @@ Every tile carries `Simulated`, `Fresh`, `Validated`, `Uncalibrated`.
 | Claim id | Status | Basis or blocker | Event ids | Missing inputs |
 |---|---|---|---|---|
 | `telemetry_confinement` | Evidenced | Structural: fixture-only, in-session processing, zero-egress guard | 0 (structural) | - |
-| `identity_chain` | Evidenced | 6 approved asset identities; unmapped observations quarantined | 0 (see D-01) | - |
+| `identity_chain` | Evidenced | 6 approved asset identities; unmapped observations quarantined | 18 (one representative event per mapped source) | - |
 | `facility_jurisdiction` | Not evidenced | `residency_evidence` (unavailable) | 0 | dataset_location, egress_log, operator_of_record, site_jurisdiction, workload_location |
 | `data_residency` | Not evidenced | `residency_evidence` | 0 | dataset_location, egress_log, workload_location |
 | `workload_residency` | Not evidenced | `workload_scheduler` | 0 | gpu_inventory, job_queue, workload_location, workload_placement |
@@ -89,13 +89,17 @@ Every tile carries `Simulated`, `Fresh`, `Validated`, `Uncalibrated`.
 
 ## 5. Defects found
 
-- **D-01 (medium) - `identity_chain` is evidenced with zero event ids.** It
+- **D-01 (RESOLVED) - `identity_chain` was evidenced with zero event ids.** It
   cites `mapping_coverage.source_event_ids`, which is always empty because
   `mapping_coverage`, `data_quality` and `telemetry_freshness` are computed
   from counters rather than from named observations
   (`src/dsx/metrics/definitions.ts:82-105`). The claim reads as observation-backed
   while the drawer shows "structural claim". Fix: populate the counter metrics
   with the contributing event ids, or label the claim structural in the table row.
+  Fixed: `mapped_sources`, `observed_sources`, `accepted_events`, `rejected_events`
+  and `age_seconds` now carry their contributing event ids, and `computeMetric`
+  de-duplicates the provenance set. Covered by two regression tests in
+  `src/dsx/__tests__/evidenceBoundary.test.ts`.
 - **D-02 (medium) - `site_rated_kw` has no provenance.** `power_capacity_utilisation`
   and the `capacity_driver` claim divide metered load by the fixture constant
   `rated_kw: 2400` (`src/dsx/fixtures/evidenceBetaFacility.ts:49`). The UI shows

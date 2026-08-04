@@ -87,7 +87,9 @@ export function computeMetric(
     }
   }
 
-  const eventIds = present.flatMap((p) => p.event_ids);
+  // Inputs can share observations (e.g. mapped vs observed sources); the
+  // provenance list must stay a stable, de-duplicated set of event ids.
+  const eventIds = Array.from(new Set(present.flatMap((p) => p.event_ids)));
   const limitations = [...(ctx.limitations ?? [])];
   if (ctx.data_mode === 'SIMULATED') {
     limitations.unshift('Value derived from simulated inputs; not a measurement of a physical facility.');

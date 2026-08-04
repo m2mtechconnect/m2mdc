@@ -99,6 +99,14 @@ export function EvidenceBoundaryTable({
                 >
                   {ok ? 'Evidenced' : 'Not evidenced'}
                 </Badge>
+                {ok && a.unattested_inputs.length > 0 && (
+                  <Badge
+                    variant="outline"
+                    className="mt-1 block whitespace-nowrap border-amber-500/50 bg-amber-500/10 text-[11px] text-amber-700 dark:text-amber-200"
+                  >
+                    Declared input
+                  </Badge>
+                )}
               </TableCell>
               <TableCell className="align-top text-xs text-muted-foreground">
                 {ok ? a.basis : a.blocking_capability?.reason}
@@ -111,6 +119,11 @@ export function EvidenceBoundaryTable({
               </TableCell>
               <TableCell className="align-top font-mono text-[11px] text-muted-foreground">
                 {a.missing_inputs.length ? a.missing_inputs.join(', ') : 'none'}
+                {a.unattested_inputs.length > 0 && (
+                  <span className="mt-1 block text-amber-700 dark:text-amber-200">
+                    unattested: {a.unattested_inputs.join(', ')}
+                  </span>
+                )}
               </TableCell>
               <TableCell className="align-top">
                 <Button

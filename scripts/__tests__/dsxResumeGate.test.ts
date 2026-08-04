@@ -12,7 +12,6 @@ const fullSecrets = (ref: string) => ({
   DSX_DISPOSABLE_DB_URL: "postgres://x",
   DSX_DISPOSABLE_ANON_KEY: "x",
   DSX_DISPOSABLE_URL: "https://x",
-  DSX_DISPOSABLE_JWT_SECRET: "x",
 });
 
 describe("DSX resume gate", () => {
@@ -45,5 +44,13 @@ describe("DSX resume gate", () => {
 
   it("blocks empty environment", () => {
     expect(evaluateDsxResumeGate({}).allowed).toBe(false);
+  });
+
+  it("does not require the legacy project JWT secret", () => {
+    const env: Record<string, string> = fullSecrets(OK_REF);
+    delete (env as Record<string, string>).DSX_DISPOSABLE_JWT_SECRET;
+    const r = evaluateDsxResumeGate(env);
+    expect(r.allowed).toBe(true);
+    expect(r.reasons.join(" ")).not.toMatch(/JWT_SECRET/);
   });
 });

@@ -24,8 +24,13 @@ const REQUIRED_SECRETS = [
   "DSX_DISPOSABLE_DB_URL",
   "DSX_DISPOSABLE_ANON_KEY",
   "DSX_DISPOSABLE_URL",
-  "DSX_DISPOSABLE_JWT_SECRET",
 ];
+
+// DSX_DISPOSABLE_JWT_SECRET is intentionally NOT required. See
+// docs/remediation/dsx-jwt-secret-audit.md: no harness ever read it, and
+// test users must authenticate through Supabase Auth (JWKS-verified
+// tokens) rather than having the harness mint tokens with the project's
+// master signing secret.
 
 export function evaluateDsxResumeGate(env = process.env) {
   const reasons = [];

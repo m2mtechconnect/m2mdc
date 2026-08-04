@@ -148,7 +148,7 @@ export function createDsxExchangeAdapter(opts: ExchangeAdapterOptions): DsxExcha
 
     // Shared pipeline — no private validation, no bypass.
     const result = ingestRecords(
-      [{ tick: 0, source_asset_id: sourceAssetId, payload: parsed }],
+      [{ tick: 0, source_asset_id: sourceAssetId, payload: raw }],
       EVIDENCE_BETA_MAPPINGS,
       sourceSystem,
     );
@@ -179,8 +179,8 @@ export function createDsxExchangeAdapter(opts: ExchangeAdapterOptions): DsxExcha
       const verdict = assessEndpoint(transport.endpoint, {
         allowDisposableHost: opts.allowDisposableHost ?? null,
       });
-      if (!verdict.allowed) {
-        health.refused_reason = verdict.reason;
+      if (verdict.allowed !== true) {
+        health.refused_reason = (verdict as { allowed: false; reason: string }).reason;
         health.transport_state = 'error';
         notify();
         return;

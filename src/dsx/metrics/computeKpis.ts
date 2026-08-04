@@ -98,7 +98,7 @@ export function computeKpiBundle(snapshot: SourceSnapshot, nowMs: number): KpiBu
   const inputs: Record<string, MetricInputRef | undefined> = {
     it_power_total: ref(
       'it_power_total',
-      powered.length === racks.length ? itTotal : powered.length ? itTotal : null,
+      powered.length === racks.length ? itTotal : null,
       'kW',
       powered.map((r) => r.power_event_id).filter((v): v is string => !!v),
     ),

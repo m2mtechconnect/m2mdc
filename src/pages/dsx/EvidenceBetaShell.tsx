@@ -17,7 +17,7 @@ import { ContextBar } from '@/components/dsx/ContextBar';
 import { AssetDrawer } from '@/components/dsx/AssetDrawer';
 import { ConstraintDrawer } from '@/components/dsx/ConstraintDrawer';
 import { buildHierarchy, type HierarchyNode } from '@/dsx/workspaces/facilityGraph';
-import { DSX_ROOT } from '@/dsx/workspaces/relatedViews';
+import { DSX_ROOT, relatedViewsForDomain } from '@/dsx/workspaces/relatedViews';
 
 interface NavEntry { to: string; label: string; end?: boolean; domain?: string }
 
@@ -262,6 +262,7 @@ function ShellBody() {
         <div className="min-w-0 flex-1 p-4 sm:p-6">
           <WorkspaceHeader />
           <Outlet />
+          <RelatedWorkspaces />
         </div>
       </div>
       <AssetDrawer />

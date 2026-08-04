@@ -8,10 +8,17 @@
  */
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle,
+} from '@/components/ui/sheet';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import { CircleSlash, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import {
   domainVerdict, summarise, type EvidenceAssertion,
@@ -60,7 +67,10 @@ export function EvidenceBoundaryTable({
   assertions: EvidenceAssertion[];
   domain: string;
 }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+  const active = assertions.find((a) => a.id === openId) ?? null;
   return (
+    <>
     <Table data-testid={`dsx-boundary-table-${domain}`}>
       <TableHeader>
         <TableRow>
@@ -68,6 +78,7 @@ export function EvidenceBoundaryTable({
           <TableHead>Status</TableHead>
           <TableHead>Basis or blocker</TableHead>
           <TableHead>Missing inputs</TableHead>
+          <TableHead className="w-[1%]"><span className="sr-only">Provenance</span></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -101,11 +112,152 @@ export function EvidenceBoundaryTable({
               <TableCell className="align-top font-mono text-[11px] text-muted-foreground">
                 {a.missing_inputs.length ? a.missing_inputs.join(', ') : 'none'}
               </TableCell>
+              <TableCell className="align-top">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 whitespace-nowrap text-[11px]"
+                  data-testid={`dsx-assertion-drilldown-${a.id}`}
+                  aria-label={`Show provenance for claim: ${a.claim}`}
+                  onClick={() => setOpenId(a.id)}
+                >
+                  Details
+                </Button>
+              </TableCell>
             </TableRow>
           );
         })}
       </TableBody>
     </Table>
+    <AssertionProvenanceDrawer
+      assertion={active}
+      domain={domain}
+      onClose={() => setOpenId(null)}
+    />
+    </>
+  );
+}
+
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="grid grid-cols-[9rem_1fr] gap-2 py-1 text-xs">
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd className="break-words">{value}</dd>
+    </div>
+  );
+}
+
+/**
+ * Per-claim drilldown. Shows the exact basis (or the exact blocker) behind a
+ * single assertion, the capability that gates it, the named inputs that are
+ * missing and the provenanced event ids that support it. Nothing here is
+ * inferred: a claim with no supporting events says so.
+ */
+export function AssertionProvenanceDrawer({
+  assertion: a,
+  domain,
+  onClose,
+}: {
+  assertion: EvidenceAssertion | null;
+  domain: string;
+  onClose: () => void;
+}) {
+  const ok = a?.status === 'evidenced';
+  return (
+    <Sheet open={!!a} onOpenChange={(o) => !o && onClose()}>
+      <SheetContent
+        side="right"
+        className="w-full overflow-hidden bg-card sm:max-w-lg"
+        data-testid={`dsx-assertion-drawer-${domain}`}
+        data-assertion-id={a?.id ?? ''}
+        data-status={a?.status ?? ''}
+      >
+        {a && (
+          <>
+            <SheetHeader>
+              <SheetTitle className="text-sm leading-snug">{a.claim}</SheetTitle>
+              <SheetDescription>
+                Per-claim provenance for the {domain} evidence boundary.
+              </SheetDescription>
+            </SheetHeader>
+            <ScrollArea className="mt-4 h-[calc(100vh-9rem)] pr-4">
+              <Badge
+                variant="outline"
+                className={cn(
+                  'text-[11px]',
+                  ok
+                    ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-200'
+                    : 'border-zinc-500/50 bg-zinc-500/10 text-zinc-700 dark:text-zinc-300',
+                )}
+              >
+                {ok ? 'Evidenced' : 'Not evidenced'}
+              </Badge>
+
+              <Separator className="my-3" />
+              <h3 className="pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {ok ? 'Basis' : 'Why this claim is not evidenced'}
+              </h3>
+              <p className="text-xs text-muted-foreground" data-testid="dsx-assertion-basis">
+                {ok ? a.basis : a.blocking_capability?.reason ?? 'No basis is recorded for this claim.'}
+              </p>
+
+              <Separator className="my-3" />
+              <dl>
+                <DetailRow label="Claim id" value={a.id} />
+                <DetailRow label="Domain" value={a.domain} />
+                <DetailRow
+                  label="Blocking capability"
+                  value={
+                    a.blocking_capability
+                      ? `${a.blocking_capability.label} (${a.blocking_capability.id}) — state: ${a.blocking_capability.state}`
+                      : 'none'
+                  }
+                />
+                <DetailRow label="Next step" value={a.next_step} />
+              </dl>
+
+              <Separator className="my-3" />
+              <h3 className="pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Supporting observations
+              </h3>
+              {a.evidence_event_ids.length === 0 ? (
+                <p className="text-xs text-muted-foreground" data-testid="dsx-assertion-events-empty">
+                  {ok
+                    ? 'This is a structural claim. It resolves from the facility registry rather than from individual observations.'
+                    : 'No observation supports this claim.'}
+                </p>
+              ) : (
+                <ul className="space-y-0.5 text-[11px]" data-testid="dsx-assertion-events">
+                  {a.evidence_event_ids.map((id) => (
+                    <li key={id} className="break-all font-mono text-muted-foreground">{id}</li>
+                  ))}
+                </ul>
+              )}
+
+              <Separator className="my-3" />
+              <h3 className="pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Missing inputs
+              </h3>
+              {a.missing_inputs.length === 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  No input is missing for this claim.
+                </p>
+              ) : (
+                <ul className="flex flex-wrap gap-1.5" data-testid="dsx-assertion-missing">
+                  {a.missing_inputs.map((i) => (
+                    <li key={i}>
+                      <Badge variant="outline" className="font-mono text-[11px]">{i}</Badge>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="h-6" />
+            </ScrollArea>
+          </>
+        )}
+      </SheetContent>
+    </Sheet>
   );
 }
 

@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/table';
 import { MetricGrid } from '@/components/dsx/MetricTile';
 import { ConstraintStack } from '@/components/dsx/ConstraintStack';
-import { ScenarioControls, RecommendationList, PlannedScenarioNotice } from '@/components/dsx/ScenarioPanel';
+import { ScenarioControls, RecommendationList, DecisionLog, PlannedScenarioNotice } from '@/components/dsx/ScenarioPanel';
 import { CapabilityNotice, UnavailableState, ConnectionState } from '@/components/dsx/StateBadges';
 import { useWorkspace } from '@/dsx/runtime/EvidenceBetaContext';
 import { capability } from '@/dsx/workspaces/availability';
@@ -483,6 +483,10 @@ export function EvidenceWorkspace() {
     <div className="space-y-6">
       <Section title="Decisions" description="Recommendations are advisory. Every decision is recorded; nothing is dispatched.">
         <RecommendationList />
+      </Section>
+
+      <Section title="Decision log" description="Append-only audit of approvals, rejections and escalations with evidence snapshots.">
+        <DecisionLog />
       </Section>
 
       <Section title="Quarantined observations" description="A rejected record never contributes to a KPI.">

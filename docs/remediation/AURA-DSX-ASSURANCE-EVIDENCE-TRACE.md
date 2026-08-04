@@ -118,11 +118,15 @@ Every tile carries `Simulated`, `Fresh`, `Validated`, `Uncalibrated`.
   value passed range validation, not that it was validated against a physical
   instrument. Fix: rename to "Range-checked" (or similar) in
   `src/components/dsx/StateBadges.tsx:80-95`.
-- **D-04 (low) - over-broad missing-input lists.** Blocked claims inherit the
-  full capability input list, so `facility_jurisdiction` requests
-  `workload_location` and `data_residency` requests `egress_log` even though
-  neither is needed for that specific claim (`evidenceBoundary.ts:61-78`).
-  Fix: intersect capability inputs with claim-specific inputs.
+- **D-04 (low) - over-broad missing-input lists. RESOLVED.** Blocked claims no
+  longer inherit the full capability input list. Each claim in Sovereignty,
+  Carbon and Financials declares the exact inputs it requires, and the
+  capability list is used only when a claim needs the capability in full
+  (`src/dsx/workspaces/evidenceBoundary.ts`, `blocked()`). Metric-derived
+  claims keep their own metric-level missing inputs. The next step now names
+  the required inputs. Regression: `missing-input precision (D-04)` in
+  `src/dsx/__tests__/evidenceBoundary.test.ts` (4 tests) pins the expected set
+  per claim and asserts no unrelated capability input leaks in.
 - **D-05 (low) - confinement claim is scoped to the workspace, not the page.**
   `telemetry_confinement` states telemetry "is not transmitted to any external
   system", while the surrounding app shell does perform authenticated backend

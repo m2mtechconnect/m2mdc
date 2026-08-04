@@ -57,7 +57,12 @@ import AccessControl from "./pages/account/AccessControl";
 import AdminUserApproval from "./pages/AdminUserApproval";
 import AdminSignupsDashboard from "./pages/AdminSignupsDashboard";
 import { lazy } from "react";
-const EvidenceBeta = lazy(() => import("./pages/dsx/EvidenceBeta"));
+const EvidenceBetaShell = lazy(() => import("./pages/dsx/EvidenceBetaShell"));
+import {
+  OverviewWorkspace, ThermalWorkspace, PowerWorkspace, CoolingWorkspace, NetworkWorkspace,
+  FacilityWorkspace, WorkloadWorkspace, SovereigntyWorkspace, CarbonWorkspace,
+  FinancialWorkspace, EvidenceWorkspace,
+} from "./pages/dsx/workspaces";
 const OverlayFixtures = import.meta.env.DEV
   ? lazy(() => import("./pages/test/OverlayFixtures"))
   : null;
@@ -131,7 +136,19 @@ function ApprovedUserRoutes() {
       <Route path="/digital-twins/:slug" element={<Navigate to="/" replace />} />
       <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
       <Route path="/infrastructure" element={<InfrastructurePage />} />
-      <Route path="/dsx/evidence-beta" element={<EvidenceBeta />} />
+      <Route path="/dsx/evidence-beta" element={<EvidenceBetaShell />}>
+        <Route index element={<OverviewWorkspace />} />
+        <Route path="thermal" element={<ThermalWorkspace />} />
+        <Route path="power" element={<PowerWorkspace />} />
+        <Route path="cooling" element={<CoolingWorkspace />} />
+        <Route path="network" element={<NetworkWorkspace />} />
+        <Route path="facility" element={<FacilityWorkspace />} />
+        <Route path="workload" element={<WorkloadWorkspace />} />
+        <Route path="sovereignty" element={<SovereigntyWorkspace />} />
+        <Route path="carbon" element={<CarbonWorkspace />} />
+        <Route path="financials" element={<FinancialWorkspace />} />
+        <Route path="evidence" element={<EvidenceWorkspace />} />
+      </Route>
       {import.meta.env.DEV && OverlayFixtures ? (
         <Route path="/dev-overlays" element={<OverlayFixtures />} />
       ) : null}

@@ -1,48 +1,76 @@
 /**
  * DSX-aligned operator workspace shell.
  *
- * One runtime, one truth bar, one provenance drawer and eleven workspaces.
- * Navigation is stable across every workspace; the active workspace is the
- * only thing that changes.
+ * A single investigation surface: a persistent left rail (navigation plus
+ * facility scope), a centre workspace, and a right contextual drawer. The
+ * operational truth bar and the investigation context bar are always visible,
+ * so the operator always knows what they are looking at and how trustworthy
+ * it is.
  */
-import { NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { cn } from '@/lib/utils';
 import { EvidenceBetaProvider, useWorkspace } from '@/dsx/runtime/EvidenceBetaContext';
 import { OperationalTruthBar } from '@/components/dsx/OperationalTruthBar';
 import { ProvenanceDrawer } from '@/components/dsx/ProvenanceDrawer';
-import { statusRank } from '@/dsx/workspaces/constraints';
+import { ContextBar } from '@/components/dsx/ContextBar';
+import { AssetDrawer } from '@/components/dsx/AssetDrawer';
+import { ConstraintDrawer } from '@/components/dsx/ConstraintDrawer';
+import { buildHierarchy, type HierarchyNode } from '@/dsx/workspaces/facilityGraph';
+import { DSX_ROOT } from '@/dsx/workspaces/relatedViews';
 
 interface NavEntry { to: string; label: string; end?: boolean; domain?: string }
 
+/**
+ * Grouped by operator intent: what is happening, what is it made of,
+ * and what can be proven about it.
+ */
 const NAV: { group: string; items: NavEntry[] }[] = [
   {
     group: 'Operate',
     items: [
-      { to: '/dsx/evidence-beta', label: 'Facility overview', end: true },
-      { to: '/dsx/evidence-beta/thermal', label: 'Thermal', domain: 'thermal' },
-      { to: '/dsx/evidence-beta/power', label: 'Power', domain: 'power' },
-      { to: '/dsx/evidence-beta/cooling', label: 'Cooling', domain: 'cooling' },
-      { to: '/dsx/evidence-beta/network', label: 'Compute fabric', domain: 'network' },
+      { to: DSX_ROOT, label: 'Facility overview', end: true },
+      { to: `${DSX_ROOT}/thermal`, label: 'Thermal', domain: 'thermal' },
+      { to: `${DSX_ROOT}/power`, label: 'Power', domain: 'power' },
+      { to: `${DSX_ROOT}/cooling`, label: 'Cooling', domain: 'cooling' },
+      { to: `${DSX_ROOT}/network`, label: 'Compute fabric', domain: 'network' },
     ],
   },
   {
     group: 'Model',
     items: [
-      { to: '/dsx/evidence-beta/facility', label: 'Facility registry', domain: 'facility' },
-      { to: '/dsx/evidence-beta/workload', label: 'Workload', domain: 'workload' },
+      { to: `${DSX_ROOT}/facility`, label: 'Facility registry', domain: 'facility' },
+      { to: `${DSX_ROOT}/workload`, label: 'Workload', domain: 'workload' },
+      { to: `${DSX_ROOT}/simulations`, label: 'Simulations' },
     ],
   },
   {
     group: 'Assure',
     items: [
-      { to: '/dsx/evidence-beta/sovereignty', label: 'Sovereignty', domain: 'sovereignty' },
-      { to: '/dsx/evidence-beta/carbon', label: 'Carbon and water', domain: 'carbon' },
-      { to: '/dsx/evidence-beta/financials', label: 'Financial exposure', domain: 'financial' },
-      { to: '/dsx/evidence-beta/evidence', label: 'Evidence and decisions' },
+      { to: `${DSX_ROOT}/sovereignty`, label: 'Sovereignty', domain: 'sovereignty' },
+      { to: `${DSX_ROOT}/carbon`, label: 'Carbon and water', domain: 'carbon' },
+      { to: `${DSX_ROOT}/financials`, label: 'Financial exposure', domain: 'financial' },
+      { to: `${DSX_ROOT}/evidence`, label: 'Evidence and decisions' },
     ],
   },
 ];
+
+/** Page titles keyed by the final path segment. */
+const TITLES: Record<string, string> = {
+  'evidence-beta': 'Facility overview',
+  overview: 'Facility overview',
+  thermal: 'Thermal',
+  power: 'Power',
+  cooling: 'Cooling',
+  network: 'Compute fabric',
+  facility: 'Facility registry',
+  workload: 'Workload',
+  simulations: 'Simulations',
+  sovereignty: 'Sovereignty',
+  carbon: 'Carbon and water',
+  financials: 'Financial exposure',
+  evidence: 'Evidence and decisions',
+};
 
 const DOT: Record<string, string> = {
   violation: 'bg-red-400',
@@ -51,15 +79,42 @@ const DOT: Record<string, string> = {
   unavailable: 'bg-zinc-500',
 };
 
+function ScopeTree({ nodes, depth = 0 }: { nodes: HierarchyNode[]; depth?: number }) {
+  const { selectAsset, selectedAssetId } = useWorkspace();
+  return (
+    <ul className={depth === 0 ? 'space-y-0.5' : 'space-y-0.5 border-l border-border/60 pl-2'}>
+      {nodes.map((n) => (
+        <li key={n.asset.aura_asset_id}>
+          <button
+            type="button"
+            onClick={() => selectAsset(n.asset.aura_asset_id)}
+            data-testid={`dsx-scope-${n.asset.source_asset_id}`}
+            aria-current={selectedAssetId === n.asset.aura_asset_id ? 'true' : undefined}
+            className={cn(
+              'w-full truncate rounded-sm px-2 py-1 text-left text-[11px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              selectedAssetId === n.asset.aura_asset_id
+                ? 'bg-primary/15 font-semibold text-foreground'
+                : 'text-muted-foreground hover:bg-muted/60',
+            )}
+          >
+            {n.asset.name}
+          </button>
+          {n.children.length > 0 && <ScopeTree nodes={n.children} depth={depth + 1} />}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function WorkspaceNav() {
-  const { constraints } = useWorkspace();
+  const { constraints, hrefWithContext } = useWorkspace();
   const status = Object.fromEntries(constraints.map((c) => [c.domain, c.status]));
 
   return (
     <nav
       aria-label="DSX workspaces"
       data-testid="dsx-workspace-nav"
-      className="w-full shrink-0 overflow-x-auto border-b border-border bg-card/40 p-3 lg:w-60 lg:overflow-x-visible lg:border-b-0 lg:border-r"
+      className="w-full shrink-0 overflow-x-auto border-b border-border bg-card/40 p-3 lg:w-60 lg:overflow-x-visible lg:overflow-y-auto lg:border-b-0 lg:border-r"
     >
       <div className="flex min-w-max gap-4 lg:block lg:min-w-0">
       {NAV.map((g) => (
@@ -73,7 +128,7 @@ function WorkspaceNav() {
               return (
                 <li key={i.to}>
                   <NavLink
-                    to={i.to}
+                    to={hrefWithContext(i.to)}
                     end={i.end}
                     data-testid={`dsx-nav-${i.label.toLowerCase().replace(/\s+/g, '-')}`}
                     className={({ isActive }) =>
@@ -100,7 +155,49 @@ function WorkspaceNav() {
         </div>
       ))}
       </div>
+      <div className="hidden lg:block">
+        <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Facility scope
+        </p>
+        <ScopeTree nodes={buildHierarchy()} />
+      </div>
     </nav>
+  );
+}
+
+/** One h1 per route, plus the scope breadcrumb the workspace is answering for. */
+function WorkspaceHeader() {
+  const { pathname } = useLocation();
+  const { selectedAncestry, selectAsset, hrefWithContext } = useWorkspace();
+  const segment = pathname.replace(/\/$/, '').split('/').pop() ?? 'evidence-beta';
+  const title = TITLES[segment] ?? 'Facility overview';
+
+  return (
+    <header className="space-y-1 pb-4">
+      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-[11px] text-muted-foreground">
+        <Link
+          to={hrefWithContext(DSX_ROOT)}
+          className="rounded-sm underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          Operator workspace
+        </Link>
+        {selectedAncestry.map((a) => (
+          <span key={a.stable_asset_id} className="flex items-center gap-1">
+            <span aria-hidden>/</span>
+            <button
+              type="button"
+              onClick={() => selectAsset(a.stable_asset_id)}
+              className="rounded-sm underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {a.name}
+            </button>
+          </span>
+        ))}
+        <span aria-hidden>/</span>
+        <span className="font-medium text-foreground">{title}</span>
+      </nav>
+      <h1 className="text-lg font-semibold tracking-tight" data-testid="dsx-workspace-title">{title}</h1>
+    </header>
   );
 }
 
@@ -115,12 +212,16 @@ function ShellBody() {
         />
       </Helmet>
       <OperationalTruthBar />
+      <ContextBar />
       <div className="flex flex-1 flex-col lg:flex-row">
         <WorkspaceNav />
-        <main className="min-w-0 flex-1 p-4 sm:p-6">
+        <div className="min-w-0 flex-1 p-4 sm:p-6">
+          <WorkspaceHeader />
           <Outlet />
-        </main>
+        </div>
       </div>
+      <AssetDrawer />
+      <ConstraintDrawer />
       <ProvenanceDrawer />
     </div>
   );

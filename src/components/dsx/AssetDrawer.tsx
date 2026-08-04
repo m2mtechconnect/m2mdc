@@ -39,8 +39,10 @@ export function AssetDrawer() {
     : undefined;
   const children = selectedAsset ? childrenOf(selectedAsset.stable_asset_id) : [];
   const dependents = selectedAsset ? dependentRacks(selectedAsset.source_asset_id) : [];
+  // Both traces terminate at the rack itself; show each hop once.
   const chain = selectedAsset?.asset_class === 'rack'
     ? [...electricalTrace(selectedAsset.source_asset_id), ...coolingTrace(selectedAsset.source_asset_id)]
+        .filter((h, i, all) => all.findIndex((o) => o.identity.stable_asset_id === h.identity.stable_asset_id) === i)
     : [];
 
   return (

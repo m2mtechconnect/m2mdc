@@ -87,7 +87,7 @@ export function ThermalWorkspace() {
   return (
     <div className="space-y-6">
       <Section
-        title="Thermal"
+        title="Thermal state"
         description={`Which racks are closest to the ${DESIGN_INLET_LIMIT_C} degC design inlet limit, and what supplies their cooling?`}
       >
         <MetricGrid ids={['max_rack_inlet', 'thermal_headroom', 'cooling_load']} metrics={rt.bundle.metrics} columns="sm:grid-cols-3" />
@@ -152,7 +152,7 @@ export function PowerWorkspace() {
   const { rt } = useWorkspace();
   return (
     <div className="space-y-6">
-      <Section title="Power" description="How much of the site's rated capacity is committed, and what depends on each supply device?">
+      <Section title="Power state" description="How much of the site's rated capacity is committed, and what depends on each supply device?">
         <MetricGrid ids={['facility_load', 'it_load', 'power_capacity_utilisation']} metrics={rt.bundle.metrics} columns="sm:grid-cols-3" />
       </Section>
 
@@ -201,7 +201,7 @@ export function CoolingWorkspace() {
   const { rt } = useWorkspace();
   return (
     <div className="space-y-6">
-      <Section title="Cooling" description="How much electrical energy is cooling consuming, and which racks does each loop serve?">
+      <Section title="Cooling state" description="How much electrical energy is cooling consuming, and which racks does each loop serve?">
         <MetricGrid ids={['cooling_load', 'pue', 'thermal_headroom']} metrics={rt.bundle.metrics} columns="sm:grid-cols-3" />
       </Section>
 
@@ -237,7 +237,7 @@ export function CoolingWorkspace() {
 export function NetworkWorkspace() {
   return (
     <div className="space-y-6">
-      <Section title="Compute fabric" description="Which fabric links constrain workload placement?">
+      <Section title="Fabric state" description="Which fabric links constrain workload placement?">
         <CapabilityNotice capability={capability('compute_fabric')} />
       </Section>
       <Section title="What would make this workspace operational">
@@ -273,7 +273,7 @@ export function FacilityWorkspace() {
   const unapproved = ALL_RACK_IDENTITIES.filter((a) => a.mapping_approval !== 'approved');
   return (
     <div className="space-y-6">
-      <Section title="Facility registry" description="Every asset carries a stable AURA identity. Display names are never identity.">
+      <Section title="Registry health" description="Every asset carries a stable AURA identity. Display names are never identity.">
         <MetricGrid ids={['mapping_coverage', 'data_quality', 'telemetry_freshness']} metrics={rt.bundle.metrics} columns="sm:grid-cols-3" />
       </Section>
 
@@ -352,7 +352,7 @@ export function FacilityWorkspace() {
 export function WorkloadWorkspace() {
   return (
     <div className="space-y-6">
-      <Section title="Workload exposure" description="Which workloads are exposed by the current facility constraint?">
+      <Section title="Exposure summary" description="Which workloads are exposed by the current facility constraint?">
         <CapabilityNotice capability={capability('workload_scheduler')} />
       </Section>
       <p className="text-sm text-muted-foreground">
@@ -370,7 +370,7 @@ export function SovereigntyWorkspace() {
   return (
     <div className="space-y-6">
       <Section
-        title="Sovereignty"
+        title="Evidence boundary"
         description="Which sovereignty claims can this build actually evidence, and which cannot be made at all?"
       >
         <BoundaryVerdict assertions={assertions} domain="sovereignty" />
@@ -410,7 +410,7 @@ export function CarbonWorkspace() {
   return (
     <div className="space-y-6">
       <Section
-        title="Carbon and water"
+        title="Evidence boundary"
         description="What can be stated about emissions and water from the sources that are actually connected?"
       >
         <BoundaryVerdict assertions={assertions} domain="carbon" />
@@ -456,7 +456,7 @@ export function FinancialWorkspace() {
   return (
     <div className="space-y-6">
       <Section
-        title="Financial exposure"
+        title="Evidence boundary"
         description="Which cost drivers are measured, and why no monetary figure is displayed?"
       >
         <BoundaryVerdict assertions={assertions} domain="financial" />

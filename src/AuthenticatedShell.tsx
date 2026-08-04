@@ -57,6 +57,7 @@ import AccessControl from "./pages/account/AccessControl";
 import AdminUserApproval from "./pages/AdminUserApproval";
 import AdminSignupsDashboard from "./pages/AdminSignupsDashboard";
 import { lazy } from "react";
+const EvidenceBeta = lazy(() => import("./pages/dsx/EvidenceBeta"));
 const OverlayFixtures = import.meta.env.DEV
   ? lazy(() => import("./pages/test/OverlayFixtures"))
   : null;
@@ -130,6 +131,7 @@ function ApprovedUserRoutes() {
       <Route path="/digital-twins/:slug" element={<Navigate to="/" replace />} />
       <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
       <Route path="/infrastructure" element={<InfrastructurePage />} />
+      <Route path="/dsx/evidence-beta" element={<EvidenceBeta />} />
       {import.meta.env.DEV && OverlayFixtures ? (
         <Route path="/dev-overlays" element={<OverlayFixtures />} />
       ) : null}

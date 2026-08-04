@@ -31,7 +31,8 @@
     "/pilot/asset/:twinId which serve read-only projections of",
     "public.data_centre_twins and public.twin_kpi_snapshots gated by",
     "existing owner-scoped RLS. No edge function is invoked; the",
-    "production_functions allowlist remains empty."
+    "production_functions allowlist remains empty.",
+    "Evidence Beta (/dsx/evidence-beta) is an authenticated, local-only, zero-edge-function DSX evidence workspace. It is classified production_blocked until the disposable-environment gate passes."
   ],
   "production_functions": [],
   "production_routes": [
@@ -99,7 +100,8 @@
     "/auth",
     "/sign-in",
     "/sign-up",
-    "*"
+    "*",
+    "/dsx/evidence-beta"
   ],
   "development_only_routes": [
     "/dev-overlays"

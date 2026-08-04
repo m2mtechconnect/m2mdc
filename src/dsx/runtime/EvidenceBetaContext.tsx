@@ -18,7 +18,7 @@ import {
   buildContextChips, contextToParams, linkWithContext, parseContext,
   type ContextChip, type InvestigationContext,
 } from './investigationContext';
-import { TIMELINES, type TimelineId } from '../fixtures/timelines';
+import { TIMELINE_IDS, type TimelineId } from '../fixtures/timelines';
 
 export interface EvidenceBetaWorkspace {
   rt: EvidenceBetaRuntime;
@@ -57,8 +57,6 @@ export interface EvidenceBetaWorkspace {
 }
 
 const Ctx = createContext<EvidenceBetaWorkspace | null>(null);
-
-const TIMELINE_IDS = TIMELINES.map((t) => t.id) as TimelineId[];
 
 export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
   const rt = useEvidenceBeta();

@@ -83,7 +83,17 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
     const el = triggerRef.current;
     triggerRef.current = null;
     if (!el || !el.isConnected) return;
-    requestAnimationFrame(() => el.focus());
+    // The closing overlay's focus scope may reclaim focus for a few frames
+    // after unmount, so keep re-asserting until the trigger actually holds it.
+    let attempts = 0;
+    const tryFocus = () => {
+      attempts += 1;
+      if (!el.isConnected) return;
+      if (document.activeElement === el) return;
+      el.focus();
+      if (attempts < 12) requestAnimationFrame(tryFocus);
+    };
+    requestAnimationFrame(tryFocus);
   }, []);
 
   const context = useMemo(() => parseContext(searchParams), [searchParams]);

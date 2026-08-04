@@ -35,6 +35,7 @@ export function MetricTile({ id, metric, digits = 2, label, className }: Props) 
           className="w-full space-y-2 rounded-sm text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label={`${label ?? metric.metric_name} — open provenance`}
           data-testid={`dsx-metric-${id}-open`}
+          data-metric-name={metric.metric_name}
         >
           <span className="block text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
             {label ?? metric.metric_name}

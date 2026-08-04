@@ -23,7 +23,7 @@ export function ProvenanceDrawer() {
 
   return (
     <Sheet open={!!m} onOpenChange={(o) => !o && closeProvenance()}>
-      <SheetContent side="right" className="w-full overflow-hidden bg-card sm:max-w-lg" data-testid="dsx-provenance-drawer">
+      <SheetContent side="right" className="w-full overflow-hidden bg-card sm:max-w-lg" data-testid="dsx-provenance-drawer" data-metric-name={m?.metric_name ?? ''}>
         {m && (
           <>
             <SheetHeader>

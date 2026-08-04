@@ -52,6 +52,7 @@ function AssetSelectButton({ auraId, sourceId, name }: { auraId: string; sourceI
       variant={selectedAssetId === auraId ? 'default' : 'ghost'}
       onClick={() => selectAsset(auraId)}
       data-testid={`dsx-select-asset-${sourceId}`}
+      data-aura-id={auraId}
     >
       {name}
     </Button>

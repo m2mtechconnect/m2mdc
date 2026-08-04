@@ -67,6 +67,13 @@ docker compose -f infra/dsx-exchange/docker-compose.yml down -v
 Both provisioning paths are transport-identical; see
 `infra/dsx-exchange/README.md`.
 
+One-shot verification (provisions the broker, runs the runtime harness, runs
+the 56 DSX unit tests, tears down, prints a single verdict):
+
+```
+npm run verify:dsx-phase7      # → PHASE 7 VERIFIED
+```
+
 `src/dsx/exchange/mqttTransport.ts` is the only module in the DSX tree that
 imports a broker client. It is deliberately NOT re-exported from
 `src/dsx/exchange/index.ts`, so the browser bundle never pulls in `mqtt`;

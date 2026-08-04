@@ -66,23 +66,34 @@ function evidenced(
   };
 }
 
+/**
+ * `requiredInputs` is the exact set of inputs THIS claim needs, not the
+ * whole input surface of the blocking capability. A capability may feed
+ * several claims with different needs (for example a tariff feed supplies a
+ * per-kWh price to an energy-cost claim and a demand-charge schedule to a
+ * peak-demand claim); listing every capability input against every claim
+ * overstates what an operator must connect to close that one claim. When a
+ * claim declares no inputs of its own, the capability's list is used, since
+ * in that case the claim needs the capability in full.
+ */
 function blocked(
   id: string,
   domain: AssuranceDomain,
   claim: string,
   capabilityId: string,
-  extraMissing: string[] = [],
+  requiredInputs: string[] = [],
 ): EvidenceAssertion {
   const c = capability(capabilityId);
+  const missing = requiredInputs.length > 0 ? requiredInputs : c.missing_inputs;
   return {
     id, domain, claim,
     status: 'not_evidenced',
     basis: null,
     evidence_event_ids: [],
     blocking_capability: c,
-    missing_inputs: Array.from(new Set([...c.missing_inputs, ...extraMissing])).sort(),
+    missing_inputs: Array.from(new Set(missing)).sort(),
     unattested_inputs: [],
-    next_step: `Connect ${c.label.toLowerCase()} before this claim may be displayed.`,
+    next_step: `Connect ${c.label.toLowerCase()} to supply ${Array.from(new Set(missing)).sort().join(', ')} before this claim may be displayed.`,
   };
 }
 
@@ -111,8 +122,9 @@ function fromMetric(
         : 'Open the metric provenance to review the contributing observations.',
       unattested);
   }
-  const a = blocked(id, domain, claim, capabilityId, m?.missing_inputs ?? []);
-  return a;
+  // A metric that reports its own missing inputs is more precise than the
+  // capability-wide list, so it wins when present.
+  return blocked(id, domain, claim, capabilityId, m?.missing_inputs ?? []);
 }
 
 export function sovereigntyAssertions(bundle: KpiBundle, snapshot: SourceSnapshot): EvidenceAssertion[] {
@@ -144,13 +156,13 @@ export function sovereigntyAssertions(bundle: KpiBundle, snapshot: SourceSnapsho
       'residency_evidence', ['dataset_location', 'egress_log']),
     blocked('workload_residency', 'sovereignty',
       'Workloads execute only on nodes inside the declared jurisdiction.',
-      'workload_scheduler', ['workload_location']),
+      'workload_scheduler', ['workload_placement', 'workload_location']),
     blocked('node_attestation', 'sovereignty',
       'Compute nodes are running attested, unmodified firmware.',
-      'node_attestation'),
+      'node_attestation', ['attestation_report', 'measured_boot_state']),
     blocked('key_custody', 'sovereignty',
       'Encryption keys are held under sovereign custody.',
-      'node_attestation', ['key_custody_record']),
+      'node_attestation', ['key_location', 'key_custody_record']),
   ];
   return assertions;
 }
@@ -167,22 +179,22 @@ export function carbonAssertions(bundle: KpiBundle): EvidenceAssertion[] {
       'PUE is calculated from metered IT and cooling power at the same observation window.'),
     blocked('energy_consumed', 'carbon',
       'Energy consumed over the reporting period is known.',
-      'grid_carbon_intensity', ['facility_energy_kwh', 'it_energy_kwh', 'meter_interval']),
+      'grid_carbon_intensity', ['facility_energy_kwh', 'meter_interval']),
     blocked('operational_emissions', 'carbon',
       'Operational (scope 2) emissions for this period are known.',
-      'grid_carbon_intensity'),
+      'grid_carbon_intensity', ['facility_energy_kwh', 'grid_intensity_g_per_kwh', 'emission_factor_source']),
     blocked('carbon_usage_effectiveness', 'carbon',
       'Carbon usage effectiveness (CUE) is known.',
-      'grid_carbon_intensity', ['facility_energy_kwh', 'it_energy_kwh']),
+      'grid_carbon_intensity', ['facility_energy_kwh', 'it_energy_kwh', 'grid_intensity_g_per_kwh']),
     blocked('water_usage_effectiveness', 'carbon',
       'Water usage effectiveness (WUE) is known.',
-      'water_metering'),
+      'water_metering', ['water_consumption_l', 'it_energy_kwh']),
     blocked('renewable_share', 'carbon',
       'The renewable share of consumed energy is known.',
-      'renewable_mix'),
+      'renewable_mix', ['renewable_pct']),
     blocked('heat_reuse', 'carbon',
       'Recovered heat offsets facility emissions.',
-      'heat_reuse'),
+      'heat_reuse', ['heat_recovered_kwh']),
   ];
 }
 
@@ -198,13 +210,13 @@ export function financialAssertions(bundle: KpiBundle): EvidenceAssertion[] {
       'Capacity utilisation is calculated from metered load against the declared site rating.'),
     blocked('energy_cost', 'financial',
       'The cost of energy consumed in this period is known.',
-      'energy_tariff', ['facility_energy_kwh']),
+      'energy_tariff', ['facility_energy_kwh', 'energy_price_per_kwh']),
     blocked('demand_charge', 'financial',
       'Peak-demand charge exposure for this period is known.',
-      'energy_tariff', ['billing_period_peak_kw']),
+      'energy_tariff', ['billing_period_peak_kw', 'demand_charge_per_kw']),
     blocked('operating_cost', 'financial',
       'Operating cost for this facility is known.',
-      'cost_ledger'),
+      'cost_ledger', ['opex_records']),
     blocked('sla_exposure', 'financial',
       'Financial exposure from an SLA breach is known.',
       'cost_ledger', ['sla_terms', 'penalty_schedule']),

@@ -203,3 +203,60 @@ describe('declared (non-observed) input provenance', () => {
     expect(claim?.unattested_inputs).toEqual([]);
   });
 });
+
+describe('missing-input precision (D-04)', () => {
+  const EXPECTED: Record<string, string[]> = {
+    // sovereignty
+    facility_jurisdiction: ['operator_of_record', 'site_jurisdiction'],
+    data_residency: ['dataset_location', 'egress_log'],
+    workload_residency: ['workload_location', 'workload_placement'],
+    node_attestation: ['attestation_report', 'measured_boot_state'],
+    key_custody: ['key_custody_record', 'key_location'],
+    // carbon
+    energy_consumed: ['facility_energy_kwh', 'meter_interval'],
+    operational_emissions: ['emission_factor_source', 'facility_energy_kwh', 'grid_intensity_g_per_kwh'],
+    carbon_usage_effectiveness: ['facility_energy_kwh', 'grid_intensity_g_per_kwh', 'it_energy_kwh'],
+    water_usage_effectiveness: ['it_energy_kwh', 'water_consumption_l'],
+    renewable_share: ['renewable_pct'],
+    heat_reuse: ['heat_recovered_kwh'],
+    // financial
+    energy_cost: ['energy_price_per_kwh', 'facility_energy_kwh'],
+    demand_charge: ['billing_period_peak_kw', 'demand_charge_per_kw'],
+    operating_cost: ['opex_records'],
+    sla_exposure: ['penalty_schedule', 'sla_terms'],
+    avoided_cost: ['baseline_counterfactual', 'energy_price_per_kwh'],
+  };
+
+  it('lists only the inputs each specific claim requires', () => {
+    for (const a of allAssertions().filter((x) => x.status === 'not_evidenced')) {
+      expect(EXPECTED[a.id], `no expectation declared for ${a.id}`).toBeDefined();
+      expect(a.missing_inputs, a.id).toEqual(EXPECTED[a.id]);
+    }
+  });
+
+  it('does not inherit capability inputs a claim does not need', () => {
+    const a = allAssertions().filter((x) => x.status === 'not_evidenced');
+    const byId = Object.fromEntries(a.map((x) => [x.id, x]));
+    // demand-charge schedule is irrelevant to a per-kWh energy cost
+    expect(byId.energy_cost.missing_inputs).not.toContain('demand_charge_per_kw');
+    // key location is a custody input, not a firmware-attestation input
+    expect(byId.node_attestation.missing_inputs).not.toContain('key_location');
+    // residency capability also carries workload/dataset inputs a jurisdiction claim does not need
+    expect(byId.facility_jurisdiction.missing_inputs).not.toContain('egress_log');
+    // operating cost does not require the capital ledger
+    expect(byId.operating_cost.missing_inputs).not.toContain('capex_records');
+  });
+
+  it('names the required inputs in the next step', () => {
+    for (const a of allAssertions().filter((x) => x.status === 'not_evidenced')) {
+      for (const i of a.missing_inputs) expect(a.next_step, a.id).toContain(i);
+    }
+  });
+
+  it('keeps every claim input within its blocking capability or a claim-specific extension', () => {
+    for (const a of allAssertions().filter((x) => x.status === 'not_evidenced')) {
+      expect(a.missing_inputs.length).toBeGreaterThan(0);
+      expect(a.missing_inputs.length).toBeLessThanOrEqual(capability(a.blocking_capability!.id).missing_inputs.length + 2);
+    }
+  });
+});

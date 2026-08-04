@@ -49,7 +49,7 @@ export function ConstraintRow({ c }: { c: DomainConstraint }) {
       <p className="text-xs text-muted-foreground">{c.summary}</p>
       {c.affected_assets.length > 0 && (
         <p className="text-xs text-muted-foreground">
-          Affected: {c.affected_assets.map((a) => a.display_name).join(', ')}
+          Affected: {c.affected_assets.map((a) => a.name).join(', ')}
         </p>
       )}
       <p className="text-xs text-muted-foreground">Next step: {c.next_step}</p>

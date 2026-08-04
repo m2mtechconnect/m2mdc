@@ -59,7 +59,7 @@ import AdminSignupsDashboard from "./pages/AdminSignupsDashboard";
 import { lazy } from "react";
 const EvidenceBetaShell = lazy(() => import("./pages/dsx/EvidenceBetaShell"));
 import {
-  OverviewWorkspace, ThermalWorkspace, PowerWorkspace, CoolingWorkspace, NetworkWorkspace,
+  OverviewWorkspace, SimulationsWorkspace, ThermalWorkspace, PowerWorkspace, CoolingWorkspace, NetworkWorkspace,
   FacilityWorkspace, WorkloadWorkspace, SovereigntyWorkspace, CarbonWorkspace,
   FinancialWorkspace, EvidenceWorkspace,
 } from "./pages/dsx/workspaces";

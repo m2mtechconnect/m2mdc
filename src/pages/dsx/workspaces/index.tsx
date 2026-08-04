@@ -19,8 +19,8 @@ import { CapabilityNotice, UnavailableState, ConnectionState } from '@/component
 import { useWorkspace } from '@/dsx/runtime/EvidenceBetaContext';
 import { capability } from '@/dsx/workspaces/availability';
 import {
-  ALL_RACK_IDENTITIES, OPENUSD_UNAVAILABLE, buildHierarchy, coolingChain, coolingTrace,
-  dependentRacks, electricalChain, electricalTrace, type HierarchyNode,
+  ALL_RACK_IDENTITIES, OPENUSD_UNAVAILABLE, buildHierarchy, childrenOf, coolingChain, coolingTrace,
+  declaredBuildings, dependentRacks, electricalChain, electricalTrace, type HierarchyNode,
 } from '@/dsx/workspaces/facilityGraph';
 import { DESIGN_INLET_LIMIT_C } from '@/dsx/metrics/computeKpis';
 import { EVIDENCE_BETA_SEED, EVIDENCE_BETA_VERSION } from '@/dsx/fixtures/evidenceBetaFacility';
@@ -64,7 +64,7 @@ export function OverviewWorkspace() {
   return (
     <div className="space-y-6">
       <Section
-        title="Facility overview"
+        title="Current operational state"
         description="What is the operational state of the facility at this observation step, and which constraint binds first?"
       >
         <MetricGrid
@@ -275,6 +275,29 @@ export function FacilityWorkspace() {
     <div className="space-y-6">
       <Section title="Facility registry" description="Every asset carries a stable AURA identity. Display names are never identity.">
         <MetricGrid ids={['mapping_coverage', 'data_quality', 'telemetry_freshness']} metrics={rt.bundle.metrics} columns="sm:grid-cols-3" />
+      </Section>
+
+      <Section
+        title="Inside this building"
+        description="Contents of the declared building. Only one building is declared in the connected facility record, so no related-building list is shown."
+      >
+        <Card>
+          <CardContent className="space-y-3 p-4">
+            {declaredBuildings().map((b) => (
+              <div key={b.stable_asset_id} data-testid="dsx-building-contents">
+                <div className="flex flex-wrap items-center gap-2 pb-1">
+                  <AssetSelectButton auraId={b.stable_asset_id} sourceId={b.source_asset_id} name={b.name} />
+                  <Badge variant="outline" className="text-[11px]">
+                    {childrenOf(b.stable_asset_id).length} direct child asset(s)
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Contains: {childrenOf(b.stable_asset_id).map((c) => c.name).join(', ') || 'no child asset is declared'}.
+                </p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       </Section>
 
       <Section title="Asset hierarchy">
@@ -542,6 +565,47 @@ export function EvidenceWorkspace() {
         Full traceability for any displayed value is available from its metric tile. See also the{' '}
         <Link className="underline underline-offset-4" to="/dsx/evidence-beta">facility overview</Link>.
       </p>
+    </div>
+  );
+}
+/* 12 — Simulations: seeded scenarios and the decisions they produce */
+export function SimulationsWorkspace() {
+  const { rt } = useWorkspace();
+  return (
+    <div className="space-y-6">
+      <Section
+        title="Scenario control"
+        description="Every scenario is a seeded, deterministic replay of the Evidence Beta fixture. No scenario writes to any physical system."
+      >
+        <ScenarioControls />
+      </Section>
+
+      <Section title="Scenario result" description="The constraint stack below is the outcome of the current step, not a forecast.">
+        <ConstraintStack />
+      </Section>
+
+      <Section title="Recommendations from this run" description="Advisory only. Each one requires a recorded human decision.">
+        <RecommendationList />
+      </Section>
+
+      <Section title="Decisions recorded in this run">
+        <DecisionLog />
+      </Section>
+
+      <Section title="Run identity">
+        <Card>
+          <CardContent className="space-y-1 p-4 text-xs">
+            <p>Scenario: {rt.timeline.replace(/_/g, ' ')}</p>
+            <p>Observation step: {rt.tick} of {rt.maxTick}</p>
+            <p>Fixture version {EVIDENCE_BETA_VERSION}, seed {EVIDENCE_BETA_SEED}.</p>
+            <p>Source: {rt.source.description}</p>
+          </CardContent>
+        </Card>
+      </Section>
+
+      <Section title="Planned scenarios" description="Listed so that absence is explicit. A planned scenario produces no results.">
+        <PlannedScenarioNotice />
+      </Section>
     </div>
   );
 }

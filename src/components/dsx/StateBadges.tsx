@@ -200,7 +200,7 @@ export function SafetyChip({ className }: { className?: string }) {
       )}
     >
       <AlertTriangle className="h-3 w-3" aria-hidden />
-      Simulated · Uncalibrated · Not for physical control
+      SIMULATED · UNCALIBRATED · NOT FOR PHYSICAL CONTROL
     </span>
   );
 }

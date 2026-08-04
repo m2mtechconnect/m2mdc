@@ -15,6 +15,18 @@ export interface MetricInputRef {
   unit: string;
   event_ids: string[];
   asset_id?: string;
+  /**
+   * How the input entered the calculation.
+   * - `observed`: carried by ingested observations (event_ids are the proof).
+   * - `declared`: a registry/nameplate value asserted by a human or fixture.
+   *   It has no observation behind it, so it must never be presented as if
+   *   it were metered.
+   */
+  provenance?: 'observed' | 'declared';
+  /** Where a declared input comes from, e.g. 'facility registry (nameplate)'. */
+  declared_source?: string;
+  /** True when a declared input has no attestation/verification on file. */
+  unattested?: boolean;
 }
 
 export interface DsxProvenancedMetric {
@@ -26,6 +38,10 @@ export interface DsxProvenancedMetric {
   formula_version: string;
   inputs: MetricInputRef[];
   missing_inputs: string[];
+  /** Declared (non-observed) inputs that contributed to the value. */
+  declared_inputs: MetricInputRef[];
+  /** Named evidence that would be required to attest the declared inputs. */
+  unattested_inputs: string[];
   source_event_ids: string[];
   aura_asset_id: string | null;
   usd_prim_path: string | null;

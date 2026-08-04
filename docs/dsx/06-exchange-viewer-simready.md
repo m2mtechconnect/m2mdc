@@ -9,7 +9,7 @@ Status: **implemented and unit-verified locally. Live DSX connectivity remains d
 | 1 | Evidence Beta baseline freeze | PASS — 39 pre-existing tests green, manifest verification green |
 | 2 | Safety-gate correction | PASS — gate contract is 7 names; `DSX_DISPOSABLE_JWT_SECRET` removed (see `docs/remediation/dsx-jwt-secret-audit.md`) |
 | 3–6 | Hosted disposable verification, tenant isolation, ingestion proof, cleanup | **BLOCKED** — `node scripts/dsx-resume-gate.mjs` exits 1; no disposable credentials configured. No hosted mutation attempted. |
-| 7 | DSX Exchange adapter boundary | Implemented + unit-verified. Broker runtime run **BLOCKED** (no container runtime, mosquitto or nats-server in the build sandbox). |
+| 7 | DSX Exchange adapter boundary | Implemented, unit-verified, and **runtime-verified against a real local mosquitto broker** (17/17 assertions) |
 | 8 | OpenUSD viewer synchronization boundary | Implemented + unit-verified |
 | 9 | SimReady asset-onboarding boundary | Implemented + unit-verified |
 | 10 | Evidence package | This document + test run below |
@@ -42,13 +42,51 @@ Design decisions:
   validated observations all resolve to `UNAVAILABLE`. Simulated data is
   never substituted.
 
-### Runtime blocker
+### Runtime verification (real broker)
 
-`scripts/dsx-exchange-local-harness.mjs` probes a local broker and exits
-non-zero when none is listening. In this sandbox no container runtime,
-mosquitto or nats-server is available, so an end-to-end broker run has not
-been executed. The adapter is verified against an in-memory transport that
-reproduces connect/disconnect/redelivery behaviour.
+Docker is not available in this sandbox, so the broker is provisioned
+directly instead of via a container:
+
+```
+mosquitto 2.0.22, config /tmp/dsx-broker/mosquitto.conf
+  listener 1883 127.0.0.1
+  allow_anonymous true
+  persistence false
+```
+
+`src/dsx/exchange/mqttTransport.ts` is the only module in the DSX tree that
+imports a broker client. It is deliberately NOT re-exported from
+`src/dsx/exchange/index.ts`, so the browser bundle never pulls in `mqtt`;
+the verification harness imports it by explicit path. The endpoint is
+assessed before the client is constructed, so a refused host cannot open a
+socket.
+
+```
+bun scripts/dsx-exchange-runtime-verify.ts        # 17/17 PASS
+  remote endpoint refused before any connection attempt
+  production project endpoint refused
+  transport reports connected
+  connected-but-empty resolves to UNAVAILABLE
+  connected-but-empty freshness is unknown
+  valid observation accepted through shared pipeline
+  mode becomes REPLAYED with run identity
+  freshness is fresh for a just-observed value
+  malformed broker payload quarantined
+  malformed payload did not add an accepted reading
+  disconnect reported by health
+  disconnected transport fails closed to UNAVAILABLE
+  redelivered event_id suppressed after reconnect
+  duplicate suppression counted
+  reconnect counted in health
+  freshness degrades to stale on age alone
+  transport still reported connected while data ages
+
+RUNTIME VERIFICATION PASSED
+```
+
+`scripts/dsx-exchange-local-harness.mjs` remains the pre-flight probe: it
+exits 2 with an UNAVAILABLE message when no local broker is listening,
+rather than simulating a connection.
 
 ## 3. Phase 8 — OpenUSD viewer synchronization
 
@@ -109,5 +147,7 @@ SimReady blocker/no-default/fleet-summary behaviour.
 1. **Hosted proof (Phases 3–6).** Requires the seven `DSX_DISPOSABLE_*`
    values under the exact gate names. Until then tenant-isolation, grant,
    hosted-ingestion and cleanup proofs cannot be executed.
-2. **Broker runtime (Phase 7 end-to-end).** Requires mosquitto or
-   nats-server, or a container runtime, on the verification host.
+
+Phase 7's broker-runtime blocker is CLEARED. The broker is ephemeral
+(`/tmp/dsx-broker`, no persistence) and must be restarted before re-running
+the verification on a fresh host.

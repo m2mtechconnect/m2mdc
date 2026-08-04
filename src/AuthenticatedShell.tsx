@@ -138,12 +138,14 @@ function ApprovedUserRoutes() {
       <Route path="/infrastructure" element={<InfrastructurePage />} />
       <Route path="/dsx/evidence-beta" element={<EvidenceBetaShell />}>
         <Route index element={<OverviewWorkspace />} />
+        <Route path="overview" element={<OverviewWorkspace />} />
         <Route path="thermal" element={<ThermalWorkspace />} />
         <Route path="power" element={<PowerWorkspace />} />
         <Route path="cooling" element={<CoolingWorkspace />} />
         <Route path="network" element={<NetworkWorkspace />} />
         <Route path="facility" element={<FacilityWorkspace />} />
         <Route path="workload" element={<WorkloadWorkspace />} />
+        <Route path="simulations" element={<SimulationsWorkspace />} />
         <Route path="sovereignty" element={<SovereigntyWorkspace />} />
         <Route path="carbon" element={<CarbonWorkspace />} />
         <Route path="financials" element={<FinancialWorkspace />} />

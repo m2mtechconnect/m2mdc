@@ -14,9 +14,13 @@ import {
 import { assessAsset, assessFleet } from '../simready/onboarding';
 import {
   EVIDENCE_BETA_ASSETS,
+  EVIDENCE_BETA_CONNECTION_ID,
   EVIDENCE_BETA_MAPPINGS,
+  EVIDENCE_BETA_ORG_ID,
   EVIDENCE_BETA_RACKS,
+  EVIDENCE_BETA_SITE_ID,
   EVIDENCE_BETA_SOURCE_SYSTEM,
+  assetBySourceId,
 } from '../fixtures/evidenceBetaFacility';
 
 const LOCAL: TransportEndpoint = {
@@ -28,17 +32,25 @@ const LOCAL: TransportEndpoint = {
 const OBSERVED = '2026-03-02T08:00:00.000Z';
 
 function event(id: string, sourceAsset: string, value: number) {
+  const asset = assetBySourceId(sourceAsset);
   return JSON.stringify({
     schema_version: 1,
     event_id: id,
-    source_asset_id: sourceAsset,
-    source_subject: `dc.evidence-beta.${sourceAsset}.inlet_temp_c`,
+    tenant_id: EVIDENCE_BETA_ORG_ID,
+    site_id: EVIDENCE_BETA_SITE_ID,
+    asset_id: asset ? asset.aura_asset_id : null,
+    connection_id: EVIDENCE_BETA_CONNECTION_ID,
+    source_system: 'dsx_cooling',
+    source_subject: `${EVIDENCE_BETA_SOURCE_SYSTEM}/${sourceAsset}/inlet_temp_c`,
+    event_type: 'telemetry',
     observed_at: OBSERVED,
     received_at: OBSERVED,
-    quality: 'validated',
     value,
-    unit: 'C',
-    gateway_id: 'local-harness',
+    unit: 'degC',
+    quality: 'validated',
+    validation_state: 'accepted',
+    mapping_state: asset ? 'mapped' : 'unmapped',
+    ingestion_version: 'exchange-test/1.0.0',
   });
 }
 

@@ -16,7 +16,7 @@
 import type { KpiBundle } from '../metrics/computeKpis';
 import type { SourceSnapshot } from '../adapters/types';
 import { capability, type Capability } from './availability';
-import { ALL_IDENTITIES } from './facilityGraph';
+import { ALL_RACK_IDENTITIES } from './facilityGraph';
 
 export type AssuranceDomain = 'sovereignty' | 'carbon' | 'financial';
 export type AssertionStatus = 'evidenced' | 'not_evidenced';
@@ -100,7 +100,7 @@ function fromMetric(
 }
 
 export function sovereigntyAssertions(bundle: KpiBundle, snapshot: SourceSnapshot): EvidenceAssertion[] {
-  const approved = ALL_IDENTITIES.filter((a) => a.mapping_approval === 'approved').length;
+  const approved = ALL_RACK_IDENTITIES.filter((a) => a.mapping_approval === 'approved').length;
   const mapping = bundle.metrics.mapping_coverage;
 
   const assertions: EvidenceAssertion[] = [

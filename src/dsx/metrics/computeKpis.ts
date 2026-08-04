@@ -88,6 +88,28 @@ export function computeKpiBundle(snapshot: SourceSnapshot, nowMs: number): KpiBu
   ]).size;
   const mappedSources = new Set(snapshot.accepted.map((a) => a.mapping.source_asset_id)).size;
 
+  // Event ids that back the coverage / quality / freshness counters. Without
+  // these, claims that cite those metrics (e.g. sovereignty identity_chain)
+  // would render as evidenced with zero traceable observations.
+  const acceptedEventIds = snapshot.accepted.map((a) => a.envelope.event_id).filter((v): v is string => !!v);
+  const rejectedEventIds = snapshot.rejected.map((r) => r.event_id).filter((v): v is string => !!v);
+  // One representative event per mapped source: the identity evidence is the
+  // resolution of a source id to a governed asset, not every reading.
+  const mappedSourceEventIds = Array.from(
+    snapshot.accepted
+      .reduce((acc, a) => {
+        if (a.envelope.event_id && !acc.has(a.mapping.source_asset_id)) {
+          acc.set(a.mapping.source_asset_id, a.envelope.event_id);
+        }
+        return acc;
+      }, new Map<string, string>())
+      .values(),
+  );
+  const latestEventId =
+    snapshot.accepted.length && snapshot.last_observed_at
+      ? (snapshot.accepted.find((a) => a.envelope.observed_at === snapshot.last_observed_at)?.envelope.event_id ?? null)
+      : null;
+
   const ref = (name: string, value: number | null, unit: string, eventIds: string[]): MetricInputRef => ({
     name,
     value,
@@ -120,12 +142,15 @@ export function computeKpiBundle(snapshot: SourceSnapshot, nowMs: number): KpiBu
       'age_seconds',
       snapshot.last_observed_at ? Math.max(0, Math.round((nowMs - Date.parse(snapshot.last_observed_at)) / 1000)) : null,
       's',
-      [],
+      latestEventId ? [latestEventId] : [],
     ),
-    mapped_sources: ref('mapped_sources', observedSources ? mappedSources : null, 'count', []),
-    observed_sources: ref('observed_sources', observedSources || null, 'count', []),
-    accepted_events: ref('accepted_events', snapshot.accepted.length || null, 'count', []),
-    rejected_events: ref('rejected_events', snapshot.rejected.length, 'count', []),
+    mapped_sources: ref('mapped_sources', observedSources ? mappedSources : null, 'count', mappedSourceEventIds),
+    observed_sources: ref('observed_sources', observedSources || null, 'count', [
+      ...mappedSourceEventIds,
+      ...rejectedEventIds,
+    ]),
+    accepted_events: ref('accepted_events', snapshot.accepted.length || null, 'count', acceptedEventIds),
+    rejected_events: ref('rejected_events', snapshot.rejected.length, 'count', rejectedEventIds),
     // WUE / CUE inputs are intentionally absent: the Evidence Beta fixture
     // has no water or grid-intensity instrumentation. These KPIs must render
     // as Unavailable rather than as an invented number.

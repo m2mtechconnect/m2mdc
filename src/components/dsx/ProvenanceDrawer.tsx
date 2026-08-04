@@ -63,10 +63,33 @@ export function ProvenanceDrawer() {
               <ul className="space-y-1 text-xs" data-testid="dsx-provenance-inputs">
                 {m.inputs.map((i) => (
                   <li key={i.name} className="font-mono">
-                    {i.name} = {i.value} {i.unit} ({i.event_ids.length} event(s))
+                    {i.name} = {i.value} {i.unit}{' '}
+                    {i.provenance === 'declared'
+                      ? `(declared, not observed - ${i.declared_source ?? 'source not named'})`
+                      : `(${i.event_ids.length} event(s))`}
                   </li>
                 ))}
               </ul>
+
+              {m.unattested_inputs.length > 0 && (
+                <>
+                  <Separator className="my-3" />
+                  <h3 className="pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Declared, unattested inputs
+                  </h3>
+                  <p className="pb-1 text-xs text-muted-foreground">
+                    These values are asserted in the facility registry. No observation or attestation
+                    evidences them, so this metric is only as trustworthy as the declaration.
+                  </p>
+                  <ul className="list-disc pl-4 text-xs text-amber-200" data-testid="dsx-provenance-declared">
+                    {m.declared_inputs.map((i) => (
+                      <li key={i.name}>
+                        <span className="font-mono">{i.name}</span> = {i.value} {i.unit} - {i.declared_source ?? 'source not named'}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
 
               {m.missing_inputs.length > 0 && (
                 <>

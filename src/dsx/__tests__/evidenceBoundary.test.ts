@@ -166,3 +166,40 @@ describe('identity_chain provenance', () => {
     }
   });
 });
+
+describe('declared (non-observed) input provenance', () => {
+  it('marks site_rated_kw as declared and unattested, with no fake event ids', () => {
+    const { bundle } = stateAt(3);
+    const m = bundle.metrics.power_capacity_utilisation;
+    expect(m.value).not.toBeNull();
+    const declared = m.declared_inputs.map((i) => i.name);
+    expect(declared).toContain('site_rated_kw');
+    expect(m.unattested_inputs).toContain('site_rated_kw');
+    const rated = m.declared_inputs.find((i) => i.name === 'site_rated_kw');
+    expect(rated?.event_ids).toEqual([]);
+    expect(rated?.declared_source).toBeTruthy();
+    expect(m.limitations.some((l) => l.includes('site_rated_kw'))).toBe(true);
+  });
+
+  it('observed inputs are never labelled declared', () => {
+    const { bundle } = stateAt(3);
+    const facility = bundle.metrics.facility_load;
+    expect(facility.declared_inputs).toEqual([]);
+    expect(facility.unattested_inputs).toEqual([]);
+    for (const i of facility.inputs) expect(i.event_ids.length).toBeGreaterThan(0);
+  });
+
+  it('capacity_driver discloses its declared input instead of implying it is metered', () => {
+    const { bundle, snapshot } = stateAt(3);
+    const claim = financialAssertions(bundle, snapshot).find((a) => a.id === 'capacity_driver');
+    expect(claim?.status).toBe('evidenced');
+    expect(claim?.unattested_inputs).toContain('site_rated_kw');
+    expect(claim?.basis).toMatch(/site_rated_kw/);
+  });
+
+  it('claims with only observed inputs report no unattested inputs', () => {
+    const { bundle, snapshot } = stateAt(3);
+    const claim = financialAssertions(bundle, snapshot).find((a) => a.id === 'load_driver');
+    expect(claim?.unattested_inputs).toEqual([]);
+  });
+});

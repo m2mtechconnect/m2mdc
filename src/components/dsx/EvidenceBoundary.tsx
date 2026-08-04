@@ -99,6 +99,14 @@ export function EvidenceBoundaryTable({
                 >
                   {ok ? 'Evidenced' : 'Not evidenced'}
                 </Badge>
+                {ok && a.unattested_inputs.length > 0 && (
+                  <Badge
+                    variant="outline"
+                    className="mt-1 block whitespace-nowrap border-amber-500/50 bg-amber-500/10 text-[11px] text-amber-700 dark:text-amber-200"
+                  >
+                    Declared input
+                  </Badge>
+                )}
               </TableCell>
               <TableCell className="align-top text-xs text-muted-foreground">
                 {ok ? a.basis : a.blocking_capability?.reason}
@@ -111,6 +119,11 @@ export function EvidenceBoundaryTable({
               </TableCell>
               <TableCell className="align-top font-mono text-[11px] text-muted-foreground">
                 {a.missing_inputs.length ? a.missing_inputs.join(', ') : 'none'}
+                {a.unattested_inputs.length > 0 && (
+                  <span className="mt-1 block text-amber-700 dark:text-amber-200">
+                    unattested: {a.unattested_inputs.join(', ')}
+                  </span>
+                )}
               </TableCell>
               <TableCell className="align-top">
                 <Button
@@ -251,6 +264,31 @@ export function AssertionProvenanceDrawer({
                     </li>
                   ))}
                 </ul>
+              )}
+
+              {a.unattested_inputs.length > 0 && (
+                <>
+                  <Separator className="my-3" />
+                  <h3 className="pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Declared, unattested inputs
+                  </h3>
+                  <p className="pb-1 text-xs text-muted-foreground">
+                    This claim depends on value(s) declared in the facility registry. No observation or
+                    attestation evidences them, so the claim holds only as far as the declaration is trusted.
+                  </p>
+                  <ul className="flex flex-wrap gap-1.5" data-testid="dsx-assertion-unattested">
+                    {a.unattested_inputs.map((i) => (
+                      <li key={i}>
+                        <Badge
+                          variant="outline"
+                          className="border-amber-500/50 bg-amber-500/10 font-mono text-[11px] text-amber-700 dark:text-amber-200"
+                        >
+                          {i}
+                        </Badge>
+                      </li>
+                    ))}
+                  </ul>
+                </>
               )}
               <div className="h-6" />
             </ScrollArea>

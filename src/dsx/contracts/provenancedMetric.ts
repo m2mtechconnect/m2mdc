@@ -15,6 +15,18 @@ export interface MetricInputRef {
   unit: string;
   event_ids: string[];
   asset_id?: string;
+  /**
+   * How the input entered the calculation.
+   * - `observed`: carried by ingested observations (event_ids are the proof).
+   * - `declared`: a registry/nameplate value asserted by a human or fixture.
+   *   It has no observation behind it, so it must never be presented as if
+   *   it were metered.
+   */
+  provenance?: 'observed' | 'declared';
+  /** Where a declared input comes from, e.g. 'facility registry (nameplate)'. */
+  declared_source?: string;
+  /** True when a declared input has no attestation/verification on file. */
+  unattested?: boolean;
 }
 
 export interface DsxProvenancedMetric {
@@ -26,6 +38,10 @@ export interface DsxProvenancedMetric {
   formula_version: string;
   inputs: MetricInputRef[];
   missing_inputs: string[];
+  /** Declared (non-observed) inputs that contributed to the value. */
+  declared_inputs: MetricInputRef[];
+  /** Named evidence that would be required to attest the declared inputs. */
+  unattested_inputs: string[];
   source_event_ids: string[];
   aura_asset_id: string | null;
   usd_prim_path: string | null;
@@ -91,6 +107,14 @@ export function computeMetric(
   // provenance list must stay a stable, de-duplicated set of event ids.
   const eventIds = Array.from(new Set(present.flatMap((p) => p.event_ids)));
   const limitations = [...(ctx.limitations ?? [])];
+  const declared = present.filter((p) => p.provenance === 'declared');
+  const unattested = declared.filter((p) => p.unattested !== false).map((p) => p.name);
+  for (const d of declared) {
+    limitations.push(
+      `${d.name} is a declared value from ${d.declared_source ?? 'an unnamed source'}, not an observation` +
+        `${d.unattested === false ? '.' : '; no attestation for it is on file.'}`,
+    );
+  }
   if (ctx.data_mode === 'SIMULATED') {
     limitations.unshift('Value derived from simulated inputs; not a measurement of a physical facility.');
   }
@@ -105,6 +129,8 @@ export function computeMetric(
     formula_version: def.formula_version,
     inputs: present,
     missing_inputs: missing,
+    declared_inputs: declared,
+    unattested_inputs: unattested,
     source_event_ids: eventIds,
     aura_asset_id: ctx.aura_asset_id ?? null,
     usd_prim_path: ctx.usd_prim_path ?? null,

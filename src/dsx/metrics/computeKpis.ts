@@ -115,6 +115,26 @@ export function computeKpiBundle(snapshot: SourceSnapshot, nowMs: number): KpiBu
     value,
     unit,
     event_ids: eventIds,
+    provenance: 'observed',
+  });
+
+  /**
+   * A registry/nameplate value. It has no observation behind it, so it is
+   * flagged as declared and unattested: the UI must not imply it was metered.
+   */
+  const declaredRef = (
+    name: string,
+    value: number | null,
+    unit: string,
+    declaredSource: string,
+  ): MetricInputRef => ({
+    name,
+    value,
+    unit,
+    event_ids: [],
+    provenance: 'declared',
+    declared_source: declaredSource,
+    unattested: true,
   });
 
   const inputs: Record<string, MetricInputRef | undefined> = {
@@ -136,8 +156,18 @@ export function computeKpiBundle(snapshot: SourceSnapshot, nowMs: number): KpiBu
       'degC',
       inlets.map((r) => r.inlet_event_id).filter((v): v is string => !!v),
     ),
-    design_inlet_limit_c: ref('design_inlet_limit_c', DESIGN_INLET_LIMIT_C, 'degC', []),
-    site_rated_kw: ref('site_rated_kw', EVIDENCE_BETA_SITE.rated_kw, 'kW', []),
+    design_inlet_limit_c: declaredRef(
+      'design_inlet_limit_c',
+      DESIGN_INLET_LIMIT_C,
+      'degC',
+      'facility registry (design thermal limit)',
+    ),
+    site_rated_kw: declaredRef(
+      'site_rated_kw',
+      EVIDENCE_BETA_SITE.rated_kw,
+      'kW',
+      `facility registry nameplate for ${EVIDENCE_BETA_SITE.name}`,
+    ),
     age_seconds: ref(
       'age_seconds',
       snapshot.last_observed_at ? Math.max(0, Math.round((nowMs - Date.parse(snapshot.last_observed_at)) / 1000)) : null,

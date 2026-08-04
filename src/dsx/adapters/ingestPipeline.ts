@@ -52,15 +52,16 @@ export function ingestRecords(
     }
 
     const parsed = parseDsxEvent(record.payload);
-    if (!parsed.ok) {
+    if (parsed.ok !== true) {
+      const failure = parsed as Extract<typeof parsed, { ok: false }>;
       rejected.push({
-        reason: parsed.reason,
+        reason: failure.reason,
         source_asset_id: record.source_asset_id,
         event_id: eventId,
         observed_at: observedAt,
-        detail: parsed.reason === 'schema_invalid'
-          ? (parsed.issues ?? []).map((i) => `${i.path.join('.')}: ${i.message}`).join('; ')
-          : parsed.reason,
+        detail: failure.reason === 'schema_invalid'
+          ? (failure.issues ?? []).map((i) => `${i.path.join('.')}: ${i.message}`).join('; ')
+          : failure.reason,
         payload_hash: hash,
       });
       continue;
@@ -95,14 +96,15 @@ export function ingestRecords(
     }
 
     const mapping = lookupMapping(mappings, sourceSystem, record.source_asset_id, env.observed_at);
-    if (!mapping.ok) {
+    if (mapping.ok !== true) {
+      const miss = mapping as Extract<typeof mapping, { ok: false }>;
       seen.add(env.event_id);
       rejected.push({
-        reason: mapping.reason === 'unknown_asset' ? 'unknown_mapping' : 'mapping_not_approved',
+        reason: miss.reason === 'unknown_asset' ? 'unknown_mapping' : 'mapping_not_approved',
         source_asset_id: record.source_asset_id,
         event_id: env.event_id,
         observed_at: env.observed_at,
-        detail: `asset mapping ${mapping.reason}`,
+        detail: `asset mapping ${miss.reason}`,
         payload_hash: hash,
       });
       continue;

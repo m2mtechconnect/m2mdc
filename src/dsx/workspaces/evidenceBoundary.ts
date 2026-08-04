@@ -35,6 +35,12 @@ export interface EvidenceAssertion {
   blocking_capability: Capability | null;
   /** Named inputs required before the claim could be evidenced. */
   missing_inputs: string[];
+  /**
+   * Declared (registry/nameplate) inputs the claim depends on that carry no
+   * observation or attestation. An evidenced claim with entries here is
+   * evidenced only as far as the declaration is trusted.
+   */
+  unattested_inputs: string[];
   /** What an operator must connect or do next. Always present. */
   next_step: string;
 }
@@ -46,6 +52,7 @@ function evidenced(
   basis: string,
   eventIds: string[],
   nextStep: string,
+  unattestedInputs: string[] = [],
 ): EvidenceAssertion {
   return {
     id, domain, claim,
@@ -54,6 +61,7 @@ function evidenced(
     evidence_event_ids: eventIds,
     blocking_capability: null,
     missing_inputs: [],
+    unattested_inputs: unattestedInputs,
     next_step: nextStep,
   };
 }
@@ -73,6 +81,7 @@ function blocked(
     evidence_event_ids: [],
     blocking_capability: c,
     missing_inputs: Array.from(new Set([...c.missing_inputs, ...extraMissing])).sort(),
+    unattested_inputs: [],
     next_step: `Connect ${c.label.toLowerCase()} before this claim may be displayed.`,
   };
 }
@@ -92,8 +101,15 @@ function fromMetric(
 ): EvidenceAssertion {
   const m = bundle.metrics[metricKey];
   if (m && m.value !== null) {
-    return evidenced(id, domain, claim, basis, m.source_event_ids,
-      'Open the metric provenance to review the contributing observations.');
+    const unattested = m.unattested_inputs ?? [];
+    const qualifiedBasis = unattested.length
+      ? `${basis} Declared (not observed, unattested) input(s): ${unattested.join(', ')}.`
+      : basis;
+    return evidenced(id, domain, claim, qualifiedBasis, m.source_event_ids,
+      unattested.length
+        ? `Attest the declared input(s) (${unattested.join(', ')}) and review the contributing observations in the metric provenance.`
+        : 'Open the metric provenance to review the contributing observations.',
+      unattested);
   }
   const a = blocked(id, domain, claim, capabilityId, m?.missing_inputs ?? []);
   return a;

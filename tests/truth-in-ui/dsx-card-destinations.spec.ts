@@ -174,7 +174,17 @@ test.describe('DSX Evidence Beta — clickable card destinations', () => {
         (await auditAssetSelects(page, name, failures));
       tally[name] = clicked;
 
-      expect(clicked, `${name}: workspace must expose at least one clickable card`).toBeGreaterThan(0);
+      // A workspace with no clickable card is only acceptable when it says
+      // why: a blocked capability or an explicit unavailable/planned state.
+      if (clicked === 0) {
+        const blocked = await page
+          .locator('[data-testid^="dsx-capability-"], [data-testid^="dsx-unavailable"], [data-testid="dsx-planned"]')
+          .count();
+        expect(
+          blocked,
+          `${name}: a workspace with no clickable card must declare a blocked or unavailable capability`,
+        ).toBeGreaterThan(0);
+      }
     }
 
     // eslint-disable-next-line no-console

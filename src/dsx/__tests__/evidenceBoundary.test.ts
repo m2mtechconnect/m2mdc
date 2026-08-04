@@ -144,3 +144,25 @@ describe('summary', () => {
     expect(s.blocking_capabilities).toContain('water_metering');
   });
 });
+
+describe('identity_chain provenance', () => {
+  it('cites at least one event id per mapped source, with no duplicates', () => {
+    const { bundle, snapshot } = stateAt(3);
+    const claim = sovereigntyAssertions(bundle, snapshot).find((a) => a.id === 'identity_chain');
+    expect(claim?.status).toBe('evidenced');
+    const ids = claim?.event_ids ?? [];
+    const mappedSources = new Set(snapshot.accepted.map((a) => a.mapping.source_asset_id));
+    expect(ids.length).toBe(mappedSources.size);
+    expect(new Set(ids).size).toBe(ids.length);
+    const known = new Set(snapshot.accepted.map((a) => a.envelope.event_id));
+    for (const id of ids) expect(known.has(id)).toBe(true);
+  });
+
+  it('never reports an evidenced identity chain with zero event ids', () => {
+    for (const tick of [0, 1, 2, 3, 4]) {
+      const { bundle, snapshot } = stateAt(tick, 'cooling_degradation');
+      const claim = sovereigntyAssertions(bundle, snapshot).find((a) => a.id === 'identity_chain');
+      if (claim?.status === 'evidenced') expect(claim.event_ids.length).toBeGreaterThan(0);
+    }
+  });
+});

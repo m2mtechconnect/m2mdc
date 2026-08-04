@@ -7,7 +7,7 @@
  * restore the same investigation. Components never branch on "is this mock
  * data"; an unresolved id renders as unavailable.
  */
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useEvidenceBeta, type EvidenceBetaRuntime } from './useEvidenceBeta';
 import { buildConstraintStack, type DomainConstraint } from '../workspaces/constraints';
@@ -67,6 +67,34 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
   const [provenanceMetric, setProvenanceMetric] = useState<DsxProvenancedMetric | null>(null);
   const [assetDrawerOpen, setAssetDrawerOpen] = useState(false);
   const [investigatedConstraint, setInvestigatedConstraint] = useState<DomainConstraint | null>(null);
+
+  /**
+   * Focus restoration. The drawers unmount their content the moment their
+   * backing state clears, so Radix's own `onCloseAutoFocus` never runs. We
+   * record the element that opened a drawer and return focus to it on close,
+   * which keeps keyboard users where they were.
+   */
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const rememberTrigger = useCallback(() => {
+    const el = document.activeElement;
+    triggerRef.current = el instanceof HTMLElement ? el : null;
+  }, []);
+  const restoreTrigger = useCallback(() => {
+    const el = triggerRef.current;
+    triggerRef.current = null;
+    if (!el || !el.isConnected) return;
+    // The closing overlay's focus scope may reclaim focus for a few frames
+    // after unmount, so keep re-asserting until the trigger actually holds it.
+    let attempts = 0;
+    const tryFocus = () => {
+      attempts += 1;
+      if (!el.isConnected) return;
+      if (document.activeElement === el) return;
+      el.focus();
+      if (attempts < 12) requestAnimationFrame(tryFocus);
+    };
+    requestAnimationFrame(tryFocus);
+  }, []);
 
   const context = useMemo(() => parseContext(searchParams), [searchParams]);
 
@@ -130,9 +158,12 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
         openusd_prim_path: identity?.openusd_prim_path ?? null,
         source_workspace: currentWorkspace,
       });
-      if (options?.openDrawer !== false) setAssetDrawerOpen(true);
+      if (options?.openDrawer !== false) {
+        if (!assetDrawerOpen) rememberTrigger();
+        setAssetDrawerOpen(true);
+      }
     },
-    [context, writeContext, currentWorkspace],
+    [context, writeContext, currentWorkspace, assetDrawerOpen, rememberTrigger],
   );
 
   const selectWorkload = useCallback(
@@ -196,14 +227,14 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
     selectWorkload,
     setTimeRange,
     assetDrawerOpen: assetDrawerOpen && !!selectedAssetId,
-    openAssetDrawer: () => setAssetDrawerOpen(true),
-    closeAssetDrawer: () => setAssetDrawerOpen(false),
+    openAssetDrawer: () => { if (!assetDrawerOpen) rememberTrigger(); setAssetDrawerOpen(true); },
+    closeAssetDrawer: () => { setAssetDrawerOpen(false); restoreTrigger(); },
     investigatedConstraint,
-    openConstraint: (c) => setInvestigatedConstraint(c),
-    closeConstraint: () => setInvestigatedConstraint(null),
+    openConstraint: (c) => { rememberTrigger(); setInvestigatedConstraint(c); },
+    closeConstraint: () => { setInvestigatedConstraint(null); restoreTrigger(); },
     provenanceMetric,
-    openProvenance: (m) => setProvenanceMetric(m),
-    closeProvenance: () => setProvenanceMetric(null),
+    openProvenance: (m) => { rememberTrigger(); setProvenanceMetric(m); },
+    closeProvenance: () => { setProvenanceMetric(null); restoreTrigger(); },
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

@@ -25,6 +25,12 @@ import {
 import { DESIGN_INLET_LIMIT_C } from '@/dsx/metrics/computeKpis';
 import { EVIDENCE_BETA_SEED, EVIDENCE_BETA_VERSION } from '@/dsx/fixtures/evidenceBetaFacility';
 import { LIVE_DISABLED_REASON } from '@/dsx/adapters/liveDisabledAdapter';
+import {
+  BoundaryVerdict, EvidenceBoundaryTable, RequiredInputList,
+} from '@/components/dsx/EvidenceBoundary';
+import {
+  carbonAssertions, financialAssertions, sovereigntyAssertions,
+} from '@/dsx/workspaces/evidenceBoundary';
 
 function Section({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
@@ -336,14 +342,40 @@ export function WorkloadWorkspace() {
 
 /* 8 — Sovereignty */
 export function SovereigntyWorkspace() {
+  const { rt } = useWorkspace();
+  const assertions = sovereigntyAssertions(rt.bundle, rt.snapshot);
   return (
     <div className="space-y-6">
-      <Section title="Sovereignty" description="Where does this workload run, and can that be evidenced?">
-        <CapabilityNotice capability={capability('residency_evidence')} />
+      <Section
+        title="Sovereignty"
+        description="Which sovereignty claims can this build actually evidence, and which cannot be made at all?"
+      >
+        <BoundaryVerdict assertions={assertions} domain="sovereignty" />
       </Section>
-      <p className="text-sm text-muted-foreground" data-testid="dsx-sovereignty-claim">
-        Sovereignty status is unverified. No residency, jurisdiction or attestation claim is made by this build.
-      </p>
+
+      <Section
+        title="Declared claims"
+        description="Each claim is either backed by a named source or reported as not evidenced. Nothing is inferred."
+      >
+        <EvidenceBoundaryTable assertions={assertions} domain="sovereignty" />
+      </Section>
+
+      <Section title="Attestation and residency">
+        <CapabilityNotice capability={capability('residency_evidence')} />
+        <CapabilityNotice capability={capability('node_attestation')} />
+      </Section>
+
+      <Section title="Standing statement">
+        <UnavailableState
+          title="Sovereignty status unverified"
+          reason={`No residency, jurisdiction, custody or attestation claim is made by this build. Data mode is ${rt.snapshot.data_mode} and calibration is uncalibrated, so nothing here may be used as a compliance artefact.`}
+          testId="dsx-sovereignty-claim"
+        />
+      </Section>
+
+      <Section title="What would close this boundary">
+        <RequiredInputList assertions={assertions} domain="sovereignty" />
+      </Section>
     </div>
   );
 }
@@ -351,12 +383,44 @@ export function SovereigntyWorkspace() {
 /* 9 — Carbon */
 export function CarbonWorkspace() {
   const { rt } = useWorkspace();
+  const assertions = carbonAssertions(rt.bundle);
   return (
     <div className="space-y-6">
-      <Section title="Carbon and water" description="What are the emissions and water consequences of the current operating state?">
+      <Section
+        title="Carbon and water"
+        description="What can be stated about emissions and water from the sources that are actually connected?"
+      >
+        <BoundaryVerdict assertions={assertions} domain="carbon" />
+      </Section>
+
+      <Section
+        title="Measured energy drivers"
+        description="These are metered quantities, not emissions. An emissions figure requires an intensity source."
+      >
+        <MetricGrid ids={['facility_load', 'it_load', 'cooling_load', 'pue']} metrics={rt.bundle.metrics} />
+      </Section>
+
+      <Section title="Sustainability ratios">
         <MetricGrid ids={['wue', 'cue']} metrics={rt.bundle.metrics} columns="sm:grid-cols-2" />
         <CapabilityNotice capability={capability('grid_carbon_intensity')} />
         <CapabilityNotice capability={capability('water_metering')} />
+      </Section>
+
+      <Section title="Declared claims">
+        <EvidenceBoundaryTable assertions={assertions} domain="carbon" />
+      </Section>
+
+      <Section title="Reporting boundary">
+        <UnavailableState
+          title="No emissions figure is produced"
+          reason="Power is metered instantaneously in kW; emissions reporting requires metered energy over a billing interval and a grid intensity factor. AURA will not convert an instantaneous draw into a reported emissions total."
+          missingInputs={['facility_energy_kwh', 'it_energy_kwh', 'meter_interval', 'grid_intensity_g_per_kwh']}
+          testId="dsx-carbon-reporting-unavailable"
+        />
+      </Section>
+
+      <Section title="What would close this boundary">
+        <RequiredInputList assertions={assertions} domain="carbon" />
       </Section>
     </div>
   );
@@ -364,15 +428,50 @@ export function CarbonWorkspace() {
 
 /* 10 — Financial */
 export function FinancialWorkspace() {
+  const { rt } = useWorkspace();
+  const assertions = financialAssertions(rt.bundle);
   return (
     <div className="space-y-6">
-      <Section title="Financial exposure" description="What does the current operating state cost, and what is at risk?">
-        <CapabilityNotice capability={capability('cost_ledger')} />
+      <Section
+        title="Financial exposure"
+        description="Which cost drivers are measured, and why no monetary figure is displayed?"
+      >
+        <BoundaryVerdict assertions={assertions} domain="financial" />
       </Section>
-      <p className="text-sm text-muted-foreground">
-        No cost, tariff or penalty figure is displayed. Energy price and contract terms are not connected,
-        so any financial number would be invented.
-      </p>
+
+      <Section
+        title="Measured cost drivers"
+        description="These are the physical quantities a cost would be priced against. They are not costs."
+      >
+        <MetricGrid
+          ids={['facility_load', 'it_load', 'power_capacity_utilisation']}
+          metrics={rt.bundle.metrics}
+          columns="sm:grid-cols-3"
+        />
+      </Section>
+
+      <Section title="Declared claims">
+        <EvidenceBoundaryTable assertions={assertions} domain="financial" />
+      </Section>
+
+      <Section title="Monetary values">
+        <UnavailableState
+          title="No cost, tariff or penalty figure is displayed"
+          reason="Energy price, demand-charge schedule, contract terms and the cost ledger are not connected. Any monetary number shown here would be invented, so none is produced, including for advisory recommendations."
+          missingInputs={['energy_price_per_kwh', 'demand_charge_per_kw', 'capex_records', 'opex_records', 'sla_terms']}
+          testId="dsx-financial-monetary-unavailable"
+        />
+        <div className="pt-3">
+          <CapabilityNotice capability={capability('energy_tariff')} />
+        </div>
+        <div className="pt-3">
+          <CapabilityNotice capability={capability('cost_ledger')} />
+        </div>
+      </Section>
+
+      <Section title="What would close this boundary">
+        <RequiredInputList assertions={assertions} domain="financial" />
+      </Section>
     </div>
   );
 }

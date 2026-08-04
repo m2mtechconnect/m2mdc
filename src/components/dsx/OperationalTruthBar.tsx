@@ -37,7 +37,7 @@ export function OperationalTruthBar() {
       </span>
       <span className="flex flex-col gap-0.5">
         <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Calibration</span>
-        <Badge variant="outline" className="border-amber-500/50 bg-amber-500/10 text-[11px] text-amber-200">
+        <Badge variant="outline" className="border-amber-500/50 bg-amber-500/10 text-[11px] text-amber-800 dark:text-amber-200">
           Uncalibrated
         </Badge>
       </span>

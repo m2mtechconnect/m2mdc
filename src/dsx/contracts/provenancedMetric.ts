@@ -107,6 +107,14 @@ export function computeMetric(
   // provenance list must stay a stable, de-duplicated set of event ids.
   const eventIds = Array.from(new Set(present.flatMap((p) => p.event_ids)));
   const limitations = [...(ctx.limitations ?? [])];
+  const declared = present.filter((p) => p.provenance === 'declared');
+  const unattested = declared.filter((p) => p.unattested !== false).map((p) => p.name);
+  for (const d of declared) {
+    limitations.push(
+      `${d.name} is a declared value from ${d.declared_source ?? 'an unnamed source'}, not an observation` +
+        `${d.unattested === false ? '.' : '; no attestation for it is on file.'}`,
+    );
+  }
   if (ctx.data_mode === 'SIMULATED') {
     limitations.unshift('Value derived from simulated inputs; not a measurement of a physical facility.');
   }
@@ -121,6 +129,8 @@ export function computeMetric(
     formula_version: def.formula_version,
     inputs: present,
     missing_inputs: missing,
+    declared_inputs: declared,
+    unattested_inputs: unattested,
     source_event_ids: eventIds,
     aura_asset_id: ctx.aura_asset_id ?? null,
     usd_prim_path: ctx.usd_prim_path ?? null,

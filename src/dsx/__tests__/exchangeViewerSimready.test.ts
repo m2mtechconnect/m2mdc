@@ -12,6 +12,7 @@ import {
   assetIdForPrim,
 } from '../viewer/viewerBoundary';
 import { assessAsset, assessFleet } from '../simready/onboarding';
+import { stableUuid } from '../fixtures/determinism';
 import {
   EVIDENCE_BETA_ASSETS,
   EVIDENCE_BETA_CONNECTION_ID,
@@ -99,7 +100,7 @@ describe('DSX Exchange adapter — ingestion', () => {
     const rack = EVIDENCE_BETA_RACKS[0].source_asset_id;
     transport.emit({
       subject: `dsx/evidence-beta/${rack}/inlet_temp_c`,
-      payload: event('evt-1', rack, 27.4),
+      payload: event(stableUuid('exchange-test:evt-1'), rack, 27.4),
       received_at: OBSERVED,
     });
 
@@ -122,7 +123,7 @@ describe('DSX Exchange adapter — ingestion', () => {
     const rack = EVIDENCE_BETA_RACKS[1].source_asset_id;
     const msg = {
       subject: `dsx/evidence-beta/${rack}/inlet_temp_c`,
-      payload: event('evt-dup', rack, 26.1),
+      payload: event(stableUuid('exchange-test:evt-dup'), rack, 26.1),
       received_at: OBSERVED,
     };
     transport.emit(msg);

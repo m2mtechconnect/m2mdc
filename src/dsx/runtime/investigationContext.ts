@@ -108,8 +108,8 @@ export function buildContextChips(
   if (ctx.data_hall_id) chips.push({ field: 'data_hall_id', label: 'Data hall', value: named(ctx.data_hall_id), removable: true });
   if (ctx.stable_asset_id) chips.push({ field: 'stable_asset_id', label: 'Asset', value: named(ctx.stable_asset_id), removable: true });
   if (ctx.workload_id) chips.push({ field: 'workload_id', label: 'Workload', value: ctx.workload_id, removable: true });
-  if (ctx.scenario_id) chips.push({ field: 'scenario_id', label: 'Scenario', value: ctx.scenario_id.replace(/_/g, ' '), removable: true });
   if (ctx.time_range) chips.push({ field: 'time_range', label: 'Time range', value: ctx.time_range, removable: true });
-  if (ctx.data_mode) chips.push({ field: 'data_mode', label: 'Data mode', value: ctx.data_mode, removable: false });
+  // Scenario and data mode are reported by the operational truth bar, which is
+  // always visible, so they are not repeated here as removable scope chips.
   return chips;
 }

@@ -62,4 +62,4 @@ export function resolveMode(requested: DataMode, opts: { liveVerified?: boolean;
   return requested;
 }
 
-export const UNCALIBRATED_NOTICE = 'SIMULATED — UNCALIBRATED — NOT FOR PHYSICAL CONTROL';
+export const UNCALIBRATED_NOTICE = 'SIMULATED · UNCALIBRATED · NOT FOR PHYSICAL CONTROL';

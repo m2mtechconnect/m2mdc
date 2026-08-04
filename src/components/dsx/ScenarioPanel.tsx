@@ -10,13 +10,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { Play, Pause, RotateCcw } from 'lucide-react';
 import { useWorkspace } from '@/dsx/runtime/EvidenceBetaContext';
 import { SCENARIO_CATALOGUE } from '@/dsx/workspaces/availability';
 import { TIMELINE_IDS, type TimelineId } from '@/dsx/fixtures/timelines';
-import { PHYSICAL_CONTROL_ENABLED } from '@/dsx/contracts/recommendation';
+import {
+  PHYSICAL_CONTROL_ENABLED,
+  type DecisionOutcome,
+  type DecisionRecord,
+  type Recommendation,
+} from '@/dsx/contracts/recommendation';
 import { PlannedState } from './StateBadges';
 
 export function ScenarioControls() {

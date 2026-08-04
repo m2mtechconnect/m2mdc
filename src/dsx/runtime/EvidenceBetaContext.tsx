@@ -1,24 +1,56 @@
 /**
  * Shared Evidence Beta workspace context.
  *
- * One runtime, one asset selection and one provenance drawer are shared by
- * all eleven workspaces so that a selection made anywhere is reflected
- * everywhere. Components never branch on "is this mock data".
+ * One runtime, one investigation context and one set of drawers are shared by
+ * every workspace, so a selection made anywhere is reflected everywhere.
+ * The context lives in the URL: refresh, back/forward and deep links all
+ * restore the same investigation. Components never branch on "is this mock
+ * data"; an unresolved id renders as unavailable.
  */
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useEvidenceBeta, type EvidenceBetaRuntime } from './useEvidenceBeta';
 import { buildConstraintStack, type DomainConstraint } from '../workspaces/constraints';
-import { identityByAuraId, type AssetIdentity } from '../workspaces/facilityGraph';
+import { ancestryFor, identityByAuraId, type AssetIdentity } from '../workspaces/facilityGraph';
 import type { DsxProvenancedMetric } from '../contracts/provenancedMetric';
 import { freshnessFor, type FreshnessState } from '../modes';
+import {
+  buildContextChips, contextToParams, linkWithContext, parseContext,
+  type ContextChip, type InvestigationContext,
+} from './investigationContext';
+import { TIMELINES, type TimelineId } from '../fixtures/timelines';
 
 export interface EvidenceBetaWorkspace {
   rt: EvidenceBetaRuntime;
   freshness: FreshnessState;
   constraints: DomainConstraint[];
+
+  /** Shared, URL-persisted investigation context. */
+  context: InvestigationContext;
+  chips: ContextChip[];
+  clearContextField: (field: keyof InvestigationContext) => void;
+  clearContext: () => void;
+  /** Builds a link to another workspace that preserves the whole context. */
+  hrefWithContext: (path: string) => string;
+
   selectedAssetId: string | null;
   selectedAsset: AssetIdentity | null;
-  selectAsset: (auraAssetId: string | null) => void;
+  /** Ancestry of the selected asset, root first. Empty when nothing is selected. */
+  selectedAncestry: AssetIdentity[];
+  /** True when a selected id does not resolve to a declared record. */
+  selectionUnavailable: boolean;
+  selectAsset: (auraAssetId: string | null, options?: { openDrawer?: boolean }) => void;
+  selectWorkload: (workloadId: string | null) => void;
+  setTimeRange: (range: string | null) => void;
+
+  assetDrawerOpen: boolean;
+  openAssetDrawer: () => void;
+  closeAssetDrawer: () => void;
+
+  investigatedConstraint: DomainConstraint | null;
+  openConstraint: (c: DomainConstraint) => void;
+  closeConstraint: () => void;
+
   provenanceMetric: DsxProvenancedMetric | null;
   openProvenance: (metric: DsxProvenancedMetric) => void;
   closeProvenance: () => void;
@@ -26,29 +58,154 @@ export interface EvidenceBetaWorkspace {
 
 const Ctx = createContext<EvidenceBetaWorkspace | null>(null);
 
+const TIMELINE_IDS = TIMELINES.map((t) => t.id) as TimelineId[];
+
 export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
   const rt = useEvidenceBeta();
-  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [provenanceMetric, setProvenanceMetric] = useState<DsxProvenancedMetric | null>(null);
+  const [assetDrawerOpen, setAssetDrawerOpen] = useState(false);
+  const [investigatedConstraint, setInvestigatedConstraint] = useState<DomainConstraint | null>(null);
+
+  const context = useMemo(() => parseContext(searchParams), [searchParams]);
+
+  // Deep link restore: a shared scenario id reopens the same scenario once.
+  const urlScenario = context.scenario_id;
+  useEffect(() => {
+    if (urlScenario && urlScenario !== rt.timeline && (TIMELINE_IDS as string[]).includes(urlScenario)) {
+      rt.setTimeline(urlScenario as TimelineId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlScenario]);
+
+  const writeContext = useCallback(
+    (next: InvestigationContext, replace = false) => {
+      setSearchParams(contextToParams(next), { replace });
+    },
+    [setSearchParams],
+  );
+
+  // Scenario and data mode are runtime facts; mirror them into the URL so a
+  // deep link reproduces the same evidence, without ever implying live data.
+  useEffect(() => {
+    if (context.scenario_id === rt.timeline && context.data_mode === rt.mode) return;
+    writeContext({ ...context, scenario_id: rt.timeline, data_mode: rt.mode }, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rt.timeline, rt.mode, context.scenario_id, context.data_mode]);
+
+  const selectedAssetId = context.stable_asset_id;
+  const selectedAsset = useMemo(() => identityByAuraId(selectedAssetId), [selectedAssetId]);
+  const selectedAncestry = useMemo(
+    () => (selectedAssetId ? ancestryFor(selectedAssetId) : []),
+    [selectedAssetId],
+  );
+  const selectionUnavailable = !!selectedAssetId && !selectedAsset;
+
+  const currentWorkspace = location.pathname.split('/').pop() ?? 'overview';
+
+  const selectAsset = useCallback(
+    (id: string | null, options?: { openDrawer?: boolean }) => {
+      if (!id) {
+        writeContext({
+          ...context,
+          stable_asset_id: null,
+          openusd_prim_path: null,
+          building_id: null,
+          data_hall_id: null,
+        });
+        setAssetDrawerOpen(false);
+        return;
+      }
+      const identity = identityByAuraId(id);
+      const chain = ancestryFor(id);
+      const building = chain.find((a) => a.asset_class === 'site') ?? null;
+      const hall = chain.find((a) => a.asset_class === 'data_hall') ?? null;
+      writeContext({
+        ...context,
+        facility_id: identity?.facility_id ?? context.facility_id,
+        building_id: building?.stable_asset_id ?? null,
+        data_hall_id: hall?.stable_asset_id ?? null,
+        stable_asset_id: id,
+        openusd_prim_path: identity?.openusd_prim_path ?? null,
+        source_workspace: currentWorkspace,
+      });
+      if (options?.openDrawer !== false) setAssetDrawerOpen(true);
+    },
+    [context, writeContext, currentWorkspace],
+  );
+
+  const selectWorkload = useCallback(
+    (workloadId: string | null) => writeContext({ ...context, workload_id: workloadId }),
+    [context, writeContext],
+  );
+
+  const setTimeRange = useCallback(
+    (range: string | null) => writeContext({ ...context, time_range: range }),
+    [context, writeContext],
+  );
+
+  const clearContextField = useCallback(
+    (field: keyof InvestigationContext) => {
+      const next = { ...context, [field]: null };
+      if (field === 'stable_asset_id') next.openusd_prim_path = null;
+      if (field === 'building_id') {
+        next.data_hall_id = null;
+        next.stable_asset_id = null;
+        next.openusd_prim_path = null;
+      }
+      writeContext(next);
+      if (field === 'stable_asset_id' || field === 'building_id') setAssetDrawerOpen(false);
+    },
+    [context, writeContext],
+  );
+
+  const clearContext = useCallback(() => {
+    setAssetDrawerOpen(false);
+    setInvestigatedConstraint(null);
+    navigate({ pathname: location.pathname, search: '' });
+  }, [navigate, location.pathname]);
+
+  const hrefWithContext = useCallback(
+    (path: string) => linkWithContext(path, context, currentWorkspace),
+    [context, currentWorkspace],
+  );
+
+  const chips = useMemo(
+    () => buildContextChips(context, (id) => identityByAuraId(id)),
+    [context],
+  );
 
   const freshness = freshnessFor(rt.snapshot.last_observed_at, Date.parse(rt.nowIso));
   const constraints = useMemo(() => buildConstraintStack(rt.bundle, rt.snapshot), [rt.bundle, rt.snapshot]);
-  const selectedAsset = useMemo(() => identityByAuraId(selectedAssetId), [selectedAssetId]);
-
-  const selectAsset = useCallback((id: string | null) => setSelectedAssetId(id), []);
-  const openProvenance = useCallback((m: DsxProvenancedMetric) => setProvenanceMetric(m), []);
-  const closeProvenance = useCallback(() => setProvenanceMetric(null), []);
 
   const value: EvidenceBetaWorkspace = {
     rt,
     freshness,
     constraints,
+    context,
+    chips,
+    clearContextField,
+    clearContext,
+    hrefWithContext,
     selectedAssetId,
     selectedAsset,
+    selectedAncestry,
+    selectionUnavailable,
     selectAsset,
+    selectWorkload,
+    setTimeRange,
+    assetDrawerOpen: assetDrawerOpen && !!selectedAssetId,
+    openAssetDrawer: () => setAssetDrawerOpen(true),
+    closeAssetDrawer: () => setAssetDrawerOpen(false),
+    investigatedConstraint,
+    openConstraint: (c) => setInvestigatedConstraint(c),
+    closeConstraint: () => setInvestigatedConstraint(null),
     provenanceMetric,
-    openProvenance,
-    closeProvenance,
+    openProvenance: (m) => setProvenanceMetric(m),
+    closeProvenance: () => setProvenanceMetric(null),
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

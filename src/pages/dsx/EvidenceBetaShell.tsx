@@ -79,6 +79,50 @@ const DOT: Record<string, string> = {
   unavailable: 'bg-zinc-500',
 };
 
+/** Maps a route segment to the constraint domain used for related views. */
+const SEGMENT_DOMAIN: Record<string, string> = {
+  thermal: 'thermal',
+  power: 'power',
+  cooling: 'cooling',
+  network: 'network',
+  facility: 'facility',
+  workload: 'workload',
+  sovereignty: 'sovereignty',
+  carbon: 'carbon',
+  financials: 'financial',
+};
+
+/** Continues the investigation without losing the current scope. */
+function RelatedWorkspaces() {
+  const { pathname } = useLocation();
+  const { hrefWithContext } = useWorkspace();
+  const segment = pathname.replace(/\/$/, '').split('/').pop() ?? 'evidence-beta';
+  const domain = SEGMENT_DOMAIN[segment];
+  if (!domain) return null;
+  const views = relatedViewsForDomain(domain).filter((v) => !v.path.endsWith(`/${segment}`));
+  if (views.length === 0) return null;
+
+  return (
+    <section aria-label="Related workspaces" data-testid="dsx-related-workspaces" className="pt-8">
+      <h2 className="pb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        Continue this investigation
+      </h2>
+      <div className="flex flex-wrap gap-2">
+        {views.map((v) => (
+          <Link
+            key={v.id}
+            to={hrefWithContext(v.path)}
+            title={v.hint}
+            className="rounded-md border border-border/60 px-2.5 py-1 text-xs text-muted-foreground hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {v.label}
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function ScopeTree({ nodes, depth = 0 }: { nodes: HierarchyNode[]; depth?: number }) {
   const { selectAsset, selectedAssetId } = useWorkspace();
   return (

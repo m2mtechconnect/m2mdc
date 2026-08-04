@@ -69,7 +69,7 @@ Every tile carries `Simulated`, `Fresh`, `Validated`, `Uncalibrated`.
 | Claim id | Status | Basis or blocker | Event ids | Missing inputs |
 |---|---|---|---|---|
 | `load_driver` | Evidenced | metered facility load as pricing quantity | 10 | - |
-| `capacity_driver` | Evidenced | metered load against declared site rating | 10 | - (but see D-02) |
+| `capacity_driver` | Evidenced | metered load against declared site rating | 10 | none missing; `site_rated_kw` disclosed as declared and unattested |
 | `energy_cost` | Not evidenced | `energy_tariff` | 0 | demand_charge_per_kw, energy_price_per_kwh, facility_energy_kwh |
 | `demand_charge` | Not evidenced | `energy_tariff` | 0 | billing_period_peak_kw, demand_charge_per_kw, energy_price_per_kwh |
 | `operating_cost` | Not evidenced | `cost_ledger` | 0 | budget, capex_records, opex_records |
@@ -100,12 +100,19 @@ Every tile carries `Simulated`, `Fresh`, `Validated`, `Uncalibrated`.
   and `age_seconds` now carry their contributing event ids, and `computeMetric`
   de-duplicates the provenance set. Covered by two regression tests in
   `src/dsx/__tests__/evidenceBoundary.test.ts`.
-- **D-02 (medium) - `site_rated_kw` has no provenance.** `power_capacity_utilisation`
+- **D-02 (RESOLVED) - `site_rated_kw` had no provenance.** `power_capacity_utilisation`
   and the `capacity_driver` claim divide metered load by the fixture constant
   `rated_kw: 2400` (`src/dsx/fixtures/evidenceBetaFacility.ts:49`). The UI shows
   10 supporting events and "no input missing", implying the denominator is
   observed. Fix: declare the rating as a registry-declared input with its own
   provenance entry.
+  Fixed: `MetricInputRef` now carries `provenance: 'observed' | 'declared'`,
+  `declared_source` and `unattested`. `site_rated_kw` and `design_inlet_limit_c`
+  are declared registry values, so metrics that use them expose
+  `declared_inputs` / `unattested_inputs` and a limitation, the metric
+  provenance drawer lists a "Declared, unattested inputs" section, and the
+  `capacity_driver` claim states the declared dependency in its basis and
+  carries a "Declared input" badge in the evidence boundary table.
 - **D-03 (medium) - `Validated` badge next to `Uncalibrated`.** Tiles read
   "Simulated / Fresh / Validated / Uncalibrated". "Validated" only means the
   value passed range validation, not that it was validated against a physical

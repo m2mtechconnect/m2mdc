@@ -10,7 +10,7 @@ import { EVIDENCE_BETA_SITE } from '@/dsx/fixtures/evidenceBetaFacility';
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
-    <span className="flex min-w-0 flex-col leading-tight">
+    <span className="flex min-w-0 shrink-0 flex-col leading-tight">
       <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</span>
       <span className="truncate text-xs font-medium text-foreground">{value}</span>
     </span>
@@ -26,23 +26,25 @@ export function OperationalTruthBar() {
     <div
       role="status"
       aria-live="polite"
+      aria-label="Operational truth bar"
+      tabIndex={0}
       data-testid="dsx-truth-bar"
       data-mode={rt.snapshot.data_mode}
-      className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-border bg-muted/40 px-4 py-2"
+      className="flex flex-nowrap items-center gap-x-4 gap-y-2 overflow-x-auto border-b border-border bg-muted/40 px-3 py-2 sm:flex-wrap sm:gap-x-5 sm:overflow-x-visible sm:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <Field label="Facility" value={EVIDENCE_BETA_SITE.name} />
-      <span className="flex flex-col gap-0.5">
+      <span className="flex shrink-0 flex-col gap-0.5">
         <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Data mode</span>
         <DataModeBadge mode={rt.snapshot.data_mode} />
       </span>
-      <span className="flex flex-col gap-0.5">
+      <span className="flex shrink-0 flex-col gap-0.5">
         <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Calibration</span>
         <Badge variant="outline" className="border-amber-500/50 bg-amber-500/10 text-[11px] text-amber-800 dark:text-amber-200">
           Uncalibrated
         </Badge>
       </span>
       <Field label="Last validated observation" value={rt.snapshot.last_observed_at ?? 'none'} />
-      <span className="flex flex-col gap-0.5">
+      <span className="flex shrink-0 flex-col gap-0.5">
         <span className="text-[10px] uppercase tracking-wider text-muted-foreground">DSX Exchange</span>
         <ConnectionState state="unavailable" label="Exchange" />
       </span>
@@ -51,15 +53,15 @@ export function OperationalTruthBar() {
         label="Observation window"
         value={window ? `${window.from.slice(11, 19)} → ${window.to.slice(11, 19)} UTC` : 'none'}
       />
-      <span className="flex flex-col gap-0.5">
+      <span className="flex shrink-0 flex-col gap-0.5">
         <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Connection health</span>
         <ConnectionState state={rt.snapshot.connection_state} label="Source" />
       </span>
-      <span className="flex flex-col gap-0.5">
+      <span className="flex shrink-0 flex-col gap-0.5">
         <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Data freshness</span>
         <FreshnessIndicator freshness={freshness} />
       </span>
-      <SafetyChip className="ml-auto" />
+      <SafetyChip className="shrink-0 sm:ml-auto" />
       <span className="sr-only">{exchange.reason}</span>
     </div>
   );

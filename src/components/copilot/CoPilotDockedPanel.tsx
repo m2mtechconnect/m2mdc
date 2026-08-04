@@ -350,7 +350,7 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
         'fixed right-0 top-0 h-full bg-background border-l border-border shadow-2xl transition-transform duration-300 ease-in-out z-50',
         'flex flex-col',
         isOpen ? 'translate-x-0' : 'translate-x-full',
-        'w-[480px]'
+        'w-full max-w-[480px]'
       )}
     >
       {/* Header */}

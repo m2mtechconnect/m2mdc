@@ -219,6 +219,10 @@
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 14px;
+    /* Off-canvas drawers translate past the right edge; never expose them as
+       a horizontal page scroll on tablet or mobile. `clip` (not `hidden`)
+       also blocks programmatic/focus-driven horizontal scrolling. */
+    overflow-x: clip;
     line-height: 1.5;
     font-weight: 400;
   }

@@ -36,7 +36,11 @@ export function ProvenanceDrawer() {
               <div className="flex flex-wrap gap-1 pb-3">
                 <DataModeBadge mode={m.data_mode} />
                 <FreshnessIndicator freshness={m.freshness} />
-                <ValidationBadge validation={m.validation} />
+                <ValidationBadge
+                  validation={m.validation}
+                  calibration={m.calibration}
+                  unattestedInputs={m.unattested_inputs ?? []}
+                />
                 <CalibrationBadge calibration={m.calibration} />
               </div>
               <dl>

@@ -77,19 +77,46 @@ export function FreshnessIndicator({ freshness, className }: { freshness: Freshn
   );
 }
 
-export function ValidationBadge({ validation }: { validation: MetricValidation }) {
+/**
+ * `validation === 'validated'` only means the value passed range and input
+ * checks. It is NOT evidence that the value was verified against a calibrated
+ * instrument, so the badge must never read "Validated" while the metric is
+ * uncalibrated or depends on declared, unattested inputs.
+ */
+export function ValidationBadge({
+  validation,
+  calibration,
+  unattestedInputs = [],
+}: {
+  validation: MetricValidation;
+  calibration?: CalibrationStatus;
+  unattestedInputs?: string[];
+}) {
+  const unverified = calibration === 'uncalibrated' || unattestedInputs.length > 0;
   const label =
-    validation === 'validated' ? 'Validated'
+    validation === 'validated'
+      ? unverified ? 'Range-checked · unverified' : 'Range-checked'
       : validation === 'requires_review' ? 'Requires review'
         : validation === 'invalid' ? 'Invalid'
           : 'Unavailable';
+  const title =
+    validation === 'validated'
+      ? unattestedInputs.length > 0
+        ? `Passed range and input checks only. Not verified: metric is ${calibration === 'uncalibrated' ? 'uncalibrated and ' : ''}depends on declared, unattested input(s): ${unattestedInputs.join(', ')}.`
+        : unverified
+          ? 'Passed range and input checks only. Not verified against a calibrated instrument.'
+          : 'Passed range and input checks.'
+      : undefined;
   return (
     <Badge
       variant="outline"
+      title={title}
       data-testid="dsx-validation"
       data-validation={validation}
+      data-verified={validation === 'validated' && !unverified ? 'true' : 'false'}
       className={cn(
         'text-[11px]',
+        validation === 'validated' && unverified && 'border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-200',
         validation === 'requires_review' && 'border-amber-500/50 bg-amber-500/10 text-amber-200',
         validation === 'invalid' && 'border-red-500/50 bg-red-500/10 text-red-200',
       )}

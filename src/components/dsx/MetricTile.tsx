@@ -54,7 +54,11 @@ export function MetricTile({ id, metric, digits = 2, label, className }: Props) 
           <span className="flex flex-wrap gap-1">
             <DataModeBadge mode={metric.data_mode} />
             <FreshnessIndicator freshness={metric.freshness} />
-            <ValidationBadge validation={metric.validation} />
+            <ValidationBadge
+              validation={metric.validation}
+              calibration={metric.calibration}
+              unattestedInputs={metric.unattested_inputs ?? []}
+            />
             <CalibrationBadge calibration={metric.calibration} />
           </span>
 

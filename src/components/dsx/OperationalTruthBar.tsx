@@ -28,7 +28,7 @@ export function OperationalTruthBar() {
       aria-live="polite"
       data-testid="dsx-truth-bar"
       data-mode={rt.snapshot.data_mode}
-      className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-border bg-muted/40 px-4 py-2"
+      className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-border bg-muted/40 px-3 py-2 sm:gap-x-5 sm:px-4"
     >
       <Field label="Facility" value={EVIDENCE_BETA_SITE.name} />
       <span className="flex flex-col gap-0.5">
@@ -59,7 +59,7 @@ export function OperationalTruthBar() {
         <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Data freshness</span>
         <FreshnessIndicator freshness={freshness} />
       </span>
-      <SafetyChip className="ml-auto" />
+      <SafetyChip className="w-full sm:ml-auto sm:w-auto" />
       <span className="sr-only">{exchange.reason}</span>
     </div>
   );

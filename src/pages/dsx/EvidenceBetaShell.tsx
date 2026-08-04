@@ -56,13 +56,18 @@ function WorkspaceNav() {
   const status = Object.fromEntries(constraints.map((c) => [c.domain, c.status]));
 
   return (
-    <nav aria-label="DSX workspaces" className="w-60 shrink-0 border-r border-border bg-card/40 p-3">
+    <nav
+      aria-label="DSX workspaces"
+      data-testid="dsx-workspace-nav"
+      className="w-full shrink-0 overflow-x-auto border-b border-border bg-card/40 p-3 lg:w-60 lg:overflow-x-visible lg:border-b-0 lg:border-r"
+    >
+      <div className="flex min-w-max gap-4 lg:block lg:min-w-0">
       {NAV.map((g) => (
-        <div key={g.group} className="pb-4">
+        <div key={g.group} className="pb-0 lg:pb-4">
           <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             {g.group}
           </p>
-          <ul className="space-y-0.5">
+          <ul className="flex gap-1 lg:block lg:space-y-0.5">
             {g.items.map((i) => {
               const s = i.domain ? status[i.domain] : undefined;
               return (
@@ -73,7 +78,7 @@ function WorkspaceNav() {
                     data-testid={`dsx-nav-${i.label.toLowerCase().replace(/\s+/g, '-')}`}
                     className={({ isActive }) =>
                       cn(
-                        'flex items-center gap-2 rounded-sm px-2 py-1.5 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                        'flex items-center gap-2 whitespace-nowrap rounded-sm px-2 py-1.5 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                         isActive ? 'bg-primary/15 font-semibold text-foreground' : 'text-muted-foreground hover:bg-muted/60',
                       )
                     }
@@ -94,6 +99,7 @@ function WorkspaceNav() {
           </ul>
         </div>
       ))}
+      </div>
     </nav>
   );
 }
@@ -109,9 +115,9 @@ function ShellBody() {
         />
       </Helmet>
       <OperationalTruthBar />
-      <div className="flex flex-1">
+      <div className="flex flex-1 flex-col lg:flex-row">
         <WorkspaceNav />
-        <main className="min-w-0 flex-1 p-6">
+        <main className="min-w-0 flex-1 p-4 sm:p-6">
           <Outlet />
         </main>
       </div>

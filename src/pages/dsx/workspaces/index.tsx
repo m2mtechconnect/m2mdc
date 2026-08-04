@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
-import { MetricTile, MetricGrid } from '@/components/dsx/MetricTile';
+import { MetricGrid } from '@/components/dsx/MetricTile';
 import { ConstraintStack } from '@/components/dsx/ConstraintStack';
 import { ScenarioControls, RecommendationList, PlannedScenarioNotice } from '@/components/dsx/ScenarioPanel';
 import { CapabilityNotice, UnavailableState, ConnectionState } from '@/components/dsx/StateBadges';
@@ -20,7 +20,7 @@ import { useWorkspace } from '@/dsx/runtime/EvidenceBetaContext';
 import { capability } from '@/dsx/workspaces/availability';
 import {
   ALL_RACK_IDENTITIES, OPENUSD_UNAVAILABLE, buildHierarchy, coolingChain, coolingTrace,
-  dependentRacks, electricalChain, electricalTrace, identityBySourceId, type HierarchyNode,
+  dependentRacks, electricalChain, electricalTrace, type HierarchyNode,
 } from '@/dsx/workspaces/facilityGraph';
 import { DESIGN_INLET_LIMIT_C } from '@/dsx/metrics/computeKpis';
 import { EVIDENCE_BETA_SEED, EVIDENCE_BETA_VERSION } from '@/dsx/fixtures/evidenceBetaFacility';
@@ -325,7 +325,6 @@ export function WorkloadWorkspace() {
     <div className="space-y-6">
       <Section title="Workload exposure" description="Which workloads are exposed by the current facility constraint?">
         <CapabilityNotice capability={capability('workload_scheduler')} />
-        <CapabilityNotice capability={capability('gpu_inventory')} />
       </Section>
       <p className="text-sm text-muted-foreground">
         Facility constraints cannot be attributed to workloads until a scheduler source is connected.

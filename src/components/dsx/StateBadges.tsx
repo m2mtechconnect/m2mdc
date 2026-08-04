@@ -141,7 +141,7 @@ export function UnavailableState({
       data-state="unavailable"
       className="flex flex-col gap-2 rounded-md border border-dashed border-zinc-600/60 bg-zinc-500/5 p-4 text-sm"
     >
-      <span className="flex items-center gap-2 font-semibold text-zinc-200">
+      <span className="flex items-center gap-2 font-semibold text-foreground">
         <CircleSlash className="h-4 w-4" aria-hidden />
         {title}
       </span>
@@ -163,7 +163,7 @@ export function PlannedState({ title, reason }: { title: string; reason: string 
       data-state="planned"
       className="flex flex-col gap-2 rounded-md border border-dashed border-amber-500/40 bg-amber-500/5 p-4 text-sm"
     >
-      <span className="flex items-center gap-2 font-semibold text-amber-200">
+      <span className="flex items-center gap-2 font-semibold text-amber-700 dark:text-amber-200">
         <Info className="h-4 w-4" aria-hidden />
         {title} — Planned
       </span>
@@ -195,7 +195,7 @@ export function SafetyChip({ className }: { className?: string }) {
     <span
       data-testid="dsx-safety-status"
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-sm border border-amber-500/50 bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-amber-200',
+        'inline-flex items-center gap-1.5 rounded-sm border border-amber-500/50 bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-amber-800 dark:text-amber-200',
         className,
       )}
     >

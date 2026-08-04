@@ -37,7 +37,7 @@ export function BoundaryVerdict({
       )}
     >
       <CardContent className="flex flex-wrap items-center gap-x-4 gap-y-2 p-4">
-        <span className={cn('flex items-center gap-2 text-sm font-semibold', assured ? 'text-emerald-200' : 'text-zinc-200')}>
+        <span className={cn('flex items-center gap-2 text-sm font-semibold', assured ? 'text-emerald-700 dark:text-emerald-200' : 'text-foreground')}>
           {assured ? <ShieldCheck className="h-4 w-4" aria-hidden /> : <CircleSlash className="h-4 w-4" aria-hidden />}
           {assured ? 'Assured' : 'Unverified'}
         </span>
@@ -82,8 +82,8 @@ export function EvidenceBoundaryTable({
                   className={cn(
                     'whitespace-nowrap text-[11px]',
                     ok
-                      ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-200'
-                      : 'border-zinc-500/50 bg-zinc-500/10 text-zinc-300',
+                      ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-200'
+                      : 'border-zinc-500/50 bg-zinc-500/10 text-zinc-700 dark:text-zinc-300',
                   )}
                 >
                   {ok ? 'Evidenced' : 'Not evidenced'}

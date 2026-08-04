@@ -1,7 +1,7 @@
 /**
  * Cross-domain constraint stack. Shows every domain's status including the
  * domains that cannot be assessed, so an operator never mistakes silence
- * for health.
+ * for health. Each row is an entry point into an investigation.
  */
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,6 +25,8 @@ const STATUS_LABEL: Record<ConstraintStatus, string> = {
 };
 
 export function ConstraintRow({ c }: { c: DomainConstraint }) {
+  const { openConstraint, hrefWithContext, selectAsset } = useWorkspace();
+
   return (
     <li
       data-testid={`dsx-constraint-${c.domain}`}
@@ -32,7 +34,14 @@ export function ConstraintRow({ c }: { c: DomainConstraint }) {
       className="flex flex-col gap-1 rounded-md border border-border/60 bg-card/40 p-3"
     >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm font-semibold">{c.label}</span>
+        <button
+          type="button"
+          data-testid={`dsx-constraint-open-${c.domain}`}
+          onClick={() => openConstraint(c)}
+          className="rounded-sm text-sm font-semibold underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {c.label}
+        </button>
         <Badge variant="outline" className={cn('text-[11px]', STATUS_CLASS[c.status])}>
           {STATUS_LABEL[c.status]}
         </Badge>
@@ -40,7 +49,7 @@ export function ConstraintRow({ c }: { c: DomainConstraint }) {
           {c.evidence_events} evidence event(s)
         </Badge>
         <Link
-          to={c.route}
+          to={hrefWithContext(c.route)}
           className="ml-auto rounded-sm text-xs underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           Open {c.label} workspace
@@ -48,8 +57,18 @@ export function ConstraintRow({ c }: { c: DomainConstraint }) {
       </div>
       <p className="text-xs text-muted-foreground">{c.summary}</p>
       {c.affected_assets.length > 0 && (
-        <p className="text-xs text-muted-foreground">
-          Affected: {c.affected_assets.map((a) => a.name).join(', ')}
+        <p className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+          Affected:
+          {c.affected_assets.map((a) => (
+            <button
+              key={a.stable_asset_id}
+              type="button"
+              onClick={() => selectAsset(a.stable_asset_id)}
+              className="rounded-sm underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {a.name}
+            </button>
+          ))}
         </p>
       )}
       <p className="text-xs text-muted-foreground">Next step: {c.next_step}</p>

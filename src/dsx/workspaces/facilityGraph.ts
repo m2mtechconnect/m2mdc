@@ -153,3 +153,31 @@ export function coolingChain(): FixtureAsset[] {
 }
 
 export const ALL_RACK_IDENTITIES = EVIDENCE_BETA_RACKS.map(identityFor);
+/**
+ * Ancestry of an asset, root first. Used to derive the building and data-hall
+ * scope for the shared investigation context. Never invents a parent.
+ */
+export function ancestryFor(auraId: string): AssetIdentity[] {
+  const chain: AssetIdentity[] = [];
+  let current = assetByAuraId(auraId);
+  const guard = new Set<string>();
+  while (current && !guard.has(current.aura_asset_id)) {
+    guard.add(current.aura_asset_id);
+    chain.unshift(identityFor(current));
+    current = current.parent_id ? assetByAuraId(current.parent_id) : undefined;
+  }
+  return chain;
+}
+
+/** Direct children of an asset, as identities. Empty when none are declared. */
+export function childrenOf(auraId: string): AssetIdentity[] {
+  return EVIDENCE_BETA_ASSETS.filter((a) => a.parent_id === auraId).map(identityFor);
+}
+
+/**
+ * Buildings declared in the dataset. This fixture declares a single site with
+ * one data hall, so no "related buildings" list may be shown: there are none.
+ */
+export function declaredBuildings(): AssetIdentity[] {
+  return EVIDENCE_BETA_ASSETS.filter((a) => a.asset_class === 'site').map(identityFor);
+}

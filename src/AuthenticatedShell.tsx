@@ -59,7 +59,7 @@ import AdminSignupsDashboard from "./pages/AdminSignupsDashboard";
 import { lazy } from "react";
 const EvidenceBetaShell = lazy(() => import("./pages/dsx/EvidenceBetaShell"));
 import {
-  OverviewWorkspace, ThermalWorkspace, PowerWorkspace, CoolingWorkspace, NetworkWorkspace,
+  OverviewWorkspace, SimulationsWorkspace, ThermalWorkspace, PowerWorkspace, CoolingWorkspace, NetworkWorkspace,
   FacilityWorkspace, WorkloadWorkspace, SovereigntyWorkspace, CarbonWorkspace,
   FinancialWorkspace, EvidenceWorkspace,
 } from "./pages/dsx/workspaces";
@@ -138,12 +138,14 @@ function ApprovedUserRoutes() {
       <Route path="/infrastructure" element={<InfrastructurePage />} />
       <Route path="/dsx/evidence-beta" element={<EvidenceBetaShell />}>
         <Route index element={<OverviewWorkspace />} />
+        <Route path="overview" element={<OverviewWorkspace />} />
         <Route path="thermal" element={<ThermalWorkspace />} />
         <Route path="power" element={<PowerWorkspace />} />
         <Route path="cooling" element={<CoolingWorkspace />} />
         <Route path="network" element={<NetworkWorkspace />} />
         <Route path="facility" element={<FacilityWorkspace />} />
         <Route path="workload" element={<WorkloadWorkspace />} />
+        <Route path="simulations" element={<SimulationsWorkspace />} />
         <Route path="sovereignty" element={<SovereigntyWorkspace />} />
         <Route path="carbon" element={<CarbonWorkspace />} />
         <Route path="financials" element={<FinancialWorkspace />} />

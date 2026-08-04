@@ -38,7 +38,7 @@ export function createReplaySource(
       if (!usable) {
         return {
           data_mode: 'UNAVAILABLE',
-          connection_state: 'unavailable' as never,
+          connection_state: 'disconnected',
           last_observed_at: null,
           run_id: null,
           tick,

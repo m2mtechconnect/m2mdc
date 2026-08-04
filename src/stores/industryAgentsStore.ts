@@ -131,15 +131,20 @@ export const useIndustryAgentsStore = create<IndustryAgentsStore>((set, get) => 
 
   updateAgentStatus: async (id: string, status: 'Connected' | 'Not Connected') => {
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('industry_agents')
         .update({ 
           status, 
           last_run_at: status === 'Connected' ? new Date().toISOString() : undefined 
         })
-        .eq('id', id);
+        .eq('id', id)
+        .select('id');
 
       if (error) throw error;
+
+      if (!data || data.length === 0) {
+        throw new Error('You do not have permission to change this agent catalogue entry.');
+      }
 
       // Update local state
       set(state => ({

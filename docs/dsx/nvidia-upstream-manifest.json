@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-04T00:00:00Z",
+  "policy": "reference-only",
+  "notes": [
+    "NVIDIA repositories are used as reference architecture, interoperability",
+    "contracts and simulation patterns. No NVIDIA code is vendored into AURA,",
+    "no live DSX gateway is contacted, and no NVIDIA certification, validation",
+    "or production readiness is claimed."
+  ],
+  "upstream": [
+    {
+      "id": "omniverse-kit-app-template",
+      "url": "https://github.com/NVIDIA-Omniverse/kit-app-template",
+      "role": "reference",
+      "used_for": "Kit application/service packaging patterns for the future viewport bridge.",
+      "aura_touchpoints": ["src/integrations/omniverseKit/"],
+      "vendored": false
+    },
+    {
+      "id": "openusd",
+      "url": "https://github.com/PixarAnimationStudios/OpenUSD",
+      "role": "contract",
+      "used_for": "Prim-path addressing for AURA asset mappings.",
+      "aura_touchpoints": ["src/dsx/contracts/assetMapping.ts"],
+      "vendored": false
+    },
+    {
+      "id": "omniverse-blueprint-dc-digital-twin",
+      "url": "https://github.com/NVIDIA-Omniverse-blueprints/digital-twins-for-fast-flexible-design",
+      "role": "reference",
+      "used_for": "Data-centre digital-twin workflow and CFD/thermal scenario patterns.",
+      "aura_touchpoints": ["src/dsx/scenario/degradationEngine.ts"],
+      "vendored": false
+    },
+    {
+      "id": "nvidia-dsx",
+      "url": "https://www.nvidia.com/en-us/data-center/dsx/",
+      "role": "architecture",
+      "used_for": "DSX asset, telemetry and exchange semantics informing the AURA event envelope.",
+      "aura_touchpoints": [
+        "supabase/functions/_shared/dsx-contract.ts",
+        "src/dsx/adapters/ingestPipeline.ts"
+      ],
+      "vendored": false
+    },
+    {
+      "id": "physicsnemo",
+      "url": "https://github.com/NVIDIA/physicsnemo",
+      "role": "future-dependency",
+      "used_for": "Candidate surrogate-model runtime for calibrated thermal prediction.",
+      "aura_touchpoints": [],
+      "vendored": false
+    }
+  ],
+  "prohibited": [
+    "vendoring NVIDIA source into the AURA repository",
+    "contacting a live DSX gateway from this build",
+    "claiming NVIDIA certification or validation"
+  ]
+}

@@ -1,0 +1,23 @@
+# Local-only DSX Exchange broker for Phase 7 runtime verification.
+# Bound to 127.0.0.1 exclusively: no external network exposure, no remote endpoints.
+services:
+  dsx-exchange-broker:
+    image: eclipse-mosquitto:2.0.22
+    container_name: dsx-exchange-broker
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - dsx-exchange-data:/mosquitto/data
+      - dsx-exchange-log:/mosquitto/log
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_sub -h 127.0.0.1 -p 1883 -t '$$SYS/broker/uptime' -C 1 -W 3 >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  dsx-exchange-data:
+  dsx-exchange-log:

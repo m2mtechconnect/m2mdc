@@ -54,6 +54,19 @@ mosquitto 2.0.22, config /tmp/dsx-broker/mosquitto.conf
   persistence false
 ```
 
+Where Docker **is** available, an equivalent loopback-only broker is defined in
+`infra/dsx-exchange/docker-compose.yml` (eclipse-mosquitto 2.0.22, published on
+`127.0.0.1:1883` only):
+
+```
+docker compose -f infra/dsx-exchange/docker-compose.yml up -d
+DSX_EXCHANGE_URL=mqtt://127.0.0.1:1883 npx tsx scripts/dsx-exchange-runtime-verify.ts
+docker compose -f infra/dsx-exchange/docker-compose.yml down -v
+```
+
+Both provisioning paths are transport-identical; see
+`infra/dsx-exchange/README.md`.
+
 `src/dsx/exchange/mqttTransport.ts` is the only module in the DSX tree that
 imports a broker client. It is deliberately NOT re-exported from
 `src/dsx/exchange/index.ts`, so the browser bundle never pulls in `mqtt`;

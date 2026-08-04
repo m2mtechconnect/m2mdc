@@ -150,7 +150,7 @@ describe('identity_chain provenance', () => {
     const { bundle, snapshot } = stateAt(3);
     const claim = sovereigntyAssertions(bundle, snapshot).find((a) => a.id === 'identity_chain');
     expect(claim?.status).toBe('evidenced');
-    const ids = claim?.event_ids ?? [];
+    const ids = claim?.evidence_event_ids ?? [];
     const mappedSources = new Set(snapshot.accepted.map((a) => a.mapping.source_asset_id));
     expect(ids.length).toBe(mappedSources.size);
     expect(new Set(ids).size).toBe(ids.length);
@@ -162,7 +162,7 @@ describe('identity_chain provenance', () => {
     for (const tick of [0, 1, 2, 3, 4]) {
       const { bundle, snapshot } = stateAt(tick, 'cooling_degradation');
       const claim = sovereigntyAssertions(bundle, snapshot).find((a) => a.id === 'identity_chain');
-      if (claim?.status === 'evidenced') expect(claim.event_ids.length).toBeGreaterThan(0);
+      if (claim?.status === 'evidenced') expect(claim.evidence_event_ids.length).toBeGreaterThan(0);
     }
   });
 });

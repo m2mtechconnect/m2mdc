@@ -191,7 +191,7 @@ describe('declared (non-observed) input provenance', () => {
 
   it('capacity_driver discloses its declared input instead of implying it is metered', () => {
     const { bundle, snapshot } = stateAt(3);
-    const claim = financialAssertions(bundle, snapshot).find((a) => a.id === 'capacity_driver');
+    const claim = financialAssertions(bundle).find((a) => a.id === 'capacity_driver');
     expect(claim?.status).toBe('evidenced');
     expect(claim?.unattested_inputs).toContain('site_rated_kw');
     expect(claim?.basis).toMatch(/site_rated_kw/);
@@ -199,7 +199,7 @@ describe('declared (non-observed) input provenance', () => {
 
   it('claims with only observed inputs report no unattested inputs', () => {
     const { bundle, snapshot } = stateAt(3);
-    const claim = financialAssertions(bundle, snapshot).find((a) => a.id === 'load_driver');
+    const claim = financialAssertions(bundle).find((a) => a.id === 'load_driver');
     expect(claim?.unattested_inputs).toEqual([]);
   });
 });

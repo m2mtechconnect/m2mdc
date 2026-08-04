@@ -18,8 +18,12 @@ live DSX connectivity, no hosted migrations.
 | Adapters | `src/dsx/adapters/` | Simulated, replay, live-disabled behind one interface |
 | KPI engine | `src/dsx/metrics/` | 12 calculated KPIs, no hardcoded values |
 | Scenario engine | `src/dsx/scenario/degradationEngine.ts` | Cooling degradation, advisory-only output |
-| Workspace | `src/pages/dsx/EvidenceBeta.tsx` (`/dsx/evidence-beta`) | Seven workspaces, persistent mode banner |
-| Tests | `src/dsx/__tests__/evidenceBeta.test.ts` | 14 passing determinism/truthfulness/safety tests |
+| Capability registry | `src/dsx/workspaces/availability.ts` | Operational / unavailable / planned, each with a reason |
+| Facility graph | `src/dsx/workspaces/facilityGraph.ts` | Stable asset identity, hierarchy, electrical and cooling traces |
+| Constraint stack | `src/dsx/workspaces/constraints.ts` | Nine domains; a domain with no source reports "cannot be assessed" |
+| Workspace shell | `src/pages/dsx/EvidenceBetaShell.tsx` (`/dsx/evidence-beta`) | Eleven workspaces, persistent operational truth bar, shared provenance drawer |
+| Workspaces | `src/pages/dsx/workspaces/index.tsx` | Overview, thermal, power, cooling, fabric, facility, workload, sovereignty, carbon, financial, evidence |
+| Tests | `src/dsx/__tests__/` | 69 passing determinism/truthfulness/safety tests |
 
 ## Preserved, unchanged behaviour
 

@@ -13,8 +13,22 @@ import type { TimelineId } from '../fixtures/timelines';
 import { TICK_MS, TIMELINE_START_ISO } from '../fixtures/timelines';
 import type { DataMode } from '../modes';
 import { DEFAULT_DATA_MODE } from '../modes';
-import type { HumanDecision, DecisionOutcome } from '../contracts/recommendation';
-import { stableUuid } from '../fixtures/determinism';
+import type {
+  DecisionOutcome,
+  DecisionRecord,
+  DecisionEvidenceSnapshot,
+  Recommendation,
+} from '../contracts/recommendation';
+import { validateDecisionInput } from '../contracts/recommendation';
+import { payloadHash, stableUuid } from '../fixtures/determinism';
+
+export interface DecisionInput {
+  outcome: DecisionOutcome;
+  rationale: string;
+  approver: string;
+  comment?: string;
+  escalated_to?: string;
+}
 
 const PLAY_INTERVAL_MS = 900;
 
@@ -23,7 +37,7 @@ export function useEvidenceBeta() {
   const [timeline, setTimeline] = useState<TimelineId>('cooling_degradation');
   const [tick, setTick] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [decisions, setDecisions] = useState<HumanDecision[]>([]);
+  const [decisions, setDecisions] = useState<DecisionRecord[]>([]);
   const timer = useRef<number | null>(null);
 
   const source: OperationalSource = useMemo(
@@ -56,22 +70,68 @@ export function useEvidenceBeta() {
     setDecisions([]);
   }, []);
 
+  /**
+   * Records a human decision plus an immutable snapshot of the evidence that
+   * was on screen. Returns validation errors instead of recording when the
+   * decision is incomplete: no recommendation may be closed without a rationale.
+   */
   const recordDecision = useCallback(
-    (recommendationId: string, outcome: DecisionOutcome, rationale: string, approver: string) => {
+    (recommendation: Recommendation, input: DecisionInput): { ok: boolean; errors: string[] } => {
+      const { valid, errors } = validateDecisionInput(input);
+      if (!valid) return { ok: false, errors };
+
+      const metrics = recommendation.evidence.metric_names.map((name) => {
+        const m = bundle.metrics[name];
+        return { name, value: m?.value ?? null, unit: m?.unit ?? null };
+      });
+
+      const snapshotBody = {
+        captured_at: nowIso,
+        observation_tick: tick,
+        data_mode: recommendation.data_mode,
+        timeline_id: timeline,
+        severity: recommendation.severity,
+        recommendation_text: recommendation.text,
+        expected_effect: recommendation.expected_effect,
+        proposed_action: recommendation.proposed_action,
+        confidence: recommendation.confidence,
+        limitations: recommendation.limitations,
+        evidence: recommendation.evidence,
+        metrics,
+      };
+      const evidence_snapshot: DecisionEvidenceSnapshot = {
+        ...snapshotBody,
+        snapshot_hash: payloadHash(snapshotBody),
+      };
+
       setDecisions((prev) => [
-        ...prev.filter((d) => d.recommendation_id !== recommendationId),
+        ...prev.filter((d) => d.recommendation_id !== recommendation.recommendation_id),
         {
-          decision_id: stableUuid(`decision:${recommendationId}:${outcome}:${prev.length}`),
-          recommendation_id: recommendationId,
-          outcome,
-          rationale,
-          approver,
-          decided_at: new Date().toISOString(),
-          execution_status: outcome === 'approved' ? 'manual_execution_pending' : 'not_executed',
+          decision_id: stableUuid(
+            `decision:${recommendation.recommendation_id}:${input.outcome}:${prev.length}`,
+          ),
+          recommendation_id: recommendation.recommendation_id,
+          outcome: input.outcome,
+          rationale: input.rationale.trim(),
+          approver: input.approver,
+          comment: input.comment?.trim() ? input.comment.trim() : undefined,
+          escalated_to: input.escalated_to?.trim() ? input.escalated_to.trim() : undefined,
+          decided_at: nowIso,
+          execution_status: input.outcome === 'approved' ? 'manual_execution_pending' : 'not_executed',
+          evidence_snapshot,
         },
       ]);
+      return { ok: true, errors: [] };
     },
-    [],
+    [bundle, nowIso, tick, timeline],
+  );
+
+  const pendingRecommendations = useMemo(
+    () =>
+      scenario.recommendations.filter(
+        (r) => !decisions.some((d) => d.recommendation_id === r.recommendation_id),
+      ),
+    [scenario.recommendations, decisions],
   );
 
   return {
@@ -95,6 +155,7 @@ export function useEvidenceBeta() {
     scenario,
     decisions,
     recordDecision,
+    pendingRecommendations,
     nowIso,
   };
 }

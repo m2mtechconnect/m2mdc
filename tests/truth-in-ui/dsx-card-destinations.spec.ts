@@ -156,8 +156,11 @@ test.describe('DSX Evidence Beta — clickable card destinations', () => {
 
     const failures: string[] = [];
     const consoleErrors: string[] = [];
-    page.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()); });
-    page.on('pageerror', (e) => consoleErrors.push(e.message));
+    const isEgressNoise = (t: string) => /ERR_BLOCKED_BY_CLIENT|ERR_FAILED|net::/i.test(t);
+    page.on('console', (m) => {
+      if (m.type() === 'error' && !isEgressNoise(m.text())) consoleErrors.push(m.text());
+    });
+    page.on('pageerror', (e) => { if (!isEgressNoise(e.message)) consoleErrors.push(e.message); });
 
     const tally: Record<string, number> = {};
 

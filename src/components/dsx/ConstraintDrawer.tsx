@@ -17,7 +17,7 @@ export function ConstraintDrawer() {
 
   return (
     <Sheet open={!!c} onOpenChange={(o) => { if (!o) closeConstraint(); }}>
-      <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-md" data-testid="dsx-constraint-drawer">
+      <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-md" data-testid="dsx-constraint-drawer" data-constraint-domain={c?.domain ?? ''}>
         {c && (
           <>
             <SheetHeader>

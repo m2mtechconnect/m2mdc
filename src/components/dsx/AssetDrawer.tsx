@@ -47,7 +47,7 @@ export function AssetDrawer() {
 
   return (
     <Sheet open={open} onOpenChange={(o) => { if (!o) closeAssetDrawer(); }}>
-      <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-md" data-testid="dsx-asset-drawer">
+      <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-md" data-testid="dsx-asset-drawer" data-asset-id={selectedAssetId ?? ''}>
         <SheetHeader>
           <SheetTitle className="text-base">
             {selectedAsset ? selectedAsset.name : 'Asset unavailable'}

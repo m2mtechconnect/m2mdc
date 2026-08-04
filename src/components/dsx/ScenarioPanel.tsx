@@ -35,18 +35,18 @@ export function ScenarioControls() {
       <CardContent className="space-y-4">
         <div className="flex flex-wrap gap-2">
           {SCENARIO_CATALOGUE.map((s) => {
-            const runnable = s.state === 'operational' && timelineIds.includes(s.timeline_id ?? '');
-            const active = rt.timeline === s.timeline_id;
+            const runnable = s.state === 'operational' && timelineIds.includes(s.timeline ?? '');
+            const active = rt.timeline === s.timeline;
             return (
               <Button
                 key={s.id}
                 size="sm"
                 variant={active ? 'default' : 'outline'}
                 disabled={!runnable}
-                onClick={() => runnable && rt.setTimeline(s.timeline_id as TimelineId)}
+                onClick={() => runnable && rt.setTimeline(s.timeline as TimelineId)}
                 data-testid={`dsx-scenario-${s.id}`}
                 data-state={s.state}
-                title={s.state === 'operational' ? s.description : s.reason}
+                title={s.state === 'operational' ? s.question : s.reason}
               >
                 {s.label}
                 {s.state !== 'operational' && <span className="ml-2 text-[10px] uppercase">Planned</span>}

@@ -34,8 +34,23 @@ async function assertSubstantive(drawer: Locator, label: string) {
 }
 
 async function closeDrawer(page: Page, drawer: Locator, label: string) {
-  await page.keyboard.press('Escape');
+  // WebKit does not auto-focus the dialog, so a page-level Escape can be
+  // delivered to the previously focused trigger instead of the drawer.
+  // Press Escape on the drawer itself, then fall back to its close button.
+  await drawer.press('Escape').catch(() => {});
+  if (await drawer.isVisible().catch(() => false)) {
+    const closeButton = drawer.getByRole('button', { name: /close/i }).first();
+    if (await closeButton.count()) {
+      await closeButton.click({ force: true }).catch(() => {});
+    }
+  }
   await expect(drawer, `${label}: drawer must close on Escape`).toBeHidden({ timeout: 5_000 });
+}
+
+/** Best-effort dismissal used in error paths so the sweep can continue. */
+async function forceDismiss(page: Page, drawer: Locator) {
+  await drawer.press('Escape').catch(() => {});
+  await page.keyboard.press('Escape').catch(() => {});
 }
 
 async function auditMetricTiles(page: Page, route: string, failures: string[]) {

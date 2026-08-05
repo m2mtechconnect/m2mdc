@@ -18,6 +18,7 @@
 
 import { test, expect, type Page, type Locator } from './_setup/fixtures';
 import { installSupabaseMock } from './_setup/supabase-mock';
+import { activateCard, closeAndSettle } from './_setup/card-activation';
 
 const ROOT = '/dsx/evidence-beta';
 
@@ -28,23 +29,8 @@ const ROUTES = [
 
 /** A drawer is "real" when it is visible and renders substantive content. */
 async function assertSubstantive(drawer: Locator, label: string) {
-  await expect(drawer, `${label}: drawer must open`).toBeVisible({ timeout: 5_000 });
   const text = ((await drawer.innerText()) ?? '').trim();
   expect(text.length, `${label}: drawer must not be blank (got ${text.length} chars)`).toBeGreaterThan(60);
-}
-
-async function closeDrawer(drawer: Locator, label: string) {
-  // WebKit does not auto-focus the dialog, so a page-level Escape can be
-  // delivered to the previously focused trigger instead of the drawer.
-  // Press Escape on the drawer itself, then fall back to its close button.
-  await drawer.press('Escape').catch(() => {});
-  if (await drawer.isVisible().catch(() => false)) {
-    const closeButton = drawer.getByRole('button', { name: /close/i }).first();
-    if (await closeButton.count()) {
-      await closeButton.click({ force: true }).catch(() => {});
-    }
-  }
-  await expect(drawer, `${label}: drawer must close on Escape`).toBeHidden({ timeout: 5_000 });
 }
 
 /** Best-effort dismissal used in error paths so the sweep can continue. */
@@ -63,15 +49,14 @@ async function auditMetricTiles(page: Page, route: string, failures: string[]) {
     const testid = await t.getAttribute('data-testid');
     const label = `${route} ▸ ${testid}`;
     try {
-      await t.scrollIntoViewIfNeeded();
-      await t.click();
       const drawer = page.locator('[data-testid="dsx-provenance-drawer"]');
+      await activateCard(page, t, drawer, label);
       await assertSubstantive(drawer, label);
       expect(
         await drawer.getAttribute('data-metric-name'),
         `${label}: provenance drawer must describe the clicked metric`,
       ).toBe(expected);
-      await closeDrawer(drawer, label);
+      await closeAndSettle(page, drawer, label);
     } catch (e) {
       failures.push(`${label}: ${(e as Error).message.split('\n')[0]}`);
       await forceDismiss(page);
@@ -89,15 +74,14 @@ async function auditConstraints(page: Page, route: string, failures: string[]) {
     const domain = testid.replace('dsx-constraint-open-', '');
     const label = `${route} ▸ ${testid}`;
     try {
-      await t.scrollIntoViewIfNeeded();
-      await t.click();
       const drawer = page.locator('[data-testid="dsx-constraint-drawer"]');
+      await activateCard(page, t, drawer, label);
       await assertSubstantive(drawer, label);
       expect(
         await drawer.getAttribute('data-constraint-domain'),
         `${label}: constraint drawer must describe the clicked domain`,
       ).toBe(domain);
-      await closeDrawer(drawer, label);
+      await closeAndSettle(page, drawer, label);
     } catch (e) {
       failures.push(`${label}: ${(e as Error).message.split('\n')[0]}`);
       await forceDismiss(page);
@@ -115,15 +99,14 @@ async function auditAssertions(page: Page, route: string, failures: string[]) {
     const id = testid.replace('dsx-assertion-drilldown-', '');
     const label = `${route} ▸ ${testid}`;
     try {
-      await t.scrollIntoViewIfNeeded();
-      await t.click();
-      const drawer = page.locator('[data-testid^="dsx-assertion-drawer-"]:visible');
+      const drawer = page.locator('[data-testid^="dsx-assertion-drawer-"]').last();
+      await activateCard(page, t, drawer, label);
       await assertSubstantive(drawer, label);
       expect(
         await drawer.getAttribute('data-assertion-id'),
         `${label}: assertion drawer must describe the clicked claim`,
       ).toBe(id);
-      await closeDrawer(drawer, label);
+      await closeAndSettle(page, drawer, label);
     } catch (e) {
       failures.push(`${label}: ${(e as Error).message.split('\n')[0]}`);
       await forceDismiss(page);
@@ -141,9 +124,8 @@ async function auditAssetSelects(page: Page, route: string, failures: string[]) 
     const auraId = await t.getAttribute('data-aura-id');
     const label = `${route} ▸ ${testid}`;
     try {
-      await t.scrollIntoViewIfNeeded();
-      await t.click();
       const drawer = page.locator('[data-testid="dsx-asset-drawer"]');
+      await activateCard(page, t, drawer, label);
       await assertSubstantive(drawer, label);
       expect(
         await drawer.getAttribute('data-asset-id'),
@@ -153,7 +135,7 @@ async function auditAssetSelects(page: Page, route: string, failures: string[]) 
         drawer.getByText('Asset unavailable', { exact: true }),
         `${label}: asset drawer must resolve the clicked asset`,
       ).toHaveCount(0);
-      await closeDrawer(drawer, label);
+      await closeAndSettle(page, drawer, label);
     } catch (e) {
       failures.push(`${label}: ${(e as Error).message.split('\n')[0]}`);
       await forceDismiss(page);

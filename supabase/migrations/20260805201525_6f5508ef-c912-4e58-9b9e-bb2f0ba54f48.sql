@@ -1,0 +1,1 @@
+UPDATE public.profiles SET is_approved = true, approved_at = now() WHERE email IN ('sumeet@m2mtechconnect.com','sonia@m2mtechconnect.com');

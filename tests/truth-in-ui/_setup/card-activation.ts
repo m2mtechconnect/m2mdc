@@ -107,13 +107,28 @@ export async function awaitDrawerOpen(drawer: Locator, label: string) {
  * Close via drawer-targeted Escape, falling back to the explicit close
  * button, then wait until the drawer is hidden/detached and the page is
  * free of overlay and scroll-lock artefacts.
+ *
+ * Evidence (desktop-webkit, focused run 2, 15:17Z): Escape does close the
+ * drawer, but WebKit runs a slide-out exit animation during which
+ * `isVisible()` is still true. Falling back to the close button mid-exit
+ * targets an element that is never "stable" and is then detached, so the
+ * click retries until the whole test budget is gone. The fallback must
+ * therefore be gated on the drawer genuinely still being open after a
+ * bounded wait, and must itself be bounded.
  */
 export async function closeAndSettle(page: Page, drawer: Locator, label: string) {
   await drawer.press('Escape').catch(() => {});
-  if (await drawer.isVisible().catch(() => false)) {
+
+  const closedByEscape = await drawer
+    .waitFor({ state: 'hidden', timeout: SETTLE_TIMEOUT })
+    .then(() => true)
+    .catch(() => false);
+
+  if (!closedByEscape && (await drawer.getAttribute('data-state').catch(() => null)) === 'open') {
     const closeButton = drawer.getByRole('button', { name: /close/i }).first();
-    if (await closeButton.count()) await closeButton.click().catch(() => {});
+    if (await closeButton.count()) await closeButton.click({ timeout: SETTLE_TIMEOUT }).catch(() => {});
   }
+
   await expect(drawer, `${label}: drawer must close`).toBeHidden({ timeout: SETTLE_TIMEOUT });
   await assertNoOverlayArtifacts(page, label);
   await waitForScrollSettled(page, label);

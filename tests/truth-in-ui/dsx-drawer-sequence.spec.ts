@@ -15,7 +15,7 @@
  */
 import { test, expect, type Locator, type Page } from './_setup/fixtures';
 import { installSupabaseMock } from './_setup/supabase-mock';
-import { seedDismissedTours } from './_setup/app-state';
+import { seedDismissedTours, assertNoOnboardingOverlay } from './_setup/app-state';
 import { activateCard, closeAndSettle, assertNoOverlayArtifacts, waitForScrollSettled } from './_setup/card-activation';
 
 const ROOT = '/dsx/evidence-beta';
@@ -23,6 +23,7 @@ const ROOT = '/dsx/evidence-beta';
 async function open(page: Page) {
   await page.goto(ROOT, { waitUntil: 'domcontentloaded' });
   await expect(page.getByTestId('dsx-workspace-title')).toBeVisible({ timeout: 15_000 });
+  await assertNoOnboardingOverlay(page);
 }
 
 const scrollY = (page: Page) => page.evaluate(() => Math.round(window.scrollY));

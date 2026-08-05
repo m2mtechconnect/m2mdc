@@ -13,6 +13,7 @@
  * as the product itself persists it (`m2m_tour_state_v1`).
  */
 import type { BrowserContext } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 
 const TOUR_STORAGE_KEY = 'm2m_tour_state_v1';
 
@@ -41,4 +42,15 @@ export async function seedDismissedTours(context: BrowserContext) {
     },
     [TOUR_STORAGE_KEY, JSON.stringify(seen)] as const,
   );
+}
+
+/**
+ * Test-precondition assertion: the workspace must not start in first-time
+ * onboarding state. This asserts the seeded returning-operator precondition
+ * held; it never dismisses anything, and it deliberately ignores ordinary
+ * metric/constraint/asset/Co-Pilot dialogs opened by the test itself.
+ */
+export async function assertNoOnboardingOverlay(page: Page, label = 'precondition') {
+  const tourModal = page.locator('[role="alertdialog"][data-state="open"]');
+  await expect(tourModal, `${label}: no onboarding tour modal may cover the workspace`).toHaveCount(0);
 }

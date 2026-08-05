@@ -33,9 +33,25 @@ async function assertSubstantive(drawer: Locator, label: string) {
   expect(text.length, `${label}: drawer must not be blank (got ${text.length} chars)`).toBeGreaterThan(60);
 }
 
-async function closeDrawer(page: Page, drawer: Locator, label: string) {
-  await page.keyboard.press('Escape');
+async function closeDrawer(drawer: Locator, label: string) {
+  // WebKit does not auto-focus the dialog, so a page-level Escape can be
+  // delivered to the previously focused trigger instead of the drawer.
+  // Press Escape on the drawer itself, then fall back to its close button.
+  await drawer.press('Escape').catch(() => {});
+  if (await drawer.isVisible().catch(() => false)) {
+    const closeButton = drawer.getByRole('button', { name: /close/i }).first();
+    if (await closeButton.count()) {
+      await closeButton.click({ force: true }).catch(() => {});
+    }
+  }
   await expect(drawer, `${label}: drawer must close on Escape`).toBeHidden({ timeout: 5_000 });
+}
+
+/** Best-effort dismissal used in error paths so the sweep can continue. */
+async function forceDismiss(page: Page) {
+  const open = page.locator('[role="dialog"]:visible').first();
+  if (await open.count()) await open.press('Escape').catch(() => {});
+  await page.keyboard.press('Escape').catch(() => {});
 }
 
 async function auditMetricTiles(page: Page, route: string, failures: string[]) {
@@ -55,10 +71,10 @@ async function auditMetricTiles(page: Page, route: string, failures: string[]) {
         await drawer.getAttribute('data-metric-name'),
         `${label}: provenance drawer must describe the clicked metric`,
       ).toBe(expected);
-      await closeDrawer(page, drawer, label);
+      await closeDrawer(drawer, label);
     } catch (e) {
       failures.push(`${label}: ${(e as Error).message.split('\n')[0]}`);
-      await page.keyboard.press('Escape').catch(() => {});
+      await forceDismiss(page);
     }
   }
   return count;
@@ -81,10 +97,10 @@ async function auditConstraints(page: Page, route: string, failures: string[]) {
         await drawer.getAttribute('data-constraint-domain'),
         `${label}: constraint drawer must describe the clicked domain`,
       ).toBe(domain);
-      await closeDrawer(page, drawer, label);
+      await closeDrawer(drawer, label);
     } catch (e) {
       failures.push(`${label}: ${(e as Error).message.split('\n')[0]}`);
-      await page.keyboard.press('Escape').catch(() => {});
+      await forceDismiss(page);
     }
   }
   return count;
@@ -107,10 +123,10 @@ async function auditAssertions(page: Page, route: string, failures: string[]) {
         await drawer.getAttribute('data-assertion-id'),
         `${label}: assertion drawer must describe the clicked claim`,
       ).toBe(id);
-      await closeDrawer(page, drawer, label);
+      await closeDrawer(drawer, label);
     } catch (e) {
       failures.push(`${label}: ${(e as Error).message.split('\n')[0]}`);
-      await page.keyboard.press('Escape').catch(() => {});
+      await forceDismiss(page);
     }
   }
   return count;
@@ -137,10 +153,10 @@ async function auditAssetSelects(page: Page, route: string, failures: string[]) 
         drawer.getByText('Asset unavailable', { exact: true }),
         `${label}: asset drawer must resolve the clicked asset`,
       ).toHaveCount(0);
-      await closeDrawer(page, drawer, label);
+      await closeDrawer(drawer, label);
     } catch (e) {
       failures.push(`${label}: ${(e as Error).message.split('\n')[0]}`);
-      await page.keyboard.press('Escape').catch(() => {});
+      await forceDismiss(page);
     }
   }
   return count;

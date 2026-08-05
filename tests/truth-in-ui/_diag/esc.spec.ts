@@ -19,7 +19,7 @@ window.addEventListener('keydown', e => { if (e.key === 'Escape') { window.__win
 window.__openish = () => Array.from(document.querySelectorAll('[data-state="open"], [data-radix-popper-content-wrapper]')).map(el => (el.tagName+'.'+(el.getAttribute('data-testid')||el.getAttribute('role')||el.className.toString().slice(0,40))));`);
   await drawer.press('Escape');
   await page.waitForTimeout(1200);
-  console.log('DIAG cap/bub/win/dp=', await page.evaluate('[window.__cap, window.__bub, window.__win, window.__dp]'), 'openish=', await page.evaluate('window.__openish()'), 'state=', await drawer.getAttribute('data-state'));
+  console.log('DIAG cap/bub/win/dp=', await page.evaluate('[window.__cap, window.__bub, window.__win, window.__dp]'), 'openish=', JSON.stringify(await page.evaluate('window.__openish()')), 'state=', await drawer.getAttribute('data-state'));
   console.log('DIAG active=', await page.evaluate(`document.activeElement && (document.activeElement.getAttribute('data-testid') || document.activeElement.tagName + '#' + document.activeElement.id)`));
   console.log('DIAG copilotAfter=', await page.evaluate(`(()=>{const el=document.querySelector('[role="dialog"][aria-label="Data Centre Co-Pilot"]'); return el ? el.className.includes('translate-x-0') + '|' + el.getAttribute('aria-hidden') : 'absent';})()`));
   if (false) {

@@ -5610,6 +5610,7 @@ export type Database = {
           similarity: number
         }[]
       }
+      provision_default_twin: { Args: { _user_id: string }; Returns: string }
       rpc_kpi_agents_deployed: {
         Args: { p_from: string; p_org_id?: string; p_to: string }
         Returns: {

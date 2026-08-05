@@ -12,14 +12,14 @@ const PORT = Number(process.env.AURA_XB_PORT ?? 8093);
 
 export default defineConfig({
   testDir: './tests/truth-in-ui',
-  testMatch: '_diag/diag-drawer.spec.ts',
+  testMatch: 'dsx-drawer-sequence.spec.ts',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: 0,
   workers: 1,
   timeout: 900_000,
   expect: { timeout: 10_000 },
-  reporter: [['list'], ['json', { outputFile: 'test-results/dsx-card-destinations-crossbrowser.json' }]],
+  reporter: [['list'], ['json', { outputFile: 'test-results/dsx-drawer-sequence.json' }]],
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: 'retain-on-failure',

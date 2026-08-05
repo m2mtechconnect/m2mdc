@@ -15,6 +15,7 @@
  */
 import { test, expect, type Locator, type Page } from './_setup/fixtures';
 import { installSupabaseMock } from './_setup/supabase-mock';
+import { seedDismissedTours } from './_setup/app-state';
 import { activateCard, closeAndSettle, assertNoOverlayArtifacts, waitForScrollSettled } from './_setup/card-activation';
 
 const ROOT = '/dsx/evidence-beta';
@@ -35,7 +36,8 @@ async function expectAttribution(drawer: Locator, attr: string, value: string | 
 }
 
 test.describe('DSX drawer sequencing', () => {
-  test.beforeEach(async ({ context }) => { await installSupabaseMock(context); });
+  test.beforeEach(async ({ context }) => { await installSupabaseMock(context);
+    await seedDismissedTours(context); });
 
   test('two consecutive constraint drawers activate normally', async ({ page }) => {
     await open(page);

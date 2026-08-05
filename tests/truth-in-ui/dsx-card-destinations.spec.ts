@@ -18,6 +18,7 @@
 
 import { test, expect, type Page, type Locator } from './_setup/fixtures';
 import { installSupabaseMock } from './_setup/supabase-mock';
+import { seedDismissedTours } from './_setup/app-state';
 import { activateCard, closeAndSettle } from './_setup/card-activation';
 
 const ROOT = '/dsx/evidence-beta';
@@ -147,6 +148,7 @@ async function auditAssetSelects(page: Page, route: string, failures: string[]) 
 test.describe('DSX Evidence Beta — clickable card destinations', () => {
   test.beforeEach(async ({ context }) => {
     await installSupabaseMock(context);
+    await seedDismissedTours(context);
   });
 
   test('every clickable card opens its correct, non-blank drawer', async ({ page, guard }) => {

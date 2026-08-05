@@ -48,8 +48,9 @@ async function closeDrawer(page: Page, drawer: Locator, label: string) {
 }
 
 /** Best-effort dismissal used in error paths so the sweep can continue. */
-async function forceDismiss(page: Page, drawer: Locator) {
-  await drawer.press('Escape').catch(() => {});
+async function forceDismiss(page: Page) {
+  const open = page.locator('[role="dialog"]:visible').first();
+  if (await open.count()) await open.press('Escape').catch(() => {});
   await page.keyboard.press('Escape').catch(() => {});
 }
 
@@ -73,7 +74,7 @@ async function auditMetricTiles(page: Page, route: string, failures: string[]) {
       await closeDrawer(page, drawer, label);
     } catch (e) {
       failures.push(`${label}: ${(e as Error).message.split('\n')[0]}`);
-      await page.keyboard.press('Escape').catch(() => {});
+      await forceDismiss(page);
     }
   }
   return count;
@@ -99,7 +100,7 @@ async function auditConstraints(page: Page, route: string, failures: string[]) {
       await closeDrawer(page, drawer, label);
     } catch (e) {
       failures.push(`${label}: ${(e as Error).message.split('\n')[0]}`);
-      await page.keyboard.press('Escape').catch(() => {});
+      await forceDismiss(page);
     }
   }
   return count;
@@ -125,7 +126,7 @@ async function auditAssertions(page: Page, route: string, failures: string[]) {
       await closeDrawer(page, drawer, label);
     } catch (e) {
       failures.push(`${label}: ${(e as Error).message.split('\n')[0]}`);
-      await page.keyboard.press('Escape').catch(() => {});
+      await forceDismiss(page);
     }
   }
   return count;
@@ -155,7 +156,7 @@ async function auditAssetSelects(page: Page, route: string, failures: string[]) 
       await closeDrawer(page, drawer, label);
     } catch (e) {
       failures.push(`${label}: ${(e as Error).message.split('\n')[0]}`);
-      await page.keyboard.press('Escape').catch(() => {});
+      await forceDismiss(page);
     }
   }
   return count;

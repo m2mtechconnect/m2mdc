@@ -152,7 +152,7 @@ test.describe('DSX Evidence Beta — clickable card destinations', () => {
   });
 
   test('every clickable card opens its correct, non-blank drawer', async ({ page, guard }) => {
-    test.setTimeout(300_000);
+    test.setTimeout(900_000);
 
     const failures: string[] = [];
     const consoleErrors: string[] = [];

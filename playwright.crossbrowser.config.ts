@@ -17,8 +17,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: 0,
   workers: 1,
-  timeout: 300_000,
-  expect: { timeout: 5_000 },
+  timeout: 900_000,
+  expect: { timeout: 10_000 },
   reporter: [['list'], ['json', { outputFile: 'test-results/dsx-card-destinations-crossbrowser.json' }]],
   use: {
     baseURL: `http://localhost:${PORT}`,

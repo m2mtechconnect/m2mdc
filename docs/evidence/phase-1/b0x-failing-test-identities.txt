@@ -4,7 +4,6 @@ src/lib/__tests__/twinNameMigration.test.ts :: twinNameMigration migrateTwinBuil
 src/lib/utils/normalizeCompanyName.test.ts :: extractCompanyNameFromUrl should handle malformed URLs gracefully
 src/lib/utils/normalizeCompanyName.test.ts :: normalizeCompanyName should convert hyphens to spaces and capitalize
 src/lib/utils/normalizeCompanyName.test.ts :: sanitizeTwinName should fix malformed twin names
-src/simulation/providers/__tests__/contract.test.ts :: no consumer migration in Phase 1B.1 src/simulation/index.ts does NOT re-export the new facade (facade is opt-in)
 src/simulation/providers/__tests__/contract.test.ts :: no consumer migration in Phase 1B.1 src/simulation/index.ts still exports the legacy SimulationEngine class
 tests/digitalTwinRuntime.test.ts :: Digital Twin Runtime should capture errors and return failed status
 tests/digitalTwinRuntime.test.ts :: Digital Twin Runtime should execute a simple twin workflow
@@ -63,6 +62,8 @@ tests/integration/integrations.test.ts :: Integrations API should test integrati
 tests/integration/integrations.test.ts :: Integrations API should track last sync time
 tests/integration/integrations.test.ts :: Integrations API should update integration settings
 tests/integration/operations.test.ts :: Operations Monitor API should fetch operations overview
+tests/integration/operations.test.ts :: Operations Monitor API should list environments
+tests/integration/operations.test.ts :: Operations Monitor API should query system events
 tests/integration/template-to-builder.test.ts :: Template to Builder Integration should clear previous blueprint data when loading new template
 tests/integration/template-url-loading.test.ts :: Template URL Loading Integration should convert template to builder state correctly
 tests/integration/template-url-loading.test.ts :: Template URL Loading Integration should detect templateId in URL and load from JSON

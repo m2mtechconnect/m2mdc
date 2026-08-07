@@ -1,0 +1,50 @@
+table,resource_type,ownership_path_class,direct_tenant_column,parent_tenant_path,user_ownership_path,authoritative_source,cross_tenant_relationship_prevention,RLS_summary,runtime_verification_required
+agent_action_logs,agent,authoritative_tenant_path,no,agent_action_logs -> integrations_connections:direct_tenant_column,none,organizations.org_id,FK to tenant-scoped parent; no DB constraint forbids cross-tenant FK,RLS enabled; 2 policies,yes
+agent_activity_logs,agent,authoritative_tenant_path,no,agent_activity_logs -> agents:direct_tenant_column,none,organizations.org_id,FK to tenant-scoped parent; no DB constraint forbids cross-tenant FK,RLS enabled; 2 policies,yes
+agent_conversations,agent,user_only_path,no,none,user_id,auth.uid(),none - per-user only,RLS enabled; 3 policies,yes
+agent_custom_questions,agent,user_only_path,no,none,user_id,auth.uid(),none - per-user only,RLS enabled; 3 policies,yes
+agent_definition_runs,agent,user_only_path,no,none,user_id,auth.uid(),none - per-user only,RLS enabled; 3 policies,yes
+agent_definitions,agent,user_only_path,no,none,owner_id,auth.uid(),none - per-user only,RLS enabled; 5 policies,yes
+agent_drafts,agent,user_only_path,no,none,owner_id,auth.uid(),none - per-user only,RLS enabled; 4 policies,yes
+agent_environments,agent,no_authoritative_ownership_path,no,none,none,none,none,RLS enabled; 1 policies,yes
+agent_exports,agent,user_only_path,no,none,user_id,auth.uid(),none - per-user only,RLS enabled; 2 policies,yes
+agent_integrations,agent,authoritative_tenant_path,no,agent_integrations -> integrations_connections:direct_tenant_column,none,organizations.org_id,FK to tenant-scoped parent; no DB constraint forbids cross-tenant FK,RLS enabled; 4 policies,yes
+agent_memory,agent,user_only_path,no,none,user_id,auth.uid(),none - per-user only,RLS enabled; 1 policies,yes
+agent_messages,agent,user_only_path,no,agent_messages -> agent_conversations:direct_user_column,agent_messages -> agent_conversations:direct_user_column,auth.uid(),none - per-user only,RLS enabled; 2 policies,yes
+agent_runs,agent,user_only_path,no,none,user_id,auth.uid(),none - per-user only,RLS enabled; 5 policies,yes
+agent_runtime_status,agent,authoritative_tenant_path,no,agent_runtime_status -> agents:direct_tenant_column,none,organizations.org_id,FK to tenant-scoped parent; no DB constraint forbids cross-tenant FK,RLS enabled; 3 policies,yes
+agent_suggestions_cache,agent,no_authoritative_ownership_path,no,none,none,none,none,RLS enabled; 1 policies,yes
+agent_templates,agent,no_authoritative_ownership_path,no,none,none,none,none,RLS enabled; 1 policies,yes
+agent_versions,agent,authoritative_tenant_path,no,agent_versions -> agents:direct_tenant_column,none,organizations.org_id,FK to tenant-scoped parent; no DB constraint forbids cross-tenant FK,RLS enabled; 2 policies,yes
+agent_workflows,agent,authoritative_tenant_path,no,agent_workflows -> agents:direct_tenant_column,none,organizations.org_id,FK to tenant-scoped parent; no DB constraint forbids cross-tenant FK,RLS enabled; 2 policies,yes
+agents,agent,authoritative_tenant_path,yes:org_id;owner_id,none,none,organizations.org_id,org_id NOT NULL + RLS,RLS enabled; 9 policies,yes
+data_centre_twins,twin,user_only_path,no,none,created_by_user,auth.uid(),none - per-user only,RLS enabled; 5 policies,yes
+dc_blueprint_templates,catalog,no_authoritative_ownership_path,no,none,none,none,none,RLS enabled; 1 policies,yes
+dc_scan_sessions,scan_session,user_only_path,no,none,user_id,auth.uid(),none - per-user only,RLS enabled; 3 policies,yes
+digital_twins,twin,user_only_path,no,none,user_id,auth.uid(),none - per-user only,RLS enabled; 4 policies,yes
+documents,document,authoritative_tenant_path,yes:org_id;user_id,none,none,organizations.org_id,org_id NOT NULL + RLS,RLS enabled; 2 policies,yes
+dsx_asset_mappings,telemetry_ingest,authoritative_tenant_path,yes:org_id,none,none,organizations.org_id,org_id NOT NULL + RLS,RLS enabled; 1 policies,yes
+dsx_connections,telemetry_ingest,authoritative_tenant_path,yes:created_by;org_id,none,none,organizations.org_id,org_id NOT NULL + RLS,RLS enabled; 1 policies,yes
+dsx_events,telemetry_ingest,authoritative_tenant_path,yes:org_id,none,none,organizations.org_id,org_id NOT NULL + RLS,RLS enabled; 1 policies,yes
+dsx_events_quarantine,telemetry_ingest,authoritative_tenant_path,yes:org_id,none,none,organizations.org_id,org_id NOT NULL + RLS,RLS enabled; 1 policies,yes
+dsx_gateway_heartbeats,telemetry_ingest,authoritative_tenant_path,yes:org_id,none,none,organizations.org_id,org_id NOT NULL + RLS,RLS enabled; 1 policies,yes
+dsx_ingestion_audit,telemetry_ingest,authoritative_tenant_path,yes:org_id,none,none,organizations.org_id,org_id NOT NULL + RLS,RLS enabled; 1 policies,yes
+integrations,integration,authoritative_tenant_path,yes:created_by;org_id;user_id,none,none,organizations.org_id,org_id NOT NULL + RLS,RLS enabled; 6 policies,yes
+integrations_connections,integration,authoritative_tenant_path,yes:org_id;user_id,none,none,organizations.org_id,org_id NOT NULL + RLS,RLS enabled; 4 policies,yes
+integrations_tokens,integration,user_only_path,no,none,user_id,auth.uid(),none - per-user only,RLS enabled; 4 policies,yes
+recommendations,recommendation,no_authoritative_ownership_path,no,none,none,none,none,RLS enabled; 2 policies,yes
+simulation_runs,simulation_run,user_only_path,no,none,user_id,auth.uid(),none - per-user only,RLS enabled; 4 policies,yes
+sovereign_dc_facilities,facility,user_only_path,no,none,owner_id,auth.uid(),none - per-user only,RLS enabled; 4 policies,yes
+sovereign_dc_simulation_runs,simulation_run,user_only_path,no,none,user_id,auth.uid(),none - per-user only,RLS enabled; 3 policies,yes
+twin_agent_bindings,twin_child,user_only_path,no,twin_agent_bindings -> agent_definitions:direct_user_column,twin_agent_bindings -> agent_definitions:direct_user_column,auth.uid(),none - per-user only,RLS enabled; 2 policies,yes
+twin_carbon_emissions,twin_child,user_only_path,no,twin_carbon_emissions -> data_centre_twins:direct_user_column,twin_carbon_emissions -> data_centre_twins:direct_user_column,auth.uid(),none - per-user only,RLS enabled; 2 policies,yes
+twin_financial_records,twin_child,user_only_path,no,twin_financial_records -> data_centre_twins:direct_user_column,twin_financial_records -> data_centre_twins:direct_user_column,auth.uid(),none - per-user only,RLS enabled; 2 policies,yes
+twin_kpi_snapshots,twin_child,user_only_path,no,twin_kpi_snapshots -> data_centre_twins:direct_user_column,twin_kpi_snapshots -> data_centre_twins:direct_user_column,auth.uid(),none - per-user only,RLS enabled; 2 policies,yes
+twin_simulation_runs,twin_child,user_only_path,no,none,created_by,auth.uid(),none - per-user only,RLS enabled; 3 policies,yes
+twin_sovereignty_events,twin_child,user_only_path,no,twin_sovereignty_events -> data_centre_twins:direct_user_column,twin_sovereignty_events -> data_centre_twins:direct_user_column,auth.uid(),none - per-user only,RLS enabled; 2 policies,yes
+twin_telemetry,twin_child,user_only_path,no,twin_telemetry -> data_centre_twins:direct_user_column,twin_telemetry -> data_centre_twins:direct_user_column,auth.uid(),none - per-user only,RLS enabled; 2 policies,yes
+workflow_edges,workflow,user_only_path,no,workflow_edges -> workflow_nodes -> workflows:direct_user_column,workflow_edges -> workflow_nodes -> workflows:direct_user_column,auth.uid(),none - per-user only,RLS enabled; 3 policies,yes
+workflow_nodes,workflow,user_only_path,no,workflow_nodes -> workflows:direct_user_column,workflow_nodes -> workflows:direct_user_column,auth.uid(),none - per-user only,RLS enabled; 4 policies,yes
+workflow_run_events,workflow,user_only_path,no,workflow_run_events -> workflow_nodes -> workflows:direct_user_column,workflow_run_events -> workflow_nodes -> workflows:direct_user_column,auth.uid(),none - per-user only,RLS enabled; 1 policies,yes
+workflow_runs,workflow,user_only_path,no,none,created_by,auth.uid(),none - per-user only,RLS enabled; 2 policies,yes
+workflows,workflow,user_only_path,no,none,created_by,auth.uid(),none - per-user only,RLS enabled; 4 policies,yes

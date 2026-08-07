@@ -1,0 +1,114 @@
+table,classification,ownership_columns,direct_scope,authoritative_tenant_path,inherits_via_fk,foreign_keys,policy_count,core_resource_graph,tenant_ownership_nonforgeable
+agent_action_logs,tenant_owned,none,none,agent_action_logs -> integrations_connections:direct_tenant_column,yes,integrations_connections;agent_runs;agents,2,yes,yes
+agent_activity_logs,tenant_owned,none,none,agent_activity_logs -> agents:direct_tenant_column,yes,agents;agent_runs,2,yes,yes
+agent_conversations,user_private,user_id,direct_user_column,agent_conversations:direct_user_column,no,agents;users,3,yes,yes
+agent_custom_questions,user_private,user_id,direct_user_column,agent_custom_questions:direct_user_column,no,agents;users,3,yes,yes
+agent_definition_runs,user_private,user_id,direct_user_column,agent_definition_runs:direct_user_column,no,agent_definitions;data_centre_twins;users,3,yes,yes
+agent_definitions,user_private,owner_id,direct_user_column,agent_definitions:direct_user_column,no,users;data_centre_twins,5,yes,yes
+agent_drafts,user_private,owner_id,direct_user_column,agent_drafts:direct_user_column,no,sites,4,yes,yes
+agent_environments,deliberately_public,none,none,NONE,no,none,1,yes,no
+agent_exports,user_private,user_id,direct_user_column,agent_exports:direct_user_column,no,agents;users,2,yes,yes
+agent_integrations,tenant_owned,none,none,agent_integrations -> integrations_connections:direct_tenant_column,yes,integrations_connections;agents,4,yes,yes
+agent_memory,user_private,user_id,direct_user_column,agent_memory:direct_user_column,no,users,1,yes,yes
+agent_messages,user_private,none,none,agent_messages -> agent_conversations:direct_user_column,yes,agent_conversations,2,yes,yes
+agent_runs,user_private,user_id,direct_user_column,agent_runs:direct_user_column,no,agents;data_centre_twins;users,5,yes,yes
+agent_runtime_status,tenant_owned,none,none,agent_runtime_status -> agents:direct_tenant_column,yes,agents,3,yes,yes
+agent_suggestions_cache,system_internal,none,none,NONE,no,none,1,yes,no
+agent_templates,deliberately_public,none,none,NONE,no,none,1,yes,no
+agent_versions,tenant_owned,none,none,agent_versions -> agents:direct_tenant_column,yes,agents;agent_versions,2,yes,yes
+agent_workflows,tenant_owned,none,none,agent_workflows -> agents:direct_tenant_column,yes,agents;data_centre_twins,2,yes,yes
+agents,tenant_owned,org_id;owner_id,direct_tenant_column,agents:direct_tenant_column,no,environments;users;data_centre_twins,9,yes,yes
+ai_recommendations_cache,system_internal,none,none,NONE,no,none,2,no,no
+audit_logs,tenant_owned,org_id;user_id,direct_tenant_column,audit_logs:direct_tenant_column,no,users,3,no,yes
+capture_cache,system_internal,none,none,NONE,no,none,1,no,no
+captured_pages,user_private,user_id,direct_user_column,captured_pages:direct_user_column,no,users,3,no,yes
+cloud_deployments,tenant_owned,none,none,cloud_deployments -> agents:direct_tenant_column,yes,agents;agent_environments,2,no,yes
+contact_expert_logs,user_private,user_id,direct_user_column,contact_expert_logs:direct_user_column,no,users,3,no,yes
+content_embeddings,user_private,none,none,content_embeddings -> indexed_content:direct_user_column,yes,indexed_content,2,no,yes
+copilot_events,user_private,user_id,direct_user_column,copilot_events:direct_user_column,no,agents;users,2,no,yes
+copilot_memory,user_private,user_id,direct_user_column,copilot_memory:direct_user_column,no,none,5,no,yes
+copilot_sessions,user_private,user_id,direct_user_column,copilot_sessions:direct_user_column,no,users,3,no,yes
+copilot_sessions_cache,user_private,user_id,direct_user_column,copilot_sessions_cache:direct_user_column,no,users,4,no,yes
+crawl_jobs,system_internal,none,none,NONE,no,none,2,no,no
+data_centre_locations,user_private,created_by,direct_user_column,data_centre_locations:direct_user_column,no,none,4,no,yes
+data_centre_twins,user_private,created_by_user,direct_user_column,data_centre_twins:direct_user_column,no,digital_twins;data_centre_locations,5,yes,yes
+dc_blueprint_templates,deliberately_public,none,none,NONE,no,none,1,yes,no
+dc_scan_sessions,user_private,user_id,direct_user_column,dc_scan_sessions:direct_user_column,no,data_centre_twins,3,yes,yes
+departments,deliberately_public,none,none,NONE,no,none,1,no,no
+deployment_tracking,user_private,deployed_by,direct_user_column,deployment_tracking:direct_user_column,no,users;agents,3,no,yes
+deployments,user_private,deployed_by,direct_user_column,deployments:direct_user_column,no,none,3,no,yes
+digital_twin_runs,user_private,user_id,direct_user_column,digital_twin_runs:direct_user_column,no,digital_twins,3,no,yes
+digital_twins,user_private,user_id,direct_user_column,digital_twins:direct_user_column,no,none,4,yes,yes
+document_analysis_jobs,user_private,user_id,direct_user_column,document_analysis_jobs:direct_user_column,no,users,3,no,yes
+documents,tenant_owned,org_id;user_id,direct_tenant_column,documents:direct_tenant_column,no,users,2,yes,yes
+dsx_asset_mappings,tenant_owned,org_id,direct_tenant_column,dsx_asset_mappings:direct_tenant_column,no,dsx_connections,1,yes,yes
+dsx_connections,tenant_owned,created_by;org_id,direct_tenant_column,dsx_connections:direct_tenant_column,no,organizations;data_centre_twins,1,yes,yes
+dsx_events,tenant_owned,org_id,direct_tenant_column,dsx_events:direct_tenant_column,no,dsx_connections;dsx_asset_mappings,1,yes,yes
+dsx_events_quarantine,tenant_owned,org_id,direct_tenant_column,dsx_events_quarantine:direct_tenant_column,no,dsx_connections,1,yes,yes
+dsx_gateway_heartbeats,tenant_owned,org_id,direct_tenant_column,dsx_gateway_heartbeats:direct_tenant_column,no,dsx_connections,1,yes,yes
+dsx_ingestion_audit,tenant_owned,org_id,direct_tenant_column,dsx_ingestion_audit:direct_tenant_column,no,none,1,yes,yes
+environments,deliberately_public,none,none,NONE,no,none,1,no,no
+funding_programs,deliberately_public,none,none,NONE,no,none,2,no,no
+heartbeats,tenant_owned,none,none,heartbeats -> agents:direct_tenant_column,yes,agents,2,no,yes
+indexed_content,user_private,user_id,direct_user_column,indexed_content:direct_user_column,no,users,5,no,yes
+industry_agents,unknown,none,none,NONE,no,none,2,no,no
+industry_templates,deliberately_public,none,none,NONE,no,none,1,no,no
+integration_logs,user_private,user_id,direct_user_column,integration_logs:direct_user_column,no,integrations;users,1,no,yes
+integration_sync_logs,user_private,user_id,direct_user_column,integration_sync_logs:direct_user_column,no,none,2,no,yes
+integrations,tenant_owned,created_by;org_id;user_id,direct_tenant_column,integrations:direct_tenant_column,no,users;users,6,yes,yes
+integrations_connections,tenant_owned,org_id;user_id,direct_tenant_column,integrations_connections:direct_tenant_column,no,none,4,yes,yes
+integrations_tokens,user_private,user_id,direct_user_column,integrations_tokens:direct_user_column,no,zapier_apps,4,yes,yes
+intelligence_settings,tenant_owned,none,none,intelligence_settings -> agents:direct_tenant_column,yes,agents,3,no,yes
+knowledge_sources,user_private,user_id,direct_user_column,knowledge_sources:direct_user_column,no,captured_pages;users,4,no,yes
+m2m_templates,deliberately_public,none,none,NONE,no,none,1,no,no
+mcp_credentials,user_private,user_id,direct_user_column,mcp_credentials:direct_user_column,no,users,1,no,yes
+mcp_servers_catalog,deliberately_public,none,none,NONE,no,none,1,no,no
+mcp_sync_runs,unknown,none,none,NONE,no,none,1,no,no
+mcp_tokens,user_private,user_id,direct_user_column,mcp_tokens:direct_user_column,no,agents;users,4,no,yes
+oauth_states,user_private,user_id,direct_user_column,oauth_states:direct_user_column,no,none,2,no,yes
+onboarding_submissions,unknown,none,none,NONE,no,none,2,no,no
+organizations,unknown,none,none,NONE,no,none,1,no,no
+page_classifications,user_private,none,none,page_classifications -> captured_pages:direct_user_column,yes,captured_pages,2,no,yes
+page_summaries,user_private,none,none,page_summaries -> captured_pages:direct_user_column,yes,captured_pages,2,no,yes
+policies,user_private,created_by,direct_user_column,policies:direct_user_column,no,agents,4,no,yes
+policy_audit,user_private,none,none,policy_audit -> policies:direct_user_column,yes,policies;agents,2,no,yes
+policy_bindings,user_private,none,none,policy_bindings -> policies:direct_user_column,yes,policies,3,no,yes
+profiles,tenant_owned,org_id;user_id,direct_tenant_column,profiles:direct_tenant_column,no,departments;users,3,no,yes
+rag_chunks,user_private,none,none,rag_chunks -> rag_items:direct_user_column,yes,rag_items,2,no,yes
+rag_documents,user_private,user_id,direct_user_column,rag_documents:direct_user_column,no,users,1,no,yes
+rag_items,user_private,user_id,direct_user_column,rag_items:direct_user_column,no,agents,4,no,yes
+rag_tokens,user_private,user_id,direct_user_column,rag_tokens:direct_user_column,no,agents,1,no,yes
+recommendations,unknown,none,none,NONE,no,sites,2,yes,no
+roi_assumptions,unknown,none,none,NONE,no,none,3,no,no
+roi_snapshots,unknown,none,none,NONE,no,none,2,no,no
+role_change_audit,user_private,actor_user_id;target_user_id,direct_user_column,role_change_audit:direct_user_column,no,none,1,no,yes
+scraper_logs,system_internal,none,none,NONE,no,none,2,no,no
+search_analytics,system_internal,none,none,NONE,no,none,2,no,no
+search_history,user_private,user_id,direct_user_column,search_history:direct_user_column,no,users,2,no,yes
+simulation_runs,user_private,user_id,direct_user_column,simulation_runs:direct_user_column,no,data_centre_twins,4,yes,yes
+site_crawls,unknown,none,none,NONE,no,sites,2,no,no
+site_pages,unknown,none,none,NONE,no,sites,2,no,no
+sites,unknown,none,none,NONE,no,none,2,no,no
+sovereign_dc_facilities,user_private,owner_id,direct_user_column,sovereign_dc_facilities:direct_user_column,no,none,4,yes,yes
+sovereign_dc_simulation_runs,user_private,user_id,direct_user_column,sovereign_dc_simulation_runs:direct_user_column,no,sovereign_dc_facilities,3,yes,yes
+system_builder_state,tenant_owned,none,none,system_builder_state -> agents:direct_tenant_column,yes,agents,6,no,yes
+system_events,tenant_owned,none,none,system_events -> agents:direct_tenant_column,yes,agents,2,no,yes
+system_health,tenant_owned,none,none,system_health -> agents:direct_tenant_column,yes,agents,2,no,yes
+system_integrations,tenant_owned,none,none,system_integrations -> integrations:direct_tenant_column,yes,integrations;agents,4,no,yes
+team_invites,tenant_owned,invited_by;org_id,direct_tenant_column,team_invites:direct_tenant_column,no,users,4,no,yes
+twin_agent_bindings,user_private,none,none,twin_agent_bindings -> agent_definitions:direct_user_column,yes,agent_definitions;digital_twins,2,yes,yes
+twin_carbon_emissions,user_private,none,none,twin_carbon_emissions -> data_centre_twins:direct_user_column,yes,data_centre_twins,2,yes,yes
+twin_financial_records,user_private,none,none,twin_financial_records -> data_centre_twins:direct_user_column,yes,data_centre_twins,2,yes,yes
+twin_kpi_snapshots,user_private,none,none,twin_kpi_snapshots -> data_centre_twins:direct_user_column,yes,data_centre_twins,2,yes,yes
+twin_simulation_runs,user_private,created_by,direct_user_column,twin_simulation_runs:direct_user_column,no,data_centre_twins,3,yes,yes
+twin_sovereignty_events,user_private,none,none,twin_sovereignty_events -> data_centre_twins:direct_user_column,yes,data_centre_twins,2,yes,yes
+twin_telemetry,user_private,none,none,twin_telemetry -> data_centre_twins:direct_user_column,yes,data_centre_twins,2,yes,yes
+user_preferences,user_private,user_id,direct_user_column,user_preferences:direct_user_column,no,users,3,no,yes
+user_roles,user_private,user_id,direct_user_column,user_roles:direct_user_column,no,users,1,no,yes
+website_content_cache,system_internal,none,none,NONE,no,none,2,no,no
+workflow_edges,user_private,none,none,workflow_edges -> workflow_nodes -> workflows:direct_user_column,yes,workflow_nodes;workflow_nodes;workflows,3,yes,yes
+workflow_nodes,user_private,none,none,workflow_nodes -> workflows:direct_user_column,yes,workflows,4,yes,yes
+workflow_run_events,user_private,none,none,workflow_run_events -> workflow_nodes -> workflows:direct_user_column,yes,workflow_nodes;workflow_runs,1,yes,yes
+workflow_runs,user_private,created_by,direct_user_column,workflow_runs:direct_user_column,no,users;workflows,2,yes,yes
+workflows,user_private,created_by,direct_user_column,workflows:direct_user_column,no,users;agents,4,yes,yes
+zapier_apps,deliberately_public,none,none,NONE,no,none,1,no,no

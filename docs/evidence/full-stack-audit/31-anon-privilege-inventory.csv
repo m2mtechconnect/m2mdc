@@ -1,0 +1,10 @@
+privilege_class,object,anon_privilege
+table_privileges,onboarding_submissions,INSERT
+table_privileges,(all other 112 tables),NONE
+schema_usage,public/storage/graphql_public,USAGE (no CREATE)
+sequence_privileges,public.*,NONE
+function_execute,public.match_documents,EXECUTE (SECURITY INVOKER; RLS+grants still apply)
+function_execute,2 SECURITY DEFINER trigger functions,EXECUTE (returns trigger; not RPC-callable)
+function_execute,126 pgvector operator functions,EXECUTE (extension builtins)
+storage_buckets,profile-images,PUBLIC READ (by design); no anon write policy
+rpc_admin_functions,admin_* role RPCs,NONE (EXECUTE revoked from anon)

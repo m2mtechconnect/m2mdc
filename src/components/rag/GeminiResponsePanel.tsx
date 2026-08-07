@@ -3,7 +3,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
-import { signalStrength, SIGNAL_BASIS } from '@/capabilities/recommendationSignal';
   FileText, 
   Link as LinkIcon, 
   CheckCircle2, 
@@ -11,6 +10,7 @@ import { signalStrength, SIGNAL_BASIS } from '@/capabilities/recommendationSigna
   ExternalLink,
   Eye,
 } from "lucide-react";
+import { signalStrength, SIGNAL_BASIS } from '@/capabilities/recommendationSignal';
 
 interface GeminiResponsePanelProps {
   className?: string;

@@ -236,7 +236,7 @@ export function KPIEnhancementsPanel({ kpi, className }: KPIEnhancementsPanelPro
               </ResponsiveContainer>
             </div>
             <p className="text-xs text-muted-foreground mt-2 text-center">
-              30-day forecast with confidence bands
+              30-day forecast with rule-based projection bands
             </p>
           </TabsContent>
 

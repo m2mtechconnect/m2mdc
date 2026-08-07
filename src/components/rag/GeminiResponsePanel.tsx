@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
+import { signalStrength, SIGNAL_BASIS } from '@/capabilities/recommendationSignal';
   FileText, 
   Link as LinkIcon, 
   CheckCircle2, 
@@ -197,7 +198,7 @@ export function GeminiResponsePanel({ className }: GeminiResponsePanelProps) {
                     </td>
                     <td className="py-3">
                       <span className="font-mono text-sm font-semibold text-secondary">
-                        {citation.confidence}%
+                        {signalStrength(citation.confidence)}
                       </span>
                     </td>
                     <td className="py-3 text-right">

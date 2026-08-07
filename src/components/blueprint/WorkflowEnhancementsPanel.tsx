@@ -21,6 +21,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { signalStrength, SIGNAL_BASIS } from '@/capabilities/recommendationSignal';
 
 interface WorkflowVersion {
   id: string;
@@ -295,7 +296,7 @@ export function WorkflowEnhancementsPanel({
                       {impact.expectedChange > 0 ? '+' : ''}{impact.expectedChange}%
                     </span>
                     <Badge variant="outline" className="text-[10px] h-4">
-                      {impact.confidence}% conf
+                      {signalStrength(impact.confidence)} signal
                     </Badge>
                   </div>
                 </div>

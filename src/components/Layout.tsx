@@ -383,6 +383,9 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
+      {/* Persistent operating-state bar (Stage 5 truth alignment) */}
+      <OperatingStateBar />
+
       {/* Mobile Navigation Sheet */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent 

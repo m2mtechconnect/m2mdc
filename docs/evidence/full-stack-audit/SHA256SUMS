@@ -48,3 +48,6 @@ a2a90e93ba6dc72acf927062b1dbe2c1297f4dc80cb7b04574316d0b67e8bb1e  45-stage-2a-ad
 b2cb7eba4a21080c82c8a9190f5e1cc5e22c0c4d5ef20ef6d1ee43ca49bdbe8f  48-f14-uncollected-case-identities.csv
 31c9e09ef8e7539584f20db7c4fde753693845decb18f7b16c03272e8e04f6d1  49-stage-2b-preflight.md
 42d1104a0d383493a8d21718d9c7bcd591f7a05d45ecf18971498ec57341db5a  50-effective-privilege-by-object-class.csv
+b4c04ea3a47cde153279c7b166595b7d2cb7d0a1ce9ae36e64420e793700cd49  51-stage-2b-environment-provisioning-handoff.md
+8be85c0d030eb3e32063c5e6b51c5b73397d1e2a836e99ce3bf39e09c1bef369  52-migration-replay-ledger.csv
+c59cc442e94191a7b24fc10b8c0c80def3f16790dc47df2f194a0ca27b205c77  53-stage-2b-preflight-handoff-result.md

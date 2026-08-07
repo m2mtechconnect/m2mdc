@@ -71,6 +71,25 @@ export function isSupabaseHost(target: string): boolean {
   }
 }
 
+/** Production hosts that are denylisted unconditionally, guard decision or not. */
+export const DENYLISTED_HOSTS = [
+  `${PRODUCTION_PROJECT_REF}.supabase.co`,
+  `${PRODUCTION_PROJECT_REF}.supabase.in`,
+  'm2mdc.lovable.app',
+  'auradc.m2mtechconnect.com',
+  'm2mtechconnect.com',
+];
+
+export function isDenylistedHost(target: string): boolean {
+  let host: string;
+  try {
+    host = new URL(target).hostname.toLowerCase();
+  } catch {
+    return false;
+  }
+  return DENYLISTED_HOSTS.some((d) => host === d || host.endsWith(`.${d}`));
+}
+
 export class LiveBackendBlockedError extends Error {
   constructor(target: string, reasons: string[]) {
     // Path only - query strings can carry tokens.
@@ -102,12 +121,16 @@ export function installLiveBackendGuard(
   env: Record<string, string | undefined> = process.env,
 ): LiveBackendDecision {
   const decision = evaluateLiveBackendAccess(env);
-  if (decision.allowed) return decision;
-
   const original = globalThis.fetch?.bind(globalThis);
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const target = targetOf(input);
-    if (isSupabaseHost(target)) throw new LiveBackendBlockedError(target, decision.reasons);
+    // Production hosts are denied unconditionally, even in an allowed test env.
+    if (isDenylistedHost(target)) {
+      throw new LiveBackendBlockedError(target, ['denylisted production hostname']);
+    }
+    if (!decision.allowed && isSupabaseHost(target)) {
+      throw new LiveBackendBlockedError(target, decision.reasons);
+    }
     if (!original) throw new Error(`fetch is unavailable in this environment (${target})`);
     return original(input, init);
   }) as typeof fetch;

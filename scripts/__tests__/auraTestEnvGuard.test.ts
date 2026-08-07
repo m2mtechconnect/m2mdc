@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { evaluateTestEnvGuard, refFromUrl } from "../aura-test-env-guard.mjs";
+import { evaluateTestEnvGuard, refFromUrl, isDenylistedHost } from "../aura-test-env-guard.mjs";
 
 const REF = "auradisposable123";
 const ok = () => ({
@@ -7,6 +7,8 @@ const ok = () => ({
   SUPABASE_PROJECT_ID: REF,
   VITE_SUPABASE_URL: `https://${REF}.supabase.co`,
   VITE_SUPABASE_PUBLISHABLE_KEY: "pub",
+  AURA_DC_TEST_DISPOSABLE: "true",
+  AURA_DC_TEST_CLEANUP_AUTHORIZED: "true",
 });
 
 describe("aura test-env guard", () => {
@@ -54,5 +56,38 @@ describe("aura test-env guard", () => {
     expect(refFromUrl(`https://${REF}.supabase.co`)).toBe(REF);
     expect(refFromUrl("https://evil.example.com")).toBeNull();
     expect(refFromUrl(undefined)).toBeNull();
+  });
+
+  it("blocks when the target is not labelled disposable", () => {
+    const env = { ...ok() };
+    delete (env as Record<string, string>).AURA_DC_TEST_DISPOSABLE;
+    const r = evaluateTestEnvGuard(env);
+    expect(r.allowed).toBe(false);
+    expect(r.reasons.join()).toContain("disposable");
+  });
+
+  it("blocks when destructive cleanup is not authorized", () => {
+    const env = { ...ok(), AURA_DC_TEST_CLEANUP_AUTHORIZED: "false" };
+    const r = evaluateTestEnvGuard(env);
+    expect(r.allowed).toBe(false);
+    expect(r.reasons.join()).toContain("cleanup");
+  });
+
+  it("denylists production hostnames", () => {
+    expect(isDenylistedHost("https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/x")).toBe(true);
+    expect(isDenylistedHost("https://auradc.m2mtechconnect.com")).toBe(true);
+    expect(isDenylistedHost("https://m2mdc.lovable.app/api")).toBe(true);
+    expect(isDenylistedHost(`https://${REF}.supabase.co`)).toBe(false);
+  });
+
+  it("blocks a service-role key paired with a production target, without echoing it", () => {
+    const r = evaluateTestEnvGuard({
+      ...ok(),
+      SUPABASE_PROJECT_ID: "psfvrskpnwcshvajzeix",
+      SUPABASE_SERVICE_ROLE_KEY: "sk-should-never-appear",
+    });
+    expect(r.allowed).toBe(false);
+    expect(r.reasons.join()).toContain("service-role key");
+    expect(JSON.stringify(r)).not.toContain("sk-should-never-appear");
   });
 });

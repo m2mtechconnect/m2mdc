@@ -111,7 +111,7 @@ const en = {
     useCases: 'Use Cases',
     integrations: 'Integrations',
     whyM2M: 'Why M2M',
-    omniverseLiveScene: 'Omniverse Live Scene',
+    omniverseLiveScene: 'AURA Twin Preview',
     solutions: 'Solutions',
     product: 'Product',
     company: 'Company',
@@ -153,7 +153,7 @@ const en = {
     enterprises: 'Enterprises',
     hoursSavedMonthly: 'Hours saved monthly',
     efficiencyGains: 'Efficiency gains',
-    liveMonitoring: 'Live Monitoring',
+    liveMonitoring: 'Simulated Monitoring',
     // Stats Band
     platformCapabilities: 'Platform Capabilities',
     designedToBenchmarks: 'Designed to Meet Industry Benchmarks',
@@ -195,7 +195,7 @@ const en = {
     rackVisualization3dDesc: 'Inspect racks, aisles, and zones in a 3D model. Apply thermal, power, and cooling overlays to identify hotspots and load distribution.',
     domainOverlays: 'Domain overlays available',
     carbonIntensityTracking: 'Carbon Intensity Tracking',
-    carbonIntensityTrackingDesc: 'Monitor Carbon Intensity (gCO₂/kWh) as a live KPI. Run simulation scenarios to compare carbon outcomes before making changes.',
+    carbonIntensityTrackingDesc: 'Monitor Carbon Intensity (gCO₂/kWh) as a simulated KPI. Run simulation scenarios to compare carbon outcomes before making changes.',
     gco2Target2: 'gCO₂/kWh target',
     subsystemAgentsPanel: 'Subsystem Agents Panel',
     subsystemAgentsPanelDesc: 'View status of domain-specific agents: Thermal Guardian, Power Monitor, Workload Orchestrator, and Sovereignty Sentinel.',
@@ -270,7 +270,7 @@ const en = {
     featureDashboardTitle: 'Data Centre Command Dashboard',
     featureDashboardSubtitle: 'Single pane of glass for PUE, GPU Saturation, Thermal Stability, and Sovereign Compute metrics with AI Co-Pilot assistance.',
     featureDashboardB1: 'Global PUE tracking with trend improvement indicators',
-    featureDashboardB2: 'GPU Saturation and Thermal Stability live percentages',
+    featureDashboardB2: 'GPU Saturation and Thermal Stability simulated percentages',
     featureDashboardB3: 'Sovereign Compute percentage with jurisdiction compliance',
     feature3dTitle: '3D Digital Twin & Simulation',
     feature3dSubtitle: 'Interactive 3D rack visualization with thermal overlays, simulation controls, and scenario playback for what-if analysis.',
@@ -434,8 +434,8 @@ const en = {
     nocViewDescription: 'Full NOC view with 8 domain twins, real-time telemetry, and simulation controls',
     viewBlueprint: 'View Blueprint',
     runSimulation: 'Run Simulation',
-    liveTwinPreview: 'Live Twin Preview',
-    noTelemetry: 'No live telemetry yet. Connect a facility or start the Data Centre Simulation.',
+    liveTwinPreview: 'AURA Twin Preview',
+    noTelemetry: 'No facility telemetry source connected. Start the Data Centre Simulation to view simulated values.',
   },
 
   // Marketplace
@@ -476,7 +476,7 @@ const en = {
     },
     emptyState: {
       noTwin: 'No data centre twin selected. Scan a website or create a new twin to begin.',
-      noData: 'Awaiting telemetry. Connect data sources to populate live metrics.',
+      noData: 'No telemetry source connected. Values shown come from the AURA simulation.',
     },
   },
 
@@ -920,7 +920,7 @@ const en = {
 
   // Data Centre Twin
   dataCentreTwin: {
-    liveDigitalTwin: 'Live Digital Twin',
+    liveDigitalTwin: 'Simulated Digital Twin',
     loading3dTwin: 'Loading 3D Twin...',
     loadingTwinData: 'Loading Twin Data...',
     selectingTwin: 'Selecting Data Centre Twin...',

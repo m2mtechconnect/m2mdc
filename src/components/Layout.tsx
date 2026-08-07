@@ -46,6 +46,7 @@ import { getRoleNavigation } from "@/config/roleDashboardConfig";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { OperatingStateBar } from "@/components/capability/OperatingStateBar";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -382,6 +383,9 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </header>
+
+      {/* Persistent operating-state bar (Stage 5 truth alignment) */}
+      <OperatingStateBar />
 
       {/* Mobile Navigation Sheet */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>

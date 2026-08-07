@@ -42,9 +42,9 @@ interface Stage {
 const STAGES: Stage[] = [
   { id: "collect", label: "Collect", icon: Radio, color: "hsl(var(--accent-foreground))", short: "DDN ingests DCIM telemetry, BMS feeds, power/cooling sensor streams at high throughput.", full: "DDN A3I storage appliances ingest telemetry from DCIM platforms, Building Management Systems, and thousands of environmental sensors (temperature, humidity, power draw, airflow). Data arrives at wire speed via GPUDirect Storage, bypassing CPU bottlenecks entirely.", specs: ["DDN A3I TLC", "120 GB/s ingest", "NVMe-oF"] },
   { id: "train", label: "Train", icon: Cpu, color: "hsl(var(--warning))", short: "NVIDIA B3100 trains AI models for PUE optimization, capacity planning, and failure prediction.", full: "Blackwell B3100 GPU clusters train transformer and graph neural network models on historical facility data. Models learn PUE patterns, predict cooling failures 72 hours ahead, and optimize workload placement across racks. Training runs complete in under 4 hours on 8-GPU pods.", specs: ["B3100 x8", "FP8 inference", "72h lookahead"] },
-  { id: "synthesize", label: "Synthesize", icon: Eye, color: "hsl(var(--success))", short: "RTX PRO 6000 creates a living 3D digital twin of racks, cooling, and power distribution.", full: "NVIDIA RTX PRO 6000 workstations render a photorealistic, physics-accurate 3D digital twin of the entire facility. Every rack, CRAH unit, PDU, and cable tray is modeled. The twin updates in real time as sensors stream new data, enabling operators to visualize thermal hotspots and airflow patterns.", specs: ["RTX PRO 6000", "Omniverse USD", "Real-time sync"] },
+  { id: "synthesize", label: "Synthesize", icon: Eye, color: "hsl(var(--success))", short: "AURA renders a 3D model of racks, cooling, and power distribution from the simulated facility model.", full: "AURA renders a 3D model of the facility from its own asset model: racks, CRAH units, PDUs and cable trays. Values shown are produced by the deterministic simulation, not by sensors. Photorealistic rendering and physics accuracy require an NVIDIA Omniverse environment that is not connected.", specs: ["AURA renderer", "Application asset model", "Simulated updates"] },
   { id: "act", label: "Act", icon: Bot, color: "hsl(var(--info))", short: "Edge inference nodes run real-time thermal and power management per rack row.", full: "Dedicated edge inference nodes deployed at each rack row execute lightweight AI models locally. They adjust fan speeds, shift workloads between racks, and trigger cooling pre-emptively — all within 50ms latency. No round-trip to the cloud required.", specs: ["Edge Nodes", "<50ms latency", "Per-row control"] },
-  { id: "simulate", label: "Simulate", icon: Layers, color: "hsl(var(--primary))", short: "NVIDIA Omniverse enables what-if scenarios for expansion, failover, and cooling optimization.", full: "Omniverse simulation engine runs thousands of what-if scenarios: adding new racks, switching to liquid cooling, failing over an entire hall, or doubling GPU density. Each scenario completes in minutes, giving operators confidence before committing capital.", specs: ["Omniverse", "What-if engine", "Minutes per scenario"] },
+  { id: "simulate", label: "Simulate", icon: Layers, color: "hsl(var(--primary))", short: "AURA runs what-if scenarios for expansion, failover, and cooling optimization.", full: "The AURA deterministic simulation runs what-if scenarios: adding new racks, switching to liquid cooling, failing over an entire hall, or doubling GPU density. Each scenario completes in minutes, giving operators confidence before committing capital.", specs: ["AURA simulation", "What-if engine", "Uncalibrated estimates"] },
 ];
 
 // Clusters
@@ -70,7 +70,7 @@ const HEALTH_CHECKS = [
   { service: "DCIM Gateway", status: "ok" as const, latency: "2ms" },
   { service: "BMS Connector", status: "ok" as const, latency: "5ms" },
   { service: "GPU Scheduler", status: "ok" as const, latency: "1ms" },
-  { service: "Omniverse Sync", status: "ok" as const, latency: "12ms" },
+  { service: "Twin preview sync", status: "ok" as const, latency: "12ms" },
   { service: "DDN StorageLink", status: "ok" as const, latency: "3ms" },
   { service: "Edge Fleet Mgr", status: "warning" as const, latency: "48ms" },
   { service: "Power Monitoring", status: "ok" as const, latency: "4ms" },
@@ -919,7 +919,7 @@ const InfrastructurePage = () => {
                         {[
                           { label: "DDN Storage", spec: "A3I / Infinia / EXAScaler", role: "High-throughput data ingestion and tiered storage", icon: HardDrive },
                           { label: "NVIDIA B3100", spec: "Blackwell Architecture", role: "Training GPU cluster for facility AI models", icon: Cpu },
-                          { label: "RTX PRO 6000", spec: "Ada Lovelace", role: "Inference and 3D digital twin rendering", icon: Eye },
+                          { label: "RTX PRO 6000", spec: "Ada Lovelace", role: "Modelled inference and rendering capacity (simulated)", icon: Eye },
                           { label: "Edge Inference", spec: "Dedicated Nodes", role: "Edge inference per rack row, sub-50ms latency", icon: Bot },
                         ].map((node, i) => (
                           <React.Fragment key={node.label}>

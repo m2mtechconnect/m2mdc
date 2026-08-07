@@ -21,6 +21,54 @@
 import type { DataProvenance } from '../types';
 import type { ProvenancedMetric } from '../types';
 import type { MetricCatalogEntry } from '../metricCatalog';
+import {
+  ACTIVE_MODE,
+  INPUT_CLASSIFICATION,
+  SIMULATION_SOURCE,
+  activeScenarioLabel,
+} from '@/capabilities/operatingState';
+import { getRunProvenance } from '@/capabilities/runProvenance';
+
+/**
+ * Stage 5 truth block. Every serialized artefact must carry it so a file
+ * that leaves the product cannot be mistaken for live or NVIDIA-generated
+ * output.
+ */
+export interface ExportOperatingState {
+  operatingMode: string;
+  inputClassification: string;
+  simulationRunId: string | null;
+  scenario: string;
+  calculationTimestamp: string | null;
+  sourceGenerator: string;
+  humanReviewStatus: string;
+  nvidiaRuntimeUsed: 'No' | 'Yes';
+  liveFacilityDataUsed: 'No' | 'Yes';
+  knownLimitations: string;
+}
+
+export const EXPORT_KNOWN_LIMITATIONS =
+  'Values are produced by a deterministic AURA simulation with synthetic inputs. Not calibrated against a physical facility. No OpenUSD stage, SimReady-validated asset or DSX Exchange transport is involved.';
+
+/** Build the truth block from live capability state (no fabrication). */
+export function buildExportOperatingState(
+  overrides?: Partial<ExportOperatingState>,
+): ExportOperatingState {
+  const run = getRunProvenance();
+  return {
+    operatingMode: ACTIVE_MODE,
+    inputClassification: INPUT_CLASSIFICATION,
+    simulationRunId: run.runId,
+    scenario: activeScenarioLabel(),
+    calculationTimestamp: run.calculatedAt,
+    sourceGenerator: SIMULATION_SOURCE,
+    humanReviewStatus: 'Not reviewed',
+    nvidiaRuntimeUsed: 'No',
+    liveFacilityDataUsed: 'No',
+    knownLimitations: EXPORT_KNOWN_LIMITATIONS,
+    ...overrides,
+  };
+}
 
 /** Bump when the record shape changes in a breaking way. */
 export const EXPORT_SCHEMA_VERSION = '1.0.0';
@@ -68,6 +116,8 @@ export interface ExportPayload {
   records: ExportRecord[];
   /** Optional per-payload note (surface-level provenance summary). */
   note?: string;
+  /** Stage 5 operating-state truth block. Defaulted by the serializers. */
+  operatingState?: ExportOperatingState;
 }
 
 export interface BuildRecordInput<T = number | string> {

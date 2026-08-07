@@ -1,0 +1,314 @@
+{
+ "public": [
+  {
+   "route": "/",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/login",
+   "after_deeplink": "/login",
+   "after_refresh": "/login",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/sign-in",
+   "after_deeplink": "/onboarding",
+   "after_refresh": "/onboarding",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/sign-up",
+   "after_deeplink": "/onboarding",
+   "after_refresh": "/onboarding",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/forgot-password",
+   "after_deeplink": "/onboarding",
+   "after_refresh": "/onboarding",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/onboarding",
+   "after_deeplink": "/onboarding",
+   "after_refresh": "/onboarding",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/twin-datacentre",
+   "after_deeplink": "/twin-datacentre",
+   "after_refresh": "/twin-datacentre",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/data-centre-twin",
+   "after_deeplink": "/data-centre-twin",
+   "after_refresh": "/data-centre-twin",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/omniverse-scene",
+   "after_deeplink": "/omniverse-scene",
+   "after_refresh": "/omniverse-scene",
+   "blank": false,
+   "console_errors": []
+  }
+ ],
+ "authenticated": [
+  {
+   "route": "/dashboard",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/builder",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/deploy",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/deployments",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/analytics",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/operations",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/intelligence",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/infrastructure",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/account/profile",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/account/settings",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/account/access-control",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/teams",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/compliance",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/marketplace",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/app/agents",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/help",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/search",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/settings/ai",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/settings/integrations/nvidia-dsx",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/playbook",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/pilot",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/pilot/overview",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/dsx/evidence-beta/overview",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/dsx/evidence-beta/thermal",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/dsx/evidence-beta/power",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/dsx/evidence-beta/cooling",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/dsx/evidence-beta/network",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/dsx/evidence-beta/facility",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/dsx/evidence-beta/workload",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/dsx/evidence-beta/simulations",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/dsx/evidence-beta/sovereignty",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/dsx/evidence-beta/carbon",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/dsx/evidence-beta/financials",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/dsx/evidence-beta/evidence",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  },
+  {
+   "route": "/nope-404",
+   "after_deeplink": "/",
+   "after_refresh": "/",
+   "blank": false,
+   "console_errors": []
+  }
+ ]
+}

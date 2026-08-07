@@ -1,0 +1,380 @@
+[
+ {
+  "vp": "desktop",
+  "route": "/",
+  "final": "/",
+  "textLen": 7637,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "desktop",
+  "route": "/login",
+  "final": "/login",
+  "textLen": 489,
+  "hOverflowPx": 0,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "desktop",
+  "route": "/onboarding",
+  "final": "/onboarding",
+  "textLen": 244,
+  "hOverflowPx": 0,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "desktop",
+  "route": "/twin-datacentre",
+  "final": "/twin-datacentre",
+  "textLen": 7637,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "desktop",
+  "route": "/data-centre-twin",
+  "final": "/data-centre-twin",
+  "textLen": 2241,
+  "hOverflowPx": 0,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "desktop",
+  "route": "/omniverse-scene",
+  "final": "/omniverse-scene",
+  "textLen": 675,
+  "hOverflowPx": 0,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "desktop",
+  "route": "/dashboard",
+  "final": "/",
+  "textLen": 7637,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "desktop",
+  "route": "/builder",
+  "final": "/",
+  "textLen": 7637,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "desktop",
+  "route": "/analytics",
+  "final": "/",
+  "textLen": 7637,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "desktop",
+  "route": "/operations",
+  "final": "/",
+  "textLen": 7637,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "desktop",
+  "route": "/infrastructure",
+  "final": "/",
+  "textLen": 7637,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "desktop",
+  "route": "/settings/integrations/nvidia-dsx",
+  "final": "/",
+  "textLen": 7637,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "desktop",
+  "route": "/dsx/evidence-beta",
+  "final": "/",
+  "textLen": 7637,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "desktop",
+  "route": "/pilot/overview",
+  "final": "/",
+  "textLen": 7637,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "tablet",
+  "route": "/",
+  "final": "/",
+  "textLen": 7556,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "tablet",
+  "route": "/login",
+  "final": "/login",
+  "textLen": 314,
+  "hOverflowPx": 0,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "tablet",
+  "route": "/onboarding",
+  "final": "/onboarding",
+  "textLen": 244,
+  "hOverflowPx": 0,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "tablet",
+  "route": "/twin-datacentre",
+  "final": "/twin-datacentre",
+  "textLen": 7556,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "tablet",
+  "route": "/data-centre-twin",
+  "final": "/data-centre-twin",
+  "textLen": 2262,
+  "hOverflowPx": 0,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "tablet",
+  "route": "/omniverse-scene",
+  "final": "/omniverse-scene",
+  "textLen": 675,
+  "hOverflowPx": 0,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "tablet",
+  "route": "/dashboard",
+  "final": "/",
+  "textLen": 7556,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "tablet",
+  "route": "/builder",
+  "final": "/",
+  "textLen": 7556,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "tablet",
+  "route": "/analytics",
+  "final": "/",
+  "textLen": 7556,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "tablet",
+  "route": "/operations",
+  "final": "/",
+  "textLen": 7556,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "tablet",
+  "route": "/infrastructure",
+  "final": "/",
+  "textLen": 7556,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "tablet",
+  "route": "/settings/integrations/nvidia-dsx",
+  "final": "/",
+  "textLen": 7556,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "tablet",
+  "route": "/dsx/evidence-beta",
+  "final": "/",
+  "textLen": 7556,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "tablet",
+  "route": "/pilot/overview",
+  "final": "/",
+  "textLen": 7556,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "mobile",
+  "route": "/",
+  "final": "/",
+  "textLen": 7490,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "mobile",
+  "route": "/login",
+  "final": "/login",
+  "textLen": 314,
+  "hOverflowPx": 0,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "mobile",
+  "route": "/onboarding",
+  "final": "/onboarding",
+  "textLen": 198,
+  "hOverflowPx": 0,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "mobile",
+  "route": "/twin-datacentre",
+  "final": "/twin-datacentre",
+  "textLen": 7490,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "mobile",
+  "route": "/data-centre-twin",
+  "final": "/data-centre-twin",
+  "textLen": 2137,
+  "hOverflowPx": 128,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "mobile",
+  "route": "/omniverse-scene",
+  "final": "/omniverse-scene",
+  "textLen": 675,
+  "hOverflowPx": 0,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "mobile",
+  "route": "/dashboard",
+  "final": "/",
+  "textLen": 7490,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "mobile",
+  "route": "/builder",
+  "final": "/",
+  "textLen": 7490,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "mobile",
+  "route": "/analytics",
+  "final": "/",
+  "textLen": 7490,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "mobile",
+  "route": "/operations",
+  "final": "/",
+  "textLen": 7490,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "mobile",
+  "route": "/infrastructure",
+  "final": "/",
+  "textLen": 7490,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "mobile",
+  "route": "/settings/integrations/nvidia-dsx",
+  "final": "/",
+  "textLen": 7490,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "mobile",
+  "route": "/dsx/evidence-beta",
+  "final": "/",
+  "textLen": 7490,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ },
+ {
+  "vp": "mobile",
+  "route": "/pilot/overview",
+  "final": "/",
+  "textLen": 7490,
+  "hOverflowPx": 40,
+  "operatingStateBar": 0,
+  "errors": []
+ }
+]

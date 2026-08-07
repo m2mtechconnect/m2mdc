@@ -60,3 +60,54 @@ Runtime verification executed headless against `http://localhost:8080` with `?de
 Evidence: `/tmp/browser/s5a/routes.json` (17 routes probed, 0 nav errors, 0 console errors,
 0 blank pages). These gates remain BLOCKED_BY_AUTH until an authenticated preview session
 is available; no production project was contacted.
+
+## Re-run: S5A-05 and S5A-13 (2026-08-07)
+
+Preview auth status remained `signed_out` (`LOVABLE_BROWSER_AUTH_STATUS=signed_out`,
+no injected session), so an authenticated in-page verification could not be performed.
+The matrix below is the unauthenticated deep-link + hard-refresh proof for all 44 routes.
+
+- S5A-05: PASS re-run (`vitest run src/capabilities`, 10/10 passed).
+- S5A-13: PASS for public routes and for redirect behaviour of all authenticated routes.
+  Authenticated in-page rendering remains BLOCKED_BY_AUTH.
+
+Evidence: `/tmp/browser/s5a/m5.json` - 44 routes, 0 blank pages, 0 console errors,
+0 failed requests, deep-link and refresh URLs identical on every route.
+
+### Public routes (deep link -> after refresh)
+
+| Route | Deep link | After refresh |
+|---|---|---|
+| `/` | `/` | `/` |
+| `/login` | `/login` | `/login` |
+| `/sign-in` | `/onboarding` (onboarding gate) | `/onboarding` |
+| `/sign-up` | `/onboarding` (onboarding gate) | `/onboarding` |
+| `/forgot-password` | `/onboarding` (onboarding gate) | `/onboarding` |
+| `/onboarding` | `/onboarding` | `/onboarding` |
+| `/twin-datacentre` | `/twin-datacentre` | `/twin-datacentre` |
+| `/data-centre-twin` | `/data-centre-twin` | `/data-centre-twin` |
+| `/omniverse-scene` | `/omniverse-scene` | `/omniverse-scene` |
+
+### Authenticated routes (unauthenticated behaviour)
+
+All 34 probed authenticated routes plus `/nope-404` redirect to `/` on both deep link and
+refresh, with no blank render and no console error:
+`/dashboard`, `/builder`, `/deploy`, `/deployments`, `/analytics`, `/operations`,
+`/intelligence`, `/infrastructure`, `/account/profile`, `/account/settings`,
+`/account/access-control`, `/teams`, `/compliance`, `/marketplace`, `/app/agents`,
+`/help`, `/search`, `/settings/ai`, `/settings/integrations/nvidia-dsx`, `/playbook`,
+`/pilot`, `/pilot/overview`, and the 12 `/dsx/evidence-beta/*` workspaces.
+
+### Defects found and fixed during the re-run
+
+- **D-5A-02 (HIGH, fixed).** Public route `/data-centre-twin` crashed into the
+  ErrorBoundary: `DataCentreDashboard` calls `useCoPilotCommands`/`useCoPilotContext`, but
+  the unauthenticated router in `src/App.tsx` did not provide `CoPilotProvider` /
+  `CoPilotCommandProvider`. Fixed by wrapping only that route element (a global wrap was
+  tried first and rejected because it triggered the anonymous request in D-5A-03 on every
+  public route).
+- **D-5A-03 (MEDIUM, fixed).** `CoPilotContext` issued an anonymous
+  `GET /rest/v1/copilot_memory` on mount, returning 401 after the B-03 anonymous-read
+  closure. Fixed by skipping the memory load when no session exists.
+
+Operating mode remains SIMULATED. Production verdict unchanged: NO-GO.

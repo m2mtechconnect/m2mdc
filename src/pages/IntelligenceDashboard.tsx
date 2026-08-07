@@ -670,7 +670,7 @@ export default function IntelligenceDashboard() {
                 statusLabel={`Target ≤ ${CARBON_INTENSITY_TARGET}`}
                 quality="good"
                 icon={Flame}
-                tooltip="Live grid carbon intensity for the selected region. Lower is better. IEA 2024 + electricityMap convention."
+                tooltip="Simulated grid carbon intensity for the selected region. Lower is better. IEA 2024 + electricityMap convention."
               />
               <KpiCardProvenance
                 id="sovereignty"

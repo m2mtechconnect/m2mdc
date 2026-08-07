@@ -1,0 +1,2 @@
+No probe failures observed: zero probes were executed.
+All 26 probes are blocked_preflight (environment guard BLOCKED, 0 network requests).

@@ -9,7 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Info, Lock } from 'lucide-react';
 import { Layout } from '@/components/Layout';
-import { OperatingStateBar } from '@/components/capability/OperatingStateBar';
 import { NVIDIA_READINESS } from '@/capabilities/registry';
 
 interface Row {
@@ -48,7 +47,6 @@ function StatusBadge({ status, tone }: { status: string; tone: Row['tone'] }) {
 export default function NvidiaDsxReadiness() {
   return (
     <Layout>
-      <OperatingStateBar className="mb-4 rounded-md border" />
       <div className="space-y-6 pb-10" data-testid="nvidia-dsx-readiness">
         <header className="space-y-1">
           <p className="text-xs uppercase tracking-wider text-muted-foreground">

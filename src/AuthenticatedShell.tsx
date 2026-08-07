@@ -31,6 +31,7 @@ import ConnectHealth from "./pages/ConnectHealth";
 import Search from "./pages/Search";
 import UniversalSearch from "./pages/UniversalSearch";
 import AISettings from "./pages/AISettings";
+import NvidiaDsxReadiness from "./pages/settings/NvidiaDsxReadiness";
 import { SignOut } from "./pages/auth/index";
 import NotFound from "./pages/NotFound";
 import AgentWorkspace from "./pages/AgentWorkspace";
@@ -119,6 +120,7 @@ function ApprovedUserRoutes() {
       <Route path="/search" element={<Search />} />
       <Route path="/universal-search" element={<UniversalSearch />} />
       <Route path="/settings/ai" element={<AISettings />} />
+      <Route path="/settings/integrations/nvidia-dsx" element={<NvidiaDsxReadiness />} />
       <Route path="/auth" element={<Navigate to="/" replace />} />
       <Route path="/sign-in" element={<Navigate to="/" replace />} />
       <Route path="/sign-up" element={<Navigate to="/" replace />} />

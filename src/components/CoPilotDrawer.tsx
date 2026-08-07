@@ -733,12 +733,12 @@ export function CoPilotDrawer({ open, onClose, currentRole, initialMessage }: Co
                 <div>
                   <h4 className="text-base font-semibold mb-1">Welcome to M2M Co-Pilot</h4>
                   <p className="text-sm text-muted-foreground leading-relaxed mb-2">
-                    Your enterprise AI assistant powered by <strong className="text-primary">Google Gemini 2.5 Pro</strong> with intelligent grounding to your workspace data and M2M Knowledge Base. Get accurate, contextual answers with automatic fallback to broader AI knowledge when needed.
+                    Your AURA DC assistant. Answers are grounded in the current deterministic simulation run and your workspace data. It reasons about simulated results and does not have access to live facility or NVIDIA DSX data.
                   </p>
                   <div className="flex flex-wrap gap-2 text-xs">
                     <Badge variant="secondary" className="gap-1">
                       <Database className="h-3 w-3" />
-                      Live Workspace Data
+                      Simulated Workspace Data
                     </Badge>
                     <Badge variant="secondary" className="gap-1">
                       <BookOpen className="h-3 w-3" />
@@ -758,14 +758,14 @@ export function CoPilotDrawer({ open, onClose, currentRole, initialMessage }: Co
                 Quick start - Ask me anything:
               </p>
               <div className="space-y-2">
-                {getSuggestionButton("Show me the six steps of the AI System Builder")}
-                {getSuggestionButton("Compare Gemini vs GPT-5 for my use case")}
-                {getSuggestionButton("Walk me through connecting Salesforce via Zapier")}
-                {getSuggestionButton("Calculate ROI for my deployed AI systems")}
-                {getSuggestionButton("What compliance checks should I run before deploying?")}
-                {getSuggestionButton("How do I improve RAG retrieval accuracy?")}
-                {getSuggestionButton("Show me workflow automation templates for my industry")}
-                {getSuggestionButton("What's the difference between Operations Monitor and Analytics?")}
+                {getSuggestionButton("Explain the PUE result from the current simulation run")}
+                {getSuggestionButton("Which cooling scenario produced the best thermal margin?")}
+                {getSuggestionButton("Summarise the open recommendations awaiting human review")}
+                {getSuggestionButton("What evidence supports the carbon intensity figure shown?")}
+                {getSuggestionButton("Compare the baseline and degraded cooling scenarios")}
+                {getSuggestionButton("Which metrics on this page are simulated rather than measured?")}
+                {getSuggestionButton("Walk me through the simulation inputs for this facility")}
+                {getSuggestionButton("What would need to be connected before these values are operational?")}
               </div>
             </div>
           </div>

@@ -72,3 +72,6 @@ a455c922f38dd0d64ac66508d5076572c258db42fdf114ffae0e47ef1a53bcb3  68-nvidia-bloc
 17aed832b4213f50f7439b11467f84cecb8d7fead94857440cfd1aac92c06b3e  72-stage-4-gate-results.csv
 50e752486db5ffaaa7e751053ed5719f9822133a242af6a12c32eb9aac55c188  73-stage-4-environment-requirements.md
 e877fa705f8e8bb8493767cfb861e1d4b54d482d609b27f55494210ca4efd208  74-stage-4-summary.md
+119b4f07ed0ab20ffe743c89561fd7b7ddc0d3ab5f043202b0354255c04f8853  75-stage-4a-infrastructure-manifest.md
+fdffaa793bc851d6ac8e7984e783d626c93f2ed60e0d327bc5316a9bf94101e1  76-stage-4a-entitlement-and-package-register.csv
+d83f5cb14e01caab9eeaf3fe6e2c6e53b54d0b950adb7e48ecd3ed417ac21c49  77-stage-4a-preflight-result.md

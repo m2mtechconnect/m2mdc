@@ -1,17 +1,31 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  EMPTY_AUTHORIZATION,
+  resolveAuthorization,
+  type AnyRole,
+  type Permission,
+  type ResolvedAuthorization,
+} from '@/auth/permissions';
 
-export type AppRole = 
-  | 'executive' 
-  | 'manager' 
-  | 'engineer' 
-  | 'security_admin'
-  | 'compliance' 
-  | 'data_analyst' 
-  | 'marketing' 
-  | 'sales' 
-  | 'support' 
-  | 'finance';
+/**
+ * Canonical authorization provider (B-01).
+ *
+ * This is the ONLY place the frontend resolves who the caller is and what they
+ * may do. `useUserPermissions` is a thin deprecated shim over this context and
+ * no longer issues its own `user_roles` query, so the two systems can no longer
+ * disagree.
+ *
+ * Authority rules:
+ *   - identity comes from `supabase.auth` (i.e. `auth.users`) only;
+ *   - roles come from `public.user_roles`, which is read-own under RLS and
+ *     writable only through audited SECURITY DEFINER RPCs;
+ *   - `profiles` is never consulted for security-effective roles;
+ *   - expired grants are dropped client-side AND server-side;
+ *   - a failed lookup is an error state, never a silent downgrade.
+ */
+export type AppRole = AnyRole;
+export type { Permission } from '@/auth/permissions';
 
 /**
  * Explicit authorization resolution state. Replaces the ambiguous
@@ -32,6 +46,14 @@ interface RBACContextType {
   isInternal: boolean;
   resolution: RoleResolution;
   retry: () => void;
+  /** Every active role label held by the caller. */
+  roles: AppRole[];
+  /** Union of permissions granted by active global grants. */
+  permissions: Permission[];
+  /** Permission-based gate. Prefer this over role-label comparisons. */
+  can: (permission: Permission) => boolean;
+  /** Full resolution detail, including grants that could not be mapped. */
+  authorization: ResolvedAuthorization;
 }
 
 const RBACContext = createContext<RBACContextType>({
@@ -42,6 +64,10 @@ const RBACContext = createContext<RBACContextType>({
   isInternal: false,
   resolution: { status: 'loading' },
   retry: () => {},
+  roles: [],
+  permissions: [],
+  can: () => false,
+  authorization: EMPTY_AUTHORIZATION,
 });
 
 export const useRBAC = () => useContext(RBACContext);
@@ -50,6 +76,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [resolution, setResolution] = useState<RoleResolution>({ status: 'loading' });
   const [retryTick, setRetryTick] = useState(0);
+  const [authorization, setAuthorization] = useState<ResolvedAuthorization>(EMPTY_AUTHORIZATION);
 
   const retry = useCallback(() => {
     setResolution({ status: 'loading' });
@@ -71,6 +98,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
         if (!user) {
           if (!cancelled) {
             setUserId(null);
+            setAuthorization(EMPTY_AUTHORIZATION);
             setResolution({ status: 'loading' });
           }
           return;
@@ -78,31 +106,45 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
 
         if (!cancelled) setUserId(user.id);
 
-        const { data: userRoles, error: rolesError } = await supabase
+        // Read ALL grants, not just the first row: a caller may legitimately
+        // hold several, and truncating to one silently discarded authority.
+        const { data: roleRows, error: rolesError } = await supabase
           .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .limit(1)
-          .maybeSingle();
+          .select('role, scope, expires_at')
+          .eq('user_id', user.id);
 
         if (rolesError) {
           // Lookup FAILURE is distinct from "no row". Do NOT silently
           // downgrade to pilot — surface an authorization-error state.
           console.error('Error fetching user roles:', rolesError);
-          if (!cancelled) setResolution({ status: 'error', error: rolesError });
+          if (!cancelled) {
+            setAuthorization(EMPTY_AUTHORIZATION);
+            setResolution({ status: 'error', error: rolesError });
+          }
           return;
         }
 
+        const resolved = resolveAuthorization(roleRows ?? []);
+
+        if (resolved.unmapped.length > 0) {
+          // Report, never guess: an unrecognised label grants nothing.
+          console.error('Unmapped authorization labels ignored:', resolved.unmapped);
+        }
+
         if (!cancelled) {
-          if (userRoles) {
-            setResolution({ status: 'internal', role: userRoles.role as AppRole });
+          setAuthorization(resolved);
+          if (resolved.primaryRole) {
+            setResolution({ status: 'internal', role: resolved.primaryRole });
           } else {
             setResolution({ status: 'pilot' });
           }
         }
       } catch (error) {
         console.error('Error fetching user role:', error);
-        if (!cancelled) setResolution({ status: 'error', error });
+        if (!cancelled) {
+          setAuthorization(EMPTY_AUTHORIZATION);
+          setResolution({ status: 'error', error });
+        }
       }
     };
 
@@ -115,6 +157,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
         setTimeout(() => fetchUserRole(), 0);
       } else {
         setUserId(null);
+        setAuthorization(EMPTY_AUTHORIZATION);
         setResolution({ status: 'loading' });
       }
     });
@@ -131,12 +174,28 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
   const loading = resolution.status === 'loading';
 
   const hasAccess = (requiredRoles: AppRole[]) => {
-    if (!role) return false;
-    return requiredRoles.includes(role);
+    if (authorization.roles.length === 0) return false;
+    return requiredRoles.some((required) => authorization.roles.includes(required));
   };
 
+  const can = (permission: Permission) => authorization.permissions.has(permission);
+
   return (
-    <RBACContext.Provider value={{ role, loading, hasAccess, userId, isInternal, resolution, retry }}>
+    <RBACContext.Provider
+      value={{
+        role,
+        loading,
+        hasAccess,
+        userId,
+        isInternal,
+        resolution,
+        retry,
+        roles: authorization.roles,
+        permissions: Array.from(authorization.permissions),
+        can,
+        authorization,
+      }}
+    >
       {children}
     </RBACContext.Provider>
   );

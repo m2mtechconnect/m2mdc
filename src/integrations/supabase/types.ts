@@ -4929,7 +4929,7 @@ export type Database = {
           granted_at: string | null
           granted_by: string | null
           id: string
-          role: string
+          role: Database["public"]["Enums"]["app_role"]
           scope: string | null
           updated_at: string | null
           user_id: string
@@ -4940,7 +4940,7 @@ export type Database = {
           granted_at?: string | null
           granted_by?: string | null
           id?: string
-          role: string
+          role: Database["public"]["Enums"]["app_role"]
           scope?: string | null
           updated_at?: string | null
           user_id: string
@@ -4951,7 +4951,7 @@ export type Database = {
           granted_at?: string | null
           granted_by?: string | null
           id?: string
-          role?: string
+          role?: Database["public"]["Enums"]["app_role"]
           scope?: string | null
           updated_at?: string | null
           user_id?: string
@@ -5527,6 +5527,19 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_clear_user_roles: {
+        Args: { _reason?: string; _target_user_id: string }
+        Returns: undefined
+      }
+      admin_grant_role: {
+        Args: {
+          _reason?: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _scope?: string
+          _target_user_id: string
+        }
+        Returns: undefined
+      }
       admin_revoke_role: {
         Args: {
           _reason?: string
@@ -5535,6 +5548,19 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_revoke_role_grant: {
+        Args: { _reason?: string; _role_id: string }
+        Returns: undefined
+      }
+      admin_set_user_role: {
+        Args: {
+          _reason?: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _target_user_id: string
+        }
+        Returns: undefined
+      }
+      assert_role_admin: { Args: never; Returns: string }
       check_user_has_role: {
         Args: { _role: string; _user_id: string }
         Returns: boolean
@@ -5669,7 +5695,21 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "executive" | "manager" | "engineer" | "security_admin"
+      app_role:
+        | "executive"
+        | "manager"
+        | "engineer"
+        | "security_admin"
+        | "admin"
+        | "operator"
+        | "viewer"
+        | "owner"
+        | "compliance"
+        | "data_analyst"
+        | "marketing"
+        | "sales"
+        | "support"
+        | "finance"
       policy_decision: "allow" | "deny" | "warn"
       policy_scope: "model" | "rag" | "mcp" | "workflow" | "global"
       policy_target_type:
@@ -5805,7 +5845,22 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["executive", "manager", "engineer", "security_admin"],
+      app_role: [
+        "executive",
+        "manager",
+        "engineer",
+        "security_admin",
+        "admin",
+        "operator",
+        "viewer",
+        "owner",
+        "compliance",
+        "data_analyst",
+        "marketing",
+        "sales",
+        "support",
+        "finance",
+      ],
       policy_decision: ["allow", "deny", "warn"],
       policy_scope: ["model", "rag", "mcp", "workflow", "global"],
       policy_target_type: [

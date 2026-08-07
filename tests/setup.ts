@@ -1,5 +1,11 @@
 import '@testing-library/jest-dom';
 import { beforeAll, afterEach, afterAll, vi } from 'vitest';
+import { installLiveBackendGuard } from './_setup/liveBackendGuard';
+
+// Fail closed: block every Supabase network call unless the disposable
+// test project (aura-dc-security-test) is proven. Installed at module load,
+// before any test file imports the Supabase client.
+installLiveBackendGuard();
 
 // Mock environment variables
 beforeAll(() => {

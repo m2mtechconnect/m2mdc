@@ -1,0 +1,11 @@
+id,gate,severity,status,title,location,evidence_artifact
+D-5A-01,S5A-07,HIGH,FIXED,Run IDs and calculation timestamps fabricated at render time via new Date(),src/components/capability/OperatingStateBar.tsx; src/components/provenance/ProvenanceBadge.tsx,78
+D-5A-02,S5A-13,HIGH,FIXED,Public route /data-centre-twin crashed into ErrorBoundary: CoPilot hooks used without providers,src/App.tsx,79
+D-5A-03,S5A-13,MEDIUM,FIXED,Anonymous GET /rest/v1/copilot_memory returned 401 on mount for unauthenticated visitors,src/contexts/CoPilotContext.tsx,79
+V-5A-01,S5A-12,LOW,OPEN,Landing page has 40px horizontal overflow at desktop/tablet/mobile from hero decorative glow and floating stat card,src/pages (landing hero section),80
+V-5A-02,S5A-12,LOW,OPEN,/data-centre-twin has 128px horizontal overflow at 390px viewport only,src/pages/DataCentreDashboard surface,80
+P-5A-01,S5A-09,HIGH,OPEN,System prompt labels simulated DCDomainContext values as LIVE DATA and Real-Time KPIs,src/lib/copilot/dcSystemPrompt.ts:17;24,81
+P-5A-02,S5A-09,MEDIUM,OPEN,Live Data badge rendered for stored agent configuration rows rather than any telemetry feed,src/components/blueprint/tabs/BlueprintAgentsTab.tsx:171,81
+P-5A-03,S5A-09,MEDIUM,OPEN,Six percentage-confidence displays survive including a hard-coded 92% confidence,src/components/builder/GroundedRecommendationsCard.tsx:332; src/components/marketplace/TemplateSimulation.tsx:269; src/components/simulation/SimulationModeWrapper.tsx:270; src/components/simulation/EnterpriseKPIChart.tsx:303; src/components/search/InsightActionPanel.tsx:195,81
+P-5A-04,S5A-09,MEDIUM,OPEN,NVIDIA Kit 109 runtime claims survive outside InfrastructurePage,src/integrations/omniverseKit/client.ts:3; src/components/twin-visualization/OmniverseStreamViewer.tsx:2,81
+P-5A-05,S5A-09,LOW,OPEN,Marketing and config strings assert real-time telemetry and production-ready templates,src/data/templates/data-centre-master.json:10;92;112; src/i18n/locales/en.ts:447; src/tours/tourRegistry.ts:187,81

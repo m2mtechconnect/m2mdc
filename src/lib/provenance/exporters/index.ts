@@ -7,12 +7,15 @@ export {
   EXPORT_SCHEMA_VERSION,
   toExportRecord,
   describeExportBlock,
+  buildExportOperatingState,
+  EXPORT_KNOWN_LIMITATIONS,
 } from './schema';
 export type {
   ExportRecord,
   ExportPayload,
   ExportBlockReason,
   BuildRecordInput,
+  ExportOperatingState,
 } from './schema';
 export { CSV_COLUMNS, toCsv } from './csv';
 export { toJson } from './json';

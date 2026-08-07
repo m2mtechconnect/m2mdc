@@ -172,8 +172,8 @@ export function GeminiResponsePanel({ className }: GeminiResponsePanelProps) {
                   <th className="text-left py-2 text-xs font-semibold text-muted-foreground">
                     Section
                   </th>
-                  <th className="text-left py-2 text-xs font-semibold text-muted-foreground">
-                    Confidence
+                  <th className="text-left py-2 text-xs font-semibold text-muted-foreground" title={SIGNAL_BASIS}>
+                    Rule-based signal
                   </th>
                   <th className="text-right py-2 text-xs font-semibold text-muted-foreground">
                     Action

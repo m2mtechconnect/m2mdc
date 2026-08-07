@@ -181,6 +181,7 @@ export function AgentHealthPanel({ className }: { className?: string }) {
                         </Badge>
                       </div>
                       <p className="text-xs font-medium">{agent.lastDecision.action}</p>
+                      <p className="text-[10px] text-muted-foreground">{SIGNAL_BASIS}</p>
                       <p className="text-[10px] text-muted-foreground">{agent.lastDecision.reasoning}</p>
                       <div className="flex flex-wrap gap-1">
                         {agent.lastDecision.factors.map((factor, i) => (

@@ -306,7 +306,7 @@ export function WorkflowEnhancementsPanel({
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="h-4 w-4 text-info shrink-0 mt-0.5" />
                   <p className="text-xs text-info">
-                    Impact predictions are based on historical data and may vary with actual conditions.
+                    Impact projections are rule-based simulation estimates, not statistical confidence scores or model probabilities. {SIGNAL_BASIS}
                   </p>
                 </div>
               </div>

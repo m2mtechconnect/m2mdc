@@ -19,6 +19,27 @@ export const PRODUCTION_PROJECT_REF = "psfvrskpnwcshvajzeix";
 export const EXPECTED_TEST_PROJECT_NAME = "aura-dc-security-test";
 const AUDIT_LOG = "docs/evidence/phase-1/b0x-test-env-guard.log";
 
+/** Hostnames that must never be contacted by a test runner. */
+export const DENYLISTED_HOSTS = [
+  `${PRODUCTION_PROJECT_REF}.supabase.co`,
+  `${PRODUCTION_PROJECT_REF}.supabase.in`,
+  "m2mdc.lovable.app",
+  "auradc.m2mtechconnect.com",
+  "m2mtechconnect.com",
+];
+
+/** True when the target string resolves to a denylisted production host. */
+export function isDenylistedHost(target) {
+  if (!target) return false;
+  let host;
+  try {
+    host = new URL(target).hostname.toLowerCase();
+  } catch {
+    host = String(target).toLowerCase();
+  }
+  return DENYLISTED_HOSTS.some((d) => host === d || host.endsWith(`.${d}`));
+}
+
 /** Extract the project ref from a Supabase URL, or null. */
 export function refFromUrl(url) {
   if (!url) return null;
@@ -69,6 +90,25 @@ export function evaluateTestEnvGuard(env = process.env) {
   //    and is NEVER used as proof of authenticated RLS.
   if (!env.VITE_SUPABASE_PUBLISHABLE_KEY) {
     reasons.push("VITE_SUPABASE_PUBLISHABLE_KEY is not configured");
+  }
+
+  // 6. Target must be explicitly labelled disposable and cleanup authorized.
+  if (env.AURA_DC_TEST_DISPOSABLE?.trim() !== "true") {
+    reasons.push("AURA_DC_TEST_DISPOSABLE must be exactly \"true\" (target not labelled disposable)");
+  }
+  if (env.AURA_DC_TEST_CLEANUP_AUTHORIZED?.trim() !== "true") {
+    reasons.push("AURA_DC_TEST_CLEANUP_AUTHORIZED must be exactly \"true\" (destructive cleanup not authorized)");
+  }
+
+  // 7. Production hostnames denylisted for the resolved target.
+  if (url && isDenylistedHost(url)) {
+    reasons.push("VITE_SUPABASE_URL resolves to a denylisted production hostname");
+  }
+
+  // 8. No production service-role key may be reachable by the test runner.
+  //    Presence only is evaluated; the value is never read, compared or logged.
+  if (env.SUPABASE_SERVICE_ROLE_KEY && projectId?.includes(PRODUCTION_PROJECT_REF)) {
+    reasons.push("a service-role key is present while the target resolves to production (forbidden)");
   }
 
   return {

@@ -46,6 +46,7 @@ import { getRoleNavigation } from "@/config/roleDashboardConfig";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { OperatingStateBar } from "@/components/capability/OperatingStateBar";
 
 interface LayoutProps {
   children: React.ReactNode;

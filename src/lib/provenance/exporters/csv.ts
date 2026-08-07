@@ -9,7 +9,7 @@
  */
 
 import type { ExportPayload, ExportRecord } from './schema';
-import { EXPORT_SCHEMA_VERSION } from './schema';
+import { EXPORT_SCHEMA_VERSION, buildExportOperatingState } from './schema';
 
 export const CSV_COLUMNS = [
   'metric_id',
@@ -59,6 +59,12 @@ function rowValues(r: ExportRecord): string[] {
 export function toCsv(payload: ExportPayload): string {
   const lines: string[] = [];
   lines.push(`# aura-export schema=${EXPORT_SCHEMA_VERSION} surface=${payload.surface} generatedAt=${payload.generatedAt}`);
+  const os = payload.operatingState ?? buildExportOperatingState();
+  lines.push(`# operating_mode=${os.operatingMode} input_classification=${os.inputClassification} scenario=${os.scenario}`);
+  lines.push(`# simulation_run_id=${os.simulationRunId ?? 'unavailable'} calculation_timestamp=${os.calculationTimestamp ?? 'unavailable'}`);
+  lines.push(`# source_generator=${os.sourceGenerator} human_review=${os.humanReviewStatus}`);
+  lines.push(`# nvidia_runtime_used=${os.nvidiaRuntimeUsed} live_facility_data_used=${os.liveFacilityDataUsed}`);
+  lines.push(`# known_limitations=${os.knownLimitations.replace(/[\r\n]+/g, ' ')}`);
   lines.push(`# unavailable rows carry empty value; stale=true means source exceeded freshness budget`);
   lines.push(CSV_COLUMNS.join(','));
   for (const r of payload.records) {

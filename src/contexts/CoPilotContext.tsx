@@ -88,6 +88,11 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadMemory = async () => {
       try {
+        // Memory is per-user and RLS-scoped; skip the request entirely when
+        // there is no session (anonymous reads are closed and return 401).
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
         const { data } = await supabase
           .from('copilot_memory')
           .select('key, value');

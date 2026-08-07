@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { RBACProvider, useRBAC } from "@/contexts/RBACContext";
 import { ActiveTwinProvider } from "@/context/ActiveTwinContext";
+import { CoPilotProvider } from "@/contexts/CoPilotContext";
+import { CoPilotCommandProvider } from "@/contexts/CoPilotCommandContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemeProvider } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
@@ -131,7 +133,16 @@ function AuthenticatedApp() {
         <Route path="/forgot-password" element={onboardingDone ? <ForgotPassword /> : <Navigate to="/onboarding" replace />} />
         <Route path="/mfa" element={onboardingDone ? <MFA /> : <Navigate to="/onboarding" replace />} />
         <Route path="/twin-datacentre" element={<DataCentreTwinLanding />} />
-        <Route path="/data-centre-twin" element={<DataCentreTwin />} />
+        <Route
+          path="/data-centre-twin"
+          element={(
+            <CoPilotProvider>
+              <CoPilotCommandProvider>
+                <DataCentreTwin />
+              </CoPilotCommandProvider>
+            </CoPilotProvider>
+          )}
+        />
         <Route path="/omniverse-scene" element={<OmniverseScene />} />
         <Route path="/onboarding" element={<Onboarding />} />
         {import.meta.env.DEV && OverlayFixtures ? <Route path="/dev-overlays" element={<OverlayFixtures />} /> : null}

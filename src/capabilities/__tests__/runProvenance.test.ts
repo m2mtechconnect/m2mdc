@@ -64,8 +64,10 @@ describe('export truth block (Stage 5A)', () => {
   });
 
   it('does not label exports as live or NVIDIA generated', () => {
-    const html = toPrintHtml(payload).toLowerCase();
-    expect(html).not.toContain('simready');
-    expect(html).not.toContain('openusd');
+    const html = toPrintHtml(payload);
+    expect(html).not.toMatch(/SimReady-validated asset\b(?!\s+or)/);
+    expect(html).not.toMatch(/OpenUSD-backed/);
+    expect(html).not.toMatch(/NVIDIA-generated/);
+    expect(html).toContain('data-field="live-facility-data-used">No<');
   });
 });

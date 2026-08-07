@@ -2,7 +2,6 @@
  * Persistent operating-state bar (Stage 5).
  * Compact, one line on desktop, never claims live data.
  */
-import { useEffect, useState } from 'react';
 import { Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -13,8 +12,13 @@ import {
   OPERATING_MODES,
   OPERATING_STATE_TOOLTIP,
   activeScenarioLabel,
-  simulationRunId,
 } from '@/capabilities/operatingState';
+import {
+  NO_RUN_NOTICE,
+  RUN_UNAVAILABLE_LABEL,
+  formatCalculatedAt,
+  useRunProvenance,
+} from '@/capabilities/runProvenance';
 
 interface Props {
   className?: string;
@@ -24,12 +28,9 @@ interface Props {
 
 export function OperatingStateBar({ className, scenario, runId }: Props) {
   const mode = OPERATING_MODES[ACTIVE_MODE];
-  const id = runId ?? simulationRunId();
-  const [calculatedAt, setCalculatedAt] = useState<string>('');
-
-  useEffect(() => {
-    setCalculatedAt(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-  }, []);
+  const provenance = useRunProvenance();
+  const id = runId ?? provenance.runId ?? RUN_UNAVAILABLE_LABEL;
+  const calculatedAt = formatCalculatedAt(provenance.calculatedAt);
 
   return (
     <div
@@ -47,10 +48,17 @@ export function OperatingStateBar({ className, scenario, runId }: Props) {
         {mode.mode}
       </Badge>
       <span className="font-medium text-foreground">{scenario ?? activeScenarioLabel()}</span>
-      <span className="text-muted-foreground">Run {id}</span>
+      <span className="text-muted-foreground" data-testid="operating-state-run-id">
+        Run {id}
+      </span>
       <span className="text-muted-foreground">{INPUT_CLASSIFICATION}</span>
-      <span className="text-muted-foreground">
-        Last calculated: <time>{calculatedAt || '—'}</time>
+      <span className="text-muted-foreground" data-testid="operating-state-calculated-at">
+        Last calculated:{' '}
+        {provenance.calculatedAt ? (
+          <time dateTime={provenance.calculatedAt}>{calculatedAt}</time>
+        ) : (
+          <span>{RUN_UNAVAILABLE_LABEL}</span>
+        )}
       </span>
       <TooltipProvider>
         <Tooltip>
@@ -63,6 +71,7 @@ export function OperatingStateBar({ className, scenario, runId }: Props) {
           </TooltipTrigger>
           <TooltipContent side="bottom" className="max-w-xs text-xs">
             {OPERATING_STATE_TOOLTIP}
+            {!provenance.available && <span className="mt-1 block">{NO_RUN_NOTICE}</span>}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

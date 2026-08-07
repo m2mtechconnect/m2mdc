@@ -87,3 +87,49 @@ before any authenticated verification work begins.
 
 B-04 tenant isolation is NOT implemented and no further authorization proof is
 claimed. Both remain blocked pending the disposable project variables.
+
+## 6. Vitest live-backend egress guard (added 2026-08-07)
+
+`tests/_setup/liveBackendGuard.ts`, installed at the top of `tests/setup.ts`,
+so it is active before any test file imports the Supabase client.
+
+Behaviour: it re-evaluates the same disposable-environment criteria as
+`scripts/aura-test-env-guard.mjs`. If the environment is not the proven
+disposable project, `globalThis.fetch` is wrapped and **every** request whose
+host matches `*.supabase.co` / `*.supabase.in` throws
+`LiveBackendBlockedError` locally, before egress. Non-Supabase requests pass
+through untouched. When the disposable variables are present and valid, no
+interceptor is installed at all.
+
+Error messages carry only `origin + pathname`; query strings (which can carry
+`apikey`) are stripped. No token, password or secret key is read or printed.
+
+Unit tests: `tests/unit/live-backend-guard.test.ts`, 6/6 passing, including a
+leak assertion.
+
+Runtime proof: `npx vitest run tests/integration/builder.test.ts` now aborts with
+`LiveBackendBlockedError ... https://<production-ref>.supabase.co/auth/v1/signup`
+instead of `AuthWeakPasswordError`. The signup request never left the process.
+
+### Full-suite delta after installing the guard
+
+| Run | Total | Passed | Failed | Skipped |
+|---|---|---|---|---|
+| Previous (guard CLI slice) | 1438 | 1102 | 227 | 109 |
+| Current | 1451 | 1114 | 228 | 109 |
+
+Identity-level diff against
+`docs/evidence/phase-1/b0x-failing-test-identities.txt` (now refreshed to the
+current run):
+
+- **Newly failing (2), both expected and both caused by the guard:**
+  `tests/integration/operations.test.ts :: should list environments` and
+  `:: should query system events`. These two tests were previously **passing by
+  reading live production data**. That is a finding, not a regression: the guard
+  converted a silent production read into a visible failure. They must be
+  repointed at the disposable project.
+- **Newly passing (1):** `src/simulation/providers/__tests__/contract.test.ts ::
+  ... facade is opt-in` — unrelated ordering flake, no source change.
+- Zero change in any authorization file. B-01/B-02/B-03/B-06 evidence untouched.
+
+B-04 remains untouched.

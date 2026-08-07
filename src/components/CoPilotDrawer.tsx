@@ -13,6 +13,7 @@ import { useCopilotHistory } from "@/hooks/useCopilotHistory";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { logger } from "@/lib/logger";
 import { formatRelativeTime } from "@/lib/formatters";
+import { evidenceBoundaryNotice } from '@/capabilities/operatingState';
 
 interface Citation {
   id: number;
@@ -821,6 +822,13 @@ export function CoPilotDrawer({ open, onClose, currentRole, initialMessage }: Co
                   
                   {msg.role === 'assistant' && (
                     <div className="px-4 pb-3 space-y-3 border-t border-border/50 pt-3 mt-2">
+                      {/* Evidence boundary — every answer states its source of truth */}
+                      <p
+                        data-testid="assistant-evidence-boundary"
+                        className="text-[11px] leading-snug text-muted-foreground"
+                      >
+                        {evidenceBoundaryNotice()}
+                      </p>
                       {/* Data Sources & Knowledge Badge */}
                       {(msg.dataSources || msg.knowledgeCount) && (
                         <div className="flex flex-wrap gap-1.5 mb-2">

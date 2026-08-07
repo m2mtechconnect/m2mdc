@@ -1,6 +1,7 @@
 /**
  * Omniverse Scene Page
- * Dedicated page for live NVIDIA Omniverse RTX-rendered data center scene.
+ * AURA Twin Preview. Application-rendered preview of the AURA data centre
+ * model. No NVIDIA Omniverse runtime, OpenUSD stage or live scene is used.
  * Shows WebRTC stream viewport, live Kit metrics, simulation controls,
  * camera presets, and rack health panel — all powered by the Kit REST API.
  */
@@ -163,9 +164,9 @@ export default function OmniverseScene() {
               <Server className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">DSX AI Factory Digital Twin</h1>
+              <h1 className="text-2xl font-bold tracking-tight">AURA Twin Preview</h1>
               <p className="text-sm text-muted-foreground font-mono">
-                NVIDIA Omniverse RTX • Kit 109 • {kit.rackCount} Racks • Live Scene
+                AURA application rendering • {kit.rackCount} racks • Simulated scene
               </p>
             </div>
           </div>

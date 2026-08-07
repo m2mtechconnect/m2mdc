@@ -1,0 +1,158 @@
+# Stage 5A prohibited-claims scan - raw output
+# Generated 2026-08-07 UTC. Read-only scan, no source modified.
+
+## A) live / real-time / production-ready claims
+src/components/capability/OperatingStateBar.tsx:3: * Compact, one line on desktop, never claims live data.
+src/tours/tourRegistry.ts:187:    content: 'Real-time data centre metrics—PUE, GPU saturation, thermal stability, and sovereignty compliance.',
+src/capabilities/registry.ts:12: *   Live telemetry sources: 0 · DSX Exchange: not deployed
+src/components/builder/AIRecommendationCard.tsx:114:        optimizations.push("Enable Grounding layer for higher accuracy with real-time data enrichment");
+src/config/roleDashboardConfig.ts:22:  /** Mock value — replaced by live data in dashboard */
+src/components/builder/TemplateSelector.tsx:39:      systemPrompt: "You are the Data Centre Digital Twin CoPilot, an expert AI assistant for sovereign data centre operations. You monitor 9 domain twins: Thermal, Power, Cooling, Network, Facility, Workload, Sovereignty, Carbon, and Financial. Provide actionable insights based on real-time telemetry and simulation results.",
+src/components/builder/steps/Step3Tools.tsx:236:            subtitle="Real-time data collection from infrastructure"
+src/components/blueprint/tabs/BlueprintAgentsTab.tsx:171:              <Badge variant="secondary" className="ml-2">Live Data</Badge>
+src/pages/Dashboard.tsx:159:  // Use KPI hooks with real-time data
+src/components/aoc/AOC_DEPLOYMENT.md:4:The Agent Operations Center (AOC) is a production-ready, enterprise-grade management console for deployed AI agents and digital twins.
+src/components/builder/step5/deploy/SimulationPreviewPanel.tsx:173:      {/* KPI Cards Grid - uses live data when simulation is running */}
+src/types/dcTwinBuilder.ts:776:        'Ingest real-time telemetry from DCIM (Schneider/Vertiv), GPU schedulers (SLURM/Kubernetes), and grid APIs',
+src/components/provenance/DomainProvenanceHeader.tsx:34:      return `Live data from ${source}.`;
+src/twins/sovereignDataCenter/templateDefinition.ts:313:          'Event Hubs for real-time telemetry',
+src/twins/sovereignDataCenter/templateDefinition.ts:650:1. **Data Ingestion**: Real-time telemetry flows from DCIM sensors, GPU schedulers (Slurm/K8s), power monitoring systems, and grid carbon APIs into the twin's data layer.
+src/twins/sovereignDataCenter/templateDefinition.ts:701:        preview_disclaimer: 'This preview demonstrates the twin\'s logic and capabilities. In production, responses will be grounded to live data centre telemetry: GPU metrics, energy mix, PUE readings, emissions data, and sovereignty compliance rules.',
+src/components/blueprint/BlueprintDesignerWrapper.tsx:23: * - NO live telemetry, time-series, or heatmaps
+src/simulation/providers/scenarioLibraryProvider.ts:47:/** Deterministic epoch — this is a bundled fixture, not a live feed. */
+src/pages/OmniverseScene.tsx:4: * model. No NVIDIA Omniverse runtime, OpenUSD stage or live scene is used.
+src/components/dsx/DsxModeBanner.tsx:3: * simulated or replayed reading can never be mistaken for live data.
+src/twins/sovereignDataCenter/components/SovereignDCKPIPanel.tsx:122:  // fixture for live telemetry.
+src/twins/sovereignDataCenter/components/SovereignDCDeploymentSteps.tsx:72:        'Event Hubs for real-time telemetry',
+src/components/marketplace/IndustryAgentPreviewModal.tsx:70:              'Real-time data processing and analysis',
+src/twins/dataCenter/MasterTemplate.ts:57:    'Real-time Telemetry',
+src/components/data-centre-twin/KPICockpit.tsx:5: * Integrates Carbon and Financial engines for real-time metrics
+src/lib/marketplaceNormalizer.ts:33:        description: 'Use grounding to improve accuracy with real-time data',
+src/engines/carbon/types.ts:106: * - Real-time feeds: ElectricityMap, WattTime API
+src/data/templates/data-centre-master.json:10:    "badges": ["Sovereign AI", "Carbon Neutral", "GPU-Optimized", "Tier IV", "Real-time Telemetry", "Simulation-Ready"],
+src/data/templates/data-centre-master.json:92:    "system_prompt": "You are the Data Centre Digital Twin CoPilot, an expert AI assistant for sovereign data centre operations. You monitor 9 domain twins: Thermal, Power, Cooling, Network, Facility, Workload, Sovereignty, Carbon, and Financial. You understand PUE optimization, GPU workload scheduling, sovereignty compliance, carbon neutrality targets, and incident response procedures. Provide actionable insights based on real-time telemetry and simulation results.",
+src/data/templates/data-centre-master.json:112:      "capabilities": ["Real-time telemetry analysis", "Cross-domain correlation", "Simulation scenario execution", "Sovereignty compliance validation", "Carbon footprint tracking", "Financial impact forecasting"],
+src/i18n/locales/en.ts:434:    nocViewDescription: 'Full NOC view with 8 domain twins, real-time telemetry, and simulation controls',
+src/i18n/locales/en.ts:447:    heroSubtitle: 'Production-ready templates for digital twins and AI agents. Certified by industry experts.',
+src/lib/dc-twin/industryProfiles.ts:214:      `${companyName} operates complex manufacturing environments requiring real-time data processing. This Sovereign Green AI Data Centre Twin integrates with factory systems, hosts predictive maintenance AI, and tracks carbon per production line.`,
+src/lib/provenance/exporters/markdown.ts:91:  lines.push(`_schema ${EXPORT_SCHEMA_VERSION} — every row is classified per-metric. Simulation results are estimator output, never live telemetry._`);
+src/dsx/runtime/EvidenceBetaContext.tsx:118:  // deep link reproduces the same evidence, without ever implying live data.
+src/components/simulation/exportSimulationResult.ts:103:      description: 'Post-scenario value produced by the AURA simulation estimator. Not live telemetry.',
+src/components/simulation/exportSimulationResult.ts:129:    note: 'Simulation output. Baseline values are demonstration fixtures; post-scenario values are estimator output. No row is live telemetry.',
+src/lib/copilot/dcSystemPrompt.ts:17:## Current Facility Status (LIVE DATA - Use these exact values)
+src/components/templates/StandardizedTemplatePreview.tsx:593:                      `This preview demonstrates the twin's logic and capabilities. In production, responses will be grounded to live operational systems including real-time telemetry, monitoring data, and enterprise integrations.`}
+src/lib/funding/QA_REPORT.md:319:The Canadian Funding Source Scanner infrastructure is fully deployed and ready for testing. The system is production-ready for the initial 6 programs across 3 federal funding sources.
+src/components/simulation/AnimatedRackHeatmap.tsx:179:  //     `demo`. Live telemetry is not a supported input on this surface.
+src/lib/playbook/playbookGenerator.ts:306:        trigger: 'Real-time data stream',
+src/components/simulation/SimulationModeWrapper.tsx:6: * - Live telemetry
+src/components/simulation/SimulationModeWrapper.tsx:73:  'Live Telemetry',
+src/components/simulation/SimulationModeWrapper.tsx:139: * Live Telemetry Panel - Simulation Only
+src/hooks/useKpi.ts:18: * - Real-time data from Supabase RPC functions
+
+## B) OpenUSD / SimReady / DSX Exchange
+src/capabilities/operatingState.ts:45:    detail: 'Blocked by infrastructure: GPU runner, entitlements and DSX Exchange distribution required.',
+src/capabilities/registry.ts:11: *   OpenUSD stages: 0 · SimReady-validated assets: 0
+src/capabilities/registry.ts:12: *   Live telemetry sources: 0 · DSX Exchange: not deployed
+src/capabilities/registry.ts:21:  | 'openUsdStage'
+src/capabilities/registry.ts:22:  | 'simReadyAssets'
+src/capabilities/registry.ts:69:  openUsdStage: {
+src/capabilities/registry.ts:70:    key: 'openUsdStage',
+src/capabilities/registry.ts:71:    label: 'OpenUSD stage',
+src/capabilities/registry.ts:73:    requirement: 'No OpenUSD stage has been authored, validated or mounted.',
+src/capabilities/registry.ts:76:  simReadyAssets: {
+src/capabilities/registry.ts:77:    key: 'simReadyAssets',
+src/capabilities/registry.ts:78:    label: 'SimReady assets',
+src/capabilities/registry.ts:80:    requirement: 'No asset has passed SimReady validation.',
+src/capabilities/registry.ts:93:    label: 'DSX Exchange',
+src/capabilities/registry.ts:95:    requirement: 'The official DSX Exchange distribution has not been deployed.',
+src/capabilities/registry.ts:102:    requirement: 'Mapping requires an OpenUSD stage and a verified telemetry source.',
+src/capabilities/registry.ts:141:  openUsdStages: 0,
+src/capabilities/registry.ts:142:  simReadyValidatedAssets: 0,
+src/pages/settings/NvidiaDsxReadiness.tsx:24:  { capability: 'OpenUSD stage', status: 'Not configured', tone: 'grey', detail: 'No OpenUSD stage has been authored or mounted. The preview uses the AURA application asset model.' },
+src/pages/settings/NvidiaDsxReadiness.tsx:25:  { capability: 'SimReady assets', status: 'None validated', tone: 'grey', detail: 'No asset has been validated against SimReady requirements.' },
+src/pages/settings/NvidiaDsxReadiness.tsx:26:  { capability: 'DSX Exchange', status: 'Not deployed', tone: 'grey', detail: 'The official DSX Exchange distribution is not deployed. Generic messaging transports are not DSX Exchange.' },
+src/pages/settings/NvidiaDsxReadiness.tsx:28:  { capability: 'Telemetry-to-prim mapping', status: 'Not configured', tone: 'grey', detail: 'Mapping requires both an OpenUSD stage and a verified telemetry source.' },
+src/pages/settings/NvidiaDsxReadiness.tsx:104:              <li>The official DSX Exchange distribution together with its AsyncAPI event schemas.</li>
+src/pages/settings/NvidiaDsxReadiness.tsx:106:              <li>An authored OpenUSD stage with SimReady-validated assets and a telemetry-to-prim mapping.</li>
+src/pages/settings/NvidiaDsxReadiness.tsx:119:              A GPU runner, official NVIDIA entitlements, DSX Exchange distribution and disposable backend are required.
+src/pages/dsx/workspaces/index.tsx:22:  ALL_RACK_IDENTITIES, OPENUSD_UNAVAILABLE, buildHierarchy, childrenOf, coolingChain, coolingTrace,
+src/pages/dsx/workspaces/index.tsx:246:          <li>A switch and link telemetry source published through the DSX Exchange.</li>
+src/pages/dsx/workspaces/index.tsx:247:          <li>An approved asset mapping for every switch and link, with OpenUSD prim paths.</li>
+src/pages/dsx/workspaces/index.tsx:319:              <p>OpenUSD prim: <span className="font-mono">{selectedAsset.openusd_prim_path ?? OPENUSD_UNAVAILABLE}</span></p>
+src/pages/dsx/workspaces/index.tsx:334:                {a.name} — mapping {a.mapping_approval}; {OPENUSD_UNAVAILABLE}.
+src/pages/dsx/workspaces/index.tsx:344:          reason="No OpenUSD stage is served to this build. The facility is presented as an identity-accurate hierarchy and dependency list instead of an approximate 3D scene."
+src/pages/dsx/workspaces/index.tsx:554:              <ConnectionState state="unavailable" label="DSX Exchange" />
+src/dsx/workspaces/facilityGraph.ts:5: * as identity. An OpenUSD prim path is exposed only when an approved mapping
+src/dsx/workspaces/facilityGraph.ts:6: * exists; otherwise the caller must render "OpenUSD mapping unavailable".
+src/dsx/workspaces/facilityGraph.ts:26:  openusd_prim_path: string | null;
+src/dsx/workspaces/facilityGraph.ts:30:export const OPENUSD_UNAVAILABLE = 'OpenUSD mapping unavailable';
+src/dsx/workspaces/facilityGraph.ts:41:    openusd_prim_path: approved ? (mapping?.usd_prim_path ?? null) : null,
+src/dsx/fixtures/evidenceBetaFacility.ts:30:  simready: boolean;
+src/dsx/fixtures/evidenceBetaFacility.ts:52:  simready: false,
+src/dsx/fixtures/evidenceBetaFacility.ts:68:  simready: false,
+src/dsx/fixtures/evidenceBetaFacility.ts:86:    simready: i < 6,
+src/dsx/fixtures/evidenceBetaFacility.ts:104:    simready: true,
+src/dsx/fixtures/evidenceBetaFacility.ts:121:  simready: true,
+src/dsx/fixtures/evidenceBetaFacility.ts:137:  simready: false,
+src/dsx/fixtures/evidenceBetaFacility.ts:154:    simready: false,
+src/dsx/fixtures/evidenceBetaFacility.ts:173:    simready: false,
+src/dsx/fixtures/evidenceBetaFacility.ts:189:      simready: false,
+src/dsx/fixtures/evidenceBetaFacility.ts:204:      simready: false,
+src/dsx/exchange/transport.ts:2: * Transport abstraction for the DSX Exchange adapter.
+src/dsx/exchange/mqttTransport.ts:2: * Real MQTT transport for the DSX Exchange adapter.
+src/dsx/exchange/mqttTransport.ts:22:    super(`DSX Exchange endpoint refused: ${reason}`);
+src/dsx/workspaces/availability.ts:106:    'dsx_exchange_runtime', 'DSX Exchange runtime', 'unavailable',
+src/dsx/workspaces/availability.ts:107:    'No DSX Exchange broker is connected to this browser session. The Exchange adapter is verified only by the local Phase 7 harness.',
+src/dsx/viewer/viewerBoundary.ts:2: * OpenUSD viewer synchronization boundary.
+src/dsx/viewer/viewerBoundary.ts:6: * synchronization between AURA assets and OpenUSD prim paths.
+src/dsx/viewer/viewerBoundary.ts:70:    description: `Static OpenUSD stage ${stage.stage_id} v${stage.stage_version}`,
+src/dsx/viewer/viewerBoundary.ts:87: * Resolve an AURA asset to its OpenUSD prim through the APPROVED mapping
+src/dsx/viewer/viewerBoundary.ts:145:          ? `No approved OpenUSD mapping for this asset (${resolution.reason}).`
+src/dsx/simready/onboarding.ts:2: * SimReady asset-onboarding boundary.
+src/dsx/simready/onboarding.ts:17:  'simready',
+src/dsx/simready/onboarding.ts:54:/** Classes whose geometry must be SimReady before simulation eligibility. */
+src/dsx/simready/onboarding.ts:79:  if (GEOMETRY_REQUIRED.has(asset.asset_class) && asset.simready !== true) {
+src/dsx/simready/onboarding.ts:81:      field: 'simready',
+src/dsx/simready/onboarding.ts:83:      detail: 'No SimReady geometry/material definition is attached to this asset.',
+src/dsx/simready/onboarding.ts:91:      detail: 'Asset has no OpenUSD prim path and cannot be located in a stage.',
+src/dsx/simready/onboarding.ts:111:  else state = 'simready';
+src/dsx/simready/onboarding.ts:120:    simulation_eligible: state === 'simready',
+src/dsx/exchange/dsxExchangeAdapter.ts:2: * DSX Exchange adapter.
+src/dsx/exchange/dsxExchangeAdapter.ts:88: * Local-broker DSX Exchange source. Fails closed to UNAVAILABLE whenever
+src/dsx/runtime/investigationContext.ts:17:  openusd_prim_path: string | null;
+src/dsx/runtime/investigationContext.ts:30:  openusd_prim_path: null,
+src/dsx/runtime/investigationContext.ts:44:  openusd_prim_path: 'prim',
+src/dsx/contracts/assetMapping.ts:3: * Maps a source-system asset identifier to an AURA asset and OpenUSD prim.
+src/dsx/contracts/assetMapping.ts:22:/** OpenUSD-style prim path: /World/Site_A/Hall_1/Rack_01 */
+src/dsx/contracts/assetMapping.ts:25:  .regex(/^\/[A-Za-z0-9_]+(\/[A-Za-z0-9_]+)*$/, 'invalid OpenUSD prim path');
+src/dsx/runtime/EvidenceBetaContext.tsx:141:          openusd_prim_path: null,
+src/dsx/runtime/EvidenceBetaContext.tsx:158:        openusd_prim_path: identity?.openusd_prim_path ?? null,
+src/dsx/runtime/EvidenceBetaContext.tsx:182:      if (field === 'stable_asset_id') next.openusd_prim_path = null;
+src/dsx/runtime/EvidenceBetaContext.tsx:186:        next.openusd_prim_path = null;
+src/pages/OmniverseScene.tsx:4: * model. No NVIDIA Omniverse runtime, OpenUSD stage or live scene is used.
+src/dsx/adapters/liveDisabledAdapter.ts:2: * Live DSX Exchange adapter — DISABLED and fail-closed.
+src/components/dsx/ProvenanceDrawer.tsx:10:import { OPENUSD_UNAVAILABLE } from '@/dsx/workspaces/facilityGraph';
+src/components/dsx/ProvenanceDrawer.tsx:59:                <Row label="OpenUSD prim" value={m.usd_prim_path ?? OPENUSD_UNAVAILABLE} />
+src/components/dsx/OperationalTruthBar.tsx:48:        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">DSX Exchange</span>
+src/components/dsx/AssetDrawer.tsx:17:  OPENUSD_UNAVAILABLE, childrenOf, coolingTrace, dependentRacks, electricalTrace,
+src/components/dsx/AssetDrawer.tsx:70:              <Row label="OpenUSD prim" value={selectedAsset.openusd_prim_path ?? OPENUSD_UNAVAILABLE} />
+src/lib/provenance/exporters/schema.ts:51:  'Values are produced by a deterministic AURA simulation with synthetic inputs. Not calibrated against a physical facility. No OpenUSD stage, SimReady-validated asset or DSX Exchange transport is involved.';
+
+## C) percentage-confidence displays
+src/simulation/customScenarioBuilder.ts:70:      domain: config.affectedDomains[index % config.affectedDomains.length] || 'facility_safety',
+src/components/builder/GroundedRecommendationsCard.tsx:332:                              {rec.confidence}% confidence
+src/components/marketplace/TemplateSimulation.tsx:269:    ml_model: `Prediction completed with 92% confidence`,
+src/components/simulation/EnterpriseKPIChart.tsx:303:                  Forecast: {forecast.trend} ({forecast.trendConfidence.toFixed(0)}% conf)
+src/components/simulation/SimulationModeWrapper.tsx:270:            {confidence}% confidence
+src/components/search/InsightActionPanel.tsx:195:              {Math.round(classification.confidence * 100)}% Confidence
+
+## D) NVIDIA hardware / Kit runtime claims
+src/components/twin-visualization/OmniverseStreamViewer.tsx:2: * OmniverseStreamViewer — WebRTC stream from NVIDIA Omniverse Kit 109
+src/integrations/omniverseKit/client.ts:3: * Connects to the DDN Data Center Digital Twin running on NVIDIA Kit 109
+src/components/platform/RackPreview2D.tsx:24:// Realistic mixed fleet: B200 for training, RTX PRO 6000 for inference, H100 for general
+src/components/platform/RackPreview2D.tsx:27:  { name: "RTX PRO 6000", tag: "RTX6000", color: "hsl(217 91% 60%)" }, // Inference
+src/components/platform/RackPreview2D.tsx:32:  // First ~60% B200 (training), next ~30% RTX PRO 6000 (inference), rest H100
+src/pages/InfrastructurePage.tsx:59:  { model: "RTX PRO 6000", count: 96, allocated: 72, utilAvg: 65, power: "350W", temp: "68C" },
+src/pages/InfrastructurePage.tsx:86:  { id: "1", name: "twin-inference", scenario: "PUE Optimization", cluster: "dc-infer-01", gpuType: "RTX PRO 6000", gpus: 8, memory: "384 GB", status: "running", created: "2026-03-01" },
+src/pages/InfrastructurePage.tsx:493:              { label: "Inference GPUs (RTX PRO 6000)",   value: "72 / 96",   pct: 75, icon: Eye,        color: "primary", provenance: "demo" as const },
+src/pages/InfrastructurePage.tsx:922:                          { label: "RTX PRO 6000", spec: "Ada Lovelace", role: "Modelled inference and rendering capacity (simulated)", icon: Eye },

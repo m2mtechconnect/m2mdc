@@ -111,3 +111,61 @@ refresh, with no blank render and no console error:
   closure. Fixed by skipping the memory load when no session exists.
 
 Operating mode remains SIMULATED. Production verdict unchanged: NO-GO.
+
+## Gate S5A-12: Desktop / Tablet / Mobile Visual QA (2026-08-07)
+
+Status: **PARTIAL - BLOCKED_BY_AUTH for authenticated surfaces.**
+
+Preview auth remained `signed_out` (`LOVABLE_BROWSER_AUTH_STATUS=signed_out`,
+`LOVABLE_BROWSER_SUPABASE_SESSION_JSON` absent), so no session could be restored. All 8
+probed authenticated routes (`/dashboard`, `/builder`, `/analytics`, `/operations`,
+`/infrastructure`, `/settings/integrations/nvidia-dsx`, `/dsx/evidence-beta`,
+`/pilot/overview`) redirected to `/` at every viewport. Authenticated in-page visual QA,
+including `OperatingStateBar` responsive rendering, is therefore **not proven**.
+
+Method: Playwright Chromium, three viewports - desktop 1280x1800, tablet 834x1112,
+mobile 390x844. Per route: navigate, wait for network idle, capture console errors,
+measure rendered text length, measure horizontal overflow
+(`documentElement.scrollWidth - clientWidth`), probe `[data-testid="operating-state-bar"]`,
+and screenshot.
+
+Raw matrix: `docs/evidence/stage-5a/61-s5a-12-visual-qa-matrix.json` (42 observations).
+Screenshots: `/tmp/browser/s5a12/screenshots/` (42 PNGs, ephemeral).
+
+### Result summary
+
+| Viewport | Routes probed | Blank pages | Console errors | Routes with h-overflow |
+|---|---|---|---|---|
+| Desktop 1280 | 14 | 0 | 0 | 9 |
+| Tablet 834 | 14 | 0 | 0 | 9 |
+| Mobile 390 | 14 | 0 | 0 | 10 |
+
+`operating-state-bar` count is 0 on every observation. This is **expected, not a defect**:
+the bar is mounted in `src/components/Layout.tsx`, which only wraps authenticated routes,
+and no authenticated route rendered. The bar's responsive behaviour stays unverified.
+
+### Regressions recorded
+
+- **V-5A-01 (LOW, open).** Landing page (`/` and its alias `/twin-datacentre`) has 40px of
+  horizontal overflow at all three viewports. Source is the hero block in the marketing
+  landing page: a decorative `absolute -z-10 ... w-4/5 h-4/5 rounded-full` glow layer and
+  an `absolute -top-6 -right-6` floating stat card inside `div.lg:col-span-7.relative`
+  extend past the viewport. The parent `section` carries `overflow-hidden` but the
+  protruding nodes are measured against the document, so the page remains horizontally
+  scrollable by 40px. No content is clipped or unreachable; visual rendering is correct at
+  all three sizes.
+- **V-5A-02 (LOW, open).** `/data-centre-twin` has 128px of horizontal overflow at mobile
+  390px only (0px at tablet and desktop). Contributing nodes are the `space-y-8` KPI/card
+  stack whose cards render 378px wide inside a 390px viewport with padding, plus a wider
+  element below the fold. Screenshot review confirms the KPI grid, header, search bar, and
+  filter chips all render correctly and legibly at 390px.
+
+Neither regression blocks the gate's intent (no blank pages, no console errors, no broken
+layouts). Both are cosmetic overflow on public marketing/preview surfaces and are logged
+for Stage 5B.
+
+### Gate verdict
+
+S5A-12 is **PARTIAL**. Public-surface responsive QA passes with two LOW cosmetic
+regressions logged. Authenticated-surface QA carries forward as BLOCKED_BY_AUTH alongside
+S5A-13/S5A-14. Operating mode remains SIMULATED. Production verdict unchanged: **NO-GO**.

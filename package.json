@@ -21,7 +21,10 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:record": "playwright test --update-snapshots",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
-    "db:seed:studio": "tsx scripts/seed.ts"
+    "db:seed:studio": "tsx scripts/seed.ts",
+    "guard:test-env": "node scripts/aura-test-env-guard.mjs",
+    "db:migrate:test": "node scripts/aura-test-env-guard.mjs && supabase db push --project-ref $SUPABASE_PROJECT_ID",
+    "db:reset:test": "node scripts/aura-test-env-guard.mjs && supabase db reset --linked"
   },
   "dependencies": {
     "@axe-core/playwright": "^4.11.0",
@@ -118,6 +121,7 @@
     "lovable-tagger": "^1.1.11",
     "mqtt": "^5.15.2",
     "postcss": "^8.5.6",
+    "supabase": "2.34.3",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",

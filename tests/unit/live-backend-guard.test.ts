@@ -67,3 +67,24 @@ describe('live-backend guard', () => {
     }
   });
 });
+
+describe('production hostname denylist', () => {
+  it('denies production hosts even when the disposable environment is allowed', async () => {
+    const saved = globalThis.fetch;
+    try {
+      globalThis.fetch = (async () => new Response('ok')) as typeof fetch;
+      const decision = installLiveBackendGuard(ok());
+      expect(decision.allowed).toBe(true);
+      await expect(
+        fetch('https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles'),
+      ).rejects.toThrow(LiveBackendBlockedError);
+      await expect(fetch('https://auradc.m2mtechconnect.com/')).rejects.toThrow(
+        LiveBackendBlockedError,
+      );
+      const res = await fetch(`https://${REF}.supabase.co/rest/v1/x`);
+      expect(await res.text()).toBe('ok');
+    } finally {
+      globalThis.fetch = saved;
+    }
+  });
+});

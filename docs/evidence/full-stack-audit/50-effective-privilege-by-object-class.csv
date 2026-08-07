@@ -1,0 +1,7 @@
+object_class,scope,total_objects,authenticated,anon,service_role,notes
+relations (tables/views/matviews/partitioned),schema public,118,117 with SELECT,0,118 with SELECT,"the single relation without an authenticated ACL entry is mv_ops_overview (relkind=m). Its relacl is {postgres,service_role,sandbox_exec*} only, so authenticated cannot read it through PostgREST. Cause: materialized views are not covered by ALTER DEFAULT PRIVILEGES ... ON TABLES at bootstrap and no migration granted it. Effect: the ops overview matview is service-role only."
+functions/RPCs,schema public,165,147 EXECUTE,129 EXECUTE,165 EXECUTE,"pgvector operator-support functions dominate the anon-executable set. The audited application RPCs (admin_* / assert_role_admin / has_role) are SECURITY DEFINER and perform their own caller checks; execute privilege alone is not authorization."
+sequences,schema public,4,4 USAGE,0,4 USAGE,anon holds no sequence privilege after B-03.
+schemas,public,1,USAGE granted,USAGE granted,USAGE granted,"schema USAGE alone confers nothing without object privileges; anon holds object privileges on onboarding_submissions (INSERT) only."
+schemas,storage,1,USAGE granted,USAGE granted,USAGE granted,platform-managed schema; access mediated by storage RLS policies.
+storage resources,storage.buckets,1,n/a - policy mediated,n/a - policy mediated,full,"1 bucket exists and it is marked public=true. Public buckets serve objects without authentication; this is outside RLS and is tracked as a Stage 2B probe (R-09, Storage isolation)."

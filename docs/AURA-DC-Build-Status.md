@@ -51,5 +51,18 @@ deleted or skipped to improve the count.
 See `docs/AURA-DC-Implementation-Plan.md` §Blockers.
 
 ### Next phase
-Phase 0 remainder: anonymous access containment, synthetic-data labelling, misleading
-operational copy. Then Phase 1 (security and data foundation).
+Phase 0 remainder: synthetic-data labelling and misleading operational copy.
+
+## Phase 1 — Security and data foundation (IN PROGRESS)
+
+| Item | Before | After | Status |
+|---|---|---|---|
+| B-02 `has_role()` type mismatch | 15 RLS policies raised 42883 and could never grant | `user_roles.role` is `app_role`; helpers rebuilt, expiry-aware, `anon` EXECUTE revoked | PROVEN |
+| B-03 anonymous access | `anon` held `arwdDxtm` on every public table; 3 tables leaked rows | Default-deny across `public`; only lead-capture INSERT retained; all probes 401/42501 | PROVEN |
+| B-06 browser-side role writes | Client INSERT/DELETE on `user_roles` | Read-own table; audited SECURITY DEFINER admin RPCs only | IMPLEMENTED |
+
+Evidence, including the inventory, probe transcripts and the one explicitly
+UNVERIFIED item (signed-in per-policy row visibility), is in
+`docs/evidence/phase-1/README.md`.
+
+Still open in Phase 1: B-04 tenant isolation, B-01 duplicate role systems.

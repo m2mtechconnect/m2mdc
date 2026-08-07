@@ -1,0 +1,9 @@
+package_id,official_package_name,publisher,version,digest,source_registry,license_or_entitlement,compatibility_requirements,retrieval_status,blocking_reason
+P4A-PKG-01,Omniverse DSX Blueprint,NVIDIA,not_retrieved,not_retrieved,build.nvidia.com / NGC,entitlement_not_configured,NVIDIA GPU + Container Toolkit,not_retrieved,no NGC credential in secret manager
+P4A-PKG-02,DSX Exchange official distribution,NVIDIA,not_retrieved,not_retrieved,NGC,entitlement_not_configured,container runtime,not_retrieved,no NGC credential; substitutes explicitly refused
+P4A-PKG-03,DSX Exchange AsyncAPI schema set,NVIDIA,not_retrieved,not_retrieved,NGC / official docs distribution,entitlement_not_configured,n/a,not_retrieved,must be official copy; hand-authored copy refused
+P4A-PKG-04,Omniverse Kit runtime container,NVIDIA,not_retrieved,not_retrieved,nvcr.io,entitlement_not_configured,NVIDIA driver + Container Toolkit,not_retrieved,no GPU host and no NGC credential
+P4A-PKG-05,OpenUSD toolchain incl. usdchecker,NVIDIA / AOUSD,not_retrieved,not_retrieved,NGC or OpenUSD source build,open_source_or_bundled,linux x86_64,not_retrieved,not installed; deferred until host exists
+P4A-PKG-06,SimReady asset validator,NVIDIA,not_retrieved,not_retrieved,NGC,entitlement_not_configured,Omniverse runtime,not_retrieved,no published standalone validator retrieved
+P4A-PKG-07,NGC CLI,NVIDIA,not_retrieved,not_retrieved,ngc.nvidia.com,free_download,linux x86_64,not_retrieved,no entitled credential to authenticate with
+P4A-PKG-08,NVIDIA Container Toolkit,NVIDIA,not_retrieved,not_retrieved,nvidia.github.io,apache_2_0,requires NVIDIA driver + container runtime,not_retrieved,no GPU host and no container runtime

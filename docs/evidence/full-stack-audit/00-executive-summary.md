@@ -47,3 +47,29 @@ Severity counts after erratum: 1 CRITICAL, 6 HIGH, 5 MEDIUM, 2 INFORMATIONAL. Pr
 - CONFIRMED (static): B-02 search_path hardening, B-03 anonymous closure, guard fails closed, test egress guard.
 - DISPROVED: none of the Phase 1 claims were found overstated at the static level.
 - STILL UNVERIFIED: authenticated RLS behavior, B-06 end-to-end role management, B-04 in every respect.
+
+---
+
+## Stage 2A addendum - static audit closed (2026-08-07)
+
+See `43-stage-2a-static-audit-closeout.md`. Audit-only; nothing was modified.
+
+- **F-01 CRITICAL, confirmed.** 49 core tables reconciled into mutually exclusive categories: 16
+  `authoritative_tenant_path`, 28 `user_only_path`, 5 `no_authoritative_ownership_path`. `data_centre_twins`,
+  the root of the twin graph, is user-only with no `org_id` and no FK to `organizations`, and every twin child
+  table inherits that root.
+- **F-13 re-proved and decomposed** across 156 functions: 7 authenticated_and_authorized, 76 authenticated_only,
+  16 intentionally_public, 1 signed_webhook (`dsx-ingest`, correctly verified in code), 39 unprotected_reachable,
+  17 unknown pending one runtime probe. Accurate wording is "79 perform no in-code authorization check", not
+  "79 unauthenticated".
+- **New F-15 (HIGH).** `_shared/auth.ts` implements `authLevel: "admin"` as a service-role client with no token
+  verification and no role lookup. Authorization scored down from 3 to 2.
+- **All 106 migration GRANT findings withdrawn** as false positives (F-17); effective privileges verified in the
+  live catalog. Stage 1 gate 9 downgraded from FAIL to PASS with hygiene notes.
+- **F-14 explained:** 32 cases in 3 files fail at transform time (JSX in a `.ts` file; `@jest/globals` with no
+  Jest runner). The exclusive-Data-Centre-template invariant has never been tested.
+- **Dead code corrected:** 56 proven-unreachable modules, not 287.
+- **Dependency scan is BLOCKED, not PASS.** An SBOM of 901 packages and the three-lockfile provenance stand in.
+
+Severity counts: 1 CRITICAL, 7 HIGH, 5 MEDIUM, 4 INFORMATIONAL. Readiness **42% PROVISIONAL**.
+Verdict: **Production NO-GO** (unchanged).

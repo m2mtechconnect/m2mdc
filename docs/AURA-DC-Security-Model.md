@@ -14,11 +14,15 @@ Status: PLANNED, with Phase 0 containment applied.
 | ID | Issue | Impact |
 |---|---|---|
 | B-01 | Two conflicting role systems | Authorization outcome depends on which hook a component uses |
-| B-02 | `has_role(uuid, app_role)` type mismatch | 10 RLS policies never evaluate to true |
-| B-03 | Anonymous read of `sites`, `dc_blueprint_templates` | Data exposure via publishable key |
 | B-04 | No `tenant_id` on most entities | Cross-tenant access cannot be prevented |
 | B-05 | Self-approval permitted | No separation of duties |
-| B-06 | Browser-side privileged writes | Client can bypass intended server checks |
+
+## Closed in Phase 1 (evidence: `docs/evidence/phase-1/`)
+| ID | Issue | Resolution |
+|---|---|---|
+| B-02 | `has_role(uuid, app_role)` type mismatch | `user_roles.role` converted to `app_role`; 15 policies rebuilt; helper EXECUTE revoked from `PUBLIC`/`anon` |
+| B-03 | Anonymous read of `sites`, `dc_blueprint_templates`, `agent_definitions` | `anon` default-deny across `public`; only lead-capture INSERT retained; verified 401/42501 |
+| B-06 | Browser-side privileged role writes | `user_roles` is read-own; all mutations via audited SECURITY DEFINER RPCs |
 
 ## Phase 1 target
 - Single `has_permission(user_id, tenant_id, permission)` security-definer function
@@ -30,3 +34,11 @@ Status: PLANNED, with Phase 0 containment applied.
 ## Phase 0 containment already applied
 - `rag-test` no longer returns fabricated answers, citations or token counts.
 - `rag-upload` no longer accepts and silently discards uploaded bytes.
+
+## Phase 1 containment already applied
+- One canonical role type: `public.app_role`, enforced by the column type.
+- Every authorization helper is `SECURITY DEFINER` with `SET search_path = pg_catalog, public`,
+  honours `expires_at`, and is not executable by `anon` or `PUBLIC`.
+- Role changes are auditable by construction: no write path exists outside the
+  admin RPCs, each of which appends to `role_change_audit`.
+- Self-escalation and self-lockout are refused inside the RPCs, not in the UI.

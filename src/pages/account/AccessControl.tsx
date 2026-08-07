@@ -92,14 +92,13 @@ export default function AccessControl() {
 
       const scopeValue = scope === 'global' ? 'global' : `agent:${agentId}`;
 
-      const { error } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: profile.user_id,
-          role,
-          scope: scopeValue,
-          granted_by: user.id,
-        });
+      // Privileged write: audited server-side RPC, never a direct table write.
+      const { error } = await supabase.rpc('admin_grant_role', {
+        _target_user_id: profile.user_id,
+        _role: role,
+        _scope: scopeValue,
+        _reason: 'granted from Access Control',
+      });
 
       if (error) throw error;
     },
@@ -120,10 +119,10 @@ export default function AccessControl() {
   // Revoke role mutation
   const revokeRoleMutation = useMutation({
     mutationFn: async (roleId: string) => {
-      const { error } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('id', roleId);
+      const { error } = await supabase.rpc('admin_revoke_role_grant', {
+        _role_id: roleId,
+        _reason: 'revoked from Access Control',
+      });
 
       if (error) throw error;
     },

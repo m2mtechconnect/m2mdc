@@ -28,6 +28,9 @@ import {
   XCircle,
 } from "lucide-react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import type { Database } from "@/integrations/supabase/types";
+
+type AppRole = Database["public"]["Enums"]["app_role"];
 import { useTranslation } from 'react-i18next';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -299,13 +302,14 @@ export default function Teams() {
 
       // Assign role when approving
       if (approve) {
-        const role = selectedRoles[userId] || 'engineer';
-        // Remove existing roles first
-        await supabase.from('user_roles').delete().eq('user_id', userId);
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({ user_id: userId, role });
-        if (roleError) console.error('Role assignment error:', roleError);
+        const role = (selectedRoles[userId] || 'engineer') as AppRole;
+        // Privileged write: audited server-side RPC, never a direct table write.
+        const { error: roleError } = await supabase.rpc('admin_set_user_role', {
+          _target_user_id: userId,
+          _role: role,
+          _reason: 'approval role assignment',
+        });
+        if (roleError) throw roleError;
       }
     },
     onSuccess: (_, { approve }) => {
@@ -320,8 +324,11 @@ export default function Teams() {
   // Edit role mutation
   const editRoleMutation = useMutation({
     mutationFn: async ({ userId, newRole }: { userId: string; newRole: string }) => {
-      await supabase.from('user_roles').delete().eq('user_id', userId);
-      const { error } = await supabase.from('user_roles').insert({ user_id: userId, role: newRole });
+      const { error } = await supabase.rpc('admin_set_user_role', {
+        _target_user_id: userId,
+        _role: newRole as AppRole,
+        _reason: 'role edited from Teams',
+      });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -337,8 +344,12 @@ export default function Teams() {
   // Remove member mutation
   const removeMemberMutation = useMutation({
     mutationFn: async (userId: string) => {
-      // Remove roles
-      await supabase.from('user_roles').delete().eq('user_id', userId);
+      // Remove roles via the audited server-side RPC.
+      const { error: rolesError } = await supabase.rpc('admin_clear_user_roles', {
+        _target_user_id: userId,
+        _reason: 'member removed from Teams',
+      });
+      if (rolesError) throw rolesError;
       // Revoke approval
       await supabase.from('profiles').update({ is_approved: false, approved_at: null, approved_by: null }).eq('user_id', userId);
     },

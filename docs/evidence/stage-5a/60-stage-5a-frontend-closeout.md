@@ -169,3 +169,75 @@ for Stage 5B.
 S5A-12 is **PARTIAL**. Public-surface responsive QA passes with two LOW cosmetic
 regressions logged. Authenticated-surface QA carries forward as BLOCKED_BY_AUTH alongside
 S5A-13/S5A-14. Operating mode remains SIMULATED. Production verdict unchanged: **NO-GO**.
+
+## Gate S5A-09 Re-audit: Prohibited Claims (2026-08-07)
+
+Status: **FAIL - the earlier "0 prohibited claims" result does not hold.**
+
+This re-run is audit-only; no source file was modified. The original S5A-09 scan matched a
+narrow literal set ("Omniverse Live", "Real-time telemetry", "Production-ready") and so
+missed live-data framing expressed in other wording. The re-audit uses four broadened
+pattern families over `src/` and `index.html`, excluding test files.
+
+Commands:
+
+```
+rg -ni "real[- ]?time (telemetry|data|ingest|feed|metrics)|live (telemetry|data|feed|scene|sensor)|production[- ]ready|Omniverse Live|actual (sensor|telemetry)" src/ index.html -g '!*.test.*'
+rg -ni "openusd|open usd|simready|sim-ready|dsx exchange|usd stage|nucleus server" src/ index.html -g '!*.test.*'
+rg -n "% *conf|[0-9]+% confiden" src/ -i -g '!*.test.*'
+rg -ni "Kit 10[0-9]|RTX PRO 6000" src/ -g '!*.test.*'
+```
+
+### Category B - OpenUSD / SimReady / DSX Exchange: **PASS**
+
+31 matches, all reviewed, all negative-form or capability-registry declarations. Every
+occurrence states absence: `registry.ts` ("OpenUSD stages: 0", "SimReady-validated assets:
+0", "DSX Exchange: not deployed"), `NvidiaDsxReadiness.tsx` ("Not configured", "None
+validated", "Not deployed", plus the explicit "Generic messaging transports are not DSX
+Exchange"), `workspaces/index.tsx` (`OPENUSD_UNAVAILABLE`, `ConnectionState
+state="unavailable"`), and `exporters/schema.ts` (export truth block). No file asserts an
+OpenUSD stage, a SimReady-validated asset, or a DSX Exchange deployment exists. No
+remediation required.
+
+### Category A/C/D - simulated values represented as live: **FAIL, 5 regressions**
+
+- **P-5A-01 (HIGH, open).** `src/lib/copilot/dcSystemPrompt.ts:17` heads the injected
+  system prompt with `## Current Facility Status (LIVE DATA - Use these exact values)` and
+  line 24 labels the block `### Real-Time KPIs`. The values interpolated into it are
+  `DCDomainContext` simulation output. The assistant is therefore instructed to present
+  simulated values to the user as live telemetry. This is the single most direct violation
+  of the Stage 5 truth objective and it defeats the evidence-boundary disclaimer added to
+  `CoPilotDrawer.tsx`, because the prompt body contradicts the disclaimer.
+- **P-5A-02 (MEDIUM, open).** `src/components/blueprint/tabs/BlueprintAgentsTab.tsx:171`
+  renders a `Live Data` badge whenever `useRealData && dbAgents.length > 0`. The condition
+  is true for stored agent configuration rows, not for any telemetry feed, so the badge
+  asserts liveness that does not exist.
+- **P-5A-03 (MEDIUM, open).** Six percentage-confidence displays survive, contradicting the
+  S5A-09 entry that recorded all of them as replaced with qualitative signals:
+  `GroundedRecommendationsCard.tsx:332`, `TemplateSimulation.tsx:269` (hard-coded "92%
+  confidence"), `SimulationModeWrapper.tsx:270`, `EnterpriseKPIChart.tsx:303`,
+  `InsightActionPanel.tsx:195`. The earlier pass covered only the four panels named in that
+  entry.
+- **P-5A-04 (MEDIUM, open).** NVIDIA runtime claims survive outside `InfrastructurePage.tsx`:
+  `src/integrations/omniverseKit/client.ts:3` ("Connects to the DDN Data Center Digital Twin
+  running on NVIDIA Kit 109") and
+  `src/components/twin-visualization/OmniverseStreamViewer.tsx:2` ("WebRTC stream from
+  NVIDIA Omniverse Kit 109"). Per Stage 3 and Stage 4 no Kit runtime exists.
+- **P-5A-05 (LOW, open).** Marketing/config strings: `data/templates/data-centre-master.json:10`
+  ships a user-visible `"Real-time Telemetry"` badge and line 92/112 tell the CoPilot it
+  works from "real-time telemetry"; `i18n/locales/en.ts:447` advertises "Production-ready
+  templates"; `tours/tourRegistry.ts:187` says "Real-time data centre metrics" (and also
+  carries a prohibited em dash).
+
+Correctly-guarded matches, reviewed and cleared: `DomainProvenanceHeader.tsx:34` (the
+"Live data from X" string is reachable only when `provenance === 'live'`),
+`SimulationModeWrapper.tsx` "Live Telemetry" (a simulation-only feature label, already
+scoped), and all comment-form denials in `OmniverseScene.tsx`, `DsxModeBanner.tsx`,
+`OperatingStateBar.tsx`, `exportSimulationResult.ts` and `markdown.ts`.
+
+### Verdict
+
+Gate S5A-09 is reopened as **FAIL**. The S5A closeout entry claiming zero prohibited claims
+is superseded by this section. Category B (OpenUSD / SimReady / DSX Exchange) is clean and
+requires no work. Five open regressions, one HIGH, carry into Stage 5B remediation.
+Operating mode remains SIMULATED. Production verdict unchanged: **NO-GO**.

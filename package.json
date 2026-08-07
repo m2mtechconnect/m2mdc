@@ -10,7 +10,18 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test:a11y": "playwright test --config=playwright.truth.config.ts axe-a11y.spec.ts",
-    "verify:dsx-phase7": "node scripts/dsx-phase7-verify.mjs"
+    "verify:dsx-phase7": "node scripts/dsx-phase7-verify.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run tests/unit src",
+    "test:unit:coverage": "vitest run tests/unit src --coverage",
+    "test:int": "vitest run tests/integration",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:record": "playwright test --update-snapshots",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit",
+    "db:seed:studio": "tsx scripts/seed.ts"
   },
   "dependencies": {
     "@axe-core/playwright": "^4.11.0",

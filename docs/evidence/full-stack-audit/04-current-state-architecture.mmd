@@ -1,0 +1,11 @@
+flowchart TB
+  U[Browser SPA React+Vite 24 routes] --> A[Supabase Auth]
+  U --> P[PostgREST / Postgres 113 tables 284 policies RLS per-user]
+  U --> E[Edge Functions 50 reachable]
+  O[Edge Functions 107 orphaned] -.no caller.-> P
+  E --> G[Gemini CONFIGURED]
+  E --> R[rag-* STUBBED 501]
+  U --> S[In-browser simulation engines SIMULATED]
+  U -. disabled .-> K[Omniverse Kit DISCONNECTED]
+  U -. disabled .-> D[DSX Exchange DISCONNECTED]
+  P --> AU[audit_logs / role_change_audit]

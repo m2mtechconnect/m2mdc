@@ -1,0 +1,25 @@
+capability,ui_entry_point,backend_path,data_source,classification,evidence,limitation
+Data-centre digital twin,/dc-twin,data_centre_twins table,DB rows + client engine,IMPLEMENTED,src/twins/dataCenter,no runtime authenticated proof
+Site/facility modelling,/infrastructure,sovereign_dc_facilities,DB,IMPLEMENTED,src/pages/InfrastructurePage.tsx,partial
+Asset inventory,/infrastructure,none,client constants,MOCKED,hard-coded 'healthy' statuses,static
+Telemetry ingestion,/dsx,dsx-ingest edge fn,MQTT/HTTP adapters,DISCONNECTED,src/dsx/exchange,no broker deployed
+Live monitoring,/dashboard,none,seeded generators,SIMULATED,src/lib/generators/mockSimulationData.ts,no live source
+Historical replay,/dsx/evidence-beta,scenario fixtures,fixtures,MOCKED,src/dsx/fixtures/determinism.ts,
+Simulation,/simulation,in-browser engine,deterministic seed,IMPLEMENTED,src/simulation/api.ts,client-side only
+Recommendations,/dsx/evidence-beta,contracts only,fixtures,MOCKED,src/dsx/contracts/recommendation.ts,no model inputs
+Approval workflow,/dsx/evidence-beta,client state,client,STUBBED,DecisionForm/DecisionLog,not persisted server-side
+Audit history,DB,audit_logs/role_change_audit,DB,IMPLEMENTED,pg_policies,no authenticated proof
+Energy/cooling/capacity analysis,/dc-twin tabs,client engines,synthetic,SIMULATED,src/engines/*,
+Failure prediction,n/a,none,none,ABSENT,,
+Sovereignty analysis,/sovereignty,client,static rules,IMPLEMENTED,src/sovereignty,
+Compliance analysis,various,client,static,MOCKED,,
+NVIDIA Omniverse/OpenUSD,/dc-twin,kit client,none,DISCONNECTED,src/integrations/omniverseKit,transport disabled fail-closed
+DSX / DDN,/dsx,dsx-* fns,none,DISCONNECTED,src/dsx,production hosts rejected
+Gemini,edge fns,server-side,Gemini API,CONFIGURED,supabase/functions,no runtime probe
+RAG,edge fns,rag-* fns,none,STUBBED,501 stubs from Phase 0,
+MCP,/marketplace,mcp-* fns,catalog table,STUBBED,,
+Reports/exports,various,client exporters,client data,IMPLEMENTED,src/lib exporters,provenance preserved
+User administration,/admin,admin_* RPCs,DB,IMPLEMENTED,33 SECURITY DEFINER fns,end-to-end UNVERIFIED
+Tenant administration,n/a,none,none,ABSENT,14/113 tables have tenant column,
+Notifications/Email,n/a,none,none,ABSENT,,
+SSO/MFA,/auth/MFA,supabase auth,,STUBBED,src/pages/auth/MFA.tsx,no enterprise SSO configured

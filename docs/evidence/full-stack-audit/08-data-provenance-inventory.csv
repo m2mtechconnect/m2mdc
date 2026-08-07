@@ -1,0 +1,6 @@
+item,status,evidence,limitation
+dashboard KPIs,SIMULATED,src/lib/generators/mockSimulationData.ts,seeded generator
+rack/thermal views,SIMULATED,src/components/data-centre-twin/*,43 modules use Math.random
+asset health badges,STATIC,hard-coded 'healthy' in 11 modules,masquerades as computed
+twins list,LIVE,data_centre_twins table,authenticated read unverified
+DSX telemetry,UNKNOWN,src/dsx/exchange,transport disabled

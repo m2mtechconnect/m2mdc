@@ -1,0 +1,7 @@
+command,working_directory,utc_start,utc_end,exit_code,output_artifact,limitations
+git rev-parse HEAD,/dev-server,2026-08-07T15:57:12Z,2026-08-07T15:57:12Z,0,00-executive-summary.md,none
+node scripts/aura-test-env-guard.mjs,/dev-server,2026-08-07T15:57:23Z,2026-08-07T15:57:23Z,1,00-executive-summary.md,guard BLOCKED - resolves to production project
+npx tsgo --noEmit,/dev-server,2026-08-07T15:57:25Z,2026-08-07T16:01Z,0,00-executive-summary.md,tsgo not tsc; strict flags partial
+npx eslint . -f json,/dev-server,2026-08-07T15:57:25Z,2026-08-07T16:03Z,1,00-executive-summary.md,1329 errors / 137 warnings
+supabase read_query (catalog introspection),production,2026-08-07T15:59Z,2026-08-07T16:00Z,0,11-database-security-audit.md,READ-ONLY; no mutation performed
+npx vitest run --reporter=json,/dev-server,2026-08-07T15:58Z,2026-08-07T16:20Z,1,18-test-results.json,run 1 only; second run not executed (time)

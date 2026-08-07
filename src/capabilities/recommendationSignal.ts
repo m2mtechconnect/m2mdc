@@ -17,4 +17,8 @@ export function signalLabel(score: number): string {
   return `Rule-based signal: ${signalStrength(score)}`;
 }
 
-export const SIGNAL_BASIS = 'Derived from simulation rules. Not a validated model confidence.';
+export const SIGNAL_BASIS =
+  'Rule-based signal derived from defined simulation thresholds. Not a statistical confidence score, not a model probability, not NVIDIA-generated, and not a substitute for human review.';
+
+/** Thresholds shown to the user so the rule basis is inspectable. */
+export const SIGNAL_RULES = 'Strong >= 85, Moderate 65-84, Weak < 65 on the rule score.';

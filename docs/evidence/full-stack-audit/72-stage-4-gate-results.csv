@@ -1,0 +1,12 @@
+gate,requirement,status,evidence,blocking_dependency
+G4-01,Official NVIDIA software deployed,BLOCKED,71-stage-4-nvidia-environment-preflight.md,No NGC entitlement and no container runtime
+G4-02,NVIDIA GPU execution proven,BLOCKED,71-stage-4-nvidia-environment-preflight.md,No NVIDIA GPU or driver present
+G4-03,Valid OpenUSD stage loaded,BLOCKED,71-stage-4-nvidia-environment-preflight.md,No pxr runtime and no usdchecker
+G4-04,SimReady-aligned asset validated,BLOCKED,71-stage-4-nvidia-environment-preflight.md,No published SimReady validation tool or criteria available
+G4-05,DSX Exchange operational,BLOCKED,71-stage-4-nvidia-environment-preflight.md,Official DSX Exchange components unavailable; Mosquitto disqualified
+G4-06,Schema-conformant telemetry accepted,BLOCKED,71-stage-4-nvidia-environment-preflight.md,No official DSX Exchange AsyncAPI document obtainable
+G4-07,Telemetry mapped to a real USD prim,BLOCKED,71-stage-4-nvidia-environment-preflight.md,Depends on G4-03 and G4-06
+G4-08,AURA DC displays non-hardcoded state,BLOCKED,71-stage-4-nvidia-environment-preflight.md,Depends on G4-07
+G4-09,Scenario produces reproducible output,BLOCKED,71-stage-4-nvidia-environment-preflight.md,Depends on G4-05 and G4-08
+G4-10,Clean deployment reproduction succeeds,BLOCKED,73-stage-4-environment-requirements.md,Depends on G4-01
+G4-11,Evidence contains no reusable credentials,PASS,73-stage-4-environment-requirements.md,None; zero credentials exist in the package

@@ -1,0 +1,6430 @@
+{
+ "bomFormat": "CycloneDX-lite",
+ "specVersion": "1.5-subset",
+ "generated": "2026-08-07",
+ "source": "package-lock.json (lockfileVersion 3)",
+ "vulnerability_status": "BLOCKED - not assessed. npm audit and bun audit both return HTTP 404 against the sandbox registry mirror and no offline advisory database is available.",
+ "lockfile_provenance": {
+  "files": [
+   "bun.lock",
+   "bun.lockb",
+   "package-lock.json"
+  ],
+  "authoritative_for_ci": "package-lock.json - every GitHub Actions job installs with `npm ci`, which fails if package-lock.json is absent or out of sync with package.json",
+  "authoritative_for_platform_build": "bun.lock - the hosting build installs with bun",
+  "stale": "bun.lockb - the legacy binary Bun lockfile, superseded by the text bun.lock; retained only because it was never deleted",
+  "why_three": "the project was created on a bun-based toolchain (bun.lockb), migrated to the text bun lockfile (bun.lock) when bun changed formats, then had npm-based CI workflows added which required package-lock.json. None of the three was removed.",
+  "risk": "dependency resolution is not guaranteed to be identical between CI (npm) and the hosting build (bun); an advisory fixed in one lockfile can remain unfixed in the other"
+ },
+ "direct_dependencies": {
+  "@axe-core/playwright": "^4.11.0",
+  "@faker-js/faker": "^10.1.0",
+  "@hookform/resolvers": "^3.10.0",
+  "@langchain/community": "^1.0.0",
+  "@langchain/core": "^1.0.3",
+  "@langchain/langgraph": "^1.0.1",
+  "@langchain/openai": "^1.0.0",
+  "@playwright/test": "^1.56.1",
+  "@radix-ui/react-accordion": "^1.2.11",
+  "@radix-ui/react-alert-dialog": "^1.1.14",
+  "@radix-ui/react-aspect-ratio": "^1.1.7",
+  "@radix-ui/react-avatar": "^1.1.10",
+  "@radix-ui/react-checkbox": "^1.3.2",
+  "@radix-ui/react-collapsible": "^1.1.11",
+  "@radix-ui/react-context-menu": "^2.2.15",
+  "@radix-ui/react-dialog": "^1.1.14",
+  "@radix-ui/react-dropdown-menu": "^2.1.15",
+  "@radix-ui/react-hover-card": "^1.1.14",
+  "@radix-ui/react-label": "^2.1.7",
+  "@radix-ui/react-menubar": "^1.1.15",
+  "@radix-ui/react-navigation-menu": "^1.2.13",
+  "@radix-ui/react-popover": "^1.1.14",
+  "@radix-ui/react-progress": "^1.1.7",
+  "@radix-ui/react-radio-group": "^1.3.7",
+  "@radix-ui/react-scroll-area": "^1.2.9",
+  "@radix-ui/react-select": "^2.2.5",
+  "@radix-ui/react-separator": "^1.1.7",
+  "@radix-ui/react-slider": "^1.3.5",
+  "@radix-ui/react-slot": "^1.2.3",
+  "@radix-ui/react-switch": "^1.2.5",
+  "@radix-ui/react-tabs": "^1.1.12",
+  "@radix-ui/react-toast": "^1.2.14",
+  "@radix-ui/react-toggle": "^1.1.9",
+  "@radix-ui/react-toggle-group": "^1.1.10",
+  "@radix-ui/react-tooltip": "^1.2.7",
+  "@react-three/drei": "^9.122.0",
+  "@react-three/fiber": "^8.18.0",
+  "@supabase/realtime-js": "^2.83.0",
+  "@supabase/supabase-js": "^2.78.0",
+  "@tanstack/react-query": "^5.83.0",
+  "@testing-library/jest-dom": "^6.9.1",
+  "@testing-library/react": "^16.3.0",
+  "@testing-library/user-event": "^14.6.1",
+  "@types/three": "^0.160.0",
+  "class-variance-authority": "^0.7.1",
+  "clsx": "^2.1.1",
+  "cmdk": "^1.1.1",
+  "date-fns": "^4.1.0",
+  "embla-carousel-react": "^8.6.0",
+  "fabric": "^6.7.1",
+  "framer-motion": "^12.23.24",
+  "i18next": "^26.0.4",
+  "i18next-browser-languagedetector": "^8.2.1",
+  "input-otp": "^1.4.2",
+  "jsdom": "^27.1.0",
+  "lucide-react": "^0.462.0",
+  "next-themes": "^0.3.0",
+  "openai": "^4.104.0",
+  "react": "^18.3.1",
+  "react-day-picker": "^8.10.1",
+  "react-dom": "^18.3.1",
+  "react-helmet-async": "^3.0.0",
+  "react-hook-form": "^7.61.1",
+  "react-i18next": "^17.0.2",
+  "react-joyride": "^2.9.3",
+  "react-markdown": "^10.1.0",
+  "react-resizable-panels": "^2.1.9",
+  "react-router-dom": "^6.30.1",
+  "recharts": "^2.15.4",
+  "sonner": "^1.7.4",
+  "tailwind-merge": "^2.6.0",
+  "tailwindcss-animate": "^1.0.7",
+  "three": "^0.160.1",
+  "vaul": "^0.9.9",
+  "vitest": "^4.0.6",
+  "zod": "^3.25.76",
+  "zustand": "^5.0.8"
+ },
+ "direct_dev_dependencies": {
+  "@eslint/js": "^9.32.0",
+  "@tailwindcss/typography": "^0.5.16",
+  "@testing-library/dom": "^10.4.1",
+  "@types/node": "^22.16.5",
+  "@types/react": "^18.3.23",
+  "@types/react-dom": "^18.3.7",
+  "@vitejs/plugin-react-swc": "^3.11.0",
+  "autoprefixer": "^10.4.21",
+  "eslint": "^9.32.0",
+  "eslint-plugin-react-hooks": "^5.2.0",
+  "eslint-plugin-react-refresh": "^0.4.20",
+  "globals": "^15.15.0",
+  "lovable-tagger": "^1.1.11",
+  "mqtt": "^5.15.2",
+  "postcss": "^8.5.6",
+  "supabase": "2.34.3",
+  "tailwindcss": "^3.4.17",
+  "typescript": "^5.8.3",
+  "typescript-eslint": "^8.38.0",
+  "vite": "^5.4.19"
+ },
+ "resolved_package_count": 901,
+ "components": [
+  {
+   "name": "@acemir/cssom",
+   "version": "0.9.19",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@adobe/css-tools",
+   "version": "4.4.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@alloc/quick-lru",
+   "version": "5.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@asamuzakjp/css-color",
+   "version": "4.0.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@asamuzakjp/dom-selector",
+   "version": "6.7.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@asamuzakjp/nwsapi",
+   "version": "2.3.9",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@axe-core/playwright",
+   "version": "4.11.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@babel/helper-string-parser",
+   "version": "7.25.9",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@babel/helper-validator-identifier",
+   "version": "7.25.9",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@babel/parser",
+   "version": "7.25.9",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@babel/runtime",
+   "version": "7.28.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@babel/types",
+   "version": "7.25.9",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@cfworker/json-schema",
+   "version": "4.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@csstools/color-helpers",
+   "version": "5.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@csstools/css-calc",
+   "version": "2.1.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@csstools/css-color-parser",
+   "version": "3.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@csstools/css-parser-algorithms",
+   "version": "3.0.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@csstools/css-syntax-patches-for-csstree",
+   "version": "1.0.15",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@csstools/css-tokenizer",
+   "version": "3.0.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/aix-ppc64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/aix-ppc64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/aix-ppc64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/android-arm",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/android-arm",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/android-arm",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/android-arm64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/android-arm64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/android-arm64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/android-x64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/android-x64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/android-x64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/darwin-arm64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/darwin-arm64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/darwin-arm64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/darwin-x64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/darwin-x64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/darwin-x64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/freebsd-arm64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/freebsd-arm64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/freebsd-arm64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/freebsd-x64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/freebsd-x64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/freebsd-x64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/linux-arm",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-arm",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-arm",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/linux-arm64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-arm64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-arm64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/linux-ia32",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-ia32",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-ia32",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/linux-loong64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-loong64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-loong64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/linux-mips64el",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-mips64el",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-mips64el",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/linux-ppc64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-ppc64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-ppc64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/linux-riscv64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-riscv64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-riscv64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/linux-s390x",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-s390x",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-s390x",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/linux-x64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-x64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/linux-x64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/netbsd-arm64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/netbsd-arm64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/netbsd-x64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/netbsd-x64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/netbsd-x64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/openbsd-arm64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/openbsd-arm64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/openbsd-x64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/openbsd-x64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/openbsd-x64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/openharmony-arm64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/sunos-x64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/sunos-x64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/sunos-x64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/win32-arm64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/win32-arm64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/win32-arm64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/win32-ia32",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/win32-ia32",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/win32-ia32",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@esbuild/win32-x64",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/win32-x64",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@esbuild/win32-x64",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@eslint-community/eslint-utils",
+   "version": "4.7.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@eslint-community/regexpp",
+   "version": "4.12.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@eslint/config-array",
+   "version": "0.21.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@eslint/config-helpers",
+   "version": "0.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@eslint/core",
+   "version": "0.15.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@eslint/eslintrc",
+   "version": "3.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@eslint/js",
+   "version": "9.32.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@eslint/object-schema",
+   "version": "2.1.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@eslint/plugin-kit",
+   "version": "0.3.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@faker-js/faker",
+   "version": "10.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@floating-ui/core",
+   "version": "1.7.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@floating-ui/dom",
+   "version": "1.7.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@floating-ui/react-dom",
+   "version": "2.1.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@floating-ui/utils",
+   "version": "0.2.10",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@gilbarbara/deep-equal",
+   "version": "0.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@gilbarbara/deep-equal",
+   "version": "0.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@hookform/resolvers",
+   "version": "3.10.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@humanfs/core",
+   "version": "0.19.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@humanfs/node",
+   "version": "0.16.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@humanwhocodes/module-importer",
+   "version": "1.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@humanwhocodes/retry",
+   "version": "0.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@humanwhocodes/retry",
+   "version": "0.4.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@isaacs/cliui",
+   "version": "8.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@jridgewell/gen-mapping",
+   "version": "0.3.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@jridgewell/resolve-uri",
+   "version": "3.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@jridgewell/set-array",
+   "version": "1.2.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@jridgewell/sourcemap-codec",
+   "version": "1.5.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@jridgewell/trace-mapping",
+   "version": "0.3.25",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@langchain/classic",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@langchain/community",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@langchain/core",
+   "version": "1.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@langchain/langgraph",
+   "version": "1.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@langchain/langgraph-checkpoint",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@langchain/langgraph-sdk",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@langchain/openai",
+   "version": "1.0.0-alpha.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@langchain/openai",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@langchain/textsplitters",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@mapbox/node-pre-gyp",
+   "version": "1.0.11",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@mediapipe/tasks-vision",
+   "version": "0.10.17",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@monogrid/gainmap-js",
+   "version": "3.4.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@nodelib/fs.scandir",
+   "version": "2.1.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@nodelib/fs.stat",
+   "version": "2.0.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@nodelib/fs.walk",
+   "version": "1.2.8",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@pkgjs/parseargs",
+   "version": "0.11.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@playwright/test",
+   "version": "1.56.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/number",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/primitive",
+   "version": "1.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-accordion",
+   "version": "1.2.11",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-alert-dialog",
+   "version": "1.1.14",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-arrow",
+   "version": "1.1.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-aspect-ratio",
+   "version": "1.1.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-avatar",
+   "version": "1.1.10",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-checkbox",
+   "version": "1.3.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-collapsible",
+   "version": "1.1.11",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-collection",
+   "version": "1.1.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-compose-refs",
+   "version": "1.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-context",
+   "version": "1.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-context-menu",
+   "version": "2.2.15",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-dialog",
+   "version": "1.1.14",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-direction",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-dismissable-layer",
+   "version": "1.1.10",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-dropdown-menu",
+   "version": "2.1.15",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-focus-guards",
+   "version": "1.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-focus-scope",
+   "version": "1.1.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-hover-card",
+   "version": "1.1.14",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-id",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-label",
+   "version": "2.1.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-menu",
+   "version": "2.1.15",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-menubar",
+   "version": "1.1.15",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-navigation-menu",
+   "version": "1.2.13",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-popover",
+   "version": "1.1.14",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-popper",
+   "version": "1.2.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-portal",
+   "version": "1.1.9",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-presence",
+   "version": "1.1.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-primitive",
+   "version": "2.1.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-progress",
+   "version": "1.1.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-radio-group",
+   "version": "1.3.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-roving-focus",
+   "version": "1.1.10",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-scroll-area",
+   "version": "1.2.9",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-select",
+   "version": "2.2.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-separator",
+   "version": "1.1.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-slider",
+   "version": "1.3.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-slot",
+   "version": "1.2.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-switch",
+   "version": "1.2.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-tabs",
+   "version": "1.1.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-toast",
+   "version": "1.2.14",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-toggle",
+   "version": "1.1.9",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-toggle-group",
+   "version": "1.1.10",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-tooltip",
+   "version": "1.2.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-use-callback-ref",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-use-controllable-state",
+   "version": "1.2.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-use-effect-event",
+   "version": "0.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-use-escape-keydown",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-use-is-hydrated",
+   "version": "0.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-use-layout-effect",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-use-previous",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-use-rect",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-use-size",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/react-visually-hidden",
+   "version": "1.2.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@radix-ui/rect",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@react-spring/animated",
+   "version": "9.7.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@react-spring/core",
+   "version": "9.7.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@react-spring/rafz",
+   "version": "9.7.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@react-spring/shared",
+   "version": "9.7.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@react-spring/three",
+   "version": "9.7.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@react-spring/types",
+   "version": "9.7.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@react-three/drei",
+   "version": "9.122.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@react-three/fiber",
+   "version": "8.18.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@remix-run/router",
+   "version": "1.23.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rolldown/pluginutils",
+   "version": "1.0.0-beta.27",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@rollup/rollup-android-arm-eabi",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-android-arm64",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-darwin-arm64",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-darwin-x64",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-freebsd-arm64",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-freebsd-x64",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-linux-arm-gnueabihf",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-linux-arm-musleabihf",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-linux-arm64-gnu",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-linux-arm64-musl",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-linux-loong64-gnu",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-linux-ppc64-gnu",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-linux-riscv64-gnu",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-linux-riscv64-musl",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-linux-s390x-gnu",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-linux-x64-gnu",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-linux-x64-musl",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-openharmony-arm64",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-win32-arm64-msvc",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-win32-ia32-msvc",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-win32-x64-gnu",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@rollup/rollup-win32-x64-msvc",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@standard-schema/spec",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@supabase/auth-js",
+   "version": "2.78.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@supabase/functions-js",
+   "version": "2.78.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@supabase/node-fetch",
+   "version": "2.6.15",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@supabase/postgrest-js",
+   "version": "2.78.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@supabase/realtime-js",
+   "version": "2.83.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@supabase/realtime-js",
+   "version": "2.78.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@supabase/storage-js",
+   "version": "2.78.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@supabase/supabase-js",
+   "version": "2.78.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@swc/core",
+   "version": "1.13.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@swc/core-darwin-arm64",
+   "version": "1.13.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@swc/core-darwin-x64",
+   "version": "1.13.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@swc/core-linux-arm-gnueabihf",
+   "version": "1.13.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@swc/core-linux-arm64-gnu",
+   "version": "1.13.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@swc/core-linux-arm64-musl",
+   "version": "1.13.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@swc/core-linux-x64-gnu",
+   "version": "1.13.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@swc/core-linux-x64-musl",
+   "version": "1.13.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@swc/core-win32-arm64-msvc",
+   "version": "1.13.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@swc/core-win32-ia32-msvc",
+   "version": "1.13.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@swc/core-win32-x64-msvc",
+   "version": "1.13.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@swc/counter",
+   "version": "0.1.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@swc/types",
+   "version": "0.1.23",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@tailwindcss/typography",
+   "version": "0.5.16",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@tanstack/query-core",
+   "version": "5.83.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@tanstack/react-query",
+   "version": "5.83.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@testing-library/jest-dom",
+   "version": "6.9.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@testing-library/react",
+   "version": "16.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@testing-library/user-event",
+   "version": "14.6.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@tootallnate/once",
+   "version": "2.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/chai",
+   "version": "5.2.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/d3-array",
+   "version": "3.2.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/d3-color",
+   "version": "3.1.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/d3-ease",
+   "version": "3.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/d3-interpolate",
+   "version": "3.0.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/d3-path",
+   "version": "3.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/d3-scale",
+   "version": "4.0.8",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/d3-shape",
+   "version": "3.1.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/d3-time",
+   "version": "3.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/d3-timer",
+   "version": "3.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/debug",
+   "version": "4.1.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/deep-eql",
+   "version": "4.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/draco3d",
+   "version": "1.4.10",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/estree",
+   "version": "1.0.8",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/estree-jsx",
+   "version": "1.0.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/hast",
+   "version": "3.0.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/json-schema",
+   "version": "7.0.15",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@types/mdast",
+   "version": "4.0.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/ms",
+   "version": "2.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/node",
+   "version": "22.16.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/node",
+   "version": "18.19.130",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/node-fetch",
+   "version": "2.6.13",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/offscreencanvas",
+   "version": "2019.7.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/phoenix",
+   "version": "1.6.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/prop-types",
+   "version": "15.7.13",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/react",
+   "version": "18.3.23",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/react-dom",
+   "version": "18.3.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@types/react-reconciler",
+   "version": "0.26.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/react-reconciler",
+   "version": "0.28.9",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/retry",
+   "version": "0.12.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/stats.js",
+   "version": "0.17.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/three",
+   "version": "0.160.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/unist",
+   "version": "3.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/unist",
+   "version": "2.0.11",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/uuid",
+   "version": "10.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/webxr",
+   "version": "0.5.24",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@types/ws",
+   "version": "8.18.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@typescript-eslint/eslint-plugin",
+   "version": "8.38.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@typescript-eslint/parser",
+   "version": "8.38.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@typescript-eslint/project-service",
+   "version": "8.38.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@typescript-eslint/scope-manager",
+   "version": "8.38.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@typescript-eslint/tsconfig-utils",
+   "version": "8.38.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@typescript-eslint/type-utils",
+   "version": "8.38.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@typescript-eslint/types",
+   "version": "8.38.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@typescript-eslint/typescript-estree",
+   "version": "8.38.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@typescript-eslint/utils",
+   "version": "8.38.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@typescript-eslint/visitor-keys",
+   "version": "8.38.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@ungap/structured-clone",
+   "version": "1.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@use-gesture/core",
+   "version": "10.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@use-gesture/react",
+   "version": "10.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@vitejs/plugin-react-swc",
+   "version": "3.11.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "@vitest/expect",
+   "version": "4.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@vitest/mocker",
+   "version": "4.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@vitest/pretty-format",
+   "version": "4.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@vitest/runner",
+   "version": "4.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@vitest/snapshot",
+   "version": "4.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@vitest/spy",
+   "version": "4.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "@vitest/utils",
+   "version": "4.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "abab",
+   "version": "2.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "abbrev",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "abort-controller",
+   "version": "3.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "acorn",
+   "version": "8.15.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "acorn-globals",
+   "version": "7.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "acorn-jsx",
+   "version": "5.3.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "acorn-walk",
+   "version": "8.3.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "agent-base",
+   "version": "6.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "agent-base",
+   "version": "7.1.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "agent-base",
+   "version": "7.1.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "agentkeepalive",
+   "version": "4.6.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "ajv",
+   "version": "6.12.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "ansi-regex",
+   "version": "6.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "ansi-regex",
+   "version": "5.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "ansi-regex",
+   "version": "5.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "ansi-regex",
+   "version": "5.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "ansi-regex",
+   "version": "5.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "ansi-regex",
+   "version": "5.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "ansi-styles",
+   "version": "5.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "ansi-styles",
+   "version": "4.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "ansi-styles",
+   "version": "6.2.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "any-promise",
+   "version": "1.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "anymatch",
+   "version": "3.1.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "aproba",
+   "version": "2.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "are-we-there-yet",
+   "version": "2.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "arg",
+   "version": "5.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "argparse",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "aria-hidden",
+   "version": "1.2.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "aria-query",
+   "version": "5.3.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "assertion-error",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "asynckit",
+   "version": "0.4.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "autoprefixer",
+   "version": "10.4.21",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "axe-core",
+   "version": "4.11.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "bail",
+   "version": "2.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "balanced-match",
+   "version": "1.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "base64-js",
+   "version": "1.5.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "bidi-js",
+   "version": "1.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "binary-extensions",
+   "version": "2.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "brace-expansion",
+   "version": "2.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "brace-expansion",
+   "version": "1.1.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "brace-expansion",
+   "version": "2.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "braces",
+   "version": "3.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "browserslist",
+   "version": "4.25.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "buffer",
+   "version": "6.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "call-bind-apply-helpers",
+   "version": "1.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "callsites",
+   "version": "3.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "camelcase",
+   "version": "6.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "camelcase-css",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "camera-controls",
+   "version": "2.10.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "caniuse-lite",
+   "version": "1.0.30001727",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "canvas",
+   "version": "2.11.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "ccount",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "chai",
+   "version": "6.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "chalk",
+   "version": "4.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "character-entities",
+   "version": "2.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "character-entities-html4",
+   "version": "2.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "character-entities-legacy",
+   "version": "3.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "character-reference-invalid",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "chokidar",
+   "version": "3.6.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "chownr",
+   "version": "2.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "class-variance-authority",
+   "version": "0.7.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "clsx",
+   "version": "2.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "cmdk",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "color-convert",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "color-name",
+   "version": "1.1.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "color-support",
+   "version": "1.1.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "combined-stream",
+   "version": "1.0.8",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "comma-separated-tokens",
+   "version": "2.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "commander",
+   "version": "4.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "concat-map",
+   "version": "0.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "console-control-strings",
+   "version": "1.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "console-table-printer",
+   "version": "2.15.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "cross-env",
+   "version": "7.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "cross-spawn",
+   "version": "7.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "css-tree",
+   "version": "3.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "css.escape",
+   "version": "1.5.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "cssesc",
+   "version": "3.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "cssom",
+   "version": "0.5.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "cssom",
+   "version": "0.3.8",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "cssstyle",
+   "version": "5.3.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "cssstyle",
+   "version": "2.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "csstype",
+   "version": "3.1.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "d3-array",
+   "version": "3.2.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "d3-color",
+   "version": "3.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "d3-ease",
+   "version": "3.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "d3-format",
+   "version": "3.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "d3-interpolate",
+   "version": "3.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "d3-path",
+   "version": "3.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "d3-scale",
+   "version": "4.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "d3-shape",
+   "version": "3.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "d3-time",
+   "version": "3.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "d3-time-format",
+   "version": "4.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "d3-timer",
+   "version": "3.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "data-urls",
+   "version": "6.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "data-urls",
+   "version": "3.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "date-fns",
+   "version": "4.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "debug",
+   "version": "4.4.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "decamelize",
+   "version": "1.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "decimal.js",
+   "version": "10.6.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "decimal.js-light",
+   "version": "2.5.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "decode-named-character-reference",
+   "version": "1.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "decompress-response",
+   "version": "4.2.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "deep-diff",
+   "version": "1.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "deep-is",
+   "version": "0.1.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "deepmerge",
+   "version": "4.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "delayed-stream",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "delegates",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "dequal",
+   "version": "2.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "detect-gpu",
+   "version": "5.0.70",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "detect-libc",
+   "version": "2.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "detect-node-es",
+   "version": "1.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "devlop",
+   "version": "1.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "didyoumean",
+   "version": "1.2.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "dlv",
+   "version": "1.1.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "dom-accessibility-api",
+   "version": "0.6.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "dom-helpers",
+   "version": "5.2.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "domexception",
+   "version": "4.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "draco3d",
+   "version": "1.5.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "dunder-proto",
+   "version": "1.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "eastasianwidth",
+   "version": "0.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "electron-to-chromium",
+   "version": "1.5.192",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "embla-carousel",
+   "version": "8.6.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "embla-carousel-react",
+   "version": "8.6.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "embla-carousel-reactive-utils",
+   "version": "8.6.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "emoji-regex",
+   "version": "9.2.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "emoji-regex",
+   "version": "8.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "emoji-regex",
+   "version": "8.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "emoji-regex",
+   "version": "8.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "emoji-regex",
+   "version": "8.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "entities",
+   "version": "6.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "es-define-property",
+   "version": "1.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "es-errors",
+   "version": "1.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "es-module-lexer",
+   "version": "1.7.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "es-object-atoms",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "es-set-tostringtag",
+   "version": "2.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "esbuild",
+   "version": "0.21.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "esbuild",
+   "version": "0.25.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "esbuild",
+   "version": "0.25.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "escalade",
+   "version": "3.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "escape-string-regexp",
+   "version": "4.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "escodegen",
+   "version": "2.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "eslint",
+   "version": "9.32.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "eslint-plugin-react-hooks",
+   "version": "5.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "eslint-plugin-react-refresh",
+   "version": "0.4.20",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "eslint-scope",
+   "version": "8.4.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "eslint-visitor-keys",
+   "version": "3.4.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "eslint-visitor-keys",
+   "version": "4.2.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "espree",
+   "version": "10.4.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "esprima",
+   "version": "4.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "esquery",
+   "version": "1.6.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "esrecurse",
+   "version": "4.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "estraverse",
+   "version": "5.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "estree-util-is-identifier-name",
+   "version": "3.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "estree-walker",
+   "version": "3.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "esutils",
+   "version": "2.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "event-target-shim",
+   "version": "5.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "eventemitter3",
+   "version": "4.0.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "expect-type",
+   "version": "1.2.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "expr-eval",
+   "version": "2.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "extend",
+   "version": "3.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "fabric",
+   "version": "6.7.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "fast-deep-equal",
+   "version": "3.1.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "fast-equals",
+   "version": "5.2.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "fast-glob",
+   "version": "3.3.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "fast-json-stable-stringify",
+   "version": "2.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "fast-levenshtein",
+   "version": "2.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "fastq",
+   "version": "1.17.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "fdir",
+   "version": "6.5.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "fflate",
+   "version": "0.6.10",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "file-entry-cache",
+   "version": "8.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "fill-range",
+   "version": "7.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "find-up",
+   "version": "5.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "flat",
+   "version": "5.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "flat-cache",
+   "version": "4.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "flatted",
+   "version": "3.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "foreground-child",
+   "version": "3.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "form-data",
+   "version": "4.0.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "form-data-encoder",
+   "version": "1.7.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "formdata-node",
+   "version": "4.4.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "fraction.js",
+   "version": "4.3.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "framer-motion",
+   "version": "12.23.24",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "fs-minipass",
+   "version": "2.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "fs.realpath",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "fsevents",
+   "version": "2.3.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "fsevents",
+   "version": "2.3.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "function-bind",
+   "version": "1.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "gauge",
+   "version": "3.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "get-intrinsic",
+   "version": "1.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "get-nonce",
+   "version": "1.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "get-proto",
+   "version": "1.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "glob",
+   "version": "10.4.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "glob",
+   "version": "7.2.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "glob-parent",
+   "version": "5.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "glob-parent",
+   "version": "5.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "glob-parent",
+   "version": "6.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "globals",
+   "version": "14.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "globals",
+   "version": "15.15.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "glsl-noise",
+   "version": "0.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "gopd",
+   "version": "1.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "graphemer",
+   "version": "1.4.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "handlebars",
+   "version": "4.7.8",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "has-flag",
+   "version": "4.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "has-symbols",
+   "version": "1.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "has-tostringtag",
+   "version": "1.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "has-unicode",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "hasown",
+   "version": "2.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "hast-util-to-jsx-runtime",
+   "version": "2.3.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "hast-util-whitespace",
+   "version": "3.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "hls.js",
+   "version": "1.6.15",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "html-encoding-sniffer",
+   "version": "3.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "html-encoding-sniffer",
+   "version": "4.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "html-url-attributes",
+   "version": "3.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "http-proxy-agent",
+   "version": "5.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "http-proxy-agent",
+   "version": "7.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "https-proxy-agent",
+   "version": "5.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "https-proxy-agent",
+   "version": "7.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "humanize-ms",
+   "version": "1.2.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "iconv-lite",
+   "version": "0.6.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "ieee754",
+   "version": "1.2.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "ignore",
+   "version": "7.0.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "ignore",
+   "version": "5.3.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "immediate",
+   "version": "3.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "import-fresh",
+   "version": "3.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "imurmurhash",
+   "version": "0.1.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "indent-string",
+   "version": "4.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "inflight",
+   "version": "1.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "inherits",
+   "version": "2.0.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "inline-style-parser",
+   "version": "0.2.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "input-otp",
+   "version": "1.4.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "internmap",
+   "version": "2.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "is-alphabetical",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "is-alphanumerical",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "is-binary-path",
+   "version": "2.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "is-core-module",
+   "version": "2.15.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "is-decimal",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "is-extglob",
+   "version": "2.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "is-fullwidth-code-point",
+   "version": "3.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "is-glob",
+   "version": "4.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "is-hexadecimal",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "is-lite",
+   "version": "1.2.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "is-lite",
+   "version": "0.8.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "is-number",
+   "version": "7.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "is-plain-obj",
+   "version": "4.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "is-potential-custom-element-name",
+   "version": "1.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "is-promise",
+   "version": "2.2.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "isexe",
+   "version": "2.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "its-fine",
+   "version": "1.2.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "jackspeak",
+   "version": "3.4.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "jiti",
+   "version": "1.21.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "js-tiktoken",
+   "version": "1.0.21",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "js-tokens",
+   "version": "4.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "js-yaml",
+   "version": "4.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "jsdom",
+   "version": "20.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "jsdom",
+   "version": "27.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "json-buffer",
+   "version": "3.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "json-schema-traverse",
+   "version": "0.4.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "json-stable-stringify-without-jsonify",
+   "version": "1.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "jsonpointer",
+   "version": "5.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "keyv",
+   "version": "4.5.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "langsmith",
+   "version": "0.3.79",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "levn",
+   "version": "0.4.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "lie",
+   "version": "3.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "lilconfig",
+   "version": "3.1.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "lines-and-columns",
+   "version": "1.2.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "locate-path",
+   "version": "6.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "lodash",
+   "version": "4.17.21",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "lodash.castarray",
+   "version": "4.4.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "lodash.isplainobject",
+   "version": "4.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "lodash.merge",
+   "version": "4.6.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "longest-streak",
+   "version": "3.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "loose-envify",
+   "version": "1.4.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "lovable-tagger",
+   "version": "1.1.11",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "lru-cache",
+   "version": "11.2.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "lru-cache",
+   "version": "11.2.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "lru-cache",
+   "version": "10.4.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "lucide-react",
+   "version": "0.462.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "maath",
+   "version": "0.10.8",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "magic-string",
+   "version": "0.30.21",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "make-dir",
+   "version": "3.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "math-intrinsics",
+   "version": "1.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "mdast-util-from-markdown",
+   "version": "2.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "mdast-util-mdx-expression",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "mdast-util-mdx-jsx",
+   "version": "3.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "mdast-util-mdxjs-esm",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "mdast-util-phrasing",
+   "version": "4.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "mdast-util-to-hast",
+   "version": "13.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "mdast-util-to-markdown",
+   "version": "2.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "mdast-util-to-string",
+   "version": "4.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "mdn-data",
+   "version": "2.12.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "merge2",
+   "version": "1.4.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "meshline",
+   "version": "3.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "meshoptimizer",
+   "version": "0.18.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark",
+   "version": "4.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-core-commonmark",
+   "version": "2.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-factory-destination",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-factory-label",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-factory-space",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-factory-title",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-factory-whitespace",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-util-character",
+   "version": "2.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-util-chunked",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-util-classify-character",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-util-combine-extensions",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-util-decode-numeric-character-reference",
+   "version": "2.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-util-decode-string",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-util-encode",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-util-html-tag-name",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-util-normalize-identifier",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-util-resolve-all",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-util-sanitize-uri",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-util-subtokenize",
+   "version": "2.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-util-symbol",
+   "version": "2.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromark-util-types",
+   "version": "2.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "micromatch",
+   "version": "4.0.8",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "mime-db",
+   "version": "1.52.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "mime-types",
+   "version": "2.1.35",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "mimic-response",
+   "version": "2.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "min-indent",
+   "version": "1.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "minimatch",
+   "version": "9.0.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "minimatch",
+   "version": "9.0.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "minimatch",
+   "version": "3.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "minimist",
+   "version": "1.2.8",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "minipass",
+   "version": "3.3.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "minipass",
+   "version": "7.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "minipass",
+   "version": "3.3.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "minipass",
+   "version": "5.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "minizlib",
+   "version": "2.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "mkdirp",
+   "version": "1.0.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "motion-dom",
+   "version": "12.23.23",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "motion-utils",
+   "version": "12.23.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "ms",
+   "version": "2.1.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "mustache",
+   "version": "4.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "mz",
+   "version": "2.7.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "nan",
+   "version": "2.23.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "nanoid",
+   "version": "3.3.11",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "natural-compare",
+   "version": "1.4.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "neo-async",
+   "version": "2.6.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "next-themes",
+   "version": "0.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "node-domexception",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "node-fetch",
+   "version": "2.7.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "node-releases",
+   "version": "2.0.19",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "nopt",
+   "version": "5.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "normalize-path",
+   "version": "3.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "normalize-range",
+   "version": "0.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "npmlog",
+   "version": "5.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "nwsapi",
+   "version": "2.2.22",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "object-assign",
+   "version": "4.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "object-hash",
+   "version": "3.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "once",
+   "version": "1.4.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "openai",
+   "version": "6.9.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "openai",
+   "version": "6.9.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "openai",
+   "version": "4.104.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "openapi-types",
+   "version": "12.1.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "optionator",
+   "version": "0.9.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "p-finally",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "p-limit",
+   "version": "3.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "p-locate",
+   "version": "5.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "p-queue",
+   "version": "6.6.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "p-retry",
+   "version": "4.6.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "p-timeout",
+   "version": "3.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "package-json-from-dist",
+   "version": "1.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "parent-module",
+   "version": "1.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "parse-entities",
+   "version": "4.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "parse5",
+   "version": "7.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "parse5",
+   "version": "8.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "path-exists",
+   "version": "4.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "path-is-absolute",
+   "version": "1.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "path-key",
+   "version": "3.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "path-parse",
+   "version": "1.0.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "path-scurry",
+   "version": "1.11.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "pathe",
+   "version": "2.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "picocolors",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "picomatch",
+   "version": "2.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "picomatch",
+   "version": "4.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "picomatch",
+   "version": "4.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "pify",
+   "version": "2.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "pirates",
+   "version": "4.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "playwright",
+   "version": "1.56.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "playwright-core",
+   "version": "1.56.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "popper.js",
+   "version": "1.16.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "postcss",
+   "version": "8.5.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "postcss-import",
+   "version": "15.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "postcss-js",
+   "version": "4.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "postcss-load-config",
+   "version": "4.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "postcss-nested",
+   "version": "6.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "postcss-selector-parser",
+   "version": "6.0.10",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "postcss-selector-parser",
+   "version": "6.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "postcss-value-parser",
+   "version": "4.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "potpack",
+   "version": "1.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "prelude-ls",
+   "version": "1.2.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "promise-worker-transferable",
+   "version": "1.0.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "prop-types",
+   "version": "15.8.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "property-information",
+   "version": "7.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "psl",
+   "version": "1.15.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "punycode",
+   "version": "2.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "querystringify",
+   "version": "2.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "queue-microtask",
+   "version": "1.2.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "react",
+   "version": "18.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-composer",
+   "version": "5.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-day-picker",
+   "version": "8.10.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-dom",
+   "version": "18.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-floater",
+   "version": "0.7.9",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-hook-form",
+   "version": "7.61.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-innertext",
+   "version": "1.1.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-is",
+   "version": "16.13.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-is",
+   "version": "18.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-is",
+   "version": "16.13.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-joyride",
+   "version": "2.9.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-markdown",
+   "version": "10.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-reconciler",
+   "version": "0.27.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-remove-scroll",
+   "version": "2.7.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-remove-scroll-bar",
+   "version": "2.3.8",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-resizable-panels",
+   "version": "2.1.9",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-router",
+   "version": "6.30.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-router-dom",
+   "version": "6.30.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-smooth",
+   "version": "4.0.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-style-singleton",
+   "version": "2.2.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-transition-group",
+   "version": "4.4.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "react-use-measure",
+   "version": "2.1.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "read-cache",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "readable-stream",
+   "version": "3.6.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "readdirp",
+   "version": "3.6.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "recharts",
+   "version": "2.15.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "recharts-scale",
+   "version": "0.4.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "redent",
+   "version": "3.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "remark-parse",
+   "version": "11.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "remark-rehype",
+   "version": "11.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "require-from-string",
+   "version": "2.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "requires-port",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "resolve",
+   "version": "1.22.8",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "resolve-from",
+   "version": "4.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "retry",
+   "version": "0.13.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "reusify",
+   "version": "1.0.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "rimraf",
+   "version": "3.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "rollup",
+   "version": "4.52.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "run-parallel",
+   "version": "1.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "safe-buffer",
+   "version": "5.2.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "safer-buffer",
+   "version": "2.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "saxes",
+   "version": "6.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "scheduler",
+   "version": "0.21.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "scheduler",
+   "version": "0.21.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "scheduler",
+   "version": "0.23.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "scroll",
+   "version": "3.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "scrollparent",
+   "version": "2.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "semver",
+   "version": "6.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "semver",
+   "version": "7.7.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "set-blocking",
+   "version": "2.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "shebang-command",
+   "version": "2.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "shebang-regex",
+   "version": "3.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "siginfo",
+   "version": "2.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "signal-exit",
+   "version": "3.0.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "signal-exit",
+   "version": "4.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "simple-concat",
+   "version": "1.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "simple-get",
+   "version": "3.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "simple-wcswidth",
+   "version": "1.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "sonner",
+   "version": "1.7.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "source-map",
+   "version": "0.6.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "source-map-js",
+   "version": "1.2.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "space-separated-tokens",
+   "version": "2.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "stackback",
+   "version": "0.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "stats-gl",
+   "version": "2.4.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "stats.js",
+   "version": "0.17.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "std-env",
+   "version": "3.10.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "string-width",
+   "version": "4.2.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "string-width",
+   "version": "5.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "string-width",
+   "version": "4.2.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "string-width",
+   "version": "4.2.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "string-width-cjs",
+   "version": "4.2.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "string_decoder",
+   "version": "1.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "stringify-entities",
+   "version": "4.0.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "strip-ansi",
+   "version": "6.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "strip-ansi",
+   "version": "6.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "strip-ansi",
+   "version": "7.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "strip-ansi",
+   "version": "6.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "strip-ansi",
+   "version": "6.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "strip-ansi-cjs",
+   "version": "6.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "strip-indent",
+   "version": "3.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "strip-json-comments",
+   "version": "3.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "style-to-js",
+   "version": "1.1.18",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "style-to-object",
+   "version": "1.0.11",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "sucrase",
+   "version": "3.35.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "supports-color",
+   "version": "7.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "supports-preserve-symlinks-flag",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "suspend-react",
+   "version": "0.1.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "symbol-tree",
+   "version": "3.2.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tailwind-merge",
+   "version": "2.6.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tailwindcss",
+   "version": "3.4.17",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "tailwindcss-animate",
+   "version": "1.0.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tar",
+   "version": "6.2.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "thenify",
+   "version": "3.3.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "thenify-all",
+   "version": "1.6.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "three",
+   "version": "0.170.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "three",
+   "version": "0.160.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "three-mesh-bvh",
+   "version": "0.7.8",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "three-stdlib",
+   "version": "2.36.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tiny-invariant",
+   "version": "1.3.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tinybench",
+   "version": "2.9.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tinyexec",
+   "version": "0.3.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tinyglobby",
+   "version": "0.2.15",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tinyrainbow",
+   "version": "3.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tldts",
+   "version": "7.0.17",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tldts-core",
+   "version": "7.0.17",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "to-regex-range",
+   "version": "5.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "tough-cookie",
+   "version": "4.1.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tough-cookie",
+   "version": "6.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tr46",
+   "version": "6.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tr46",
+   "version": "3.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tr46",
+   "version": "6.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tr46",
+   "version": "0.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tree-changes",
+   "version": "0.9.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tree-changes",
+   "version": "0.11.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "trim-lines",
+   "version": "3.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "troika-three-text",
+   "version": "0.52.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "troika-three-utils",
+   "version": "0.52.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "troika-worker-utils",
+   "version": "0.52.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "trough",
+   "version": "2.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "ts-api-utils",
+   "version": "2.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "ts-interface-checker",
+   "version": "0.1.13",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "tslib",
+   "version": "2.8.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "tunnel-rat",
+   "version": "0.1.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "type-check",
+   "version": "0.4.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "type-fest",
+   "version": "4.41.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "typescript",
+   "version": "5.8.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "typescript-eslint",
+   "version": "8.38.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "uglify-js",
+   "version": "3.19.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "undici-types",
+   "version": "5.26.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "undici-types",
+   "version": "6.21.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "unified",
+   "version": "11.0.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "unist-util-is",
+   "version": "6.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "unist-util-position",
+   "version": "5.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "unist-util-stringify-position",
+   "version": "4.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "unist-util-visit",
+   "version": "5.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "unist-util-visit-parents",
+   "version": "6.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "universalify",
+   "version": "0.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "update-browserslist-db",
+   "version": "1.1.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "uri-js",
+   "version": "4.4.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "url-parse",
+   "version": "1.5.10",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "use-callback-ref",
+   "version": "1.3.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "use-sidecar",
+   "version": "1.1.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "use-sync-external-store",
+   "version": "1.5.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "util-deprecate",
+   "version": "1.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "utility-types",
+   "version": "3.11.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "uuid",
+   "version": "9.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "uuid",
+   "version": "10.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "vaul",
+   "version": "0.9.9",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "vfile",
+   "version": "6.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "vfile-message",
+   "version": "4.0.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "victory-vendor",
+   "version": "36.9.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "vite",
+   "version": "5.4.19",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "vite",
+   "version": "7.1.12",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "vitest",
+   "version": "4.0.6",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "w3c-xmlserializer",
+   "version": "4.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "w3c-xmlserializer",
+   "version": "5.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "web-streams-polyfill",
+   "version": "4.0.0-beta.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "webgl-constants",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "webgl-sdf-generator",
+   "version": "1.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "webidl-conversions",
+   "version": "8.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "webidl-conversions",
+   "version": "7.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "webidl-conversions",
+   "version": "7.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "webidl-conversions",
+   "version": "8.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "webidl-conversions",
+   "version": "3.0.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "whatwg-encoding",
+   "version": "2.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "whatwg-encoding",
+   "version": "3.1.1",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "whatwg-mimetype",
+   "version": "3.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "whatwg-mimetype",
+   "version": "4.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "whatwg-url",
+   "version": "15.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "whatwg-url",
+   "version": "11.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "whatwg-url",
+   "version": "15.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "whatwg-url",
+   "version": "5.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "which",
+   "version": "2.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "why-is-node-running",
+   "version": "2.3.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "wide-align",
+   "version": "1.1.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "word-wrap",
+   "version": "1.2.5",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "wordwrap",
+   "version": "1.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "wrap-ansi",
+   "version": "8.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "wrap-ansi-cjs",
+   "version": "7.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "wrappy",
+   "version": "1.0.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "ws",
+   "version": "8.18.3",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "xml-name-validator",
+   "version": "4.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "xml-name-validator",
+   "version": "5.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "xmlchars",
+   "version": "2.2.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "yallist",
+   "version": "4.0.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "yaml",
+   "version": "2.6.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "yocto-queue",
+   "version": "0.1.0",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": true
+  },
+  {
+   "name": "zod",
+   "version": "3.25.76",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "zustand",
+   "version": "3.7.2",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "zustand",
+   "version": "4.5.7",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "zustand",
+   "version": "5.0.8",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  },
+  {
+   "name": "zwitch",
+   "version": "2.0.4",
+   "resolved_host": "registry.npmjs.org",
+   "integrity_present": true,
+   "dev": false
+  }
+ ]
+}

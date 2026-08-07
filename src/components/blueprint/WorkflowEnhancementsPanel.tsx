@@ -21,6 +21,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { signalStrength, SIGNAL_BASIS } from '@/capabilities/recommendationSignal';
 
 interface WorkflowVersion {
   id: string;
@@ -295,7 +296,7 @@ export function WorkflowEnhancementsPanel({
                       {impact.expectedChange > 0 ? '+' : ''}{impact.expectedChange}%
                     </span>
                     <Badge variant="outline" className="text-[10px] h-4">
-                      {impact.confidence}% conf
+                      {signalStrength(impact.confidence)} signal
                     </Badge>
                   </div>
                 </div>
@@ -305,7 +306,7 @@ export function WorkflowEnhancementsPanel({
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="h-4 w-4 text-info shrink-0 mt-0.5" />
                   <p className="text-xs text-info">
-                    Impact predictions are based on historical data and may vary with actual conditions.
+                    Impact projections are rule-based simulation estimates, not statistical confidence scores or model probabilities. {SIGNAL_BASIS}
                   </p>
                 </div>
               </div>

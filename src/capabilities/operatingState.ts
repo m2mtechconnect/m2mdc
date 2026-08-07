@@ -54,7 +54,11 @@ export const SIMULATION_SOURCE = 'AURA deterministic simulation';
 
 export const EVIDENCE_BOUNDARY_PREFIX = 'Based on simulation run';
 
-/** Deterministic run id: SIM-YYYY-MM-DD-001 for the given day. */
+/**
+ * Deterministic run-id formatter used by the simulation execution lifecycle
+ * when a new run is started. It must NOT be called during rendering: display
+ * surfaces read the persisted run id via `useRunProvenance()` instead.
+ */
 export function simulationRunId(now: Date = new Date()): string {
   const iso = now.toISOString().slice(0, 10);
   return `SIM-${iso}-001`;
@@ -64,7 +68,10 @@ export function activeScenarioLabel(): string {
   return 'Baseline Operations';
 }
 
-export function evidenceBoundaryNotice(runId: string = simulationRunId()): string {
+export function evidenceBoundaryNotice(runId?: string | null): string {
+  if (!runId) {
+    return 'No simulation run has been recorded yet, so no result provenance is available. No live facility or NVIDIA DSX data was used.';
+  }
   return `${EVIDENCE_BOUNDARY_PREFIX} ${runId}. No live facility or NVIDIA DSX data was used.`;
 }
 

@@ -23,7 +23,7 @@
  */
 
 import type { ExportPayload, ExportRecord } from './schema';
-import { EXPORT_SCHEMA_VERSION } from './schema';
+import { EXPORT_SCHEMA_VERSION, buildExportOperatingState } from './schema';
 
 function esc(s: unknown): string {
   if (s === null || s === undefined) return '';
@@ -69,6 +69,20 @@ function renderRow(r: ExportRecord): string {
 export function toPrintHtml(payload: ExportPayload): string {
   const rows = payload.records.map(renderRow).join('');
   const note = payload.note ? `<p class="note">${esc(payload.note)}</p>` : '';
+  const os = payload.operatingState ?? buildExportOperatingState();
+  const truthBlock = `
+  <dl class="truth" data-export-operating-state>
+   <dt>Operating mode</dt><dd data-field="operating-mode">${esc(os.operatingMode)}</dd>
+   <dt>Input classification</dt><dd data-field="input-classification">${esc(os.inputClassification)}</dd>
+   <dt>Simulation run ID</dt><dd data-field="simulation-run-id">${esc(os.simulationRunId ?? 'Unavailable')}</dd>
+   <dt>Scenario</dt><dd data-field="scenario">${esc(os.scenario)}</dd>
+   <dt>Calculation timestamp</dt><dd data-field="calculation-timestamp">${esc(os.calculationTimestamp ?? 'Unavailable')}</dd>
+   <dt>Source / generator</dt><dd data-field="source-generator">${esc(os.sourceGenerator)}</dd>
+   <dt>Human review status</dt><dd data-field="human-review">${esc(os.humanReviewStatus)}</dd>
+   <dt>NVIDIA runtime used</dt><dd data-field="nvidia-runtime-used">${esc(os.nvidiaRuntimeUsed)}</dd>
+   <dt>Live facility data used</dt><dd data-field="live-facility-data-used">${esc(os.liveFacilityDataUsed)}</dd>
+   <dt>Known limitations</dt><dd data-field="known-limitations">${esc(os.knownLimitations)}</dd>
+  </dl>`;
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"/>
 <title>${esc(payload.title)}</title>
@@ -91,13 +105,18 @@ export function toPrintHtml(payload: ExportPayload): string {
  .unavail{color:#991b1b;font-style:italic}
  .stale{margin-left:4px;color:#92400e;font-size:10px;text-transform:uppercase}
  .note{margin:8px 0 12px;padding:8px;border-left:3px solid #999;background:#fafafa}
+ .truth{margin:8px 0 12px;padding:8px;border:1px solid #ccc;background:#fafafa;
+   display:grid;grid-template-columns:180px 1fr;gap:2px 12px;font-size:11px}
+ .truth dt{font-weight:600;color:#333;margin:0}
+ .truth dd{margin:0;color:#333}
  footer{margin-top:16px;color:#666;font-size:10px}
 </style></head>
 <body>
 <main data-aura-export data-schema-version="${EXPORT_SCHEMA_VERSION}" data-surface="${esc(payload.surface)}">
  <header>
   <h1>${esc(payload.title)}</h1>
-  <div class="meta">Generated at ${esc(payload.generatedAt)} — schema ${EXPORT_SCHEMA_VERSION} — surface ${esc(payload.surface)}</div>
+  <div class="meta">Generated at ${esc(payload.generatedAt)} - schema ${EXPORT_SCHEMA_VERSION} - surface ${esc(payload.surface)}</div>
+  ${truthBlock}
   ${note}
  </header>
  <table>

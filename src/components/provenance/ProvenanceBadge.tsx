@@ -10,7 +10,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Activity, CircleDashed, FlaskConical, Sparkles, Target, WifiOff } from 'lucide-react';
 import type { ProvenanceMeta } from '@/lib/provenance/types';
 import { provenanceLabel } from '@/lib/provenance';
-import { SIMULATION_SOURCE, simulationRunId } from '@/capabilities/operatingState';
+import { SIMULATION_SOURCE } from '@/capabilities/operatingState';
+import { RUN_UNAVAILABLE_LABEL, useRunProvenance } from '@/capabilities/runProvenance';
 import { cn } from '@/lib/utils';
 
 interface ProvenanceBadgeProps {
@@ -40,12 +41,13 @@ const variantFor = {
 export function ProvenanceBadge({ meta, compact = false, className }: ProvenanceBadgeProps) {
   const Icon = iconFor[meta.provenance];
   const label = provenanceLabel(meta.provenance);
+  const runProvenance = useRunProvenance();
 
   const timestamp = meta.at ? meta.at.toLocaleString() : 'no timestamp';
   const stale = meta.stale ? ' (stale)' : '';
   const connection = meta.connection ? ` · ${meta.connection}` : '';
   const synthetic = meta.provenance === 'simulated' || meta.provenance === 'demo';
-  const runId = synthetic ? simulationRunId() : null;
+  const runId = synthetic ? runProvenance.runId ?? RUN_UNAVAILABLE_LABEL : null;
 
   return (
     <TooltipProvider delayDuration={150}>

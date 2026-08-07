@@ -14,6 +14,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { logger } from "@/lib/logger";
 import { formatRelativeTime } from "@/lib/formatters";
 import { evidenceBoundaryNotice } from '@/capabilities/operatingState';
+import { useRunProvenance } from '@/capabilities/runProvenance';
 
 interface Citation {
   id: number;
@@ -83,6 +84,7 @@ export function CoPilotDrawer({ open, onClose, currentRole, initialMessage }: Co
   
   const { sessions, saveMessages, loadMessages, deleteSession, clearCurrentSession } = useCopilotHistory(sessionId);
   const [showHistory, setShowHistory] = useState(false);
+  const runProvenance = useRunProvenance();
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -827,7 +829,7 @@ export function CoPilotDrawer({ open, onClose, currentRole, initialMessage }: Co
                         data-testid="assistant-evidence-boundary"
                         className="text-[11px] leading-snug text-muted-foreground"
                       >
-                        {evidenceBoundaryNotice()}
+                        {evidenceBoundaryNotice(runProvenance.runId)}
                       </p>
                       {/* Data Sources & Knowledge Badge */}
                       {(msg.dataSources || msg.knowledgeCount) && (

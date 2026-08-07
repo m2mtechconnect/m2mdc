@@ -4,8 +4,8 @@
  * export-generation time.
  */
 
-import type { ExportPayload } from './schema';
-import { EXPORT_SCHEMA_VERSION } from './schema';
+import type { ExportOperatingState, ExportPayload } from './schema';
+import { EXPORT_SCHEMA_VERSION, buildExportOperatingState } from './schema';
 
 export interface SerializedJsonPayload {
   $schema: 'aura.export/v1';
@@ -14,6 +14,7 @@ export interface SerializedJsonPayload {
   title: string;
   generatedAt: string;
   note?: string;
+  operatingState: ExportOperatingState;
   records: ExportPayload['records'];
 }
 
@@ -25,6 +26,7 @@ export function toJson(payload: ExportPayload): string {
     title: payload.title,
     generatedAt: payload.generatedAt,
     ...(payload.note ? { note: payload.note } : {}),
+    operatingState: payload.operatingState ?? buildExportOperatingState(),
     records: payload.records,
   };
   return JSON.stringify(serialized, null, 2);

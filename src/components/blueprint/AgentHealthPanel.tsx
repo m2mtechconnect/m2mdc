@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { cn } from '@/lib/utils';
+import { signalStrength, SIGNAL_BASIS } from '@/capabilities/recommendationSignal';
 
 interface AgentHealthMetrics {
   id: string;
@@ -176,10 +177,11 @@ export function AgentHealthPanel({ className }: { className?: string }) {
                         <Brain className="h-3.5 w-3.5 text-primary" />
                         <span className="text-xs font-medium">Last Decision</span>
                         <Badge variant="outline" className="text-[10px] ml-auto">
-                          {Math.round(agent.lastDecision.confidence * 100)}% confidence
+                          {signalStrength(agent.lastDecision.confidence * 100)} signal
                         </Badge>
                       </div>
                       <p className="text-xs font-medium">{agent.lastDecision.action}</p>
+                      <p className="text-[10px] text-muted-foreground">{SIGNAL_BASIS}</p>
                       <p className="text-[10px] text-muted-foreground">{agent.lastDecision.reasoning}</p>
                       <div className="flex flex-wrap gap-1">
                         {agent.lastDecision.factors.map((factor, i) => (

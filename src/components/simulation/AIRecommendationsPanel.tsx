@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import type { AIRecommendation, SimulationSummary } from '@/twins/sovereignDataCenter/enhancedSimulationEngine';
 import { cn } from '@/lib/utils';
-import { signalLabel, signalStrength, SIGNAL_BASIS } from '@/capabilities/recommendationSignal';
+import { signalLabel, signalStrength, SIGNAL_BASIS, SIGNAL_RULES } from '@/capabilities/recommendationSignal';
 
 interface AIRecommendationsPanelProps {
   summary: SimulationSummary | null;
@@ -139,7 +139,7 @@ export function AIRecommendationsPanel({
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs text-muted-foreground" title={SIGNAL_BASIS}>
+                        <span className="text-xs text-muted-foreground" title={SIGNAL_BASIS} aria-label={`${signalLabel(rec.confidence)}. ${SIGNAL_BASIS}`}>
                           {signalLabel(rec.confidence)}
                         </span>
                       </div>
@@ -193,6 +193,10 @@ export function AIRecommendationsPanel({
             <div className="text-xs text-muted-foreground">Rule-based signal</div>
           </div>
         </div>
+
+        <p className="pt-2 text-[11px] leading-snug text-muted-foreground">
+          {SIGNAL_BASIS} {SIGNAL_RULES}
+        </p>
 
         {onDismiss && (
           <Button variant="outline" className="w-full" onClick={onDismiss}>

@@ -829,7 +829,7 @@ export function CoPilotDrawer({ open, onClose, currentRole, initialMessage }: Co
                         data-testid="assistant-evidence-boundary"
                         className="text-[11px] leading-snug text-muted-foreground"
                       >
-                        {evidenceBoundaryNotice()}
+                        {evidenceBoundaryNotice(runProvenance.runId)}
                       </p>
                       {/* Data Sources & Knowledge Badge */}
                       {(msg.dataSources || msg.knowledgeCount) && (

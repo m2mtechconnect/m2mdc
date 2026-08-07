@@ -1,0 +1,3 @@
+# Scope and Method
+Read-only audit. Methods used: git and package introspection; ripgrep static analysis; TypeScript type-check (tsgo); ESLint; full Vitest run with per-test identities; read-only PostgreSQL catalog introspection (pg_class, pg_policies, pg_proc, information_schema) against the production project with no mutation; Edge Function caller reconciliation.
+Not performed and therefore reported BLOCKED: migration replay, authenticated RLS probes, cross-tenant probes, Auth/Storage/Realtime integration tests, Edge Function runtime probes, dependency vulnerability scan, bundle analysis, Playwright end-to-end sweeps. Cause: the disposable environment does not exist and the guard fails closed (correct behavior).

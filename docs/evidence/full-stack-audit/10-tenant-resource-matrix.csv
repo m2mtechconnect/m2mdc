@@ -1,0 +1,5 @@
+item,status,evidence,limitation
+113 public tables,user_private or system_internal in practice,catalog,only 14 have tenant/org column - no tenant_owned class is enforceable
+4 views + 1 matview,system_internal,catalog,security_invoker not verified
+157 edge functions,system_internal,repo,no tenant validation observed in reachable set
+1 realtime publication,system_internal,catalog,tenant leakage unverified

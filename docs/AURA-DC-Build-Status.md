@@ -65,4 +65,16 @@ Evidence, including the inventory, probe transcripts and the one explicitly
 UNVERIFIED item (signed-in per-policy row visibility), is in
 `docs/evidence/phase-1/README.md`.
 
-Still open in Phase 1: B-04 tenant isolation, B-01 duplicate role systems.
+| B-01 duplicate role systems | Two disagreeing resolvers, two vocabularies, client-side ownership bypass | One canonical permission model; `useUserPermissions` retired to a shim; agent checks fail closed | IMPLEMENTED |
+| B-04 tenant isolation | Unclassified | 113 tables classified; 52 tenant-owned tables proven to lack any `tenant_id` | PLANNED |
+
+Evidence: `docs/evidence/phase-1/b01-authorization-consolidation.md`,
+`docs/evidence/phase-1/b04-resource-classification.md`.
+
+### Phase 1 blocked gates
+
+B-04 enforcement and the authenticated verification of B-06 and the 15 rebuilt RLS
+policies are **BLOCKED**. The sandbox has no Docker, no Supabase CLI and no injected
+session (`LOVABLE_BROWSER_AUTH_STATUS=signed_out`), and the only reachable database is
+the production project, which is out of scope for authorization testing. No
+authenticated result may be claimed until a disposable environment exists.

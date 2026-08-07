@@ -84,6 +84,7 @@ export function CoPilotDrawer({ open, onClose, currentRole, initialMessage }: Co
   
   const { sessions, saveMessages, loadMessages, deleteSession, clearCurrentSession } = useCopilotHistory(sessionId);
   const [showHistory, setShowHistory] = useState(false);
+  const runProvenance = useRunProvenance();
 
   // Auto-scroll to bottom
   useEffect(() => {

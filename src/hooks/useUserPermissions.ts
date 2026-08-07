@@ -1,58 +1,31 @@
-import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useRBAC } from '@/contexts/RBACContext';
+import type { AnyRole } from '@/auth/permissions';
 
-export type UserRole = 'admin' | 'operator' | 'viewer' | 'owner';
+export type UserRole = AnyRole;
 export type Permission = 'view' | 'operate' | 'admin';
 
 /**
- * Hook to check user's roles and permissions
- * 
- * Uses the consolidated AOC RBAC system with scopes and expiration.
- * See docs/aoc/RBAC_SETUP.md for full documentation.
+ * DEPRECATED compatibility shim (B-01).
+ *
+ * This hook used to be a second, independent authorization system: its own
+ * `user_roles` query, its own role vocabulary and its own expiry handling.
+ * It now reads exclusively from the canonical `RBACContext`, so there is a
+ * single resolution path. Prefer `useRBAC().can(permission)` in new code.
  */
 export function useUserPermissions() {
-  // Get current user
-  const { data: currentUser } = useQuery({
-    queryKey: ['current-user'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      return user;
-    },
-    staleTime: 5 * 60 * 1000,
-  });
+  const { userId, loading, authorization, can } = useRBAC();
 
-  const { data: userRoles, isLoading } = useQuery({
-    queryKey: ['user-roles', currentUser?.id],
-    queryFn: async () => {
-      if (!currentUser) return [];
+  const currentUser = userId ? ({ id: userId } as { id: string }) : null;
+  const userRoles = authorization.grants.map((grant) => ({
+    role: grant.role,
+    scope: grant.scope,
+    expires_at: grant.expiresAt,
+  }));
+  const isLoading = loading;
 
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .or('expires_at.is.null,expires_at.gt.now()'); // Only non-expired roles
-
-      if (error) {
-        console.warn('user_roles query error:', error);
-        return [];
-      }
-
-      return data || [];
-    },
-    enabled: !!currentUser,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    retry: false,
-  });
-
-  /**
-   * Check if user has a specific role
-   * For basic role checking without scope support
-   */
-  const hasRole = (role: UserRole): boolean => {
-    if (!userRoles || userRoles.length === 0) return false;
-
-    return userRoles.some((ur: any) => ur.role === role);
-  };
+  /** Check if the caller holds a specific active role label. */
+  const hasRole = (role: UserRole): boolean => authorization.roles.includes(role);
 
   /**
    * Check if user can access an agent with required permission
@@ -70,15 +43,10 @@ export function useUserPermissions() {
       });
 
       if (error) {
+        // Fail closed. A failed server-side authorization check must never be
+        // downgraded to a client-side ownership guess.
         console.error('RBAC check error:', error);
-        // Fallback: check if user owns the agent
-        const { data: agent } = await supabase
-          .from('agents')
-          .select('owner_id')
-          .eq('id', agentId)
-          .maybeSingle();
-        
-        return agent?.owner_id === currentUser.id;
+        return false;
       }
 
       return data === true;
@@ -94,12 +62,8 @@ export function useUserPermissions() {
    */
   const canViewAgent = (agentOwnerId: string): boolean => {
     if (!currentUser) return false;
-    
-    // Owner can always view
     if (agentOwnerId === currentUser.id) return true;
-    
-    // Anyone with viewer/operator/admin role can view
-    return hasRole('viewer') || hasRole('operator') || hasRole('admin');
+    return can('agent.view');
   };
 
   /**
@@ -108,12 +72,8 @@ export function useUserPermissions() {
    */
   const canOperateAgent = (agentOwnerId: string): boolean => {
     if (!currentUser) return false;
-    
-    // Owner can always operate
     if (agentOwnerId === currentUser.id) return true;
-    
-    // Requires operator or admin role
-    return hasRole('operator') || hasRole('admin');
+    return can('agent.operate');
   };
 
   /**
@@ -122,48 +82,22 @@ export function useUserPermissions() {
    */
   const canAdminAgent = (agentOwnerId: string): boolean => {
     if (!currentUser) return false;
-    
-    // Owner can always admin
     if (agentOwnerId === currentUser.id) return true;
-    
-    // Requires admin role
-    return hasRole('admin');
+    return can('agent.administer');
   };
 
   /**
    * Check if user has global admin access
    */
-  const isGlobalAdmin = (): boolean => {
-    if (!userRoles) return false;
-    return userRoles.some((ur: any) => 
-      ur.role === 'admin' && 
-      (ur.scope === 'global' || ur.scope === null) &&
-      (ur.expires_at === null || new Date(ur.expires_at) > new Date())
-    );
-  };
+  const isGlobalAdmin = (): boolean => can('authz.manage_assignments');
 
   /**
    * Get user's highest role level (for display purposes)
    */
-  const getHighestRole = (): UserRole | null => {
-    if (!userRoles || userRoles.length === 0) return null;
-
-    const roleHierarchy: Record<UserRole, number> = {
-      admin: 4,
-      operator: 3,
-      viewer: 2,
-      owner: 1,
-    };
-
-    return userRoles.reduce((highest: any, current: any) => {
-      const currentLevel = roleHierarchy[current.role as UserRole] || 0;
-      const highestLevel = highest ? (roleHierarchy[highest.role as UserRole] || 0) : 0;
-      return currentLevel > highestLevel ? current : highest;
-    }, null)?.role || null;
-  };
+  const getHighestRole = (): UserRole | null => authorization.primaryRole;
 
   return {
-    userRoles: userRoles || [],
+    userRoles,
     currentUser,
     isLoading,
     hasRole,
@@ -173,6 +107,6 @@ export function useUserPermissions() {
     canAdminAgent,
     isGlobalAdmin: isGlobalAdmin(),
     highestRole: getHighestRole(),
-    requiresManualSetup: !userRoles || userRoles.length === 0,
+    requiresManualSetup: !isLoading && userRoles.length === 0,
   };
 }

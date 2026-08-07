@@ -1,16 +1,28 @@
 import { ReactNode } from 'react';
 import { useRBAC, AppRole } from '@/contexts/RBACContext';
+import type { Permission } from '@/auth/permissions';
 import { Card } from '@/components/ui/card';
 import { Shield, Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  allowedRoles: AppRole[];
+  /**
+   * Legacy role gate. Prefer `requiredPermissions`: permissions, not role
+   * labels, are the canonical authorization unit (B-01).
+   */
+  allowedRoles?: AppRole[];
+  /** Caller must hold every listed permission. */
+  requiredPermissions?: Permission[];
   fallback?: ReactNode;
 }
 
-export default function ProtectedRoute({ children, allowedRoles, fallback }: ProtectedRouteProps) {
-  const { hasAccess, loading, role } = useRBAC();
+export default function ProtectedRoute({
+  children,
+  allowedRoles,
+  requiredPermissions,
+  fallback,
+}: ProtectedRouteProps) {
+  const { hasAccess, loading, role, can } = useRBAC();
 
   if (loading) {
     return (
@@ -20,7 +32,14 @@ export default function ProtectedRoute({ children, allowedRoles, fallback }: Pro
     );
   }
 
-  if (!hasAccess(allowedRoles)) {
+  const permissionOk = requiredPermissions
+    ? requiredPermissions.every((permission) => can(permission))
+    : true;
+  const roleOk = allowedRoles ? hasAccess(allowedRoles) : true;
+  // Default-deny: with neither gate specified, nothing is granted.
+  const granted = (!!requiredPermissions || !!allowedRoles) && permissionOk && roleOk;
+
+  if (!granted) {
     return fallback || (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="glass-panel p-8 max-w-md text-center">
@@ -35,7 +54,10 @@ export default function ProtectedRoute({ children, allowedRoles, fallback }: Pro
             Your role: <span className="font-semibold">{role || 'None'}</span>
           </p>
           <p className="text-sm text-muted-foreground">
-            Required: <span className="font-semibold">{allowedRoles.join(', ')}</span>
+            Required:{' '}
+            <span className="font-semibold">
+              {requiredPermissions?.join(', ') || allowedRoles?.join(', ') || 'unspecified'}
+            </span>
           </p>
         </Card>
       </div>

@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import type { AIRecommendation, SimulationSummary } from '@/twins/sovereignDataCenter/enhancedSimulationEngine';
 import { cn } from '@/lib/utils';
-import { signalLabel, signalStrength, SIGNAL_BASIS } from '@/capabilities/recommendationSignal';
+import { signalLabel, signalStrength, SIGNAL_BASIS, SIGNAL_RULES } from '@/capabilities/recommendationSignal';
 
 interface AIRecommendationsPanelProps {
   summary: SimulationSummary | null;

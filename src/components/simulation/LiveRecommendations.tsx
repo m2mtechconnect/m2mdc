@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SIMULATION } from '@/ux';
+import { signalStrength } from '@/capabilities/recommendationSignal';
 
 interface Recommendation {
   id: string;
@@ -189,7 +190,7 @@ export function LiveRecommendations({
                         
                         <span className="flex items-center gap-1">
                           <Badge variant="outline" className="h-4 px-1 text-[10px]">
-                            {rec.confidence}% conf
+                            {signalStrength(rec.confidence)} signal
                           </Badge>
                         </span>
                       </div>

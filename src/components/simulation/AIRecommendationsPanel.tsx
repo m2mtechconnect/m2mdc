@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import type { AIRecommendation, SimulationSummary } from '@/twins/sovereignDataCenter/enhancedSimulationEngine';
 import { cn } from '@/lib/utils';
+import { signalLabel, signalStrength, SIGNAL_BASIS } from '@/capabilities/recommendationSignal';
 
 interface AIRecommendationsPanelProps {
   summary: SimulationSummary | null;
@@ -138,14 +139,8 @@ export function AIRecommendationsPanel({
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <div className="h-1.5 w-12 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary rounded-full"
-                            style={{ width: `${rec.confidence}%` }}
-                          />
-                        </div>
-                        <span className="text-xs text-muted-foreground">
-                          {rec.confidence}% confidence
+                        <span className="text-xs text-muted-foreground" title={SIGNAL_BASIS}>
+                          {signalLabel(rec.confidence)}
                         </span>
                       </div>
                     </div>
@@ -193,9 +188,9 @@ export function AIRecommendationsPanel({
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-green-500">
-              {Math.round(recommendations.reduce((sum, r) => sum + r.confidence, 0) / recommendations.length)}%
+              {signalStrength(recommendations.reduce((sum, r) => sum + r.confidence, 0) / recommendations.length)}
             </div>
-            <div className="text-xs text-muted-foreground">Avg Confidence</div>
+            <div className="text-xs text-muted-foreground">Rule-based signal</div>
           </div>
         </div>
 

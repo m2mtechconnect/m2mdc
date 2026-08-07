@@ -71,7 +71,7 @@ The matrix below is the unauthenticated deep-link + hard-refresh proof for all 4
 - S5A-13: PASS for public routes and for redirect behaviour of all authenticated routes.
   Authenticated in-page rendering remains BLOCKED_BY_AUTH.
 
-Evidence: `/tmp/browser/s5a/m5.json` - 44 routes, 0 blank pages, 0 console errors,
+Evidence: `docs/evidence/full-stack-audit/79-s5a-route-matrix.json` - 44 routes, 0 blank pages, 0 console errors,
 0 failed requests, deep-link and refresh URLs identical on every route.
 
 ### Public routes (deep link -> after refresh)
@@ -129,7 +129,7 @@ measure rendered text length, measure horizontal overflow
 (`documentElement.scrollWidth - clientWidth`), probe `[data-testid="operating-state-bar"]`,
 and screenshot.
 
-Raw matrix: `docs/evidence/stage-5a/61-s5a-12-visual-qa-matrix.json` (42 observations).
+Raw matrix: `docs/evidence/full-stack-audit/80-s5a-visual-qa-matrix.json` (42 observations).
 Screenshots: `/tmp/browser/s5a12/screenshots/` (42 PNGs, ephemeral).
 
 ### Result summary

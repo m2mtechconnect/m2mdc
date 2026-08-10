@@ -8,7 +8,18 @@
  */
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Boxes, ChevronDown, FileSearch, FileText, MoreHorizontal, PlayCircle, Server } from 'lucide-react';
+import {
+  Boxes,
+  Building2,
+  ChevronDown,
+  CircleAlert,
+  CircleCheck,
+  Ellipsis,
+  FileSearch,
+  Info,
+  Play,
+  TriangleAlert,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -19,7 +30,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { KPI_STATE_META, type KpiInterpretation } from './kpiInterpretation';
+import { type KpiInterpretation, type KpiState } from './kpiInterpretation';
 
 interface Props {
   facilityName: string;
@@ -35,11 +46,14 @@ interface Props {
   assumptions: ReactNode;
 }
 
-function monogram(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return 'DC';
-  return (parts[0][0] + (parts[1]?.[0] ?? '')).toUpperCase();
-}
+/** Semantic icon + colour pairing. Colour is never the only signal. */
+const STATE_UI: Record<KpiState, { Icon: typeof Info; className: string }> = {
+  within: { Icon: CircleCheck, className: 'text-success' },
+  watch: { Icon: TriangleAlert, className: 'text-warning' },
+  constraint: { Icon: CircleAlert, className: 'text-destructive' },
+  unknown: { Icon: Info, className: 'text-muted-foreground' },
+  unavailable: { Icon: Info, className: 'text-muted-foreground' },
+};
 
 export function FacilityHighlights({
   facilityName,
@@ -58,53 +72,56 @@ export function FacilityHighlights({
     <section
       aria-labelledby="facility-highlights-heading"
       data-testid="facility-highlights"
-      className="min-w-0 overflow-hidden rounded-lg border border-border bg-card shadow-sm"
+      className="min-w-0 overflow-hidden rounded-lg border border-border bg-card shadow-[0_1px_3px_0_hsl(214_25%_20%/0.08)]"
     >
       <div className="flex min-w-0 flex-wrap items-start justify-between gap-4 p-4 sm:p-5">
-        <div className="flex min-w-0 flex-1 items-start gap-3">
+        <div className="flex min-w-0 flex-1 items-start gap-3.5">
           <span
             aria-hidden
-            className="hidden h-11 w-11 shrink-0 select-none items-center justify-center rounded-md bg-primary text-[15px] font-bold tracking-wide text-primary-foreground sm:flex"
+            className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground sm:flex"
           >
-            {monogram(facilityName)}
+            <Building2 className="h-[22px] w-[22px]" strokeWidth={1.75} />
           </span>
           <div className="min-w-0">
-            <p className="flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">
-              <Server className="h-3.5 w-3.5" aria-hidden />
+            <p className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">
               Data centre facility
             </p>
             <h1
               id="facility-highlights-heading"
-              className="mt-0.5 break-words text-[24px] font-bold leading-tight text-foreground sm:text-[28px]"
+              className="mt-1 break-words text-[22px] font-bold leading-tight text-foreground sm:text-[26px]"
             >
               {facilityName}
             </h1>
-            <p className="mt-1 break-words text-[14px] text-muted-foreground">
+            <p className="mt-1.5 break-words text-[14px] text-muted-foreground">
               {location} · {tier} design
               {isFallback && ' · Reference model'}
             </p>
             <p className="mt-0.5 break-words text-[13px] font-medium text-muted-foreground">
-              SIMULATED · Synthetic inputs · Calculated {calculatedAt}
+              Simulated design baseline · Synthetic inputs · Calculated {calculatedAt}
             </p>
           </div>
         </div>
 
         <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <Button asChild className="min-h-[36px] text-[14px] max-sm:min-h-[44px]" data-testid="primary-action-simulate">
+          <Button
+            asChild
+            className="h-10 px-4 text-[14px] font-semibold shadow-sm max-sm:h-11"
+            data-testid="primary-action-simulate"
+          >
             <Link to={simulationHref}>
-              <PlayCircle className="mr-1.5 h-4 w-4" aria-hidden />
+              <Play className="mr-2 h-[18px] w-[18px]" strokeWidth={2} aria-hidden />
               Start simulation
             </Link>
           </Button>
-          <Button asChild variant="outline" className="min-h-[36px] text-[14px] max-sm:min-h-[44px]">
+          <Button asChild variant="outline" className="h-[38px] text-[14px] font-normal max-sm:h-11">
             <Link to={blueprintHref}>
-              <Boxes className="mr-1.5 h-4 w-4" aria-hidden />
+              <Boxes className="mr-2 h-4 w-4" strokeWidth={1.75} aria-hidden />
               Open Blueprint
             </Link>
           </Button>
-          <Button asChild variant="outline" className="min-h-[36px] text-[14px] max-sm:min-h-[44px]">
+          <Button asChild variant="outline" className="h-[38px] text-[14px] font-normal max-sm:h-11">
             <Link to={evidenceHref}>
-              <FileText className="mr-1.5 h-4 w-4" aria-hidden />
+              <FileSearch className="mr-2 h-4 w-4" strokeWidth={1.75} aria-hidden />
               View Evidence
             </Link>
           </Button>
@@ -112,10 +129,11 @@ export function FacilityHighlights({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                className="min-h-[36px] w-9 p-0 max-sm:min-h-[44px] max-sm:w-11"
+                className="h-[38px] w-[38px] p-0 max-sm:h-11 max-sm:w-11"
                 aria-label="More facility actions"
+                title="More facility actions"
               >
-                <MoreHorizontal className="h-4 w-4" aria-hidden />
+                <Ellipsis className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -135,22 +153,22 @@ export function FacilityHighlights({
 
       {/* Primary indicators as divided cells inside the same surface. */}
       <div
-        className="grid min-w-0 grid-cols-2 border-t border-border lg:grid-cols-4"
+        className="grid min-w-0 grid-cols-2 border-t border-border xl:grid-cols-4"
         role="group"
         aria-label="Facility highlights"
       >
         {kpis.map((kpi, index) => {
-          const meta = KPI_STATE_META[kpi.state];
+          const meta = STATE_UI[kpi.state];
           return (
             <div
               key={kpi.key}
               data-testid={`command-kpi-${kpi.key}`}
               data-state={kpi.state}
               className={cn(
-                'min-w-0 border-border p-4',
+                'flex min-h-[116px] min-w-0 flex-col border-border p-4 sm:px-5',
                 index % 2 === 1 ? 'border-l' : '',
-                index >= 2 ? 'border-t lg:border-t-0' : '',
-                'lg:border-l lg:first:border-l-0',
+                index >= 2 ? 'border-t xl:border-t-0' : '',
+                'xl:border-l xl:first:border-l-0',
               )}
             >
               <p className="break-words text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -158,7 +176,7 @@ export function FacilityHighlights({
               </p>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <p className="mt-1 break-words text-[26px] font-bold tabular-nums leading-none text-foreground">
+                  <p className="mt-1.5 break-words text-[28px] font-bold tabular-nums leading-none text-foreground">
                     {kpi.value}
                   </p>
                 </TooltipTrigger>
@@ -166,22 +184,26 @@ export function FacilityHighlights({
                   <p className="text-[13px]">Modelled value · calculated {calculatedAt}</p>
                 </TooltipContent>
               </Tooltip>
-              <p className="mt-2 flex items-center gap-1.5 text-[13px] font-medium text-foreground">
-                <span className={cn('h-2 w-2 shrink-0 rounded-full', meta.dotClassName)} aria-hidden />
+              <p className="mt-2.5 flex items-start gap-1.5 text-[13px] font-semibold text-foreground">
+                <meta.Icon
+                  className={cn('mt-px h-[18px] w-[18px] shrink-0', meta.className)}
+                  strokeWidth={1.75}
+                  aria-hidden
+                />
                 <span className="min-w-0 break-words">{kpi.stateLabel}</span>
               </p>
               {kpi.comparison && (
-                <p className="mt-1 break-words text-[13px] leading-snug text-muted-foreground">
+                <p className="mt-1 break-words text-[13px] font-normal leading-snug text-muted-foreground">
                   {kpi.comparison}
                 </p>
               )}
               <Link
                 to={evidenceHrefForKpi(kpi)}
                 data-testid={`command-kpi-${kpi.key}-evidence`}
-                className="mt-2 inline-flex items-center gap-1 rounded-sm text-[13px] text-muted-foreground underline-offset-2 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="mt-auto inline-flex w-fit items-center gap-1.5 rounded-sm pt-3 text-[13px] text-[hsl(var(--info))] underline-offset-2 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <FileSearch className="h-3.5 w-3.5" aria-hidden />
-                Provenance
+                <FileSearch className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                View source
               </Link>
             </div>
           );
@@ -189,8 +211,8 @@ export function FacilityHighlights({
       </div>
 
       <Collapsible className="min-w-0 border-t border-border">
-        <CollapsibleTrigger className="inline-flex min-h-[36px] items-center gap-1.5 px-4 py-2 text-[13px] text-muted-foreground underline-offset-2 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-          <ChevronDown className="h-3.5 w-3.5" aria-hidden />
+        <CollapsibleTrigger className="inline-flex min-h-[36px] items-center gap-1.5 px-4 py-2 text-[13px] text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <ChevronDown className="h-4 w-4" strokeWidth={1.75} aria-hidden />
           Model assumptions
         </CollapsibleTrigger>
         <CollapsibleContent className="min-w-0 border-t border-border bg-muted/50 p-4">

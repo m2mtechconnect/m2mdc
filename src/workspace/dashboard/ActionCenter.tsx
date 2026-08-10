@@ -7,7 +7,7 @@
  */
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertOctagon, AlertTriangle, Info, MoreHorizontal } from 'lucide-react';
+import { CircleAlert, Ellipsis, Info, TriangleAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,19 +28,21 @@ const INITIAL_VISIBLE = 4;
 
 const SEVERITY_UI: Record<
   AttentionSeverity,
-  { label: string; Icon: typeof Info; iconClass: string; accent: string; tint: string }
+  { label: string; Icon: typeof Info; iconClass: string; tileClass: string; accent: string; tint: string }
 > = {
   constraint: {
     label: 'Constraint',
-    Icon: AlertOctagon,
+    Icon: CircleAlert,
     iconClass: 'text-destructive',
+    tileClass: 'bg-destructive/10',
     accent: 'bg-destructive',
-    tint: 'bg-destructive/[0.04]',
+    tint: 'bg-destructive/[0.045]',
   },
   review: {
     label: 'Review',
-    Icon: AlertTriangle,
+    Icon: TriangleAlert,
     iconClass: 'text-warning',
+    tileClass: 'bg-warning/10',
     accent: 'bg-warning',
     tint: 'bg-warning/[0.05]',
   },
@@ -48,6 +50,7 @@ const SEVERITY_UI: Record<
     label: 'Context',
     Icon: Info,
     iconClass: 'text-info',
+    tileClass: 'bg-info/10',
     accent: 'bg-info',
     tint: 'bg-transparent',
   },
@@ -74,7 +77,7 @@ export function ActionCenter({ items }: { items: AttentionItem[] }) {
           <h2 id="action-center-heading" className="text-[18px] font-semibold leading-tight text-foreground">
             Action Center
           </h2>
-          <p className="text-[13px] tabular-nums text-muted-foreground">
+          <p className="text-[14px] font-medium tabular-nums text-muted-foreground">
             {items.length} open item{items.length === 1 ? '' : 's'}
           </p>
         </div>
@@ -83,7 +86,7 @@ export function ActionCenter({ items }: { items: AttentionItem[] }) {
         </p>
 
         <div
-          className="mt-3 flex min-w-0 flex-wrap gap-1.5"
+          className="mt-3.5 flex min-w-0 flex-wrap gap-2"
           role="group"
           aria-label="Filter action items"
         >
@@ -104,11 +107,11 @@ export function ActionCenter({ items }: { items: AttentionItem[] }) {
                   setExpanded(false);
                 }}
                 className={cn(
-                  'inline-flex min-h-[36px] items-center gap-1.5 rounded-md border px-3 text-[13px] font-medium transition-colors',
+                  'inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-[13px] font-medium transition-colors duration-150 max-sm:h-11',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
                   active
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground',
+                    ? 'border-[hsl(var(--info))] bg-[hsl(var(--info)/0.10)] text-[hsl(var(--info))]'
+                    : 'border-border bg-card text-muted-foreground hover:border-[hsl(var(--info)/0.5)] hover:text-foreground',
                 )}
               >
                 {option.label}
@@ -134,18 +137,24 @@ export function ActionCenter({ items }: { items: AttentionItem[] }) {
                 key={item.id}
                 data-testid={`action-item-${item.id}`}
                 className={cn(
-                  'relative min-w-0 overflow-hidden rounded-md border border-border pl-5',
+                  'relative min-h-[88px] min-w-0 overflow-hidden rounded-md border border-border pl-1 transition-colors duration-150 hover:bg-muted/40',
                   highest ? ui.tint : 'bg-card',
                 )}
               >
                 <span
-                  className={cn('absolute inset-y-0 left-0 w-2', ui.accent)}
+                  className={cn('absolute inset-y-0 left-0 w-1', ui.accent)}
                   aria-hidden
                 />
-                <div className="flex min-w-0 gap-3 p-3 sm:p-4">
-                  <div className="hidden w-12 shrink-0 justify-center pt-0.5 sm:flex">
-                    <ui.Icon className={cn('h-6 w-6', ui.iconClass)} aria-hidden />
-                  </div>
+                <div className="flex min-w-0 gap-4 p-4">
+                  <span
+                    className={cn(
+                      'hidden h-10 w-10 shrink-0 items-center justify-center rounded-md sm:flex',
+                      ui.tileClass,
+                    )}
+                    aria-hidden
+                  >
+                    <ui.Icon className={cn('h-5 w-5', ui.iconClass)} strokeWidth={1.75} />
+                  </span>
 
                   <div className="min-w-0 flex-1">
                     <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
@@ -163,37 +172,27 @@ export function ActionCenter({ items }: { items: AttentionItem[] }) {
                     <p className="mt-1 break-words text-[13px] leading-relaxed text-muted-foreground">
                       {item.impact}
                     </p>
-                    <p className="mt-1 break-words text-[12px] font-medium text-muted-foreground">
+                    <p className="mt-1.5 break-words text-[12px] font-medium text-muted-foreground">
                       {item.subsystem} · {item.evidence}
                     </p>
 
                     <div className="mt-3 flex min-w-0 flex-wrap items-center gap-2">
                       {primary && (
-                        <Button asChild size="sm" className="min-h-[36px] text-[13px] max-sm:min-h-[44px]">
+                        <Button asChild size="sm" className="h-9 text-[13px] font-semibold max-sm:h-11">
                           <Link to={primary.to}>{primary.label}</Link>
                         </Button>
                       )}
-                      {rest.map((action) => (
-                        <Button
-                          key={action.label}
-                          asChild
-                          size="sm"
-                          variant="link"
-                          className="hidden min-h-[36px] px-1 text-[13px] sm:inline-flex"
-                        >
-                          <Link to={action.to}>{action.label}</Link>
-                        </Button>
-                      ))}
                       {rest.length > 0 && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="ml-auto h-9 w-9 p-0 max-sm:h-11 max-sm:w-11 sm:hidden"
+                              className="h-9 w-9 p-0 max-sm:h-11 max-sm:w-11"
                               aria-label={`More actions for ${item.title}`}
+                              title="More actions"
                             >
-                              <MoreHorizontal className="h-4 w-4" aria-hidden />
+                              <Ellipsis className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
@@ -219,7 +218,7 @@ export function ActionCenter({ items }: { items: AttentionItem[] }) {
           <Button
             variant="outline"
             size="sm"
-            className="min-h-[36px] text-[13px] max-sm:min-h-[44px]"
+            className="h-9 text-[13px] max-sm:h-11"
             onClick={() => setExpanded((v) => !v)}
           >
             {expanded ? `Show top ${INITIAL_VISIBLE} only` : `View all ${filtered.length} items`}

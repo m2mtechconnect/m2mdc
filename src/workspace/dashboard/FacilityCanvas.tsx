@@ -6,7 +6,8 @@
  * procedural design representation, never a validated OpenUSD stage.
  */
 import { Link } from 'react-router-dom';
-import { Layers } from 'lucide-react';
+import { ExternalLink, Gauge, Layers3, Leaf, Thermometer, Zap, type LucideIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -18,12 +19,17 @@ import {
 import { FacilityFloorPlan } from '../FacilityFloorPlan';
 import type { FacilityAsset, FacilityDefinition } from '../facilityModel';
 
-export const CANVAS_OVERLAYS = [
-  { id: 'thermal', label: 'Thermal', legend: ['Cooler', 'Nominal', 'Warmer'] },
-  { id: 'power', label: 'Power', legend: ['Low draw', 'Moderate draw', 'High draw'] },
-  { id: 'workload', label: 'Capacity', legend: ['Light', 'Moderate', 'Dense'] },
-  { id: 'carbon', label: 'Carbon', legend: ['Lower', 'Moderate', 'Higher'] },
-] as const;
+export const CANVAS_OVERLAYS: ReadonlyArray<{
+  id: 'thermal' | 'power' | 'workload' | 'carbon';
+  label: string;
+  legend: [string, string, string];
+  Icon: LucideIcon;
+}> = [
+  { id: 'thermal', label: 'Thermal', legend: ['Cooler', 'Nominal', 'Warmer'], Icon: Thermometer },
+  { id: 'power', label: 'Power', legend: ['Low draw', 'Moderate draw', 'High draw'], Icon: Zap },
+  { id: 'workload', label: 'Capacity', legend: ['Light', 'Moderate', 'Dense'], Icon: Gauge },
+  { id: 'carbon', label: 'Carbon', legend: ['Lower', 'Moderate', 'Higher'], Icon: Leaf },
+];
 
 export type CanvasOverlayId = (typeof CANVAS_OVERLAYS)[number]['id'];
 
@@ -74,22 +80,31 @@ export function FacilityCanvas({
           </p>
         </div>
         <div className="flex min-w-0 flex-wrap items-center gap-1.5" role="group" aria-label="Visualisation layer">
-          {CANVAS_OVERLAYS.map((layer) => (
-            <Button
-              key={layer.id}
-              size="sm"
-              variant={overlay === layer.id ? 'default' : 'outline'}
-              aria-pressed={overlay === layer.id}
-              className="min-h-[36px] text-[13px] max-sm:min-h-[44px]"
-              onClick={() => onOverlayChange(layer.id)}
-            >
-              {layer.label}
-            </Button>
-          ))}
+          {CANVAS_OVERLAYS.map((layer) => {
+            const active = overlay === layer.id;
+            return (
+              <button
+                key={layer.id}
+                type="button"
+                aria-pressed={active}
+                onClick={() => onOverlayChange(layer.id)}
+                className={cn(
+                  'inline-flex h-9 items-center gap-1.5 rounded-md border px-3 text-[13px] font-medium transition-colors duration-150 max-sm:h-11',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
+                  active
+                    ? 'border-[hsl(var(--info))] bg-[hsl(var(--info)/0.12)] text-[hsl(var(--info))]'
+                    : 'border-border bg-card text-muted-foreground hover:border-[hsl(var(--info)/0.5)] hover:text-foreground',
+                )}
+              >
+                <layer.Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                {layer.label}
+              </button>
+            );
+          })}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="min-h-[36px] text-[13px] max-sm:min-h-[44px]">
-                <Layers className="mr-1.5 h-3.5 w-3.5" aria-hidden />
+              <Button variant="outline" size="sm" className="h-9 text-[13px] max-sm:h-11">
+                <Layers3 className="mr-1.5 h-4 w-4" strokeWidth={1.75} aria-hidden />
                 Layers
               </Button>
             </DropdownMenuTrigger>
@@ -106,14 +121,17 @@ export function FacilityCanvas({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button asChild size="sm" variant="outline" className="min-h-[36px] text-[13px] max-sm:min-h-[44px]">
-            <Link to={`${blueprintHref}?tab=model&layer=${overlay}`}>Open in Blueprint</Link>
+          <Button asChild size="sm" variant="outline" className="h-9 text-[13px] max-sm:h-11">
+            <Link to={`${blueprintHref}?tab=model&layer=${overlay}`}>
+              <ExternalLink className="mr-1.5 h-4 w-4" strokeWidth={1.75} aria-hidden />
+              Open in Blueprint
+            </Link>
           </Button>
         </div>
       </div>
 
       <div className="min-w-0 overflow-hidden p-4">
-        <div className="h-[300px] w-full overflow-hidden rounded-md border border-border bg-[#0a0a14] sm:h-[360px] lg:h-[420px]">
+        <div className="h-[300px] w-full overflow-hidden rounded-md border border-border bg-[#0a1020] sm:h-[360px] lg:h-[440px]">
           <FacilityFloorPlan
             facility={facility}
             overlay={overlay}

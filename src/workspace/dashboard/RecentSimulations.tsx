@@ -1,6 +1,6 @@
 /** Stage 7B - Lightning related-list treatment for recorded simulation runs. */
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, FlaskConical, Play } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatKpi } from '../facilityModel';
@@ -32,17 +32,25 @@ export function RecentSimulations({ runs, facilityId }: Props) {
 
       <div className="min-w-0 p-4">
         {runs.length === 0 ? (
-          <div className="min-w-0 rounded-md border border-dashed border-border p-4">
-            <p className="text-[15px] font-semibold text-foreground">No simulation runs yet</p>
-            <p className="mt-1 text-[13px] text-muted-foreground">
-              Test a power, cooling or capacity change against the current design baseline.
-            </p>
-            <Button asChild size="sm" className="mt-3 min-h-[36px] text-[13px] max-sm:min-h-[44px]">
-              <Link to={simulationHref}>
-                Create first simulation
-                <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden />
-              </Link>
-            </Button>
+          <div className="flex min-w-0 items-start gap-4 rounded-md bg-muted/40 p-5">
+            <span
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[hsl(var(--info)/0.12)]"
+              aria-hidden
+            >
+              <FlaskConical className="h-[22px] w-[22px] text-[hsl(var(--info))]" strokeWidth={1.75} />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[15px] font-semibold text-foreground">No simulation runs yet</p>
+              <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
+                Test a power, cooling or capacity change against the current design baseline.
+              </p>
+              <Button asChild size="sm" className="mt-3 h-9 text-[13px] font-semibold max-sm:h-11">
+                <Link to={simulationHref}>
+                  <Play className="mr-1.5 h-4 w-4" strokeWidth={2} aria-hidden />
+                  Create simulation
+                </Link>
+              </Button>
+            </div>
           </div>
         ) : (
           <ul className="min-w-0 divide-y divide-border">
@@ -68,7 +76,7 @@ export function RecentSimulations({ runs, facilityId }: Props) {
                   <Badge variant={pending > 0 ? 'secondary' : 'outline'} className="text-[12px]">
                     {pending > 0 ? `${pending} to review` : 'Reviewed'}
                   </Badge>
-                  <Button asChild size="sm" variant="outline" className="min-h-[36px] text-[13px] max-sm:min-h-[44px]">
+                  <Button asChild size="sm" variant="outline" className="h-9 text-[13px] max-sm:h-11">
                     <Link to={`/simulation?run=${encodeURIComponent(run.id)}`}>View result</Link>
                   </Button>
                 </li>
@@ -78,7 +86,7 @@ export function RecentSimulations({ runs, facilityId }: Props) {
         )}
 
         {runs.length > 1 && (
-          <Button asChild size="sm" variant="outline" className="mt-3 min-h-[36px] text-[13px] max-sm:min-h-[44px]">
+          <Button asChild size="sm" variant="outline" className="mt-3 h-9 text-[13px] max-sm:h-11">
             <Link
               to={`/simulation?compare=${runs
                 .slice(0, 2)
@@ -86,6 +94,7 @@ export function RecentSimulations({ runs, facilityId }: Props) {
                 .join(',')}`}
             >
               Compare runs
+              <ArrowRight className="ml-1.5 h-4 w-4" strokeWidth={1.75} aria-hidden />
             </Link>
           </Button>
         )}

@@ -15,9 +15,10 @@ import {
   HelpCircle,
   Menu,
   X,
-  Command,
   LogOut,
-  SlidersHorizontal,
+  Settings,
+  Search,
+  Sparkles,
 } from "lucide-react";
 import GlobalSearchBar from "@/components/search/GlobalSearchBar";
 import { CoPilotPanel } from "@/components/copilot/CoPilotPanel";
@@ -44,7 +45,6 @@ import {
   useAssistantPresentation,
 } from "@/stores/assistantLayoutStore";
 import { COPILOT } from "@/ux";
-import { MessagesSquare } from "lucide-react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -116,7 +116,7 @@ export function Layout({ children }: LayoutProps) {
         aria-label="Primary navigation"
         data-testid="global-header"
       >
-        <div className="mx-auto max-w-[1920px] flex items-center justify-between px-[clamp(16px,4vw,32px)] py-3">
+        <div className="mx-auto flex h-14 max-w-[1920px] items-center justify-between gap-3 px-3 sm:px-4 md:px-5 lg:px-6">
           {/* Brand, facility context and workspace navigation */}
           <div className="flex items-center gap-3 lg:gap-6 min-w-0">
             <Link to="/dashboard" className="flex items-center flex-shrink-0 group">
@@ -133,7 +133,7 @@ export function Layout({ children }: LayoutProps) {
             </div>
 
             {/* Workspace navigation: five destinations, always the same five. */}
-            <nav className="hidden lg:flex items-center gap-0.5" aria-label="Workspaces" data-testid="primary-navigation">
+            <nav className="hidden lg:flex items-center gap-1 xl:gap-2" aria-label="Workspaces" data-testid="primary-navigation">
               {workspaceNavigation.map((item) => {
                 const isActive = isNavItemActive(item, location.pathname);
                 const tourId = item.href === '/' ? 'nav-dashboard' :
@@ -145,8 +145,10 @@ export function Layout({ children }: LayoutProps) {
                         asChild
                         variant={isActive ? "secondary" : "ghost"}
                         size="sm"
-                        className={`gap-1.5 px-2 xl:px-2.5 text-xs font-medium transition-smooth min-h-[36px] ${
-                          isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
+                        className={`gap-2 rounded-md px-2.5 xl:px-3 text-[14px] font-medium transition-smooth min-h-[40px] ${
+                          isActive
+                            ? "bg-[hsl(var(--info)/0.10)] text-[hsl(var(--info))] shadow-[inset_0_-2px_0_0_hsl(var(--info))]"
+                            : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
                         <Link
@@ -156,7 +158,7 @@ export function Layout({ children }: LayoutProps) {
                           aria-label={item.fullName}
                           aria-current={isActive ? "page" : undefined}
                         >
-                          <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
+                          <item.icon className="h-[18px] w-[18px] flex-shrink-0" strokeWidth={1.75} aria-hidden="true" />
                           {/* xl is 1536px in this project, so labels are gated at lg. */}
                           <span className="hidden lg:inline whitespace-nowrap">{item.name}</span>
                         </Link>
@@ -177,13 +179,13 @@ export function Layout({ children }: LayoutProps) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:text-foreground min-h-[36px]"
+                        className="gap-2 px-2.5 text-[14px] font-medium text-muted-foreground hover:text-foreground min-h-[40px]"
                         aria-label="Manage"
                         data-testid="manage-trigger"
                         data-nav-item="Manage"
                       >
-                        <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span className="hidden xl:inline">Manage</span>
+                        <Settings className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
+                        <span className="hidden lg:inline">Manage</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-64" data-testid="manage-menu">
@@ -224,7 +226,7 @@ export function Layout({ children }: LayoutProps) {
             <Button
               variant="outline"
               size="sm"
-              className="hidden xl:flex gap-1.5 text-muted-foreground min-h-[36px] hover:bg-accent/10 transition-smooth"
+              className="hidden xl:flex gap-2 text-[13px] text-muted-foreground min-h-[38px] hover:bg-accent/10 transition-smooth"
               aria-label="Open command palette"
               onClick={() => {
                 // Dispatch the same keyboard shortcut that GlobalSearchBar listens for
@@ -233,8 +235,8 @@ export function Layout({ children }: LayoutProps) {
                 );
               }}
             >
-              <Command className="h-3.5 w-3.5" aria-hidden="true" />
-              <span className="text-xs">Ctrl+K</span>
+              <Search className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
+              <span>Search</span>
             </Button>
 
             {/* User Menu - Desktop */}
@@ -248,14 +250,14 @@ export function Layout({ children }: LayoutProps) {
                 <Button
                   variant={isOpen ? "secondary" : "outline"}
                   size="sm"
-                  className="gap-1.5 min-h-[36px]"
+                  className="gap-2 min-h-[38px] text-[13px]"
                   data-testid="assistant-entry"
                   aria-label={isOpen ? `Close ${COPILOT.TITLE}` : `Open ${COPILOT.TITLE}`}
                   aria-expanded={isOpen}
                   onClick={() => setIsOpen(!isOpen)}
                 >
-                  <MessagesSquare className="h-3.5 w-3.5" aria-hidden="true" />
-                  <span className="hidden lg:inline text-xs">Assistant</span>
+                  <Sparkles className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
+                  <span className="hidden lg:inline">Assistant</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom">
@@ -408,7 +410,7 @@ export function Layout({ children }: LayoutProps) {
         className={
           fullBleed
             ? "flex-1 w-full"
-            : "flex-1 w-full mx-auto max-w-[1680px] px-[clamp(8px,2vw,16px)] sm:px-[clamp(12px,3vw,20px)] md:px-[clamp(16px,4vw,24px)] lg:px-[clamp(20px,5vw,32px)]"
+            : "flex-1 w-full mx-auto max-w-[1920px] px-3 sm:px-4 md:px-5 lg:px-6"
         }
       >
         {children}

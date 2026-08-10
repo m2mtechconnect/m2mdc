@@ -121,7 +121,7 @@ export default function CommandCentre() {
 
   return (
     <div className="aura-workspace-theme min-w-0 bg-background py-5" data-testid="command-centre">
-      <div className="dashboard-container min-w-0">
+      <div className="dashboard-shell min-w-0">
         {/* 1. Facility highlights: identity, state, one primary action, indicators. */}
         <FacilityHighlights
           facilityName={facility.name}
@@ -137,9 +137,9 @@ export default function CommandCentre() {
           assumptions={assumptions}
         />
 
-        {/* 2. Primary workspace (8) and contextual rail (4). */}
-        <div className="mt-5 grid min-w-0 grid-cols-1 gap-5 lg:grid-cols-12">
-          <div className="min-w-0 space-y-5 lg:col-span-8">
+        {/* 2. Primary workspace and 320px contextual rail. */}
+        <div className="dashboard-grid mt-5">
+          <div className="dashboard-main space-y-5">
             <ActionCenter items={attentionItems} />
 
             <FacilityCanvas
@@ -156,7 +156,7 @@ export default function CommandCentre() {
             <RecentSimulations runs={runs} facilityId={facility.id} />
           </div>
 
-          <aside className="min-w-0 lg:col-span-4" aria-label="Facility context">
+          <aside className="dashboard-rail" aria-label="Facility context">
             <ContextRail
               calculatedAt={calculatedAt}
               kpis={interpretations}

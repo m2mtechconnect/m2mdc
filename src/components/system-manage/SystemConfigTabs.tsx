@@ -255,7 +255,7 @@ export function SystemConfigTabs({ system, onEdit }: SystemConfigTabsProps) {
                   <Card
                     key={run.id}
                     className="p-4 cursor-pointer hover:shadow-md transition-smooth"
-                    onClick={() => navigate(`/intelligence?tab=monitoring&run=${run.id}`)}
+                    onClick={() => navigate(`/analytics?tab=monitoring&run=${run.id}`)}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">

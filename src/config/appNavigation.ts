@@ -23,7 +23,6 @@ import {
   Plug,
   Server,
   Shield,
-  Users,
   Wrench,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -109,20 +108,11 @@ export const MANAGE_NAV: AppNavItem[] = [
   {
     name: 'Analytics',
     fullName: 'Telemetry and analytics',
-    href: '/intelligence',
+    href: '/analytics',
     icon: BarChart3,
     matches: ['/intelligence', '/analytics', '/operations'],
     permission: 'analytics.view',
-    description: 'Aggregated views over modelled outputs.',
-  },
-  {
-    name: 'Access',
-    fullName: 'Teams and access',
-    href: '/teams',
-    icon: Users,
-    matches: ['/teams', '/account/access-control'],
-    permission: 'tenant.view_members',
-    description: 'Members, roles and access review.',
+    description: 'Aggregated trend views over modelled outputs.',
   },
   {
     name: 'Admin',

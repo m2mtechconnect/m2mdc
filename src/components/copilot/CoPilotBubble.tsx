@@ -22,6 +22,7 @@ export function CoPilotBubble({ className, position = 'bottom-right' }: CoPilotB
   return (
     <button
       onClick={() => setIsOpen(true)}
+      data-testid="assistant-entry"
       className={cn(
         'fixed h-14 w-14 rounded-full bg-gradient-to-r from-[#FFD700] to-[#3AB6FF] flex items-center justify-center shadow-2xl hover:scale-110 transition-smooth z-40 group',
         positionClasses[position],

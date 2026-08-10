@@ -43,7 +43,7 @@ function StrategicOverview() {
             <p className="text-xs text-success mt-1">↑ 3.1% improvement</p>
           </div>
         </div>
-        <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => navigate('/intelligence')}>
+        <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => navigate('/analytics')}>
           View Full Analytics <ArrowUpRight className="h-3.5 w-3.5" />
         </Button>
       </CardContent>

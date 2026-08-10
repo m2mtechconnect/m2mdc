@@ -36,7 +36,6 @@ import NotFound from "./pages/NotFound";
 import AgentWorkspace from "./pages/AgentWorkspace";
 import AgentChat from "./pages/AgentChat";
 import Playbook from "./pages/Playbook";
-import Pilot from "./pages/Pilot";
 import FundingIntakeDemo from "./pages/FundingIntakeDemo";
 import ManageAgents from "./pages/ManageAgents";
 import SystemManage from "./pages/SystemManage";
@@ -132,7 +131,6 @@ function ApprovedUserRoutes() {
       <Route path="/forgot-password" element={<Navigate to="/" replace />} />
       <Route path="/mfa" element={<Navigate to="/" replace />} />
       <Route path="/playbook" element={<Playbook />} />
-      <Route path="/pilot" element={<Pilot />} />
       <Route path="/data-centre-twin" element={<DataCentreTwin />} />
       <Route path="/data-centre-twin/:id" element={<DataCentreTwin />} />
       <Route path="/omniverse-scene" element={<OmniverseScene />} />

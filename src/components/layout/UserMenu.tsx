@@ -12,8 +12,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { UserAvatar } from '@/components/ui/user-avatar';
-import { LogOut, User as UserIcon, Settings } from 'lucide-react';
+import { LogOut, User as UserIcon, Settings, Users } from 'lucide-react';
 import { toast } from 'sonner';
+import { useRBAC } from '@/contexts/RBACContext';
 
 interface ProfileData {
   avatar_url: string | null;
@@ -23,6 +24,7 @@ interface ProfileData {
 
 export function UserMenu() {
   const navigate = useNavigate();
+  const { can } = useRBAC();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
 
@@ -112,6 +114,14 @@ export function UserMenu() {
             <span>Settings</span>
           </Link>
         </DropdownMenuItem>
+        {can('tenant.view_members') && (
+          <DropdownMenuItem asChild>
+            <Link to="/teams" className="cursor-pointer">
+              <Users className="mr-2 h-4 w-4" />
+              <span>Teams and access</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
           <LogOut className="mr-2 h-4 w-4" />

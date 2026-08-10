@@ -196,7 +196,7 @@ export default function Blueprint() {
                   {/* Co-Pilot Mode Header */}
                   <CoPilotModeHeader mode="blueprint-designer" />
                 </div>
-                <div className="flex gap-2">
+                <div className="flex min-w-0 flex-wrap gap-2">
                   {/* Toggle Co-Pilot Panel */}
                   <Button
                     variant={showCoPilotPanel ? 'secondary' : 'outline'}

@@ -46,6 +46,7 @@ import DataCentreTwin from "./pages/DataCentreTwin";
 import Blueprint from "./pages/Blueprint";
 import BlueprintPreview from "./pages/BlueprintPreview";
 import SimulationPreview from "./pages/SimulationPreview";
+import AuraWorkspace from "./workspace/AuraWorkspace";
 import InfrastructurePage from "./pages/InfrastructurePage";
 import DataCentreTwinLanding from "./pages/DataCentreTwinLanding";
 import OmniverseScene from "./pages/OmniverseScene";
@@ -112,7 +113,9 @@ function ApprovedUserRoutes() {
       <Route path="/studio/systems/:systemId/manage" element={<SystemManage />} />
       <Route path="/data-centre-twin/:id/blueprint" element={<Blueprint />} />
       <Route path="/blueprint/:id" element={<Blueprint />} />
+      <Route path="/blueprint" element={<Navigate to="/blueprint/default" replace />} />
       <Route path="/blueprint/preview" element={<BlueprintPreview />} />
+      <Route path="/simulation" element={<AuraWorkspace />} />
       <Route path="/simulation/preview" element={<SimulationPreview />} />
       <Route path="/help" element={<Help />} />
       <Route path="/connect/monitor" element={<ConnectMonitor />} />

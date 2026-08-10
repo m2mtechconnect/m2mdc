@@ -408,6 +408,7 @@ export interface FacilityModel {
   assets: FacilityAsset[];
   isFallback: boolean;
   isLoading: boolean;
+  naming: FacilityNamingContext;
 }
 
 /** Single hook every workspace surface uses to read the facility model. */
@@ -416,19 +417,34 @@ export function useFacilityModel(): FacilityModel {
 
   return useMemo(() => {
     if (!twin) {
+      const naming = resolveFacilityNaming(FALLBACK_FACILITY);
       return {
         facility: FALLBACK_FACILITY,
         assets: buildAssets(FALLBACK_FACILITY),
         isFallback: true,
         isLoading,
+        naming: {
+          classification: naming.classification,
+          breadcrumb: naming.breadcrumb,
+          isDerivedName: false,
+          storedName: FALLBACK_FACILITY.name,
+        },
       };
     }
     const capacityKw = twin.capacity_kw || FALLBACK_FACILITY.capacityKw;
     const rackCount = Math.max(8, Math.min(40, Math.floor(capacityKw / 50)));
     const rowCount = Math.max(1, Math.ceil(rackCount / 8));
+    const naming = resolveFacilityNaming({
+      name: twin.name,
+      city: twin.city || FALLBACK_FACILITY.city,
+      regionCode: twin.region_code || FALLBACK_FACILITY.regionCode,
+      tier: twin.tier || FALLBACK_FACILITY.tier,
+      sovereigntyLevel: twin.sovereignty_level ?? FALLBACK_FACILITY.sovereigntyLevel,
+      industry: twin.industry ?? FALLBACK_FACILITY.industry,
+    });
     const facility: FacilityDefinition = {
       id: twin.id,
-      name: twin.name,
+      name: naming.displayName,
       city: twin.city || FALLBACK_FACILITY.city,
       regionCode: twin.region_code || FALLBACK_FACILITY.regionCode,
       tier: twin.tier || FALLBACK_FACILITY.tier,
@@ -441,6 +457,17 @@ export function useFacilityModel(): FacilityModel {
       sovereigntyLevel: twin.sovereignty_level ?? FALLBACK_FACILITY.sovereigntyLevel,
       industry: twin.industry ?? FALLBACK_FACILITY.industry,
     };
-    return { facility, assets: buildAssets(facility), isFallback: false, isLoading };
+    return {
+      facility,
+      assets: buildAssets(facility),
+      isFallback: false,
+      isLoading,
+      naming: {
+        classification: naming.classification,
+        breadcrumb: naming.breadcrumb,
+        isDerivedName: naming.isDerivedName,
+        storedName: naming.storedName,
+      },
+    };
   }, [twin, isLoading]);
 }

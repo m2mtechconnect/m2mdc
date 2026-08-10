@@ -74,9 +74,9 @@ export default function SimulationPreview() {
   if (!recommendation && !isPreview) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="max-w-md p-6 text-center">
-          <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-lg font-semibold mb-2">No Recommendation to Preview</h2>
+        <Card className="max-w-md p-6 text-center" role="status" aria-live="polite">
+          <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" aria-hidden="true" />
+          <h1 className="text-lg font-semibold mb-2">No Recommendation to Preview</h1>
           <p className="text-muted-foreground mb-4">
             Scan a website URL first to generate a recommendation, then preview simulation scenarios.
           </p>
@@ -136,7 +136,7 @@ export default function SimulationPreview() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-semibold mb-2 flex items-center gap-3">
-            <PlayCircle className="h-6 w-6 text-primary" />
+            <PlayCircle className="h-6 w-6 text-primary" aria-hidden="true" />
             Simulation Preview
           </h1>
           <p className="text-muted-foreground">

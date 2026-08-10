@@ -164,6 +164,7 @@ export default function AISettings() {
   return (
     <div className="w-full min-w-0 py-8 space-y-8" data-testid="ai-settings-workspace">
         <DCSectionHeader
+          as="h1"
           title={t("aiSettings.title")}
           subtitle={t("aiSettings.subtitle")}
           icon={<Settings className="h-5 w-5 text-primary" />}

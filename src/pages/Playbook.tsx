@@ -397,7 +397,7 @@ export default function Playbook() {
             </section>
 
             {/* CTA */}
-            <div className="flex gap-4 pt-8">
+            <div className="flex flex-col sm:flex-row gap-4 pt-8">
               <Button size="lg" className="flex-1" onClick={() => navigate(`/pilot?initiative=${encodeURIComponent(initiativeTitle)}&id=${initiativeId}`)}>
                 Start Pilot Program
               </Button>

@@ -218,8 +218,8 @@ export default function Compliance() {
         
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+            <div className="min-w-0">
               <h1 className="text-2xl font-semibold mb-2 flex items-center gap-3">
                 <Shield className="h-6 w-6 text-primary" />
                 {t('compliance.title')}

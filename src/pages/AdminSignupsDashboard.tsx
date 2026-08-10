@@ -159,7 +159,7 @@ function SignupsDashboardContent() {
 
       {/* Tabs + Table */}
       <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
-        <TabsList>
+        <TabsList className="flex w-full flex-wrap h-auto justify-start">
           <TabsTrigger value="all" className="gap-1">
             <Users className="h-3.5 w-3.5" /> All ({totalUsers})
           </TabsTrigger>
@@ -184,6 +184,7 @@ function SignupsDashboardContent() {
                   <p className="text-muted-foreground">No {tab === 'all' ? '' : tab} users found</p>
                 </div>
               ) : (
+                <div className="w-full overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -261,6 +262,7 @@ function SignupsDashboardContent() {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               )}
             </CardContent>
           </Card>

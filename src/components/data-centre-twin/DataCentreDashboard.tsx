@@ -464,9 +464,9 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
           <SimulationSummaryCard onOpenSimulation={() => setActiveTab('simulation')} />
           
           {/* 2-Column NOC Layout - Primary (65%) / Secondary (35%) */}
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             {/* Left Column - Primary Content */}
-            <div className="space-y-8">
+            <div className="min-w-0 space-y-8">
               <div data-tour="overview-kpi-cockpit">
                 <CompactKPICockpit facility={facility} twinId={twinId} mode="overview" />
               </div>
@@ -477,7 +477,7 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
             </div>
             
             {/* Right Column - Secondary Content */}
-            <div className="space-y-8">
+            <div className="min-w-0 space-y-8">
               {/* Mini 3D Twin Preview */}
               <div data-tour="overview-3d-preview">
                 <MiniTwinPreview onExpand={() => setActiveTab('simulation')} />

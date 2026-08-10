@@ -55,6 +55,11 @@ export default function AuraWorkspace() {
     document.title = `${facility.name} | AURA engineering workspace`;
   }, [facility.name]);
 
+  // Below xl the panel is an overlay, so it must not cover the model on load.
+  useEffect(() => {
+    setPanelOpen(!belowXl);
+  }, [belowXl, setPanelOpen]);
+
   // Role view sets a sensible starting tool once per role change.
   useEffect(() => {
     setTool(ROLE_VIEWS[roleView].defaultTool);

@@ -5,10 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatKpi } from '../facilityModel';
 import { isFixtureRun } from '../runFixtures';
-import type { ScenarioRun } from '../workspaceStore';
+import type { WorkspaceRun } from '../scenarioEngine';
 
 interface Props {
-  runs: ScenarioRun[];
+  runs: WorkspaceRun[];
   facilityId: string;
 }
 

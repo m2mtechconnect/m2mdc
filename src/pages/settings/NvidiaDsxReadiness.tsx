@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Info, Lock } from 'lucide-react';
-import { Layout } from '@/components/Layout';
 import { NVIDIA_READINESS } from '@/capabilities/registry';
 
 interface Row {
@@ -127,10 +126,8 @@ export function NvidiaDsxReadinessPanel({ heading = 'h2' }: { heading?: 'h1' | '
 
 export default function NvidiaDsxReadiness() {
   return (
-    <Layout>
-      <div className="pb-10">
-        <NvidiaDsxReadinessPanel heading="h1" />
-      </div>
-    </Layout>
+    <div className="pb-10" data-testid="page-content">
+      <NvidiaDsxReadinessPanel heading="h1" />
+    </div>
   );
 }

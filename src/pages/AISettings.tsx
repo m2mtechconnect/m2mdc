@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
-import { Layout } from "@/components/Layout";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -126,8 +125,7 @@ export default function AISettings() {
 
   if (isLoading) {
     return (
-      <Layout>
-        <main
+      <main
           className="flex items-center justify-center min-h-[60vh]"
           role="status"
           aria-live="polite"
@@ -137,8 +135,7 @@ export default function AISettings() {
             <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" aria-hidden="true" />
             <p className="text-sm text-muted-foreground">Loading AI configuration…</p>
           </div>
-        </main>
-      </Layout>
+      </main>
     );
   }
 
@@ -165,8 +162,7 @@ export default function AISettings() {
   };
 
   return (
-    <Layout>
-      <div className="container mx-auto py-8 px-4 space-y-8">
+    <div className="container mx-auto py-8 px-4 space-y-8" data-testid="page-content">
         <DCSectionHeader
           title={t("aiSettings.title")}
           subtitle={t("aiSettings.subtitle")}
@@ -425,7 +421,6 @@ export default function AISettings() {
             </div>
           </DCCard>
         )}
-      </div>
-    </Layout>
+    </div>
   );
 }

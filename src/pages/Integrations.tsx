@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Layout } from '@/components/Layout';
 import { NvidiaDsxReadinessPanel } from '@/pages/settings/NvidiaDsxReadiness';
 import { ArrowRight, Plug } from 'lucide-react';
 
@@ -40,8 +39,7 @@ export default function Integrations() {
   }, []);
 
   return (
-    <Layout>
-      <div className="space-y-6 pb-10" data-testid="integrations-page">
+    <div className="space-y-6 pb-10" data-testid="integrations-page">
         <header className="space-y-1">
           <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
             <Plug className="h-5 w-5 text-muted-foreground" aria-hidden />
@@ -85,7 +83,6 @@ export default function Integrations() {
         </Card>
 
         <NvidiaDsxReadinessPanel />
-      </div>
-    </Layout>
+    </div>
   );
 }

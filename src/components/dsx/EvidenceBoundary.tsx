@@ -18,7 +18,8 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import { CircleSlash, ShieldCheck } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
   domainVerdict, summarise, type EvidenceAssertion,
@@ -67,10 +68,51 @@ export function EvidenceBoundaryTable({
   assertions: EvidenceAssertion[];
   domain: string;
 }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedClaim = searchParams.get('claim');
   const [openId, setOpenId] = useState<string | null>(null);
+
+  // A deep link from another surface (for example a Command Centre KPI
+  // "View source" action) names the exact claim record to open.
+  useEffect(() => {
+    if (requestedClaim && assertions.some((a) => a.id === requestedClaim)) {
+      setOpenId(requestedClaim);
+    }
+  }, [requestedClaim, assertions]);
+
   const active = assertions.find((a) => a.id === openId) ?? null;
+  const unresolvedClaim =
+    requestedClaim && !assertions.some((a) => a.id === requestedClaim) ? requestedClaim : null;
+
+  const open = useCallback((id: string) => {
+    setOpenId(id);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('claim', id);
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
+
+  const close = useCallback(() => {
+    setOpenId(null);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete('claim');
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
+
   return (
     <>
+    {unresolvedClaim && (
+      <p
+        className="mb-2 text-xs text-muted-foreground"
+        data-testid={`dsx-boundary-unresolved-${domain}`}
+      >
+        No claim record named <span className="font-mono">{unresolvedClaim}</span> is declared in the{' '}
+        {domain} evidence boundary. The full set of declared claims is listed below.
+      </p>
+    )}
     <Table data-testid={`dsx-boundary-table-${domain}`}>
       <TableHeader>
         <TableRow>
@@ -85,7 +127,13 @@ export function EvidenceBoundaryTable({
         {assertions.map((a) => {
           const ok = a.status === 'evidenced';
           return (
-            <TableRow key={a.id} data-testid={`dsx-assertion-${a.id}`} data-status={a.status}>
+            <TableRow
+              key={a.id}
+              data-testid={`dsx-assertion-${a.id}`}
+              data-status={a.status}
+              data-active={a.id === openId ? 'true' : undefined}
+              className={cn(a.id === openId && 'bg-primary/5')}
+            >
               <TableCell className="align-top text-xs">{a.claim}</TableCell>
               <TableCell className="align-top">
                 <Badge
@@ -133,7 +181,7 @@ export function EvidenceBoundaryTable({
                   className="h-7 whitespace-nowrap text-[11px]"
                   data-testid={`dsx-assertion-drilldown-${a.id}`}
                   aria-label={`Show provenance for claim: ${a.claim}`}
-                  onClick={() => setOpenId(a.id)}
+                  onClick={() => open(a.id)}
                 >
                   Details
                 </Button>
@@ -146,7 +194,7 @@ export function EvidenceBoundaryTable({
     <AssertionProvenanceDrawer
       assertion={active}
       domain={domain}
-      onClose={() => setOpenId(null)}
+      onClose={close}
     />
     </>
   );

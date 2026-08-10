@@ -153,7 +153,7 @@ export function FacilityHighlights({
                 'lg:border-l lg:first:border-l-0',
               )}
             >
-              <p className="truncate text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <p className="break-words text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
                 {kpi.label}
               </p>
               <Tooltip>

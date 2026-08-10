@@ -6,7 +6,8 @@
  * opens in a drawer and each row's explanation lives in the Issue Quick View,
  * so the default document height never grows.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { CircleAlert, Ellipsis, Info, TriangleAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';

@@ -30,7 +30,7 @@ export function OperationalTruthBar() {
       tabIndex={0}
       data-testid="dsx-truth-bar"
       data-mode={rt.snapshot.data_mode}
-      className="flex flex-nowrap items-center gap-x-4 gap-y-2 overflow-x-auto border-b border-border bg-muted/40 px-3 py-2 sm:flex-wrap sm:gap-x-5 sm:overflow-x-visible sm:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="flex w-full min-w-0 max-w-full flex-nowrap items-center gap-x-4 gap-y-2 overflow-x-auto border-b border-border bg-muted/40 px-3 py-2 sm:flex-wrap sm:gap-x-5 sm:overflow-x-visible sm:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <Field label="Facility" value={EVIDENCE_BETA_SITE.name} />
       <span className="flex shrink-0 flex-col gap-0.5">

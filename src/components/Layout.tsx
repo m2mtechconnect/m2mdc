@@ -118,7 +118,7 @@ export function Layout({ children }: LayoutProps) {
       >
         <div className="mx-auto flex h-14 max-w-[1920px] items-center justify-between gap-3 px-3 sm:px-4 md:px-5 lg:px-6">
           {/* Brand, facility context and workspace navigation */}
-          <div className="flex items-center gap-3 lg:gap-6 min-w-0">
+          <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-5">
             <Link to="/dashboard" className="flex items-center flex-shrink-0 group">
               <img 
                 src={m2mLogo} 
@@ -133,7 +133,11 @@ export function Layout({ children }: LayoutProps) {
             </div>
 
             {/* Workspace navigation: five destinations, always the same five. */}
-            <nav className="hidden lg:flex items-center gap-1 xl:gap-2" aria-label="Workspaces" data-testid="primary-navigation">
+            <nav
+              className="hidden min-w-0 items-center gap-1 lg:flex xl:gap-1.5"
+              aria-label="Workspaces"
+              data-testid="primary-navigation"
+            >
               {workspaceNavigation.map((item) => {
                 const isActive = isNavItemActive(item, location.pathname);
                 const tourId = item.href === '/' ? 'nav-dashboard' :
@@ -159,8 +163,8 @@ export function Layout({ children }: LayoutProps) {
                           aria-current={isActive ? "page" : undefined}
                         >
                           <item.icon className="h-[18px] w-[18px] flex-shrink-0" strokeWidth={1.75} aria-hidden="true" />
-                          {/* xl is 1536px in this project, so labels are gated at lg. */}
-                          <span className="hidden lg:inline whitespace-nowrap">{item.name}</span>
+                          {/* xl is 1536px here: labels only appear once there is room for them. */}
+                          <span className="hidden whitespace-nowrap xl:inline">{item.name}</span>
                         </Link>
                       </Button>
                     </TooltipTrigger>
@@ -185,7 +189,7 @@ export function Layout({ children }: LayoutProps) {
                         data-nav-item="Manage"
                       >
                         <Settings className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
-                        <span className="hidden lg:inline">Manage</span>
+                        <span className="hidden xl:inline">Manage</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-64" data-testid="manage-menu">
@@ -215,7 +219,7 @@ export function Layout({ children }: LayoutProps) {
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
+          <div className="flex flex-shrink-0 items-center gap-1.5 lg:gap-2">
             {/* Language Switcher */}
             <LanguageSwitcher />
             
@@ -257,7 +261,7 @@ export function Layout({ children }: LayoutProps) {
                   onClick={() => setIsOpen(!isOpen)}
                 >
                   <Sparkles className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
-                  <span className="hidden lg:inline">Assistant</span>
+                  <span className="hidden xl:inline">Assistant</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom">

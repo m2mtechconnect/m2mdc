@@ -274,14 +274,13 @@ export function Layout({ children }: LayoutProps) {
               <DataCentreSelector />
             </div>
             
-            {/* Platform Section */}
+            {/* Workspaces */}
             <div className="pb-4">
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Data Centre
+                Workspaces
               </h3>
-              {primaryNavigation.map((item) => {
-                const isActive = location.pathname === item.href || 
-                  (item.href.includes('?') && location.pathname + location.search === item.href);
+              {workspaceNavigation.map((item) => {
+                const isActive = isNavItemActive(item, location.pathname);
                 return (
                   <Button
                     key={item.name}
@@ -302,33 +301,34 @@ export function Layout({ children }: LayoutProps) {
               })}
             </div>
 
-            {/* Analytics & Simulation Section */}
-            <div className="pb-4 border-t border-border pt-4">
-              <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Analytics & Compliance
-              </h3>
-              {secondaryNavigation.map((item) => {
-                const isActive = location.pathname === item.href || 
-                  (item.href.includes('?') && location.pathname + location.search === item.href);
-                return (
-                  <Button
-                    key={item.name}
-                    asChild
-                    variant={isActive ? "secondary" : "ghost"}
-                    className="w-full justify-start gap-3 min-h-[44px] text-base"
-                  >
-                    <Link
-                      to={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      aria-current={isActive ? "page" : undefined}
+            {/* Manage */}
+            {manageNavigation.length > 0 && (
+              <div className="pb-4 border-t border-border pt-4">
+                <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Manage
+                </h3>
+                {manageNavigation.map((item) => {
+                  const isActive = isNavItemActive(item, location.pathname);
+                  return (
+                    <Button
+                      key={item.name}
+                      asChild
+                      variant={isActive ? "secondary" : "ghost"}
+                      className="w-full justify-start gap-3 min-h-[44px] text-base"
                     >
-                      <item.icon className="h-5 w-5" aria-hidden="true" />
-                      {item.fullName}
-                    </Link>
-                  </Button>
-                );
-              })}
-            </div>
+                      <Link
+                        to={item.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        aria-current={isActive ? "page" : undefined}
+                      >
+                        <item.icon className="h-5 w-5" aria-hidden="true" />
+                        {item.fullName}
+                      </Link>
+                    </Button>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Help Section */}
             <div className="pb-4 border-t border-border pt-4">

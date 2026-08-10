@@ -17,11 +17,11 @@ interface Props {
   onSelect: (assetId: string) => void;
 }
 
-const RACK_W = 26;
-const RACK_H = 46;
-const GAP = 6;
-const ROW_GAP = 34;
-const PAD = 28;
+const RACK_W = 44;
+const RACK_H = 74;
+const GAP = 12;
+const ROW_GAP = 30;
+const PAD = 40;
 
 /** Overlay-specific colour ramp, expressed with plain CSS colours on the dark plate. */
 function rackFill(overlay: string, t: number): string {
@@ -55,10 +55,11 @@ export function FacilityFloorPlan({ facility, overlay, selectedAssetId, onSelect
   const values: number[] = Array.from({ length: facility.rowCount * perRow }, () => rng());
 
   return (
-    <div className="h-full w-full overflow-auto bg-[#0a0a14] p-2" data-testid="facility-floor-plan">
+    <div className="flex h-full w-full items-center justify-center overflow-auto bg-[#0a0a14] p-3" data-testid="facility-floor-plan">
       <svg
         viewBox={`0 0 ${width} ${height}`}
-        className="h-full w-full"
+        className="mx-auto h-full w-full"
+        preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-label={`Simulated floor plan of ${facility.name}: ${facility.rowCount} rows, ${facility.rackCount} racks.`}
       >
@@ -69,7 +70,7 @@ export function FacilityFloorPlan({ facility, overlay, selectedAssetId, onSelect
           const rowLetter = String.fromCharCode(65 + r);
           return (
             <g key={rowId}>
-              <text x={4} y={y + RACK_H / 2} fill="#94a3b8" fontSize={11} dominantBaseline="middle">
+              <text x={4} y={y + RACK_H / 2} fill="#94a3b8" fontSize={20} dominantBaseline="middle">
                 {rowLetter}
               </text>
               <rect
@@ -78,7 +79,7 @@ export function FacilityFloorPlan({ facility, overlay, selectedAssetId, onSelect
                 width={perRow * (RACK_W + GAP) + 6}
                 height={RACK_H + 12}
                 rx={4}
-                fill="transparent"
+                fill="#101827"
                 stroke={selectedAssetId === rowId ? '#ffcc00' : '#1e293b'}
                 strokeWidth={selectedAssetId === rowId ? 2 : 1}
                 className="cursor-pointer"
@@ -91,16 +92,28 @@ export function FacilityFloorPlan({ facility, overlay, selectedAssetId, onSelect
                 return (
                   <rect
                     key={id}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`Rack ${rowLetter}${i + 1}, simulated`}
                     x={PAD + i * (RACK_W + GAP)}
                     y={y}
                     width={RACK_W}
                     height={RACK_H}
                     rx={2}
                     fill={rackFill(String(overlay), t)}
-                    stroke={isSelected ? '#ffcc00' : '#0f172a'}
-                    strokeWidth={isSelected ? 2 : 1}
-                    className={cn('cursor-pointer transition-opacity hover:opacity-80')}
+                    stroke={isSelected ? '#ffcc00' : '#0b1120'}
+                    strokeWidth={isSelected ? 3 : 1}
+                    className={cn(
+                      'cursor-pointer outline-none transition-opacity hover:opacity-75',
+                      'focus-visible:stroke-[#ffcc00] focus-visible:[stroke-width:3]',
+                    )}
                     onClick={() => onSelect(id)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        onSelect(id);
+                      }
+                    }}
                   >
                     <title>{`Rack ${rowLetter}${i + 1} (simulated)`}</title>
                   </rect>

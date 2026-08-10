@@ -257,6 +257,7 @@ export default function Profile() {
       <div className="space-y-6">
         {/* Header */}
         <DCSectionHeader
+          as="h1"
           title="Profile"
           subtitle="Manage your personal account settings and preferences"
           icon={<User className="h-5 w-5 text-primary" />}

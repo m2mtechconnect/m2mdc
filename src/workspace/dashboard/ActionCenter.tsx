@@ -140,12 +140,45 @@ export function ActionCenter({
   items: AttentionItem[];
   onInspectRacks?: (item: AttentionItem) => void;
 }) {
-  const [openId, setOpenId] = useState<string | null>(null);
-  const [showAll, setShowAll] = useState(false);
   const limit = useVisibleCount();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Deep-link state: `?action=<id>` opens a row drawer, `?actions=all` opens
+  // the full list. Both are shareable and survive reload / Back.
+  const actionParam = searchParams.get('action');
+  const openId = actionParam && items.some((item) => item.id === actionParam) ? actionParam : null;
 
   const visible = useMemo(() => items.slice(0, limit), [items, limit]);
   const openItem = items.find((item) => item.id === openId) ?? null;
+
+  // A shared link to a row that sits below the fold also restores the row's
+  // context by opening the full list behind the drawer.
+  const deepLinkedBelowFold = Boolean(openId) && !visible.some((item) => item.id === openId);
+  const showAll = searchParams.get('actions') === 'all' || deepLinkedBelowFold;
+
+  const patchParams = useCallback(
+    (patch: Record<string, string | null>) => {
+      setSearchParams(
+        (current) => {
+          const next = new URLSearchParams(current);
+          for (const [key, value] of Object.entries(patch)) {
+            if (value === null) next.delete(key);
+            else next.set(key, value);
+          }
+          return next;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
+  const openAction = useCallback((id: string) => patchParams({ action: id }), [patchParams]);
+  const closeAction = useCallback(() => patchParams({ action: null }), [patchParams]);
+  const setShowAll = useCallback(
+    (open: boolean) => patchParams(open ? { actions: 'all' } : { actions: null, action: null }),
+    [patchParams],
+  );
 
   return (
     <section
@@ -183,7 +216,7 @@ export function ActionCenter({
       ) : (
         <ul className="min-w-0 space-y-2 p-3" data-testid="action-center-list">
           {visible.map((item) => (
-            <ActionRow key={item.id} item={item} onOpen={setOpenId} />
+            <ActionRow key={item.id} item={item} onOpen={openAction} />
           ))}
         </ul>
       )}
@@ -199,7 +232,7 @@ export function ActionCenter({
           </SheetHeader>
           <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3" data-testid="action-center-all-list">
             {items.map((item) => (
-              <ActionRow key={item.id} item={item} onOpen={setOpenId} />
+              <ActionRow key={item.id} item={item} onOpen={openAction} />
             ))}
           </ul>
         </SheetContent>
@@ -207,12 +240,11 @@ export function ActionCenter({
 
       <ActionDetailDrawer
         item={openItem}
-        onClose={() => setOpenId(null)}
+        onClose={closeAction}
         onInspectRacks={
           onInspectRacks
             ? (item) => {
-                setOpenId(null);
-                setShowAll(false);
+                patchParams({ action: null, actions: null });
                 onInspectRacks(item);
               }
             : undefined

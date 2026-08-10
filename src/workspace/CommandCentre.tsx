@@ -190,12 +190,12 @@ export default function CommandCentre() {
                   return (
                     <li key={run.id} className="flex flex-wrap items-center gap-2 py-2">
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-foreground">
-                          {run.scenarioLabel}
+                        <div className="flex items-center gap-2 truncate text-sm font-medium text-foreground">
+                          <span className="truncate">{run.scenarioLabel}</span>
                           {isFixtureRun(run) && (
-                            <Badge variant="outline" className="ml-2 align-middle text-[10px]">Seeded fixture</Badge>
+                            <Badge variant="outline" className="shrink-0 text-[10px]">Seeded fixture</Badge>
                           )}
-                        </p>
+                        </div>
                         <p className="text-[11px] text-muted-foreground">
                           Run {run.id} · {new Date(run.completedAt).toLocaleString()}
                         </p>

@@ -32,7 +32,7 @@ export function LanguageSwitcher({ variant = 'ghost' }: { variant?: 'ghost' | 'o
         >
           <Globe className="h-4 w-4" aria-hidden="true" />
           <span className="hidden sm:inline">{current.short}</span>
-          <span className="hidden lg:inline">· {current.label}</span>
+          <span className="hidden 2xl:inline">· {current.label}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

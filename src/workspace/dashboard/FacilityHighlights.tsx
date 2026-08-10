@@ -84,7 +84,7 @@ export function FacilityHighlights({
             <Building2 className="h-[22px] w-[22px]" strokeWidth={1.75} />
           </span>
           <div className="min-w-0">
-            <p className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="hidden text-[12px] font-semibold uppercase tracking-wider text-muted-foreground sm:block">
               Data centre facility
             </p>
             <h1
@@ -95,8 +95,9 @@ export function FacilityHighlights({
             </h1>
             <p className="mt-1 break-words text-[13px] text-muted-foreground">
               {location} · {tier} design
-              {isFallback && ' · Reference model'} · Simulated design baseline · Synthetic inputs ·
-              Calculated {calculatedAt}
+              {isFallback && ' · Reference model'}
+              <span className="hidden sm:inline"> · Simulated design baseline · Synthetic inputs</span>
+              {' · '}Calculated {calculatedAt}
             </p>
           </div>
         </div>
@@ -170,7 +171,7 @@ export function FacilityHighlights({
               data-testid={`command-kpi-${kpi.key}`}
               data-state={kpi.state}
               className={cn(
-                'flex min-h-[88px] min-w-0 flex-col border-border p-3 sm:px-4',
+                'flex min-h-[84px] min-w-0 flex-col border-border px-3 py-2.5 sm:px-4 sm:py-3',
                 index % 2 === 1 ? 'border-l' : '',
                 index >= 2 ? 'border-t min-[960px]:border-t-0' : '',
                 'min-[960px]:border-l min-[960px]:first:border-l-0',
@@ -189,7 +190,7 @@ export function FacilityHighlights({
                 <span className="mt-1 block break-words text-[24px] font-bold tabular-nums leading-none text-foreground">
                   {kpi.value}
                 </span>
-                <span className="mt-2 flex items-start gap-1.5 text-[13px] font-semibold text-foreground">
+                <span className="mt-1.5 flex items-start gap-1.5 text-[13px] font-semibold text-foreground">
                   <meta.Icon
                     className={cn('mt-px h-[16px] w-[16px] shrink-0', meta.className)}
                     strokeWidth={1.75}
@@ -201,10 +202,11 @@ export function FacilityHighlights({
               <Link
                 to={evidenceHrefForKpi(kpi)}
                 data-testid={`command-kpi-${kpi.key}-evidence`}
-                className="mt-auto inline-flex w-fit items-center gap-1.5 rounded-sm pt-2 text-[13px] text-[hsl(var(--info))] underline-offset-2 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="mt-auto inline-flex w-fit items-center gap-1.5 rounded-sm pt-1.5 text-[13px] text-[hsl(var(--info))] underline-offset-2 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <FileSearch className="h-4 w-4" strokeWidth={1.75} aria-hidden />
-                View source
+                <span className="sm:hidden">Source</span>
+                <span className="hidden sm:inline">View source</span>
               </Link>
             </div>
           );

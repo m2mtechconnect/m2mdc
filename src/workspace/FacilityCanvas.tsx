@@ -9,7 +9,7 @@
  *   error    -> the renderer threw; the 2D floor plan is shown with a retry
  * The canvas can never remain in `loading` indefinitely.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Box, Grid2x2, Loader2, RefreshCw } from 'lucide-react';
@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { useWorkspaceStore } from './workspaceStore';
 import { LayerSelector } from './LayerSelector';
 import { FacilityFloorPlan } from './FacilityFloorPlan';
+import { buildRackGrid } from './dashboard/rackModel';
 import { formatPower, type FacilityDefinition } from './facilityModel';
 
 /** Hard ceiling on the 3D initialisation window. */
@@ -41,6 +42,7 @@ export function FacilityCanvas({ facility }: Props) {
   const isRunning = useWorkspaceStore((s) => s.isRunning);
   const selectedAssetId = useWorkspaceStore((s) => s.selectedAssetId);
 
+  const rackGrid = useMemo(() => buildRackGrid(facility), [facility]);
   const [viewMode, setViewMode] = useState<ViewMode>('3d');
   const [modelState, setModelState] = useState<ModelState>('loading');
   const [attempt, setAttempt] = useState(0);
@@ -125,7 +127,8 @@ export function FacilityCanvas({ facility }: Props) {
           <FacilityFloorPlan
             facility={facility}
             overlay={activeOverlay}
-            selectedAssetId={selectedAssetId}
+            grid={rackGrid}
+            selectedRackId={selectedAssetId}
             onSelect={handleSelect}
           />
         )}

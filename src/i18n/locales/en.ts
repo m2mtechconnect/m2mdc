@@ -504,7 +504,7 @@ const en = {
     addToMyTwins: 'Add to My Twins',
     creating: 'Creating...',
     downloadJson: 'Download JSON',
-    askCoPilot: 'Ask Co-Pilot:',
+    askCoPilot: 'Ask AURA Assistant:',
     thermalAgents: 'Thermal Agents',
     upsWorkflows: 'UPS Workflows',
     carbonKpis: 'Carbon KPIs',
@@ -943,7 +943,7 @@ const en = {
 
   // CoPilot
   copilot: {
-    title: 'Data Centre Co-Pilot',
+    title: 'AURA Assistant',
     placeholder: 'Ask about PUE, cooling, GPU saturation, carbon, or sovereignty...',
     quickActions: {
       explainKPI: 'Explain this KPI',
@@ -1257,7 +1257,7 @@ const en = {
     securityRequirements: 'Security Requirements',
     complianceStandards: 'Compliance Standards',
     questionsAbout: 'Questions About This Implementation?',
-    askCoPilot: 'Ask Co-Pilot for clarification, additional recommendations, or specific guidance for your use case.',
+    askCoPilot: 'Ask AURA Assistant for clarification, additional recommendations, or specific guidance for your use case.',
     startPilot: 'Start Pilot Program',
     contactExpert: 'Contact Expert',
   },

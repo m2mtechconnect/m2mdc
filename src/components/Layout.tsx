@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import GlobalSearchBar from "@/components/search/GlobalSearchBar";
 import { CoPilotPanel } from "@/components/copilot/CoPilotPanel";
-import { CoPilotBubble } from "@/components/copilot/CoPilotBubble";
 import { useCoPilot } from "@/contexts/CoPilotContext";
 import { HealthBadges } from "@/components/HealthBadges";
 import { UserMenu } from "@/components/layout/UserMenu";
@@ -40,6 +39,12 @@ import {
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { OperatingStateBar } from "@/components/capability/OperatingStateBar";
 import { useShellLayoutStore } from "@/stores/shellLayoutStore";
+import {
+  useAssistantLayoutStore,
+  useAssistantPresentation,
+} from "@/stores/assistantLayoutStore";
+import { COPILOT } from "@/ux";
+import { MessagesSquare } from "lucide-react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -53,6 +58,10 @@ export function Layout({ children }: LayoutProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const { isOpen, setIsOpen } = useCoPilot();
   const { can, loading: roleLoading } = useRBAC();
+  const assistantPresentation = useAssistantPresentation();
+  const assistantWidth = useAssistantLayoutStore((s) => s.width);
+  // At desktop widths the assistant reflows the workspace instead of covering it.
+  const assistantReflow = isOpen && assistantPresentation === 'docked';
 
   // Canonical information architecture. Workspaces are always visible;
   // authoring and administration collapse into a single Manage group.
@@ -90,7 +99,11 @@ export function Layout({ children }: LayoutProps) {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background" data-testid="app-shell">
+    <div
+      className="min-h-screen flex flex-col bg-background transition-[padding] duration-200 motion-reduce:transition-none"
+      data-testid="app-shell"
+      style={assistantReflow ? { paddingRight: assistantWidth } : undefined}
+    >
       <GlobalSearchBar />
       
       {/* Top Navigation Bar */}
@@ -228,6 +241,27 @@ export function Layout({ children }: LayoutProps) {
             <div className="hidden xl:block">
               <UserMenu />
             </div>
+
+            {/* AURA Assistant */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={isOpen ? "secondary" : "outline"}
+                  size="sm"
+                  className="gap-1.5 min-h-[36px]"
+                  data-testid="assistant-entry"
+                  aria-label={isOpen ? `Close ${COPILOT.TITLE}` : `Open ${COPILOT.TITLE}`}
+                  aria-expanded={isOpen}
+                  onClick={() => setIsOpen(!isOpen)}
+                >
+                  <MessagesSquare className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span className="hidden lg:inline text-xs">Assistant</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>{COPILOT.TITLE} · {COPILOT.SUBTITLE}</p>
+              </TooltipContent>
+            </Tooltip>
 
             {/* Mobile Menu Toggle */}
             <Button
@@ -402,9 +436,8 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </footer>
 
-      {/* Data Centre Co-Pilot */}
+      {/* AURA Assistant (single instance) */}
       <CoPilotPanel />
-      <CoPilotBubble position="bottom-right" />
     </div>
   );
 }

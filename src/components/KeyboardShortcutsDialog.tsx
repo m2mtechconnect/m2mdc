@@ -19,7 +19,7 @@ const shortcuts = [
     items: [
       { keys: ['Ctrl', 'K'], description: 'Open command palette' },
       { keys: ['Ctrl', 'H'], description: 'Open help' },
-      { keys: ['Ctrl', '/'], description: 'Toggle Co-Pilot' },
+      { keys: ['Ctrl', '/'], description: 'Toggle AURA Assistant' },
       { keys: ['←', '→'], description: 'Navigate between steps' },
     ],
   },

@@ -387,11 +387,11 @@ export default function Playbook() {
               </div>
             </section>
 
-            {/* Ask Co-Pilot About This Playbook */}
+            {/* Ask AURA Assistant About This Playbook */}
             <section className="bg-gradient-to-r from-primary/5 via-accent/5 to-secondary/5 rounded-lg p-6 border border-border/50">
               <h3 className="text-lg font-semibold mb-3">Questions About This Implementation?</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Ask Co-Pilot for clarification, additional recommendations, or specific guidance for your use case.
+                Ask AURA Assistant for clarification, additional recommendations, or specific guidance for your use case.
               </p>
               <CoPilotInput placeholder="Ask about implementation details, ROI, risks, or next steps..." />
             </section>

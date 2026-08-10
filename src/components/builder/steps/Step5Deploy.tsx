@@ -433,7 +433,7 @@ export function Step5Deploy() {
       <DCCard className="bg-muted/30">
         <div className="flex items-center gap-3">
           <Sparkles className="h-4 w-4 text-primary" />
-          <span className="text-sm text-muted-foreground">Ask Co-Pilot:</span>
+          <span className="text-sm text-muted-foreground">Ask AURA Assistant:</span>
           <div className="flex flex-wrap gap-2">
             {copilotQuestions.map((q, idx) => (
               <Button

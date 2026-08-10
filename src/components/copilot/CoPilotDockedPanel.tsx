@@ -1,14 +1,14 @@
 /**
- * Co-Pilot Docked Panel
- * 
- * Right-side docked assistant panel with streaming responses,
- * context chips, and structured 4-section layout.
- * Now integrated with DC domain context and quick chips.
- * P0 fix: Context-aware in Simulation mode with badge indicator.
+ * AURA Assistant panel (Stage 7A).
+ *
+ * The assistant supports the operations workspace, it never dominates it:
+ *   >= 1200px  docked, non-modal, resizable, the shell reflows around it
+ *   >= 640px   right-side overlay sheet with focus trap
+ *   < 640px    full-screen experience that keeps the current route context
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, StopCircle, Sparkles, Loader2 } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { X, Send, StopCircle, Loader2, ArrowLeft, GripVertical, Building2 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,10 +22,17 @@ import { SimulationContextBadge } from './SimulationContextBadge';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useCoPilotCommands } from '@/contexts/CoPilotCommandContext';
 import { logCoPilotEvent } from '@/lib/copilot/analytics';
-import { getModelDisplayName, getModelVersion } from '@/lib/copilot/copilotConfig';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useCoPilotSimulationContext } from '@/hooks/useCoPilotSimulationContext';
 import { COPILOT } from '@/ux';
+import { assistantSuggestions } from './assistantSuggestions';
+import { useWorkspaceStore } from '@/workspace/workspaceStore';
+import {
+  ASSISTANT_MAX_WIDTH,
+  ASSISTANT_MIN_WIDTH,
+  useAssistantLayoutStore,
+  useAssistantPresentation,
+} from '@/stores/assistantLayoutStore';
 
 // Global tracker: the last element that received focus before the
 // CoPilot drawer captured it. A launcher (e.g. CoPilotBubble) that
@@ -39,7 +46,7 @@ if (typeof document !== 'undefined') {
       const target = event.target as HTMLElement | null;
       if (!target || target === document.body) return;
       // Ignore focus that lands inside the CoPilot drawer itself.
-      if (target.closest?.('[role="dialog"][aria-label="' + 'Data Centre Co-Pilot' + '"]')) {
+      if (target.closest?.('[data-assistant-panel="true"]')) {
         return;
       }
       lastFocusedBeforeCoPilot = target;
@@ -110,6 +117,11 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
   
   const { isDCPage, activeTab, pageContext } = useDCPageContext();
   const { executeCommand } = useCoPilotCommands();
+  const routeLocation = useLocation();
+  const presentation = useAssistantPresentation();
+  const width = useAssistantLayoutStore((s) => s.width);
+  const setWidth = useAssistantLayoutStore((s) => s.setWidth);
+  const runs = useWorkspaceStore((s) => s.runs);
   
   // Get active twin context
   const { activeTwinId, twin, location } = useActiveTwin();
@@ -117,7 +129,7 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
   // Get simulation context for context-aware CoPilot (P0 fix)
   const { hasSimulationContext, contextSummary, simulationContextPayload } = useCoPilotSimulationContext();
   
-  const { 
+  const {
     context, 
     updateContext,
     messages, 
@@ -125,8 +137,6 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
     sendMessage, 
     stopStreaming,
     error,
-    memoryEnabled,
-    setMemoryEnabled,
   } = useCoPilotContext();
   
   // Update CoPilot context when twin changes
@@ -210,9 +220,10 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
     previouslyFocusedRef.current = null;
   }, [isOpen]);
 
-  // Focus trap: keep Tab / Shift+Tab within the drawer, and close on Escape.
+  // Focus trap: overlay presentations are modal, the docked panel is not.
   useEffect(() => {
     if (!isOpen) return;
+    const isModal = presentation !== 'docked';
 
     const FOCUSABLE_SELECTOR = [
       'a[href]',
@@ -245,7 +256,7 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
         onClose();
         return;
       }
-      if (e.key !== 'Tab') return;
+      if (e.key !== 'Tab' || !isModal) return;
 
       const focusables = getFocusable();
       if (focusables.length === 0) {
@@ -277,7 +288,33 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
 
     document.addEventListener('keydown', handleKeyDown, true);
     return () => document.removeEventListener('keydown', handleKeyDown, true);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, presentation]);
+
+  const suggestions = useMemo(
+    () =>
+      assistantSuggestions({
+        pathname: routeLocation.pathname,
+        runCount: runs.length,
+        hasSelectedRun: new URLSearchParams(routeLocation.search).has('run'),
+        hasSelectedAsset: new URLSearchParams(routeLocation.search).has('asset'),
+      }),
+    [routeLocation.pathname, routeLocation.search, runs.length],
+  );
+
+  // Pointer-driven resize for the docked presentation only.
+  const startResize = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      const onMove = (e: PointerEvent) => setWidth(window.innerWidth - e.clientX);
+      const onUp = () => {
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
+      };
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+    },
+    [setWidth],
+  );
 
   const handleSend = useCallback(async (overrideMessage?: string) => {
     const text = (overrideMessage ?? input).trim();
@@ -325,10 +362,13 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
     handleSend(query);
   };
 
+  const isModal = presentation !== 'docked';
+  const facilityLabel = twin?.name ?? 'Modelled facility';
+
   return (
     <>
-      {/* Backdrop — click to close. Rendered as sibling so it does not
-          intercept focus inside the drawer. Only interactive while open. */}
+      {/* Backdrop for overlay presentations only. A docked assistant must not
+          dim or block the operational workspace. */}
       <div
         data-testid="copilot-backdrop"
         aria-hidden="true"
@@ -336,50 +376,73 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
           if (isOpen) onClose();
         }}
         className={cn(
-          'fixed inset-0 z-40 bg-background/40 backdrop-blur-[1px] transition-opacity duration-300',
-          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
+          'fixed inset-0 z-40 bg-background/40 backdrop-blur-[1px] transition-opacity duration-200',
+          isOpen && isModal ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none hidden',
         )}
       />
-      {/* Clipping viewport: an off-canvas `translate-x-full` panel would
-          otherwise extend the document scroll width and create a phantom
-          horizontal scrollbar on every route (Stage 6G S6G-02). */}
+      {/* Clipping viewport: an off-canvas panel would otherwise extend the
+          document scroll width and create a phantom horizontal scrollbar. */}
       <div
         className={cn(
           'fixed inset-0 z-50 overflow-hidden',
-          isOpen ? 'pointer-events-auto' : 'pointer-events-none hidden',
+          isOpen ? 'pointer-events-none' : 'pointer-events-none hidden',
         )}
         aria-hidden={isOpen ? undefined : true}
       >
       <div
       ref={panelRef}
+      data-assistant-panel="true"
+      data-testid="assistant-panel"
+      data-presentation={presentation}
       role="dialog"
-      aria-modal="true"
+      aria-modal={isModal ? 'true' : undefined}
       aria-label={COPILOT.TITLE}
       tabIndex={-1}
+      style={presentation === 'docked' ? { width } : undefined}
       className={cn(
-        'absolute right-0 top-0 h-full bg-background border-l border-border shadow-2xl transition-transform duration-300 ease-in-out',
-        'flex flex-col pointer-events-auto',
+        'absolute right-0 top-0 h-full bg-background border-l border-border transition-transform duration-200 ease-in-out',
+        'motion-reduce:transition-none flex flex-col pointer-events-auto',
         isOpen ? 'translate-x-0' : 'translate-x-full',
-        'w-full max-w-[480px]'
+        presentation === 'fullscreen' && 'w-full border-l-0',
+        presentation === 'overlay' && 'w-full max-w-[440px] shadow-2xl',
+        presentation === 'docked' && 'shadow-none',
       )}
     >
+      {/* Resize handle (docked only) */}
+      {presentation === 'docked' && (
+        <div
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize AURA Assistant"
+          aria-valuenow={width}
+          aria-valuemin={ASSISTANT_MIN_WIDTH}
+          aria-valuemax={ASSISTANT_MAX_WIDTH}
+          tabIndex={0}
+          onPointerDown={startResize}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowLeft') setWidth(width + 20);
+            if (e.key === 'ArrowRight') setWidth(width - 20);
+          }}
+          className="absolute left-0 top-0 flex h-full w-2 cursor-col-resize items-center justify-center bg-transparent hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <GripVertical className="h-4 w-4 text-muted-foreground/60" aria-hidden />
+        </div>
+      )}
+
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30">
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold">{COPILOT.TITLE}</h2>
+      <div className="flex items-start justify-between gap-2 border-b border-border px-4 py-3">
+        <div className="min-w-0">
+          <h2 className="truncate text-base font-semibold text-foreground">{COPILOT.TITLE}</h2>
+          <p className="truncate text-[11px] text-muted-foreground">{COPILOT.SUBTITLE}</p>
         </div>
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => {
-            console.log('[CoPilotPanel] Close button clicked');
-            onClose();
-          }}
-          className="h-8 w-8 hover:bg-muted"
-          aria-label="Close Co-Pilot"
+          onClick={onClose}
+          className="h-9 w-9 shrink-0 hover:bg-muted"
+          aria-label={presentation === 'fullscreen' ? 'Back to workspace' : 'Close AURA Assistant'}
         >
-          <X className="h-4 w-4" />
+          {presentation === 'fullscreen' ? <ArrowLeft className="h-4 w-4" aria-hidden /> : <X className="h-4 w-4" aria-hidden />}
         </Button>
       </div>
       
@@ -416,23 +479,30 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
           )}
 
           {messages.length === 0 && !isStreaming && (
-            <div className="text-center py-8 text-muted-foreground">
-              <Sparkles className="h-10 w-10 mx-auto mb-3 text-primary/50" />
-              <p className="text-sm mb-3">{COPILOT.PLACEHOLDER}</p>
-              <div className="space-y-2 text-left max-w-xs mx-auto">
-                {[
-                  { label: 'Cooling adequacy', query: 'Is cooling adequate for current GPU load?' },
-                  { label: 'Thermal hotspots', query: 'Identify thermal hotspots in the data center.' },
-                  { label: 'Carbon impact', query: 'What is the carbon impact today?' },
-                  { label: 'Sovereignty routing', query: 'Has sovereignty routing failed recently?' },
-                  { label: 'PUE drift prediction', query: 'Predict next PUE drift event.' },
-                  { label: 'Reduce power draw', query: 'How can we reduce power draw?' },
-                ].map((suggestion) => (
+            <div className="min-w-0" data-testid="assistant-empty-state">
+              <div className="rounded-md border border-border bg-muted/40 p-3">
+                <p className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+                  <Building2 className="h-4 w-4 text-muted-foreground" aria-hidden />
+                  <span className="truncate">{facilityLabel}</span>
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {routeLocation.pathname === '/' || routeLocation.pathname.startsWith('/dashboard')
+                    ? 'Dashboard'
+                    : routeLocation.pathname}{' '}
+                  · Design baseline · Simulated
+                </p>
+                <ul className="mt-2 space-y-0.5 text-[11px] text-muted-foreground">
+                  <li>No live telemetry</li>
+                  <li>{runs.length === 0 ? 'No simulation run selected' : `${runs.length} recorded run${runs.length === 1 ? '' : 's'}`}</li>
+                </ul>
+              </div>
+              <div className="mt-3 space-y-2">
+                {suggestions.map((suggestion) => (
                   <button
                     key={suggestion.label}
                     type="button"
                     onClick={() => handleFollowUp(suggestion.query)}
-                    className="w-full text-xs px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground transition-all text-left"
+                    className="w-full rounded-md border border-border px-3 py-2 text-left text-xs text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {suggestion.label}
                   </button>
@@ -483,8 +553,12 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
         </div>
       </ScrollArea>
 
-      {/* Footer */}
-      <div className="border-t border-border p-4 space-y-2">
+      {/* Composer: context scope, prompt, send. Model and privacy settings
+          live in Assistant settings, not in the operational interface. */}
+      <div className="space-y-2 border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <p className="truncate text-[11px] text-muted-foreground">
+          Context: {facilityLabel} · simulated design baseline
+        </p>
         <div className="flex gap-2">
           <Input
             ref={inputRef}
@@ -511,20 +585,8 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
           )}
         </div>
         
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <div className="flex items-center gap-3">
-            <span>Powered by {getModelDisplayName()} (v{getModelVersion()})</span>
-            <label className="flex items-center gap-1.5 cursor-pointer hover:text-foreground transition-colors">
-              <input
-                type="checkbox"
-                checked={memoryEnabled}
-                onChange={(e) => setMemoryEnabled(e.target.checked)}
-                className="w-3 h-3 rounded border-border"
-              />
-              <span className="text-[10px]">Remember preferences</span>
-            </label>
-          </div>
-          <span>⌘/ to open</span>
+        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+          <span>Responses describe the modelled facility, not live telemetry.</span>
         </div>
       </div>
       </div>

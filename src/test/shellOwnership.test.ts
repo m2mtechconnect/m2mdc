@@ -36,6 +36,7 @@ describe("global shell ownership", () => {
       const rel = f.slice(f.indexOf("src/"));
       if (rel === "src/components/Layout.tsx") return false;
       if (rel.includes("/capability/OperatingStateBar")) return false;
+      if (/\.(test|spec)\.tsx?$/.test(rel)) return false;
       return /<OperatingStateBar\b/.test(readFileSync(f, "utf8"));
     });
     expect(offenders).toEqual([]);

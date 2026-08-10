@@ -41,6 +41,7 @@ function useBelowXl(): boolean {
 export default function AuraWorkspace() {
   useSeededRunFixtures();
   const { facility, assets, isFallback } = useFacilityModel();
+  const { activeTwinId, twins, setActiveTwin } = useActiveTwin();
   const overrides = useWorkspaceStore((s) => s.overrides);
   const panelOpen = useWorkspaceStore((s) => s.panelOpen);
   const setPanelOpen = useWorkspaceStore((s) => s.setPanelOpen);

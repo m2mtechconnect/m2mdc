@@ -21,7 +21,7 @@ const RACK_W = 44;
 const RACK_H = 74;
 const GAP = 12;
 const ROW_GAP = 30;
-const PAD = 32;
+const PAD = 40;
 
 /** Overlay-specific colour ramp, expressed with plain CSS colours on the dark plate. */
 function rackFill(overlay: string, t: number): string {
@@ -70,7 +70,7 @@ export function FacilityFloorPlan({ facility, overlay, selectedAssetId, onSelect
           const rowLetter = String.fromCharCode(65 + r);
           return (
             <g key={rowId}>
-              <text x={4} y={y + RACK_H / 2} fill="#94a3b8" fontSize={11} dominantBaseline="middle">
+              <text x={4} y={y + RACK_H / 2} fill="#94a3b8" fontSize={20} dominantBaseline="middle">
                 {rowLetter}
               </text>
               <rect

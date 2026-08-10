@@ -397,6 +397,7 @@ const FALLBACK_FACILITY: FacilityDefinition = {
   capacityKw: 4200,
   rackCount: 24,
   rowCount: 3,
+  designRackEstimate: 24,
   pueTarget: 1.28,
   renewableTargetPct: 85,
   carbonIntensity: 32,

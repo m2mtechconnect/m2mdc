@@ -340,6 +340,16 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
         )}
       />
+      {/* Clipping viewport: an off-canvas `translate-x-full` panel would
+          otherwise extend the document scroll width and create a phantom
+          horizontal scrollbar on every route (Stage 6G S6G-02). */}
+      <div
+        className={cn(
+          'fixed inset-0 z-50 overflow-hidden',
+          isOpen ? 'pointer-events-auto' : 'pointer-events-none',
+        )}
+        aria-hidden={isOpen ? undefined : true}
+      >
       <div
       ref={panelRef}
       role="dialog"
@@ -347,7 +357,7 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
       aria-label={COPILOT.TITLE}
       tabIndex={-1}
       className={cn(
-        'fixed right-0 top-0 h-full bg-background border-l border-border shadow-2xl transition-transform duration-300 ease-in-out z-50',
+        'absolute right-0 top-0 h-full bg-background border-l border-border shadow-2xl transition-transform duration-300 ease-in-out',
         'flex flex-col',
         isOpen ? 'translate-x-0' : 'translate-x-full',
         'w-full max-w-[480px]'
@@ -516,6 +526,7 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
           </div>
           <span>⌘/ to open</span>
         </div>
+      </div>
       </div>
       </div>
     </>

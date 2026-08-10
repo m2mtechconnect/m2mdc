@@ -53,6 +53,10 @@ interface WorkspaceState {
   recordDecision: (runId: string, recommendationId: string, decision: DecisionState) => void;
   openEvidence: (kpi: KpiKey) => void;
   closeEvidence: () => void;
+  /** Test/verification helper: inserts deterministic fixture runs (idempotent). */
+  seedFixtureRuns: (fixtures: WorkspaceRun[]) => void;
+  /** Removes any previously seeded fixture runs, leaving real runs untouched. */
+  clearFixtureRuns: () => void;
 }
 
 export const useWorkspaceStore = create<WorkspaceState>()(
@@ -130,6 +134,32 @@ export const useWorkspaceStore = create<WorkspaceState>()(
 
       openEvidence: (evidenceKpi) => set({ evidenceKpi }),
       closeEvidence: () => set({ evidenceKpi: null }),
+
+      seedFixtureRuns: (fixtures) =>
+        set((s) => {
+          const existing = new Set(s.runs.map((r) => r.id));
+          const additions = fixtures.filter((f) => !existing.has(f.id));
+          if (additions.length === 0) return {} as Partial<WorkspaceState>;
+          const runs = [...s.runs, ...additions].slice(0, 20);
+          return {
+            runs,
+            activeRunId: s.activeRunId ?? additions[0].id,
+            compareRunIds:
+              s.compareRunIds.length > 0
+                ? s.compareRunIds
+                : additions.slice(0, 2).map((r) => r.id),
+          };
+        }),
+
+      clearFixtureRuns: () =>
+        set((s) => {
+          const runs = s.runs.filter((r) => !r.id.startsWith('FIXTURE-'));
+          return {
+            runs,
+            activeRunId: runs.some((r) => r.id === s.activeRunId) ? s.activeRunId : (runs[0]?.id ?? null),
+            compareRunIds: s.compareRunIds.filter((id) => runs.some((r) => r.id === id)),
+          };
+        }),
     }),
     {
       name: 'aura-workspace',

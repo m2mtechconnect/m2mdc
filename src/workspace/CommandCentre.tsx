@@ -18,6 +18,7 @@ import { Activity, AlertTriangle, ArrowRight, Boxes, ClipboardCheck, FileText, P
 import { KPI_DESCRIPTORS, deriveKpis, formatKpi, formatPower, useFacilityModel } from './facilityModel';
 import { FacilityFloorPlan } from './FacilityFloorPlan';
 import { useWorkspaceStore } from './workspaceStore';
+import { isFixtureRun, useSeededRunFixtures } from './runFixtures';
 
 const READINESS: Array<{ label: string; state: string }> = [
   { label: 'NVIDIA Omniverse DSX', state: 'Not deployed' },
@@ -31,6 +32,7 @@ const READINESS: Array<{ label: string; state: string }> = [
 const SUMMARY_KPIS = ['pue', 'itLoadKw', 'capacityHeadroom', 'thermalStability', 'carbonIntensity', 'sovereigntyScore'] as const;
 
 export default function CommandCentre() {
+  useSeededRunFixtures();
   const { facility, assets, isFallback } = useFacilityModel();
   const overrides = useWorkspaceStore((s) => s.overrides);
   const runs = useWorkspaceStore((s) => s.runs);
@@ -188,7 +190,12 @@ export default function CommandCentre() {
                   return (
                     <li key={run.id} className="flex flex-wrap items-center gap-2 py-2">
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-foreground">{run.scenarioLabel}</p>
+                        <div className="flex items-center gap-2 truncate text-sm font-medium text-foreground">
+                          <span className="truncate">{run.scenarioLabel}</span>
+                          {isFixtureRun(run) && (
+                            <Badge variant="outline" className="shrink-0 text-[10px]">Seeded fixture</Badge>
+                          )}
+                        </div>
                         <p className="text-[11px] text-muted-foreground">
                           Run {run.id} · {new Date(run.completedAt).toLocaleString()}
                         </p>
@@ -197,12 +204,29 @@ export default function CommandCentre() {
                         {pending > 0 ? `${pending} to review` : 'Reviewed'}
                       </Badge>
                       <Button asChild size="sm" variant="ghost" className="h-7 px-2 text-xs">
-                        <Link to="/simulation">Open</Link>
+                        <Link to={`/simulation?run=${encodeURIComponent(run.id)}`}>View result</Link>
                       </Button>
                     </li>
                   );
                 })}
               </ul>
+            )}
+            {runs.length > 1 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button asChild size="sm" variant="outline">
+                  <Link
+                    to={`/simulation?compare=${runs
+                      .slice(0, 2)
+                      .map((r) => encodeURIComponent(r.id))
+                      .join(',')}`}
+                  >
+                    Compare runs
+                  </Link>
+                </Button>
+                <Button asChild size="sm" variant="ghost">
+                  <Link to="/simulation">Open simulation</Link>
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>

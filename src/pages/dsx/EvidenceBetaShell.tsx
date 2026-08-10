@@ -257,7 +257,7 @@ function ShellBody() {
       </Helmet>
       <OperationalTruthBar />
       <ContextBar />
-      <div className="flex flex-1 flex-col lg:flex-row">
+      <div className="flex flex-1 min-w-0 flex-col lg:flex-row">
         <WorkspaceNav />
         <div className="min-w-0 flex-1 p-4 sm:p-6">
           <WorkspaceHeader />

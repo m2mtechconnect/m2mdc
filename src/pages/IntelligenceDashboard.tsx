@@ -444,7 +444,7 @@ export default function IntelligenceDashboard() {
                 : t('intelligenceDashboard.defaultSubtitle')}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 min-w-0">
             <div
               className="hidden md:flex items-center gap-2 text-xs text-muted-foreground border border-border rounded-md px-2.5 py-1.5"
               title={dataTrust.lastRefreshed.toLocaleString()}

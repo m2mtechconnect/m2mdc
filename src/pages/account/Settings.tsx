@@ -169,6 +169,7 @@ export default function Settings() {
       <div className="space-y-6">
         {/* Header */}
         <DCSectionHeader
+          as="h1"
           title="Workspace Settings"
           subtitle="Manage workspace configuration and team defaults"
           icon={<SettingsIcon className="h-5 w-5 text-primary" />}

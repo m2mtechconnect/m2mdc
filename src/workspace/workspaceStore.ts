@@ -24,7 +24,7 @@ export const WORKFLOW_STEPS: Array<{ tool: WorkspaceTool; label: string }> = [
   { tool: 'configure', label: 'Configure' },
   { tool: 'simulate', label: 'Simulate' },
   { tool: 'compare', label: 'Compare' },
-  { tool: 'decide', label: 'Decide' },
+  { tool: 'decide', label: 'Review' },
 ];
 
 interface WorkspaceState {

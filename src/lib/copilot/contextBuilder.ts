@@ -6,6 +6,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { isUuid } from '@/lib/identifiers';
 import { generateDefaultBlueprint } from '@/data/defaultBlueprint';
 import { dcToolRegistry, type DcToolDefinition } from '@/data/dcToolRegistry';
 import { getSovereigntyEngine, mockDataAssets, mockDataFlows, mockSovereigntyPolicies, mockComplianceFrameworks } from '@/sovereignty';
@@ -199,8 +200,9 @@ export async function buildCoPilotContext(
     ...additionalContext,
   };
 
-  // If we have an agent ID, fetch rich metadata
-  if (agentId) {
+  // If we have a real (UUID) agent ID, fetch rich metadata. Sample ids such as
+  // `agent-1` would make Postgres reject the request with HTTP 400.
+  if (agentId && isUuid(agentId)) {
     try {
       const { data: agent } = await supabase
         .from('agents')

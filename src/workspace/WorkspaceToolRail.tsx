@@ -20,6 +20,9 @@ interface Props {
   orientation?: 'vertical' | 'horizontal';
 }
 
+/** Steps that only make sense once at least one run exists. */
+const gatedTools = new Set<WorkspaceTool>(['compare', 'decide']);
+
 export function WorkspaceToolRail({ orientation = 'vertical' }: Props) {
   const activeTool = useWorkspaceStore((s) => s.activeTool);
   const setTool = useWorkspaceStore((s) => s.setTool);

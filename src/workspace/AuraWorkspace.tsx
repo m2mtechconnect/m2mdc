@@ -6,7 +6,7 @@
  * the current selection. Every action lives in the rail or the panel, so
  * there are no duplicate KPI cards or scattered call-to-action buttons.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { PanelRightOpen } from 'lucide-react';

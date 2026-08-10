@@ -34,6 +34,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { resolveFacilityNaming } from '@/workspace/facilityNaming';
 import { useToast } from '@/hooks/use-toast';
 import { BLUEPRINT } from '@/ux';
 

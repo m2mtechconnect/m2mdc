@@ -24,6 +24,7 @@ import {
   LogOut,
   Server,
   Activity,
+  Boxes,
   Monitor,
   MoreHorizontal,
 } from "lucide-react";

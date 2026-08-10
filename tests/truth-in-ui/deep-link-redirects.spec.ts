@@ -82,20 +82,22 @@ async function assertSingleShell(page: Page, label: string) {
 }
 
 function assertNoLoop(result: HopResult, label: string) {
+  // Chromium emits a framenavigated event for the provisional document and
+  // again for the committed one, so collapse consecutive repeats first: a
+  // hop is counted by how many DISTINCT locations the frame settled on.
+  const hops = result.visited.filter((path, i) => path !== result.visited[i - 1]);
   // A loop shows up as the same pathname appearing twice with a different
   // pathname in between (alias -> target -> alias).
   const seen = new Set<string>();
-  let previous = '';
-  for (const path of result.visited) {
-    if (path !== previous && seen.has(path)) {
-      throw new Error(`${label}: redirect loop detected, sequence=${result.visited.join(' -> ')}`);
+  for (const path of hops) {
+    if (seen.has(path)) {
+      throw new Error(`${label}: redirect loop detected, sequence=${hops.join(' -> ')}`);
     }
     seen.add(path);
-    previous = path;
   }
   expect(
-    result.visited.length,
-    `${label}: alias must resolve in at most two navigations, got ${result.visited.join(' -> ')}`,
+    hops.length,
+    `${label}: alias must resolve in at most two navigations, got ${hops.join(' -> ')}`,
   ).toBeLessThanOrEqual(2);
 }
 

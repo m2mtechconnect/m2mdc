@@ -202,7 +202,7 @@ export function FacilityHighlights({
               <Link
                 to={evidenceHrefForKpi(kpi)}
                 data-testid={`command-kpi-${kpi.key}-evidence`}
-                className="mt-auto inline-flex w-fit items-center gap-1.5 rounded-sm pt-1.5 text-[13px] text-[hsl(var(--info))] underline-offset-2 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="mt-auto inline-flex w-fit min-h-[44px] items-center gap-1.5 rounded-sm pt-1.5 text-[13px] sm:min-h-0 text-[hsl(var(--info))] underline-offset-2 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <FileSearch className="h-4 w-4" strokeWidth={1.75} aria-hidden />
                 <span className="sm:hidden">Source</span>
@@ -214,7 +214,7 @@ export function FacilityHighlights({
       </div>
 
       <Collapsible className="min-w-0 border-t border-border">
-        <CollapsibleTrigger className="inline-flex min-h-[36px] items-center gap-1.5 px-4 py-2 text-[13px] text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+        <CollapsibleTrigger className="inline-flex min-h-[44px] items-center gap-1.5 px-4 py-2 text-[13px] sm:min-h-[36px] text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <ChevronDown className="h-4 w-4" strokeWidth={1.75} aria-hidden />
           Model assumptions
         </CollapsibleTrigger>

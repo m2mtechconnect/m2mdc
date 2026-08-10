@@ -15,7 +15,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, AlertTriangle, ArrowRight, Boxes, ClipboardCheck, FileText, PlayCircle, Plug } from 'lucide-react';
-import { KPI_DESCRIPTORS, deriveKpis, formatKpi, formatPower, useFacilityModel } from './facilityModel';
+import { KPI_DESCRIPTORS, deriveKpis, formatKpi, formatPower, useFacilityModel, type KpiKey } from './facilityModel';
+import { blueprintHrefForKpi, evidenceHrefForKpi, layerLabelForKpi } from './kpiDrilldown';
 import { FacilityFloorPlan } from './FacilityFloorPlan';
 import { useWorkspaceStore } from './workspaceStore';
 import { isFixtureRun, useSeededRunFixtures } from './runFixtures';
@@ -93,15 +94,19 @@ export default function CommandCentre() {
             const descriptor = KPI_DESCRIPTORS[key];
             const value = latestRun ? latestRun.result[key] : kpis[key];
             return (
-              <div key={key} className="rounded-lg border border-border bg-card px-3 py-2.5" data-testid={`command-kpi-${key}`}>
-                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{descriptor.label}</p>
-                <p className="mt-1 text-lg font-semibold tabular-nums text-foreground">{formatKpi(key, value)}</p>
-              </div>
+              <KpiTile
+                key={key}
+                kpiKey={key}
+                label={descriptor.label}
+                value={formatKpi(key, value)}
+                facilityId={facility.id}
+              />
             );
           })}
         </div>
         <p className="mt-2 text-[11px] text-muted-foreground">
           Values are derived from the modelled configuration{latestRun ? ` and run ${latestRun.id}` : ''}. They are not measured facility data.
+          Select an indicator to open its Blueprint layer, or Evidence for its provenance.
         </p>
       </section>
 

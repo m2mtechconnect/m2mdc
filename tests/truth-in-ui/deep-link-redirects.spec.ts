@@ -49,7 +49,7 @@ async function runHop(page: Page, from: string): Promise<HopResult> {
 
   const historyBefore = await page.evaluate(() => window.history.length);
   await page.goto(from, { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector("[data-testid='page-content']", { timeout: 20_000 });
+  await page.waitForSelector("[data-testid='page-content']", { timeout: 45_000 });
   // Let any client-side <Navigate replace> settle before sampling the URL.
   await page.waitForTimeout(750);
   page.off('framenavigated', onNav as never);

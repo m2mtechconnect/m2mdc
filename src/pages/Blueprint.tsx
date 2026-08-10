@@ -59,6 +59,7 @@ import { SnapshotBadge, ModeBadge, LastUpdatedBadge, SnapshotHeader } from '@/co
 import { KpiTooltip } from '@/components/ui/kpi-tooltip';
 import { LoadingState, SnapshotNotFoundEmptyState } from '@/components/ui/empty-state';
 import { BlueprintModelSection } from '@/workspace/BlueprintModelSection';
+import { formatPower } from '@/workspace/facilityModel';
 function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: any }) {
   const { createTwin } = useActiveTwin();
   const { toast } = useToast();
@@ -230,7 +231,7 @@ export default function Blueprint() {
                   {twin?.city || blueprint.location}
                 </Badge>
                 <Badge variant="outline">Tier {blueprint.tier}</Badge>
-                <Badge variant="outline">{blueprint.capacityKw} MW</Badge>
+                <Badge variant="outline">{formatPower(blueprint.capacityKw)}</Badge>
                 <Badge variant="outline">{blueprint.racks} Racks</Badge>
               </div>
 

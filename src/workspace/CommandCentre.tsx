@@ -15,7 +15,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, ArrowRight, Boxes, ClipboardCheck, PlayCircle } from 'lucide-react';
-import { OperatingStateBar } from '@/components/capability/OperatingStateBar';
 import { KPI_DESCRIPTORS, deriveKpis, formatKpi, formatPower, useFacilityModel } from './facilityModel';
 import { useWorkspaceStore } from './workspaceStore';
 
@@ -42,8 +41,6 @@ export default function CommandCentre() {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-4" data-testid="command-centre">
-      <OperatingStateBar className="mb-4 rounded-md border" />
-
       <header className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-foreground">{facility.name}</h1>

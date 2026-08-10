@@ -178,6 +178,7 @@ export default function AccessControl() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <DCSectionHeader
+        as="h1"
         title="Access Control & RBAC"
         subtitle="Manage user roles and permissions across the platform"
         icon={<Shield className="h-5 w-5 text-info" />}

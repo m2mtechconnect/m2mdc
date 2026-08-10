@@ -60,8 +60,15 @@ export default function AuraWorkspace() {
     setPanelOpen(!belowXl);
   }, [belowXl, setPanelOpen]);
 
-  // Role view sets a sensible starting tool once per role change.
+  // This surface is the simulation workspace, so it always opens on the
+  // scenario step. Later role changes still move to the role's default tool.
+  const initialTool = useRef(true);
   useEffect(() => {
+    if (initialTool.current) {
+      initialTool.current = false;
+      setTool('simulate');
+      return;
+    }
     setTool(ROLE_VIEWS[roleView].defaultTool);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roleView]);

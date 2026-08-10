@@ -91,7 +91,7 @@ export function Layout({ children }: LayoutProps) {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background" data-testid="app-shell">
       <GlobalSearchBar />
       
       {/* Top Navigation Bar */}
@@ -102,6 +102,7 @@ export function Layout({ children }: LayoutProps) {
         }`}
         role="navigation"
         aria-label="Primary navigation"
+        data-testid="global-header"
       >
         <div className="mx-auto max-w-[1920px] flex items-center justify-between px-[clamp(16px,4vw,32px)] py-3">
           {/* Brand, facility context and workspace navigation */}
@@ -120,7 +121,7 @@ export function Layout({ children }: LayoutProps) {
             </div>
 
             {/* Workspace navigation: five destinations, always the same five. */}
-            <nav className="hidden lg:flex items-center gap-0.5" aria-label="Workspaces">
+            <nav className="hidden lg:flex items-center gap-0.5" aria-label="Workspaces" data-testid="primary-navigation">
               {workspaceNavigation.map((item) => {
                 const isActive = isNavItemActive(item, location.pathname);
                 const tourId = item.href === '/' ? 'nav-dashboard' :
@@ -166,13 +167,14 @@ export function Layout({ children }: LayoutProps) {
                         size="sm"
                         className="gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:text-foreground min-h-[36px]"
                         aria-label="Manage"
+                        data-testid="manage-trigger"
                         data-nav-item="Manage"
                       >
                         <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
                         <span className="hidden xl:inline">Manage</span>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-64">
+                    <DropdownMenuContent align="start" className="w-64" data-testid="manage-menu">
                       {manageNavigation.map((item) => {
                         const isActive = isNavItemActive(item, location.pathname);
                         return (

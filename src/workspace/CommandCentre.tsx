@@ -10,51 +10,30 @@
  * Blueprint or the Simulation workspace.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ArrowRight, Boxes, ChevronDown, FileText, PlayCircle } from 'lucide-react';
 import { deriveKpis, formatKpi, formatPower, useFacilityModel, type KpiKey } from './facilityModel';
-import { blueprintHrefForKpi, evidenceHrefForKpi } from './kpiDrilldown';
-import { FacilityFloorPlan } from './FacilityFloorPlan';
+import { evidenceHrefForKpi } from './kpiDrilldown';
 import { useWorkspaceStore } from './workspaceStore';
-import { isFixtureRun, useSeededRunFixtures } from './runFixtures';
-import { interpretKpi } from './dashboard/kpiInterpretation';
+import { useSeededRunFixtures } from './runFixtures';
+import { interpretKpi, type KpiInterpretation } from './dashboard/kpiInterpretation';
 import { buildAttentionQueue } from './dashboard/attentionQueue';
-import { AttentionQueueSection } from './dashboard/AttentionQueue';
-import { KpiCard } from './dashboard/KpiCard';
+import { ActionCenter } from './dashboard/ActionCenter';
+import { FacilityHighlights } from './dashboard/FacilityHighlights';
+import { FacilityCanvas, type CanvasOverlayId } from './dashboard/FacilityCanvas';
+import { RecentSimulations } from './dashboard/RecentSimulations';
+import { ContextRail } from './dashboard/ContextRail';
 
-const READINESS: Array<{ label: string; state: string; to: string }> = [
-  { label: 'Facility telemetry', state: 'Not connected', to: '/integrations' },
-  { label: 'NVIDIA runtime', state: 'Not available', to: '/settings/integrations/nvidia-dsx' },
-  { label: 'OpenUSD stage', state: 'Not validated', to: '/settings/integrations/nvidia-dsx' },
-  { label: 'SimReady assets', state: '0 validated', to: '/settings/integrations/nvidia-dsx' },
-  { label: 'Production readiness', state: 'No-Go', to: '/settings/integrations/nvidia-dsx' },
-];
-
-const SUMMARY_KPIS: KpiKey[] = [
-  'pue',
-  'itLoadKw',
-  'capacityHeadroom',
-  'thermalStability',
-  'carbonIntensity',
-  'sovereigntyScore',
-];
-
-const OVERLAYS = [
-  { id: 'thermal', label: 'Thermal' },
-  { id: 'power', label: 'Power' },
-  { id: 'workload', label: 'Capacity' },
-  { id: 'carbon', label: 'Carbon' },
-] as const;
+/** Primary highlights cells, in scanning order. */
+const PRIMARY_KPIS: KpiKey[] = ['pue', 'itLoadKw', 'capacityHeadroom', 'sovereigntyScore'];
+/** Secondary indicators, surfaced through evidence rather than the strip. */
+const SECONDARY_KPIS: KpiKey[] = ['thermalStability', 'carbonIntensity'];
+const SUMMARY_KPIS: KpiKey[] = [...PRIMARY_KPIS, ...SECONDARY_KPIS];
 
 export default function CommandCentre() {
   useSeededRunFixtures();
   const { facility, assets, isFallback, naming, modelNotes } = useFacilityModel();
   const overrides = useWorkspaceStore((s) => s.overrides);
   const runs = useWorkspaceStore((s) => s.runs);
-  const [overlay, setOverlay] = useState<string>('thermal');
+  const [overlay, setOverlay] = useState<CanvasOverlayId>('thermal');
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
 
   const kpis = deriveKpis(facility, overrides);
@@ -66,6 +45,8 @@ export default function CommandCentre() {
   );
   const rackCount = assets.filter((a) => a.kind === 'rack').length;
   const blueprintHref = `/blueprint/${facility.id || 'default'}`;
+  const evidenceHref = '/dsx/evidence-beta';
+  const simulationHref = `/simulation?twin=${encodeURIComponent(facility.id || 'default')}`;
   const calculatedAt = latestRun
     ? new Date(latestRun.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

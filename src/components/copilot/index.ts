@@ -14,7 +14,6 @@ export { CoPilotModeHeader, AskCoPilotButton } from './CoPilotModeHeader';
 // Main panels
 export { CoPilotPanel } from './CoPilotPanel';
 export { CoPilotDockedPanel } from './CoPilotDockedPanel';
-export { CoPilotBubble } from './CoPilotBubble';
 
 // Context chips
 export { CoPilotContextChips } from './CoPilotContextChips';

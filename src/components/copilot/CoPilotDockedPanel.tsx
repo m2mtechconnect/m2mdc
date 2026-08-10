@@ -332,7 +332,7 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
       <div
         data-testid="copilot-backdrop"
         aria-hidden="true"
-        onClick={() => {
+        onMouseDown={() => {
           if (isOpen) onClose();
         }}
         className={cn(
@@ -346,7 +346,7 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
       <div
         className={cn(
           'fixed inset-0 z-50 overflow-hidden',
-          isOpen ? 'pointer-events-auto' : 'pointer-events-none',
+          isOpen ? 'pointer-events-auto' : 'pointer-events-none hidden',
         )}
         aria-hidden={isOpen ? undefined : true}
       >
@@ -358,7 +358,7 @@ export function CoPilotDockedPanel({ isOpen, onClose }: CoPilotDockedPanelProps)
       tabIndex={-1}
       className={cn(
         'absolute right-0 top-0 h-full bg-background border-l border-border shadow-2xl transition-transform duration-300 ease-in-out',
-        'flex flex-col',
+        'flex flex-col pointer-events-auto',
         isOpen ? 'translate-x-0' : 'translate-x-full',
         'w-full max-w-[480px]'
       )}

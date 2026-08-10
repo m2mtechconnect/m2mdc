@@ -14,9 +14,19 @@ import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Activity, ArrowRight, Boxes, ClipboardCheck, PlayCircle } from 'lucide-react';
+import { Activity, AlertTriangle, ArrowRight, Boxes, ClipboardCheck, FileText, PlayCircle, Plug } from 'lucide-react';
 import { KPI_DESCRIPTORS, deriveKpis, formatKpi, formatPower, useFacilityModel } from './facilityModel';
+import { FacilityFloorPlan } from './FacilityFloorPlan';
 import { useWorkspaceStore } from './workspaceStore';
+
+const READINESS: Array<{ label: string; state: string }> = [
+  { label: 'NVIDIA Omniverse DSX', state: 'Not deployed' },
+  { label: 'DSX Exchange', state: 'Not integrated' },
+  { label: 'OpenUSD stage', state: 'Not deployed' },
+  { label: 'SimReady assets', state: 'Not validated' },
+  { label: 'NVIDIA runtime', state: 'Not deployed' },
+  { label: 'Live facility telemetry', state: 'Not connected' },
+];
 
 const SUMMARY_KPIS = ['pue', 'itLoadKw', 'capacityHeadroom', 'thermalStability', 'carbonIntensity', 'sovereigntyScore'] as const;
 
@@ -55,7 +65,7 @@ export default function CommandCentre() {
           <Button asChild variant="outline" size="sm">
             <Link to={blueprintHref}>
               <Boxes className="mr-1.5 h-4 w-4" aria-hidden />
-              Open blueprint
+              View blueprint
             </Link>
           </Button>
           <Button asChild size="sm">
@@ -86,6 +96,69 @@ export default function CommandCentre() {
       </section>
 
       <div className="grid gap-4 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Boxes className="h-4 w-4 text-muted-foreground" aria-hidden />
+              Facility overview
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5 text-sm">
+              <p className="font-medium text-foreground">{facility.name}</p>
+              <p className="text-muted-foreground">{facility.tier} · {facility.city}</p>
+              <p className="text-muted-foreground">Design capacity: {formatPower(facility.capacityKw)}</p>
+              <p className="text-muted-foreground">Modelled IT load: {formatKpi('itLoadKw', kpis.itLoadKw)}</p>
+              <p className="text-muted-foreground">{rackCount} racks across {facility.rowCount} rows</p>
+              <p className="text-[11px] text-muted-foreground">
+                Application-rendered simulated facility. Not an NVIDIA DSX, Omniverse, OpenUSD or SimReady model.
+              </p>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <Button asChild size="sm" variant="outline">
+                  <Link to={blueprintHref}>View blueprint</Link>
+                </Button>
+                <Button asChild size="sm" variant="ghost">
+                  <Link to={`${blueprintHref}?tab=model`}>View assets</Link>
+                </Button>
+              </div>
+            </div>
+            <div
+              aria-hidden
+              className="pointer-events-none hidden max-h-56 overflow-hidden rounded-md border border-border bg-background md:block"
+            >
+              <FacilityFloorPlan facility={facility} overlay="thermal" selectedAssetId={null} onSelect={() => {}} />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <AlertTriangle className="h-4 w-4 text-muted-foreground" aria-hidden />
+              Attention and review
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <AttentionItem
+              label={`${pendingDecisions} recommendation${pendingDecisions === 1 ? '' : 's'} awaiting review`}
+              detail="Recorded in the simulation workspace"
+              to="/simulation"
+            />
+            <AttentionItem
+              label="Live facility telemetry unavailable"
+              detail="All indicators are simulated model outputs"
+              to="/settings/integrations/nvidia-dsx"
+            />
+            {isFallback && (
+              <AttentionItem
+                label="Reference facility model in use"
+                detail="No saved blueprint was loaded for this account"
+                to={blueprintHref}
+              />
+            )}
+          </CardContent>
+        </Card>
+
         <Card className="lg:col-span-2">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
@@ -137,6 +210,48 @@ export default function CommandCentre() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
+              <Plug className="h-4 w-4 text-muted-foreground" aria-hidden />
+              Integration readiness
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <ul className="space-y-1.5 text-sm">
+              {READINESS.map((item) => (
+                <li key={item.label} className="flex items-center justify-between gap-2">
+                  <span className="text-muted-foreground">{item.label}</span>
+                  <Badge variant="outline" className="text-[11px]">{item.state}</Badge>
+                </li>
+              ))}
+            </ul>
+            <Button asChild size="sm" variant="outline" className="mt-1 w-full">
+              <Link to="/settings/integrations/nvidia-dsx">Review NVIDIA DSX readiness</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <FileText className="h-4 w-4 text-muted-foreground" aria-hidden />
+              Evidence and provenance
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
+            <p>Calculation source: deterministic in-application scenario engine.</p>
+            <p>Input classification: synthetic configuration inputs, no measured telemetry.</p>
+            <p>
+              Baseline provenance: {latestRun ? `run ${latestRun.id} (${new Date(latestRun.completedAt).toLocaleString()})` : 'modelled configuration baseline, no run recorded'}.
+            </p>
+            <p>Known limitation: results cannot be validated against a physical facility in this environment.</p>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/dsx/evidence-beta">View evidence</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
               <ClipboardCheck className="h-4 w-4 text-muted-foreground" aria-hidden />
               Where to go next
             </CardTitle>
@@ -166,6 +281,18 @@ export default function CommandCentre() {
         </Card>
       </div>
     </div>
+  );
+}
+
+function AttentionItem({ label, detail, to }: { label: string; detail: string; to: string }) {
+  return (
+    <Link
+      to={to}
+      className="block rounded-md border border-border px-3 py-2 transition-colors hover:border-primary/50 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      <span className="block text-[13px] font-medium text-foreground">{label}</span>
+      <span className="mt-0.5 block text-[11px] text-muted-foreground">{detail}</span>
+    </Link>
   );
 }
 

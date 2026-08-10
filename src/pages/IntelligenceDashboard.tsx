@@ -432,8 +432,8 @@ export default function IntelligenceDashboard() {
           </div>
         )}
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6 min-w-0">
+          <div className="min-w-0">
             <h1 className="text-2xl font-semibold flex items-center gap-3">
               <BarChart3 className="h-6 w-6 text-primary" />
               Telemetry & Analytics
@@ -726,8 +726,11 @@ export default function IntelligenceDashboard() {
         })()}
 
         {/* Tabs */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList>
+        <Tabs defaultValue="overview" className="space-y-6 min-w-0">
+          {/* Horizontal scroll container keeps the six triggers reachable on
+              narrow viewports without expanding the document (S6G-02). */}
+          <div className="w-full min-w-0 overflow-x-auto">
+          <TabsList className="w-max">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="thermal">Thermal Analysis</TabsTrigger>
             <TabsTrigger value="power">Power & Energy</TabsTrigger>
@@ -735,6 +738,7 @@ export default function IntelligenceDashboard() {
             <TabsTrigger value="sovereignty">Sovereignty</TabsTrigger>
             <TabsTrigger value="simulation-replay">Simulation Replay</TabsTrigger>
           </TabsList>
+          </div>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">

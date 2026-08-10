@@ -415,7 +415,7 @@ export default function Teams() {
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8 min-w-0">
             <div>
               <h1 className="text-4xl font-display font-bold mb-2 text-gradient-hero">
                 {t('teams.title')}
@@ -486,12 +486,12 @@ export default function Teams() {
                 <div className="lg:col-span-2 space-y-6">
                   <Card>
                     <CardHeader className="pb-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2 min-w-0">
+                        <div className="flex items-center gap-2 min-w-0">
                           <Users className="h-5 w-5 text-muted-foreground" />
                           <CardTitle className="text-lg">Team Members</CardTitle>
                         </div>
-                        <Badge variant="secondary" className="text-sm">
+                        <Badge variant="secondary" className="text-sm shrink-0">
                           {isInitialLoading ? "..." : `${filteredMembers.length} of ${activeMembersCount}`}
                         </Badge>
                       </div>
@@ -554,8 +554,8 @@ export default function Teams() {
                                   className="p-4 rounded-lg border border-border hover:border-secondary/50 transition-smooth cursor-pointer"
                                   onClick={() => handleMemberClick(member)}
                                 >
-                                  <div className="flex items-center justify-between">
-                                     <div className="flex items-center gap-3">
+                                  <div className="flex flex-wrap items-center justify-between gap-3 min-w-0">
+                                     <div className="flex items-center gap-3 min-w-0">
                                       <UserAvatar
                                         profileImageUrl={member.avatarUrl}
                                         initials={member.avatarInitials}

@@ -6,7 +6,8 @@
  * opens in a drawer and each row's explanation lives in the Issue Quick View,
  * so the default document height never grows.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { CircleAlert, Ellipsis, Info, TriangleAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -140,12 +141,50 @@ export function ActionCenter({
   items: AttentionItem[];
   onInspectRacks?: (item: AttentionItem) => void;
 }) {
-  const [openId, setOpenId] = useState<string | null>(null);
-  const [showAll, setShowAll] = useState(false);
   const limit = useVisibleCount();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const visible = useMemo(() => items.slice(0, limit), [items, limit]);
+  // Deep-link state: `?action=<id>` opens a row drawer, `?actions=all` opens
+  // the full list. Both are shareable and survive reload / Back.
+  const actionParam = searchParams.get('action');
+  const openId = actionParam && items.some((item) => item.id === actionParam) ? actionParam : null;
+
+  // A shared link to a row that sits below the fold keeps its row context by
+  // appending that row to the visible list, rather than stacking a second
+  // dialog (the full-list sheet) behind the drawer.
+  const visible = useMemo(() => {
+    const top = items.slice(0, limit);
+    if (!openId || top.some((item) => item.id === openId)) return top;
+    const deepLinked = items.find((item) => item.id === openId);
+    return deepLinked ? [...top, deepLinked] : top;
+  }, [items, limit, openId]);
   const openItem = items.find((item) => item.id === openId) ?? null;
+
+  const showAll = searchParams.get('actions') === 'all';
+
+  const patchParams = useCallback(
+    (patch: Record<string, string | null>) => {
+      setSearchParams(
+        (current) => {
+          const next = new URLSearchParams(current);
+          for (const [key, value] of Object.entries(patch)) {
+            if (value === null) next.delete(key);
+            else next.set(key, value);
+          }
+          return next;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
+  const openAction = useCallback((id: string) => patchParams({ action: id }), [patchParams]);
+  const closeAction = useCallback(() => patchParams({ action: null }), [patchParams]);
+  const setShowAll = useCallback(
+    (open: boolean) => patchParams(open ? { actions: 'all' } : { actions: null, action: null }),
+    [patchParams],
+  );
 
   return (
     <section
@@ -183,7 +222,7 @@ export function ActionCenter({
       ) : (
         <ul className="min-w-0 space-y-2 p-3" data-testid="action-center-list">
           {visible.map((item) => (
-            <ActionRow key={item.id} item={item} onOpen={setOpenId} />
+            <ActionRow key={item.id} item={item} onOpen={openAction} />
           ))}
         </ul>
       )}
@@ -199,7 +238,7 @@ export function ActionCenter({
           </SheetHeader>
           <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3" data-testid="action-center-all-list">
             {items.map((item) => (
-              <ActionRow key={item.id} item={item} onOpen={setOpenId} />
+              <ActionRow key={item.id} item={item} onOpen={openAction} />
             ))}
           </ul>
         </SheetContent>
@@ -207,12 +246,11 @@ export function ActionCenter({
 
       <ActionDetailDrawer
         item={openItem}
-        onClose={() => setOpenId(null)}
+        onClose={closeAction}
         onInspectRacks={
           onInspectRacks
             ? (item) => {
-                setOpenId(null);
-                setShowAll(false);
+                patchParams({ action: null, actions: null });
                 onInspectRacks(item);
               }
             : undefined

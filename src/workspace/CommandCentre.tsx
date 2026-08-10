@@ -64,15 +64,19 @@ export default function CommandCentre() {
 
   const setSelectedRack = useCallback(
     (rackId: string | null) => {
-      const next = new URLSearchParams(searchParams);
-      if (rackId) {
-        const rack = grid.byId.get(rackId);
-        if (!rack) return;
-        next.set('rack', rack.code);
-      } else {
-        next.delete('rack');
-      }
-      setSearchParams(next, { replace: !rackId && !rackParam });
+      const rack = rackId ? grid.byId.get(rackId) : null;
+      if (rackId && !rack) return;
+      // Functional update so concurrent parameter writers (Action Center deep
+      // links) are never clobbered by a stale snapshot.
+      setSearchParams(
+        (current) => {
+          const next = new URLSearchParams(current);
+          if (rack) next.set('rack', rack.code);
+          else next.delete('rack');
+          return next;
+        },
+        { replace: !rackId && !rackParam },
+      );
     },
     [searchParams, setSearchParams, grid, rackParam],
   );

@@ -150,7 +150,6 @@ const engineerConfig: RoleDashboardConfig = {
     { name: 'Build', fullName: 'Build Data Centre Twin', href: '/builder', icon: Wrench, group: 'primary' },
     { name: 'Agents', fullName: 'Subsystem Agents', href: '/app/agents', icon: Server, group: 'primary' },
     { name: 'Analytics', fullName: 'Telemetry & Analytics', href: '/intelligence', icon: BarChart3, group: 'secondary' },
-    { name: 'Simulation', fullName: 'Simulation', href: '/simulation', icon: Activity, group: 'secondary' },
     { name: 'Audit', fullName: 'Sovereignty & Safety Audit', href: '/compliance', icon: Shield, group: 'secondary' },
     { name: 'Teams', fullName: 'Teams', href: '/teams', icon: Users, group: 'secondary' },
     { name: 'Infra', fullName: 'Infrastructure', href: '/infrastructure', icon: HardDrive, group: 'secondary' },

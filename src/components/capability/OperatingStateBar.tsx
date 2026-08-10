@@ -19,7 +19,7 @@ import {
   formatCalculatedAt,
   useRunProvenance,
 } from '@/capabilities/runProvenance';
-import { useWorkspaceStore } from '@/stores/workspaceRunProvenance';
+import { useWorkspaceStore } from '@/workspace/workspaceStore';
 
 interface Props {
   className?: string;

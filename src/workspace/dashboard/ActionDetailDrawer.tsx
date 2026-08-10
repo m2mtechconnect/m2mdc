@@ -52,9 +52,12 @@ function DetailSkeleton() {
 export function ActionDetailDrawer({
   item,
   onClose,
+  onInspectRacks,
 }: {
   item: AttentionItem | null;
   onClose: () => void;
+  /** Opens the facility visualisation focused on the racks this item affects. */
+  onInspectRacks?: (item: AttentionItem) => void;
 }) {
   const [detail, setDetail] = useState<ActionDetail | null>(null);
   const [loading, setLoading] = useState(false);
@@ -156,6 +159,24 @@ export function ActionDetailDrawer({
                       </li>
                     ))}
                   </ul>
+                </>
+              )}
+              {onInspectRacks && item && (
+                <>
+                  <Separator className="my-3" />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 w-full justify-start text-[13px] max-sm:h-11"
+                    data-testid="action-detail-inspect-racks"
+                    onClick={() => onInspectRacks(item)}
+                  >
+                    Inspect affected racks
+                  </Button>
+                  <p className="mt-1.5 text-[12px] leading-relaxed text-muted-foreground">
+                    Scrolls to the facility visualisation, activates the related layer and opens the first
+                    affected rack.
+                  </p>
                 </>
               )}
               <div className="h-4" />

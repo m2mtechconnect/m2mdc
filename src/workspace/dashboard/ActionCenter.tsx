@@ -1,11 +1,12 @@
 /**
- * Stage 7B - Action Center.
+ * Stage 7D - compact Action Center.
  *
- * Lightning-style related-list treatment: a single surface, structured
- * operational rows, semantic status column, one primary action per row and
- * everything else behind links or an overflow menu.
+ * The dashboard shows the three highest-priority items (two on mobile) as
+ * single-line rows. Everything else is progressive disclosure: the full list
+ * opens in a drawer and each row's explanation lives in the Issue Quick View,
+ * so the default document height never grows.
  */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CircleAlert, Ellipsis, Info, TriangleAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -16,21 +17,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  ATTENTION_FILTERS,
-  attentionGroup,
-  type AttentionGroup,
-  type AttentionItem,
-  type AttentionSeverity,
-} from './attentionQueue';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import type { AttentionItem, AttentionSeverity } from './attentionQueue';
 import { ActionDetailDrawer } from './ActionDetailDrawer';
-import { formatObservedAt } from './actionDetail';
-
-const INITIAL_VISIBLE = 4;
 
 const SEVERITY_UI: Record<
   AttentionSeverity,
-  { label: string; Icon: typeof Info; iconClass: string; tileClass: string; accent: string; tint: string }
+  { label: string; Icon: typeof Info; iconClass: string; tileClass: string; accent: string }
 > = {
   constraint: {
     label: 'Constraint',
@@ -38,7 +31,6 @@ const SEVERITY_UI: Record<
     iconClass: 'text-destructive',
     tileClass: 'bg-destructive/10',
     accent: 'bg-destructive',
-    tint: 'bg-destructive/[0.045]',
   },
   review: {
     label: 'Review',
@@ -46,7 +38,6 @@ const SEVERITY_UI: Record<
     iconClass: 'text-warning',
     tileClass: 'bg-warning/10',
     accent: 'bg-warning',
-    tint: 'bg-warning/[0.05]',
   },
   informational: {
     label: 'Context',
@@ -54,20 +45,106 @@ const SEVERITY_UI: Record<
     iconClass: 'text-info',
     tileClass: 'bg-info/10',
     accent: 'bg-info',
-    tint: 'bg-transparent',
   },
 };
 
-export function ActionCenter({ items }: { items: AttentionItem[] }) {
-  const [filter, setFilter] = useState<AttentionGroup | 'all'>('all');
-  const [expanded, setExpanded] = useState(false);
-  const [openId, setOpenId] = useState<string | null>(null);
-
-  const filtered = useMemo(
-    () => (filter === 'all' ? items : items.filter((item) => attentionGroup(item) === filter)),
-    [items, filter],
+function useVisibleCount(): number {
+  const [count, setCount] = useState(() =>
+    typeof window !== 'undefined' && window.innerWidth < 768 ? 2 : 3,
   );
-  const visible = expanded ? filtered : filtered.slice(0, INITIAL_VISIBLE);
+  useEffect(() => {
+    const onResize = () => setCount(window.innerWidth < 768 ? 2 : 3);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  return count;
+}
+
+function ActionRow({
+  item,
+  onOpen,
+}: {
+  item: AttentionItem;
+  onOpen: (id: string) => void;
+}) {
+  const ui = SEVERITY_UI[item.severity];
+  const [primary, ...rest] = item.actions;
+  return (
+    <li
+      data-testid={`action-item-${item.id}`}
+      className="relative flex min-h-[72px] min-w-0 items-center gap-3 overflow-hidden rounded-md border border-border bg-card pl-3 pr-3 py-2.5 transition-colors duration-150 hover:bg-muted/40"
+    >
+      <span className={cn('absolute inset-y-0 left-0 w-1', ui.accent)} aria-hidden />
+      <span
+        className={cn('hidden h-9 w-9 shrink-0 items-center justify-center rounded-md sm:flex', ui.tileClass)}
+        aria-hidden
+      >
+        <ui.Icon className={cn('h-[18px] w-[18px]', ui.iconClass)} strokeWidth={1.75} />
+      </span>
+
+      <div className="min-w-0 flex-1">
+        <h3 className="min-w-0 text-[14px] font-semibold leading-snug text-foreground">
+          <button
+            type="button"
+            onClick={() => onOpen(item.id)}
+            data-testid={`action-item-open-${item.id}`}
+            aria-haspopup="dialog"
+            className="line-clamp-1 break-words text-left underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+          >
+            {item.title}
+          </button>
+        </h3>
+        <p className="line-clamp-1 text-[13px] leading-snug text-muted-foreground">{item.impact}</p>
+        <p className="line-clamp-1 text-[12px] font-medium text-muted-foreground">
+          {ui.label} · {item.subsystem} · {item.evidence}
+        </p>
+      </div>
+
+      <div className="flex shrink-0 items-center gap-1.5">
+        {primary && (
+          <Button asChild size="sm" className="h-9 text-[13px] font-semibold max-sm:h-11">
+            <Link to={primary.to}>{primary.label}</Link>
+          </Button>
+        )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 w-9 p-0 max-sm:h-11 max-sm:w-11"
+              aria-label={`More actions for ${item.title}`}
+              data-testid={`action-item-details-${item.id}`}
+            >
+              <Ellipsis className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onSelect={() => onOpen(item.id)}>View details</DropdownMenuItem>
+            {rest.map((action) => (
+              <DropdownMenuItem key={action.label} asChild>
+                <Link to={action.to}>{action.label}</Link>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </li>
+  );
+}
+
+export function ActionCenter({
+  items,
+  onInspectRacks,
+}: {
+  items: AttentionItem[];
+  onInspectRacks?: (item: AttentionItem) => void;
+}) {
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
+  const limit = useVisibleCount();
+
+  const visible = useMemo(() => items.slice(0, limit), [items, limit]);
   const openItem = items.find((item) => item.id === openId) ?? null;
 
   return (
@@ -76,179 +153,71 @@ export function ActionCenter({ items }: { items: AttentionItem[] }) {
       data-testid="action-center"
       className="min-w-0 rounded-lg border border-border bg-card"
     >
-      <div className="min-w-0 border-b border-border p-4 sm:p-5">
-        <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-2">
-          <h2 id="action-center-heading" className="text-[18px] font-semibold leading-tight text-foreground">
-            Action Center
-          </h2>
-          <p className="text-[14px] font-medium tabular-nums text-muted-foreground">
-            {items.length} open item{items.length === 1 ? '' : 's'}
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-2.5">
+        <h2 id="action-center-heading" className="text-[16px] font-semibold leading-tight text-foreground">
+          Action Center
+        </h2>
+        <div className="flex items-center gap-2">
+          <p className="text-[13px] font-medium tabular-nums text-muted-foreground">
+            {items.length} open
           </p>
-        </div>
-        <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
-          Review modelled constraints and incomplete readiness.
-        </p>
-
-        <div
-          className="mt-3.5 flex min-w-0 flex-wrap gap-2"
-          role="group"
-          aria-label="Filter action items"
-        >
-          {ATTENTION_FILTERS.map((option) => {
-            const active = filter === option.id;
-            const count =
-              option.id === 'all'
-                ? items.length
-                : items.filter((item) => attentionGroup(item) === option.id).length;
-            return (
-              <button
-                key={option.id}
-                type="button"
-                aria-pressed={active}
-                data-testid={`action-filter-${option.id}`}
-                onClick={() => {
-                  setFilter(option.id);
-                  setExpanded(false);
-                }}
-                className={cn(
-                  'inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-[13px] font-medium transition-colors duration-150 max-sm:h-11',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
-                  active
-                    ? 'border-[hsl(var(--info))] bg-[hsl(var(--info)/0.10)] text-[hsl(var(--info))]'
-                    : 'border-border bg-card text-muted-foreground hover:border-[hsl(var(--info)/0.5)] hover:text-foreground',
-                )}
-              >
-                {option.label}
-                <span className="tabular-nums opacity-70">{count}</span>
-              </button>
-            );
-          })}
+          {items.length > limit && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 text-[13px] max-sm:h-11"
+              aria-haspopup="dialog"
+              data-testid="action-center-view-all"
+              onClick={() => setShowAll(true)}
+            >
+              {`View all ${items.length} items`}
+            </Button>
+          )}
         </div>
       </div>
 
-      {filtered.length === 0 ? (
-        <p className="p-5 text-[14px] text-muted-foreground">
-          No items in this category for the current design baseline.
+      {items.length === 0 ? (
+        <p className="p-4 text-[13px] text-muted-foreground">
+          No open items for the current design baseline.
         </p>
       ) : (
-        <ul className="min-w-0 space-y-2 p-3 sm:p-4">
-          {visible.map((item, index) => {
-            const ui = SEVERITY_UI[item.severity];
-            const highest = index === 0 && !expanded && filter === 'all';
-            const [primary, ...rest] = item.actions;
-            return (
-              <li
-                key={item.id}
-                data-testid={`action-item-${item.id}`}
-                className={cn(
-                  'relative min-h-[88px] min-w-0 overflow-hidden rounded-md border border-border pl-1 transition-colors duration-150 hover:bg-muted/40',
-                  highest ? ui.tint : 'bg-card',
-                )}
-              >
-                <span
-                  className={cn('absolute inset-y-0 left-0 w-1', ui.accent)}
-                  aria-hidden
-                />
-                <div className="flex min-w-0 gap-4 p-4">
-                  <span
-                    className={cn(
-                      'hidden h-10 w-10 shrink-0 items-center justify-center rounded-md sm:flex',
-                      ui.tileClass,
-                    )}
-                    aria-hidden
-                  >
-                    <ui.Icon className={cn('h-5 w-5', ui.iconClass)} strokeWidth={1.75} />
-                  </span>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                      <span className="text-[12px] font-semibold uppercase tracking-wide text-foreground">
-                        {ui.label}
-                      </span>
-                      <span className="text-[12px] font-medium text-muted-foreground">
-                        {item.category}
-                      </span>
-                    </div>
-
-                    <h3 className="mt-1 break-words text-[15px] font-semibold leading-snug text-foreground">
-                      <button
-                        type="button"
-                        onClick={() => setOpenId(item.id)}
-                        data-testid={`action-item-open-${item.id}`}
-                        aria-haspopup="dialog"
-                        className="break-words text-left underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
-                      >
-                        {item.title}
-                      </button>
-                    </h3>
-                    <p className="mt-1 break-words text-[13px] leading-relaxed text-muted-foreground">
-                      {item.impact}
-                    </p>
-                    <p className="mt-1.5 break-words text-[12px] font-medium text-muted-foreground">
-                      {item.subsystem} · {item.evidence} · {formatObservedAt(item.observedAt)}
-                    </p>
-
-                    <div className="mt-3 flex min-w-0 flex-wrap items-center gap-2">
-                      {primary && (
-                        <Button asChild size="sm" className="h-9 text-[13px] font-semibold max-sm:h-11">
-                          <Link to={primary.to}>{primary.label}</Link>
-                        </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-9 text-[13px] max-sm:h-11"
-                        aria-haspopup="dialog"
-                        data-testid={`action-item-details-${item.id}`}
-                        onClick={() => setOpenId(item.id)}
-                      >
-                        Details
-                      </Button>
-                      {rest.length > 0 && (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-9 w-9 p-0 max-sm:h-11 max-sm:w-11"
-                              aria-label={`More actions for ${item.title}`}
-                              title="More actions"
-                            >
-                              <Ellipsis className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {rest.map((action) => (
-                              <DropdownMenuItem key={action.label} asChild>
-                                <Link to={action.to}>{action.label}</Link>
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </li>
-            );
-          })}
+        <ul className="min-w-0 space-y-2 p-3" data-testid="action-center-list">
+          {visible.map((item) => (
+            <ActionRow key={item.id} item={item} onOpen={setOpenId} />
+          ))}
         </ul>
       )}
 
-      {filtered.length > INITIAL_VISIBLE && (
-        <div className="border-t border-border px-4 py-3">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 text-[13px] max-sm:h-11"
-            onClick={() => setExpanded((v) => !v)}
-          >
-            {expanded ? `Show top ${INITIAL_VISIBLE} only` : `View all ${filtered.length} items`}
-          </Button>
-        </div>
-      )}
 
-      <ActionDetailDrawer item={openItem} onClose={() => setOpenId(null)} />
+      <Sheet open={showAll} onOpenChange={setShowAll}>
+        <SheetContent side="right" className="flex w-[min(560px,94vw)] flex-col gap-0 p-0 sm:max-w-none">
+          <SheetHeader className="space-y-1 border-b border-border p-4 text-left">
+            <SheetTitle className="text-[16px]">Action Center</SheetTitle>
+            <SheetDescription className="text-[13px]">
+              All modelled constraints, data-quality notes and readiness gaps.
+            </SheetDescription>
+          </SheetHeader>
+          <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3" data-testid="action-center-all-list">
+            {items.map((item) => (
+              <ActionRow key={item.id} item={item} onOpen={setOpenId} />
+            ))}
+          </ul>
+        </SheetContent>
+      </Sheet>
+
+      <ActionDetailDrawer
+        item={openItem}
+        onClose={() => setOpenId(null)}
+        onInspectRacks={
+          onInspectRacks
+            ? (item) => {
+                setOpenId(null);
+                setShowAll(false);
+                onInspectRacks(item);
+              }
+            : undefined
+        }
+      />
     </section>
   );
 }

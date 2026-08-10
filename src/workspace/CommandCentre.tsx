@@ -1,26 +1,30 @@
 /**
  * Data Centre Command Centre (route `/` and `/dashboard`).
  *
- * Stage 6B separation of concerns:
- *   Command Centre  - read-only operational overview of the modelled facility
- *   Blueprint       - the facility model, hierarchy and configuration
- *   Simulation      - scenario execution, comparison and review
+ * Stage 7D structure - the default surface fits inside two viewport heights:
+ *   Screen 1 (Decisions)  - facility header, four KPI highlights, the three
+ *                           highest-priority action items, status snapshot.
+ *   Screen 2 (Exploration)- facility visualisation with Rack Quick View, and
+ *                           the latest three simulation runs.
  *
- * This surface authors nothing. Every action is a deep link into the
- * Blueprint or the Simulation workspace.
+ * Everything else is progressive disclosure: quick views and drawers, never
+ * inline expansion, so opening detail cannot grow the document.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { deriveKpis, formatKpi, formatPower, useFacilityModel, type KpiKey } from './facilityModel';
 import { evidenceHrefForKpi } from './kpiDrilldown';
 import { useWorkspaceStore } from './workspaceStore';
 import { useSeededRunFixtures } from './runFixtures';
 import { interpretKpi, type KpiInterpretation } from './dashboard/kpiInterpretation';
-import { buildAttentionQueue } from './dashboard/attentionQueue';
+import { buildAttentionQueue, type AttentionItem } from './dashboard/attentionQueue';
 import { ActionCenter } from './dashboard/ActionCenter';
 import { FacilityHighlights } from './dashboard/FacilityHighlights';
 import { FacilityCanvas, type CanvasOverlayId } from './dashboard/FacilityCanvas';
 import { RecentSimulations } from './dashboard/RecentSimulations';
-import { ContextRail } from './dashboard/ContextRail';
+import { StatusSnapshot, buildSnapshotRows } from './dashboard/StatusSnapshot';
+import { MetricQuickView } from './dashboard/MetricQuickView';
+import { buildRackGrid } from './dashboard/rackModel';
 
 /** Primary highlights cells, in scanning order. */
 const PRIMARY_KPIS: KpiKey[] = ['pue', 'itLoadKw', 'capacityHeadroom', 'sovereigntyScore'];
@@ -28,13 +32,50 @@ const PRIMARY_KPIS: KpiKey[] = ['pue', 'itLoadKw', 'capacityHeadroom', 'sovereig
 const SECONDARY_KPIS: KpiKey[] = ['thermalStability', 'carbonIntensity'];
 const SUMMARY_KPIS: KpiKey[] = [...PRIMARY_KPIS, ...SECONDARY_KPIS];
 
+/** Session memory for the active analytical layer. */
+const LAYER_STORAGE_KEY = 'aura.dashboard.layer';
+
 export default function CommandCentre() {
   useSeededRunFixtures();
   const { facility, assets, isFallback, naming, modelNotes } = useFacilityModel();
   const overrides = useWorkspaceStore((s) => s.overrides);
   const runs = useWorkspaceStore((s) => s.runs);
-  const [overlay, setOverlay] = useState<CanvasOverlayId>('thermal');
-  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [overlay, setOverlay] = useState<CanvasOverlayId>(() => {
+    const stored = typeof window !== 'undefined' ? window.sessionStorage.getItem(LAYER_STORAGE_KEY) : null;
+    return (stored as CanvasOverlayId) || 'thermal';
+  });
+  useEffect(() => {
+    window.sessionStorage.setItem(LAYER_STORAGE_KEY, overlay);
+  }, [overlay]);
+
+  const [metricKpi, setMetricKpi] = useState<KpiInterpretation | null>(null);
+  const [centerNonce, setCenterNonce] = useState(0);
+
+  const grid = useMemo(() => buildRackGrid(facility), [facility]);
+
+  /** Rack selection lives in the URL, so Back restores the previous state. */
+  const rackParam = searchParams.get('rack');
+  const selectedRackId = useMemo(() => {
+    if (!rackParam) return null;
+    return grid.byCode.get(rackParam.toUpperCase())?.id ?? grid.byId.get(rackParam)?.id ?? null;
+  }, [rackParam, grid]);
+
+  const setSelectedRack = useCallback(
+    (rackId: string | null) => {
+      const next = new URLSearchParams(searchParams);
+      if (rackId) {
+        const rack = grid.byId.get(rackId);
+        if (!rack) return;
+        next.set('rack', rack.code);
+      } else {
+        next.delete('rack');
+      }
+      setSearchParams(next, { replace: !rackId && !rackParam });
+    },
+    [searchParams, setSearchParams, grid, rackParam],
+  );
 
   const kpis = deriveKpis(facility, overrides);
   const latestRun = runs[0] ?? null;
@@ -83,11 +124,39 @@ export default function CommandCentre() {
     [interpretations],
   );
 
-  const selectedAsset = selectedAssetId ? assets.find((a) => a.id === selectedAssetId) ?? null : null;
+  const evidenceNeedingReview = interpretations.filter(
+    (k) => k.state === 'watch' || k.state === 'constraint',
+  ).length;
 
   useEffect(() => {
     document.title = `${facility.name} | AURA command centre`;
   }, [facility.name]);
+
+  /** Issue Quick View -> facility visualisation, correct layer, first affected rack. */
+  const inspectAffectedRacks = useCallback(
+    (item: AttentionItem) => {
+      const layer: CanvasOverlayId =
+        item.id.includes('pue') || item.id.includes('thermal')
+          ? 'thermal'
+          : item.id.includes('itLoad') || item.id.includes('power')
+            ? 'power'
+            : item.id.includes('carbon')
+              ? 'carbon'
+              : 'workload';
+      setOverlay(layer);
+      const affected =
+        grid.racks.find((rack) => rack.state === 'constraint') ??
+        grid.racks.find((rack) => rack.state === 'watch') ??
+        grid.racks[0];
+      if (affected) setSelectedRack(affected.id);
+      const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+      document
+        .querySelector('[data-testid="facility-canvas"]')
+        ?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      setCenterNonce((n) => n + 1);
+    },
+    [grid, setSelectedRack],
+  );
 
   const assumptions = (
     <ul className="space-y-1.5 text-[13px] leading-relaxed text-muted-foreground">
@@ -113,18 +182,15 @@ export default function CommandCentre() {
       {modelNotes.map((note) => (
         <li key={note}>{note}</li>
       ))}
-      <li>
-        Secondary indicators (thermal stability, carbon intensity) are available in Evidence rather than the
-        highlights strip.
-      </li>
+      <li>OpenUSD stage: NOT VALIDATED · SimReady assets: 0 VALIDATED · Production readiness: NO-GO.</li>
       <li>Results cannot be validated against a physical facility in this environment.</li>
     </ul>
   );
 
   return (
-    <div className="aura-workspace-theme min-w-0 bg-background py-5" data-testid="command-centre">
-      <div className="dashboard-shell min-w-0">
-        {/* 1. Facility highlights: identity, state, one primary action, indicators. */}
+    <div className="aura-workspace-theme min-w-0 bg-background py-4" data-testid="command-centre">
+      <div className="dashboard-shell min-w-0 space-y-4">
+        {/* Screen 1 - decisions. */}
         <FacilityHighlights
           facilityName={facility.name}
           location={facility.city}
@@ -136,38 +202,42 @@ export default function CommandCentre() {
           evidenceHref={evidenceHref}
           kpis={primaryKpis}
           evidenceHrefForKpi={(kpi: KpiInterpretation) => evidenceHrefForKpi(kpi.key)}
+          onSelectKpi={setMetricKpi}
           assumptions={assumptions}
         />
 
-        {/* 2. Primary workspace and 320px contextual rail. */}
-        <div className="dashboard-grid mt-5">
-          <div className="dashboard-main space-y-5">
-            <ActionCenter items={attentionItems} />
-
-            <FacilityCanvas
-              facility={facility}
-              overlay={overlay}
-              onOverlayChange={setOverlay}
-              selectedAssetId={selectedAssetId}
-              onSelect={setSelectedAssetId}
-              selectedAsset={selectedAsset}
-              rackCount={rackCount}
-              blueprintHref={blueprintHref}
-            />
-
-            <RecentSimulations runs={runs} facilityId={facility.id} />
+        <div className="dashboard-grid">
+          <div className="dashboard-main">
+            <ActionCenter items={attentionItems} onInspectRacks={inspectAffectedRacks} />
           </div>
-
-          <aside className="dashboard-rail" aria-label="Facility context">
-            <ContextRail
-              calculatedAt={calculatedAt}
-              kpis={interpretations}
-              blueprintHref={blueprintHref}
-              evidenceHref={evidenceHref}
-            />
+          <aside className="dashboard-rail" aria-label="Facility status">
+            <StatusSnapshot rows={buildSnapshotRows(evidenceNeedingReview)} evidenceHref={evidenceHref} />
           </aside>
         </div>
+
+        {/* Screen 2 - facility exploration. */}
+        <FacilityCanvas
+          facility={facility}
+          grid={grid}
+          overlay={overlay}
+          onOverlayChange={setOverlay}
+          selectedRackId={selectedRackId}
+          onSelectRack={setSelectedRack}
+          rackCount={rackCount}
+          blueprintHref={blueprintHref}
+          calculatedAt={calculatedAt}
+          centerNonce={centerNonce}
+        />
+
+        <RecentSimulations runs={runs} facilityId={facility.id} />
       </div>
+
+      <MetricQuickView
+        kpi={metricKpi}
+        facilityId={facility.id}
+        calculatedAt={calculatedAt}
+        onClose={() => setMetricKpi(null)}
+      />
     </div>
   );
 }

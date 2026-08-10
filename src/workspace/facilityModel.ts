@@ -411,6 +411,11 @@ export interface FacilityModel {
   isFallback: boolean;
   isLoading: boolean;
   naming: FacilityNamingContext;
+  /**
+   * Disclosure emitted when the stored capacity had to be rescaled, or when
+   * the rendered rack count is a subset of the design estimate.
+   */
+  modelNotes: string[];
 }
 
 /** Single hook every workspace surface uses to read the facility model. */
@@ -425,6 +430,7 @@ export function useFacilityModel(): FacilityModel {
         assets: buildAssets(FALLBACK_FACILITY),
         isFallback: true,
         isLoading,
+      modelNotes: [],
         naming: {
           classification: naming.classification,
           breadcrumb: naming.breadcrumb,
@@ -433,9 +439,18 @@ export function useFacilityModel(): FacilityModel {
         },
       };
     }
-    const capacityKw = twin.capacity_kw || FALLBACK_FACILITY.capacityKw;
-    const rackCount = Math.max(8, Math.min(40, Math.floor(capacityKw / 50)));
+    const capacity = normaliseStoredCapacityKw(twin.capacity_kw, FALLBACK_FACILITY.capacityKw);
+    const capacityKw = capacity.kw;
+    const designRackEstimate = Math.max(8, Math.floor(capacityKw / 50));
+    const rackCount = Math.min(40, designRackEstimate);
     const rowCount = Math.max(1, Math.ceil(rackCount / 8));
+    const modelNotes: string[] = [];
+    if (capacity.note) modelNotes.push(capacity.note);
+    if (designRackEstimate > rackCount) {
+      modelNotes.push(
+        `${rackCount} of an estimated ${designRackEstimate} racks are rendered. The remainder are represented by the aggregate load model.`,
+      );
+    }
     const naming = resolveFacilityNaming({
       name: twin.name,
       city: twin.city || FALLBACK_FACILITY.city,
@@ -453,6 +468,7 @@ export function useFacilityModel(): FacilityModel {
       capacityKw,
       rackCount,
       rowCount,
+      designRackEstimate,
       pueTarget: twin.pue_target ?? FALLBACK_FACILITY.pueTarget,
       renewableTargetPct: twin.renewable_target_pct ?? FALLBACK_FACILITY.renewableTargetPct,
       carbonIntensity: twin.carbon_intensity ?? FALLBACK_FACILITY.carbonIntensity,
@@ -464,6 +480,7 @@ export function useFacilityModel(): FacilityModel {
       assets: buildAssets(facility),
       isFallback: false,
       isLoading,
+      modelNotes,
       naming: {
         classification: naming.classification,
         breadcrumb: naming.breadcrumb,

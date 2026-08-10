@@ -190,12 +190,12 @@ export default function Help() {
               status="operational"
               className="lg:col-span-2"
             >
-              <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between min-w-0">
                 <p className="text-sm text-muted-foreground">
                   Master the simulation engine to test cooling failures, GPU spikes, sovereignty violations, and more. 
                   Understand how KPI deltas help you evaluate the impact of different scenarios on your data centre operations.
                 </p>
-                <div className="flex gap-2 flex-shrink-0">
+                <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:flex-shrink-0">
                   <Button onClick={() => navigate('/data-centre-twin?view=simulation&mode=guided')} className="gap-2">
                     <PlayCircle className="h-4 w-4" />
                     Open Simulation

@@ -158,7 +158,7 @@ function WorkspaceNav() {
     <nav
       aria-label="DSX workspaces"
       data-testid="dsx-workspace-nav"
-      className="w-full shrink-0 overflow-x-auto border-b border-border bg-card/40 p-3 lg:w-60 lg:overflow-x-visible lg:overflow-y-auto lg:border-b-0 lg:border-r"
+      className="relative w-full min-w-0 max-w-full shrink-0 overflow-x-auto border-b border-border bg-card/40 p-3 lg:w-60 lg:overflow-x-visible lg:overflow-y-auto lg:border-b-0 lg:border-r"
     >
       <div className="flex min-w-max gap-4 lg:block lg:min-w-0">
       {NAV.map((g) => (
@@ -247,7 +247,7 @@ function WorkspaceHeader() {
 
 function ShellBody() {
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] flex-col">
+    <div className="flex min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full flex-col overflow-x-hidden">
       <Helmet>
         <title>DSX Operator Workspace | AURA Data Centre Twin</title>
         <meta

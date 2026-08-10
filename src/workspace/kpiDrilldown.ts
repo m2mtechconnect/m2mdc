@@ -14,12 +14,12 @@ const EVIDENCE_WORKSPACE: Record<KpiKey, string> = {
   itLoadKw: 'power',
   gpuUtilization: 'workload',
   thermalStability: 'thermal',
-  coolingLoadKw: 'cooling',
+  coolingEfficiency: 'cooling',
   capacityHeadroom: 'facility',
   carbonIntensity: 'carbon',
   sovereigntyScore: 'sovereignty',
-  costPerHour: 'financials',
-} as Record<KpiKey, string>;
+  energyCostPerMwh: 'financials',
+};
 
 /** Blueprint deep link that opens the model layer backing a KPI. */
 export function blueprintHrefForKpi(facilityId: string, key: KpiKey): string {

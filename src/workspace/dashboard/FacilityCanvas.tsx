@@ -170,7 +170,7 @@ export function FacilityCanvas({
           <h2 id="facility-visual-heading" className="text-[16px] font-semibold leading-tight text-foreground">
             Facility visualisation
           </h2>
-          <p className="mt-0.5 text-[13px] text-muted-foreground">
+          <p className="mt-0.5 hidden text-[13px] text-muted-foreground sm:block">
             Procedural design representation · select a rack for details.
           </p>
         </div>
@@ -188,7 +188,7 @@ export function FacilityCanvas({
               placeholder="Find rack or asset"
               aria-label="Find rack or asset"
               data-testid="rack-search-input"
-              className="h-9 w-[180px] pl-8 text-[13px] max-sm:h-11"
+              className="h-9 w-[150px] pl-8 text-[13px] sm:w-[180px] max-sm:h-11"
             />
             {query.trim() && (
               <div
@@ -232,7 +232,7 @@ export function FacilityCanvas({
                 data-testid={`layer-${layer.id}`}
                 onClick={() => onOverlayChange(layer.id)}
                 className={cn(
-                  'inline-flex h-9 items-center gap-1.5 rounded-md border px-2.5 text-[13px] font-medium transition-colors duration-150 max-sm:h-11',
+                  'hidden h-9 items-center gap-1.5 rounded-md border px-2.5 text-[13px] font-medium transition-colors duration-150 lg:inline-flex',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
                   isActive
                     ? 'border-[hsl(var(--info))] bg-[hsl(var(--info)/0.12)] text-[hsl(var(--info))]'

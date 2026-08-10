@@ -39,7 +39,7 @@ export function StatusSnapshot({ rows, evidenceHref }: { rows: SnapshotRow[]; ev
       data-testid="status-snapshot"
       className="min-w-0 overflow-hidden rounded-lg border border-border bg-card"
     >
-      <div className="flex min-h-[44px] min-w-0 items-center gap-2.5 border-b border-border px-4 py-2.5">
+      <div className="flex min-h-[42px] min-w-0 items-center gap-2.5 border-b border-border px-4 py-2.5">
         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted" aria-hidden>
           <Gauge className="h-[18px] w-[18px] text-muted-foreground" strokeWidth={1.75} />
         </span>
@@ -54,7 +54,7 @@ export function StatusSnapshot({ rows, evidenceHref }: { rows: SnapshotRow[]; ev
             <Link
               to={row.to}
               data-testid={`snapshot-row-${row.label.toLowerCase().replace(/\s+/g, '-')}`}
-              className="flex min-h-[44px] min-w-0 items-center justify-between gap-3 px-4 py-1.5 text-[13px] transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+              className="flex min-h-[42px] min-w-0 items-center justify-between gap-3 px-4 py-1.5 text-[13px] transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
             >
               <span className="min-w-0 break-words text-muted-foreground">{row.label}</span>
               <span className="flex shrink-0 items-center gap-1">

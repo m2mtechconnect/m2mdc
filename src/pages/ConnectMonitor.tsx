@@ -51,6 +51,7 @@ export default function ConnectMonitor() {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <DCSectionHeader
+          as="h1"
           title={t("connectMonitor.title")}
           subtitle={t("connectMonitor.subtitle")}
           icon={<Activity className="h-5 w-5 text-primary" />}

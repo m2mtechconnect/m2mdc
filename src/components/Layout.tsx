@@ -12,23 +12,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import m2mLogo from "@/assets/m2m-logo.png";
 import {
-  LayoutDashboard,
-  Wrench,
-  BarChart3,
-  Shield,
-  Users,
   HelpCircle,
   Menu,
   X,
   Command,
   LogOut,
-  Server,
-  Activity,
-  Boxes,
-  Monitor,
-  MoreHorizontal,
+  SlidersHorizontal,
 } from "lucide-react";
-import { User } from '@supabase/supabase-js';
 import GlobalSearchBar from "@/components/search/GlobalSearchBar";
 import { CoPilotPanel } from "@/components/copilot/CoPilotPanel";
 import { CoPilotBubble } from "@/components/copilot/CoPilotBubble";
@@ -43,9 +33,11 @@ import { DataCentreSelector } from "@/components/twin-selector";
 import { HelpMenu } from "@/components/header/HelpMenu";
 import { useTourAutoStart } from "@/tours/useTourAutoStart";
 import { useRBAC } from "@/contexts/RBACContext";
-import { getRoleNavigation } from "@/config/roleDashboardConfig";
-import { Badge } from "@/components/ui/badge";
-import { useTranslation } from "react-i18next";
+import {
+  WORKSPACE_NAV,
+  isNavItemActive,
+  visibleManageNav,
+} from "@/config/appNavigation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { OperatingStateBar } from "@/components/capability/OperatingStateBar";
 import { useShellLayoutStore } from "@/stores/shellLayoutStore";
@@ -54,64 +46,19 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
-// Fallback navigation (used during loading)
-const fallbackPrimary = [
-  { name: "Command", fullName: "Data Centre Command", href: "/", icon: LayoutDashboard, group: 'primary' as const },
-  { name: "Blueprint", fullName: "Facility Blueprint", href: "/blueprint", icon: Boxes, group: 'primary' as const },
-  { name: "Simulation", fullName: "Simulation Workspace", href: "/simulation", icon: Activity, group: 'primary' as const },
-  { name: "Build", fullName: "Build Data Centre Twin", href: "/builder", icon: Wrench, group: 'primary' as const },
-  { name: "Agents", fullName: "Subsystem Agents", href: "/app/agents", icon: Server, group: 'primary' as const },
-];
-
-const fallbackSecondary = [
-  { name: "Analytics", fullName: "Telemetry & Analytics", href: "/intelligence", icon: BarChart3, group: 'secondary' as const },
-  { name: "Audit", fullName: "Sovereignty & Safety Audit", href: "/compliance", icon: Shield, group: 'secondary' as const },
-  { name: "Teams", fullName: "Teams", href: "/teams", icon: Users, group: 'secondary' as const },
-];
-
-// Helper function to get time-based greeting key
-const getGreetingKey = () => {
-  const hour = new Date().getHours();
-  if (hour < 12) return "layout.goodMorning";
-  if (hour < 18) return "layout.goodAfternoon";
-  return "layout.goodEvening";
-};
-
-// Helper function to extract first name from user
-const getFirstName = (user: User | null): string => {
-  if (!user) return "there";
-  
-  if (user.user_metadata?.full_name) {
-    return user.user_metadata.full_name.split(' ')[0];
-  }
-  if (user.user_metadata?.first_name) {
-    return user.user_metadata.first_name;
-  }
-  
-  if (user.email) {
-    const username = user.email.split('@')[0];
-    return username.charAt(0).toUpperCase() + username.slice(1).split(/[._-]/)[0];
-  }
-  
-  return "there";
-};
-
 export function Layout({ children }: LayoutProps) {
   const fullBleed = useShellLayoutStore((s) => s.fullBleed);
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
   const { isOpen, setIsOpen } = useCoPilot();
-  const [greeting, setGreeting] = useState(getGreetingKey());
-  const { t } = useTranslation();
-  const { role, loading: roleLoading } = useRBAC();
-  
-  // Role-adaptive navigation
-  const roleNav = getRoleNavigation(role);
-  const primaryNavigation = roleLoading ? fallbackPrimary : roleNav.primary;
-  const secondaryNavigation = roleLoading ? fallbackSecondary : roleNav.secondary;
+  const { can, loading: roleLoading } = useRBAC();
+
+  // Canonical information architecture. Workspaces are always visible;
+  // authoring and administration collapse into a single Manage group.
+  const workspaceNavigation = WORKSPACE_NAV;
+  const manageNavigation = roleLoading ? [] : visibleManageNav(can);
   const headerRef = useRef<HTMLElement>(null);
 
   // Auto-start tours based on route and user state

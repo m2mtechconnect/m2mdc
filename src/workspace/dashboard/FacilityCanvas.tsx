@@ -332,7 +332,7 @@ export function FacilityCanvas({
         </div>
       </div>
 
-      <div className="flex min-w-0 items-stretch h-[248px] sm:h-[320px] lg:h-[368px]">
+      <div className="flex min-w-0 items-stretch h-[220px] sm:h-[320px] lg:h-[368px]">
         <div className="min-w-0 flex-1 p-3">
           <div className="h-full w-full overflow-hidden rounded-md border border-border bg-[#0a1020]">
             <FacilityFloorPlan
@@ -371,7 +371,7 @@ export function FacilityCanvas({
 
       <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-border px-4 py-2">
         <span className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
-          {active.label} legend
+          {active.label}
         </span>
         {active.legend.map((label, index) => (
           <span key={label} className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground">
@@ -383,8 +383,11 @@ export function FacilityCanvas({
             {label}
           </span>
         ))}
-        <span className="text-[13px] text-muted-foreground">
+        <span className="hidden text-[13px] text-muted-foreground sm:inline">
           {rackCount} of ~{facility.designRackEstimate} racks represented · not a validated OpenUSD stage
+        </span>
+        <span className="text-[13px] text-muted-foreground sm:hidden">
+          {rackCount}/~{facility.designRackEstimate} racks · modelled
         </span>
       </div>
 

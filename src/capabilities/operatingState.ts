@@ -65,7 +65,9 @@ export function simulationRunId(now: Date = new Date()): string {
 }
 
 export function activeScenarioLabel(): string {
-  return 'Baseline Operations';
+  // "Design baseline" states what the values are: the modelled design point,
+  // not an operating facility.
+  return 'Design baseline';
 }
 
 export function evidenceBoundaryNotice(runId?: string | null): string {

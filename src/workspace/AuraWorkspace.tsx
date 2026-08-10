@@ -6,7 +6,7 @@
  * the current selection. Every action lives in the rail or the panel, so
  * there are no duplicate KPI cards or scattered call-to-action buttons.
  */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { PanelRightOpen } from 'lucide-react';
@@ -22,6 +22,19 @@ import { RoleViewSelector } from './RoleViewSelector';
 import { useFacilityModel } from './facilityModel';
 import { ROLE_VIEWS, useWorkspaceStore } from './workspaceStore';
 
+/** True below the xl breakpoint, where the context panel becomes a sheet. */
+function useBelowXl(): boolean {
+  const [below, setBelow] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 1279px)');
+    const sync = () => setBelow(mql.matches);
+    sync();
+    mql.addEventListener('change', sync);
+    return () => mql.removeEventListener('change', sync);
+  }, []);
+  return below;
+}
+
 export default function AuraWorkspace() {
   const { facility, assets, isFallback } = useFacilityModel();
   const overrides = useWorkspaceStore((s) => s.overrides);
@@ -30,6 +43,7 @@ export default function AuraWorkspace() {
   const roleView = useWorkspaceStore((s) => s.roleView);
   const setTool = useWorkspaceStore((s) => s.setTool);
   const isMobile = useIsMobile();
+  const belowXl = useBelowXl();
   const setFullBleed = useShellLayoutStore((s) => s.setFullBleed);
 
   useEffect(() => {
@@ -100,13 +114,13 @@ export default function AuraWorkspace() {
           {isMobile && <WorkspaceToolRail orientation="horizontal" />}
         </div>
 
-        <div className="xl:hidden">
+        {belowXl && (
           <Sheet open={panelOpen} onOpenChange={setPanelOpen}>
             <SheetContent side="right" className="w-full bg-card p-0 sm:max-w-md">
               <ContextPanel facility={facility} assets={assets} overrides={overrides} />
             </SheetContent>
           </Sheet>
-        </div>
+        )}
 
         <EvidenceDrawer facility={facility} overrides={overrides} />
       </div>

@@ -17,6 +17,7 @@ import { AOCMetricsTab } from '@/components/aoc/AOCMetricsTab';
 import { AOCDeployTab } from '@/components/aoc/AOCDeployTab';
 import { AOCGovernanceTab } from '@/components/aoc/AOCGovernanceTab';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
+import { isUuid } from '@/lib/identifiers';
 
 /**
  * AURA Agent Operations Center (AOC)
@@ -31,6 +32,11 @@ export default function TwinManage() {
   const { toast } = useToast();
   const { updateContext } = useCoPilotContext();
   const [activeTab, setActiveTab] = useState('live');
+
+  // Sample/placeholder ids (e.g. `agent-1`, `twin-1`) are not UUIDs. Querying
+  // with them makes Postgres reject the request with HTTP 400, so guard first
+  // and render a truthful empty state instead of a failed network call.
+  const hasValidId = isUuid(resolvedId);
 
   // Fetch deployed instance data
   const { data: instance, isLoading, error } = useQuery({
@@ -103,7 +109,8 @@ export default function TwinManage() {
 
       return system;
     },
-    enabled: !!resolvedId,
+    enabled: hasValidId,
+    retry: false,
   });
 
   // Update Co-Pilot context when tab or agent changes
@@ -124,6 +131,28 @@ export default function TwinManage() {
       navigate(`/builder?systemId=${instance.id}`);
     }
   };
+
+  if (!hasValidId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-8">
+        <div className="max-w-md text-center">
+          <div className="mb-4 p-4 rounded-full bg-muted w-16 h-16 flex items-center justify-center mx-auto">
+            <AlertCircle aria-hidden="true" className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <h1 className="text-lg font-semibold mb-2">Invalid agent reference</h1>
+          <p className="text-muted-foreground mb-4">
+            {resolvedId
+              ? `"${resolvedId}" is not a valid agent identifier. This link may be a sample or demo URL.`
+              : 'No agent identifier was provided in this link.'}
+          </p>
+          <Button onClick={() => navigate('/app/agents')}>
+            <ArrowLeft aria-hidden="true" className="h-4 w-4 mr-2" />
+            Back to Agents
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

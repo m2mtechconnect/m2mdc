@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { PanelRightOpen } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TwinOverlayProvider } from '@/context/TwinOverlayContext';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useShellLayoutStore } from '@/stores/shellLayoutStore';
 import { FacilityCanvas } from './FacilityCanvas';
 import { KpiStrip } from './KpiStrip';

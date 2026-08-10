@@ -52,7 +52,7 @@ export default function AuraWorkspace() {
   }, [setFullBleed]);
 
   useEffect(() => {
-    document.title = `${facility.name} | AURA engineering workspace`;
+    document.title = `${facility.name} | AURA simulation workspace`;
   }, [facility.name]);
 
   // Below xl the panel is an overlay, so it must not cover the model on load.
@@ -76,7 +76,7 @@ export default function AuraWorkspace() {
         <div className="flex flex-wrap items-center gap-2 border-b border-border px-3 py-1.5">
           <h1 className="truncate text-sm font-semibold text-foreground">
             {facility.name}
-            <span className="ml-2 font-normal text-muted-foreground">Engineering workspace</span>
+            <span className="ml-2 font-normal text-muted-foreground">Simulation workspace</span>
           </h1>
           {isFallback && (
             <span className="rounded-sm bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">

@@ -13,9 +13,7 @@ import { cn } from '@/lib/utils';
 import { useWorkspaceStore } from './workspaceStore';
 import type { FacilityDefinition } from './facilityModel';
 
-const DataCenter3DScene = lazy(() =>
-  import('@/components/twin-visualization/DataCenter3DScene').then((m) => ({ default: m.DataCenter3DScene })),
-);
+import { DataCenter3DScene } from '@/components/twin-visualization/DataCenter3DScene';
 
 const OVERLAYS: TwinOverlay[] = ['thermal', 'power', 'cooling', 'gpu', 'workload', 'network', 'sovereignty', 'carbon'];
 

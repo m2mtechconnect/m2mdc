@@ -23,6 +23,8 @@ import {
   type AttentionItem,
   type AttentionSeverity,
 } from './attentionQueue';
+import { ActionDetailDrawer } from './ActionDetailDrawer';
+import { formatObservedAt } from './actionDetail';
 
 const INITIAL_VISIBLE = 4;
 
@@ -59,12 +61,14 @@ const SEVERITY_UI: Record<
 export function ActionCenter({ items }: { items: AttentionItem[] }) {
   const [filter, setFilter] = useState<AttentionGroup | 'all'>('all');
   const [expanded, setExpanded] = useState(false);
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const filtered = useMemo(
     () => (filter === 'all' ? items : items.filter((item) => attentionGroup(item) === filter)),
     [items, filter],
   );
   const visible = expanded ? filtered : filtered.slice(0, INITIAL_VISIBLE);
+  const openItem = items.find((item) => item.id === openId) ?? null;
 
   return (
     <section
@@ -167,13 +171,21 @@ export function ActionCenter({ items }: { items: AttentionItem[] }) {
                     </div>
 
                     <h3 className="mt-1 break-words text-[15px] font-semibold leading-snug text-foreground">
-                      {item.title}
+                      <button
+                        type="button"
+                        onClick={() => setOpenId(item.id)}
+                        data-testid={`action-item-open-${item.id}`}
+                        aria-haspopup="dialog"
+                        className="break-words text-left underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+                      >
+                        {item.title}
+                      </button>
                     </h3>
                     <p className="mt-1 break-words text-[13px] leading-relaxed text-muted-foreground">
                       {item.impact}
                     </p>
                     <p className="mt-1.5 break-words text-[12px] font-medium text-muted-foreground">
-                      {item.subsystem} · {item.evidence}
+                      {item.subsystem} · {item.evidence} · {formatObservedAt(item.observedAt)}
                     </p>
 
                     <div className="mt-3 flex min-w-0 flex-wrap items-center gap-2">
@@ -182,6 +194,16 @@ export function ActionCenter({ items }: { items: AttentionItem[] }) {
                           <Link to={primary.to}>{primary.label}</Link>
                         </Button>
                       )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-9 text-[13px] max-sm:h-11"
+                        aria-haspopup="dialog"
+                        data-testid={`action-item-details-${item.id}`}
+                        onClick={() => setOpenId(item.id)}
+                      >
+                        Details
+                      </Button>
                       {rest.length > 0 && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

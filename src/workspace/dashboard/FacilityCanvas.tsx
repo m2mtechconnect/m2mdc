@@ -332,7 +332,7 @@ export function FacilityCanvas({
         </div>
       </div>
 
-      <div className="flex min-w-0 items-stretch h-[220px] sm:h-[320px] lg:h-[368px]">
+      <div className="flex min-w-0 items-stretch h-[204px] sm:h-[320px] lg:h-[368px]">
         <div className="min-w-0 flex-1 p-3">
           <div className="h-full w-full overflow-hidden rounded-md border border-border bg-[#0a1020]">
             <FacilityFloorPlan

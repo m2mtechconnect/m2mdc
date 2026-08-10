@@ -53,12 +53,15 @@ export function RecentSimulations({ runs, facilityId }: Props) {
           </div>
         ) : (
           <ul className="min-w-0 divide-y divide-border" data-testid="simulation-list">
-            {visible.map((run) => {
+            {visible.map((run, runIndex) => {
               const pending = run.recommendations.filter(
                 (r) => (run.decisions[r.id] ?? 'pending') === 'pending',
               ).length;
               return (
-                <li key={run.id} className="flex min-w-0 flex-wrap items-center gap-2 py-2">
+                <li
+                  key={run.id}
+                  className={`flex min-w-0 flex-wrap items-center gap-2 py-2 ${runIndex === 2 ? 'max-sm:hidden' : ''}`}
+                >
                   <div className="min-w-0 flex-1">
                     <div className="flex min-w-0 items-center gap-2 text-[14px] font-medium text-foreground">
                       <span className="truncate">{run.scenarioLabel}</span>

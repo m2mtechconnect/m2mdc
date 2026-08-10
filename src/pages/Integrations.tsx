@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { NvidiaDsxReadinessPanel } from '@/pages/settings/NvidiaDsxReadiness';
+import { NvidiaDsxReadinessPanel } from '@/components/integrations/NvidiaDsxReadinessPanel';
 import { ArrowRight, Plug } from 'lucide-react';
 
 const SOURCES: Array<{ name: string; state: string; detail: string; href?: string; cta?: string }> = [

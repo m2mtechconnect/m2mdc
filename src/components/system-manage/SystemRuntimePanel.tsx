@@ -45,7 +45,7 @@ export function SystemRuntimePanel({ system }: SystemRuntimePanelProps) {
       subvalue: system.lastRun?.channel || '',
       icon: Clock,
       unit: '',
-      onClick: () => navigate(`/intelligence?tab=monitoring&system=${system.id}`),
+      onClick: () => navigate(`/analytics?tab=monitoring&system=${system.id}`),
     },
     {
       id: 'success-rate',
@@ -54,7 +54,7 @@ export function SystemRuntimePanel({ system }: SystemRuntimePanelProps) {
       subvalue: 'Last 7 days',
       icon: CheckCircle2,
       unit: '%',
-      onClick: () => navigate(`/intelligence?tab=performance&system=${system.id}`),
+      onClick: () => navigate(`/analytics?tab=performance&system=${system.id}`),
     },
     {
       id: 'avg-duration',
@@ -63,7 +63,7 @@ export function SystemRuntimePanel({ system }: SystemRuntimePanelProps) {
       subvalue: 'Response time',
       icon: Activity,
       unit: 'ms',
-      onClick: () => navigate(`/intelligence?tab=performance&system=${system.id}`),
+      onClick: () => navigate(`/analytics?tab=performance&system=${system.id}`),
     },
     {
       id: 'roi',
@@ -72,7 +72,7 @@ export function SystemRuntimePanel({ system }: SystemRuntimePanelProps) {
       subvalue: 'Current period',
       icon: TrendingUp,
       unit: '%',
-      onClick: () => navigate(`/intelligence?tab=roi&system=${system.id}`),
+      onClick: () => navigate(`/analytics?tab=roi&system=${system.id}`),
     },
   ];
 

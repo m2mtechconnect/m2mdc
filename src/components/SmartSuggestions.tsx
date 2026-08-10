@@ -13,7 +13,7 @@ export default function SmartSuggestions() {
     {
       text: "You've connected marketing data — would you like to summarize last quarter's campaigns?",
       actions: [
-        { label: "Analyze data", action: () => navigate("/intelligence") },
+        { label: "Analyze data", action: () => navigate("/analytics") },
         { label: "Build report assistant", action: () => navigate("/builder?template=marketing") },
       ],
       icon: TrendingUp,
@@ -29,7 +29,7 @@ export default function SmartSuggestions() {
     {
       text: "ROI increased 110% this quarter. Share these insights with your team?",
       actions: [
-        { label: "View analytics", action: () => navigate("/intelligence") },
+        { label: "View analytics", action: () => navigate("/analytics") },
         { label: "Invite teammate", action: () => navigate("/teams") },
       ],
       icon: BarChart3,

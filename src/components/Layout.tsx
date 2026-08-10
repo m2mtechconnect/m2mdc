@@ -28,7 +28,6 @@ import { UserMenu } from "@/components/layout/UserMenu";
 import { BuildVersion } from "@/components/BuildVersion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { AOCQuickAccessButton } from "@/components/aoc/AOCQuickAccessButton";
 import { DataCentreSelector } from "@/components/twin-selector";
 import { HelpMenu } from "@/components/header/HelpMenu";
 import { useTourAutoStart } from "@/tours/useTourAutoStart";
@@ -115,8 +114,8 @@ export function Layout({ children }: LayoutProps) {
               />
             </Link>
 
-            {/* Data Centre Twin Selector */}
-            <div className="hidden lg:block" data-tour="dc-selector">
+            {/* Data Centre Twin Selector (single canonical facility switcher) */}
+            <div className="hidden lg:block" data-tour="dc-selector" data-testid="facility-switcher">
               <DataCentreSelector />
             </div>
 
@@ -208,9 +207,6 @@ export function Layout({ children }: LayoutProps) {
             {/* Help Menu with Tours */}
             <HelpMenu />
             
-            {/* AOC Quick Access */}
-            <AOCQuickAccessButton />
-            
             {/* Command Palette Trigger */}
             <Button
               variant="outline"
@@ -273,7 +269,7 @@ export function Layout({ children }: LayoutProps) {
 
           <nav className="mt-6 space-y-1" aria-label="Mobile navigation">
             {/* Data Centre Selector - Mobile */}
-            <div className="px-3 mb-4">
+            <div className="px-3 mb-4" data-testid="facility-switcher-mobile">
               <DataCentreSelector />
             </div>
             
@@ -374,6 +370,7 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Main Content */}
       <main
+        data-testid="page-content"
         className={
           fullBleed
             ? "flex-1 w-full"

@@ -80,7 +80,7 @@ export function SearchResultsPanel({ result, onAction }: SearchResultsPanelProps
         actions.push({
           label: 'View in Analytics Dashboard',
           icon: TrendingUp,
-          action: () => navigate('/intelligence')
+          action: () => navigate('/analytics')
         });
         break;
       case 'compliance':

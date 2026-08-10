@@ -507,7 +507,7 @@ export function CoPilotDrawer({ open, onClose, currentRole, initialMessage }: Co
         );
       case 'kpi':
         return (
-          <Link to="/intelligence">
+          <Link to="/analytics">
             <Button size="sm" variant="outline" className="gap-2">
               <BarChart3 className="h-3.5 w-3.5" />
               View Intelligence Dashboard

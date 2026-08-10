@@ -319,7 +319,7 @@ export default function CommandCentre() {
               description="Run a scenario, compare runs and record decisions."
             />
             <NextStep
-              to="/intelligence"
+              to="/analytics"
               title="Telemetry and analytics"
               description="Review modelled trends across thermal, power and carbon domains."
             />

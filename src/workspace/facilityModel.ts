@@ -246,7 +246,18 @@ export function clamp(v: number, min: number, max: number): number {
 
 export function formatKpi(key: KpiKey, value: number): string {
   const d = KPI_DESCRIPTORS[key];
+  if (key === 'itLoadKw') return formatPower(value);
   return `${value.toFixed(d.precision)}${d.unit}`;
+}
+
+/**
+ * Power is modelled in kilowatts. Render kW below 1 MW and MW above it so
+ * facility-scale figures are never shown as five-digit kW or as watts.
+ */
+export function formatPower(kw: number): string {
+  if (!Number.isFinite(kw)) return '-';
+  if (Math.abs(kw) >= 1000) return `${(kw / 1000).toFixed(kw >= 10000 ? 1 : 2)} MW`;
+  return `${Math.round(kw).toLocaleString()} kW`;
 }
 
 /** Deterministic asset tree derived from the facility definition. */
@@ -262,7 +273,7 @@ export function buildAssets(facility: FacilityDefinition): FacilityAsset[] {
       attributes: [
         { label: 'Location', value: `${facility.city} (${facility.regionCode})` },
         { label: 'Tier', value: facility.tier },
-        { label: 'Design capacity', value: `${facility.capacityKw.toLocaleString()} kW` },
+        { label: 'Design capacity', value: formatPower(facility.capacityKw) },
         { label: 'Racks modelled', value: String(facility.rackCount) },
       ],
     },
@@ -313,7 +324,7 @@ export function buildAssets(facility: FacilityDefinition): FacilityAsset[] {
       dependencies: ['facility'],
       attributes: [
         { label: 'Topology', value: '2N' },
-        { label: 'Modelled load', value: `${(facility.capacityKw * 0.42).toFixed(0)} kW` },
+        { label: 'Modelled load', value: formatPower(facility.capacityKw * 0.42) },
       ],
     },
     {
@@ -324,7 +335,7 @@ export function buildAssets(facility: FacilityDefinition): FacilityAsset[] {
       dependencies: ['facility'],
       attributes: [
         { label: 'Topology', value: '2N' },
-        { label: 'Modelled load', value: `${(facility.capacityKw * 0.4).toFixed(0)} kW` },
+        { label: 'Modelled load', value: formatPower(facility.capacityKw * 0.4) },
       ],
     },
     {

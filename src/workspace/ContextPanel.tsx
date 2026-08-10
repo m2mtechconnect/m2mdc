@@ -20,7 +20,7 @@ const TITLES: Record<string, string> = {
   configure: 'Configure model',
   simulate: 'Simulate scenario',
   compare: 'Compare runs',
-  decide: 'Decide and record',
+  decide: 'Review and record',
   assist: 'AURA assistant',
 };
 

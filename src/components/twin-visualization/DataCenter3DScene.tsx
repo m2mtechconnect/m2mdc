@@ -60,6 +60,8 @@ interface DataCenter3DSceneProps {
   showThermal?: boolean;
   showEvents?: boolean;
   compact?: boolean;
+  /** Fill the parent container instead of using a fixed preview height. */
+  fill?: boolean;
   mode?: 'dashboard' | 'blueprint' | 'simulation';
   onRackClick?: (rackId: string) => void;
   /** Active overlay domain - binds to KPI tab selection */
@@ -484,10 +486,14 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
     );
   }
 
-  const height = props.compact ? 'h-72' : 'h-[450px]';
+  const height = props.fill ? 'h-full' : props.compact ? 'h-72' : 'h-[450px]';
 
   return (
-    <div className={`relative ${height} w-full rounded-lg overflow-hidden border border-slate-700/50 bg-[#0a0a14]`}>
+    <div
+      className={`relative ${height} w-full overflow-hidden bg-[#0a0a14] ${
+        props.fill ? '' : 'rounded-lg border border-slate-700/50'
+      }`}
+    >
       {/* Zoom controls overlay */}
       <ZoomControlsOverlay
         onZoomIn={handleZoomIn}

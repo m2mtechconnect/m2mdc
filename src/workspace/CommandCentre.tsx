@@ -15,7 +15,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, AlertTriangle, ArrowRight, Boxes, ClipboardCheck, FileText, PlayCircle, Plug } from 'lucide-react';
-import { KPI_DESCRIPTORS, deriveKpis, formatKpi, formatPower, useFacilityModel } from './facilityModel';
+import { KPI_DESCRIPTORS, deriveKpis, formatKpi, formatPower, useFacilityModel, type KpiKey } from './facilityModel';
+import { blueprintHrefForKpi, evidenceHrefForKpi, layerLabelForKpi } from './kpiDrilldown';
 import { FacilityFloorPlan } from './FacilityFloorPlan';
 import { useWorkspaceStore } from './workspaceStore';
 import { isFixtureRun, useSeededRunFixtures } from './runFixtures';
@@ -93,15 +94,19 @@ export default function CommandCentre() {
             const descriptor = KPI_DESCRIPTORS[key];
             const value = latestRun ? latestRun.result[key] : kpis[key];
             return (
-              <div key={key} className="rounded-lg border border-border bg-card px-3 py-2.5" data-testid={`command-kpi-${key}`}>
-                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{descriptor.label}</p>
-                <p className="mt-1 text-lg font-semibold tabular-nums text-foreground">{formatKpi(key, value)}</p>
-              </div>
+              <KpiTile
+                key={key}
+                kpiKey={key}
+                label={descriptor.label}
+                value={formatKpi(key, value)}
+                facilityId={facility.id}
+              />
             );
           })}
         </div>
         <p className="mt-2 text-[11px] text-muted-foreground">
           Values are derived from the modelled configuration{latestRun ? ` and run ${latestRun.id}` : ''}. They are not measured facility data.
+          Select an indicator to open its Blueprint layer, or Evidence for its provenance.
         </p>
       </section>
 
@@ -152,18 +157,22 @@ export default function CommandCentre() {
             <AttentionItem
               label={`${pendingDecisions} recommendation${pendingDecisions === 1 ? '' : 's'} awaiting review`}
               detail="Recorded in the simulation workspace"
-              to="/simulation"
+              to={
+                latestRun
+                  ? `/simulation?run=${encodeURIComponent(latestRun.id)}&review=pending`
+                  : '/simulation?review=pending'
+              }
             />
             <AttentionItem
               label="Live facility telemetry unavailable"
               detail="All indicators are simulated model outputs"
-              to="/settings/integrations/nvidia-dsx"
+              to="/dsx/evidence-beta/evidence?focus=data-mode"
             />
             {isFallback && (
               <AttentionItem
                 label="Reference facility model in use"
                 detail="No saved blueprint was loaded for this account"
-                to={blueprintHref}
+                to={`${blueprintHref}?tab=model&layer=thermal`}
               />
             )}
           </CardContent>
@@ -325,6 +334,50 @@ function AttentionItem({ label, detail, to }: { label: string; detail: string; t
       <span className="block text-[13px] font-medium text-foreground">{label}</span>
       <span className="mt-0.5 block text-[11px] text-muted-foreground">{detail}</span>
     </Link>
+  );
+}
+
+/**
+ * A KPI tile is a drilldown, not a readout: the value opens the Blueprint
+ * layer the metric is derived from, and a secondary link opens the Evidence
+ * workspace that documents its provenance.
+ */
+function KpiTile({
+  kpiKey,
+  label,
+  value,
+  facilityId,
+}: {
+  kpiKey: KpiKey;
+  label: string;
+  value: string;
+  facilityId: string;
+}) {
+  return (
+    <div
+      className="rounded-lg border border-border bg-card transition-colors focus-within:border-primary/60 hover:border-primary/40"
+      data-testid={`command-kpi-${kpiKey}`}
+    >
+      <Link
+        to={blueprintHrefForKpi(facilityId, kpiKey)}
+        className="block rounded-t-lg px-3 pt-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        data-testid={`command-kpi-${kpiKey}-blueprint`}
+        aria-label={`${label}: open the ${layerLabelForKpi(kpiKey)} layer in Blueprint`}
+      >
+        <span className="block text-[11px] uppercase tracking-wide text-muted-foreground">{label}</span>
+        <span className="mt-1 block text-lg font-semibold tabular-nums text-foreground">{value}</span>
+      </Link>
+      <div className="px-3 pb-2 pt-1">
+        <Link
+          to={evidenceHrefForKpi(kpiKey)}
+          className="text-[11px] text-muted-foreground underline-offset-2 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          data-testid={`command-kpi-${kpiKey}-evidence`}
+          aria-label={`${label}: open evidence and provenance`}
+        >
+          Evidence
+        </Link>
+      </div>
+    </div>
   );
 }
 

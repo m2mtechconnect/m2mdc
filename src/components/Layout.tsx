@@ -47,6 +47,7 @@ import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { OperatingStateBar } from "@/components/capability/OperatingStateBar";
+import { useShellLayoutStore } from "@/stores/shellLayoutStore";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -94,6 +95,7 @@ const getFirstName = (user: User | null): string => {
 };
 
 export function Layout({ children }: LayoutProps) {
+  const fullBleed = useShellLayoutStore((s) => s.fullBleed);
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -504,12 +506,18 @@ export function Layout({ children }: LayoutProps) {
       </Sheet>
 
       {/* Main Content */}
-      <main className="flex-1 w-full mx-auto max-w-[1680px] px-[clamp(8px,2vw,16px)] sm:px-[clamp(12px,3vw,20px)] md:px-[clamp(16px,4vw,24px)] lg:px-[clamp(20px,5vw,32px)]">
+      <main
+        className={
+          fullBleed
+            ? "flex-1 w-full"
+            : "flex-1 w-full mx-auto max-w-[1680px] px-[clamp(8px,2vw,16px)] sm:px-[clamp(12px,3vw,20px)] md:px-[clamp(16px,4vw,24px)] lg:px-[clamp(20px,5vw,32px)]"
+        }
+      >
         {children}
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-card/50 backdrop-blur-sm">
+      <footer className={`border-t border-border bg-card/50 backdrop-blur-sm${fullBleed ? " hidden" : ""}`}>
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">

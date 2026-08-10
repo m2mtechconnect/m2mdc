@@ -19,6 +19,7 @@ import {
   formatCalculatedAt,
   useRunProvenance,
 } from '@/capabilities/runProvenance';
+import { useWorkspaceStore } from '@/workspace/workspaceStore';
 
 interface Props {
   className?: string;
@@ -29,8 +30,13 @@ interface Props {
 export function OperatingStateBar({ className, scenario, runId }: Props) {
   const mode = OPERATING_MODES[ACTIVE_MODE];
   const provenance = useRunProvenance();
-  const id = runId ?? provenance.runId ?? RUN_UNAVAILABLE_LABEL;
-  const calculatedAt = formatCalculatedAt(provenance.calculatedAt);
+  // The workspace records its own runs; prefer the most recent one so the
+  // bar always reflects the run whose values are on screen.
+  const workspaceRun = useWorkspaceStore((s) => s.runs.find((r) => r.id === s.activeRunId) ?? s.runs[0] ?? null);
+  const resolvedRunId = runId ?? workspaceRun?.id ?? provenance.runId;
+  const resolvedCalculatedAt = workspaceRun?.completedAt ?? provenance.calculatedAt;
+  const id = resolvedRunId ?? RUN_UNAVAILABLE_LABEL;
+  const calculatedAt = formatCalculatedAt(resolvedCalculatedAt);
 
   return (
     <div
@@ -47,15 +53,17 @@ export function OperatingStateBar({ className, scenario, runId }: Props) {
       <Badge variant="outline" className={cn('rounded-sm px-1.5 py-0 text-[11px] font-semibold uppercase tracking-wider', mode.className)}>
         {mode.mode}
       </Badge>
-      <span className="font-medium text-foreground">{scenario ?? activeScenarioLabel()}</span>
+      <span className="font-medium text-foreground">
+        {scenario ?? workspaceRun?.scenarioLabel ?? activeScenarioLabel()}
+      </span>
       <span className="text-muted-foreground" data-testid="operating-state-run-id">
         Run {id}
       </span>
       <span className="text-muted-foreground">{INPUT_CLASSIFICATION}</span>
       <span className="text-muted-foreground" data-testid="operating-state-calculated-at">
         Last calculated:{' '}
-        {provenance.calculatedAt ? (
-          <time dateTime={provenance.calculatedAt}>{calculatedAt}</time>
+        {resolvedCalculatedAt ? (
+          <time dateTime={resolvedCalculatedAt}>{calculatedAt}</time>
         ) : (
           <span>{RUN_UNAVAILABLE_LABEL}</span>
         )}
@@ -71,7 +79,7 @@ export function OperatingStateBar({ className, scenario, runId }: Props) {
           </TooltipTrigger>
           <TooltipContent side="bottom" className="max-w-xs text-xs">
             {OPERATING_STATE_TOOLTIP}
-            {!provenance.available && <span className="mt-1 block">{NO_RUN_NOTICE}</span>}
+            {!provenance.available && !workspaceRun && <span className="mt-1 block">{NO_RUN_NOTICE}</span>}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

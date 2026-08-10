@@ -157,18 +157,22 @@ export default function CommandCentre() {
             <AttentionItem
               label={`${pendingDecisions} recommendation${pendingDecisions === 1 ? '' : 's'} awaiting review`}
               detail="Recorded in the simulation workspace"
-              to="/simulation"
+              to={
+                latestRun
+                  ? `/simulation?run=${encodeURIComponent(latestRun.id)}&review=pending`
+                  : '/simulation?review=pending'
+              }
             />
             <AttentionItem
               label="Live facility telemetry unavailable"
               detail="All indicators are simulated model outputs"
-              to="/settings/integrations/nvidia-dsx"
+              to="/dsx/evidence-beta/evidence?focus=data-mode"
             />
             {isFallback && (
               <AttentionItem
                 label="Reference facility model in use"
                 detail="No saved blueprint was loaded for this account"
-                to={blueprintHref}
+                to={`${blueprintHref}?tab=model&layer=thermal`}
               />
             )}
           </CardContent>

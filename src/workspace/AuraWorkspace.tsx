@@ -7,6 +7,7 @@
  * there are no duplicate KPI cards or scattered call-to-action buttons.
  */
 import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { PanelRightOpen } from 'lucide-react';
@@ -21,6 +22,7 @@ import { EvidenceDrawer } from './EvidenceDrawer';
 import { RoleViewSelector } from './RoleViewSelector';
 import { useFacilityModel } from './facilityModel';
 import { ROLE_VIEWS, useWorkspaceStore } from './workspaceStore';
+import { useSeededRunFixtures } from './runFixtures';
 
 /** True below the lg breakpoint (1280px), where the panel becomes a sheet. */
 function useBelowXl(): boolean {
@@ -36,12 +38,18 @@ function useBelowXl(): boolean {
 }
 
 export default function AuraWorkspace() {
+  useSeededRunFixtures();
   const { facility, assets, isFallback } = useFacilityModel();
   const overrides = useWorkspaceStore((s) => s.overrides);
   const panelOpen = useWorkspaceStore((s) => s.panelOpen);
   const setPanelOpen = useWorkspaceStore((s) => s.setPanelOpen);
   const roleView = useWorkspaceStore((s) => s.roleView);
   const setTool = useWorkspaceStore((s) => s.setTool);
+  const runs = useWorkspaceStore((s) => s.runs);
+  const setActiveRun = useWorkspaceStore((s) => s.setActiveRun);
+  const toggleCompareRun = useWorkspaceStore((s) => s.toggleCompareRun);
+  const selectAsset = useWorkspaceStore((s) => s.selectAsset);
+  const [searchParams] = useSearchParams();
   const isMobile = useIsMobile();
   const belowXl = useBelowXl();
   const setFullBleed = useShellLayoutStore((s) => s.setFullBleed);
@@ -72,6 +80,33 @@ export default function AuraWorkspace() {
     setTool(ROLE_VIEWS[roleView].defaultTool);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roleView]);
+
+  // Deep links from the command centre: open a run result, a comparison, or
+  // an asset. Routing state is explicit in the URL, never component-local.
+  const runParam = searchParams.get('run');
+  const compareParam = searchParams.get('compare');
+  const assetParam = searchParams.get('asset');
+  useEffect(() => {
+    if (assetParam) {
+      selectAsset(assetParam);
+      setTool('inspect');
+    }
+    if (compareParam) {
+      const ids = compareParam.split(',').filter((id) => runs.some((r) => r.id === id));
+      if (ids.length > 0) {
+        ids.slice(0, 2).forEach((id) => toggleCompareRun(id));
+        setActiveRun(ids[0]);
+        setTool('compare');
+        return;
+      }
+    }
+    if (runParam && runs.some((r) => r.id === runParam)) {
+      setActiveRun(runParam);
+      setTool('compare');
+    }
+    // Deep links are applied once per URL change, not on every run mutation.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [runParam, compareParam, assetParam, runs.length]);
 
   return (
     <TwinOverlayProvider twinId={facility.id} defaultOverlay="thermal">

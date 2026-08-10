@@ -60,6 +60,8 @@ interface DataCenter3DSceneProps {
   showThermal?: boolean;
   showEvents?: boolean;
   compact?: boolean;
+  /** Fill the parent container instead of using a fixed preview height. */
+  fill?: boolean;
   mode?: 'dashboard' | 'blueprint' | 'simulation';
   onRackClick?: (rackId: string) => void;
   /** Active overlay domain - binds to KPI tab selection */

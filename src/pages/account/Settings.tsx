@@ -376,7 +376,7 @@ export default function Settings() {
           <div className="flex justify-end gap-3">
             <Button
               variant="outline"
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/dashboard')}
             >
               Cancel
             </Button>

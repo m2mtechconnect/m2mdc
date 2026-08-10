@@ -21,6 +21,12 @@ export interface RouteAlias {
 }
 
 export const ROUTE_ALIASES: RouteAlias[] = [
+  // Stage 6G: /dashboard is the canonical Dashboard destination.
+  { from: '/', to: '/dashboard' },
+  { from: '/command', to: '/dashboard' },
+  { from: '/evidence', to: '/dsx/evidence-beta/evidence' },
+  { from: '/build', to: '/builder' },
+  { from: '/admin', to: '/admin/signups-dashboard' },
   { from: '/operations', to: '/analytics' },
   { from: '/intelligence', to: '/analytics' },
   { from: '/marketplace/integrations', to: '/integrations' },

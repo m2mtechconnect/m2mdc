@@ -80,7 +80,7 @@ function TwinManageRedirect() {
 function ApprovedUserRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />} />
+      {/* Stage 6G: /dashboard is canonical; `/` redirects via ROUTE_ALIASES. */}
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/builder" element={<Builder />} />
       <Route path="/deploy" element={<Deploy />} />

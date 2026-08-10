@@ -144,7 +144,7 @@ export default function SystemManage() {
           title: 'Success',
           description: 'System archived successfully',
         });
-        navigate('/');
+        navigate('/dashboard');
       }
     }
   };
@@ -171,7 +171,7 @@ export default function SystemManage() {
             <p className="text-muted-foreground mb-4">
               {error instanceof Error ? error.message : 'The system you are looking for does not exist or you do not have access to it.'}
             </p>
-            <Button onClick={() => navigate('/')}>
+            <Button onClick={() => navigate('/dashboard')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
@@ -188,7 +188,7 @@ export default function SystemManage() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/dashboard')}
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />

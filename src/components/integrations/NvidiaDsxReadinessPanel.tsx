@@ -123,11 +123,5 @@ export function NvidiaDsxReadinessPanel({ heading = 'h2' }: { heading?: 'h1' | '
       </div>
   );
 }
-
-export default function NvidiaDsxReadiness() {
-  return (
-    <div className="pb-10" data-testid="page-content">
-      <NvidiaDsxReadinessPanel heading="h1" />
-    </div>
-  );
-}
+// Single canonical readiness implementation: <NvidiaDsxReadinessPanel /> is
+// mounted only by /integrations. No standalone page wrapper exists (Stage 6G).

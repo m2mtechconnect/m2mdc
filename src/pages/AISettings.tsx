@@ -162,7 +162,7 @@ export default function AISettings() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-8" data-testid="page-content">
+    <div className="w-full min-w-0 py-8 space-y-8" data-testid="ai-settings-workspace">
         <DCSectionHeader
           title={t("aiSettings.title")}
           subtitle={t("aiSettings.subtitle")}

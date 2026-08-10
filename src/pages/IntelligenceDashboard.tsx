@@ -195,7 +195,8 @@ export default function IntelligenceDashboard() {
           component: 'IntelligenceDashboard',
           metadata: { facility, error: (err as Error)?.message },
         });
-        return { data: { overview: null } };
+        // Truthful unavailable state: the request failed, this is not "no data".
+        return { unavailable: true, data: { overview: null } };
       }
     },
     retry: false,
@@ -221,7 +222,7 @@ export default function IntelligenceDashboard() {
           component: 'IntelligenceDashboard',
           metadata: { facility, error: (err as Error)?.message },
         });
-        return { data: { systems: [], total: 0, page: 1, pageSize: 50 } };
+        return { unavailable: true, data: { systems: [], total: 0, page: 1, pageSize: 50 } };
       }
     },
     retry: false,
@@ -420,7 +421,16 @@ export default function IntelligenceDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6 max-w-[1600px]">
+      <div className="w-full min-w-0 px-0 py-6 max-w-[1600px] mx-auto">
+        {(opsOverview?.unavailable || systemsData?.unavailable) && (
+          <div
+            role="status"
+            className="mb-4 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground"
+          >
+            Operational telemetry service is unavailable in this environment. Charts below
+            show simulated model values only; no live facility data was retrieved.
+          </div>
+        )}
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>

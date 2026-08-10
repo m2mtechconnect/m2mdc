@@ -39,7 +39,7 @@ export default function Playbook() {
           onClick={() => {
             // Navigate back to the main AI Workspace where recommendations are displayed
             // The Zustand store will restore the recommendations state and scroll position
-            navigate('/');
+            navigate('/dashboard');
           }}
           className="mb-6"
         >

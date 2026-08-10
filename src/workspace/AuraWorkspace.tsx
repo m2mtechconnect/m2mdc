@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { PanelRightOpen } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TwinOverlayProvider } from '@/context/TwinOverlayContext';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useShellLayoutStore } from '@/stores/shellLayoutStore';
 import { FacilityCanvas } from './FacilityCanvas';
 import { KpiStrip } from './KpiStrip';
@@ -40,6 +41,7 @@ function useBelowXl(): boolean {
 export default function AuraWorkspace() {
   useSeededRunFixtures();
   const { facility, assets, isFallback } = useFacilityModel();
+  const { activeTwinId, twins, setActiveTwin } = useActiveTwin();
   const overrides = useWorkspaceStore((s) => s.overrides);
   const panelOpen = useWorkspaceStore((s) => s.panelOpen);
   const setPanelOpen = useWorkspaceStore((s) => s.setPanelOpen);
@@ -86,6 +88,7 @@ export default function AuraWorkspace() {
   const runParam = searchParams.get('run');
   const compareParam = searchParams.get('compare');
   const assetParam = searchParams.get('asset');
+  const twinParam = searchParams.get('twin');
   useEffect(() => {
     if (assetParam) {
       selectAsset(assetParam);
@@ -107,6 +110,18 @@ export default function AuraWorkspace() {
     // Deep links are applied once per URL change, not on every run mutation.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [runParam, compareParam, assetParam, runs.length]);
+
+  // Facility preselection: a ?twin=... deep-link from the command centre
+  // (or a shared URL) should activate that facility if the user has access.
+  useEffect(() => {
+    if (!twinParam || twinParam === activeTwinId) return;
+    const requestedTwin = twins.find((t) => t.id === twinParam);
+    if (requestedTwin) {
+      setActiveTwin(requestedTwin.id);
+    }
+    // Only react to explicit twinParam changes; ignore activeTwinId updates.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [twinParam]);
 
   return (
     <TwinOverlayProvider twinId={facility.id} defaultOverlay="thermal">

@@ -337,6 +337,62 @@ function AttentionItem({ label, detail, to }: { label: string; detail: string; t
   );
 }
 
+/**
+ * A KPI tile is a drilldown, not a readout: the value opens the Blueprint
+ * layer the metric is derived from, and a secondary link opens the Evidence
+ * workspace that documents its provenance.
+ */
+function KpiTile({
+  kpiKey,
+  label,
+  value,
+  facilityId,
+}: {
+  kpiKey: KpiKey;
+  label: string;
+  value: string;
+  facilityId: string;
+}) {
+  return (
+    <div
+      className="rounded-lg border border-border bg-card transition-colors focus-within:border-primary/60 hover:border-primary/40"
+      data-testid={`command-kpi-${kpiKey}`}
+    >
+      <Link
+        to={blueprintHrefForKpi(facilityId, kpiKey)}
+        className="block rounded-t-lg px-3 pt-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        data-testid={`command-kpi-${kpiKey}-blueprint`}
+        aria-label={`${label}: open the ${layerLabelForKpi(kpiKey)} layer in Blueprint`}
+      >
+        <span className="block text-[11px] uppercase tracking-wide text-muted-foreground">{label}</span>
+        <span className="mt-1 block text-lg font-semibold tabular-nums text-foreground">{value}</span>
+      </Link>
+      <div className="px-3 pb-2 pt-1">
+        <Link
+          to={evidenceHrefForKpi(kpiKey)}
+          className="text-[11px] text-muted-foreground underline-offset-2 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          data-testid={`command-kpi-${kpiKey}-evidence`}
+          aria-label={`${label}: open evidence and provenance`}
+        >
+          Evidence
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function AttentionItemLegacyRemoved() {
+  return (
+    <Link
+      to={to}
+      className="block rounded-md border border-border px-3 py-2 transition-colors hover:border-primary/50 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      <span className="block text-[13px] font-medium text-foreground">{label}</span>
+      <span className="mt-0.5 block text-[11px] text-muted-foreground">{detail}</span>
+    </Link>
+  );
+}
+
 function NextStep({ to, title, description }: { to: string; title: string; description: string }) {
   return (
     <Link

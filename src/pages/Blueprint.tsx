@@ -58,6 +58,7 @@ import { BlueprintCoPilotPanel, CoPilotModeHeader } from '@/components/copilot';
 import { SnapshotBadge, ModeBadge, LastUpdatedBadge, SnapshotHeader } from '@/components/ui/snapshot-indicator';
 import { KpiTooltip } from '@/components/ui/kpi-tooltip';
 import { LoadingState, SnapshotNotFoundEmptyState } from '@/components/ui/empty-state';
+import { BlueprintModelSection } from '@/workspace/BlueprintModelSection';
 function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: any }) {
   const { createTwin } = useActiveTwin();
   const { toast } = useToast();
@@ -135,7 +136,7 @@ export default function Blueprint() {
   // Read tab and highlight from query params
   const tabParam = searchParams.get('tab');
   const highlightParam = searchParams.get('highlight');
-  const [activeTab, setActiveTab] = useState(tabParam || 'overview');
+  const [activeTab, setActiveTab] = useState(tabParam || 'model');
   
   // Switch tab when query param changes
   useEffect(() => {
@@ -306,6 +307,7 @@ export default function Blueprint() {
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="w-full justify-start border-b rounded-none bg-transparent p-0 h-auto flex-wrap gap-1">
                   {[
+                    { value: 'model', label: 'Facility model' },
                     { value: 'overview', label: 'Overview' },
                     { value: 'agents', label: 'Agents' },
                     { value: 'data', label: 'Data' },
@@ -329,6 +331,9 @@ export default function Blueprint() {
                 </TabsList>
 
                 <div className="mt-6">
+                  <TabsContent value="model" className="m-0">
+                    <BlueprintModelSection />
+                  </TabsContent>
                   <TabsContent value="overview" className="m-0">
                     <BlueprintOverviewTab blueprint={blueprint} summary={summary} />
                   </TabsContent>

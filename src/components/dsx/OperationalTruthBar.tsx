@@ -30,7 +30,7 @@ export function OperationalTruthBar() {
       tabIndex={0}
       data-testid="dsx-truth-bar"
       data-mode={rt.snapshot.data_mode}
-      className="relative flex w-full min-w-0 max-w-full flex-nowrap items-center gap-x-4 gap-y-2 overflow-x-auto border-b border-border bg-muted/40 px-3 py-2 sm:flex-wrap sm:gap-x-5 sm:overflow-x-visible sm:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="flex w-full min-w-0 max-w-full flex-nowrap items-center gap-x-4 gap-y-2 overflow-x-auto border-b border-border bg-muted/40 px-3 py-2 sm:flex-wrap sm:gap-x-5 sm:overflow-x-visible sm:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <Field label="Facility" value={EVIDENCE_BETA_SITE.name} />
       <span className="flex shrink-0 flex-col gap-0.5">
@@ -62,9 +62,12 @@ export function OperationalTruthBar() {
         <FreshnessIndicator freshness={freshness} />
       </span>
       <SafetyChip className="shrink-0 sm:ml-auto" />
-      {/* Anchored to the bar so the visually hidden node can never extend the
-          document's scroll width on narrow desktop widths. */}
-      <span className="sr-only left-0 top-0">{exchange.reason}</span>
+      {/* The visually hidden note is anchored inside a zero-width relative
+          wrapper so its absolute box can never extend the document scroll
+          width when the bar is not clipping (sm and up). */}
+      <span className="relative block h-0 w-0 shrink-0">
+        <span className="sr-only left-0 top-0">{exchange.reason}</span>
+      </span>
     </div>
   );
 }

@@ -247,6 +247,8 @@ export function ActionCenter({ items }: { items: AttentionItem[] }) {
           </Button>
         </div>
       )}
+
+      <ActionDetailDrawer item={openItem} onClose={() => setOpenId(null)} />
     </section>
   );
 }

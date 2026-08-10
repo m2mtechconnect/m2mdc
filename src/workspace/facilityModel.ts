@@ -11,6 +11,11 @@
 import { useMemo } from 'react';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { resolveFacilityNaming } from '@/workspace/facilityNaming';
+import { formatPower, normaliseStoredCapacityKw, powerAriaLabel } from '@/lib/units/power';
+
+// Power formatting has a single owner: `@/lib/units/power`. Re-exported here
+// so existing workspace imports keep working without a second implementation.
+export { formatPower, powerAriaLabel };
 
 /** Deterministic 32-bit hash -> seeded PRNG (no runtime randomness). */
 export function seededRandom(seed: string): () => number {
@@ -55,6 +60,11 @@ export interface FacilityDefinition {
   carbonIntensity: number;
   sovereigntyLevel: string;
   industry: string;
+  /**
+   * Racks the model can plausibly support at design capacity. `rackCount` is
+   * the rendered subset, capped so the canvas stays interactive.
+   */
+  designRackEstimate: number;
 }
 
 export interface FacilityNamingContext {
@@ -260,16 +270,6 @@ export function formatKpi(key: KpiKey, value: number): string {
   const d = KPI_DESCRIPTORS[key];
   if (key === 'itLoadKw') return formatPower(value);
   return `${value.toFixed(d.precision)}${d.unit}`;
-}
-
-/**
- * Power is modelled in kilowatts. Render kW below 1 MW and MW above it so
- * facility-scale figures are never shown as five-digit kW or as watts.
- */
-export function formatPower(kw: number): string {
-  if (!Number.isFinite(kw)) return '-';
-  if (Math.abs(kw) >= 1000) return `${(kw / 1000).toFixed(kw >= 10000 ? 1 : 2)} MW`;
-  return `${Math.round(kw).toLocaleString()} kW`;
 }
 
 /** Deterministic asset tree derived from the facility definition. */

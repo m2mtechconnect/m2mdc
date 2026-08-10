@@ -6,6 +6,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { isUuid } from '@/lib/identifiers';
 import { generateDefaultBlueprint } from '@/data/defaultBlueprint';
 import { dcToolRegistry, type DcToolDefinition } from '@/data/dcToolRegistry';
 import { getSovereigntyEngine, mockDataAssets, mockDataFlows, mockSovereigntyPolicies, mockComplianceFrameworks } from '@/sovereignty';

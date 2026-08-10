@@ -12,23 +12,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import m2mLogo from "@/assets/m2m-logo.png";
 import {
-  LayoutDashboard,
-  Wrench,
-  BarChart3,
-  Shield,
-  Users,
   HelpCircle,
   Menu,
   X,
   Command,
   LogOut,
-  Server,
-  Activity,
-  Boxes,
-  Monitor,
-  MoreHorizontal,
+  SlidersHorizontal,
 } from "lucide-react";
-import { User } from '@supabase/supabase-js';
 import GlobalSearchBar from "@/components/search/GlobalSearchBar";
 import { CoPilotPanel } from "@/components/copilot/CoPilotPanel";
 import { CoPilotBubble } from "@/components/copilot/CoPilotBubble";
@@ -43,9 +33,11 @@ import { DataCentreSelector } from "@/components/twin-selector";
 import { HelpMenu } from "@/components/header/HelpMenu";
 import { useTourAutoStart } from "@/tours/useTourAutoStart";
 import { useRBAC } from "@/contexts/RBACContext";
-import { getRoleNavigation } from "@/config/roleDashboardConfig";
-import { Badge } from "@/components/ui/badge";
-import { useTranslation } from "react-i18next";
+import {
+  WORKSPACE_NAV,
+  isNavItemActive,
+  visibleManageNav,
+} from "@/config/appNavigation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { OperatingStateBar } from "@/components/capability/OperatingStateBar";
 import { useShellLayoutStore } from "@/stores/shellLayoutStore";
@@ -54,101 +46,23 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
-// Fallback navigation (used during loading)
-const fallbackPrimary = [
-  { name: "Command", fullName: "Data Centre Command", href: "/", icon: LayoutDashboard, group: 'primary' as const },
-  { name: "Blueprint", fullName: "Facility Blueprint", href: "/blueprint", icon: Boxes, group: 'primary' as const },
-  { name: "Simulation", fullName: "Simulation Workspace", href: "/simulation", icon: Activity, group: 'primary' as const },
-  { name: "Build", fullName: "Build Data Centre Twin", href: "/builder", icon: Wrench, group: 'primary' as const },
-  { name: "Agents", fullName: "Subsystem Agents", href: "/app/agents", icon: Server, group: 'primary' as const },
-];
-
-const fallbackSecondary = [
-  { name: "Analytics", fullName: "Telemetry & Analytics", href: "/intelligence", icon: BarChart3, group: 'secondary' as const },
-  { name: "Audit", fullName: "Sovereignty & Safety Audit", href: "/compliance", icon: Shield, group: 'secondary' as const },
-  { name: "Teams", fullName: "Teams", href: "/teams", icon: Users, group: 'secondary' as const },
-];
-
-// Helper function to get time-based greeting key
-const getGreetingKey = () => {
-  const hour = new Date().getHours();
-  if (hour < 12) return "layout.goodMorning";
-  if (hour < 18) return "layout.goodAfternoon";
-  return "layout.goodEvening";
-};
-
-// Helper function to extract first name from user
-const getFirstName = (user: User | null): string => {
-  if (!user) return "there";
-  
-  if (user.user_metadata?.full_name) {
-    return user.user_metadata.full_name.split(' ')[0];
-  }
-  if (user.user_metadata?.first_name) {
-    return user.user_metadata.first_name;
-  }
-  
-  if (user.email) {
-    const username = user.email.split('@')[0];
-    return username.charAt(0).toUpperCase() + username.slice(1).split(/[._-]/)[0];
-  }
-  
-  return "there";
-};
-
 export function Layout({ children }: LayoutProps) {
   const fullBleed = useShellLayoutStore((s) => s.fullBleed);
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
   const { isOpen, setIsOpen } = useCoPilot();
-  const [greeting, setGreeting] = useState(getGreetingKey());
-  const { t } = useTranslation();
-  const { role, loading: roleLoading } = useRBAC();
-  
-  // Role-adaptive navigation
-  const roleNav = getRoleNavigation(role);
-  const primaryNavigation = roleLoading ? fallbackPrimary : roleNav.primary;
-  const secondaryNavigation = roleLoading ? fallbackSecondary : roleNav.secondary;
+  const { can, loading: roleLoading } = useRBAC();
+
+  // Canonical information architecture. Workspaces are always visible;
+  // authoring and administration collapse into a single Manage group.
+  const workspaceNavigation = WORKSPACE_NAV;
+  const manageNavigation = roleLoading ? [] : visibleManageNav(can);
   const headerRef = useRef<HTMLElement>(null);
 
   // Auto-start tours based on route and user state
   useTourAutoStart();
-
-  useEffect(() => {
-    // Application-owned lifecycle boundary for supabase.auth.getUser.
-    // Rejections from a disposed owner (e.g. route change while the request
-    // is in flight) must not surface as ambient unhandled errors, but a
-    // failure from the currently-mounted owner remains observable.
-    let mounted = true;
-    supabase.auth.getUser()
-      .then(({ data: { user } }) => {
-        if (mounted) setUser(user);
-      })
-      .catch((err) => {
-        if (mounted) {
-          console.error('[Layout] auth.getUser failed for mounted owner:', err);
-        }
-      });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (mounted) setUser(session?.user ?? null);
-    });
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setGreeting(getGreetingKey());
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -190,7 +104,7 @@ export function Layout({ children }: LayoutProps) {
         aria-label="Primary navigation"
       >
         <div className="mx-auto max-w-[1920px] flex items-center justify-between px-[clamp(16px,4vw,32px)] py-3">
-          {/* Logo and Greeting */}
+          {/* Brand, facility context and workspace navigation */}
           <div className="flex items-center gap-3 lg:gap-6 min-w-0">
             <Link to="/" className="flex items-center flex-shrink-0 group">
               <img 
@@ -200,26 +114,17 @@ export function Layout({ children }: LayoutProps) {
               />
             </Link>
 
-            {/* Dynamic Greeting */}
-            <div className="hidden md:flex items-center text-sm text-muted-foreground">
-              {t(greeting)}, <span className="ml-1 font-medium text-foreground">{getFirstName(user)}</span>
-            </div>
-
             {/* Data Centre Twin Selector */}
             <div className="hidden lg:block" data-tour="dc-selector">
               <DataCentreSelector />
             </div>
 
-            {/* Desktop Navigation - Full labels on 2xl+, icons on lg-xl */}
-            <nav className="hidden lg:flex items-center gap-0.5" aria-label="Main menu">
-              {/* Primary navigation - always visible on lg+ */}
-              {primaryNavigation.map((item) => {
-                const isActive = item.href.includes('?') 
-                  ? location.pathname + location.search === item.href
-                  : location.pathname === item.href;
-                const tourId = item.href === '/' ? 'nav-dashboard' : 
-                  item.href === '/builder' ? 'nav-builder' :
-                  item.href === '/app/agents' ? 'nav-agents' : undefined;
+            {/* Workspace navigation: five destinations, always the same five. */}
+            <nav className="hidden lg:flex items-center gap-0.5" aria-label="Workspaces">
+              {workspaceNavigation.map((item) => {
+                const isActive = isNavItemActive(item, location.pathname);
+                const tourId = item.href === '/' ? 'nav-dashboard' :
+                  item.href === '/simulation' ? 'nav-simulation' : undefined;
                 return (
                   <Tooltip key={item.name}>
                     <TooltipTrigger asChild>
@@ -234,104 +139,62 @@ export function Layout({ children }: LayoutProps) {
                         <Link
                           to={item.href}
                           data-tour={tourId}
+                          data-nav-item={item.name}
                           aria-label={item.fullName}
                           aria-current={isActive ? "page" : undefined}
                         >
                           <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
-                          <span className="hidden xl:inline whitespace-nowrap">{item.name}</span>
+                          {/* xl is 1536px in this project, so labels are gated at lg. */}
+                          <span className="hidden lg:inline whitespace-nowrap">{item.name}</span>
                         </Link>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="bottom">
-                      <p>{item.fullName}</p>
+                      <p>{item.description}</p>
                     </TooltipContent>
                   </Tooltip>
                 );
               })}
-              
-              {/* Separator */}
-              <div className="h-4 w-px bg-border mx-1" />
 
-              {/* Secondary navigation - full on 2xl+, dropdown below to prevent header overlap */}
-              <div className="hidden 2xl:flex items-center gap-0.5">
-                {secondaryNavigation.map((item) => {
-                  const isActive = item.href.includes('?') 
-                    ? location.pathname + location.search === item.href
-                    : location.pathname === item.href;
-                  const tourId = item.href.includes('simulation') ? 'nav-simulation' :
-                    item.href === '/intelligence' ? 'nav-analytics' :
-                    item.href === '/compliance' ? 'nav-audit' : undefined;
-                  return (
-                    <Tooltip key={item.name}>
-                      <TooltipTrigger asChild>
-                        <Button
-                          asChild
-                          variant={isActive ? "secondary" : "ghost"}
-                          size="sm"
-                          className={`gap-1.5 px-2.5 text-xs font-medium transition-smooth min-h-[36px] ${
-                            isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          <Link
-                            to={item.href}
-                            data-tour={tourId}
-                            aria-label={item.fullName}
-                            aria-current={isActive ? "page" : undefined}
-                          >
-                            <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
-                            <span className="whitespace-nowrap">{item.name}</span>
-                          </Link>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        <p>{item.fullName}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  );
-                })}
-              </div>
-
-              {/* More dropdown - visible below 2xl */}
-              <div className="2xl:hidden">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:text-foreground min-h-[36px]"
-                      aria-label="More navigation"
-                    >
-                      <MoreHorizontal className="h-3.5 w-3.5" />
-                      <span className="hidden xl:inline">More</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    {secondaryNavigation.map((item) => {
-                      const isActive = item.href.includes('?') 
-                        ? location.pathname + location.search === item.href
-                        : location.pathname === item.href;
-                      return (
-                        <DropdownMenuItem key={item.name} asChild>
-                          <Link 
-                            to={item.href}
-                            className={`flex items-center gap-2 ${isActive ? 'text-primary' : ''}`}
-                          >
-                            <item.icon className="h-4 w-4" />
-                            {item.fullName}
-                          </Link>
-                        </DropdownMenuItem>
-                      );
-                    })}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/help" className="flex items-center gap-2">
-                        <HelpCircle className="h-4 w-4" />
-                        Help
-                      </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+              {manageNavigation.length > 0 && (
+                <>
+                  <div className="h-4 w-px bg-border mx-1" />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:text-foreground min-h-[36px]"
+                        aria-label="Manage"
+                        data-nav-item="Manage"
+                      >
+                        <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span className="hidden xl:inline">Manage</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-64">
+                      {manageNavigation.map((item) => {
+                        const isActive = isNavItemActive(item, location.pathname);
+                        return (
+                          <DropdownMenuItem key={item.name} asChild>
+                            <Link
+                              to={item.href}
+                              className={`flex items-start gap-2 ${isActive ? 'text-primary' : ''}`}
+                              aria-current={isActive ? "page" : undefined}
+                            >
+                              <item.icon className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                              <span>
+                                <span className="block text-sm">{item.fullName}</span>
+                                <span className="block text-[11px] text-muted-foreground">{item.description}</span>
+                              </span>
+                            </Link>
+                          </DropdownMenuItem>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              )}
             </nav>
           </div>
 
@@ -412,14 +275,13 @@ export function Layout({ children }: LayoutProps) {
               <DataCentreSelector />
             </div>
             
-            {/* Platform Section */}
+            {/* Workspaces */}
             <div className="pb-4">
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Data Centre
+                Workspaces
               </h3>
-              {primaryNavigation.map((item) => {
-                const isActive = location.pathname === item.href || 
-                  (item.href.includes('?') && location.pathname + location.search === item.href);
+              {workspaceNavigation.map((item) => {
+                const isActive = isNavItemActive(item, location.pathname);
                 return (
                   <Button
                     key={item.name}
@@ -440,33 +302,34 @@ export function Layout({ children }: LayoutProps) {
               })}
             </div>
 
-            {/* Analytics & Simulation Section */}
-            <div className="pb-4 border-t border-border pt-4">
-              <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Analytics & Compliance
-              </h3>
-              {secondaryNavigation.map((item) => {
-                const isActive = location.pathname === item.href || 
-                  (item.href.includes('?') && location.pathname + location.search === item.href);
-                return (
-                  <Button
-                    key={item.name}
-                    asChild
-                    variant={isActive ? "secondary" : "ghost"}
-                    className="w-full justify-start gap-3 min-h-[44px] text-base"
-                  >
-                    <Link
-                      to={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      aria-current={isActive ? "page" : undefined}
+            {/* Manage */}
+            {manageNavigation.length > 0 && (
+              <div className="pb-4 border-t border-border pt-4">
+                <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Manage
+                </h3>
+                {manageNavigation.map((item) => {
+                  const isActive = isNavItemActive(item, location.pathname);
+                  return (
+                    <Button
+                      key={item.name}
+                      asChild
+                      variant={isActive ? "secondary" : "ghost"}
+                      className="w-full justify-start gap-3 min-h-[44px] text-base"
                     >
-                      <item.icon className="h-5 w-5" aria-hidden="true" />
-                      {item.fullName}
-                    </Link>
-                  </Button>
-                );
-              })}
-            </div>
+                      <Link
+                        to={item.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        aria-current={isActive ? "page" : undefined}
+                      >
+                        <item.icon className="h-5 w-5" aria-hidden="true" />
+                        {item.fullName}
+                      </Link>
+                    </Button>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Help Section */}
             <div className="pb-4 border-t border-border pt-4">

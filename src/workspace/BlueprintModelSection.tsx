@@ -16,7 +16,7 @@ import { MODEL_LAYERS } from './LayerSelector';
 import { useTwinOverlaySafe, type TwinOverlay } from '@/context/TwinOverlayContext';
 
 export function BlueprintModelSection() {
-  const { facility, assets, isFallback, naming } = useFacilityModel();
+  const { facility, assets, isFallback, naming, modelNotes } = useFacilityModel();
   const [searchParams] = useSearchParams();
   const { setOverlay } = useTwinOverlaySafe();
 
@@ -57,6 +57,9 @@ export function BlueprintModelSection() {
             Modelled facility: {facility.name} · {naming.classification} · {formatPower(facility.capacityKw)}
             {isFallback ? ' · reference model' : ''}
           </p>
+          {modelNotes.map((note) => (
+            <p key={note} className="text-[11px] text-muted-foreground">{note}</p>
+          ))}
         </div>
         <Button asChild size="sm" variant="outline">
           <Link to="/simulation">

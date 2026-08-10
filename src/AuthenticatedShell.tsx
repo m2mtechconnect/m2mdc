@@ -31,7 +31,7 @@ import ConnectHealth from "./pages/ConnectHealth";
 import Search from "./pages/Search";
 import UniversalSearch from "./pages/UniversalSearch";
 import AISettings from "./pages/AISettings";
-import NvidiaDsxReadiness from "./pages/settings/NvidiaDsxReadiness";
+import Integrations from "./pages/Integrations";
 import { SignOut } from "./pages/auth/index";
 import NotFound from "./pages/NotFound";
 import AgentWorkspace from "./pages/AgentWorkspace";
@@ -98,8 +98,9 @@ function ApprovedUserRoutes() {
       <Route path="/admin/onboarding-submissions" element={<OnboardingSubmissions />} />
       <Route path="/admin/user-approvals" element={<AdminUserApproval />} />
       <Route path="/admin/signups-dashboard" element={<AdminSignupsDashboard />} />
-      <Route path="/integrations" element={<Navigate to="/marketplace?tab=integrations" replace />} />
-      <Route path="/marketplace/integrations" element={<Marketplace />} />
+      {/* Canonical integrations destination. */}
+      <Route path="/integrations" element={<Integrations />} />
+      <Route path="/marketplace/integrations" element={<Navigate to="/integrations" replace />} />
       <Route path="/compliance" element={<Compliance />} />
       <Route path="/teams" element={<Teams />} />
       <Route path="/marketplace" element={<Marketplace />} />
@@ -123,7 +124,7 @@ function ApprovedUserRoutes() {
       <Route path="/search" element={<Search />} />
       <Route path="/universal-search" element={<UniversalSearch />} />
       <Route path="/settings/ai" element={<AISettings />} />
-      <Route path="/settings/integrations/nvidia-dsx" element={<NvidiaDsxReadiness />} />
+      <Route path="/settings/integrations/nvidia-dsx" element={<Navigate to="/integrations#nvidia-dsx" replace />} />
       <Route path="/auth" element={<Navigate to="/" replace />} />
       <Route path="/sign-in" element={<Navigate to="/" replace />} />
       <Route path="/sign-up" element={<Navigate to="/" replace />} />

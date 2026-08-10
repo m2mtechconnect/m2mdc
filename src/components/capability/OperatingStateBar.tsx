@@ -50,6 +50,10 @@ export function OperatingStateBar({ className, scenario, runId }: Props) {
         className,
       )}
     >
+      {/*
+        One state sentence, not five competing chips: mode, what is being
+        shown, and which run it came from.
+      */}
       <Badge variant="outline" className={cn('rounded-sm px-1.5 py-0 text-[11px] font-semibold uppercase tracking-wider', mode.className)}>
         {mode.mode}
       </Badge>
@@ -57,15 +61,15 @@ export function OperatingStateBar({ className, scenario, runId }: Props) {
         {scenario ?? workspaceRun?.scenarioLabel ?? activeScenarioLabel()}
       </span>
       <span className="text-muted-foreground" data-testid="operating-state-run-id">
-        Run {id}
+        {resolvedRunId ? `Run ${id}` : 'No run recorded'}
       </span>
-      <span className="text-muted-foreground">{INPUT_CLASSIFICATION}</span>
-      <span className="text-muted-foreground" data-testid="operating-state-calculated-at">
-        Last calculated:{' '}
+      <span className="hidden text-muted-foreground sm:inline" data-testid="operating-state-calculated-at">
         {resolvedCalculatedAt ? (
-          <time dateTime={resolvedCalculatedAt}>{calculatedAt}</time>
+          <>
+            Calculated <time dateTime={resolvedCalculatedAt}>{calculatedAt}</time>
+          </>
         ) : (
-          <span>{RUN_UNAVAILABLE_LABEL}</span>
+          <span>{INPUT_CLASSIFICATION}</span>
         )}
       </span>
       <TooltipProvider>

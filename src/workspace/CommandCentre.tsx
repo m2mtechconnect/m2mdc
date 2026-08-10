@@ -381,18 +381,6 @@ function KpiTile({
   );
 }
 
-function AttentionItemLegacyRemoved() {
-  return (
-    <Link
-      to={to}
-      className="block rounded-md border border-border px-3 py-2 transition-colors hover:border-primary/50 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-    >
-      <span className="block text-[13px] font-medium text-foreground">{label}</span>
-      <span className="mt-0.5 block text-[11px] text-muted-foreground">{detail}</span>
-    </Link>
-  );
-}
-
 function NextStep({ to, title, description }: { to: string; title: string; description: string }) {
   return (
     <Link

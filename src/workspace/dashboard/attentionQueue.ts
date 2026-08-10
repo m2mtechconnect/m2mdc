@@ -50,6 +50,33 @@ export const SEVERITY_META: Record<AttentionSeverity, { label: string; className
 
 const SEVERITY_ORDER: AttentionSeverity[] = ['constraint', 'review', 'informational'];
 
+/** Stage 7B - Action Center filter groups. */
+export type AttentionGroup = 'constraints' | 'data-quality' | 'readiness' | 'assumptions';
+
+export const ATTENTION_FILTERS: Array<{ id: AttentionGroup | 'all'; label: string }> = [
+  { id: 'all', label: 'All' },
+  { id: 'constraints', label: 'Constraints' },
+  { id: 'data-quality', label: 'Data quality' },
+  { id: 'readiness', label: 'Readiness' },
+  { id: 'assumptions', label: 'Assumptions' },
+];
+
+export function attentionGroup(item: AttentionItem): AttentionGroup {
+  switch (item.category) {
+    case 'Design constraint':
+    case 'Modelled risk':
+      return 'constraints';
+    case 'Data quality issue':
+      return 'data-quality';
+    case 'Evidence unavailable':
+    case 'Integration blocked':
+      return 'readiness';
+    case 'Assumption requires review':
+    default:
+      return 'assumptions';
+  }
+}
+
 export interface AttentionInputs {
   facility: FacilityDefinition;
   interpretations: KpiInterpretation[];

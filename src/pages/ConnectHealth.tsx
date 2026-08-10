@@ -35,6 +35,7 @@ export default function ConnectHealth() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <DCSectionHeader
+            as="h1"
             title={t("connectHealth.title")}
             subtitle={t("connectHealth.subtitle")}
             icon={<Activity className="h-6 w-6" />}

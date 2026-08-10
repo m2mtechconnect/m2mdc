@@ -55,7 +55,9 @@ export default function Playbook() {
                   <BookOpen className="h-6 w-6 text-primary" />
                   <Badge variant="outline">Implementation Playbook</Badge>
                 </div>
-                <CardTitle className="text-3xl mb-2">{initiativeTitle}</CardTitle>
+                <h1 className="text-3xl font-semibold leading-none tracking-tight mb-2">
+                  {initiativeTitle}
+                </h1>
                 <CardDescription>
                   Comprehensive implementation guide and best practices
                 </CardDescription>

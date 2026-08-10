@@ -80,6 +80,7 @@ export default function Search() {
     <div className="min-h-screen bg-background section-padding-lg">
       <div className="max-w-7xl mx-auto">
         <DCSectionHeader
+          as="h1"
           title={t('search.title')}
           subtitle={t('search.subtitle')}
           icon={<FileSearch className="h-5 w-5" />}

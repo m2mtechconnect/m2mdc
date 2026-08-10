@@ -31,7 +31,6 @@ import ConnectHealth from "./pages/ConnectHealth";
 import Search from "./pages/Search";
 import UniversalSearch from "./pages/UniversalSearch";
 import AISettings from "./pages/AISettings";
-import NvidiaDsxReadiness from "./pages/settings/NvidiaDsxReadiness";
 import Integrations from "./pages/Integrations";
 import { SignOut } from "./pages/auth/index";
 import NotFound from "./pages/NotFound";

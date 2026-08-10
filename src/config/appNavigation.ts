@@ -47,9 +47,9 @@ export const WORKSPACE_NAV: AppNavItem[] = [
   {
     name: 'Dashboard',
     fullName: 'Dashboard',
-    href: '/',
+    href: '/dashboard',
     icon: LayoutDashboard,
-    matches: ['/dashboard'],
+    matches: ['/dashboard', '/'],
     description: 'Read-only overview of the modelled facility.',
   },
   {

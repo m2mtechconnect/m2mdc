@@ -234,7 +234,7 @@ When asked "what do you do" or similar, give a concise outline of your capabilit
     checkAuth();
     if (!agentId) {
       toast.error("Agent ID is required");
-      navigate("/");
+      navigate("/dashboard");
     }
   }, [agentId]);
 
@@ -381,7 +381,7 @@ When asked "what do you do" or similar, give a concise outline of your capabilit
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/dashboard")}
           className="mb-3 -ml-2"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />

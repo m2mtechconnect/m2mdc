@@ -124,23 +124,25 @@ export function StandardFilters({
         {/* Industry Filter */}
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger asChild>
-              <Select 
-                value={filters.industryFilter} 
-                onValueChange={(v) => updateFilter('industryFilter', v)}
-                disabled={disabled}
-              >
+            <Select 
+              value={filters.industryFilter} 
+              onValueChange={(v) => updateFilter('industryFilter', v)}
+              disabled={disabled}
+            >
+              {/* TooltipTrigger must wrap the focusable SelectTrigger element,
+                  not the Select root (a non-forwardRef function component). */}
+              <TooltipTrigger asChild>
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="Industry" />
                 </SelectTrigger>
+              </TooltipTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Industries</SelectItem>
                   {INDUSTRIES.map(ind => (
                     <SelectItem key={ind} value={ind}>{ind}</SelectItem>
                   ))}
                 </SelectContent>
-              </Select>
-            </TooltipTrigger>
+            </Select>
             <TooltipContent>
               <p>Filter {mode === 'template' ? 'blueprints' : 'agents'} by your primary industry</p>
             </TooltipContent>
@@ -150,23 +152,23 @@ export function StandardFilters({
         {/* Department Filter */}
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger asChild>
-              <Select 
-                value={filters.departmentFilter} 
-                onValueChange={(v) => updateFilter('departmentFilter', v)}
-                disabled={disabled}
-              >
+            <Select 
+              value={filters.departmentFilter} 
+              onValueChange={(v) => updateFilter('departmentFilter', v)}
+              disabled={disabled}
+            >
+              <TooltipTrigger asChild>
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="Department" />
                 </SelectTrigger>
+              </TooltipTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Departments</SelectItem>
                   {DEPARTMENTS.map(dept => (
                     <SelectItem key={dept} value={dept}>{dept}</SelectItem>
                   ))}
                 </SelectContent>
-              </Select>
-            </TooltipTrigger>
+            </Select>
             <TooltipContent>
               <p>Filter by the team owning this {mode === 'template' ? 'twin' : 'agent'} (Ops, Supply Chain, HR, etc.)</p>
             </TooltipContent>
@@ -176,15 +178,16 @@ export function StandardFilters({
         {/* Type Filter */}
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger asChild>
-              <Select 
-                value={filters.typeFilter} 
-                onValueChange={(v) => updateFilter('typeFilter', v)}
-                disabled={disabled}
-              >
+            <Select 
+              value={filters.typeFilter} 
+              onValueChange={(v) => updateFilter('typeFilter', v)}
+              disabled={disabled}
+            >
+              <TooltipTrigger asChild>
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
+              </TooltipTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Types</SelectItem>
                   {TYPES.map(type => (
@@ -193,8 +196,7 @@ export function StandardFilters({
                     </SelectItem>
                   ))}
                 </SelectContent>
-              </Select>
-            </TooltipTrigger>
+            </Select>
             <TooltipContent>
               <p>Filter by {mode === 'template' ? 'twin/agent' : 'system'} type</p>
             </TooltipContent>
@@ -205,15 +207,16 @@ export function StandardFilters({
         {mode === 'template' && (
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger asChild>
-                <Select 
-                  value={filters.levelFilter} 
-                  onValueChange={(v) => updateFilter('levelFilter', v)}
-                  disabled={disabled}
-                >
+              <Select 
+                value={filters.levelFilter} 
+                onValueChange={(v) => updateFilter('levelFilter', v)}
+                disabled={disabled}
+              >
+                <TooltipTrigger asChild>
                   <SelectTrigger className="w-36">
                     <SelectValue placeholder="All Levels" />
                   </SelectTrigger>
+                </TooltipTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Levels</SelectItem>
                     {LEVELS.map(level => (
@@ -222,8 +225,7 @@ export function StandardFilters({
                       </SelectItem>
                     ))}
                   </SelectContent>
-                </Select>
-              </TooltipTrigger>
+              </Select>
               <TooltipContent>
                 <p>Filter by implementation complexity</p>
               </TooltipContent>
@@ -254,14 +256,20 @@ export function StandardFilters({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Badge 
-                variant={filters.showRecommended ? "default" : "outline"}
-                className="cursor-pointer hover:bg-primary/10 transition-colors"
+              <button
+                type="button"
+                aria-pressed={filters.showRecommended}
                 onClick={() => updateFilter('showRecommended', !filters.showRecommended)}
+                className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
-                <Sparkles className="h-3 w-3 mr-1" />
-                Recommended for You
-              </Badge>
+                <Badge
+                  variant={filters.showRecommended ? "default" : "outline"}
+                  className="cursor-pointer hover:bg-primary/10 transition-colors"
+                >
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  Recommended for You
+                </Badge>
+              </button>
             </TooltipTrigger>
             <TooltipContent>
               <p>{mode === 'template' 

@@ -195,7 +195,8 @@ export default function IntelligenceDashboard() {
           component: 'IntelligenceDashboard',
           metadata: { facility, error: (err as Error)?.message },
         });
-        return { data: { overview: null } };
+        // Truthful unavailable state: the request failed, this is not "no data".
+        return { unavailable: true, data: { overview: null } };
       }
     },
     retry: false,
@@ -221,7 +222,7 @@ export default function IntelligenceDashboard() {
           component: 'IntelligenceDashboard',
           metadata: { facility, error: (err as Error)?.message },
         });
-        return { data: { systems: [], total: 0, page: 1, pageSize: 50 } };
+        return { unavailable: true, data: { systems: [], total: 0, page: 1, pageSize: 50 } };
       }
     },
     retry: false,
@@ -420,10 +421,19 @@ export default function IntelligenceDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6 max-w-[1600px]">
+      <div className="w-full min-w-0 px-0 py-6 max-w-[1600px] mx-auto">
+        {(opsOverview?.unavailable || systemsData?.unavailable) && (
+          <div
+            role="status"
+            className="mb-4 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground"
+          >
+            Operational telemetry service is unavailable in this environment. Charts below
+            show simulated model values only; no live facility data was retrieved.
+          </div>
+        )}
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6 min-w-0">
+          <div className="min-w-0">
             <h1 className="text-2xl font-semibold flex items-center gap-3">
               <BarChart3 className="h-6 w-6 text-primary" />
               Telemetry & Analytics
@@ -434,7 +444,7 @@ export default function IntelligenceDashboard() {
                 : t('intelligenceDashboard.defaultSubtitle')}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 min-w-0">
             <div
               className="hidden md:flex items-center gap-2 text-xs text-muted-foreground border border-border rounded-md px-2.5 py-1.5"
               title={dataTrust.lastRefreshed.toLocaleString()}
@@ -716,8 +726,11 @@ export default function IntelligenceDashboard() {
         })()}
 
         {/* Tabs */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList>
+        <Tabs defaultValue="overview" className="space-y-6 min-w-0">
+          {/* Horizontal scroll container keeps the six triggers reachable on
+              narrow viewports without expanding the document (S6G-02). */}
+          <div className="w-full min-w-0 overflow-x-auto">
+          <TabsList className="w-max">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="thermal">Thermal Analysis</TabsTrigger>
             <TabsTrigger value="power">Power & Energy</TabsTrigger>
@@ -725,6 +738,7 @@ export default function IntelligenceDashboard() {
             <TabsTrigger value="sovereignty">Sovereignty</TabsTrigger>
             <TabsTrigger value="simulation-replay">Simulation Replay</TabsTrigger>
           </TabsList>
+          </div>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">

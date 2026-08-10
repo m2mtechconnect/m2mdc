@@ -44,16 +44,32 @@ export default function AccessControl() {
   const [agentId, setAgentId] = useState('');
 
   // Fetch all user roles with user info
-  const { data: userRoles, isLoading: rolesLoading } = useQuery({
+  // Stage 6G: the previous implementation used a PostgREST embed
+  // (`profiles!user_roles_user_id_fkey`). No such foreign key exists between
+  // public.user_roles and public.profiles, so PostgREST rejected the request
+  // with HTTP 400 ("could not find a relationship"). The roster is now built
+  // from two explicit reads and joined in the client; a genuine failure is
+  // surfaced as an error state instead of an empty roster.
+  const { data: userRoles, isLoading: rolesLoading, isError: rolesError, refetch: refetchRoles } = useQuery({
     queryKey: ['all-user-roles'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: roles, error } = await supabase
         .from('user_roles')
-        .select('*, profiles!user_roles_user_id_fkey(user_id, email, full_name)')
+        .select('*')
         .order('granted_at', { ascending: false });
-
       if (error) throw error;
-      return data;
+
+      const userIds = [...new Set((roles ?? []).map((r) => r.user_id))];
+      if (userIds.length === 0) return [];
+
+      const { data: profileRows, error: profilesErr } = await supabase
+        .from('profiles')
+        .select('user_id, email, full_name')
+        .in('user_id', userIds);
+      if (profilesErr) throw profilesErr;
+
+      const byUser = new Map((profileRows ?? []).map((p) => [p.user_id, p]));
+      return (roles ?? []).map((r) => ({ ...r, profiles: byUser.get(r.user_id) ?? null }));
     },
     enabled: isGlobalAdmin,
   });
@@ -296,7 +312,19 @@ export default function AccessControl() {
             <div className="flex justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
+          ) : rolesError ? (
+            <div role="alert" className="space-y-3 py-6 text-sm">
+              <p className="font-medium text-destructive">Role assignments unavailable</p>
+              <p className="text-muted-foreground">
+                The role roster could not be read. This is not an empty roster - the
+                request failed and no assignments can be shown.
+              </p>
+              <Button variant="outline" size="sm" onClick={() => refetchRoles()}>
+                Retry
+              </Button>
+            </div>
           ) : (
+            <div className="w-full overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -397,6 +425,7 @@ export default function AccessControl() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
       </DCCard>
     </div>

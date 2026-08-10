@@ -106,7 +106,7 @@ export function Layout({ children }: LayoutProps) {
         <div className="mx-auto max-w-[1920px] flex items-center justify-between px-[clamp(16px,4vw,32px)] py-3">
           {/* Brand, facility context and workspace navigation */}
           <div className="flex items-center gap-3 lg:gap-6 min-w-0">
-            <Link to="/" className="flex items-center flex-shrink-0 group">
+            <Link to="/dashboard" className="flex items-center flex-shrink-0 group">
               <img 
                 src={m2mLogo} 
                 alt="Data Centre Twin Studio" 

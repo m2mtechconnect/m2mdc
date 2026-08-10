@@ -162,9 +162,9 @@ export default function Blueprint() {
   return (
     <BlueprintDesignerWrapper twinId={blueprintId}>
       <div className="min-h-screen bg-background">
-        <div className="flex">
+        <div className="flex min-w-0">
           {/* Main Content */}
-          <div className={`flex-1 transition-all duration-300 ${showCoPilotPanel ? 'mr-96' : ''}`}>
+          <div className={`flex-1 min-w-0 transition-all duration-300 ${showCoPilotPanel ? 'lg:mr-96' : ''}`}>
             <div className="container mx-auto py-6 px-4 max-w-7xl">
               {/* DESIGNER MODE HEADER - Clear visual distinction */}
               <DesignerModeHeader
@@ -182,8 +182,8 @@ export default function Blueprint() {
               />
 
               {/* Quick Actions Bar */}
-              <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-6 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 min-w-0">
                   <Button
                     variant="ghost"
                     onClick={() => navigate(-1)}

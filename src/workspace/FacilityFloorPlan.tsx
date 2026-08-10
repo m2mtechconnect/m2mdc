@@ -17,12 +17,12 @@ interface Props {
   onSelect: (assetId: string) => void;
 }
 
-const RACK_W = 34;
+const RACK_W = 46;
 const RACK_H = 76;
-const GAP = 6;
+const GAP = 10;
 /** Alternating hot / cold service aisles between rack rows. */
 const AISLE_H = 34;
-const ROW_LABEL_W = 34;
+const ROW_LABEL_W = 64;
 const PAD = 26;
 const SCALE_H = 26;
 
@@ -180,7 +180,7 @@ export function FacilityFloorPlan({ facility, overlay, selectedAssetId, onSelect
                       <rect
                         key={u}
                         x={x + 4}
-                        y={y + 12 + u * 10}
+                        y={y + 14 + u * 10}
                         width={RACK_W - 8}
                         height={7}
                         rx={1}
@@ -192,7 +192,7 @@ export function FacilityFloorPlan({ facility, overlay, selectedAssetId, onSelect
                       x={x + RACK_W / 2}
                       y={y + 8}
                       fill="#cbd5e1"
-                      fontSize={7}
+                      fontSize={9}
                       fontWeight={600}
                       textAnchor="middle"
                       dominantBaseline="middle"

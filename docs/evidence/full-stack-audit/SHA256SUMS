@@ -81,3 +81,4 @@ d8942e28346bfa2154bb06c143ba6cc9f2a3745dd7ca7bc23dd1697f08e4e2f0  80-s5a-visual-
 cdb455c3602d8227dc6d663bd0f6324b91c9b055304c17421bf335c5e7992a6e  81-s5a-prohibited-claims-scan.txt
 605384daf7a005e438d47f677b69e84a5f56b2825ebd19f324542a0ad68ab262  82-s5a-open-defect-register.csv
 77d859684ad9da5f00fb8478b4e4c5e2efe1483d3a2b4fd13a04b0806704b0b7  83-stage-5a-closeout-verdict.md
+b4068defed9ceecc0e4f471cb2ae8896a8aff245506791edeefccec4d8fbdd6e  84-s5a-authenticated-session-harness.md

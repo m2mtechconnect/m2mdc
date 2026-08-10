@@ -176,8 +176,8 @@ const roleSharedSteps: Step[] = [
   },
   {
     target: '[data-tour="role-search"]',
-    title: 'AI Co-Pilot',
-    content: 'Ask natural-language questions about your data centre. The Co-Pilot understands your role context.',
+    title: 'AURA Assistant',
+    content: 'Ask natural-language questions about your data centre. The assistant understands your role context.',
     placement: 'bottom',
     disableBeacon: true,
   },

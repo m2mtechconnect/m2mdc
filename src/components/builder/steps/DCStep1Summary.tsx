@@ -264,7 +264,7 @@ export function DCStep1Summary() {
           
           {/* Co-Pilot Quick Actions */}
           <div className="pt-4 border-t border-border/50">
-            <p className="text-xs text-muted-foreground mb-2">Ask Co-Pilot:</p>
+            <p className="text-xs text-muted-foreground mb-2">Ask AURA Assistant:</p>
             <div className="flex flex-wrap gap-2">
               <Button 
                 variant="ghost" 

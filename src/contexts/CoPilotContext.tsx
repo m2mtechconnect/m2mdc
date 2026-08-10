@@ -60,7 +60,18 @@ interface CoPilotContextValue {
 const CoPilotContext = createContext<CoPilotContextValue | undefined>(undefined);
 
 export function CoPilotProvider({ children }: { children: ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false);
+  // Closed by default for new users; the user's own preference is remembered
+  // across sessions and is never re-opened automatically on route changes.
+  const [isOpen, setIsOpenState] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.localStorage.getItem('aura.assistant.open') === 'true';
+  });
+  const setIsOpen = useCallback((open: boolean) => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('aura.assistant.open', String(open));
+    }
+    setIsOpenState(open);
+  }, []);
   const [initialMessage, setInitialMessage] = useState<string | undefined>();
   const [context, setContext] = useState<CoPilotContextType>({
     activePage: 'dashboard',
@@ -402,7 +413,13 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === '/') {
         e.preventDefault();
-        setIsOpen(prev => !prev);
+        setIsOpenState((prev) => {
+          const next = !prev;
+          if (typeof window !== 'undefined') {
+            window.localStorage.setItem('aura.assistant.open', String(next));
+          }
+          return next;
+        });
       }
     };
 

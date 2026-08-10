@@ -644,7 +644,8 @@ export const BUILDER = {
 // =============================================================================
 
 export const COPILOT = {
-  TITLE: 'Data Centre Co-Pilot',
+  TITLE: 'AURA Assistant',
+  SUBTITLE: 'Facility Operations Intelligence',
   
   PERSONAS: {
     DESIGNER: {

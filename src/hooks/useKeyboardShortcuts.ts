@@ -50,10 +50,10 @@ export const useGlobalShortcuts = () => {
       key: '/',
       ctrl: true,
       action: () => {
-        // Toggle Co-Pilot
+        // Toggle AURA Assistant
         window.dispatchEvent(new CustomEvent('toggle-copilot'));
       },
-      description: 'Toggle Co-Pilot',
+      description: 'Toggle AURA Assistant',
     },
     {
       key: 's',

@@ -12,7 +12,7 @@ const TOOLS: Array<{ tool: WorkspaceTool; label: string; hint: string; icon: typ
   { tool: 'configure', label: 'Configure', hint: 'Change modelled setpoints and capacity assumptions', icon: SlidersHorizontal },
   { tool: 'simulate', label: 'Simulate', hint: 'Run a scenario against the current configuration', icon: PlayCircle },
   { tool: 'compare', label: 'Compare', hint: 'Compare runs and read KPI deltas', icon: GitCompare },
-  { tool: 'decide', label: 'Decide', hint: 'Accept, reject or defer each recommendation', icon: Scale },
+  { tool: 'decide', label: 'Review', hint: 'Review a completed run: accept, reject or defer each recommendation', icon: Scale },
   { tool: 'assist', label: 'Assistant', hint: 'Ask the AURA assistant about this facility', icon: MessageSquare },
 ];
 
@@ -23,6 +23,7 @@ interface Props {
 export function WorkspaceToolRail({ orientation = 'vertical' }: Props) {
   const activeTool = useWorkspaceStore((s) => s.activeTool);
   const setTool = useWorkspaceStore((s) => s.setTool);
+  const hasRun = useWorkspaceStore((s) => s.runs.length > 0);
   const isVertical = orientation === 'vertical';
 
   return (
@@ -41,6 +42,7 @@ export function WorkspaceToolRail({ orientation = 'vertical' }: Props) {
       >
         {TOOLS.map(({ tool, label, hint, icon: Icon }) => {
           const isActive = activeTool === tool;
+          const isGated = gatedTools.has(tool) && !hasRun;
           return (
             <Tooltip key={tool}>
               <TooltipTrigger asChild>
@@ -48,11 +50,16 @@ export function WorkspaceToolRail({ orientation = 'vertical' }: Props) {
                   type="button"
                   aria-pressed={isActive}
                   aria-label={label}
+                  aria-disabled={isGated}
                   data-testid={`workspace-tool-${tool}`}
-                  onClick={() => setTool(tool)}
+                  onClick={() => {
+                    if (isGated) return;
+                    setTool(tool);
+                  }}
                   className={cn(
                     'flex min-h-11 min-w-11 flex-col items-center justify-center gap-0.5 rounded-md transition-colors',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
+                    isGated && 'opacity-40',
                     isActive
                       ? 'bg-primary/10 text-primary'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground',
@@ -63,7 +70,7 @@ export function WorkspaceToolRail({ orientation = 'vertical' }: Props) {
                 </button>
               </TooltipTrigger>
               <TooltipContent side={isVertical ? 'right' : 'top'} className="text-xs">
-                {hint}
+                {isGated ? 'Run a scenario first to unlock this step' : hint}
               </TooltipContent>
             </Tooltip>
           );

@@ -10,6 +10,7 @@
  */
 import { useMemo } from 'react';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { resolveFacilityNaming } from '@/workspace/facilityNaming';
 
 /** Deterministic 32-bit hash -> seeded PRNG (no runtime randomness). */
 export function seededRandom(seed: string): () => number {
@@ -54,6 +55,17 @@ export interface FacilityDefinition {
   carbonIntensity: number;
   sovereigntyLevel: string;
   industry: string;
+}
+
+export interface FacilityNamingContext {
+  /** Facility classification, e.g. "Tier-III · Sovereign AI data centre". */
+  classification: string;
+  /** Region → city → facility breadcrumb trail. */
+  breadcrumb: string[];
+  /** True when `name` was derived because the stored twin name is a placeholder. */
+  isDerivedName: boolean;
+  /** Original stored twin name, kept for provenance. */
+  storedName: string | null;
 }
 
 export interface ConfigOverrides {
@@ -397,6 +409,7 @@ export interface FacilityModel {
   assets: FacilityAsset[];
   isFallback: boolean;
   isLoading: boolean;
+  naming: FacilityNamingContext;
 }
 
 /** Single hook every workspace surface uses to read the facility model. */
@@ -405,19 +418,34 @@ export function useFacilityModel(): FacilityModel {
 
   return useMemo(() => {
     if (!twin) {
+      const naming = resolveFacilityNaming(FALLBACK_FACILITY);
       return {
         facility: FALLBACK_FACILITY,
         assets: buildAssets(FALLBACK_FACILITY),
         isFallback: true,
         isLoading,
+        naming: {
+          classification: naming.classification,
+          breadcrumb: naming.breadcrumb,
+          isDerivedName: false,
+          storedName: FALLBACK_FACILITY.name,
+        },
       };
     }
     const capacityKw = twin.capacity_kw || FALLBACK_FACILITY.capacityKw;
     const rackCount = Math.max(8, Math.min(40, Math.floor(capacityKw / 50)));
     const rowCount = Math.max(1, Math.ceil(rackCount / 8));
+    const naming = resolveFacilityNaming({
+      name: twin.name,
+      city: twin.city || FALLBACK_FACILITY.city,
+      regionCode: twin.region_code || FALLBACK_FACILITY.regionCode,
+      tier: twin.tier || FALLBACK_FACILITY.tier,
+      sovereigntyLevel: twin.sovereignty_level ?? FALLBACK_FACILITY.sovereigntyLevel,
+      industry: twin.industry ?? FALLBACK_FACILITY.industry,
+    });
     const facility: FacilityDefinition = {
       id: twin.id,
-      name: twin.name,
+      name: naming.displayName,
       city: twin.city || FALLBACK_FACILITY.city,
       regionCode: twin.region_code || FALLBACK_FACILITY.regionCode,
       tier: twin.tier || FALLBACK_FACILITY.tier,
@@ -430,6 +458,17 @@ export function useFacilityModel(): FacilityModel {
       sovereigntyLevel: twin.sovereignty_level ?? FALLBACK_FACILITY.sovereigntyLevel,
       industry: twin.industry ?? FALLBACK_FACILITY.industry,
     };
-    return { facility, assets: buildAssets(facility), isFallback: false, isLoading };
+    return {
+      facility,
+      assets: buildAssets(facility),
+      isFallback: false,
+      isLoading,
+      naming: {
+        classification: naming.classification,
+        breadcrumb: naming.breadcrumb,
+        isDerivedName: naming.isDerivedName,
+        storedName: naming.storedName,
+      },
+    };
   }, [twin, isLoading]);
 }

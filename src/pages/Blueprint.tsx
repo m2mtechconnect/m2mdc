@@ -34,6 +34,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { resolveFacilityNaming } from '@/workspace/facilityNaming';
 import { useToast } from '@/hooks/use-toast';
 import { BLUEPRINT } from '@/ux';
 
@@ -167,7 +168,14 @@ export default function Blueprint() {
             <div className="container mx-auto py-6 px-4 max-w-7xl">
               {/* DESIGNER MODE HEADER - Clear visual distinction */}
               <DesignerModeHeader
-                twinName={twin?.name || blueprint.name}
+                twinName={resolveFacilityNaming({
+                  name: twin?.name || blueprint.name,
+                  city: twin?.city || blueprint.location,
+                  regionCode: twin?.region_code,
+                  tier: twin?.tier,
+                  sovereigntyLevel: twin?.sovereignty_level,
+                  industry: twin?.industry,
+                }).displayName}
                 twinId={blueprintId}
                 location={twin?.city || blueprint.location}
                 showSimulationLink={true}

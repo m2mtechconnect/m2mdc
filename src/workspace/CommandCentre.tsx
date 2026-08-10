@@ -33,7 +33,7 @@ const SUMMARY_KPIS = ['pue', 'itLoadKw', 'capacityHeadroom', 'thermalStability',
 
 export default function CommandCentre() {
   useSeededRunFixtures();
-  const { facility, assets, isFallback } = useFacilityModel();
+  const { facility, assets, isFallback, naming } = useFacilityModel();
   const overrides = useWorkspaceStore((s) => s.overrides);
   const runs = useWorkspaceStore((s) => s.runs);
 
@@ -55,10 +55,18 @@ export default function CommandCentre() {
     <div className="mx-auto w-full max-w-7xl px-4 py-4" data-testid="command-centre">
       <header className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
+          <nav aria-label="Facility context" className="mb-1 text-[11px] text-muted-foreground">
+            {naming.breadcrumb.join(' / ')}
+          </nav>
           <h1 className="text-xl font-semibold text-foreground">{facility.name}</h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
-            {facility.city} · {facility.tier} · {formatPower(facility.capacityKw)} modelled capacity · {rackCount} racks
+            {naming.classification} · {formatPower(facility.capacityKw)} modelled capacity · {rackCount} racks
           </p>
+          {naming.isDerivedName && (
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              Display name derived from facility attributes (stored name: {naming.storedName ?? 'empty'}).
+            </p>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {isFallback && (

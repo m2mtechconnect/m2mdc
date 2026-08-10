@@ -50,8 +50,9 @@ export function HelpMenu() {
           size="sm"
           className="gap-2"
           data-tour="help-menu"
+          aria-label="Help and guided tours"
         >
-          <HelpCircle className="h-4 w-4" />
+          <HelpCircle className="h-4 w-4" aria-hidden="true" />
           <span className="hidden sm:inline">Help</span>
         </Button>
       </DropdownMenuTrigger>

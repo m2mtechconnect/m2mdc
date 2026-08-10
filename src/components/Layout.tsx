@@ -140,11 +140,11 @@ export function Layout({ children }: LayoutProps) {
                           to={item.href}
                           data-tour={tourId}
                           data-nav-item={item.name}
+                          aria-label={item.fullName}
                           aria-current={isActive ? "page" : undefined}
                         >
                           <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
                           <span className="hidden xl:inline whitespace-nowrap">{item.name}</span>
-                          <span className="xl:hidden sr-only">{item.fullName}</span>
                         </Link>
                       </Button>
                     </TooltipTrigger>

@@ -10,6 +10,7 @@
  */
 import { useMemo } from 'react';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { resolveFacilityNaming } from '@/workspace/facilityNaming';
 
 /** Deterministic 32-bit hash -> seeded PRNG (no runtime randomness). */
 export function seededRandom(seed: string): () => number {

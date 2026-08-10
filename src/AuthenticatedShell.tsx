@@ -29,7 +29,6 @@ import Help from "./pages/Help";
 import ConnectMonitor from "./pages/ConnectMonitor";
 import ConnectHealth from "./pages/ConnectHealth";
 import Search from "./pages/Search";
-import UniversalSearch from "./pages/UniversalSearch";
 import AISettings from "./pages/AISettings";
 import Integrations from "./pages/Integrations";
 import { SignOut } from "./pages/auth/index";
@@ -48,7 +47,6 @@ import BlueprintPreview from "./pages/BlueprintPreview";
 import SimulationPreview from "./pages/SimulationPreview";
 import AuraWorkspace from "./workspace/AuraWorkspace";
 import InfrastructurePage from "./pages/InfrastructurePage";
-import DataCentreTwinLanding from "./pages/DataCentreTwinLanding";
 import OmniverseScene from "./pages/OmniverseScene";
 import OnboardingSubmissions from "./pages/OnboardingSubmissions";
 import AgentDetail from "./pages/AgentDetail";
@@ -90,8 +88,9 @@ function ApprovedUserRoutes() {
       <Route path="/agents/:id/chat" element={<AgentChat />} />
       <Route path="/agent-chat" element={<AgentChat />} />
       <Route path="/analytics" element={<IntelligenceDashboard />} />
-      <Route path="/operations" element={<IntelligenceDashboard />} />
-      <Route path="/intelligence" element={<IntelligenceDashboard />} />
+      {/* Stage 6D dedup: one analytics surface, legacy aliases redirect. */}
+      <Route path="/operations" element={<Navigate to="/analytics" replace />} />
+      <Route path="/intelligence" element={<Navigate to="/analytics" replace />} />
       <Route path="/account/profile" element={<Profile />} />
       <Route path="/account/settings" element={<Settings />} />
       <Route path="/account/access-control" element={<AccessControl />} />
@@ -113,16 +112,17 @@ function ApprovedUserRoutes() {
       <Route path="/twins/:instanceId/manage" element={<TwinManageRedirect />} />
       <Route path="/studio/systems/:systemId/manage" element={<SystemManage />} />
       <Route path="/data-centre-twin/:id/blueprint" element={<Blueprint />} />
-      <Route path="/blueprint/:id" element={<Blueprint />} />
       <Route path="/blueprint" element={<Navigate to="/blueprint/default" replace />} />
+      {/* `/blueprint/preview` must precede `/blueprint/:id` or it is swallowed. */}
       <Route path="/blueprint/preview" element={<BlueprintPreview />} />
+      <Route path="/blueprint/:id" element={<Blueprint />} />
       <Route path="/simulation" element={<AuraWorkspace />} />
       <Route path="/simulation/preview" element={<SimulationPreview />} />
       <Route path="/help" element={<Help />} />
       <Route path="/connect/monitor" element={<ConnectMonitor />} />
       <Route path="/connect/health" element={<ConnectHealth />} />
       <Route path="/search" element={<Search />} />
-      <Route path="/universal-search" element={<UniversalSearch />} />
+      <Route path="/universal-search" element={<Navigate to="/search" replace />} />
       <Route path="/settings/ai" element={<AISettings />} />
       <Route path="/settings/integrations/nvidia-dsx" element={<Navigate to="/integrations#nvidia-dsx" replace />} />
       <Route path="/auth" element={<Navigate to="/" replace />} />
@@ -136,7 +136,7 @@ function ApprovedUserRoutes() {
       <Route path="/data-centre-twin" element={<DataCentreTwin />} />
       <Route path="/data-centre-twin/:id" element={<DataCentreTwin />} />
       <Route path="/omniverse-scene" element={<OmniverseScene />} />
-      <Route path="/twin-datacentre" element={<DataCentreTwinLanding />} />
+      <Route path="/twin-datacentre" element={<Navigate to="/blueprint/default" replace />} />
       <Route path="/twin-debug" element={<TwinDebug />} />
       <Route path="/digital-twins" element={<Navigate to="/" replace />} />
       <Route path="/digital-twins/:slug" element={<Navigate to="/" replace />} />

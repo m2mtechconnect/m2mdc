@@ -1,7 +1,7 @@
 /**
- * `/` and `/dashboard` render the AURA DC engineering workspace: a single
- * 3D-first surface where the facility model is the primary object of work.
- * The previous card-grid dashboard is retained as `LegacyDashboard` for
- * reference only and is no longer routed.
+ * `/` and `/dashboard` render the AURA DC command centre: a read-only
+ * operational overview of the modelled facility that deep-links into the
+ * Blueprint (model and configuration) and the Simulation workspace
+ * (scenario execution, comparison and review).
  */
-export { default } from '@/workspace/AuraWorkspace';
+export { default } from '@/workspace/CommandCentre';

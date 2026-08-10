@@ -6,7 +6,7 @@
  * the current selection. Every action lives in the rail or the panel, so
  * there are no duplicate KPI cards or scattered call-to-action buttons.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { PanelRightOpen } from 'lucide-react';
@@ -52,7 +52,7 @@ export default function AuraWorkspace() {
   }, [setFullBleed]);
 
   useEffect(() => {
-    document.title = `${facility.name} | AURA engineering workspace`;
+    document.title = `${facility.name} | AURA simulation workspace`;
   }, [facility.name]);
 
   // Below xl the panel is an overlay, so it must not cover the model on load.
@@ -60,8 +60,15 @@ export default function AuraWorkspace() {
     setPanelOpen(!belowXl);
   }, [belowXl, setPanelOpen]);
 
-  // Role view sets a sensible starting tool once per role change.
+  // This surface is the simulation workspace, so it always opens on the
+  // scenario step. Later role changes still move to the role's default tool.
+  const initialTool = useRef(true);
   useEffect(() => {
+    if (initialTool.current) {
+      initialTool.current = false;
+      setTool('simulate');
+      return;
+    }
     setTool(ROLE_VIEWS[roleView].defaultTool);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roleView]);
@@ -76,7 +83,7 @@ export default function AuraWorkspace() {
         <div className="flex flex-wrap items-center gap-2 border-b border-border px-3 py-1.5">
           <h1 className="truncate text-sm font-semibold text-foreground">
             {facility.name}
-            <span className="ml-2 font-normal text-muted-foreground">Engineering workspace</span>
+            <span className="ml-2 font-normal text-muted-foreground">Simulation workspace</span>
           </h1>
           {isFallback && (
             <span className="rounded-sm bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">

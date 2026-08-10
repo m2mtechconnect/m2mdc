@@ -40,7 +40,7 @@ export function DesignerModeHeader({
   const navigate = useNavigate();
 
   const handleOpenSimulation = () => {
-    navigate(`/data-centre-twin?tab=simulation`);
+    navigate('/simulation');
   };
 
   return (

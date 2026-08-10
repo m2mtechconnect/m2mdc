@@ -104,7 +104,7 @@ export function Layout({ children }: LayoutProps) {
         aria-label="Primary navigation"
       >
         <div className="mx-auto max-w-[1920px] flex items-center justify-between px-[clamp(16px,4vw,32px)] py-3">
-          {/* Logo and Greeting */}
+          {/* Brand, facility context and workspace navigation */}
           <div className="flex items-center gap-3 lg:gap-6 min-w-0">
             <Link to="/" className="flex items-center flex-shrink-0 group">
               <img 
@@ -114,26 +114,17 @@ export function Layout({ children }: LayoutProps) {
               />
             </Link>
 
-            {/* Dynamic Greeting */}
-            <div className="hidden md:flex items-center text-sm text-muted-foreground">
-              {t(greeting)}, <span className="ml-1 font-medium text-foreground">{getFirstName(user)}</span>
-            </div>
-
             {/* Data Centre Twin Selector */}
             <div className="hidden lg:block" data-tour="dc-selector">
               <DataCentreSelector />
             </div>
 
-            {/* Desktop Navigation - Full labels on 2xl+, icons on lg-xl */}
-            <nav className="hidden lg:flex items-center gap-0.5" aria-label="Main menu">
-              {/* Primary navigation - always visible on lg+ */}
-              {primaryNavigation.map((item) => {
-                const isActive = item.href.includes('?') 
-                  ? location.pathname + location.search === item.href
-                  : location.pathname === item.href;
-                const tourId = item.href === '/' ? 'nav-dashboard' : 
-                  item.href === '/builder' ? 'nav-builder' :
-                  item.href === '/app/agents' ? 'nav-agents' : undefined;
+            {/* Workspace navigation: five destinations, always the same five. */}
+            <nav className="hidden lg:flex items-center gap-0.5" aria-label="Workspaces">
+              {workspaceNavigation.map((item) => {
+                const isActive = isNavItemActive(item, location.pathname);
+                const tourId = item.href === '/' ? 'nav-dashboard' :
+                  item.href === '/simulation' ? 'nav-simulation' : undefined;
                 return (
                   <Tooltip key={item.name}>
                     <TooltipTrigger asChild>
@@ -148,104 +139,61 @@ export function Layout({ children }: LayoutProps) {
                         <Link
                           to={item.href}
                           data-tour={tourId}
-                          aria-label={item.fullName}
+                          data-nav-item={item.name}
                           aria-current={isActive ? "page" : undefined}
                         >
                           <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
                           <span className="hidden xl:inline whitespace-nowrap">{item.name}</span>
+                          <span className="xl:hidden sr-only">{item.fullName}</span>
                         </Link>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="bottom">
-                      <p>{item.fullName}</p>
+                      <p>{item.description}</p>
                     </TooltipContent>
                   </Tooltip>
                 );
               })}
-              
-              {/* Separator */}
-              <div className="h-4 w-px bg-border mx-1" />
 
-              {/* Secondary navigation - full on 2xl+, dropdown below to prevent header overlap */}
-              <div className="hidden 2xl:flex items-center gap-0.5">
-                {secondaryNavigation.map((item) => {
-                  const isActive = item.href.includes('?') 
-                    ? location.pathname + location.search === item.href
-                    : location.pathname === item.href;
-                  const tourId = item.href.includes('simulation') ? 'nav-simulation' :
-                    item.href === '/intelligence' ? 'nav-analytics' :
-                    item.href === '/compliance' ? 'nav-audit' : undefined;
-                  return (
-                    <Tooltip key={item.name}>
-                      <TooltipTrigger asChild>
-                        <Button
-                          asChild
-                          variant={isActive ? "secondary" : "ghost"}
-                          size="sm"
-                          className={`gap-1.5 px-2.5 text-xs font-medium transition-smooth min-h-[36px] ${
-                            isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          <Link
-                            to={item.href}
-                            data-tour={tourId}
-                            aria-label={item.fullName}
-                            aria-current={isActive ? "page" : undefined}
-                          >
-                            <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
-                            <span className="whitespace-nowrap">{item.name}</span>
-                          </Link>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        <p>{item.fullName}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  );
-                })}
-              </div>
-
-              {/* More dropdown - visible below 2xl */}
-              <div className="2xl:hidden">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:text-foreground min-h-[36px]"
-                      aria-label="More navigation"
-                    >
-                      <MoreHorizontal className="h-3.5 w-3.5" />
-                      <span className="hidden xl:inline">More</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    {secondaryNavigation.map((item) => {
-                      const isActive = item.href.includes('?') 
-                        ? location.pathname + location.search === item.href
-                        : location.pathname === item.href;
-                      return (
-                        <DropdownMenuItem key={item.name} asChild>
-                          <Link 
-                            to={item.href}
-                            className={`flex items-center gap-2 ${isActive ? 'text-primary' : ''}`}
-                          >
-                            <item.icon className="h-4 w-4" />
-                            {item.fullName}
-                          </Link>
-                        </DropdownMenuItem>
-                      );
-                    })}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/help" className="flex items-center gap-2">
-                        <HelpCircle className="h-4 w-4" />
-                        Help
-                      </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+              {manageNavigation.length > 0 && (
+                <>
+                  <div className="h-4 w-px bg-border mx-1" />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:text-foreground min-h-[36px]"
+                        aria-label="Manage"
+                        data-nav-item="Manage"
+                      >
+                        <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span className="hidden xl:inline">Manage</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-64">
+                      {manageNavigation.map((item) => {
+                        const isActive = isNavItemActive(item, location.pathname);
+                        return (
+                          <DropdownMenuItem key={item.name} asChild>
+                            <Link
+                              to={item.href}
+                              className={`flex items-start gap-2 ${isActive ? 'text-primary' : ''}`}
+                              aria-current={isActive ? "page" : undefined}
+                            >
+                              <item.icon className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                              <span>
+                                <span className="block text-sm">{item.fullName}</span>
+                                <span className="block text-[11px] text-muted-foreground">{item.description}</span>
+                              </span>
+                            </Link>
+                          </DropdownMenuItem>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              )}
             </nav>
           </div>
 

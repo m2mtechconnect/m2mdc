@@ -187,12 +187,19 @@ export default function CommandCentre() {
           </CardHeader>
           <CardContent>
             {runs.length === 0 ? (
-              <div className="rounded-md border border-dashed border-border px-4 py-6 text-center">
-                <p className="text-sm text-muted-foreground">
-                  No scenario has been run against this configuration yet.
+              <div className="rounded-md border border-dashed border-border px-4 py-8 text-center">
+                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                  <PlayCircle className="h-5 w-5 text-muted-foreground" aria-hidden />
+                </div>
+                <h3 className="mt-3 text-sm font-medium text-foreground">No simulation runs yet</h3>
+                <p className="mt-1 max-w-xs text-sm text-muted-foreground">
+                  Run your first scenario against <span className="font-medium text-foreground">{facility.name}</span> to see modelled PUE, thermal stability, and capacity outcomes.
                 </p>
-                <Button asChild size="sm" className="mt-3">
-                  <Link to="/simulation">
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  The simulation workspace will open with this facility preselected.
+                </p>
+                <Button asChild size="sm" className="mt-4 min-w-[10rem]">
+                  <Link to={`/simulation?twin=${encodeURIComponent(facility.id || 'default')}`}>
                     Run a scenario
                     <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden />
                   </Link>

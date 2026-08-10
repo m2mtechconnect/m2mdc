@@ -153,7 +153,7 @@ export function FacilityHighlights({
 
       {/* Primary indicators as divided cells inside the same surface. */}
       <div
-        className="grid min-w-0 grid-cols-2 border-t border-border xl:grid-cols-4"
+        className="grid min-w-0 grid-cols-1 border-t border-border sm:grid-cols-2 lg:grid-cols-4"
         role="group"
         aria-label="Facility highlights"
       >

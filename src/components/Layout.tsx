@@ -144,7 +144,8 @@ export function Layout({ children }: LayoutProps) {
                           aria-current={isActive ? "page" : undefined}
                         >
                           <item.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
-                          <span className="hidden xl:inline whitespace-nowrap">{item.name}</span>
+                          {/* xl is 1536px in this project, so labels are gated at lg. */}
+                          <span className="hidden lg:inline whitespace-nowrap">{item.name}</span>
                         </Link>
                       </Button>
                     </TooltipTrigger>

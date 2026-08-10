@@ -56,6 +56,16 @@ export interface FacilityDefinition {
   industry: string;
 }
 
+export interface FacilityNamingContext {
+  /** Facility classification, e.g. "Tier-III · Sovereign AI data centre". */
+  classification: string;
+  /** Region → city → facility breadcrumb trail. */
+  breadcrumb: string[];
+  /** True when `name` was derived because the stored twin name is a placeholder. */
+  isDerivedName: boolean;
+  /** Original stored twin name, kept for provenance. */
+  storedName: string | null;
+}
 
 export interface ConfigOverrides {
   coolingSetpointC: number;

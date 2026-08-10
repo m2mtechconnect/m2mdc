@@ -149,13 +149,18 @@ export function ActionCenter({
   const actionParam = searchParams.get('action');
   const openId = actionParam && items.some((item) => item.id === actionParam) ? actionParam : null;
 
-  const visible = useMemo(() => items.slice(0, limit), [items, limit]);
+  // A shared link to a row that sits below the fold keeps its row context by
+  // appending that row to the visible list, rather than stacking a second
+  // dialog (the full-list sheet) behind the drawer.
+  const visible = useMemo(() => {
+    const top = items.slice(0, limit);
+    if (!openId || top.some((item) => item.id === openId)) return top;
+    const deepLinked = items.find((item) => item.id === openId);
+    return deepLinked ? [...top, deepLinked] : top;
+  }, [items, limit, openId]);
   const openItem = items.find((item) => item.id === openId) ?? null;
 
-  // A shared link to a row that sits below the fold also restores the row's
-  // context by opening the full list behind the drawer.
-  const deepLinkedBelowFold = Boolean(openId) && !visible.some((item) => item.id === openId);
-  const showAll = searchParams.get('actions') === 'all' || deepLinkedBelowFold;
+  const showAll = searchParams.get('actions') === 'all';
 
   const patchParams = useCallback(
     (patch: Record<string, string | null>) => {

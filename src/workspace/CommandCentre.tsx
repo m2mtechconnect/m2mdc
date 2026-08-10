@@ -72,6 +72,8 @@ export default function CommandCentre() {
         isFallback,
         modelNotes,
         blueprintHref,
+        derivedAt: new Date().toISOString(),
+        latestRunAt: latestRun ? new Date(latestRun.completedAt).toISOString() : null,
       }),
     [facility, interpretations, pendingDecisions, runs.length, latestRun, isFallback, modelNotes, blueprintHref],
   );

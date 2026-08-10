@@ -27,6 +27,10 @@ export interface AttentionItem {
   title: string;
   impact: string;
   evidence: string;
+  /** ISO timestamp of the state this item was derived from. */
+  observedAt: string;
+  /** How the timestamp above was obtained, so the drawer can label it truthfully. */
+  observedBasis: 'derivation' | 'run' | 'registry';
   actions: Array<{ label: string; to: string }>;
 }
 
@@ -86,6 +90,10 @@ export interface AttentionInputs {
   isFallback: boolean;
   modelNotes: string[];
   blueprintHref: string;
+  /** ISO time at which the current model derivation was produced. */
+  derivedAt?: string;
+  /** ISO completion time of the most recent recorded run, when one exists. */
+  latestRunAt?: string | null;
 }
 
 /** Human summary for a raw engineering model note. Full text stays in the assumptions drawer. */
@@ -112,7 +120,12 @@ export function summariseModelNote(note: string): { title: string; impact: strin
 }
 
 export function buildAttentionQueue(input: AttentionInputs): AttentionItem[] {
-  const { facility, interpretations, pendingDecisions, runCount, latestRunId, isFallback, modelNotes, blueprintHref } = input;
+  const {
+    facility, interpretations, pendingDecisions, runCount, latestRunId, isFallback,
+    modelNotes, blueprintHref,
+  } = input;
+  const derivedAt = input.derivedAt ?? new Date().toISOString();
+  const latestRunAt = input.latestRunAt ?? null;
   const items: AttentionItem[] = [];
 
   for (const kpi of interpretations) {
@@ -132,6 +145,8 @@ export function buildAttentionQueue(input: AttentionInputs): AttentionItem[] {
               ? 'Modelled hotspot pressure reduces tolerance to workload increases.'
               : `${kpi.comparison || 'Derived from the current design baseline.'}`,
       evidence: 'Calculated from the current design baseline.',
+      observedAt: derivedAt,
+      observedBasis: 'derivation',
       actions: [
         { label: 'Inspect in Blueprint', to: `${blueprintHref}?tab=model&layer=${encodeURIComponent(kpi.key)}` },
         { label: 'Open calculation', to: `/dsx/evidence-beta/evidence?kpi=${encodeURIComponent(kpi.key)}` },
@@ -149,6 +164,8 @@ export function buildAttentionQueue(input: AttentionInputs): AttentionItem[] {
       title: summary.title,
       impact: summary.impact,
       evidence: 'Recorded while building the model. Review model assumptions.',
+      observedAt: derivedAt,
+      observedBasis: 'derivation',
       actions: [{ label: 'Review model assumptions', to: `${blueprintHref}?tab=model` }],
     });
   }
@@ -162,6 +179,8 @@ export function buildAttentionQueue(input: AttentionInputs): AttentionItem[] {
       title: `${pendingDecisions} recommendation${pendingDecisions === 1 ? '' : 's'} awaiting review`,
       impact: 'Recorded simulation recommendations have no accept or reject decision yet.',
       evidence: latestRunId ? `Recorded against run ${latestRunId}.` : 'Recorded in the simulation workspace.',
+      observedAt: latestRunAt ?? derivedAt,
+      observedBasis: latestRunAt ? 'run' : 'derivation',
       actions: [
         {
           label: 'Review recommendations',
@@ -180,6 +199,8 @@ export function buildAttentionQueue(input: AttentionInputs): AttentionItem[] {
       title: 'Reference facility model is in use',
       impact: 'No saved blueprint was loaded for this account, so all values describe the reference design.',
       evidence: 'Model source: built-in reference facility definition.',
+      observedAt: derivedAt,
+      observedBasis: 'derivation',
       actions: [{ label: 'Open Blueprint', to: blueprintHref }],
     });
   }
@@ -193,6 +214,8 @@ export function buildAttentionQueue(input: AttentionInputs): AttentionItem[] {
       title: 'No simulation run has been recorded for this facility',
       impact: 'Indicators reflect the design baseline only, with no scenario outcome to compare against.',
       evidence: 'No run record exists.',
+      observedAt: derivedAt,
+      observedBasis: 'derivation',
       actions: [{ label: 'Start simulation', to: `/simulation?twin=${encodeURIComponent(facility.id || 'default')}` }],
     });
   }
@@ -205,6 +228,8 @@ export function buildAttentionQueue(input: AttentionInputs): AttentionItem[] {
     title: 'Live facility telemetry is not connected',
     impact: 'Every indicator is a modelled output and cannot be validated against the physical facility.',
     evidence: 'Capability registry reports the simulated operating mode.',
+    observedAt: derivedAt,
+    observedBasis: 'registry',
     actions: [{ label: 'Open Integrations', to: '/integrations' }],
   });
 

@@ -222,7 +222,7 @@ export default function DataCentreTwin() {
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <Activity className="h-4 w-4 text-primary" />
-              Live Digital Twin
+              Facility Model (Simulated)
             </CardTitle>
           </CardHeader>
           <CardContent>

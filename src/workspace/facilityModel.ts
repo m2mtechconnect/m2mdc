@@ -286,7 +286,13 @@ export function buildAssets(facility: FacilityDefinition): FacilityAsset[] {
         { label: 'Location', value: `${facility.city} (${facility.regionCode})` },
         { label: 'Tier', value: facility.tier },
         { label: 'Design capacity', value: formatPower(facility.capacityKw) },
-        { label: 'Racks modelled', value: String(facility.rackCount) },
+        {
+          label: 'Racks modelled',
+          value:
+            facility.designRackEstimate > facility.rackCount
+              ? `${facility.rackCount} of ~${facility.designRackEstimate}`
+              : String(facility.rackCount),
+        },
       ],
     },
   ];

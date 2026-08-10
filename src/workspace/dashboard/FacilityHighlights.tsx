@@ -158,7 +158,7 @@ export function FacilityHighlights({
 
       {/* Primary indicators as divided cells inside the same surface. */}
       <div
-        className="grid min-w-0 grid-cols-2 border-t border-border lg:grid-cols-4"
+        className="grid min-w-0 grid-cols-2 border-t border-border min-[960px]:grid-cols-4"
         role="group"
         aria-label="Facility highlights"
       >
@@ -172,8 +172,8 @@ export function FacilityHighlights({
               className={cn(
                 'flex min-h-[88px] min-w-0 flex-col border-border p-3 sm:px-4',
                 index % 2 === 1 ? 'border-l' : '',
-                index >= 2 ? 'border-t lg:border-t-0' : '',
-                'lg:border-l lg:first:border-l-0',
+                index >= 2 ? 'border-t min-[960px]:border-t-0' : '',
+                'min-[960px]:border-l min-[960px]:first:border-l-0',
               )}
             >
               <button

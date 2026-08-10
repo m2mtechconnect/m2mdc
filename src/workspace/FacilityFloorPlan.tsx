@@ -17,10 +17,10 @@ interface Props {
   onSelect: (assetId: string) => void;
 }
 
-const RACK_W = 30;
-const RACK_H = 58;
-const GAP = 7;
-const ROW_GAP = 40;
+const RACK_W = 44;
+const RACK_H = 74;
+const GAP = 12;
+const ROW_GAP = 30;
 const PAD = 32;
 
 /** Overlay-specific colour ramp, expressed with plain CSS colours on the dark plate. */

@@ -5,8 +5,9 @@
  * evidence coverage, assistant) with a single five-row summary. Each row links
  * to the exact destination that owns the detail.
  */
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronRight, Gauge } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronRight, Gauge } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -32,23 +33,67 @@ export function buildSnapshotRows(evidenceNeedingReview: number): SnapshotRow[] 
   ];
 }
 
+/** Below the rail breakpoint the snapshot stacks, so it collapses to one row. */
+function useCompact() {
+  const [compact, setCompact] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 959px)').matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 959px)');
+    const onChange = () => setCompact(mq.matches);
+    onChange();
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  return compact;
+}
+
 export function StatusSnapshot({ rows, evidenceHref }: { rows: SnapshotRow[]; evidenceHref: string }) {
+  const compact = useCompact();
+  const [open, setOpen] = useState(false);
+  const expanded = !compact || open;
+  const summary = `${rows[0]?.value ?? ''} · Readiness ${rows[rows.length - 1]?.value ?? ''}`;
+
   return (
     <section
       aria-labelledby="status-snapshot-heading"
       data-testid="status-snapshot"
       className="min-w-0 overflow-hidden rounded-lg border border-border bg-card"
     >
-      <div className="flex min-h-[42px] min-w-0 items-center gap-2.5 border-b border-border px-4 py-2.5">
+      <div
+        className={cn(
+          'flex min-h-[44px] min-w-0 items-center gap-2.5 px-4 py-2.5',
+          expanded ? 'border-b border-border' : '',
+        )}
+      >
         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted" aria-hidden>
           <Gauge className="h-[18px] w-[18px] text-muted-foreground" strokeWidth={1.75} />
         </span>
         <h2 id="status-snapshot-heading" className="min-w-0 text-[15px] font-semibold leading-tight text-foreground">
           Status snapshot
         </h2>
+        {compact && (
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-controls="status-snapshot-rows"
+            data-testid="status-snapshot-toggle"
+            onClick={() => setOpen((value) => !value)}
+            className="ml-auto inline-flex min-h-[44px] min-w-0 items-center gap-1.5 rounded-sm text-[13px] text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <span className="min-w-0 truncate">{open ? 'Hide' : summary}</span>
+            <ChevronDown
+              className={cn('h-4 w-4 shrink-0 transition-transform', open ? 'rotate-180' : '')}
+              strokeWidth={1.75}
+              aria-hidden
+            />
+          </button>
+        )}
       </div>
 
-      <ul className="min-w-0 divide-y divide-border">
+      <ul
+        id="status-snapshot-rows"
+        hidden={!expanded} className="min-w-0 divide-y divide-border">
         {rows.map((row) => (
           <li key={row.label} className="min-w-0">
             <Link
@@ -68,7 +113,7 @@ export function StatusSnapshot({ rows, evidenceHref }: { rows: SnapshotRow[]; ev
         ))}
       </ul>
 
-      <div className="hidden flex-wrap gap-2 border-t border-border p-3 sm:flex">
+      <div className={cn('flex-wrap gap-2 border-t border-border p-3', expanded && !compact ? 'flex' : 'hidden')}>
         <Button asChild variant="outline" size="sm" className="h-9 flex-1 text-[13px] max-sm:h-11">
           <Link to="/integrations">View Integrations</Link>
         </Button>

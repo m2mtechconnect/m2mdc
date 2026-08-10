@@ -39,10 +39,10 @@ test.describe('Action Center deep links', () => {
   });
 
   test('closing the drawer clears the parameter and preserves other state', async ({ page }) => {
-    await page.goto(`${DASHBOARD}?rack=rack-1-2&action=kpi-pue`);
+    await page.goto(`${DASHBOARD}?rack=A3&action=kpi-pue`);
     await expect(page.getByTestId('action-detail-drawer')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(page).not.toHaveURL(/action=/);
-    await expect(page).toHaveURL(/rack=rack-1-2/);
+    await expect(page).toHaveURL(/rack=A3/);
   });
 });

@@ -94,6 +94,7 @@ const getFirstName = (user: User | null): string => {
 };
 
 export function Layout({ children }: LayoutProps) {
+  const fullBleed = useShellLayoutStore((s) => s.fullBleed);
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

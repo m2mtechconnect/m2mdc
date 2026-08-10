@@ -123,6 +123,11 @@ interface DCSectionHeaderProps {
   action?: ReactNode;
   metrics?: Array<{ label: string; value: string | number }>;
   className?: string;
+  /**
+   * Heading level rendered for the title. Pages that use this component as
+   * their page title pass "h1" so every route exposes exactly one H1.
+   */
+  as?: 'h1' | 'h2' | 'h3';
 }
 
 export function DCSectionHeader({
@@ -132,17 +137,18 @@ export function DCSectionHeader({
   action,
   metrics,
   className,
+  as: Heading = 'h2',
 }: DCSectionHeaderProps) {
   return (
     <div className={cn('flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6', className)}>
       <div className="flex items-center gap-3">
         {icon && (
-          <div className="p-2 rounded-lg bg-accent/10">
+          <div className="p-2 rounded-lg bg-accent/10" aria-hidden="true">
             {icon}
           </div>
         )}
         <div>
-          <h2 className="text-lg font-semibold">{title}</h2>
+          <Heading className="text-lg font-semibold">{title}</Heading>
           {subtitle && (
             <p className="text-sm text-muted-foreground">{subtitle}</p>
           )}

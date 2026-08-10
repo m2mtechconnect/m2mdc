@@ -41,7 +41,9 @@ test.describe('Action Center deep links', () => {
   test('closing the drawer clears the parameter and preserves other state', async ({ page }) => {
     await page.goto(`${DASHBOARD}?rack=A3&action=kpi-pue`);
     await expect(page.getByTestId('action-detail-drawer')).toBeVisible();
-    await page.keyboard.press('Escape');
+    // Close via the drawer's own control: a global Escape also clears the rack
+    // selection, which is separate behaviour.
+    await page.getByTestId('action-detail-drawer').getByRole('button', { name: /close/i }).first().click();
     await expect(page).not.toHaveURL(/action=/);
     await expect(page).toHaveURL(/rack=A3/);
   });

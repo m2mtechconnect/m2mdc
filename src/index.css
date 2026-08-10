@@ -97,6 +97,9 @@
     
     --info: 217 91% 60%;
     --info-foreground: 0 0% 98%;
+    /* AA-compliant text tint of the interactive blue (#0B5CAB) for labels on
+       tinted info backgrounds, where --info itself falls below 4.5:1. */
+    --info-strong: 209 88% 36%;
     
     --border: 220 13% 91%;
     --input: 220 13% 91%;
@@ -990,6 +993,7 @@ html:not(.dark) .aura-workspace-theme {
   --destructive-foreground: 0 0% 100%;
   --info: 207 99% 42%;            /* #0176D3                        */
   --info-foreground: 0 0% 100%;
+  --info-strong: 209 88% 36%;     /* #0B5CAB - AA text on info tints */
   --radius: 0.5rem;               /* 8px card radius                */
 }
 

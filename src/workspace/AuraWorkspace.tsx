@@ -22,7 +22,7 @@ import { RoleViewSelector } from './RoleViewSelector';
 import { useFacilityModel } from './facilityModel';
 import { ROLE_VIEWS, useWorkspaceStore } from './workspaceStore';
 
-/** True below the xl breakpoint, where the context panel becomes a sheet. */
+/** True below the lg breakpoint (1280px), where the panel becomes a sheet. */
 function useBelowXl(): boolean {
   const [below, setBelow] = useState(false);
   useEffect(() => {
@@ -105,7 +105,7 @@ export default function AuraWorkspace() {
           </div>
 
           {/* Desktop: docked panel. Tablet and mobile: sheet. */}
-          <div className="hidden min-h-0 w-[22rem] shrink-0 xl:flex">
+          <div className="hidden min-h-0 w-[22rem] shrink-0 lg:flex">
             {panelOpen && (
               <ContextPanel
                 facility={facility}

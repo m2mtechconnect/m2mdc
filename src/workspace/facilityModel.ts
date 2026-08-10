@@ -273,7 +273,7 @@ export function buildAssets(facility: FacilityDefinition): FacilityAsset[] {
       attributes: [
         { label: 'Location', value: `${facility.city} (${facility.regionCode})` },
         { label: 'Tier', value: facility.tier },
-        { label: 'Design capacity', value: `${facility.capacityKw.toLocaleString()} kW` },
+        { label: 'Design capacity', value: formatPower(facility.capacityKw) },
         { label: 'Racks modelled', value: String(facility.rackCount) },
       ],
     },
@@ -324,7 +324,7 @@ export function buildAssets(facility: FacilityDefinition): FacilityAsset[] {
       dependencies: ['facility'],
       attributes: [
         { label: 'Topology', value: '2N' },
-        { label: 'Modelled load', value: `${(facility.capacityKw * 0.42).toFixed(0)} kW` },
+        { label: 'Modelled load', value: formatPower(facility.capacityKw * 0.42) },
       ],
     },
     {
@@ -335,7 +335,7 @@ export function buildAssets(facility: FacilityDefinition): FacilityAsset[] {
       dependencies: ['facility'],
       attributes: [
         { label: 'Topology', value: '2N' },
-        { label: 'Modelled load', value: `${(facility.capacityKw * 0.4).toFixed(0)} kW` },
+        { label: 'Modelled load', value: formatPower(facility.capacityKw * 0.4) },
       ],
     },
     {

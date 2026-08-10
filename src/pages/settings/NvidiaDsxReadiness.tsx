@@ -44,17 +44,18 @@ function StatusBadge({ status, tone }: { status: string; tone: Row['tone'] }) {
   );
 }
 
-export default function NvidiaDsxReadiness() {
+/**
+ * Readiness panel, rendered inside the canonical Integrations workspace.
+ * Exported without a Layout so it can never become a second destination.
+ */
+export function NvidiaDsxReadinessPanel({ heading = 'h2' }: { heading?: 'h1' | 'h2' }) {
+  const Heading = heading;
   return (
-    <Layout>
-      <div className="space-y-6 pb-10" data-testid="nvidia-dsx-readiness">
+      <div className="space-y-6" data-testid="nvidia-dsx-readiness" id="nvidia-dsx">
         <header className="space-y-1">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">
-            Settings · Integrations
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight">NVIDIA DSX</h1>
+          <Heading className="text-lg font-semibold tracking-tight">NVIDIA DSX</Heading>
           <p className="max-w-3xl text-sm text-muted-foreground">
-            Readiness overview for a future NVIDIA DSX deployment. Nothing on this page is active:
+            Readiness overview for a future NVIDIA DSX deployment. Nothing here is active:
             AURA DC currently operates as a deterministic simulation and evidence platform.
           </p>
         </header>
@@ -120,6 +121,15 @@ export default function NvidiaDsxReadiness() {
             </p>
           </CardContent>
         </Card>
+      </div>
+  );
+}
+
+export default function NvidiaDsxReadiness() {
+  return (
+    <Layout>
+      <div className="pb-10">
+        <NvidiaDsxReadinessPanel heading="h1" />
       </div>
     </Layout>
   );

@@ -238,7 +238,8 @@ export function FacilityFloorPlan({
                         data-selected={isSelected ? 'true' : 'false'}
                         tabIndex={0}
                         role="button"
-                        aria-selected={isSelected}
+                        aria-haspopup="dialog"
+                        aria-expanded={isSelected}
                         aria-label={`Rack ${rack.code}, row ${rowLetter}, modelled load ${loadText}, state ${STATE_TEXT[rack.state]}. Opens rack details.`}
                         className={cn(
                           'cursor-pointer outline-none transition-opacity duration-150',

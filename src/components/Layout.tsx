@@ -151,7 +151,7 @@ export function Layout({ children }: LayoutProps) {
                         size="sm"
                         className={`gap-2 rounded-md px-2.5 xl:px-3 text-[14px] font-medium transition-smooth min-h-[40px] ${
                           isActive
-                            ? "bg-[hsl(var(--info)/0.10)] text-[hsl(var(--info))] shadow-[inset_0_-2px_0_0_hsl(var(--info))]"
+                            ? "bg-[hsl(var(--info)/0.10)] text-[hsl(var(--info-strong))] shadow-[inset_0_-2px_0_0_hsl(var(--info))]"
                             : "text-muted-foreground hover:text-foreground"
                         }`}
                       >

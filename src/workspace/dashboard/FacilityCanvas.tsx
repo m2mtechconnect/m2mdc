@@ -235,7 +235,7 @@ export function FacilityCanvas({
                   'hidden h-9 items-center gap-1.5 rounded-md border px-2.5 text-[13px] font-medium transition-colors duration-150 lg:inline-flex',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
                   isActive
-                    ? 'border-[hsl(var(--info))] bg-[hsl(var(--info)/0.12)] text-[hsl(var(--info))]'
+                    ? 'border-[hsl(var(--info))] bg-[hsl(var(--info)/0.12)] text-[hsl(var(--info-strong))]'
                     : 'border-border bg-card text-muted-foreground hover:border-[hsl(var(--info)/0.5)] hover:text-foreground',
                 )}
               >

@@ -34,7 +34,7 @@ const SUMMARY_KPIS = ['pue', 'itLoadKw', 'capacityHeadroom', 'thermalStability',
 
 export default function CommandCentre() {
   useSeededRunFixtures();
-  const { facility, assets, isFallback, naming } = useFacilityModel();
+  const { facility, assets, isFallback, naming, modelNotes } = useFacilityModel();
   const overrides = useWorkspaceStore((s) => s.overrides);
   const runs = useWorkspaceStore((s) => s.runs);
 
@@ -68,6 +68,9 @@ export default function CommandCentre() {
               Display name derived from facility attributes (stored name: {naming.storedName ?? 'empty'}).
             </p>
           )}
+          {modelNotes.map((note) => (
+            <p key={note} className="mt-0.5 text-[11px] text-muted-foreground">{note}</p>
+          ))}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {isFallback && (

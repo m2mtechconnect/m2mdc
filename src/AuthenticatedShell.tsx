@@ -13,6 +13,8 @@
  */
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import { Layout } from "@/components/Layout";
+import { PreserveNavigate } from "@/routing/PreserveNavigate";
+import { ROUTE_ALIASES } from "@/config/routeAliases";
 import { CoPilotProvider } from "@/contexts/CoPilotContext";
 import { CoPilotCommandProvider } from "@/contexts/CoPilotCommandContext";
 import { TourProvider } from "@/context/TourContext";
@@ -87,9 +89,6 @@ function ApprovedUserRoutes() {
       <Route path="/agents/:id/chat" element={<AgentChat />} />
       <Route path="/agent-chat" element={<AgentChat />} />
       <Route path="/analytics" element={<IntelligenceDashboard />} />
-      {/* Stage 6D dedup: one analytics surface, legacy aliases redirect. */}
-      <Route path="/operations" element={<Navigate to="/analytics" replace />} />
-      <Route path="/intelligence" element={<Navigate to="/analytics" replace />} />
       <Route path="/account/profile" element={<Profile />} />
       <Route path="/account/settings" element={<Settings />} />
       <Route path="/account/access-control" element={<AccessControl />} />
@@ -98,20 +97,16 @@ function ApprovedUserRoutes() {
       <Route path="/admin/signups-dashboard" element={<AdminSignupsDashboard />} />
       {/* Canonical integrations destination. */}
       <Route path="/integrations" element={<Integrations />} />
-      <Route path="/marketplace/integrations" element={<Navigate to="/integrations" replace />} />
       <Route path="/compliance" element={<Compliance />} />
       <Route path="/teams" element={<Teams />} />
       <Route path="/marketplace" element={<Marketplace />} />
       <Route path="/app/agents" element={<ManageAgents />} />
-      <Route path="/agents" element={<Navigate to="/app/agents" replace />} />
-      <Route path="/subsystem-agents" element={<Navigate to="/app/agents" replace />} />
       <Route path="/app/agents/:slug/detail" element={<AgentDetail />} />
       <Route path="/app/agents/:agentId/manage" element={<TwinManage />} />
       <Route path="/app/agents/:agentId/operations" element={<AgentOperationsRedirect />} />
       <Route path="/twins/:instanceId/manage" element={<TwinManageRedirect />} />
       <Route path="/studio/systems/:systemId/manage" element={<SystemManage />} />
       <Route path="/data-centre-twin/:id/blueprint" element={<Blueprint />} />
-      <Route path="/blueprint" element={<Navigate to="/blueprint/default" replace />} />
       {/* `/blueprint/preview` must precede `/blueprint/:id` or it is swallowed. */}
       <Route path="/blueprint/preview" element={<BlueprintPreview />} />
       <Route path="/blueprint/:id" element={<Blueprint />} />
@@ -121,25 +116,24 @@ function ApprovedUserRoutes() {
       <Route path="/connect/monitor" element={<ConnectMonitor />} />
       <Route path="/connect/health" element={<ConnectHealth />} />
       <Route path="/search" element={<Search />} />
-      <Route path="/universal-search" element={<Navigate to="/search" replace />} />
       <Route path="/settings/ai" element={<AISettings />} />
-      <Route path="/settings/integrations/nvidia-dsx" element={<Navigate to="/integrations#nvidia-dsx" replace />} />
-      <Route path="/auth" element={<Navigate to="/" replace />} />
-      <Route path="/sign-in" element={<Navigate to="/" replace />} />
-      <Route path="/sign-up" element={<Navigate to="/" replace />} />
       <Route path="/sign-out" element={<SignOut />} />
-      <Route path="/forgot-password" element={<Navigate to="/" replace />} />
-      <Route path="/mfa" element={<Navigate to="/" replace />} />
       <Route path="/playbook" element={<Playbook />} />
       <Route path="/data-centre-twin" element={<DataCentreTwin />} />
       <Route path="/data-centre-twin/:id" element={<DataCentreTwin />} />
       <Route path="/omniverse-scene" element={<OmniverseScene />} />
-      <Route path="/twin-datacentre" element={<Navigate to="/blueprint/default" replace />} />
       <Route path="/twin-debug" element={<TwinDebug />} />
-      <Route path="/digital-twins" element={<Navigate to="/" replace />} />
-      <Route path="/digital-twins/:slug" element={<Navigate to="/" replace />} />
       <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
       <Route path="/infrastructure" element={<InfrastructurePage />} />
+      {/* Stage 6F: every legacy alias resolves from one registry and keeps
+          its query string, so deep links survive consolidation. */}
+      {ROUTE_ALIASES.map((alias) => (
+        <Route
+          key={alias.from}
+          path={alias.from}
+          element={<PreserveNavigate to={alias.to} />}
+        />
+      ))}
       <Route path="/dsx/evidence-beta" element={<EvidenceBetaShell />}>
         <Route index element={<OverviewWorkspace />} />
         <Route path="overview" element={<OverviewWorkspace />} />

@@ -56,6 +56,7 @@ export interface FacilityDefinition {
   industry: string;
 }
 
+
 export interface ConfigOverrides {
   coolingSetpointC: number;
   gpuPowerCapPct: number;

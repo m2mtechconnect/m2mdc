@@ -9,7 +9,10 @@
  * named `capacity_kw` (5 MW and 10 MW facilities). Rendered verbatim they
  * produced "10000.0 MW" - a 10 GW claim - on the Dashboard and Blueprint.
  *
- * This module is the single conversion boundary: storage values are
+ * Stage 7J closed this at the source: the affected rows were rescaled by
+ * migration and a database trigger now rejects any capacity above the
+ * plausibility limit. This module remains the single conversion boundary and
+ * the last line of defence for legacy or imported records: storage values are
  * normalised once, formatting happens once, and every rescale is disclosed.
  */
 

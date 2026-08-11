@@ -30,6 +30,7 @@ import { calculateBlueprintSummary } from '@/types/dataCentreBlueprint';
 import { supabase } from '@/integrations/supabase/client';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { useRecommendationStore } from '@/stores/recommendationStore';
+import { normaliseStoredCapacityKw } from '@/lib/units/power';
 
 // UUID validation regex
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -41,6 +42,9 @@ export function useBlueprint(twinId: string) {
   const [isLoading, setIsLoading] = useState(true);
   const [loadSource, setLoadSource] = useState<BlueprintLoadSource>('default');
   const [dbTwinData, setDbTwinData] = useState<any>(null);
+  // Stage 7J: a single disclosure when the stored capacity had to be
+  // reinterpreted, so no surface silently shows a different number.
+  const [capacityNote, setCapacityNote] = useState<string | null>(null);
   
   // Access builder store state (only for preview mode) - select primitive values to avoid re-renders
   const builderTwinName = useDCTwinBuilderStore((s) => s.overview?.twinName);
@@ -86,6 +90,14 @@ export function useBlueprint(twinId: string) {
             
             // Generate base blueprint with twin's data overlaid
             const baseBp = generateDefaultBlueprint(twinId);
+
+            // Capacity is normalised HERE, once, so every Blueprint surface
+            // (header badge, model section, validation) reads the same number.
+            const capacity = normaliseStoredCapacityKw(
+              data.capacity_kw,
+              baseBp.capacityKw,
+            );
+            setCapacityNote(capacity.note);
             
             // Overlay database values onto the default blueprint
             const bp: DataCentreBlueprint = {
@@ -95,7 +107,7 @@ export function useBlueprint(twinId: string) {
               name: data.name || baseBp.name,
               location: `${data.city}, ${data.region_code}`,
               tier: data.tier || baseBp.tier,
-              capacityKw: data.capacity_kw || baseBp.capacityKw,
+              capacityKw: capacity.kw,
               createdAt: data.created_at,
               updatedAt: data.updated_at,
             };
@@ -211,6 +223,7 @@ export function useBlueprint(twinId: string) {
     isLoading, 
     downloadBlueprint,
     loadSource,
+    capacityNote,
     dbTwinData, // Expose raw DB data for debugging
   };
 }

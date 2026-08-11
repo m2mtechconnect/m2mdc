@@ -334,7 +334,11 @@ export function NetworkWorkspace() {
   return (
     <div className="space-y-6">
       <Section title="Fabric state" description="Which fabric links constrain workload placement?">
-        <CapabilityNotice capability={capability('compute_fabric')} />
+        <MissingSourceState
+          capability={capability('compute_fabric')}
+          unlocks="link utilisation, oversubscription and placement constraints for the declared fabric"
+          testId="dsx-network-missing-source"
+        />
       </Section>
       <Section title="What would make this workspace operational">
         <ul className="list-disc pl-5 text-sm text-muted-foreground">
@@ -449,7 +453,11 @@ export function WorkloadWorkspace() {
   return (
     <div className="space-y-6">
       <Section title="Exposure summary" description="Which workloads are exposed by the current facility constraint?">
-        <CapabilityNotice capability={capability('workload_scheduler')} />
+        <MissingSourceState
+          capability={capability('workload_scheduler')}
+          unlocks="attribution of facility constraints to named jobs, tenants and GPU allocations"
+          testId="dsx-workload-missing-source"
+        />
       </Section>
       <p className="text-sm text-muted-foreground">
         Facility constraints cannot be attributed to workloads until a scheduler source is connected.

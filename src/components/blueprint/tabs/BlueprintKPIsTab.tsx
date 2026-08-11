@@ -138,7 +138,14 @@ export function BlueprintKPIsTab({ kpis }: BlueprintKPIsTabProps) {
                     </div>
                     <div className="flex items-center gap-1">
                       <Badge variant="outline" className="text-xs">{kpi.unit}</Badge>
-                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); setSelectedKPI(kpi); }}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        aria-label={`View definition for ${kpi.name}`}
+                        title="View KPI definition"
+                        onClick={(e) => { e.stopPropagation(); setSelectedKPI(kpi); }}
+                      >
                         <Info className="h-3 w-3" />
                       </Button>
                     </div>

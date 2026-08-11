@@ -107,6 +107,8 @@ export function ChangeLogPanel({ className }: { className?: string }) {
               variant="ghost"
               size="sm"
               className="h-6 w-6 p-0"
+              aria-label={isExpanded ? 'Collapse change log' : 'Expand change log'}
+              aria-expanded={isExpanded}
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? (

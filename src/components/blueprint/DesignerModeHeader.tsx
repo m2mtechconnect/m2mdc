@@ -116,7 +116,7 @@ export function DesignerModeHeader({
               
               {/* Info tooltip */}
               <Tooltip>
-                <TooltipTrigger>
+                <TooltipTrigger aria-label="About Designer Mode">
                   <Info className="h-4 w-4 text-muted-foreground cursor-help hover:text-foreground transition-colors" />
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="max-w-xs">

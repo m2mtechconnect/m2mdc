@@ -14,7 +14,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   ArrowRight,
-  Eye,
+  ShieldCheck,
   History
 } from 'lucide-react';
 import { WORKFLOWS, getWorkflowDescription } from '@/ux';
@@ -162,9 +162,10 @@ export function BlueprintWorkflowsTab({ workflows }: BlueprintWorkflowsTabProps)
                           e.stopPropagation();
                           handleOpenSimulationPreview(workflow);
                         }}
-                        title="Preview Simulation"
+                        aria-label={`Validate structure of ${workflow.id}`}
+                        title="Validate workflow structure"
                       >
-                        <Eye className="h-3.5 w-3.5" />
+                        <ShieldCheck className="h-3.5 w-3.5" />
                       </Button>
                       <Button 
                         variant="ghost" 
@@ -174,6 +175,7 @@ export function BlueprintWorkflowsTab({ workflows }: BlueprintWorkflowsTabProps)
                           e.stopPropagation();
                           handleOpenVersionControl(workflow);
                         }}
+                        aria-label={`Version history for ${workflow.id}`}
                         title="Version History"
                       >
                         <History className="h-3.5 w-3.5" />
@@ -221,8 +223,8 @@ export function BlueprintWorkflowsTab({ workflows }: BlueprintWorkflowsTabProps)
                               className="h-7 text-xs"
                               onClick={() => handleOpenSimulationPreview(workflow)}
                             >
-                              <Eye className="h-3 w-3 mr-1" />
-                              Preview
+                              <ShieldCheck className="h-3 w-3 mr-1" />
+                              Validate
                             </Button>
                             {workflow.autoRun ? (
                               <Badge className="bg-success/10 text-success border-success/30">

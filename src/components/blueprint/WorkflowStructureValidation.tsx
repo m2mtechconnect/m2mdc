@@ -38,14 +38,14 @@ export function validateWorkflowStructure(workflow?: WorkflowBlueprint | null): 
   }
 
   const actions = workflow.actions ?? [];
-  const tools = workflow.toolsUsed ?? [];
+  const mitigations = workflow.recommendedMitigation ?? [];
 
   return [
     {
       id: 'trigger',
       label: 'Trigger defined',
-      status: workflow.trigger ? 'pass' : 'warn',
-      detail: workflow.trigger ? String(workflow.trigger) : 'No trigger condition is modelled.',
+      status: workflow.triggerCondition ? 'pass' : 'warn',
+      detail: workflow.triggerCondition || 'No trigger condition is modelled.',
     },
     {
       id: 'actions',
@@ -54,10 +54,10 @@ export function validateWorkflowStructure(workflow?: WorkflowBlueprint | null): 
       detail: actions.length > 0 ? `${actions.length} modelled action(s).` : 'No actions are modelled.',
     },
     {
-      id: 'tools',
-      label: 'Tool bindings',
-      status: tools.length > 0 ? 'pass' : 'warn',
-      detail: tools.length > 0 ? tools.join(', ') : 'No tool bindings declared.',
+      id: 'mitigation',
+      label: 'Recommended mitigation',
+      status: mitigations.length > 0 ? 'pass' : 'warn',
+      detail: mitigations.length > 0 ? mitigations.join(', ') : 'No mitigation steps declared.',
     },
     {
       id: 'domain',
@@ -91,7 +91,7 @@ export function WorkflowStructureValidation({ workflow, className }: Props) {
           </Badge>
         </div>
         <p className="text-sm text-muted-foreground">
-          {workflow ? workflow.id.replace(/-/g, ' ') : 'Select a workflow'}
+          {workflow ? workflow.name : 'Select a workflow'}
         </p>
       </CardHeader>
 

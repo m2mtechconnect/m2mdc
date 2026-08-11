@@ -109,7 +109,21 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
 
   const writeContext = useCallback(
     (next: InvestigationContext, replace = false) => {
-      setSearchParams(contextToParams(next), { replace });
+      // Investigation keys are rewritten; every other query parameter the
+      // caller arrived with (deep links, feature flags) is carried through.
+      setSearchParams(
+        (current) => {
+          const params = contextToParams(next);
+          const owned = new Set(params.keys());
+          const contextKeys = new Set(Object.values(CONTEXT_PARAM));
+          current.forEach((value, key) => {
+            if (owned.has(key) || contextKeys.has(key)) return;
+            params.append(key, value);
+          });
+          return params;
+        },
+        { replace },
+      );
     },
     [setSearchParams],
   );

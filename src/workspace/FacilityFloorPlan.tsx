@@ -28,6 +28,8 @@ interface Props {
   showRowLabels?: boolean;
   showConstraintMarkers?: boolean;
   showCoolingZones?: boolean;
+  /** Cursor-anchored wheel/pinch zoom reports back to the canvas controls. */
+  onZoomChange?: (next: number) => void;
   /** Request to scroll a rack into view and focus it. */
   centerRequest?: CenterRequest | null;
 }
@@ -153,6 +155,7 @@ export function FacilityFloorPlan({
   onSelect,
   onClearSelection,
   zoom = 1,
+  onZoomChange,
   showRowLabels = true,
   showConstraintMarkers = true,
   showCoolingZones = true,
@@ -280,6 +283,39 @@ export function FacilityFloorPlan({
   // Pointer panning, used mainly on narrow viewports where the plan overflows.
   const dragRef = useRef<{ id: number; x: number; y: number; origin: { x: number; y: number } } | null>(null);
   const [dragging, setDragging] = useState(false);
+
+  /**
+   * Cursor-anchored wheel and trackpad-pinch zoom. React's onWheel is passive,
+   * so the listener is attached natively and reads live state through a ref.
+   */
+  const wheelHandlerRef = useRef<(event: WheelEvent) => void>(() => {});
+  wheelHandlerRef.current = (event: WheelEvent) => {
+    if (!onZoomChange) return;
+    const dy = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 100 : 1);
+    const next = clamp(zoom * Math.exp(-dy * 0.0015), MIN_ZOOM, MAX_ZOOM);
+    if (Math.abs(next - zoom) < 0.0005) return;
+    const rect = scrollRef.current?.getBoundingClientRect();
+    if (rect) {
+      // Screen point measured from the canvas centre, where the plan is anchored.
+      const px = event.clientX - rect.left - rect.width / 2;
+      const py = event.clientY - rect.top - rect.height / 2;
+      const k = next / zoom;
+      setPan((prev) => clampPan({ x: px - (px - prev.x) * k, y: py - (py - prev.y) * k }));
+    }
+    onZoomChange(next);
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onWheel = (event: WheelEvent) => {
+      // Also covers trackpad pinch (ctrlKey), which would otherwise zoom the page.
+      event.preventDefault();
+      wheelHandlerRef.current(event);
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
 
   return (
     <div

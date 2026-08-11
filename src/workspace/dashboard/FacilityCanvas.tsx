@@ -355,6 +355,7 @@ export function FacilityCanvas({
               onSelect={selectRack}
               onClearSelection={() => onSelectRack(null)}
               zoom={zoom}
+              onZoomChange={(next) => setZoom(Number(next.toFixed(3)))}
               showRowLabels={showRowLabels}
               showConstraintMarkers={showConstraintMarkers}
               showCoolingZones={showCoolingZones}

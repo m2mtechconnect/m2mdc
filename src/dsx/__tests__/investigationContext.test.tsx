@@ -37,6 +37,23 @@ describe('investigation context serialisation', () => {
     const chips = buildContextChips({ ...EMPTY_CONTEXT, stable_asset_id: 'not-a-real-id' }, identityByAuraId);
     expect(chips[0].value).toMatch(/Unavailable/);
   });
+
+  it('carries the full deep-link contract through the URL', () => {
+    const ctx = {
+      ...EMPTY_CONTEXT,
+      facility_id: 'fac-1',
+      data_mode: 'SIMULATED',
+      run_id: 'sim:run:1',
+      observation_tick: '3',
+      stable_asset_id: rack.aura_asset_id,
+      metric_id: 'pue',
+      time_range: '1h',
+      overlay_id: 'thermal',
+      inspector: 'asset',
+    };
+    const restored = parseContext(contextSearch(ctx).slice(1));
+    expect(restored).toEqual(ctx);
+  });
 });
 
 describe('facility hierarchy scoping', () => {

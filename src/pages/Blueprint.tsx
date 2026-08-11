@@ -75,7 +75,9 @@ function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: any }) {
         city: 'Montreal',
         region_code: 'QC',
         tier: blueprint.tier || 'Tier III',
-        capacity_kw: blueprint.capacityKw * 1000 || 10000,
+        // `capacityKw` is already kilowatts. Multiplying by 1000 wrote watts into a
+        // kW column and relied on normaliseStoredCapacityKw() to rescale it back.
+        capacity_kw: blueprint.capacityKw || 10000,
         industry: 'ai_compute',
         pue_target: blueprint.pueTarget || 1.3,
         renewable_target_pct: 95,
@@ -126,13 +128,14 @@ export default function Blueprint() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { openWithQuestion } = useCoPilotContext();
   const { twin, activeTwinId: twinId } = useActiveTwin();
   const [showCoPilotPanel, setShowCoPilotPanel] = useState(false);
   
-  // Use twin's blueprint_id if available, otherwise use URL param or 'default'
-  const blueprintId = twin?.blueprint_id || id || 'default';
+  // The URL is authoritative: /blueprint/:id must render :id. The active twin's
+  // blueprint is only a fallback when the route carries no id.
+  const blueprintId = id || twin?.blueprint_id || 'default';
   const { blueprint, summary, isLoading, downloadBlueprint } = useBlueprint(blueprintId);
   
   // Read tab and highlight from query params
@@ -146,6 +149,14 @@ export default function Blueprint() {
       setActiveTab(tabParam);
     }
   }, [tabParam]);
+
+  // Keep the URL in sync so a tab can be shared and the back button works.
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', value);
+    setSearchParams(next, { replace: true });
+  };
 
   if (isLoading) {
     return <LoadingState message="Loading Blueprint..." />;
@@ -161,7 +172,7 @@ export default function Blueprint() {
 
   return (
     <BlueprintDesignerWrapper twinId={blueprintId}>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <div className="flex min-w-0">
           {/* Main Content */}
           <div className={`flex-1 min-w-0 transition-all duration-300 ${showCoPilotPanel ? 'lg:mr-96' : ''}`}>
@@ -232,7 +243,7 @@ export default function Blueprint() {
                   version={String(blueprint.version)}
                   mode="designer"
                   changesCount={0}
-                  lastUpdated={new Date()}
+                  lastUpdated={blueprint.updatedAt ? new Date(blueprint.updatedAt) : undefined}
                 />
                 <Badge variant="outline" className="gap-1">
                   <MapPin className="h-3 w-3" />
@@ -259,7 +270,7 @@ export default function Blueprint() {
                     return (
                       <div 
                         key={stat.label}
-                        className="group p-3 rounded-lg border bg-card hover:bg-muted/50 hover:shadow-md hover:border-primary/30 transition-all duration-300 cursor-pointer animate-fade-in"
+                        className="group p-3 rounded-lg border bg-card hover:bg-muted/50 hover:shadow-md hover:border-primary/30 transition-all duration-300 animate-fade-in"
                         style={{ animationDelay: `${index * 0.05}s` }}
                       >
                         <div className="flex items-center gap-2 mb-1">
@@ -313,7 +324,7 @@ export default function Blueprint() {
               </div>
 
               {/* Main Tabs - Enhanced with better styling */}
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="w-full justify-start border-b rounded-none bg-transparent p-0 h-auto flex-wrap gap-1">
                   {[
                     { value: 'model', label: 'Facility model' },

@@ -128,7 +128,7 @@ export default function Blueprint() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { openWithQuestion } = useCoPilotContext();
   const { twin, activeTwinId: twinId } = useActiveTwin();
   const [showCoPilotPanel, setShowCoPilotPanel] = useState(false);

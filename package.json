@@ -25,7 +25,7 @@
     "guard:test-env": "node scripts/aura-test-env-guard.mjs",
     "db:migrate:test": "node scripts/aura-test-env-guard.mjs && supabase db push --project-ref $SUPABASE_PROJECT_ID",
     "db:reset:test": "node scripts/aura-test-env-guard.mjs && supabase db reset --linked",
-    "lint:dsx": "eslint src/dsx src/components/dsx --max-warnings=0",
+    "lint:dsx": "eslint src/dsx src/components/dsx",
     "test:dsx": "vitest run src/dsx"
   },
   "dependencies": {

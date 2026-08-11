@@ -26,6 +26,29 @@ import { ROUTE_ALIASES, PARAM_ALIASES } from '../../src/config/routeAliases';
 
 const QUERY = 'facility=montreal&layer=power&kpi=pue';
 
+/**
+ * Aliases may chain: the auth surfaces redirect to `/`, which is itself an
+ * alias for `/dashboard` once a session exists. The harness follows the
+ * chain so the expected destination matches what a signed-in user reaches.
+ */
+function resolveAlias(path: string): { target: string; hash: string | undefined; hops: number } {
+  let target = path;
+  let hash: string | undefined;
+  let hops = 0;
+  const seen = new Set<string>([path]);
+  for (;;) {
+    const next = ROUTE_ALIASES.find((a) => a.from === target);
+    if (!next) break;
+    const [nextPath, nextHash] = next.to.split('#');
+    if (seen.has(nextPath)) break;
+    seen.add(nextPath);
+    target = nextPath;
+    hash = nextHash ?? hash;
+    hops += 1;
+  }
+  return { target, hash, hops };
+}
+
 interface HopResult {
   finalPath: string;
   finalSearch: string;
@@ -89,7 +112,7 @@ async function assertSingleShell(page: Page, label: string) {
   ).toHaveCount(0);
 }
 
-function assertNoLoop(result: HopResult, label: string) {
+function assertNoLoop(result: HopResult, label: string, maxHops = 2) {
   // Chromium emits a framenavigated event for the provisional document and
   // again for the committed one, so collapse consecutive repeats first: a
   // hop is counted by how many DISTINCT locations the frame settled on.
@@ -105,8 +128,8 @@ function assertNoLoop(result: HopResult, label: string) {
   }
   expect(
     hops.length,
-    `${label}: alias must resolve in at most two navigations, got ${hops.join(' -> ')}`,
-  ).toBeLessThanOrEqual(2);
+    `${label}: alias must resolve in at most ${maxHops} navigations, got ${hops.join(' -> ')}`,
+  ).toBeLessThanOrEqual(maxHops);
 }
 
 test.describe('deep-link alias and redirect harness', () => {
@@ -124,8 +147,12 @@ test.describe('deep-link alias and redirect harness', () => {
 
   for (const alias of ROUTE_ALIASES) {
     const sample = alias.sample ?? alias.from;
-    const [expectedPath, expectedHash] = alias.to.split('#');
-    const target = alias.expected ?? expectedPath;
+    const [expectedPath, declaredHash] = alias.to.split('#');
+    // Follow any further alias hop (e.g. `/auth` -> `/` -> `/dashboard`).
+    const chain = resolveAlias(alias.expected ?? expectedPath);
+    const target = chain.target;
+    const expectedHash = chain.hash ?? declaredHash;
+    const maxHops = 2 + chain.hops;
 
     test(`${sample} preserves context into ${alias.to}`, async ({ page }) => {
       const incomingHash = expectedHash ? '' : '#section-two';
@@ -144,7 +171,7 @@ test.describe('deep-link alias and redirect harness', () => {
         expect(result.finalHash, `${sample}: incoming anchor preserved`).toBe(incomingHash);
       }
 
-      assertNoLoop(result, sample);
+      assertNoLoop(result, sample, maxHops);
       await assertSingleShell(page, sample);
 
       // `replace` semantics: the alias entry must not remain in history.

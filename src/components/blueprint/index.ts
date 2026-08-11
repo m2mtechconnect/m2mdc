@@ -23,6 +23,8 @@ export { BlueprintDesignerWrapper } from './BlueprintDesignerWrapper';
 export { BlueprintSnapshotCard } from './BlueprintSnapshotCard';
 export { BlueprintSummaryCard } from './BlueprintSummaryCard';
 export { BlueprintReviewSection } from './BlueprintReviewSection';
+export { QuarantinedCapacityPanel } from './QuarantinedCapacityPanel';
+export { buildBlueprintCapacityRecords } from './blueprintCapacityRecords';
 
 // Mode-specific Headers
 export { DesignerModeHeader } from './DesignerModeHeader';

@@ -30,6 +30,8 @@ import { BLUEPRINT } from '@/ux';
 import { BlueprintDesignerWrapper } from '@/components/blueprint/BlueprintDesignerWrapper';
 import { BlueprintValidationPanel } from '@/components/blueprint/BlueprintValidationPanel';
 import { DesignerModeHeader } from '@/components/blueprint/DesignerModeHeader';
+import { QuarantinedCapacityPanel } from '@/components/blueprint/QuarantinedCapacityPanel';
+import { buildBlueprintCapacityRecords } from '@/components/blueprint/blueprintCapacityRecords';
 
 // Blueprint Tab Components
 import { BlueprintOverviewTab } from '@/components/blueprint/tabs/BlueprintOverviewTab';
@@ -165,7 +167,7 @@ export default function Blueprint() {
   // The URL is authoritative: /blueprint/:id must render :id. The active twin's
   // blueprint is only a fallback when the route carries no id.
   const blueprintId = id || twin?.blueprint_id || 'default';
-  const { blueprint, summary, isLoading, downloadBlueprint, capacityNote } =
+  const { blueprint, summary, isLoading, downloadBlueprint, capacityNote, dbTwinData } =
     useBlueprint(blueprintId);
   
   // Read tab and highlight from query params
@@ -372,6 +374,13 @@ export default function Blueprint() {
                   <TabsContent value="validation" className="m-0">
                     <div className="grid lg:grid-cols-2 gap-6">
                       <BlueprintValidationPanel blueprint={blueprint} />
+                      {/* Read-only: capacity records that cannot be published. */}
+                      <QuarantinedCapacityPanel
+                        records={buildBlueprintCapacityRecords({
+                          blueprint,
+                          dbTwin: dbTwinData,
+                        })}
+                      />
                       <Card>
                         <CardHeader>
                           <CardTitle className="text-base flex items-center gap-2">

@@ -73,31 +73,7 @@ export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTa
   return (
     <div className="space-y-6" data-tour="blueprint-overview">
       {/* ============================================== */}
-      {/* SECTION 0: 3D Twin Visualization */}
-      {/* Visual layout of racks, power, cooling, network */}
-      {/* ============================================== */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Activity className="h-4 w-4" />
-            Blueprint Layout Visualization
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Suspense fallback={<VisualizationSkeleton />}>
-            <TwinVisualizationLayout mode="blueprint" />
-          </Suspense>
-        </CardContent>
-      </Card>
-
-      {/* ============================================== */}
-      {/* SECTION 1: Executive Summary Block */}
-      {/* ROI, Carbon Impact, Active Systems, Costs */}
-      {/* ============================================== */}
-      <ExecutiveSummaryBlock />
-
-      {/* ============================================== */}
-      {/* SECTION 2: Domain Health + Dependency Graph */}
+      {/* Domain Health + Dependency Graph */}
       {/* Visual system overview and relationships */}
       {/* ============================================== */}
       <div className="grid lg:grid-cols-2 gap-6">
@@ -106,25 +82,7 @@ export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTa
       </div>
 
       {/* ============================================== */}
-      {/* SECTION 3: Agent Health & Performance Panel */}
-      {/* Health scores, latency, refresh rates, ML reasoning */}
-      {/* ============================================== */}
-      <AgentHealthPanel />
-
-      {/* ============================================== */}
-      {/* SECTION 4: KPI Insights & Forecasting */}
-      {/* Why KPIs matter, impacts, 30-day forecasts, recommendations */}
-      {/* ============================================== */}
-      <KPIEnhancementsPanel />
-
-      {/* ============================================== */}
-      {/* SECTION 5: Workflow Version Control & Preview */}
-      {/* Simulation preview, version history, rollback, impact analysis */}
-      {/* ============================================== */}
-      <WorkflowEnhancementsPanel />
-
-      {/* ============================================== */}
-      {/* SECTION 7: Facility Summary */}
+      {/* Facility Summary */}
       {/* Location, Capacity, Racks, Tier */}
       {/* ============================================== */}
       <Card>
@@ -148,7 +106,8 @@ export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTa
                 <Zap className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">Capacity</span>
               </div>
-              <p className="font-medium">{blueprint.capacityKw} MW</p>
+              {/* Canonical unit is kW; formatPower renders MW only when scaled. */}
+              <p className="font-medium">{formatPower(blueprint.capacityKw)}</p>
             </div>
             <div className="p-3 rounded-lg border bg-muted/30">
               <div className="flex items-center gap-2 mb-1">
@@ -162,7 +121,7 @@ export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTa
                 <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">Tier</span>
               </div>
-              <p className="font-medium">Tier {blueprint.tier}</p>
+              <p className="font-medium">Tier {stripTierPrefix(blueprint.tier)}</p>
             </div>
           </div>
         </CardContent>

@@ -15,7 +15,7 @@ const blueprint = {
   name: 'Test blueprint',
   agents: [{ id: 'a1' }],
   domains: {},
-  kpis: [],
+  kpis: [{ id: 'k1' }],
   workflows: [],
   dataSources: [],
   integrations: [],

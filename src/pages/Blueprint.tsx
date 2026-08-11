@@ -161,14 +161,14 @@ export default function Blueprint() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { openWithQuestion } = useCoPilotContext();
   const { twin, activeTwinId: twinId } = useActiveTwin();
   const [showCoPilotPanel, setShowCoPilotPanel] = useState(false);
   
   // The URL is authoritative: /blueprint/:id must render :id. The active twin's
   // blueprint is only a fallback when the route carries no id.
   const blueprintId = id || twin?.blueprint_id || 'default';
-  const { blueprint, summary, isLoading, downloadBlueprint } = useBlueprint(blueprintId);
+  const { blueprint, summary, isLoading, downloadBlueprint, capacityNote } =
+    useBlueprint(blueprintId);
   
   // Read tab and highlight from query params
   const tabParam = searchParams.get('tab');

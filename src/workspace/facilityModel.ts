@@ -445,7 +445,10 @@ export function useFacilityModel(override?: FacilityOverride): FacilityModel {
   const overrideKey = override ? JSON.stringify(override) : '';
 
   return useMemo(() => {
-    if (!twin) {
+    // The routed record wins over the active twin whenever the two differ.
+    const source = override?.id && override.id !== twin?.id ? null : twin;
+
+    if (!source && !override) {
       const naming = resolveFacilityNaming(FALLBACK_FACILITY);
       return {
         facility: FALLBACK_FACILITY,
@@ -461,7 +464,10 @@ export function useFacilityModel(override?: FacilityOverride): FacilityModel {
         },
       };
     }
-    const capacity = normaliseStoredCapacityKw(twin.capacity_kw, FALLBACK_FACILITY.capacityKw);
+    const capacity = normaliseStoredCapacityKw(
+      override?.capacityKw ?? source?.capacity_kw,
+      FALLBACK_FACILITY.capacityKw,
+    );
     const capacityKw = capacity.kw;
     const designRackEstimate = Math.max(8, Math.floor(capacityKw / 50));
     const rackCount = Math.min(40, designRackEstimate);
@@ -473,34 +479,37 @@ export function useFacilityModel(override?: FacilityOverride): FacilityModel {
         `${rackCount} of an estimated ${designRackEstimate} racks are rendered. The remainder are represented by the aggregate load model.`,
       );
     }
+    const city = override?.city || source?.city || FALLBACK_FACILITY.city;
+    const regionCode = override?.regionCode || source?.region_code || FALLBACK_FACILITY.regionCode;
+    const tier = override?.tier || source?.tier || FALLBACK_FACILITY.tier;
     const naming = resolveFacilityNaming({
-      name: twin.name,
-      city: twin.city || FALLBACK_FACILITY.city,
-      regionCode: twin.region_code || FALLBACK_FACILITY.regionCode,
-      tier: twin.tier || FALLBACK_FACILITY.tier,
-      sovereigntyLevel: twin.sovereignty_level ?? FALLBACK_FACILITY.sovereigntyLevel,
-      industry: twin.industry ?? FALLBACK_FACILITY.industry,
+      name: override?.name || source?.name || FALLBACK_FACILITY.name,
+      city,
+      regionCode,
+      tier,
+      sovereigntyLevel: source?.sovereignty_level ?? FALLBACK_FACILITY.sovereigntyLevel,
+      industry: source?.industry ?? FALLBACK_FACILITY.industry,
     });
     const facility: FacilityDefinition = {
-      id: twin.id,
+      id: override?.id ?? source?.id ?? FALLBACK_FACILITY.id,
       name: naming.displayName,
-      city: twin.city || FALLBACK_FACILITY.city,
-      regionCode: twin.region_code || FALLBACK_FACILITY.regionCode,
-      tier: twin.tier || FALLBACK_FACILITY.tier,
+      city,
+      regionCode,
+      tier,
       capacityKw,
       rackCount,
       rowCount,
       designRackEstimate,
-      pueTarget: twin.pue_target ?? FALLBACK_FACILITY.pueTarget,
-      renewableTargetPct: twin.renewable_target_pct ?? FALLBACK_FACILITY.renewableTargetPct,
-      carbonIntensity: twin.carbon_intensity ?? FALLBACK_FACILITY.carbonIntensity,
-      sovereigntyLevel: twin.sovereignty_level ?? FALLBACK_FACILITY.sovereigntyLevel,
-      industry: twin.industry ?? FALLBACK_FACILITY.industry,
+      pueTarget: source?.pue_target ?? FALLBACK_FACILITY.pueTarget,
+      renewableTargetPct: source?.renewable_target_pct ?? FALLBACK_FACILITY.renewableTargetPct,
+      carbonIntensity: source?.carbon_intensity ?? FALLBACK_FACILITY.carbonIntensity,
+      sovereigntyLevel: source?.sovereignty_level ?? FALLBACK_FACILITY.sovereigntyLevel,
+      industry: source?.industry ?? FALLBACK_FACILITY.industry,
     };
     return {
       facility,
       assets: buildAssets(facility),
-      isFallback: false,
+      isFallback: !source && !override,
       isLoading,
       modelNotes,
       naming: {

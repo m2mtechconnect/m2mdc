@@ -252,6 +252,9 @@ export default function Blueprint() {
                 twinId={blueprintId}
                 location={twin?.city || blueprint.location}
                 showSimulationLink={true}
+                blueprintId={blueprintId}
+                versionId={blueprint.version ?? null}
+                returnTab={activeTab}
               />
 
               {/* Quick Actions Bar */}
@@ -397,7 +400,6 @@ export default function Blueprint() {
                     { value: 'kpis', label: t('blueprint.tabs.kpis') },
                     { value: 'workflows', label: t('blueprint.tabs.workflows') },
                     { value: 'roles', label: t('blueprint.tabs.roles') },
-                    { value: 'scenarios', label: t('blueprint.tabs.scenarios') },
                     { value: 'validation', label: t('blueprint.tabs.validation') },
                   ].map((tab) => (
                     <TabsTrigger 

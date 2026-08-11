@@ -15,7 +15,7 @@ import { ancestryFor, identityByAuraId, type AssetIdentity } from '../workspaces
 import type { DsxProvenancedMetric } from '../contracts/provenancedMetric';
 import { freshnessFor, type FreshnessState } from '../modes';
 import {
-  buildContextChips, contextToParams, linkWithContext, parseContext,
+  CONTEXT_PARAM, buildContextChips, contextToParams, linkWithContext, parseContext,
   type ContextChip, type InvestigationContext,
 } from './investigationContext';
 import { TIMELINE_IDS, type TimelineId } from '../fixtures/timelines';

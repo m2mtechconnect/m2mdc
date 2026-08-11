@@ -24,6 +24,7 @@ import { RoleViewSelector } from './RoleViewSelector';
 import { useFacilityModel } from './facilityModel';
 import { ROLE_VIEWS, useWorkspaceStore } from './workspaceStore';
 import { useSeededRunFixtures } from './runFixtures';
+import { parseSimulationHandoff } from '@/simulation/handoff';
 
 /** True below the lg breakpoint (1280px), where the panel becomes a sheet. */
 function useBelowXl(): boolean {
@@ -51,6 +52,7 @@ export default function AuraWorkspace() {
   const setActiveRun = useWorkspaceStore((s) => s.setActiveRun);
   const toggleCompareRun = useWorkspaceStore((s) => s.toggleCompareRun);
   const selectAsset = useWorkspaceStore((s) => s.selectAsset);
+  const setHandoff = useWorkspaceStore((s) => s.setHandoff);
   const [searchParams] = useSearchParams();
   const isMobile = useIsMobile();
   const belowXl = useBelowXl();
@@ -89,6 +91,20 @@ export default function AuraWorkspace() {
   const compareParam = searchParams.get('compare');
   const assetParam = searchParams.get('asset');
   const twinParam = searchParams.get('twin');
+  const blueprintParam = searchParams.get('blueprintId');
+  const versionParam = searchParams.get('versionId');
+
+  // Blueprint handoff: load a DRAFT configuration only. No run is created and
+  // no simulation mutation is issued on arrival.
+  useEffect(() => {
+    const handoff = parseSimulationHandoff(searchParams);
+    if (handoff) {
+      setHandoff({ blueprintId: handoff.blueprintId, versionId: handoff.versionId });
+      setTool('simulate');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blueprintParam, versionParam]);
+
   useEffect(() => {
     if (assetParam) {
       selectAsset(assetParam);

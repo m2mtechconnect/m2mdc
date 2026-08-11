@@ -40,7 +40,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { WorkflowVersionControl } from '../WorkflowVersionControl';
-import { WorkflowSimulationPreview } from '../WorkflowSimulationPreview';
+import { WorkflowStructureValidation } from '../WorkflowStructureValidation';
 
 interface BlueprintWorkflowsTabProps {
   workflows: WorkflowBlueprint[];
@@ -84,10 +84,7 @@ export function BlueprintWorkflowsTab({ workflows }: BlueprintWorkflowsTabProps)
           workflowName={selectedWorkflow?.id.replace(/-/g, ' ').replace(/wf /i, '') || 'Select a workflow'}
           onRollback={(versionId) => console.log('Rollback to:', versionId)}
         />
-        <WorkflowSimulationPreview 
-          workflowName={selectedWorkflow?.id.replace(/-/g, ' ').replace(/wf /i, '') || 'Select a workflow'}
-          onApplyToProduction={() => console.log('Apply to production')}
-        />
+        <WorkflowStructureValidation workflow={selectedWorkflow} />
       </div>
 
       {/* Summary Table */}
@@ -311,19 +308,13 @@ export function BlueprintWorkflowsTab({ workflows }: BlueprintWorkflowsTabProps)
         </DialogContent>
       </Dialog>
 
-      {/* Simulation Preview Dialog */}
+      {/* Structure Validation Dialog (no execution) */}
       <Dialog open={showSimulationPreview} onOpenChange={setShowSimulationPreview}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Simulation Preview</DialogTitle>
+            <DialogTitle>Workflow structure validation</DialogTitle>
           </DialogHeader>
-          <WorkflowSimulationPreview 
-            workflowName={selectedWorkflow?.id.replace(/-/g, ' ').replace(/wf /i, '')}
-            onApplyToProduction={() => {
-              console.log('Apply to production');
-              setShowSimulationPreview(false);
-            }}
-          />
+          <WorkflowStructureValidation workflow={selectedWorkflow} />
         </DialogContent>
       </Dialog>
     </div>

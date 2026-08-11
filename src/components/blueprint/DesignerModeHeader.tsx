@@ -7,16 +7,18 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  Edit3, 
-  Unlock, 
-  PlayCircle,
+import {
+  Edit3,
+  Unlock,
+  ExternalLink,
   Server,
   Info,
   Save,
-  Sparkles
+  Sparkles,
+  Lock,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { buildSimulationHandoffUrl, useSimulationPermissions } from '@/simulation/handoff';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
@@ -27,6 +29,12 @@ interface DesignerModeHeaderProps {
   showSimulationLink?: boolean;
   onSave?: () => void;
   hasUnsavedChanges?: boolean;
+  /** Route-authoritative blueprint id used for the Simulation handoff. */
+  blueprintId?: string;
+  /** Explicitly selected blueprint version / snapshot. */
+  versionId?: string | number | null;
+  /** Blueprint tab restored when the user presses Browser Back. */
+  returnTab?: string;
 }
 
 export function DesignerModeHeader({ 
@@ -35,12 +43,28 @@ export function DesignerModeHeader({
   location,
   showSimulationLink = true,
   onSave,
-  hasUnsavedChanges = false
+  hasUnsavedChanges = false,
+  blueprintId,
+  versionId = null,
+  returnTab,
 }: DesignerModeHeaderProps) {
   const navigate = useNavigate();
+  const { canViewSimulation, canConfigureSimulation } = useSimulationPermissions();
+  const canHandOff = canViewSimulation && canConfigureSimulation;
 
-  const handleOpenSimulation = () => {
-    navigate('/simulation');
+  /**
+   * Navigation ONLY. Blueprint must never create, queue or start a run, so
+   * this handler performs no mutation and calls no simulation service.
+   */
+  const handleOpenInSimulation = () => {
+    navigate(
+      buildSimulationHandoffUrl({
+        blueprintId: blueprintId ?? twinId,
+        versionId,
+        twinId: twinId !== blueprintId ? twinId : null,
+        returnTab,
+      }),
+    );
   };
 
   return (
@@ -97,8 +121,9 @@ export function DesignerModeHeader({
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="max-w-xs">
                   <p className="text-sm">
-                    <strong>Designer Mode</strong> allows full editing of the blueprint configuration. 
-                    Changes here affect future simulations. Run simulations to test changes.
+                    <strong>Designer Mode</strong> allows full editing of the blueprint configuration.
+                    Scenarios and runs are owned by the Simulation workspace: open this version there
+                    to configure and execute a run.
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -128,15 +153,30 @@ export function DesignerModeHeader({
               </Button>
             )}
             
-            {showSimulationLink && (
-              <Button 
-                variant="outline" 
-                onClick={handleOpenSimulation}
+            {showSimulationLink && canHandOff && (
+              <Button
+                variant="outline"
+                onClick={handleOpenInSimulation}
+                data-testid="blueprint-open-in-simulation"
                 className="gap-2 shrink-0 hover:bg-primary/5 hover:border-primary/50 hover:text-primary transition-all duration-300 group"
               >
-                <PlayCircle className="h-4 w-4 group-hover:scale-110 transition-transform" />
-                Run Simulation
+                <ExternalLink className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                Open in Simulation
               </Button>
+            )}
+            {showSimulationLink && !canHandOff && (
+              <div
+                className="flex max-w-xs items-start gap-2 rounded-md border border-border bg-muted/40 px-3 py-2"
+                data-testid="blueprint-simulation-access-required"
+              >
+                <Lock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+                <div>
+                  <p className="text-xs font-medium text-foreground">Simulation access required</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    You can view this blueprint, but your role cannot configure or run simulations.
+                  </p>
+                </div>
+              </div>
             )}
           </div>
         </div>

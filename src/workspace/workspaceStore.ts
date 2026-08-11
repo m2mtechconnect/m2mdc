@@ -27,6 +27,12 @@ export const WORKFLOW_STEPS: Array<{ tool: WorkspaceTool; label: string }> = [
   { tool: 'decide', label: 'Review' },
 ];
 
+/** Draft configuration handed over from Blueprint. Never auto-executed. */
+export interface HandoffDraft {
+  blueprintId: string;
+  versionId: string | null;
+}
+
 interface WorkspaceState {
   activeTool: WorkspaceTool;
   roleView: RoleView;
@@ -39,6 +45,13 @@ interface WorkspaceState {
   activeRunId: string | null;
   compareRunIds: string[];
   evidenceKpi: KpiKey | null;
+  /** Blueprint handoff currently loaded as a draft configuration. */
+  handoff: HandoffDraft | null;
+  /**
+   * Explicit operator acknowledgement of the run inputs. Execution is blocked
+   * until this is true, so opening Simulation can never start a run.
+   */
+  assumptionsReviewed: boolean;
 
   setTool: (tool: WorkspaceTool) => void;
   setRoleView: (role: RoleView) => void;
@@ -47,6 +60,8 @@ interface WorkspaceState {
   setOverride: <K extends keyof ConfigOverrides>(key: K, value: ConfigOverrides[K]) => void;
   resetOverrides: () => void;
   setScenario: (scenarioId: string) => void;
+  setHandoff: (handoff: HandoffDraft | null) => void;
+  setAssumptionsReviewed: (reviewed: boolean) => void;
   runScenario: (facility: FacilityDefinition) => Promise<string | null>;
   setActiveRun: (runId: string) => void;
   toggleCompareRun: (runId: string) => void;
@@ -73,18 +88,27 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       activeRunId: null,
       compareRunIds: [],
       evidenceKpi: null,
+      handoff: null,
+      assumptionsReviewed: false,
 
       setTool: (activeTool) => set({ activeTool, panelOpen: true }),
       setRoleView: (roleView) => set({ roleView }),
       selectAsset: (selectedAssetId) => set({ selectedAssetId, panelOpen: true }),
       setPanelOpen: (panelOpen) => set({ panelOpen }),
-      setOverride: (key, value) => set((s) => ({ overrides: { ...s.overrides, [key]: value } })),
-      resetOverrides: () => set({ overrides: { ...DEFAULT_OVERRIDES } }),
-      setScenario: (scenarioId) => set({ scenarioId }),
+      setOverride: (key, value) =>
+        set((s) => ({ overrides: { ...s.overrides, [key]: value }, assumptionsReviewed: false })),
+      resetOverrides: () => set({ overrides: { ...DEFAULT_OVERRIDES }, assumptionsReviewed: false }),
+      // Changing any run input invalidates the previous review.
+      setScenario: (scenarioId) => set({ scenarioId, assumptionsReviewed: false }),
+      setHandoff: (handoff) => set({ handoff, assumptionsReviewed: false }),
+      setAssumptionsReviewed: (assumptionsReviewed) => set({ assumptionsReviewed }),
 
       runScenario: async (facility) => {
-        const { scenarioId, overrides, runs, isRunning } = get();
+        const { scenarioId, overrides, runs, isRunning, assumptionsReviewed } = get();
         if (isRunning) return null;
+        // Execution requires an explicit review inside Simulation. This is the
+        // single place a run record is created.
+        if (!assumptionsReviewed) return null;
         const scenario = WORKSPACE_SCENARIOS.find((s) => s.id === scenarioId);
         if (!scenario) return null;
 

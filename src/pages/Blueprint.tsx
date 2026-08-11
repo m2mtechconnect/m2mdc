@@ -50,7 +50,6 @@ import { BlueprintDataTab } from '@/components/blueprint/tabs/BlueprintDataTab';
 import { BlueprintKPIsTab } from '@/components/blueprint/tabs/BlueprintKPIsTab';
 import { BlueprintWorkflowsTab } from '@/components/blueprint/tabs/BlueprintWorkflowsTab';
 import { BlueprintRolesTab } from '@/components/blueprint/tabs/BlueprintRolesTab';
-import { BlueprintScenariosTab } from '@/components/blueprint/tabs/BlueprintScenariosTab';
 
 // Co-Pilot Components
 import { BlueprintCoPilotPanel, CoPilotModeHeader } from '@/components/copilot';
@@ -61,6 +60,8 @@ import { KpiTooltip } from '@/components/ui/kpi-tooltip';
 import { LoadingState, SnapshotNotFoundEmptyState } from '@/components/ui/empty-state';
 import { BlueprintModelSection } from '@/workspace/BlueprintModelSection';
 import { formatPower } from '@/workspace/facilityModel';
+import { normalizeLocation } from '@/lib/location/normalizeLocation';
+import { classifyCreateTwinFields } from '@/lib/provenance/twinFieldProvenance';
 import type { DataCentreBlueprint } from '@/types/dataCentreBlueprint';
 
 /**
@@ -78,10 +79,25 @@ const STAT_TONES = {
 
 type StatTone = keyof typeof STAT_TONES;
 
-/** Split a blueprint location such as "Montreal, QC" into city and region code. */
-function splitLocation(location?: string): { city: string; regionCode: string } {
-  const [city, region] = (location || '').split(',').map((part) => part.trim());
-  return { city: city || 'Unknown', regionCode: region || 'ca-central-1' };
+/**
+ * Blueprint tabs. Scenario configuration and run execution are owned by the
+ * Simulation workspace, so there is no scenarios tab here.
+ */
+const BLUEPRINT_TABS = [
+  'model',
+  'overview',
+  'agents',
+  'data',
+  'kpis',
+  'workflows',
+  'roles',
+  'validation',
+] as const;
+type BlueprintTab = (typeof BLUEPRINT_TABS)[number];
+const DEFAULT_TAB: BlueprintTab = 'model';
+
+function isBlueprintTab(value: string | null): value is BlueprintTab {
+  return !!value && (BLUEPRINT_TABS as readonly string[]).includes(value);
 }
 
 /** Tier values arrive either as "III" or already prefixed as "Tier III". */
@@ -101,18 +117,31 @@ function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: DataCentreBlu
     try {
       // Facility identity comes from the blueprint being converted, never a
       // hard-coded Montreal default.
-      const { city, regionCode } = splitLocation(blueprint.location);
-      const newTwin = await createTwin(null, {
+      // Typed normalization: structured fields win, nothing is guessed and
+      // nothing defaults to Montreal / QC.
+      const location = normalizeLocation(blueprint.location);
+      const supplied = {
         name: blueprint.name,
-        city,
-        region_code: regionCode,
-        tier: blueprint.tier || 'Tier III',
+        city: location.city ?? undefined,
+        region_code: location.regionCode ?? undefined,
+        tier: blueprint.tier || undefined,
+        capacity_kw: blueprint.capacityKw || undefined,
+      };
+      const newTwin = await createTwin(null, {
+        ...supplied,
         // `capacityKw` is already kilowatts. Multiplying by 1000 wrote watts into a
         // kW column and relied on normaliseStoredCapacityKw() to rescale it back.
-        capacity_kw: blueprint.capacityKw || 10000,
         metadata: {
           from_blueprint: blueprint.id,
           racks: blueprint.racks,
+          location_provenance: {
+            displayLocation: location.displayLocation,
+            source: location.source,
+            confidence: location.confidence,
+          },
+          // Every context-applied default keeps its classification so no
+          // assumption can later be read as a validated facility fact.
+          field_provenance: classifyCreateTwinFields(supplied),
         },
       });
 
@@ -168,21 +197,27 @@ export default function Blueprint() {
   // Read tab and highlight from query params
   const tabParam = searchParams.get('tab');
   const highlightParam = searchParams.get('highlight');
-  const [activeTab, setActiveTab] = useState(tabParam || 'model');
-  
-  // Switch tab when query param changes
+  // The URL is the single source of truth for the active tab.
+  const activeTab: BlueprintTab = isBlueprintTab(tabParam) ? tabParam : DEFAULT_TAB;
+
+  // Normalization only (invalid tab, legacy `scenarios` link, missing param)
+  // uses replace so it never adds a history entry the user did not create.
   useEffect(() => {
-    if (tabParam) {
-      setActiveTab(tabParam);
+    if (tabParam !== null && !isBlueprintTab(tabParam)) {
+      const next = new URLSearchParams(searchParams);
+      next.set('tab', DEFAULT_TAB);
+      setSearchParams(next, { replace: true });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabParam]);
 
-  // Keep the URL in sync so a tab can be shared and the back button works.
+  // A deliberate tab selection is a navigation: push, so Browser Back and
+  // Forward traverse tab changes. Re-selecting the active tab is a no-op.
   const handleTabChange = (value: string) => {
-    setActiveTab(value);
+    if (value === activeTab) return;
     const next = new URLSearchParams(searchParams);
     next.set('tab', value);
-    setSearchParams(next, { replace: true });
+    setSearchParams(next, { replace: false });
   };
 
   if (isLoading) {
@@ -217,6 +252,9 @@ export default function Blueprint() {
                 twinId={blueprintId}
                 location={twin?.city || blueprint.location}
                 showSimulationLink={true}
+                blueprintId={blueprintId}
+                versionId={blueprint.version ?? null}
+                returnTab={activeTab}
               />
 
               {/* Quick Actions Bar */}
@@ -362,7 +400,6 @@ export default function Blueprint() {
                     { value: 'kpis', label: t('blueprint.tabs.kpis') },
                     { value: 'workflows', label: t('blueprint.tabs.workflows') },
                     { value: 'roles', label: t('blueprint.tabs.roles') },
-                    { value: 'scenarios', label: t('blueprint.tabs.scenarios') },
                     { value: 'validation', label: t('blueprint.tabs.validation') },
                   ].map((tab) => (
                     <TabsTrigger 
@@ -399,9 +436,6 @@ export default function Blueprint() {
                   </TabsContent>
                   <TabsContent value="roles" className="m-0">
                     <BlueprintRolesTab roles={blueprint.humanRoles} />
-                  </TabsContent>
-                  <TabsContent value="scenarios" className="m-0">
-                    <BlueprintScenariosTab scenarios={blueprint.simulationScenarios} />
                   </TabsContent>
                   <TabsContent value="validation" className="m-0">
                     <div className="grid lg:grid-cols-2 gap-6">

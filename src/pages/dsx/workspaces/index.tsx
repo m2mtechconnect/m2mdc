@@ -404,6 +404,10 @@ export function FacilityWorkspace() {
         <Card><CardContent className="p-4"><HierarchyList nodes={buildHierarchy()} /></CardContent></Card>
       </Section>
 
+      <Section title="Evidence coverage by rack" description="Which declared racks are actually reporting an accepted observation at this step.">
+        <RackMapPanel defaultOverlay="evidence" />
+      </Section>
+
       <Section title="Selected asset">
         {selectedAsset ? (
           <Card data-testid="dsx-selected-asset">

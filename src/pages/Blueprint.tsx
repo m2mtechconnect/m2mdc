@@ -84,6 +84,11 @@ function splitLocation(location?: string): { city: string; regionCode: string } 
   return { city: city || 'Unknown', regionCode: region || 'ca-central-1' };
 }
 
+/** Tier values arrive either as "III" or already prefixed as "Tier III". */
+function stripTierPrefix(tier: string): string {
+  return tier.replace(/^\s*tier\s+/i, '');
+}
+
 function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: DataCentreBlueprint }) {
   const { t } = useTranslation();
   const { createTwin } = useActiveTwin();

@@ -82,7 +82,7 @@ describe('Simulation run gate', () => {
 });
 
 describe('Stage 7H — Builder is a design surface', () => {
-  const read = (p: string) => readFileSync(resolve(process.cwd(), p), 'utf8');
+  const read = (p: string) => readFileSync(p, 'utf8');
 
   it('Builder step 5 contains no simulation execution path', () => {
     const src = read('src/components/builder/steps/Step5Deploy.tsx');

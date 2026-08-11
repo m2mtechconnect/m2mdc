@@ -10,9 +10,22 @@ interface ArchitectureNode {
   id: string;
   label: string;
   icon: typeof Cpu;
-  color: string;
+  color: NodeTone;
   items: string[];
 }
+
+/**
+ * Static class map. Interpolated Tailwind classes (`bg-${color}/10`) are never
+ * emitted by the JIT compiler, so tones must be spelled out literally.
+ */
+const NODE_TONES = {
+  primary: { surface: 'bg-primary/10 border-primary/30', chip: 'bg-primary/20', icon: 'text-primary' },
+  info: { surface: 'bg-info/10 border-info/30', chip: 'bg-info/20', icon: 'text-info' },
+  success: { surface: 'bg-success/10 border-success/30', chip: 'bg-success/20', icon: 'text-success' },
+  warning: { surface: 'bg-warning/10 border-warning/30', chip: 'bg-warning/20', icon: 'text-warning' },
+} as const;
+
+type NodeTone = keyof typeof NODE_TONES;
 
 const architectureNodes: ArchitectureNode[] = [
   {
@@ -101,12 +114,13 @@ export function DCArchitectureDiagram({ showJson = false }: DCArchitectureDiagra
       <div className="flex items-center justify-between gap-2 overflow-x-auto pb-4">
         {architectureNodes.map((node, idx) => {
           const IconComp = node.icon;
+          const tone = NODE_TONES[node.color];
           return (
             <div key={node.id} className="flex items-center gap-2 flex-shrink-0">
-              <div className={`p-3 rounded-lg bg-${node.color}/10 border border-${node.color}/30 min-w-[140px]`}>
+              <div className={`p-3 rounded-lg border min-w-[140px] ${tone.surface}`}>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className={`p-1.5 rounded bg-${node.color}/20`}>
-                    <IconComp className={`h-4 w-4 text-${node.color}`} />
+                  <div className={`p-1.5 rounded ${tone.chip}`}>
+                    <IconComp className={`h-4 w-4 ${tone.icon}`} />
                   </div>
                   <span className="text-sm font-medium">{node.label}</span>
                 </div>

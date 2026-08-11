@@ -13,12 +13,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
-  Server, 
   Bot, 
   Database, 
   Activity, 
   GitBranch, 
-  Users, 
   Plus,
   Loader2,
 } from 'lucide-react';

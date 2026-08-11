@@ -5,7 +5,7 @@
  * Helps design better twins with validation-aware suggestions.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,50 +22,22 @@ import {
   Wand2,
   FileText,
   Zap,
+  Layers,
+  Gauge,
+  GitBranch,
+  ShieldAlert,
 } from 'lucide-react';
 import { useCoPilotPayload } from '@/hooks/useCoPilotPayload';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { cn } from '@/lib/utils';
 import type { CoPilotQuickAction } from '@/types/copilotContext';
+import { quickPromptsForTab, BLUEPRINT_TAB_PROMPTS } from './blueprintTabPrompts';
+import { BLUEPRINT_TAB_LABELS } from '@/pages/blueprint/tabModel';
 
 interface BlueprintCoPilotPanelProps {
   className?: string;
   activeTab?: string;
 }
-
-// Quick actions for Blueprint Designer mode
-const BLUEPRINT_QUICK_ACTIONS: CoPilotQuickAction[] = [
-  {
-    id: 'explain-design',
-    label: 'Explain current design',
-    icon: 'FileText',
-    prompt: 'Explain the current blueprint design including domains, agents, KPIs, workflows, and scenarios. Highlight the key architectural decisions and their rationale.',
-  },
-  {
-    id: 'suggest-agents',
-    label: 'Suggest missing agents',
-    icon: 'Wand2',
-    prompt: 'Based on the industry, tier, and capacity of this twin, suggest any agents that might be missing or should be enabled for optimal operations.',
-  },
-  {
-    id: 'optimize-scenarios',
-    label: 'Recommend optimization scenarios',
-    icon: 'Zap',
-    prompt: 'Recommend optimization scenarios that could improve carbon footprint, ROI, or thermal risk based on the current configuration.',
-  },
-  {
-    id: 'fix-validation',
-    label: 'Fix validation issues',
-    icon: 'AlertTriangle',
-    prompt: 'Review the current validation warnings and issues. Explain why each exists and provide specific steps to resolve them.',
-  },
-  {
-    id: 'summarize-changes',
-    label: 'Summarize recent changes',
-    icon: 'FileText',
-    prompt: 'Summarize the recent changes made to this blueprint from the change log and explain their potential impact.',
-  },
-];
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   FileText,
@@ -73,12 +45,26 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Zap,
   AlertTriangle,
   Lightbulb,
+  Layers,
+  Gauge,
+  GitBranch,
+  ShieldAlert,
+  CheckCircle2,
 };
 
 export function BlueprintCoPilotPanel({ className, activeTab }: BlueprintCoPilotPanelProps) {
   const [input, setInput] = useState('');
   const payload = useCoPilotPayload({ mode: 'blueprint-designer' });
   const { sendMessage, isStreaming, messages, openWithQuestion } = useCoPilotContext();
+
+  // Quick prompts follow the tab the user is standing on. They only ask the
+  // assistant to explain what is already visible, so no permission, ownership
+  // or simulation state changes.
+  const quickActions = useMemo(() => quickPromptsForTab(activeTab), [activeTab]);
+  const tabPromptCount = activeTab && activeTab in BLUEPRINT_TAB_PROMPTS
+    ? BLUEPRINT_TAB_PROMPTS[activeTab as keyof typeof BLUEPRINT_TAB_PROMPTS].length
+    : 0;
+  const tabLabel = activeTab ? BLUEPRINT_TAB_LABELS[activeTab as keyof typeof BLUEPRINT_TAB_LABELS] : undefined;
 
   const handleQuickAction = useCallback((action: CoPilotQuickAction) => {
     openWithQuestion(action.prompt);
@@ -140,9 +126,9 @@ export function BlueprintCoPilotPanel({ className, activeTab }: BlueprintCoPilot
               {payload.validationReport?.issues.length} issues
             </Badge>
           )}
-          {activeTab && (
-            <Badge variant="outline" className="text-xs capitalize">
-              Tab: {activeTab}
+          {tabLabel && (
+            <Badge variant="outline" className="text-xs">
+              Tab: {tabLabel}
             </Badge>
           )}
         </div>
@@ -151,14 +137,17 @@ export function BlueprintCoPilotPanel({ className, activeTab }: BlueprintCoPilot
       <CardContent className="flex-1 flex flex-col p-0 min-h-0">
         {/* Quick Actions */}
         <div className="p-3 border-b">
-          <p className="text-xs text-muted-foreground mb-2">Quick actions:</p>
-          <div className="flex flex-wrap gap-1.5">
-            {BLUEPRINT_QUICK_ACTIONS.map((action) => {
+          <p className="text-xs text-muted-foreground mb-2">
+            {tabLabel ? `Quick prompts for ${tabLabel}:` : 'Quick prompts:'}
+          </p>
+          <div className="flex flex-wrap gap-1.5" data-testid="blueprint-quick-prompts">
+            {quickActions.map((action, index) => {
               const Icon = iconMap[action.icon || ''] || Sparkles;
               return (
                 <Button
                   key={action.id}
-                  variant="outline"
+                  variant={index < tabPromptCount ? 'secondary' : 'outline'}
+                  data-tab-prompt={index < tabPromptCount ? 'true' : 'false'}
                   size="sm"
                   className="h-7 text-xs"
                   onClick={() => handleQuickAction(action)}

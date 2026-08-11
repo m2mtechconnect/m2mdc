@@ -18,18 +18,18 @@ export interface RelatedView {
 }
 
 const V = {
-  facility: { id: 'facility', label: 'View in Facility', path: `${DSX_ROOT}/facility`, hint: 'Show this object in the facility hierarchy and registry.' },
-  thermal: { id: 'thermal', label: 'View Thermal', path: `${DSX_ROOT}/thermal`, hint: 'Rank inlet temperatures and headroom for the selected scope.' },
-  power: { id: 'power', label: 'Trace Power', path: `${DSX_ROOT}/power`, hint: 'Follow the electrical supply chain that feeds this object.' },
-  cooling: { id: 'cooling', label: 'Trace Cooling', path: `${DSX_ROOT}/cooling`, hint: 'Follow the cooling loop that serves this object.' },
-  network: { id: 'network', label: 'View Network', path: `${DSX_ROOT}/network`, hint: 'Compute fabric state for this scope.' },
-  workload: { id: 'workload', label: 'View Workloads', path: `${DSX_ROOT}/workload`, hint: 'Workloads placed on this object, when a scheduler source is connected.' },
-  evidence: { id: 'evidence', label: 'View Evidence', path: `${DSX_ROOT}/evidence`, hint: 'Source events, decisions and quarantined records.' },
-  simulations: { id: 'simulations', label: 'Open Simulations', path: `${DSX_ROOT}/simulations`, hint: 'Run the seeded scenario against this scope.' },
-  carbon: { id: 'carbon', label: 'View Carbon', path: `${DSX_ROOT}/carbon`, hint: 'Energy drivers behind emissions reporting.' },
-  financials: { id: 'financials', label: 'View Financials', path: `${DSX_ROOT}/financials`, hint: 'Cost drivers and the assumptions behind them.' },
-  sovereignty: { id: 'sovereignty', label: 'View Sovereignty', path: `${DSX_ROOT}/sovereignty`, hint: 'Residency, custody and attestation claims.' },
-  overview: { id: 'overview', label: 'Back to Overview', path: `${DSX_ROOT}/overview`, hint: 'Constraint stack for the whole facility.' },
+  facility: { id: 'facility', label: 'View in Assets', path: `${DSX_ROOT}/assets`, hint: 'Show this object in the facility hierarchy and registry.' },
+  thermal: { id: 'thermal', label: 'View Thermal', path: `${DSX_ROOT}/operations/thermal`, hint: 'Rank inlet temperatures and headroom for the selected scope.' },
+  power: { id: 'power', label: 'Trace Power', path: `${DSX_ROOT}/operations/power`, hint: 'Follow the electrical supply chain that feeds this object.' },
+  cooling: { id: 'cooling', label: 'Trace Cooling', path: `${DSX_ROOT}/operations/cooling`, hint: 'Follow the cooling loop that serves this object.' },
+  network: { id: 'network', label: 'View Compute', path: `${DSX_ROOT}/operations/compute`, hint: 'Compute fabric state for this scope.' },
+  workload: { id: 'workload', label: 'View Workloads', path: `${DSX_ROOT}/operations/workload`, hint: 'Workloads placed on this object, when a scheduler source is connected.' },
+  evidence: { id: 'evidence', label: 'View Decision log', path: `${DSX_ROOT}/decisions/log`, hint: 'Source events, decisions and quarantined records.' },
+  simulations: { id: 'simulations', label: 'Open Decisions', path: `${DSX_ROOT}/decisions`, hint: 'Latest evaluated run and the decisions it produced.' },
+  carbon: { id: 'carbon', label: 'View Energy and carbon', path: `${DSX_ROOT}/sustainability`, hint: 'Energy drivers behind emissions reporting.' },
+  financials: { id: 'financials', label: 'View Financial exposure', path: `${DSX_ROOT}/sustainability/financial`, hint: 'Cost drivers and the assumptions behind them.' },
+  sovereignty: { id: 'sovereignty', label: 'View Sovereignty', path: `${DSX_ROOT}/sustainability/sovereignty`, hint: 'Residency, custody and attestation claims.' },
+  overview: { id: 'overview', label: 'Back to Overview', path: `${DSX_ROOT}/overview`, hint: 'Facility condition, exceptions and coverage.' },
 } satisfies Record<string, RelatedView>;
 
 const BY_CLASS: Record<AssetClass, RelatedView[]> = {

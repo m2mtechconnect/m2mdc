@@ -172,7 +172,7 @@ export default function Blueprint() {
 
   return (
     <BlueprintDesignerWrapper twinId={blueprintId}>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <div className="flex min-w-0">
           {/* Main Content */}
           <div className={`flex-1 min-w-0 transition-all duration-300 ${showCoPilotPanel ? 'lg:mr-96' : ''}`}>
@@ -243,7 +243,7 @@ export default function Blueprint() {
                   version={String(blueprint.version)}
                   mode="designer"
                   changesCount={0}
-                  lastUpdated={new Date()}
+                  lastUpdated={blueprint.updatedAt ? new Date(blueprint.updatedAt) : undefined}
                 />
                 <Badge variant="outline" className="gap-1">
                   <MapPin className="h-3 w-3" />
@@ -270,7 +270,7 @@ export default function Blueprint() {
                     return (
                       <div 
                         key={stat.label}
-                        className="group p-3 rounded-lg border bg-card hover:bg-muted/50 hover:shadow-md hover:border-primary/30 transition-all duration-300 cursor-pointer animate-fade-in"
+                        className="group p-3 rounded-lg border bg-card hover:bg-muted/50 hover:shadow-md hover:border-primary/30 transition-all duration-300 animate-fade-in"
                         style={{ animationDelay: `${index * 0.05}s` }}
                       >
                         <div className="flex items-center gap-2 mb-1">
@@ -324,7 +324,7 @@ export default function Blueprint() {
               </div>
 
               {/* Main Tabs - Enhanced with better styling */}
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="w-full justify-start border-b rounded-none bg-transparent p-0 h-auto flex-wrap gap-1">
                   {[
                     { value: 'model', label: 'Facility model' },

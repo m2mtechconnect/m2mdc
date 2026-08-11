@@ -33,7 +33,8 @@ function stripTierPrefix(tier: string): string {
 
 interface BlueprintOverviewTabProps {
   blueprint: DataCentreBlueprint;
-  summary: BlueprintSummary | null;
+  /** Retained for call-site compatibility; counts are owned by other tabs. */
+  summary?: BlueprintSummary | null;
 }
 
 const domainIcons: Record<string, React.ReactNode> = {
@@ -67,7 +68,7 @@ const domainColors: Record<string, string> = {
  * - All scanner-generated twins
  * - All regional variants (BC, Alberta, Quebec, US, EU, APAC, etc.)
  */
-export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTabProps) {
+export function BlueprintOverviewTab({ blueprint }: BlueprintOverviewTabProps) {
   const domains = Object.entries(blueprint.domains);
 
   return (

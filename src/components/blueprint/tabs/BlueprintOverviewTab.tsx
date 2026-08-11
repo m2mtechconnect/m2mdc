@@ -170,48 +170,14 @@ export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTa
         </CardContent>
       </Card>
 
-      {/* ============================================== */}
-      {/* SECTION 9: Blueprint Metrics Summary */}
-      {/* Total counts for all components */}
-      {/* ============================================== */}
-      {summary && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Blueprint Metrics</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
-              <div className="text-center p-4 rounded-lg bg-muted/30">
-                <p className="text-2xl font-bold text-primary">{summary.totalAgents}</p>
-                <p className="text-xs text-muted-foreground">Active Agents</p>
-              </div>
-              <div className="text-center p-4 rounded-lg bg-muted/30">
-                <p className="text-2xl font-bold text-primary">{summary.totalKpis}</p>
-                <p className="text-xs text-muted-foreground">KPIs Tracked</p>
-              </div>
-              <div className="text-center p-4 rounded-lg bg-muted/30">
-                <p className="text-2xl font-bold text-primary">{summary.totalWorkflows}</p>
-                <p className="text-xs text-muted-foreground">Workflows</p>
-              </div>
-              <div className="text-center p-4 rounded-lg bg-muted/30">
-                <p className="text-2xl font-bold text-primary">{summary.totalDataSources}</p>
-                <p className="text-xs text-muted-foreground">Data Sources</p>
-              </div>
-              <div className="text-center p-4 rounded-lg bg-muted/30">
-                <p className="text-2xl font-bold text-primary">{summary.totalScenarios}</p>
-                <p className="text-xs text-muted-foreground">Scenarios</p>
-              </div>
-              <div className="text-center p-4 rounded-lg bg-muted/30">
-                <p className="text-2xl font-bold text-primary">{summary.totalRoles}</p>
-                <p className="text-xs text-muted-foreground">Human Roles</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/*
+        Stage 7K audit: the vanity totals grid (agents, KPIs, workflows,
+        scenarios, human roles) is removed. Those counts are owned by Controls,
+        Validation, Simulation and Manage.
+      */}
 
       {/* ============================================== */}
-      {/* SECTION 10: Blueprint Metadata */}
+      {/* Blueprint Metadata */}
       {/* ID, Version, Created, Updated timestamps */}
       {/* ============================================== */}
       <Card>

@@ -542,6 +542,7 @@ const frCA = {
     kpisTracked: 'IRC suivis',
     workflowsActive: 'Flux de travail actifs',
     scenariosReady: 'Scénarios prêts',
+    scenariosOwnedBySimulation: "L'état de préparation des scénarios est géré dans l'espace Simulation.",
     twinCreated: 'Jumeau créé',
     twinCreatedDesc: '{{name}} est maintenant disponible dans le sélecteur.',
     creationFailed: 'Échec de la création',

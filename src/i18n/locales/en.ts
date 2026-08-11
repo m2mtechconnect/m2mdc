@@ -541,6 +541,7 @@ const en = {
     kpisTracked: 'KPIs Tracked',
     workflowsActive: 'Workflows Active',
     scenariosReady: 'Scenarios Ready',
+    scenariosOwnedBySimulation: 'Scenario readiness is managed in the Simulation workspace.',
     twinCreated: 'Twin Created',
     twinCreatedDesc: '{{name}} is now available in the selector.',
     creationFailed: 'Creation Failed',

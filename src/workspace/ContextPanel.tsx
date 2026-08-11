@@ -35,7 +35,6 @@ interface Props {
 export function ContextPanel({ facility, assets, overrides, onClose }: Props) {
   const activeTool = useWorkspaceStore((s) => s.activeTool);
   const setTool = useWorkspaceStore((s) => s.setTool);
-  const runs = useWorkspaceStore((s) => s.runs);
   const kpis = deriveKpis(facility, overrides);
   const headerRef = useRef<HTMLDivElement | null>(null);
   const [wide, setWide] = useState(false);

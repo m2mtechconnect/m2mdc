@@ -42,6 +42,8 @@ interface Props {
 const LEFT_GUTTER = 82;
 const RIGHT_GUTTER = 32;
 const FIT_PAD = 24;
+/** Bottom strip kept clear so the corner legend never covers a rack control. */
+export const LEGEND_RESERVE = 30;
 const MIN_ZOOM = 0.6;
 const MAX_ZOOM = 3;
 
@@ -70,7 +72,7 @@ export function computePlanGeometry(
   rowCount: number,
 ): PlanGeometry {
   const availW = Math.max(containerW - FIT_PAD * 2, 240);
-  const availH = Math.max(containerH - FIT_PAD * 2, 180);
+  const availH = Math.max(containerH - FIT_PAD * 2 - LEGEND_RESERVE, 150);
   const usableWidth = availW - LEFT_GUTTER - RIGHT_GUTTER;
   const rackGap = clamp(usableWidth * 0.014, 10, 16);
   const totalRackGaps = rackGap * (perRow - 1);
@@ -210,7 +212,7 @@ export function FacilityFloorPlan({
   }, [clampPan]);
 
   const offsetX = (viewW - scaledW) / 2 + pan.x;
-  const offsetY = (viewH - scaledH) / 2 + pan.y;
+  const offsetY = (viewH - scaledH) / 2 - LEGEND_RESERVE / 2 + pan.y;
 
   const rackPos = useCallback(
     (rack: RackNode) => ({

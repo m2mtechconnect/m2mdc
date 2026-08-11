@@ -5,6 +5,7 @@
  * values through <MetricTile>, and states plainly when a capability cannot
  * be assessed. No workspace fabricates a value or a health claim.
  */
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +15,14 @@ import {
 } from '@/components/ui/table';
 import { MetricGrid } from '@/components/dsx/MetricTile';
 import { ConstraintStack } from '@/components/dsx/ConstraintStack';
+import { RackMap, RackMapLegend, RACK_OVERLAYS, type RackOverlay } from '@/components/dsx/RackMap';
+import { TrendStrip, type TrendSeries } from '@/components/dsx/TrendStrip';
+import { EvidenceQualityBar } from '@/components/dsx/EvidenceQualityBar';
+import { ExceptionList } from '@/components/dsx/ExceptionList';
+import { MissingSourceState } from '@/components/dsx/MissingSourceState';
+import { PowerOneLine } from '@/components/dsx/PowerOneLine';
+import { CoolingLoopDiagram } from '@/components/dsx/CoolingLoopDiagram';
+import { useRunSeries } from '@/dsx/runtime/useRunSeries';
 import { ScenarioControls, RecommendationList, DecisionLog, PlannedScenarioNotice } from '@/components/dsx/ScenarioPanel';
 import { CapabilityNotice, UnavailableState, ConnectionState } from '@/components/dsx/StateBadges';
 import { useWorkspace } from '@/dsx/runtime/EvidenceBetaContext';
@@ -59,9 +68,57 @@ function AssetSelectButton({ auraId, sourceId, name }: { auraId: string; sourceI
   );
 }
 
+/**
+ * Rack map with an overlay selector. Overlay choice is view state for this
+ * panel only; every cell value is read from the accepted observation set.
+ */
+function RackMapPanel({ defaultOverlay = 'thermal' }: { defaultOverlay?: RackOverlay }) {
+  const [overlay, setOverlay] = useState<RackOverlay>(defaultOverlay);
+  return (
+    <div className="space-y-3" data-testid="dsx-rack-map-panel">
+      <div className="flex flex-wrap gap-1" role="group" aria-label="Rack map overlay">
+        {RACK_OVERLAYS.map((o) => (
+          <Button
+            key={o.id}
+            size="sm"
+            variant={overlay === o.id ? 'default' : 'outline'}
+            aria-pressed={overlay === o.id}
+            onClick={() => setOverlay(o.id)}
+            data-testid={`dsx-rack-overlay-${o.id}`}
+          >
+            {o.label}
+          </Button>
+        ))}
+      </div>
+      <RackMap overlay={overlay} />
+      <RackMapLegend overlay={overlay} />
+    </div>
+  );
+}
+
+/** Observation-step trends recomputed from the same KPI pipeline as the tiles. */
+function useTrendSeries(ids: Array<'max_inlet_c' | 'it_load_kw' | 'cooling_load_kw' | 'pue'>): TrendSeries[] {
+  const { rt } = useWorkspace();
+  const points = useRunSeries(rt);
+  const defs: Record<string, { label: string; unit: string; digits: number }> = {
+    max_inlet_c: { label: 'Max rack inlet', unit: 'degC', digits: 2 },
+    it_load_kw: { label: 'IT load', unit: 'kW', digits: 2 },
+    cooling_load_kw: { label: 'Cooling load', unit: 'kW', digits: 2 },
+    pue: { label: 'PUE', unit: 'ratio', digits: 3 },
+  };
+  return ids.map((id) => ({
+    id,
+    label: defs[id].label,
+    unit: defs[id].unit,
+    digits: defs[id].digits,
+    points: points.map((p) => p[id]),
+  }));
+}
+
 /* 1 — Facility overview: what is the state of the facility right now? */
 export function OverviewWorkspace() {
   const { rt } = useWorkspace();
+  const trends = useTrendSeries(['pue', 'it_load_kw', 'cooling_load_kw', 'max_inlet_c']);
   return (
     <div className="space-y-6">
       <Section
@@ -72,6 +129,18 @@ export function OverviewWorkspace() {
           ids={['pue', 'facility_load', 'it_load', 'cooling_load', 'max_rack_inlet', 'thermal_headroom', 'power_capacity_utilisation', 'data_quality']}
           metrics={rt.bundle.metrics}
         />
+      </Section>
+      <Section title="Trend across this run" description="Each point is recomputed from the accepted observations at that step. A step without an accepted observation is drawn as a gap.">
+        <TrendStrip series={trends} />
+      </Section>
+      <Section title="Data hall" description="Logical rack layout declared by the facility record. A rack with no accepted observation is never shown as healthy.">
+        <RackMapPanel />
+      </Section>
+      <Section title="Evidence quality" description="Only accepted observations contribute to any value on this page.">
+        <EvidenceQualityBar accepted={rt.snapshot.accepted.length} rejected={rt.snapshot.rejected.length} />
+      </Section>
+      <Section title="Exceptions" description="Ranked by severity, then by number of affected assets.">
+        <ExceptionList limit={5} />
       </Section>
       <ConstraintStack />
       <Section title="Scenario" description="Baseline is step 0 of the same seeded fixture.">
@@ -84,6 +153,7 @@ export function OverviewWorkspace() {
 /* 2 — Thermal */
 export function ThermalWorkspace() {
   const { rt, selectAsset } = useWorkspace();
+  const trends = useTrendSeries(['max_inlet_c', 'cooling_load_kw']);
   const ranked = [...rt.bundle.racks].sort((a, b) => (b.inlet_c ?? -Infinity) - (a.inlet_c ?? -Infinity));
   return (
     <div className="space-y-6">
@@ -92,6 +162,14 @@ export function ThermalWorkspace() {
         description={`Which racks are closest to the ${DESIGN_INLET_LIMIT_C} degC design inlet limit, and what supplies their cooling?`}
       >
         <MetricGrid ids={['max_rack_inlet', 'thermal_headroom', 'cooling_load']} metrics={rt.bundle.metrics} columns="sm:grid-cols-3" />
+      </Section>
+
+      <Section title="Thermal trend" description="Maximum measured rack inlet and cooling draw at each observation step of this run.">
+        <TrendStrip series={trends} className="sm:grid-cols-2 xl:grid-cols-2" />
+      </Section>
+
+      <Section title="Rack map" description="Inlet band per rack, from the measured value only.">
+        <RackMapPanel defaultOverlay="thermal" />
       </Section>
 
       <Section title="Rack inlet queue" description="Ranked by measured inlet temperature. A rack without an observation is never ranked as cool.">
@@ -157,6 +235,14 @@ export function PowerWorkspace() {
         <MetricGrid ids={['facility_load', 'it_load', 'power_capacity_utilisation']} metrics={rt.bundle.metrics} columns="sm:grid-cols-3" />
       </Section>
 
+      <Section title="Single-line view" description="Stages declared by the facility record. A stage without metering is labelled as uninstrumented rather than estimated.">
+        <PowerOneLine />
+      </Section>
+
+      <Section title="Rack power map" description="Per-rack draw against rack rating, from metered rack power only.">
+        <RackMapPanel defaultOverlay="power" />
+      </Section>
+
       <Section title="Electrical supply chain" description="Derived from declared connection points in the facility fixture.">
         <ul className="space-y-2" data-testid="dsx-electrical-chain">
           {electricalChain().map((a) => {
@@ -200,10 +286,19 @@ export function PowerWorkspace() {
 /* 4 — Cooling */
 export function CoolingWorkspace() {
   const { rt } = useWorkspace();
+  const coolingTrends = useTrendSeries(['cooling_load_kw', 'pue']);
   return (
     <div className="space-y-6">
       <Section title="Cooling state" description="How much electrical energy is cooling consuming, and which racks does each loop serve?">
         <MetricGrid ids={['cooling_load', 'pue', 'thermal_headroom']} metrics={rt.bundle.metrics} columns="sm:grid-cols-3" />
+      </Section>
+
+      <Section title="Loop diagram" description="Each cooling unit with the racks it serves and their measured inlet temperatures.">
+        <CoolingLoopDiagram />
+      </Section>
+
+      <Section title="Cooling trend" description="Cooling draw and PUE at each observation step of this run.">
+        <TrendStrip series={coolingTrends} className="sm:grid-cols-2 xl:grid-cols-2" />
       </Section>
 
       <Section title="Cooling loops">
@@ -239,7 +334,11 @@ export function NetworkWorkspace() {
   return (
     <div className="space-y-6">
       <Section title="Fabric state" description="Which fabric links constrain workload placement?">
-        <CapabilityNotice capability={capability('compute_fabric')} />
+        <MissingSourceState
+          capability={capability('compute_fabric')}
+          unlocks="link utilisation, oversubscription and placement constraints for the declared fabric"
+          testId="dsx-network-missing-source"
+        />
       </Section>
       <Section title="What would make this workspace operational">
         <ul className="list-disc pl-5 text-sm text-muted-foreground">
@@ -305,6 +404,10 @@ export function FacilityWorkspace() {
         <Card><CardContent className="p-4"><HierarchyList nodes={buildHierarchy()} /></CardContent></Card>
       </Section>
 
+      <Section title="Evidence coverage by rack" description="Which declared racks are actually reporting an accepted observation at this step.">
+        <RackMapPanel defaultOverlay="evidence" />
+      </Section>
+
       <Section title="Selected asset">
         {selectedAsset ? (
           <Card data-testid="dsx-selected-asset">
@@ -354,7 +457,11 @@ export function WorkloadWorkspace() {
   return (
     <div className="space-y-6">
       <Section title="Exposure summary" description="Which workloads are exposed by the current facility constraint?">
-        <CapabilityNotice capability={capability('workload_scheduler')} />
+        <MissingSourceState
+          capability={capability('workload_scheduler')}
+          unlocks="attribution of facility constraints to named jobs, tenants and GPU allocations"
+          testId="dsx-workload-missing-source"
+        />
       </Section>
       <p className="text-sm text-muted-foreground">
         Facility constraints cannot be attributed to workloads until a scheduler source is connected.
@@ -408,6 +515,7 @@ export function SovereigntyWorkspace() {
 export function CarbonWorkspace() {
   const { rt } = useWorkspace();
   const assertions = carbonAssertions(rt.bundle);
+  const energyTrends = useTrendSeries(['pue', 'it_load_kw', 'cooling_load_kw']);
   return (
     <div className="space-y-6">
       <Section
@@ -424,10 +532,20 @@ export function CarbonWorkspace() {
         <MetricGrid ids={['facility_load', 'it_load', 'cooling_load', 'pue']} metrics={rt.bundle.metrics} />
       </Section>
 
+      <Section title="Energy driver trend" description="Metered quantities across this run. No emissions figure is derived from them.">
+        <TrendStrip series={energyTrends} className="sm:grid-cols-2 xl:grid-cols-3" />
+      </Section>
+
       <Section title="Sustainability ratios">
         <MetricGrid ids={['wue', 'cue']} metrics={rt.bundle.metrics} columns="sm:grid-cols-2" />
-        <CapabilityNotice capability={capability('grid_carbon_intensity')} />
-        <CapabilityNotice capability={capability('water_metering')} />
+        <MissingSourceState
+          capability={capability('grid_carbon_intensity')}
+          unlocks="carbon usage effectiveness and a reportable emissions total"
+        />
+        <MissingSourceState
+          capability={capability('water_metering')}
+          unlocks="water usage effectiveness and consumption reporting"
+        />
       </Section>
 
       <Section title="Declared claims">
@@ -505,6 +623,14 @@ export function EvidenceWorkspace() {
   const { rt } = useWorkspace();
   return (
     <div className="space-y-6">
+      <Section title="Evidence quality" description="Accepted against quarantined observations for this window. A quarantined record never contributes to a decision.">
+        <EvidenceQualityBar accepted={rt.snapshot.accepted.length} rejected={rt.snapshot.rejected.length} />
+      </Section>
+
+      <Section title="Open exceptions" description="The constraint exceptions a decision would be taken against.">
+        <ExceptionList />
+      </Section>
+
       <Section title="Decisions" description="Recommendations are advisory. Every decision is recorded; nothing is dispatched.">
         <RecommendationList />
       </Section>

@@ -28,7 +28,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { KPIEnhancementsPanel } from '../KPIEnhancementsPanel';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Info } from 'lucide-react';
 
@@ -195,6 +202,14 @@ export function BlueprintKPIsTab({ kpis }: BlueprintKPIsTabProps) {
       {/* KPI Enhancement Dialog */}
       <Dialog open={!!selectedKPI} onOpenChange={(open) => !open && setSelectedKPI(null)}>
         <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedKPI ? `${selectedKPI.name} definition` : 'KPI definition'}
+            </DialogTitle>
+            <DialogDescription>
+              Modelled KPI definition, thresholds and inputs. Design-time reference only.
+            </DialogDescription>
+          </DialogHeader>
           <KPIEnhancementsPanel 
             kpi={selectedKPI ? {
               id: selectedKPI.id,

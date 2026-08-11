@@ -103,7 +103,14 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
   test('05 schema invalid (demo fallback)', async ({ page, guard }) => {
     await mockKit(page, 'schema-invalid');
     await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText('Kit response invalid').first()).toBeVisible();
+    // Checkpoint B7 lockdown: `readKitConfig()` is hard-disabled in every
+    // browser build, so the Kit mock is never reached and the truthful
+    // fallback is the disabled-by-configuration demo disclosure rather
+    // than a schema-validation failure. Accept either so this stays
+    // correct if server-mediated transport lands in Checkpoint C.
+    await expect(
+      page.getByText(/Kit response invalid|Kit disabled by configuration/).first(),
+    ).toBeVisible();
     await shot(page, '05-omniverse-invalid-demo.png');
     void guard;
   });

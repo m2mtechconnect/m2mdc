@@ -31,7 +31,6 @@ import { ChangeLogPanel } from '../ChangeLogPanel';
 import { AgentHealthPanel } from '../AgentHealthPanel';
 import { KPIEnhancementsPanel } from '../KPIEnhancementsPanel';
 import { WorkflowEnhancementsPanel } from '../WorkflowEnhancementsPanel';
-import { ScenarioEnhancementsPanel } from '../ScenarioEnhancementsPanel';
 
 // Lazy load 3D visualization for performance
 const TwinVisualizationLayout = lazy(() => 
@@ -140,12 +139,6 @@ export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTa
       {/* Simulation preview, version history, rollback, impact analysis */}
       {/* ============================================== */}
       <WorkflowEnhancementsPanel />
-
-      {/* ============================================== */}
-      {/* SECTION 6: Scenario Chain Simulator */}
-      {/* Multi-scenario chaining, complexity scoring, KPI deltas */}
-      {/* ============================================== */}
-      <ScenarioEnhancementsPanel />
 
       {/* ============================================== */}
       {/* SECTION 7: Facility Summary */}

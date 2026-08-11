@@ -477,17 +477,17 @@ export function FacilityFloorPlan({
                           <>
                             <rect
                               x={x + 4}
-                              y={y + RACK_H - 9}
+                              y={y + RACK_H - 5}
                               width={RACK_W - 8}
-                              height={4}
-                              rx={2}
+                              height={3}
+                              rx={1.5}
                               fill="#1f3350"
                             />
                             <rect
                               x={x + 4}
-                              y={y + RACK_H - 26}
+                              y={y + RACK_H - 17}
                               width={RACK_W - 8}
-                              height={12}
+                              height={9}
                               rx={2}
                               fill="#111c31"
                               stroke="#22304d"
@@ -495,9 +495,9 @@ export function FacilityFloorPlan({
                             />
                             <rect
                               x={x + 5}
-                              y={y + RACK_H - 25}
+                              y={y + RACK_H - 16}
                               width={Math.max((RACK_W - 10) * t, 2)}
-                              height={10}
+                              height={7}
                               rx={1.5}
                               fill={rackFill(String(overlay), t)}
                             />
@@ -506,7 +506,7 @@ export function FacilityFloorPlan({
                         {!rack.represented && (
                           <text
                             x={x + RACK_W / 2}
-                            y={y + RACK_H - 18}
+                            y={y + RACK_H / 2}
                             fill="#64748b"
                             fontSize={11}
                             textAnchor="middle"
@@ -526,10 +526,10 @@ export function FacilityFloorPlan({
                         >
                           {rack.code}
                         </text>
-                        {rack.represented && (
+                        {rack.represented && RACK_H >= 46 && (
                           <text
                             x={x + RACK_W / 2}
-                            y={y + 28}
+                            y={y + RACK_H - 27}
                             fill="#93a4bd"
                             fontSize={10.5}
                             textAnchor="middle"

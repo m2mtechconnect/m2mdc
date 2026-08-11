@@ -38,3 +38,5 @@ export { BlueprintDataTab } from './tabs/BlueprintDataTab';
 export { BlueprintKPIsTab } from './tabs/BlueprintKPIsTab';
 export { BlueprintWorkflowsTab } from './tabs/BlueprintWorkflowsTab';
 export { BlueprintRolesTab } from './tabs/BlueprintRolesTab';
+export { SimulationHandoffDialog } from './SimulationHandoffDialog';
+export type { SimulationHandoffPreview } from './SimulationHandoffDialog';

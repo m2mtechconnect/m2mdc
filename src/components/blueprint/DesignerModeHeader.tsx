@@ -25,11 +25,12 @@ import {
   Save,
   Server,
 } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { buildSimulationHandoffUrl, useSimulationPermissions } from '@/simulation/handoff';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { SimulationHandoffDialog } from './SimulationHandoffDialog';
 
 interface DesignerModeHeaderProps {
   twinName?: string;
@@ -85,20 +86,26 @@ export function DesignerModeHeader({
   const navigate = useNavigate();
   const { canViewSimulation, canConfigureSimulation } = useSimulationPermissions();
   const canHandOff = canViewSimulation && canConfigureSimulation;
+  const [handoffOpen, setHandoffOpen] = useState(false);
 
-  /**
-   * Navigation ONLY. Blueprint must never create, queue or start a run, so
-   * this handler performs no mutation and calls no simulation service.
-   */
-  const handleOpenInSimulation = () => {
-    navigate(
+  const handoffUrl = useMemo(
+    () =>
       buildSimulationHandoffUrl({
         blueprintId: blueprintId ?? twinId,
         versionId,
         twinId: twinId !== blueprintId ? twinId : null,
         returnTab,
       }),
-    );
+    [blueprintId, twinId, versionId, returnTab],
+  );
+
+  /**
+   * Navigation ONLY. Blueprint must never create, queue or start a run, so
+   * this handler performs no mutation and calls no simulation service.
+   */
+  const handleOpenInSimulation = () => {
+    setHandoffOpen(false);
+    navigate(handoffUrl);
   };
 
   return (
@@ -187,7 +194,7 @@ export function DesignerModeHeader({
             <Button
               variant="outline"
               size="sm"
-              onClick={handleOpenInSimulation}
+              onClick={() => setHandoffOpen(true)}
               data-testid="blueprint-open-in-simulation"
               className="h-8 shrink-0 gap-1.5"
             >
@@ -208,6 +215,21 @@ export function DesignerModeHeader({
           )}
         </div>
       </div>
+
+      <SimulationHandoffDialog
+        open={handoffOpen}
+        onOpenChange={setHandoffOpen}
+        onConfirm={handleOpenInSimulation}
+        preview={{
+          facilityName: twinName,
+          blueprintId: blueprintId ?? twinId,
+          versionLabel:
+            versionId === null || versionId === undefined || versionId === ''
+              ? 'Current working version'
+              : String(versionId),
+          targetUrl: handoffUrl,
+        }}
+      />
 
       {/* Facility facts: one wrapping row of compact badges. */}
       <div className="flex flex-wrap items-center gap-1.5 border-t border-border px-3 py-2">

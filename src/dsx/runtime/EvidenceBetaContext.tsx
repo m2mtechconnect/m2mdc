@@ -15,7 +15,7 @@ import { ancestryFor, identityByAuraId, type AssetIdentity } from '../workspaces
 import type { DsxProvenancedMetric } from '../contracts/provenancedMetric';
 import { freshnessFor, type FreshnessState } from '../modes';
 import {
-  buildContextChips, contextToParams, linkWithContext, parseContext,
+  CONTEXT_PARAM, buildContextChips, contextToParams, linkWithContext, parseContext,
   type ContextChip, type InvestigationContext,
 } from './investigationContext';
 import { TIMELINE_IDS, type TimelineId } from '../fixtures/timelines';
@@ -109,10 +109,38 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
 
   const writeContext = useCallback(
     (next: InvestigationContext, replace = false) => {
-      setSearchParams(contextToParams(next), { replace });
+      // Investigation keys are rewritten; every other query parameter the
+      // caller arrived with (deep links, feature flags) is carried through,
+      // and the incoming anchor is preserved.
+      setSearchParams(
+        (current) => {
+          const params = contextToParams(next);
+          const owned = new Set(params.keys());
+          const contextKeys = new Set(Object.values(CONTEXT_PARAM));
+          current.forEach((value, key) => {
+            if (owned.has(key) || contextKeys.has(key)) return;
+            params.append(key, value);
+          });
+          return params;
+        },
+        { replace, preventScrollReset: true },
+      );
     },
     [setSearchParams],
   );
+
+  // `setSearchParams` rewrites the URL without a fragment, so a deep link's
+  // anchor would be lost the first time context is mirrored into the URL.
+  const arrivalHash = useRef(typeof window === 'undefined' ? '' : window.location.hash);
+  useEffect(() => {
+    if (!arrivalHash.current || typeof window === 'undefined') return;
+    if (window.location.hash === arrivalHash.current) return;
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${window.location.pathname}${window.location.search}${arrivalHash.current}`,
+    );
+  }, [location.search, location.pathname]);
 
   // Scenario and data mode are runtime facts; mirror them into the URL so a
   // deep link reproduces the same evidence, without ever implying live data.

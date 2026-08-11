@@ -50,7 +50,7 @@ export function WorkspaceRecordHeader({ facility, isFallback, panelOpen, onOpenP
     <TooltipProvider delayDuration={200}>
       <header
         data-testid="workspace-record-header"
-        className="flex h-13 min-h-[52px] w-full shrink-0 items-center gap-x-3 gap-y-1 border-b border-border bg-card px-3 sm:px-4"
+        className="flex h-[52px] w-full shrink-0 items-center gap-x-3 border-b border-border bg-card px-3 sm:px-4"
       >
         <div className="flex min-w-0 items-center gap-2">
           <h1 className="min-w-0 truncate text-base font-semibold leading-tight text-foreground sm:text-[17px]">

@@ -5,6 +5,7 @@
  * values through <MetricTile>, and states plainly when a capability cannot
  * be assessed. No workspace fabricates a value or a health claim.
  */
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +15,14 @@ import {
 } from '@/components/ui/table';
 import { MetricGrid } from '@/components/dsx/MetricTile';
 import { ConstraintStack } from '@/components/dsx/ConstraintStack';
+import { RackMap, RackMapLegend, RACK_OVERLAYS, type RackOverlay } from '@/components/dsx/RackMap';
+import { TrendStrip, type TrendSeries } from '@/components/dsx/TrendStrip';
+import { EvidenceQualityBar } from '@/components/dsx/EvidenceQualityBar';
+import { ExceptionList } from '@/components/dsx/ExceptionList';
+import { MissingSourceState } from '@/components/dsx/MissingSourceState';
+import { PowerOneLine } from '@/components/dsx/PowerOneLine';
+import { CoolingLoopDiagram } from '@/components/dsx/CoolingLoopDiagram';
+import { useRunSeries } from '@/dsx/runtime/useRunSeries';
 import { ScenarioControls, RecommendationList, DecisionLog, PlannedScenarioNotice } from '@/components/dsx/ScenarioPanel';
 import { CapabilityNotice, UnavailableState, ConnectionState } from '@/components/dsx/StateBadges';
 import { useWorkspace } from '@/dsx/runtime/EvidenceBetaContext';
@@ -59,9 +68,57 @@ function AssetSelectButton({ auraId, sourceId, name }: { auraId: string; sourceI
   );
 }
 
+/**
+ * Rack map with an overlay selector. Overlay choice is view state for this
+ * panel only; every cell value is read from the accepted observation set.
+ */
+function RackMapPanel({ defaultOverlay = 'thermal' }: { defaultOverlay?: RackOverlay }) {
+  const [overlay, setOverlay] = useState<RackOverlay>(defaultOverlay);
+  return (
+    <div className="space-y-3" data-testid="dsx-rack-map-panel">
+      <div className="flex flex-wrap gap-1" role="group" aria-label="Rack map overlay">
+        {RACK_OVERLAYS.map((o) => (
+          <Button
+            key={o.id}
+            size="sm"
+            variant={overlay === o.id ? 'default' : 'outline'}
+            aria-pressed={overlay === o.id}
+            onClick={() => setOverlay(o.id)}
+            data-testid={`dsx-rack-overlay-${o.id}`}
+          >
+            {o.label}
+          </Button>
+        ))}
+      </div>
+      <RackMap overlay={overlay} />
+      <RackMapLegend overlay={overlay} />
+    </div>
+  );
+}
+
+/** Observation-step trends recomputed from the same KPI pipeline as the tiles. */
+function useTrendSeries(ids: Array<'max_inlet_c' | 'it_load_kw' | 'cooling_load_kw' | 'pue'>): TrendSeries[] {
+  const { rt } = useWorkspace();
+  const points = useRunSeries(rt);
+  const defs: Record<string, { label: string; unit: string; digits: number }> = {
+    max_inlet_c: { label: 'Max rack inlet', unit: 'degC', digits: 2 },
+    it_load_kw: { label: 'IT load', unit: 'kW', digits: 2 },
+    cooling_load_kw: { label: 'Cooling load', unit: 'kW', digits: 2 },
+    pue: { label: 'PUE', unit: 'ratio', digits: 3 },
+  };
+  return ids.map((id) => ({
+    id,
+    label: defs[id].label,
+    unit: defs[id].unit,
+    digits: defs[id].digits,
+    points: points.map((p) => p[id]),
+  }));
+}
+
 /* 1 — Facility overview: what is the state of the facility right now? */
 export function OverviewWorkspace() {
   const { rt } = useWorkspace();
+  const trends = useTrendSeries(['pue', 'it_load_kw', 'cooling_load_kw', 'max_inlet_c']);
   return (
     <div className="space-y-6">
       <Section
@@ -72,6 +129,18 @@ export function OverviewWorkspace() {
           ids={['pue', 'facility_load', 'it_load', 'cooling_load', 'max_rack_inlet', 'thermal_headroom', 'power_capacity_utilisation', 'data_quality']}
           metrics={rt.bundle.metrics}
         />
+      </Section>
+      <Section title="Trend across this run" description="Each point is recomputed from the accepted observations at that step. A step without an accepted observation is drawn as a gap.">
+        <TrendStrip series={trends} />
+      </Section>
+      <Section title="Data hall" description="Logical rack layout declared by the facility record. A rack with no accepted observation is never shown as healthy.">
+        <RackMapPanel />
+      </Section>
+      <Section title="Evidence quality" description="Only accepted observations contribute to any value on this page.">
+        <EvidenceQualityBar accepted={rt.snapshot.accepted.length} rejected={rt.snapshot.rejected.length} />
+      </Section>
+      <Section title="Exceptions" description="Ranked by severity, then by number of affected assets.">
+        <ExceptionList limit={5} />
       </Section>
       <ConstraintStack />
       <Section title="Scenario" description="Baseline is step 0 of the same seeded fixture.">
@@ -84,6 +153,7 @@ export function OverviewWorkspace() {
 /* 2 — Thermal */
 export function ThermalWorkspace() {
   const { rt, selectAsset } = useWorkspace();
+  const trends = useTrendSeries(['max_inlet_c', 'cooling_load_kw']);
   const ranked = [...rt.bundle.racks].sort((a, b) => (b.inlet_c ?? -Infinity) - (a.inlet_c ?? -Infinity));
   return (
     <div className="space-y-6">
@@ -92,6 +162,14 @@ export function ThermalWorkspace() {
         description={`Which racks are closest to the ${DESIGN_INLET_LIMIT_C} degC design inlet limit, and what supplies their cooling?`}
       >
         <MetricGrid ids={['max_rack_inlet', 'thermal_headroom', 'cooling_load']} metrics={rt.bundle.metrics} columns="sm:grid-cols-3" />
+      </Section>
+
+      <Section title="Thermal trend" description="Maximum measured rack inlet and cooling draw at each observation step of this run.">
+        <TrendStrip series={trends} className="sm:grid-cols-2 xl:grid-cols-2" />
+      </Section>
+
+      <Section title="Rack map" description="Inlet band per rack, from the measured value only.">
+        <RackMapPanel defaultOverlay="thermal" />
       </Section>
 
       <Section title="Rack inlet queue" description="Ranked by measured inlet temperature. A rack without an observation is never ranked as cool.">

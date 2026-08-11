@@ -110,7 +110,8 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
   const writeContext = useCallback(
     (next: InvestigationContext, replace = false) => {
       // Investigation keys are rewritten; every other query parameter the
-      // caller arrived with (deep links, feature flags) is carried through.
+      // caller arrived with (deep links, feature flags) is carried through,
+      // and the incoming anchor is preserved.
       setSearchParams(
         (current) => {
           const params = contextToParams(next);
@@ -122,10 +123,18 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
           });
           return params;
         },
-        { replace },
+        { replace, preventScrollReset: true },
       );
+      if (location.hash && typeof window !== 'undefined' && !window.location.hash) {
+        // `setSearchParams` drops the fragment; restore it without a new entry.
+        window.history.replaceState(
+          window.history.state,
+          '',
+          `${window.location.pathname}${window.location.search}${location.hash}`,
+        );
+      }
     },
-    [setSearchParams],
+    [setSearchParams, location.hash],
   );
 
   // Scenario and data mode are runtime facts; mirror them into the URL so a

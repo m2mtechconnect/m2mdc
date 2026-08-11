@@ -2,15 +2,16 @@ import { test, expect } from './_setup/fixtures';
 import { installSupabaseMock } from './_setup/supabase-mock';
 
 test('dbg', async ({ page, context }) => {
-  await installSupabaseMock(context);
   page.on('console', (m) => console.log('PAGE', m.text()));
+  await installSupabaseMock(context);
   await page.goto('/dashboard?rack=A3&action=kpi-pue');
   const d = page.getByTestId('action-detail-drawer');
   await expect(d).toBeVisible();
-  const names = await d.getByRole('button').evaluateAll((ns) => ns.map((n) => (n as HTMLElement).getAttribute('aria-label') || (n as HTMLElement).innerText));
-  console.log('BUTTONS', JSON.stringify(names));
-  await d.getByRole('button', { name: /close/i }).first().click();
-  await page.waitForTimeout(1500);
+  console.log('DRAWERS', await page.getByTestId('action-detail-drawer').count());
+  const btn = d.getByRole('button', { name: /close/i }).first();
+  console.log('BOX', JSON.stringify(await btn.boundingBox()));
+  await page.evaluate(() => { document.addEventListener('click', (e) => console.log('CLICKED', (e.target as HTMLElement).tagName, (e.target as HTMLElement).className), true); });
+  await btn.click();
+  await page.waitForTimeout(1000);
   console.log('URL', page.url());
-  console.log('STILL', await d.count(), await d.isVisible().catch(() => false));
 });

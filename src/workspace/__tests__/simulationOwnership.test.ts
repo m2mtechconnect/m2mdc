@@ -80,3 +80,21 @@ describe('Simulation run gate', () => {
     expect(useWorkspaceStore.getState().assumptionsReviewed).toBe(false);
   });
 });
+
+describe('Stage 7H — Builder is a design surface', () => {
+  const read = (p: string) => readFileSync(resolve(process.cwd(), p), 'utf8');
+
+  it('Builder step 5 contains no simulation execution path', () => {
+    const src = read('src/components/builder/steps/Step5Deploy.tsx');
+    expect(src).not.toMatch(/handleRunSimulation/);
+    expect(src).not.toMatch(/type:\s*'simulation'/);
+    expect(src).toMatch(/buildSimulationHandoffUrl/);
+  });
+
+  it('Builder simulation preview offers only a handoff affordance', () => {
+    const src = read('src/components/builder/step5/deploy/SimulationPreviewPanel.tsx');
+    expect(src).not.toMatch(/useSimulation\b/);
+    expect(src).not.toMatch(/startScenario|onRunSimulation/);
+    expect(src).toMatch(/Open in Simulation/);
+  });
+});

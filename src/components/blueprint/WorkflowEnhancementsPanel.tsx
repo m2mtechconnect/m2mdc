@@ -184,12 +184,12 @@ export function WorkflowEnhancementsPanel({
                 {isSimulating ? (
                   <>
                     <Clock className="h-3 w-3 mr-2 animate-spin" />
-                    Simulating...
+                    Stepping through...
                   </>
                 ) : (
                   <>
                     <Play className="h-3 w-3 mr-2" />
-                    Run Preview Simulation
+                    Preview workflow structure
                   </>
                 )}
               </Button>

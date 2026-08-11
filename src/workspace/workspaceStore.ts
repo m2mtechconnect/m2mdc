@@ -95,8 +95,9 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       setRoleView: (roleView) => set({ roleView }),
       selectAsset: (selectedAssetId) => set({ selectedAssetId, panelOpen: true }),
       setPanelOpen: (panelOpen) => set({ panelOpen }),
-      setOverride: (key, value) => set((s) => ({ overrides: { ...s.overrides, [key]: value } })),
-      resetOverrides: () => set({ overrides: { ...DEFAULT_OVERRIDES } }),
+      setOverride: (key, value) =>
+        set((s) => ({ overrides: { ...s.overrides, [key]: value }, assumptionsReviewed: false })),
+      resetOverrides: () => set({ overrides: { ...DEFAULT_OVERRIDES }, assumptionsReviewed: false }),
       // Changing any run input invalidates the previous review.
       setScenario: (scenarioId) => set({ scenarioId, assumptionsReviewed: false }),
       setHandoff: (handoff) => set({ handoff, assumptionsReviewed: false }),

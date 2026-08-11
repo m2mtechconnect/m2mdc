@@ -340,7 +340,7 @@ export function FacilityCanvas({
         </div>
       </div>
 
-      <div className="flex min-w-0 items-stretch h-[clamp(300px,42vh,340px)] md:h-[clamp(360px,46vh,420px)] lg:h-[clamp(440px,52vh,500px)]">
+      <div className="flex min-w-0 items-stretch h-[clamp(300px,38vh,320px)] md:h-[clamp(360px,44vh,400px)] lg:h-[clamp(440px,52vh,500px)]">
         <div className="min-w-0 flex-1 p-3">
           <div
             className="facility-canvas relative h-full w-full min-w-0 overflow-hidden rounded-md border border-border bg-[#0a1020]"

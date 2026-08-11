@@ -14,7 +14,7 @@ import { EvidenceBetaProvider, useWorkspace } from '@/dsx/runtime/EvidenceBetaCo
 import { OperationalTruthBar } from '@/components/dsx/OperationalTruthBar';
 import { ProvenanceDrawer } from '@/components/dsx/ProvenanceDrawer';
 import { ContextBar } from '@/components/dsx/ContextBar';
-import { AssetDrawer } from '@/components/dsx/AssetDrawer';
+import { SideInspector } from '@/components/dsx/SideInspector';
 import { ConstraintDrawer } from '@/components/dsx/ConstraintDrawer';
 import { buildHierarchy, type HierarchyNode } from '@/dsx/workspaces/facilityGraph';
 import { DSX_ROOT, relatedViewsForDomain } from '@/dsx/workspaces/relatedViews';
@@ -265,7 +265,7 @@ function ShellBody() {
           <RelatedWorkspaces />
         </div>
       </div>
-      <AssetDrawer />
+      <SideInspector />
       <ConstraintDrawer />
       <ProvenanceDrawer />
     </div>

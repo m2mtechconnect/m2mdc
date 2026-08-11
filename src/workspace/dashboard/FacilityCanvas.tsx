@@ -97,6 +97,8 @@ export function FacilityCanvas({
   const presentation = usePresentation();
 
   const [zoom, setZoom] = useState(1);
+  /** Bumped by Fit / Reset to force a fresh measured refit of the plan. */
+  const [fitNonce, setFitNonce] = useState(0);
   const [query, setQuery] = useState('');
   const [showRowLabels, setShowRowLabels] = useState(true);
   const [showConstraintMarkers, setShowConstraintMarkers] = useState(true);
@@ -293,7 +295,7 @@ export function FacilityCanvas({
               className="h-9 w-9 p-0 max-sm:h-11 max-sm:w-11"
               aria-label="Zoom out"
               data-testid="canvas-zoom-out"
-              onClick={() => setZoom((z) => Math.max(1, Number((z / 1.25).toFixed(3))))}
+              onClick={() => setZoom((z) => Math.max(0.6, Number((z / 1.25).toFixed(3))))}
             >
               <ZoomOut className="h-4 w-4" strokeWidth={1.75} aria-hidden />
             </Button>
@@ -303,7 +305,12 @@ export function FacilityCanvas({
               className="h-9 w-9 p-0 max-sm:h-11 max-sm:w-11"
               aria-label="Fit to facility"
               data-testid="canvas-fit"
-              onClick={() => setZoom(1)}
+              // Fit is a measured recomputation: zoom 1 means "the scale the
+              // plan derives from the current container", not a stored value.
+              onClick={() => {
+                setZoom(1);
+                setFitNonce((n) => n + 1);
+              }}
             >
               <Maximize2 className="h-4 w-4" strokeWidth={1.75} aria-hidden />
             </Button>
@@ -317,6 +324,7 @@ export function FacilityCanvas({
                 setZoom(1);
                 setQuery('');
                 onSelectRack(null);
+                setFitNonce((n) => n + 1);
               }}
             >
               <RotateCcw className="h-4 w-4" strokeWidth={1.75} aria-hidden />
@@ -332,10 +340,14 @@ export function FacilityCanvas({
         </div>
       </div>
 
-      <div className="flex min-w-0 items-stretch h-[204px] sm:h-[320px] lg:h-[368px]">
+      <div className="flex min-w-0 items-stretch h-[clamp(300px,42vh,340px)] md:h-[clamp(360px,46vh,420px)] lg:h-[clamp(440px,52vh,500px)]">
         <div className="min-w-0 flex-1 p-3">
-          <div className="h-full w-full overflow-hidden rounded-md border border-border bg-[#0a1020]">
+          <div
+            className="facility-canvas relative h-full w-full min-w-0 overflow-hidden rounded-md border border-border bg-[#0a1020]"
+            data-testid="facility-canvas-viewport"
+          >
             <FacilityFloorPlan
+              key={fitNonce}
               facility={facility}
               overlay={overlay}
               grid={grid}
@@ -348,6 +360,25 @@ export function FacilityCanvas({
               showCoolingZones={showCoolingZones}
               centerRequest={centerRequest}
             />
+            {/* Compact legend overlay: the legend no longer consumes a full row. */}
+            <div
+              className="pointer-events-none absolute bottom-2 left-2 rounded-md border border-[#22304d] bg-[#0f172ae6] px-2 py-1.5"
+              data-testid="canvas-legend"
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-[#93a4bd]">{active.label}</p>
+              <ul className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+                {active.legend.map((label, index) => (
+                  <li key={label} className="inline-flex items-center gap-1.5 text-[11px] text-[#cbd5e1]">
+                    <span
+                      className="h-2.5 w-2.5 rounded-sm border border-[#33415c]"
+                      style={{ backgroundColor: swatches[index] }}
+                      aria-hidden
+                    />
+                    {label}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -369,26 +400,17 @@ export function FacilityCanvas({
         )}
       </div>
 
-      <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-border px-4 py-2">
-        <span className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
-          {active.label}
+      <div
+        className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 border-t border-border px-4 py-2 text-[12px] text-muted-foreground"
+        data-testid="canvas-disclosure"
+      >
+        <span>Procedural design visualization</span>
+        <span aria-hidden>·</span>
+        <span>
+          {rackCount} of approximately {facility.designRackEstimate} racks represented
         </span>
-        {active.legend.map((label, index) => (
-          <span key={label} className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground">
-            <span
-              className="h-3 w-3 rounded-sm border border-border"
-              style={{ backgroundColor: swatches[index] }}
-              aria-hidden
-            />
-            {label}
-          </span>
-        ))}
-        <span className="hidden text-[13px] text-muted-foreground sm:inline">
-          {rackCount} of ~{facility.designRackEstimate} racks represented · not a validated OpenUSD stage
-        </span>
-        <span className="text-[13px] text-muted-foreground sm:hidden">
-          {rackCount}/~{facility.designRackEstimate} racks · modelled
-        </span>
+        <span aria-hidden>·</span>
+        <span>Not a validated OpenUSD stage</span>
       </div>
 
       {presentation !== 'inline' && (

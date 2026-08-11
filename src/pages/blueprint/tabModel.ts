@@ -20,6 +20,15 @@ export type BlueprintTab = (typeof BLUEPRINT_TABS)[number];
 export const CONTROLS_SUBTABS = ['agents', 'kpis', 'workflows'] as const;
 export type ControlsSubtab = (typeof CONTROLS_SUBTABS)[number];
 
+/** Human labels for the five canonical tabs. */
+export const BLUEPRINT_TAB_LABELS: Record<BlueprintTab, string> = {
+  model: 'Model',
+  assets: 'Assets & Systems',
+  controls: 'Controls',
+  validation: 'Validation',
+  versions: 'Versions',
+};
+
 export const DEFAULT_TAB: BlueprintTab = 'model';
 export const DEFAULT_CONTROLS_SUBTAB: ControlsSubtab = 'agents';
 

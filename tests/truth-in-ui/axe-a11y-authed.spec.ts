@@ -91,7 +91,7 @@ test.describe('Axe a11y — auth-gated surfaces', () => {
     test.setTimeout(60_000);
     await gotoAuthed(page, '/dashboard');
 
-    const trigger = page.getByRole('button', { name: /Open Co-?Pilot/i }).first();
+    const trigger = page.getByRole('button', { name: /Open AURA Assistant/i }).first();
     // Best-effort open the overlay. Dashboard hydration occasionally re-mounts
     // the launcher; if we can't reach it, axe still audits the /dashboard
     // surface (which mounts the same CoPilot context/components).

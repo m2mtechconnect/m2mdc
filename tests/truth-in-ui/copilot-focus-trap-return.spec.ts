@@ -19,12 +19,12 @@
 import { test, expect, type Page } from './_setup/fixtures';
 import { installSupabaseMock } from './_setup/supabase-mock';
 
-const LAUNCHER_LABEL = 'Open Co-Pilot Assistant';
+const LAUNCHER_LABEL = 'Open AURA Assistant';
 
 // The docked CoPilot panel stays mounted and slides in/out via a
 // `translate-x-*` transform. "Open" == class contains `translate-x-0`;
 // "closed" == class contains `translate-x-full`.
-const DRAWER_SELECTOR = '[role="dialog"][aria-label="Data Centre Co-Pilot"]';
+const DRAWER_SELECTOR = '[role="dialog"][aria-label="AURA Assistant"]';
 
 async function drawerState(page: Page): Promise<'open' | 'closed'> {
   return page.evaluate((sel) => {

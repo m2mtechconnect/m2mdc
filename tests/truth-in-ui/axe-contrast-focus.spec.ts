@@ -74,7 +74,7 @@ const AUTHED_SURFACES: Surface[] = [
     name: 'dashboard + CoPilot overlay',
     path: '/dashboard',
     openOverlays: async (page) => {
-      const trigger = page.getByRole('button', { name: /Open Co-?Pilot/i }).first();
+      const trigger = page.getByRole('button', { name: /Open AURA Assistant/i }).first();
       const opened = await trigger
         .waitFor({ state: 'visible', timeout: 10_000 })
         .then(async () => {

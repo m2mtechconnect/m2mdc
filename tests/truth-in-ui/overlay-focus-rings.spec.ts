@@ -209,7 +209,7 @@ test.describe('overlays — focus rings paint on top of glows', () => {
     await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
 
     // Open CoPilot drawer.
-    const trigger = page.getByRole('button', { name: /Open Co-?Pilot/i }).first();
+    const trigger = page.getByRole('button', { name: /Open AURA Assistant/i }).first();
     await trigger.waitFor({ state: 'visible', timeout: 10_000 });
     await page.waitForTimeout(300);
     await trigger.click({ force: true });

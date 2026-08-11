@@ -19,8 +19,8 @@
 import { test, expect, type Page } from './_setup/fixtures';
 import { installSupabaseMock } from './_setup/supabase-mock';
 
-const LAUNCHER_LABEL = 'Open Co-Pilot Assistant';
-const DRAWER_SELECTOR = '[role="dialog"][aria-label="Data Centre Co-Pilot"]';
+const LAUNCHER_LABEL = 'Open AURA Assistant';
+const DRAWER_SELECTOR = '[role="dialog"][aria-label="AURA Assistant"]';
 
 async function waitForDrawer(page: Page, state: 'open' | 'closed', timeout = 10_000) {
   await page.waitForFunction(

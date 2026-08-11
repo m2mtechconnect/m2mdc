@@ -26,7 +26,7 @@ async function openCommandPalette(page: import('@playwright/test').Page) {
   // not depend on host platform (headless chromium on Linux does not
   // map Meta -> Cmd) or on which element currently owns focus.
   await page
-    .getByRole('button', { name: /Open Co-?Pilot/i })
+    .getByRole('button', { name: /Open AURA Assistant/i })
     .first()
     .waitFor({ state: 'visible', timeout: 10_000 })
     .catch(() => {});

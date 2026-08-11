@@ -181,7 +181,7 @@ test.describe('DSX Evidence Beta — clickable card destinations', () => {
       // why: a blocked capability or an explicit unavailable/planned state.
       if (clicked === 0) {
         const blocked = await page
-          .locator('[data-testid^="dsx-capability-"], [data-testid^="dsx-unavailable"], [data-testid="dsx-planned"]')
+          .locator('[data-dsx-capability], [data-testid^="dsx-capability-"], [data-testid^="dsx-unavailable"], [data-testid="dsx-planned"]')
           .count();
         expect(
           blocked,

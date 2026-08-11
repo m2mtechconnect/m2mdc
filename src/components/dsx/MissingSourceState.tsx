@@ -25,6 +25,7 @@ export function MissingSourceState({
     <div
       data-testid={testId ?? `dsx-capability-${c.id}`}
       data-state={c.state}
+      data-dsx-capability={c.id}
       className="flex flex-col gap-2 rounded-md border border-border bg-muted/40 p-4"
     >
       <span className="flex items-center gap-2 text-[14px] font-semibold">

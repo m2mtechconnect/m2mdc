@@ -511,6 +511,7 @@ export function SovereigntyWorkspace() {
 export function CarbonWorkspace() {
   const { rt } = useWorkspace();
   const assertions = carbonAssertions(rt.bundle);
+  const energyTrends = useTrendSeries(['pue', 'it_load_kw', 'cooling_load_kw']);
   return (
     <div className="space-y-6">
       <Section
@@ -527,10 +528,20 @@ export function CarbonWorkspace() {
         <MetricGrid ids={['facility_load', 'it_load', 'cooling_load', 'pue']} metrics={rt.bundle.metrics} />
       </Section>
 
+      <Section title="Energy driver trend" description="Metered quantities across this run. No emissions figure is derived from them.">
+        <TrendStrip series={energyTrends} className="sm:grid-cols-2 xl:grid-cols-3" />
+      </Section>
+
       <Section title="Sustainability ratios">
         <MetricGrid ids={['wue', 'cue']} metrics={rt.bundle.metrics} columns="sm:grid-cols-2" />
-        <CapabilityNotice capability={capability('grid_carbon_intensity')} />
-        <CapabilityNotice capability={capability('water_metering')} />
+        <MissingSourceState
+          capability={capability('grid_carbon_intensity')}
+          unlocks="carbon usage effectiveness and a reportable emissions total"
+        />
+        <MissingSourceState
+          capability={capability('water_metering')}
+          unlocks="water usage effectiveness and consumption reporting"
+        />
       </Section>
 
       <Section title="Declared claims">
@@ -608,6 +619,14 @@ export function EvidenceWorkspace() {
   const { rt } = useWorkspace();
   return (
     <div className="space-y-6">
+      <Section title="Evidence quality" description="Accepted against quarantined observations for this window. A quarantined record never contributes to a decision.">
+        <EvidenceQualityBar accepted={rt.snapshot.accepted.length} rejected={rt.snapshot.rejected.length} />
+      </Section>
+
+      <Section title="Open exceptions" description="The constraint exceptions a decision would be taken against.">
+        <ExceptionList />
+      </Section>
+
       <Section title="Decisions" description="Recommendations are advisory. Every decision is recorded; nothing is dispatched.">
         <RecommendationList />
       </Section>

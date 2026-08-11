@@ -276,7 +276,7 @@ export default function Blueprint() {
                   <MapPin className="h-3 w-3" />
                   {twin?.city || blueprint.location}
                 </Badge>
-                <Badge variant="outline">{t('blueprint.tierBadge', { tier: blueprint.tier })}</Badge>
+                <Badge variant="outline">{t('blueprint.tierBadge', { tier: stripTierPrefix(blueprint.tier) })}</Badge>
                 <Badge variant="outline">{formatPower(blueprint.capacityKw)}</Badge>
                 <Badge variant="outline">{t('blueprint.racksBadge', { count: blueprint.racks })}</Badge>
               </div>

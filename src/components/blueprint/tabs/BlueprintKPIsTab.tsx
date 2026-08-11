@@ -104,7 +104,7 @@ export function BlueprintKPIsTab({ kpis }: BlueprintKPIsTabProps) {
               />
             </div>
             <Select value={selectedDomain} onValueChange={setSelectedDomain}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px]" aria-label="Filter KPIs by domain">
                 <SelectValue placeholder="Filter by domain" />
               </SelectTrigger>
               <SelectContent>

@@ -424,9 +424,25 @@ export interface FacilityModel {
   modelNotes: string[];
 }
 
+/**
+ * Facility identity supplied by a route that is authoritative over the active
+ * twin. `/blueprint/:id` renders `:id`, which is not always the active twin, so
+ * the model must be built from the routed record or the page would show two
+ * different capacities for one facility.
+ */
+export interface FacilityOverride {
+  id?: string;
+  name?: string;
+  city?: string;
+  regionCode?: string;
+  tier?: string;
+  capacityKw?: number;
+}
+
 /** Single hook every workspace surface uses to read the facility model. */
-export function useFacilityModel(): FacilityModel {
+export function useFacilityModel(override?: FacilityOverride): FacilityModel {
   const { twin, isLoading } = useActiveTwin();
+  const overrideKey = override ? JSON.stringify(override) : '';
 
   return useMemo(() => {
     if (!twin) {

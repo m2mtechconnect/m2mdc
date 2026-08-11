@@ -138,7 +138,7 @@ test.describe('CoPilot drawer — focus trap and return', () => {
     // Shift focus inside the drawer so return-focus is a real transition.
     await page.keyboard.press('Tab');
 
-    const closeBtn = page.locator(`${DRAWER_SELECTOR} >> role=button[name=/Close Co-?Pilot/i]`).first();
+    const closeBtn = page.locator(`${DRAWER_SELECTOR} >> role=button[name=/Close AURA Assistant/i]`).first();
     await expect(closeBtn).toBeVisible();
     await closeBtn.click();
 

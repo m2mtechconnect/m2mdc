@@ -215,10 +215,10 @@ test.describe('overlays — focus rings paint on top of glows', () => {
     await trigger.click({ force: true });
 
     // The drawer is a role="dialog" with aria-label matching COPILOT.TITLE.
-    const drawer = page.locator('[role="dialog"][aria-modal="true"]');
+    const drawer = page.locator('[data-testid="assistant-panel"]');
     await expect(drawer.first()).toBeVisible({ timeout: 10_000 });
 
-    const failures = await probeFocusInside(page, '[role="dialog"][aria-modal="true"]');
+    const failures = await probeFocusInside(page, '[data-testid="assistant-panel"]');
     if (failures.length > 0) {
       test.info().annotations.push({
         type: 'overlay-focus-ring-failures',

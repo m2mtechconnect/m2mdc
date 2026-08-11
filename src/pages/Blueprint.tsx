@@ -13,26 +13,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
-  ArrowLeft, 
-  Download, 
   Server, 
   Bot, 
   Database, 
   Activity, 
   GitBranch, 
   Users, 
-  PlayCircle,
-  MessageCircle,
-  Sparkles,
   Plus,
   Loader2,
-  Edit3,
-  PanelRightOpen,
-  PanelRightClose,
-  MapPin,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { resolveFacilityNaming } from '@/workspace/facilityNaming';
 import { useToast } from '@/hooks/use-toast';
@@ -61,11 +51,9 @@ import {
 } from '@/pages/blueprint/tabModel';
 
 // Assistant components
-import { BlueprintCoPilotPanel, CoPilotModeHeader } from '@/components/copilot';
+import { BlueprintCoPilotPanel } from '@/components/copilot';
 
 // UI Polish Components
-import { SnapshotBadge, ModeBadge, LastUpdatedBadge, SnapshotHeader } from '@/components/ui/snapshot-indicator';
-import { KpiTooltip } from '@/components/ui/kpi-tooltip';
 import { LoadingState, SnapshotNotFoundEmptyState } from '@/components/ui/empty-state';
 import { BlueprintModelSection } from '@/workspace/BlueprintModelSection';
 import { formatPower } from '@/workspace/facilityModel';

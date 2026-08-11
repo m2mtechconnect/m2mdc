@@ -260,6 +260,8 @@ export function BlueprintAgentsTab({ agents, domains, highlightAgentId, useRealD
                       <Button 
                         size="sm" 
                         variant="ghost"
+                        aria-label={`Open ${agent.name} details`}
+                        title="Open agent details"
                         onClick={() => handleViewAgent(agent.slug)}
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
@@ -267,9 +269,13 @@ export function BlueprintAgentsTab({ agents, domains, highlightAgentId, useRealD
                       <Button 
                         size="sm" 
                         variant="ghost"
+                        aria-label={`Chat with ${agent.name}`}
+                        title="Chat with agent"
                         onClick={() => navigate(`/agents/${agent.id}/chat`)}
                       >
-                        <Play className="h-3.5 w-3.5" />
+                        {/* A play glyph implied "run this agent". Blueprint is a
+                            design surface: this only opens the agent chat. */}
+                        <MessageSquare className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </TableCell>

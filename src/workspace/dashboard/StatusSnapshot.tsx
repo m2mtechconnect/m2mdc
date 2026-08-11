@@ -20,16 +20,16 @@ export interface SnapshotRow {
 
 export function buildSnapshotRows(evidenceNeedingReview: number): SnapshotRow[] {
   return [
-    { label: 'Operating mode', value: 'Simulated', tone: 'neutral', to: '/integrations' },
-    { label: 'Live telemetry', value: 'Not connected', tone: 'neutral', to: '/integrations' },
-    { label: 'NVIDIA runtime', value: 'Not available', tone: 'neutral', to: '/settings/integrations/nvidia-dsx' },
+    { label: 'Operating mode', value: 'Simulated', tone: 'neutral', to: '/manage/integrations' },
+    { label: 'Live telemetry', value: 'Not connected', tone: 'neutral', to: '/manage/integrations' },
+    { label: 'NVIDIA runtime', value: 'Not available', tone: 'neutral', to: '/manage/integrations#nvidia-dsx' },
     {
       label: 'Evidence requiring review',
       value: String(evidenceNeedingReview),
       tone: evidenceNeedingReview > 0 ? 'critical' : 'neutral',
       to: '/dsx/evidence-beta',
     },
-    { label: 'Production readiness', value: 'No-Go', tone: 'critical', to: '/settings/integrations/nvidia-dsx' },
+    { label: 'Production readiness', value: 'No-Go', tone: 'critical', to: '/manage/integrations#nvidia-dsx' },
   ];
 }
 
@@ -115,7 +115,7 @@ export function StatusSnapshot({ rows, evidenceHref }: { rows: SnapshotRow[]; ev
 
       <div className={cn('flex-wrap gap-2 border-t border-border p-3', expanded && !compact ? 'flex' : 'hidden')}>
         <Button asChild variant="outline" size="sm" className="h-9 flex-1 text-[13px] max-sm:h-11">
-          <Link to="/integrations">View Integrations</Link>
+          <Link to="/manage/integrations">View Integrations</Link>
         </Button>
         <Button asChild variant="outline" size="sm" className="h-9 flex-1 text-[13px] max-sm:h-11">
           <Link to={evidenceHref}>

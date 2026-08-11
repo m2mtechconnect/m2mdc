@@ -2,7 +2,9 @@
  * Blueprint Data Tab - Data sources and integrations
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   Database, 
@@ -47,6 +49,41 @@ export function BlueprintDataTab({ dataSources, integrations }: BlueprintDataTab
 
   return (
     <div className="space-y-6">
+      {/*
+        Stage 7E: Blueprint shows read-only readiness only. Credentials,
+        schedules and connection setup are owned by Manage > Integrations.
+      */}
+      <Card data-testid="blueprint-integration-summary">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Plug className="h-4 w-4" aria-hidden />
+            Data sources and readiness
+          </CardTitle>
+          <CardDescription>
+            Read-only status. Connection configuration lives in Integrations.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {[
+            { label: 'Facility telemetry', value: 'Not connected' },
+            { label: 'NVIDIA runtime', value: 'Not available' },
+            { label: 'OpenUSD stage', value: 'Not validated' },
+            { label: 'SimReady assets', value: '0 validated' },
+          ].map((row) => (
+            <div
+              key={row.label}
+              className="flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
+            >
+              <span className="text-sm text-foreground">{row.label}</span>
+              <Badge variant="outline" className="text-[11px]">{row.value}</Badge>
+            </div>
+          ))}
+          <Button asChild variant="outline" size="sm">
+            <Link to="/manage/integrations">Manage integrations</Link>
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Data Sources */}
       <Card>
         <CardHeader>

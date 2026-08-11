@@ -36,7 +36,7 @@ export function assistantSuggestions(input: SuggestionInputs): AssistantSuggesti
     suggestions.push({ label: 'How was this calculated?', query: 'Explain how this value was calculated.' });
     suggestions.push({ label: 'Missing provenance', query: 'Identify values with missing provenance.' });
     suggestions.push({ label: 'Conflicting sources', query: 'Show conflicting source values in this evidence set.' });
-  } else if (pathname.startsWith('/integrations') || pathname.startsWith('/settings/integrations')) {
+  } else if (pathname.startsWith('/manage/integrations') || pathname.startsWith('/integrations') || pathname.startsWith('/settings/integrations')) {
     suggestions.push({ label: 'What blocks readiness?', query: 'What is blocking integration readiness?' });
     suggestions.push({ label: 'Fail-closed integrations', query: 'Which integrations are fail-closed?' });
     suggestions.push({ label: 'NVIDIA DSX requirements', query: 'What is required for NVIDIA DSX readiness?' });

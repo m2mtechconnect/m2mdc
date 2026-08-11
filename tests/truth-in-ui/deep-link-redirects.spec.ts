@@ -79,10 +79,14 @@ async function assertSingleShell(page: Page, label: string) {
     page.locator("[data-testid='operating-state-bar']"),
     `${label}: exactly one operating-state bar`,
   ).toHaveCount(1);
-  const switchers =
-    (await page.locator("[data-testid='facility-switcher']").count()) +
-    (await page.locator("[data-testid='facility-switcher-mobile']").count());
-  expect(switchers, `${label}: exactly one facility switcher`).toBe(1);
+  // Stage 7E: the facility switcher lives in the page header and only renders
+  // for multi-facility users, so at most one may exist anywhere on the page.
+  const switchers = await page.locator("[data-testid='facility-switcher']").count();
+  expect(switchers, `${label}: at most one facility switcher`).toBeLessThanOrEqual(1);
+  await expect(
+    page.locator("[data-testid='global-header'] [data-testid='facility-switcher']"),
+    `${label}: facility switcher must not live in the global header`,
+  ).toHaveCount(0);
 }
 
 function assertNoLoop(result: HopResult, label: string) {

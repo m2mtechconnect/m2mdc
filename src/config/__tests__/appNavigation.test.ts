@@ -2,13 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { MANAGE_NAV, WORKSPACE_NAV, isNavItemActive, visibleManageNav } from '../appNavigation';
 
 describe('canonical navigation', () => {
-  it('exposes exactly five workspaces', () => {
+  it('exposes exactly four workspaces', () => {
     expect(WORKSPACE_NAV.map((i) => i.name)).toEqual([
       'Dashboard',
       'Blueprint',
       'Simulation',
       'Evidence',
-      'Integrations',
     ]);
   });
 
@@ -38,7 +37,11 @@ describe('canonical navigation', () => {
 
   it('hides manage items the caller cannot use', () => {
     expect(visibleManageNav(() => false)).toHaveLength(0);
-    expect(visibleManageNav((p) => p === 'twin.edit').map((i) => i.name)).toEqual(['Build']);
+    expect(visibleManageNav((p) => p === 'twin.edit').map((i) => i.name)).toEqual([
+      'Facilities',
+      'Integrations',
+      'Build',
+    ]);
     expect(visibleManageNav(() => true)).toHaveLength(MANAGE_NAV.length);
   });
 });

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
@@ -9,12 +10,20 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { UserAvatar } from '@/components/ui/user-avatar';
-import { LogOut, User as UserIcon, Settings, Users } from 'lucide-react';
+import { Globe, HelpCircle, LogOut, User as UserIcon, Settings, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRBAC } from '@/contexts/RBACContext';
+
+const LANGUAGES = [
+  { code: 'en', label: 'English', short: 'EN' },
+  { code: 'fr-CA', label: 'Français (QC)', short: 'FR' },
+] as const;
 
 interface ProfileData {
   avatar_url: string | null;
@@ -25,6 +34,7 @@ interface ProfileData {
 export function UserMenu() {
   const navigate = useNavigate();
   const { can } = useRBAC();
+  const { i18n } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
 
@@ -111,7 +121,33 @@ export function UserMenu() {
         <DropdownMenuItem asChild>
           <Link to="/account/settings" className="cursor-pointer">
             <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
+            <span>Preferences</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Globe className="mr-2 h-4 w-4" aria-hidden="true" />
+            <span>Language</span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            {LANGUAGES.map((lang) => (
+              <DropdownMenuItem
+                key={lang.code}
+                onSelect={() => i18n.changeLanguage(lang.code)}
+                className={i18n.language === lang.code ? 'bg-accent/10 font-medium' : ''}
+              >
+                <span className="mr-2 inline-block w-6 text-xs font-semibold tracking-wide text-muted-foreground">
+                  {lang.short}
+                </span>
+                {lang.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+        <DropdownMenuItem asChild>
+          <Link to="/help" className="cursor-pointer">
+            <HelpCircle className="mr-2 h-4 w-4" />
+            <span>Help and guided tours</span>
           </Link>
         </DropdownMenuItem>
         {can('tenant.view_members') && (

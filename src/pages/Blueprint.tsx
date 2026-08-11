@@ -197,21 +197,27 @@ export default function Blueprint() {
   // Read tab and highlight from query params
   const tabParam = searchParams.get('tab');
   const highlightParam = searchParams.get('highlight');
-  const [activeTab, setActiveTab] = useState(tabParam || 'model');
-  
-  // Switch tab when query param changes
+  // The URL is the single source of truth for the active tab.
+  const activeTab: BlueprintTab = isBlueprintTab(tabParam) ? tabParam : DEFAULT_TAB;
+
+  // Normalization only (invalid tab, legacy `scenarios` link, missing param)
+  // uses replace so it never adds a history entry the user did not create.
   useEffect(() => {
-    if (tabParam) {
-      setActiveTab(tabParam);
+    if (tabParam !== null && !isBlueprintTab(tabParam)) {
+      const next = new URLSearchParams(searchParams);
+      next.set('tab', DEFAULT_TAB);
+      setSearchParams(next, { replace: true });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabParam]);
 
-  // Keep the URL in sync so a tab can be shared and the back button works.
+  // A deliberate tab selection is a navigation: push, so Browser Back and
+  // Forward traverse tab changes. Re-selecting the active tab is a no-op.
   const handleTabChange = (value: string) => {
-    setActiveTab(value);
+    if (value === activeTab) return;
     const next = new URLSearchParams(searchParams);
     next.set('tab', value);
-    setSearchParams(next, { replace: true });
+    setSearchParams(next, { replace: false });
   };
 
   if (isLoading) {
@@ -428,9 +434,6 @@ export default function Blueprint() {
                   </TabsContent>
                   <TabsContent value="roles" className="m-0">
                     <BlueprintRolesTab roles={blueprint.humanRoles} />
-                  </TabsContent>
-                  <TabsContent value="scenarios" className="m-0">
-                    <BlueprintScenariosTab scenarios={blueprint.simulationScenarios} />
                   </TabsContent>
                   <TabsContent value="validation" className="m-0">
                     <div className="grid lg:grid-cols-2 gap-6">

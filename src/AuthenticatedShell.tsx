@@ -33,6 +33,7 @@ import ConnectHealth from "./pages/ConnectHealth";
 import Search from "./pages/Search";
 import AISettings from "./pages/AISettings";
 import Integrations from "./pages/Integrations";
+import ManageFacilities from "./pages/manage/Facilities";
 import { SignOut } from "./pages/auth/index";
 import NotFound from "./pages/NotFound";
 import AgentWorkspace from "./pages/AgentWorkspace";
@@ -96,7 +97,8 @@ function ApprovedUserRoutes() {
       <Route path="/admin/user-approvals" element={<AdminUserApproval />} />
       <Route path="/admin/signups-dashboard" element={<AdminSignupsDashboard />} />
       {/* Canonical integrations destination. */}
-      <Route path="/integrations" element={<Integrations />} />
+      <Route path="/manage/integrations" element={<Integrations />} />
+      <Route path="/manage/facilities" element={<ManageFacilities />} />
       <Route path="/compliance" element={<Compliance />} />
       <Route path="/teams" element={<Teams />} />
       <Route path="/marketplace" element={<Marketplace />} />

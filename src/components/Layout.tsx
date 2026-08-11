@@ -28,8 +28,6 @@ import { UserMenu } from "@/components/layout/UserMenu";
 import { BuildVersion } from "@/components/BuildVersion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { DataCentreSelector } from "@/components/twin-selector";
-import { HelpMenu } from "@/components/header/HelpMenu";
 import { useTourAutoStart } from "@/tours/useTourAutoStart";
 import { useRBAC } from "@/contexts/RBACContext";
 import {
@@ -37,7 +35,6 @@ import {
   isNavItemActive,
   visibleManageNav,
 } from "@/config/appNavigation";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { OperatingStateBar } from "@/components/capability/OperatingStateBar";
 import { useShellLayoutStore } from "@/stores/shellLayoutStore";
 import {
@@ -127,11 +124,6 @@ export function Layout({ children }: LayoutProps) {
               />
             </Link>
 
-            {/* Data Centre Twin Selector (single canonical facility switcher) */}
-            <div className="hidden lg:block" data-tour="dc-selector" data-testid="facility-switcher">
-              <DataCentreSelector />
-            </div>
-
             {/* Workspace navigation: five destinations, always the same five. */}
             <nav
               className="hidden min-w-0 items-center gap-1 lg:flex xl:gap-1.5"
@@ -218,19 +210,13 @@ export function Layout({ children }: LayoutProps) {
             </nav>
           </div>
 
-          {/* Right Side Actions */}
+          {/* Right Side Actions: Search, Assistant, Manage (in nav), Avatar. */}
           <div className="flex flex-shrink-0 items-center gap-1.5 lg:gap-2">
-            {/* Language Switcher */}
-            <LanguageSwitcher />
-            
-            {/* Help Menu with Tours */}
-            <HelpMenu />
-            
-            {/* Command Palette Trigger */}
+            {/* Search: full control on desktop, icon-only (labelled) on tablet. */}
             <Button
               variant="outline"
               size="sm"
-              className="hidden xl:flex gap-2 text-[13px] text-muted-foreground min-h-[38px] hover:bg-accent/10 transition-smooth"
+              className="hidden lg:flex gap-2 text-[13px] text-muted-foreground min-h-[38px] hover:bg-accent/10 transition-smooth"
               aria-label="Open command palette"
               onClick={() => {
                 // Dispatch the same keyboard shortcut that GlobalSearchBar listens for
@@ -240,13 +226,8 @@ export function Layout({ children }: LayoutProps) {
               }}
             >
               <Search className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
-              <span>Search</span>
+              <span className="hidden xl:inline">Search</span>
             </Button>
-
-            {/* User Menu - Desktop */}
-            <div className="hidden xl:block">
-              <UserMenu />
-            </div>
 
             {/* AURA Assistant */}
             <Tooltip>
@@ -268,6 +249,9 @@ export function Layout({ children }: LayoutProps) {
                 <p>{COPILOT.TITLE} · {COPILOT.SUBTITLE}</p>
               </TooltipContent>
             </Tooltip>
+
+            {/* User menu owns profile, language, help, preferences, sign out. */}
+            <UserMenu />
 
             {/* Mobile Menu Toggle */}
             <Button
@@ -308,11 +292,6 @@ export function Layout({ children }: LayoutProps) {
           </SheetHeader>
 
           <nav className="mt-6 space-y-1" aria-label="Mobile navigation">
-            {/* Data Centre Selector - Mobile */}
-            <div className="px-3 mb-4" data-testid="facility-switcher-mobile">
-              <DataCentreSelector />
-            </div>
-            
             {/* Workspaces */}
             <div className="pb-4">
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">

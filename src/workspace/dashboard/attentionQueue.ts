@@ -230,7 +230,7 @@ export function buildAttentionQueue(input: AttentionInputs): AttentionItem[] {
     evidence: 'Capability registry reports the simulated operating mode.',
     observedAt: derivedAt,
     observedBasis: 'registry',
-    actions: [{ label: 'Open Integrations', to: '/integrations' }],
+    actions: [{ label: 'Open Integrations', to: '/manage/integrations' }],
   });
 
   return items.sort((a, b) => SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity));

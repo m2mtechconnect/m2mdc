@@ -17,6 +17,7 @@
 import {
   BarChart3,
   Boxes,
+  Building2,
   Cable,
   FileSearch,
   FlaskConical,
@@ -76,17 +77,27 @@ export const WORKSPACE_NAV: AppNavItem[] = [
     matches: ['/dsx/evidence-beta', '/compliance'],
     description: 'Provenance, decision record and exports.',
   },
-  {
-    name: 'Integrations',
-    fullName: 'Integrations',
-    href: '/integrations',
-    icon: Cable,
-    matches: ['/integrations', '/settings/integrations', '/marketplace', '/connect'],
-    description: 'Connection and readiness state for external systems.',
-  },
 ];
 
 export const MANAGE_NAV: AppNavItem[] = [
+  {
+    name: 'Facilities',
+    fullName: 'Facilities',
+    href: '/manage/facilities',
+    icon: Building2,
+    matches: ['/manage/facilities'],
+    permission: 'twin.edit',
+    description: 'Facility list, creation, access and configuration.',
+  },
+  {
+    name: 'Integrations',
+    fullName: 'Integrations',
+    href: '/manage/integrations',
+    icon: Cable,
+    matches: ['/manage/integrations', '/integrations', '/settings/integrations', '/marketplace', '/connect'],
+    permission: 'twin.edit',
+    description: 'Connectors, credentials and external-system readiness.',
+  },
   {
     name: 'Build',
     fullName: 'Build twin',

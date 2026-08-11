@@ -275,7 +275,7 @@ export default function UploadZone() {
           </button>
 
           <button
-            onClick={() => navigate("/integrations")}
+            onClick={() => navigate("/manage/integrations")}
             className="p-4 border border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-smooth group"
             aria-label="Connect app integration as data source"
           >

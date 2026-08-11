@@ -16,7 +16,7 @@ export default function OnboardingWizard() {
       title: "Connect your data",
       description: "Link your Drive, SharePoint, website, or CRM",
       icon: Plug,
-      action: () => navigate("/integrations"),
+      action: () => navigate("/manage/integrations"),
       cta: "Connect",
     },
     {

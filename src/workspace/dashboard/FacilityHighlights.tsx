@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { FacilitySwitcher } from '@/components/facility/FacilitySwitcher';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   DropdownMenu,
@@ -103,6 +104,8 @@ export function FacilityHighlights({
         </div>
 
         <div className="flex min-w-0 flex-wrap items-center gap-2">
+          {/* Only rendered when the user has more than one facility. */}
+          <FacilitySwitcher />
           <Button
             asChild
             className="h-10 px-4 text-[14px] font-semibold shadow-sm max-sm:h-11"
@@ -147,7 +150,7 @@ export function FacilityHighlights({
                 <Link to={`${blueprintHref}?tab=model`}>Inspect facility model</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/integrations">Open Integrations</Link>
+                <Link to="/manage/integrations">Open Integrations</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/simulation">Simulation workspace</Link>

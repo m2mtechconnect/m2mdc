@@ -6,11 +6,9 @@
  * the current selection. Every action lives in the rail or the panel, so
  * there are no duplicate KPI cards or scattered call-to-action buttons.
  */
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import { PanelRightOpen } from 'lucide-react';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TwinOverlayProvider } from '@/context/TwinOverlayContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
@@ -20,17 +18,24 @@ import { KpiStrip } from './KpiStrip';
 import { ContextPanel } from './ContextPanel';
 import { WorkspaceToolRail } from './WorkspaceToolRail';
 import { EvidenceDrawer } from './EvidenceDrawer';
-import { RoleViewSelector } from './RoleViewSelector';
+import { WorkspaceRecordHeader } from './WorkspaceRecordHeader';
 import { useFacilityModel } from './facilityModel';
 import { ROLE_VIEWS, useWorkspaceStore } from './workspaceStore';
 import { useSeededRunFixtures } from './runFixtures';
 import { parseSimulationHandoff } from '@/simulation/handoff';
 
-/** True below the lg breakpoint (1280px), where the panel becomes a sheet. */
-function useBelowXl(): boolean {
+/** Docked inspector width envelope (Salesforce-style split workspace). */
+const PANEL_DEFAULT = 368;
+const PANEL_MIN = 336;
+const PANEL_MAX = 440;
+/** Below this width the inspector becomes a non-destructive overlay drawer. */
+const OVERLAY_BREAKPOINT = 1180;
+
+/** True below the overlay breakpoint, where the panel becomes a drawer. */
+function useOverlayInspector(): boolean {
   const [below, setBelow] = useState(false);
   useEffect(() => {
-    const mql = window.matchMedia('(max-width: 1279px)');
+    const mql = window.matchMedia(`(max-width: ${OVERLAY_BREAKPOINT - 1}px)`);
     const sync = () => setBelow(mql.matches);
     sync();
     mql.addEventListener('change', sync);
@@ -55,13 +60,48 @@ export default function AuraWorkspace() {
   const setHandoff = useWorkspaceStore((s) => s.setHandoff);
   const [searchParams] = useSearchParams();
   const isMobile = useIsMobile();
-  const belowXl = useBelowXl();
+  const overlayInspector = useOverlayInspector();
   const setFullBleed = useShellLayoutStore((s) => s.setFullBleed);
+  const setPageOwnsOperatingState = useShellLayoutStore((s) => s.setPageOwnsOperatingState);
+  const [panelWidth, setPanelWidth] = useState(PANEL_DEFAULT);
+  const panelToggleRef = useRef<HTMLButtonElement | null>(null);
+  const resizeRef = useRef<{ startX: number; startWidth: number } | null>(null);
 
   useEffect(() => {
     setFullBleed(true);
-    return () => setFullBleed(false);
-  }, [setFullBleed]);
+    setPageOwnsOperatingState(true);
+    return () => {
+      setFullBleed(false);
+      setPageOwnsOperatingState(false);
+    };
+  }, [setFullBleed, setPageOwnsOperatingState]);
+
+  const clampWidth = (w: number) => Math.min(PANEL_MAX, Math.max(PANEL_MIN, w));
+
+  const onResizePointerDown = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      resizeRef.current = { startX: event.clientX, startWidth: panelWidth };
+      event.currentTarget.setPointerCapture(event.pointerId);
+    },
+    [panelWidth],
+  );
+
+  const onResizePointerMove = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    const state = resizeRef.current;
+    if (!state) return;
+    setPanelWidth(clampWidth(state.startWidth - (event.clientX - state.startX)));
+  }, []);
+
+  const endResize = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    resizeRef.current = null;
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+  }, []);
+
+  // Closing the overlay drawer returns focus to the control that opened it.
+  const closePanel = useCallback(() => {
+    setPanelOpen(false);
+    window.requestAnimationFrame(() => panelToggleRef.current?.focus());
+  }, [setPanelOpen]);
 
   useEffect(() => {
     document.title = `${facility.name} | AURA simulation workspace`;
@@ -69,8 +109,8 @@ export default function AuraWorkspace() {
 
   // Below xl the panel is an overlay, so it must not cover the model on load.
   useEffect(() => {
-    setPanelOpen(!belowXl);
-  }, [belowXl, setPanelOpen]);
+    setPanelOpen(!overlayInspector);
+  }, [overlayInspector, setPanelOpen]);
 
   // This surface is the simulation workspace, so it always opens on the
   // scenario step. Later role changes still move to the role's default tool.
@@ -142,60 +182,73 @@ export default function AuraWorkspace() {
   return (
     <TwinOverlayProvider twinId={facility.id} defaultOverlay="thermal">
       <div
-        className="flex h-[calc(100vh-8.5rem)] min-h-[32rem] w-full flex-col overflow-hidden bg-background"
+        className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden bg-background"
         data-testid="aura-workspace"
       >
-        {/* Workspace bar: identity + role view. No duplicated actions. */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-border px-3 py-1.5">
-          <h1 className="truncate text-sm font-semibold text-foreground">
-            {facility.name}
-            <span className="ml-2 font-normal text-muted-foreground">Simulation workspace</span>
-          </h1>
-          {isFallback && (
-            <span className="rounded-sm bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
-              Reference facility model
-            </span>
-          )}
-          <div className="ml-auto flex items-center gap-2">
-            <RoleViewSelector />
-            {!panelOpen && (
-              <Button size="sm" variant="outline" className="h-8" onClick={() => setPanelOpen(true)}>
-                <PanelRightOpen className="mr-1.5 h-4 w-4" aria-hidden />
-                Panel
-              </Button>
-            )}
-          </div>
-        </div>
+        {/* One record header: identity, truth line, view selector, actions. */}
+        <WorkspaceRecordHeader
+          facility={facility}
+          isFallback={isFallback}
+          panelOpen={panelOpen}
+          onOpenPanel={() => setPanelOpen(true)}
+          panelToggleRef={panelToggleRef}
+        />
 
-        <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:flex-row">
           {!isMobile && <WorkspaceToolRail />}
 
-          <div className="flex min-h-0 flex-1 flex-col">
-            <div className="min-h-[16rem] flex-1">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+            <div className="min-h-0 flex-1">
               <FacilityCanvas facility={facility} />
             </div>
             <KpiStrip facility={facility} overrides={overrides} />
           </div>
 
-          {/* Desktop: docked panel. Tablet and mobile: sheet. */}
-          <div className="hidden min-h-0 w-[22rem] shrink-0 lg:flex">
-            {panelOpen && (
+          {/* Desktop: docked, resizable inspector. Narrow: overlay drawer. */}
+          {!overlayInspector && panelOpen && (
+            <div className="flex min-h-0 shrink-0" style={{ width: panelWidth }}>
+              <div
+                role="separator"
+                aria-orientation="vertical"
+                aria-label="Resize inspector"
+                tabIndex={0}
+                onPointerDown={onResizePointerDown}
+                onPointerMove={onResizePointerMove}
+                onPointerUp={endResize}
+                onPointerCancel={endResize}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowLeft') setPanelWidth((w) => clampWidth(w + 16));
+                  if (e.key === 'ArrowRight') setPanelWidth((w) => clampWidth(w - 16));
+                }}
+                className="w-1 shrink-0 cursor-col-resize bg-border transition-colors hover:bg-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
               <ContextPanel
                 facility={facility}
                 assets={assets}
                 overrides={overrides}
-                onClose={() => setPanelOpen(false)}
+                onClose={closePanel}
               />
-            )}
-          </div>
+            </div>
+          )}
 
           {isMobile && <WorkspaceToolRail orientation="horizontal" />}
         </div>
 
-        {belowXl && (
-          <Sheet open={panelOpen} onOpenChange={setPanelOpen}>
-            <SheetContent side="right" className="w-full bg-card p-0 sm:max-w-md">
-              <ContextPanel facility={facility} assets={assets} overrides={overrides} />
+        {overlayInspector && (
+          <Sheet
+            open={panelOpen}
+            onOpenChange={(open) => {
+              if (!open) closePanel();
+              else setPanelOpen(true);
+            }}
+          >
+            <SheetContent
+              side="right"
+              className="flex w-full flex-col gap-0 bg-card p-0 sm:max-w-[440px]"
+              data-testid="workspace-inspector-drawer"
+            >
+              <SheetTitle className="sr-only">Workspace inspector</SheetTitle>
+              <ContextPanel facility={facility} assets={assets} overrides={overrides} onClose={closePanel} />
             </SheetContent>
           </Sheet>
         )}

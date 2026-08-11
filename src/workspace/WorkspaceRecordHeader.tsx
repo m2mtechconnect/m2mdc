@@ -52,7 +52,7 @@ export function WorkspaceRecordHeader({ facility, isFallback, panelOpen, onOpenP
         data-testid="workspace-record-header"
         className="flex h-[52px] w-full shrink-0 items-center gap-x-3 border-b border-border bg-card px-3 sm:px-4"
       >
-        <div className="flex min-w-0 items-center gap-2">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
           <h1 className="min-w-0 truncate text-base font-semibold leading-tight text-foreground sm:text-[17px]">
             {facility.name}
           </h1>
@@ -122,7 +122,11 @@ export function WorkspaceRecordHeader({ facility, isFallback, panelOpen, onOpenP
         </div>
 
         <div className="ml-auto flex shrink-0 items-center gap-2">
-          <RoleViewSelector />
+          {/* The role view selector needs real width; below sm the facility
+              identity takes priority and the selector lives in the inspector. */}
+          <div className="hidden sm:block">
+            <RoleViewSelector />
+          </div>
           {!panelOpen && (
             <Button
               ref={panelToggleRef}

@@ -199,7 +199,7 @@ export function RackQuickViewBody({ data, facilityId, blueprintHref }: BodyProps
         <Button asChild size="sm" variant="outline" className="h-9 text-[13px] max-sm:h-11">
           <Link to={`/simulation?twin=${encodeURIComponent(facilityId || 'default')}&rack=${rackParam}`}>
             <Play className="mr-1.5 h-4 w-4" strokeWidth={1.75} aria-hidden />
-            Run simulation
+            Open in Simulation
           </Link>
         </Button>
         <Button

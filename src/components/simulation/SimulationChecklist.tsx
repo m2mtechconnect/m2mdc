@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { SIMULATION_ROUTE } from '@/simulation/handoff';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, XCircle, PlayCircle, ChevronDown, ChevronUp, Clock, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -46,7 +47,8 @@ export function SimulationChecklist() {
   }, []);
   
   const handleRunSimulation = () => {
-    navigate('/data-centre-twin?view=simulation');
+    // Navigation only: the run is created inside the canonical Simulation workspace.
+    navigate(SIMULATION_ROUTE);
   };
   
   return (
@@ -86,7 +88,7 @@ export function SimulationChecklist() {
         {!isComplete ? (
           <Button onClick={handleRunSimulation} className="w-full gap-2">
             <PlayCircle className="h-4 w-4" />
-            Run Simulation Now
+            Open in Simulation
           </Button>
         ) : (
           <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>

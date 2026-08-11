@@ -5,12 +5,11 @@ test('dbg', async ({ page, context }) => {
   await page.goto('/dashboard?rack=A3&action=kpi-pue');
   const d = page.getByTestId('action-detail-drawer');
   await expect(d).toBeVisible();
-  const btn = d.getByRole('button', { name: /close/i }).first();
-  const box = (await btn.boundingBox())!;
-  console.log('VP', JSON.stringify(page.viewportSize()), 'BOX', JSON.stringify(box));
-  const info = await page.evaluate(([x, y]) => {
-    const el = document.elementFromPoint(x as number, y as number) as HTMLElement;
-    return el ? el.tagName + '|' + el.className.toString().slice(0, 80) : 'none';
-  }, [box.x + box.width / 2, box.y + box.height / 2]);
-  console.log('ATPOINT', info);
+  console.log(JSON.stringify(await d.evaluate((el) => {
+    const cs = getComputedStyle(el);
+    const r = el.getBoundingClientRect();
+    let p: HTMLElement | null = el.parentElement; const chain: string[] = [];
+    while (p) { const s = getComputedStyle(p); chain.push(`${p.tagName}.${p.className.toString().slice(0,40)}|pos=${s.position}|tr=${s.transform}|f=${s.filter}|ovf=${s.overflowX}|w=${p.getBoundingClientRect().width}`); p = p.parentElement; }
+    return { pos: cs.position, rect: { x: r.x, w: r.width }, docW: document.documentElement.scrollWidth, inner: window.innerWidth, chain };
+  })));
 });

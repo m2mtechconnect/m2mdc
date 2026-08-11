@@ -48,6 +48,7 @@ export default defineConfig({
     // Any accidental network egress is caught by the network guard
     // fixture; the ignoreHTTPSErrors here just avoids TLS noise on
     // aborted external calls.
+    reducedMotion: 'reduce',
     ignoreHTTPSErrors: true,
   },
   projects: [{
@@ -56,7 +57,7 @@ export default defineConfig({
     // which is missing libglib on the CI image). Playwright ships both
     // under PLAYWRIGHT_BROWSERS_PATH; `channel: 'chromium'` selects the
     // full build.
-    use: { ...devices['Desktop Chrome'], channel: 'chromium' },
+    use: { ...devices['Desktop Chrome'], channel: 'chromium', reducedMotion: 'reduce' },
   }],
   webServer: PLAYWRIGHT_BASE_URL
     ? undefined

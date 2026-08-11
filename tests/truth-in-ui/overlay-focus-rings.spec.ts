@@ -209,16 +209,16 @@ test.describe('overlays — focus rings paint on top of glows', () => {
     await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
 
     // Open CoPilot drawer.
-    const trigger = page.getByRole('button', { name: /Open Co-?Pilot/i }).first();
+    const trigger = page.getByRole('button', { name: /Open AURA Assistant/i }).first();
     await trigger.waitFor({ state: 'visible', timeout: 10_000 });
     await page.waitForTimeout(300);
     await trigger.click({ force: true });
 
     // The drawer is a role="dialog" with aria-label matching COPILOT.TITLE.
-    const drawer = page.locator('[role="dialog"][aria-modal="true"]');
+    const drawer = page.locator('[data-testid="assistant-panel"]');
     await expect(drawer.first()).toBeVisible({ timeout: 10_000 });
 
-    const failures = await probeFocusInside(page, '[role="dialog"][aria-modal="true"]');
+    const failures = await probeFocusInside(page, '[data-testid="assistant-panel"]');
     if (failures.length > 0) {
       test.info().annotations.push({
         type: 'overlay-focus-ring-failures',

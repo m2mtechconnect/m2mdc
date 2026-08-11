@@ -13,8 +13,8 @@
 import { test, expect, type Page } from './_setup/fixtures';
 import { installSupabaseMock } from './_setup/supabase-mock';
 
-const LAUNCHER_LABEL = 'Open Co-Pilot Assistant';
-const DRAWER_SELECTOR = '[role="dialog"][aria-label="Data Centre Co-Pilot"]';
+const LAUNCHER_LABEL = 'Open AURA Assistant';
+const DRAWER_SELECTOR = '[role="dialog"][aria-label="AURA Assistant"]';
 const BACKDROP_SELECTOR = '[data-testid="copilot-backdrop"]';
 
 async function waitForDrawer(page: Page, state: 'open' | 'closed', timeout = 5_000) {
@@ -122,6 +122,22 @@ test.describe('CoPilot drawer — Escape + backdrop-click return focus to launch
 
     const backdrop = page.locator(BACKDROP_SELECTOR);
     await expect(backdrop).toHaveCount(1);
+
+    // The docked (non-modal) presentation intentionally has no dismissible
+    // backdrop: the panel sits beside the workspace and the page stays usable.
+    // Backdrop dismissal only applies to the modal presentation.
+    const isModal =
+      (await page.locator('[data-testid="assistant-panel"]').getAttribute('aria-modal')) === 'true';
+    if (!isModal) {
+      await expect(backdrop).toBeHidden();
+      await page.keyboard.press('Escape');
+      await waitForDrawer(page, 'closed');
+      await waitForFocusOnLauncher(page);
+      expect(await activeAriaLabel(page)).toBe(LAUNCHER_LABEL);
+      void guard;
+      return;
+    }
+
     // Backdrop covers the viewport; click on the left edge so we can't
     // accidentally hit the 480px-wide drawer docked on the right.
     await backdrop.click({ position: { x: 20, y: 200 } });

@@ -11,7 +11,7 @@ import { test, expect } from './_setup/fixtures';
 import { installSupabaseMock } from './_setup/supabase-mock';
 import { A11Y_BLOCKING_RULES } from './_setup/a11y-rules';
 
-const DRAWER_SELECTOR = '[role="dialog"][aria-label="Data Centre Co-Pilot"]';
+const DRAWER_SELECTOR = '[role="dialog"][aria-label="AURA Assistant"]';
 
 test('axe: CoPilot drawer — no violations on blocking rules', async ({ page, context, guard }) => {
   test.setTimeout(60_000);
@@ -20,7 +20,7 @@ test('axe: CoPilot drawer — no violations on blocking rules', async ({ page, c
   await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
   await expect.poll(() => mock.profileHits(), { timeout: 5_000 }).toBeGreaterThan(0);
 
-  const launcher = page.getByRole('button', { name: /Open Co-?Pilot/i }).first();
+  const launcher = page.getByRole('button', { name: /Open AURA Assistant/i }).first();
   await launcher.waitFor({ state: 'visible', timeout: 15_000 });
   await launcher.focus();
   await launcher.press("Enter");

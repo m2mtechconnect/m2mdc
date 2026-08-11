@@ -43,6 +43,11 @@ test.describe('Action Center deep links', () => {
     await expect(page.getByTestId('action-detail-drawer')).toBeVisible();
     // Close via the drawer's own control: a global Escape also clears the rack
     // selection, which is separate behaviour.
+    // The sheet slides in; wait for it to settle so the close control is at
+    // its final position before clicking.
+    await page.getByTestId('action-detail-drawer').evaluate((el) =>
+      Promise.all(el.getAnimations().map((a) => a.finished.catch(() => undefined))).then(() => undefined),
+    );
     await page.getByTestId('action-detail-drawer').getByRole('button', { name: /close/i }).first().click();
     await expect(page).not.toHaveURL(/action=/);
     await expect(page).toHaveURL(/rack=A3/);

@@ -117,18 +117,31 @@ function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: DataCentreBlu
     try {
       // Facility identity comes from the blueprint being converted, never a
       // hard-coded Montreal default.
-      const { city, regionCode } = splitLocation(blueprint.location);
-      const newTwin = await createTwin(null, {
+      // Typed normalization: structured fields win, nothing is guessed and
+      // nothing defaults to Montreal / QC.
+      const location = normalizeLocation(blueprint.location);
+      const supplied = {
         name: blueprint.name,
-        city,
-        region_code: regionCode,
-        tier: blueprint.tier || 'Tier III',
+        city: location.city ?? undefined,
+        region_code: location.regionCode ?? undefined,
+        tier: blueprint.tier || undefined,
+        capacity_kw: blueprint.capacityKw || undefined,
+      };
+      const newTwin = await createTwin(null, {
+        ...supplied,
         // `capacityKw` is already kilowatts. Multiplying by 1000 wrote watts into a
         // kW column and relied on normaliseStoredCapacityKw() to rescale it back.
-        capacity_kw: blueprint.capacityKw || 10000,
         metadata: {
           from_blueprint: blueprint.id,
           racks: blueprint.racks,
+          location_provenance: {
+            displayLocation: location.displayLocation,
+            source: location.source,
+            confidence: location.confidence,
+          },
+          // Every context-applied default keeps its classification so no
+          // assumption can later be read as a validated facility fact.
+          field_provenance: classifyCreateTwinFields(supplied),
         },
       });
 

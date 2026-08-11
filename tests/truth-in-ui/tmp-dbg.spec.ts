@@ -3,6 +3,7 @@ import { installSupabaseMock } from './_setup/supabase-mock';
 
 test('dbg', async ({ page, context }) => {
   await installSupabaseMock(context);
+  page.on('console', (m) => console.log('PAGE', m.text()));
   await page.goto('/dashboard?rack=A3&action=kpi-pue');
   const d = page.getByTestId('action-detail-drawer');
   await expect(d).toBeVisible();

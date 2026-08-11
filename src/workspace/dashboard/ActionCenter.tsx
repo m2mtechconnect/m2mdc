@@ -180,7 +180,7 @@ export function ActionCenter({
   );
 
   const openAction = useCallback((id: string) => patchParams({ action: id }), [patchParams]);
-  const closeAction = useCallback(() => patchParams({ action: null }), [patchParams]);
+  const closeAction = useCallback(() => { console.log("DBG closeAction"); patchParams({ action: null }); }, [patchParams]);
   const setShowAll = useCallback(
     (open: boolean) => patchParams(open ? { actions: 'all' } : { actions: null, action: null }),
     [patchParams],

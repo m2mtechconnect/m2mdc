@@ -50,7 +50,6 @@ import { BlueprintDataTab } from '@/components/blueprint/tabs/BlueprintDataTab';
 import { BlueprintKPIsTab } from '@/components/blueprint/tabs/BlueprintKPIsTab';
 import { BlueprintWorkflowsTab } from '@/components/blueprint/tabs/BlueprintWorkflowsTab';
 import { BlueprintRolesTab } from '@/components/blueprint/tabs/BlueprintRolesTab';
-import { BlueprintScenariosTab } from '@/components/blueprint/tabs/BlueprintScenariosTab';
 
 // Co-Pilot Components
 import { BlueprintCoPilotPanel, CoPilotModeHeader } from '@/components/copilot';
@@ -61,6 +60,8 @@ import { KpiTooltip } from '@/components/ui/kpi-tooltip';
 import { LoadingState, SnapshotNotFoundEmptyState } from '@/components/ui/empty-state';
 import { BlueprintModelSection } from '@/workspace/BlueprintModelSection';
 import { formatPower } from '@/workspace/facilityModel';
+import { normalizeLocation } from '@/lib/location/normalizeLocation';
+import { classifyCreateTwinFields } from '@/lib/provenance/twinFieldProvenance';
 import type { DataCentreBlueprint } from '@/types/dataCentreBlueprint';
 
 /**
@@ -78,10 +79,25 @@ const STAT_TONES = {
 
 type StatTone = keyof typeof STAT_TONES;
 
-/** Split a blueprint location such as "Montreal, QC" into city and region code. */
-function splitLocation(location?: string): { city: string; regionCode: string } {
-  const [city, region] = (location || '').split(',').map((part) => part.trim());
-  return { city: city || 'Unknown', regionCode: region || 'ca-central-1' };
+/**
+ * Blueprint tabs. Scenario configuration and run execution are owned by the
+ * Simulation workspace, so there is no scenarios tab here.
+ */
+const BLUEPRINT_TABS = [
+  'model',
+  'overview',
+  'agents',
+  'data',
+  'kpis',
+  'workflows',
+  'roles',
+  'validation',
+] as const;
+type BlueprintTab = (typeof BLUEPRINT_TABS)[number];
+const DEFAULT_TAB: BlueprintTab = 'model';
+
+function isBlueprintTab(value: string | null): value is BlueprintTab {
+  return !!value && (BLUEPRINT_TABS as readonly string[]).includes(value);
 }
 
 /** Tier values arrive either as "III" or already prefixed as "Tier III". */

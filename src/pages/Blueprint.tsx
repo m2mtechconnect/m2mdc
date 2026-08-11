@@ -268,36 +268,10 @@ export default function Blueprint() {
               />
 
               {/*
-                Counts the Blueprint owns are shown plainly. Roles and
-                Integrations are referenced from other workspaces, and
-                Scenarios are owned by Simulation, so they are not presented
-                here as Blueprint-owned configuration.
+                Stage 7K: Blueprint-owned counts are vanity totals on the Model
+                page. They now live in their owning tabs (Controls, Validation)
+                and are referenced from the Linked configuration group.
               */}
-              {summary && (
-                <div className="mb-4 grid grid-cols-2 gap-2 md:grid-cols-4">
-                  {[
-                    { icon: Bot, label: t('blueprint.stats.agents'), value: summary.totalAgents, tone: 'primary' as StatTone },
-                    { icon: Database, label: t('blueprint.stats.dataSources'), value: summary.totalDataSources, tone: 'info' as StatTone },
-                    { icon: Activity, label: t('blueprint.stats.kpis'), value: summary.totalKpis, tone: 'success' as StatTone },
-                    { icon: GitBranch, label: t('blueprint.stats.workflows'), value: summary.totalWorkflows, tone: 'warning' as StatTone },
-                  ].map((stat) => {
-                    const Icon = stat.icon;
-                    const tone = STAT_TONES[stat.tone];
-                    return (
-                      <div
-                        key={stat.label}
-                        className="flex items-center gap-2 rounded-lg border bg-card p-2"
-                      >
-                        <div className={`rounded p-1 ${tone.chip}`}>
-                          <Icon className={`h-3.5 w-3.5 text-muted-foreground ${tone.icon}`} aria-hidden />
-                        </div>
-                        <span className="truncate text-xs text-muted-foreground">{stat.label}</span>
-                        <span className="ml-auto text-sm font-semibold text-foreground">{stat.value}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
 
 
               {/* Main Tabs - Enhanced with better styling */}

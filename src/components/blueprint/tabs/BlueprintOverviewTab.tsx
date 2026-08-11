@@ -1,10 +1,11 @@
 /**
- * Blueprint Overview Tab - Universal Enterprise Template
- * ALL Data Centre twins use this standard layout with complete enterprise components
- * This is the Walmart Standard Blueprint template applied globally
+ * Blueprint Assets & Systems - structural record of the modelled facility.
+ *
+ * Stage 7K audit: the model canvas, executive summary, agent health, KPI
+ * analysis and workflow panels are owned by the Model, Controls and Versions
+ * destinations. They are no longer reproduced here.
  */
 
-import { lazy, Suspense } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -22,29 +23,12 @@ import {
   Activity
 } from 'lucide-react';
 import type { DataCentreBlueprint, BlueprintSummary } from '@/types/dataCentreBlueprint';
-
-// Universal Enterprise Components - ALL twins get these
-import { ExecutiveSummaryBlock } from '../ExecutiveSummaryBlock';
 import { DomainHealthMap } from '../DomainHealthMap';
 import { DependencyGraph } from '../DependencyGraph';
-import { AgentHealthPanel } from '../AgentHealthPanel';
-import { KPIEnhancementsPanel } from '../KPIEnhancementsPanel';
-import { WorkflowEnhancementsPanel } from '../WorkflowEnhancementsPanel';
+import { formatPower } from '@/workspace/facilityModel';
 
-// Lazy load 3D visualization for performance
-const TwinVisualizationLayout = lazy(() => 
-  import('@/components/twin-visualization').then(m => ({ default: m.TwinVisualizationLayout }))
-);
-
-function VisualizationSkeleton() {
-  return (
-    <div className="h-[400px] bg-muted rounded-lg animate-pulse flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-        <p className="text-sm text-muted-foreground">Loading 3D Twin...</p>
-      </div>
-    </div>
-  );
+function stripTierPrefix(tier: string): string {
+  return tier.replace(/^tier[\s-]*/i, '').trim();
 }
 
 interface BlueprintOverviewTabProps {

@@ -31,7 +31,7 @@ interface BlueprintDataTabProps {
 
 const criticalityColors: Record<string, string> = {
   critical: 'bg-red-500/10 text-red-600 border-red-500/30',
-  high: 'bg-orange-500/10 text-orange-600 border-orange-500/30',
+  high: 'bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-500/40',
   medium: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/30',
   low: 'bg-green-500/10 text-green-600 border-green-500/30',
 };

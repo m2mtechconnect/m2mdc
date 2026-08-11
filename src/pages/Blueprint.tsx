@@ -61,7 +61,36 @@ import { KpiTooltip } from '@/components/ui/kpi-tooltip';
 import { LoadingState, SnapshotNotFoundEmptyState } from '@/components/ui/empty-state';
 import { BlueprintModelSection } from '@/workspace/BlueprintModelSection';
 import { formatPower } from '@/workspace/facilityModel';
-function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: any }) {
+import type { DataCentreBlueprint } from '@/types/dataCentreBlueprint';
+
+/**
+ * Static Tailwind class map. Interpolated classes (`bg-${color}/10`) are not
+ * emitted by the JIT compiler and only rendered before because the literals
+ * happened to exist elsewhere in the bundle.
+ */
+const STAT_TONES = {
+  primary: { chip: 'bg-primary/10 group-hover:bg-primary/20', icon: 'group-hover:text-primary' },
+  info: { chip: 'bg-info/10 group-hover:bg-info/20', icon: 'group-hover:text-info' },
+  success: { chip: 'bg-success/10 group-hover:bg-success/20', icon: 'group-hover:text-success' },
+  warning: { chip: 'bg-warning/10 group-hover:bg-warning/20', icon: 'group-hover:text-warning' },
+  destructive: { chip: 'bg-destructive/10 group-hover:bg-destructive/20', icon: 'group-hover:text-destructive' },
+} as const;
+
+type StatTone = keyof typeof STAT_TONES;
+
+/** Split a blueprint location such as "Montreal, QC" into city and region code. */
+function splitLocation(location?: string): { city: string; regionCode: string } {
+  const [city, region] = (location || '').split(',').map((part) => part.trim());
+  return { city: city || 'Unknown', regionCode: region || 'ca-central-1' };
+}
+
+/** Tier values arrive either as "III" or already prefixed as "Tier III". */
+function stripTierPrefix(tier: string): string {
+  return tier.replace(/^\s*tier\s+/i, '');
+}
+
+function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: DataCentreBlueprint }) {
+  const { t } = useTranslation();
   const { createTwin } = useActiveTwin();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -70,36 +99,34 @@ function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: any }) {
   const handleCreate = async () => {
     setIsCreating(true);
     try {
+      // Facility identity comes from the blueprint being converted, never a
+      // hard-coded Montreal default.
+      const { city, regionCode } = splitLocation(blueprint.location);
       const newTwin = await createTwin(null, {
-        name: blueprint.name || 'Montreal Sovereign AI DC',
-        city: 'Montreal',
-        region_code: 'QC',
+        name: blueprint.name,
+        city,
+        region_code: regionCode,
         tier: blueprint.tier || 'Tier III',
         // `capacityKw` is already kilowatts. Multiplying by 1000 wrote watts into a
         // kW column and relied on normaliseStoredCapacityKw() to rescale it back.
         capacity_kw: blueprint.capacityKw || 10000,
-        industry: 'ai_compute',
-        pue_target: blueprint.pueTarget || 1.3,
-        renewable_target_pct: 95,
-        carbon_intensity: 12,
-        sovereignty_level: 'federal',
         metadata: {
-          from_blueprint: 'default',
+          from_blueprint: blueprint.id,
           racks: blueprint.racks,
         },
       });
 
       if (newTwin) {
         toast({
-          title: 'Twin Created',
-          description: `${newTwin.name} is now available in the selector.`,
+          title: t('blueprint.twinCreated'),
+          description: t('blueprint.twinCreatedDesc', { name: newTwin.name }),
         });
         navigate('/data-centre-twin');
       }
     } catch (err) {
       toast({
-        title: 'Creation Failed',
-        description: err instanceof Error ? err.message : 'Failed to create twin',
+        title: t('blueprint.creationFailed'),
+        description: err instanceof Error ? err.message : t('blueprint.creationFailed'),
         variant: 'destructive',
       });
     } finally {
@@ -112,12 +139,12 @@ function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: any }) {
       {isCreating ? (
         <>
           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          Creating...
+          {t('blueprint.creating')}
         </>
       ) : (
         <>
           <Plus className="h-4 w-4 mr-2" />
-          Add to My Twins
+          {t('blueprint.addToMyTwins')}
         </>
       )}
     </Button>
@@ -249,24 +276,25 @@ export default function Blueprint() {
                   <MapPin className="h-3 w-3" />
                   {twin?.city || blueprint.location}
                 </Badge>
-                <Badge variant="outline">Tier {blueprint.tier}</Badge>
+                <Badge variant="outline">{t('blueprint.tierBadge', { tier: stripTierPrefix(blueprint.tier) })}</Badge>
                 <Badge variant="outline">{formatPower(blueprint.capacityKw)}</Badge>
-                <Badge variant="outline">{blueprint.racks} Racks</Badge>
+                <Badge variant="outline">{t('blueprint.racksBadge', { racks: blueprint.racks })}</Badge>
               </div>
 
               {/* Quick Stats - Enhanced with animations and hover effects */}
               {summary && (
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
                   {[
-                    { icon: Bot, label: 'Agents', value: summary.totalAgents, color: 'primary' },
-                    { icon: Database, label: 'Data Sources', value: summary.totalDataSources, color: 'info' },
-                    { icon: Activity, label: 'KPIs', value: summary.totalKpis, color: 'success' },
-                    { icon: GitBranch, label: 'Workflows', value: summary.totalWorkflows, color: 'warning' },
-                    { icon: Users, label: 'Roles', value: summary.totalRoles, color: 'primary' },
-                    { icon: PlayCircle, label: 'Scenarios', value: summary.totalScenarios, color: 'destructive' },
-                    { icon: Database, label: 'Integrations', value: summary.totalIntegrations, color: 'info' },
+                    { icon: Bot, label: t('blueprint.stats.agents'), value: summary.totalAgents, tone: 'primary' as StatTone },
+                    { icon: Database, label: t('blueprint.stats.dataSources'), value: summary.totalDataSources, tone: 'info' as StatTone },
+                    { icon: Activity, label: t('blueprint.stats.kpis'), value: summary.totalKpis, tone: 'success' as StatTone },
+                    { icon: GitBranch, label: t('blueprint.stats.workflows'), value: summary.totalWorkflows, tone: 'warning' as StatTone },
+                    { icon: Users, label: t('blueprint.stats.roles'), value: summary.totalRoles, tone: 'primary' as StatTone },
+                    { icon: PlayCircle, label: t('blueprint.stats.scenarios'), value: summary.totalScenarios, tone: 'destructive' as StatTone },
+                    { icon: Database, label: t('blueprint.stats.integrations'), value: summary.totalIntegrations, tone: 'info' as StatTone },
                   ].map((stat, index) => {
                     const Icon = stat.icon;
+                    const tone = STAT_TONES[stat.tone];
                     return (
                       <div 
                         key={stat.label}
@@ -274,8 +302,8 @@ export default function Blueprint() {
                         style={{ animationDelay: `${index * 0.05}s` }}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <div className={`p-1 rounded bg-${stat.color}/10 group-hover:bg-${stat.color}/20 transition-colors`}>
-                            <Icon className={`h-3.5 w-3.5 text-muted-foreground group-hover:text-${stat.color} transition-colors`} />
+                          <div className={`p-1 rounded transition-colors ${tone.chip}`}>
+                            <Icon className={`h-3.5 w-3.5 text-muted-foreground transition-colors ${tone.icon}`} />
                           </div>
                           <span className="text-xs text-muted-foreground">{stat.label}</span>
                         </div>
@@ -327,15 +355,15 @@ export default function Blueprint() {
               <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="w-full justify-start border-b rounded-none bg-transparent p-0 h-auto flex-wrap gap-1">
                   {[
-                    { value: 'model', label: 'Facility model' },
-                    { value: 'overview', label: 'Overview' },
-                    { value: 'agents', label: 'Agents' },
-                    { value: 'data', label: 'Data' },
-                    { value: 'kpis', label: 'KPIs' },
-                    { value: 'workflows', label: 'Workflows' },
-                    { value: 'roles', label: 'Roles' },
-                    { value: 'scenarios', label: 'Scenarios' },
-                    { value: 'validation', label: 'Validation' },
+                    { value: 'model', label: t('blueprint.tabs.model') },
+                    { value: 'overview', label: t('blueprint.tabs.overview') },
+                    { value: 'agents', label: t('blueprint.tabs.agents') },
+                    { value: 'data', label: t('blueprint.tabs.data') },
+                    { value: 'kpis', label: t('blueprint.tabs.kpis') },
+                    { value: 'workflows', label: t('blueprint.tabs.workflows') },
+                    { value: 'roles', label: t('blueprint.tabs.roles') },
+                    { value: 'scenarios', label: t('blueprint.tabs.scenarios') },
+                    { value: 'validation', label: t('blueprint.tabs.validation') },
                   ].map((tab) => (
                     <TabsTrigger 
                       key={tab.value}

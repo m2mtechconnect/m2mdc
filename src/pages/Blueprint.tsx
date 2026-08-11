@@ -390,10 +390,11 @@ export default function Blueprint() {
                               <span className="text-sm">{t('blueprint.workflowsActive')}</span>
                               <Badge variant="outline">{blueprint.workflows.filter(w => w.enabled).length}</Badge>
                             </div>
-                            <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                              <span className="text-sm">{t('blueprint.scenariosReady')}</span>
-                              <Badge variant="outline">{blueprint.simulationScenarios.length}</Badge>
-                            </div>
+                            {/* Stage 7J: scenario readiness is owned by the
+                                Simulation workspace, not by Blueprint. */}
+                            <p className="text-xs text-muted-foreground">
+                              {t('blueprint.scenariosOwnedBySimulation')}
+                            </p>
                           </div>
                         </CardContent>
                       </Card>

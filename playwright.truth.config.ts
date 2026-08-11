@@ -25,6 +25,7 @@ const FACADE_ON = process.env.AURA_TRUTH_FACADE === 'on';
 const DEFAULT_PORT = FACADE_ON ? 8092 : 8091;
 const PORT = Number(process.env.AURA_TRUTH_PORT ?? DEFAULT_PORT);
 const FACADE_ENV = FACADE_ON ? 'VITE_AURA_SIM_FACADE_DCPANEL=on ' : '';
+const PLAYWRIGHT_BASE_URL = process.env.PLAYWRIGHT_BASE_URL?.trim();
 
 export default defineConfig({
   testDir: './tests/truth-in-ui',
@@ -39,7 +40,7 @@ export default defineConfig({
     ['json', { outputFile: 'test-results/truth-in-ui.json' }],
   ],
   use: {
-    baseURL: `http://localhost:${PORT}`,
+    baseURL: PLAYWRIGHT_BASE_URL || `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
     screenshot: 'off',
     video: 'off',
@@ -57,19 +58,21 @@ export default defineConfig({
     // full build.
     use: { ...devices['Desktop Chrome'], channel: 'chromium' },
   }],
-  webServer: {
-    // NOTE: this starts a SECOND Vite instance on port 8091. The
-    // primary dev server on 8080 is untouched. The env below forces
-    // the Kit client into "enabled" mode so tests can inject payloads
-    // via `page.route('**/kit-api/**', …)`.
-    command:
-      'VITE_OMNIVERSE_KIT_URL=http://kit.aura-truth.local/api ' +
-      FACADE_ENV +
-      `npx vite --port ${PORT} --strictPort`,
-    url: `http://localhost:${PORT}`,
-    reuseExistingServer: !process.env.CI,
-    timeout: 60_000,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  },
+  webServer: PLAYWRIGHT_BASE_URL
+    ? undefined
+    : {
+        // NOTE: this starts a SECOND Vite instance on port 8091. The
+        // primary dev server on 8080 is untouched. The env below forces
+        // the Kit client into "enabled" mode so tests can inject payloads
+        // via `page.route('**/kit-api/**', …)`.
+        command:
+          'VITE_OMNIVERSE_KIT_URL=http://kit.aura-truth.local/api ' +
+          FACADE_ENV +
+          `npx vite --port ${PORT} --strictPort`,
+        url: `http://localhost:${PORT}`,
+        reuseExistingServer: !process.env.CI,
+        timeout: 60_000,
+        stdout: 'pipe',
+        stderr: 'pipe',
+      },
 });

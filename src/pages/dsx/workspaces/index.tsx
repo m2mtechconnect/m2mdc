@@ -286,6 +286,7 @@ export function PowerWorkspace() {
 /* 4 — Cooling */
 export function CoolingWorkspace() {
   const { rt } = useWorkspace();
+  const coolingTrends = useTrendSeries(['cooling_load_kw', 'pue']);
   return (
     <div className="space-y-6">
       <Section title="Cooling state" description="How much electrical energy is cooling consuming, and which racks does each loop serve?">

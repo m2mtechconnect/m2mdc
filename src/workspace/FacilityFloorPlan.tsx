@@ -5,7 +5,7 @@
  * default, hover, keyboard-focus, selected, constraint and unavailable state.
  * Values are SIMULATED model outputs, never measured telemetry.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { FacilityDefinition } from './facilityModel';
 import type { RackGrid, RackNode } from './dashboard/rackModel';
@@ -32,14 +32,86 @@ interface Props {
   centerRequest?: CenterRequest | null;
 }
 
-const RACK_W = 46;
-const RACK_H = 76;
-const GAP = 10;
-/** Alternating hot / cold service aisles between rack rows. */
-const AISLE_H = 34;
-const ROW_LABEL_W = 64;
-const PAD = 26;
-const SCALE_H = 26;
+/**
+ * Stage 7F geometry. Nothing here is a fixed canvas size: the plan is a
+ * landscape floor plan whose rack footprints are recomputed from the measured
+ * container so the facility fills the visualisation workspace.
+ */
+const LEFT_GUTTER = 82;
+const RIGHT_GUTTER = 32;
+const FIT_PAD = 36;
+const MIN_ZOOM = 0.6;
+const MAX_ZOOM = 3;
+
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+
+export interface PlanGeometry {
+  rackW: number;
+  rackH: number;
+  rackGap: number;
+  rowGap: number;
+  aisleBand: number;
+  contentW: number;
+  contentH: number;
+  bankW: number;
+  fitScale: number;
+}
+
+/**
+ * Derives rack footprints from the available container box. Exported so the
+ * geometry can be asserted directly in unit tests.
+ */
+export function computePlanGeometry(
+  containerW: number,
+  containerH: number,
+  perRow: number,
+  rowCount: number,
+): PlanGeometry {
+  const availW = Math.max(containerW - FIT_PAD * 2, 240);
+  const availH = Math.max(containerH - FIT_PAD * 2, 180);
+  const usableWidth = availW - LEFT_GUTTER - RIGHT_GUTTER;
+  const rackGap = clamp(usableWidth * 0.014, 10, 16);
+  const totalRackGaps = rackGap * (perRow - 1);
+  // The bank fills the usable width: racks are widened rather than leaving
+  // large empty areas on either side of the plan.
+  const rackW = clamp((usableWidth - totalRackGaps) / perRow, 68, 150);
+  // Row spacing tracks the available height so the plan never has to be
+  // scaled down (which is what previously shrank the whole diagram).
+  const rowGap = clamp(availH * 0.06, 14, 26);
+  const heightBudget = (availH - rowGap * (rowCount - 1)) / rowCount;
+  const rackH = clamp(Math.min(rackW * 0.52, heightBudget), 34, 76);
+  const aisleBand = Math.max(Math.min(16, rowGap - 6), 8);
+  const bankW = perRow * rackW + totalRackGaps;
+  const contentW = LEFT_GUTTER + bankW + RIGHT_GUTTER;
+  const contentH = rowCount * rackH + (rowCount - 1) * rowGap;
+  const fitScale = Math.min(availW / contentW, availH / contentH);
+  return { rackW, rackH, rackGap, rowGap, aisleBand, contentW, contentH, bankW, fitScale };
+}
+
+function useContainerSize(ref: React.RefObject<HTMLElement>) {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const read = () => {
+      const rect = el.getBoundingClientRect();
+      setSize((prev) =>
+        Math.abs(prev.width - rect.width) < 0.5 && Math.abs(prev.height - rect.height) < 0.5
+          ? prev
+          : { width: rect.width, height: rect.height },
+      );
+    };
+    read();
+    const observer = new ResizeObserver(read);
+    observer.observe(el);
+    window.addEventListener('resize', read);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', read);
+    };
+  }, [ref]);
+  return size;
+}
 
 /** Overlay-specific colour ramp, expressed with plain CSS colours on the dark plate. */
 function rackFill(overlay: string, t: number): string {
@@ -88,32 +160,96 @@ export function FacilityFloorPlan({
 }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
 
   const { perRow, rowCount } = grid;
-  const rowStride = RACK_H + AISLE_H;
-  const floorW = perRow * (RACK_W + GAP) - GAP;
-  const width = PAD * 2 + ROW_LABEL_W + floorW;
-  const height = PAD * 2 + rowCount * rowStride + SCALE_H;
-  const floorX = PAD + ROW_LABEL_W;
+  const { width: cw, height: ch } = useContainerSize(scrollRef);
+  const viewW = cw || 960;
+  const viewH = ch || 440;
+
+  const geometry = useMemo(
+    () => computePlanGeometry(viewW, viewH, perRow, rowCount),
+    [viewW, viewH, perRow, rowCount],
+  );
+  const { rackW: RACK_W, rackH: RACK_H, rackGap: RACK_GAP, rowGap: ROW_GAP, aisleBand: AISLE_BAND, contentW, contentH, bankW } = geometry;
+  const rowStride = RACK_H + ROW_GAP;
+  const floorX = LEFT_GUTTER;
+  const isNarrow = viewW < 768;
+
+  /**
+   * Fit-to-facility: the base scale is measured, never a hard-coded zoom. On
+   * narrow viewports the plan fits to height and pans horizontally so rack
+   * labels stay readable instead of collapsing to unreadable slivers.
+   */
+  const baseScale = isNarrow
+    ? Math.max(geometry.fitScale, (viewH - FIT_PAD * 2) / contentH)
+    : geometry.fitScale;
+  const scale = clamp(baseScale * zoom, baseScale * MIN_ZOOM, baseScale * MAX_ZOOM);
+  const scaledW = contentW * scale;
+  const scaledH = contentH * scale;
+
+  const clampPan = useCallback(
+    (next: { x: number; y: number }) => {
+      const slackX = Math.max((scaledW - viewW) / 2 + FIT_PAD, 0);
+      const slackY = Math.max((scaledH - viewH) / 2 + FIT_PAD, 0);
+      return { x: clamp(next.x, -slackX, slackX), y: clamp(next.y, -slackY, slackY) };
+    },
+    [scaledW, scaledH, viewW, viewH],
+  );
+
+  // Any container or zoom change refits: the pan offset is re-clamped so the
+  // facility can never be lost outside the visible canvas.
+  useEffect(() => {
+    setPan((prev) => {
+      const next = clampPan(prev);
+      return next.x === prev.x && next.y === prev.y ? prev : next;
+    });
+  }, [clampPan]);
+
+  const offsetX = (viewW - scaledW) / 2 + pan.x;
+  const offsetY = (viewH - scaledH) / 2 + pan.y;
+
+  const rackPos = useCallback(
+    (rack: RackNode) => ({
+      x: floorX + rack.colIndex * (RACK_W + RACK_GAP),
+      y: rack.rowIndex * rowStride,
+    }),
+    [floorX, RACK_W, rowStride],
+  );
 
   const focusRack = useCallback((rackId: string) => {
     const node = scrollRef.current?.querySelector<SVGGElement>(`[data-rack-id="${rackId}"]`);
-    node?.focus();
+    node?.focus({ preventScroll: true });
   }, []);
 
-  const centerRack = useCallback((rackId: string) => {
-    const container = scrollRef.current;
-    const node = container?.querySelector<SVGGElement>(`[data-rack-id="${rackId}"]`);
-    if (!container || !node) return;
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-    const rect = node.getBoundingClientRect();
-    const box = container.getBoundingClientRect();
-    container.scrollTo({
-      left: container.scrollLeft + (rect.left - box.left) - box.width / 2 + rect.width / 2,
-      top: container.scrollTop + (rect.top - box.top) - box.height / 2 + rect.height / 2,
-      behavior: reduce ? 'auto' : 'smooth',
-    });
-  }, []);
+  /** Pans so the rack sits at the centre of the visible canvas. */
+  const centerRack = useCallback(
+    (rackId: string) => {
+      const rack = grid.byId.get(rackId);
+      if (!rack) return;
+      const { x, y } = rackPos(rack);
+      const cx = (x + RACK_W / 2) * scale;
+      const cy = (y + RACK_H / 2) * scale;
+      setPan(clampPan({ x: scaledW / 2 - cx, y: scaledH / 2 - cy }));
+    },
+    [grid, rackPos, scale, RACK_W, RACK_H, scaledW, scaledH, clampPan],
+  );
+
+  /** Pans only when the rack is outside the visible canvas (drawer reflow). */
+  const revealRack = useCallback(
+    (rackId: string) => {
+      const rack = grid.byId.get(rackId);
+      if (!rack) return;
+      const { x, y } = rackPos(rack);
+      const left = offsetX + x * scale;
+      const right = left + RACK_W * scale;
+      const top = offsetY + y * scale;
+      const bottom = top + RACK_H * scale;
+      if (left >= 8 && right <= viewW - 8 && top >= 8 && bottom <= viewH - 8) return;
+      centerRack(rackId);
+    },
+    [grid, rackPos, offsetX, offsetY, scale, RACK_W, RACK_H, viewW, viewH, centerRack],
+  );
 
   useEffect(() => {
     if (!centerRequest) return;
@@ -121,37 +257,69 @@ export function FacilityFloorPlan({
     focusRack(centerRequest.rackId);
   }, [centerRequest, centerRack, focusRack]);
 
+  // Keep the selected rack visible when the canvas is resized by Rack Quick View.
+  useEffect(() => {
+    if (!selectedRackId) return;
+    revealRack(selectedRackId);
+    // Deliberately keyed on the measured box: a reflow refits, a re-render does not.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRackId, viewW, viewH]);
+
   const moveFocus = (rack: RackNode, dx: number, dy: number) => {
     const col = Math.min(Math.max(rack.colIndex + dx, 0), perRow - 1);
     const row = Math.min(Math.max(rack.rowIndex + dy, 0), rowCount - 1);
     const next = grid.racks.find((r) => r.rowIndex === row && r.colIndex === col);
     if (next && next.id !== rack.id) {
       focusRack(next.id);
-      centerRack(next.id);
+      revealRack(next.id);
     }
   };
 
   const hovered = hoveredId ? grid.byId.get(hoveredId) ?? null : null;
 
+  // Pointer panning, used mainly on narrow viewports where the plan overflows.
+  const dragRef = useRef<{ id: number; x: number; y: number; origin: { x: number; y: number } } | null>(null);
+
   return (
     <div
       ref={scrollRef}
-      className="h-full w-full overflow-auto bg-[#0a1020]"
+      className="relative h-full w-full min-w-0 touch-pan-y overflow-hidden bg-[#0a1020]"
       data-testid="facility-floor-plan"
+      data-plan-scale={scale.toFixed(4)}
+      data-plan-width={Math.round(scaledW)}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClearSelection?.();
       }}
+      onPointerDown={(event) => {
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        if ((event.target as Element).closest('[data-rack-id]')) return;
+        dragRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY, origin: pan };
+      }}
+      onPointerMove={(event) => {
+        const drag = dragRef.current;
+        if (!drag || drag.id !== event.pointerId) return;
+        setPan(
+          clampPan({
+            x: drag.origin.x + (event.clientX - drag.x),
+            y: drag.origin.y + (event.clientY - drag.y),
+          }),
+        );
+      }}
+      onPointerUp={() => {
+        dragRef.current = null;
+      }}
+      onPointerCancel={() => {
+        dragRef.current = null;
+      }}
     >
-      <div
-        className="min-h-full p-3"
-        style={{ width: `${zoom * 100}%`, height: `${zoom * 100}%` }}
+      <svg
+        viewBox={`0 0 ${viewW} ${viewH}`}
+        width={viewW}
+        height={viewH}
+        className="block h-full w-full"
+        preserveAspectRatio="xMidYMid meet"
+        aria-label={`Simulated floor plan of ${facility.name}: ${rowCount} rows, ${facility.rackCount} racks represented.`}
       >
-        <svg
-          viewBox={`0 0 ${width} ${height}`}
-          className="mx-auto h-full w-full"
-          preserveAspectRatio="xMidYMid meet"
-          aria-label={`Simulated floor plan of ${facility.name}: ${rowCount} rows, ${facility.rackCount} racks represented.`}
-        >
           <defs>
             <pattern id="fp-grid" width={20} height={20} patternUnits="userSpaceOnUse">
               <path d="M20 0H0V20" fill="none" stroke="#16233d" strokeWidth={1} />
@@ -160,16 +328,17 @@ export function FacilityFloorPlan({
           <rect
             x={0}
             y={0}
-            width={width}
-            height={height}
+            width={viewW}
+            height={viewH}
             fill="#0a1020"
             onMouseDown={() => onClearSelection?.()}
           />
+        <g transform={`translate(${offsetX} ${offsetY}) scale(${scale})`}>
           <rect
             x={floorX - 12}
-            y={PAD - 12}
-            width={floorW + 24}
-            height={rowCount * rowStride - AISLE_H + 24}
+            y={-12}
+            width={bankW + 24}
+            height={contentH + 24}
             fill="url(#fp-grid)"
             stroke="#22304d"
             strokeWidth={1}
@@ -177,29 +346,41 @@ export function FacilityFloorPlan({
           />
 
           {Array.from({ length: rowCount }).map((_, r) => {
-            const y = PAD + r * rowStride;
+            const y = r * rowStride;
             const rowLetter = String.fromCharCode(65 + r);
             const coldAisle = r % 2 === 0;
             const rowSelected = grid.byId.get(selectedRackId ?? '')?.rowIndex === r;
             return (
               <g key={`row-${r + 1}`}>
+                {/* Row zone so racks read as one aligned bank. */}
+                <rect
+                  x={floorX - 6}
+                  y={y - 5}
+                  width={bankW + 12}
+                  height={RACK_H + 10}
+                  rx={4}
+                  fill={rowSelected ? '#101c33' : '#0c1526'}
+                  stroke={rowSelected ? '#33415c' : '#1b2740'}
+                  strokeWidth={1}
+                />
                 {showCoolingZones && r < rowCount - 1 && (
                   <g>
                     <rect
                       x={floorX}
-                      y={y + RACK_H + 5}
-                      width={floorW}
-                      height={AISLE_H - 10}
+                      y={y + RACK_H + (ROW_GAP - AISLE_BAND) / 2}
+                      width={bankW}
+                      height={AISLE_BAND}
                       fill={coldAisle ? '#0d2a3f' : '#2c1517'}
                       rx={2}
                     />
                     <text
-                      x={floorX + 8}
-                      y={y + RACK_H + AISLE_H / 2}
+                      x={floorX + bankW / 2}
+                      y={y + RACK_H + ROW_GAP / 2}
                       fill={coldAisle ? '#7fc3d4' : '#e8908d'}
-                      fontSize={11}
+                      fontSize={11.5}
                       fontWeight={600}
                       letterSpacing={1}
+                      textAnchor="middle"
                       dominantBaseline="middle"
                     >
                       {coldAisle ? 'COLD AISLE' : 'HOT AISLE'}
@@ -209,11 +390,11 @@ export function FacilityFloorPlan({
 
                 {showRowLabels && (
                   <text
-                    x={PAD + 4}
+                    x={4}
                     y={y + RACK_H / 2}
                     fill={rowSelected ? '#ffcc00' : '#94a3b8'}
-                    fontSize={14}
-                    fontWeight={700}
+                    fontSize={13}
+                    fontWeight={650}
                     dominantBaseline="middle"
                   >
                     {`ROW ${rowLetter}`}
@@ -226,9 +407,8 @@ export function FacilityFloorPlan({
                     const t = rack.load ?? 0;
                     const isSelected = selectedRackId === rack.id;
                     const dimmed = Boolean(selectedRackId) && !isSelected;
-                    const x = floorX + rack.colIndex * (RACK_W + GAP);
+                    const x = rackPos(rack).x;
                     const loadText = rack.load === null ? 'unavailable' : `${Math.round(t * 100)}%`;
-                    const units = 6;
                     return (
                       <g
                         key={rack.id}
@@ -247,7 +427,7 @@ export function FacilityFloorPlan({
                           'focus-visible:[&>rect:first-of-type]:[stroke-width:3]',
                           'hover:opacity-100',
                         )}
-                        opacity={dimmed ? 0.45 : 1}
+                        opacity={dimmed ? 0.55 : 1}
                         onMouseEnter={() => setHoveredId(rack.id)}
                         onMouseLeave={() => setHoveredId((id) => (id === rack.id ? null : id))}
                         onFocus={() => setHoveredId(rack.id)}
@@ -292,25 +472,43 @@ export function FacilityFloorPlan({
                           strokeWidth={isSelected ? 3.5 : hoveredId === rack.id ? 2 : 1}
                           strokeDasharray={rack.represented ? undefined : '4 3'}
                         />
-                        {rack.represented &&
-                          Array.from({ length: units }).map((___, u) => (
+                        {/* Top-down footprint: cold-aisle face bar plus a modelled load bar. */}
+                        {rack.represented && (
+                          <>
                             <rect
-                              key={u}
                               x={x + 4}
-                              y={y + 14 + u * 10}
+                              y={y + RACK_H - 5}
                               width={RACK_W - 8}
-                              height={7}
-                              rx={1}
-                              fill={rackFill(String(overlay), t)}
-                              opacity={u / units < t ? 0.95 : 0.28}
+                              height={3}
+                              rx={1.5}
+                              fill="#1f3350"
                             />
-                          ))}
+                            <rect
+                              x={x + 4}
+                              y={y + RACK_H - 17}
+                              width={RACK_W - 8}
+                              height={9}
+                              rx={2}
+                              fill="#111c31"
+                              stroke="#22304d"
+                              strokeWidth={0.75}
+                            />
+                            <rect
+                              x={x + 5}
+                              y={y + RACK_H - 16}
+                              width={Math.max((RACK_W - 10) * t, 2)}
+                              height={7}
+                              rx={1.5}
+                              fill={rackFill(String(overlay), t)}
+                            />
+                          </>
+                        )}
                         {!rack.represented && (
                           <text
                             x={x + RACK_W / 2}
                             y={y + RACK_H / 2}
                             fill="#64748b"
-                            fontSize={9}
+                            fontSize={11}
                             textAnchor="middle"
                             dominantBaseline="middle"
                           >
@@ -319,20 +517,32 @@ export function FacilityFloorPlan({
                         )}
                         <text
                           x={x + RACK_W / 2}
-                          y={y + 8}
-                          fill="#cbd5e1"
-                          fontSize={9}
-                          fontWeight={600}
+                          y={y + 13}
+                          fill={isSelected ? '#ffcc00' : '#e2e8f0'}
+                          fontSize={11.5}
+                          fontWeight={650}
                           textAnchor="middle"
                           dominantBaseline="middle"
                         >
                           {rack.code}
                         </text>
+                        {rack.represented && RACK_H >= 46 && (
+                          <text
+                            x={x + RACK_W / 2}
+                            y={y + RACK_H - 27}
+                            fill="#93a4bd"
+                            fontSize={10.5}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                          >
+                            {loadText}
+                          </text>
+                        )}
                         {showConstraintMarkers && rack.state === 'constraint' && (
-                          <circle cx={x + RACK_W - 5} cy={y + RACK_H - 5} r={3.5} fill="#BA0517" stroke="#0a1020" />
+                          <circle cx={x + RACK_W - 8} cy={y + 10} r={4} fill="#BA0517" stroke="#0a1020" />
                         )}
                         {showConstraintMarkers && rack.state === 'watch' && (
-                          <rect x={x + RACK_W - 9} y={y + RACK_H - 9} width={7} height={7} rx={1} fill="#C87A0A" stroke="#0a1020" />
+                          <rect x={x + RACK_W - 12} y={y + 6} width={8} height={8} rx={1} fill="#C87A0A" stroke="#0a1020" />
                         )}
                       </g>
                     );
@@ -345,9 +555,9 @@ export function FacilityFloorPlan({
           {hovered && (() => {
             const boxW = 168;
             const boxH = 62;
-            const rx = floorX + hovered.colIndex * (RACK_W + GAP);
-            const ry = PAD + hovered.rowIndex * rowStride;
-            const tx = Math.min(Math.max(rx + RACK_W / 2 - boxW / 2, 4), width - boxW - 4);
+            const rx = rackPos(hovered).x;
+            const ry = rackPos(hovered).y;
+            const tx = Math.min(Math.max(rx + RACK_W / 2 - boxW / 2, 4), contentW - boxW - 4);
             const ty = ry - boxH - 6 < 4 ? ry + RACK_H + 6 : ry - boxH - 6;
             return (
               <g pointerEvents="none" data-testid="rack-preview-tooltip">
@@ -367,23 +577,8 @@ export function FacilityFloorPlan({
               </g>
             );
           })()}
-
-          {/* Scale reference. */}
-          <g>
-            <line
-              x1={floorX}
-              x2={floorX + (RACK_W + GAP) * 5 - GAP}
-              y1={height - PAD - 6}
-              y2={height - PAD - 6}
-              stroke="#64748b"
-              strokeWidth={1.5}
-            />
-            <text x={floorX} y={height - PAD + 10} fill="#94a3b8" fontSize={11}>
-              5 rack positions (modelled scale)
-            </text>
-          </g>
-        </svg>
-      </div>
+        </g>
+      </svg>
     </div>
   );
 }

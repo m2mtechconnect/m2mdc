@@ -235,6 +235,14 @@ export function PowerWorkspace() {
         <MetricGrid ids={['facility_load', 'it_load', 'power_capacity_utilisation']} metrics={rt.bundle.metrics} columns="sm:grid-cols-3" />
       </Section>
 
+      <Section title="Single-line view" description="Stages declared by the facility record. A stage without metering is labelled as uninstrumented rather than estimated.">
+        <PowerOneLine />
+      </Section>
+
+      <Section title="Rack power map" description="Per-rack draw against rack rating, from metered rack power only.">
+        <RackMapPanel defaultOverlay="power" />
+      </Section>
+
       <Section title="Electrical supply chain" description="Derived from declared connection points in the facility fixture.">
         <ul className="space-y-2" data-testid="dsx-electrical-chain">
           {electricalChain().map((a) => {
@@ -282,6 +290,14 @@ export function CoolingWorkspace() {
     <div className="space-y-6">
       <Section title="Cooling state" description="How much electrical energy is cooling consuming, and which racks does each loop serve?">
         <MetricGrid ids={['cooling_load', 'pue', 'thermal_headroom']} metrics={rt.bundle.metrics} columns="sm:grid-cols-3" />
+      </Section>
+
+      <Section title="Loop diagram" description="Each cooling unit with the racks it serves and their measured inlet temperatures.">
+        <CoolingLoopDiagram />
+      </Section>
+
+      <Section title="Cooling trend" description="Cooling draw and PUE at each observation step of this run.">
+        <TrendStrip series={coolingTrends} className="sm:grid-cols-2 xl:grid-cols-2" />
       </Section>
 
       <Section title="Cooling loops">

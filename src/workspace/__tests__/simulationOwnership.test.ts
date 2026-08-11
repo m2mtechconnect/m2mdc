@@ -2,7 +2,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { useWorkspaceStore } from '../workspaceStore';
-import { buildFacilityFromTwin, FALLBACK_FACILITY } from '../facilityModel';
+import type { FacilityDefinition } from '../facilityModel';
 
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((entry) => {
@@ -39,7 +39,22 @@ describe('Blueprint cannot execute simulations', () => {
 });
 
 describe('Simulation run gate', () => {
-  const facility = FALLBACK_FACILITY ?? buildFacilityFromTwin(null as never);
+  const facility: FacilityDefinition = {
+    id: 'test-facility',
+    name: 'Test facility',
+    city: 'Toronto',
+    regionCode: 'CA-ON',
+    tier: 'Tier-III',
+    capacityKw: 4200,
+    rackCount: 24,
+    rowCount: 3,
+    designRackEstimate: 24,
+    pueTarget: 1.28,
+    renewableTargetPct: 85,
+    carbonIntensity: 32,
+    sovereigntyLevel: 'sovereign',
+    industry: 'AI infrastructure',
+  };
 
   it('does not start a run until inputs are reviewed', async () => {
     useWorkspaceStore.setState({ assumptionsReviewed: false, isRunning: false });

@@ -195,7 +195,7 @@ test.describe('deep-link alias and redirect harness', () => {
   }
 
   test('canonical routes are not themselves redirected', async ({ page }) => {
-    for (const canonical of ['/analytics', '/integrations', '/app/agents', '/search', '/blueprint/default']) {
+    for (const canonical of ['/analytics', '/manage/integrations', '/app/agents', '/search', '/blueprint/default']) {
       const result = await runHop(page, `${canonical}?${QUERY}`);
       expect(result.finalPath, `${canonical}: canonical route must be terminal`).toBe(canonical);
       expect(new URLSearchParams(result.finalSearch).get('facility')).toBe('montreal');

@@ -221,18 +221,19 @@ export default function Blueprint() {
     return <SnapshotNotFoundEmptyState onGoBack={() => navigate('/dashboard')} />;
   }
 
-  const handleAskCoPilot = (question: string) => {
-    openWithQuestion(question);
-  };
-
   return (
     <BlueprintDesignerWrapper twinId={blueprintId}>
       <div className="min-h-dvh bg-background">
         <div className="flex min-w-0">
           {/* Main Content */}
           <div className={`flex-1 min-w-0 transition-all duration-300 ${showCoPilotPanel ? 'lg:mr-96' : ''}`}>
-            <div className="container mx-auto py-6 px-4 max-w-7xl">
-              {/* DESIGNER MODE HEADER - Clear visual distinction */}
+            <div className="container mx-auto py-4 px-4 max-w-7xl">
+              {/*
+                Stage 7J: a single compact header. Identity, facility facts and
+                every Blueprint action live here so the modelling workspace
+                stays above the fold, and the assistant has exactly one entry
+                point.
+              */}
               <DesignerModeHeader
                 twinName={resolveFacilityNaming({
                   name: twin?.name || blueprint.name,
@@ -248,139 +249,57 @@ export default function Blueprint() {
                 blueprintId={blueprintId}
                 versionId={blueprint.version ?? null}
                 returnTab={activeTab}
+                tier={t('blueprint.tierBadge', { tier: stripTierPrefix(blueprint.tier) })}
+                capacityLabel={formatPower(blueprint.capacityKw)}
+                rackLabel={t('blueprint.racksBadge', { racks: blueprint.racks })}
+                updatedAt={blueprint.updatedAt ? new Date(blueprint.updatedAt) : null}
+                dataNote={capacityNote}
+                onBack={() => navigate(-1)}
+                onDownload={downloadBlueprint}
+                assistantOpen={showCoPilotPanel}
+                onToggleAssistant={() => setShowCoPilotPanel((open) => !open)}
+                assistantLabel={
+                  showCoPilotPanel ? t('blueprint.hideAssistant') : t('blueprint.showAssistant')
+                }
+                extraAction={
+                  !twin && blueprintId === 'default' ? (
+                    <CreateTwinFromBlueprintButton blueprint={blueprint} />
+                  ) : undefined
+                }
               />
 
-              {/* Quick Actions Bar */}
-              <div className="flex flex-wrap items-center justify-between gap-4 mb-6 min-w-0">
-                <div className="flex flex-wrap items-center gap-2 min-w-0">
-                  <Button
-                    variant="ghost"
-                    onClick={() => navigate(-1)}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    {t('blueprint.back')}
-                  </Button>
-                  
-                  {/* Assistant mode header */}
-                  <CoPilotModeHeader mode="blueprint-designer" />
-                </div>
-                <div className="flex min-w-0 flex-wrap gap-2">
-                  {/* Toggle assistant panel */}
-                  <Button
-                    variant={showCoPilotPanel ? 'secondary' : 'outline'}
-                    onClick={() => setShowCoPilotPanel(!showCoPilotPanel)}
-                    className="gap-2"
-                  >
-                    {showCoPilotPanel ? (
-                      <>
-                        <PanelRightClose className="h-4 w-4" />
-                        {t('blueprint.hideAssistant')}
-                      </>
-                    ) : (
-                      <>
-                        <PanelRightOpen className="h-4 w-4" />
-                        {t('blueprint.showAssistant')}
-                      </>
-                    )}
-                  </Button>
-                  
-                  {!twin && blueprintId === 'default' && (
-                    <CreateTwinFromBlueprintButton blueprint={blueprint} />
-                  )}
-                  <Button variant="outline" onClick={downloadBlueprint}>
-                    <Download className="h-4 w-4 mr-2" />
-                    {t('blueprint.downloadJson')}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Blueprint Snapshot Header */}
-              <div className="flex flex-wrap items-center gap-2 mb-6">
-                <SnapshotHeader
-                  version={String(blueprint.version)}
-                  mode="designer"
-                  changesCount={0}
-                  lastUpdated={blueprint.updatedAt ? new Date(blueprint.updatedAt) : undefined}
-                />
-                <Badge variant="outline" className="gap-1">
-                  <MapPin className="h-3 w-3" />
-                  {twin?.city || blueprint.location}
-                </Badge>
-                <Badge variant="outline">{t('blueprint.tierBadge', { tier: stripTierPrefix(blueprint.tier) })}</Badge>
-                <Badge variant="outline">{formatPower(blueprint.capacityKw)}</Badge>
-                <Badge variant="outline">{t('blueprint.racksBadge', { racks: blueprint.racks })}</Badge>
-              </div>
-
-              {/* Quick Stats - Enhanced with animations and hover effects */}
+              {/*
+                Counts the Blueprint owns are shown plainly. Roles and
+                Integrations are referenced from other workspaces, and
+                Scenarios are owned by Simulation, so they are not presented
+                here as Blueprint-owned configuration.
+              */}
               {summary && (
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
+                <div className="mb-4 grid grid-cols-2 gap-2 md:grid-cols-4">
                   {[
                     { icon: Bot, label: t('blueprint.stats.agents'), value: summary.totalAgents, tone: 'primary' as StatTone },
                     { icon: Database, label: t('blueprint.stats.dataSources'), value: summary.totalDataSources, tone: 'info' as StatTone },
                     { icon: Activity, label: t('blueprint.stats.kpis'), value: summary.totalKpis, tone: 'success' as StatTone },
                     { icon: GitBranch, label: t('blueprint.stats.workflows'), value: summary.totalWorkflows, tone: 'warning' as StatTone },
-                    { icon: Users, label: t('blueprint.stats.roles'), value: summary.totalRoles, tone: 'primary' as StatTone },
-                    { icon: PlayCircle, label: t('blueprint.stats.scenarios'), value: summary.totalScenarios, tone: 'destructive' as StatTone },
-                    { icon: Database, label: t('blueprint.stats.integrations'), value: summary.totalIntegrations, tone: 'info' as StatTone },
-                  ].map((stat, index) => {
+                  ].map((stat) => {
                     const Icon = stat.icon;
                     const tone = STAT_TONES[stat.tone];
                     return (
-                      <div 
+                      <div
                         key={stat.label}
-                        className="group p-3 rounded-lg border bg-card hover:bg-muted/50 hover:shadow-md hover:border-primary/30 transition-all duration-300 animate-fade-in"
-                        style={{ animationDelay: `${index * 0.05}s` }}
+                        className="flex items-center gap-2 rounded-lg border bg-card p-2"
                       >
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className={`p-1 rounded transition-colors ${tone.chip}`}>
-                            <Icon className={`h-3.5 w-3.5 text-muted-foreground transition-colors ${tone.icon}`} />
-                          </div>
-                          <span className="text-xs text-muted-foreground">{stat.label}</span>
+                        <div className={`rounded p-1 ${tone.chip}`}>
+                          <Icon className={`h-3.5 w-3.5 text-muted-foreground ${tone.icon}`} aria-hidden />
                         </div>
-                        <p className="text-lg font-semibold group-hover:text-primary transition-colors">{stat.value}</p>
+                        <span className="truncate text-xs text-muted-foreground">{stat.label}</span>
+                        <span className="ml-auto text-sm font-semibold text-foreground">{stat.value}</span>
                       </div>
                     );
                   })}
                 </div>
               )}
 
-              {/* Assistant quick actions */}
-              <div className="flex items-center gap-3 p-4 rounded-xl border bg-gradient-to-r from-primary/5 via-background to-primary/5 mb-6 animate-fade-in hover:shadow-md transition-all duration-300">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-                </div>
-                <span className="text-sm font-medium text-foreground">{t('blueprint.askCoPilot')}</span>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs hover:bg-primary/10 hover:text-primary transition-all group"
-                    onClick={() => handleAskCoPilot('Which agents manage thermal safety in this data centre?')}
-                  >
-                    <MessageCircle className="h-3 w-3 mr-1 group-hover:scale-110 transition-transform" />
-                    {t('blueprint.thermalAgents')}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs hover:bg-primary/10 hover:text-primary transition-all group"
-                    onClick={() => handleAskCoPilot('Show all workflows related to UPS failures in this blueprint.')}
-                  >
-                    <MessageCircle className="h-3 w-3 mr-1 group-hover:scale-110 transition-transform" />
-                    {t('blueprint.upsWorkflows')}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs hover:bg-primary/10 hover:text-primary transition-all group"
-                    onClick={() => handleAskCoPilot('What KPIs relate to carbon and cost in this data centre?')}
-                  >
-                    <MessageCircle className="h-3 w-3 mr-1 group-hover:scale-110 transition-transform" />
-                    {t('blueprint.carbonKpis')}
-                  </Button>
-                </div>
-              </div>
 
               {/* Main Tabs - Enhanced with better styling */}
               <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">

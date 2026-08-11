@@ -510,7 +510,7 @@ const frCA = {
     upsWorkflows: 'Flux de travail ASI',
     carbonKpis: 'IRC carbone',
     tabs: {
-      model: "Modèle d'installation",
+      model: 'Modèle',
       assets: 'Actifs et systèmes',
       controls: 'Contrôles',
       versions: 'Versions',

@@ -13,7 +13,7 @@ import { useEvidenceBeta, type EvidenceBetaRuntime } from './useEvidenceBeta';
 import { buildConstraintStack, type DomainConstraint } from '../workspaces/constraints';
 import { ancestryFor, identityByAuraId, type AssetIdentity } from '../workspaces/facilityGraph';
 import type { DsxProvenancedMetric } from '../contracts/provenancedMetric';
-import { freshnessFor, type FreshnessState } from '../modes';
+import { DATA_MODES, freshnessFor, type DataMode, type FreshnessState } from '../modes';
 import {
   CONTEXT_PARAM, buildContextChips, contextToParams, linkWithContext, parseContext,
   type ContextChip, type InvestigationContext,
@@ -211,8 +211,8 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
           openusd_prim_path: null,
           building_id: null,
           data_hall_id: null,
+          inspector: context.inspector === 'asset' ? null : context.inspector,
         });
-        setAssetDrawerOpen(false);
         return;
       }
       const identity = identityByAuraId(id);

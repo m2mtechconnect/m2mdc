@@ -20,6 +20,16 @@ export interface InvestigationContext {
   time_range: string | null;
   data_mode: string | null;
   source_workspace: string | null;
+  /** Deterministic run identity the evidence on screen came from. */
+  run_id: string | null;
+  /** Position inside the run (observation tick). */
+  observation_tick: string | null;
+  /** Metric currently under investigation (metric_name). */
+  metric_id: string | null;
+  /** Active visual overlay / constraint domain. */
+  overlay_id: string | null;
+  /** Which contextual inspector is open: asset | metric | constraint. */
+  inspector: string | null;
 }
 
 export const EMPTY_CONTEXT: InvestigationContext = {
@@ -33,6 +43,11 @@ export const EMPTY_CONTEXT: InvestigationContext = {
   time_range: null,
   data_mode: null,
   source_workspace: null,
+  run_id: null,
+  observation_tick: null,
+  metric_id: null,
+  overlay_id: null,
+  inspector: null,
 };
 
 /** URL parameter names. Short, stable and safe to share. */
@@ -47,6 +62,11 @@ export const CONTEXT_PARAM: Record<keyof InvestigationContext, string> = {
   time_range: 'range',
   data_mode: 'mode',
   source_workspace: 'from',
+  run_id: 'run',
+  observation_tick: 'tick',
+  metric_id: 'metric',
+  overlay_id: 'overlay',
+  inspector: 'inspector',
 };
 
 const KEYS = Object.keys(CONTEXT_PARAM) as (keyof InvestigationContext)[];
@@ -108,6 +128,8 @@ export function buildContextChips(
   if (ctx.data_hall_id) chips.push({ field: 'data_hall_id', label: 'Data hall', value: named(ctx.data_hall_id), removable: true });
   if (ctx.stable_asset_id) chips.push({ field: 'stable_asset_id', label: 'Asset', value: named(ctx.stable_asset_id), removable: true });
   if (ctx.workload_id) chips.push({ field: 'workload_id', label: 'Workload', value: ctx.workload_id, removable: true });
+  if (ctx.metric_id) chips.push({ field: 'metric_id', label: 'Metric', value: ctx.metric_id, removable: true });
+  if (ctx.overlay_id) chips.push({ field: 'overlay_id', label: 'Overlay', value: ctx.overlay_id, removable: true });
   if (ctx.time_range) chips.push({ field: 'time_range', label: 'Time range', value: ctx.time_range, removable: true });
   // Scenario and data mode are reported by the operational truth bar, which is
   // always visible, so they are not repeated here as removable scope chips.

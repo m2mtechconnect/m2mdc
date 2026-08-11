@@ -7,7 +7,7 @@ test('detail', async ({ page, context }) => {
   await installSupabaseMock(context);
   for (const route of ['/dashboard', '/builder', '/analytics', '/infrastructure', '/account/profile', '/help', '/dsx/evidence-beta']) {
     await page.goto(route, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1200);
+    await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {}); await page.waitForTimeout(1500);
     const info = await page.evaluate(() => {
       const unnamed = [...document.querySelectorAll<HTMLElement>('button,a[href],[role="button"]')]
         .filter((el) => el.getBoundingClientRect().width && !(el.textContent || '').trim() && !el.getAttribute('aria-label') && !el.getAttribute('title') && !el.getAttribute('aria-labelledby'))

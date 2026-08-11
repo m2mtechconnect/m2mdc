@@ -271,24 +271,25 @@ export default function Blueprint() {
                   <MapPin className="h-3 w-3" />
                   {twin?.city || blueprint.location}
                 </Badge>
-                <Badge variant="outline">Tier {blueprint.tier}</Badge>
+                <Badge variant="outline">{t('blueprint.tierBadge', { tier: blueprint.tier })}</Badge>
                 <Badge variant="outline">{formatPower(blueprint.capacityKw)}</Badge>
-                <Badge variant="outline">{blueprint.racks} Racks</Badge>
+                <Badge variant="outline">{t('blueprint.racksBadge', { count: blueprint.racks })}</Badge>
               </div>
 
               {/* Quick Stats - Enhanced with animations and hover effects */}
               {summary && (
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
                   {[
-                    { icon: Bot, label: 'Agents', value: summary.totalAgents, color: 'primary' },
-                    { icon: Database, label: 'Data Sources', value: summary.totalDataSources, color: 'info' },
-                    { icon: Activity, label: 'KPIs', value: summary.totalKpis, color: 'success' },
-                    { icon: GitBranch, label: 'Workflows', value: summary.totalWorkflows, color: 'warning' },
-                    { icon: Users, label: 'Roles', value: summary.totalRoles, color: 'primary' },
-                    { icon: PlayCircle, label: 'Scenarios', value: summary.totalScenarios, color: 'destructive' },
-                    { icon: Database, label: 'Integrations', value: summary.totalIntegrations, color: 'info' },
+                    { icon: Bot, label: t('blueprint.stats.agents'), value: summary.totalAgents, tone: 'primary' as StatTone },
+                    { icon: Database, label: t('blueprint.stats.dataSources'), value: summary.totalDataSources, tone: 'info' as StatTone },
+                    { icon: Activity, label: t('blueprint.stats.kpis'), value: summary.totalKpis, tone: 'success' as StatTone },
+                    { icon: GitBranch, label: t('blueprint.stats.workflows'), value: summary.totalWorkflows, tone: 'warning' as StatTone },
+                    { icon: Users, label: t('blueprint.stats.roles'), value: summary.totalRoles, tone: 'primary' as StatTone },
+                    { icon: PlayCircle, label: t('blueprint.stats.scenarios'), value: summary.totalScenarios, tone: 'destructive' as StatTone },
+                    { icon: Database, label: t('blueprint.stats.integrations'), value: summary.totalIntegrations, tone: 'info' as StatTone },
                   ].map((stat, index) => {
                     const Icon = stat.icon;
+                    const tone = STAT_TONES[stat.tone];
                     return (
                       <div 
                         key={stat.label}
@@ -296,8 +297,8 @@ export default function Blueprint() {
                         style={{ animationDelay: `${index * 0.05}s` }}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <div className={`p-1 rounded bg-${stat.color}/10 group-hover:bg-${stat.color}/20 transition-colors`}>
-                            <Icon className={`h-3.5 w-3.5 text-muted-foreground group-hover:text-${stat.color} transition-colors`} />
+                          <div className={`p-1 rounded transition-colors ${tone.chip}`}>
+                            <Icon className={`h-3.5 w-3.5 text-muted-foreground transition-colors ${tone.icon}`} />
                           </div>
                           <span className="text-xs text-muted-foreground">{stat.label}</span>
                         </div>
@@ -349,15 +350,15 @@ export default function Blueprint() {
               <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="w-full justify-start border-b rounded-none bg-transparent p-0 h-auto flex-wrap gap-1">
                   {[
-                    { value: 'model', label: 'Facility model' },
-                    { value: 'overview', label: 'Overview' },
-                    { value: 'agents', label: 'Agents' },
-                    { value: 'data', label: 'Data' },
-                    { value: 'kpis', label: 'KPIs' },
-                    { value: 'workflows', label: 'Workflows' },
-                    { value: 'roles', label: 'Roles' },
-                    { value: 'scenarios', label: 'Scenarios' },
-                    { value: 'validation', label: 'Validation' },
+                    { value: 'model', label: t('blueprint.tabs.model') },
+                    { value: 'overview', label: t('blueprint.tabs.overview') },
+                    { value: 'agents', label: t('blueprint.tabs.agents') },
+                    { value: 'data', label: t('blueprint.tabs.data') },
+                    { value: 'kpis', label: t('blueprint.tabs.kpis') },
+                    { value: 'workflows', label: t('blueprint.tabs.workflows') },
+                    { value: 'roles', label: t('blueprint.tabs.roles') },
+                    { value: 'scenarios', label: t('blueprint.tabs.scenarios') },
+                    { value: 'validation', label: t('blueprint.tabs.validation') },
                   ].map((tab) => (
                     <TabsTrigger 
                       key={tab.value}

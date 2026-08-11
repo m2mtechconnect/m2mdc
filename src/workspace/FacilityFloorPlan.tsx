@@ -81,7 +81,7 @@ export function computePlanGeometry(
   // scaled down (which is what previously shrank the whole diagram).
   const rowGap = clamp(availH * 0.07, 14, 40);
   const heightBudget = (availH - rowGap * (rowCount - 1)) / rowCount;
-  const rackH = clamp(Math.min(rackW * 0.78, heightBudget), 34, 110);
+  const rackH = clamp(Math.min(rackW * 0.95, heightBudget), 34, 110);
   const aisleBand = Math.max(Math.min(16, rowGap - 6), 8);
   const bankW = perRow * rackW + totalRackGaps;
   const contentW = LEFT_GUTTER + bankW + RIGHT_GUTTER;

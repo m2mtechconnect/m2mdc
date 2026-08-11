@@ -355,6 +355,7 @@ export function FacilityCanvas({
               onSelect={selectRack}
               onClearSelection={() => onSelectRack(null)}
               zoom={zoom}
+              onZoomChange={(next) => setZoom(Number(next.toFixed(3)))}
               showRowLabels={showRowLabels}
               showConstraintMarkers={showConstraintMarkers}
               showCoolingZones={showCoolingZones}
@@ -362,11 +363,11 @@ export function FacilityCanvas({
             />
             {/* Compact legend overlay: the legend no longer consumes a full row. */}
             <div
-              className="pointer-events-none absolute bottom-2 left-2 rounded-md border border-[#22304d] bg-[#0f172ae6] px-2 py-1.5"
+              className="pointer-events-none absolute bottom-1.5 left-2 flex items-center gap-2 rounded-md border border-[#22304d] bg-[#0f172af2] px-2 py-1"
               data-testid="canvas-legend"
             >
               <p className="text-[11px] font-semibold uppercase tracking-wide text-[#93a4bd]">{active.label}</p>
-              <ul className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+              <ul className="flex items-center gap-x-3">
                 {active.legend.map((label, index) => (
                   <li key={label} className="inline-flex items-center gap-1.5 text-[11px] text-[#cbd5e1]">
                     <span

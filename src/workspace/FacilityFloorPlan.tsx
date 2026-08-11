@@ -28,6 +28,8 @@ interface Props {
   showRowLabels?: boolean;
   showConstraintMarkers?: boolean;
   showCoolingZones?: boolean;
+  /** Cursor-anchored wheel/pinch zoom reports back to the canvas controls. */
+  onZoomChange?: (next: number) => void;
   /** Request to scroll a rack into view and focus it. */
   centerRequest?: CenterRequest | null;
 }
@@ -39,7 +41,9 @@ interface Props {
  */
 const LEFT_GUTTER = 82;
 const RIGHT_GUTTER = 32;
-const FIT_PAD = 36;
+const FIT_PAD = 24;
+/** Bottom strip kept clear so the corner legend never covers a rack control. */
+export const LEGEND_RESERVE = 30;
 const MIN_ZOOM = 0.6;
 const MAX_ZOOM = 3;
 
@@ -68,7 +72,7 @@ export function computePlanGeometry(
   rowCount: number,
 ): PlanGeometry {
   const availW = Math.max(containerW - FIT_PAD * 2, 240);
-  const availH = Math.max(containerH - FIT_PAD * 2, 180);
+  const availH = Math.max(containerH - FIT_PAD * 2 - LEGEND_RESERVE, 150);
   const usableWidth = availW - LEFT_GUTTER - RIGHT_GUTTER;
   const rackGap = clamp(usableWidth * 0.014, 10, 16);
   const totalRackGaps = rackGap * (perRow - 1);
@@ -77,9 +81,9 @@ export function computePlanGeometry(
   const rackW = clamp((usableWidth - totalRackGaps) / perRow, 68, 150);
   // Row spacing tracks the available height so the plan never has to be
   // scaled down (which is what previously shrank the whole diagram).
-  const rowGap = clamp(availH * 0.06, 14, 26);
+  const rowGap = clamp(availH * 0.07, 14, 40);
   const heightBudget = (availH - rowGap * (rowCount - 1)) / rowCount;
-  const rackH = clamp(Math.min(rackW * 0.52, heightBudget), 34, 76);
+  const rackH = clamp(Math.min(rackW * 0.95, heightBudget), 34, 110);
   const aisleBand = Math.max(Math.min(16, rowGap - 6), 8);
   const bankW = perRow * rackW + totalRackGaps;
   const contentW = LEFT_GUTTER + bankW + RIGHT_GUTTER;
@@ -153,6 +157,7 @@ export function FacilityFloorPlan({
   onSelect,
   onClearSelection,
   zoom = 1,
+  onZoomChange,
   showRowLabels = true,
   showConstraintMarkers = true,
   showCoolingZones = true,
@@ -207,14 +212,14 @@ export function FacilityFloorPlan({
   }, [clampPan]);
 
   const offsetX = (viewW - scaledW) / 2 + pan.x;
-  const offsetY = (viewH - scaledH) / 2 + pan.y;
+  const offsetY = (viewH - scaledH) / 2 - LEGEND_RESERVE / 2 + pan.y;
 
   const rackPos = useCallback(
     (rack: RackNode) => ({
       x: floorX + rack.colIndex * (RACK_W + RACK_GAP),
       y: rack.rowIndex * rowStride,
     }),
-    [floorX, RACK_W, rowStride],
+    [floorX, RACK_W, RACK_GAP, rowStride],
   );
 
   const focusRack = useCallback((rackId: string) => {
@@ -279,11 +284,48 @@ export function FacilityFloorPlan({
 
   // Pointer panning, used mainly on narrow viewports where the plan overflows.
   const dragRef = useRef<{ id: number; x: number; y: number; origin: { x: number; y: number } } | null>(null);
+  const [dragging, setDragging] = useState(false);
+
+  /**
+   * Cursor-anchored wheel and trackpad-pinch zoom. React's onWheel is passive,
+   * so the listener is attached natively and reads live state through a ref.
+   */
+  const wheelHandlerRef = useRef<(event: WheelEvent) => void>(() => {});
+  wheelHandlerRef.current = (event: WheelEvent) => {
+    if (!onZoomChange) return;
+    const dy = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 100 : 1);
+    const next = clamp(zoom * Math.exp(-dy * 0.0015), MIN_ZOOM, MAX_ZOOM);
+    if (Math.abs(next - zoom) < 0.0005) return;
+    const rect = scrollRef.current?.getBoundingClientRect();
+    if (rect) {
+      // Screen point measured from the canvas centre, where the plan is anchored.
+      const px = event.clientX - rect.left - rect.width / 2;
+      const py = event.clientY - rect.top - rect.height / 2;
+      const k = next / zoom;
+      setPan((prev) => clampPan({ x: px - (px - prev.x) * k, y: py - (py - prev.y) * k }));
+    }
+    onZoomChange(next);
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onWheel = (event: WheelEvent) => {
+      // Also covers trackpad pinch (ctrlKey), which would otherwise zoom the page.
+      event.preventDefault();
+      wheelHandlerRef.current(event);
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
 
   return (
     <div
       ref={scrollRef}
-      className="relative h-full w-full min-w-0 touch-pan-y overflow-hidden bg-[#0a1020]"
+      className={cn(
+        'relative h-full w-full min-w-0 touch-none overflow-hidden bg-[#0a1020]',
+        dragging ? 'cursor-grabbing' : 'cursor-grab',
+      )}
       data-testid="facility-floor-plan"
       data-plan-scale={scale.toFixed(4)}
       data-plan-width={Math.round(scaledW)}
@@ -294,6 +336,8 @@ export function FacilityFloorPlan({
         if (event.pointerType === 'mouse' && event.button !== 0) return;
         if ((event.target as Element).closest('[data-rack-id]')) return;
         dragRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY, origin: pan };
+        event.currentTarget.setPointerCapture(event.pointerId);
+        setDragging(true);
       }}
       onPointerMove={(event) => {
         const drag = dragRef.current;
@@ -305,11 +349,16 @@ export function FacilityFloorPlan({
           }),
         );
       }}
-      onPointerUp={() => {
+      onPointerUp={(event) => {
+        if (dragRef.current?.id === event.pointerId) {
+          event.currentTarget.releasePointerCapture?.(event.pointerId);
+        }
         dragRef.current = null;
+        setDragging(false);
       }}
       onPointerCancel={() => {
         dragRef.current = null;
+        setDragging(false);
       }}
     >
       <svg
@@ -475,6 +524,18 @@ export function FacilityFloorPlan({
                         {/* Top-down footprint: cold-aisle face bar plus a modelled load bar. */}
                         {rack.represented && (
                           <>
+                            {RACK_H >= 62 &&
+                              [0, 1, 2].map((i) => (
+                                <rect
+                                  key={i}
+                                  x={x + 8}
+                                  y={y + RACK_H / 2 - 9 + i * 7}
+                                  width={RACK_W - 16}
+                                  height={3}
+                                  rx={1.5}
+                                  fill="#16243d"
+                                />
+                              ))}
                             <rect
                               x={x + 4}
                               y={y + RACK_H - 5}

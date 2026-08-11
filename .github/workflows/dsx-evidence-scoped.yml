@@ -1,0 +1,80 @@
+name: DSX / Evidence Scoped Checks
+
+# Scoped gate for the DSX + Evidence surface only.
+#
+# The legacy suites in test.yml carry known pre-existing failures that are
+# unrelated to this surface. Running DSX lint and DSX unit tests in their own
+# workflow keeps that surface independently green and blockable, without
+# waiting on (or being blocked by) the legacy jobs.
+#
+# Scope:
+#   lint  -> src/dsx, src/components/dsx
+#   tests -> src/dsx/__tests__ (vitest, jsdom)
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: dsx-scoped-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dsx-lint:
+    name: DSX lint (scoped)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      # Fails on errors only. Warnings in this scope are reported in the log
+      # but do not gate; raising them to errors is a separate cleanup task.
+      - name: Lint DSX / Evidence sources
+        run: npm run lint:dsx
+
+  dsx-unit-tests:
+    name: DSX unit tests (scoped)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run DSX / Evidence unit tests
+        run: npm run test:dsx -- --reporter=default --reporter=junit --outputFile=dsx-test-results.xml
+      - name: Upload DSX test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsx-test-results
+          path: dsx-test-results.xml
+          if-no-files-found: ignore
+          retention-days: 30
+
+  dsx-scoped-summary:
+    name: DSX scoped summary
+    runs-on: ubuntu-latest
+    needs: [dsx-lint, dsx-unit-tests]
+    if: always()
+    steps:
+      - name: Report
+        run: |
+          {
+            echo "### DSX / Evidence scoped checks"
+            echo ""
+            echo "- lint: ${{ needs.dsx-lint.result }}"
+            echo "- unit tests: ${{ needs.dsx-unit-tests.result }}"
+            echo ""
+            echo "Legacy suites run separately in \`test.yml\` and do not gate this scope."
+          } >> "$GITHUB_STEP_SUMMARY"
+          [ "${{ needs.dsx-lint.result }}" = "success" ] && [ "${{ needs.dsx-unit-tests.result }}" = "success" ]

@@ -220,7 +220,7 @@ export function BlueprintModelWorkspace({
           <LinkRow
             to={`${blueprintPath}?tab=validation`}
             label="Data sovereignty"
-            value={`$${String(blueprint.jurisdiction ?? "Jurisdiction")} validation status`}
+            value={`${String(blueprint.jurisdiction ?? 'Jurisdiction')} validation status`}
           />
         </ul>
       </ModelDetailSection>

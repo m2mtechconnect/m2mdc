@@ -219,7 +219,7 @@ export function FacilityFloorPlan({
       x: floorX + rack.colIndex * (RACK_W + RACK_GAP),
       y: rack.rowIndex * rowStride,
     }),
-    [floorX, RACK_W, rowStride],
+    [floorX, RACK_W, RACK_GAP, rowStride],
   );
 
   const focusRack = useCallback((rackId: string) => {

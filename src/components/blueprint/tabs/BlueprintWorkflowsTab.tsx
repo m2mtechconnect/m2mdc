@@ -14,7 +14,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   ArrowRight,
-  Eye,
+  ShieldCheck,
   History
 } from 'lucide-react';
 import { WORKFLOWS, getWorkflowDescription } from '@/ux';

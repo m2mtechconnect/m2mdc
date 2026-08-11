@@ -61,7 +61,31 @@ import { KpiTooltip } from '@/components/ui/kpi-tooltip';
 import { LoadingState, SnapshotNotFoundEmptyState } from '@/components/ui/empty-state';
 import { BlueprintModelSection } from '@/workspace/BlueprintModelSection';
 import { formatPower } from '@/workspace/facilityModel';
-function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: any }) {
+import type { DataCentreBlueprint } from '@/types/dataCentreBlueprint';
+
+/**
+ * Static Tailwind class map. Interpolated classes (`bg-${color}/10`) are not
+ * emitted by the JIT compiler and only rendered before because the literals
+ * happened to exist elsewhere in the bundle.
+ */
+const STAT_TONES = {
+  primary: { chip: 'bg-primary/10 group-hover:bg-primary/20', icon: 'group-hover:text-primary' },
+  info: { chip: 'bg-info/10 group-hover:bg-info/20', icon: 'group-hover:text-info' },
+  success: { chip: 'bg-success/10 group-hover:bg-success/20', icon: 'group-hover:text-success' },
+  warning: { chip: 'bg-warning/10 group-hover:bg-warning/20', icon: 'group-hover:text-warning' },
+  destructive: { chip: 'bg-destructive/10 group-hover:bg-destructive/20', icon: 'group-hover:text-destructive' },
+} as const;
+
+type StatTone = keyof typeof STAT_TONES;
+
+/** Split a blueprint location such as "Montreal, QC" into city and region code. */
+function splitLocation(location?: string): { city: string; regionCode: string } {
+  const [city, region] = (location || '').split(',').map((part) => part.trim());
+  return { city: city || 'Unknown', regionCode: region || 'ca-central-1' };
+}
+
+function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: DataCentreBlueprint }) {
+  const { t } = useTranslation();
   const { createTwin } = useActiveTwin();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -70,36 +94,34 @@ function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: any }) {
   const handleCreate = async () => {
     setIsCreating(true);
     try {
+      // Facility identity comes from the blueprint being converted, never a
+      // hard-coded Montreal default.
+      const { city, regionCode } = splitLocation(blueprint.location);
       const newTwin = await createTwin(null, {
-        name: blueprint.name || 'Montreal Sovereign AI DC',
-        city: 'Montreal',
-        region_code: 'QC',
+        name: blueprint.name,
+        city,
+        region_code: regionCode,
         tier: blueprint.tier || 'Tier III',
         // `capacityKw` is already kilowatts. Multiplying by 1000 wrote watts into a
         // kW column and relied on normaliseStoredCapacityKw() to rescale it back.
         capacity_kw: blueprint.capacityKw || 10000,
-        industry: 'ai_compute',
-        pue_target: blueprint.pueTarget || 1.3,
-        renewable_target_pct: 95,
-        carbon_intensity: 12,
-        sovereignty_level: 'federal',
         metadata: {
-          from_blueprint: 'default',
+          from_blueprint: blueprint.id,
           racks: blueprint.racks,
         },
       });
 
       if (newTwin) {
         toast({
-          title: 'Twin Created',
-          description: `${newTwin.name} is now available in the selector.`,
+          title: t('blueprint.twinCreated'),
+          description: t('blueprint.twinCreatedDesc', { name: newTwin.name }),
         });
         navigate('/data-centre-twin');
       }
     } catch (err) {
       toast({
-        title: 'Creation Failed',
-        description: err instanceof Error ? err.message : 'Failed to create twin',
+        title: t('blueprint.creationFailed'),
+        description: err instanceof Error ? err.message : t('blueprint.creationFailed'),
         variant: 'destructive',
       });
     } finally {
@@ -112,12 +134,12 @@ function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: any }) {
       {isCreating ? (
         <>
           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          Creating...
+          {t('blueprint.creating')}
         </>
       ) : (
         <>
           <Plus className="h-4 w-4 mr-2" />
-          Add to My Twins
+          {t('blueprint.addToMyTwins')}
         </>
       )}
     </Button>

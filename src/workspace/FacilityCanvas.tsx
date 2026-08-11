@@ -10,9 +10,9 @@
  * The canvas can never remain in `loading` indefinitely.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Box, Grid2x2, Loader2, RefreshCw } from 'lucide-react';
+import { Box, Grid2x2, Loader2, Maximize2, Minus, Plus, RefreshCw } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { SimulationErrorBoundary } from '@/components/twin-visualization/SimulationErrorBoundary';
 import { DataCenter3DScene } from '@/components/twin-visualization/DataCenter3DScene';
 import { useTwinVisualizationData } from '@/components/twin-visualization/hooks/useTwinVisualizationData';
@@ -22,10 +22,20 @@ import { useWorkspaceStore } from './workspaceStore';
 import { LayerSelector } from './LayerSelector';
 import { FacilityFloorPlan } from './FacilityFloorPlan';
 import { buildRackGrid } from './dashboard/rackModel';
-import { formatPower, type FacilityDefinition } from './facilityModel';
+import { type FacilityDefinition } from './facilityModel';
 
 /** Hard ceiling on the 3D initialisation window. */
 const LOAD_TIMEOUT_MS = 8000;
+const ZOOM_MIN = 0.6;
+const ZOOM_MAX = 3;
+
+/** Status legend for the model, readable without relying on colour alone. */
+const LEGEND: Array<{ label: string; className: string }> = [
+  { label: 'Nominal', className: 'bg-success' },
+  { label: 'Watch', className: 'bg-warning' },
+  { label: 'Constraint', className: 'bg-destructive' },
+  { label: 'Unavailable', className: 'bg-muted-foreground' },
+];
 
 type ModelState = 'loading' | 'ready' | 'degraded' | 'error';
 type ViewMode = '3d' | '2d';
@@ -46,6 +56,7 @@ export function FacilityCanvas({ facility }: Props) {
   const [viewMode, setViewMode] = useState<ViewMode>('3d');
   const [modelState, setModelState] = useState<ModelState>('loading');
   const [attempt, setAttempt] = useState(0);
+  const [zoom, setZoom] = useState(1);
   const hostRef = useRef<HTMLDivElement | null>(null);
 
   const handleSelect = useCallback(
@@ -101,9 +112,11 @@ export function FacilityCanvas({ facility }: Props) {
   }, [viewMode, attempt]);
 
   const showLoading = viewMode === '3d' && modelState === 'loading';
+  const clampZoom = (z: number) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
 
   return (
-    <div className="relative h-full w-full bg-background" data-testid="facility-model-canvas">
+    <TooltipProvider delayDuration={200}>
+    <div className="relative h-full min-h-0 w-full min-w-0 overflow-hidden bg-background" data-testid="facility-model-canvas">
       <div ref={hostRef} className="h-full w-full" data-model-state={modelState}>
         {viewMode === '3d' ? (
           <SimulationErrorBoundary
@@ -130,6 +143,8 @@ export function FacilityCanvas({ facility }: Props) {
             grid={rackGrid}
             selectedRackId={selectedAssetId}
             onSelect={handleSelect}
+            zoom={zoom}
+            onZoomChange={(next) => setZoom(clampZoom(next))}
           />
         )}
       </div>
@@ -146,8 +161,8 @@ export function FacilityCanvas({ facility }: Props) {
         </div>
       )}
 
-      {/* Model controls: one layer selector, one view toggle. */}
-      <div className="absolute left-3 top-3 flex flex-wrap items-center gap-2">
+      {/* Protected zone, top-left: layer selection and 3D/2D. */}
+      <div className="absolute left-3 top-3 z-20 flex max-w-[calc(100%-11rem)] flex-wrap items-center gap-2">
         <LayerSelector
           value={activeOverlay as TwinOverlay | 'none'}
           onChange={(layer) => setOverlay(layer)}
@@ -158,7 +173,7 @@ export function FacilityCanvas({ facility }: Props) {
             size="sm"
             variant={viewMode === '3d' ? 'secondary' : 'ghost'}
             aria-pressed={viewMode === '3d'}
-            className="h-7 px-2 text-[11px]"
+            className="h-8 px-2.5 text-xs"
             onClick={retry}
           >
             <Box className="mr-1 h-3.5 w-3.5" aria-hidden />
@@ -169,7 +184,7 @@ export function FacilityCanvas({ facility }: Props) {
             size="sm"
             variant={viewMode === '2d' ? 'secondary' : 'ghost'}
             aria-pressed={viewMode === '2d'}
-            className="h-7 px-2 text-[11px]"
+            className="h-8 px-2.5 text-xs"
             onClick={() => setViewMode('2d')}
           >
             <Grid2x2 className="mr-1 h-3.5 w-3.5" aria-hidden />
@@ -178,34 +193,93 @@ export function FacilityCanvas({ facility }: Props) {
         </div>
       </div>
 
-      {(modelState === 'degraded' || modelState === 'error') && viewMode === '2d' && (
-        <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-md border border-border bg-card/95 px-2.5 py-1.5 text-[11px] text-muted-foreground backdrop-blur">
-          <span>Interactive 3D unavailable in this browser. Showing the 2D floor plan of the same model.</span>
-          <Button size="sm" variant="outline" className="h-6 px-2 text-[11px]" onClick={retry}>
-            <RefreshCw className="mr-1 h-3 w-3" aria-hidden />
-            Retry 3D
-          </Button>
+      {/* Protected zone, top-right: zoom and camera controls only. */}
+      {viewMode === '2d' && (
+        <div
+          className="absolute right-3 top-3 z-20 flex items-center gap-1 rounded-md border border-border bg-card/90 p-1 backdrop-blur"
+          role="group"
+          aria-label="Model zoom controls"
+        >
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                aria-label="Zoom out"
+                onClick={() => setZoom((z) => clampZoom(z / 1.2))}
+              >
+                <Minus className="h-4 w-4" aria-hidden />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="text-xs">Zoom out</TooltipContent>
+          </Tooltip>
+          <span className="w-12 text-center text-xs tabular-nums text-muted-foreground">
+            {Math.round(zoom * 100)}%
+          </span>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                aria-label="Zoom in"
+                onClick={() => setZoom((z) => clampZoom(z * 1.2))}
+              >
+                <Plus className="h-4 w-4" aria-hidden />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="text-xs">Zoom in</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                aria-label="Fit facility to view"
+                onClick={() => setZoom(1)}
+              >
+                <Maximize2 className="h-4 w-4" aria-hidden />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="text-xs">Fit to view</TooltipContent>
+          </Tooltip>
         </div>
       )}
 
-      {/* Facility identity + selection context */}
-      <div className="pointer-events-none absolute right-3 top-3 max-w-[16rem] rounded-md border border-border bg-card/90 px-3 py-2 text-right backdrop-blur">
-        <p className="truncate text-sm font-semibold text-foreground">{facility.name}</p>
-        <p className="text-[11px] text-muted-foreground">
-          {facility.city} · {facility.tier} · {formatPower(facility.capacityKw)}
-        </p>
-        {selectedAssetId && selectedAssetId !== 'facility' && (
-          <Badge variant="outline" className="mt-1 text-[10px]">
-            Selected: {selectedAssetId}
-          </Badge>
+      {/* Protected zone, bottom-left: legend and degraded-model notice. */}
+      <div className="pointer-events-none absolute bottom-3 left-3 z-20 flex max-w-[min(28rem,calc(100%-1.5rem))] flex-col gap-2">
+        {(modelState === 'degraded' || modelState === 'error') && viewMode === '2d' && (
+          <div className="pointer-events-auto flex flex-wrap items-center gap-2 rounded-md border border-border bg-card/95 px-2.5 py-1.5 text-xs text-muted-foreground backdrop-blur">
+            <span className="min-w-0">Interactive 3D unavailable in this browser. Showing the 2D floor plan of the same model.</span>
+            <Button size="sm" variant="outline" className="h-7 px-2 text-xs" onClick={retry}>
+              <RefreshCw className="mr-1 h-3 w-3" aria-hidden />
+              Retry 3D
+            </Button>
+          </div>
         )}
+        <ul
+          className="pointer-events-auto flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border bg-card/90 px-2.5 py-1.5 text-xs text-muted-foreground backdrop-blur"
+          aria-label="Model status legend"
+        >
+          {LEGEND.map((item) => (
+            <li key={item.label} className="flex items-center gap-1.5 whitespace-nowrap">
+              <span className={cn('h-2 w-2 rounded-full', item.className)} aria-hidden />
+              {item.label}
+            </li>
+          ))}
+        </ul>
       </div>
 
       {isRunning && (
         <div
           className={cn(
-            'pointer-events-none absolute inset-x-0 bottom-3 mx-auto w-fit rounded-full border border-border',
-            'bg-card/90 px-3 py-1 text-[11px] text-muted-foreground backdrop-blur',
+            'pointer-events-none absolute inset-x-0 top-14 z-20 mx-auto w-fit max-w-[80%] rounded-full border border-border',
+            'bg-card/90 px-3 py-1 text-xs text-muted-foreground backdrop-blur',
           )}
           role="status"
         >
@@ -214,5 +288,6 @@ export function FacilityCanvas({ facility }: Props) {
         </div>
       )}
     </div>
+    </TooltipProvider>
   );
 }

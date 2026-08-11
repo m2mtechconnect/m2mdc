@@ -49,6 +49,7 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const fullBleed = useShellLayoutStore((s) => s.fullBleed);
+  const pageOwnsOperatingState = useShellLayoutStore((s) => s.pageOwnsOperatingState);
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -97,7 +98,7 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-background transition-[padding] duration-200 motion-reduce:transition-none"
+      className={`${fullBleed ? "h-screen overflow-hidden" : "min-h-screen"} flex flex-col bg-background transition-[padding] duration-200 motion-reduce:transition-none`}
       data-testid="app-shell"
       style={assistantReflow ? { paddingRight: assistantWidth } : undefined}
     >
@@ -274,7 +275,7 @@ export function Layout({ children }: LayoutProps) {
       </header>
 
       {/* Persistent operating-state bar (Stage 5 truth alignment) */}
-      <OperatingStateBar />
+      <OperatingStateBar srOnly={pageOwnsOperatingState} />
 
       {/* Mobile Navigation Sheet */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -392,7 +393,7 @@ export function Layout({ children }: LayoutProps) {
         data-testid="page-content"
         className={
           fullBleed
-            ? "flex-1 w-full"
+            ? "flex-1 w-full min-h-0 overflow-hidden"
             : "flex-1 w-full mx-auto max-w-[1920px] px-3 sm:px-4 md:px-5 lg:px-6"
         }
       >

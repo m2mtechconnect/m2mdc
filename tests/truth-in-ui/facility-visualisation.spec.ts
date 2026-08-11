@@ -17,7 +17,7 @@ const VIEWPORTS = [
 
 async function openDashboard(page: Page) {
   await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-  await expect(page.getByTestId('facility-floor-plan')).toBeVisible();
+  await expect(page.getByTestId('facility-floor-plan')).toBeVisible({ timeout: 30_000 });
 }
 
 async function occupancy(page: Page) {

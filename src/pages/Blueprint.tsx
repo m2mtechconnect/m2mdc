@@ -331,7 +331,15 @@ export default function Blueprint() {
 
                 <div className="mt-6">
                   <TabsContent value="model" className="m-0">
-                    <BlueprintModelSection />
+                    <BlueprintModelSection
+                      facilityOverride={{
+                        id: blueprint.twinId || blueprintId,
+                        name: blueprint.name,
+                        city: twin?.city ?? undefined,
+                        tier: blueprint.tier,
+                        capacityKw: blueprint.capacityKw,
+                      }}
+                    />
                   </TabsContent>
                   <TabsContent value="assets" className="m-0 space-y-8">
                     <BlueprintOverviewTab blueprint={blueprint} summary={summary} />

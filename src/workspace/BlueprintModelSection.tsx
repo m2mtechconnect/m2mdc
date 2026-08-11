@@ -9,12 +9,27 @@ import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FacilityCanvas } from './FacilityCanvas';
 import { InspectorPanel } from './panels/InspectorPanel';
-import { KPI_DESCRIPTORS, formatPower, useFacilityModel, type KpiKey } from './facilityModel';
+import {
+  KPI_DESCRIPTORS,
+  formatPower,
+  useFacilityModel,
+  type FacilityOverride,
+  type KpiKey,
+} from './facilityModel';
 import { MODEL_LAYERS } from './LayerSelector';
 import { useTwinOverlaySafe, type TwinOverlay } from '@/context/TwinOverlayContext';
 
-export function BlueprintModelSection() {
-  const { facility, assets, isFallback, naming, modelNotes } = useFacilityModel();
+interface BlueprintModelSectionProps {
+  /**
+   * Facility identity from the routed blueprint. `/blueprint/:id` is
+   * authoritative over the active twin, so the model renders the routed
+   * record and both surfaces report one capacity.
+   */
+  facilityOverride?: FacilityOverride;
+}
+
+export function BlueprintModelSection({ facilityOverride }: BlueprintModelSectionProps = {}) {
+  const { facility, assets, isFallback, naming, modelNotes } = useFacilityModel(facilityOverride);
   const [searchParams] = useSearchParams();
   const { setOverlay } = useTwinOverlaySafe();
 

@@ -3,12 +3,13 @@
  * on the selected tool and the current asset selection, and it is the only
  * place workspace actions live.
  */
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { ChevronLeft, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { InspectorPanel } from './panels/InspectorPanel';
 import { ConfigurePanel } from './panels/ConfigurePanel';
-import { SimulatePanel } from './panels/SimulatePanel';
+import { SimulatePanel, SimulateFooterAction } from './panels/SimulatePanel';
 import { ComparePanel } from './panels/ComparePanel';
 import { DecidePanel } from './panels/DecidePanel';
 import { AssistPanel } from './panels/AssistPanel';
@@ -34,60 +35,124 @@ interface Props {
 export function ContextPanel({ facility, assets, overrides, onClose }: Props) {
   const activeTool = useWorkspaceStore((s) => s.activeTool);
   const setTool = useWorkspaceStore((s) => s.setTool);
-  const runs = useWorkspaceStore((s) => s.runs);
   const kpis = deriveKpis(facility, overrides);
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const [wide, setWide] = useState(false);
+
+  // Step names are only shown when the inspector is wide enough for them.
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(([entry]) => setWide(entry.contentRect.width >= 420));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const stepIndex = WORKFLOW_STEPS.findIndex((s) => s.tool === activeTool);
+  const currentStep = WORKFLOW_STEPS[stepIndex];
+  const previousStep = stepIndex > 0 ? WORKFLOW_STEPS[stepIndex - 1] : null;
 
   return (
     <aside
-      className="flex h-full min-h-0 w-full flex-col border-l border-border bg-card"
+      className="flex h-full min-h-0 w-full min-w-0 flex-col border-l border-border bg-card"
       aria-label="Workspace context panel"
       data-testid="workspace-context-panel"
+      ref={headerRef}
     >
-      <div className="flex items-center justify-between border-b border-border px-3 py-2">
-        <h2 className="text-sm font-semibold text-foreground">{TITLES[activeTool]}</h2>
+      {/* Fixed header */}
+      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-3 py-2">
+        <h2 className="min-w-0 truncate text-sm font-semibold text-foreground">{TITLES[activeTool]}</h2>
         {onClose && (
-          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Close context panel" onClick={onClose}>
+          <Button variant="ghost" size="icon" className="h-11 w-11 shrink-0" aria-label="Close context panel" onClick={onClose}>
             <X className="h-4 w-4" aria-hidden />
           </Button>
         )}
       </div>
 
-      {/* Guided workflow */}
-      <nav aria-label="Guided workflow" className="flex items-center gap-1 border-b border-border px-2 py-1.5">
-        {WORKFLOW_STEPS.map((step, i) => {
-          const done = stepIndex > i || (step.tool === 'simulate' && runs.length > 0 && stepIndex > i);
-          const current = step.tool === activeTool;
-          return (
-            <button
-              key={step.tool}
-              type="button"
-              onClick={() => setTool(step.tool)}
-              aria-current={current ? 'step' : undefined}
-              className={cn(
-                'flex-1 rounded-sm px-1 py-1 text-[10px] font-medium transition-colors',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                current
-                  ? 'bg-primary/10 text-primary'
-                  : done
-                    ? 'text-foreground hover:bg-muted'
-                    : 'text-muted-foreground hover:bg-muted',
-              )}
-            >
-              {i + 1}. {step.label}
-            </button>
-          );
-        })}
+      {/* Guided workflow: position, current step title, compact indicator. */}
+      <nav aria-label="Guided workflow" className="shrink-0 border-b border-border px-3 py-2">
+        {wide ? (
+          <div className="flex items-center gap-1">
+            {WORKFLOW_STEPS.map((step, i) => (
+              <button
+                key={step.tool}
+                type="button"
+                onClick={() => setTool(step.tool)}
+                aria-current={step.tool === activeTool ? 'step' : undefined}
+                className={cn(
+                  'min-w-0 flex-1 truncate rounded-sm px-1.5 py-1.5 text-xs font-medium transition-colors',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  step.tool === activeTool
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                )}
+              >
+                {i + 1}. {step.label}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-xs text-muted-foreground">
+                Step {stepIndex + 1} of {WORKFLOW_STEPS.length}
+              </p>
+              <p className="truncate text-sm font-medium text-foreground">{currentStep?.label}</p>
+            </div>
+            <ol className="flex shrink-0 items-center gap-1.5" aria-hidden>
+              {WORKFLOW_STEPS.map((step, i) => (
+                <li
+                  key={step.tool}
+                  className={cn(
+                    'h-1.5 rounded-full transition-all',
+                    i === stepIndex ? 'w-5 bg-primary' : i < stepIndex ? 'w-1.5 bg-primary/50' : 'w-1.5 bg-border',
+                  )}
+                />
+              ))}
+            </ol>
+          </div>
+        )}
       </nav>
 
-      <div className="min-h-0 flex-1 overflow-y-auto p-3">
+      {/* Independently scrollable body */}
+      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden p-3">
         {activeTool === 'inspect' && <InspectorPanel facility={facility} assets={assets} />}
         {activeTool === 'configure' && <ConfigurePanel facility={facility} overrides={overrides} />}
         {activeTool === 'simulate' && <SimulatePanel facility={facility} />}
         {activeTool === 'compare' && <ComparePanel />}
         {activeTool === 'decide' && <DecidePanel />}
         {activeTool === 'assist' && <AssistPanel facility={facility} kpis={kpis} />}
+      </div>
+
+      {/* Sticky action footer: the primary action never scrolls out of view. */}
+      <div className="flex shrink-0 items-center gap-2 border-t border-border bg-card px-3 py-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9 shrink-0"
+          disabled={!previousStep}
+          onClick={() => previousStep && setTool(previousStep.tool)}
+        >
+          <ChevronLeft className="mr-1 h-4 w-4" aria-hidden />
+          Back
+        </Button>
+        <div className="min-w-0 flex-1">
+          {activeTool === 'simulate' ? (
+            <SimulateFooterAction facility={facility} />
+          ) : (
+            <Button
+              size="sm"
+              className="h-9 w-full"
+              disabled={stepIndex < 0 || stepIndex >= WORKFLOW_STEPS.length - 1}
+              onClick={() => {
+                const next = WORKFLOW_STEPS[stepIndex + 1];
+                if (next) setTool(next.tool);
+              }}
+            >
+              Continue
+            </Button>
+          )}
+        </div>
       </div>
     </aside>
   );

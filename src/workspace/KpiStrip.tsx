@@ -3,6 +3,7 @@
  * are rendered, so the values shown here are the values used everywhere else.
  */
 import { ArrowDown, ArrowUp, Minus } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { KPI_DESCRIPTORS, deriveKpis, formatKpi, type KpiKey, type FacilityDefinition, type ConfigOverrides } from './facilityModel';
 import { deltaDirection } from './scenarioEngine';
@@ -24,20 +25,25 @@ export function KpiStrip({ facility, overrides }: Props) {
   const keys = ROLE_VIEWS[roleView].kpis;
 
   return (
-    <div
-      className="flex w-full gap-2 overflow-x-auto border-t border-border bg-card/80 px-2 py-2 backdrop-blur"
-      role="group"
-      aria-label="Modelled key performance indicators"
-      data-testid="workspace-kpi-strip"
-    >
+    <TooltipProvider delayDuration={200}>
+      <div
+        className="flex w-full min-w-0 shrink-0 gap-2 overflow-x-auto border-t border-border bg-card px-2 py-2"
+        role="group"
+        aria-label="Modelled key performance indicators"
+        data-testid="workspace-kpi-strip"
+      >
       {keys.map((key) => {
         const descriptor = KPI_DESCRIPTORS[key];
         const value = run ? run.result[key] : modelled[key];
         const delta = run ? run.result[key] - run.baseline[key] : 0;
         const direction = deltaDirection(key, delta);
+        const deltaText = delta.toFixed(descriptor.precision);
+        const noChange = Number(deltaText) === 0;
         const selected = activeOverlay === (descriptor.overlay as TwinOverlay);
 
         return (
+          <Tooltip key={key}>
+            <TooltipTrigger asChild>
           <button
             key={key}
             type="button"
@@ -47,40 +53,59 @@ export function KpiStrip({ facility, overrides }: Props) {
               openEvidence(key);
             }}
             className={cn(
-              'min-w-[9.5rem] flex-1 rounded-md border px-3 py-2 text-left transition-colors',
+              'min-w-[10rem] flex-1 shrink-0 rounded-md border px-3 py-2 text-left transition-colors',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
               selected ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50 hover:bg-muted/60',
             )}
-            aria-label={`${descriptor.label}: ${formatKpi(key, value)}. Open evidence.`}
+            aria-label={`${descriptor.label}: ${formatKpi(key, value)}.${
+              run ? ` ${noChange ? 'No change' : `Change ${deltaText}, ${direction}`}.` : ''
+            } Open evidence.`}
           >
-            <span className="block text-[11px] uppercase tracking-wide text-muted-foreground">
+            <span className="block truncate text-xs uppercase tracking-wide text-muted-foreground">
               {descriptor.label}
             </span>
-            <span className="mt-0.5 flex items-baseline gap-2">
-              <span className="text-lg font-semibold tabular-nums text-foreground">
+            <span className="mt-0.5 flex flex-wrap items-baseline gap-x-2">
+              <span className="text-xl font-semibold tabular-nums text-foreground">
                 {formatKpi(key, value)}
               </span>
               {run && (
                 <span
                   className={cn(
-                    'inline-flex items-center gap-0.5 text-[11px] font-medium tabular-nums',
+                    'inline-flex items-center gap-0.5 whitespace-nowrap text-xs font-medium tabular-nums',
                     direction === 'better' && 'text-success',
                     direction === 'worse' && 'text-destructive',
                     direction === 'flat' && 'text-muted-foreground',
                   )}
                 >
-                  {direction === 'better' && <ArrowDown className="h-3 w-3" aria-hidden />}
-                  {direction === 'worse' && <ArrowUp className="h-3 w-3" aria-hidden />}
-                  {direction === 'flat' && <Minus className="h-3 w-3" aria-hidden />}
-                  {delta > 0 ? '+' : ''}
-                  {delta.toFixed(descriptor.precision)}
+                  {noChange ? (
+                    <>
+                      <Minus className="h-3 w-3" aria-hidden />
+                      No change
+                    </>
+                  ) : (
+                    <>
+                      {direction === 'better' && <ArrowDown className="h-3 w-3" aria-hidden />}
+                      {direction === 'worse' && <ArrowUp className="h-3 w-3" aria-hidden />}
+                      {direction === 'flat' && <Minus className="h-3 w-3" aria-hidden />}
+                      {delta > 0 ? '+' : ''}
+                      {deltaText}
+                    </>
+                  )}
                 </span>
               )}
             </span>
           </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs text-xs">
+              <p className="font-medium">{descriptor.label}</p>
+              <p className="mt-0.5 text-muted-foreground">{descriptor.derivation}</p>
+              <p className="mt-1 text-muted-foreground">Select to open the evidence record.</p>
+            </TooltipContent>
+          </Tooltip>
         );
       })}
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }
 

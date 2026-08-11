@@ -269,6 +269,9 @@ export function clamp(v: number, min: number, max: number): number {
 export function formatKpi(key: KpiKey, value: number): string {
   const d = KPI_DESCRIPTORS[key];
   if (key === 'itLoadKw') return formatPower(value);
+  // Unit placement is fixed per metric so every surface reads identically.
+  if (key === 'energyCostPerMwh') return `$${value.toFixed(0)}/MWh`;
+  if (key === 'carbonIntensity') return `${value.toFixed(0)} gCO\u2082e/kWh`;
   return `${value.toFixed(d.precision)}${d.unit}`;
 }
 

@@ -25,9 +25,14 @@ interface Props {
   className?: string;
   scenario?: string;
   runId?: string;
+  /**
+   * Keep the status region in the accessibility tree but hide it visually,
+   * for pages that render the same truth line inside their own header.
+   */
+  srOnly?: boolean;
 }
 
-export function OperatingStateBar({ className, scenario, runId }: Props) {
+export function OperatingStateBar({ className, scenario, runId, srOnly }: Props) {
   const mode = OPERATING_MODES[ACTIVE_MODE];
   const provenance = useRunProvenance();
   // The workspace records its own runs; prefer the most recent one so the
@@ -38,7 +43,7 @@ export function OperatingStateBar({ className, scenario, runId }: Props) {
   const id = resolvedRunId ?? RUN_UNAVAILABLE_LABEL;
   const calculatedAt = formatCalculatedAt(resolvedCalculatedAt);
 
-  return (
+  const bar = (
     <div
       role="status"
       aria-live="polite"
@@ -89,6 +94,8 @@ export function OperatingStateBar({ className, scenario, runId }: Props) {
       </TooltipProvider>
     </div>
   );
+
+  return srOnly ? <div className="sr-only">{bar}</div> : bar;
 }
 
 export default OperatingStateBar;

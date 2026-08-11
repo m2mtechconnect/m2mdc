@@ -37,6 +37,18 @@ const defaultCommands: CoPilotCommands = {
 
 const CoPilotCommandContext = createContext<CoPilotCommandContextValue | undefined>(undefined);
 
+/**
+ * Commands that mutate simulation run state. Stage 7H: these are owned by the
+ * Simulation workspace and must be unreachable from Blueprint surfaces, even
+ * through an assistant action or a directly invoked callback.
+ */
+const SIMULATION_EXECUTION_COMMANDS = new Set(['runSimulation', 'pauseSimulation', 'resetSimulation']);
+
+function isBlueprintSurface(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.location.pathname.startsWith('/blueprint');
+}
+
 export function CoPilotCommandProvider({ children }: { children: ReactNode }) {
   const [commands, setCommands] = useState<CoPilotCommands>(defaultCommands);
   const [highlightedKPI, setHighlightedKPI] = useState<string | null>(null);
@@ -52,7 +64,13 @@ export function CoPilotCommandProvider({ children }: { children: ReactNode }) {
   // Execute a command by name with optional arguments
   const executeCommand = useCallback((commandName: string, args?: any): boolean => {
     console.log('[CoPilotCommand] executeCommand:', commandName, args);
-    
+
+    // Ownership boundary: Blueprint may hand a design to Simulation, never run it.
+    if (SIMULATION_EXECUTION_COMMANDS.has(commandName) && isBlueprintSurface()) {
+      console.warn('[CoPilotCommand] Blocked simulation execution from Blueprint:', commandName);
+      return false;
+    }
+
     switch (commandName) {
       case 'runSimulation':
         commands.runSimulation(args?.scenarioId);

@@ -333,20 +333,20 @@ export default function Blueprint() {
 
                 <div className="mt-6">
                   <TabsContent value="model" className="m-0">
-                    <BlueprintModelSection
-                      facilityOverride={{
-                        id: blueprint.twinId || blueprintId,
-                        name: blueprint.name,
-                        city: twin?.city ?? undefined,
-                        tier: blueprint.tier,
-                        capacityKw: blueprint.capacityKw,
-                      }}
+                    {/* Stage 7K: operator workspace, not a full system report. */}
+                    <BlueprintModelWorkspace
+                      blueprint={blueprint}
+                      summary={summary}
+                      blueprintPath={`/blueprint/${blueprintId}`}
+                      capacityNote={capacityNote}
+                      dbTwinData={dbTwinData}
+                      city={twin?.city ?? undefined}
                     />
                   </TabsContent>
                   <TabsContent value="assets" className="m-0 space-y-8">
                     <BlueprintOverviewTab blueprint={blueprint} summary={summary} />
                     <BlueprintDataTab dataSources={blueprint.dataSources} integrations={blueprint.integrations} />
-                    <BlueprintRolesTab roles={blueprint.humanRoles} />
+                    {/* Stage 7K: Human Roles are owned by Manage, not Blueprint. */}
                   </TabsContent>
                   <TabsContent value="controls" className="m-0">
                     <Tabs value={activeSubtab} onValueChange={handleSubtabChange} className="w-full">

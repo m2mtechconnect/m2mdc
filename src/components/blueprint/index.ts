@@ -24,6 +24,13 @@ export { BlueprintSnapshotCard } from './BlueprintSnapshotCard';
 export { BlueprintSummaryCard } from './BlueprintSummaryCard';
 export { BlueprintReviewSection } from './BlueprintReviewSection';
 export { QuarantinedCapacityPanel } from './QuarantinedCapacityPanel';
+
+// Stage 7K — Model operator workspace
+export { BlueprintModelWorkspace } from './model/BlueprintModelWorkspace';
+export { OperatorSummaryStrip } from './model/OperatorSummaryStrip';
+export { RequiresAttentionPanel } from './model/RequiresAttentionPanel';
+export { ModelDetailSection } from './model/ModelDetailSection';
+export { EvidenceChip } from './model/EvidenceChip';
 export { buildBlueprintCapacityRecords } from './blueprintCapacityRecords';
 
 // Mode-specific Headers

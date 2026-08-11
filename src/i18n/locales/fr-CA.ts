@@ -530,7 +530,7 @@ const frCA = {
       integrations: 'Intégrations',
     },
     tierBadge: 'Niveau {{tier}}',
-    racksBadge: '{{count}} baies',
+    racksBadge: '{{racks}} baies',
     deploymentReadiness: 'Préparation au déploiement',
     deploymentReadinessDesc: 'Examinez les problèmes de validation avant de déployer ce plan directeur en production.',
     agentsConfigured: 'Agents configurés',

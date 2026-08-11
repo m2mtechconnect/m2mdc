@@ -529,7 +529,7 @@ const en = {
       integrations: 'Integrations',
     },
     tierBadge: 'Tier {{tier}}',
-    racksBadge: '{{count}} Racks',
+    racksBadge: '{{racks}} Racks',
     deploymentReadiness: 'Deployment Readiness',
     deploymentReadinessDesc: 'Review validation issues before deploying this blueprint to production.',
     agentsConfigured: 'Agents Configured',

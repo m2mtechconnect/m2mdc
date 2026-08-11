@@ -278,7 +278,7 @@ export default function Blueprint() {
                 </Badge>
                 <Badge variant="outline">{t('blueprint.tierBadge', { tier: stripTierPrefix(blueprint.tier) })}</Badge>
                 <Badge variant="outline">{formatPower(blueprint.capacityKw)}</Badge>
-                <Badge variant="outline">{t('blueprint.racksBadge', { count: blueprint.racks })}</Badge>
+                <Badge variant="outline">{t('blueprint.racksBadge', { racks: blueprint.racks })}</Badge>
               </div>
 
               {/* Quick Stats - Enhanced with animations and hover effects */}

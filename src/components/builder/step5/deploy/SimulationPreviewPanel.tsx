@@ -1,8 +1,11 @@
 /**
  * Simulation Preview Panel
- * Shows industry-specific KPIs, event timeline, and simulation controls
- * 
- * ENHANCED: Now connects to live simulation engine for real-time KPI updates
+ * Read-only design-time preview of the industry KPI set, event template and
+ * historical runs.
+ *
+ * Stage 7H ownership rule: the Builder is a DESIGN surface. It must never
+ * configure, create, queue, start, pause, rerun or cancel a simulation. The
+ * only affordance is a handoff into the canonical Simulation workspace.
  */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -12,8 +15,8 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
-  Play, Clock, CheckCircle2, AlertCircle, Activity, 
-  TrendingUp, Zap, Info, Plus, Pause
+  Play, Clock, CheckCircle2, AlertCircle, Activity,
+  TrendingUp, Zap, Info, ArrowUpRight
 } from 'lucide-react';
 import { 
   getSimulationTemplateForIndustry, 
@@ -21,10 +24,8 @@ import {
   type SimulationTemplate,
   type SimulationKPI,
 } from '@/lib/simulationTemplates';
-import { useSimulation } from '@/simulation/useSimulation';
 import { SimulationKPICard } from './SimulationKPICard';
 import { SimulationEventTimeline } from './SimulationEventTimeline';
-import { getKpiValue } from '@/lib/kpiKeyMap';
 
 interface SimulationRun {
   id: string;
@@ -40,62 +41,26 @@ interface SimulationRun {
 interface SimulationPreviewPanelProps {
   simulationHistory: SimulationRun[];
   industry: string;
-  onRunSimulation: (scenario: string) => void;
-  isRunning: boolean;
+  /** Navigate to the canonical Simulation workspace. No run is created here. */
+  onOpenInSimulation: () => void;
 }
 
 export function SimulationPreviewPanel({
   simulationHistory,
   industry,
-  onRunSimulation,
-  isRunning
+  onOpenInSimulation,
 }: SimulationPreviewPanelProps) {
   const [template, setTemplate] = useState<SimulationTemplate | null>(null);
   const [isSampleData, setIsSampleData] = useState(true);
-  
-  // Connect to live simulation engine for real-time KPI data
-  const { 
-    status: simulationStatus, 
-    currentKpis, 
-    baselineKpis,
-    presetScenarios,
-    startScenario,
-    pause,
-    resume,
-    reset,
-    progress,
-  } = useSimulation();
-  
-  const isEngineRunning = simulationStatus === 'running';
-  
+
   useEffect(() => {
     const simTemplate = getSimulationTemplateForIndustry(industry);
     setTemplate(simTemplate);
-    setIsSampleData(simulationHistory.length === 0 && simulationStatus === 'idle');
-  }, [industry, simulationHistory.length, simulationStatus]);
+    setIsSampleData(simulationHistory.length === 0);
+  }, [industry, simulationHistory.length]);
 
-  // Create live KPIs by merging template definitions with live simulation data
-  const liveKpis = useMemo<SimulationKPI[]>(() => {
-    if (!template) return [];
-    
-    return template.kpis.map(kpi => {
-      // Use centralized getKpiValue which handles all aliases automatically
-      const hasLiveData = simulationStatus !== 'idle' && 
-                         Object.keys(currentKpis).length > 0;
-      
-      if (hasLiveData) {
-        // Use live simulation data with alias resolution
-        return {
-          ...kpi,
-          baseline: getKpiValue(baselineKpis, kpi.code, kpi.baseline),
-          simulated: getKpiValue(currentKpis, kpi.code, kpi.simulated),
-        };
-      }
-      
-      // Fall back to template static values
-      return kpi;
-    });
-  }, [template, currentKpis, baselineKpis, simulationStatus]);
+  // Design-time preview only: the template KPI definitions, never live values.
+  const previewKpis = useMemo<SimulationKPI[]>(() => template?.kpis ?? [], [template]);
 
   const industryLabel = getIndustryLabel(industry);
 
@@ -117,28 +82,12 @@ export function SimulationPreviewPanel({
   return (
     <div className="space-y-4">
       {/* Sample Data Info Banner - show only when idle with no history */}
-      {isSampleData && simulationStatus === 'idle' && (
+      {isSampleData && (
         <Alert className="bg-warning/10 border-warning/30">
           <Info className="h-4 w-4 text-warning" />
           <AlertDescription className="text-sm">
             Showing recommended sample KPIs for <strong>{industryLabel}</strong>.
-            Run a simulation scenario to see live KPI updates.
-          </AlertDescription>
-        </Alert>
-      )}
-      
-      {/* Live Simulation Status Banner */}
-      {isEngineRunning && (
-        <Alert className="bg-success/10 border-success/30">
-          <Activity className="h-4 w-4 text-success animate-pulse" />
-          <AlertDescription className="text-sm flex items-center justify-between">
-            <span>
-              Simulation running • <strong>{Math.round(progress)}%</strong> complete
-            </span>
-            <Button size="sm" variant="ghost" onClick={pause} className="h-6 gap-1">
-              <Pause className="h-3 w-3" />
-              Pause
-            </Button>
+            Open this design in the Simulation workspace to execute a scenario.
           </AlertDescription>
         </Alert>
       )}
@@ -146,8 +95,8 @@ export function SimulationPreviewPanel({
       {/* Simulation Header Card */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-1 min-w-0">
               <div className="flex items-center gap-2">
                 <CardTitle className="text-lg">{template.title}</CardTitle>
                 {isSampleData && (
@@ -159,12 +108,12 @@ export function SimulationPreviewPanel({
               <p className="text-sm text-muted-foreground">{template.description}</p>
             </div>
             <Button
-              onClick={() => onRunSimulation(template.defaultQuery)}
-              disabled={isRunning}
+              onClick={onOpenInSimulation}
+              variant="outline"
               className="gap-2"
             >
-              <Play className="h-4 w-4" />
-              {isRunning ? 'Running...' : 'Run Simulation'}
+              <ArrowUpRight className="h-4 w-4" />
+              Open in Simulation
             </Button>
           </div>
         </CardHeader>
@@ -175,18 +124,13 @@ export function SimulationPreviewPanel({
         <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
           <TrendingUp className="h-4 w-4" />
           Key Performance Indicators
-          {isEngineRunning && (
-            <Badge variant="outline" className="text-[10px] ml-2 bg-success/10 text-success border-success/30 animate-pulse">
-              LIVE
-            </Badge>
-          )}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {liveKpis.map((kpi) => (
+          {previewKpis.map((kpi) => (
             <SimulationKPICard 
               key={kpi.code} 
               kpi={kpi} 
-              isSampleData={isSampleData && simulationStatus === 'idle'} 
+              isSampleData={isSampleData}
             />
           ))}
         </div>
@@ -265,11 +209,10 @@ export function SimulationPreviewPanel({
                 variant="link" 
                 size="sm" 
                 className="px-0 h-auto mt-2"
-                onClick={() => onRunSimulation(template.defaultQuery)}
-                disabled={isRunning}
+                onClick={onOpenInSimulation}
               >
-                <Plus className="h-3 w-3 mr-1" />
-                Run this scenario
+                <ArrowUpRight className="h-3 w-3 mr-1" />
+                Open this scenario in Simulation
               </Button>
             </div>
           </div>

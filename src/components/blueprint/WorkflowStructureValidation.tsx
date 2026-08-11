@@ -123,7 +123,7 @@ export function WorkflowStructureValidation({ workflow, className }: Props) {
           <span>
             Structural validation only. It does not execute the workflow, does not create a
             simulation run and does not change facility state. Sample values shown in the registry
-            are modelled inputs, not measurements. Run scenarios in the Simulation workspace.
+            are modelled inputs, not measurements. Scenario execution lives in the Simulation workspace.
           </span>
         </div>
       </CardContent>

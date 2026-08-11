@@ -219,15 +219,14 @@ function calculateReadinessScore(issues: ValidationIssue[]): number {
 
 export function BlueprintValidationPanel({ blueprint, className }: BlueprintValidationPanelProps) {
   const { mode, canShow } = useBlueprintView();
-  
-  // Only show in designer mode
-  if (!canShow('showValidationWarnings')) {
-    return null;
-  }
-  
+
   const issues = useMemo(() => validateBlueprint(blueprint), [blueprint]);
   const readinessScore = useMemo(() => calculateReadinessScore(issues), [issues]);
-  
+
+  // Only show in designer mode. Checked after the hooks so hook order stays
+  // stable across renders.
+  const visible = canShow('showValidationWarnings');
+
   const errors = issues.filter(i => i.type === 'error');
   const warnings = issues.filter(i => i.type === 'warning');
   const infos = issues.filter(i => i.type === 'info');
@@ -265,6 +264,8 @@ export function BlueprintValidationPanel({ blueprint, className }: BlueprintVali
     }
   };
   
+  if (!visible) return null;
+
   return (
     <Card className={cn('', className)}>
       <CardHeader className="pb-3">

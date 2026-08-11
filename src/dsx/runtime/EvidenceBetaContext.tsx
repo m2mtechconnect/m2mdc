@@ -125,17 +125,22 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
         },
         { replace, preventScrollReset: true },
       );
-      if (location.hash && typeof window !== 'undefined' && !window.location.hash) {
-        // `setSearchParams` drops the fragment; restore it without a new entry.
-        window.history.replaceState(
-          window.history.state,
-          '',
-          `${window.location.pathname}${window.location.search}${location.hash}`,
-        );
-      }
     },
-    [setSearchParams, location.hash],
+    [setSearchParams],
   );
+
+  // `setSearchParams` rewrites the URL without a fragment, so a deep link's
+  // anchor would be lost the first time context is mirrored into the URL.
+  const arrivalHash = useRef(typeof window === 'undefined' ? '' : window.location.hash);
+  useEffect(() => {
+    if (!arrivalHash.current || typeof window === 'undefined') return;
+    if (window.location.hash === arrivalHash.current) return;
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${window.location.pathname}${window.location.search}${arrivalHash.current}`,
+    );
+  }, [location.search, location.pathname]);
 
   // Scenario and data mode are runtime facts; mirror them into the URL so a
   // deep link reproduces the same evidence, without ever implying live data.

@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { DCCard, DCSectionHeader, DCKPITile, DCStatusBadge } from '@/components/dc-ui';
 import { BlueprintReviewSection } from '@/components/blueprint';
+import { buildSimulationHandoffUrl } from '@/simulation/handoff';
 
 import {
   ReadinessChecklist,
@@ -45,7 +46,6 @@ export function Step5Deploy() {
   const [governanceConfig, setGovernanceConfig] = useState({ auditEnabled: true, tags: [] as string[] });
   const [currentVersion, setCurrentVersion] = useState('1.0.0');
   const [localKPIs, setLocalKPIs] = useState<any[]>([]);
-  const [isSimulationRunning, setIsSimulationRunning] = useState(false);
 
   const builderState = {
     goal, industry, department, type, template, workflow, modelConfig, kpis: localKPIs,
@@ -123,53 +123,16 @@ export function Step5Deploy() {
     setCurrentStep(step);
   };
 
-  const handleRunSimulation = async (scenario: string) => {
-    if (!builderId) {
-      toast.error('No builder ID available');
-      return;
-    }
-
-    setIsSimulationRunning(true);
-    
-    try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session?.user) {
-        throw new Error('Not authenticated');
-      }
-
-      const { data: run, error } = await supabase
-        .from('agent_runs')
-        .insert({
-          agent_id: builderId,
-          user_id: session.session.user.id,
-          status: 'completed',
-          input: { scenario, type: 'simulation' },
-          output: { summary: `Completed ${scenario} simulation successfully` },
-          duration_ms: Math.floor(1500 + Math.random() * 2000)
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setSimulationHistory(prev => [{
-        id: run.id,
-        scenario,
-        status: 'completed',
-        duration: run.duration_ms || 0,
-        timestamp: new Date(),
-        outputs: `Completed ${scenario} simulation successfully`,
-        events: Math.floor(5 + Math.random() * 10),
-        latency: run.duration_ms || 0
-      }, ...prev]);
-
-      toast.success(`Simulation "${scenario}" completed`);
-    } catch (err) {
-      console.error('[Step5] Simulation failed:', err);
-      toast.error('Simulation failed');
-    } finally {
-      setIsSimulationRunning(false);
-    }
+  /**
+   * Stage 7H: design surfaces hand off, they never execute. Navigation only.
+   */
+  const handleOpenInSimulation = () => {
+    navigate(
+      buildSimulationHandoffUrl({
+        blueprintId: builderId ?? 'default',
+        returnTab: 'simulation',
+      }),
+    );
   };
 
   const handleAddKPIs = (newKPIs: any[]) => {
@@ -361,8 +324,7 @@ export function Step5Deploy() {
           <SimulationPreviewPanel
             simulationHistory={simulationHistory}
             industry={industry}
-            onRunSimulation={handleRunSimulation}
-            isRunning={isSimulationRunning}
+            onOpenInSimulation={handleOpenInSimulation}
           />
         </TabsContent>
 

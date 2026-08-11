@@ -6,9 +6,7 @@
  * run controls are rendered here.
  */
 import { useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { PlayCircle } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { FacilityCanvas } from './FacilityCanvas';
 import { InspectorPanel } from './panels/InspectorPanel';
 import { KPI_DESCRIPTORS, formatPower, useFacilityModel, type KpiKey } from './facilityModel';
@@ -61,12 +59,8 @@ export function BlueprintModelSection() {
             <p key={note} className="text-[11px] text-muted-foreground">{note}</p>
           ))}
         </div>
-        <Button asChild size="sm" variant="outline">
-          <Link to="/simulation">
-            <PlayCircle className="mr-1.5 h-4 w-4" aria-hidden />
-            Run a scenario in Simulation
-          </Link>
-        </Button>
+        {/* Stage 7H: Blueprint exposes exactly one simulation handoff action,
+            in the Designer header. No duplicate entry point lives here. */}
       </div>
 
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_20rem]">

@@ -269,7 +269,7 @@ const frCA = {
     regionCanada: 'Canada', regionEu: 'Union européenne', regionGov: 'Gouvernement et réglementé', regionFinance: 'Services financiers', regionHealth: 'Santé',
     // Sections de fonctionnalités
     featureDashboardTitle: 'Tableau de bord de commandement du centre de données',
-    featureDashboardSubtitle: 'Vue unifiée de l\'EEE, la saturation GPU, la stabilité thermique et les métriques de calcul souverain avec assistance du copilote IA.',
+    featureDashboardSubtitle: 'Vue unifiée de l\'EEE, la saturation GPU, la stabilité thermique et les métriques de calcul souverain avec le soutien de l\'assistant AURA.',
     featureDashboardB1: 'Suivi EEE global avec indicateurs de tendance d\'amélioration',
     featureDashboardB2: 'Pourcentages en direct de saturation GPU et stabilité thermique',
     featureDashboardB3: 'Pourcentage de calcul souverain avec conformité juridictionnelle',
@@ -511,6 +511,11 @@ const frCA = {
     carbonKpis: 'IRC carbone',
     tabs: {
       model: "Modèle d'installation",
+      assets: 'Actifs et systèmes',
+      controls: 'Contrôles',
+      versions: 'Versions',
+      listLabel: 'Sections du plan directeur',
+      controlsListLabel: 'Vues des contrôles',
       overview: 'Aperçu',
       agents: 'Agents',
       data: 'Données',
@@ -956,7 +961,7 @@ const frCA = {
 
   // Copilote
   copilot: {
-    title: 'Copilote du centre de données',
+    title: 'Assistant AURA du centre de données',
     placeholder: "Posez une question sur l'EEE, le refroidissement, la saturation GPU, le carbone ou la souveraineté...",
     quickActions: {
       explainKPI: 'Expliquer cet IRC',
@@ -1058,7 +1063,7 @@ const frCA = {
   // Paramètres IA
   aiSettings: {
     title: 'Paramètres du moteur IA',
-    subtitle: 'Configurer Google Gemini (Vertex AI) pour le copilote M2M',
+    subtitle: 'Configurer Google Gemini (Vertex AI) pour l\'assistant AURA',
     gcpConfig: 'Configuration Google Cloud',
     projectId: 'ID du projet Google Cloud',
     region: 'Région',

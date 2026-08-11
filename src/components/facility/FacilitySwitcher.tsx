@@ -52,7 +52,7 @@ export function FacilitySwitcher({ className }: { className?: string }) {
             className="pl-8"
           />
         </div>
-        <ul className="max-h-72 overflow-y-auto" role="listbox" aria-label="Facilities">
+        <ul className="max-h-72 overflow-y-auto" aria-label="Facilities">
           {matches.length === 0 && (
             <li className="px-2 py-3 text-sm text-muted-foreground">No matching facility.</li>
           )}
@@ -60,8 +60,7 @@ export function FacilitySwitcher({ className }: { className?: string }) {
             <li key={t.id}>
               <button
                 type="button"
-                role="option"
-                aria-selected={t.id === activeTwinId}
+                aria-pressed={t.id === activeTwinId}
                 className="flex w-full min-h-[44px] items-center justify-between gap-2 rounded-md px-2 text-left text-sm hover:bg-muted"
                 onClick={() => {
                   useRecommendationStore.getState().clearRecommendation();

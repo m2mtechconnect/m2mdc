@@ -98,3 +98,53 @@ describe('Stage 7H — Builder is a design surface', () => {
     expect(src).toMatch(/Open in Simulation/);
   });
 });
+
+describe('Stage 7I — Blueprint terminology and mutation boundary', () => {
+  const MISLEADING = [
+    /Run simulation/i,
+    /Preview simulation/i,
+    /Start run/i,
+    /Run scenario/i,
+    /Apply workflow/i,
+    /Co-?Pilot/i,
+  ];
+
+  /**
+   * Only user-visible text is audited: imports, comments and internal
+   * identifiers (CoPilotContext, showCoPilotPanel) are implementation names,
+   * not labels a data-centre operator ever reads.
+   */
+  function visibleLines(src: string): string[] {
+    return src
+      .split('\n')
+      .filter((line) => !/^\s*(import|\/\/|\*|\/\*)/.test(line))
+      .map((line) => line.replace(/\b\w*[Cc]o-?[Pp]ilot\w*\b(?=[\s.,)]*[({=]|Panel|Context|Props)/g, ''))
+      .map((line) => line.replace(/[A-Za-z]*CoPilot[A-Za-z]*/g, ''));
+  }
+
+  it('contains no misleading execution or legacy assistant labels', () => {
+    const offenders: string[] = [];
+    for (const file of BLUEPRINT_FILES) {
+      const lines = visibleLines(readFileSync(file, 'utf8'));
+      for (const pattern of MISLEADING) {
+        const hit = lines.find((line) => pattern.test(line));
+        if (hit) offenders.push(`${file} :: ${pattern} :: ${hit.trim().slice(0, 80)}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+
+  it('never issues a simulation write through the backend client', () => {
+    const offenders = BLUEPRINT_FILES.filter((file) => {
+      const src = readFileSync(file, 'utf8');
+      return /from\('(simulation|simulation_runs|scenario_runs|simulations)'\)/.test(src)
+        || /functions\.invoke\(\s*['"][^'"]*(simulat|solver|scenario)/i.test(src);
+    });
+    expect(offenders).toEqual([]);
+  });
+
+  it('keeps workflow validation structural only', () => {
+    const src = readFileSync('src/components/blueprint/tabs/BlueprintWorkflowsTab.tsx', 'utf8');
+    expect(src).not.toMatch(/execute|solver|queueRun/i);
+  });
+});

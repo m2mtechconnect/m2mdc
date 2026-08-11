@@ -50,8 +50,17 @@ import { BlueprintDataTab } from '@/components/blueprint/tabs/BlueprintDataTab';
 import { BlueprintKPIsTab } from '@/components/blueprint/tabs/BlueprintKPIsTab';
 import { BlueprintWorkflowsTab } from '@/components/blueprint/tabs/BlueprintWorkflowsTab';
 import { BlueprintRolesTab } from '@/components/blueprint/tabs/BlueprintRolesTab';
+import { ChangeLogPanel } from '@/components/blueprint/ChangeLogPanel';
+import {
+  CONTROLS_SUBTABS,
+  DEFAULT_TAB,
+  canonicalTabParams,
+  resolveBlueprintTabState,
+  type BlueprintTab,
+  type ControlsSubtab,
+} from '@/pages/blueprint/tabModel';
 
-// Co-Pilot Components
+// Assistant components
 import { BlueprintCoPilotPanel, CoPilotModeHeader } from '@/components/copilot';
 
 // UI Polish Components
@@ -78,27 +87,6 @@ const STAT_TONES = {
 } as const;
 
 type StatTone = keyof typeof STAT_TONES;
-
-/**
- * Blueprint tabs. Scenario configuration and run execution are owned by the
- * Simulation workspace, so there is no scenarios tab here.
- */
-const BLUEPRINT_TABS = [
-  'model',
-  'overview',
-  'agents',
-  'data',
-  'kpis',
-  'workflows',
-  'roles',
-  'validation',
-] as const;
-type BlueprintTab = (typeof BLUEPRINT_TABS)[number];
-const DEFAULT_TAB: BlueprintTab = 'model';
-
-function isBlueprintTab(value: string | null): value is BlueprintTab {
-  return !!value && (BLUEPRINT_TABS as readonly string[]).includes(value);
-}
 
 /** Tier values arrive either as "III" or already prefixed as "Tier III". */
 function stripTierPrefix(tier: string): string {
@@ -196,20 +184,26 @@ export default function Blueprint() {
   
   // Read tab and highlight from query params
   const tabParam = searchParams.get('tab');
+  const subParam = searchParams.get('sub');
   const highlightParam = searchParams.get('highlight');
-  // The URL is the single source of truth for the active tab.
-  const activeTab: BlueprintTab = isBlueprintTab(tabParam) ? tabParam : DEFAULT_TAB;
+  // The URL is the single source of truth for the active tab and subtab.
+  const tabState = resolveBlueprintTabState(tabParam, subParam);
+  const activeTab: BlueprintTab = tabState.tab;
+  const activeSubtab: ControlsSubtab = tabState.sub;
 
-  // Normalization only (invalid tab, legacy `scenarios` link, missing param)
-  // uses replace so it never adds a history entry the user did not create.
+  // Normalization only (invalid tab, legacy eight-tab deep link, missing
+  // Controls subtab) uses replace so it never adds a history entry the user
+  // did not create.
   useEffect(() => {
-    if (tabParam !== null && !isBlueprintTab(tabParam)) {
-      const next = new URLSearchParams(searchParams);
-      next.set('tab', DEFAULT_TAB);
-      setSearchParams(next, { replace: true });
-    }
+    if (!tabState.normalized) return;
+    const next = new URLSearchParams(searchParams);
+    const canonical = canonicalTabParams(tabState);
+    next.set('tab', canonical.tab);
+    if (canonical.sub) next.set('sub', canonical.sub);
+    else next.delete('sub');
+    setSearchParams(next, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabParam]);
+  }, [tabParam, subParam, tabState.normalized]);
 
   // A deliberate tab selection is a navigation: push, so Browser Back and
   // Forward traverse tab changes. Re-selecting the active tab is a no-op.
@@ -217,6 +211,17 @@ export default function Blueprint() {
     if (value === activeTab) return;
     const next = new URLSearchParams(searchParams);
     next.set('tab', value);
+    if (value === 'controls') next.set('sub', activeSubtab);
+    else next.delete('sub');
+    setSearchParams(next, { replace: false });
+  };
+
+  // Controls subtab selection is equally deliberate navigation.
+  const handleSubtabChange = (value: string) => {
+    if (value === activeSubtab) return;
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', 'controls');
+    next.set('sub', value);
     setSearchParams(next, { replace: false });
   };
 
@@ -269,11 +274,11 @@ export default function Blueprint() {
                     {t('blueprint.back')}
                   </Button>
                   
-                  {/* Co-Pilot Mode Header */}
+                  {/* Assistant mode header */}
                   <CoPilotModeHeader mode="blueprint-designer" />
                 </div>
                 <div className="flex min-w-0 flex-wrap gap-2">
-                  {/* Toggle Co-Pilot Panel */}
+                  {/* Toggle assistant panel */}
                   <Button
                     variant={showCoPilotPanel ? 'secondary' : 'outline'}
                     onClick={() => setShowCoPilotPanel(!showCoPilotPanel)}
@@ -352,7 +357,7 @@ export default function Blueprint() {
                 </div>
               )}
 
-              {/* Co-Pilot Quick Actions - Enhanced */}
+              {/* Assistant quick actions */}
               <div className="flex items-center gap-3 p-4 rounded-xl border bg-gradient-to-r from-primary/5 via-background to-primary/5 mb-6 animate-fade-in hover:shadow-md transition-all duration-300">
                 <div className="p-2 rounded-lg bg-primary/10">
                   <Sparkles className="h-4 w-4 text-primary animate-pulse" />
@@ -391,25 +396,29 @@ export default function Blueprint() {
 
               {/* Main Tabs - Enhanced with better styling */}
               <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-                <TabsList className="w-full justify-start border-b rounded-none bg-transparent p-0 h-auto flex-wrap gap-1">
+                <TabsList
+                  aria-label={t('blueprint.tabs.listLabel')}
+                  className="w-full justify-start border-b rounded-none bg-transparent p-0 h-auto flex-wrap gap-1"
+                >
                   {[
                     { value: 'model', label: t('blueprint.tabs.model') },
-                    { value: 'overview', label: t('blueprint.tabs.overview') },
-                    { value: 'agents', label: t('blueprint.tabs.agents') },
-                    { value: 'data', label: t('blueprint.tabs.data') },
-                    { value: 'kpis', label: t('blueprint.tabs.kpis') },
-                    { value: 'workflows', label: t('blueprint.tabs.workflows') },
-                    { value: 'roles', label: t('blueprint.tabs.roles') },
+                    { value: 'assets', label: t('blueprint.tabs.assets') },
+                    { value: 'controls', label: t('blueprint.tabs.controls') },
                     { value: 'validation', label: t('blueprint.tabs.validation') },
+                    { value: 'versions', label: t('blueprint.tabs.versions') },
                   ].map((tab) => (
                     <TabsTrigger 
                       key={tab.value}
                       value={tab.value}
+                      data-blueprint-tab={tab.value}
                       className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2.5 text-muted-foreground data-[state=active]:text-foreground hover:text-foreground transition-all duration-200 data-[state=active]:font-medium"
                     >
                       {tab.label}
                       {activeTab === tab.value && (
-                        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary animate-pulse" />
+                        <span
+                          aria-hidden="true"
+                          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary motion-safe:animate-pulse"
+                        />
                       )}
                     </TabsTrigger>
                   ))}
@@ -419,23 +428,33 @@ export default function Blueprint() {
                   <TabsContent value="model" className="m-0">
                     <BlueprintModelSection />
                   </TabsContent>
-                  <TabsContent value="overview" className="m-0">
+                  <TabsContent value="assets" className="m-0 space-y-8">
                     <BlueprintOverviewTab blueprint={blueprint} summary={summary} />
-                  </TabsContent>
-                  <TabsContent value="agents" className="m-0">
-                    <BlueprintAgentsTab agents={blueprint.agents} domains={blueprint.domains} highlightAgentId={highlightParam || undefined} />
-                  </TabsContent>
-                  <TabsContent value="data" className="m-0">
                     <BlueprintDataTab dataSources={blueprint.dataSources} integrations={blueprint.integrations} />
-                  </TabsContent>
-                  <TabsContent value="kpis" className="m-0">
-                    <BlueprintKPIsTab kpis={blueprint.kpis} />
-                  </TabsContent>
-                  <TabsContent value="workflows" className="m-0">
-                    <BlueprintWorkflowsTab workflows={blueprint.workflows} />
-                  </TabsContent>
-                  <TabsContent value="roles" className="m-0">
                     <BlueprintRolesTab roles={blueprint.humanRoles} />
+                  </TabsContent>
+                  <TabsContent value="controls" className="m-0">
+                    <Tabs value={activeSubtab} onValueChange={handleSubtabChange} className="w-full">
+                      <TabsList
+                        aria-label={t('blueprint.tabs.controlsListLabel')}
+                        className="mb-6 flex-wrap"
+                      >
+                        {CONTROLS_SUBTABS.map((sub) => (
+                          <TabsTrigger key={sub} value={sub} data-blueprint-subtab={sub}>
+                            {t(`blueprint.tabs.${sub}`)}
+                          </TabsTrigger>
+                        ))}
+                      </TabsList>
+                      <TabsContent value="agents" className="m-0">
+                        <BlueprintAgentsTab agents={blueprint.agents} domains={blueprint.domains} highlightAgentId={highlightParam || undefined} />
+                      </TabsContent>
+                      <TabsContent value="kpis" className="m-0">
+                        <BlueprintKPIsTab kpis={blueprint.kpis} />
+                      </TabsContent>
+                      <TabsContent value="workflows" className="m-0">
+                        <BlueprintWorkflowsTab workflows={blueprint.workflows} />
+                      </TabsContent>
+                    </Tabs>
                   </TabsContent>
                   <TabsContent value="validation" className="m-0">
                     <div className="grid lg:grid-cols-2 gap-6">
@@ -473,12 +492,15 @@ export default function Blueprint() {
                       </Card>
                     </div>
                   </TabsContent>
+                  <TabsContent value="versions" className="m-0">
+                    <ChangeLogPanel />
+                  </TabsContent>
                 </div>
               </Tabs>
             </div>
           </div>
 
-          {/* Co-Pilot Side Panel */}
+          {/* Assistant side panel */}
           {showCoPilotPanel && (
             <div className="fixed right-0 top-16 bottom-0 w-96 border-l bg-background shadow-lg z-40 overflow-hidden">
               <BlueprintCoPilotPanel activeTab={activeTab} className="h-full" />

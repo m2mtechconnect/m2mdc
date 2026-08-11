@@ -137,7 +137,7 @@ export function OmniverseStreamViewer({
     demo:         'bg-amber-500/10 text-amber-700 border-amber-500/30',
     connecting:   'bg-yellow-500/10 text-yellow-600 border-yellow-500/30',
     connected:    'bg-emerald-500/10 text-emerald-600 border-emerald-500/30',
-    degraded:     'bg-orange-500/10 text-orange-600 border-orange-500/30',
+    degraded:     'bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-500/40',
     unavailable:  'bg-rose-500/10 text-rose-600 border-rose-500/30',
   };
 

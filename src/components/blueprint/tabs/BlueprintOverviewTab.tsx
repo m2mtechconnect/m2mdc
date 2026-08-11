@@ -27,7 +27,6 @@ import type { DataCentreBlueprint, BlueprintSummary } from '@/types/dataCentreBl
 import { ExecutiveSummaryBlock } from '../ExecutiveSummaryBlock';
 import { DomainHealthMap } from '../DomainHealthMap';
 import { DependencyGraph } from '../DependencyGraph';
-import { ChangeLogPanel } from '../ChangeLogPanel';
 import { AgentHealthPanel } from '../AgentHealthPanel';
 import { KPIEnhancementsPanel } from '../KPIEnhancementsPanel';
 import { WorkflowEnhancementsPanel } from '../WorkflowEnhancementsPanel';
@@ -302,7 +301,6 @@ export function BlueprintOverviewTab({ blueprint, summary }: BlueprintOverviewTa
       {/* SECTION 11: Real-Time Change Log */}
       {/* Audit trail of all builder edits */}
       {/* ============================================== */}
-      <ChangeLogPanel />
     </div>
   );
 }

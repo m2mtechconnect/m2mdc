@@ -173,7 +173,7 @@ export function DesignerModeHeader({
                 <div>
                   <p className="text-xs font-medium text-foreground">Simulation access required</p>
                   <p className="text-[11px] text-muted-foreground">
-                    You can view this blueprint, but your role cannot configure or run simulations.
+                    You can view this blueprint, but your role cannot configure or start simulation runs.
                   </p>
                 </div>
               </div>

@@ -268,7 +268,7 @@ const en = {
     regionCanada: 'Canada', regionEu: 'European Union', regionGov: 'Government & Regulated', regionFinance: 'Financial Services', regionHealth: 'Healthcare',
     // Feature Sections
     featureDashboardTitle: 'Data Centre Command Dashboard',
-    featureDashboardSubtitle: 'Single pane of glass for PUE, GPU Saturation, Thermal Stability, and Sovereign Compute metrics with AI Co-Pilot assistance.',
+    featureDashboardSubtitle: 'Single pane of glass for PUE, GPU Saturation, Thermal Stability, and Sovereign Compute metrics with AURA Assistant support.',
     featureDashboardB1: 'Global PUE tracking with trend improvement indicators',
     featureDashboardB2: 'GPU Saturation and Thermal Stability simulated percentages',
     featureDashboardB3: 'Sovereign Compute percentage with jurisdiction compliance',
@@ -510,6 +510,11 @@ const en = {
     carbonKpis: 'Carbon KPIs',
     tabs: {
       model: 'Facility model',
+      assets: 'Assets & Systems',
+      controls: 'Controls',
+      versions: 'Versions',
+      listLabel: 'Blueprint sections',
+      controlsListLabel: 'Controls views',
       overview: 'Overview',
       agents: 'Agents',
       data: 'Data',
@@ -1057,7 +1062,7 @@ const en = {
   // AI Settings
   aiSettings: {
     title: 'AI Engine Settings',
-    subtitle: 'Configure Google Gemini (Vertex AI) for M2M Co-Pilot',
+    subtitle: 'Configure Google Gemini (Vertex AI) for AURA Assistant',
     gcpConfig: 'Google Cloud Configuration',
     projectId: 'Google Cloud Project ID',
     region: 'Region',

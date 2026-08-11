@@ -350,7 +350,7 @@ function WebGLFallback({ report, compact, onRetry }: WebGLFallbackProps) {
           )}
         </div>
         {report.renderer && (
-          <p className="text-[11px] text-slate-600 font-mono truncate">
+          <p className="text-[11px] text-slate-300 font-mono truncate">
             Renderer: {report.renderer}
           </p>
         )}

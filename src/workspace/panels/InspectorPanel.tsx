@@ -41,13 +41,12 @@ export function InspectorPanel({ facility, assets }: Props) {
       </div>
 
       <div className="max-h-44 overflow-y-auto rounded-md border border-border">
-        <ul role="listbox" aria-label="Facility assets">
+        <ul aria-label="Facility assets">
           {filtered.map((asset) => (
             <li key={asset.id}>
               <button
                 type="button"
-                role="option"
-                aria-selected={asset.id === selected?.id}
+                aria-pressed={asset.id === selected?.id}
                 onClick={() => selectAsset(asset.id)}
                 className={cn(
                   'flex w-full items-center justify-between px-3 py-1.5 text-left text-xs transition-colors',

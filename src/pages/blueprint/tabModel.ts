@@ -1,5 +1,5 @@
 /**
- * Stage 7I — Blueprint tab architecture.
+ * Stage 7I - Blueprint tab architecture.
  *
  * Blueprint exposes exactly FIVE top-level tabs. Agents, KPIs and Workflows
  * are nested views inside Controls, never top-level Blueprint tabs.
@@ -48,6 +48,26 @@ const LEGACY_TABS: Record<string, { tab: BlueprintTab; sub?: ControlsSubtab }> =
   // workspace; the legacy Blueprint link lands on the model.
   scenarios: { tab: 'model' },
 };
+
+/**
+ * Stage 7K closure: registries that Blueprint no longer owns. Legacy deep
+ * links are preserved by redirecting to their canonical Manage destination
+ * rather than by reproducing the registry inside Blueprint.
+ */
+const LEGACY_MANAGE_REDIRECTS: Record<string, string> = {
+  data: '/manage/integrations',
+  datasources: '/manage/integrations',
+  'data-sources': '/manage/integrations',
+  integrations: '/manage/integrations',
+  connectors: '/manage/integrations',
+};
+
+/** Manage route for a legacy registry deep link, or null when Blueprint owns it. */
+export function legacyManageRedirect(tabParam: string | null): string | null {
+  if (!tabParam) return null;
+  if (isBlueprintTab(tabParam)) return null;
+  return LEGACY_MANAGE_REDIRECTS[tabParam] ?? null;
+}
 
 export function isBlueprintTab(value: string | null | undefined): value is BlueprintTab {
   return !!value && (BLUEPRINT_TABS as readonly string[]).includes(value);

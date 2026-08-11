@@ -48,6 +48,7 @@ export default defineConfig({
     // Any accidental network egress is caught by the network guard
     // fixture; the ignoreHTTPSErrors here just avoids TLS noise on
     // aborted external calls.
+    reducedMotion: 'reduce',
     ignoreHTTPSErrors: true,
   },
   projects: [{

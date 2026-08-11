@@ -8,6 +8,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { formatPower } from '@/lib/units/power';
 import {
   TrendingUp,
   Leaf,
@@ -123,7 +124,7 @@ export function ExecutiveSummaryBlock({ className, twinId }: ExecutiveSummaryBlo
           Executive Summary
         </h2>
         <Badge variant="outline" className="text-xs hover:bg-muted/50 transition-colors">
-          {overview.tier} • {overview.capacityKw.toLocaleString()} kW
+          {overview.tier} • {formatPower(overview.capacityKw)}
         </Badge>
       </div>
 

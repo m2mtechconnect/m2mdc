@@ -7,6 +7,7 @@
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { formatPower } from '@/lib/units/power';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -193,7 +194,7 @@ function validateBlueprint(blueprint: DataCentreBlueprint): ValidationIssue[] {
       type: 'warning',
       category: 'performance',
       message: 'Large facility with limited agent coverage',
-      suggestion: `${blueprint.capacityKw}kW facility should have more monitoring agents`,
+      suggestion: `${formatPower(blueprint.capacityKw)} facility should have more monitoring agents`,
     });
   }
   

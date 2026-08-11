@@ -7,6 +7,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { formatPower } from '@/lib/units/power';
 import { 
   Eye, ExternalLink, FileText, Lock, 
   Cpu, Zap, Thermometer, Globe
@@ -69,7 +70,7 @@ export function DesignViewHeader({
           </Badge>
           <Badge variant="outline" className="gap-1.5 px-3 py-1">
             <Zap className="h-3.5 w-3.5" />
-            {capacityKw.toLocaleString()} kW
+            {formatPower(capacityKw)}
           </Badge>
           <Badge variant="outline" className="gap-1.5 px-3 py-1">
             <Thermometer className="h-3.5 w-3.5" />

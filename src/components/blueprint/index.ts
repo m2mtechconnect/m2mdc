@@ -41,9 +41,11 @@ export { ReadOnlyGuard, useReadOnlyMode, withReadOnlyDisabled } from './ReadOnly
 // Tab Components
 export { BlueprintOverviewTab } from './tabs/BlueprintOverviewTab';
 export { BlueprintAgentsTab } from './tabs/BlueprintAgentsTab';
-export { BlueprintDataTab } from './tabs/BlueprintDataTab';
 export { BlueprintKPIsTab } from './tabs/BlueprintKPIsTab';
 export { BlueprintWorkflowsTab } from './tabs/BlueprintWorkflowsTab';
-export { BlueprintRolesTab } from './tabs/BlueprintRolesTab';
+
+// Stage 7K closure: data-source / integration registries and Human Roles are
+// owned by Manage, not Blueprint.
+export { AssetConnectivitySummary } from './assets/AssetConnectivitySummary';
 export { SimulationHandoffDialog } from './SimulationHandoffDialog';
 export type { SimulationHandoffPreview } from './SimulationHandoffDialog';

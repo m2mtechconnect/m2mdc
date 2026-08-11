@@ -36,7 +36,7 @@ import { buildBlueprintCapacityRecords } from '@/components/blueprint/blueprintC
 // Blueprint Tab Components
 import { BlueprintOverviewTab } from '@/components/blueprint/tabs/BlueprintOverviewTab';
 import { BlueprintAgentsTab } from '@/components/blueprint/tabs/BlueprintAgentsTab';
-import { BlueprintDataTab } from '@/components/blueprint/tabs/BlueprintDataTab';
+import { AssetConnectivitySummary } from '@/components/blueprint/assets/AssetConnectivitySummary';
 import { BlueprintKPIsTab } from '@/components/blueprint/tabs/BlueprintKPIsTab';
 import { BlueprintWorkflowsTab } from '@/components/blueprint/tabs/BlueprintWorkflowsTab';
 import { ChangeLogPanel } from '@/components/blueprint/ChangeLogPanel';
@@ -44,6 +44,7 @@ import {
   CONTROLS_SUBTABS,
   DEFAULT_TAB,
   canonicalTabParams,
+  legacyManageRedirect,
   resolveBlueprintTabState,
   type BlueprintTab,
   type ControlsSubtab,
@@ -178,10 +179,18 @@ export default function Blueprint() {
   const activeTab: BlueprintTab = tabState.tab;
   const activeSubtab: ControlsSubtab = tabState.sub;
 
+  // Stage 7K closure: legacy registry deep links (?tab=data, ?tab=integrations)
+  // are preserved by redirecting to Manage, which owns those registries.
+  const manageRedirect = legacyManageRedirect(tabParam);
+  useEffect(() => {
+    if (manageRedirect) navigate(manageRedirect, { replace: true });
+  }, [manageRedirect, navigate]);
+
   // Normalization only (invalid tab, legacy eight-tab deep link, missing
   // Controls subtab) uses replace so it never adds a history entry the user
   // did not create.
   useEffect(() => {
+    if (manageRedirect) return;
     if (!tabState.normalized) return;
     const next = new URLSearchParams(searchParams);
     const canonical = canonicalTabParams(tabState);
@@ -318,8 +327,16 @@ export default function Blueprint() {
                   </TabsContent>
                   <TabsContent value="assets" className="m-0 space-y-8">
                     <BlueprintOverviewTab blueprint={blueprint} summary={summary} />
-                    <BlueprintDataTab dataSources={blueprint.dataSources} integrations={blueprint.integrations} />
-                    {/* Stage 7K: Human Roles are owned by Manage, not Blueprint. */}
+                    {/*
+                      Stage 7K closure: the data-source and integration
+                      registries are owned by Manage → Integrations. Assets
+                      shows a contextual count and a link only. Human Roles are
+                      likewise owned by Manage.
+                    */}
+                    <AssetConnectivitySummary
+                      dataSourceCount={blueprint.dataSources.length}
+                      integrationCount={blueprint.integrations.length}
+                    />
                   </TabsContent>
                   <TabsContent value="controls" className="m-0">
                     <Tabs value={activeSubtab} onValueChange={handleSubtabChange} className="w-full">

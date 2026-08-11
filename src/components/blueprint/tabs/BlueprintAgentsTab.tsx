@@ -22,7 +22,7 @@ import {
   Activity,
   AlertTriangle,
   ExternalLink,
-  Play
+  MessageSquare
 } from 'lucide-react';
 import { AGENTS, getAgentSummary } from '@/ux';
 import type { AgentBlueprint, DomainSection } from '@/types/dataCentreBlueprint';

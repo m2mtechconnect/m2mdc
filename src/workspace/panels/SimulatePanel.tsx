@@ -94,7 +94,7 @@ export function SimulatePanel({ facility }: Props) {
           <li>Scenario: {scenario?.label ?? 'None selected'}</li>
           <li>Solver / model: Deterministic rule model ({CLASSIFICATION_LABEL['modeled-assumption']})</li>
           <li>Fidelity: Reduced-order, minute resolution</li>
-          <li>Time horizon: {scenario ? `${scenario.horizonMinutes ?? 60} minutes` : 'Unavailable'}</li>
+          <li>Time horizon: {scenario ? `${scenario.durationMinutes} minutes` : 'Unavailable'}</li>
           <li>Input source: Synthetic modelled inputs, no live telemetry</li>
           <li>Limitations: Outputs are simulated and carry no measurement evidence</li>
         </ul>

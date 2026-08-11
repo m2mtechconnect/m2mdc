@@ -4,11 +4,20 @@
  * Stage 6B: the Blueprint owns the model and its hierarchy. Scenario
  * execution, comparison and review live in the Simulation workspace, so no
  * run controls are rendered here.
+ *
+ * Stage 7K: the visualization dominates the workspace. The inspector is
+ * rendered exactly once - as a docked panel on desktop and as an accessible
+ * bottom sheet on mobile - so no hidden responsive duplicate reaches the
+ * accessibility tree.
  */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FacilityCanvas } from './FacilityCanvas';
 import { InspectorPanel } from './panels/InspectorPanel';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { PanelRightOpen } from 'lucide-react';
 import {
   KPI_DESCRIPTORS,
   formatPower,
@@ -32,6 +41,8 @@ export function BlueprintModelSection({ facilityOverride }: BlueprintModelSectio
   const { facility, assets, isFallback, naming, modelNotes } = useFacilityModel(facilityOverride);
   const [searchParams] = useSearchParams();
   const { setOverlay } = useTwinOverlaySafe();
+  const isMobile = useIsMobile();
+  const [inspectorOpen, setInspectorOpen] = useState(false);
 
   // Drilldown context from the Command Centre: `layer` selects the model
   // overlay, `kpi` explains which indicator the user came from.
@@ -78,14 +89,46 @@ export function BlueprintModelSection({ facilityOverride }: BlueprintModelSectio
             in the Designer header. No duplicate entry point lives here. */}
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <div className="h-[28rem] overflow-hidden rounded-lg border border-border">
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_21rem]">
+        <div
+          className="h-[24rem] overflow-hidden rounded-lg border border-border md:h-[30rem]"
+          data-testid="blueprint-model-canvas"
+        >
           <FacilityCanvas facility={facility} />
         </div>
-        <div className="max-h-[28rem] overflow-y-auto rounded-lg border border-border bg-card p-3">
-          <h2 className="mb-2 text-sm font-semibold text-foreground">Asset hierarchy</h2>
-          <InspectorPanel facility={facility} assets={assets} />
-        </div>
+
+        {isMobile ? (
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              className="min-h-11 w-full gap-1.5"
+              onClick={() => setInspectorOpen(true)}
+              data-testid="blueprint-inspector-trigger"
+            >
+              <PanelRightOpen className="h-4 w-4" aria-hidden />
+              Inspect assets
+            </Button>
+            <Sheet open={inspectorOpen} onOpenChange={setInspectorOpen}>
+              <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle className="text-sm">Asset hierarchy</SheetTitle>
+                </SheetHeader>
+                <div className="mt-3">
+                  <InspectorPanel facility={facility} assets={assets} />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </>
+        ) : (
+          <div
+            className="max-h-[30rem] overflow-y-auto rounded-lg border border-border bg-card p-3"
+            data-testid="blueprint-inspector"
+          >
+            <h2 className="mb-2 text-sm font-semibold text-foreground">Asset hierarchy</h2>
+            <InspectorPanel facility={facility} assets={assets} />
+          </div>
+        )}
       </div>
     </section>
   );

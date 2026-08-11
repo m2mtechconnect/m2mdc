@@ -39,7 +39,6 @@ import { BlueprintAgentsTab } from '@/components/blueprint/tabs/BlueprintAgentsT
 import { BlueprintDataTab } from '@/components/blueprint/tabs/BlueprintDataTab';
 import { BlueprintKPIsTab } from '@/components/blueprint/tabs/BlueprintKPIsTab';
 import { BlueprintWorkflowsTab } from '@/components/blueprint/tabs/BlueprintWorkflowsTab';
-import { BlueprintRolesTab } from '@/components/blueprint/tabs/BlueprintRolesTab';
 import { ChangeLogPanel } from '@/components/blueprint/ChangeLogPanel';
 import {
   CONTROLS_SUBTABS,
@@ -55,7 +54,7 @@ import { BlueprintCoPilotPanel } from '@/components/copilot';
 
 // UI Polish Components
 import { LoadingState, SnapshotNotFoundEmptyState } from '@/components/ui/empty-state';
-import { BlueprintModelSection } from '@/workspace/BlueprintModelSection';
+import { BlueprintModelWorkspace } from '@/components/blueprint/model/BlueprintModelWorkspace';
 import { formatPower } from '@/workspace/facilityModel';
 import { normalizeLocation } from '@/lib/location/normalizeLocation';
 import { classifyCreateTwinFields } from '@/lib/provenance/twinFieldProvenance';
@@ -269,36 +268,10 @@ export default function Blueprint() {
               />
 
               {/*
-                Counts the Blueprint owns are shown plainly. Roles and
-                Integrations are referenced from other workspaces, and
-                Scenarios are owned by Simulation, so they are not presented
-                here as Blueprint-owned configuration.
+                Stage 7K: Blueprint-owned counts are vanity totals on the Model
+                page. They now live in their owning tabs (Controls, Validation)
+                and are referenced from the Linked configuration group.
               */}
-              {summary && (
-                <div className="mb-4 grid grid-cols-2 gap-2 md:grid-cols-4">
-                  {[
-                    { icon: Bot, label: t('blueprint.stats.agents'), value: summary.totalAgents, tone: 'primary' as StatTone },
-                    { icon: Database, label: t('blueprint.stats.dataSources'), value: summary.totalDataSources, tone: 'info' as StatTone },
-                    { icon: Activity, label: t('blueprint.stats.kpis'), value: summary.totalKpis, tone: 'success' as StatTone },
-                    { icon: GitBranch, label: t('blueprint.stats.workflows'), value: summary.totalWorkflows, tone: 'warning' as StatTone },
-                  ].map((stat) => {
-                    const Icon = stat.icon;
-                    const tone = STAT_TONES[stat.tone];
-                    return (
-                      <div
-                        key={stat.label}
-                        className="flex items-center gap-2 rounded-lg border bg-card p-2"
-                      >
-                        <div className={`rounded p-1 ${tone.chip}`}>
-                          <Icon className={`h-3.5 w-3.5 text-muted-foreground ${tone.icon}`} aria-hidden />
-                        </div>
-                        <span className="truncate text-xs text-muted-foreground">{stat.label}</span>
-                        <span className="ml-auto text-sm font-semibold text-foreground">{stat.value}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
 
 
               {/* Main Tabs - Enhanced with better styling */}
@@ -333,20 +306,20 @@ export default function Blueprint() {
 
                 <div className="mt-6">
                   <TabsContent value="model" className="m-0">
-                    <BlueprintModelSection
-                      facilityOverride={{
-                        id: blueprint.twinId || blueprintId,
-                        name: blueprint.name,
-                        city: twin?.city ?? undefined,
-                        tier: blueprint.tier,
-                        capacityKw: blueprint.capacityKw,
-                      }}
+                    {/* Stage 7K: operator workspace, not a full system report. */}
+                    <BlueprintModelWorkspace
+                      blueprint={blueprint}
+                      summary={summary}
+                      blueprintPath={`/blueprint/${blueprintId}`}
+                      capacityNote={capacityNote}
+                      dbTwinData={dbTwinData}
+                      city={twin?.city ?? undefined}
                     />
                   </TabsContent>
                   <TabsContent value="assets" className="m-0 space-y-8">
                     <BlueprintOverviewTab blueprint={blueprint} summary={summary} />
                     <BlueprintDataTab dataSources={blueprint.dataSources} integrations={blueprint.integrations} />
-                    <BlueprintRolesTab roles={blueprint.humanRoles} />
+                    {/* Stage 7K: Human Roles are owned by Manage, not Blueprint. */}
                   </TabsContent>
                   <TabsContent value="controls" className="m-0">
                     <Tabs value={activeSubtab} onValueChange={handleSubtabChange} className="w-full">

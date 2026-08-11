@@ -24,6 +24,7 @@ import {
   PanelRightOpen,
   Save,
   Server,
+  MoreHorizontal,
 } from 'lucide-react';
 import { useMemo, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -31,6 +32,12 @@ import { buildSimulationHandoffUrl, useSimulationPermissions } from '@/simulatio
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { SimulationHandoffDialog } from './SimulationHandoffDialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface DesignerModeHeaderProps {
   twinName?: string;
@@ -80,7 +87,7 @@ export function DesignerModeHeader({
   onDownload,
   assistantOpen = false,
   onToggleAssistant,
-  assistantLabel = 'Assistant',
+  assistantLabel = 'AURA Assistant',
   extraAction,
 }: DesignerModeHeaderProps) {
   const navigate = useNavigate();
@@ -173,12 +180,6 @@ export function DesignerModeHeader({
             </Button>
           )}
           {extraAction}
-          {onDownload && (
-            <Button variant="outline" size="sm" className="h-8 gap-1.5" onClick={onDownload}>
-              <Download className="h-4 w-4" aria-hidden />
-              Download JSON
-            </Button>
-          )}
           {onSave && (
             <Button
               size="sm"
@@ -212,6 +213,29 @@ export function DesignerModeHeader({
                 Your role cannot configure or start simulation runs.
               </p>
             </div>
+          )}
+
+          {/* Stage 7K: secondary actions live in one overflow menu. */}
+          {onDownload && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  aria-label="More Blueprint actions"
+                  data-testid="blueprint-overflow-menu"
+                >
+                  <MoreHorizontal className="h-4 w-4" aria-hidden />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => onDownload()}>
+                  <Download className="mr-2 h-4 w-4" aria-hidden />
+                  Download JSON
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>

@@ -519,5 +519,8 @@ export function useFacilityModel(override?: FacilityOverride): FacilityModel {
         storedName: naming.storedName,
       },
     };
-  }, [twin, isLoading]);
+    // `overrideKey` is the serialized override; depending on it keeps the memo
+    // stable when callers pass a fresh object literal each render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [twin, isLoading, overrideKey]);
 }

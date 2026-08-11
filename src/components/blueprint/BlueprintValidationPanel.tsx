@@ -296,6 +296,7 @@ export function BlueprintValidationPanel({ blueprint, className }: BlueprintVali
           </div>
           <Progress 
             value={readinessScore} 
+            aria-label="Blueprint readiness score"
             className={cn(
               'h-2',
               readinessScore >= 90 ? '[&>div]:bg-success' :

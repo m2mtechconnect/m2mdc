@@ -42,6 +42,11 @@ export interface EvidenceBetaWorkspace {
   selectAsset: (auraAssetId: string | null, options?: { openDrawer?: boolean }) => void;
   selectWorkload: (workloadId: string | null) => void;
   setTimeRange: (range: string | null) => void;
+  /** Active visual overlay / domain, restored from the URL on reload. */
+  overlay: string | null;
+  setOverlay: (overlayId: string | null) => void;
+  /** Metric currently under investigation, restored from the URL on reload. */
+  focusedMetricName: string | null;
 
   assetDrawerOpen: boolean;
   openAssetDrawer: () => void;
@@ -64,9 +69,12 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [provenanceMetric, setProvenanceMetric] = useState<DsxProvenancedMetric | null>(null);
-  const [assetDrawerOpen, setAssetDrawerOpen] = useState(false);
-  const [investigatedConstraint, setInvestigatedConstraint] = useState<DomainConstraint | null>(null);
+  /**
+   * Inspector state is derived from the URL (`inspector`, `metric`, `overlay`)
+   * so a direct reload or a shared deep link reopens the same panel. The local
+   * metric fallback only covers metrics that are not part of the KPI bundle.
+   */
+  const [localMetric, setLocalMetric] = useState<DsxProvenancedMetric | null>(null);
 
   /**
    * Focus restoration. The drawers unmount their content the moment their
@@ -107,6 +115,22 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlScenario]);
 
+  // Deep link restore: data mode and run position. Applied once on arrival so
+  // later user changes are never overwritten by the incoming URL.
+  const restored = useRef(false);
+  const arrivalMode = context.data_mode;
+  const arrivalTick = context.observation_tick;
+  useEffect(() => {
+    if (restored.current) return;
+    restored.current = true;
+    if (arrivalMode && arrivalMode !== rt.mode && (DATA_MODES as readonly string[]).includes(arrivalMode)) {
+      rt.setMode(arrivalMode as DataMode);
+    }
+    const tick = arrivalTick === null ? NaN : Number.parseInt(arrivalTick, 10);
+    if (Number.isFinite(tick) && tick >= 0) rt.setTick(Math.min(tick, rt.maxTick));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const writeContext = useCallback(
     (next: InvestigationContext, replace = false) => {
       // Investigation keys are rewritten; every other query parameter the
@@ -142,13 +166,31 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
     );
   }, [location.search, location.pathname]);
 
-  // Scenario and data mode are runtime facts; mirror them into the URL so a
-  // deep link reproduces the same evidence, without ever implying live data.
+  // Scenario, data mode, run identity and run position are runtime facts;
+  // mirror them into the URL so a deep link reproduces the same evidence,
+  // without ever implying live data.
+  const runId = rt.snapshot.run_id;
+  const tickParam = String(rt.tick);
   useEffect(() => {
-    if (context.scenario_id === rt.timeline && context.data_mode === rt.mode) return;
-    writeContext({ ...context, scenario_id: rt.timeline, data_mode: rt.mode }, true);
+    if (!restored.current) return;
+    if (
+      context.scenario_id === rt.timeline &&
+      context.data_mode === rt.mode &&
+      context.run_id === (runId ?? null) &&
+      context.observation_tick === tickParam
+    ) return;
+    writeContext(
+      {
+        ...context,
+        scenario_id: rt.timeline,
+        data_mode: rt.mode,
+        run_id: runId ?? null,
+        observation_tick: tickParam,
+      },
+      true,
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rt.timeline, rt.mode, context.scenario_id, context.data_mode]);
+  }, [rt.timeline, rt.mode, runId, tickParam, context.scenario_id, context.data_mode, context.run_id, context.observation_tick]);
 
   const selectedAssetId = context.stable_asset_id;
   const selectedAsset = useMemo(() => identityByAuraId(selectedAssetId), [selectedAssetId]);
@@ -185,13 +227,11 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
         stable_asset_id: id,
         openusd_prim_path: identity?.openusd_prim_path ?? null,
         source_workspace: currentWorkspace,
+        inspector: options?.openDrawer === false ? context.inspector : 'asset',
       });
-      if (options?.openDrawer !== false) {
-        if (!assetDrawerOpen) rememberTrigger();
-        setAssetDrawerOpen(true);
-      }
+      if (options?.openDrawer !== false && context.inspector !== 'asset') rememberTrigger();
     },
-    [context, writeContext, currentWorkspace, assetDrawerOpen, rememberTrigger],
+    [context, writeContext, currentWorkspace, rememberTrigger],
   );
 
   const selectWorkload = useCallback(
@@ -204,6 +244,11 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
     [context, writeContext],
   );
 
+  const setOverlay = useCallback(
+    (overlayId: string | null) => writeContext({ ...context, overlay_id: overlayId }),
+    [context, writeContext],
+  );
+
   const clearContextField = useCallback(
     (field: keyof InvestigationContext) => {
       const next = { ...context, [field]: null };
@@ -213,15 +258,18 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
         next.stable_asset_id = null;
         next.openusd_prim_path = null;
       }
+      if (field === 'stable_asset_id' || field === 'building_id') {
+        if (next.inspector === 'asset') next.inspector = null;
+      }
+      if (field === 'metric_id' && next.inspector === 'metric') next.inspector = null;
+      if (field === 'overlay_id' && next.inspector === 'constraint') next.inspector = null;
       writeContext(next);
-      if (field === 'stable_asset_id' || field === 'building_id') setAssetDrawerOpen(false);
     },
     [context, writeContext],
   );
 
   const clearContext = useCallback(() => {
-    setAssetDrawerOpen(false);
-    setInvestigatedConstraint(null);
+    setLocalMetric(null);
     navigate({ pathname: location.pathname, search: '' });
   }, [navigate, location.pathname]);
 
@@ -237,6 +285,34 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
 
   const freshness = freshnessFor(rt.snapshot.last_observed_at, Date.parse(rt.nowIso));
   const constraints = useMemo(() => buildConstraintStack(rt.bundle, rt.snapshot), [rt.bundle, rt.snapshot]);
+
+  // Inspector resolution. Each panel's target is addressable, so a reload
+  // reopens the same record; a target that no longer resolves stays closed
+  // rather than being invented.
+  const assetDrawerOpen = context.inspector === 'asset' && !!selectedAssetId;
+  const investigatedConstraint = useMemo(
+    () =>
+      context.inspector === 'constraint' && context.overlay_id
+        ? constraints.find((c) => c.domain === context.overlay_id) ?? null
+        : null,
+    [context.inspector, context.overlay_id, constraints],
+  );
+  const provenanceMetric = useMemo(() => {
+    if (context.inspector !== 'metric' || !context.metric_id) return null;
+    return rt.bundle.metrics[context.metric_id] ?? (localMetric?.metric_name === context.metric_id ? localMetric : null);
+  }, [context.inspector, context.metric_id, rt.bundle.metrics, localMetric]);
+
+  const openInspector = useCallback(
+    (next: Partial<InvestigationContext>) => {
+      if (!context.inspector) rememberTrigger();
+      writeContext({ ...context, ...next });
+    },
+    [context, writeContext, rememberTrigger],
+  );
+  const closeInspector = useCallback(() => {
+    writeContext({ ...context, inspector: null });
+    restoreTrigger();
+  }, [context, writeContext, restoreTrigger]);
 
   const value: EvidenceBetaWorkspace = {
     rt,
@@ -254,15 +330,21 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
     selectAsset,
     selectWorkload,
     setTimeRange,
-    assetDrawerOpen: assetDrawerOpen && !!selectedAssetId,
-    openAssetDrawer: () => { if (!assetDrawerOpen) rememberTrigger(); setAssetDrawerOpen(true); },
-    closeAssetDrawer: () => { setAssetDrawerOpen(false); restoreTrigger(); },
+    overlay: context.overlay_id,
+    setOverlay,
+    focusedMetricName: context.metric_id,
+    assetDrawerOpen,
+    openAssetDrawer: () => openInspector({ inspector: 'asset' }),
+    closeAssetDrawer: closeInspector,
     investigatedConstraint,
-    openConstraint: (c) => { rememberTrigger(); setInvestigatedConstraint(c); },
-    closeConstraint: () => { setInvestigatedConstraint(null); restoreTrigger(); },
+    openConstraint: (c) => openInspector({ inspector: 'constraint', overlay_id: c.domain }),
+    closeConstraint: closeInspector,
     provenanceMetric,
-    openProvenance: (m) => { rememberTrigger(); setProvenanceMetric(m); },
-    closeProvenance: () => { setProvenanceMetric(null); restoreTrigger(); },
+    openProvenance: (m) => {
+      setLocalMetric(m);
+      openInspector({ inspector: 'metric', metric_id: m.metric_name });
+    },
+    closeProvenance: closeInspector,
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

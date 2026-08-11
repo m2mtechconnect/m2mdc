@@ -39,7 +39,6 @@ import { BlueprintAgentsTab } from '@/components/blueprint/tabs/BlueprintAgentsT
 import { BlueprintDataTab } from '@/components/blueprint/tabs/BlueprintDataTab';
 import { BlueprintKPIsTab } from '@/components/blueprint/tabs/BlueprintKPIsTab';
 import { BlueprintWorkflowsTab } from '@/components/blueprint/tabs/BlueprintWorkflowsTab';
-import { BlueprintRolesTab } from '@/components/blueprint/tabs/BlueprintRolesTab';
 import { ChangeLogPanel } from '@/components/blueprint/ChangeLogPanel';
 import {
   CONTROLS_SUBTABS,
@@ -55,7 +54,7 @@ import { BlueprintCoPilotPanel } from '@/components/copilot';
 
 // UI Polish Components
 import { LoadingState, SnapshotNotFoundEmptyState } from '@/components/ui/empty-state';
-import { BlueprintModelSection } from '@/workspace/BlueprintModelSection';
+import { BlueprintModelWorkspace } from '@/components/blueprint/model/BlueprintModelWorkspace';
 import { formatPower } from '@/workspace/facilityModel';
 import { normalizeLocation } from '@/lib/location/normalizeLocation';
 import { classifyCreateTwinFields } from '@/lib/provenance/twinFieldProvenance';

@@ -39,7 +39,7 @@ interface Props {
  */
 const LEFT_GUTTER = 82;
 const RIGHT_GUTTER = 32;
-const FIT_PAD = 36;
+const FIT_PAD = 24;
 const MIN_ZOOM = 0.6;
 const MAX_ZOOM = 3;
 
@@ -77,9 +77,9 @@ export function computePlanGeometry(
   const rackW = clamp((usableWidth - totalRackGaps) / perRow, 68, 150);
   // Row spacing tracks the available height so the plan never has to be
   // scaled down (which is what previously shrank the whole diagram).
-  const rowGap = clamp(availH * 0.06, 14, 26);
+  const rowGap = clamp(availH * 0.07, 14, 40);
   const heightBudget = (availH - rowGap * (rowCount - 1)) / rowCount;
-  const rackH = clamp(Math.min(rackW * 0.52, heightBudget), 34, 76);
+  const rackH = clamp(Math.min(rackW * 0.7, heightBudget), 34, 110);
   const aisleBand = Math.max(Math.min(16, rowGap - 6), 8);
   const bankW = perRow * rackW + totalRackGaps;
   const contentW = LEFT_GUTTER + bankW + RIGHT_GUTTER;
@@ -279,11 +279,15 @@ export function FacilityFloorPlan({
 
   // Pointer panning, used mainly on narrow viewports where the plan overflows.
   const dragRef = useRef<{ id: number; x: number; y: number; origin: { x: number; y: number } } | null>(null);
+  const [dragging, setDragging] = useState(false);
 
   return (
     <div
       ref={scrollRef}
-      className="relative h-full w-full min-w-0 touch-pan-y overflow-hidden bg-[#0a1020]"
+      className={cn(
+        'relative h-full w-full min-w-0 touch-none overflow-hidden bg-[#0a1020]',
+        dragging ? 'cursor-grabbing' : 'cursor-grab',
+      )}
       data-testid="facility-floor-plan"
       data-plan-scale={scale.toFixed(4)}
       data-plan-width={Math.round(scaledW)}
@@ -294,6 +298,8 @@ export function FacilityFloorPlan({
         if (event.pointerType === 'mouse' && event.button !== 0) return;
         if ((event.target as Element).closest('[data-rack-id]')) return;
         dragRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY, origin: pan };
+        event.currentTarget.setPointerCapture(event.pointerId);
+        setDragging(true);
       }}
       onPointerMove={(event) => {
         const drag = dragRef.current;
@@ -305,11 +311,16 @@ export function FacilityFloorPlan({
           }),
         );
       }}
-      onPointerUp={() => {
+      onPointerUp={(event) => {
+        if (dragRef.current?.id === event.pointerId) {
+          event.currentTarget.releasePointerCapture?.(event.pointerId);
+        }
         dragRef.current = null;
+        setDragging(false);
       }}
       onPointerCancel={() => {
         dragRef.current = null;
+        setDragging(false);
       }}
     >
       <svg
@@ -475,6 +486,18 @@ export function FacilityFloorPlan({
                         {/* Top-down footprint: cold-aisle face bar plus a modelled load bar. */}
                         {rack.represented && (
                           <>
+                            {RACK_H >= 62 &&
+                              [0, 1, 2].map((i) => (
+                                <rect
+                                  key={i}
+                                  x={x + 8}
+                                  y={y + RACK_H / 2 - 9 + i * 7}
+                                  width={RACK_W - 16}
+                                  height={3}
+                                  rx={1.5}
+                                  fill="#16243d"
+                                />
+                              ))}
                             <rect
                               x={x + 4}
                               y={y + RACK_H - 5}

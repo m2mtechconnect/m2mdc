@@ -509,7 +509,7 @@ const en = {
     upsWorkflows: 'UPS Workflows',
     carbonKpis: 'Carbon KPIs',
     tabs: {
-      model: 'Facility model',
+      model: 'Model',
       assets: 'Assets & Systems',
       controls: 'Controls',
       versions: 'Versions',

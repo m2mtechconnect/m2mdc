@@ -75,7 +75,9 @@ function CreateTwinFromBlueprintButton({ blueprint }: { blueprint: any }) {
         city: 'Montreal',
         region_code: 'QC',
         tier: blueprint.tier || 'Tier III',
-        capacity_kw: blueprint.capacityKw * 1000 || 10000,
+        // `capacityKw` is already kilowatts. Multiplying by 1000 wrote watts into a
+        // kW column and relied on normaliseStoredCapacityKw() to rescale it back.
+        capacity_kw: blueprint.capacityKw || 10000,
         industry: 'ai_compute',
         pue_target: blueprint.pueTarget || 1.3,
         renewable_target_pct: 95,
@@ -131,8 +133,9 @@ export default function Blueprint() {
   const { twin, activeTwinId: twinId } = useActiveTwin();
   const [showCoPilotPanel, setShowCoPilotPanel] = useState(false);
   
-  // Use twin's blueprint_id if available, otherwise use URL param or 'default'
-  const blueprintId = twin?.blueprint_id || id || 'default';
+  // The URL is authoritative: /blueprint/:id must render :id. The active twin's
+  // blueprint is only a fallback when the route carries no id.
+  const blueprintId = id || twin?.blueprint_id || 'default';
   const { blueprint, summary, isLoading, downloadBlueprint } = useBlueprint(blueprintId);
   
   // Read tab and highlight from query params
@@ -146,6 +149,14 @@ export default function Blueprint() {
       setActiveTab(tabParam);
     }
   }, [tabParam]);
+
+  // Keep the URL in sync so a tab can be shared and the back button works.
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', value);
+    setSearchParams(next, { replace: true });
+  };
 
   if (isLoading) {
     return <LoadingState message="Loading Blueprint..." />;

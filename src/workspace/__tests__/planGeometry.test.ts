@@ -21,6 +21,16 @@ describe('computePlanGeometry', () => {
     }
   });
 
+  it('fills at least 75% of the canvas height on desktop containers', () => {
+    for (const [w, h] of DESKTOPS) {
+      for (const rows of [3, 5]) {
+        const g = computePlanGeometry(w, h, 8, rows);
+        const drawnHeight = g.contentH * Math.min(g.fitScale, 1);
+        expect(drawnHeight / h, `${w}x${h} rows=${rows} height occupancy`).toBeGreaterThanOrEqual(0.75);
+      }
+    }
+  });
+
   it('never needs to scale the plan down to fit the height', () => {
     for (const [w, h] of DESKTOPS) {
       const g = computePlanGeometry(w, h, 8, 5);

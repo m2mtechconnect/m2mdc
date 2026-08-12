@@ -213,19 +213,19 @@ function SignupsDashboardContent() {
                           </div>
                         </TableCell>
                         <TableCell className="text-muted-foreground text-sm truncate max-w-[200px]">
-                          {profile.email || '—'}
+                          {profile.email || "-"}
                         </TableCell>
                         <TableCell>
                           {profile.job_title ? (
                             <Badge variant="outline" className="text-xs">{profile.job_title}</Badge>
                           ) : (
-                            <span className="text-xs text-muted-foreground">—</span>
+                            <span className="text-xs text-muted-foreground">-</span>
                           )}
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                           {profile.created_at
                             ? format(new Date(profile.created_at), 'MMM d, yyyy HH:mm')
-                            : '—'}
+                            : "-"}
                         </TableCell>
                         <TableCell>
                           {profile.is_approved ? (

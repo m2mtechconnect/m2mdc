@@ -29,6 +29,8 @@ interface Props {
   panelOpen: boolean;
   onOpenPanel: () => void;
   panelToggleRef?: React.Ref<HTMLButtonElement>;
+  /** Distinguishes Blueprint from Simulation when both render the same facility. */
+  workspaceLabel?: string;
 }
 
 export function WorkspaceRecordHeader({ facility, isFallback, panelOpen, onOpenPanel, panelToggleRef, workspaceLabel }: Props) {

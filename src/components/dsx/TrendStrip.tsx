@@ -8,6 +8,9 @@
  */
 import { cn } from '@/lib/utils';
 
+/** Minimum accepted observations in one series before a line can be drawn. */
+const MIN_POINTS = 2;
+
 export interface TrendSeries {
   id: string;
   label: string;

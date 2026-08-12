@@ -143,11 +143,12 @@ export function DCSearchBar({
           <Button
             type="submit"
             size="sm"
-            className="mr-2 gap-2"
+            className="mr-2 gap-2 min-h-[36px] min-w-[36px]"
+            aria-label="Ask AURA Assistant"
             disabled={!query.trim()}
           >
             <Sparkles className="h-4 w-4" />
-            <span className="hidden sm:inline">Ask CoPilot</span>
+            <span className="hidden sm:inline">Ask AURA Assistant</span>
           </Button>
         </div>
       </form>

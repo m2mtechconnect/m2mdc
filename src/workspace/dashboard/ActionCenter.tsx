@@ -161,6 +161,7 @@ export function ActionCenter({
   const openItem = items.find((item) => item.id === openId) ?? null;
 
   const showAll = searchParams.get('actions') === 'all';
+  const returnFocus = useReturnFocus(showAll);
 
   const patchParams = useCallback(
     (patch: Record<string, string | null>) => {

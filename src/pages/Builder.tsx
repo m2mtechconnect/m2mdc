@@ -347,7 +347,7 @@ export default function Builder() {
   // Show loading state while checking auth or first initialization only
   if (!authChecked || !isInitialized) {
     return (
-      <main
+      <div
         className="flex items-center justify-center min-h-dvh bg-background"
         role="status"
         aria-live="polite"

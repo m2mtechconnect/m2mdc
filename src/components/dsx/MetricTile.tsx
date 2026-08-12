@@ -107,7 +107,7 @@ export function MetricGrid({
   return (
     <div className="space-y-2">
       {shared && (
-        <p
+        <div
           className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground"
           data-testid="dsx-metric-grid-validation"
         >
@@ -116,7 +116,7 @@ export function MetricGrid({
             validation={shared.validation}
             calibration={unverified(shared) ? 'uncalibrated' : shared.calibration}
           />
-        </p>
+        </div>
       )}
       <div className={cn('grid gap-3', columns)}>
         {shown.map((id) => (

@@ -31,7 +31,7 @@ interface Props {
   panelToggleRef?: React.Ref<HTMLButtonElement>;
 }
 
-export function WorkspaceRecordHeader({ facility, isFallback, panelOpen, onOpenPanel, panelToggleRef }: Props) {
+export function WorkspaceRecordHeader({ facility, isFallback, panelOpen, onOpenPanel, panelToggleRef, workspaceLabel }: Props) {
   const mode = OPERATING_MODES[ACTIVE_MODE];
   const provenance = useRunProvenance();
   const run = useWorkspaceStore((s) => s.runs.find((r) => r.id === s.activeRunId) ?? s.runs[0] ?? null);
@@ -54,7 +54,7 @@ export function WorkspaceRecordHeader({ facility, isFallback, panelOpen, onOpenP
       >
         <div className="flex min-w-0 flex-1 items-center gap-2">
           <h1 className="min-w-0 truncate text-base font-semibold leading-tight text-foreground sm:text-[17px]">
-            {facility.name}
+            {workspaceLabel ? `${facility.name} - ${workspaceLabel}` : facility.name}
           </h1>
           <Badge
             variant="outline"

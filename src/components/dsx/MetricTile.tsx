@@ -94,8 +94,13 @@ export function MetricGrid({
   columns?: string;
 }) {
   const shown = ids.filter((id) => metrics[id]);
-  const signature = (m: DsxProvenancedMetric) =>
-    `${m.validation}|${m.calibration}|${(m.unattested_inputs ?? []).join(',')}`;
+  /* Tiles collapse to one statement when they render the identical badge:
+     the badge text depends on the validation state and on whether the value
+     is verified, not on which inputs are unattested (those stay in the
+     per-metric provenance drawer). */
+  const unverified = (m: DsxProvenancedMetric) =>
+    m.calibration === 'uncalibrated' || (m.unattested_inputs ?? []).length > 0;
+  const signature = (m: DsxProvenancedMetric) => `${m.validation}|${unverified(m)}`;
   const first = shown.length > 1 ? metrics[shown[0]] : undefined;
   const shared = first && shown.every((id) => signature(metrics[id]) === signature(first)) ? first : undefined;
 
@@ -109,8 +114,7 @@ export function MetricGrid({
           <span>All {shown.length} values below share the same verification state:</span>
           <ValidationBadge
             validation={shared.validation}
-            calibration={shared.calibration}
-            unattestedInputs={shared.unattested_inputs ?? []}
+            calibration={unverified(shared) ? 'uncalibrated' : shared.calibration}
           />
         </p>
       )}

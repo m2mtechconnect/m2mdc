@@ -118,7 +118,7 @@ function ScopeNode({ node, depth }: { node: HierarchyNode; depth: number }) {
             onClick={() => setOpen((v) => !v)}
             aria-expanded={expanded}
             aria-label={`${expanded ? 'Collapse' : 'Expand'} ${node.asset.name}`}
-            className="rounded-sm p-1 text-muted-foreground hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-sm text-muted-foreground hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <ChevronRight className={cn('h-3 w-3 transition-transform', expanded && 'rotate-90')} aria-hidden />
           </button>

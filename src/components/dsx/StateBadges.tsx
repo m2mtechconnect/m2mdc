@@ -1,6 +1,6 @@
 /**
  * Shared state primitives: data mode, calibration, freshness, connection,
- * unavailable and planned. Colour is never the only carrier of meaning —
+ * unavailable and planned. Colour is never the only carrier of meaning:
  * every badge also carries text.
  */
 import { Badge } from '@/components/ui/badge';
@@ -218,6 +218,11 @@ export function CapabilityNotice({ capability: c }: { capability: Capability }) 
   return null;
 }
 
+/**
+ * The safety chip states only the control restriction. Data mode and
+ * calibration are already carried, labelled, by the operational truth bar,
+ * so repeating them here would state the same fact three times.
+ */
 export function SafetyChip({ className }: { className?: string }) {
   return (
     <span
@@ -228,7 +233,7 @@ export function SafetyChip({ className }: { className?: string }) {
       )}
     >
       <AlertTriangle className="h-3 w-3" aria-hidden />
-      SIMULATED · UNCALIBRATED · NOT FOR PHYSICAL CONTROL
+      Not for physical control
     </span>
   );
 }

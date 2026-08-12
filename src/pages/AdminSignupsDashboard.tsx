@@ -126,6 +126,19 @@ function SignupsDashboardContent() {
         </div>
       </div>
 
+      {/* Related administration surfaces, linked so approvals are not fragmented. */}
+      <nav aria-label="Related administration" className="flex flex-wrap gap-2">
+        <Button asChild variant="outline" size="sm">
+          <Link to="/admin/user-approvals">User approvals</Link>
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <Link to="/admin/onboarding-submissions">Onboarding submissions</Link>
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <Link to="/teams">Teams and roles</Link>
+        </Button>
+      </nav>
+
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4">

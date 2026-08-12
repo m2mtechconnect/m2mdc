@@ -121,7 +121,7 @@ function useTrendSeries(ids: Array<'max_inlet_c' | 'it_load_kw' | 'cooling_load_
   }));
 }
 
-/* 1 — Facility overview: what is the state of the facility right now? */
+/* 1 - Facility overview: what is the state of the facility right now? */
 export function OverviewWorkspace() {
   const { rt } = useWorkspace();
   const trends = useTrendSeries(['pue', 'it_load_kw', 'cooling_load_kw', 'max_inlet_c']);
@@ -153,7 +153,7 @@ export function OverviewWorkspace() {
   );
 }
 
-/* 2 — Thermal */
+/* 2 - Thermal */
 export function ThermalWorkspace() {
   const { rt, selectAsset } = useWorkspace();
   const trends = useTrendSeries(['max_inlet_c', 'cooling_load_kw']);
@@ -229,7 +229,7 @@ export function ThermalWorkspace() {
   );
 }
 
-/* 3 — Power */
+/* 3 - Power */
 export function PowerWorkspace() {
   const { rt } = useWorkspace();
   return (
@@ -286,7 +286,7 @@ export function PowerWorkspace() {
   );
 }
 
-/* 4 — Cooling */
+/* 4 - Cooling */
 export function CoolingWorkspace() {
   const { rt } = useWorkspace();
   const coolingTrends = useTrendSeries(['cooling_load_kw', 'pue']);
@@ -332,7 +332,7 @@ export function CoolingWorkspace() {
   );
 }
 
-/* 5 — Network fabric */
+/* 5 - Network fabric */
 export function NetworkWorkspace() {
   return (
     <div className="space-y-6">
@@ -354,7 +354,7 @@ export function NetworkWorkspace() {
   );
 }
 
-/* 6 — Facility registry and topology */
+/* 6 - Facility registry and topology */
 function HierarchyList({ nodes, depth = 0 }: { nodes: HierarchyNode[]; depth?: number }) {
   return (
     <ul className={depth === 0 ? 'space-y-1' : 'space-y-1 border-l border-border/60 pl-4'}>
@@ -455,7 +455,7 @@ export function FacilityWorkspace() {
   );
 }
 
-/* 7 — Workload */
+/* 7 - Workload */
 export function WorkloadWorkspace() {
   return (
     <div className="space-y-6">
@@ -474,7 +474,7 @@ export function WorkloadWorkspace() {
   );
 }
 
-/* 8 — Sovereignty */
+/* 8 - Sovereignty */
 export function SovereigntyWorkspace() {
   const { rt } = useWorkspace();
   const assertions = sovereigntyAssertions(rt.bundle, rt.snapshot);
@@ -514,7 +514,7 @@ export function SovereigntyWorkspace() {
   );
 }
 
-/* 9 — Carbon */
+/* 9 - Carbon */
 export function CarbonWorkspace() {
   const { rt } = useWorkspace();
   const assertions = carbonAssertions(rt.bundle);
@@ -571,7 +571,7 @@ export function CarbonWorkspace() {
   );
 }
 
-/* 10 — Financial */
+/* 10 - Financial */
 export function FinancialWorkspace() {
   const { rt } = useWorkspace();
   const assertions = financialAssertions(rt.bundle);
@@ -621,7 +621,7 @@ export function FinancialWorkspace() {
   );
 }
 
-/* 11 — Evidence, audit and decisions */
+/* 11 - Evidence, audit and decisions */
 export function EvidenceWorkspace() {
   const { rt } = useWorkspace();
   return (
@@ -698,7 +698,7 @@ export function EvidenceWorkspace() {
     </div>
   );
 }
-/* 12 — Simulations: seeded scenarios and the decisions they produce */
+/* 12 - Simulations: seeded scenarios and the decisions they produce */
 export function SimulationsWorkspace() {
   const { rt } = useWorkspace();
   return (

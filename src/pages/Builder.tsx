@@ -21,6 +21,7 @@ import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { Button } from '@/components/ui/button';
 import { Sparkles, LayoutTemplate, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { BuilderStarterLists } from '@/components/builder/BuilderStarterLists';
 
 export default function Builder() {
   const { t } = useTranslation();
@@ -406,7 +407,8 @@ export default function Builder() {
     };
     return (
       <section className="min-h-dvh bg-background section-padding-lg" aria-labelledby="builder-start-heading">
-        <div className="max-w-2xl mx-auto text-center space-y-6">
+        <div className="max-w-5xl mx-auto space-y-8">
+          <div className="max-w-2xl mx-auto text-center space-y-6">
           <div className="space-y-2">
             <h1 id="builder-start-heading" className="text-2xl font-semibold">
               {t('builder.startTitle', 'Start a new build')}
@@ -446,6 +448,8 @@ export default function Builder() {
                   : t('builder.startBlank', 'Start blank')}
             </Button>
           </div>
+          </div>
+          <BuilderStarterLists />
         </div>
       </section>
     );

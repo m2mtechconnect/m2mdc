@@ -98,7 +98,7 @@ export function evidenceTitle(pathname: string): string {
   for (const section of EVIDENCE_SECTIONS) {
     const child = section.children.find((c) => c.path === clean);
     if (child) return section.id === 'sustainability' || section.id === 'decisions'
-      ? `${section.label} — ${child.label}`
+      ? `${section.label}: ${child.label}`
       : child.label;
     if (clean === section.path || clean.startsWith(`${section.match}/`) || clean === section.match) {
       return section.label;

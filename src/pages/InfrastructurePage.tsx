@@ -506,7 +506,7 @@ const InfrastructurePage = () => {
                   <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold font-sans truncate">{m.label}</span>
                 </div>
                 <p className="text-lg font-bold font-mono text-foreground mb-1">{m.value}</p>
-                <Progress value={m.pct} className="h-1.5" />
+                <Progress value={m.pct} className="h-1.5" aria-label={`${m.label} utilisation`} />
               </Card>
             ))}
           </div>
@@ -571,7 +571,7 @@ const InfrastructurePage = () => {
                         <span className="text-xs font-semibold text-foreground">{g.model}</span>
                         <span className="text-xs font-mono text-muted-foreground">{g.allocated}/{g.count} allocated - {g.utilAvg}% avg</span>
                       </div>
-                      <Progress value={(g.allocated / g.count) * 100} className="h-1.5" />
+                      <Progress value={(g.allocated / g.count) * 100} className="h-1.5" aria-label={`${g.model} allocation`} />
                     </div>
                   ))}
                 </CardContent>
@@ -599,7 +599,7 @@ const InfrastructurePage = () => {
                         <span className="text-xs font-semibold text-foreground">{sp.name}</span>
                         <span className="text-xs font-mono text-muted-foreground">{sp.used} / {sp.total} - {sp.throughput}</span>
                       </div>
-                      <Progress value={sp.usedPct} className="h-1.5" />
+                      <Progress value={sp.usedPct} className="h-1.5" aria-label={`${sp.name} capacity used`} />
                     </div>
                   ))}
                 </CardContent>

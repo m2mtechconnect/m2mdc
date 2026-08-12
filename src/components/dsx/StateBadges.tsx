@@ -13,10 +13,10 @@ import type { ReactNode } from 'react';
 import type { Capability } from '@/dsx/workspaces/availability';
 
 const MODE_CLASS: Record<DataMode, string> = {
-  SIMULATED: 'border-violet-500/50 bg-violet-500/10 text-violet-200',
-  REPLAYED: 'border-violet-500/50 bg-violet-500/10 text-violet-200',
-  LIVE: 'border-cyan-500/50 bg-cyan-500/10 text-cyan-200',
-  UNAVAILABLE: 'border-zinc-500/50 bg-zinc-500/10 text-zinc-300',
+  SIMULATED: 'border-violet-500/50 bg-violet-500/10 text-violet-800 dark:text-violet-200',
+  REPLAYED: 'border-violet-500/50 bg-violet-500/10 text-violet-800 dark:text-violet-200',
+  LIVE: 'border-cyan-500/50 bg-cyan-500/10 text-cyan-800 dark:text-cyan-200',
+  UNAVAILABLE: 'border-zinc-500/50 bg-zinc-500/10 text-zinc-700 dark:text-zinc-300',
 };
 
 export function DataModeBadge({ mode, className }: { mode: DataMode; className?: string }) {
@@ -42,7 +42,7 @@ export function CalibrationBadge({ calibration }: { calibration: CalibrationStat
       variant="outline"
       data-testid="dsx-calibration"
       data-calibration={calibration}
-      className={cn('text-[11px]', calibration === 'uncalibrated' && 'border-amber-500/50 bg-amber-500/10 text-amber-200')}
+      className={cn('text-[11px]', calibration === 'uncalibrated' && 'border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200')}
     >
       {label}
     </Badge>
@@ -50,10 +50,10 @@ export function CalibrationBadge({ calibration }: { calibration: CalibrationStat
 }
 
 const FRESHNESS_CLASS: Record<FreshnessState, string> = {
-  fresh: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-200',
-  delayed: 'border-amber-500/50 bg-amber-500/10 text-amber-200',
-  stale: 'border-red-500/50 bg-red-500/10 text-red-200',
-  unknown: 'border-zinc-500/50 bg-zinc-500/10 text-zinc-300',
+  fresh: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-800 dark:text-emerald-200',
+  delayed: 'border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200',
+  stale: 'border-red-500/50 bg-red-500/10 text-red-800 dark:text-red-200',
+  unknown: 'border-zinc-500/50 bg-zinc-500/10 text-zinc-700 dark:text-zinc-300',
 };
 
 const FRESHNESS_LABEL: Record<FreshnessState, string> = {
@@ -116,9 +116,9 @@ export function ValidationBadge({
       data-verified={validation === 'validated' && !unverified ? 'true' : 'false'}
       className={cn(
         'text-[11px]',
-        validation === 'validated' && unverified && 'border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-200',
-        validation === 'requires_review' && 'border-amber-500/50 bg-amber-500/10 text-amber-200',
-        validation === 'invalid' && 'border-red-500/50 bg-red-500/10 text-red-200',
+        validation === 'validated' && unverified && 'border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200',
+        validation === 'requires_review' && 'border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200',
+        validation === 'invalid' && 'border-red-500/50 bg-red-500/10 text-red-800 dark:text-red-200',
       )}
     >
       {label}
@@ -140,8 +140,8 @@ export function ConnectionState({ state, label }: { state: DsxConnectionState | 
       data-connection={state}
       className={cn(
         'text-[11px]',
-        ok ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-200'
-          : 'border-zinc-500/50 bg-zinc-500/10 text-zinc-300',
+        ok ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-800 dark:text-emerald-200'
+          : 'border-zinc-500/50 bg-zinc-500/10 text-zinc-700 dark:text-zinc-300',
       )}
     >
       {label ? `${label}: ` : 'Connection: '}{String(state).replace(/_/g, ' ')}
@@ -191,7 +191,7 @@ export function PlannedState({ title, reason }: { title: string; reason: string 
       data-state="planned"
       className="flex flex-col gap-2 rounded-md border border-dashed border-amber-500/40 bg-amber-500/5 p-4 text-sm"
     >
-      <span className="flex items-center gap-2 font-semibold text-amber-700 dark:text-amber-200">
+      <span className="flex items-center gap-2 font-semibold text-amber-800 dark:text-amber-200">
         <Info className="h-4 w-4" aria-hidden />
         {title} - Planned
       </span>

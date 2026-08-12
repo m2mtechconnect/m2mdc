@@ -511,7 +511,7 @@ export default function Teams() {
                           </div>
                         </div>
                       <Select value={roleFilter} onValueChange={setRoleFilter}>
-                        <SelectTrigger className="w-[180px]">
+                        <SelectTrigger className="w-[180px]" aria-label="Filter by role">
                           <Filter className="h-4 w-4 mr-2" />
                           <SelectValue placeholder="All Roles" />
                         </SelectTrigger>
@@ -529,7 +529,7 @@ export default function Teams() {
                         </SelectContent>
                       </Select>
                       <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-[150px]">
+                        <SelectTrigger className="w-[150px]" aria-label="Filter by status">
                           <SelectValue placeholder="Status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -711,7 +711,7 @@ export default function Teams() {
                             value={selectedRoles[profile.user_id] || 'engineer'}
                             onValueChange={(val) => setSelectedRoles(prev => ({ ...prev, [profile.user_id]: val }))}
                           >
-                            <SelectTrigger className="w-[140px] h-8 text-xs">
+                            <SelectTrigger className="w-[140px] h-8 text-xs" aria-label="Assign role">
                               <SelectValue placeholder="Assign role" />
                             </SelectTrigger>
                             <SelectContent>

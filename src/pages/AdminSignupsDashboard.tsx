@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import ProtectedRoute from '@/components/shared/ProtectedRoute';
 import { format, subDays, isAfter } from 'date-fns';
+import { accessibleAvatarBackground } from "@/components/ui/user-avatar";
 
 interface ProfileRow {
   user_id: string;
@@ -203,7 +204,7 @@ function SignupsDashboardContent() {
                           <div className="flex items-center gap-2.5">
                             <div
                               className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
-                              style={{ backgroundColor: profile.avatar_bg_color || 'hsl(var(--primary))' }}
+                              style={{ backgroundColor: accessibleAvatarBackground(profile.avatar_bg_color || '#B45309') }}
                             >
                               {profile.avatar_initials || '?'}
                             </div>

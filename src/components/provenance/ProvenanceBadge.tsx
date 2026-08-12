@@ -35,7 +35,7 @@ const variantFor = {
   simulated:   'bg-violet-500/10 text-violet-600 border-violet-500/30',
   demo:        'bg-amber-500/10 text-amber-700 border-amber-500/30',
   static:      'bg-slate-500/10 text-slate-600 border-slate-500/30',
-  unavailable: 'bg-rose-500/10 text-rose-600 border-rose-500/30',
+  unavailable: 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/30',
 } as const;
 
 export function ProvenanceBadge({ meta, compact = false, className }: ProvenanceBadgeProps) {

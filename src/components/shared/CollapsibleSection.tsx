@@ -30,7 +30,7 @@ export function CollapsibleSection({
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <Card className="border-border/50">
-        <CollapsibleTrigger asChild>
+        <CollapsibleTrigger className="w-full text-left">
           <CardHeader className="pb-3 cursor-pointer hover:bg-muted/30 transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">

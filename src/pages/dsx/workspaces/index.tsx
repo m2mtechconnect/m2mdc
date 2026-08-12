@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/table';
 import { MetricGrid } from '@/components/dsx/MetricTile';
 import { ConstraintStack } from '@/components/dsx/ConstraintStack';
-import { RackMap, RackMapLegend, RACK_OVERLAYS, type RackOverlay } from '@/components/dsx/RackMap';
+import { RackMap, RACK_OVERLAYS, type RackOverlay } from '@/components/dsx/RackMap';
 import { TrendStrip, type TrendSeries } from '@/components/dsx/TrendStrip';
 import { EvidenceQualityBar } from '@/components/dsx/EvidenceQualityBar';
 import { ExceptionList } from '@/components/dsx/ExceptionList';

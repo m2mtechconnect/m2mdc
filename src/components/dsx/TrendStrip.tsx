@@ -36,9 +36,26 @@ function path(points: (number | null)[], width: number, height: number): string 
 }
 
 export function TrendStrip({ series, className }: { series: TrendSeries[]; className?: string }) {
+  // A run with fewer than two accepted observations produces one identical
+  // empty state per series. Collapse them into a single truthful statement.
+  const drawable = series.filter((s) => s.points.filter((p) => p !== null).length >= 2);
+  if (drawable.length === 0) {
+    const steps = Math.max(0, ...series.map((s) => s.points.filter((p) => p !== null).length));
+    return (
+      <p
+        data-testid="dsx-trend-strip"
+        data-trend-state="insufficient"
+        className="rounded-md border border-dashed border-border bg-card/40 p-3 text-[12px] text-muted-foreground"
+      >
+        No trend yet: {steps} accepted observation step(s) in this run. A trend is drawn once a
+        series has at least two accepted observations.
+      </p>
+    );
+  }
+
   return (
     <div className={cn('grid gap-3 sm:grid-cols-2 xl:grid-cols-4', className)} data-testid="dsx-trend-strip">
-      {series.map((s) => {
+      {drawable.map((s) => {
         const values = s.points.filter((p): p is number => p !== null);
         const last = values.length ? values[values.length - 1] : null;
         const digits = s.digits ?? 2;

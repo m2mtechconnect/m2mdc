@@ -133,7 +133,7 @@ export function RackMap({ overlay }: { overlay: RackOverlay }) {
         data-overlay={overlay}
         role="group"
         aria-label={`Data Hall 1 logical rack map, ${overlay} overlay`}
-        className="grid grid-cols-2 gap-2 sm:grid-cols-4"
+        className="grid grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-2"
       >
         {cells.map(({ rack, band, value }) => {
           const active = selectedAssetId === rack.aura_asset_id;

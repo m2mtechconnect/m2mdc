@@ -7,7 +7,9 @@
  * so the operator always knows what they are looking at and how trustworthy
  * it is.
  */
+import { useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { cn } from '@/lib/utils';
 import { EvidenceBetaProvider, useWorkspace } from '@/dsx/runtime/EvidenceBetaContext';
@@ -92,29 +94,59 @@ function RelatedWorkspaces() {
   );
 }
 
-function ScopeTree({ nodes, depth = 0 }: { nodes: HierarchyNode[]; depth?: number }) {
+/** True when this branch contains the selected asset, so it opens by default. */
+function containsAsset(node: HierarchyNode, id: string | null): boolean {
+  if (!id) return false;
+  if (node.asset.aura_asset_id === id) return true;
+  return node.children.some((c) => containsAsset(c, id));
+}
+
+function ScopeNode({ node, depth }: { node: HierarchyNode; depth: number }) {
   const { selectAsset, selectedAssetId } = useWorkspace();
+  const onPath = containsAsset(node, selectedAssetId);
+  // Collapsed by default: only the branch holding the selected asset expands.
+  const [open, setOpen] = useState(onPath || depth === 0);
+  const expanded = open || onPath;
+  const selected = selectedAssetId === node.asset.aura_asset_id;
+
   return (
-    <ul className={depth === 0 ? 'space-y-0.5' : 'space-y-0.5 border-l border-border/60 pl-2'}>
-      {nodes.map((n) => (
-        <li key={n.asset.aura_asset_id}>
+    <li>
+      <div className="flex items-center gap-0.5">
+        {node.children.length > 0 ? (
           <button
             type="button"
-            onClick={() => selectAsset(n.asset.aura_asset_id)}
-            data-testid={`dsx-scope-${n.asset.source_asset_id}`}
-            aria-current={selectedAssetId === n.asset.aura_asset_id ? 'true' : undefined}
-            className={cn(
-              'w-full truncate rounded-sm px-2 py-1 text-left text-[11px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-              selectedAssetId === n.asset.aura_asset_id
-                ? 'bg-primary/15 font-semibold text-foreground'
-                : 'text-muted-foreground hover:bg-muted/60',
-            )}
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={expanded}
+            aria-label={`${expanded ? 'Collapse' : 'Expand'} ${node.asset.name}`}
+            className="rounded-sm p-1 text-muted-foreground hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            {n.asset.name}
+            <ChevronRight className={cn('h-3 w-3 transition-transform', expanded && 'rotate-90')} aria-hidden />
           </button>
-          {n.children.length > 0 && <ScopeTree nodes={n.children} depth={depth + 1} />}
-        </li>
-      ))}
+        ) : (
+          <span className="w-5 shrink-0" aria-hidden />
+        )}
+        <button
+          type="button"
+          onClick={() => selectAsset(node.asset.aura_asset_id)}
+          data-testid={`dsx-scope-${node.asset.source_asset_id}`}
+          aria-current={selected ? 'true' : undefined}
+          className={cn(
+            'min-w-0 flex-1 truncate rounded-sm px-1.5 py-1 text-left text-[11px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            selected ? 'bg-primary/15 font-semibold text-foreground' : 'text-muted-foreground hover:bg-muted/60',
+          )}
+        >
+          {node.asset.name}
+        </button>
+      </div>
+      {node.children.length > 0 && expanded && <ScopeTree nodes={node.children} depth={depth + 1} />}
+    </li>
+  );
+}
+
+function ScopeTree({ nodes, depth = 0 }: { nodes: HierarchyNode[]; depth?: number }) {
+  return (
+    <ul className={depth === 0 ? 'space-y-0.5' : 'space-y-0.5 border-l border-border/60 pl-2'}>
+      {nodes.map((n) => <ScopeNode key={n.asset.aura_asset_id} node={n} depth={depth} />)}
     </ul>
   );
 }

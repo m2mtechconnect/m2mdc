@@ -740,6 +740,15 @@ export default function IntelligenceDashboard() {
           </TabsList>
           </div>
 
+          {/* Evidence owns per-domain analysis; this page stays aggregate-only. */}
+          <p className="text-xs text-muted-foreground">
+            Aggregated trend views only. For per-domain analysis with provenance, open{' '}
+            <a className="underline underline-offset-2 hover:text-foreground" href="/dsx/evidence-beta/operations/thermal">
+              Evidence operations
+            </a>
+            .
+          </p>
+
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
             {/*

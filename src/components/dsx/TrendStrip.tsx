@@ -40,16 +40,43 @@ export function TrendStrip({ series, className }: { series: TrendSeries[]; class
   // empty state per series. Collapse them into a single truthful statement.
   const drawable = series.filter((s) => s.points.filter((p) => p !== null).length >= 2);
   if (drawable.length === 0) {
-    const steps = Math.max(0, ...series.map((s) => s.points.filter((p) => p !== null).length));
+    const counts = series.map((s) => ({
+      id: s.id,
+      label: s.label,
+      accepted: s.points.filter((p) => p !== null).length,
+      offered: s.points.length,
+    }));
+    const best = Math.max(0, ...counts.map((c) => c.accepted));
+    const missing = Math.max(0, MIN_POINTS - best);
+    const missingStep =
+      best === 0
+        ? 'No series has an accepted observation yet. The missing step is ingesting a first accepted observation for at least one series.'
+        : `The closest series has ${best} of ${MIN_POINTS} required accepted observations. The missing step is ${missing} further accepted observation step(s) for that series.`;
     return (
-      <p
+      <div
         data-testid="dsx-trend-strip"
         data-trend-state="insufficient"
+        data-trend-missing-observations={missing}
         className="rounded-md border border-dashed border-border bg-card/40 p-3 text-[12px] text-muted-foreground"
       >
-        No trend yet: {steps} accepted observation step(s) in this run. A trend is drawn once a
-        series has at least two accepted observations.
-      </p>
+        <p className="font-medium text-foreground">No trend can be drawn yet</p>
+        <p className="mt-1">
+          Threshold: a line is drawn only when a single series holds at least {MIN_POINTS} accepted
+          observations in this run. Rejected or missing observations leave a gap and are never
+          counted or interpolated.
+        </p>
+        <p className="mt-1" data-testid="dsx-trend-missing-step">{missingStep}</p>
+        <ul className="mt-2 space-y-0.5">
+          {counts.map((c) => (
+            <li key={c.id} className="flex justify-between gap-2">
+              <span className="truncate">{c.label}</span>
+              <span className="shrink-0 tabular-nums">
+                {c.accepted} of {MIN_POINTS} accepted ({c.offered} step(s) in run)
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
     );
   }
 
@@ -91,7 +118,9 @@ export function TrendStrip({ series, className }: { series: TrendSeries[]; class
               />
             </svg>
             <p className="text-[12px] text-muted-foreground">
-              {values.length < 2 ? 'Not enough accepted observations to draw a trend.' : `${values.length} observation steps`}
+              {values.length < MIN_POINTS
+                ? `${values.length} of ${MIN_POINTS} accepted observations needed to draw a trend.`
+                : `${values.length} observation steps`}
             </p>
           </figure>
         );

@@ -271,7 +271,7 @@ export function AssertionProvenanceDrawer({
                   label="Blocking capability"
                   value={
                     a.blocking_capability
-                      ? `${a.blocking_capability.label} (${a.blocking_capability.id}) — state: ${a.blocking_capability.state}`
+                      ? `${a.blocking_capability.label} (${a.blocking_capability.id}) - state: ${a.blocking_capability.state}`
                       : 'none'
                   }
                 />

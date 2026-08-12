@@ -135,7 +135,7 @@ export function PowerOneLine() {
         </li>
         <li className="flex items-center gap-1.5">
           <span aria-hidden className="h-2.5 w-4 rounded-sm border border-dashed border-muted-foreground/60" />
-          Not instrumented — no branch value is calculated
+          Not instrumented - no branch value is calculated
         </li>
         <li className="tabular-nums">
           Facility draw {facility === null ? 'unavailable' : `${facility.toFixed(1)} kW`} · IT draw{' '}

@@ -12,7 +12,7 @@ test('recheck', async ({ page, context }) => {
   await installSupabaseMock(context);
   for (const r of ROUTES) {
     await page.goto(r, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1200);
+    await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {}); await page.waitForTimeout(2500);
     const d = await page.evaluate(() => ({
       url: location.pathname,
       mains: document.querySelectorAll('main').length,

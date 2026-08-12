@@ -5,6 +5,7 @@
 import { Badge } from '@/components/ui/badge';
 import { useWorkspace } from '@/dsx/runtime/EvidenceBetaContext';
 import { ConnectionState, DataModeBadge, FreshnessIndicator, SafetyChip } from './StateBadges';
+import { EvidenceQualityBar } from './EvidenceQualityBar';
 import { capability } from '@/dsx/workspaces/availability';
 import { EVIDENCE_BETA_SITE } from '@/dsx/fixtures/evidenceBetaFacility';
 
@@ -18,9 +19,10 @@ function Field({ label, value }: { label: string; value: string }) {
 }
 
 export function OperationalTruthBar() {
-  const { rt, freshness } = useWorkspace();
+  const { rt, freshness, constraints, openConstraint } = useWorkspace();
   const exchange = capability('dsx_exchange_runtime');
   const window = rt.bundle.metrics.pue?.observation_window;
+  const unassessable = constraints.filter((c) => c.status === 'unavailable');
 
   return (
     <div
@@ -61,6 +63,24 @@ export function OperationalTruthBar() {
         <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Data freshness</span>
         <FreshnessIndicator freshness={freshness} />
       </span>
+      <EvidenceQualityBar
+        compact
+        accepted={rt.snapshot.accepted.length}
+        rejected={rt.snapshot.rejected.length}
+      />
+      {unassessable.length > 0 && (
+        <span className="flex shrink-0 flex-col gap-0.5">
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Coverage</span>
+          <button
+            type="button"
+            data-testid="dsx-unassessable-domains"
+            onClick={() => openConstraint(unassessable[0])}
+            className="rounded-sm border border-zinc-500/50 bg-zinc-500/10 px-2 py-0.5 text-[11px] text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {unassessable.length} domain(s) cannot be assessed
+          </button>
+        </span>
+      )}
       <SafetyChip className="shrink-0 sm:ml-auto" />
       {/* Anchored to the bar (which is `relative`) so this visually hidden box
           cannot escape the scroll container and widen the document. */}

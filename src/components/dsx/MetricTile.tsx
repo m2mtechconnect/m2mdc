@@ -33,7 +33,7 @@ export function MetricTile({ id, metric, digits = 2, label, className }: Props) 
           type="button"
           onClick={() => openProvenance(metric)}
           className="w-full space-y-2 rounded-sm text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          aria-label={`${label ?? metric.metric_name} — open provenance`}
+          aria-label={`${label ?? metric.metric_name} - open provenance`}
           data-testid={`dsx-metric-${id}-open`}
           data-metric-name={metric.metric_name}
         >

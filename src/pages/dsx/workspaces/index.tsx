@@ -434,7 +434,7 @@ export function FacilityWorkspace() {
           <ul className="list-disc pl-5 text-sm" data-testid="dsx-mapping-exceptions">
             {unapproved.map((a) => (
               <li key={a.stable_asset_id}>
-                {a.name} — mapping {a.mapping_approval}; {OPENUSD_UNAVAILABLE}.
+                {a.name} - mapping {a.mapping_approval}; {OPENUSD_UNAVAILABLE}.
               </li>
             ))}
           </ul>

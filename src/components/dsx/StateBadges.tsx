@@ -193,7 +193,7 @@ export function PlannedState({ title, reason }: { title: string; reason: string 
     >
       <span className="flex items-center gap-2 font-semibold text-amber-700 dark:text-amber-200">
         <Info className="h-4 w-4" aria-hidden />
-        {title} — Planned
+        {title} - Planned
       </span>
       <p className="text-muted-foreground">{reason}</p>
       <p className="text-xs text-muted-foreground">

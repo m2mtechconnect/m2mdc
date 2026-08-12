@@ -436,7 +436,7 @@ export default function IntelligenceDashboard() {
           <div className="min-w-0">
             <h1 className="text-2xl font-semibold flex items-center gap-3">
               <BarChart3 className="h-6 w-6 text-primary" />
-              Telemetry & Analytics
+              Telemetry and analytics
             </h1>
             <p className="text-muted-foreground text-sm max-w-3xl">
               {twin
@@ -739,6 +739,15 @@ export default function IntelligenceDashboard() {
             <TabsTrigger value="simulation-replay">Simulation Replay</TabsTrigger>
           </TabsList>
           </div>
+
+          {/* Evidence owns per-domain analysis; this page stays aggregate-only. */}
+          <p className="text-xs text-muted-foreground">
+            Aggregated trend views only. For per-domain analysis with provenance, open{' '}
+            <a className="underline underline-offset-2 hover:text-foreground" href="/dsx/evidence-beta/operations/thermal">
+              Evidence operations
+            </a>
+            .
+          </p>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">

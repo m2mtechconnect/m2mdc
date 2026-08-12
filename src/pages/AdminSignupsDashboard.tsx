@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
  */
 
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -125,6 +126,19 @@ function SignupsDashboardContent() {
           <span className="text-xs text-muted-foreground">Live</span>
         </div>
       </div>
+
+      {/* Related administration surfaces, linked so approvals are not fragmented. */}
+      <nav aria-label="Related administration" className="flex flex-wrap gap-2">
+        <Button asChild variant="outline" size="sm">
+          <Link to="/admin/user-approvals">User approvals</Link>
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <Link to="/admin/onboarding-submissions">Onboarding submissions</Link>
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <Link to="/teams">Teams and roles</Link>
+        </Button>
+      </nav>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

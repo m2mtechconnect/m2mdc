@@ -7,7 +7,7 @@
  * there are no duplicate KPI cards or scattered call-to-action buttons.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TwinOverlayProvider } from '@/context/TwinOverlayContext';
@@ -46,6 +46,8 @@ function useOverlayInspector(): boolean {
 
 export default function AuraWorkspace() {
   useSeededRunFixtures();
+  const { pathname } = useLocation();
+  const workspaceLabel = pathname.startsWith('/simulation') ? 'Simulation' : 'Blueprint';
   const { facility, assets, isFallback } = useFacilityModel();
   const { activeTwinId, twins, setActiveTwin } = useActiveTwin();
   const overrides = useWorkspaceStore((s) => s.overrides);
@@ -188,6 +190,7 @@ export default function AuraWorkspace() {
         {/* One record header: identity, truth line, view selector, actions. */}
         <WorkspaceRecordHeader
           facility={facility}
+          workspaceLabel={workspaceLabel}
           isFallback={isFallback}
           panelOpen={panelOpen}
           onOpenPanel={() => setPanelOpen(true)}

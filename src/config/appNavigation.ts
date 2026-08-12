@@ -72,7 +72,7 @@ export const WORKSPACE_NAV: AppNavItem[] = [
   {
     name: 'Evidence',
     fullName: 'Evidence',
-    href: '/dsx/evidence-beta/evidence',
+    href: '/dsx/evidence-beta/overview',
     icon: FileSearch,
     matches: ['/dsx/evidence-beta', '/compliance'],
     description: 'Provenance, decision record and exports.',

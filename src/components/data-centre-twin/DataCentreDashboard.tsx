@@ -320,7 +320,11 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
             <div className="p-2 rounded-lg bg-accent/10">
               <Server className="h-6 w-6 text-accent" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">{facility.name}</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              {/^[\s\d\W]*$/.test(facility.name ?? '')
+                ? `Data centre twin ${facility.name ?? ''}`.trim()
+                : facility.name}
+            </h1>
             <Badge 
               variant={facility.status === 'operational' ? 'default' : 'destructive'}
               className={facility.status === 'operational' ? 'bg-success/10 text-success border-success/30' : ''}

@@ -9,13 +9,11 @@ import { Suspense, useState, useRef, useEffect, useCallback, useMemo, WheelEvent
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls, Grid, Environment, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
-import { AlertTriangle, Cpu, MonitorX, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
   detectWebGLCapability,
   type WebGLCapabilityReport,
-  type WebGLCapabilityStatus,
 } from './webglCapability';
+import { TwinFallback2D } from './TwinFallback2D';
 import type { 
   RackVisual, 
   RowVisual, 
@@ -284,92 +282,6 @@ function LoadingFallback() {
   );
 }
 
-interface WebGLFallbackProps {
-  report: WebGLCapabilityReport;
-  compact?: boolean;
-  onRetry?: () => void;
-}
-
-const STATUS_COPY: Record<
-  WebGLCapabilityStatus,
-  { title: string; hint: string; icon: 'monitor' | 'cpu' | 'alert' }
-> = {
-  ok: {
-    title: '3D twin ready',
-    hint: '',
-    icon: 'monitor',
-  },
-  'webgl1-only': {
-    title: '3D twin needs WebGL 2',
-    hint: 'Update your browser or enable hardware acceleration in browser settings, then reload.',
-    icon: 'monitor',
-  },
-  software: {
-    title: '3D twin unavailable (software renderer)',
-    hint: 'Enable "Use hardware acceleration when available" in your browser settings and reload. On desktops, update your GPU driver.',
-    icon: 'cpu',
-  },
-  blocklisted: {
-    title: '3D twin blocked by browser',
-    hint: 'Your browser has WebGL disabled or is blocking your GPU. Enable hardware acceleration and reload, or open the twin on a different device.',
-    icon: 'alert',
-  },
-  unsupported: {
-    title: '3D twin not supported on this device',
-    hint: 'This browser does not support WebGL. Try the latest Chrome, Edge, Firefox, or Safari on a device with a modern GPU.',
-    icon: 'monitor',
-  },
-  unknown: {
-    title: '3D twin could not initialise',
-    hint: 'We could not verify WebGL support in this environment. Reload the page or open the twin on another browser.',
-    icon: 'alert',
-  },
-};
-
-function WebGLFallback({ report, compact, onRetry }: WebGLFallbackProps) {
-  const copy = STATUS_COPY[report.status] ?? STATUS_COPY.unknown;
-  const Icon =
-    copy.icon === 'cpu' ? Cpu : copy.icon === 'alert' ? AlertTriangle : MonitorX;
-  const height = compact ? 'h-72' : 'h-[450px]';
-
-  return (
-    <div
-      className={`relative ${height} w-full rounded-lg overflow-hidden border border-slate-700/50 bg-[#0a0a14] flex items-center justify-center p-6`}
-      role="status"
-      aria-live="polite"
-    >
-      <div className="text-center max-w-md space-y-3">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10 text-amber-400">
-          <Icon className="h-6 w-6" aria-hidden="true" />
-        </div>
-        <div>
-          <h3 className="font-semibold text-slate-100">{copy.title}</h3>
-          <p className="text-sm text-slate-300 mt-1">{report.reason}</p>
-          {copy.hint && (
-            <p className="text-xs text-slate-300 mt-2">{copy.hint}</p>
-          )}
-        </div>
-        {report.renderer && (
-          <p className="text-[11px] text-slate-300 font-mono truncate">
-            Renderer: {report.renderer}
-          </p>
-        )}
-        {onRetry && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onRetry}
-            className="gap-2 border-slate-700 bg-slate-900/60 text-slate-200 hover:bg-slate-800"
-          >
-            <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
-            Recheck WebGL
-          </Button>
-        )}
-      </div>
-    </div>
-  );
-}
-
 export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   const [capability, setCapability] = useState<WebGLCapabilityReport>(() => ({
     status: 'ok',
@@ -478,10 +390,13 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   // Fail early with an informative fallback if WebGL2 isn't usable.
   if (!canRender3D) {
     return (
-      <WebGLFallback
+      <TwinFallback2D
         report={activeReport}
+        racks={props.racks}
+        rows={props.rows}
         compact={props.compact}
         onRetry={recheckCapability}
+        onRackClick={props.onRackClick}
       />
     );
   }

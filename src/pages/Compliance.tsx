@@ -596,7 +596,7 @@ export default function Compliance() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <Select value={selectedStressScenario} onValueChange={setSelectedStressScenario}>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Choose compliance scenario">
                       <SelectValue placeholder="Choose scenario..." />
                     </SelectTrigger>
                     <SelectContent>

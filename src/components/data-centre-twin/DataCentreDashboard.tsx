@@ -451,9 +451,10 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
             <TabsTrigger 
               key={tab.id} 
               value={tab.id}
+              aria-label={tab.label}
               className="flex items-center gap-2"
             >
-              <tab.icon className="h-4 w-4" />
+              <tab.icon className="h-4 w-4" aria-hidden />
               <span className="hidden sm:inline">{tab.label}</span>
             </TabsTrigger>
           ))}

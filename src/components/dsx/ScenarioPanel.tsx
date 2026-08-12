@@ -67,6 +67,7 @@ export function ScenarioControls() {
           </Label>
           <Slider
             id="dsx-tick"
+            aria-label="Observation step"
             value={[rt.tick]}
             min={0}
             max={rt.maxTick}

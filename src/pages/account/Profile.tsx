@@ -277,6 +277,7 @@ export default function Profile() {
               <button
                 onClick={triggerFileInput}
                 disabled={uploading}
+                aria-label="Change profile photo"
                 className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
               >
                 <Camera className="h-6 w-6 text-white" />
@@ -385,8 +386,9 @@ export default function Profile() {
         >
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label>Role</Label>
+              <Label htmlFor="profile-role">Role</Label>
               <Input
+                id="profile-role"
                 value={profile.role ? profile.role.replace(/_/g, ' ').toUpperCase() : 'Not assigned'}
                 disabled
                 className="bg-muted"
@@ -394,8 +396,9 @@ export default function Profile() {
             </div>
 
             <div className="grid gap-2">
-              <Label>Department</Label>
+              <Label htmlFor="profile-department">Department</Label>
               <Input
+                id="profile-department"
                 value={
                   profile.department_id
                     ? departments.find(d => d.id === profile.department_id)?.name || 'Unknown'
@@ -417,7 +420,7 @@ export default function Profile() {
                 value={formData.locale}
                 onValueChange={(value) => setFormData({ ...formData, locale: value })}
               >
-                <SelectTrigger>
+                <SelectTrigger id="locale" aria-label="Language">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -436,7 +439,7 @@ export default function Profile() {
                 value={formData.timezone}
                 onValueChange={(value) => setFormData({ ...formData, timezone: value })}
               >
-                <SelectTrigger>
+                <SelectTrigger id="timezone" aria-label="Timezone">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

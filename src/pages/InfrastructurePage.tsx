@@ -334,8 +334,11 @@ const InfrastructurePage = () => {
                     PHYSICAL AI · DIGITAL TWIN
                   </Badge>
                   <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
-                    Ready to build your infrastructure?
+                    Infrastructure
                   </h1>
+                  <p className="text-base font-medium text-foreground mb-2">
+                    Ready to build your infrastructure?
+                  </p>
                   <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                     Use the Pod Designer to configure your NVIDIA + DDN hardware stack for your specific
                     data centre scenario. Get recommendations, cost estimates, and deploy in minutes.

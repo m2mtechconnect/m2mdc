@@ -447,7 +447,7 @@ export default function Builder() {
             </Button>
           </div>
         </div>
-      </main>
+      </section>
     );
   }
 

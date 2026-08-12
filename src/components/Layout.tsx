@@ -369,7 +369,7 @@ export function Layout({ children }: LayoutProps) {
                   aria-current={location.pathname === '/help' ? "page" : undefined}
                 >
                   <HelpCircle className="h-5 w-5" aria-hidden="true" />
-                  Help
+                  Learning Hub
                 </Link>
               </Button>
             </div>

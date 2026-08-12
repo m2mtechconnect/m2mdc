@@ -75,7 +75,7 @@ export function ProvenanceDrawer() {
                   <h3 className="pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Evidence counts
                   </h3>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                     <Count label="Source events" value={counts.source_events} />
                     <Count label="Matched accepted" value={counts.accepted_events} />
                     <Count label="Unmatched" value={counts.unmatched_events} tone="warn" />

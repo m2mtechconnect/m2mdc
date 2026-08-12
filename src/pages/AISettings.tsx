@@ -246,7 +246,7 @@ export default function AISettings() {
         </DCCard>
 
         <DCCard
-          title="Vertex AI Search & Grounding"
+          title="Vertex AI search and grounding"
           icon={<Database className="h-5 w-5 text-primary" />}
           status="info"
         >

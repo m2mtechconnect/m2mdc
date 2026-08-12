@@ -170,7 +170,7 @@ export default function Settings() {
         {/* Header */}
         <DCSectionHeader
           as="h1"
-          title="Workspace Settings"
+          title="Workspace settings"
           subtitle="Manage workspace configuration and team defaults"
           icon={<SettingsIcon className="h-5 w-5 text-primary" />}
           action={
@@ -302,7 +302,7 @@ export default function Settings() {
 
             {/* Security Tab */}
             <TabsContent value="security" className="space-y-6">
-              <DCCard title="Access & Security" icon={<Shield className="h-4 w-4 text-primary" />}>
+              <DCCard title="Access and security" icon={<Shield className="h-4 w-4 text-primary" />}>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">

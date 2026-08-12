@@ -32,6 +32,7 @@ import { useTourAutoStart } from "@/tours/useTourAutoStart";
 import { useRBAC } from "@/contexts/RBACContext";
 import {
   WORKSPACE_NAV,
+  SUPPORT_NAV,
   isNavItemActive,
   visibleManageNav,
 } from "@/config/appNavigation";
@@ -333,21 +334,46 @@ export function Layout({ children }: LayoutProps) {
                 {manageNavigation.map((item) => {
                   const isActive = isNavItemActive(item, location.pathname);
                   return (
-                    <Button
-                      key={item.name}
-                      asChild
-                      variant={isActive ? "secondary" : "ghost"}
-                      className="w-full justify-start gap-3 min-h-[44px] text-base"
-                    >
-                      <Link
-                        to={item.href}
-                        onClick={() => setMobileMenuOpen(false)}
-                        aria-current={isActive ? "page" : undefined}
+                    <div key={item.name}>
+                      <Button
+                        asChild
+                        variant={isActive ? "secondary" : "ghost"}
+                        className="w-full justify-start gap-3 min-h-[44px] text-base"
                       >
-                        <item.icon className="h-5 w-5" aria-hidden="true" />
-                        {item.fullName}
-                      </Link>
-                    </Button>
+                        <Link
+                          to={item.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          aria-current={isActive ? "page" : undefined}
+                        >
+                          <item.icon className="h-5 w-5" aria-hidden="true" />
+                          {item.fullName}
+                        </Link>
+                      </Button>
+                      {isActive && item.children?.length ? (
+                        <div className="ml-6 mt-1 space-y-1 border-l border-border pl-2">
+                          {item.children.map((child) => {
+                            const childActive = isNavItemActive(child, location.pathname);
+                            return (
+                              <Button
+                                key={child.href}
+                                asChild
+                                variant={childActive ? "secondary" : "ghost"}
+                                size="sm"
+                                className="w-full justify-start min-h-11 text-sm"
+                              >
+                                <Link
+                                  to={child.href}
+                                  onClick={() => setMobileMenuOpen(false)}
+                                  aria-current={childActive ? "page" : undefined}
+                                >
+                                  {child.fullName}
+                                </Link>
+                              </Button>
+                            );
+                          })}
+                        </div>
+                      ) : null}
+                    </div>
                   );
                 })}
               </div>
@@ -358,20 +384,26 @@ export function Layout({ children }: LayoutProps) {
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Support
               </h3>
-              <Button
-                asChild
-                variant={location.pathname === '/help' ? "secondary" : "ghost"}
-                className="w-full justify-start gap-3 min-h-[44px] text-base"
-              >
-                <Link
-                  to="/help"
-                  onClick={() => setMobileMenuOpen(false)}
-                  aria-current={location.pathname === '/help' ? "page" : undefined}
-                >
-                  <HelpCircle className="h-5 w-5" aria-hidden="true" />
-                  Learning Hub
-                </Link>
-              </Button>
+              {SUPPORT_NAV.map((item) => {
+                const isActive = isNavItemActive(item, location.pathname);
+                return (
+                  <Button
+                    key={item.href}
+                    asChild
+                    variant={isActive ? "secondary" : "ghost"}
+                    className="w-full justify-start gap-3 min-h-[44px] text-base"
+                  >
+                    <Link
+                      to={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      aria-current={isActive ? "page" : undefined}
+                    >
+                      <item.icon className="h-5 w-5" aria-hidden="true" />
+                      {item.fullName}
+                    </Link>
+                  </Button>
+                );
+              })}
             </div>
           </nav>
 

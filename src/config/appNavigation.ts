@@ -21,9 +21,13 @@ import {
   Cable,
   FileSearch,
   FlaskConical,
+  HelpCircle,
   LayoutDashboard,
+  Rocket,
+  Search,
   Server,
   Shield,
+  Sparkles,
   Wrench,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -42,6 +46,12 @@ export interface AppNavItem {
   permission?: Permission;
   /** One-line purpose, shown in the mobile sheet. */
   description: string;
+  /**
+   * Sub-destinations that belong to this item. Rendered indented under the
+   * parent so previously orphaned pages are reachable from navigation
+   * without inventing a second top-level entry for the same concept.
+   */
+  children?: AppNavItem[];
 }
 
 export const WORKSPACE_NAV: AppNavItem[] = [
@@ -126,6 +136,24 @@ export const MANAGE_NAV: AppNavItem[] = [
     description: 'Aggregated trend views over modelled outputs.',
   },
   {
+    name: 'Deployments',
+    fullName: 'Deployments',
+    href: '/deployments',
+    icon: Rocket,
+    matches: ['/deployments', '/deploy'],
+    permission: 'deployment.view',
+    description: 'Deployment history, versions and rollout status.',
+  },
+  {
+    name: 'AI settings',
+    fullName: 'AI settings',
+    href: '/settings/ai',
+    icon: Sparkles,
+    matches: ['/settings/ai'],
+    permission: 'agent.administer',
+    description: 'Model selection and assistant configuration.',
+  },
+  {
     name: 'Admin',
     fullName: 'Admin console',
     href: '/admin/signups-dashboard',
@@ -133,6 +161,68 @@ export const MANAGE_NAV: AppNavItem[] = [
     matches: ['/admin'],
     permission: 'platform.view_admin_console',
     description: 'Approvals, signups and platform administration.',
+    children: [
+      {
+        name: 'Signups',
+        fullName: 'Signups and approvals',
+        href: '/admin/signups-dashboard',
+        icon: Shield,
+        matches: ['/admin/signups-dashboard'],
+        description: 'Review and approve new account requests.',
+      },
+      {
+        name: 'User approvals',
+        fullName: 'User approvals',
+        href: '/admin/user-approvals',
+        icon: Shield,
+        matches: ['/admin/user-approvals'],
+        description: 'Approve or reject pending platform users.',
+      },
+      {
+        name: 'Onboarding',
+        fullName: 'Onboarding submissions',
+        href: '/admin/onboarding-submissions',
+        icon: Shield,
+        matches: ['/admin/onboarding-submissions'],
+        description: 'Questionnaire responses captured before sign-up.',
+      },
+      {
+        name: 'Teams',
+        fullName: 'Teams and roles',
+        href: '/teams',
+        icon: Shield,
+        matches: ['/teams'],
+        description: 'Members, role assignment and collaboration.',
+      },
+      {
+        name: 'Access control',
+        fullName: 'Access control',
+        href: '/account/access-control',
+        icon: Shield,
+        matches: ['/account/access-control'],
+        description: 'Per-resource permissions for the current account.',
+      },
+    ],
+  },
+];
+
+/** Always-visible support and utility destinations. */
+export const SUPPORT_NAV: AppNavItem[] = [
+  {
+    name: 'Search',
+    fullName: 'Search',
+    href: '/search',
+    icon: Search,
+    matches: ['/search'],
+    description: 'Search facilities, assets, agents and evidence.',
+  },
+  {
+    name: 'Learning Hub',
+    fullName: 'Learning Hub',
+    href: '/help',
+    icon: HelpCircle,
+    matches: ['/help', '/playbook'],
+    description: 'Guides, playbooks and product documentation.',
   },
 ];
 

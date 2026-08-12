@@ -3,7 +3,7 @@
  *
  * Position comes from the declared rack order in the facility record; the
  * map is explicitly a logical layout, not a surveyed floor plan. A rack with
- * no accepted observation renders as "no observation" — never as a cool,
+ * no accepted observation renders as "no observation", never as a cool,
  * healthy or zero-load rack.
  */
 import { useMemo } from 'react';

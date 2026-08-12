@@ -116,7 +116,7 @@ export function ValidationBadge({
       data-verified={validation === 'validated' && !unverified ? 'true' : 'false'}
       className={cn(
         'text-[11px]',
-        validation === 'validated' && unverified && 'border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-200',
+        validation === 'validated' && unverified && 'border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200',
         validation === 'requires_review' && 'border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200',
         validation === 'invalid' && 'border-red-500/50 bg-red-500/10 text-red-800 dark:text-red-200',
       )}
@@ -191,7 +191,7 @@ export function PlannedState({ title, reason }: { title: string; reason: string 
       data-state="planned"
       className="flex flex-col gap-2 rounded-md border border-dashed border-amber-500/40 bg-amber-500/5 p-4 text-sm"
     >
-      <span className="flex items-center gap-2 font-semibold text-amber-700 dark:text-amber-200">
+      <span className="flex items-center gap-2 font-semibold text-amber-800 dark:text-amber-200">
         <Info className="h-4 w-4" aria-hidden />
         {title} - Planned
       </span>

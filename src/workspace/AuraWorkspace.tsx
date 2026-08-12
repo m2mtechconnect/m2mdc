@@ -188,6 +188,7 @@ export default function AuraWorkspace() {
         {/* One record header: identity, truth line, view selector, actions. */}
         <WorkspaceRecordHeader
           facility={facility}
+          workspaceLabel={workspaceLabel}
           isFallback={isFallback}
           panelOpen={panelOpen}
           onOpenPanel={() => setPanelOpen(true)}

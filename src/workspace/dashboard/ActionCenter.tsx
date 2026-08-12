@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { useReturnFocus } from '@/hooks/useReturnFocus';
 import type { AttentionItem, AttentionSeverity } from './attentionQueue';
 import { ActionDetailDrawer } from './ActionDetailDrawer';
 
@@ -161,6 +162,7 @@ export function ActionCenter({
   const openItem = items.find((item) => item.id === openId) ?? null;
 
   const showAll = searchParams.get('actions') === 'all';
+  const returnFocus = useReturnFocus(showAll);
 
   const patchParams = useCallback(
     (patch: Record<string, string | null>) => {
@@ -229,7 +231,11 @@ export function ActionCenter({
 
 
       <Sheet open={showAll} onOpenChange={setShowAll}>
-        <SheetContent side="right" className="flex w-[min(560px,94vw)] flex-col gap-0 p-0 sm:max-w-none">
+        <SheetContent
+          side="right"
+          className="flex w-[min(560px,94vw)] flex-col gap-0 p-0 sm:max-w-none"
+          onCloseAutoFocus={returnFocus}
+        >
           <SheetHeader className="space-y-1 border-b border-border p-4 text-left">
             <SheetTitle className="text-[16px]">Action Center</SheetTitle>
             <SheetDescription className="text-[13px]">

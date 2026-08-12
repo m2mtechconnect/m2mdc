@@ -8,6 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useReturnFocus } from "@/hooks/useReturnFocus";
 import { 
   ArrowRight, 
   Search, 
@@ -24,6 +25,7 @@ interface DecisionReplayModalProps {
 }
 
 export function DecisionReplayModal({ open, onOpenChange }: DecisionReplayModalProps) {
+  const returnFocus = useReturnFocus(open);
   const steps = [
     {
       stage: "User Query",
@@ -77,7 +79,10 @@ export function DecisionReplayModal({ open, onOpenChange }: DecisionReplayModalP
   return (
     <TooltipProvider>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto bg-card border-2 border-border">
+        <DialogContent
+          className="max-w-4xl max-h-[85vh] overflow-y-auto bg-card border-2 border-border"
+          onCloseAutoFocus={returnFocus}
+        >
           <DialogHeader>
             <div className="flex items-center gap-3 mb-2">
               <div className="h-10 w-10 rounded-lg bg-primary/10 border-2 border-primary flex items-center justify-center">

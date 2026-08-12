@@ -229,7 +229,11 @@ export function ActionCenter({
 
 
       <Sheet open={showAll} onOpenChange={setShowAll}>
-        <SheetContent side="right" className="flex w-[min(560px,94vw)] flex-col gap-0 p-0 sm:max-w-none">
+        <SheetContent
+          side="right"
+          className="flex w-[min(560px,94vw)] flex-col gap-0 p-0 sm:max-w-none"
+          onCloseAutoFocus={returnFocus}
+        >
           <SheetHeader className="space-y-1 border-b border-border p-4 text-left">
             <SheetTitle className="text-[16px]">Action Center</SheetTitle>
             <SheetDescription className="text-[13px]">

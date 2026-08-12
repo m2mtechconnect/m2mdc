@@ -18,6 +18,7 @@ import { SideInspector } from '@/components/dsx/SideInspector';
 import { ConstraintDrawer } from '@/components/dsx/ConstraintDrawer';
 import { buildHierarchy, type HierarchyNode } from '@/dsx/workspaces/facilityGraph';
 import { DSX_ROOT, relatedViewsForDomain } from '@/dsx/workspaces/relatedViews';
+import { EVIDENCE_SECTIONS, evidenceTitle } from '@/dsx/nav/evidenceNav';
 
 interface NavEntry { to: string; label: string; end?: boolean; domain?: string }
 
@@ -178,8 +179,7 @@ function WorkspaceNav() {
 function WorkspaceHeader() {
   const { pathname } = useLocation();
   const { selectedAncestry, selectAsset, hrefWithContext } = useWorkspace();
-  const segment = pathname.replace(/\/$/, '').split('/').pop() ?? 'evidence-beta';
-  const title = TITLES[segment] ?? 'Facility overview';
+  const title = evidenceTitle(pathname);
 
   return (
     <header className="space-y-1 pb-4">

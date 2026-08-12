@@ -17,6 +17,7 @@ test('recheck', async ({ page, context }) => {
       url: location.pathname,
       mains: document.querySelectorAll('main').length,
       notFound: /page not found|404/i.test(document.body.innerText),
+      snippet: document.body.innerText.slice(0,120),
       unnamed: [...document.querySelectorAll<HTMLElement>('button,a[href],[role="button"]')]
         .filter((el) => el.getBoundingClientRect().width && !(el.textContent || '').trim() && !el.getAttribute('aria-label') && !el.getAttribute('title') && !el.getAttribute('aria-labelledby')).length,
     }));

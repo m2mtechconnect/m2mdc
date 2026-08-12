@@ -76,22 +76,28 @@ function RackMapPanel({ defaultOverlay = 'thermal' }: { defaultOverlay?: RackOve
   const [overlay, setOverlay] = useState<RackOverlay>(defaultOverlay);
   return (
     <div className="space-y-3" data-testid="dsx-rack-map-panel">
-      <div className="flex flex-wrap gap-1" role="group" aria-label="Rack map overlay">
+      {/* Segmented control: this switches the view of one map, it is not
+          page navigation. The legend lives inside <RackMap>. */}
+      <div
+        className="inline-flex flex-wrap overflow-hidden rounded-md border border-border"
+        role="group"
+        aria-label="Rack map overlay"
+      >
         {RACK_OVERLAYS.map((o) => (
           <Button
             key={o.id}
             size="sm"
-            variant={overlay === o.id ? 'default' : 'outline'}
+            variant={overlay === o.id ? 'default' : 'ghost'}
             aria-pressed={overlay === o.id}
             onClick={() => setOverlay(o.id)}
             data-testid={`dsx-rack-overlay-${o.id}`}
+            className="rounded-none border-0 text-xs"
           >
             {o.label}
           </Button>
         ))}
       </div>
       <RackMap overlay={overlay} />
-      <RackMapLegend overlay={overlay} />
     </div>
   );
 }
@@ -121,27 +127,24 @@ export function OverviewWorkspace() {
   const trends = useTrendSeries(['pue', 'it_load_kw', 'cooling_load_kw', 'max_inlet_c']);
   return (
     <div className="space-y-6">
-      <Section
-        title="Current operational state"
-        description="What is the operational state of the facility at this observation step, and which constraint binds first?"
-      >
-        <MetricGrid
-          ids={['pue', 'facility_load', 'it_load', 'cooling_load', 'max_rack_inlet', 'thermal_headroom', 'power_capacity_utilisation', 'data_quality']}
-          metrics={rt.bundle.metrics}
-        />
-      </Section>
+      {/* The page h1 already names this view, so the KPI grid leads with the
+          question it answers instead of repeating the title. */}
+      <p className="max-w-3xl text-xs text-muted-foreground">
+        What is the operational state of the facility at this observation step, and which
+        constraint binds first?
+      </p>
+      <MetricGrid
+        ids={['pue', 'facility_load', 'it_load', 'cooling_load', 'max_rack_inlet', 'thermal_headroom', 'power_capacity_utilisation', 'data_quality']}
+        metrics={rt.bundle.metrics}
+      />
       <Section title="Trend across this run" description="Each point is recomputed from the accepted observations at that step. A step without an accepted observation is drawn as a gap.">
         <TrendStrip series={trends} />
       </Section>
       <Section title="Data hall" description="Logical rack layout declared by the facility record. A rack with no accepted observation is never shown as healthy.">
         <RackMapPanel />
       </Section>
-      <Section title="Evidence quality" description="Only accepted observations contribute to any value on this page.">
-        <EvidenceQualityBar accepted={rt.snapshot.accepted.length} rejected={rt.snapshot.rejected.length} />
-      </Section>
-      <Section title="Exceptions" description="Ranked by severity, then by number of affected assets.">
-        <ExceptionList limit={5} />
-      </Section>
+      {/* Exceptions and the constraint stack listed the same domains twice.
+          The constraint stack is the single ranked list. */}
       <ConstraintStack />
       <Section title="Scenario" description="Baseline is step 0 of the same seeded fixture.">
         <ScenarioControls />

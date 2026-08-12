@@ -384,6 +384,15 @@ textarea:focus {
   z-index: 2;
 }
 
+/* Already-positioned controls keep their own placement and only get the
+   paint-order lift. */
+.relative:focus-visible,
+.sticky:focus-visible,
+.relative:focus,
+.sticky:focus {
+  z-index: 2;
+}
+
 /* 2. Decorative-only layers must never intercept the focus ring or
       pointer events. Apps commonly mark glow / gradient wrappers with
       `aria-hidden="true"` or `data-decorative`; enforce it here so a

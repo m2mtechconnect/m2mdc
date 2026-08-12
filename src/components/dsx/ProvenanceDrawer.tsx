@@ -8,6 +8,11 @@ import { Separator } from '@/components/ui/separator';
 import { useWorkspace } from '@/dsx/runtime/EvidenceBetaContext';
 import { CalibrationBadge, DataModeBadge, FreshnessIndicator, ValidationBadge } from './StateBadges';
 import { OPENUSD_UNAVAILABLE } from '@/dsx/workspaces/facilityGraph';
+import {
+  metricDomainCoverage,
+  metricEvidenceCounts,
+  validationRationale,
+} from '@/dsx/metrics/metricDrilldown';
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
@@ -18,8 +23,29 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
+function Count({ label, value, tone }: { label: string; value: number; tone?: 'warn' }) {
+  return (
+    <div className="rounded-sm border border-border/60 bg-muted/30 px-2 py-1.5">
+      <div className={tone === 'warn' && value > 0 ? 'font-mono text-base font-semibold text-amber-700 dark:text-amber-200' : 'font-mono text-base font-semibold text-foreground'}>
+        {value}
+      </div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+    </div>
+  );
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  normal: 'Within limits',
+  attention: 'Attention',
+  violation: 'Violation',
+  unavailable: 'Cannot be assessed',
+};
+
 export function ProvenanceDrawer() {
-  const { provenanceMetric: m, closeProvenance } = useWorkspace();
+  const { provenanceMetric: m, closeProvenance, rt, constraints } = useWorkspace();
+  const counts = m ? metricEvidenceCounts(m, rt.snapshot) : null;
+  const coverage = m ? metricDomainCoverage(m, constraints) : null;
+  const rationale = m ? validationRationale(m) : null;
 
   return (
     <Sheet open={!!m} onOpenChange={(o) => !o && closeProvenance()}>
@@ -43,6 +69,90 @@ export function ProvenanceDrawer() {
                 />
                 <CalibrationBadge calibration={m.calibration} />
               </div>
+
+              {counts && (
+                <section data-testid="dsx-provenance-counts" className="pb-1">
+                  <h3 className="pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Evidence counts
+                  </h3>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    <Count label="Source events" value={counts.source_events} />
+                    <Count label="Matched accepted" value={counts.accepted_events} />
+                    <Count label="Unmatched" value={counts.unmatched_events} tone="warn" />
+                    <Count label="Observed inputs" value={counts.observed_inputs} />
+                    <Count label="Declared inputs" value={counts.declared_inputs} tone="warn" />
+                    <Count label="Missing inputs" value={counts.missing_inputs} tone="warn" />
+                  </div>
+                  <p className="pt-1 text-[11px] text-muted-foreground">
+                    {counts.quarantined_events} event(s) were quarantined at ingest in this
+                    observation step and were not used in any value.
+                  </p>
+                </section>
+              )}
+
+              {coverage && (
+                <>
+                  <Separator className="my-3" />
+                  <section data-testid="dsx-provenance-coverage">
+                    <h3 className="pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Domain coverage
+                    </h3>
+                    <p className="pb-2 text-[11px] text-muted-foreground">
+                      {coverage.assessed_domains} of {coverage.total_domains} facility domains can be
+                      assessed at this observation step.
+                    </p>
+                    {coverage.contributing.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">
+                        No operational domain is mapped to this metric&apos;s inputs.
+                      </p>
+                    ) : (
+                      <ul className="space-y-1 text-xs">
+                        {coverage.contributing.map((c) => (
+                          <li key={c.domain} className="flex items-center justify-between gap-2">
+                            <span>{c.label}</span>
+                            <span className="text-[11px] text-muted-foreground">
+                              {STATUS_LABEL[c.status]} · {c.evidence_events} evidence event(s)
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {coverage.unassessable.length > 0 && (
+                      <p className="pt-2 text-[11px] text-muted-foreground">
+                        Cannot be assessed anywhere in this facility:{' '}
+                        {coverage.unassessable.map((c) => c.label).join(', ')}.
+                      </p>
+                    )}
+                  </section>
+                </>
+              )}
+
+              {rationale && (
+                <>
+                  <Separator className="my-3" />
+                  <section data-testid="dsx-provenance-rationale">
+                    <h3 className="pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Validation rationale
+                    </h3>
+                    <p className="pb-1 text-xs font-medium text-foreground">{rationale.verdict}</p>
+                    <ul className="list-disc space-y-1 pl-4 text-xs text-muted-foreground">
+                      {rationale.reasons.map((r) => <li key={r}>{r}</li>)}
+                    </ul>
+                    {rationale.to_verify.length > 0 && (
+                      <>
+                        <p className="pt-2 text-[11px] font-medium text-foreground">
+                          Required before this value can be called verified
+                        </p>
+                        <ul className="list-disc space-y-1 pl-4 text-xs text-muted-foreground">
+                          {rationale.to_verify.map((r) => <li key={r}>{r}</li>)}
+                        </ul>
+                      </>
+                    )}
+                  </section>
+                </>
+              )}
+
+              <Separator className="my-3" />
               <dl>
                 <Row label="Value" value={m.value === null ? 'Unavailable' : `${m.value} ${m.unit}`} />
                 <Row label="Unit" value={m.unit} />

@@ -11,9 +11,9 @@ import { useWorkspace } from '@/dsx/runtime/EvidenceBetaContext';
 import { statusRank, type ConstraintStatus, type DomainConstraint } from '@/dsx/workspaces/constraints';
 
 const STATUS_CLASS: Record<ConstraintStatus, string> = {
-  violation: 'border-red-500/50 bg-red-500/10 text-red-200',
-  attention: 'border-amber-500/50 bg-amber-500/10 text-amber-200',
-  normal: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-200',
+  violation: 'border-red-500/50 bg-red-500/10 text-red-800 dark:text-red-200',
+  attention: 'border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200',
+  normal: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-800 dark:text-emerald-200',
   unavailable: 'border-zinc-500/50 bg-zinc-500/10 text-zinc-700 dark:text-zinc-300',
 };
 

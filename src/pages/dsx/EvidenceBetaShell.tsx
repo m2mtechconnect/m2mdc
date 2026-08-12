@@ -25,52 +25,17 @@ interface NavEntry { to: string; label: string; end?: boolean; domain?: string }
  * Grouped by operator intent: what is happening, what is it made of,
  * and what can be proven about it.
  */
-const NAV: { group: string; items: NavEntry[] }[] = [
-  {
-    group: 'Operate',
-    items: [
-      { to: DSX_ROOT, label: 'Facility overview', end: true },
-      { to: `${DSX_ROOT}/thermal`, label: 'Thermal', domain: 'thermal' },
-      { to: `${DSX_ROOT}/power`, label: 'Power', domain: 'power' },
-      { to: `${DSX_ROOT}/cooling`, label: 'Cooling', domain: 'cooling' },
-      { to: `${DSX_ROOT}/network`, label: 'Compute fabric', domain: 'network' },
-    ],
-  },
-  {
-    group: 'Model',
-    items: [
-      { to: `${DSX_ROOT}/facility`, label: 'Facility registry', domain: 'facility' },
-      { to: `${DSX_ROOT}/workload`, label: 'Workload', domain: 'workload' },
-      { to: `${DSX_ROOT}/simulations`, label: 'Simulations' },
-    ],
-  },
-  {
-    group: 'Assure',
-    items: [
-      { to: `${DSX_ROOT}/sovereignty`, label: 'Sovereignty', domain: 'sovereignty' },
-      { to: `${DSX_ROOT}/carbon`, label: 'Carbon and water', domain: 'carbon' },
-      { to: `${DSX_ROOT}/financials`, label: 'Financial exposure', domain: 'financial' },
-      { to: `${DSX_ROOT}/evidence`, label: 'Evidence and decisions' },
-    ],
-  },
-];
-
-/** Page titles keyed by the final path segment. */
-const TITLES: Record<string, string> = {
-  'evidence-beta': 'Facility overview',
-  overview: 'Facility overview',
-  thermal: 'Thermal',
-  power: 'Power',
-  cooling: 'Cooling',
-  network: 'Compute fabric',
-  facility: 'Facility registry',
-  workload: 'Workload',
-  simulations: 'Simulations',
-  sovereignty: 'Sovereignty',
-  carbon: 'Carbon and water',
-  financials: 'Financial exposure',
-  evidence: 'Evidence and decisions',
-};
+/**
+ * Navigation is derived from the canonical five-section Evidence IA so the
+ * sidebar, the routes and the page titles can never drift apart.
+ */
+const NAV: { group: string; items: NavEntry[] }[] = EVIDENCE_SECTIONS.map((section) => ({
+  group: section.label,
+  items:
+    section.children.length > 0
+      ? section.children.map((child) => ({ to: child.path, label: child.label, domain: child.domain }))
+      : [{ to: section.path, label: section.label, end: section.id === 'overview' }],
+}));
 
 const DOT: Record<string, string> = {
   violation: 'bg-red-400',

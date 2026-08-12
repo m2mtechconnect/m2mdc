@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { useReturnFocus } from '@/hooks/useReturnFocus';
 import type { AttentionItem, AttentionSeverity } from './attentionQueue';
 import { ActionDetailDrawer } from './ActionDetailDrawer';
 

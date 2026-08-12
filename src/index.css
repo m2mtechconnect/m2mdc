@@ -365,10 +365,31 @@ textarea:focus {
    * ----------------------------------------------------------------- */
 
 /* 1. Any focused interactive control paints above adjacent decorative
-      glow / gradient siblings by getting its own stacking context. */
+      glow / gradient siblings by getting its own stacking context.
+
+      `isolation` creates that stacking context without touching layout,
+      so it is safe for every element. `position: relative` is only added
+      for statically positioned controls: applying it to an element that
+      is already absolute / fixed / sticky (for example the Sheet and
+      Dialog close buttons pinned to the top-right corner) would drop it
+      back into normal flow and move it to the bottom of the panel. */
 :focus-visible,
 :focus {
+  isolation: isolate;
+}
+
+:focus-visible:not(.absolute):not(.fixed):not(.sticky):not(.relative),
+:focus:not(.absolute):not(.fixed):not(.sticky):not(.relative) {
   position: relative;
+  z-index: 2;
+}
+
+/* Already-positioned controls keep their own placement and only get the
+   paint-order lift. */
+.relative:focus-visible,
+.sticky:focus-visible,
+.relative:focus,
+.sticky:focus {
   z-index: 2;
 }
 

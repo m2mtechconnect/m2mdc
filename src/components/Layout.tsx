@@ -117,7 +117,11 @@ export function Layout({ children }: LayoutProps) {
         <div className="mx-auto flex h-14 max-w-[1920px] items-center justify-between gap-3 px-3 sm:px-4 md:px-5 lg:px-6">
           {/* Brand, facility context and workspace navigation */}
           <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-5">
-            <Link to="/dashboard" className="flex items-center flex-shrink-0 group">
+            <Link
+              to="/dashboard"
+              aria-label="Data Centre Twin Studio home"
+              className="flex items-center flex-shrink-0 group"
+            >
               <img 
                 src={m2mLogo} 
                 alt="Data Centre Twin Studio" 

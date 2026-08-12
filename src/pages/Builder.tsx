@@ -347,7 +347,7 @@ export default function Builder() {
   // Show loading state while checking auth or first initialization only
   if (!authChecked || !isInitialized) {
     return (
-      <main
+      <div
         className="flex items-center justify-center min-h-dvh bg-background"
         role="status"
         aria-live="polite"
@@ -359,7 +359,7 @@ export default function Builder() {
             <p className="text-sm text-muted-foreground">{t('builder.loadingDesc')}</p>
           </div>
         </div>
-      </main>
+      </div>
     );
   }
 
@@ -405,7 +405,7 @@ export default function Builder() {
       }
     };
     return (
-      <main className="min-h-dvh bg-background section-padding-lg" aria-labelledby="builder-start-heading">
+      <section className="min-h-dvh bg-background section-padding-lg" aria-labelledby="builder-start-heading">
         <div className="max-w-2xl mx-auto text-center space-y-6">
           <div className="space-y-2">
             <h1 id="builder-start-heading" className="text-2xl font-semibold">
@@ -447,7 +447,7 @@ export default function Builder() {
             </Button>
           </div>
         </div>
-      </main>
+      </section>
     );
   }
 

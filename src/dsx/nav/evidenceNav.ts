@@ -53,8 +53,8 @@ export const EVIDENCE_SECTIONS: EvidenceSection[] = [
     label: 'Sustainability',
     children: [
       { path: `${DSX_ROOT}/sustainability`, label: 'Energy and carbon', domain: 'carbon' },
-      { path: `${DSX_ROOT}/sustainability/water`, label: 'Water' },
       { path: `${DSX_ROOT}/sustainability/financial`, label: 'Financial exposure', domain: 'financial' },
+      { path: `${DSX_ROOT}/sustainability/sovereignty`, label: 'Sovereignty' },
     ],
   },
   {
@@ -64,7 +64,6 @@ export const EVIDENCE_SECTIONS: EvidenceSection[] = [
     label: 'Decisions',
     children: [
       { path: `${DSX_ROOT}/decisions`, label: 'Results' },
-      { path: `${DSX_ROOT}/decisions/recommendations`, label: 'Recommendations' },
       { path: `${DSX_ROOT}/decisions/log`, label: 'Decision log' },
     ],
   },

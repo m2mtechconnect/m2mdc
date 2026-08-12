@@ -139,6 +139,20 @@ function ApprovedUserRoutes() {
       <Route path="/dsx/evidence-beta" element={<EvidenceBetaShell />}>
         <Route index element={<OverviewWorkspace />} />
         <Route path="overview" element={<OverviewWorkspace />} />
+        {/* Canonical five-section Evidence IA (src/dsx/nav/evidenceNav.ts). */}
+        <Route path="operations" element={<PreserveNavigate to="/dsx/evidence-beta/operations/thermal" />} />
+        <Route path="operations/thermal" element={<ThermalWorkspace />} />
+        <Route path="operations/power" element={<PowerWorkspace />} />
+        <Route path="operations/cooling" element={<CoolingWorkspace />} />
+        <Route path="operations/compute" element={<NetworkWorkspace />} />
+        <Route path="operations/workload" element={<WorkloadWorkspace />} />
+        <Route path="sustainability" element={<CarbonWorkspace />} />
+        <Route path="sustainability/financial" element={<FinancialWorkspace />} />
+        <Route path="sustainability/sovereignty" element={<SovereigntyWorkspace />} />
+        <Route path="decisions" element={<SimulationsWorkspace />} />
+        <Route path="decisions/log" element={<EvidenceWorkspace />} />
+        <Route path="assets" element={<FacilityWorkspace />} />
+        {/* Legacy children keep working, query string preserved. */}
         <Route path="thermal" element={<ThermalWorkspace />} />
         <Route path="power" element={<PowerWorkspace />} />
         <Route path="cooling" element={<CoolingWorkspace />} />

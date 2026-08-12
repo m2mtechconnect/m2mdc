@@ -55,6 +55,7 @@ export function ProvenanceBadge({ meta, compact = false, className }: Provenance
         <TooltipTrigger asChild>
           <Badge
             variant="outline"
+            role="img"
             aria-label={`Provenance: ${label}. Source: ${meta.source}. ${timestamp}${stale}${connection}.${runId ? ` Simulation run ${runId}.` : ''}`}
             className={cn('gap-1 font-medium', variantFor[meta.provenance], className)}
           >

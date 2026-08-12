@@ -6,7 +6,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { DsxProvenancedMetric } from '@/dsx/contracts/provenancedMetric';
-import { CalibrationBadge, DataModeBadge, FreshnessIndicator, ValidationBadge } from './StateBadges';
+import { FreshnessIndicator, ValidationBadge } from './StateBadges';
 import { useWorkspace } from '@/dsx/runtime/EvidenceBetaContext';
 
 interface Props {
@@ -52,15 +52,16 @@ export function MetricTile({ id, metric, digits = 2, label, className }: Props) 
             )}
           </span>
 
+          {/* Data mode and calibration are facility-wide facts carried once by
+              the operational truth bar; the tile keeps only the per-metric
+              verification state, plus freshness when it is not fresh. */}
           <span className="flex flex-wrap gap-1">
-            <DataModeBadge mode={metric.data_mode} />
-            <FreshnessIndicator freshness={metric.freshness} />
+            {metric.freshness !== 'fresh' && <FreshnessIndicator freshness={metric.freshness} />}
             <ValidationBadge
               validation={metric.validation}
               calibration={metric.calibration}
               unattestedInputs={metric.unattested_inputs ?? []}
             />
-            <CalibrationBadge calibration={metric.calibration} />
           </span>
 
           {unavailable && metric.missing_inputs.length > 0 && (

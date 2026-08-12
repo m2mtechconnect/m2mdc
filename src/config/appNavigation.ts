@@ -127,7 +127,7 @@ export const MANAGE_NAV: AppNavItem[] = [
     description: 'Configure the modelled subsystem agents.',
   },
   {
-    name: 'Analytics',
+    name: 'Telemetry and analytics',
     fullName: 'Telemetry and analytics',
     href: '/analytics',
     icon: BarChart3,

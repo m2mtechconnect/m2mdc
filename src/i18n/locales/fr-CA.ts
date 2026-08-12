@@ -750,7 +750,7 @@ const frCA = {
 
   // Équipes
   teams: {
-    title: 'Équipes et collaboration',
+    title: 'Équipes et rôles',
     subtitle: "Gérer les membres de l'équipe, les rôles et les contrôles d'accès",
     inviteMember: "Inviter un membre de l'équipe",
     addMembers: 'Ajouter de nouveaux membres à votre espace de travail',
@@ -1063,7 +1063,7 @@ const frCA = {
 
   // Paramètres IA
   aiSettings: {
-    title: 'Paramètres du moteur IA',
+    title: 'Paramètres IA',
     subtitle: 'Configurer Google Gemini (Vertex AI) pour l\'assistant AURA',
     gcpConfig: 'Configuration Google Cloud',
     projectId: 'ID du projet Google Cloud',
@@ -1324,7 +1324,7 @@ const frCA = {
 
   // Tableau de bord des inscriptions admin
   adminSignups: {
-    title: "Inscriptions d'intégration",
+    title: 'Inscriptions et approbations',
     subtitle: "Inscriptions en temps réel et état d'approbation",
     live: 'En direct',
     totalUsers: 'Total des utilisateurs',

@@ -749,7 +749,7 @@ const en = {
 
   // Teams
   teams: {
-    title: 'Teams & Collaboration',
+    title: 'Teams and roles',
     subtitle: 'Manage team members, roles, and access controls',
     inviteMember: 'Invite Team Member',
     addMembers: 'Add new members to your workspace',
@@ -1062,7 +1062,7 @@ const en = {
 
   // AI Settings
   aiSettings: {
-    title: 'AI Engine Settings',
+    title: 'AI settings',
     subtitle: 'Configure Google Gemini (Vertex AI) for AURA Assistant',
     gcpConfig: 'Google Cloud Configuration',
     projectId: 'Google Cloud Project ID',
@@ -1305,7 +1305,7 @@ const en = {
 
   // Onboarding Submissions
   onboardingSubmissions: {
-    title: 'Onboarding Submissions',
+    title: 'Onboarding submissions',
     subtitle: 'Prospect questionnaire responses from the marketing page',
     totalLeads: 'Total Leads',
     thisWeek: 'This Week',
@@ -1323,7 +1323,7 @@ const en = {
 
   // Admin Signups Dashboard
   adminSignups: {
-    title: 'Onboarding Signups',
+    title: 'Signups and approvals',
     subtitle: 'Real-time user registrations and approval status',
     live: 'Live',
     totalUsers: 'Total Users',
@@ -1342,7 +1342,7 @@ const en = {
 
   // Admin User Approval
   adminUserApproval: {
-    title: 'User Approvals',
+    title: 'User approvals',
     subtitle: 'Manage access for new user signups',
   },
 

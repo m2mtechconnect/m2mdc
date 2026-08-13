@@ -82,6 +82,11 @@ interface DataCenter3DSceneProps {
   activeOverlay?: OverlayDomain;
   /** Simulation KPIs for overlay customization */
   simulationKpis?: Record<string, number>;
+  /**
+   * The host renders its own toolbar in the top-left corner (layer selector,
+   * 3D/2D switch). Offsets the in-scene camera bar so the two never overlap.
+   */
+  hostChromeTop?: boolean;
 }
 
 interface CanvasMountBoundaryProps {

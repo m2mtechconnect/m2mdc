@@ -31,18 +31,9 @@ import { LoadingState, NoTwinSelectedEmptyState } from '@/components/ui/empty-st
 import { ModeBadge, SnapshotBadge } from '@/components/ui/snapshot-indicator';
 
 // Lazy load 3D visualization for performance
-const TwinVisualizationLayout = lazy(() => {
-  console.log('[twin] lazy import start');
-  return import('@/components/twin-visualization')
-    .then(m => {
-      console.log('[twin] lazy import ok', typeof m.TwinVisualizationLayout);
-      return { default: m.TwinVisualizationLayout };
-    })
-    .catch(e => {
-      console.error('[twin] lazy import failed', e);
-      throw e;
-    });
-});
+const TwinVisualizationLayout = lazy(() =>
+  import('@/components/twin-visualization').then(m => ({ default: m.TwinVisualizationLayout }))
+);
 
 function VisualizationSkeleton() {
   return (

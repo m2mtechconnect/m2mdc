@@ -132,6 +132,7 @@ export function FacilityCanvas({ facility }: Props) {
               events={[]}
               mode="blueprint"
               fill
+              hostChromeTop
               activeOverlay={activeOverlay as never}
               onRackClick={handleSelect}
             />

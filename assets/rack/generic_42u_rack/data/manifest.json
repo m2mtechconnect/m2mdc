@@ -1,0 +1,29 @@
+{
+  "assetId": "aura.rack.generic_42u",
+  "displayName": "Generic 42U server rack (unbranded)",
+  "sourceFormat": "OpenUSD (usda)",
+  "usdVersion": "1.0.0",
+  "upAxis": "Y",
+  "metersPerUnit": 1,
+  "originConvention": "floor-contact, centred on footprint",
+  "dimensionsMeters": { "width": 0.6, "height": 2.0, "depth": 1.2 },
+  "instanceable": true,
+  "payloads": {
+    "external": "payloads/external.usdc",
+    "internal": "payloads/internal.usdc"
+  },
+  "layers": [
+    "layers/generic_42u_rack_Properties.usda",
+    "layers/generic_42u_rack_ConnectionPoints.usda"
+  ],
+  "web": {
+    "glb": null,
+    "status": "not-generated",
+    "reason": "USD to glTF conversion requires a USD toolchain that is unavailable in this environment."
+  },
+  "validation": {
+    "usdchecker": "not-run",
+    "lastValidatedAt": null
+  },
+  "approvalStatus": "pending-review"
+}

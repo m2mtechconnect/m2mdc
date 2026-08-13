@@ -16,7 +16,7 @@ import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import type { RackVisual } from './types';
-import { getThermalColor, getUtilizationColor } from './types';
+import { getThermalColor } from './types';
 import { surfaceMaterial, ledMaterial, overlayMaterial } from '@/three/materials';
 
 interface RackProps {

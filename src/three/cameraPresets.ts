@@ -69,7 +69,7 @@ export function resolveCameraPreset(
   // 40 degree vertical FOV. A 0.62 fill factor keeps every row inside the
   // frame while removing the empty foreground the previous fit produced.
   const facility: CameraPlacement = {
-    distance: clampDistance((bounds.radius * 0.62) / Math.tan((40 * Math.PI) / 180 / 2)),
+    distance: clampDistance((bounds.radius * 0.5) / Math.tan((40 * Math.PI) / 180 / 2)),
     theta: 0.55,
     phi: 1.12,
     target: [bounds.centre[0], bounds.centre[1] + 0.5, bounds.centre[2]],

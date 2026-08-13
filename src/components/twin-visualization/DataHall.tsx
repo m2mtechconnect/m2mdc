@@ -10,7 +10,6 @@
  */
 
 import { useMemo } from 'react';
-import { Html } from '@react-three/drei';
 import type { RowVisual } from './types';
 import type { QualityProfile } from '@/three/qualityProfiles';
 import {
@@ -34,7 +33,7 @@ interface Props {
   crahUnits?: number;
 }
 
-const CEILING = 4.6;
+const CEILING = 4.2;
 const WALL_CLEARANCE = 3.2;
 
 export function DataHall({ bounds, rows, profile, crahUnits = 0 }: Props) {
@@ -117,9 +116,14 @@ export function DataHall({ bounds, rows, profile, crahUnits = 0 }: Props) {
               <boxGeometry args={[width, 0.18, 0.14]} />
             </mesh>
           ))}
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[cx, CEILING, cz]} material={ceiling}>
-        <planeGeometry args={[width, depth]} />
-      </mesh>
+      {/* Ceiling deck: rendered as narrow panels between beams so the hall is
+          never occluded when the camera sits above the containment. */}
+      {structural &&
+        [minX + width * 0.25, maxX - width * 0.25].map((px) => (
+          <mesh key={`deck-${px}`} rotation={[Math.PI / 2, 0, 0]} position={[px, CEILING, cz]} material={ceiling}>
+            <planeGeometry args={[width * 0.18, depth]} />
+          </mesh>
+        ))}
 
       {/* Overhead cable trays and power busway following each row */}
       {rows.map((row) => (
@@ -180,20 +184,6 @@ export function DataHall({ bounds, rows, profile, crahUnits = 0 }: Props) {
         );
       })}
 
-      {/* Aisle and row identifiers */}
-      {rows.map((row) => (
-        <Html
-          key={`label-${row.id}`}
-          position={[bounds.minX - 1.6, 0.35, row.position[2]]}
-          center
-          distanceFactor={16}
-          occlude={false}
-        >
-          <div className="rounded bg-slate-900/85 px-2 py-0.5 text-[11px] font-semibold text-slate-100 whitespace-nowrap">
-            {row.name}
-          </div>
-        </Html>
-      ))}
     </group>
   );
 }

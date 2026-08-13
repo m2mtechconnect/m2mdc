@@ -7,10 +7,11 @@
 
 import { Component, Suspense, useState, useRef, useEffect, useCallback, useMemo, WheelEvent, type ReactNode } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls, Grid, PerspectiveCamera } from '@react-three/drei';
+import { ContactShadows, OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import { FacilityLighting } from './FacilityLighting';
-import { surfaceMaterial } from '@/three/materials';
+import { DataHall } from './DataHall';
+import { overlayContract } from '@/three/overlayContract';
 import {
   QUALITY_PROFILES,
   readQualityProfile,
@@ -87,6 +88,8 @@ interface DataCenter3DSceneProps {
    * 3D/2D switch). Offsets the in-scene camera bar so the two never overlap.
    */
   hostChromeTop?: boolean;
+  /** Currently selected asset, highlighted without replacing its material. */
+  selectedAssetId?: string | null;
 }
 
 interface CanvasMountBoundaryProps {
@@ -152,7 +155,10 @@ function CameraController({
   const focus = placement
     ? new THREE.Vector3(placement.target[0], placement.target[1], placement.target[2])
     : targetPosition;
-  const distance = placement ? placement.distance : targetDistance;
+  // Manual zoom stays authoritative even while a preset placement is active:
+  // targetDistance/baseDistance encodes the operator zoom factor (1 / zoom).
+  const zoomScale = baseDistance > 0 ? targetDistance / baseDistance : 1;
+  const distance = placement ? placement.distance * zoomScale : targetDistance;
   
   useFrame((state, delta) => {
     // Lerp distance toward target
@@ -204,6 +210,7 @@ function Scene({
   qualityProfile,
   placement,
   reducedMotion,
+  selectedAssetId,
 }: Omit<DataCenter3DSceneProps, 'events'> & { 
   targetDistance: number; 
   baseDistance: number;
@@ -213,22 +220,43 @@ function Scene({
   reducedMotion: boolean;
 }) {
   const controlsRef = useRef<any>(null);
-  
-  // Calculate scene bounds
-  const maxZ = Math.max(...rows.map(r => r.position[2]), 5) + 5;
-  const maxX = Math.max(...racks.map(r => r.position[0]), 8) + 3;
-  
-  const targetPosition = new THREE.Vector3(maxX / 2, 0.5, maxZ / 2);
-  
-  // Initial camera position for fly-in
-  const cameraPosition: [number, number, number] = compact 
-    ? [maxX * 0.8 + 15, 18, maxZ + 15]
-    : [maxX * 0.7 + 20, 22, maxZ + 18];
+
+  // Facility extents derived from the real rack positions.
+  const extents = useMemo(() => {
+    const xs = racks.map((r) => r.position[0]);
+    const zs = [...rows.map((r) => r.position[2]), ...racks.map((r) => r.position[2])];
+    return {
+      minX: xs.length ? Math.min(...xs) - 0.8 : -4,
+      maxX: xs.length ? Math.max(...xs) + 0.8 : 4,
+      minZ: zs.length ? Math.min(...zs) - 1.6 : -4,
+      maxZ: zs.length ? Math.max(...zs) + 1.6 : 4,
+    };
+  }, [racks, rows]);
+
+  const centre: [number, number, number] = [
+    (extents.minX + extents.maxX) / 2,
+    1.0,
+    (extents.minZ + extents.maxZ) / 2,
+  ];
+  const hallRadius = Math.max(
+    6,
+    Math.hypot((extents.maxX - extents.minX) / 2 + 2, (extents.maxZ - extents.minZ) / 2 + 2),
+  );
+
+  const targetPosition = new THREE.Vector3(centre[0], centre[1], centre[2]);
+  const profile = QUALITY_PROFILES[qualityProfile];
+
+  // Framing that fills the viewport with the hall instead of empty floor.
+  const cameraPosition: [number, number, number] = [
+    centre[0] + hallRadius * 0.9,
+    hallRadius * 0.75,
+    centre[2] + hallRadius * 1.05,
+  ];
 
   return (
     <>
-      <PerspectiveCamera 
-        makeDefault 
+      <PerspectiveCamera
+        makeDefault
         position={cameraPosition}
         fov={compact ? 45 : 40}
       />
@@ -255,36 +283,24 @@ function Scene({
       />
 
       {/* Industrial lighting rig (neutral 4000-5000K, quality-profile aware) */}
-      <FacilityLighting
-        centre={[targetPosition.x, 0, targetPosition.z]}
-        radius={Math.max(maxX, maxZ) / 2 + 4}
-        profile={QUALITY_PROFILES[qualityProfile]}
-      />
+      <FacilityLighting centre={centre} radius={hallRadius} profile={profile} />
 
-      {/* Raised floor */}
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[maxX / 2, -0.02, maxZ / 2]}
-        material={surfaceMaterial('raisedFloorTile')}
-        receiveShadow
-      >
-        <planeGeometry args={[maxX + 20, maxZ + 20]} />
-      </mesh>
+      {/* Architectural environment: raised floor, walls, ceiling frame,
+          cable trays, busway, cooling routes, containment and markings. */}
+      <DataHall bounds={extents} rows={rows} profile={profile} crahUnits={thermalZones.length} />
 
-      {/* Floor tile grid (600 mm pitch) */}
-      <Grid 
-        position={[maxX / 2, 0, maxZ / 2]}
-        args={[maxX + 16, maxZ + 16]}
-        cellSize={0.6}
-        cellThickness={0.4}
-        cellColor="#6a7079"
-        sectionSize={3}
-        sectionThickness={0.9}
-        sectionColor="#878e97"
-        fadeDistance={40}
-        fadeStrength={1.2}
-        followCamera={false}
-      />
+      {/* Grounded contact shadows (high profile only) */}
+      {profile.ambientOcclusion && (
+        <ContactShadows
+          position={[centre[0], 0.012, centre[2]]}
+          scale={hallRadius * 2.6}
+          resolution={1024}
+          blur={2.4}
+          opacity={0.55}
+          far={4}
+          frames={1}
+        />
+      )}
 
       {/* Domain-specific overlays based on KPI tab selection */}
       {/* Thermal overlay - show when thermal domain active or explicit showThermal */}
@@ -318,6 +334,26 @@ function Scene({
         avgGpuUtilization={simulationKpis?.avgGpuUtilization}
       />
 
+      {/* Carbon: facility-level only. AURA holds no per-rack energy allocation
+          evidence, so the layer renders the facility energy envelope rather
+          than inventing rack-level emissions. */}
+      {activeOverlay === 'carbon' && (
+        <group name="overlay:carbon-facility">
+          <mesh
+            rotation={[-Math.PI / 2, 0, 0]}
+            position={[centre[0], 0.02, centre[2]]}
+            renderOrder={1}
+          >
+            <planeGeometry args={[extents.maxX - extents.minX + 5, extents.maxZ - extents.minZ + 5]} />
+            <meshBasicMaterial color="#0ea5a4" transparent opacity={0.16} depthWrite={false} />
+          </mesh>
+          <mesh position={[centre[0], 3.05, extents.minZ - 1.2]} renderOrder={1}>
+            <boxGeometry args={[extents.maxX - extents.minX + 4, 0.18, 0.18]} />
+            <meshBasicMaterial color="#38bdf8" transparent opacity={0.75} />
+          </mesh>
+        </group>
+      )}
+
       {/* Rack groups */}
       {rows.map((row) => (
         <RackGroup 
@@ -326,7 +362,9 @@ function Scene({
           racks={racks}
           showThermal={showThermal || activeOverlay === 'thermal'}
           onRackClick={onRackClick}
-          detailed={racks.length <= QUALITY_PROFILES[qualityProfile].detailBudget}
+          detailed={racks.length <= profile.detailBudget}
+          detailLevel={profile.rackDetail}
+          selectedRackId={selectedAssetId ?? null}
           overlayColorFor={(rack) => {
             switch (activeOverlay) {
               case 'thermal':
@@ -338,6 +376,9 @@ function Scene({
               case 'power':
               case 'pue':
                 return getPowerColor(rack.powerKw / 12, false);
+              case 'carbon':
+                // Rack-level carbon allocation is not evidenced: no rack tint.
+                return null;
               default:
                 return null;
             }
@@ -374,6 +415,12 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
     () => facilityBoundsFromPositions(props.racks.map((r) => r.position)),
     [props.racks],
   );
+
+  // The default view is the calculated facility overview, so "Reset camera"
+  // always returns to a computed fit rather than a hardcoded position.
+  useEffect(() => {
+    setPlacement(resolveCameraPreset('fitFacility', bounds));
+  }, [bounds]);
 
   const applyPreset = useCallback(
     (preset: CameraPresetId) => {
@@ -518,41 +565,85 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
         disabled={contextLost}
       />
 
-      {/* Camera presets and rendering quality (keyboard accessible) */}
+      {/* Canvas toolbar, protected groups.
+          Left is reserved for the host (layer selector, 3D/2D).
+          Centre: camera presets. Right: quality profile and fit action.
+          Top-right above these: the zoom control zone. */}
       {!props.compact && (
-        <div
-          className={`absolute left-3 z-20 flex max-w-[calc(100%-6.5rem)] flex-wrap items-center gap-1.5 ${
-            props.hostChromeTop ? 'top-[3.75rem]' : 'top-3'
-          }`}
-        >
-          {(['fitFacility', 'topDown', 'powerTopology', 'coolingTopology', 'reset'] as CameraPresetId[]).map(
-            (preset) => (
-              <button
-                key={preset}
-                type="button"
-                onClick={() => applyPreset(preset)}
-                className="rounded-md border border-slate-600/70 bg-slate-900/85 px-2.5 py-1.5 text-xs text-slate-100 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+        <>
+          <div
+            className={`absolute left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 ${
+              props.hostChromeTop ? 'top-[3.75rem]' : 'top-3'
+            }`}
+            role="group"
+            aria-label="Camera views"
+          >
+            <label className="flex items-center gap-1.5 text-xs text-slate-100">
+              <span className="sr-only">Camera view</span>
+              <select
+                aria-label="Camera view"
+                data-testid="twin-camera-preset"
+                value=""
+                onChange={(e) => {
+                  const preset = e.target.value as CameraPresetId;
+                  if (preset) applyPreset(preset);
+                }}
+                className="max-w-[10rem] bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
               >
-                {CAMERA_PRESET_LABELS[preset]}
-              </button>
-            ),
-          )}
-          <label className="ml-1 flex items-center gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
-            <span className="sr-only">Rendering quality</span>
-            <select
-              aria-label="Rendering quality"
-              value={qualityProfile}
-              onChange={(e) => changeQuality(e.target.value as QualityProfileId)}
-              className="bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
-            >
-              {Object.values(QUALITY_PROFILES).map((p) => (
-                <option key={p.id} value={p.id} className="bg-slate-900">
-                  {p.label}
+                <option value="" className="bg-slate-900">
+                  Camera view
                 </option>
-              ))}
-            </select>
-          </label>
-        </div>
+                {(
+                  [
+                    'fitFacility',
+                    'topDown',
+                    'frontAisles',
+                    'rearInfrastructure',
+                    'coolingTopology',
+                    'powerTopology',
+                    'fitSelection',
+                  ] as CameraPresetId[]
+                ).map((preset) => (
+                  <option key={preset} value={preset} className="bg-slate-900">
+                    {CAMERA_PRESET_LABELS[preset]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div
+            className={`absolute right-3 z-20 flex items-center gap-1.5 ${
+              props.hostChromeTop ? 'top-[3.75rem]' : 'top-14'
+            }`}
+            role="group"
+            aria-label="Rendering controls"
+          >
+            <label className="flex items-center gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
+              <span className="sr-only">Rendering quality</span>
+              <select
+                aria-label="Rendering quality"
+                value={qualityProfile}
+                onChange={(e) => changeQuality(e.target.value as QualityProfileId)}
+                className="max-w-[9rem] bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+              >
+                {Object.values(QUALITY_PROFILES).map((p) => (
+                  <option key={p.id} value={p.id} className="bg-slate-900">
+                    {p.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              onClick={() => applyPreset('reset')}
+              title="Reset camera to the calculated facility overview"
+              className="rounded-md border border-slate-600/70 bg-slate-900/85 px-2.5 py-1.5 text-xs text-slate-100 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+            >
+              Reset camera
+            </button>
+          </div>
+        </>
       )}
 
       {/* Context lost overlay */}
@@ -583,7 +674,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             frameloop="always"
             gl={{ 
               antialias: QUALITY_PROFILES[qualityProfile].antialias,
-              failIfMajorPerformanceCaveat: true,
+              failIfMajorPerformanceCaveat: false,
               powerPreference: 'high-performance',
               toneMapping: THREE.ACESFilmicToneMapping,
               toneMappingExposure: 1.05,

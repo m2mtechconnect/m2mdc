@@ -18,6 +18,7 @@ import { DataCenter3DScene } from '@/components/twin-visualization/DataCenter3DS
 import { useTwinVisualizationData } from '@/components/twin-visualization/hooks/useTwinVisualizationData';
 import { useTwinOverlaySafe, type TwinOverlay } from '@/context/TwinOverlayContext';
 import { cn } from '@/lib/utils';
+import { overlayContract } from '@/three/overlayContract';
 import { useWorkspaceStore } from './workspaceStore';
 import { LayerSelector } from './LayerSelector';
 import { FacilityFloorPlan } from './FacilityFloorPlan';
@@ -28,14 +29,6 @@ import { type FacilityDefinition } from './facilityModel';
 const LOAD_TIMEOUT_MS = 8000;
 const ZOOM_MIN = 0.6;
 const ZOOM_MAX = 3;
-
-/** Status legend for the model, readable without relying on colour alone. */
-const LEGEND: Array<{ label: string; className: string }> = [
-  { label: 'Nominal', className: 'bg-success' },
-  { label: 'Watch', className: 'bg-warning' },
-  { label: 'Constraint', className: 'bg-destructive' },
-  { label: 'Unavailable', className: 'bg-muted-foreground' },
-];
 
 type ModelState = 'loading' | 'ready' | 'degraded' | 'error';
 type ViewMode = '3d' | '2d';
@@ -111,6 +104,7 @@ export function FacilityCanvas({ facility }: Props) {
     };
   }, [viewMode, attempt]);
 
+  const contract = overlayContract(activeOverlay as never);
   const showLoading = viewMode === '3d' && modelState === 'loading';
   const clampZoom = (z: number) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
 
@@ -134,6 +128,7 @@ export function FacilityCanvas({ facility }: Props) {
               fill
               hostChromeTop
               activeOverlay={activeOverlay as never}
+              selectedAssetId={selectedAssetId}
               onRackClick={handleSelect}
             />
           </SimulationErrorBoundary>
@@ -263,17 +258,43 @@ export function FacilityCanvas({ facility }: Props) {
             </Button>
           </div>
         )}
-        <ul
-          className="pointer-events-auto flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border bg-card/90 px-2.5 py-1.5 text-xs text-muted-foreground backdrop-blur"
-          aria-label="Model status legend"
+        <div
+          className="pointer-events-auto max-w-full rounded-md border border-border bg-card/95 px-2.5 py-2 text-xs text-muted-foreground backdrop-blur"
+          data-testid="model-overlay-legend"
         >
-          {LEGEND.map((item) => (
-            <li key={item.label} className="flex items-center gap-1.5 whitespace-nowrap">
-              <span className={cn('h-2 w-2 rounded-full', item.className)} aria-hidden />
-              {item.label}
-            </li>
-          ))}
-        </ul>
+          <div className="mb-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="font-medium text-foreground">{contract.label}</span>
+            {contract.unit && <span className="text-[11px]">{contract.unit}</span>}
+            {activeOverlay !== 'none' && (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-6 px-1.5 text-[11px]"
+                onClick={() => setOverlay('none')}
+              >
+                Clear layer
+              </Button>
+            )}
+          </div>
+          {contract.legend.length > 0 && (
+            <ul className="flex flex-wrap items-center gap-x-3 gap-y-1" aria-label={`${contract.label} legend`}>
+              {contract.legend.map((stop) => (
+                <li key={stop.label} className="flex items-center gap-1.5 whitespace-nowrap">
+                  <span
+                    className="h-2 w-2 rounded-full"
+                    style={{ backgroundColor: stop.color }}
+                    aria-hidden
+                  />
+                  {stop.label}
+                </li>
+              ))}
+            </ul>
+          )}
+          {contract.unavailableNote && (
+            <p className="mt-1 max-w-[26rem] text-[11px] text-foreground">{contract.unavailableNote}</p>
+          )}
+          <p className="mt-1 max-w-[26rem] text-[11px]">{contract.provenance}</p>
+        </div>
       </div>
 
       {isRunning && (

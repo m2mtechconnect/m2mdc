@@ -5,7 +5,7 @@
 
 import { Html } from '@react-three/drei';
 import type { RowVisual, RackVisual } from './types';
-import { Rack } from './Rack';
+import { Rack, type RackDetailLevel } from './Rack';
 
 interface RackGroupProps {
   row: RowVisual;
@@ -16,6 +16,9 @@ interface RackGroupProps {
   detailed?: boolean;
   /** Resolve the operational overlay colour for a rack, or null to clear. */
   overlayColorFor?: (rack: RackVisual) => string | null;
+  /** Rack geometry level of detail from the active quality profile. */
+  detailLevel?: RackDetailLevel;
+  selectedRackId?: string | null;
 }
 
 export function RackGroup({
@@ -25,6 +28,8 @@ export function RackGroup({
   onRackClick,
   detailed = true,
   overlayColorFor,
+  detailLevel,
+  selectedRackId,
 }: RackGroupProps) {
   const rowRacks = racks.filter(r => r.rowId === row.id);
   const rowWidth = rowRacks.length * 1.1 + 0.5;
@@ -76,6 +81,8 @@ export function RackGroup({
           showThermal={showThermal}
           onClick={onRackClick}
           detailed={detailed}
+          detailLevel={detailLevel}
+          selected={selectedRackId === rack.id}
           overlayColor={overlayColorFor ? overlayColorFor(rack) : null}
         />
       ))}

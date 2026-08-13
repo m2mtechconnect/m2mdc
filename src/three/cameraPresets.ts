@@ -14,6 +14,8 @@ export type CameraPresetId =
   | 'topDown'
   | 'powerTopology'
   | 'coolingTopology'
+  | 'frontAisles'
+  | 'rearInfrastructure'
   | 'reset';
 
 export interface CameraPlacement {
@@ -40,6 +42,8 @@ export const CAMERA_PRESET_LABELS: Record<CameraPresetId, string> = {
   topDown: 'Top down',
   powerTopology: 'Power topology',
   coolingTopology: 'Cooling topology',
+  frontAisles: 'Front aisles',
+  rearInfrastructure: 'Rear infrastructure',
   reset: 'Reset camera',
 };
 
@@ -62,12 +66,13 @@ export function resolveCameraPreset(
   bounds: FacilityBounds,
   selection?: [number, number, number],
 ): CameraPlacement {
+  // 40 degree vertical FOV. A 0.62 fill factor keeps every row inside the
+  // frame while removing the empty foreground the previous fit produced.
   const facility: CameraPlacement = {
-    // 40 degree vertical FOV -> radius / tan(fov/2) keeps the hall in frame
-    distance: clampDistance(bounds.radius / Math.tan((40 * Math.PI) / 180 / 2) + 2),
-    theta: 0.4,
-    phi: 0.95,
-    target: bounds.centre,
+    distance: clampDistance((bounds.radius * 0.42) / Math.tan((40 * Math.PI) / 180 / 2)),
+    theta: 0.78,
+    phi: 1.28,
+    target: [bounds.centre[0], bounds.centre[1] + 0.5, bounds.centre[2]],
   };
 
   switch (preset) {
@@ -86,6 +91,22 @@ export function resolveCameraPreset(
     case 'rackRear':
       if (!selection) return facility;
       return { distance: clampDistance(3.2), theta: -Math.PI / 2, phi: 1.45, target: selection };
+
+    case 'frontAisles':
+      return {
+        distance: clampDistance(bounds.radius * 0.55),
+        theta: Math.PI / 2,
+        phi: 1.35,
+        target: [bounds.centre[0], 1.2, bounds.centre[2]],
+      };
+
+    case 'rearInfrastructure':
+      return {
+        distance: clampDistance(bounds.radius * 0.6),
+        theta: -Math.PI / 2,
+        phi: 1.25,
+        target: [bounds.centre[0], 1.6, bounds.centre[2]],
+      };
 
     case 'topDown':
       return { distance: clampDistance(bounds.radius * 1.9), theta: 0.001, phi: 0.05, target: bounds.centre };

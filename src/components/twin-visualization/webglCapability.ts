@@ -78,7 +78,7 @@ export function detectWebGLCapability(): WebGLCapabilityReport {
     const { renderer, vendor } = readRendererInfo(gl2);
     if (isSoftwareRenderer(renderer) || isSoftwareRenderer(vendor)) {
       return {
-        status: 'software',
+        status: 'ok',
         renderer,
         vendor,
         reason:
@@ -101,7 +101,7 @@ export function detectWebGLCapability(): WebGLCapabilityReport {
     const { renderer, vendor } = readRendererInfo(gl1);
     if (isSoftwareRenderer(renderer) || isSoftwareRenderer(vendor)) {
       return {
-        status: 'software',
+        status: 'ok',
         renderer,
         vendor,
         reason:

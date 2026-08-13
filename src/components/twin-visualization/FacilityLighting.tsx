@@ -27,7 +27,7 @@ const BOUNCE_COLOR = '#c8d4e0';
  * Locally generated environment map (no network fetch, no external HDRI
  * dependency) so reflections work offline and never block the canvas.
  */
-function LocalEnvironment() {
+function LocalEnvironment({ intensity }: { intensity: number }) {
   const { gl, scene } = useThree();
 
   useEffect(() => {
@@ -35,12 +35,13 @@ function LocalEnvironment() {
     const envScene = new RoomEnvironment();
     const target = pmrem.fromScene(envScene, 0.04);
     scene.environment = target.texture;
+    (scene as THREE.Scene & { environmentIntensity?: number }).environmentIntensity = intensity;
     return () => {
       scene.environment = null;
       target.dispose();
       pmrem.dispose();
     };
-  }, [gl, scene]);
+  }, [gl, scene, intensity]);
 
   return null;
 }
@@ -97,7 +98,7 @@ export function FacilityLighting({ centre, radius, profile }: FacilityLightingPr
       ))}
 
       {/* Environment reflections for metal and glass */}
-      {profile.environment && <LocalEnvironment />}
+      {profile.environment && <LocalEnvironment intensity={profile.envIntensity} />}
     </>
   );
 }

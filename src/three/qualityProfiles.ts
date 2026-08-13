@@ -19,6 +19,14 @@ export interface QualityProfile {
   contactShadows: boolean;
   /** Maximum number of racks rendered with interior detail geometry. */
   detailBudget: number;
+  /** Rack geometry level of detail. */
+  rackDetail: 'full' | 'exterior' | 'simple';
+  /** Screen-space ambient occlusion / grounded contact shadows. */
+  ambientOcclusion: boolean;
+  /** Texture anisotropy for floor tiles and faceplates. */
+  anisotropy: number;
+  /** Environment reflection strength applied to metals. */
+  envIntensity: number;
 }
 
 export const QUALITY_PROFILES: Record<QualityProfileId, QualityProfile> = {
@@ -32,6 +40,10 @@ export const QUALITY_PROFILES: Record<QualityProfileId, QualityProfile> = {
     environment: true,
     contactShadows: true,
     detailBudget: 240,
+    rackDetail: 'full',
+    ambientOcclusion: true,
+    anisotropy: 8,
+    envIntensity: 1,
   },
   balanced: {
     id: 'balanced',
@@ -43,6 +55,10 @@ export const QUALITY_PROFILES: Record<QualityProfileId, QualityProfile> = {
     environment: true,
     contactShadows: false,
     detailBudget: 120,
+    rackDetail: 'exterior',
+    ambientOcclusion: false,
+    anisotropy: 4,
+    envIntensity: 0.7,
   },
   low: {
     id: 'low',
@@ -54,6 +70,10 @@ export const QUALITY_PROFILES: Record<QualityProfileId, QualityProfile> = {
     environment: false,
     contactShadows: false,
     detailBudget: 48,
+    rackDetail: 'simple',
+    ambientOcclusion: false,
+    anisotropy: 1,
+    envIntensity: 0.35,
   },
 };
 

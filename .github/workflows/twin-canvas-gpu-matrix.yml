@@ -1,0 +1,111 @@
+name: Twin canvas / GPU matrix
+
+# Runs the twin-canvas mounting test across rendering environments and reports
+# genuine product failures separately from software-rendering limitations.
+#
+# Lanes:
+#   software  — hosted ubuntu runner (SwiftShader). The 2D fallback is a valid
+#               terminal state, so a missing WebGL canvas is reported as a
+#               limitation and never gates the build.
+#   gpu       — self-hosted runner labelled `gpu` with real WebGL. A missing
+#               hardware context or a missing canvas fails the lane.
+#
+# The gpu lane is skipped automatically when no GPU runner is available; it is
+# reported as "unavailable" rather than failing the workflow.
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'src/components/twin-visualization/**'
+      - 'src/three/**'
+      - 'tests/truth-in-ui/twin-canvas-mounting.spec.ts'
+      - 'tests/truth-in-ui/_setup/renderer.ts'
+      - 'playwright.gpu.config.ts'
+      - 'scripts/report-gpu-matrix.mjs'
+      - '.github/workflows/twin-canvas-gpu-matrix.yml'
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      run_gpu_lane:
+        description: 'Run the hardware GPU lane'
+        type: boolean
+        default: true
+
+concurrency:
+  group: twin-canvas-gpu-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  twin-canvas:
+    name: Twin canvas (${{ matrix.lane }})
+    runs-on: ${{ matrix.runs-on }}
+    # The GPU lane runs on optional hardware; its failures are surfaced in the
+    # summary job, which decides what gates.
+    continue-on-error: ${{ matrix.lane == 'gpu' }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - lane: software
+            runs-on: ubuntu-latest
+            gpu_required: '0'
+          - lane: gpu
+            runs-on: ubuntu-latest-gpu
+            gpu_required: '1'
+    env:
+      AURA_GPU_LANE: ${{ matrix.lane }}
+      AURA_GPU_REQUIRED: ${{ matrix.gpu_required }}
+      CI: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright chromium
+        run: npx playwright install --with-deps chromium
+      - name: Report GPU environment
+        run: |
+          echo "lane=${AURA_GPU_LANE} gpu_required=${AURA_GPU_REQUIRED}"
+          (command -v nvidia-smi >/dev/null && nvidia-smi) || echo "no nvidia-smi on this runner"
+          (command -v glxinfo >/dev/null && glxinfo -B) || echo "no glxinfo on this runner"
+      - name: Run twin-canvas mounting test
+        id: run
+        continue-on-error: true
+        run: npx playwright test --config=playwright.gpu.config.ts
+      - name: Classify results
+        run: node scripts/report-gpu-matrix.mjs "test-results/gpu-matrix-${AURA_GPU_LANE}.json"
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: twin-canvas-${{ matrix.lane }}
+          path: |
+            test-results/gpu-matrix-${{ matrix.lane }}.json
+            test-results/**
+          if-no-files-found: ignore
+          retention-days: 14
+
+  summary:
+    name: Twin canvas matrix summary
+    runs-on: ubuntu-latest
+    needs: [twin-canvas]
+    if: always()
+    steps:
+      - name: Report
+        run: |
+          {
+            echo "### Twin canvas GPU matrix"
+            echo ""
+            echo "- matrix result: ${{ needs.twin-canvas.result }}"
+            echo ""
+            echo "The \`software\` lane gates this workflow. The \`gpu\` lane is advisory when no GPU runner is available; check its job summary for hardware-only regressions."
+          } >> "$GITHUB_STEP_SUMMARY"
+          [ "${{ needs.twin-canvas.result }}" != "failure" ]

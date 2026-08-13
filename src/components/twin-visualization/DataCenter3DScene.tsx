@@ -37,6 +37,7 @@ import type {
   SimulationEventVisual 
 } from './types';
 import { RackGroup } from './RackGroup';
+import { getThermalColor, getUtilizationColor, getPowerColor } from './types';
 import { ThermalOverlayLayer } from './ThermalOverlayLayer';
 import { PowerFlowLayer } from './PowerFlowLayer';
 import { SovereigntyOverlayLayer } from './SovereigntyOverlayLayer';

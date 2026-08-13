@@ -22,6 +22,7 @@ import {
   resolveCameraPreset,
   CAMERA_PRESET_LABELS,
   type CameraPresetId,
+  type CameraPlacement,
 } from '@/three/cameraPresets';
 import {
   detectWebGLCapability,

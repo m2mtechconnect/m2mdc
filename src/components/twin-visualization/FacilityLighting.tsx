@@ -4,7 +4,10 @@
  * lights, soft key/fill, and grounded ambient. No cyberpunk tint, no bloom.
  */
 
-import { Environment } from '@react-three/drei';
+import { useEffect } from 'react';
+import { useThree } from '@react-three/fiber';
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import type { QualityProfile } from '@/three/qualityProfiles';
 
 interface FacilityLightingProps {
@@ -19,6 +22,28 @@ interface FacilityLightingProps {
 const LUMINAIRE_COLOR = '#fff2e0';
 /** Cool bounce off the raised floor / containment panels. */
 const BOUNCE_COLOR = '#c8d4e0';
+
+/**
+ * Locally generated environment map (no network fetch, no external HDRI
+ * dependency) so reflections work offline and never block the canvas.
+ */
+function LocalEnvironment() {
+  const { gl, scene } = useThree();
+
+  useEffect(() => {
+    const pmrem = new THREE.PMREMGenerator(gl);
+    const envScene = new RoomEnvironment();
+    const target = pmrem.fromScene(envScene, 0.04);
+    scene.environment = target.texture;
+    return () => {
+      scene.environment = null;
+      target.dispose();
+      pmrem.dispose();
+    };
+  }, [gl, scene]);
+
+  return null;
+}
 
 export function FacilityLighting({ centre, radius, profile }: FacilityLightingProps) {
   const [cx, , cz] = centre;
@@ -72,7 +97,7 @@ export function FacilityLighting({ centre, radius, profile }: FacilityLightingPr
       ))}
 
       {/* Environment reflections for metal and glass */}
-      {profile.environment && <Environment preset="warehouse" />}
+      {profile.environment && <LocalEnvironment />}
     </>
   );
 }

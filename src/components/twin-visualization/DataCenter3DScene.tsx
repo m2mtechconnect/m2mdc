@@ -500,12 +500,15 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
       >
         <Suspense fallback={<LoadingFallback />}>
           <Canvas
-            dpr={[1, 1.5]}
+            dpr={QUALITY_PROFILES[qualityProfile].dpr}
+            shadows={QUALITY_PROFILES[qualityProfile].shadows}
             frameloop="always"
             gl={{ 
-              antialias: true,
+              antialias: QUALITY_PROFILES[qualityProfile].antialias,
               failIfMajorPerformanceCaveat: true,
-              powerPreference: 'high-performance'
+              powerPreference: 'high-performance',
+              toneMapping: THREE.ACESFilmicToneMapping,
+              toneMappingExposure: 1.05,
             }}
             onCreated={({ gl }) => {
               if (!gl.capabilities.isWebGL2) {
@@ -533,6 +536,9 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
               lastInteractionTime={lastInteractionTime}
               activeOverlay={props.activeOverlay}
               simulationKpis={props.simulationKpis}
+              qualityProfile={qualityProfile}
+              placement={placement}
+              reducedMotion={reducedMotion}
             />
           </Canvas>
         </Suspense>

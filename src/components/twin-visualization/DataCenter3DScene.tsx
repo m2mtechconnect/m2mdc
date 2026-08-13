@@ -7,10 +7,12 @@
 
 import { Component, Suspense, useState, useRef, useEffect, useCallback, useMemo, WheelEvent, type ReactNode } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls, Grid, PerspectiveCamera } from '@react-three/drei';
+import { ContactShadows, OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import { FacilityLighting } from './FacilityLighting';
 import { surfaceMaterial } from '@/three/materials';
+import { DataHall } from './DataHall';
+import { overlayContract } from '@/three/overlayContract';
 import {
   QUALITY_PROFILES,
   readQualityProfile,
@@ -87,6 +89,8 @@ interface DataCenter3DSceneProps {
    * 3D/2D switch). Offsets the in-scene camera bar so the two never overlap.
    */
   hostChromeTop?: boolean;
+  /** Currently selected asset, highlighted without replacing its material. */
+  selectedAssetId?: string | null;
 }
 
 interface CanvasMountBoundaryProps {
@@ -213,22 +217,43 @@ function Scene({
   reducedMotion: boolean;
 }) {
   const controlsRef = useRef<any>(null);
-  
-  // Calculate scene bounds
-  const maxZ = Math.max(...rows.map(r => r.position[2]), 5) + 5;
-  const maxX = Math.max(...racks.map(r => r.position[0]), 8) + 3;
-  
-  const targetPosition = new THREE.Vector3(maxX / 2, 0.5, maxZ / 2);
-  
-  // Initial camera position for fly-in
-  const cameraPosition: [number, number, number] = compact 
-    ? [maxX * 0.8 + 15, 18, maxZ + 15]
-    : [maxX * 0.7 + 20, 22, maxZ + 18];
+
+  // Facility extents derived from the real rack positions.
+  const extents = useMemo(() => {
+    const xs = racks.map((r) => r.position[0]);
+    const zs = rows.map((r) => r.position[2]);
+    return {
+      minX: xs.length ? Math.min(...xs) - 1 : -4,
+      maxX: xs.length ? Math.max(...xs) + 1 : 4,
+      minZ: zs.length ? Math.min(...zs) - 2 : -4,
+      maxZ: zs.length ? Math.max(...zs) + 2 : 4,
+    };
+  }, [racks, rows]);
+
+  const centre: [number, number, number] = [
+    (extents.minX + extents.maxX) / 2,
+    1.0,
+    (extents.minZ + extents.maxZ) / 2,
+  ];
+  const hallRadius = Math.max(
+    6,
+    Math.hypot((extents.maxX - extents.minX) / 2 + 2, (extents.maxZ - extents.minZ) / 2 + 2),
+  );
+
+  const targetPosition = new THREE.Vector3(centre[0], centre[1], centre[2]);
+  const profile = QUALITY_PROFILES[qualityProfile];
+
+  // Framing that fills the viewport with the hall instead of empty floor.
+  const cameraPosition: [number, number, number] = [
+    centre[0] + hallRadius * 0.9,
+    hallRadius * 0.75,
+    centre[2] + hallRadius * 1.05,
+  ];
 
   return (
     <>
-      <PerspectiveCamera 
-        makeDefault 
+      <PerspectiveCamera
+        makeDefault
         position={cameraPosition}
         fov={compact ? 45 : 40}
       />
@@ -255,36 +280,24 @@ function Scene({
       />
 
       {/* Industrial lighting rig (neutral 4000-5000K, quality-profile aware) */}
-      <FacilityLighting
-        centre={[targetPosition.x, 0, targetPosition.z]}
-        radius={Math.max(maxX, maxZ) / 2 + 4}
-        profile={QUALITY_PROFILES[qualityProfile]}
-      />
+      <FacilityLighting centre={centre} radius={hallRadius} profile={profile} />
 
-      {/* Raised floor */}
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[maxX / 2, -0.02, maxZ / 2]}
-        material={surfaceMaterial('raisedFloorTile')}
-        receiveShadow
-      >
-        <planeGeometry args={[maxX + 20, maxZ + 20]} />
-      </mesh>
+      {/* Architectural environment: raised floor, walls, ceiling frame,
+          cable trays, busway, cooling routes, containment and markings. */}
+      <DataHall bounds={extents} rows={rows} profile={profile} crahUnits={thermalZones.length} />
 
-      {/* Floor tile grid (600 mm pitch) */}
-      <Grid 
-        position={[maxX / 2, 0, maxZ / 2]}
-        args={[maxX + 16, maxZ + 16]}
-        cellSize={0.6}
-        cellThickness={0.4}
-        cellColor="#6a7079"
-        sectionSize={3}
-        sectionThickness={0.9}
-        sectionColor="#878e97"
-        fadeDistance={40}
-        fadeStrength={1.2}
-        followCamera={false}
-      />
+      {/* Grounded contact shadows (high profile only) */}
+      {profile.ambientOcclusion && (
+        <ContactShadows
+          position={[centre[0], 0.012, centre[2]]}
+          scale={hallRadius * 2.6}
+          resolution={1024}
+          blur={2.4}
+          opacity={0.55}
+          far={4}
+          frames={1}
+        />
+      )}
 
       {/* Domain-specific overlays based on KPI tab selection */}
       {/* Thermal overlay - show when thermal domain active or explicit showThermal */}
@@ -326,7 +339,9 @@ function Scene({
           racks={racks}
           showThermal={showThermal || activeOverlay === 'thermal'}
           onRackClick={onRackClick}
-          detailed={racks.length <= QUALITY_PROFILES[qualityProfile].detailBudget}
+          detailed={racks.length <= profile.detailBudget}
+          detailLevel={profile.rackDetail}
+          selectedRackId={selectedAssetId ?? null}
           overlayColorFor={(rack) => {
             switch (activeOverlay) {
               case 'thermal':
@@ -338,6 +353,9 @@ function Scene({
               case 'power':
               case 'pue':
                 return getPowerColor(rack.powerKw / 12, false);
+              case 'carbon':
+                // Rack-level carbon allocation is not evidenced: no rack tint.
+                return null;
               default:
                 return null;
             }

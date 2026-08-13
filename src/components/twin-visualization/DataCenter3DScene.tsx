@@ -155,7 +155,10 @@ function CameraController({
   const focus = placement
     ? new THREE.Vector3(placement.target[0], placement.target[1], placement.target[2])
     : targetPosition;
-  const distance = placement ? placement.distance : targetDistance;
+  // Manual zoom stays authoritative even while a preset placement is active:
+  // targetDistance/baseDistance encodes the operator zoom factor (1 / zoom).
+  const zoomScale = baseDistance > 0 ? targetDistance / baseDistance : 1;
+  const distance = placement ? placement.distance * zoomScale : targetDistance;
   
   useFrame((state, delta) => {
     // Lerp distance toward target

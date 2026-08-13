@@ -94,7 +94,7 @@ export function resolveCameraPreset(
 
     case 'frontAisles':
       return {
-        distance: clampDistance(bounds.radius * 0.85),
+        distance: clampDistance(bounds.radius * 0.55),
         theta: Math.PI / 2,
         phi: 1.35,
         target: [bounds.centre[0], 1.2, bounds.centre[2]],
@@ -102,7 +102,7 @@ export function resolveCameraPreset(
 
     case 'rearInfrastructure':
       return {
-        distance: clampDistance(bounds.radius * 0.95),
+        distance: clampDistance(bounds.radius * 0.6),
         theta: -Math.PI / 2,
         phi: 1.25,
         target: [bounds.centre[0], 1.6, bounds.centre[2]],

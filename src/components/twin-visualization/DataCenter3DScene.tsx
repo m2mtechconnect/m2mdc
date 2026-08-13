@@ -89,6 +89,10 @@ interface CameraControllerProps {
   initialFlyIn: boolean;
   mode?: 'dashboard' | 'blueprint' | 'simulation';
   lastInteractionTime: number;
+  /** Placement requested by a camera preset, applied on change. */
+  placement?: CameraPlacement | null;
+  /** Skip transitions when the operator prefers reduced motion. */
+  reducedMotion?: boolean;
 }
 
 // Camera controller component for smooth animations
@@ -98,38 +102,54 @@ function CameraController({
   targetPosition,
   initialFlyIn,
   mode,
-  lastInteractionTime
+  lastInteractionTime,
+  placement,
+  reducedMotion,
 }: CameraControllerProps) {
   const { camera, invalidate } = useThree();
   const distanceRef = useRef(initialFlyIn ? baseDistance * 2.5 : baseDistance);
   const thetaRef = useRef(0.4); // Azimuth angle
   const phiRef = useRef(0.8); // Polar angle
   const hasAnimatedIn = useRef(false);
+  const appliedPlacement = useRef<CameraPlacement | null>(null);
+
+  // Apply a preset placement once per change (angles + look-at target).
+  if (placement && placement !== appliedPlacement.current) {
+    appliedPlacement.current = placement;
+    thetaRef.current = placement.theta;
+    phiRef.current = placement.phi;
+    if (reducedMotion) distanceRef.current = placement.distance;
+  }
+
+  const focus = placement
+    ? new THREE.Vector3(placement.target[0], placement.target[1], placement.target[2])
+    : targetPosition;
+  const distance = placement ? placement.distance : targetDistance;
   
   useFrame((state, delta) => {
     // Lerp distance toward target
-    const lerpFactor = initialFlyIn && !hasAnimatedIn.current ? 0.03 : 0.06;
-    distanceRef.current += (targetDistance - distanceRef.current) * lerpFactor;
+    const lerpFactor = reducedMotion ? 1 : initialFlyIn && !hasAnimatedIn.current ? 0.03 : 0.06;
+    distanceRef.current += (distance - distanceRef.current) * lerpFactor;
     
     // Mark fly-in as complete when close enough
-    if (Math.abs(distanceRef.current - targetDistance) < 0.5) {
+    if (Math.abs(distanceRef.current - distance) < 0.5) {
       hasAnimatedIn.current = true;
     }
     
     // Auto-orbit in simulation mode when idle
     const isIdle = Date.now() - lastInteractionTime > IDLE_THRESHOLD_MS;
-    if (mode === 'simulation' && isIdle && hasAnimatedIn.current) {
+    if (mode === 'simulation' && isIdle && hasAnimatedIn.current && !reducedMotion) {
       thetaRef.current += 0.002; // Very slow rotation
     }
     
     // Calculate camera position using spherical coordinates
-    const x = targetPosition.x + distanceRef.current * Math.sin(phiRef.current) * Math.cos(thetaRef.current);
-    const y = targetPosition.y + distanceRef.current * Math.cos(phiRef.current);
-    const z = targetPosition.z + distanceRef.current * Math.sin(phiRef.current) * Math.sin(thetaRef.current);
+    const x = focus.x + distanceRef.current * Math.sin(phiRef.current) * Math.cos(thetaRef.current);
+    const y = focus.y + distanceRef.current * Math.cos(phiRef.current);
+    const z = focus.z + distanceRef.current * Math.sin(phiRef.current) * Math.sin(thetaRef.current);
     
     // Smooth interpolation to new position
     camera.position.lerp(new THREE.Vector3(x, y, z), lerpFactor);
-    camera.lookAt(targetPosition);
+    camera.lookAt(focus);
     camera.updateProjectionMatrix();
     
     invalidate();
@@ -153,10 +173,16 @@ function Scene({
   lastInteractionTime,
   activeOverlay,
   simulationKpis,
+  qualityProfile,
+  placement,
+  reducedMotion,
 }: Omit<DataCenter3DSceneProps, 'events'> & { 
   targetDistance: number; 
   baseDistance: number;
   lastInteractionTime: number;
+  qualityProfile: QualityProfileId;
+  placement: CameraPlacement | null;
+  reducedMotion: boolean;
 }) {
   const controlsRef = useRef<any>(null);
   
@@ -196,6 +222,8 @@ function Scene({
         initialFlyIn={true}
         mode={mode}
         lastInteractionTime={lastInteractionTime}
+        placement={placement}
+        reducedMotion={reducedMotion}
       />
 
       {/* Industrial lighting rig (neutral 4000-5000K, quality-profile aware) */}

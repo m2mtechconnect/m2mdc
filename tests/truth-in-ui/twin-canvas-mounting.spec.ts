@@ -1,8 +1,9 @@
 import { test, expect } from './_setup/fixtures';
 import { installSupabaseMock } from './_setup/supabase-mock';
+import { annotateRenderer, gpuRequired, probeRenderer } from './_setup/renderer';
 
 test.describe('AURA twin canvas mounting', () => {
-  test('route leaves the loading skeleton and reaches a terminal viewport state', async ({ context, page }) => {
+  test('route leaves the loading skeleton and reaches a terminal viewport state', async ({ context, page }, testInfo) => {
     const mock = await installSupabaseMock(context);
     const twinId = '00000000-0000-4000-8000-000000000042';
     const twin = {
@@ -36,6 +37,9 @@ test.describe('AURA twin canvas mounting', () => {
     await context.addInitScript((id) => localStorage.setItem('dc_active_twin_id', id), twinId);
     await page.goto('/data-centre-twin', { waitUntil: 'domcontentloaded' });
 
+    const probe = await probeRenderer(page);
+    annotateRenderer(testInfo, probe);
+
     await expect(page.getByTestId('twin-visualization-layout')).toBeVisible();
     await expect(page.getByText('Loading 3D Twin...', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Loading Digital Twin...', { exact: true })).toHaveCount(0);
@@ -45,6 +49,12 @@ test.describe('AURA twin canvas mounting', () => {
     await expect
       .poll(async () => (await canvas.count()) + (await fallback.count()))
       .toBeGreaterThan(0);
+
+    if (gpuRequired) {
+      // Hardware lane: the 2D fallback is a failure, not an accepted state.
+      expect(probe.classification, 'hardware WebGL context expected on the GPU lane').toBe('hardware');
+      await expect(canvas).toBeVisible();
+    }
 
     if (await canvas.count()) {
       await expect(canvas).toBeVisible();

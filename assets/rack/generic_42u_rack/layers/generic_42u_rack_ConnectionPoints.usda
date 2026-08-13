@@ -1,0 +1,78 @@
+#usda 1.0
+(
+    """Guide-purpose connection points for the AURA generic 42U rack.
+       These prims are addressable by simulation and inspection tooling but are
+       purpose = "guide", so they never render in normal views."""
+)
+
+over "Rack_42U"
+{
+    def Scope "ConnectionPoints"
+    {
+        def Xform "Electrical_Input_A" (purpose = "guide")
+        {
+            custom string aif:core:connectionType = "electrical:input"
+            double3 xformOp:translate = (-0.25, 0.15, -0.55)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "Electrical_Input_B" (purpose = "guide")
+        {
+            custom string aif:core:connectionType = "electrical:input"
+            double3 xformOp:translate = (0.25, 0.15, -0.55)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "Liquid_Supply" (purpose = "guide")
+        {
+            custom string aif:core:connectionType = "liquid:supply"
+            double3 xformOp:translate = (-0.2, 0.1, -0.58)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "Liquid_Return" (purpose = "guide")
+        {
+            custom string aif:core:connectionType = "liquid:return"
+            double3 xformOp:translate = (0.2, 0.1, -0.58)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "Airflow_Intake" (purpose = "guide")
+        {
+            custom string aif:core:connectionType = "air:intake"
+            custom vector3f aif:core:flowDirection = (0, 0, -1)
+            double3 xformOp:translate = (0, 1.0, 0.6)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "Airflow_Exhaust" (purpose = "guide")
+        {
+            custom string aif:core:connectionType = "air:exhaust"
+            custom vector3f aif:core:flowDirection = (0, 0, -1)
+            double3 xformOp:translate = (0, 1.0, -0.6)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "Network_Uplink" (purpose = "guide")
+        {
+            custom string aif:core:connectionType = "network:uplink"
+            double3 xformOp:translate = (0, 1.95, -0.5)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "Mount_Rail_Front" (purpose = "guide")
+        {
+            custom string aif:core:connectionType = "mount:rail"
+            double3 xformOp:translate = (0, 0.05, 0.5)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "Sensor_Inlet_Mid" (purpose = "guide")
+        {
+            custom string aif:core:connectionType = "sensor:temperature"
+            custom string aura:telemetrySource = ""
+            double3 xformOp:translate = (0, 1.05, 0.6)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+}

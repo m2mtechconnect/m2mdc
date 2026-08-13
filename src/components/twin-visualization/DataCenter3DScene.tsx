@@ -299,6 +299,22 @@ function Scene({
           racks={racks}
           showThermal={showThermal || activeOverlay === 'thermal'}
           onRackClick={onRackClick}
+          detailed={racks.length <= QUALITY_PROFILES[qualityProfile].detailBudget}
+          overlayColorFor={(rack) => {
+            switch (activeOverlay) {
+              case 'thermal':
+              case 'cooling':
+                return getThermalColor(rack.thermalCelsius);
+              case 'gpu':
+              case 'workload':
+                return getUtilizationColor(rack.gpuLoad ?? rack.utilizationPercent);
+              case 'power':
+              case 'pue':
+                return getPowerColor(rack.powerKw / 12, false);
+              default:
+                return null;
+            }
+          }}
         />
       ))}
     </>

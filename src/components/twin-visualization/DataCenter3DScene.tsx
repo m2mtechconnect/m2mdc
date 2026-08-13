@@ -7,8 +7,22 @@
 
 import { Suspense, useState, useRef, useEffect, useCallback, useMemo, WheelEvent } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls, Grid, Environment, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, Grid, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
+import { FacilityLighting } from './FacilityLighting';
+import { surfaceMaterial } from '@/three/materials';
+import {
+  QUALITY_PROFILES,
+  readQualityProfile,
+  writeQualityProfile,
+  type QualityProfileId,
+} from '@/three/qualityProfiles';
+import {
+  facilityBoundsFromPositions,
+  resolveCameraPreset,
+  CAMERA_PRESET_LABELS,
+  type CameraPresetId,
+} from '@/three/cameraPresets';
 import {
   detectWebGLCapability,
   type WebGLCapabilityReport,

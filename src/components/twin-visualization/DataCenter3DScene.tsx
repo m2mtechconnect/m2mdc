@@ -479,6 +479,39 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
         disabled={contextLost}
       />
 
+      {/* Camera presets and rendering quality (keyboard accessible) */}
+      {!props.compact && (
+        <div className="absolute left-3 top-3 z-20 flex flex-wrap items-center gap-1.5">
+          {(['fitFacility', 'topDown', 'powerTopology', 'coolingTopology', 'reset'] as CameraPresetId[]).map(
+            (preset) => (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => applyPreset(preset)}
+                className="rounded-md border border-slate-600/70 bg-slate-900/85 px-2.5 py-1.5 text-xs text-slate-100 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+              >
+                {CAMERA_PRESET_LABELS[preset]}
+              </button>
+            ),
+          )}
+          <label className="ml-1 flex items-center gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
+            <span className="sr-only">Rendering quality</span>
+            <select
+              aria-label="Rendering quality"
+              value={qualityProfile}
+              onChange={(e) => changeQuality(e.target.value as QualityProfileId)}
+              className="bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+            >
+              {Object.values(QUALITY_PROFILES).map((p) => (
+                <option key={p.id} value={p.id} className="bg-slate-900">
+                  {p.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
+
       {/* Context lost overlay */}
       {contextLost && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/90 backdrop-blur-sm">

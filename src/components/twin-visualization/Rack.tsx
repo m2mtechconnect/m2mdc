@@ -1,105 +1,188 @@
 /**
  * Rack Component
- * 3D representation of a single server rack
+ * Detailed 3D representation of a single unbranded EIA-310 style server rack.
+ *
+ * Geometry is procedural and documented (frame, side panels, perforated front
+ * and rear doors, mounting rails, 1U equipment trays, plinth, top panel). It is
+ * replaced automatically by an approved GLB derivative once one is registered
+ * in `assets/manifest.json`.
+ *
+ * Telemetry is NEVER baked into the physical material: overlay state renders on
+ * a dedicated translucent mesh in front of the door.
  */
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import type { RackVisual } from './types';
 import { getThermalColor, getUtilizationColor } from './types';
+import { surfaceMaterial, ledMaterial, overlayMaterial } from '@/three/materials';
 
 interface RackProps {
   rack: RackVisual;
   showThermal: boolean;
   onClick?: (rackId: string) => void;
+  /** Render interior detail (trays, rails). Disabled beyond the detail budget. */
+  detailed?: boolean;
+  /** Overlay colour for the active operational overlay, or null to clear. */
+  overlayColor?: string | null;
+  /** Overlay opacity (0.05 - 0.75). */
+  overlayOpacity?: number;
+  selected?: boolean;
 }
 
-export function Rack({ rack, showThermal, onClick }: RackProps) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const glowRef = useRef<THREE.Mesh>(null);
+// EIA-310 derived envelope, scaled to the layout engine pitch.
+const RACK_WIDTH = 0.85;
+const RACK_DEPTH = 1.1;
+const POST = 0.05;
+
+export function Rack({
+  rack,
+  showThermal,
+  onClick,
+  detailed = true,
+  overlayColor = null,
+  overlayOpacity = 0.35,
+  selected = false,
+}: RackProps) {
+  const groupRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
-  
-  // Pulse animation for affected racks and subtle glow
+
+  // Subtle emphasis pulse for racks affected by a simulation event.
   useFrame((state) => {
-    if (meshRef.current && rack.isAffected) {
-      const scale = 1 + Math.sin(state.clock.elapsedTime * 4) * 0.02;
-      meshRef.current.scale.setScalar(scale);
-    }
-    // Subtle breathing glow effect for all racks
-    if (glowRef.current) {
-      const glowIntensity = 0.15 + Math.sin(state.clock.elapsedTime * 1.5 + rack.utilizationPercent * 0.1) * 0.05;
-      (glowRef.current.material as THREE.MeshBasicMaterial).opacity = glowIntensity;
+    if (groupRef.current && rack.isAffected) {
+      const scale = 1 + Math.sin(state.clock.elapsedTime * 4) * 0.01;
+      groupRef.current.scale.setScalar(scale);
     }
   });
 
-  const color = showThermal 
-    ? getThermalColor(rack.thermalCelsius)
-    : getUtilizationColor(rack.utilizationPercent);
+  const height = (rack.heightU / 42) * 2.0;
 
-  const height = (rack.heightU / 42) * 2.2; // Slightly taller racks
+  // Equipment trays: filled proportionally to reported utilisation.
+  const trays = useMemo(() => {
+    if (!detailed) return [] as number[];
+    const slots = Math.max(6, Math.round(rack.heightU / 3));
+    const filled = Math.round((slots * Math.min(100, Math.max(0, rack.utilizationPercent))) / 100);
+    return Array.from({ length: filled }, (_, i) => (i + 0.7) * (height / slots));
+  }, [detailed, rack.heightU, rack.utilizationPercent, height]);
+
+  const resolvedOverlay =
+    overlayColor ??
+    (showThermal ? getThermalColor(rack.thermalCelsius) : null);
+
+  const frame = surfaceMaterial('powderCoatedSteel');
+  const door = surfaceMaterial('darkRackDoor');
+  const perforated = surfaceMaterial('perforatedMetal');
+  const tray = surfaceMaterial('brushedMetal');
 
   return (
-    <group position={rack.position}>
-      {/* Main rack body */}
+    <group position={rack.position} ref={groupRef}>
+      {/* Plinth */}
+      <mesh position={[0, 0.03, 0]} material={frame} castShadow receiveShadow>
+        <boxGeometry args={[RACK_WIDTH, 0.06, RACK_DEPTH]} />
+      </mesh>
+
+      {/* Corner posts */}
+      {[
+        [-(RACK_WIDTH / 2 - POST / 2), (RACK_DEPTH / 2 - POST / 2)],
+        [(RACK_WIDTH / 2 - POST / 2), (RACK_DEPTH / 2 - POST / 2)],
+        [-(RACK_WIDTH / 2 - POST / 2), -(RACK_DEPTH / 2 - POST / 2)],
+        [(RACK_WIDTH / 2 - POST / 2), -(RACK_DEPTH / 2 - POST / 2)],
+      ].map(([px, pz]) => (
+        <mesh key={`${px}:${pz}`} position={[px, height / 2, pz]} material={frame} castShadow>
+          <boxGeometry args={[POST, height, POST]} />
+        </mesh>
+      ))}
+
+      {/* Side panels */}
+      {[-(RACK_WIDTH / 2), RACK_WIDTH / 2].map((px) => (
+        <mesh key={px} position={[px, height / 2, 0]} material={frame} castShadow receiveShadow>
+          <boxGeometry args={[0.015, height - 0.08, RACK_DEPTH - 0.02]} />
+        </mesh>
+      ))}
+
+      {/* Top panel */}
+      <mesh position={[0, height - 0.02, 0]} material={frame} castShadow>
+        <boxGeometry args={[RACK_WIDTH, 0.04, RACK_DEPTH]} />
+      </mesh>
+
+      {/* Front perforated door - primary pick target */}
       <mesh
-        ref={meshRef}
-        position={[0, height / 2, 0]}
-        onClick={() => onClick?.(rack.id)}
+        position={[0, height / 2, RACK_DEPTH / 2]}
+        material={perforated}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick?.(rack.id);
+        }}
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
         castShadow
         receiveShadow
       >
-        <boxGeometry args={[0.85, height, 1.1]} />
-        <meshStandardMaterial 
-          color={color}
-          emissive={color}
-          emissiveIntensity={rack.isAffected ? 0.4 : (hovered ? 0.25 : 0.15)}
-          metalness={0.4}
-          roughness={0.55}
-        />
+        <boxGeometry args={[RACK_WIDTH - 0.08, height - 0.12, 0.03]} />
       </mesh>
 
-      {/* Top glow for thermal effect */}
-      <mesh 
-        ref={glowRef}
-        position={[0, height + 0.02, 0]} 
-        rotation={[-Math.PI / 2, 0, 0]}
-      >
-        <planeGeometry args={[0.9, 1.15]} />
-        <meshBasicMaterial 
-          color={color} 
-          transparent 
-          opacity={0.2} 
-          side={THREE.DoubleSide}
-        />
+      {/* Rear door */}
+      <mesh position={[0, height / 2, -RACK_DEPTH / 2]} material={door} castShadow receiveShadow>
+        <boxGeometry args={[RACK_WIDTH - 0.08, height - 0.12, 0.03]} />
       </mesh>
-      
-      {/* Rack frame outline - subtle dark edges */}
-      <lineSegments position={[0, height / 2, 0]}>
-        <edgesGeometry args={[new THREE.BoxGeometry(0.87, height, 1.12)]} />
-        <lineBasicMaterial color={rack.isCritical ? '#ff3333' : '#334455'} linewidth={1} />
-      </lineSegments>
 
-      {/* Front panel detail lines */}
-      {[0.2, 0.4, 0.6, 0.8].map((fraction) => (
-        <mesh key={fraction} position={[0, height * fraction, 0.56]}>
-          <boxGeometry args={[0.75, 0.02, 0.01]} />
-          <meshBasicMaterial color="#1a2030" />
-        </mesh>
+      {/* Door handle */}
+      <mesh position={[RACK_WIDTH / 2 - 0.12, height * 0.55, RACK_DEPTH / 2 + 0.03]} material={tray}>
+        <boxGeometry args={[0.03, 0.18, 0.02]} />
+      </mesh>
+
+      {/* Mounting rails */}
+      {detailed &&
+        [-(RACK_WIDTH / 2 - 0.12), RACK_WIDTH / 2 - 0.12].map((px) => (
+          <mesh key={`rail-${px}`} position={[px, height / 2, 0.3]} material={tray}>
+            <boxGeometry args={[0.02, height - 0.16, 0.03]} />
+          </mesh>
+        ))}
+
+      {/* Equipment trays */}
+      {trays.map((ty) => (
+        <group key={ty}>
+          <mesh position={[0, ty, 0.18]} material={tray} castShadow>
+            <boxGeometry args={[RACK_WIDTH - 0.16, 0.035, RACK_DEPTH - 0.34]} />
+          </mesh>
+          <mesh
+            position={[RACK_WIDTH / 2 - 0.16, ty, RACK_DEPTH / 2 - 0.08]}
+            material={ledMaterial(rack.isCritical ? '#e0533d' : '#4ade80')}
+          >
+            <boxGeometry args={[0.02, 0.012, 0.008]} />
+          </mesh>
+        </group>
       ))}
 
-      {/* Status indicator LEDs */}
-      <mesh position={[0.38, height * 0.95, 0.57]}>
-        <sphereGeometry args={[0.025, 8, 8]} />
-        <meshBasicMaterial color={rack.isCritical ? '#ff3333' : '#00ff66'} />
+      {/* Status LEDs on the door bezel (hardware state, not telemetry) */}
+      <mesh
+        position={[RACK_WIDTH / 2 - 0.06, height - 0.12, RACK_DEPTH / 2 + 0.02]}
+        material={ledMaterial(rack.isCritical ? '#e0533d' : '#4ade80')}
+      >
+        <boxGeometry args={[0.024, 0.024, 0.006]} />
       </mesh>
-      <mesh position={[0.32, height * 0.95, 0.57]}>
-        <sphereGeometry args={[0.02, 8, 8]} />
-        <meshBasicMaterial color={rack.utilizationPercent > 80 ? '#ffaa00' : '#0066ff'} />
-      </mesh>
+
+      {/* Operational overlay - separate mesh, clipped to the rack face.
+          Clearing the overlay restores the physical material untouched. */}
+      {resolvedOverlay && (
+        <mesh
+          position={[0, height / 2, RACK_DEPTH / 2 + 0.025]}
+          material={overlayMaterial(resolvedOverlay, overlayOpacity)}
+          renderOrder={2}
+        >
+          <planeGeometry args={[RACK_WIDTH - 0.1, height - 0.14]} />
+        </mesh>
+      )}
+
+      {/* Selection / hover outline */}
+      {(selected || hovered || rack.isCritical) && (
+        <lineSegments position={[0, height / 2, 0]}>
+          <edgesGeometry args={[new THREE.BoxGeometry(RACK_WIDTH + 0.02, height, RACK_DEPTH + 0.02)]} />
+          <lineBasicMaterial color={rack.isCritical ? '#e0533d' : selected ? '#ffcc00' : '#9aa1a8'} />
+        </lineSegments>
+      )}
 
       {/* Hover tooltip */}
       {hovered && (

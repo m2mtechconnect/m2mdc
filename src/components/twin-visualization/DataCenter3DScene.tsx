@@ -208,6 +208,7 @@ function Scene({
   qualityProfile,
   placement,
   reducedMotion,
+  selectedAssetId,
 }: Omit<DataCenter3DSceneProps, 'events'> & { 
   targetDistance: number; 
   baseDistance: number;
@@ -330,6 +331,26 @@ function Scene({
         racks={racks}
         avgGpuUtilization={simulationKpis?.avgGpuUtilization}
       />
+
+      {/* Carbon: facility-level only. AURA holds no per-rack energy allocation
+          evidence, so the layer renders the facility energy envelope rather
+          than inventing rack-level emissions. */}
+      {activeOverlay === 'carbon' && (
+        <group name="overlay:carbon-facility">
+          <mesh
+            rotation={[-Math.PI / 2, 0, 0]}
+            position={[centre[0], 0.02, centre[2]]}
+            renderOrder={1}
+          >
+            <planeGeometry args={[extents.maxX - extents.minX + 5, extents.maxZ - extents.minZ + 5]} />
+            <meshBasicMaterial color="#0ea5a4" transparent opacity={0.16} depthWrite={false} />
+          </mesh>
+          <mesh position={[centre[0], 3.05, extents.minZ - 1.2]} renderOrder={1}>
+            <boxGeometry args={[extents.maxX - extents.minX + 4, 0.18, 0.18]} />
+            <meshBasicMaterial color="#38bdf8" transparent opacity={0.75} />
+          </mesh>
+        </group>
+      )}
 
       {/* Rack groups */}
       {rows.map((row) => (

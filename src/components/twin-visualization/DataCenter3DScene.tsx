@@ -322,17 +322,6 @@ function Scene({
   );
 }
 
-function LoadingFallback() {
-  return (
-    <div className="absolute inset-0 flex items-center justify-center bg-slate-900/80">
-      <div className="text-center">
-        <div className="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-sm text-slate-300">Loading 3D Twin...</p>
-      </div>
-    </div>
-  );
-}
-
 export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   const [capability, setCapability] = useState<WebGLCapabilityReport>(() => ({
     status: 'ok',
@@ -541,15 +530,16 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
       )}
 
       {/* Canvas container with wheel handler */}
-      <div 
+      <div
+        data-testid="twin-canvas-container"
         ref={canvasContainerRef}
         className="h-full w-full" 
         onWheel={handleWheel}
         onMouseDown={markInteraction}
         onTouchStart={markInteraction}
       >
-        <Suspense fallback={<LoadingFallback />}>
           <Canvas
+            data-testid="twin-canvas"
             dpr={QUALITY_PROFILES[qualityProfile].dpr}
             shadows={QUALITY_PROFILES[qualityProfile].shadows}
             frameloop="always"
@@ -579,19 +569,20 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
               });
             }}
           >
-            <Scene 
-              {...props} 
-              targetDistance={targetDistance}
-              baseDistance={baseDistance}
-              lastInteractionTime={lastInteractionTime}
-              activeOverlay={props.activeOverlay}
-              simulationKpis={props.simulationKpis}
-              qualityProfile={qualityProfile}
-              placement={placement}
-              reducedMotion={reducedMotion}
-            />
+            <Suspense fallback={null}>
+              <Scene 
+                {...props} 
+                targetDistance={targetDistance}
+                baseDistance={baseDistance}
+                lastInteractionTime={lastInteractionTime}
+                activeOverlay={props.activeOverlay}
+                simulationKpis={props.simulationKpis}
+                qualityProfile={qualityProfile}
+                placement={placement}
+                reducedMotion={reducedMotion}
+              />
+            </Suspense>
           </Canvas>
-        </Suspense>
       </div>
 
       {/* Thermal/Power legend */}

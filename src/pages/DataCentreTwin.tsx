@@ -5,7 +5,7 @@
  * ENHANCED: Added 3D Twin Visualization header
  */
 
-import { useEffect, useState, lazy, Suspense } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -25,26 +25,11 @@ import { EmptyStateSelectTwin } from '@/components/twin-selector';
 import { Eye, FileText, MessageSquare, Rocket, LayoutDashboard, Activity } from 'lucide-react';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 import { OVERVIEW } from '@/ux';
+import { TwinVisualizationLayout } from '@/components/twin-visualization/TwinVisualizationLayout';
 
 // UI Polish Components
 import { LoadingState, NoTwinSelectedEmptyState } from '@/components/ui/empty-state';
 import { ModeBadge, SnapshotBadge } from '@/components/ui/snapshot-indicator';
-
-// Lazy load 3D visualization for performance
-const TwinVisualizationLayout = lazy(() =>
-  import('@/components/twin-visualization').then(m => ({ default: m.TwinVisualizationLayout }))
-);
-
-function VisualizationSkeleton() {
-  return (
-    <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-        <p className="text-sm text-foreground">Loading 3D Twin...</p>
-      </div>
-    </div>
-  );
-}
 
 export default function DataCentreTwin() {
   const { t } = useTranslation();
@@ -226,9 +211,7 @@ export default function DataCentreTwin() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Suspense fallback={<VisualizationSkeleton />}>
-              <TwinVisualizationLayout mode="dashboard" />
-            </Suspense>
+            <TwinVisualizationLayout mode="dashboard" />
           </CardContent>
         </Card>
         

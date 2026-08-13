@@ -7,7 +7,7 @@
  * HARDENED: Wrapped with SimulationErrorBoundary for crash protection
  */
 
-import { lazy, Suspense, useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -28,12 +28,7 @@ import { SimulationErrorBoundary } from './SimulationErrorBoundary';
 import { useSimulationVisualization } from '@/hooks/useSimulationVisualization';
 import { useTwinOverlaySafe, OVERLAY_CONFIG, type TwinOverlay } from '@/context/TwinOverlayContext';
 import type { TwinVisualizationMode } from './types';
-import type { OverlayDomain } from './DataCenter3DScene';
-
-// Lazy load the 3D scene for performance
-const DataCenter3DScene = lazy(() => 
-  import('./DataCenter3DScene').then(m => ({ default: m.DataCenter3DScene }))
-);
+import { DataCenter3DScene, type OverlayDomain } from './DataCenter3DScene';
 
 interface TwinVisualizationLayoutProps {
   mode: TwinVisualizationMode;
@@ -44,17 +39,6 @@ interface TwinVisualizationLayoutProps {
   className?: string;
   /** @deprecated Use TwinOverlayProvider instead */
   initialOverlay?: OverlayDomain;
-}
-
-function LoadingSkeleton() {
-  return (
-    <div className="h-64 bg-muted rounded-lg animate-pulse flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-        <p className="text-sm text-muted-foreground">Loading Digital Twin...</p>
-      </div>
-    </div>
-  );
 }
 
 export function TwinVisualizationLayout({ 
@@ -131,7 +115,7 @@ export function TwinVisualizationLayout({
   const timelineDuration = 600; // Default 10 minutes
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div data-testid="twin-visualization-layout" className={`space-y-4 ${className}`}>
       {/* Header with facility info */}
       <div className="flex items-center justify-between">
         <div>
@@ -248,20 +232,18 @@ export function TwinVisualizationLayout({
           
           <CardContent className="p-0 relative">
             <SimulationErrorBoundary fallbackMessage="3D Visualization Error">
-              <Suspense fallback={<LoadingSkeleton />}>
-                <DataCenter3DScene
-                  racks={data.racks}
-                  rows={data.rows}
-                  powerSegments={data.powerSegments}
-                  thermalZones={data.thermalZones}
-                  events={data.events}
-                  compact={isCompact}
-                  mode={mode}
-                  onRackClick={onRackSelect}
-                  activeOverlay={activeOverlay}
-                  simulationKpis={simulation.currentKpis}
-                />
-              </Suspense>
+              <DataCenter3DScene
+                racks={data.racks}
+                rows={data.rows}
+                powerSegments={data.powerSegments}
+                thermalZones={data.thermalZones}
+                events={data.events}
+                compact={isCompact}
+                mode={mode}
+                onRackClick={onRackSelect}
+                activeOverlay={activeOverlay}
+                simulationKpis={simulation.currentKpis}
+              />
             </SimulationErrorBoundary>
 
             {/* Network topology overlay */}

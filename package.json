@@ -26,7 +26,11 @@
     "db:migrate:test": "node scripts/aura-test-env-guard.mjs && supabase db push --project-ref $SUPABASE_PROJECT_ID",
     "db:reset:test": "node scripts/aura-test-env-guard.mjs && supabase db reset --linked",
     "lint:dsx": "eslint src/dsx src/components/dsx",
-    "test:dsx": "vitest run src/dsx"
+    "test:dsx": "vitest run src/dsx",
+    "test:twin-canvas": "playwright test --config=playwright.gpu.config.ts",
+    "test:twin-canvas:software": "AURA_GPU_LANE=software playwright test --config=playwright.gpu.config.ts",
+    "test:twin-canvas:gpu": "AURA_GPU_LANE=gpu AURA_GPU_REQUIRED=1 playwright test --config=playwright.gpu.config.ts",
+    "report:gpu-matrix": "node scripts/report-gpu-matrix.mjs"
   },
   "dependencies": {
     "@axe-core/playwright": "^4.11.0",

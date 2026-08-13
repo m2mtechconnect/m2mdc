@@ -414,6 +414,12 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
     [props.racks],
   );
 
+  // The default view is the calculated facility overview, so "Reset camera"
+  // always returns to a computed fit rather than a hardcoded position.
+  useEffect(() => {
+    setPlacement(resolveCameraPreset('fitFacility', bounds));
+  }, [bounds]);
+
   const applyPreset = useCallback(
     (preset: CameraPresetId) => {
       setLastInteractionTime(Date.now());
@@ -557,41 +563,85 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
         disabled={contextLost}
       />
 
-      {/* Camera presets and rendering quality (keyboard accessible) */}
+      {/* Canvas toolbar, protected groups.
+          Left is reserved for the host (layer selector, 3D/2D).
+          Centre: camera presets. Right: quality profile and fit action.
+          Top-right above these: the zoom control zone. */}
       {!props.compact && (
-        <div
-          className={`absolute left-3 z-20 flex max-w-[calc(100%-6.5rem)] flex-wrap items-center gap-1.5 ${
-            props.hostChromeTop ? 'top-[3.75rem]' : 'top-3'
-          }`}
-        >
-          {(['fitFacility', 'topDown', 'powerTopology', 'coolingTopology', 'reset'] as CameraPresetId[]).map(
-            (preset) => (
-              <button
-                key={preset}
-                type="button"
-                onClick={() => applyPreset(preset)}
-                className="rounded-md border border-slate-600/70 bg-slate-900/85 px-2.5 py-1.5 text-xs text-slate-100 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+        <>
+          <div
+            className={`absolute left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 ${
+              props.hostChromeTop ? 'top-[3.75rem]' : 'top-3'
+            }`}
+            role="group"
+            aria-label="Camera views"
+          >
+            <label className="flex items-center gap-1.5 text-xs text-slate-100">
+              <span className="sr-only">Camera view</span>
+              <select
+                aria-label="Camera view"
+                data-testid="twin-camera-preset"
+                value=""
+                onChange={(e) => {
+                  const preset = e.target.value as CameraPresetId;
+                  if (preset) applyPreset(preset);
+                }}
+                className="max-w-[10rem] bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
               >
-                {CAMERA_PRESET_LABELS[preset]}
-              </button>
-            ),
-          )}
-          <label className="ml-1 flex items-center gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
-            <span className="sr-only">Rendering quality</span>
-            <select
-              aria-label="Rendering quality"
-              value={qualityProfile}
-              onChange={(e) => changeQuality(e.target.value as QualityProfileId)}
-              className="bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
-            >
-              {Object.values(QUALITY_PROFILES).map((p) => (
-                <option key={p.id} value={p.id} className="bg-slate-900">
-                  {p.label}
+                <option value="" className="bg-slate-900">
+                  Camera view
                 </option>
-              ))}
-            </select>
-          </label>
-        </div>
+                {(
+                  [
+                    'fitFacility',
+                    'topDown',
+                    'frontAisles',
+                    'rearInfrastructure',
+                    'coolingTopology',
+                    'powerTopology',
+                    'fitSelection',
+                  ] as CameraPresetId[]
+                ).map((preset) => (
+                  <option key={preset} value={preset} className="bg-slate-900">
+                    {CAMERA_PRESET_LABELS[preset]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div
+            className={`absolute right-3 z-20 flex items-center gap-1.5 ${
+              props.hostChromeTop ? 'top-[3.75rem]' : 'top-14'
+            }`}
+            role="group"
+            aria-label="Rendering controls"
+          >
+            <label className="flex items-center gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
+              <span className="sr-only">Rendering quality</span>
+              <select
+                aria-label="Rendering quality"
+                value={qualityProfile}
+                onChange={(e) => changeQuality(e.target.value as QualityProfileId)}
+                className="max-w-[9rem] bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+              >
+                {Object.values(QUALITY_PROFILES).map((p) => (
+                  <option key={p.id} value={p.id} className="bg-slate-900">
+                    {p.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              onClick={() => applyPreset('reset')}
+              title="Reset camera to the calculated facility overview"
+              className="rounded-md border border-slate-600/70 bg-slate-900/85 px-2.5 py-1.5 text-xs text-slate-100 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+            >
+              Reset camera
+            </button>
+          </div>
+        </>
       )}
 
       {/* Context lost overlay */}

@@ -10,7 +10,6 @@ import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { ContactShadows, OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import { FacilityLighting } from './FacilityLighting';
-import { surfaceMaterial } from '@/three/materials';
 import { DataHall } from './DataHall';
 import { overlayContract } from '@/three/overlayContract';
 import {

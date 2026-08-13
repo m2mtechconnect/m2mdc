@@ -515,7 +515,11 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
 
       {/* Camera presets and rendering quality (keyboard accessible) */}
       {!props.compact && (
-        <div className="absolute left-3 top-3 z-20 flex flex-wrap items-center gap-1.5">
+        <div
+          className={`absolute left-3 z-20 flex max-w-[calc(100%-6.5rem)] flex-wrap items-center gap-1.5 ${
+            props.hostChromeTop ? 'top-[3.75rem]' : 'top-3'
+          }`}
+        >
           {(['fitFacility', 'topDown', 'powerTopology', 'coolingTopology', 'reset'] as CameraPresetId[]).map(
             (preset) => (
               <button

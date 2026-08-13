@@ -671,7 +671,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             frameloop="always"
             gl={{ 
               antialias: QUALITY_PROFILES[qualityProfile].antialias,
-              failIfMajorPerformanceCaveat: true,
+              failIfMajorPerformanceCaveat: false,
               powerPreference: 'high-performance',
               toneMapping: THREE.ACESFilmicToneMapping,
               toneMappingExposure: 1.05,

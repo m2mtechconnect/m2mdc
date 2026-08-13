@@ -328,6 +328,33 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [lastInteractionTime, setLastInteractionTime] = useState(Date.now());
   const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const [qualityProfile, setQualityProfile] = useState<QualityProfileId>(() => readQualityProfile());
+  const [placement, setPlacement] = useState<CameraPlacement | null>(null);
+
+  const reducedMotion = useMemo(
+    () =>
+      typeof window !== 'undefined' &&
+      !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
+    [],
+  );
+
+  const bounds = useMemo(
+    () => facilityBoundsFromPositions(props.racks.map((r) => r.position)),
+    [props.racks],
+  );
+
+  const applyPreset = useCallback(
+    (preset: CameraPresetId) => {
+      setLastInteractionTime(Date.now());
+      setPlacement(resolveCameraPreset(preset, bounds));
+    },
+    [bounds],
+  );
+
+  const changeQuality = useCallback((id: QualityProfileId) => {
+    setQualityProfile(id);
+    writeQualityProfile(id);
+  }, []);
   
   const baseDistance = props.compact ? 22 : 30;
   const [targetDistance, setTargetDistance] = useState(baseDistance);

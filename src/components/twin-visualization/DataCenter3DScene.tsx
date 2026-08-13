@@ -7,8 +7,23 @@
 
 import { Suspense, useState, useRef, useEffect, useCallback, useMemo, WheelEvent } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls, Grid, Environment, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, Grid, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
+import { FacilityLighting } from './FacilityLighting';
+import { surfaceMaterial } from '@/three/materials';
+import {
+  QUALITY_PROFILES,
+  readQualityProfile,
+  writeQualityProfile,
+  type QualityProfileId,
+} from '@/three/qualityProfiles';
+import {
+  facilityBoundsFromPositions,
+  resolveCameraPreset,
+  CAMERA_PRESET_LABELS,
+  type CameraPresetId,
+  type CameraPlacement,
+} from '@/three/cameraPresets';
 import {
   detectWebGLCapability,
   type WebGLCapabilityReport,
@@ -22,6 +37,7 @@ import type {
   SimulationEventVisual 
 } from './types';
 import { RackGroup } from './RackGroup';
+import { getThermalColor, getUtilizationColor, getPowerColor } from './types';
 import { ThermalOverlayLayer } from './ThermalOverlayLayer';
 import { PowerFlowLayer } from './PowerFlowLayer';
 import { SovereigntyOverlayLayer } from './SovereigntyOverlayLayer';
@@ -75,6 +91,10 @@ interface CameraControllerProps {
   initialFlyIn: boolean;
   mode?: 'dashboard' | 'blueprint' | 'simulation';
   lastInteractionTime: number;
+  /** Placement requested by a camera preset, applied on change. */
+  placement?: CameraPlacement | null;
+  /** Skip transitions when the operator prefers reduced motion. */
+  reducedMotion?: boolean;
 }
 
 // Camera controller component for smooth animations
@@ -84,38 +104,54 @@ function CameraController({
   targetPosition,
   initialFlyIn,
   mode,
-  lastInteractionTime
+  lastInteractionTime,
+  placement,
+  reducedMotion,
 }: CameraControllerProps) {
   const { camera, invalidate } = useThree();
   const distanceRef = useRef(initialFlyIn ? baseDistance * 2.5 : baseDistance);
   const thetaRef = useRef(0.4); // Azimuth angle
   const phiRef = useRef(0.8); // Polar angle
   const hasAnimatedIn = useRef(false);
+  const appliedPlacement = useRef<CameraPlacement | null>(null);
+
+  // Apply a preset placement once per change (angles + look-at target).
+  if (placement && placement !== appliedPlacement.current) {
+    appliedPlacement.current = placement;
+    thetaRef.current = placement.theta;
+    phiRef.current = placement.phi;
+    if (reducedMotion) distanceRef.current = placement.distance;
+  }
+
+  const focus = placement
+    ? new THREE.Vector3(placement.target[0], placement.target[1], placement.target[2])
+    : targetPosition;
+  const distance = placement ? placement.distance : targetDistance;
   
   useFrame((state, delta) => {
     // Lerp distance toward target
-    const lerpFactor = initialFlyIn && !hasAnimatedIn.current ? 0.03 : 0.06;
-    distanceRef.current += (targetDistance - distanceRef.current) * lerpFactor;
+    const lerpFactor = reducedMotion ? 1 : initialFlyIn && !hasAnimatedIn.current ? 0.03 : 0.06;
+    distanceRef.current += (distance - distanceRef.current) * lerpFactor;
     
     // Mark fly-in as complete when close enough
-    if (Math.abs(distanceRef.current - targetDistance) < 0.5) {
+    if (Math.abs(distanceRef.current - distance) < 0.5) {
       hasAnimatedIn.current = true;
     }
     
     // Auto-orbit in simulation mode when idle
     const isIdle = Date.now() - lastInteractionTime > IDLE_THRESHOLD_MS;
-    if (mode === 'simulation' && isIdle && hasAnimatedIn.current) {
+    if (mode === 'simulation' && isIdle && hasAnimatedIn.current && !reducedMotion) {
       thetaRef.current += 0.002; // Very slow rotation
     }
     
     // Calculate camera position using spherical coordinates
-    const x = targetPosition.x + distanceRef.current * Math.sin(phiRef.current) * Math.cos(thetaRef.current);
-    const y = targetPosition.y + distanceRef.current * Math.cos(phiRef.current);
-    const z = targetPosition.z + distanceRef.current * Math.sin(phiRef.current) * Math.sin(thetaRef.current);
+    const x = focus.x + distanceRef.current * Math.sin(phiRef.current) * Math.cos(thetaRef.current);
+    const y = focus.y + distanceRef.current * Math.cos(phiRef.current);
+    const z = focus.z + distanceRef.current * Math.sin(phiRef.current) * Math.sin(thetaRef.current);
     
     // Smooth interpolation to new position
     camera.position.lerp(new THREE.Vector3(x, y, z), lerpFactor);
-    camera.lookAt(targetPosition);
+    camera.lookAt(focus);
     camera.updateProjectionMatrix();
     
     invalidate();
@@ -139,10 +175,16 @@ function Scene({
   lastInteractionTime,
   activeOverlay,
   simulationKpis,
+  qualityProfile,
+  placement,
+  reducedMotion,
 }: Omit<DataCenter3DSceneProps, 'events'> & { 
   targetDistance: number; 
   baseDistance: number;
   lastInteractionTime: number;
+  qualityProfile: QualityProfileId;
+  placement: CameraPlacement | null;
+  reducedMotion: boolean;
 }) {
   const controlsRef = useRef<any>(null);
   
@@ -182,44 +224,37 @@ function Scene({
         initialFlyIn={true}
         mode={mode}
         lastInteractionTime={lastInteractionTime}
+        placement={placement}
+        reducedMotion={reducedMotion}
       />
 
-      {/* Enhanced Lighting */}
-      <ambientLight intensity={0.25} color="#8899bb" />
-      <directionalLight 
-        position={[15, 20, 15]} 
-        intensity={1.2} 
-        castShadow 
-        shadow-mapSize={[1024, 1024]}
-        color="#ffffff"
+      {/* Industrial lighting rig (neutral 4000-5000K, quality-profile aware) */}
+      <FacilityLighting
+        centre={[targetPosition.x, 0, targetPosition.z]}
+        radius={Math.max(maxX, maxZ) / 2 + 4}
+        profile={QUALITY_PROFILES[qualityProfile]}
       />
-      <directionalLight position={[-10, 8, -10]} intensity={0.15} color="#4488ff" />
-      <pointLight position={[maxX / 2, 6, maxZ / 2]} intensity={0.3} color="#6699ff" distance={20} />
 
-      {/* Environment - night mode for NOC aesthetic */}
-      <Environment preset="night" />
-      <fog attach="fog" args={['#0a0a1a', 15, 60]} />
-
-      {/* Dark floor */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[maxX / 2, -0.02, maxZ / 2]} receiveShadow>
+      {/* Raised floor */}
+      <mesh
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[maxX / 2, -0.02, maxZ / 2]}
+        material={surfaceMaterial('raisedFloorTile')}
+        receiveShadow
+      >
         <planeGeometry args={[maxX + 20, maxZ + 20]} />
-        <meshStandardMaterial 
-          color="#0d0d1a" 
-          roughness={0.95} 
-          metalness={0.05}
-        />
       </mesh>
 
-      {/* Grid */}
+      {/* Floor tile grid (600 mm pitch) */}
       <Grid 
         position={[maxX / 2, 0, maxZ / 2]}
         args={[maxX + 16, maxZ + 16]}
-        cellSize={0.8}
-        cellThickness={0.3}
-        cellColor="#1a1a3a"
-        sectionSize={4}
-        sectionThickness={0.8}
-        sectionColor="#2a2a4a"
+        cellSize={0.6}
+        cellThickness={0.4}
+        cellColor="#6a7079"
+        sectionSize={3}
+        sectionThickness={0.9}
+        sectionColor="#878e97"
         fadeDistance={40}
         fadeStrength={1.2}
         followCamera={false}
@@ -265,6 +300,22 @@ function Scene({
           racks={racks}
           showThermal={showThermal || activeOverlay === 'thermal'}
           onRackClick={onRackClick}
+          detailed={racks.length <= QUALITY_PROFILES[qualityProfile].detailBudget}
+          overlayColorFor={(rack) => {
+            switch (activeOverlay) {
+              case 'thermal':
+              case 'cooling':
+                return getThermalColor(rack.thermalCelsius);
+              case 'gpu':
+              case 'workload':
+                return getUtilizationColor(rack.gpuLoad ?? rack.utilizationPercent);
+              case 'power':
+              case 'pue':
+                return getPowerColor(rack.powerKw / 12, false);
+              default:
+                return null;
+            }
+          }}
         />
       ))}
     </>
@@ -294,6 +345,33 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [lastInteractionTime, setLastInteractionTime] = useState(Date.now());
   const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const [qualityProfile, setQualityProfile] = useState<QualityProfileId>(() => readQualityProfile());
+  const [placement, setPlacement] = useState<CameraPlacement | null>(null);
+
+  const reducedMotion = useMemo(
+    () =>
+      typeof window !== 'undefined' &&
+      !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
+    [],
+  );
+
+  const bounds = useMemo(
+    () => facilityBoundsFromPositions(props.racks.map((r) => r.position)),
+    [props.racks],
+  );
+
+  const applyPreset = useCallback(
+    (preset: CameraPresetId) => {
+      setLastInteractionTime(Date.now());
+      setPlacement(resolveCameraPreset(preset, bounds));
+    },
+    [bounds],
+  );
+
+  const changeQuality = useCallback((id: QualityProfileId) => {
+    setQualityProfile(id);
+    writeQualityProfile(id);
+  }, []);
   
   const baseDistance = props.compact ? 22 : 30;
   const [targetDistance, setTargetDistance] = useState(baseDistance);
@@ -418,6 +496,39 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
         disabled={contextLost}
       />
 
+      {/* Camera presets and rendering quality (keyboard accessible) */}
+      {!props.compact && (
+        <div className="absolute left-3 top-3 z-20 flex flex-wrap items-center gap-1.5">
+          {(['fitFacility', 'topDown', 'powerTopology', 'coolingTopology', 'reset'] as CameraPresetId[]).map(
+            (preset) => (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => applyPreset(preset)}
+                className="rounded-md border border-slate-600/70 bg-slate-900/85 px-2.5 py-1.5 text-xs text-slate-100 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+              >
+                {CAMERA_PRESET_LABELS[preset]}
+              </button>
+            ),
+          )}
+          <label className="ml-1 flex items-center gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
+            <span className="sr-only">Rendering quality</span>
+            <select
+              aria-label="Rendering quality"
+              value={qualityProfile}
+              onChange={(e) => changeQuality(e.target.value as QualityProfileId)}
+              className="bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+            >
+              {Object.values(QUALITY_PROFILES).map((p) => (
+                <option key={p.id} value={p.id} className="bg-slate-900">
+                  {p.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
+
       {/* Context lost overlay */}
       {contextLost && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/90 backdrop-blur-sm">
@@ -439,12 +550,15 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
       >
         <Suspense fallback={<LoadingFallback />}>
           <Canvas
-            dpr={[1, 1.5]}
+            dpr={QUALITY_PROFILES[qualityProfile].dpr}
+            shadows={QUALITY_PROFILES[qualityProfile].shadows}
             frameloop="always"
             gl={{ 
-              antialias: true,
+              antialias: QUALITY_PROFILES[qualityProfile].antialias,
               failIfMajorPerformanceCaveat: true,
-              powerPreference: 'high-performance'
+              powerPreference: 'high-performance',
+              toneMapping: THREE.ACESFilmicToneMapping,
+              toneMappingExposure: 1.05,
             }}
             onCreated={({ gl }) => {
               if (!gl.capabilities.isWebGL2) {
@@ -472,6 +586,9 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
               lastInteractionTime={lastInteractionTime}
               activeOverlay={props.activeOverlay}
               simulationKpis={props.simulationKpis}
+              qualityProfile={qualityProfile}
+              placement={placement}
+              reducedMotion={reducedMotion}
             />
           </Canvas>
         </Suspense>

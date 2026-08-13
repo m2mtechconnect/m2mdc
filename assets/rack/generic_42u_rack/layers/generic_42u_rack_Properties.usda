@@ -1,0 +1,32 @@
+#usda 1.0
+(
+    """Non-destructive property layer for the AURA generic 42U rack.
+       Only physically defensible, standards-derived values are declared.
+       Electrical, cooling and airflow ratings are intentionally ABSENT because
+       no approved vendor datasheet backs them. Unavailable stays unavailable."""
+)
+
+over "Rack_42U"
+{
+    # aif:core - common equipment properties
+    custom string aif:core:equipmentClass = "rack"
+    custom string aif:core:standard = "EIA-310"
+    custom float aif:core:width = 0.6
+    custom float aif:core:depth = 1.2
+    custom float aif:core:height = 2.0
+    custom int aif:core:rackUnits = 42
+
+    # aif:spec - equipment-specific properties (unpopulated where unproven)
+    custom int aif:spec:mountingHoleStandard = 310
+
+    # aura - platform identity and evidence mapping
+    custom string aura:assetId = "aura.rack.generic_42u"
+    custom string aura:facilityId = ""
+    custom string aura:locationPath = ""
+    custom string aura:equipmentClass = "rack"
+    custom string aura:telemetrySource = ""
+    custom string aura:evidenceMode = "SIMULATED"
+    custom string aura:calibrationState = "uncalibrated"
+    custom string aura:sourceVersion = "1.0.0"
+    custom string aura:lastValidatedAt = ""
+}

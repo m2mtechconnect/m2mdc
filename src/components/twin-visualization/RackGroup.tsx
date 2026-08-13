@@ -12,9 +12,20 @@ interface RackGroupProps {
   racks: RackVisual[];
   showThermal: boolean;
   onRackClick?: (rackId: string) => void;
+  /** Render interior detail geometry (bounded by the quality profile budget). */
+  detailed?: boolean;
+  /** Resolve the operational overlay colour for a rack, or null to clear. */
+  overlayColorFor?: (rack: RackVisual) => string | null;
 }
 
-export function RackGroup({ row, racks, showThermal, onRackClick }: RackGroupProps) {
+export function RackGroup({
+  row,
+  racks,
+  showThermal,
+  onRackClick,
+  detailed = true,
+  overlayColorFor,
+}: RackGroupProps) {
   const rowRacks = racks.filter(r => r.rowId === row.id);
   const rowWidth = rowRacks.length * 1.1 + 0.5;
 
@@ -64,6 +75,8 @@ export function RackGroup({ row, racks, showThermal, onRackClick }: RackGroupPro
           }}
           showThermal={showThermal}
           onClick={onRackClick}
+          detailed={detailed}
+          overlayColor={overlayColorFor ? overlayColorFor(rack) : null}
         />
       ))}
     </group>

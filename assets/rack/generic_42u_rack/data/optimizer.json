@@ -1,0 +1,18 @@
+{
+  "$comment": "Scene Optimizer recipe for the browser derivative. Applied when a USD toolchain is available.",
+  "operations": [
+    { "op": "RemoveEmptyPrims" },
+    { "op": "MergeMeshes", "byMaterial": true },
+    { "op": "DeduplicateMeshes" },
+    { "op": "GenerateNormals", "angleThresholdDegrees": 45 },
+    { "op": "ValidateUVs" },
+    { "op": "ComputeExtents" },
+    { "op": "GenerateLODs", "levels": [1.0, 0.4, 0.12] },
+    { "op": "TextureCompression", "format": "KTX2/Basis", "maxResolution": 1024 },
+    { "op": "Instanceable", "prims": ["/Rack_42U"] }
+  ],
+  "budgets": {
+    "maxTrianglesPerAsset": 40000,
+    "maxTextureMemoryMb": 8
+  }
+}

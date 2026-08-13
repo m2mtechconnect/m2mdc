@@ -1,0 +1,38 @@
+#usda 1.0
+(
+    """AURA generic 42U server rack - unbranded master.
+       Dimensions follow the EIA-310 rack envelope. No vendor geometry, no
+       vendor logos, no invented product specifications."""
+    defaultPrim = "Rack_42U"
+    metersPerUnit = 1
+    upAxis = "Y"
+    subLayers = [
+        @./layers/generic_42u_rack_Properties.usda@,
+        @./layers/generic_42u_rack_ConnectionPoints.usda@
+    ]
+)
+
+def Xform "Rack_42U" (
+    kind = "component"
+    assetInfo = {
+        string name = "generic_42u_rack"
+        string version = "1.0.0"
+        string identifier = "aura.rack.generic_42u"
+    }
+)
+{
+    # Origin is at the floor contact plane, centred on the rack footprint.
+    def Xform "Geometry" (
+        prepend payload = @./payloads/external.usdc@</Rack_42U/Geometry>
+    )
+    {
+    }
+
+    # Internal payload (rails, trays, cable management) is loaded on demand so
+    # facility-scale stages stay light.
+    def Xform "Internals" (
+        prepend payload = @./payloads/internal.usdc@</Rack_42U/Internals>
+    )
+    {
+    }
+}

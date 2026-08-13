@@ -198,42 +198,33 @@ function Scene({
         lastInteractionTime={lastInteractionTime}
       />
 
-      {/* Enhanced Lighting */}
-      <ambientLight intensity={0.25} color="#8899bb" />
-      <directionalLight 
-        position={[15, 20, 15]} 
-        intensity={1.2} 
-        castShadow 
-        shadow-mapSize={[1024, 1024]}
-        color="#ffffff"
+      {/* Industrial lighting rig (neutral 4000-5000K, quality-profile aware) */}
+      <FacilityLighting
+        centre={[targetPosition.x, 0, targetPosition.z]}
+        radius={Math.max(maxX, maxZ) / 2 + 4}
+        profile={QUALITY_PROFILES[qualityProfile]}
       />
-      <directionalLight position={[-10, 8, -10]} intensity={0.15} color="#4488ff" />
-      <pointLight position={[maxX / 2, 6, maxZ / 2]} intensity={0.3} color="#6699ff" distance={20} />
 
-      {/* Environment - night mode for NOC aesthetic */}
-      <Environment preset="night" />
-      <fog attach="fog" args={['#0a0a1a', 15, 60]} />
-
-      {/* Dark floor */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[maxX / 2, -0.02, maxZ / 2]} receiveShadow>
+      {/* Raised floor */}
+      <mesh
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[maxX / 2, -0.02, maxZ / 2]}
+        material={surfaceMaterial('raisedFloorTile')}
+        receiveShadow
+      >
         <planeGeometry args={[maxX + 20, maxZ + 20]} />
-        <meshStandardMaterial 
-          color="#0d0d1a" 
-          roughness={0.95} 
-          metalness={0.05}
-        />
       </mesh>
 
-      {/* Grid */}
+      {/* Floor tile grid (600 mm pitch) */}
       <Grid 
         position={[maxX / 2, 0, maxZ / 2]}
         args={[maxX + 16, maxZ + 16]}
-        cellSize={0.8}
-        cellThickness={0.3}
-        cellColor="#1a1a3a"
-        sectionSize={4}
-        sectionThickness={0.8}
-        sectionColor="#2a2a4a"
+        cellSize={0.6}
+        cellThickness={0.4}
+        cellColor="#6a7079"
+        sectionSize={3}
+        sectionThickness={0.9}
+        sectionColor="#878e97"
         fadeDistance={40}
         fadeStrength={1.2}
         followCamera={false}

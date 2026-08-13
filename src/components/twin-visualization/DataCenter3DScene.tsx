@@ -221,12 +221,12 @@ function Scene({
   // Facility extents derived from the real rack positions.
   const extents = useMemo(() => {
     const xs = racks.map((r) => r.position[0]);
-    const zs = rows.map((r) => r.position[2]);
+    const zs = [...rows.map((r) => r.position[2]), ...racks.map((r) => r.position[2])];
     return {
-      minX: xs.length ? Math.min(...xs) - 1 : -4,
-      maxX: xs.length ? Math.max(...xs) + 1 : 4,
-      minZ: zs.length ? Math.min(...zs) - 2 : -4,
-      maxZ: zs.length ? Math.max(...zs) + 2 : 4,
+      minX: xs.length ? Math.min(...xs) - 0.8 : -4,
+      maxX: xs.length ? Math.max(...xs) + 0.8 : 4,
+      minZ: zs.length ? Math.min(...zs) - 1.6 : -4,
+      maxZ: zs.length ? Math.max(...zs) + 1.6 : 4,
     };
   }, [racks, rows]);
 

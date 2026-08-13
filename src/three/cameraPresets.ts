@@ -70,8 +70,8 @@ export function resolveCameraPreset(
   // frame while removing the empty foreground the previous fit produced.
   const facility: CameraPlacement = {
     distance: clampDistance((bounds.radius * 0.5) / Math.tan((40 * Math.PI) / 180 / 2)),
-    theta: 0.55,
-    phi: 1.12,
+    theta: 0.72,
+    phi: 1.2,
     target: [bounds.centre[0], bounds.centre[1] + 0.5, bounds.centre[2]],
   };
 

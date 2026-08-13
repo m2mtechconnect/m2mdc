@@ -34,7 +34,7 @@ interface Props {
 }
 
 const CEILING = 4.2;
-const WALL_CLEARANCE = 3.2;
+const WALL_CLEARANCE = 2.0;
 
 export function DataHall({ bounds, rows, profile, crahUnits = 0 }: Props) {
   const geometry = useMemo(() => {

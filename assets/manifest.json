@@ -1,6 +1,6 @@
 {
-  "manifestVersion": 3,
-  "generatedAt": "2026-08-14T14:46:00Z",
+  "manifestVersion": 4,
+  "generatedAt": "2026-08-14T21:44:46Z",
   "assets": [
     {
       "assetId": "nvidia.rack.42u_a_01",
@@ -260,6 +260,1568 @@
       "supersededBy": "nvidia.rack.42u_a_01.ops",
       "notes": "Retained for audit history only. Mis-grouped chassis under the rear-door subtree and declared a Front_Door group that does not exist in the source. This build is never resolvable by the runtime registry.",
       "blocker": "Superseded build: mis-grouped chassis and a non-existent Front_Door group. Not runtime eligible."
+    },
+    {
+      "assetId": "nvidia.blanking_panel.blank_1u_black.operations",
+      "displayName": "Blanking panel - blank_1u_black (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Blank_1U_Black_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Racks/Accessories/Blank_1U_Black_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/b0080883-a74a-4b10-886a-edf9cdd881b9/blank_1u_black_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.0066,
+        "y": 0.0434,
+        "z": 0.4826
+      },
+      "triangleCount": 1996,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.blanking_panel.blank_1u_black.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T21:21:52.123Z",
+      "checksum": "sha256:d3ee5c7cc58c2b72b3f5e4816b836e06500ec88121c08ed2befc0c95e1e6b697",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "blanking-panel",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.blanking_panel.blank_1u_black.operations",
+        "lod": "nvidia.blanking_panel.blank_1u_black.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.blanking_panel.blank_1u_black.lod",
+      "displayName": "Blanking panel - blank_1u_black (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Blank_1U_Black_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Racks/Accessories/Blank_1U_Black_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/6fd2e1cf-1621-4785-8e47-6affa416ae86/blank_1u_black_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.0066,
+        "y": 0.0434,
+        "z": 0.4826
+      },
+      "triangleCount": 200,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.blanking_panel.blank_1u_black.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T21:21:52.507Z",
+      "checksum": "sha256:c99ddb30f422356d6ef3d255a06dcc27101f9b06093377bf3ce0ca5f5fbd7871",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "blanking-panel",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.blanking_panel.blank_1u_black.operations",
+        "lod": "nvidia.blanking_panel.blank_1u_black.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.blanking_panel.blank_1u_blackgold.operations",
+      "displayName": "Blanking panel - blank_1u_blackgold (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Blank_1U_BlackGold_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Racks/Accessories/Blank_1U_BlackGold_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/834be3e1-6f5e-42a8-98a5-b6c807ec92a7/blank_1u_blackgold_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.0424,
+        "y": 0.045,
+        "z": 0.4824
+      },
+      "triangleCount": 2000,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.blanking_panel.blank_1u_blackgold.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T21:21:55.628Z",
+      "checksum": "sha256:214c672e99eb34305979d2985f47a3f68703890abcb44af87ebddf4714b010f0",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "blanking-panel",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.blanking_panel.blank_1u_blackgold.operations",
+        "lod": "nvidia.blanking_panel.blank_1u_blackgold.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.blanking_panel.blank_1u_blackgold.lod",
+      "displayName": "Blanking panel - blank_1u_blackgold (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Blank_1U_BlackGold_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Racks/Accessories/Blank_1U_BlackGold_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/e41d3176-a78f-4307-89a0-f28c8e3c67f6/blank_1u_blackgold_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.0438,
+        "y": 0.0448,
+        "z": 0.4822
+      },
+      "triangleCount": 200,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.blanking_panel.blank_1u_blackgold.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T21:21:56.023Z",
+      "checksum": "sha256:f70fc9ea9d2ec5da17a300b83f9e4a8bd5a0eda6041e89291ac21d8d8bd0301f",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "blanking-panel",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.blanking_panel.blank_1u_blackgold.operations",
+        "lod": "nvidia.blanking_panel.blank_1u_blackgold.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.blanking_panel.blank_1u_snapon_gray.operations",
+      "displayName": "Blanking panel - blank_1u_snapon_gray (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Blank_1U_Snap_on_Gray_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Racks/Accessories/Blank_1U_Snap_on_Gray_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/35ceaf68-92a9-497e-8521-ab69cb09a226/blank_1u_snapon_gray_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.0028,
+        "y": 0.0445,
+        "z": 0.486
+      },
+      "triangleCount": 52,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.blanking_panel.blank_1u_snapon_gray.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T21:21:58.606Z",
+      "checksum": "sha256:903885da93cdadd979991682d4b241ee676a99e3123cccd25f16d97edd781709",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "blanking-panel",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.blanking_panel.blank_1u_snapon_gray.operations",
+        "lod": "nvidia.blanking_panel.blank_1u_snapon_gray.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.blanking_panel.blank_1u_snapon_gray.lod",
+      "displayName": "Blanking panel - blank_1u_snapon_gray (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Blank_1U_Snap_on_Gray_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Racks/Accessories/Blank_1U_Snap_on_Gray_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/09d5b425-6b24-41bd-a6d2-4619ba6c7dfd/blank_1u_snapon_gray_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.0028,
+        "y": 0.0445,
+        "z": 0.486
+      },
+      "triangleCount": 52,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.blanking_panel.blank_1u_snapon_gray.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T21:21:58.923Z",
+      "checksum": "sha256:903885da93cdadd979991682d4b241ee676a99e3123cccd25f16d97edd781709",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "blanking-panel",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.blanking_panel.blank_1u_snapon_gray.operations",
+        "lod": "nvidia.blanking_panel.blank_1u_snapon_gray.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.blanking_panel.blank_1u_white.operations",
+      "displayName": "Blanking panel - blank_1u_white (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Blank_1U_White_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Racks/Accessories/Blank_1U_White_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/3ec28508-0408-49af-94ad-1cf0405f2815/blank_1u_white_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.009,
+        "y": 0.0438,
+        "z": 0.4826
+      },
+      "triangleCount": 1998,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.blanking_panel.blank_1u_white.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T21:22:02.365Z",
+      "checksum": "sha256:ac239fc8f6c9e14300b14ccedd78f9ff621140cc9543fd3c5c9c142b7c05eee8",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "blanking-panel",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.blanking_panel.blank_1u_white.operations",
+        "lod": "nvidia.blanking_panel.blank_1u_white.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.blanking_panel.blank_1u_white.lod",
+      "displayName": "Blanking panel - blank_1u_white (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Blank_1U_White_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Racks/Accessories/Blank_1U_White_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/31c38dc0-4a3c-4729-89f7-95887c08d4e4/blank_1u_white_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.0092,
+        "y": 0.0439,
+        "z": 0.4826
+      },
+      "triangleCount": 200,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.blanking_panel.blank_1u_white.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T21:22:02.766Z",
+      "checksum": "sha256:f8e1ea69cbd44ca87e660b012793b816326fb8336e6bd42434dd12494f4255b8",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "blanking-panel",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.blanking_panel.blank_1u_white.operations",
+        "lod": "nvidia.blanking_panel.blank_1u_white.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.cable_tray.cable_tray_25.operations",
+      "displayName": "Cable tray - cable_tray_25 (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Cable_Tray_Segment_25x61x5cm_A01_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Facilities/Cable_Tray/Cable_Tray_Segment_25x61x5cm_A01_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/3f20a8a0-50dc-4528-bac0-efa5380b7954/cable_tray_25_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.2598,
+        "y": 0.0508,
+        "z": 0.6096
+      },
+      "triangleCount": 660,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.cable_tray.cable_tray_25.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T21:21:36.874Z",
+      "checksum": "sha256:003cb79749e514c6e66dfa1146a27ff7ed261762ae3ee86daa0850aabb146716",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "cable-tray",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.cable_tray.cable_tray_25.operations",
+        "lod": "nvidia.cable_tray.cable_tray_25.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.cable_tray.cable_tray_25.lod",
+      "displayName": "Cable tray - cable_tray_25 (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Cable_Tray_Segment_25x61x5cm_A01_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Facilities/Cable_Tray/Cable_Tray_Segment_25x61x5cm_A01_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/5bdb618a-fdf9-4f3b-88ad-c4b56876dc52/cable_tray_25_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.2598,
+        "y": 0.0508,
+        "z": 0.6096
+      },
+      "triangleCount": 300,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.cable_tray.cable_tray_25.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T21:21:37.301Z",
+      "checksum": "sha256:daf7d01f64b43b3cc76e02892e39be1bbbaa95ed5d4f6ce6a6637f531f5dad00",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "cable-tray",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.cable_tray.cable_tray_25.operations",
+        "lod": "nvidia.cable_tray.cable_tray_25.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.cable_tray.cable_tray_299.operations",
+      "displayName": "Cable tray - cable_tray_299 (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Cable_Tray_61x299x5cm_A01_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Facilities/Cable_Tray/Cable_Tray_61x299x5cm_A01_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/6ebc50a6-19be-4f61-a19a-173d34c768f8/cable_tray_299_operations.glb",
+      "dimensionsMeters": {
+        "x": 2.987,
+        "y": 0.0507,
+        "z": 0.6096
+      },
+      "triangleCount": 804,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.cable_tray.cable_tray_299.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T21:21:33.824Z",
+      "checksum": "sha256:c49603d313dc6cfa5eb3bd862147537e294ded9b5f97d05cbde157d7a1d18c74",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "cable-tray",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.cable_tray.cable_tray_299.operations",
+        "lod": "nvidia.cable_tray.cable_tray_299.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.cable_tray.cable_tray_299.lod",
+      "displayName": "Cable tray - cable_tray_299 (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Cable_Tray_61x299x5cm_A01_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Facilities/Cable_Tray/Cable_Tray_61x299x5cm_A01_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/fd1d8cd5-a74b-4d71-8f2f-88e0707ecfa6/cable_tray_299_lod.glb",
+      "dimensionsMeters": {
+        "x": 2.987,
+        "y": 0.0507,
+        "z": 0.6096
+      },
+      "triangleCount": 300,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.cable_tray.cable_tray_299.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T21:21:34.214Z",
+      "checksum": "sha256:a1d301d40712453b1e05742ca326be11e4f2d557d427c838935c0af84de67a53",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "cable-tray",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.cable_tray.cable_tray_299.operations",
+        "lod": "nvidia.cable_tray.cable_tray_299.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.cable_tray.cable_tray_tee.operations",
+      "displayName": "Cable tray - cable_tray_tee (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Cable_Tray_Tee_A01_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Facilities/Cable_Tray/Cable_Tray_Tee_A01_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/d60e0c57-eca4-4466-b8cc-76463083aad6/cable_tray_tee_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.8696,
+        "y": 0.0508,
+        "z": 1.1106
+      },
+      "triangleCount": 476,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.cable_tray.cable_tray_tee.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T21:21:39.822Z",
+      "checksum": "sha256:b40b4cb83bb51bb82772228876cae6584d273911a265e80ca1741a47cf6b65c3",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "cable-tray",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.cable_tray.cable_tray_tee.operations",
+        "lod": "nvidia.cable_tray.cable_tray_tee.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.cable_tray.cable_tray_tee.lod",
+      "displayName": "Cable tray - cable_tray_tee (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Cable_Tray_Tee_A01_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Facilities/Cable_Tray/Cable_Tray_Tee_A01_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/aa90292a-ae7e-4d4d-b026-b995794fceb9/cable_tray_tee_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.8696,
+        "y": 0.0508,
+        "z": 1.1106
+      },
+      "triangleCount": 300,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.cable_tray.cable_tray_tee.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T21:21:40.199Z",
+      "checksum": "sha256:61307686f3a1f34ebe931f11f095cd69faa746dc57aec0527783bf6a0cb64f28",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "cable-tray",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.cable_tray.cable_tray_tee.operations",
+        "lod": "nvidia.cable_tray.cable_tray_tee.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.liquid_cooling.dcp_a_01.operations",
+      "displayName": "Liquid-cooling equipment - dcp_a_01 (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "DCP_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Liquid_Cooling/Data_Hall/DCP_A/DCP_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/f8193412-27b4-44bd-a8bf-bbaedab1e4a5/dcp_a_01_operations.glb",
+      "dimensionsMeters": {
+        "x": 1.1398,
+        "y": 3.4461,
+        "z": 0.9942
+      },
+      "triangleCount": 15360,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.liquid_cooling.dcp_a_01.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T21:22:07.974Z",
+      "checksum": "sha256:74e3c2b4279d0c95d6ab25c01d4ffefc21fb94a2768936f07af0618a8024cf36",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "liquid-cooling-equipment",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.liquid_cooling.dcp_a_01.operations",
+        "lod": "nvidia.liquid_cooling.dcp_a_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.liquid_cooling.dcp_a_01.lod",
+      "displayName": "Liquid-cooling equipment - dcp_a_01 (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "DCP_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Liquid_Cooling/Data_Hall/DCP_A/DCP_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/2e75883a-c3f4-4a67-b1d0-0e84e1fbd94a/dcp_a_01_lod.glb",
+      "dimensionsMeters": {
+        "x": 1.1394,
+        "y": 3.4461,
+        "z": 0.9942
+      },
+      "triangleCount": 4997,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.liquid_cooling.dcp_a_01.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T21:22:08.506Z",
+      "checksum": "sha256:9ea25d8a0caf5f4496089d92870d2fb5ee025f9a581d2adb084d3248d25c1b4a",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "liquid-cooling-equipment",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.liquid_cooling.dcp_a_01.operations",
+        "lod": "nvidia.liquid_cooling.dcp_a_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.network_switch.qm8700_01.operations",
+      "displayName": "Network switch - qm8700_01 (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "QM8700_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Network_Switches/NVIDIA/QM8700/QM8700_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/18f29aaf-f029-4893-a386-f75cdec3d199/qm8700_01_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.5904,
+        "y": 0.0447,
+        "z": 0.4282
+      },
+      "triangleCount": 50752,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.network_switch.qm8700_01.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T21:25:44.898Z",
+      "checksum": "sha256:160b7bd7d11d79eb1f3ea2d7be5fb8ae6b8b4700fcf4f7b84a7a8d02a07e895d",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "network-switch",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.network_switch.qm8700_01.operations",
+        "lod": "nvidia.network_switch.qm8700_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 3,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 3 mesh(es), 1 material(s), draw-call estimate 3. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.network_switch.qm8700_01.lod",
+      "displayName": "Network switch - qm8700_01 (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "QM8700_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Network_Switches/NVIDIA/QM8700/QM8700_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/4eb152af-9fe2-4bf8-8091-179951cd3df8/qm8700_01_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.596,
+        "y": 0.0481,
+        "z": 0.428
+      },
+      "triangleCount": 136653,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.network_switch.qm8700_01.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T21:25:45.853Z",
+      "checksum": "sha256:930e00f0ae11362a85468875a8d986dd619d86bc9858533bab3eeb4c90ef4486",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "network-switch",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.network_switch.qm8700_01.operations",
+        "lod": "nvidia.network_switch.qm8700_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 3,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 3 mesh(es), 1 material(s), draw-call estimate 3. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.network_switch.qm8700_c_01.operations",
+      "displayName": "Network switch - qm8700_c_01 (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "QM8700_C_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Network_Switches/NVIDIA/QM8700/QM8700_C_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/dc8e18b2-0ca9-4de9-87e4-2929c7b25deb/qm8700_c_01_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.6776,
+        "y": 0.046,
+        "z": 0.481
+      },
+      "triangleCount": 35098,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.network_switch.qm8700_c_01.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T20:16:21.712Z",
+      "checksum": "sha256:8eeee157f423a1c204be8b48fa3f54f2c0c827762eae5b4714d65e45319e5066",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "network-switch",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.network_switch.qm8700_c_01.operations",
+        "lod": "nvidia.network_switch.qm8700_c_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 3,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 3 mesh(es), 1 material(s), draw-call estimate 3. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.network_switch.qm8700_c_01.lod",
+      "displayName": "Network switch - qm8700_c_01 (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "QM8700_C_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Network_Switches/NVIDIA/QM8700/QM8700_C_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/884c44cc-af4a-45f2-b6d2-cfaa99593b32/qm8700_c_01_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.6824,
+        "y": 0.0481,
+        "z": 0.481
+      },
+      "triangleCount": 57455,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.network_switch.qm8700_c_01.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T20:16:22.449Z",
+      "checksum": "sha256:7fb6cd124e5b410e9fa99fc1268ef00390ab3820923fe8bf8232cac5f41c7638",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "network-switch",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.network_switch.qm8700_c_01.operations",
+        "lod": "nvidia.network_switch.qm8700_c_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 3,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 3 mesh(es), 1 material(s), draw-call estimate 3. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.network_switch.qm8700_f_01.operations",
+      "displayName": "Network switch - qm8700_f_01 (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "QM8700_F_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Network_Switches/NVIDIA/QM8700/QM8700_F_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": null,
+      "dimensionsMeters": {
+        "x": 0.6058,
+        "y": 0.4571,
+        "z": 0.516
+      },
+      "triangleCount": 36273,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.network_switch.qm8700_f_01.lod"
+      ],
+      "lastValidatedAt": null,
+      "checksum": "sha256:71036132502bca9a6e9ee75995f4a3e056256a28d08a36d56d1c3b5a16af6bf0",
+      "approvalStatus": "pending-review",
+      "runtimeEligible": false,
+      "semanticRole": "network-switch",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.network_switch.qm8700_f_01.operations",
+        "lod": "nvidia.network_switch.qm8700_f_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 3,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 3 mesh(es), 1 material(s), draw-call estimate 3. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      },
+      "blocker": "lod:world-bounds-preserved [0.6301, 0.4146, 0.482] vs [0.6061, 0.4562, 0.5151]"
+    },
+    {
+      "assetId": "nvidia.network_switch.qm8700_f_01.lod",
+      "displayName": "Network switch - qm8700_f_01 (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "QM8700_F_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Network_Switches/NVIDIA/QM8700/QM8700_F_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": null,
+      "dimensionsMeters": {
+        "x": 0.63,
+        "y": 0.4146,
+        "z": 0.482
+      },
+      "triangleCount": 88476,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.network_switch.qm8700_f_01.operations"
+      ],
+      "lastValidatedAt": null,
+      "checksum": "sha256:ec4b9387cee1b43c32091edeef2bc6c9cf3e7304ab6c813890f2d8aaa31a47d5",
+      "approvalStatus": "pending-review",
+      "runtimeEligible": false,
+      "semanticRole": "network-switch",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.network_switch.qm8700_f_01.operations",
+        "lod": "nvidia.network_switch.qm8700_f_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 3,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 3 mesh(es), 1 material(s), draw-call estimate 3. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      },
+      "blocker": "lod:world-bounds-preserved [0.6301, 0.4146, 0.482] vs [0.6061, 0.4562, 0.5151]"
+    },
+    {
+      "assetId": "nvidia.rack.rack_42u_a_01.operations",
+      "displayName": "Liquid-cooled rack - rack_42u_a_01 (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Rack_42U_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/55a699c2-77c1-4f89-99d1-f2aad017797b/rack_42u_a_01_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.6034,
+        "y": 3.1663,
+        "z": 1.4214
+      },
+      "triangleCount": 59941,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.rack.rack_42u_a_01.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T21:22:28.902Z",
+      "checksum": "sha256:844e3e26d5f8b810fe3ab88c91b68bd16302267316bb36cfa49b591bc376061a",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "liquid-cooled-rack",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.rack.rack_42u_a_01.operations",
+        "lod": "nvidia.rack.rack_42u_a_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 2,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 2 mesh(es), 1 material(s), draw-call estimate 2. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.rack.rack_42u_a_01.lod",
+      "displayName": "Liquid-cooled rack - rack_42u_a_01 (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Rack_42U_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/3b8f9db0-2e2c-47c9-aaf7-dc1664988e8b/rack_42u_a_01_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.606,
+        "y": 3.1663,
+        "z": 1.4214
+      },
+      "triangleCount": 16456,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.rack.rack_42u_a_01.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T21:22:29.596Z",
+      "checksum": "sha256:0cf163c22c57f1264d218aedffc1a5c0cfc55bde9cafbc220661f2da8cc0b1f7",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "liquid-cooled-rack",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.rack.rack_42u_a_01.operations",
+        "lod": "nvidia.rack.rack_42u_a_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "displayName": "Rack core (reference) - rack_42u_a_core (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Rack_42U_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.6,
+        "y": 1.998,
+        "z": 1.1884
+      },
+      "triangleCount": 26872,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.rack_core.rack_42u_a_core.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T21:22:38.013Z",
+      "checksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "rack-core-reference",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.rack_core.rack_42u_a_core.operations",
+        "lod": "nvidia.rack_core.rack_42u_a_core.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.rack_core.rack_42u_a_core.lod",
+      "displayName": "Rack core (reference) - rack_42u_a_core (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Rack_42U_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/2b09494b-e6cf-4097-8678-d9f0a379f4d6/rack_42u_a_core_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.6,
+        "y": 1.998,
+        "z": 1.1884
+      },
+      "triangleCount": 7998,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.rack_core.rack_42u_a_core.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T21:22:38.558Z",
+      "checksum": "sha256:0dd251040c45c4b7281ef730c73aa401f14e8dcf3d94e0ff014abc184b87b34b",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "rack-core-reference",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.rack_core.rack_42u_a_core.operations",
+        "lod": "nvidia.rack_core.rack_42u_a_core.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 1,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 1 mesh(es), 1 material(s), draw-call estimate 1. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.rack_pdu.rpdu_a_01.operations",
+      "displayName": "Rack PDU - rpdu_a_01 (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "rPDU_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Power_Distribution/Controllers/PDU_A/rPDU_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/f5977476-f86f-4f56-ba2b-9d9bc3f754d1/rpdu_a_01_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.3424,
+        "y": 0.1334,
+        "z": 0.4826
+      },
+      "triangleCount": 14925,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.rack_pdu.rpdu_a_01.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T21:21:48.643Z",
+      "checksum": "sha256:65e368d3799832745b5672e948b61bd3f72cdba9f2914c153c9799134c6a5ed4",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "rack-pdu",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.rack_pdu.rpdu_a_01.operations",
+        "lod": "nvidia.rack_pdu.rpdu_a_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 2,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 2 mesh(es), 1 material(s), draw-call estimate 2. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.rack_pdu.rpdu_a_01.lod",
+      "displayName": "Rack PDU - rpdu_a_01 (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "rPDU_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Power_Distribution/Controllers/PDU_A/rPDU_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/9eeeeae8-12c8-4f32-8a6b-66af2ef26a7d/rpdu_a_01_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.344,
+        "y": 0.1334,
+        "z": 0.4806
+      },
+      "triangleCount": 2169,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.rack_pdu.rpdu_a_01.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T21:21:49.161Z",
+      "checksum": "sha256:6705b5b826b56d78b6d3b6fc7223eb68ce93501740313efc57625e0d5b529165",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "rack-pdu",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.rack_pdu.rpdu_a_01.operations",
+        "lod": "nvidia.rack_pdu.rpdu_a_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 2,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 2 mesh(es), 1 material(s), draw-call estimate 2. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.server.server_1u_a.operations",
+      "displayName": "1U server - server_1u_a (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Server_1U_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Server_Nodes/Servers/Server_1U_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/c8fcb6be-6d4c-464e-a197-165ed8ce584a/server_1u_a_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.7866,
+        "y": 0.0442,
+        "z": 0.482
+      },
+      "triangleCount": 28326,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.server.server_1u_a.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T21:22:57.589Z",
+      "checksum": "sha256:7011e15c504e162f9def0b5a687cd66e53615f6bf391352b368e738d6d38fce7",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "server-1u",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.server.server_1u_a.operations",
+        "lod": "nvidia.server.server_1u_a.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 3,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 3 mesh(es), 1 material(s), draw-call estimate 3. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.server.server_1u_a.lod",
+      "displayName": "1U server - server_1u_a (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Server_1U_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Server_Nodes/Servers/Server_1U_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/735d81fb-d44b-43ba-8677-e608ca8cb8ae/server_1u_a_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.7888,
+        "y": 0.0474,
+        "z": 0.4818
+      },
+      "triangleCount": 17066,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.server.server_1u_a.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T21:22:58.242Z",
+      "checksum": "sha256:1a505ced1a8d69074a3758d4a8ca089b2f16c3b3d5b675f4cafb189a2cb2c5b5",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "server-1u",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.server.server_1u_a.operations",
+        "lod": "nvidia.server.server_1u_a.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 2,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 2 mesh(es), 1 material(s), draw-call estimate 2. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.server.server_2u_b.operations",
+      "displayName": "2U server - server_2u_b (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Server_2U_B_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Server_Nodes/Servers/Server_2U_B_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/0fb1d0d4-78a1-474a-b65e-0a43a19f4f71/server_2u_b_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.7974,
+        "y": 0.0931,
+        "z": 1.105
+      },
+      "triangleCount": 27208,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.server.server_2u_b.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T21:23:42.678Z",
+      "checksum": "sha256:d185e4250312a0a6d99fae00a5734c5006c5b582afc78056fa28e23fb140b518",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "server-2u",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.server.server_2u_b.operations",
+        "lod": "nvidia.server.server_2u_b.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 4,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 4 mesh(es), 1 material(s), draw-call estimate 4. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.server.server_2u_b.lod",
+      "displayName": "2U server - server_2u_b (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Server_2U_B_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Server_Nodes/Servers/Server_2U_B_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/5bb2cefc-1777-4f50-b478-a6bd49054063/server_2u_b_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.7976,
+        "y": 0.0931,
+        "z": 1.105
+      },
+      "triangleCount": 64750,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.server.server_2u_b.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T21:23:43.458Z",
+      "checksum": "sha256:38a608521488d20264f3a85f83f44d05533d84682ea42052f206866c07dcfbdc",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "server-2u",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.server.server_2u_b.operations",
+        "lod": "nvidia.server.server_2u_b.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 3,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 3 mesh(es), 1 material(s), draw-call estimate 3. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.server.server_2u_c.operations",
+      "displayName": "2U server - server_2u_c (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Server_2U_C_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Server_Nodes/Servers/Server_2U_C_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/d27cfe7b-010c-4d39-a3b3-b3c057638542/server_2u_c_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.7974,
+        "y": 0.0931,
+        "z": 1.105
+      },
+      "triangleCount": 27208,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.server.server_2u_c.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T21:24:38.010Z",
+      "checksum": "sha256:11686ea31d7a23dd55f17d518dabd9ec5661fd545570523838452b86d29464db",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "server-2u",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.server.server_2u_c.operations",
+        "lod": "nvidia.server.server_2u_c.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 4,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 4 mesh(es), 1 material(s), draw-call estimate 4. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.server.server_2u_c.lod",
+      "displayName": "2U server - server_2u_c (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "Server_2U_C_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Server_Nodes/Servers/Server_2U_C_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/65dc6fee-c847-42f0-8ebd-2b179ea520af/server_2u_c_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.7976,
+        "y": 0.0931,
+        "z": 1.105
+      },
+      "triangleCount": 64734,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.server.server_2u_c.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T21:24:38.986Z",
+      "checksum": "sha256:278e5ceb63f0ce6ff7695bbcef0ad0086410874cac103c1e1606138b30d9392a",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "server-2u",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.server.server_2u_c.operations",
+        "lod": "nvidia.server.server_2u_c.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 4,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 4 mesh(es), 1 material(s), draw-call estimate 4. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.network_switch.sn2700c_01.operations",
+      "displayName": "Network switch - sn2700c_01 (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "SN2700C_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Network_Switches/NVIDIA/SN2700/SN2700C_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/86178d70-d431-40c1-9a5a-203bf03063f5/sn2700c_01_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.766,
+        "y": 0.0503,
+        "z": 0.4828
+      },
+      "triangleCount": 58397,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.network_switch.sn2700c_01.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T20:18:20.169Z",
+      "checksum": "sha256:b7f6af24d0d8d09c194593bb1c9613bd30c1589aebd136951a5501a651d21a22",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "network-switch",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.network_switch.sn2700c_01.operations",
+        "lod": "nvidia.network_switch.sn2700c_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 2,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 2 mesh(es), 1 material(s), draw-call estimate 2. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.network_switch.sn2700c_01.lod",
+      "displayName": "Network switch - sn2700c_01 (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "SN2700C_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Network_Switches/NVIDIA/SN2700/SN2700C_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/83f17793-d0c1-45f1-bf46-1985803d8a7f/sn2700c_01_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.7638,
+        "y": 0.0442,
+        "z": 0.4776
+      },
+      "triangleCount": 176676,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.network_switch.sn2700c_01.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T20:18:21.096Z",
+      "checksum": "sha256:168adb0f5fa54c8c4425094f884111e160138203253c0ce813e004b8d68eff9a",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "network-switch",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.network_switch.sn2700c_01.operations",
+        "lod": "nvidia.network_switch.sn2700c_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 2,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 2 mesh(es), 1 material(s), draw-call estimate 2. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.network_switch.sn3700c_01.operations",
+      "displayName": "Network switch - sn3700c_01 (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "SN3700C_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Network_Switches/NVIDIA/SN3700/SN3700C_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/2c0b9f4a-af53-44c0-8600-871b8da3e0f8/sn3700c_01_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.7758,
+        "y": 0.0535,
+        "z": 0.4824
+      },
+      "triangleCount": 47633,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.network_switch.sn3700c_01.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T20:18:38.807Z",
+      "checksum": "sha256:5b01bc5ab42781eac6c259ebea6e45672fcd9bb92745b8efa50a6deaa55cec4c",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "network-switch",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.network_switch.sn3700c_01.operations",
+        "lod": "nvidia.network_switch.sn3700c_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 3,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 3 mesh(es), 1 material(s), draw-call estimate 3. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.network_switch.sn3700c_01.lod",
+      "displayName": "Network switch - sn3700c_01 (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "SN3700C_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Network_Switches/NVIDIA/SN3700/SN3700C_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/8e1c090b-152f-405d-b64b-00b45f020063/sn3700c_01_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.7736,
+        "y": 0.0523,
+        "z": 0.4824
+      },
+      "triangleCount": 42614,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.network_switch.sn3700c_01.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T20:18:39.647Z",
+      "checksum": "sha256:3f76983cbcfda51cc19a207a0c6161844ee1b8308380fc643c05e587c0ac7dd2",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "network-switch",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.network_switch.sn3700c_01.operations",
+        "lod": "nvidia.network_switch.sn3700c_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 2,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 2 mesh(es), 1 material(s), draw-call estimate 2. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.network_switch.ua950h_2sf_01.operations",
+      "displayName": "Network switch - ua950h_2sf_01 (operations derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "UA950H-2SF_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Network_Switches/NVIDIA/UA950H-2SF/UA950H-2SF_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/4f53bdf0-960d-42f4-86e1-8e108962327b/ua950h_2sf_01_operations.glb",
+      "dimensionsMeters": {
+        "x": 0.8122,
+        "y": 0.0441,
+        "z": 0.4846
+      },
+      "triangleCount": 34751,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.network_switch.ua950h_2sf_01.lod"
+      ],
+      "lastValidatedAt": "2026-08-14T20:18:48.105Z",
+      "checksum": "sha256:551988833c3fc8918a712a53075a52cbcf17fd673e126d6f9cb9f60f8e7e373c",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "network-switch",
+      "qualityLevel": "operations",
+      "qualityVariants": {
+        "operations": "nvidia.network_switch.ua950h_2sf_01.operations",
+        "lod": "nvidia.network_switch.ua950h_2sf_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 3,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 3 mesh(es), 1 material(s), draw-call estimate 3. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
+    },
+    {
+      "assetId": "nvidia.network_switch.ua950h_2sf_01.lod",
+      "displayName": "Network switch - ua950h_2sf_01 (lod derivative)",
+      "manufacturer": "NVIDIA",
+      "model": "UA950H-2SF_01",
+      "sourceUrl": "Assets/DigitalTwin/Datacenter/Network_Switches/NVIDIA/UA950H-2SF/UA950H-2SF_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.1.0",
+      "glbUrl": "/__l5e/assets-v1/0c229e7b-2137-4b0b-92d1-758c90eb8045/ua950h_2sf_01_lod.glb",
+      "dimensionsMeters": {
+        "x": 0.8118,
+        "y": 0.0464,
+        "z": 0.4818
+      },
+      "triangleCount": 3909,
+      "textureMemoryMb": 0,
+      "lods": [
+        "nvidia.network_switch.ua950h_2sf_01.operations"
+      ],
+      "lastValidatedAt": "2026-08-14T20:18:48.631Z",
+      "checksum": "sha256:dd42690ca986e25eea1b85d2a0f497fb4ddc01fad2034962dc9e0bf8bba96973",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "network-switch",
+      "qualityLevel": "lod",
+      "qualityVariants": {
+        "operations": "nvidia.network_switch.ua950h_2sf_01.operations",
+        "lod": "nvidia.network_switch.ua950h_2sf_01.lod"
+      },
+      "instanceable": true,
+      "drawCallBudget": 2,
+      "notes": "AURA-authored derivative of the NVIDIA source stage. 2 mesh(es), 1 material(s), draw-call estimate 2. Materials are AURA-authored PBR approximations: MDL shading does not survive glTF conversion.",
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      }
     }
   ]
 }

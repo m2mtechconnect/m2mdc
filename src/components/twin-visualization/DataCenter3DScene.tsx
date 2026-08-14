@@ -911,7 +911,11 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
       {/* Top-centre notice stack. Every banner lives in this one column, so
           disclosures stack vertically instead of landing on top of each other,
           and the column is inset from both protected side rails. */}
-      <div className="pointer-events-none absolute left-1/2 top-3 z-20 flex w-[min(34rem,calc(100%-18rem))] -translate-x-1/2 flex-col gap-2">
+      <div
+        className={`pointer-events-none absolute left-1/2 z-20 flex w-[min(30rem,calc(100%-32rem))] -translate-x-1/2 flex-col gap-2 ${
+          props.hostChromeTop ? 'top-[3.75rem]' : 'top-3'
+        }`}
+      >
       {props.facilityGeometry === 'nvidia-reference' && (
         <div
           data-testid="reference-facility-banner"

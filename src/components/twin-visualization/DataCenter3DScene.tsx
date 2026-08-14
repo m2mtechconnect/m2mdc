@@ -56,6 +56,8 @@ import { WorkloadOverlayLayer } from './WorkloadOverlayLayer';
 import { ZoomControlsOverlay } from './ZoomControlsOverlay';
 import { AssetProvenanceBadge } from './AssetProvenancePanel';
 import { ScenarioRackLayer } from './ScenarioRackLayer';
+import { ReferenceEquipmentLayer } from './ReferenceEquipmentLayer';
+import { useRuntimeCoverageStore, coverageTotals } from './runtimeCoverageStore';
 import {
   FACILITY_GEOMETRY_MODES,
   referenceCoverageSummary,
@@ -457,6 +459,15 @@ function Scene({
       ))}
 
       {/* Simulated design scenario: additive, never part of the as-built rows. */}
+      {facilityGeometry === 'nvidia-reference' && (
+        <ReferenceEquipmentLayer
+          racks={racks}
+          rows={rows}
+          bounds={extents}
+          showInfrastructure={shellMode !== 'off'}
+        />
+      )}
+
       {scenario &&
         racks.filter(isScenarioRack).map((rack) => (
           <ScenarioRackLayer

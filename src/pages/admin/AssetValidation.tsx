@@ -83,6 +83,8 @@ export default function AssetValidation() {
   const [savedId, setSavedId] = useState<string | null>(null);
   const [preflight, setPreflight] = useState<PreflightReport | null>(null);
   const [preflighting, setPreflighting] = useState(false);
+  const visualChecklistComplete =
+    clearanceConfirmed && screenshots.every((shot) => shot.captured);
 
   const [pendingContext, setPendingContext] = useState<{
     rendererReport: RendererReport;

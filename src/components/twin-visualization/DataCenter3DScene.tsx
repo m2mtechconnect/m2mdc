@@ -39,6 +39,7 @@ import type {
 } from './types';
 import { RackGroup } from './RackGroup';
 import { isAssetAdmin } from '@/auth/assetAdmin';
+import { getAssetCapabilityParts, getGpuValidationStatus } from './assetRegistry';
 import { useRBAC } from '@/contexts/RBACContext';
 import { resolveCanaryRollout, assetIdForRack, CANARY_RACK_ASSET_ID, type CanaryRolloutConfig } from './canaryRollout';
 import { getThermalColor, getUtilizationColor, getPowerColor } from './types';

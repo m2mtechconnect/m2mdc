@@ -587,7 +587,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
       {!props.compact && (
         <>
           <div
-            className={`absolute right-3 z-20 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center justify-end gap-1.5 ${
+            className={`absolute right-[4.75rem] z-20 flex max-w-[calc(100%-6.5rem)] flex-wrap items-center justify-end gap-1.5 ${
               props.hostChromeTop ? 'top-[3.75rem]' : 'top-14'
             }`}
             role="group"

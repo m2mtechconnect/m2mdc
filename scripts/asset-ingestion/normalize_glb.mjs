@@ -8,7 +8,7 @@
  */
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
-import { bounds } from '@gltf-transform/core';
+import { getBounds as bounds } from '@gltf-transform/functions';
 import fs from 'node:fs';
 
 const [src, dst, reportPath] = process.argv.slice(2);

@@ -21,7 +21,7 @@ PACK = os.environ.get('AURA_PACK_DIR', '/tmp/ingest/pack')
 WORK = os.environ.get('AURA_WORK_DIR', '/tmp/ingest/derivatives')
 BLENDER = os.environ.get('AURA_BLENDER', '/tmp/ingest/blender/blender')
 STATE = os.path.join(REPO, 'docs/evidence/nvidia-pack/conversion-state.json')
-PIPELINE_VERSION = '1.0.0'
+PIPELINE_VERSION = '1.1.0'
 LEVELS = ('inspection', 'operations', 'lod')
 
 

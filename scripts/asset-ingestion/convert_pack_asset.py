@@ -93,6 +93,7 @@ for level, target in levels_json.items():
     bpy.ops.wm.open_mainfile(filepath=base_blend)
     objs = mesh_objects()
     removed_internal = 0
+    joined_by_material = 0
     if strip_internal and level != 'inspection':
         lo, hi = world_bbox(objs)
         keep = []
@@ -105,6 +106,33 @@ for level, target in levels_json.items():
         for o in keep:
             bpy.data.objects.remove(o, do_unlink=True)
         removed_internal = len(keep)
+        objs = mesh_objects()
+
+    # Envelope recorded BEFORE any decimation. Decimation must never grow it.
+    env_lo, env_hi = world_bbox(objs) if objs else (Vector((0, 0, 0)), Vector((0, 0, 0)))
+
+    if level == 'lod' and len(objs) > 1:
+        # Joining per material first lets collapse decimation work across the
+        # whole shell instead of stalling on hundreds of tiny separate objects,
+        # and collapses the draw call count to one per material.
+        by_mat = {}
+        for o in objs:
+            slot = o.data.materials[0].name if o.data.materials and o.data.materials[0] else '__none__'
+            by_mat.setdefault(slot, []).append(o)
+        bpy.ops.object.select_all(action='DESELECT')
+        for group in by_mat.values():
+            if len(group) < 2:
+                continue
+            bpy.ops.object.select_all(action='DESELECT')
+            for o in group:
+                o.select_set(True)
+            bpy.context.view_layer.objects.active = group[0]
+            try:
+                bpy.ops.object.join()
+                joined_by_material += len(group) - 1
+            except RuntimeError:
+                pass
+        bpy.ops.object.select_all(action='DESELECT')
         objs = mesh_objects()
 
     before = tri_count(objs)
@@ -149,6 +177,33 @@ for level, target in levels_json.items():
             decimate_pass(r, 12 if i else 40)
             current = evaluated_tris()
 
+    # Envelope guard: collapse decimation can push vertices outside the source
+    # silhouette on thin or non-manifold parts. Any object whose decimated
+    # bounds escape the pre-decimation envelope reverts to source detail rather
+    # than shipping distorted geometry. Budget misses are reported honestly.
+    envelope_reverted = []
+    tol = [max(0.004, (env_hi[i] - env_lo[i]) * 0.01) for i in range(3)]
+    dgv = bpy.context.evaluated_depsgraph_get()
+    for o in list(mesh_objects()):
+        if not any(m.name.startswith('aura_decimate') for m in o.modifiers):
+            continue
+        ev = o.evaluated_get(dgv)
+        me = ev.to_mesh()
+        lo2 = [1e18] * 3
+        hi2 = [-1e18] * 3
+        for v in me.vertices:
+            w = o.matrix_world @ v.co
+            for i in range(3):
+                lo2[i] = min(lo2[i], w[i]); hi2[i] = max(hi2[i], w[i])
+        ev.to_mesh_clear()
+        escaped = any(lo2[i] < env_lo[i] - tol[i] or hi2[i] > env_hi[i] + tol[i] for i in range(3))
+        if escaped:
+            for m in [m for m in o.modifiers if m.name.startswith('aura_decimate')]:
+                o.modifiers.remove(m)
+            envelope_reverted.append(o.name)
+    if envelope_reverted:
+        bpy.context.view_layer.update()
+
     out = os.path.join(workdir, f'{key}.{level}.raw.glb')
     bpy.ops.export_scene.gltf(filepath=out, export_format='GLB', export_yup=True,
                               export_apply=True, export_materials='EXPORT',
@@ -166,6 +221,8 @@ for level, target in levels_json.items():
         'output': out, 'target': target, 'decimateRatio': ratio,
         'trianglesBeforeDecimate': before, 'trianglesAfter': after,
         'internalObjectsRemoved': removed_internal,
+        'joinedByMaterial': joined_by_material,
+        'envelopeRevertedObjects': envelope_reverted,
         'meshCount': len(mesh_objects()),
         'materialCount': len(bpy.data.materials),
         'imageCount': len(bpy.data.images),

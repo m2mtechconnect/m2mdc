@@ -10,6 +10,8 @@ import {
   FALLBACK_REASON_LABEL,
   RACK_ASSET_ID,
   getAsset,
+  getAssetCapabilityParts,
+  getGpuValidationStatus,
   resolveRuntimeAsset,
 } from './assetRegistry';
 import { CANARY_RACK_ASSET_ID } from './canaryRollout';
@@ -28,6 +30,8 @@ export function AssetProvenanceBadge({
   );
   const entry = getAsset(assetId);
   const imported = resolution.glbUrl !== null;
+  const capability = getAssetCapabilityParts(assetId);
+  const gpu = getGpuValidationStatus(assetId);
 
   return (
     <div className="absolute bottom-3 right-3 z-10 max-w-[22rem] text-left" data-testid="asset-provenance">
@@ -60,6 +64,15 @@ export function AssetProvenanceBadge({
           {entry?.blocker && <Row label="Blocker" value={entry.blocker} />}
           <Row label="Licence basis" value={resolution.provenance.licence ?? 'Unknown'} />
           <Row label="Materials" value="1 converted PBR material (Metal_Aluminum), 0 converted textures" />
+          <Row label="GPU validation" value={gpu.label} />
+          {capability.length > 0 && (
+            <Row
+              label="Addressable parts"
+              value={capability
+                .map((p) => `${p.label}: ${p.addressable ? 'yes' : 'no'}`)
+                .join(' | ')}
+            />
+          )}
           <Row
             label="Limitations"
             value="Not photorealistic, not SimReady, not RTX-rendered, not texture-complete"

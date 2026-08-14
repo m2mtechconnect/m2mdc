@@ -14,7 +14,7 @@
  * passed through unchanged.
  */
 
-import { Suspense, useEffect, useMemo } from 'react';
+import { Component, Suspense, useEffect, useMemo, type ReactNode } from 'react';
 import { useGLTF, Clone } from '@react-three/drei';
 import { Rack, type RackDetailLevel } from './Rack';
 import type { RackVisual } from './types';
@@ -87,27 +87,28 @@ export function ApprovedRackAsset(props: ApprovedRackAssetProps) {
   }, [resolution]);
 
   if (resolution.glbUrl) {
+    const procedural = (
+      <Rack
+        rack={props.rack}
+        showThermal={props.showThermal}
+        onClick={props.onClick}
+        detailed={props.detailed}
+        detailLevel={props.detailLevel}
+        selected={props.selected}
+        overlayColor={props.overlayColor ?? null}
+      />
+    );
     return (
-      <Suspense
-        fallback={
-          <Rack
+      <DerivativeBoundary fallback={procedural}>
+        <Suspense fallback={procedural}>
+          <ImportedRack
+            url={resolution.glbUrl}
             rack={props.rack}
-            showThermal={props.showThermal}
-            onClick={props.onClick}
-            detailed={props.detailed}
-            detailLevel={props.detailLevel}
             selected={props.selected}
-            overlayColor={props.overlayColor ?? null}
+            onClick={props.onClick}
           />
-        }
-      >
-        <ImportedRack
-          url={resolution.glbUrl}
-          rack={props.rack}
-          selected={props.selected}
-          onClick={props.onClick}
-        />
-      </Suspense>
+        </Suspense>
+      </DerivativeBoundary>
     );
   }
 

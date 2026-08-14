@@ -30,26 +30,32 @@ scene.addChild(wrapper);
 const rad = (Number(rotDeg) * Math.PI) / 180;
 wrapper.setRotation([0, Math.sin(rad / 2), 0, Math.cos(rad / 2)]);
 
+/**
+ * Exact world-space bounds.
+ *
+ * Every mesh node's full 4x4 world matrix is applied to the 8 corners of its
+ * primitive AABB. An earlier revision approximated the transform as
+ * "Y rotation + scale + translation", which silently mis-measured any node
+ * carrying the X rotation the USD Z-up -> glTF Y-up conversion introduces, and
+ * produced reference bounds that no derivative could match.
+ */
+function transform(m, v) {
+  return [0, 1, 2].map((i) => m[i] * v[0] + m[4 + i] * v[1] + m[8 + i] * v[2] + m[12 + i]);
+}
+
 function bounds() {
   const min = [Infinity, Infinity, Infinity];
   const max = [-Infinity, -Infinity, -Infinity];
   const walk = (node) => {
     const mesh = node.getMesh();
     if (mesh) {
-      const t = node.getWorldTranslation();
-      const s = node.getWorldScale();
-      const r = node.getWorldRotation();
+      const m = node.getWorldMatrix();
       for (const prim of mesh.listPrimitives()) {
         const pos = prim.getAttribute('POSITION');
         const pmin = pos.getMinNormalized ? pos.getMinNormalized([0, 0, 0]) : pos.getMin([0, 0, 0]);
         const pmax = pos.getMaxNormalized ? pos.getMaxNormalized([0, 0, 0]) : pos.getMax([0, 0, 0]);
-        // sample the 8 corners through the node world transform (rotation about Y only)
         for (const cx of [pmin[0], pmax[0]]) for (const cy of [pmin[1], pmax[1]]) for (const cz of [pmin[2], pmax[2]]) {
-          const v = [cx * s[0], cy * s[1], cz * s[2]];
-          const ang = 2 * Math.atan2(r[1], r[3]);
-          const x = v[0] * Math.cos(ang) + v[2] * Math.sin(ang);
-          const z = -v[0] * Math.sin(ang) + v[2] * Math.cos(ang);
-          const w = [x + t[0], v[1] + t[1], z + t[2]];
+          const w = transform(m, [cx, cy, cz]);
           for (let i = 0; i < 3; i++) { min[i] = Math.min(min[i], w[i]); max[i] = Math.max(max[i], w[i]); }
         }
       }

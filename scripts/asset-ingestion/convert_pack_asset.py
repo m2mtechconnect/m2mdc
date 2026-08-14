@@ -137,6 +137,14 @@ for level, target in levels_json.items():
 
     before = tri_count(objs)
 
+    # Per-object pre-decimation bounds. The silhouette guard compares against
+    # these so an object can neither grow outside nor collapse inside its own
+    # source silhouette.
+    pre_obj_bounds = {}
+    for o in objs:
+        lo_o, hi_o = world_bbox([o])
+        pre_obj_bounds[o.name] = ([lo_o[i] for i in range(3)], [hi_o[i] for i in range(3)])
+
     def evaluated_tris():
         dg = bpy.context.evaluated_depsgraph_get()
         n = 0
@@ -182,27 +190,78 @@ for level, target in levels_json.items():
     # bounds escape the pre-decimation envelope reverts to source detail rather
     # than shipping distorted geometry. Budget misses are reported honestly.
     envelope_reverted = []
+    considered = []
+    decimated = []
+    softened = []
     tol = [max(0.004, (env_hi[i] - env_lo[i]) * 0.01) for i in range(3)]
-    dgv = bpy.context.evaluated_depsgraph_get()
-    for o in list(mesh_objects()):
-        if not any(m.name.startswith('aura_decimate') for m in o.modifiers):
-            continue
-        ev = o.evaluated_get(dgv)
-        me = ev.to_mesh()
-        lo2 = [1e18] * 3
-        hi2 = [-1e18] * 3
-        for v in me.vertices:
+
+    def silhouette_ok(o):
+        """True when the evaluated object still fills its own source silhouette
+        and stays inside the pre-decimation envelope."""
+        dg2 = bpy.context.evaluated_depsgraph_get()
+        ev2 = o.evaluated_get(dg2)
+        me2 = ev2.to_mesh()
+        lo3 = [1e18] * 3
+        hi3 = [-1e18] * 3
+        for v in me2.vertices:
             w = o.matrix_world @ v.co
             for i in range(3):
-                lo2[i] = min(lo2[i], w[i]); hi2[i] = max(hi2[i], w[i])
-        ev.to_mesh_clear()
-        escaped = any(lo2[i] < env_lo[i] - tol[i] or hi2[i] > env_hi[i] + tol[i] for i in range(3))
-        if escaped:
-            for m in [m for m in o.modifiers if m.name.startswith('aura_decimate')]:
+                lo3[i] = min(lo3[i], w[i]); hi3[i] = max(hi3[i], w[i])
+        ev2.to_mesh_clear()
+        if any(lo3[i] < env_lo[i] - tol[i] or hi3[i] > env_hi[i] + tol[i] for i in range(3)):
+            return False
+        pre = pre_obj_bounds.get(o.name)
+        if pre:
+            plo, phi = pre
+            otol = [max(0.002, (phi[i] - plo[i]) * 0.05) for i in range(3)]
+            if any(lo3[i] > plo[i] + otol[i] or hi3[i] < phi[i] - otol[i] for i in range(3)):
+                return False
+        return True
+
+    for o in list(mesh_objects()):
+        mods = [m for m in o.modifiers if m.name.startswith('aura_decimate')]
+        if not mods:
+            considered.append(o.name)
+            continue
+        considered.append(o.name)
+        decimated.append(o.name)
+        if silhouette_ok(o):
+            continue
+        # Soften before reverting: an object that loses its silhouette at the
+        # aggressive ratio is retried at progressively gentler ratios so the
+        # budget is not paid back in full source detail unless it must be.
+        base = min(m.ratio for m in mods)
+        recovered = False
+        for factor in (4, 10, 25, 60):
+            r = min(0.95, base * factor)
+            if r >= 0.95:
+                break
+            for m in mods:
+                m.ratio = r
+            bpy.context.view_layer.update()
+            if silhouette_ok(o):
+                softened.append({'object': o.name, 'ratio': round(r, 5)})
+                recovered = True
+                break
+        if not recovered:
+            for m in mods:
                 o.modifiers.remove(m)
             envelope_reverted.append(o.name)
+            bpy.context.view_layer.update()
     if envelope_reverted:
         bpy.context.view_layer.update()
+        decimated = [n for n in decimated if n not in set(envelope_reverted)]
+
+    # Triangles restored by reverting to source detail (evidence, never hidden).
+    reverted_tris = 0
+    if envelope_reverted:
+        names = set(envelope_reverted)
+        for o in mesh_objects():
+            if o.name in names:
+                o.data.calc_loop_triangles()
+                reverted_tris += len(o.data.loop_triangles)
+
+    post_lo, post_hi = world_bbox(mesh_objects()) if mesh_objects() else (env_lo, env_hi)
 
     out = os.path.join(workdir, f'{key}.{level}.raw.glb')
     bpy.ops.export_scene.gltf(filepath=out, export_format='GLB', export_yup=True,
@@ -223,6 +282,15 @@ for level, target in levels_json.items():
         'internalObjectsRemoved': removed_internal,
         'joinedByMaterial': joined_by_material,
         'envelopeRevertedObjects': envelope_reverted,
+        'softenedObjects': softened,
+        'objectsConsideredForDecimation': len(considered),
+        'objectsDecimated': len(decimated),
+        'envelopeReverted': len(envelope_reverted),
+        'trianglesRestoredByReversion': reverted_tris,
+        'preDecimationBounds': {'min': [round(v, 5) for v in env_lo], 'max': [round(v, 5) for v in env_hi]},
+        'postDecimationBounds': {'min': [round(v, 5) for v in post_lo], 'max': [round(v, 5) for v in post_hi]},
+        'boundsToleranceM': [round(t, 5) for t in tol],
+        'revertedTrianglePercent': round(100.0 * reverted_tris / after, 2) if after else 0.0,
         'meshCount': len(mesh_objects()),
         'materialCount': len(bpy.data.materials),
         'imageCount': len(bpy.data.images),

@@ -1,0 +1,129 @@
+/**
+ * ApprovedRackAsset
+ *
+ * Single runtime entry point for rack geometry. It asks the asset registry for
+ * an approved, validated GLB derivative of the OpenUSD rack master:
+ *
+ *  - derivative resolved  -> the imported GLB is mounted (shared geometry and
+ *    materials across every rack instance, one network request per derivative).
+ *  - derivative rejected  -> the documented procedural cabinet renders and the
+ *    reason is reported honestly through `onResolution`.
+ *
+ * AURA remains the operational data source in both cases: rack id, row,
+ * position, simulation state, overlay state and selection are owned by AURA and
+ * passed through unchanged.
+ */
+
+import { Suspense, useEffect, useMemo } from 'react';
+import { useGLTF, Clone } from '@react-three/drei';
+import { Rack, type RackDetailLevel } from './Rack';
+import type { RackVisual } from './types';
+import {
+  RACK_ASSET_ID,
+  resolveRuntimeAsset,
+  type RuntimeAssetResolution,
+} from './assetRegistry';
+
+interface ApprovedRackAssetProps {
+  rack: RackVisual;
+  showThermal: boolean;
+  onClick?: (rackId: string) => void;
+  detailed?: boolean;
+  detailLevel?: RackDetailLevel;
+  selected?: boolean;
+  overlayColor?: string | null;
+  /** Force the procedural preview (used by the low quality profile). */
+  preferFallback?: boolean;
+  onResolution?: (resolution: RuntimeAssetResolution) => void;
+}
+
+function ImportedRack({
+  url,
+  rack,
+  selected,
+  onClick,
+}: {
+  url: string;
+  rack: RackVisual;
+  selected?: boolean;
+  onClick?: (rackId: string) => void;
+}) {
+  const { scene } = useGLTF(url);
+  return (
+    <group
+      position={rack.position}
+      name={`ApprovedRackAsset:${rack.id}`}
+      userData={{ rackId: rack.id, row: rack.rowId, source: 'imported-glb' }}
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick?.(rack.id);
+      }}
+    >
+      {/* Clone reuses the loaded geometry and materials for every instance. */}
+      <Clone object={scene} castShadow receiveShadow />
+      {selected && (
+        <mesh position={[0, 1.02, 0]}>
+          <boxGeometry args={[0.68, 2.06, 1.26]} />
+          <meshBasicMaterial color="#FFCC00" wireframe transparent opacity={0.45} />
+        </mesh>
+      )}
+    </group>
+  );
+}
+
+export function ApprovedRackAsset(props: ApprovedRackAssetProps) {
+  const resolution = useMemo(
+    () => resolveRuntimeAsset(RACK_ASSET_ID, { preferFallback: props.preferFallback }),
+    [props.preferFallback],
+  );
+
+  useEffect(() => {
+    props.onResolution?.(resolution);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolution]);
+
+  if (resolution.glbUrl) {
+    return (
+      <Suspense
+        fallback={
+          <Rack
+            rack={props.rack}
+            showThermal={props.showThermal}
+            onClick={props.onClick}
+            detailed={props.detailed}
+            detailLevel={props.detailLevel}
+            selected={props.selected}
+            overlayColor={props.overlayColor ?? null}
+          />
+        }
+      >
+        <ImportedRack
+          url={resolution.glbUrl}
+          rack={props.rack}
+          selected={props.selected}
+          onClick={props.onClick}
+        />
+      </Suspense>
+    );
+  }
+
+  return (
+    <Rack
+      rack={props.rack}
+      showThermal={props.showThermal}
+      onClick={props.onClick}
+      detailed={props.detailed}
+      detailLevel={props.detailLevel}
+      selected={props.selected}
+      overlayColor={props.overlayColor ?? null}
+    />
+  );
+}
+
+/** Preload the approved derivative once, when one exists. */
+export function preloadApprovedRackAsset() {
+  const { glbUrl } = resolveRuntimeAsset(RACK_ASSET_ID);
+  if (glbUrl) useGLTF.preload(glbUrl);
+}
+
+preloadApprovedRackAsset();

@@ -91,3 +91,34 @@ The following Phase 1 items depend on **no** external blocker above and can proc
 | B | Playwright Chromium fails to launch in current sandbox runner (`libglib-2.0.so.0` missing). 47/47 green run recorded on the same source tree in 1A.3.e.1 / 1A.3.f; 1A.3.g re-run blocked by the runner image. | Platform (CI) | 1A.3.g follow-up → 1B kick-off | `npx playwright test --config playwright.truth.config.ts` reports 47/47 in the Phase 1B CI runner. |
 | C | Full Vitest suite still red (236 failed / 907 passed / 103 skipped). 198-failure Phase 0 baseline unresolved; +38 delta attributable to `vitest-pool` fork-runner timeouts under concurrent gate load — targeted provenance run is 194/194 green on the same tree. | Platform | 1B P0 | Full suite green in isolation. |
 | D | Full ESLint still red (1472 problems vs 1471 baseline). Legacy `no-explicit-any` majority; no Phase 1A source file introduces a new error class. | Platform | 1B P1 | Baseline reduction plan approved and executed. |
+## BLK-USD-RACK-01 - No approved real USD rack source (2026-08-14)
+
+**Status:** BLOCKED - external dependency.
+
+The real OpenUSD rack vertical slice cannot proceed past the corrective step because no
+approved source asset can be acquired in this environment:
+
+1. **User-provided rack CAD or USD** - none supplied.
+2. **NVIDIA Data Center OpenUSD asset pack** - distribution requires an authenticated NVIDIA
+   account and licence acceptance; the pack is multi-gigabyte and must not be pulled into the
+   frontend repository.
+3. **Licensed vendor CAD or USD** - no vendor licence or delivery record exists.
+4. **Professionally authored generic rack with documented provenance** - no commissioned
+   authoring record exists. Authoring boxes here would be another placeholder, which is
+   explicitly forbidden.
+
+**Consequence:** `assets/rack/generic_42u_rack` is now marked
+`approvalStatus: "blocked-missing-payloads"`, `runtimeEligible: false`, `lastValidatedAt: null`,
+`glbUrl: null`, with blockers `missing-payloads` and `no-approved-source`. Its master references
+`payloads/external.usdc` and `payloads/internal.usdc`, neither of which exists, so it carries no
+geometry, cannot be validated and must not be converted to a GLB.
+
+**Unblock requires one of:** a delivered rack CAD/USD file, NVIDIA asset-pack access with a
+recorded licence basis, or a signed vendor/authoring delivery. On delivery: author the master and
+payloads, run `usdchecker`, record `data/validation.json` + `data/conversion.json`, emit
+`web/<id>.glb`, then set `approvalStatus: approved` and `runtimeEligible: true`. The runtime path
+(`ApprovedRackAsset` + `resolveRuntimeAsset`) is already wired and will mount the GLB with no
+further UI work.
+
+**Interim labelling:** the scene is labelled "Procedural 3D preview" and the dev-only Asset
+Provenance panel reports `Fallback active: Yes` with the resolver's reason.

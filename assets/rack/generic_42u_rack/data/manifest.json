@@ -6,7 +6,11 @@
   "upAxis": "Y",
   "metersPerUnit": 1,
   "originConvention": "floor-contact, centred on footprint",
-  "dimensionsMeters": { "width": 0.6, "height": 2.0, "depth": 1.2 },
+  "dimensionsMeters": {
+    "width": 0.6,
+    "height": 2.0,
+    "depth": 1.2
+  },
   "instanceable": true,
   "payloads": {
     "external": "payloads/external.usdc",
@@ -19,11 +23,28 @@
   "web": {
     "glb": null,
     "status": "not-generated",
-    "reason": "USD to glTF conversion requires a USD toolchain that is unavailable in this environment."
+    "reason": "Source stage is incomplete: referenced payload layers do not exist. Converting it would produce an empty GLB."
   },
   "validation": {
     "usdchecker": "not-run",
-    "lastValidatedAt": null
+    "lastValidatedAt": null,
+    "result": "blocked",
+    "reason": "payloads/external.usdc and payloads/internal.usdc are referenced by the master but absent on disk."
   },
-  "approvalStatus": "pending-review"
+  "approvalStatus": "blocked-missing-payloads",
+  "runtimeEligible": false,
+  "lastValidatedAt": null,
+  "glbUrl": null,
+  "blockers": [
+    {
+      "id": "missing-payloads",
+      "severity": "blocker",
+      "detail": "assets/rack/generic_42u_rack/payloads/external.usdc and payloads/internal.usdc are referenced by generic_42u_rack.usda but do not exist. The master resolves with missing dependencies and contains no geometry."
+    },
+    {
+      "id": "no-approved-source",
+      "severity": "blocker",
+      "detail": "No approved rack source asset (user-provided CAD/USD, NVIDIA Data Center OpenUSD asset pack, or licensed vendor CAD) has been acquired or delivered, so a genuine USD master cannot be authored."
+    }
+  ]
 }

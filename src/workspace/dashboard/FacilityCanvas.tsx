@@ -411,7 +411,7 @@ export function FacilityCanvas({
           {rackCount} of approximately {facility.designRackEstimate} racks represented
         </span>
         <span aria-hidden>·</span>
-        <span>Not a validated OpenUSD stage</span>
+        <span>Procedural 3D preview - not a validated OpenUSD stage</span>
       </div>
 
       {presentation !== 'inline' && (

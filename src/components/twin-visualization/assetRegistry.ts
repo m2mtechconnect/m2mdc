@@ -145,12 +145,21 @@ export function resolveRuntimeAsset(
 
   if (!asset) return base;
   if (options.preferFallback) return { ...base, fallbackReason: 'quality-profile-selected-fallback' };
+  // A superseded build is retained only for audit history. It can never mount,
+  // regardless of approval flags left behind on the entry.
+  if (asset.superseded === true) return { ...base, fallbackReason: 'build-superseded' };
   if (asset.approvalStatus !== 'approved') return { ...base, fallbackReason: 'asset-not-approved' };
   if (asset.runtimeEligible !== true) return { ...base, fallbackReason: 'asset-not-runtime-eligible' };
   if (!asset.glbUrl) return { ...base, fallbackReason: 'derivative-missing' };
   if (!SUPPORTED_DERIVATIVE.test(asset.glbUrl)) return { ...base, fallbackReason: 'unsupported-format' };
   if (!asset.checksum) return { ...base, fallbackReason: 'checksum-missing' };
+  if (asset.supersededChecksums?.includes(asset.checksum)) {
+    return { ...base, fallbackReason: 'checksum-superseded' };
+  }
   if (options.expectedChecksum && options.expectedChecksum !== asset.checksum) {
+    if (asset.supersededChecksums?.includes(options.expectedChecksum)) {
+      return { ...base, fallbackReason: 'checksum-superseded' };
+    }
     return { ...base, fallbackReason: 'checksum-mismatch' };
   }
   if (!asset.lastValidatedAt) return { ...base, fallbackReason: 'asset-not-runtime-eligible' };
@@ -171,6 +180,10 @@ export const FALLBACK_REASON_LABEL: Record<FallbackReason, string> = {
   'unsupported-format': 'Approved derivative unavailable: unsupported derivative format',
   'checksum-missing': 'Approved derivative unavailable: derivative checksum missing',
   'checksum-mismatch': 'Approved derivative unavailable: derivative checksum mismatch',
+  'checksum-superseded':
+    'Approved derivative unavailable: that checksum belongs to a superseded build and is retained for audit history only',
+  'build-superseded':
+    'Approved derivative unavailable: this build is superseded and is retained for audit history only',
   'quality-profile-selected-fallback': 'Procedural geometry selected by the active quality profile',
 };
 
@@ -185,4 +198,41 @@ export function hasApprovedDerivatives(): boolean {
 /** Assets blocking the photoreal upgrade, for honest UI/reporting. */
 export function assetsAwaitingSource(): AssetManifestEntry[] {
   return FILE.assets.filter((a) => a.approvalStatus !== 'approved');
+}
+
+export function getManifestVersion(): number {
+  return FILE.manifestVersion;
+}
+
+/**
+ * Capability map for an asset, derived from validation evidence recorded in
+ * the manifest. The UI must derive available interactions from this map and
+ * never from assumed rack features.
+ */
+export function getAssetCapabilityParts(assetId: string): AssetCapabilityPart[] {
+  return getAsset(assetId)?.capabilities?.addressableParts ?? [];
+}
+
+/** True only when the named part is proven addressable in the derivative. */
+export function isPartAddressable(assetId: string, partId: string): boolean {
+  return getAssetCapabilityParts(assetId).some((p) => p.id === partId && p.addressable);
+}
+
+/** Checksums that must never resolve or mount anywhere in the runtime. */
+export function isSupersededChecksum(checksum: string): boolean {
+  const normalized = checksum.trim().toLowerCase();
+  return FILE.assets.some(
+    (a) =>
+      (a.supersededChecksums ?? []).some((c) => c.toLowerCase() === normalized) ||
+      (a.superseded === true && a.checksum?.toLowerCase() === normalized),
+  );
+}
+
+/** Resolve by checksum. Superseded checksums resolve to nothing. */
+export function resolveByChecksum(checksum: string): AssetManifestEntry | null {
+  if (isSupersededChecksum(checksum)) return null;
+  const normalized = checksum.trim().toLowerCase();
+  const entry = FILE.assets.find((a) => a.checksum?.toLowerCase() === normalized);
+  if (!entry || entry.superseded) return null;
+  return resolveRuntimeAsset(entry.assetId).glbUrl ? entry : null;
 }

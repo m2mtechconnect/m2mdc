@@ -612,7 +612,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
     return (
       <TwinFallback2D
         report={activeReport}
-        racks={props.racks}
+        racks={racks}
         rows={props.rows}
         compact={props.compact}
         onRetry={recheckCapability}
@@ -670,6 +670,10 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
                   [
                     'fitFacility',
                     'topDown',
+                    'rackFront',
+                    'rackRear',
+                    'rackSide',
+                    'rackElevated',
                     'frontAisles',
                     'rearInfrastructure',
                     'coolingTopology',
@@ -817,7 +821,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             <span
               key={rack.id}
               data-rack-id={rack.id}
-              data-asset-id={isScenarioRack(rack) ? rack.scenarioId && scenario ? scenario.assetId : 'none' : assetIdForRack(rack.id, canary)}
+              data-asset-id={isScenarioRack(rack) && scenario ? scenario.assetId : assetIdForRack(rack.id, canary)}
               data-simulated={isScenarioRack(rack) ? 'true' : 'false'}
               data-runtime-geometry={
                 isScenarioRack(rack) || assetIdForRack(rack.id, canary) === CANARY_RACK_ASSET_ID
@@ -828,6 +832,29 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
           ))}
         </div>
       </div>
+
+      {/* Simulated design-scenario disclosure. Present whenever scenario
+          geometry is mounted, so no screenshot can be read as as-built truth. */}
+      {scenario && (
+        <div
+          data-testid="design-scenario-banner"
+          className="pointer-events-auto absolute left-1/2 top-3 z-20 w-[min(34rem,calc(100%-2rem))] -translate-x-1/2 rounded-md border border-amber-400/60 bg-slate-900/92 px-3 py-2 text-xs text-slate-100"
+          role="status"
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded bg-amber-400/20 px-1.5 py-0.5 font-semibold text-amber-300">
+              SIMULATED
+            </span>
+            <span className="font-medium">{scenario.id}</span>
+            <span className="text-slate-300">Proposed design - not as-built</span>
+          </div>
+          <p className="mt-1 text-slate-300">{scenario.description}</p>
+          <p className="mt-1 text-slate-300">
+            Chilled-water loop connection: unverified. Unresolved engineering inputs:{' '}
+            {scenario.engineeringInputs.map((i) => `${i.label} (${i.unit})`).join(', ')}.
+          </p>
+        </div>
+      )}
 
       {/* Thermal/Power legend */}
       <div className="absolute bottom-3 left-3 flex gap-2 pointer-events-none">

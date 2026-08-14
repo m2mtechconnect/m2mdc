@@ -45,6 +45,7 @@ import { SovereigntyOverlayLayer } from './SovereigntyOverlayLayer';
 import { CoolingOverlayLayer } from './CoolingOverlayLayer';
 import { WorkloadOverlayLayer } from './WorkloadOverlayLayer';
 import { ZoomControlsOverlay } from './ZoomControlsOverlay';
+import { AssetProvenanceBadge } from './AssetProvenancePanel';
 
 // Zoom configuration constants
 const MIN_ZOOM = 0.4;

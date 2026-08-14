@@ -75,6 +75,7 @@ function ImportedRack({
 }
 
 export function ApprovedRackAsset(props: ApprovedRackAssetProps) {
+  // (boundary defined below)
   const assetId = props.assetId ?? RACK_ASSET_ID;
   const resolution = useMemo(
     () => resolveRuntimeAsset(assetId, { preferFallback: props.preferFallback }),

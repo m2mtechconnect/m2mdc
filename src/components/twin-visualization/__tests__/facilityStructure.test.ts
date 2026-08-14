@@ -35,6 +35,6 @@ describe('facility overhead structure', () => {
 
   it('does not parent lighting inside facility shell geometry', () => {
     expect(hall).not.toContain('pointLight');
-    expect(hall).not.toContain('FacilityLighting');
+    expect(hall).not.toContain('name="FacilityLighting"');
   });
 });

@@ -66,6 +66,17 @@ export interface AssetManifestEntry {
   capabilities?: { addressableParts: AssetCapabilityPart[] };
   drawCallBudget?: number;
   gpuValidation?: { status: string; lastPassedRunId: string | null };
+  /**
+   * Runtime semantics. Present only on pack-wide ingested entries; absent on
+   * older entries, which therefore resolve to no semantic role at all.
+   */
+  semanticRole?: SemanticRole;
+  /** Derivative class this entry represents. */
+  qualityLevel?: QualityLevel;
+  /** Sibling entries for the other derivative classes of the same source. */
+  qualityVariants?: Partial<Record<QualityLevel, string>>;
+  /** True when the entry may be instanced across many placements. */
+  instanceable?: boolean;
 }
 
 interface AssetManifestFile {
@@ -75,6 +86,80 @@ interface AssetManifestFile {
 }
 
 const FILE = manifest as unknown as AssetManifestFile;
+
+/**
+ * Semantic roles the runtime can place. A role is only ever satisfied by an
+ * asset whose manifest entry declares it; nothing is inferred from filenames.
+ */
+export type SemanticRole =
+  | 'liquid-cooled-rack'
+  | 'rack-core-reference'
+  | 'server-1u'
+  | 'server-2u'
+  | 'network-switch'
+  | 'rack-pdu'
+  | 'liquid-cooling-equipment'
+  | 'cable-tray'
+  | 'blanking-panel';
+
+/** Derivative classes, ordered from most to least detailed. */
+export type QualityLevel = 'inspection' | 'operations' | 'lod';
+
+const QUALITY_ORDER: QualityLevel[] = ['inspection', 'operations', 'lod'];
+
+export const SEMANTIC_ROLE_LABEL: Record<SemanticRole, string> = {
+  'liquid-cooled-rack': 'Liquid-cooled rack',
+  'rack-core-reference': 'Rack core (reference)',
+  'server-1u': '1U server',
+  'server-2u': '2U server',
+  'network-switch': 'Network switch',
+  'rack-pdu': 'Rack PDU',
+  'liquid-cooling-equipment': 'Liquid-cooling equipment',
+  'cable-tray': 'Cable tray',
+  'blanking-panel': 'Blanking panel',
+};
+
+/** Every runtime-resolvable asset declaring the given semantic role. */
+export function listAssetsForRole(role: SemanticRole): AssetManifestEntry[] {
+  return FILE.assets.filter(
+    (a) => a.semanticRole === role && resolveRuntimeAsset(a.assetId).glbUrl !== null,
+  );
+}
+
+/**
+ * Resolve the asset to mount for a semantic role at a requested quality level.
+ * Falls back to a coarser derivative class only, never to a finer one, so the
+ * runtime can never silently exceed a device's geometry budget.
+ */
+export function resolveRoleAsset(
+  role: SemanticRole,
+  quality: QualityLevel = 'operations',
+): { entry: AssetManifestEntry; quality: QualityLevel } | null {
+  const candidates = listAssetsForRole(role);
+  if (candidates.length === 0) return null;
+  const start = QUALITY_ORDER.indexOf(quality);
+  for (const level of QUALITY_ORDER.slice(Math.max(0, start))) {
+    const match = candidates.find((a) => (a.qualityLevel ?? 'operations') === level);
+    if (match) return { entry: match, quality: level };
+  }
+  return { entry: candidates[0], quality: candidates[0].qualityLevel ?? 'operations' };
+}
+
+/** Sibling entry for another derivative class of the same source asset. */
+export function resolveQualityVariant(
+  assetId: string,
+  quality: QualityLevel,
+): AssetManifestEntry | null {
+  const entry = getAsset(assetId);
+  const variantId = entry?.qualityVariants?.[quality];
+  if (!variantId) return null;
+  return getAsset(variantId) ?? null;
+}
+
+/** True only when the manifest explicitly declares the asset instanceable. */
+export function isInstanceable(assetId: string): boolean {
+  return getAsset(assetId)?.instanceable === true;
+}
 
 export function listAssets(): AssetManifestEntry[] {
   return FILE.assets;

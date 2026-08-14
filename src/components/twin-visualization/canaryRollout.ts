@@ -1,12 +1,19 @@
 /**
  * Canary rollout control for approved 3D derivatives.
  *
- * The NVIDIA-derived rack asset is mounted on exactly one rack instance until
- * the canary is promoted. Selection is deterministic and overridable from the
- * URL so an operator can reproduce or disable the canary without a rebuild:
+ * The NVIDIA-derived rack asset (`Rack_42U_A_01`) is a liquid-cooled cabinet
+ * with a rear-door heat exchanger and chilled-water risers. It may therefore
+ * only be mounted on a rack whose DOMAIN DATA explicitly declares the matching
+ * cooling capability. Position, row, utilisation and rack id are NOT
+ * compatibility signals and must never be used to infer one.
  *
- *   ?assetCanary=off        - disable, every rack renders procedural geometry
- *   ?canaryRack=<rackId>    - move the canary onto a specific rack
+ * When the facility dataset contains no compatible rack, the asset is not
+ * mounted in the facility at all - it is only available in the Admin Asset
+ * Preview, labelled as unassigned.
+ *
+ * URL controls (authenticated admin/developer only):
+ *   ?assetCanary=off        - disable the canary entirely
+ *   ?canaryRack=<rackId>    - move the canary onto a specific COMPATIBLE rack
  */
 
 import { RACK_ASSET_ID } from './assetRegistry';
@@ -14,9 +21,45 @@ import { RACK_ASSET_ID } from './assetRegistry';
 /** Approved, validated NVIDIA-derived rack asset. */
 export const CANARY_RACK_ASSET_ID = 'nvidia.rack.42u_a_01';
 
+/** Explicit cooling capability declared by the facility dataset. */
+export interface RackCoolingCapability {
+  liquidCooled?: boolean;
+  rearDoorHeatExchanger?: boolean;
+  chilledWaterConnected?: boolean;
+}
+
+export interface CanaryCandidate {
+  id: string;
+  cooling?: RackCoolingCapability | null;
+}
+
+export type CanarySelectionReason =
+  | 'disabled-by-url'
+  | 'admin-override'
+  | 'compatible-rack'
+  | 'no-compatible-rack';
+
 export interface CanaryRolloutConfig {
   enabled: boolean;
   rackId: string | null;
+  reason: CanarySelectionReason;
+  /** True when the asset may only be shown in the Admin Asset Preview. */
+  adminPreviewOnly: boolean;
+  /** Ids of racks whose domain data declares full compatibility. */
+  compatibleRackIds: string[];
+}
+
+/**
+ * A rack is compatible only when all three capabilities are explicitly true in
+ * the dataset. Missing or unknown capability is treated as incompatible.
+ */
+export function isCanaryCompatible(rack: CanaryCandidate): boolean {
+  const c = rack.cooling;
+  return (
+    c?.liquidCooled === true &&
+    c?.rearDoorHeatExchanger === true &&
+    c?.chilledWaterConnected === true
+  );
 }
 
 function readParams(): URLSearchParams {
@@ -24,19 +67,38 @@ function readParams(): URLSearchParams {
   return new URLSearchParams(window.location.search);
 }
 
-/**
- * Resolve the canary target from the racks currently in the scene. The default
- * target is the lowest rack id, so the same rack is selected on every reload.
- */
-export function resolveCanaryRollout(rackIds: string[]): CanaryRolloutConfig {
+export function resolveCanaryRollout(
+  racks: CanaryCandidate[],
+  options: { isAdmin?: boolean } = {},
+): CanaryRolloutConfig {
+  const compatibleRackIds = racks.filter(isCanaryCompatible).map((r) => r.id).sort((a, b) => a.localeCompare(b));
+  const none = (reason: CanarySelectionReason): CanaryRolloutConfig => ({
+    enabled: false,
+    rackId: null,
+    reason,
+    adminPreviewOnly: reason === 'no-compatible-rack',
+    compatibleRackIds,
+  });
+
   const params = readParams();
-  if (params.get('assetCanary') === 'off') return { enabled: false, rackId: null };
+  if (params.get('assetCanary') === 'off') return none('disabled-by-url');
 
-  const requested = params.get('canaryRack');
-  if (requested && rackIds.includes(requested)) return { enabled: true, rackId: requested };
+  // The override is a testing affordance for authenticated admins/developers
+  // and can still only target a rack the dataset says is compatible.
+  const requested = options.isAdmin ? params.get('canaryRack') : null;
+  if (requested && compatibleRackIds.includes(requested)) {
+    return { enabled: true, rackId: requested, reason: 'admin-override', adminPreviewOnly: false, compatibleRackIds };
+  }
 
-  const sorted = [...rackIds].sort((a, b) => a.localeCompare(b));
-  return { enabled: true, rackId: sorted[0] ?? null };
+  if (compatibleRackIds.length === 0) return none('no-compatible-rack');
+
+  return {
+    enabled: true,
+    rackId: compatibleRackIds[0],
+    reason: 'compatible-rack',
+    adminPreviewOnly: false,
+    compatibleRackIds,
+  };
 }
 
 /** Asset id a given rack instance must resolve at runtime. */

@@ -38,7 +38,8 @@ import type {
   SimulationEventVisual 
 } from './types';
 import { RackGroup } from './RackGroup';
-import { resolveCanaryRollout } from './canaryRollout';
+import { useRBAC } from '@/contexts/RBACContext';
+import { resolveCanaryRollout, assetIdForRack, CANARY_RACK_ASSET_ID, type CanaryRolloutConfig } from './canaryRollout';
 import { getThermalColor, getUtilizationColor, getPowerColor } from './types';
 import { ThermalOverlayLayer } from './ThermalOverlayLayer';
 import { PowerFlowLayer } from './PowerFlowLayer';
@@ -221,7 +222,9 @@ function Scene({
   selectedAssetId,
   shellMode,
   showLabels,
+  canary,
 }: Omit<DataCenter3DSceneProps, 'events'> & { 
+  canary: CanaryRolloutConfig;
   targetDistance: number; 
   baseDistance: number;
   lastInteractionTime: number;
@@ -250,7 +253,8 @@ function Scene({
   ];
 
   // Approved NVIDIA-derived rack derivative is mounted on one rack only.
-  const canary = useMemo(() => resolveCanaryRollout(racks.map((r) => r.id)), [racks]);
+  // Canary target is supplied by the host component (resolved outside the
+  // Canvas so it can consult authorization context).
   const hallRadius = Math.max(
     6,
     Math.hypot((extents.maxX - extents.minX) / 2 + 2, (extents.maxZ - extents.minZ) / 2 + 2),
@@ -456,6 +460,18 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
     writeQualityProfile(id);
   }, []);
   
+  // Compatibility-gated canary target. Resolved outside <Canvas /> so it can
+  // read authorization context, then passed down as a prop.
+  const { role, roles } = useRBAC();
+  const isAdmin = useMemo(
+    () => [role, ...roles].some((r) => r === 'admin' || r === 'owner' || r === 'developer'),
+    [role, roles],
+  );
+  const canary = useMemo(
+    () => resolveCanaryRollout(props.racks.map((r) => ({ id: r.id, cooling: r.cooling })), { isAdmin }),
+    [props.racks, isAdmin],
+  );
+
   const baseDistance = props.compact ? 22 : 30;
   const [targetDistance, setTargetDistance] = useState(baseDistance);
   
@@ -745,10 +761,32 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
                 qualityProfile={qualityProfile}
                 placement={placement}
                 reducedMotion={reducedMotion}
+                canary={canary}
               />
             </Suspense>
           </Canvas>
         </CanvasMountBoundary>
+
+        {/* Runtime geometry evidence: what each rack actually mounted. */}
+        <div
+          hidden
+          data-testid="rack-geometry-manifest"
+          data-canary-reason={canary.reason}
+          data-canary-rack={canary.rackId ?? 'none'}
+        >
+          {props.racks.map((rack) => (
+            <span
+              key={rack.id}
+              data-rack-id={rack.id}
+              data-asset-id={assetIdForRack(rack.id, canary)}
+              data-runtime-geometry={
+                assetIdForRack(rack.id, canary) === CANARY_RACK_ASSET_ID
+                  ? 'approved-glb'
+                  : 'procedural'
+              }
+            />
+          ))}
+        </div>
       </div>
 
       {/* Thermal/Power legend */}

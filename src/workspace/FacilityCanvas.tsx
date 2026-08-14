@@ -129,6 +129,8 @@ export function FacilityCanvas({ facility }: Props) {
   const contract = overlayContract(activeOverlay as never);
   const showLoading = viewMode === '3d' && modelState === 'loading';
   const clampZoom = (z: number) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
+  // Panel selection and mounted scene read the same URL-owned value.
+  const { requestedId: designScenarioId } = useDesignScenario();
 
   return (
     <TooltipProvider delayDuration={200}>

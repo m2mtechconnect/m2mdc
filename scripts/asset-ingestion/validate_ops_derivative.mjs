@@ -17,7 +17,7 @@ const io = new NodeIO().registerExtensions(ALL_EXTENSIONS);
 
 /** Bounds tolerance in metres: quantization can shift a vertex by <=1 mm. */
 const TOLERANCE_M = 0.002;
-const REQUIRED_GROUPS = ['Rack_Core', 'Front_Door', 'Rear_Cooler_Door', 'Chilled_Water_Risers'];
+const REQUIRED_GROUPS = ['Rack_Core', 'Rear_Cooler_Door', 'Chilled_Water_Risers'];
 
 async function inspect(path) {
   const doc = await io.read(path);

@@ -19,6 +19,8 @@ interface ScenarioRackLayerProps {
   selected?: boolean;
   showLabels?: boolean;
   onRackClick?: (rackId: string) => void;
+  /** Reported when the approved derivative fails to load at runtime. */
+  onDerivativeFailure?: (reason: string) => void;
 }
 
 export function ScenarioRackLayer({
@@ -27,6 +29,7 @@ export function ScenarioRackLayer({
   selected,
   showLabels,
   onRackClick,
+  onDerivativeFailure,
 }: ScenarioRackLayerProps) {
   const [x, , z] = rack.position;
 
@@ -38,6 +41,13 @@ export function ScenarioRackLayer({
         <meshBasicMaterial color="#FFCC00" transparent opacity={0.5} depthWrite={false} />
       </mesh>
 
+      {/* Amber locator beam: makes the proposed rack findable in a hall of
+          identical procedural cabinets without recolouring any other rack. */}
+      <mesh position={[x, 2.6, z]} renderOrder={2}>
+        <cylinderGeometry args={[0.045, 0.045, 5.2, 12]} />
+        <meshBasicMaterial color="#FFCC00" transparent opacity={0.32} depthWrite={false} />
+      </mesh>
+
       <ApprovedRackAsset
         rack={rack}
         assetId={scenario.assetId}
@@ -45,6 +55,7 @@ export function ScenarioRackLayer({
         selected={selected}
         overlayColor={null}
         onClick={onRackClick}
+        onDerivativeFailure={onDerivativeFailure}
       />
 
       {showLabels !== false && (

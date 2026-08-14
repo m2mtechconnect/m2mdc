@@ -39,7 +39,12 @@ import type {
 } from './types';
 import { RackGroup } from './RackGroup';
 import { isAssetAdmin } from '@/auth/assetAdmin';
-import { getAssetCapabilityParts, getGpuValidationStatus } from './assetRegistry';
+import {
+  FALLBACK_REASON_LABEL,
+  getAssetCapabilityParts,
+  getGpuValidationStatus,
+  resolveRuntimeAsset,
+} from './assetRegistry';
 import { useRBAC } from '@/contexts/RBACContext';
 import { resolveCanaryRollout, assetIdForRack, CANARY_RACK_ASSET_ID, type CanaryRolloutConfig } from './canaryRollout';
 import { getThermalColor, getUtilizationColor, getPowerColor } from './types';
@@ -55,6 +60,7 @@ import {
   applyDesignScenario,
   isScenarioRack,
   resolveDesignScenario,
+  resolveDesignScenarioById,
   type DesignScenario,
 } from './designScenario';
 
@@ -108,6 +114,11 @@ interface DataCenter3DSceneProps {
   /** Row annotation visibility. */
   showLabels?: boolean;
   onShowLabelsChange?: (next: boolean) => void;
+  /**
+   * Proposed-design scenario requested by the host (URL owned). `undefined`
+   * means "read the URL myself"; null means baseline operations only.
+   */
+  designScenarioId?: string | null;
 }
 
 interface CanvasMountBoundaryProps {
@@ -233,9 +244,11 @@ function Scene({
   showLabels,
   canary,
   scenario,
+  onScenarioDerivativeFailure,
 }: Omit<DataCenter3DSceneProps, 'events'> & { 
   canary: CanaryRolloutConfig;
   scenario: DesignScenario | null;
+  onScenarioDerivativeFailure: (reason: string) => void;
   targetDistance: number; 
   baseDistance: number;
   lastInteractionTime: number;
@@ -432,6 +445,7 @@ function Scene({
             selected={selectedAssetId === rack.id}
             showLabels={showLabels !== false}
             onRackClick={onRackClick}
+            onDerivativeFailure={onScenarioDerivativeFailure}
           />
         ))}
     </>
@@ -462,12 +476,35 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
 
   // Simulated design scenario (opt-in via URL). The as-built baseline in
   // `props.racks` is never modified; the scenario rack is additive.
-  const scenario = useMemo(() => resolveDesignScenario(), []);
+  // The host (Simulation workspace) owns the selection and passes it in, so
+  // the panel, the URL and the mounted scene can never disagree. When no host
+  // selection is supplied the URL is read once. An unknown id fails closed.
+  const scenario = useMemo(
+    () =>
+      props.designScenarioId === undefined
+        ? resolveDesignScenario()
+        : resolveDesignScenarioById(props.designScenarioId),
+    [props.designScenarioId],
+  );
+  const [scenarioLoadFailure, setScenarioLoadFailure] = useState<string | null>(null);
+  useEffect(() => setScenarioLoadFailure(null), [scenario?.id]);
   const racks = useMemo(
     () => applyDesignScenario(props.racks, scenario),
     [props.racks, scenario],
   );
   const scenarioRack = useMemo(() => racks.find(isScenarioRack) ?? null, [racks]);
+
+  /**
+   * Asset the provenance badge may report on: only a scenario mount, or a
+   * compatibility-gated canary mount. Baseline operations report nothing,
+   * because nothing NVIDIA-derived is mounted.
+   */
+  const scenarioResolution = useMemo(
+    () => (scenario ? resolveRuntimeAsset(scenario.assetId) : null),
+    [scenario],
+  );
+  /** True only when an approved derivative resolved AND the loader succeeded. */
+  const scenarioMounted = scenarioResolution?.glbUrl != null && !scenarioLoadFailure;
 
   const bounds = useMemo(
     () => facilityBoundsFromPositions(racks.map((r) => r.position)),
@@ -479,6 +516,13 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   useEffect(() => {
     setPlacement(resolveCameraPreset('fitFacility', bounds));
   }, [bounds]);
+
+  // A selected proposed design frames its own rack: the operator should never
+  // have to hunt for it in a hall of identical procedural cabinets.
+  useEffect(() => {
+    if (!scenario || !scenarioRack) return;
+    setPlacement(resolveCameraPreset('fitSelection', bounds, scenarioRack.position));
+  }, [scenario, scenarioRack, bounds]);
 
   const applyPreset = useCallback(
     (preset: CameraPresetId) => {
@@ -797,6 +841,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
                 {...props} 
                 racks={racks}
                 scenario={scenario}
+                onScenarioDerivativeFailure={setScenarioLoadFailure}
                 targetDistance={targetDistance}
                 baseDistance={baseDistance}
                 lastInteractionTime={lastInteractionTime}
@@ -818,6 +863,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
           data-canary-reason={canary.reason}
           data-canary-rack={canary.rackId ?? 'none'}
           data-design-scenario={scenario?.id ?? 'none'}
+          data-scenario-geometry={scenarioMounted ? 'approved-glb' : 'procedural'}
         >
           {racks.map((rack) => (
             <span
@@ -826,7 +872,8 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
               data-asset-id={isScenarioRack(rack) && scenario ? scenario.assetId : assetIdForRack(rack.id, canary)}
               data-simulated={isScenarioRack(rack) ? 'true' : 'false'}
               data-runtime-geometry={
-                isScenarioRack(rack) || assetIdForRack(rack.id, canary) === CANARY_RACK_ASSET_ID
+                (isScenarioRack(rack) && scenarioMounted) ||
+                (!isScenarioRack(rack) && assetIdForRack(rack.id, canary) === CANARY_RACK_ASSET_ID)
                   ? 'approved-glb'
                   : 'procedural'
               }
@@ -851,6 +898,15 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             <span className="text-slate-300">Proposed design - not as-built</span>
           </div>
           <p className="mt-1 text-slate-300">{scenario.description}</p>
+          {!scenarioMounted && (
+            <p className="mt-1 font-medium text-amber-300" data-testid="scenario-derivative-fallback">
+              Procedural fallback - NVIDIA derivative unavailable.{' '}
+              {scenarioLoadFailure ??
+                (scenarioResolution?.fallbackReason
+                  ? FALLBACK_REASON_LABEL[scenarioResolution.fallbackReason]
+                  : 'Resolver returned no approved derivative.')}
+            </p>
+          )}
           <p className="mt-1 text-slate-300">
             Chilled-water loop connection: unverified. Unresolved engineering inputs:{' '}
             {scenario.engineeringInputs.map((i) => `${i.label} (${i.unit})`).join(', ')}.
@@ -863,6 +919,25 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
               .join(', ') || 'none published'}
             .
           </p>
+          <div className="mt-2 flex flex-wrap items-center gap-1.5" role="group" aria-label="Proposed design camera views">
+            {([
+              ['rackFront', 'Front'],
+              ['rackRear', 'Rear'],
+              ['rackSide', 'Side'],
+              ['rackElevated', 'Elevated'],
+              ['fitFacility', 'Facility'],
+            ] as Array<[CameraPresetId, string]>).map(([preset, label]) => (
+              <button
+                key={preset}
+                type="button"
+                data-testid={`scenario-camera-${preset}`}
+                onClick={() => applyPreset(preset)}
+                className="rounded border border-amber-400/50 bg-slate-900/70 px-2 py-1 text-[11px] text-amber-200 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -904,7 +979,13 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
         </div>
       )}
 
-      {import.meta.env.DEV && <AssetProvenanceBadge />}
+      {/* Provenance evidence. Baseline operations pass no asset, so the badge
+          reports procedural and never shows an NVIDIA claim. */}
+      <AssetProvenanceBadge
+        assetId={scenario ? scenario.assetId : canary.enabled ? CANARY_RACK_ASSET_ID : null}
+        designScenarioId={scenario?.id ?? null}
+        failureReason={scenarioLoadFailure}
+      />
     </div>
   );
 }

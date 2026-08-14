@@ -9,6 +9,7 @@ import { KPI_DESCRIPTORS, deriveKpis, formatKpi, type KpiKey, type FacilityDefin
 import { deltaDirection } from './scenarioEngine';
 import { ROLE_VIEWS, useActiveRun, useWorkspaceStore } from './workspaceStore';
 import { useTwinOverlaySafe, type TwinOverlay } from '@/context/TwinOverlayContext';
+import { useDesignScenario } from './useDesignScenario';
 
 interface Props {
   facility: FacilityDefinition;
@@ -20,6 +21,9 @@ export function KpiStrip({ facility, overrides }: Props) {
   const openEvidence = useWorkspaceStore((s) => s.openEvidence);
   const run = useActiveRun();
   const { setOverlay, activeOverlay } = useTwinOverlaySafe();
+  // A proposed design has no engineering inputs, so no KPI can be calculated
+  // for it. Showing the baseline numbers next to it would be misleading.
+  const designActive = useDesignScenario().active;
 
   const modelled = deriveKpis(facility, overrides);
   const keys = ROLE_VIEWS[roleView].kpis;
@@ -31,11 +35,13 @@ export function KpiStrip({ facility, overrides }: Props) {
         role="group"
         aria-label="Modelled key performance indicators"
         data-testid="workspace-kpi-strip"
+        data-kpi-state={designActive ? 'not-calculated' : 'modelled'}
       >
       {keys.map((key) => {
         const descriptor = KPI_DESCRIPTORS[key];
         const value = run ? run.result[key] : modelled[key];
-        const delta = run ? run.result[key] - run.baseline[key] : 0;
+        const delta = run && !designActive ? run.result[key] - run.baseline[key] : 0;
+        const displayValue = designActive ? 'Not calculated' : formatKpi(key, value);
         const direction = deltaDirection(key, delta);
         const deltaText = delta.toFixed(descriptor.precision);
         const noChange = Number(deltaText) === 0;
@@ -57,18 +63,23 @@ export function KpiStrip({ facility, overrides }: Props) {
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
               selected ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50 hover:bg-muted/60',
             )}
-            aria-label={`${descriptor.label}: ${formatKpi(key, value)}.${
-              run ? ` ${noChange ? 'No change' : `Change ${deltaText}, ${direction}`}.` : ''
+            aria-label={`${descriptor.label}: ${displayValue}.${
+              run && !designActive ? ` ${noChange ? 'No change' : `Change ${deltaText}, ${direction}`}.` : ''
             } Open evidence.`}
           >
             <span className="block truncate text-xs uppercase tracking-wide text-muted-foreground">
               {descriptor.label}
             </span>
             <span className="mt-0.5 flex flex-wrap items-baseline gap-x-2">
-              <span className="text-xl font-semibold tabular-nums text-foreground">
-                {formatKpi(key, value)}
+              <span
+                className={cn(
+                  'font-semibold tabular-nums',
+                  designActive ? 'text-sm text-muted-foreground' : 'text-xl text-foreground',
+                )}
+              >
+                {displayValue}
               </span>
-              {run && (
+              {run && !designActive && (
                 <span
                   className={cn(
                     'inline-flex items-center gap-0.5 whitespace-nowrap text-xs font-medium tabular-nums',
@@ -98,7 +109,11 @@ export function KpiStrip({ facility, overrides }: Props) {
             </TooltipTrigger>
             <TooltipContent side="top" className="max-w-xs text-xs">
               <p className="font-medium">{descriptor.label}</p>
-              <p className="mt-0.5 text-muted-foreground">{descriptor.derivation}</p>
+              <p className="mt-0.5 text-muted-foreground">
+                {designActive
+                  ? 'Not calculated for a proposed design: engineering inputs are incomplete.'
+                  : descriptor.derivation}
+              </p>
               <p className="mt-1 text-muted-foreground">Select to open the evidence record.</p>
             </TooltipContent>
           </Tooltip>

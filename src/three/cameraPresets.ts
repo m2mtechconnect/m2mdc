@@ -79,6 +79,11 @@ export function resolveCameraPreset(
     target: [bounds.centre[0], bounds.centre[1] + 0.5, bounds.centre[2]],
   };
 
+  // Rack framing must include the full cabinet (2.0 m) plus the chilled-water
+  // risers above it (3.1663 m), so rack targets sit at mid-riser height and
+  // the distance is large enough to keep the whole column inside the frame.
+  const rackTarget = (s: [number, number, number], y: number): [number, number, number] => [s[0], s[1] + y, s[2]];
+
   switch (preset) {
     case 'fitFacility':
     case 'reset':
@@ -86,23 +91,23 @@ export function resolveCameraPreset(
 
     case 'fitSelection':
       if (!selection) return facility;
-      return { distance: clampDistance(4.5), theta: 0.5, phi: 1.15, target: selection };
+      return { distance: clampDistance(7.4), theta: 0.5, phi: 1.18, target: rackTarget(selection, 1.6) };
 
     case 'rackFront':
       if (!selection) return facility;
-      return { distance: clampDistance(3.2), theta: Math.PI / 2, phi: 1.45, target: selection };
+      return { distance: clampDistance(6.8), theta: Math.PI / 2, phi: 1.3, target: rackTarget(selection, 1.6) };
 
     case 'rackRear':
       if (!selection) return facility;
-      return { distance: clampDistance(3.2), theta: -Math.PI / 2, phi: 1.45, target: selection };
+      return { distance: clampDistance(6.8), theta: -Math.PI / 2, phi: 1.3, target: rackTarget(selection, 1.6) };
 
     case 'rackSide':
       if (!selection) return facility;
-      return { distance: clampDistance(3.4), theta: 0, phi: 1.45, target: selection };
+      return { distance: clampDistance(7.0), theta: 0, phi: 1.3, target: rackTarget(selection, 1.6) };
 
     case 'rackElevated':
       if (!selection) return facility;
-      return { distance: clampDistance(4.6), theta: 0.9, phi: 0.85, target: [selection[0], selection[1] + 0.6, selection[2]] };
+      return { distance: clampDistance(8.2), theta: 0.9, phi: 0.9, target: rackTarget(selection, 2.0) };
 
     case 'frontAisles':
       return {

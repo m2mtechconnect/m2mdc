@@ -2,12 +2,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Check, Loader2, PlayCircle, Lock, AlertTriangle } from 'lucide-react';
+import { Check, Loader2, PlayCircle, Lock, AlertTriangle, Snowflake } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { WORKSPACE_SCENARIOS } from '../scenarioEngine';
 import { useActiveRun, useWorkspaceStore } from '../workspaceStore';
 import { useSimulationPermissions } from '@/simulation/handoff';
 import { CLASSIFICATION_LABEL } from '@/lib/provenance/twinFieldProvenance';
+import { DESIGN_SCENARIOS } from '@/components/twin-visualization/designScenario';
+import { useDesignScenario } from '../useDesignScenario';
 import type { FacilityDefinition } from '../facilityModel';
 
 interface Props {
@@ -24,8 +26,13 @@ function useRunGate() {
   const isRunning = useWorkspaceStore((s) => s.isRunning);
   const { canConfigureSimulation, canExecuteSimulation } = useSimulationPermissions();
   const scenario = WORKSPACE_SCENARIOS.find((s) => s.id === scenarioId);
+  // A proposed design has no complete engineering inputs, so it can never be
+  // executed as an operational run.
+  const design = useDesignScenario();
 
-  const blockedReason = !canExecuteSimulation
+  const blockedReason = design.active
+    ? 'Run simulation is unavailable for a proposed design: engineering inputs are incomplete.'
+    : !canExecuteSimulation
     ? 'Your role cannot execute simulations. Ask an administrator for run permission.'
     : !scenario
       ? 'Select a scenario before running.'
@@ -33,7 +40,7 @@ function useRunGate() {
         ? 'Review the run inputs to enable execution.'
         : null;
 
-  return { scenario, scenarioId, reviewed, isRunning, blockedReason, canConfigureSimulation };
+  return { scenario, scenarioId, reviewed, isRunning, blockedReason, canConfigureSimulation, design };
 }
 
 /**
@@ -85,7 +92,8 @@ export function SimulatePanel({ facility }: Props) {
   const handoff = useWorkspaceStore((s) => s.handoff);
   const setReviewed = useWorkspaceStore((s) => s.setAssumptionsReviewed);
   const run = useActiveRun();
-  const { scenario, scenarioId, reviewed, blockedReason, canConfigureSimulation } = useRunGate();
+  const { scenario, scenarioId, reviewed, blockedReason, canConfigureSimulation, design } = useRunGate();
+  const mode: 'operational' | 'design' = design.active ? 'design' : 'operational';
 
   return (
     <div className="space-y-4">
@@ -115,11 +123,87 @@ export function SimulatePanel({ facility }: Props) {
         </dl>
       </div>
 
-      {/* Single-selection scenario list. Selection is signalled by the check
-          indicator and the row treatment, not by border colour alone. */}
+      {/* Operational scenarios and proposed designs are different kinds of
+          thing and are never mixed in one list. */}
       <div>
-        <p className="mb-1.5 text-xs font-medium text-foreground">Scenario</p>
-        <div role="radiogroup" aria-label="Scenario" className="divide-y divide-border rounded-md border border-border">
+        <div
+          role="tablist"
+          aria-label="Scenario type"
+          className="mb-2 grid grid-cols-2 gap-1 rounded-md border border-border bg-muted/40 p-1"
+        >
+          {([
+            ['operational', 'Operational scenarios', 'scenario-tab-operational'],
+            ['design', 'Proposed designs', 'scenario-tab-design'],
+          ] as const).map(([id, label, testid]) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={mode === id}
+              data-testid={testid}
+              onClick={() => design.selectDesign(id === 'design' ? DESIGN_SCENARIOS[0].id : null)}
+              className={cn(
+                'rounded px-2 py-1.5 text-xs font-medium transition-colors',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                mode === id ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {mode === 'design' ? (
+          <div className="space-y-2" data-testid="proposed-design-list">
+            <p className="text-xs text-muted-foreground">
+              A proposed design is a simulated overlay on the as-built facility. It is not commissioned, carries no
+              telemetry and cannot be run.
+            </p>
+            {DESIGN_SCENARIOS.map((d) => {
+              const selected = design.scenario?.id === d.id;
+              return (
+                <button
+                  key={d.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  data-testid={`proposed-design-${d.id}`}
+                  onClick={() => design.selectDesign(d.id)}
+                  className={cn(
+                    'flex w-full min-w-0 items-start gap-2.5 rounded-md border p-3 text-left transition-colors',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    selected ? 'border-accent bg-accent/10' : 'border-border hover:bg-muted',
+                  )}
+                >
+                  <Snowflake className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex flex-wrap items-center gap-1.5">
+                      <span className="text-sm font-semibold text-foreground">{d.summary}</span>
+                      <Badge variant="outline" className="text-[10px]">SIMULATED</Badge>
+                      {selected && <Check className="h-3.5 w-3.5 text-accent" aria-label="Selected" />}
+                    </span>
+                    <span className="mt-1 block text-xs text-muted-foreground [overflow-wrap:anywhere]">{d.id}</span>
+                    <ul className="mt-1.5 space-y-0.5 text-xs text-muted-foreground">
+                      {d.highlights.map((h) => (
+                        <li key={h}>- {h}</li>
+                      ))}
+                    </ul>
+                  </span>
+                </button>
+              );
+            })}
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 w-full text-xs"
+              data-testid="return-to-baseline-operations"
+              onClick={() => design.selectDesign(null)}
+            >
+              Return to baseline operations
+            </Button>
+          </div>
+        ) : (
+        <div role="radiogroup" aria-label="Operational scenario" className="divide-y divide-border rounded-md border border-border">
           {WORKSPACE_SCENARIOS.map((s) => {
             const selected = scenarioId === s.id;
             return (
@@ -163,9 +247,25 @@ export function SimulatePanel({ facility }: Props) {
             );
           })}
         </div>
+        )}
       </div>
 
       {/* Explicit input review. Every value below is a modelled assumption. */}
+      {mode === 'design' ? (
+        <div className="rounded-md border border-border p-3" data-testid="design-inputs-incomplete">
+          <p className="mb-1.5 text-xs font-medium text-foreground">Engineering inputs</p>
+          <ul className="space-y-0.5 text-xs text-muted-foreground">
+            {design.scenario?.engineeringInputs.map((i) => (
+              <li key={i.key}>
+                {i.label} ({i.unit}): Not provided
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1.5 text-xs text-muted-foreground">
+            Chilled-water loop connection: unverified. No run can be executed until these inputs exist.
+          </p>
+        </div>
+      ) : (
       <div className="rounded-md border border-border p-3">
         <p className="mb-1.5 text-xs font-medium text-foreground">Review run inputs</p>
         <ul className="mb-2 space-y-0.5 text-xs text-muted-foreground [overflow-wrap:anywhere]">
@@ -188,6 +288,7 @@ export function SimulatePanel({ facility }: Props) {
           <span>I have reviewed the blueprint version, scenario, assumptions and data state.</span>
         </label>
       </div>
+      )}
 
       {blockedReason && (
         <p className="flex items-start gap-1.5 text-xs text-muted-foreground" data-testid="simulation-blocked-reason">

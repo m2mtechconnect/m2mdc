@@ -39,6 +39,8 @@ interface ApprovedRackAssetProps {
   /** Force the procedural preview (used by the low quality profile). */
   preferFallback?: boolean;
   onResolution?: (resolution: RuntimeAssetResolution) => void;
+  /** Runtime loader failure after a derivative resolved (network/decode). */
+  onDerivativeFailure?: (reason: string) => void;
 }
 
 function ImportedRack({
@@ -106,13 +108,17 @@ function ImportedRack({
  * down with it.
  */
 class DerivativeBoundary extends Component<
-  { children: ReactNode; fallback: ReactNode },
+  { children: ReactNode; fallback: ReactNode; onFailure?: (reason: string) => void },
   { failed: boolean }
 > {
   state = { failed: false };
 
   static getDerivedStateFromError() {
     return { failed: true };
+  }
+
+  componentDidCatch(error: Error) {
+    this.props.onFailure?.(error.message || 'The approved derivative failed to load at runtime.');
   }
 
   render() {
@@ -145,7 +151,7 @@ export function ApprovedRackAsset(props: ApprovedRackAssetProps) {
       />
     );
     return (
-      <DerivativeBoundary fallback={procedural}>
+      <DerivativeBoundary fallback={procedural} onFailure={props.onDerivativeFailure}>
         <Suspense fallback={procedural}>
           <ImportedRack
             url={resolution.glbUrl}

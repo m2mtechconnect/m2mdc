@@ -14,6 +14,12 @@ export interface ZoomControlsOverlayProps {
   onFitToView?: () => void;
   zoomLevel?: number;
   disabled?: boolean;
+  /**
+   * Render inside a host-positioned rail instead of anchoring itself to the
+   * canvas corner. Used by the consolidated canvas toolbar so zoom, camera and
+   * quality controls occupy one protected column and can never overlap.
+   */
+  inline?: boolean;
 }
 
 export function ZoomControlsOverlay({
@@ -22,24 +28,29 @@ export function ZoomControlsOverlay({
   onReset,
   onFitToView,
   zoomLevel = 1,
-  disabled = false
+  disabled = false,
+  inline = false
 }: ZoomControlsOverlayProps) {
   return (
     <TooltipProvider delayDuration={200}>
       <div 
-        className="absolute top-3 right-3 z-10 flex flex-col gap-1.5 pointer-events-auto animate-fade-in"
-        style={{ animationDelay: '0.3s' }}
+        className={
+          inline
+            ? 'flex w-full flex-col items-stretch gap-1.5 pointer-events-auto'
+            : 'absolute top-3 right-3 z-10 flex flex-col gap-1.5 pointer-events-auto animate-fade-in'
+        }
+        style={inline ? undefined : { animationDelay: '0.3s' }}
       >
         {/* Zoom level indicator */}
-        <div className="bg-slate-900/85 backdrop-blur-sm border border-slate-700/60 rounded-md px-2.5 py-1.5 text-center shadow-lg">
-          <span className="text-[11px] text-slate-400 block leading-none mb-0.5">Zoom</span>
+        <div className="bg-slate-900/85 backdrop-blur-sm border border-slate-700/60 rounded-md px-2.5 py-1.5 flex items-center justify-between gap-2 shadow-lg">
+          <span className="text-[11px] text-slate-400 leading-none">Zoom</span>
           <span className="text-sm font-semibold text-slate-100 tabular-nums">
             {Math.round(zoomLevel * 100)}%
           </span>
         </div>
 
         {/* Control buttons */}
-        <div className="bg-slate-900/85 backdrop-blur-sm border border-slate-700/60 rounded-md p-1 flex flex-col gap-1 shadow-lg">
+        <div className={`bg-slate-900/85 backdrop-blur-sm border border-slate-700/60 rounded-md p-1 flex gap-1 shadow-lg ${inline ? 'flex-row justify-end' : 'flex-col'}`}>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button

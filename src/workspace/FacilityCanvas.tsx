@@ -24,6 +24,12 @@ import { cn } from '@/lib/utils';
 import { overlayContract } from '@/three/overlayContract';
 import { useWorkspaceStore } from './workspaceStore';
 import { LayerSelector } from './LayerSelector';
+import { useCanvasFocusStore } from './canvasFocusStore';
+import { FacilityGeometrySelector } from './FacilityGeometrySelector';
+import {
+  isFacilityGeometryMode,
+  type FacilityGeometryMode,
+} from '@/components/twin-visualization/facilityGeometry';
 import { FacilityFloorPlan } from './FacilityFloorPlan';
 import { buildRackGrid } from './dashboard/rackModel';
 import { type FacilityDefinition } from './facilityModel';
@@ -56,6 +62,8 @@ export function FacilityCanvas({ facility }: Props) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [legendOpen, setLegendOpen] = useState(false);
+  // Yield the bottom-left zone while a KPI evidence tooltip occupies it.
+  const kpiTooltipOpen = useCanvasFocusStore((s) => s.kpiTooltipOpen);
 
   // View state is URL-addressable: shell mode and label visibility survive
   // reloads and deep links without reloading the scene.
@@ -63,6 +71,13 @@ export function FacilityCanvas({ facility }: Props) {
   const shellMode: ShellMode =
     shellParam === 'cutaway' || shellParam === 'full' ? shellParam : 'off';
   const showLabels = searchParams.get('labels') !== 'off';
+
+  // Geometry source is URL-owned, so a shared link always reproduces the same
+  // mounted geometry as the screenshot it came from.
+  const geometryParam = searchParams.get('geometry');
+  const facilityGeometry: FacilityGeometryMode = isFacilityGeometryMode(geometryParam)
+    ? geometryParam
+    : 'aura-model';
 
   const setViewParam = useCallback(
     (key: string, value: string | null) => {
@@ -159,6 +174,7 @@ export function FacilityCanvas({ facility }: Props) {
               showLabels={showLabels}
               onShowLabelsChange={(next) => setViewParam('labels', next ? null : 'off')}
               designScenarioId={designScenarioId}
+              facilityGeometry={facilityGeometry}
             />
           </SimulationErrorBoundary>
         ) : (
@@ -187,10 +203,14 @@ export function FacilityCanvas({ facility }: Props) {
       )}
 
       {/* Protected zone, top-left: layer selection and 3D/2D. */}
-      <div className="absolute left-3 top-3 z-20 flex max-w-[calc(100%-11rem)] flex-wrap items-center gap-2">
+      <div className="absolute left-3 top-3 z-20 flex max-w-[calc(100%-15rem)] flex-wrap items-center gap-2">
         <LayerSelector
           value={activeOverlay as TwinOverlay | 'none'}
           onChange={(layer) => setOverlay(layer)}
+        />
+        <FacilityGeometrySelector
+          value={facilityGeometry}
+          onChange={(mode) => setViewParam('geometry', mode === 'aura-model' ? null : mode)}
         />
         <div className="flex items-center gap-1 rounded-md border border-border bg-card/90 p-1 backdrop-blur">
           <Button
@@ -277,7 +297,15 @@ export function FacilityCanvas({ facility }: Props) {
       )}
 
       {/* Protected zone, bottom-left: legend and degraded-model notice. */}
-      <div className="pointer-events-none absolute bottom-3 left-3 z-20 flex max-w-[min(28rem,calc(100%-1.5rem))] flex-col gap-2">
+      <div
+        data-testid="canvas-bottom-left-zone"
+        data-yielded={kpiTooltipOpen ? 'true' : 'false'}
+        className={cn(
+          'pointer-events-none absolute bottom-3 left-3 z-20 flex max-w-[min(28rem,calc(100%-16rem))] flex-col gap-2 transition-opacity duration-150',
+          kpiTooltipOpen && 'pointer-events-none opacity-0',
+        )}
+        aria-hidden={kpiTooltipOpen}
+      >
         {(modelState === 'degraded' || modelState === 'error') && viewMode === '2d' && (
           <div className="pointer-events-auto flex flex-wrap items-center gap-2 rounded-md border border-border bg-card/95 px-2.5 py-1.5 text-xs text-muted-foreground backdrop-blur">
             <span className="min-w-0">Interactive 3D unavailable in this browser. Showing the 2D floor plan of the same model.</span>

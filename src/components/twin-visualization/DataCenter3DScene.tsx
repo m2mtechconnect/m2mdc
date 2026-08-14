@@ -57,6 +57,13 @@ import { ZoomControlsOverlay } from './ZoomControlsOverlay';
 import { AssetProvenanceBadge } from './AssetProvenancePanel';
 import { ScenarioRackLayer } from './ScenarioRackLayer';
 import {
+  FACILITY_GEOMETRY_MODES,
+  referenceCoverageSummary,
+  referenceFacilityCoverage,
+  referenceRackAssetId,
+  type FacilityGeometryMode,
+} from './facilityGeometry';
+import {
   applyDesignScenario,
   isScenarioRack,
   resolveDesignScenario,
@@ -119,6 +126,12 @@ interface DataCenter3DSceneProps {
    * means "read the URL myself"; null means baseline operations only.
    */
   designScenarioId?: string | null;
+  /**
+   * Geometry source for the facility. `aura-model` (default) mounts the
+   * modelled facility; `nvidia-reference` mounts approved NVIDIA Data Center
+   * OpenUSD derivatives wherever a semantic role resolves.
+   */
+  facilityGeometry?: FacilityGeometryMode;
 }
 
 interface CanvasMountBoundaryProps {
@@ -245,6 +258,7 @@ function Scene({
   canary,
   scenario,
   onScenarioDerivativeFailure,
+  facilityGeometry,
 }: Omit<DataCenter3DSceneProps, 'events'> & { 
   canary: CanaryRolloutConfig;
   scenario: DesignScenario | null;
@@ -286,6 +300,12 @@ function Scene({
 
   const targetPosition = new THREE.Vector3(centre[0], centre[1], centre[2]);
   const profile = QUALITY_PROFILES[qualityProfile];
+
+  // Reference facility: every cabinet attempts the approved reference rack
+  // derivative. When none resolves the scene stays procedural and the badge
+  // says so, rather than implying vendor geometry that never mounted.
+  const referenceAssetId =
+    facilityGeometry === 'nvidia-reference' ? referenceRackAssetId() : null;
 
   // Framing that fills the viewport with the hall instead of empty floor.
   const cameraPosition: [number, number, number] = [
@@ -333,7 +353,7 @@ function Scene({
         rows={rows}
         profile={profile}
         crahUnits={thermalZones.length}
-        shellMode={shellMode ?? 'off'}
+        shellMode={facilityGeometry === 'nvidia-reference' ? (shellMode === 'off' ? 'cutaway' : shellMode) : (shellMode ?? 'off')}
       />
 
       {/* Grounded contact shadows (high profile only) */}
@@ -414,6 +434,7 @@ function Scene({
           selectedRackId={selectedAssetId ?? null}
           showLabels={showLabels !== false}
           canary={canary}
+          referenceAssetId={referenceAssetId}
           overlayColorFor={(rack) => {
             switch (activeOverlay) {
               case 'thermal':
@@ -675,29 +696,34 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
         props.fill ? '' : 'rounded-lg border border-slate-700/50'
       }`}
     >
-      {/* Zoom controls overlay */}
-      <ZoomControlsOverlay
-        onZoomIn={handleZoomIn}
-        onZoomOut={handleZoomOut}
-        onReset={handleReset}
-        zoomLevel={zoomLevel}
-        disabled={contextLost}
-      />
+      {/* Canvas right rail: ONE protected column holding every view control.
+          The host owns the top-left corner (layer selector, 3D/2D), the rail
+          owns the right edge, and neither can grow into the other because the
+          rail is a fixed-width column that scrolls instead of wrapping. */}
+      <div
+        data-testid="canvas-right-rail"
+        className={`pointer-events-none absolute right-3 z-30 flex max-h-[calc(100%-5rem)] w-[13.5rem] flex-col items-end gap-2 overflow-y-auto ${
+          props.hostChromeTop ? 'top-[3.75rem]' : 'top-3'
+        }`}
+      >
+        <div className="pointer-events-auto w-full">
+          <ZoomControlsOverlay
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
+            onReset={handleReset}
+            zoomLevel={zoomLevel}
+            disabled={contextLost}
+            inline
+          />
+        </div>
 
-      {/* Canvas toolbar, protected groups.
-          Left is reserved for the host (layer selector, 3D/2D).
-          Centre: camera presets. Right: quality profile and fit action.
-          Top-right above these: the zoom control zone. */}
-      {!props.compact && (
-        <>
+        {!props.compact && (
           <div
-            className={`absolute right-[6.25rem] z-20 flex max-w-[calc(100%-8rem)] flex-wrap items-center justify-end gap-1.5 ${
-              props.hostChromeTop ? 'top-[3.75rem]' : 'top-14'
-            }`}
+            className="pointer-events-auto flex w-full flex-col items-stretch gap-1.5"
             role="group"
             aria-label="View settings"
           >
-            <label className="flex items-center gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
+            <label className="flex items-center justify-between gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
               <span className="sr-only">Camera view</span>
               <select
                 aria-label="Camera view"
@@ -707,7 +733,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
                   const preset = e.target.value as CameraPresetId;
                   if (preset) applyPreset(preset);
                 }}
-                className="max-w-[10rem] bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+                className="w-full min-w-0 bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
               >
                 <option value="" className="bg-slate-900">
                   Camera view
@@ -733,13 +759,13 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
                 ))}
               </select>
             </label>
-            <label className="flex items-center gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
+            <label className="flex items-center justify-between gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
               <span className="sr-only">Rendering quality</span>
               <select
                 aria-label="Rendering quality"
                 value={qualityProfile}
                 onChange={(e) => changeQuality(e.target.value as QualityProfileId)}
-                className="max-w-[9rem] bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+                className="w-full min-w-0 bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
               >
                 {Object.values(QUALITY_PROFILES).map((p) => (
                   <option key={p.id} value={p.id} className="bg-slate-900">
@@ -748,8 +774,8 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
                 ))}
               </select>
             </label>
-            <label className="flex items-center gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
-              <span className="hidden sm:inline text-slate-300">Facility shell</span>
+            <label className="flex items-center justify-between gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
+              <span className="text-slate-300">Shell</span>
               <span className="sr-only">Facility shell</span>
               <select
                 aria-label="Facility shell"
@@ -781,8 +807,8 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
               Reset camera
             </button>
           </div>
-        </>
-      )}
+        )}
+      </div>
 
       {/* Context lost overlay */}
       {contextLost && (
@@ -882,12 +908,43 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
         </div>
       </div>
 
-      {/* Simulated design-scenario disclosure. Present whenever scenario
-          geometry is mounted, so no screenshot can be read as as-built truth. */}
+      {/* Top-centre notice stack. Every banner lives in this one column, so
+          disclosures stack vertically instead of landing on top of each other,
+          and the column is inset from both protected side rails. */}
+      <div
+        className={`pointer-events-none absolute left-1/2 z-20 flex w-[min(30rem,calc(100%-32rem))] -translate-x-1/2 flex-col gap-2 ${
+          props.hostChromeTop ? 'top-[3.75rem]' : 'top-3'
+        }`}
+      >
+      {props.facilityGeometry === 'nvidia-reference' && (
+        <div
+          data-testid="reference-facility-banner"
+          className="pointer-events-auto rounded-md border border-emerald-400/50 bg-slate-900/92 px-3 py-2 text-xs text-slate-100"
+          role="status"
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded bg-emerald-400/20 px-1.5 py-0.5 font-semibold text-emerald-300">
+              REFERENCE
+            </span>
+            <span className="font-medium">NVIDIA reference facility</span>
+          </div>
+          <p className="mt-1 text-slate-300" data-testid="reference-facility-coverage">
+            {referenceCoverageSummary().label}. Roles without an approved derivative render AURA
+            procedural geometry.
+          </p>
+          <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-slate-400">
+            {referenceFacilityCoverage().map((row) => (
+              <li key={row.role} data-role={row.role} data-resolved={row.resolved ? 'true' : 'false'}>
+                {row.label}: {row.resolved ? `${row.quality} derivative` : 'procedural'}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {scenario && (
         <div
           data-testid="design-scenario-banner"
-          className="pointer-events-auto absolute left-1/2 top-3 z-20 w-[min(34rem,calc(100%-2rem))] -translate-x-1/2 rounded-md border border-amber-400/60 bg-slate-900/92 px-3 py-2 text-xs text-slate-100"
+          className="pointer-events-auto rounded-md border border-amber-400/60 bg-slate-900/92 px-3 py-2 text-xs text-slate-100"
           role="status"
         >
           <div className="flex flex-wrap items-center gap-2">
@@ -940,8 +997,11 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
           </div>
         </div>
       )}
+      </div>
 
-      {/* Thermal/Power legend */}
+      {/* Thermal/Power legend. Suppressed when the host renders its own layer
+          legend in the bottom-left safe zone, so the two never stack. */}
+      {!props.hostChromeTop && (
       <div className="absolute bottom-3 left-3 flex gap-2 pointer-events-none">
         {props.showThermal && (
           <div className="bg-slate-900/90 backdrop-blur-sm border border-slate-700/50 rounded-md px-2.5 py-1.5 text-xs flex items-center gap-2 animate-fade-in pointer-events-auto">
@@ -970,6 +1030,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
           </div>
         )}
       </div>
+      )}
 
       {/* Mode indicator for simulation */}
       {props.mode === 'simulation' && (

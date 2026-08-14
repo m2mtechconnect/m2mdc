@@ -854,6 +854,14 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             Chilled-water loop connection: unverified. Unresolved engineering inputs:{' '}
             {scenario.engineeringInputs.map((i) => `${i.label} (${i.unit})`).join(', ')}.
           </p>
+          <p className="mt-1 text-slate-300" data-testid="scenario-gpu-validation-status">
+            {getGpuValidationStatus(scenario.assetId).label}. Available interactions:{' '}
+            {getAssetCapabilityParts(scenario.assetId)
+              .filter((p) => p.addressable)
+              .map((p) => p.label)
+              .join(', ') || 'none published'}
+            .
+          </p>
         </div>
       )}
 

@@ -67,7 +67,7 @@ const PATH: CameraKey[] = [
   { phase: 'front', position: [0, 1.7, 4.6], target: [0, 1.6, 0], untilMs: STAB + ORBIT / 3 },
   { phase: 'rear', position: [0, 1.7, -4.6], target: [0, 1.6, 0], untilMs: STAB + (2 * ORBIT) / 3 },
   { phase: 'elevated', position: [3.4, 4.6, 3.4], target: [0, 2.2, 0], untilMs: STAB + ORBIT },
-};
+];
 
 function phaseAt(elapsed: number): CameraKey {
   return PATH.find((key) => elapsed < key.untilMs) ?? PATH[PATH.length - 1];

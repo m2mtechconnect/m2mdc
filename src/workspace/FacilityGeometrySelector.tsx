@@ -44,7 +44,14 @@ export function FacilityGeometrySelector({ value, onChange }: Props) {
           data-value={value}
           data-reference-ready={referenceReady ? 'true' : 'false'}
         >
-          <SelectValue placeholder="Facility geometry" />
+          {/* Explicit label: the trigger must never rely on an ellipsis to
+              communicate the active geometry source. */}
+          <SelectValue placeholder="Facility geometry">
+            <span className="whitespace-nowrap">
+              {active?.label}
+              {value === 'nvidia-reference' && !referenceReady ? ' - preparing assets' : ''}
+            </span>
+          </SelectValue>
         </SelectTrigger>
         <SelectContent className="z-[100] max-w-[24rem] bg-card">
           {FACILITY_GEOMETRY_MODES.map((mode) => {

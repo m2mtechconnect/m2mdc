@@ -247,6 +247,9 @@ function Scene({
     1.0,
     (extents.minZ + extents.maxZ) / 2,
   ];
+
+  // Approved NVIDIA-derived rack derivative is mounted on one rack only.
+  const canary = useMemo(() => resolveCanaryRollout(racks.map((r) => r.id)), [racks]);
   const hallRadius = Math.max(
     6,
     Math.hypot((extents.maxX - extents.minX) / 2 + 2, (extents.maxZ - extents.minZ) / 2 + 2),

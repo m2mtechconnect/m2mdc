@@ -38,6 +38,7 @@ import type {
   SimulationEventVisual 
 } from './types';
 import { RackGroup } from './RackGroup';
+import { resolveCanaryRollout } from './canaryRollout';
 import { getThermalColor, getUtilizationColor, getPowerColor } from './types';
 import { ThermalOverlayLayer } from './ThermalOverlayLayer';
 import { PowerFlowLayer } from './PowerFlowLayer';
@@ -384,6 +385,7 @@ function Scene({
           detailLevel={profile.rackDetail}
           selectedRackId={selectedAssetId ?? null}
           showLabels={showLabels !== false}
+          canary={canary}
           overlayColorFor={(rack) => {
             switch (activeOverlay) {
               case 'thermal':

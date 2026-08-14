@@ -11,6 +11,8 @@ export type CameraPresetId =
   | 'fitSelection'
   | 'rackFront'
   | 'rackRear'
+  | 'rackSide'
+  | 'rackElevated'
   | 'topDown'
   | 'powerTopology'
   | 'coolingTopology'
@@ -39,6 +41,8 @@ export const CAMERA_PRESET_LABELS: Record<CameraPresetId, string> = {
   fitSelection: 'Fit selection',
   rackFront: 'Front rack view',
   rackRear: 'Rear rack view',
+  rackSide: 'Side rack view',
+  rackElevated: 'Elevated rack view',
   topDown: 'Top down',
   powerTopology: 'Power topology',
   coolingTopology: 'Cooling topology',
@@ -91,6 +95,14 @@ export function resolveCameraPreset(
     case 'rackRear':
       if (!selection) return facility;
       return { distance: clampDistance(3.2), theta: -Math.PI / 2, phi: 1.45, target: selection };
+
+    case 'rackSide':
+      if (!selection) return facility;
+      return { distance: clampDistance(3.4), theta: 0, phi: 1.45, target: selection };
+
+    case 'rackElevated':
+      if (!selection) return facility;
+      return { distance: clampDistance(4.6), theta: 0.9, phi: 0.85, target: [selection[0], selection[1] + 0.6, selection[2]] };
 
     case 'frontAisles':
       return {

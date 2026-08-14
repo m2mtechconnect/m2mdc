@@ -10,7 +10,7 @@ import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { ContactShadows, OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import { FacilityLighting } from './FacilityLighting';
-import { DataHall } from './DataHall';
+import { DataHall, type ShellMode } from './DataHall';
 import { overlayContract } from '@/three/overlayContract';
 import {
   QUALITY_PROFILES,
@@ -90,6 +90,12 @@ interface DataCenter3DSceneProps {
   hostChromeTop?: boolean;
   /** Currently selected asset, highlighted without replacing its material. */
   selectedAssetId?: string | null;
+  /** Facility shell visibility. Defaults to the operator view (off). */
+  shellMode?: ShellMode;
+  onShellModeChange?: (mode: ShellMode) => void;
+  /** Row annotation visibility. */
+  showLabels?: boolean;
+  onShowLabelsChange?: (next: boolean) => void;
 }
 
 interface CanvasMountBoundaryProps {
@@ -211,6 +217,8 @@ function Scene({
   placement,
   reducedMotion,
   selectedAssetId,
+  shellMode,
+  showLabels,
 }: Omit<DataCenter3DSceneProps, 'events'> & { 
   targetDistance: number; 
   baseDistance: number;
@@ -287,7 +295,13 @@ function Scene({
 
       {/* Architectural environment: raised floor, walls, ceiling frame,
           cable trays, busway, cooling routes, containment and markings. */}
-      <DataHall bounds={extents} rows={rows} profile={profile} crahUnits={thermalZones.length} />
+      <DataHall
+        bounds={extents}
+        rows={rows}
+        profile={profile}
+        crahUnits={thermalZones.length}
+        shellMode={shellMode ?? 'off'}
+      />
 
       {/* Grounded contact shadows (high profile only) */}
       {profile.ambientOcclusion && (
@@ -365,6 +379,7 @@ function Scene({
           detailed={racks.length <= profile.detailBudget}
           detailLevel={profile.rackDetail}
           selectedRackId={selectedAssetId ?? null}
+          showLabels={showLabels !== false}
           overlayColorFor={(rack) => {
             switch (activeOverlay) {
               case 'thermal':
@@ -613,7 +628,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
           </div>
 
           <div
-            className={`absolute right-3 z-20 flex items-center gap-1.5 ${
+            className={`absolute right-3 z-20 flex max-w-[calc(100%-14rem)] flex-wrap items-center justify-end gap-1.5 ${
               props.hostChromeTop ? 'top-[3.75rem]' : 'top-14'
             }`}
             role="group"
@@ -634,6 +649,30 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
                 ))}
               </select>
             </label>
+            <label className="flex items-center gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
+              <span className="hidden sm:inline text-slate-300">Facility shell</span>
+              <span className="sr-only">Facility shell</span>
+              <select
+                aria-label="Facility shell"
+                data-testid="twin-shell-mode"
+                value={props.shellMode ?? 'off'}
+                onChange={(e) => props.onShellModeChange?.(e.target.value as ShellMode)}
+                className="bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+              >
+                <option value="off" className="bg-slate-900">Off</option>
+                <option value="cutaway" className="bg-slate-900">Cutaway</option>
+                <option value="full" className="bg-slate-900">Full</option>
+              </select>
+            </label>
+            <button
+              type="button"
+              data-testid="twin-labels-toggle"
+              aria-pressed={props.showLabels !== false}
+              onClick={() => props.onShowLabelsChange?.(!(props.showLabels !== false))}
+              className="rounded-md border border-slate-600/70 bg-slate-900/85 px-2.5 py-1.5 text-xs text-slate-100 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+            >
+              Labels: {props.showLabels !== false ? 'On' : 'Off'}
+            </button>
             <button
               type="button"
               onClick={() => applyPreset('reset')}

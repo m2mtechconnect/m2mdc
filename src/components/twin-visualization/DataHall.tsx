@@ -25,18 +25,28 @@ export interface HallBounds {
   maxZ: number;
 }
 
+/**
+ * Facility shell visibility.
+ *   off     - operator default: no walls, ceiling or structural beams.
+ *   cutaway - distant context walls only, camera-facing sections removed.
+ *   full    - complete architectural shell for spatial review.
+ */
+export type ShellMode = 'off' | 'cutaway' | 'full';
+
 interface Props {
   bounds: HallBounds;
   rows: RowVisual[];
   profile: QualityProfile;
   /** Number of CRAH units declared by the facility model. 0 renders none. */
   crahUnits?: number;
+  /** Architectural shell visibility. Defaults to the operator view (off). */
+  shellMode?: ShellMode;
 }
 
 const CEILING = 4.2;
 const WALL_CLEARANCE = 2.0;
 
-export function DataHall({ bounds, rows, profile, crahUnits = 0 }: Props) {
+export function DataHall({ bounds, rows, profile, crahUnits = 0, shellMode = 'off' }: Props) {
   const geometry = useMemo(() => {
     const minX = bounds.minX - WALL_CLEARANCE;
     const maxX = bounds.maxX + WALL_CLEARANCE;
@@ -56,6 +66,8 @@ export function DataHall({ bounds, rows, profile, crahUnits = 0 }: Props) {
 
   const { minX, maxX, minZ, maxZ, width, depth, cx, cz } = geometry;
   const structural = profile.id !== 'low';
+  const showShell = shellMode !== 'off';
+  const fullShell = shellMode === 'full';
 
   const floor = floorMaterial(Math.max(8, Math.round(Math.max(width, depth) / 0.6)));
   const wall = surfaceMaterial('wallPanel');
@@ -69,7 +81,7 @@ export function DataHall({ bounds, rows, profile, crahUnits = 0 }: Props) {
   const perforatedTile = perforatedTileMaterial();
 
   return (
-    <group name="environment:data-hall" userData={{ classification: 'environmental-geometry' }}>
+    <group name="OperationalScene:environment" userData={{ classification: 'environmental-geometry' }}>
       {/* Raised floor with 600 mm tile grid */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[cx, 0, cz]} material={floor} receiveShadow>
         <planeGeometry args={[width, depth]} />
@@ -96,34 +108,59 @@ export function DataHall({ bounds, rows, profile, crahUnits = 0 }: Props) {
         </mesh>
       ))}
 
-      {/* Room boundary walls (sectional: open toward the default camera) */}
-      <mesh position={[cx, CEILING / 2, minZ]} material={wall} receiveShadow>
-        <boxGeometry args={[width, CEILING, 0.2]} />
-      </mesh>
-      <mesh position={[minX, CEILING / 2, cz]} material={wall} receiveShadow>
-        <boxGeometry args={[0.2, CEILING, depth]} />
-      </mesh>
-      <mesh position={[maxX, CEILING / 2, cz]} material={wall} receiveShadow>
-        <boxGeometry args={[0.2, CEILING, depth]} />
-      </mesh>
-
-      {/* Overhead structural frame */}
-      {structural &&
-        Array.from({ length: Math.max(2, Math.round(depth / 3)) }, (_, i) => minZ + 1.5 + i * 3)
-          .filter((bz) => bz < maxZ)
-          .map((bz) => (
-            <mesh key={`beam-${bz}`} position={[cx, CEILING - 0.15, bz]} material={steel} castShadow>
-              <boxGeometry args={[width, 0.18, 0.14]} />
+      {/* FacilityShell: purely architectural context. Never included in camera
+          fit and never rendered in the default operator view. */}
+      {showShell && (
+        <group name="FacilityShell" userData={{ classification: 'facility-shell' }}>
+          <group name="FacilityShell:PerimeterWalls">
+            {/* Distant wall retained in both cutaway and full. */}
+            <mesh position={[cx, CEILING / 2, minZ]} material={wall} receiveShadow>
+              <boxGeometry args={[width, fullShell ? CEILING : CEILING * 0.6, 0.2]} />
             </mesh>
-          ))}
-      {/* Ceiling deck: rendered as narrow panels between beams so the hall is
-          never occluded when the camera sits above the containment. */}
-      {structural &&
-        [minX + width * 0.25, maxX - width * 0.25].map((px) => (
-          <mesh key={`deck-${px}`} rotation={[Math.PI / 2, 0, 0]} position={[px, CEILING, cz]} material={ceiling}>
-            <planeGeometry args={[width * 0.18, depth]} />
-          </mesh>
-        ))}
+            <mesh position={[minX, CEILING / 2, cz]} material={wall} receiveShadow>
+              <boxGeometry args={[0.2, fullShell ? CEILING : CEILING * 0.6, depth]} />
+            </mesh>
+            {/* Camera-facing walls exist only in full shell mode. */}
+            {fullShell && (
+              <>
+                <mesh position={[maxX, CEILING / 2, cz]} material={wall} receiveShadow>
+                  <boxGeometry args={[0.2, CEILING, depth]} />
+                </mesh>
+                <mesh position={[cx, CEILING / 2, maxZ]} material={wall} receiveShadow>
+                  <boxGeometry args={[width, CEILING, 0.2]} />
+                </mesh>
+              </>
+            )}
+          </group>
+
+          {fullShell && structural && (
+            <group name="FacilityShell:StructuralBeams">
+              {Array.from({ length: Math.max(2, Math.round(depth / 3)) }, (_, i) => minZ + 1.5 + i * 3)
+                .filter((bz) => bz < maxZ)
+                .map((bz) => (
+                  <mesh key={`beam-${bz}`} position={[cx, CEILING - 0.15, bz]} material={steel} castShadow>
+                    <boxGeometry args={[width, 0.18, 0.14]} />
+                  </mesh>
+                ))}
+            </group>
+          )}
+
+          {fullShell && structural && (
+            <group name="FacilityShell:Ceiling">
+              {[minX + width * 0.25, maxX - width * 0.25].map((px) => (
+                <mesh
+                  key={`deck-${px}`}
+                  rotation={[Math.PI / 2, 0, 0]}
+                  position={[px, CEILING, cz]}
+                  material={ceiling}
+                >
+                  <planeGeometry args={[width * 0.18, depth]} />
+                </mesh>
+              ))}
+            </group>
+          )}
+        </group>
+      )}
 
       {/* Overhead cable trays and power busway following each row */}
       {rows.map((row) => (

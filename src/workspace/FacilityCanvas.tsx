@@ -10,11 +10,13 @@
  * The canvas can never remain in `loading` indefinitely.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Box, Grid2x2, Loader2, Maximize2, Minus, Plus, RefreshCw } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { SimulationErrorBoundary } from '@/components/twin-visualization/SimulationErrorBoundary';
 import { DataCenter3DScene } from '@/components/twin-visualization/DataCenter3DScene';
+import type { ShellMode } from '@/components/twin-visualization/DataHall';
 import { useTwinVisualizationData } from '@/components/twin-visualization/hooks/useTwinVisualizationData';
 import { useTwinOverlaySafe, type TwinOverlay } from '@/context/TwinOverlayContext';
 import { cn } from '@/lib/utils';
@@ -51,6 +53,25 @@ export function FacilityCanvas({ facility }: Props) {
   const [attempt, setAttempt] = useState(0);
   const [zoom, setZoom] = useState(1);
   const hostRef = useRef<HTMLDivElement | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [legendOpen, setLegendOpen] = useState(false);
+
+  // View state is URL-addressable: shell mode and label visibility survive
+  // reloads and deep links without reloading the scene.
+  const shellParam = searchParams.get('shell');
+  const shellMode: ShellMode =
+    shellParam === 'cutaway' || shellParam === 'full' ? shellParam : 'off';
+  const showLabels = searchParams.get('labels') !== 'off';
+
+  const setViewParam = useCallback(
+    (key: string, value: string | null) => {
+      const next = new URLSearchParams(searchParams);
+      if (value === null) next.delete(key);
+      else next.set(key, value);
+      setSearchParams(next, { replace: true });
+    },
+    [searchParams, setSearchParams],
+  );
 
   const handleSelect = useCallback(
     (assetId: string) => {
@@ -130,6 +151,10 @@ export function FacilityCanvas({ facility }: Props) {
               activeOverlay={activeOverlay as never}
               selectedAssetId={selectedAssetId}
               onRackClick={handleSelect}
+              shellMode={shellMode}
+              onShellModeChange={(mode) => setViewParam('shell', mode === 'off' ? null : mode)}
+              showLabels={showLabels}
+              onShowLabelsChange={(next) => setViewParam('labels', next ? null : 'off')}
             />
           </SimulationErrorBoundary>
         ) : (
@@ -262,9 +287,35 @@ export function FacilityCanvas({ facility }: Props) {
           className="pointer-events-auto max-w-full rounded-md border border-border bg-card/95 px-2.5 py-2 text-xs text-muted-foreground backdrop-blur"
           data-testid="model-overlay-legend"
         >
-          <div className="mb-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <span className="font-medium text-foreground">{contract.label}</span>
             {contract.unit && <span className="text-[11px]">{contract.unit}</span>}
+            {contract.legend.length > 0 && (
+              <ul
+                className="flex flex-wrap items-center gap-x-2.5 gap-y-1"
+                aria-label={`${contract.label} legend`}
+              >
+                {contract.legend.map((stop) => (
+                  <li key={stop.label} className="flex items-center gap-1 whitespace-nowrap text-[11px]">
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{ backgroundColor: stop.color }}
+                      aria-hidden
+                    />
+                    {stop.label}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 px-1.5 text-[11px]"
+              aria-expanded={legendOpen}
+              onClick={() => setLegendOpen((o) => !o)}
+            >
+              Details
+            </Button>
             {activeOverlay !== 'none' && (
               <Button
                 size="sm"
@@ -276,24 +327,14 @@ export function FacilityCanvas({ facility }: Props) {
               </Button>
             )}
           </div>
-          {contract.legend.length > 0 && (
-            <ul className="flex flex-wrap items-center gap-x-3 gap-y-1" aria-label={`${contract.label} legend`}>
-              {contract.legend.map((stop) => (
-                <li key={stop.label} className="flex items-center gap-1.5 whitespace-nowrap">
-                  <span
-                    className="h-2 w-2 rounded-full"
-                    style={{ backgroundColor: stop.color }}
-                    aria-hidden
-                  />
-                  {stop.label}
-                </li>
-              ))}
-            </ul>
+          {legendOpen && (
+            <div className="mt-1">
+              {contract.unavailableNote && (
+                <p className="max-w-[26rem] text-[11px] text-foreground">{contract.unavailableNote}</p>
+              )}
+              <p className="mt-1 max-w-[26rem] text-[11px]">{contract.provenance}</p>
+            </div>
           )}
-          {contract.unavailableNote && (
-            <p className="mt-1 max-w-[26rem] text-[11px] text-foreground">{contract.unavailableNote}</p>
-          )}
-          <p className="mt-1 max-w-[26rem] text-[11px]">{contract.provenance}</p>
         </div>
       </div>
 

@@ -1,7 +1,44 @@
 {
   "manifestVersion": 2,
-  "generatedAt": "2026-08-14T00:00:00Z",
+  "generatedAt": "2026-08-14T14:06:01Z",
   "assets": [
+    {
+      "assetId": "nvidia.rack.42u_a_01",
+      "displayName": "42U server rack (NVIDIA Data Center OpenUSD Assets Pack)",
+      "manufacturer": "NVIDIA",
+      "model": "Rack_42U_A_01",
+      "sourceUrl": "Assets/DigitalTwin/Assets/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd",
+      "licence": "NVIDIA Data Center OpenUSD Assets Pack (Datacenter_NVD@10012), used under the pack's NVIDIA licence terms",
+      "sourceFormat": "OpenUSD (usd)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.0.0",
+      "glbUrl": "/__l5e/assets-v1/64f21cbc-9211-4c3d-9fff-357ba1eaee03/rack_42u_a.glb",
+      "dimensionsMeters": {
+        "x": 0.6035,
+        "y": 3.1663,
+        "z": 1.4215
+      },
+      "triangleCount": 133173,
+      "textureMemoryMb": 0,
+      "lods": [],
+      "lastValidatedAt": "2026-08-14T14:06:01Z",
+      "checksum": "sha256:7ec75623ddd3cb910d798c5691f338ed45fe4056ddaae139314f9bd456290712",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "notes": "Source archive Datacenter_NVD@10012.zip sha256 4972d1a9726b36279d7c26531b4d0a084156b7d512f5340b6e1063a9cf458fd4; USD master sha256 f8505db78c2d0b3a85e2ee187e09a1bef2f9ee0fb826b9ca59e9db44c26eb1b3. Converted with Blender 5.0.1 OpenUSD importer and glTF exporter, optimised with gltf-transform 4.4.2 (dedup, instance, weld, quantize), normalised to floor contact at y=0 and front facing +Z. Height 3.1663 m includes the rear-door heat exchanger assembly. MDL material library and textures resolve against the pack root and are not carried into the glTF derivative, so the derivative is untextured PBR (0 images).",
+      "provenance": {
+        "sourceArchive": "Datacenter_NVD@10012.zip",
+        "sourceArchiveSha256": "4972d1a9726b36279d7c26531b4d0a084156b7d512f5340b6e1063a9cf458fd4",
+        "usdMasterSha256": "f8505db78c2d0b3a85e2ee187e09a1bef2f9ee0fb826b9ca59e9db44c26eb1b3",
+        "publishedSource": "digital-twin-assets/nvidia/rack_42u_a/v1/source/",
+        "publishedDerivative": "digital-twin-assets/nvidia/rack_42u_a/v1/web/rack_42u_a.glb",
+        "meshCount": 546,
+        "materialCount": 9,
+        "imageCount": 0,
+        "derivativeBytes": 5160500
+      },
+      "rollout": "canary"
+    },
     {
       "assetId": "aura.rack.generic_42u",
       "displayName": "Generic 42U server rack (unbranded)",

@@ -219,6 +219,28 @@ export function isPartAddressable(assetId: string, partId: string): boolean {
 }
 
 /** Checksums that must never resolve or mount anywhere in the runtime. */
+export interface GpuValidationStatus {
+  status: string;
+  gpuValidated: boolean;
+  label: string;
+  lastPassedRunId: string | null;
+}
+
+/**
+ * Hardware GPU validation state for an asset. Until a saved administrator run
+ * passes, the UI must keep saying "Awaiting hardware GPU validation".
+ */
+export function getGpuValidationStatus(assetId: string): GpuValidationStatus {
+  const record = getAsset(assetId)?.gpuValidation;
+  const gpuValidated = record?.status === 'gpu-validated';
+  return {
+    status: record?.status ?? 'awaiting-hardware-run',
+    gpuValidated,
+    label: gpuValidated ? 'GPU-validated' : 'Awaiting hardware GPU validation',
+    lastPassedRunId: record?.lastPassedRunId ?? null,
+  };
+}
+
 export function isSupersededChecksum(checksum: string): boolean {
   const normalized = checksum.trim().toLowerCase();
   return FILE.assets.some(

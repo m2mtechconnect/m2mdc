@@ -38,6 +38,7 @@ import type {
   SimulationEventVisual 
 } from './types';
 import { RackGroup } from './RackGroup';
+import { isAssetAdmin } from '@/auth/assetAdmin';
 import { useRBAC } from '@/contexts/RBACContext';
 import { resolveCanaryRollout, assetIdForRack, CANARY_RACK_ASSET_ID, type CanaryRolloutConfig } from './canaryRollout';
 import { getThermalColor, getUtilizationColor, getPowerColor } from './types';
@@ -500,7 +501,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   // read authorization context, then passed down as a prop.
   const { role, roles } = useRBAC();
   const isAdmin = useMemo(
-    () => [role, ...roles].some((r) => r === 'admin' || r === 'owner' || r === 'developer'),
+    () => isAssetAdmin(role, roles),
     [role, roles],
   );
   const canary = useMemo(

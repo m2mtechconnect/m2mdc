@@ -13,6 +13,7 @@ import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Grid, Environment } from '@react-three/drei';
 import { Navigate } from 'react-router-dom';
 import { useRBAC } from '@/contexts/RBACContext';
+import { isAssetAdmin } from '@/auth/assetAdmin';
 import { ApprovedRackAsset } from '@/components/twin-visualization/ApprovedRackAsset';
 import { AssetProvenanceBadge } from '@/components/twin-visualization/AssetProvenancePanel';
 import { CANARY_RACK_ASSET_ID } from '@/components/twin-visualization/canaryRollout';
@@ -51,9 +52,7 @@ function SceneProbe() {
 
 export default function AssetPreview() {
   const { role, roles, loading } = useRBAC();
-  const isAdmin = [role, ...roles].some(
-    (r) => r === 'admin' || r === 'owner' || r === 'developer',
-  );
+  const isAdmin = isAssetAdmin(role, roles);
   const useOps =
     typeof window !== 'undefined' &&
     new URLSearchParams(window.location.search).get('derivative') === 'ops';

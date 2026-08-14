@@ -23,7 +23,18 @@ export type FallbackReason =
   | 'unsupported-format'
   | 'checksum-missing'
   | 'checksum-mismatch'
+  | 'checksum-superseded'
+  | 'build-superseded'
   | 'quality-profile-selected-fallback';
+
+/** Addressable-part capability declared by validation evidence, not assumption. */
+export interface AssetCapabilityPart {
+  id: string;
+  group: string | null;
+  label: string;
+  addressable: boolean;
+  reason?: string;
+}
 
 export interface AssetManifestEntry {
   assetId: string;
@@ -47,6 +58,14 @@ export interface AssetManifestEntry {
   runtimeEligible?: boolean;
   blocker?: string;
   notes?: string;
+  /** True when a newer build replaced this one. Never runtime resolvable. */
+  superseded?: boolean;
+  supersededBy?: string;
+  /** Checksums of earlier builds that must never resolve or mount. */
+  supersededChecksums?: string[];
+  capabilities?: { addressableParts: AssetCapabilityPart[] };
+  drawCallBudget?: number;
+  gpuValidation?: { status: string; lastPassedRunId: string | null };
 }
 
 interface AssetManifestFile {

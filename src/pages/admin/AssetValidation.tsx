@@ -482,6 +482,10 @@ export default function AssetValidation() {
       <section className="grid gap-4 lg:grid-cols-2">
         <Card className="p-4">
           <h2 className="mb-2 text-sm font-semibold">Visual acceptance captures</h2>
+          <p className="mb-2 text-[11px] text-muted-foreground">
+            Capture each settled camera view. Save validation stays disabled until every item and
+            the clearance confirmation are checked.
+          </p>
           <ul className="space-y-1.5 text-[12px]">
             {screenshots.map((shot) => (
               <li key={shot.id} className="flex items-center gap-2">

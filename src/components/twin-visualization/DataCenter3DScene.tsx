@@ -48,6 +48,13 @@ import { CoolingOverlayLayer } from './CoolingOverlayLayer';
 import { WorkloadOverlayLayer } from './WorkloadOverlayLayer';
 import { ZoomControlsOverlay } from './ZoomControlsOverlay';
 import { AssetProvenanceBadge } from './AssetProvenancePanel';
+import { ScenarioRackLayer } from './ScenarioRackLayer';
+import {
+  applyDesignScenario,
+  isScenarioRack,
+  resolveDesignScenario,
+  type DesignScenario,
+} from './designScenario';
 
 // Zoom configuration constants
 const MIN_ZOOM = 0.4;
@@ -223,8 +230,10 @@ function Scene({
   shellMode,
   showLabels,
   canary,
+  scenario,
 }: Omit<DataCenter3DSceneProps, 'events'> & { 
   canary: CanaryRolloutConfig;
+  scenario: DesignScenario | null;
   targetDistance: number; 
   baseDistance: number;
   lastInteractionTime: number;
@@ -410,6 +419,19 @@ function Scene({
           }}
         />
       ))}
+
+      {/* Simulated design scenario: additive, never part of the as-built rows. */}
+      {scenario &&
+        racks.filter(isScenarioRack).map((rack) => (
+          <ScenarioRackLayer
+            key={rack.id}
+            scenario={scenario}
+            rack={rack}
+            selected={selectedAssetId === rack.id}
+            showLabels={showLabels !== false}
+            onRackClick={onRackClick}
+          />
+        ))}
     </>
   );
 }
@@ -436,9 +458,18 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
     [],
   );
 
+  // Simulated design scenario (opt-in via URL). The as-built baseline in
+  // `props.racks` is never modified; the scenario rack is additive.
+  const scenario = useMemo(() => resolveDesignScenario(), []);
+  const racks = useMemo(
+    () => applyDesignScenario(props.racks, scenario),
+    [props.racks, scenario],
+  );
+  const scenarioRack = useMemo(() => racks.find(isScenarioRack) ?? null, [racks]);
+
   const bounds = useMemo(
-    () => facilityBoundsFromPositions(props.racks.map((r) => r.position)),
-    [props.racks],
+    () => facilityBoundsFromPositions(racks.map((r) => r.position)),
+    [racks],
   );
 
   // The default view is the calculated facility overview, so "Reset camera"
@@ -450,9 +481,14 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   const applyPreset = useCallback(
     (preset: CameraPresetId) => {
       setLastInteractionTime(Date.now());
-      setPlacement(resolveCameraPreset(preset, bounds));
+      // Rack-relative presets need a subject: the selected rack, otherwise the
+      // scenario rack when a design scenario is mounted.
+      const subject =
+        racks.find((r) => r.id === props.selectedAssetId)?.position ??
+        scenarioRack?.position;
+      setPlacement(resolveCameraPreset(preset, bounds, subject));
     },
-    [bounds],
+    [bounds, racks, props.selectedAssetId, scenarioRack],
   );
 
   const changeQuality = useCallback((id: QualityProfileId) => {
@@ -753,6 +789,8 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             <Suspense fallback={null}>
               <Scene 
                 {...props} 
+                racks={racks}
+                scenario={scenario}
                 targetDistance={targetDistance}
                 baseDistance={baseDistance}
                 lastInteractionTime={lastInteractionTime}
@@ -773,14 +811,16 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
           data-testid="rack-geometry-manifest"
           data-canary-reason={canary.reason}
           data-canary-rack={canary.rackId ?? 'none'}
+          data-design-scenario={scenario?.id ?? 'none'}
         >
-          {props.racks.map((rack) => (
+          {racks.map((rack) => (
             <span
               key={rack.id}
               data-rack-id={rack.id}
-              data-asset-id={assetIdForRack(rack.id, canary)}
+              data-asset-id={isScenarioRack(rack) ? rack.scenarioId && scenario ? scenario.assetId : 'none' : assetIdForRack(rack.id, canary)}
+              data-simulated={isScenarioRack(rack) ? 'true' : 'false'}
               data-runtime-geometry={
-                assetIdForRack(rack.id, canary) === CANARY_RACK_ASSET_ID
+                isScenarioRack(rack) || assetIdForRack(rack.id, canary) === CANARY_RACK_ASSET_ID
                   ? 'approved-glb'
                   : 'procedural'
               }

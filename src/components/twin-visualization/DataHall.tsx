@@ -71,7 +71,6 @@ export function DataHall({ bounds, rows, profile, crahUnits = 0, shellMode = 'of
 
   const floor = floorMaterial(Math.max(8, Math.round(Math.max(width, depth) / 0.6)));
   const wall = surfaceMaterial('wallPanel');
-  const ceiling = surfaceMaterial('ceilingPanel');
   const tray = surfaceMaterial('galvanizedTray');
   const busbar = surfaceMaterial('copperBus');
   const pipe = surfaceMaterial('chilledPipe');

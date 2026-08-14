@@ -8,6 +8,7 @@ import {
   resolveGlbDerivative,
   resolveRuntimeAsset,
 } from '../assetRegistry';
+import { CANARY_RACK_ASSET_ID, assetIdForRack, resolveCanaryRollout } from '../canaryRollout';
 
 const root = resolve(__dirname, '../../../../');
 const rackDir = resolve(root, 'assets/rack/generic_42u_rack');
@@ -45,13 +46,62 @@ describe('asset registry runtime gating', () => {
     expect(resolveRuntimeAsset('does.not.exist').fallbackReason).toBe('no-asset-assigned');
   });
 
-  it('reports no approved derivatives in the current manifest', () => {
-    expect(hasApprovedDerivatives()).toBe(false);
+  it('reports the approved NVIDIA derivative in the current manifest', () => {
+    expect(hasApprovedDerivatives()).toBe(true);
   });
 
   it('quality profile can deliberately select the procedural fallback', () => {
     expect(resolveRuntimeAsset(RACK_ASSET_ID, { preferFallback: true }).fallbackReason).toBe(
       'quality-profile-selected-fallback',
     );
+  });
+});
+
+describe('approved NVIDIA rack derivative', () => {
+  const entry = getAsset(CANARY_RACK_ASSET_ID);
+
+  it('is approved, runtime eligible, validated and checksummed', () => {
+    expect(entry?.approvalStatus).toBe('approved');
+    expect(entry?.runtimeEligible).toBe(true);
+    expect(entry?.lastValidatedAt).toBeTruthy();
+    expect(entry?.checksum).toMatch(/^sha256:[0-9a-f]{64}$/);
+    expect(entry?.glbUrl).toMatch(/\.glb$/);
+  });
+
+  it('resolves a loadable derivative with no fallback reason', () => {
+    const r = resolveRuntimeAsset(CANARY_RACK_ASSET_ID);
+    expect(r.glbUrl).toBe(entry?.glbUrl);
+    expect(r.fallbackReason).toBeNull();
+    expect(resolveGlbDerivative(CANARY_RACK_ASSET_ID)).toBe(entry?.glbUrl);
+  });
+
+  it('carries EIA-310 consistent footprint dimensions in metres', () => {
+    expect(entry?.dimensionsMeters?.x).toBeCloseTo(0.6, 1);
+    expect(entry?.dimensionsMeters?.z).toBeCloseTo(1.42, 2);
+  });
+
+  it('a checksum mismatch blocks the derivative', () => {
+    const r = resolveRuntimeAsset(CANARY_RACK_ASSET_ID, { expectedChecksum: 'sha256:deadbeef' });
+    expect(r.glbUrl).toBeNull();
+    expect(r.fallbackReason).toBe('checksum-mismatch');
+  });
+});
+
+describe('canary rollout scope', () => {
+  const rackIds = ['R-03', 'R-01', 'R-02'];
+
+  it('mounts the approved asset on exactly one rack', () => {
+    const canary = resolveCanaryRollout(rackIds);
+    const mounted = rackIds.filter((id) => assetIdForRack(id, canary) === CANARY_RACK_ASSET_ID);
+    expect(mounted).toEqual(['R-01']);
+  });
+
+  it('rolls back to procedural geometry for every rack when disabled', () => {
+    const canary = { enabled: false, rackId: null };
+    expect(rackIds.map((id) => assetIdForRack(id, canary))).toEqual([
+      RACK_ASSET_ID,
+      RACK_ASSET_ID,
+      RACK_ASSET_ID,
+    ]);
   });
 });

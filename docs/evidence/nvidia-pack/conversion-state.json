@@ -8488,7 +8488,7 @@
           ],
           "checksum": "sha256:d32025ac84aa74bd520d2fa3ed8e1f9ca3ef7181701e6d4983c94b4ad3830153",
           "drawCallEstimate": 4,
-          "generatedAt": "2026-08-14T20:14:06.831Z",
+          "generatedAt": "2026-08-14T21:24:36.929Z",
           "input": "/tmp/ingest/derivatives/server_2u_c/server_2u_c.inspection.raw.glb",
           "materialCount": 1,
           "materialNames": [
@@ -8588,7 +8588,7 @@
           ],
           "checksum": "sha256:278e5ceb63f0ce6ff7695bbcef0ad0086410874cac103c1e1606138b30d9392a",
           "drawCallEstimate": 4,
-          "generatedAt": "2026-08-14T20:14:08.251Z",
+          "generatedAt": "2026-08-14T21:24:38.986Z",
           "input": "/tmp/ingest/derivatives/server_2u_c/server_2u_c.lod.raw.glb",
           "materialCount": 1,
           "materialNames": [
@@ -8732,7 +8732,7 @@
           ],
           "checksum": "sha256:11686ea31d7a23dd55f17d518dabd9ec5661fd545570523838452b86d29464db",
           "drawCallEstimate": 4,
-          "generatedAt": "2026-08-14T20:14:07.442Z",
+          "generatedAt": "2026-08-14T21:24:38.010Z",
           "input": "/tmp/ingest/derivatives/server_2u_c/server_2u_c.operations.raw.glb",
           "materialCount": 1,
           "materialNames": [
@@ -8758,7 +8758,7 @@
           "triangleCount": 27208
         }
       },
-      "durationSeconds": 47.8,
+      "durationSeconds": 55.5,
       "failureReason": null,
       "key": "server_2u_c",
       "manifestStatus": "not-registered",
@@ -10444,5 +10444,5 @@
     }
   },
   "pipelineVersion": "1.1.0",
-  "updatedAt": "2026-08-14T21:23:43Z"
+  "updatedAt": "2026-08-14T21:24:39Z"
 }

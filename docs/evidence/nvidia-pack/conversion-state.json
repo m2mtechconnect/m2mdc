@@ -3301,7 +3301,7 @@
           ],
           "checksum": "sha256:96ad9552e9a78f045dd38d2082cb1ef045f42b6f980e10f8036fb56536145e96",
           "drawCallEstimate": 3,
-          "generatedAt": "2026-08-14T20:15:11.562Z",
+          "generatedAt": "2026-08-14T21:25:44.095Z",
           "input": "/tmp/ingest/derivatives/qm8700_01/qm8700_01.inspection.raw.glb",
           "materialCount": 1,
           "materialNames": [
@@ -3425,7 +3425,7 @@
           ],
           "checksum": "sha256:930e00f0ae11362a85468875a8d986dd619d86bc9858533bab3eeb4c90ef4486",
           "drawCallEstimate": 3,
-          "generatedAt": "2026-08-14T20:15:13.556Z",
+          "generatedAt": "2026-08-14T21:25:45.853Z",
           "input": "/tmp/ingest/derivatives/qm8700_01/qm8700_01.lod.raw.glb",
           "materialCount": 1,
           "materialNames": [
@@ -3541,7 +3541,7 @@
           ],
           "checksum": "sha256:160b7bd7d11d79eb1f3ea2d7be5fb8ae6b8b4700fcf4f7b84a7a8d02a07e895d",
           "drawCallEstimate": 3,
-          "generatedAt": "2026-08-14T20:15:12.485Z",
+          "generatedAt": "2026-08-14T21:25:44.898Z",
           "input": "/tmp/ingest/derivatives/qm8700_01/qm8700_01.operations.raw.glb",
           "materialCount": 1,
           "materialNames": [
@@ -3566,7 +3566,7 @@
           "triangleCount": 50752
         }
       },
-      "durationSeconds": 65.3,
+      "durationSeconds": 66.8,
       "failureReason": null,
       "key": "qm8700_01",
       "manifestStatus": "not-registered",
@@ -10444,5 +10444,5 @@
     }
   },
   "pipelineVersion": "1.1.0",
-  "updatedAt": "2026-08-14T21:24:39Z"
+  "updatedAt": "2026-08-14T21:25:45Z"
 }

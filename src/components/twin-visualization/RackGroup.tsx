@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Html } from '@react-three/drei';
 import type { RowVisual, RackVisual } from './types';
 import { Rack, type RackDetailLevel } from './Rack';
+import { ApprovedRackAsset } from './ApprovedRackAsset';
 
 interface RackGroupProps {
   row: RowVisual;
@@ -97,7 +98,7 @@ export function RackGroup({
 
       {/* Render racks */}
       {rowRacks.map((rack) => (
-        <Rack 
+        <ApprovedRackAsset
           key={rack.id} 
           rack={{
             ...rack,

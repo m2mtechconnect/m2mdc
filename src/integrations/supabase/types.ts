@@ -1031,6 +1031,66 @@ export type Database = {
         }
         Relationships: []
       }
+      asset_gpu_validation_runs: {
+        Row: {
+          acceptance_result: string
+          app_version: string | null
+          asset_checksum: string
+          asset_id: string
+          benchmark_config: Json
+          created_at: string
+          delivery: Json
+          findings: Json
+          id: string
+          manifest_version: number | null
+          performance: Json
+          renderer: Json
+          scenario_id: string
+          screenshot_references: Json
+          validated_at: string
+          validated_by: string
+          verdict: string
+        }
+        Insert: {
+          acceptance_result: string
+          app_version?: string | null
+          asset_checksum: string
+          asset_id: string
+          benchmark_config?: Json
+          created_at?: string
+          delivery?: Json
+          findings?: Json
+          id?: string
+          manifest_version?: number | null
+          performance?: Json
+          renderer?: Json
+          scenario_id: string
+          screenshot_references?: Json
+          validated_at?: string
+          validated_by: string
+          verdict: string
+        }
+        Update: {
+          acceptance_result?: string
+          app_version?: string | null
+          asset_checksum?: string
+          asset_id?: string
+          benchmark_config?: Json
+          created_at?: string
+          delivery?: Json
+          findings?: Json
+          id?: string
+          manifest_version?: number | null
+          performance?: Json
+          renderer?: Json
+          scenario_id?: string
+          screenshot_references?: Json
+          validated_at?: string
+          validated_by?: string
+          verdict?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string

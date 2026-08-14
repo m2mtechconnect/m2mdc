@@ -36,7 +36,7 @@ export function AssetProvenanceBadge({ preferFallback }: { preferFallback?: bool
       </button>
 
       {open && (
-        <dl className="mt-2 space-y-1 rounded-md border border-slate-700/70 bg-slate-900/95 p-3 text-[12px] text-slate-200">
+        <dl className="mt-2 max-h-64 space-y-1 overflow-auto rounded-md border border-slate-700/70 bg-slate-900/95 p-3 text-[12px] text-slate-200">
           <Row label="Runtime geometry" value={imported ? 'Imported GLB' : 'Procedural (Rack.tsx primitives)'} />
           <Row label="USD master" value={resolution.usdMasterPath ?? 'None'} />
           <Row label="USD checksum" value={resolution.usdChecksum ?? 'None'} />

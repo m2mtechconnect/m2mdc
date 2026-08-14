@@ -280,7 +280,33 @@
       "failureReason": null,
       "key": "blank_1u_black",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/blank_1u_black_lod.glb.asset.json",
+          "bytes": 9572,
+          "checksum": "sha256:c99ddb30f422356d6ef3d255a06dcc27101f9b06093377bf3ce0ca5f5fbd7871",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:38:47Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/6fd2e1cf-1621-4785-8e47-6affa416ae86/blank_1u_black_lod.glb",
+          "remoteBytes": 9572,
+          "remoteChecksum": "sha256:c99ddb30f422356d6ef3d255a06dcc27101f9b06093377bf3ce0ca5f5fbd7871",
+          "url": "/__l5e/assets-v1/6fd2e1cf-1621-4785-8e47-6affa416ae86/blank_1u_black_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:35Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/blank_1u_black_operations.glb.asset.json",
+          "bytes": 91356,
+          "checksum": "sha256:d3ee5c7cc58c2b72b3f5e4816b836e06500ec88121c08ed2befc0c95e1e6b697",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:38:41Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/b0080883-a74a-4b10-886a-edf9cdd881b9/blank_1u_black_operations.glb",
+          "remoteBytes": 91356,
+          "remoteChecksum": "sha256:d3ee5c7cc58c2b72b3f5e4816b836e06500ec88121c08ed2befc0c95e1e6b697",
+          "url": "/__l5e/assets-v1/b0080883-a74a-4b10-886a-edf9cdd881b9/blank_1u_black_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:35Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "blanking-panel",
       "settingsHash": "a9e8ba83ad535183",
@@ -674,7 +700,33 @@
       "failureReason": null,
       "key": "blank_1u_blackgold",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/blank_1u_blackgold_lod.glb.asset.json",
+          "bytes": 6872,
+          "checksum": "sha256:f70fc9ea9d2ec5da17a300b83f9e4a8bd5a0eda6041e89291ac21d8d8bd0301f",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:39:01Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/e41d3176-a78f-4307-89a0-f28c8e3c67f6/blank_1u_blackgold_lod.glb",
+          "remoteBytes": 6872,
+          "remoteChecksum": "sha256:f70fc9ea9d2ec5da17a300b83f9e4a8bd5a0eda6041e89291ac21d8d8bd0301f",
+          "url": "/__l5e/assets-v1/e41d3176-a78f-4307-89a0-f28c8e3c67f6/blank_1u_blackgold_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:36Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/blank_1u_blackgold_operations.glb.asset.json",
+          "bytes": 56380,
+          "checksum": "sha256:214c672e99eb34305979d2985f47a3f68703890abcb44af87ebddf4714b010f0",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:38:53Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/834be3e1-6f5e-42a8-98a5-b6c807ec92a7/blank_1u_blackgold_operations.glb",
+          "remoteBytes": 56380,
+          "remoteChecksum": "sha256:214c672e99eb34305979d2985f47a3f68703890abcb44af87ebddf4714b010f0",
+          "url": "/__l5e/assets-v1/834be3e1-6f5e-42a8-98a5-b6c807ec92a7/blank_1u_blackgold_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:36Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "blanking-panel",
       "settingsHash": "a9e8ba83ad535183",
@@ -1062,7 +1114,33 @@
       "failureReason": null,
       "key": "blank_1u_snapon_gray",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/blank_1u_snapon_gray_lod.glb.asset.json",
+          "bytes": 3832,
+          "checksum": "sha256:903885da93cdadd979991682d4b241ee676a99e3123cccd25f16d97edd781709",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:39:14Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/09d5b425-6b24-41bd-a6d2-4619ba6c7dfd/blank_1u_snapon_gray_lod.glb",
+          "remoteBytes": 3832,
+          "remoteChecksum": "sha256:903885da93cdadd979991682d4b241ee676a99e3123cccd25f16d97edd781709",
+          "url": "/__l5e/assets-v1/09d5b425-6b24-41bd-a6d2-4619ba6c7dfd/blank_1u_snapon_gray_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:36Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/blank_1u_snapon_gray_operations.glb.asset.json",
+          "bytes": 3832,
+          "checksum": "sha256:903885da93cdadd979991682d4b241ee676a99e3123cccd25f16d97edd781709",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:39:07Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/35ceaf68-92a9-497e-8521-ab69cb09a226/blank_1u_snapon_gray_operations.glb",
+          "remoteBytes": 3832,
+          "remoteChecksum": "sha256:903885da93cdadd979991682d4b241ee676a99e3123cccd25f16d97edd781709",
+          "url": "/__l5e/assets-v1/35ceaf68-92a9-497e-8521-ab69cb09a226/blank_1u_snapon_gray_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:37Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "blanking-panel",
       "settingsHash": "a9e8ba83ad535183",
@@ -1448,7 +1526,33 @@
       "failureReason": null,
       "key": "blank_1u_white",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/blank_1u_white_lod.glb.asset.json",
+          "bytes": 4964,
+          "checksum": "sha256:f8e1ea69cbd44ca87e660b012793b816326fb8336e6bd42434dd12494f4255b8",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:39:29Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/31c38dc0-4a3c-4729-89f7-95887c08d4e4/blank_1u_white_lod.glb",
+          "remoteBytes": 4964,
+          "remoteChecksum": "sha256:f8e1ea69cbd44ca87e660b012793b816326fb8336e6bd42434dd12494f4255b8",
+          "url": "/__l5e/assets-v1/31c38dc0-4a3c-4729-89f7-95887c08d4e4/blank_1u_white_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:37Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/blank_1u_white_operations.glb.asset.json",
+          "bytes": 35976,
+          "checksum": "sha256:ac239fc8f6c9e14300b14ccedd78f9ff621140cc9543fd3c5c9c142b7c05eee8",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:39:20Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/3ec28508-0408-49af-94ad-1cf0405f2815/blank_1u_white_operations.glb",
+          "remoteBytes": 35976,
+          "remoteChecksum": "sha256:ac239fc8f6c9e14300b14ccedd78f9ff621140cc9543fd3c5c9c142b7c05eee8",
+          "url": "/__l5e/assets-v1/3ec28508-0408-49af-94ad-1cf0405f2815/blank_1u_white_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:37Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "blanking-panel",
       "settingsHash": "a9e8ba83ad535183",
@@ -1834,7 +1938,33 @@
       "failureReason": null,
       "key": "cable_tray_25",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/cable_tray_25_lod.glb.asset.json",
+          "bytes": 14836,
+          "checksum": "sha256:daf7d01f64b43b3cc76e02892e39be1bbbaa95ed5d4f6ce6a6637f531f5dad00",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:39:45Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/5bdb618a-fdf9-4f3b-88ad-c4b56876dc52/cable_tray_25_lod.glb",
+          "remoteBytes": 14836,
+          "remoteChecksum": "sha256:daf7d01f64b43b3cc76e02892e39be1bbbaa95ed5d4f6ce6a6637f531f5dad00",
+          "url": "/__l5e/assets-v1/5bdb618a-fdf9-4f3b-88ad-c4b56876dc52/cable_tray_25_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:37Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/cable_tray_25_operations.glb.asset.json",
+          "bytes": 32600,
+          "checksum": "sha256:003cb79749e514c6e66dfa1146a27ff7ed261762ae3ee86daa0850aabb146716",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:39:35Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/3f20a8a0-50dc-4528-bac0-efa5380b7954/cable_tray_25_operations.glb",
+          "remoteBytes": 32600,
+          "remoteChecksum": "sha256:003cb79749e514c6e66dfa1146a27ff7ed261762ae3ee86daa0850aabb146716",
+          "url": "/__l5e/assets-v1/3f20a8a0-50dc-4528-bac0-efa5380b7954/cable_tray_25_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:37Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "cable-tray",
       "settingsHash": "dbf3cd26e11315a5",
@@ -2220,7 +2350,33 @@
       "failureReason": null,
       "key": "cable_tray_299",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/cable_tray_299_lod.glb.asset.json",
+          "bytes": 14580,
+          "checksum": "sha256:a1d301d40712453b1e05742ca326be11e4f2d557d427c838935c0af84de67a53",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:39:57Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/fd1d8cd5-a74b-4d71-8f2f-88e0707ecfa6/cable_tray_299_lod.glb",
+          "remoteBytes": 14580,
+          "remoteChecksum": "sha256:a1d301d40712453b1e05742ca326be11e4f2d557d427c838935c0af84de67a53",
+          "url": "/__l5e/assets-v1/fd1d8cd5-a74b-4d71-8f2f-88e0707ecfa6/cable_tray_299_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:38Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/cable_tray_299_operations.glb.asset.json",
+          "bytes": 38368,
+          "checksum": "sha256:c49603d313dc6cfa5eb3bd862147537e294ded9b5f97d05cbde157d7a1d18c74",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:39:51Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/6ebc50a6-19be-4f61-a19a-173d34c768f8/cable_tray_299_operations.glb",
+          "remoteBytes": 38368,
+          "remoteChecksum": "sha256:c49603d313dc6cfa5eb3bd862147537e294ded9b5f97d05cbde157d7a1d18c74",
+          "url": "/__l5e/assets-v1/6ebc50a6-19be-4f61-a19a-173d34c768f8/cable_tray_299_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:38Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "cable-tray",
       "settingsHash": "dbf3cd26e11315a5",
@@ -2607,7 +2763,33 @@
       "failureReason": null,
       "key": "cable_tray_tee",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/cable_tray_tee_lod.glb.asset.json",
+          "bytes": 17152,
+          "checksum": "sha256:61307686f3a1f34ebe931f11f095cd69faa746dc57aec0527783bf6a0cb64f28",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:40:12Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/aa90292a-ae7e-4d4d-b026-b995794fceb9/cable_tray_tee_lod.glb",
+          "remoteBytes": 17152,
+          "remoteChecksum": "sha256:61307686f3a1f34ebe931f11f095cd69faa746dc57aec0527783bf6a0cb64f28",
+          "url": "/__l5e/assets-v1/aa90292a-ae7e-4d4d-b026-b995794fceb9/cable_tray_tee_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:38Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/cable_tray_tee_operations.glb.asset.json",
+          "bytes": 27928,
+          "checksum": "sha256:b40b4cb83bb51bb82772228876cae6584d273911a265e80ca1741a47cf6b65c3",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:40:04Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/d60e0c57-eca4-4466-b8cc-76463083aad6/cable_tray_tee_operations.glb",
+          "remoteBytes": 27928,
+          "remoteChecksum": "sha256:b40b4cb83bb51bb82772228876cae6584d273911a265e80ca1741a47cf6b65c3",
+          "url": "/__l5e/assets-v1/d60e0c57-eca4-4466-b8cc-76463083aad6/cable_tray_tee_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:38Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "cable-tray",
       "settingsHash": "dbf3cd26e11315a5",
@@ -2995,7 +3177,33 @@
       "failureReason": null,
       "key": "dcp_a_01",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/dcp_a_01_lod.glb.asset.json",
+          "bytes": 185580,
+          "checksum": "sha256:9ea25d8a0caf5f4496089d92870d2fb5ee025f9a581d2adb084d3248d25c1b4a",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:40:27Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/2e75883a-c3f4-4a67-b1d0-0e84e1fbd94a/dcp_a_01_lod.glb",
+          "remoteBytes": 185580,
+          "remoteChecksum": "sha256:9ea25d8a0caf5f4496089d92870d2fb5ee025f9a581d2adb084d3248d25c1b4a",
+          "url": "/__l5e/assets-v1/2e75883a-c3f4-4a67-b1d0-0e84e1fbd94a/dcp_a_01_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:39Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/dcp_a_01_operations.glb.asset.json",
+          "bytes": 659872,
+          "checksum": "sha256:74e3c2b4279d0c95d6ab25c01d4ffefc21fb94a2768936f07af0618a8024cf36",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:40:19Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/f8193412-27b4-44bd-a8bf-bbaedab1e4a5/dcp_a_01_operations.glb",
+          "remoteBytes": 659872,
+          "remoteChecksum": "sha256:74e3c2b4279d0c95d6ab25c01d4ffefc21fb94a2768936f07af0618a8024cf36",
+          "url": "/__l5e/assets-v1/f8193412-27b4-44bd-a8bf-bbaedab1e4a5/dcp_a_01_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:39Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "liquid-cooling-equipment",
       "settingsHash": "131aef469f21c77e",
@@ -3570,7 +3778,33 @@
       "failureReason": null,
       "key": "qm8700_01",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/qm8700_01_lod.glb.asset.json",
+          "bytes": 4197100,
+          "checksum": "sha256:930e00f0ae11362a85468875a8d986dd619d86bc9858533bab3eeb4c90ef4486",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:40:43Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/4eb152af-9fe2-4bf8-8091-179951cd3df8/qm8700_01_lod.glb",
+          "remoteBytes": 4197100,
+          "remoteChecksum": "sha256:930e00f0ae11362a85468875a8d986dd619d86bc9858533bab3eeb4c90ef4486",
+          "url": "/__l5e/assets-v1/4eb152af-9fe2-4bf8-8091-179951cd3df8/qm8700_01_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:39Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/qm8700_01_operations.glb.asset.json",
+          "bytes": 1397316,
+          "checksum": "sha256:160b7bd7d11d79eb1f3ea2d7be5fb8ae6b8b4700fcf4f7b84a7a8d02a07e895d",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:40:34Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/18f29aaf-f029-4893-a386-f75cdec3d199/qm8700_01_operations.glb",
+          "remoteBytes": 1397316,
+          "remoteChecksum": "sha256:160b7bd7d11d79eb1f3ea2d7be5fb8ae6b8b4700fcf4f7b84a7a8d02a07e895d",
+          "url": "/__l5e/assets-v1/18f29aaf-f029-4893-a386-f75cdec3d199/qm8700_01_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:40Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "network-switch",
       "settingsHash": "75ccc46d808adaa2",
@@ -4129,7 +4363,33 @@
       "failureReason": null,
       "key": "qm8700_c_01",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/qm8700_c_01_lod.glb.asset.json",
+          "bytes": 1935764,
+          "checksum": "sha256:7fb6cd124e5b410e9fa99fc1268ef00390ab3820923fe8bf8232cac5f41c7638",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:40:54Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/884c44cc-af4a-45f2-b6d2-cfaa99593b32/qm8700_c_01_lod.glb",
+          "remoteBytes": 1935764,
+          "remoteChecksum": "sha256:7fb6cd124e5b410e9fa99fc1268ef00390ab3820923fe8bf8232cac5f41c7638",
+          "url": "/__l5e/assets-v1/884c44cc-af4a-45f2-b6d2-cfaa99593b32/qm8700_c_01_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:40Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/qm8700_c_01_operations.glb.asset.json",
+          "bytes": 1033364,
+          "checksum": "sha256:8eeee157f423a1c204be8b48fa3f54f2c0c827762eae5b4714d65e45319e5066",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:40:48Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/dc8e18b2-0ca9-4de9-87e4-2929c7b25deb/qm8700_c_01_operations.glb",
+          "remoteBytes": 1033364,
+          "remoteChecksum": "sha256:8eeee157f423a1c204be8b48fa3f54f2c0c827762eae5b4714d65e45319e5066",
+          "url": "/__l5e/assets-v1/dc8e18b2-0ca9-4de9-87e4-2929c7b25deb/qm8700_c_01_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:40Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "network-switch",
       "settingsHash": "75ccc46d808adaa2",
@@ -5194,7 +5454,33 @@
       "failureReason": null,
       "key": "rack_42u_a_01",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/rack_42u_a_01_lod.glb.asset.json",
+          "bytes": 585392,
+          "checksum": "sha256:0cf163c22c57f1264d218aedffc1a5c0cfc55bde9cafbc220661f2da8cc0b1f7",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:41:05Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/3b8f9db0-2e2c-47c9-aaf7-dc1664988e8b/rack_42u_a_01_lod.glb",
+          "remoteBytes": 585392,
+          "remoteChecksum": "sha256:0cf163c22c57f1264d218aedffc1a5c0cfc55bde9cafbc220661f2da8cc0b1f7",
+          "url": "/__l5e/assets-v1/3b8f9db0-2e2c-47c9-aaf7-dc1664988e8b/rack_42u_a_01_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:40Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/rack_42u_a_01_operations.glb.asset.json",
+          "bytes": 2646804,
+          "checksum": "sha256:844e3e26d5f8b810fe3ab88c91b68bd16302267316bb36cfa49b591bc376061a",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:41:00Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/55a699c2-77c1-4f89-99d1-f2aad017797b/rack_42u_a_01_operations.glb",
+          "remoteBytes": 2646804,
+          "remoteChecksum": "sha256:844e3e26d5f8b810fe3ab88c91b68bd16302267316bb36cfa49b591bc376061a",
+          "url": "/__l5e/assets-v1/55a699c2-77c1-4f89-99d1-f2aad017797b/rack_42u_a_01_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:41Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "liquid-cooled-rack",
       "settingsHash": "900ec1608fc8784f",
@@ -6331,7 +6617,33 @@
       "failureReason": null,
       "key": "rack_42u_a_core",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/rack_42u_a_core_lod.glb.asset.json",
+          "bytes": 189376,
+          "checksum": "sha256:0dd251040c45c4b7281ef730c73aa401f14e8dcf3d94e0ff014abc184b87b34b",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:41:18Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/2b09494b-e6cf-4097-8678-d9f0a379f4d6/rack_42u_a_core_lod.glb",
+          "remoteBytes": 189376,
+          "remoteChecksum": "sha256:0dd251040c45c4b7281ef730c73aa401f14e8dcf3d94e0ff014abc184b87b34b",
+          "url": "/__l5e/assets-v1/2b09494b-e6cf-4097-8678-d9f0a379f4d6/rack_42u_a_core_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:41Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/rack_42u_a_core_operations.glb.asset.json",
+          "bytes": 899284,
+          "checksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:41:11Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb",
+          "remoteBytes": 899284,
+          "remoteChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98",
+          "url": "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:41Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "rack-core-reference",
       "settingsHash": "960d7076bb1af113",
@@ -6920,7 +7232,33 @@
       "failureReason": null,
       "key": "rpdu_a_01",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/rpdu_a_01_lod.glb.asset.json",
+          "bytes": 116600,
+          "checksum": "sha256:6705b5b826b56d78b6d3b6fc7223eb68ce93501740313efc57625e0d5b529165",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:41:35Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/9eeeeae8-12c8-4f32-8a6b-66af2ef26a7d/rpdu_a_01_lod.glb",
+          "remoteBytes": 116600,
+          "remoteChecksum": "sha256:6705b5b826b56d78b6d3b6fc7223eb68ce93501740313efc57625e0d5b529165",
+          "url": "/__l5e/assets-v1/9eeeeae8-12c8-4f32-8a6b-66af2ef26a7d/rpdu_a_01_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:42Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/rpdu_a_01_operations.glb.asset.json",
+          "bytes": 572396,
+          "checksum": "sha256:65e368d3799832745b5672e948b61bd3f72cdba9f2914c153c9799134c6a5ed4",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:41:28Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/f5977476-f86f-4f56-ba2b-9d9bc3f754d1/rpdu_a_01_operations.glb",
+          "remoteBytes": 572396,
+          "remoteChecksum": "sha256:65e368d3799832745b5672e948b61bd3f72cdba9f2914c153c9799134c6a5ed4",
+          "url": "/__l5e/assets-v1/f5977476-f86f-4f56-ba2b-9d9bc3f754d1/rpdu_a_01_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:42Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "rack-pdu",
       "settingsHash": "48eb841c2c5af1cf",
@@ -7611,7 +7949,33 @@
       "failureReason": null,
       "key": "server_1u_a",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/server_1u_a_lod.glb.asset.json",
+          "bytes": 446052,
+          "checksum": "sha256:1a505ced1a8d69074a3758d4a8ca089b2f16c3b3d5b675f4cafb189a2cb2c5b5",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:41:47Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/735d81fb-d44b-43ba-8677-e608ca8cb8ae/server_1u_a_lod.glb",
+          "remoteBytes": 446052,
+          "remoteChecksum": "sha256:1a505ced1a8d69074a3758d4a8ca089b2f16c3b3d5b675f4cafb189a2cb2c5b5",
+          "url": "/__l5e/assets-v1/735d81fb-d44b-43ba-8677-e608ca8cb8ae/server_1u_a_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:42Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/server_1u_a_operations.glb.asset.json",
+          "bytes": 783368,
+          "checksum": "sha256:7011e15c504e162f9def0b5a687cd66e53615f6bf391352b368e738d6d38fce7",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:41:41Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/c8fcb6be-6d4c-464e-a197-165ed8ce584a/server_1u_a_operations.glb",
+          "remoteBytes": 783368,
+          "remoteChecksum": "sha256:7011e15c504e162f9def0b5a687cd66e53615f6bf391352b368e738d6d38fce7",
+          "url": "/__l5e/assets-v1/c8fcb6be-6d4c-464e-a197-165ed8ce584a/server_1u_a_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:42Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "server-1u",
       "settingsHash": "c6957ab3cc130ae6",
@@ -8193,7 +8557,33 @@
       "failureReason": null,
       "key": "server_2u_b",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/server_2u_b_lod.glb.asset.json",
+          "bytes": 1435004,
+          "checksum": "sha256:38a608521488d20264f3a85f83f44d05533d84682ea42052f206866c07dcfbdc",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:41:58Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/5bb2cefc-1777-4f50-b478-a6bd49054063/server_2u_b_lod.glb",
+          "remoteBytes": 1435004,
+          "remoteChecksum": "sha256:38a608521488d20264f3a85f83f44d05533d84682ea42052f206866c07dcfbdc",
+          "url": "/__l5e/assets-v1/5bb2cefc-1777-4f50-b478-a6bd49054063/server_2u_b_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:43Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/server_2u_b_operations.glb.asset.json",
+          "bytes": 717288,
+          "checksum": "sha256:d185e4250312a0a6d99fae00a5734c5006c5b582afc78056fa28e23fb140b518",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:41:52Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/0fb1d0d4-78a1-474a-b65e-0a43a19f4f71/server_2u_b_operations.glb",
+          "remoteBytes": 717288,
+          "remoteChecksum": "sha256:d185e4250312a0a6d99fae00a5734c5006c5b582afc78056fa28e23fb140b518",
+          "url": "/__l5e/assets-v1/0fb1d0d4-78a1-474a-b65e-0a43a19f4f71/server_2u_b_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:43Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "server-2u",
       "settingsHash": "c6957ab3cc130ae6",
@@ -8762,7 +9152,33 @@
       "failureReason": null,
       "key": "server_2u_c",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/server_2u_c_lod.glb.asset.json",
+          "bytes": 1440680,
+          "checksum": "sha256:278e5ceb63f0ce6ff7695bbcef0ad0086410874cac103c1e1606138b30d9392a",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:42:13Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/65dc6fee-c847-42f0-8ebd-2b179ea520af/server_2u_c_lod.glb",
+          "remoteBytes": 1440680,
+          "remoteChecksum": "sha256:278e5ceb63f0ce6ff7695bbcef0ad0086410874cac103c1e1606138b30d9392a",
+          "url": "/__l5e/assets-v1/65dc6fee-c847-42f0-8ebd-2b179ea520af/server_2u_c_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:43Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/server_2u_c_operations.glb.asset.json",
+          "bytes": 717284,
+          "checksum": "sha256:11686ea31d7a23dd55f17d518dabd9ec5661fd545570523838452b86d29464db",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:42:07Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/d27cfe7b-010c-4d39-a3b3-b3c057638542/server_2u_c_operations.glb",
+          "remoteBytes": 717284,
+          "remoteChecksum": "sha256:11686ea31d7a23dd55f17d518dabd9ec5661fd545570523838452b86d29464db",
+          "url": "/__l5e/assets-v1/d27cfe7b-010c-4d39-a3b3-b3c057638542/server_2u_c_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:44Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "server-2u",
       "settingsHash": "c6957ab3cc130ae6",
@@ -9288,7 +9704,33 @@
       "failureReason": null,
       "key": "sn2700c_01",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/sn2700c_01_lod.glb.asset.json",
+          "bytes": 5201604,
+          "checksum": "sha256:168adb0f5fa54c8c4425094f884111e160138203253c0ce813e004b8d68eff9a",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:42:28Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/83f17793-d0c1-45f1-bf46-1985803d8a7f/sn2700c_01_lod.glb",
+          "remoteBytes": 5201604,
+          "remoteChecksum": "sha256:168adb0f5fa54c8c4425094f884111e160138203253c0ce813e004b8d68eff9a",
+          "url": "/__l5e/assets-v1/83f17793-d0c1-45f1-bf46-1985803d8a7f/sn2700c_01_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:44Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/sn2700c_01_operations.glb.asset.json",
+          "bytes": 1439596,
+          "checksum": "sha256:b7f6af24d0d8d09c194593bb1c9613bd30c1589aebd136951a5501a651d21a22",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:42:20Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/86178d70-d431-40c1-9a5a-203bf03063f5/sn2700c_01_operations.glb",
+          "remoteBytes": 1439596,
+          "remoteChecksum": "sha256:b7f6af24d0d8d09c194593bb1c9613bd30c1589aebd136951a5501a651d21a22",
+          "url": "/__l5e/assets-v1/86178d70-d431-40c1-9a5a-203bf03063f5/sn2700c_01_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:44Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "network-switch",
       "settingsHash": "75ccc46d808adaa2",
@@ -9713,7 +10155,33 @@
       "failureReason": null,
       "key": "sn3700c_01",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/sn3700c_01_lod.glb.asset.json",
+          "bytes": 1430268,
+          "checksum": "sha256:3f76983cbcfda51cc19a207a0c6161844ee1b8308380fc643c05e587c0ac7dd2",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:42:42Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/8e1c090b-152f-405d-b64b-00b45f020063/sn3700c_01_lod.glb",
+          "remoteBytes": 1430268,
+          "remoteChecksum": "sha256:3f76983cbcfda51cc19a207a0c6161844ee1b8308380fc643c05e587c0ac7dd2",
+          "url": "/__l5e/assets-v1/8e1c090b-152f-405d-b64b-00b45f020063/sn3700c_01_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:45Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/sn3700c_01_operations.glb.asset.json",
+          "bytes": 1556428,
+          "checksum": "sha256:5b01bc5ab42781eac6c259ebea6e45672fcd9bb92745b8efa50a6deaa55cec4c",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:42:34Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/2c0b9f4a-af53-44c0-8600-871b8da3e0f8/sn3700c_01_operations.glb",
+          "remoteBytes": 1556428,
+          "remoteChecksum": "sha256:5b01bc5ab42781eac6c259ebea6e45672fcd9bb92745b8efa50a6deaa55cec4c",
+          "url": "/__l5e/assets-v1/2c0b9f4a-af53-44c0-8600-871b8da3e0f8/sn3700c_01_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:45Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "network-switch",
       "settingsHash": "75ccc46d808adaa2",
@@ -10136,7 +10604,33 @@
       "failureReason": null,
       "key": "ua950h_2sf_01",
       "manifestStatus": "not-registered",
-      "publicationStatus": "not-published",
+      "publication": {
+        "lod": {
+          "assetPointer": "src/assets/twin/nvidia/ua950h_2sf_01_lod.glb.asset.json",
+          "bytes": 145928,
+          "checksum": "sha256:c94f480e15c208b6ce024ca1f626fa9e833452a892c54084296e92a24d83dcf1",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:42:58Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/0c229e7b-2137-4b0b-92d1-758c90eb8045/ua950h_2sf_01_lod.glb",
+          "remoteBytes": 145928,
+          "remoteChecksum": "sha256:c94f480e15c208b6ce024ca1f626fa9e833452a892c54084296e92a24d83dcf1",
+          "url": "/__l5e/assets-v1/0c229e7b-2137-4b0b-92d1-758c90eb8045/ua950h_2sf_01_lod.glb",
+          "verifiedAt": "2026-08-14T21:44:45Z"
+        },
+        "operations": {
+          "assetPointer": "src/assets/twin/nvidia/ua950h_2sf_01_operations.glb.asset.json",
+          "bytes": 1460232,
+          "checksum": "sha256:b45e594f9c94f95616f47349cd7c533b5182c1122e9e1191d5146c184b11621d",
+          "durableStatus": "verified",
+          "publishedAt": "2026-08-14T21:42:50Z",
+          "r2Key": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/4f53bdf0-960d-42f4-86e1-8e108962327b/ua950h_2sf_01_operations.glb",
+          "remoteBytes": 1460232,
+          "remoteChecksum": "sha256:b45e594f9c94f95616f47349cd7c533b5182c1122e9e1191d5146c184b11621d",
+          "url": "/__l5e/assets-v1/4f53bdf0-960d-42f4-86e1-8e108962327b/ua950h_2sf_01_operations.glb",
+          "verifiedAt": "2026-08-14T21:44:46Z"
+        }
+      },
+      "publicationStatus": "published",
       "runtimeMappingStatus": "not-mapped",
       "semanticRole": "network-switch",
       "settingsHash": "75ccc46d808adaa2",

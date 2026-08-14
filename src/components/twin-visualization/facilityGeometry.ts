@@ -30,13 +30,13 @@ export const FACILITY_GEOMETRY_MODES: Array<{
 }> = [
   {
     id: 'aura-model',
-    label: 'AURA facility model',
+    label: 'Baseline preview',
     description:
-      'The facility exactly as modelled. Procedural cabinets unless an approved derivative is assigned to that rack.',
+      'The facility exactly as modelled. AURA procedural cabinets unless an approved derivative is assigned to that rack.',
   },
   {
     id: 'nvidia-reference',
-    label: 'NVIDIA reference facility',
+    label: 'NVIDIA Reference Facility',
     description:
       'Reference geometry built from approved NVIDIA Data Center OpenUSD derivatives. Roles without an approved derivative stay procedural.',
   },
@@ -65,6 +65,23 @@ export interface ReferenceCoverageRow {
   assetId: string | null;
   quality: QualityLevel | null;
   resolved: boolean;
+}
+
+/**
+ * Roles the reference facility mounts, in reporting order. Exported so the
+ * runtime coverage report can enumerate the same set the resolver uses.
+ */
+export function referenceRoles(): SemanticRole[] {
+  return [...REFERENCE_ROLES];
+}
+
+/**
+ * True when at least one role can actually mount an approved derivative. The
+ * selector must never offer a "Reference Facility" that is 100% procedural
+ * without saying so.
+ */
+export function referenceFacilityAvailable(): boolean {
+  return referenceFacilityCoverage().some((r) => r.resolved);
 }
 
 /** Honest per-role report of what the reference facility can actually mount. */

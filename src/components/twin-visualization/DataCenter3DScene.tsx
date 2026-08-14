@@ -56,6 +56,8 @@ import { WorkloadOverlayLayer } from './WorkloadOverlayLayer';
 import { ZoomControlsOverlay } from './ZoomControlsOverlay';
 import { AssetProvenanceBadge } from './AssetProvenancePanel';
 import { ScenarioRackLayer } from './ScenarioRackLayer';
+import { ReferenceEquipmentLayer } from './ReferenceEquipmentLayer';
+import { useRuntimeCoverageStore, coverageTotals } from './runtimeCoverageStore';
 import {
   FACILITY_GEOMETRY_MODES,
   referenceCoverageSummary,
@@ -457,6 +459,15 @@ function Scene({
       ))}
 
       {/* Simulated design scenario: additive, never part of the as-built rows. */}
+      {facilityGeometry === 'nvidia-reference' && (
+        <ReferenceEquipmentLayer
+          racks={racks}
+          rows={rows}
+          bounds={extents}
+          showInfrastructure={shellMode !== 'off'}
+        />
+      )}
+
       {scenario &&
         racks.filter(isScenarioRack).map((rack) => (
           <ScenarioRackLayer
@@ -574,6 +585,10 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
     () => resolveCanaryRollout(props.racks.map((r) => ({ id: r.id, cooling: r.cooling })), { isAdmin }),
     [props.racks, isAdmin],
   );
+
+  // Coverage reported by the objects that actually mounted this frame.
+  const runtimeRoles = useRuntimeCoverageStore((s) => s.roles);
+  const runtimeTotals = useMemo(() => coverageTotals(runtimeRoles), [runtimeRoles]);
 
   const baseDistance = props.compact ? 22 : 30;
   const [targetDistance, setTargetDistance] = useState(baseDistance);
@@ -929,15 +944,34 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             <span className="font-medium">NVIDIA reference facility</span>
           </div>
           <p className="mt-1 text-slate-300" data-testid="reference-facility-coverage">
-            {referenceCoverageSummary().label}. Roles without an approved derivative render AURA
-            procedural geometry.
+            OpenUSD-derived equipment: {runtimeTotals.mountedObjects} mounted objects across{' '}
+            {runtimeTotals.derivedRoles} of {referenceFacilityCoverage().length} roles.
+            Representative NVIDIA equipment, not verified as installed. Roles without an approved
+            derivative render AURA procedural geometry.
           </p>
           <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-slate-400">
-            {referenceFacilityCoverage().map((row) => (
-              <li key={row.role} data-role={row.role} data-resolved={row.resolved ? 'true' : 'false'}>
-                {row.label}: {row.resolved ? `${row.quality} derivative` : 'procedural'}
-              </li>
-            ))}
+            {referenceFacilityCoverage().map((row) => {
+              const live = runtimeRoles[row.role];
+              const state = live?.state ?? (row.resolved ? 'preparing' : 'not-represented');
+              return (
+                <li
+                  key={row.role}
+                  data-role={row.role}
+                  data-runtime-state={state}
+                  data-mounted-objects={live?.mountedObjects ?? 0}
+                  data-resolved={state === 'openusd-derived' ? 'true' : 'false'}
+                >
+                  {row.label}:{' '}
+                  {state === 'openusd-derived'
+                    ? `OpenUSD-derived x${live?.mountedObjects ?? 0}`
+                    : state === 'procedural-fallback'
+                      ? 'procedural fallback'
+                      : state === 'preparing'
+                        ? 'preparing'
+                        : 'not represented'}
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}

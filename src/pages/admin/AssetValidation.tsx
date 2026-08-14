@@ -23,6 +23,11 @@ import { toast } from 'sonner';
 import { BENCHMARK_CONFIG, VALIDATION_ASSET_ID, buildAssetExpectation } from '@/validation/gpuAcceptance/spec';
 import { probeRenderer, type RendererReport } from '@/validation/gpuAcceptance/renderer';
 import { verifyDelivery, type DeliveryReport } from '@/validation/gpuAcceptance/delivery';
+import {
+  runPreflight,
+  SOFTWARE_RENDERER_GUIDANCE,
+  type PreflightReport,
+} from '@/validation/gpuAcceptance/preflight';
 import { evaluateAcceptance, type AcceptanceEvaluation } from '@/validation/gpuAcceptance/acceptance';
 import {
   BenchmarkScene,
@@ -39,14 +44,16 @@ import {
 
 const SCREENSHOT_CHECKLIST: ScreenshotReference[] = [
   { id: 'facility-overview', label: 'Facility overview with the simulated asset', captured: false },
-  { id: 'front-view', label: 'Front view', captured: false },
+  { id: 'front-view', label: 'Rack front', captured: false },
   { id: 'rear-cooler-door', label: 'Rear cooler-door view', captured: false },
-  { id: 'clearance-left-right', label: 'Left and right clearance', captured: false },
+  { id: 'clearance-left', label: 'Left clearance', captured: false },
+  { id: 'clearance-right', label: 'Right clearance', captured: false },
   { id: 'riser-elevated', label: 'Elevated chilled-water-riser view', captured: false },
   { id: 'riser-luminaire-clearance', label: 'Riser-to-luminaire clearance', captured: false },
-  { id: 'provenance-banner', label: 'Provenance and scenario banner', captured: false },
+  { id: 'provenance-banner', label: 'Provenance and simulated-scenario banner', captured: false },
   { id: 'renderer-evidence', label: 'Hardware renderer evidence', captured: false },
-  { id: 'performance-panel', label: 'Performance results panel', captured: false },
+  { id: 'performance-panel', label: 'Final results panel', captured: false },
+  { id: 'lighting-beams', label: 'Overhead lighting visible, obstructing structural beams removed', captured: false },
 ];
 
 const PHASE_LABEL: Record<BenchmarkPhase, string> = {

@@ -74,8 +74,27 @@ function ImportedRack({
   );
 }
 
+/**
+ * If an approved derivative fails at runtime (network, decode, driver), the
+ * rack silently rolls back to procedural geometry instead of taking the canvas
+ * down with it.
+ */
+class DerivativeBoundary extends Component<
+  { children: ReactNode; fallback: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
+
 export function ApprovedRackAsset(props: ApprovedRackAssetProps) {
-  // (boundary defined below)
   const assetId = props.assetId ?? RACK_ASSET_ID;
   const resolution = useMemo(
     () => resolveRuntimeAsset(assetId, { preferFallback: props.preferFallback }),

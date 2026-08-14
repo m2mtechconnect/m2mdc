@@ -70,7 +70,8 @@ function ImportedRack({
         if (!m || m.userData.auraTuned) continue;
         m.metalness = 0.55;
         m.roughness = 0.52;
-        m.envMapIntensity = 1.1;
+        m.envMapIntensity = 0.55;
+        m.color?.setHex(0x6b7280);
         m.userData.auraTuned = true;
         m.needsUpdate = true;
       }

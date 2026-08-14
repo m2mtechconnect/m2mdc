@@ -38,6 +38,8 @@ import type {
   SimulationEventVisual 
 } from './types';
 import { RackGroup } from './RackGroup';
+import { isAssetAdmin } from '@/auth/assetAdmin';
+import { getAssetCapabilityParts, getGpuValidationStatus } from './assetRegistry';
 import { useRBAC } from '@/contexts/RBACContext';
 import { resolveCanaryRollout, assetIdForRack, CANARY_RACK_ASSET_ID, type CanaryRolloutConfig } from './canaryRollout';
 import { getThermalColor, getUtilizationColor, getPowerColor } from './types';
@@ -500,7 +502,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   // read authorization context, then passed down as a prop.
   const { role, roles } = useRBAC();
   const isAdmin = useMemo(
-    () => [role, ...roles].some((r) => r === 'admin' || r === 'owner' || r === 'developer'),
+    () => isAssetAdmin(role, roles),
     [role, roles],
   );
   const canary = useMemo(
@@ -852,6 +854,14 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
           <p className="mt-1 text-slate-300">
             Chilled-water loop connection: unverified. Unresolved engineering inputs:{' '}
             {scenario.engineeringInputs.map((i) => `${i.label} (${i.unit})`).join(', ')}.
+          </p>
+          <p className="mt-1 text-slate-300" data-testid="scenario-gpu-validation-status">
+            {getGpuValidationStatus(scenario.assetId).label}. Available interactions:{' '}
+            {getAssetCapabilityParts(scenario.assetId)
+              .filter((p) => p.addressable)
+              .map((p) => p.label)
+              .join(', ') || 'none published'}
+            .
           </p>
         </div>
       )}

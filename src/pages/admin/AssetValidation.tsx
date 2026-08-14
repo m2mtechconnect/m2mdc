@@ -81,6 +81,8 @@ export default function AssetValidation() {
   const [screenshots, setScreenshots] = useState(SCREENSHOT_CHECKLIST);
   const [saving, setSaving] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
+  const [preflight, setPreflight] = useState<PreflightReport | null>(null);
+  const [preflighting, setPreflighting] = useState(false);
 
   const [pendingContext, setPendingContext] = useState<{
     rendererReport: RendererReport;
@@ -111,7 +113,7 @@ export default function AssetValidation() {
   );
 
   const start = useCallback(async () => {
-    if (!expected) return;
+    if (!expected || !preflight?.canStart) return;
     setSavedId(null);
     setOutcome(null);
     setAcceptance(null);
@@ -128,7 +130,17 @@ export default function AssetValidation() {
     // Hand the two reports to the completion handler through a closure so the
     // evaluation always uses the values captured for this run.
     setPendingContext({ rendererReport, deliveryReport });
-  }, [expected]);
+  }, [expected, preflight]);
+
+  const checkPreflight = useCallback(async () => {
+    if (!expected) return;
+    setPreflighting(true);
+    const report = await runPreflight({ expected, isAdmin: isAssetAdmin(role, roles) });
+    setPreflight(report);
+    setRenderer(report.renderer);
+    setDelivery(report.delivery);
+    setPreflighting(false);
+  }, [expected, role, roles]);
 
   const payload: ValidationRunPayload | null = useMemo(() => {
     if (!expected || !renderer || !delivery || !outcome || !acceptance) return null;

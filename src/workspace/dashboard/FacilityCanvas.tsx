@@ -411,7 +411,10 @@ export function FacilityCanvas({
           {rackCount} of approximately {facility.designRackEstimate} racks represented
         </span>
         <span aria-hidden>·</span>
-        <span>Procedural 3D preview - not a validated OpenUSD stage</span>
+        <span>
+          Procedural 3D preview, except one canary rack rendered from a validated
+          USD-derived GLB
+        </span>
       </div>
 
       {presentation !== 'inline' && (

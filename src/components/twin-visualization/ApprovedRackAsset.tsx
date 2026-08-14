@@ -14,7 +14,7 @@
  * passed through unchanged.
  */
 
-import { Suspense, useEffect, useMemo } from 'react';
+import { Component, Suspense, useEffect, useMemo, type ReactNode } from 'react';
 import { useGLTF, Clone } from '@react-three/drei';
 import { Rack, type RackDetailLevel } from './Rack';
 import type { RackVisual } from './types';
@@ -23,6 +23,7 @@ import {
   resolveRuntimeAsset,
   type RuntimeAssetResolution,
 } from './assetRegistry';
+import { CANARY_RACK_ASSET_ID } from './canaryRollout';
 
 interface ApprovedRackAssetProps {
   rack: RackVisual;
@@ -32,6 +33,8 @@ interface ApprovedRackAssetProps {
   detailLevel?: RackDetailLevel;
   selected?: boolean;
   overlayColor?: string | null;
+  /** Registry asset id to resolve for this instance (canary rollout aware). */
+  assetId?: string;
   /** Force the procedural preview (used by the low quality profile). */
   preferFallback?: boolean;
   onResolution?: (resolution: RuntimeAssetResolution) => void;
@@ -71,10 +74,31 @@ function ImportedRack({
   );
 }
 
+/**
+ * If an approved derivative fails at runtime (network, decode, driver), the
+ * rack silently rolls back to procedural geometry instead of taking the canvas
+ * down with it.
+ */
+class DerivativeBoundary extends Component<
+  { children: ReactNode; fallback: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
+
 export function ApprovedRackAsset(props: ApprovedRackAssetProps) {
+  const assetId = props.assetId ?? RACK_ASSET_ID;
   const resolution = useMemo(
-    () => resolveRuntimeAsset(RACK_ASSET_ID, { preferFallback: props.preferFallback }),
-    [props.preferFallback],
+    () => resolveRuntimeAsset(assetId, { preferFallback: props.preferFallback }),
+    [assetId, props.preferFallback],
   );
 
   useEffect(() => {
@@ -83,27 +107,28 @@ export function ApprovedRackAsset(props: ApprovedRackAssetProps) {
   }, [resolution]);
 
   if (resolution.glbUrl) {
+    const procedural = (
+      <Rack
+        rack={props.rack}
+        showThermal={props.showThermal}
+        onClick={props.onClick}
+        detailed={props.detailed}
+        detailLevel={props.detailLevel}
+        selected={props.selected}
+        overlayColor={props.overlayColor ?? null}
+      />
+    );
     return (
-      <Suspense
-        fallback={
-          <Rack
+      <DerivativeBoundary fallback={procedural}>
+        <Suspense fallback={procedural}>
+          <ImportedRack
+            url={resolution.glbUrl}
             rack={props.rack}
-            showThermal={props.showThermal}
-            onClick={props.onClick}
-            detailed={props.detailed}
-            detailLevel={props.detailLevel}
             selected={props.selected}
-            overlayColor={props.overlayColor ?? null}
+            onClick={props.onClick}
           />
-        }
-      >
-        <ImportedRack
-          url={resolution.glbUrl}
-          rack={props.rack}
-          selected={props.selected}
-          onClick={props.onClick}
-        />
-      </Suspense>
+        </Suspense>
+      </DerivativeBoundary>
     );
   }
 
@@ -122,8 +147,10 @@ export function ApprovedRackAsset(props: ApprovedRackAssetProps) {
 
 /** Preload the approved derivative once, when one exists. */
 export function preloadApprovedRackAsset() {
-  const { glbUrl } = resolveRuntimeAsset(RACK_ASSET_ID);
-  if (glbUrl) useGLTF.preload(glbUrl);
+  for (const id of [RACK_ASSET_ID, CANARY_RACK_ASSET_ID]) {
+    const { glbUrl } = resolveRuntimeAsset(id);
+    if (glbUrl) useGLTF.preload(glbUrl);
+  }
 }
 
 preloadApprovedRackAsset();

@@ -8,6 +8,7 @@ import { Html } from '@react-three/drei';
 import type { RowVisual, RackVisual } from './types';
 import type { RackDetailLevel } from './Rack';
 import { ApprovedRackAsset } from './ApprovedRackAsset';
+import { assetIdForRack, type CanaryRolloutConfig } from './canaryRollout';
 
 interface RackGroupProps {
   row: RowVisual;
@@ -23,6 +24,8 @@ interface RackGroupProps {
   selectedRackId?: string | null;
   /** Row annotations visibility (Labels: On/Off view setting). */
   showLabels?: boolean;
+  /** Approved-asset canary rollout state for the whole scene. */
+  canary?: CanaryRolloutConfig;
 }
 
 export function RackGroup({
@@ -35,6 +38,7 @@ export function RackGroup({
   detailLevel,
   selectedRackId,
   showLabels = true,
+  canary,
 }: RackGroupProps) {
   const rowRacks = racks.filter(r => r.rowId === row.id);
   const rowWidth = rowRacks.length * 1.1 + 0.5;
@@ -100,6 +104,7 @@ export function RackGroup({
       {rowRacks.map((rack) => (
         <ApprovedRackAsset
           key={rack.id} 
+          assetId={canary ? assetIdForRack(rack.id, canary) : undefined}
           rack={{
             ...rack,
             position: [rack.position[0] - row.position[0], rack.position[1], 0]

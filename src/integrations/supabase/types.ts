@@ -995,6 +995,42 @@ export type Database = {
         }
         Relationships: []
       }
+      asset_canary_events: {
+        Row: {
+          action: string
+          actor_id: string | null
+          asset_id: string
+          asset_version: string
+          created_at: string
+          glb_checksum: string | null
+          id: string
+          reason: string | null
+          scope: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          asset_id: string
+          asset_version: string
+          created_at?: string
+          glb_checksum?: string | null
+          id?: string
+          reason?: string | null
+          scope: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          asset_id?: string
+          asset_version?: string
+          created_at?: string
+          glb_checksum?: string | null
+          id?: string
+          reason?: string | null
+          scope?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string

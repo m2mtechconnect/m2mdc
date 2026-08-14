@@ -16,6 +16,7 @@ import { Box, Grid2x2, Loader2, Maximize2, Minus, Plus, RefreshCw } from 'lucide
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { SimulationErrorBoundary } from '@/components/twin-visualization/SimulationErrorBoundary';
 import { DataCenter3DScene } from '@/components/twin-visualization/DataCenter3DScene';
+import { useDesignScenario } from './useDesignScenario';
 import type { ShellMode } from '@/components/twin-visualization/DataHall';
 import { useTwinVisualizationData } from '@/components/twin-visualization/hooks/useTwinVisualizationData';
 import { useTwinOverlaySafe, type TwinOverlay } from '@/context/TwinOverlayContext';
@@ -155,6 +156,7 @@ export function FacilityCanvas({ facility }: Props) {
               onShellModeChange={(mode) => setViewParam('shell', mode === 'off' ? null : mode)}
               showLabels={showLabels}
               onShowLabelsChange={(next) => setViewParam('labels', next ? null : 'off')}
+              designScenarioId={designScenarioId}
             />
           </SimulationErrorBoundary>
         ) : (

@@ -14,6 +14,7 @@ import { AlertTriangle, CheckCircle2, Download, Loader2, Play, Save, XCircle } f
 import { useRBAC } from '@/contexts/RBACContext';
 import { isAssetAdmin } from '@/auth/assetAdmin';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -167,14 +168,14 @@ export default function AssetValidation() {
         app_version: payload.appVersion,
         validated_at: payload.validatedAt,
         validated_by: auth.user.id,
-        renderer: payload.renderer as unknown as Record<string, unknown>,
-        benchmark_config: payload.benchmarkConfig as unknown as Record<string, unknown>,
-        delivery: payload.delivery as unknown as Record<string, unknown>,
-        performance: payload.performance as unknown as Record<string, unknown>,
+        renderer: payload.renderer as unknown as Json,
+        benchmark_config: payload.benchmarkConfig as unknown as Json,
+        delivery: payload.delivery as unknown as Json,
+        performance: payload.performance as unknown as Json,
         acceptance_result: payload.acceptance.result,
         verdict: payload.acceptance.verdict,
-        findings: payload.acceptance.findings as unknown as Record<string, unknown>[],
-        screenshot_references: payload.screenshots as unknown as Record<string, unknown>[],
+        findings: payload.acceptance.findings as unknown as Json,
+        screenshot_references: payload.screenshots as unknown as Json,
       }])
       .select('id')
       .single();

@@ -53,7 +53,7 @@ function ImportedRack({
     <group
       position={rack.position}
       name={`ApprovedRackAsset:${rack.id}`}
-      userData={{ rackId: rack.id, row: rack.rowLetter, source: 'imported-glb' }}
+      userData={{ rackId: rack.id, row: rack.rowId, source: 'imported-glb' }}
       onClick={(event) => {
         event.stopPropagation();
         onClick?.(rack.id);

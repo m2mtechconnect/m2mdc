@@ -74,6 +74,11 @@ export default function AssetValidation() {
   const [saving, setSaving] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
 
+  const [pendingContext, setPendingContext] = useState<{
+    rendererReport: RendererReport;
+    deliveryReport: DeliveryReport;
+  } | null>(null);
+
   const finalise = useCallback(
     (result: BenchmarkOutcome, rendererReport: RendererReport, deliveryReport: DeliveryReport) => {
       if (!expected) return;
@@ -117,11 +122,6 @@ export default function AssetValidation() {
     setPendingContext({ rendererReport, deliveryReport });
   }, [expected]);
 
-  const [pendingContext, setPendingContext] = useState<{
-    rendererReport: RendererReport;
-    deliveryReport: DeliveryReport;
-  } | null>(null);
-
   const payload: ValidationRunPayload | null = useMemo(() => {
     if (!expected || !renderer || !delivery || !outcome || !acceptance) return null;
     return {
@@ -159,7 +159,7 @@ export default function AssetValidation() {
     }
     const { data, error } = await supabase
       .from('asset_gpu_validation_runs')
-      .insert({
+      .insert([{
         asset_id: payload.assetId,
         asset_checksum: payload.assetChecksum,
         scenario_id: payload.scenarioId,
@@ -175,7 +175,7 @@ export default function AssetValidation() {
         verdict: payload.acceptance.verdict,
         findings: payload.acceptance.findings as unknown as Record<string, unknown>[],
         screenshot_references: payload.screenshots as unknown as Record<string, unknown>[],
-      })
+      }])
       .select('id')
       .single();
     setSaving(false);

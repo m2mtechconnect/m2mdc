@@ -280,9 +280,17 @@ export default function AssetValidation() {
 
       <section className="space-y-3">
         <div className="flex flex-wrap items-center gap-3">
-          <Button onClick={start} disabled={running} data-testid="start-validation">
+          <Button variant="outline" onClick={checkPreflight} disabled={preflighting || running} data-testid="run-preflight">
+            {preflighting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Run preflight checks
+          </Button>
+          <Button
+            onClick={start}
+            disabled={running || !preflight?.canStart}
+            data-testid="start-validation"
+          >
             {running ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
-            Start validation
+            Start 20-second GPU validation
           </Button>
           <span className="text-xs text-muted-foreground">Phase: {PHASE_LABEL[phase]}</span>
           <span className="text-xs text-muted-foreground">
@@ -290,6 +298,43 @@ export default function AssetValidation() {
             {BENCHMARK_CONFIG.devicePixelRatioCap}, {BENCHMARK_CONFIG.qualityProfile} profile
           </span>
         </div>
+
+        {preflight && (
+          <Card className="p-4" data-testid="preflight-panel">
+            <h2 className="mb-2 text-sm font-semibold">Preflight</h2>
+            {preflight.softwareRendering && (
+              <p className="mb-3 flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-2 text-[12px] text-destructive">
+                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                {SOFTWARE_RENDERER_GUIDANCE}
+              </p>
+            )}
+            <ul className="space-y-1.5 text-[12px]">
+              {preflight.checks.map((check) => (
+                <li key={check.id} className="flex gap-2">
+                  {check.status === 'pass' ? (
+                    <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                  ) : check.status === 'warning' ? (
+                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+                  ) : (
+                    <XCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-destructive" />
+                  )}
+                  <span>
+                    <span className="font-medium">{check.label}</span>{' '}
+                    <span className="uppercase">
+                      {check.status === 'blocked' ? 'Blocked' : check.status === 'warning' ? 'Warning' : 'Pass'}
+                    </span>
+                    <span className="block text-muted-foreground">{check.detail}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              {preflight.canStart
+                ? 'Preflight cleared. A software-rendered run can never produce a GPU-verified result.'
+                : 'Start validation stays disabled until every blocked check clears.'}
+            </p>
+          </Card>
+        )}
 
         {renderer && (
           <Card className="p-4" data-testid="renderer-evidence">

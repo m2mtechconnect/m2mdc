@@ -528,11 +528,21 @@ export default function AssetValidation() {
             >
               <Download className="mr-2 h-4 w-4" /> Download acceptance report
             </Button>
-            <Button size="sm" disabled={!payload || saving} onClick={save} data-testid="save-validation">
+            <Button
+              size="sm"
+              disabled={!payload || saving || !visualChecklistComplete}
+              onClick={save}
+              data-testid="save-validation"
+            >
               {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               Save validation
             </Button>
           </div>
+          {!visualChecklistComplete && (
+            <p className="mt-2 text-[12px] text-amber-600">
+              Complete every visual acceptance capture and the clearance confirmation before saving.
+            </p>
+          )}
           {savedId && (
             <p className="mt-2 text-[12px] text-muted-foreground">
               Saved run <span className="font-mono">{savedId}</span>.

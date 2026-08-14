@@ -157,11 +157,10 @@ export const FALLBACK_REASON_LABEL: Record<FallbackReason, string> = {
 
 /** Canonical rack asset id used by the 3D scene. */
 export const RACK_ASSET_ID = 'aura.rack.generic_42u';
-}
 
 /** True when at least one approved GLB derivative exists in the manifest. */
 export function hasApprovedDerivatives(): boolean {
-  return FILE.assets.some((a) => a.approvalStatus === 'approved' && !!a.glbUrl);
+  return FILE.assets.some((a) => resolveRuntimeAsset(a.assetId).glbUrl !== null);
 }
 
 /** Assets blocking the photoreal upgrade, for honest UI/reporting. */

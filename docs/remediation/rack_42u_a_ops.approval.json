@@ -1,0 +1,123 @@
+{
+  "assetId": "nvidia.rack.42u_a_01.ops",
+  "validatedAt": "2026-08-14T14:44:48.101Z",
+  "toleranceMeters": 0.002,
+  "lineage": [
+    {
+      "stage": "source",
+      "id": "Rack_42U_A_01.usd",
+      "format": "OpenUSD",
+      "pack": "Datacenter_NVD@10012"
+    },
+    {
+      "stage": "validated-derivative",
+      "id": "nvidia.rack.42u_a_01",
+      "checksum": "sha256:7ec75623ddd3cb910d798c5691f338ed45fe4056ddaae139314f9bd456290712",
+      "drawCallMeshes": 546
+    },
+    {
+      "stage": "operations-derivative",
+      "id": "nvidia.rack.42u_a_01.ops",
+      "checksum": "sha256:2db61ead578559c2a5c2e98a0c75da31485b90445ed0d96118fc521bc83d0e46",
+      "drawCallMeshes": 6
+    }
+  ],
+  "visual": {
+    "path": "/tmp/opsval/vis.glb",
+    "bytes": 5160500,
+    "checksum": "sha256:7ec75623ddd3cb910d798c5691f338ed45fe4056ddaae139314f9bd456290712",
+    "triangleCount": 133173,
+    "drawCallMeshes": 546,
+    "materials": [
+      "Metal_Aluminum"
+    ],
+    "images": 0,
+    "min": [
+      -0.3017,
+      0,
+      -0.7108
+    ],
+    "max": [
+      0.3017,
+      3.1663,
+      0.7108
+    ],
+    "size": [
+      0.6035,
+      3.1663,
+      1.4215
+    ],
+    "nodeNames": [
+      "AURA_Publication_Root"
+    ]
+  },
+  "ops": {
+    "path": "/tmp/opsval/ops2.glb",
+    "bytes": 6249024,
+    "checksum": "sha256:2db61ead578559c2a5c2e98a0c75da31485b90445ed0d96118fc521bc83d0e46",
+    "triangleCount": 133173,
+    "drawCallMeshes": 6,
+    "materials": [
+      "Metal_Aluminum"
+    ],
+    "images": 0,
+    "min": [
+      -0.3018,
+      0,
+      -0.7107
+    ],
+    "max": [
+      0.3018,
+      3.1663,
+      0.7108
+    ],
+    "size": [
+      0.6035,
+      3.1663,
+      1.4215
+    ],
+    "nodeNames": [
+      "Chilled_Water_Risers",
+      "Rack_Core",
+      "Rear_Cooler_Door"
+    ]
+  },
+  "checks": [
+    {
+      "id": "checksum-recorded",
+      "pass": true,
+      "detail": "sha256:2db61ead578559c2a5c2e98a0c75da31485b90445ed0d96118fc521bc83d0e46"
+    },
+    {
+      "id": "bounds-match-validated-derivative",
+      "pass": true,
+      "detail": "ops 0.6035 x 3.1663 x 1.4215 vs visual 0.6035 x 3.1663 x 1.4215 (tolerance 0.002 m)"
+    },
+    {
+      "id": "floor-contact-y0",
+      "pass": true,
+      "detail": "min.y = 0"
+    },
+    {
+      "id": "front-orientation-plus-z",
+      "pass": true,
+      "detail": "z range ops [-0.7107, 0.7108] vs visual [-0.7108, 0.7108]"
+    },
+    {
+      "id": "triangles-preserved",
+      "pass": true,
+      "detail": "133173 vs 133173"
+    },
+    {
+      "id": "material-appearance-equivalent",
+      "pass": true,
+      "detail": "materials Metal_Aluminum / images 0"
+    },
+    {
+      "id": "addressable-parts-present",
+      "pass": true,
+      "detail": "Chilled_Water_Risers, Rack_Core, Rear_Cooler_Door"
+    }
+  ],
+  "approvalStatus": "approved"
+}

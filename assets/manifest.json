@@ -1,6 +1,6 @@
 {
   "manifestVersion": 2,
-  "generatedAt": "2026-08-14T14:30:15Z",
+  "generatedAt": "2026-08-14T14:46:00Z",
   "assets": [
     {
       "assetId": "nvidia.rack.42u_a_01",
@@ -52,8 +52,8 @@
       "licence": "NVIDIA Data Center OpenUSD Assets Pack (Datacenter_NVD@10012), used under the pack's NVIDIA licence terms",
       "sourceFormat": "OpenUSD (usd)",
       "usdVersion": "OpenUSD 26.08 (usd-core)",
-      "glbVersion": "1.0.0-ops",
-      "glbUrl": "/__l5e/assets-v1/714ea07f-772a-40d5-8eb1-d93772d8bb1f/rack_42u_a_ops.glb",
+      "glbVersion": "1.1.0-ops",
+      "glbUrl": "/__l5e/assets-v1/64ff3888-2891-4bba-83d2-5691ff40db55/rack_42u_a_ops_v2.glb",
       "dimensionsMeters": {
         "x": 0.6035,
         "y": 3.1663,
@@ -62,34 +62,39 @@
       "triangleCount": 133173,
       "textureMemoryMb": 0,
       "lods": [],
-      "lastValidatedAt": "2026-08-14T14:29:31Z",
-      "checksum": "sha256:f60ca0b53656fb501a6f27714f11e27dc66c2571cc24d45ee277408af3968f97",
+      "lastValidatedAt": "2026-08-14T14:45:00Z",
+      "checksum": "sha256:2db61ead578559c2a5c2e98a0c75da31485b90445ed0d96118fc521bc83d0e46",
       "approvalStatus": "approved",
       "runtimeEligible": true,
-      "notes": "Operations derivative of nvidia.rack.42u_a_01, built by scripts/asset-ingestion/build_ops_derivative.mjs. Static meshes merged by material inside four addressable groups (Rack_Core, Front_Door, Rear_Cooler_Door, Chilled_Water_Risers), reducing 546 draw calls to 5 with identical triangle count. Geometry quantized; still untextured PBR (0 images, 1 material). The validated visual derivative is unchanged.",
+      "notes": "Operations derivative of nvidia.rack.42u_a_01, built by scripts/asset-ingestion/build_ops_derivative.mjs and independently validated by scripts/asset-ingestion/validate_ops_derivative.mjs (record: docs/remediation/rack_42u_a_ops.approval.json). Static meshes merged by material inside three addressable groups (Rack_Core, Rear_Cooler_Door, Chilled_Water_Risers), reducing 546 draw calls to 6 with an identical triangle count (133,173), identical bounds and the same single material. The source asset contains no separate front-door subtree, so no Front_Door group exists; the earlier 1.0.0-ops build claimed one and mis-grouped the chassis, and is superseded by this build. The validated visual derivative is unchanged. Still untextured PBR (0 images, 1 material).",
       "provenance": {
         "sourceArchive": "Datacenter_NVD@10012.zip",
         "sourceArchiveSha256": "4972d1a9726b36279d7c26531b4d0a084156b7d512f5340b6e1063a9cf458fd4",
         "usdMasterSha256": "f8505db78c2d0b3a85e2ee187e09a1bef2f9ee0fb826b9ca59e9db44c26eb1b3",
         "publishedSource": "digital-twin-assets/nvidia/rack_42u_a/v1/source/",
-        "publishedDerivative": "/__l5e/assets-v1/714ea07f-772a-40d5-8eb1-d93772d8bb1f/rack_42u_a_ops.glb",
+        "publishedDerivative": "/__l5e/assets-v1/64ff3888-2891-4bba-83d2-5691ff40db55/rack_42u_a_ops_v2.glb",
         "meshCount": 546,
         "materialCount": 1,
         "imageCount": 0,
-        "derivativeBytes": 6407384,
+        "derivativeBytes": 6249024,
         "materialNames": [
           "Metal_Aluminum"
         ],
-        "drawCallMeshes": 5,
+        "drawCallMeshes": 6,
         "derivedFrom": "nvidia.rack.42u_a_01",
         "addressableGroups": [
           "Rack_Core",
-          "Front_Door",
           "Rear_Cooler_Door",
           "Chilled_Water_Risers"
-        ]
+        ],
+        "supersedes": {
+          "glbVersion": "1.0.0-ops",
+          "checksum": "sha256:f60ca0b53656fb501a6f27714f11e27dc66c2571cc24d45ee277408af3968f97",
+          "reason": "Mis-grouped chassis under the rear-door subtree and declared a Front_Door group that does not exist in the source."
+        }
       },
-      "rollout": "canary-operations"
+      "rollout": "canary-operations",
+      "validationRecord": "docs/remediation/rack_42u_a_ops.approval.json"
     },
     {
       "assetId": "aura.rack.generic_42u",

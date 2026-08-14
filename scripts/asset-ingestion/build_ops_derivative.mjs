@@ -22,19 +22,31 @@ const doc = await io.read(input);
 const root = doc.getRoot();
 const scene = root.getDefaultScene() ?? root.listScenes()[0];
 
+/**
+ * Group assignment is priority-ordered and evaluated against the FULL ancestry
+ * trail. The source hierarchy is misleading: the rack chassis sits under a node
+ * named `Rack_42RU_Rear_Door_V2_Component_01`, so a naive /rear_door/ match
+ * swallows the whole cabinet. Chassis markers are therefore tested first and
+ * the rear-door match is anchored on the real `Rear_Cooler_Door` subtree.
+ *
+ * The source asset has no separate front-door subtree, so no Front_Door group
+ * is emitted - claiming one would be a fabricated part.
+ */
 const GROUPS = [
   { name: 'Chilled_Water_Risers', match: /chilled_water/i },
-  { name: 'Rear_Cooler_Door', match: /rear_cooler_door|rear_door|rear_fan/i },
-  { name: 'Front_Door', match: /front_door/i },
-  { name: 'Rack_Core', match: /.*/ },
+  { name: 'Rack_Core', match: /rack_core|leveling_post/i },
+  { name: 'Rear_Cooler_Door', match: /rear_cooler_door/i },
 ];
+const REQUIRED_GROUPS = ['Rack_Core', 'Rear_Cooler_Door', 'Chilled_Water_Risers'];
 
 // Record the semantic group of every mesh node before the hierarchy is baked.
 const groupOf = new Map();
 const visit = (node, ancestry) => {
   const trail = [...ancestry, node.getName() ?? ''];
   if (node.getMesh()) {
-    groupOf.set(node, GROUPS.find((g) => trail.some((n) => g.match.test(n))).name);
+    const group = GROUPS.find((g) => trail.some((n) => g.match.test(n)));
+    if (!group) throw new Error(`Ungrouped mesh node: ${trail.join('/')}`);
+    groupOf.set(node, group.name);
   }
   node.listChildren().forEach((c) => visit(c, trail));
 };
@@ -72,6 +84,11 @@ const tris = root
   .flatMap((m) => m.listPrimitives())
   .reduce((n, p) => n + (p.getIndices()?.getCount() ?? p.getAttribute('POSITION').getCount()) / 3, 0);
 
+const emitted = scene.listChildren().map((n) => n.getName());
+for (const required of REQUIRED_GROUPS) {
+  if (!emitted.includes(required)) throw new Error(`Missing addressable group: ${required}`);
+}
+
 const record = {
   derivative: 'operations',
   source: input,
@@ -80,7 +97,7 @@ const record = {
   checksum: `sha256:${sha}`,
   drawCallMeshes: meshNodes.length,
   triangleCount: tris,
-  addressableGroups: GROUPS.map((g) => g.name),
+  addressableGroups: emitted,
   generatedAt: new Date().toISOString(),
 };
 writeFileSync(`${output}.record.json`, `${JSON.stringify(record, null, 2)}\n`);

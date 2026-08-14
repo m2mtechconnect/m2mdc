@@ -1,6 +1,6 @@
 {
-  "manifestVersion": 1,
-  "generatedAt": "2026-08-13T00:00:00Z",
+  "manifestVersion": 2,
+  "generatedAt": "2026-08-14T00:00:00Z",
   "assets": [
     {
       "assetId": "aura.rack.generic_42u",
@@ -13,14 +13,20 @@
       "usdVersion": "1.0.0",
       "glbVersion": null,
       "glbUrl": null,
-      "dimensionsMeters": { "x": 0.6, "y": 2.0, "z": 1.2 },
+      "dimensionsMeters": {
+        "x": 0.6,
+        "y": 2.0,
+        "z": 1.2
+      },
       "triangleCount": null,
       "textureMemoryMb": null,
       "lods": [],
       "lastValidatedAt": null,
       "checksum": null,
-      "approvalStatus": "pending-review",
-      "notes": "USD master authored with EIA-310 envelope dimensions. GLB derivative requires a USD toolchain (usdcat/usdzip + glTF export) that is not available in this environment; the viewer renders documented procedural geometry until the derivative is produced and validated."
+      "approvalStatus": "blocked-missing-payloads",
+      "notes": "Incomplete USD stage: payload layers are missing. No approved rack source (user CAD/USD, NVIDIA Data Center OpenUSD pack, or licensed vendor CAD) has been acquired, so no real USD-derived rack can be produced. The viewer renders documented procedural geometry labelled \"Procedural 3D preview\".",
+      "runtimeEligible": false,
+      "blocker": "The USD master references payloads/external.usdc and payloads/internal.usdc, and neither file exists. The stage therefore carries no geometry, cannot be validated, and must not be converted to a GLB derivative or marked runtime-ready."
     },
     {
       "assetId": "aura.floor.perforated_tile_600",
@@ -33,14 +39,20 @@
       "usdVersion": null,
       "glbVersion": null,
       "glbUrl": null,
-      "dimensionsMeters": { "x": 0.6, "y": 0.03, "z": 0.6 },
+      "dimensionsMeters": {
+        "x": 0.6,
+        "y": 0.03,
+        "z": 0.6
+      },
       "triangleCount": null,
       "textureMemoryMb": null,
       "lods": [],
       "lastValidatedAt": null,
       "checksum": null,
       "approvalStatus": "pending-source",
-      "notes": "Awaiting authored USD master."
+      "notes": "Awaiting authored USD master.",
+      "runtimeEligible": false,
+      "blocker": "No approved source asset acquired."
     },
     {
       "assetId": "aura.cooling.crah_generic",
@@ -60,7 +72,9 @@
       "lastValidatedAt": null,
       "checksum": null,
       "approvalStatus": "pending-source",
-      "notes": "No licensed vendor or approved NVIDIA SimReady source available in this environment."
+      "notes": "No licensed vendor or approved NVIDIA SimReady source available in this environment.",
+      "runtimeEligible": false,
+      "blocker": "No approved source asset acquired."
     },
     {
       "assetId": "aura.power.ups_generic",
@@ -80,7 +94,9 @@
       "lastValidatedAt": null,
       "checksum": null,
       "approvalStatus": "pending-source",
-      "notes": "No licensed vendor or approved NVIDIA SimReady source available in this environment."
+      "notes": "No licensed vendor or approved NVIDIA SimReady source available in this environment.",
+      "runtimeEligible": false,
+      "blocker": "No approved source asset acquired."
     }
   ]
 }

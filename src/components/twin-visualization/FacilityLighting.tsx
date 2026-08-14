@@ -60,7 +60,7 @@ export function FacilityLighting({ centre, radius, profile }: FacilityLightingPr
   ];
 
   return (
-    <>
+    <group name="FacilityLighting" userData={{ classification: 'facility-lighting' }}>
       {/* Base ambient so nothing crushes to pure black */}
       <ambientLight intensity={0.45} color={BOUNCE_COLOR} />
       <hemisphereLight args={[LUMINAIRE_COLOR, '#41474f', 0.5]} />
@@ -83,7 +83,7 @@ export function FacilityLighting({ centre, radius, profile }: FacilityLightingPr
 
       {/* Ceiling luminaires: emissive panel + local light */}
       {luminaires.map(([lx, lz]) => (
-        <group key={`${lx}:${lz}`} position={[lx, ceilingHeight, lz]}>
+        <group key={`${lx}:${lz}`} name="FacilityLighting:LightFixture" position={[lx, ceilingHeight, lz]}>
           <mesh rotation={[Math.PI / 2, 0, 0]}>
             <planeGeometry args={[1.8, 0.5]} />
             <meshBasicMaterial color={LUMINAIRE_COLOR} />
@@ -99,6 +99,6 @@ export function FacilityLighting({ centre, radius, profile }: FacilityLightingPr
 
       {/* Environment reflections for metal and glass */}
       {profile.environment && <LocalEnvironment intensity={profile.envIntensity} />}
-    </>
+    </group>
   );
 }

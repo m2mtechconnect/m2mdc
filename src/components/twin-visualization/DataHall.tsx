@@ -71,7 +71,6 @@ export function DataHall({ bounds, rows, profile, crahUnits = 0, shellMode = 'of
 
   const floor = floorMaterial(Math.max(8, Math.round(Math.max(width, depth) / 0.6)));
   const wall = surfaceMaterial('wallPanel');
-  const ceiling = surfaceMaterial('ceilingPanel');
   const tray = surfaceMaterial('galvanizedTray');
   const busbar = surfaceMaterial('copperBus');
   const pipe = surfaceMaterial('chilledPipe');
@@ -133,32 +132,10 @@ export function DataHall({ bounds, rows, profile, crahUnits = 0, shellMode = 'of
             )}
           </group>
 
-          {fullShell && structural && (
-            <group name="FacilityShell:StructuralBeams">
-              {Array.from({ length: Math.max(2, Math.round(depth / 3)) }, (_, i) => minZ + 1.5 + i * 3)
-                .filter((bz) => bz < maxZ)
-                .map((bz) => (
-                  <mesh key={`beam-${bz}`} position={[cx, CEILING - 0.15, bz]} material={steel} castShadow>
-                    <boxGeometry args={[width, 0.18, 0.14]} />
-                  </mesh>
-                ))}
-            </group>
-          )}
-
-          {fullShell && structural && (
-            <group name="FacilityShell:Ceiling">
-              {[minX + width * 0.25, maxX - width * 0.25].map((px) => (
-                <mesh
-                  key={`deck-${px}`}
-                  rotation={[Math.PI / 2, 0, 0]}
-                  position={[px, CEILING, cz]}
-                  material={ceiling}
-                >
-                  <planeGeometry args={[width * 0.18, depth]} />
-                </mesh>
-              ))}
-            </group>
-          )}
+          {/* Structural beams, roof cross-members and ceiling decks are
+              permanently removed from every shell mode: they carry no
+              operational identity and occluded the rack faces. Overhead
+              lighting lives in FacilityLighting and is unaffected. */}
         </group>
       )}
 

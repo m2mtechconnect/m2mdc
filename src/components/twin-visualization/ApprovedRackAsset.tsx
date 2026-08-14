@@ -14,6 +14,7 @@
  * passed through unchanged.
  */
 
+import type { Mesh, MeshStandardMaterial } from 'three';
 import { Component, Suspense, useEffect, useMemo, type ReactNode } from 'react';
 import { useGLTF, Clone } from '@react-three/drei';
 import { Rack, type RackDetailLevel } from './Rack';
@@ -52,6 +53,30 @@ function ImportedRack({
   onClick?: (rackId: string) => void;
 }) {
   const { scene } = useGLTF(url);
+
+  /**
+   * The USD pack's MDL materials do not survive glTF conversion, so the
+   * derivative arrives as a single untextured metal. Apply physically
+   * reasonable powder-coated-steel values so the cabinet reads correctly under
+   * facility lighting. These are AURA-authored values, not the original MDL
+   * library.
+   */
+  useEffect(() => {
+    scene.traverse((object) => {
+      const mesh = object as Mesh;
+      if (!mesh.isMesh) return;
+      const material = mesh.material as MeshStandardMaterial | MeshStandardMaterial[];
+      for (const m of Array.isArray(material) ? material : [material]) {
+        if (!m || m.userData.auraTuned) continue;
+        m.metalness = 0.55;
+        m.roughness = 0.52;
+        m.envMapIntensity = 1.1;
+        m.userData.auraTuned = true;
+        m.needsUpdate = true;
+      }
+    });
+  }, [scene]);
+
   return (
     <group
       position={rack.position}

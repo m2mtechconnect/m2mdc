@@ -58,6 +58,7 @@ import Settings from "./pages/account/Settings";
 import AccessControl from "./pages/account/AccessControl";
 import AdminUserApproval from "./pages/AdminUserApproval";
 import AdminSignupsDashboard from "./pages/AdminSignupsDashboard";
+import AssetPreview from '@/pages/admin/AssetPreview';
 import { lazy } from "react";
 const EvidenceBetaShell = lazy(() => import("./pages/dsx/EvidenceBetaShell"));
 import {
@@ -95,6 +96,7 @@ function ApprovedUserRoutes() {
       <Route path="/account/access-control" element={<AccessControl />} />
       <Route path="/admin/onboarding-submissions" element={<OnboardingSubmissions />} />
       <Route path="/admin/user-approvals" element={<AdminUserApproval />} />
+      <Route path="/admin/asset-preview" element={<AssetPreview />} />
       <Route path="/admin/signups-dashboard" element={<AdminSignupsDashboard />} />
       {/* Canonical integrations destination. */}
       <Route path="/manage/integrations" element={<Integrations />} />

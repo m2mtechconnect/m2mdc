@@ -39,7 +39,7 @@ export function AssetProvenanceBadge({
         data-runtime-geometry={imported ? 'imported-glb' : 'procedural'}
         className="rounded-md border border-slate-600/70 bg-slate-900/85 px-2.5 py-1.5 text-xs text-slate-100 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
       >
-        {imported ? 'USD-derived GLB (canary rack)' : 'Procedural 3D preview'}
+        {imported ? 'NVIDIA OpenUSD-derived geometry (canary)' : 'Procedural 3D preview'}
       </button>
 
       {open && (
@@ -59,6 +59,11 @@ export function AssetProvenanceBadge({
           )}
           {entry?.blocker && <Row label="Blocker" value={entry.blocker} />}
           <Row label="Licence basis" value={resolution.provenance.licence ?? 'Unknown'} />
+          <Row label="Materials" value="1 converted PBR material (Metal_Aluminum), 0 converted textures" />
+          <Row
+            label="Limitations"
+            value="Not photorealistic, not SimReady, not RTX-rendered, not texture-complete"
+          />
         </dl>
       )}
     </div>

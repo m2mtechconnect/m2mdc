@@ -15,6 +15,16 @@ export interface RackVisual {
   isCritical: boolean;
   isAffected: boolean; // Highlighted during simulation events
   gpuLoad?: number; // GPU utilization percentage (0-100)
+  /**
+   * Explicit cooling capability from the facility dataset. Used to decide
+   * whether a liquid-cooled, rear-door-heat-exchanger asset may be mounted on
+   * this rack. Absent means "unknown" and is treated as incompatible.
+   */
+  cooling?: {
+    liquidCooled?: boolean;
+    rearDoorHeatExchanger?: boolean;
+    chilledWaterConnected?: boolean;
+  } | null;
 }
 
 export interface RowVisual {

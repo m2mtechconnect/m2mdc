@@ -87,21 +87,58 @@ describe('approved NVIDIA rack derivative', () => {
   });
 });
 
-describe('canary rollout scope', () => {
-  const rackIds = ['R-03', 'R-01', 'R-02'];
+describe('canary rollout compatibility gating', () => {
+  const incompatible = [
+    { id: 'R-01' },
+    { id: 'R-02', cooling: { liquidCooled: true } },
+    { id: 'R-03', cooling: { liquidCooled: true, rearDoorHeatExchanger: true } },
+  ];
+  const compatible = {
+    id: 'R-09',
+    cooling: { liquidCooled: true, rearDoorHeatExchanger: true, chilledWaterConnected: true },
+  };
 
-  it('mounts the approved asset on exactly one rack', () => {
-    const canary = resolveCanaryRollout(rackIds);
-    const mounted = rackIds.filter((id) => assetIdForRack(id, canary) === CANARY_RACK_ASSET_ID);
-    expect(mounted).toEqual(['R-01']);
-  });
-
-  it('rolls back to procedural geometry for every rack when disabled', () => {
-    const canary = { enabled: false, rackId: null };
-    expect(rackIds.map((id) => assetIdForRack(id, canary))).toEqual([
+  it('never mounts the asset when no rack declares full compatibility', () => {
+    const canary = resolveCanaryRollout(incompatible);
+    expect(canary.enabled).toBe(false);
+    expect(canary.reason).toBe('no-compatible-rack');
+    expect(canary.adminPreviewOnly).toBe(true);
+    expect(incompatible.map((r) => assetIdForRack(r.id, canary))).toEqual([
       RACK_ASSET_ID,
       RACK_ASSET_ID,
       RACK_ASSET_ID,
     ]);
+  });
+
+  it('does not infer compatibility from rack id or ordering', () => {
+    const canary = resolveCanaryRollout([{ id: 'A-00' }, compatible]);
+    expect(canary.rackId).toBe('R-09');
+  });
+
+  it('mounts the asset on exactly one compatible rack', () => {
+    const racks = [...incompatible, compatible];
+    const canary = resolveCanaryRollout(racks);
+    const mounted = racks.filter((r) => assetIdForRack(r.id, canary) === CANARY_RACK_ASSET_ID);
+    expect(mounted.map((r) => r.id)).toEqual(['R-09']);
+  });
+
+  it('ignores ?canaryRack for non-admins and for incompatible racks', () => {
+    const racks = [...incompatible, compatible];
+    const original = window.location.search;
+    history.replaceState(null, '', '?canaryRack=R-01');
+    try {
+      expect(resolveCanaryRollout(racks, { isAdmin: true }).rackId).toBe('R-09');
+      history.replaceState(null, '', '?canaryRack=R-09');
+      expect(resolveCanaryRollout(racks, { isAdmin: false }).reason).toBe('compatible-rack');
+      expect(resolveCanaryRollout(racks, { isAdmin: true }).reason).toBe('admin-override');
+    } finally {
+      history.replaceState(null, '', original || '/');
+    }
+  });
+
+  it('rolls back to procedural geometry for every rack when disabled', () => {
+    const canary = resolveCanaryRollout([compatible], {});
+    const disabled = { ...canary, enabled: false, rackId: null };
+    expect(assetIdForRack(compatible.id, disabled)).toBe(RACK_ASSET_ID);
   });
 });

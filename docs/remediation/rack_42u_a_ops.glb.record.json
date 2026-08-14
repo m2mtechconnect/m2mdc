@@ -1,0 +1,16 @@
+{
+  "derivative": "operations",
+  "source": "/tmp/rack.glb",
+  "output": "/tmp/rack_42u_a_ops.glb",
+  "sizeBytes": 6407384,
+  "checksum": "sha256:f60ca0b53656fb501a6f27714f11e27dc66c2571cc24d45ee277408af3968f97",
+  "drawCallMeshes": 5,
+  "triangleCount": 133173,
+  "addressableGroups": [
+    "Chilled_Water_Risers",
+    "Rear_Cooler_Door",
+    "Front_Door",
+    "Rack_Core"
+  ],
+  "generatedAt": "2026-08-14T14:29:31.538Z"
+}

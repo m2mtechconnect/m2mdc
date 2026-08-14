@@ -20,6 +20,9 @@ import type { RackVisual } from './types';
 
 export const LIQUID_RACK_SCENARIO_ID = 'SIM-LIQUID-COOLED-RACK-PILOT-001';
 
+/** URL parameter that owns design-scenario selection. */
+export const DESIGN_SCENARIO_PARAM = 'designScenario';
+
 /** Operations derivative used by the scenario rack. */
 export const SCENARIO_RACK_ASSET_ID = 'nvidia.rack.42u_a_01.ops';
 
@@ -37,6 +40,10 @@ export interface EngineeringInput {
 export interface DesignScenario {
   id: typeof LIQUID_RACK_SCENARIO_ID;
   label: string;
+  /** Short card headline used by the scenario selector. */
+  summary: string;
+  /** Bullet points shown on the proposed-design card. */
+  highlights: string[];
   /** Always SIMULATED - a design scenario can never be LIVE. */
   dataMode: 'SIMULATED';
   status: 'proposed-design';
@@ -67,6 +74,15 @@ export function buildLiquidRackScenario(): DesignScenario {
   return {
     id: LIQUID_RACK_SCENARIO_ID,
     label: 'Simulated design scenario - liquid-cooled rack pilot',
+    summary: 'NVIDIA liquid-cooled rack pilot',
+    highlights: [
+      'Proposed design',
+      'Not installed or commissioned',
+      'One NVIDIA OpenUSD-derived liquid-cooled rack',
+      'Rear-door heat exchanger and chilled-water risers',
+      'Engineering inputs incomplete',
+      'Not part of baseline operations',
+    ],
     dataMode: 'SIMULATED',
     status: 'proposed-design',
     rackId: SCENARIO_RACK_ID,
@@ -87,9 +103,18 @@ function readParams(): URLSearchParams {
 /** Resolve the active design scenario from the URL. Off by default. */
 export function resolveDesignScenario(search?: string): DesignScenario | null {
   const params = search === undefined ? readParams() : new URLSearchParams(search);
-  const requested = params.get('designScenario');
-  return requested === LIQUID_RACK_SCENARIO_ID ? buildLiquidRackScenario() : null;
+  return resolveDesignScenarioById(params.get(DESIGN_SCENARIO_PARAM));
 }
+
+/**
+ * Resolve a design scenario by id. Unknown ids fail closed: nothing mounts.
+ */
+export function resolveDesignScenarioById(id: string | null | undefined): DesignScenario | null {
+  return id === LIQUID_RACK_SCENARIO_ID ? buildLiquidRackScenario() : null;
+}
+
+/** Catalogue of selectable proposed designs. */
+export const DESIGN_SCENARIOS: DesignScenario[] = [buildLiquidRackScenario()];
 
 /**
  * Place the scenario rack in free floor space beside the as-built layout so it

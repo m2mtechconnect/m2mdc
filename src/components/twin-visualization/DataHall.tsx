@@ -139,15 +139,16 @@ export function DataHall({ bounds, rows, profile, crahUnits = 0, shellMode = 'of
         </group>
       )}
 
-      {/* Overhead cable trays and power busway following each row */}
+      {/* Overhead cable trays and power busway following each row. Kept slim
+          and high so they read as services, never as occluding structure. */}
       {rows.map((row) => (
         <group key={`overhead-${row.id}`}>
-          <mesh position={[cx, 3.5, row.position[2]]} material={tray} castShadow>
-            <boxGeometry args={[width - 1.2, 0.06, 0.34]} />
+          <mesh position={[cx, 4.35, row.position[2]]} material={tray} castShadow>
+            <boxGeometry args={[width - 1.2, 0.035, 0.2]} />
           </mesh>
           {structural && (
-            <mesh position={[cx, 3.9, row.position[2]]} material={busbar} castShadow>
-              <boxGeometry args={[width - 1.6, 0.1, 0.1]} />
+            <mesh position={[cx, 4.6, row.position[2]]} material={busbar} castShadow>
+              <boxGeometry args={[width - 1.6, 0.05, 0.05]} />
             </mesh>
           )}
         </group>
@@ -156,8 +157,8 @@ export function DataHall({ bounds, rows, profile, crahUnits = 0, shellMode = 'of
       {/* Chilled water supply and return routed along the rear wall */}
       {structural &&
         [
-          { y: 3.2, z: minZ + 0.5 },
-          { y: 2.9, z: minZ + 0.5 },
+          { y: 4.2, z: minZ + 0.5 },
+          { y: 3.95, z: minZ + 0.5 },
         ].map((p) => (
           <mesh
             key={`pipe-${p.y}`}
@@ -166,7 +167,7 @@ export function DataHall({ bounds, rows, profile, crahUnits = 0, shellMode = 'of
             material={pipe}
             castShadow
           >
-            <cylinderGeometry args={[0.11, 0.11, width - 1, 12]} />
+            <cylinderGeometry args={[0.07, 0.07, width - 1, 12]} />
           </mesh>
         ))}
 

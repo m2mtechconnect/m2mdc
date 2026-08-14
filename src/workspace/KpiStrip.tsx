@@ -10,6 +10,7 @@ import { deltaDirection } from './scenarioEngine';
 import { ROLE_VIEWS, useActiveRun, useWorkspaceStore } from './workspaceStore';
 import { useTwinOverlaySafe, type TwinOverlay } from '@/context/TwinOverlayContext';
 import { useDesignScenario } from './useDesignScenario';
+import { useCanvasFocusStore } from './canvasFocusStore';
 
 interface Props {
   facility: FacilityDefinition;
@@ -24,6 +25,9 @@ export function KpiStrip({ facility, overrides }: Props) {
   // A proposed design has no engineering inputs, so no KPI can be calculated
   // for it. Showing the baseline numbers next to it would be misleading.
   const designActive = useDesignScenario().active;
+  // The evidence tooltip opens upward over the model canvas. Announce it so
+  // the canvas legend yields its zone instead of being covered.
+  const setKpiTooltipOpen = useCanvasFocusStore((s) => s.setKpiTooltipOpen);
 
   const modelled = deriveKpis(facility, overrides);
   const keys = ROLE_VIEWS[roleView].kpis;
@@ -48,7 +52,7 @@ export function KpiStrip({ facility, overrides }: Props) {
         const selected = activeOverlay === (descriptor.overlay as TwinOverlay);
 
         return (
-          <Tooltip key={key}>
+          <Tooltip key={key} onOpenChange={setKpiTooltipOpen}>
             <TooltipTrigger asChild>
           <button
             key={key}
@@ -107,7 +111,13 @@ export function KpiStrip({ facility, overrides }: Props) {
             </span>
           </button>
             </TooltipTrigger>
-            <TooltipContent side="top" className="max-w-xs text-xs">
+            <TooltipContent
+              side="top"
+              align="start"
+              sideOffset={8}
+              collisionPadding={12}
+              className="max-w-xs text-xs"
+            >
               <p className="font-medium">{descriptor.label}</p>
               <p className="mt-0.5 text-muted-foreground">
                 {designActive

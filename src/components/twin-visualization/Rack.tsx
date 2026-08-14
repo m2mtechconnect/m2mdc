@@ -298,15 +298,33 @@ export function Rack({
         </mesh>
       ))}
 
-      {/* Operational overlay - separate mesh in front of the door face. */}
+      {/* Operational overlay.
+          Read as instrumentation, not paint: a status stripe down the hinge
+          edge and a header band across the top of the door. The cabinet keeps
+          its physical material, so a hall under a thermal layer still looks
+          like a data hall rather than a block of coloured boxes. */}
       {resolvedOverlay && (
-        <mesh
-          position={[0, plinth + innerHeight / 2, frontZ + 0.02]}
-          material={overlayMaterial(resolvedOverlay, overlayOpacity)}
-          renderOrder={2}
-        >
-          <planeGeometry args={[RACK_WIDTH - 0.08, innerHeight]} />
-        </mesh>
+        <group renderOrder={2}>
+          <mesh
+            position={[-(RACK_WIDTH / 2 - 0.09), plinth + innerHeight / 2, frontZ + 0.02]}
+            material={overlayMaterial(resolvedOverlay, Math.min(1, overlayOpacity * 2.4))}
+          >
+            <planeGeometry args={[0.07, innerHeight - 0.06]} />
+          </mesh>
+          <mesh
+            position={[0, plinth + innerHeight - 0.06, frontZ + 0.02]}
+            material={overlayMaterial(resolvedOverlay, Math.min(1, overlayOpacity * 2.4))}
+          >
+            <planeGeometry args={[RACK_WIDTH - 0.08, 0.055]} />
+          </mesh>
+          {/* Very light wash so the state is still readable from far out. */}
+          <mesh
+            position={[0, plinth + innerHeight / 2, frontZ + 0.018]}
+            material={overlayMaterial(resolvedOverlay, overlayOpacity * 0.28)}
+          >
+            <planeGeometry args={[RACK_WIDTH - 0.08, innerHeight]} />
+          </mesh>
+        </group>
       )}
 
       {/* Selection / hover outline - never replaces the physical material */}

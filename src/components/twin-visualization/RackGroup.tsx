@@ -26,6 +26,11 @@ interface RackGroupProps {
   showLabels?: boolean;
   /** Approved-asset canary rollout state for the whole scene. */
   canary?: CanaryRolloutConfig;
+  /**
+   * Reference-facility override. When set, every rack in the row attempts this
+   * approved derivative instead of the per-rack canary assignment.
+   */
+  referenceAssetId?: string | null;
 }
 
 export function RackGroup({
@@ -39,6 +44,7 @@ export function RackGroup({
   selectedRackId,
   showLabels = true,
   canary,
+  referenceAssetId = null,
 }: RackGroupProps) {
   const rowRacks = racks.filter(r => r.rowId === row.id);
   const rowWidth = rowRacks.length * 1.1 + 0.5;
@@ -104,7 +110,7 @@ export function RackGroup({
       {rowRacks.map((rack) => (
         <ApprovedRackAsset
           key={rack.id} 
-          assetId={canary ? assetIdForRack(rack.id, canary) : undefined}
+          assetId={referenceAssetId ?? (canary ? assetIdForRack(rack.id, canary) : undefined)}
           rack={{
             ...rack,
             position: [rack.position[0] - row.position[0], rack.position[1], 0]

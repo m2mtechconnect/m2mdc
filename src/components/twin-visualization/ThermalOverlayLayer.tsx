@@ -1,9 +1,13 @@
 /**
  * ThermalOverlayLayer Component
- * Renders semi-transparent colored zones based on temperature
+ *
+ * Thermal is a readability layer, not a paint layer. Each zone renders as a
+ * soft radial gradient laid just above the floor with additive blending and no
+ * depth writes, so cabinets, aisles and floor markings stay legible underneath
+ * instead of being flooded with flat colour.
  */
 
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { ThermalZoneVisual } from './types';
@@ -14,13 +18,40 @@ interface ThermalOverlayLayerProps {
   visible: boolean;
 }
 
-function ThermalZone({ zone }: { zone: ThermalZoneVisual }) {
+/** Soft-edged radial falloff, generated once and shared by every zone. */
+function useFalloffTexture() {
+  return useMemo(() => {
+    const size = 128;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+      gradient.addColorStop(0, 'rgba(255,255,255,1)');
+      gradient.addColorStop(0.55, 'rgba(255,255,255,0.55)');
+      gradient.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+  }, []);
+}
+
+/** Peak opacity per zone. Hotspots read hotter without becoming opaque. */
+const BASE_OPACITY = 0.2;
+const HOTSPOT_OPACITY = 0.32;
+
+function ThermalZone({ zone, falloff }: { zone: ThermalZoneVisual; falloff: THREE.Texture }) {
   const meshRef = useRef<THREE.Mesh>(null);
-  
+
   useFrame((state) => {
     if (meshRef.current && zone.hotspot) {
-      // Pulse effect for hotspots
-      const opacity = 0.3 + Math.sin(state.clock.elapsedTime * 2) * 0.1;
+      // Gentle breathing pulse: enough to draw the eye, never enough to hide
+      // the equipment underneath.
+      const opacity = HOTSPOT_OPACITY + Math.sin(state.clock.elapsedTime * 1.6) * 0.05;
       (meshRef.current.material as THREE.MeshBasicMaterial).opacity = opacity;
     }
   });
@@ -30,27 +61,33 @@ function ThermalZone({ zone }: { zone: ThermalZoneVisual }) {
   return (
     <mesh
       ref={meshRef}
-      position={[zone.position[0] + zone.size[0] / 2, 0.02, zone.position[2] + zone.size[1] / 2]}
+      position={[zone.position[0] + zone.size[0] / 2, 0.035, zone.position[2] + zone.size[1] / 2]}
       rotation={[-Math.PI / 2, 0, 0]}
+      renderOrder={2}
     >
       <planeGeometry args={[zone.size[0], zone.size[1]]} />
-      <meshBasicMaterial 
+      <meshBasicMaterial
         color={color}
+        map={falloff}
         transparent
-        opacity={zone.hotspot ? 0.4 : 0.25}
+        opacity={zone.hotspot ? HOTSPOT_OPACITY : BASE_OPACITY}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
         side={THREE.DoubleSide}
+        toneMapped={false}
       />
     </mesh>
   );
 }
 
 export function ThermalOverlayLayer({ zones, visible }: ThermalOverlayLayerProps) {
+  const falloff = useFalloffTexture();
   if (!visible) return null;
 
   return (
-    <group>
+    <group name="overlay:thermal">
       {zones.map((zone) => (
-        <ThermalZone key={zone.id} zone={zone} />
+        <ThermalZone key={zone.id} zone={zone} falloff={falloff} />
       ))}
     </group>
   );

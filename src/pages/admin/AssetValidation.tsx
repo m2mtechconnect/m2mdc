@@ -23,6 +23,11 @@ import { toast } from 'sonner';
 import { BENCHMARK_CONFIG, VALIDATION_ASSET_ID, buildAssetExpectation } from '@/validation/gpuAcceptance/spec';
 import { probeRenderer, type RendererReport } from '@/validation/gpuAcceptance/renderer';
 import { verifyDelivery, type DeliveryReport } from '@/validation/gpuAcceptance/delivery';
+import {
+  runPreflight,
+  SOFTWARE_RENDERER_GUIDANCE,
+  type PreflightReport,
+} from '@/validation/gpuAcceptance/preflight';
 import { evaluateAcceptance, type AcceptanceEvaluation } from '@/validation/gpuAcceptance/acceptance';
 import {
   BenchmarkScene,
@@ -39,14 +44,16 @@ import {
 
 const SCREENSHOT_CHECKLIST: ScreenshotReference[] = [
   { id: 'facility-overview', label: 'Facility overview with the simulated asset', captured: false },
-  { id: 'front-view', label: 'Front view', captured: false },
+  { id: 'front-view', label: 'Rack front', captured: false },
   { id: 'rear-cooler-door', label: 'Rear cooler-door view', captured: false },
-  { id: 'clearance-left-right', label: 'Left and right clearance', captured: false },
+  { id: 'clearance-left', label: 'Left clearance', captured: false },
+  { id: 'clearance-right', label: 'Right clearance', captured: false },
   { id: 'riser-elevated', label: 'Elevated chilled-water-riser view', captured: false },
   { id: 'riser-luminaire-clearance', label: 'Riser-to-luminaire clearance', captured: false },
-  { id: 'provenance-banner', label: 'Provenance and scenario banner', captured: false },
+  { id: 'provenance-banner', label: 'Provenance and simulated-scenario banner', captured: false },
   { id: 'renderer-evidence', label: 'Hardware renderer evidence', captured: false },
-  { id: 'performance-panel', label: 'Performance results panel', captured: false },
+  { id: 'performance-panel', label: 'Final results panel', captured: false },
+  { id: 'lighting-beams', label: 'Overhead lighting visible, obstructing structural beams removed', captured: false },
 ];
 
 const PHASE_LABEL: Record<BenchmarkPhase, string> = {
@@ -74,6 +81,10 @@ export default function AssetValidation() {
   const [screenshots, setScreenshots] = useState(SCREENSHOT_CHECKLIST);
   const [saving, setSaving] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
+  const [preflight, setPreflight] = useState<PreflightReport | null>(null);
+  const [preflighting, setPreflighting] = useState(false);
+  const visualChecklistComplete =
+    clearanceConfirmed && screenshots.every((shot) => shot.captured);
 
   const [pendingContext, setPendingContext] = useState<{
     rendererReport: RendererReport;
@@ -104,7 +115,7 @@ export default function AssetValidation() {
   );
 
   const start = useCallback(async () => {
-    if (!expected) return;
+    if (!expected || !preflight?.canStart) return;
     setSavedId(null);
     setOutcome(null);
     setAcceptance(null);
@@ -121,7 +132,17 @@ export default function AssetValidation() {
     // Hand the two reports to the completion handler through a closure so the
     // evaluation always uses the values captured for this run.
     setPendingContext({ rendererReport, deliveryReport });
-  }, [expected]);
+  }, [expected, preflight]);
+
+  const checkPreflight = useCallback(async () => {
+    if (!expected) return;
+    setPreflighting(true);
+    const report = await runPreflight({ expected, isAdmin: isAssetAdmin(role, roles) });
+    setPreflight(report);
+    setRenderer(report.renderer);
+    setDelivery(report.delivery);
+    setPreflighting(false);
+  }, [expected, role, roles]);
 
   const payload: ValidationRunPayload | null = useMemo(() => {
     if (!expected || !renderer || !delivery || !outcome || !acceptance) return null;
@@ -261,9 +282,17 @@ export default function AssetValidation() {
 
       <section className="space-y-3">
         <div className="flex flex-wrap items-center gap-3">
-          <Button onClick={start} disabled={running} data-testid="start-validation">
+          <Button variant="outline" onClick={checkPreflight} disabled={preflighting || running} data-testid="run-preflight">
+            {preflighting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Run preflight checks
+          </Button>
+          <Button
+            onClick={start}
+            disabled={running || !preflight?.canStart}
+            data-testid="start-validation"
+          >
             {running ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
-            Start validation
+            Start 20-second GPU validation
           </Button>
           <span className="text-xs text-muted-foreground">Phase: {PHASE_LABEL[phase]}</span>
           <span className="text-xs text-muted-foreground">
@@ -271,6 +300,43 @@ export default function AssetValidation() {
             {BENCHMARK_CONFIG.devicePixelRatioCap}, {BENCHMARK_CONFIG.qualityProfile} profile
           </span>
         </div>
+
+        {preflight && (
+          <Card className="p-4" data-testid="preflight-panel">
+            <h2 className="mb-2 text-sm font-semibold">Preflight</h2>
+            {preflight.softwareRendering && (
+              <p className="mb-3 flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-2 text-[12px] text-destructive">
+                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                {SOFTWARE_RENDERER_GUIDANCE}
+              </p>
+            )}
+            <ul className="space-y-1.5 text-[12px]">
+              {preflight.checks.map((check) => (
+                <li key={check.id} className="flex gap-2">
+                  {check.status === 'pass' ? (
+                    <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                  ) : check.status === 'warning' ? (
+                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+                  ) : (
+                    <XCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-destructive" />
+                  )}
+                  <span>
+                    <span className="font-medium">{check.label}</span>{' '}
+                    <span className="uppercase">
+                      {check.status === 'blocked' ? 'Blocked' : check.status === 'warning' ? 'Warning' : 'Pass'}
+                    </span>
+                    <span className="block text-muted-foreground">{check.detail}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              {preflight.canStart
+                ? 'Preflight cleared. A software-rendered run can never produce a GPU-verified result.'
+                : 'Start validation stays disabled until every blocked check clears.'}
+            </p>
+          </Card>
+        )}
 
         {renderer && (
           <Card className="p-4" data-testid="renderer-evidence">
@@ -418,6 +484,10 @@ export default function AssetValidation() {
       <section className="grid gap-4 lg:grid-cols-2">
         <Card className="p-4">
           <h2 className="mb-2 text-sm font-semibold">Visual acceptance captures</h2>
+          <p className="mb-2 text-[11px] text-muted-foreground">
+            Capture each settled camera view. Save validation stays disabled until every item and
+            the clearance confirmation are checked.
+          </p>
           <ul className="space-y-1.5 text-[12px]">
             {screenshots.map((shot) => (
               <li key={shot.id} className="flex items-center gap-2">
@@ -460,11 +530,21 @@ export default function AssetValidation() {
             >
               <Download className="mr-2 h-4 w-4" /> Download acceptance report
             </Button>
-            <Button size="sm" disabled={!payload || saving} onClick={save} data-testid="save-validation">
+            <Button
+              size="sm"
+              disabled={!payload || saving || !visualChecklistComplete}
+              onClick={save}
+              data-testid="save-validation"
+            >
               {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               Save validation
             </Button>
           </div>
+          {!visualChecklistComplete && (
+            <p className="mt-2 text-[12px] text-amber-600">
+              Complete every visual acceptance capture and the clearance confirmation before saving.
+            </p>
+          )}
           {savedId && (
             <p className="mt-2 text-[12px] text-muted-foreground">
               Saved run <span className="font-mono">{savedId}</span>.

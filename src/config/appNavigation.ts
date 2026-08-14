@@ -202,6 +202,14 @@ export const MANAGE_NAV: AppNavItem[] = [
         matches: ['/account/access-control'],
         description: 'Per-resource permissions for the current account.',
       },
+      {
+        name: 'Asset pipeline',
+        fullName: 'Asset pipeline',
+        href: '/admin/asset-pipeline',
+        icon: Shield,
+        matches: ['/admin/asset-pipeline', '/admin/asset-validation', '/admin/asset-preview'],
+        description: 'Approved 3D derivatives and hardware GPU validation.',
+      },
     ],
   },
 ];

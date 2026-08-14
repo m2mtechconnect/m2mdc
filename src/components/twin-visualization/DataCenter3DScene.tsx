@@ -777,11 +777,13 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
 
       {/* Mode indicator for simulation */}
       {props.mode === 'simulation' && (
-        <div className="absolute bottom-3 right-3 bg-blue-600/20 backdrop-blur-sm border border-blue-500/40 rounded-md px-2.5 py-1 text-xs text-blue-300 flex items-center gap-1.5 animate-fade-in">
+        <div className="absolute bottom-12 right-3 bg-blue-600/20 backdrop-blur-sm border border-blue-500/40 rounded-md px-2.5 py-1 text-xs text-blue-300 flex items-center gap-1.5 animate-fade-in">
           <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
           Live Simulation
         </div>
       )}
+
+      {import.meta.env.DEV && <AssetProvenanceBadge />}
     </div>
   );
 }

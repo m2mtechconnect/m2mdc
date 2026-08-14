@@ -587,13 +587,13 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
       {!props.compact && (
         <>
           <div
-            className={`absolute left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 ${
-              props.hostChromeTop ? 'top-[3.75rem]' : 'top-3'
+            className={`absolute right-3 z-20 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center justify-end gap-1.5 ${
+              props.hostChromeTop ? 'top-[3.75rem]' : 'top-14'
             }`}
             role="group"
-            aria-label="Camera views"
+            aria-label="View settings"
           >
-            <label className="flex items-center gap-1.5 text-xs text-slate-100">
+            <label className="flex items-center gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
               <span className="sr-only">Camera view</span>
               <select
                 aria-label="Camera view"
@@ -625,15 +625,6 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
                 ))}
               </select>
             </label>
-          </div>
-
-          <div
-            className={`absolute right-3 z-20 flex max-w-[calc(100%-14rem)] flex-wrap items-center justify-end gap-1.5 ${
-              props.hostChromeTop ? 'top-[3.75rem]' : 'top-14'
-            }`}
-            role="group"
-            aria-label="Rendering controls"
-          >
             <label className="flex items-center gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
               <span className="sr-only">Rendering quality</span>
               <select

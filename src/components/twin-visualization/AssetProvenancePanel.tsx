@@ -12,14 +12,21 @@ import {
   getAsset,
   resolveRuntimeAsset,
 } from './assetRegistry';
+import { CANARY_RACK_ASSET_ID } from './canaryRollout';
 
-export function AssetProvenanceBadge({ preferFallback }: { preferFallback?: boolean }) {
+export function AssetProvenanceBadge({
+  preferFallback,
+  assetId = CANARY_RACK_ASSET_ID,
+}: {
+  preferFallback?: boolean;
+  assetId?: string;
+}) {
   const [open, setOpen] = useState(false);
   const resolution = useMemo(
-    () => resolveRuntimeAsset(RACK_ASSET_ID, { preferFallback }),
-    [preferFallback],
+    () => resolveRuntimeAsset(assetId, { preferFallback }),
+    [assetId, preferFallback],
   );
-  const entry = getAsset(RACK_ASSET_ID);
+  const entry = getAsset(assetId);
   const imported = resolution.glbUrl !== null;
 
   return (
@@ -32,12 +39,14 @@ export function AssetProvenanceBadge({ preferFallback }: { preferFallback?: bool
         data-runtime-geometry={imported ? 'imported-glb' : 'procedural'}
         className="rounded-md border border-slate-600/70 bg-slate-900/85 px-2.5 py-1.5 text-xs text-slate-100 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
       >
-        {imported ? 'Imported GLB asset' : 'Procedural 3D preview'}
+        {imported ? 'USD-derived GLB (canary rack)' : 'Procedural 3D preview'}
       </button>
 
       {open && (
         <dl className="mt-2 max-h-64 space-y-1 overflow-auto rounded-md border border-slate-700/70 bg-slate-900/95 p-3 text-[12px] text-slate-200">
           <Row label="Runtime geometry" value={imported ? 'Imported GLB' : 'Procedural (Rack.tsx primitives)'} />
+          <Row label="Asset id" value={resolution.assetId} />
+          <Row label="Other racks" value={`Procedural (${RACK_ASSET_ID})`} />
           <Row label="USD master" value={resolution.usdMasterPath ?? 'None'} />
           <Row label="USD checksum" value={resolution.usdChecksum ?? 'None'} />
           <Row label="GLB derivative" value={resolution.glbUrl ?? 'None'} />

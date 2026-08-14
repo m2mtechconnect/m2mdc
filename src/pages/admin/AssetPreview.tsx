@@ -66,6 +66,14 @@ export default function AssetPreview() {
     <div className="space-y-4 p-6">
       <header className="space-y-1">
         <h1 className="text-xl font-semibold">Admin asset preview</h1>
+        <p className="text-sm">
+          <a
+            className="text-primary underline underline-offset-2"
+            href={`/admin/asset-validation/${OPS_ASSET_ID}`}
+          >
+            Run the hardware GPU acceptance harness for {OPS_ASSET_ID}
+          </a>
+        </p>
         <p className="text-sm text-muted-foreground" data-testid="asset-preview-label">
           NVIDIA liquid-cooled rack canary - not assigned to facility. NVIDIA
           OpenUSD-derived geometry; 0 converted textures.{' '}

@@ -269,6 +269,7 @@ function Scene({
   scenario,
   onScenarioDerivativeFailure,
   facilityGeometry,
+  infrastructure = DEFAULT_INFRASTRUCTURE,
 }: Omit<DataCenter3DSceneProps, 'events'> & { 
   canary: CanaryRolloutConfig;
   scenario: DesignScenario | null;
@@ -363,7 +364,15 @@ function Scene({
         rows={rows}
         profile={profile}
         crahUnits={thermalZones.length}
-        shellMode={facilityGeometry === 'nvidia-reference' ? (shellMode === 'off' ? 'cutaway' : shellMode) : (shellMode ?? 'off')}
+        // Infrastructure is a first-class control: when it is off no overhead
+        // structure renders at all, whatever the shell selection says.
+        shellMode={
+          infrastructure === 'off'
+            ? 'off'
+            : shellMode && shellMode !== 'off'
+              ? shellMode
+              : shellModeForInfrastructure(infrastructure)
+        }
       />
 
       {/* Grounded contact shadows (high profile only) */}
@@ -472,7 +481,8 @@ function Scene({
           racks={racks}
           rows={rows}
           bounds={extents}
-          showInfrastructure={shellMode !== 'off'}
+          infrastructure={infrastructure}
+          band={bandForDistance(targetDistance)}
         />
       )}
 

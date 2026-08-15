@@ -840,6 +840,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
                 placement={placement}
                 reducedMotion={reducedMotion}
                 canary={canary}
+                infrastructure={infrastructure}
               />
             </Suspense>
           </Canvas>

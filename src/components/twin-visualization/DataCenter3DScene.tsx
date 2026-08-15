@@ -387,6 +387,16 @@ function Scene({
         lastInteractionTime={lastInteractionTime}
         placement={placement}
         reducedMotion={reducedMotion}
+        subject={
+          selectedAssetId
+            ? (() => {
+                const rack = racks.find((r) => r.id === selectedAssetId);
+                return rack
+                  ? new THREE.Vector3(rack.position[0], rack.position[1] + 1, rack.position[2])
+                  : null;
+              })()
+            : null
+        }
       />
 
       {/* Industrial lighting rig (neutral 4000-5000K, quality-profile aware) */}

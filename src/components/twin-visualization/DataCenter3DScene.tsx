@@ -177,6 +177,8 @@ interface CameraControllerProps {
   placement?: CameraPlacement | null;
   /** Skip transitions when the operator prefers reduced motion. */
   reducedMotion?: boolean;
+  /** World-space point that must stay outside every protected rectangle. */
+  subject?: THREE.Vector3 | null;
 }
 
 // Camera controller component for smooth animations
@@ -189,8 +191,11 @@ function CameraController({
   lastInteractionTime,
   placement,
   reducedMotion,
+  subject,
 }: CameraControllerProps) {
   const { camera, invalidate } = useThree();
+  const insets = useCanvasSafeInsets((s) => s.insets);
+  const shift = useRef(new THREE.Vector3());
   const distanceRef = useRef(initialFlyIn ? baseDistance * 2.5 : baseDistance);
   const thetaRef = useRef(0.4); // Azimuth angle
   const phiRef = useRef(0.8); // Polar angle
@@ -213,7 +218,7 @@ function CameraController({
   const zoomScale = baseDistance > 0 ? targetDistance / baseDistance : 1;
   const distance = placement ? placement.distance * zoomScale : targetDistance;
   
-  useFrame((state, delta) => {
+  useFrame(() => {
     // Lerp distance toward target
     const lerpFactor = reducedMotion ? 1 : initialFlyIn && !hasAnimatedIn.current ? 0.03 : 0.06;
     distanceRef.current += (distance - distanceRef.current) * lerpFactor;
@@ -236,6 +241,30 @@ function CameraController({
     
     // Smooth interpolation to new position
     camera.position.lerp(new THREE.Vector3(x, y, z), lerpFactor);
+    // Camera safe insets: the selected subject must stay outside the control
+    // rail, legend, KPI strip and side panel rectangles. The view is only
+    // nudged when the subject would actually be obscured, so resizing chrome
+    // never makes the camera jump.
+    if (subject) {
+      const ndc = subject.clone().project(camera);
+      if (!isPointVisible({ x: ndc.x, y: ndc.y }, insets)) {
+        const safe = safeViewportNdc(insets);
+        const centreX = (safe.minX + safe.maxX) / 2;
+        const centreY = (safe.minY + safe.maxY) / 2;
+        const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+        const up = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1);
+        const scale = distanceRef.current * 0.5;
+        shift.current
+          .copy(right)
+          .multiplyScalar((ndc.x - centreX) * scale)
+          .addScaledVector(up, (ndc.y - centreY) * scale);
+        camera.position.add(shift.current);
+        camera.lookAt(focus.clone().add(shift.current));
+        camera.updateProjectionMatrix();
+        invalidate();
+        return;
+      }
+    }
     camera.lookAt(focus);
     camera.updateProjectionMatrix();
     

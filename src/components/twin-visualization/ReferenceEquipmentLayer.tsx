@@ -21,13 +21,16 @@ import type { Mesh, MeshStandardMaterial } from 'three';
 import {
   getAsset,
   listAssetsForRole,
+  resolveRoleAssetForBand,
   resolveRuntimeAsset,
   type AssetManifestEntry,
+  type DistanceBand,
   type QualityLevel,
   type SemanticRole,
 } from './assetRegistry';
 import { useRuntimeCoverageStore, type RoleCoverage } from './runtimeCoverageStore';
 import type { RackVisual, RowVisual } from './types';
+import type { InfrastructureLevel } from './infrastructureLevel';
 
 interface Placement {
   position: [number, number, number];
@@ -42,20 +45,12 @@ interface RoleMount {
   placements: Placement[];
 }
 
-/** Cheapest published derivative of the same source, by measured triangles. */
-function cheapest(role: SemanticRole): AssetManifestEntry | null {
-  const candidates = listAssetsForRole(role);
-  if (candidates.length === 0) return null;
-  return [...candidates].sort(
-    (a, b) => (a.triangleCount ?? Infinity) - (b.triangleCount ?? Infinity),
-  )[0];
-}
-
-/** Operations derivative when published, otherwise the cheapest one. */
-function nearest(role: SemanticRole): AssetManifestEntry | null {
-  const candidates = listAssetsForRole(role);
-  const ops = candidates.find((a) => a.qualityLevel === 'operations');
-  return ops ?? cheapest(role);
+/**
+ * Derivative for a role at a camera band. The decision comes from the manifest
+ * quality policy, never from filename or triangle inference.
+ */
+function forBand(role: SemanticRole, band: DistanceBand): AssetManifestEntry | null {
+  return resolveRoleAssetForBand(role, band)?.entry ?? null;
 }
 
 function InstancedRole({
@@ -92,6 +87,7 @@ function InstancedRole({
       ...coverage,
       state: 'openusd-derived',
       mountedObjects: count,
+      glbInstances: count,
       triangles: (mount.entry.triangleCount ?? 0) * count,
       drawCalls: (mount.entry.drawCallBudget ?? 1) * count,
     });
@@ -119,8 +115,10 @@ interface Props {
   racks: RackVisual[];
   rows: RowVisual[];
   bounds: { minX: number; maxX: number; minZ: number; maxZ: number };
-  /** Overhead trays and busway detail, off in rack-inspection views. */
-  showInfrastructure: boolean;
+  /** Overhead trays, pipework and busway detail. */
+  infrastructure: InfrastructureLevel;
+  /** Camera distance band driving derivative selection. */
+  band?: DistanceBand;
   /** Rack index limit for detailed in-rack equipment (performance bound). */
   detailBudget?: number;
 }
@@ -129,12 +127,14 @@ export function ReferenceEquipmentLayer({
   racks,
   rows,
   bounds,
-  showInfrastructure,
+  infrastructure,
+  band = 'nearby',
   detailBudget = 8,
 }: Props) {
+  const showInfrastructure = infrastructure !== 'off';
   const token = useMemo(
-    () => `${racks.length}:${rows.length}:${showInfrastructure ? 'infra' : 'clean'}`,
-    [racks.length, rows.length, showInfrastructure],
+    () => `${racks.length}:${rows.length}:${infrastructure}:${band}`,
+    [racks.length, rows.length, infrastructure, band],
   );
   const reset = useRuntimeCoverageStore((s) => s.resetCoverage);
   const report = useRuntimeCoverageStore((s) => s.reportRole);
@@ -174,23 +174,25 @@ export function ReferenceEquipmentLayer({
       }
     });
 
-    push('server-1u', nearest('server-1u'), server1u);
-    push('server-2u', nearest('server-2u'), server2u);
-    push('network-switch', cheapest('network-switch'), switches);
-    push('rack-pdu', nearest('rack-pdu'), pdus);
-    push('blanking-panel', nearest('blanking-panel'), blanks);
+    push('server-1u', forBand('server-1u', band), server1u);
+    push('server-2u', forBand('server-2u', band), server2u);
+    push('network-switch', forBand('network-switch', band), switches);
+    push('rack-pdu', forBand('rack-pdu', band), pdus);
+    push('blanking-panel', forBand('blanking-panel', band), blanks);
 
     // Overhead cable trays following each row, raised clear of row labels.
     if (showInfrastructure) {
       const trays: Placement[] = [];
       const span = bounds.maxX - bounds.minX;
-      const segments = Math.max(1, Math.round(span / 3));
+      // Essential shows one tray run per row; Full adds a denser grid.
+      const spacing = infrastructure === 'full' ? 2 : 3;
+      const segments = Math.max(1, Math.round(span / spacing));
       rows.forEach((row) => {
         for (let i = 0; i < segments; i += 1) {
-          trays.push({ position: [bounds.minX + 1.5 + i * 3, 4.55, row.position[2]] });
+          trays.push({ position: [bounds.minX + 1.5 + i * spacing, 4.55, row.position[2]] });
         }
       });
-      push('cable-tray', nearest('cable-tray'), trays);
+      push('cable-tray', forBand('cable-tray', band), trays);
     }
 
     // Separate reference liquid-cooling area along the hall edge.
@@ -198,10 +200,10 @@ export function ReferenceEquipmentLayer({
       position: [bounds.minX - 2.4, 0, bounds.minZ + 1.6 + i * 1.6],
       rotationY: Math.PI / 2,
     }));
-    push('liquid-cooling-equipment', nearest('liquid-cooling-equipment'), dcp);
+    push('liquid-cooling-equipment', forBand('liquid-cooling-equipment', band), dcp);
 
     return out;
-  }, [racks, rows, bounds, showInfrastructure, detailBudget]);
+  }, [racks, rows, bounds, showInfrastructure, infrastructure, band, detailBudget]);
 
   // Roles that could not mount are reported honestly, with the reason.
   useEffect(() => {
@@ -224,6 +226,8 @@ export function ReferenceEquipmentLayer({
         assetId: anyEntry?.assetId ?? null,
         quality: (anyEntry?.qualityLevel as QualityLevel) ?? null,
         mountedObjects: 0,
+        glbInstances: 0,
+        derivativeUrl: null,
         proceduralObjects: 0,
         triangles: 0,
         drawCalls: 0,
@@ -243,6 +247,7 @@ export function ReferenceEquipmentLayer({
               role: mount.role,
               assetId: mount.entry.assetId,
               quality: (mount.entry.qualityLevel as QualityLevel) ?? null,
+              derivativeUrl: mount.url,
               proceduralObjects: 0,
               detail: getAsset(mount.entry.assetId)?.displayName,
             }}

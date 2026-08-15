@@ -62,7 +62,9 @@ describe('derivative quality policy', () => {
     const rejected = listAssets().filter((a) => a.runtimePreferred === false && a.qualityLevel === 'lod');
     expect(rejected.length).toBeGreaterThan(0);
     for (const entry of rejected) {
-      expect(entry.qualityDecision).toMatch(/rejected|quarantin|Lineage/i);
+      // Either the quality policy rejected it, or delivery quarantined it.
+      const justified = /rejected/i.test(entry.qualityDecision ?? '') || !!entry.blocker;
+      expect(justified, entry.assetId).toBe(true);
       const role = entry.semanticRole as SemanticRole | undefined;
       if (!role) continue;
       for (const band of DISTANCE_BANDS) {

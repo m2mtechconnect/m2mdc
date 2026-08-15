@@ -57,6 +57,11 @@ import { WorkloadOverlayLayer } from './WorkloadOverlayLayer';
 import { ZoomControlsOverlay } from './ZoomControlsOverlay';
 import { SceneControlsRail } from './SceneControlsRail';
 import {
+  isPointVisible,
+  safeViewportNdc,
+  useCanvasSafeInsets,
+} from '@/three/canvasSafeInsets';
+import {
   DEFAULT_INFRASTRUCTURE,
   shellModeForInfrastructure,
   type InfrastructureLevel,

@@ -41,6 +41,7 @@ import { RackGroup } from './RackGroup';
 import { isAssetAdmin } from '@/auth/assetAdmin';
 import {
   FALLBACK_REASON_LABEL,
+  bandForDistance,
   getAssetCapabilityParts,
   getGpuValidationStatus,
   resolveRuntimeAsset,

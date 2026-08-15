@@ -10603,6 +10603,10 @@
       "durationSeconds": 9.0,
       "failureReason": null,
       "key": "ua950h_2sf_01",
+      "lineage": {
+        "lod": "published-checksum-mismatch-quarantined",
+        "operations": "published-checksum-mismatch-quarantined"
+      },
       "manifestStatus": "not-registered",
       "publication": {
         "lod": {

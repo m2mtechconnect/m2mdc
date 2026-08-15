@@ -41,6 +41,7 @@ import { RackGroup } from './RackGroup';
 import { isAssetAdmin } from '@/auth/assetAdmin';
 import {
   FALLBACK_REASON_LABEL,
+  bandForDistance,
   getAssetCapabilityParts,
   getGpuValidationStatus,
   resolveRuntimeAsset,
@@ -54,6 +55,17 @@ import { SovereigntyOverlayLayer } from './SovereigntyOverlayLayer';
 import { CoolingOverlayLayer } from './CoolingOverlayLayer';
 import { WorkloadOverlayLayer } from './WorkloadOverlayLayer';
 import { ZoomControlsOverlay } from './ZoomControlsOverlay';
+import { SceneControlsRail } from './SceneControlsRail';
+import {
+  isPointVisible,
+  safeViewportNdc,
+  useCanvasSafeInsets,
+} from '@/three/canvasSafeInsets';
+import {
+  DEFAULT_INFRASTRUCTURE,
+  shellModeForInfrastructure,
+  type InfrastructureLevel,
+} from './infrastructureLevel';
 import { AssetProvenanceBadge } from './AssetProvenancePanel';
 import { ScenarioRackLayer } from './ScenarioRackLayer';
 import { ReferenceEquipmentLayer } from './ReferenceEquipmentLayer';
@@ -134,6 +146,8 @@ interface DataCenter3DSceneProps {
    * OpenUSD derivatives wherever a semantic role resolves.
    */
   facilityGeometry?: FacilityGeometryMode;
+  /** Overhead infrastructure detail. Defaults to Essential. */
+  infrastructure?: InfrastructureLevel;
 }
 
 interface CanvasMountBoundaryProps {
@@ -168,6 +182,8 @@ interface CameraControllerProps {
   placement?: CameraPlacement | null;
   /** Skip transitions when the operator prefers reduced motion. */
   reducedMotion?: boolean;
+  /** World-space point that must stay outside every protected rectangle. */
+  subject?: THREE.Vector3 | null;
 }
 
 // Camera controller component for smooth animations
@@ -180,8 +196,11 @@ function CameraController({
   lastInteractionTime,
   placement,
   reducedMotion,
+  subject,
 }: CameraControllerProps) {
   const { camera, invalidate } = useThree();
+  const insets = useCanvasSafeInsets((s) => s.insets);
+  const shift = useRef(new THREE.Vector3());
   const distanceRef = useRef(initialFlyIn ? baseDistance * 2.5 : baseDistance);
   const thetaRef = useRef(0.4); // Azimuth angle
   const phiRef = useRef(0.8); // Polar angle
@@ -204,7 +223,7 @@ function CameraController({
   const zoomScale = baseDistance > 0 ? targetDistance / baseDistance : 1;
   const distance = placement ? placement.distance * zoomScale : targetDistance;
   
-  useFrame((state, delta) => {
+  useFrame(() => {
     // Lerp distance toward target
     const lerpFactor = reducedMotion ? 1 : initialFlyIn && !hasAnimatedIn.current ? 0.03 : 0.06;
     distanceRef.current += (distance - distanceRef.current) * lerpFactor;
@@ -227,6 +246,30 @@ function CameraController({
     
     // Smooth interpolation to new position
     camera.position.lerp(new THREE.Vector3(x, y, z), lerpFactor);
+    // Camera safe insets: the selected subject must stay outside the control
+    // rail, legend, KPI strip and side panel rectangles. The view is only
+    // nudged when the subject would actually be obscured, so resizing chrome
+    // never makes the camera jump.
+    if (subject) {
+      const ndc = subject.clone().project(camera);
+      if (!isPointVisible({ x: ndc.x, y: ndc.y }, insets)) {
+        const safe = safeViewportNdc(insets);
+        const centreX = (safe.minX + safe.maxX) / 2;
+        const centreY = (safe.minY + safe.maxY) / 2;
+        const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+        const up = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1);
+        const scale = distanceRef.current * 0.5;
+        shift.current
+          .copy(right)
+          .multiplyScalar((ndc.x - centreX) * scale)
+          .addScaledVector(up, (ndc.y - centreY) * scale);
+        camera.position.add(shift.current);
+        camera.lookAt(focus.clone().add(shift.current));
+        camera.updateProjectionMatrix();
+        invalidate();
+        return;
+      }
+    }
     camera.lookAt(focus);
     camera.updateProjectionMatrix();
     
@@ -261,6 +304,7 @@ function Scene({
   scenario,
   onScenarioDerivativeFailure,
   facilityGeometry,
+  infrastructure = DEFAULT_INFRASTRUCTURE,
 }: Omit<DataCenter3DSceneProps, 'events'> & { 
   canary: CanaryRolloutConfig;
   scenario: DesignScenario | null;
@@ -343,6 +387,16 @@ function Scene({
         lastInteractionTime={lastInteractionTime}
         placement={placement}
         reducedMotion={reducedMotion}
+        subject={
+          selectedAssetId
+            ? (() => {
+                const rack = racks.find((r) => r.id === selectedAssetId);
+                return rack
+                  ? new THREE.Vector3(rack.position[0], rack.position[1] + 1, rack.position[2])
+                  : null;
+              })()
+            : null
+        }
       />
 
       {/* Industrial lighting rig (neutral 4000-5000K, quality-profile aware) */}
@@ -355,7 +409,15 @@ function Scene({
         rows={rows}
         profile={profile}
         crahUnits={thermalZones.length}
-        shellMode={facilityGeometry === 'nvidia-reference' ? (shellMode === 'off' ? 'cutaway' : shellMode) : (shellMode ?? 'off')}
+        // Infrastructure is a first-class control: when it is off no overhead
+        // structure renders at all, whatever the shell selection says.
+        shellMode={
+          infrastructure === 'off'
+            ? 'off'
+            : shellMode && shellMode !== 'off'
+              ? shellMode
+              : shellModeForInfrastructure(infrastructure)
+        }
       />
 
       {/* Grounded contact shadows (high profile only) */}
@@ -464,7 +526,8 @@ function Scene({
           racks={racks}
           rows={rows}
           bounds={extents}
-          showInfrastructure={shellMode !== 'off'}
+          infrastructure={infrastructure}
+          band={bandForDistance(targetDistance)}
         />
       )}
 
@@ -498,6 +561,12 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const [qualityProfile, setQualityProfile] = useState<QualityProfileId>(() => readQualityProfile());
   const [placement, setPlacement] = useState<CameraPlacement | null>(null);
+  const [infrastructure, setInfrastructure] = useState<InfrastructureLevel>(
+    props.infrastructure ?? DEFAULT_INFRASTRUCTURE,
+  );
+  useEffect(() => {
+    if (props.infrastructure) setInfrastructure(props.infrastructure);
+  }, [props.infrastructure]);
 
   const reducedMotion = useMemo(
     () =>
@@ -711,17 +780,11 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
         props.fill ? '' : 'rounded-lg border border-slate-700/50'
       }`}
     >
-      {/* Canvas right rail: ONE protected column holding every view control.
-          The host owns the top-left corner (layer selector, 3D/2D), the rail
-          owns the right edge, and neither can grow into the other because the
-          rail is a fixed-width column that scrolls instead of wrapping. */}
-      <div
-        data-testid="canvas-right-rail"
-        className={`pointer-events-none absolute right-3 z-30 flex max-h-[calc(100%-5rem)] w-[13.5rem] flex-col items-end gap-2 overflow-y-auto ${
-          props.hostChromeTop ? 'top-[3.75rem]' : 'top-3'
-        }`}
-      >
-        <div className="pointer-events-auto w-full">
+      {/* Compact persistent rail. Continuous controls only; everything else
+          lives in a collapsed Scene controls popover so no control column can
+          sit over the racks the operator is inspecting. */}
+      {props.compact ? (
+        <div className="pointer-events-auto absolute right-3 top-3 z-30 w-[11rem]">
           <ZoomControlsOverlay
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
@@ -731,99 +794,28 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             inline
           />
         </div>
-
-        {!props.compact && (
-          <div
-            className="pointer-events-auto flex w-full flex-col items-stretch gap-1.5"
-            role="group"
-            aria-label="View settings"
-          >
-            <label className="flex items-center justify-between gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
-              <span className="sr-only">Camera view</span>
-              <select
-                aria-label="Camera view"
-                data-testid="twin-camera-preset"
-                value=""
-                onChange={(e) => {
-                  const preset = e.target.value as CameraPresetId;
-                  if (preset) applyPreset(preset);
-                }}
-                className="w-full min-w-0 bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
-              >
-                <option value="" className="bg-slate-900">
-                  Camera view
-                </option>
-                {(
-                  [
-                    'fitFacility',
-                    'topDown',
-                    'rackFront',
-                    'rackRear',
-                    'rackSide',
-                    'rackElevated',
-                    'frontAisles',
-                    'rearInfrastructure',
-                    'coolingTopology',
-                    'powerTopology',
-                    'fitSelection',
-                  ] as CameraPresetId[]
-                ).map((preset) => (
-                  <option key={preset} value={preset} className="bg-slate-900">
-                    {CAMERA_PRESET_LABELS[preset]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="flex items-center justify-between gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
-              <span className="sr-only">Rendering quality</span>
-              <select
-                aria-label="Rendering quality"
-                value={qualityProfile}
-                onChange={(e) => changeQuality(e.target.value as QualityProfileId)}
-                className="w-full min-w-0 bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
-              >
-                {Object.values(QUALITY_PROFILES).map((p) => (
-                  <option key={p.id} value={p.id} className="bg-slate-900">
-                    {p.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="flex items-center justify-between gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
-              <span className="text-slate-300">Shell</span>
-              <span className="sr-only">Facility shell</span>
-              <select
-                aria-label="Facility shell"
-                data-testid="twin-shell-mode"
-                value={props.shellMode ?? 'off'}
-                onChange={(e) => props.onShellModeChange?.(e.target.value as ShellMode)}
-                className="bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
-              >
-                <option value="off" className="bg-slate-900">Off</option>
-                <option value="cutaway" className="bg-slate-900">Cutaway</option>
-                <option value="full" className="bg-slate-900">Full</option>
-              </select>
-            </label>
-            <button
-              type="button"
-              data-testid="twin-labels-toggle"
-              aria-pressed={props.showLabels !== false}
-              onClick={() => props.onShowLabelsChange?.(!(props.showLabels !== false))}
-              className="rounded-md border border-slate-600/70 bg-slate-900/85 px-2.5 py-1.5 text-xs text-slate-100 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
-            >
-              Labels: {props.showLabels !== false ? 'On' : 'Off'}
-            </button>
-            <button
-              type="button"
-              onClick={() => applyPreset('reset')}
-              title="Reset camera to the calculated facility overview"
-              className="rounded-md border border-slate-600/70 bg-slate-900/85 px-2.5 py-1.5 text-xs text-slate-100 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
-            >
-              Reset camera
-            </button>
-          </div>
-        )}
-      </div>
+      ) : (
+        <SceneControlsRail
+          containerRef={canvasContainerRef}
+          offsetTop={props.hostChromeTop}
+          zoomLevel={zoomLevel}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          onZoomReset={handleReset}
+          disabled={contextLost}
+          inspecting={!!props.selectedAssetId}
+          onPreset={applyPreset}
+          quality={qualityProfile}
+          onQualityChange={changeQuality}
+          shellMode={props.shellMode ?? 'off'}
+          onShellModeChange={props.onShellModeChange}
+          showLabels={props.showLabels !== false}
+          onShowLabelsChange={props.onShowLabelsChange}
+          infrastructure={infrastructure}
+          onInfrastructureChange={setInfrastructure}
+          onResetCamera={() => applyPreset('reset')}
+        />
+      )}
 
       {/* Context lost overlay */}
       {contextLost && (
@@ -892,6 +884,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
                 placement={placement}
                 reducedMotion={reducedMotion}
                 canary={canary}
+                infrastructure={infrastructure}
               />
             </Suspense>
           </Canvas>
@@ -943,9 +936,19 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             </span>
             <span className="font-medium">NVIDIA reference facility</span>
           </div>
-          <p className="mt-1 text-slate-300" data-testid="reference-facility-coverage">
-            OpenUSD-derived equipment: {runtimeTotals.mountedObjects} mounted objects across{' '}
-            {runtimeTotals.derivedRoles} of {referenceFacilityCoverage().length} roles.
+          <p
+            className="mt-1 text-slate-300"
+            data-testid="reference-facility-coverage"
+            data-mounted-logical-objects={runtimeTotals.mountedObjects}
+            data-glb-instances={runtimeTotals.glbInstances}
+            data-unique-derivatives={runtimeTotals.uniqueDerivatives}
+            data-logical-assets={runtimeTotals.logicalAssets}
+            data-procedural-objects={runtimeTotals.proceduralObjects}
+          >
+            OpenUSD-derived equipment: {runtimeTotals.mountedObjects} visible scene objects across{' '}
+            {runtimeTotals.derivedRoles} of {referenceFacilityCoverage().length} roles, drawn from{' '}
+            {runtimeTotals.logicalAssets} logical assets and {runtimeTotals.uniqueDerivatives}{' '}
+            loaded derivative files. Counts are visible objects, not manifest rows.
             Representative NVIDIA equipment, not verified as installed. Roles without an approved
             derivative render AURA procedural geometry.
           </p>

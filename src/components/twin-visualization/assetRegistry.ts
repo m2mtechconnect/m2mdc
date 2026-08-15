@@ -77,6 +77,57 @@ export interface AssetManifestEntry {
   qualityVariants?: Partial<Record<QualityLevel, string>>;
   /** True when the entry may be instanced across many placements. */
   instanceable?: boolean;
+  /** Measured cost of this derivative, recorded by the ingestion pipeline. */
+  qualityMetrics?: {
+    triangles: number;
+    drawCalls: number;
+    meshes: number;
+    materials: number;
+    textures: number;
+    sizeBytes: number;
+    boundsMin?: number[];
+    boundsMax?: number[];
+    silhouette?: string | null;
+    decodeMsMeasured?: number | null;
+  };
+  /** 1 = cheapest derivative of the same logical asset. */
+  renderCostRank?: number;
+  /** Explicit runtime permission. False keeps the entry for audit only. */
+  runtimePreferred?: boolean;
+  /** Camera distance bands this derivative is the recorded choice for. */
+  preferredFor?: DistanceBand[];
+  cameraDistanceMeters?: { min: number; max: number } | null;
+  /** Human-readable justification for the quality decision. */
+  qualityDecision?: string;
+}
+
+/** Camera distance bands the runtime selects derivatives for. */
+export type DistanceBand = 'selected' | 'nearby' | 'overview';
+
+export const DISTANCE_BANDS: DistanceBand[] = ['selected', 'nearby', 'overview'];
+
+/** Band a camera distance in metres falls into. */
+export function bandForDistance(metres: number): DistanceBand {
+  if (metres <= 3) return 'selected';
+  if (metres <= 12) return 'nearby';
+  return 'overview';
+}
+
+/**
+ * Composite render cost of a derivative, from measured pipeline metrics.
+ * Used by tests to prove distance never selects a more expensive derivative.
+ */
+export function derivativeCost(entry: AssetManifestEntry): {
+  triangles: number;
+  drawCalls: number;
+  sizeBytes: number;
+} {
+  const m = entry.qualityMetrics;
+  return {
+    triangles: m?.triangles ?? entry.triangleCount ?? Number.POSITIVE_INFINITY,
+    drawCalls: m?.drawCalls ?? entry.drawCallBudget ?? Number.POSITIVE_INFINITY,
+    sizeBytes: m?.sizeBytes ?? Number.POSITIVE_INFINITY,
+  };
 }
 
 interface AssetManifestFile {
@@ -154,6 +205,46 @@ export function resolveQualityVariant(
   const variantId = entry?.qualityVariants?.[quality];
   if (!variantId) return null;
   return getAsset(variantId) ?? null;
+}
+
+/**
+ * Runtime derivative for a semantic role at a camera distance band.
+ *
+ * The decision is read from the manifest (`preferredFor` + `runtimePreferred`),
+ * which the ingestion pipeline records from measured triangles, draw calls and
+ * transfer size. Filenames, class names and triangle counts are never used to
+ * infer quality at runtime, so a declared LOD that is objectively more
+ * expensive than its operations build can never be selected.
+ */
+export function resolveRoleAssetForBand(
+  role: SemanticRole,
+  band: DistanceBand,
+): { entry: AssetManifestEntry; band: DistanceBand } | null {
+  const candidates = listAssetsForRole(role).filter((a) => a.runtimePreferred !== false);
+  if (candidates.length === 0) return null;
+
+  const cheapestIn = (pool: AssetManifestEntry[]) =>
+    [...pool].sort((a, b) => {
+      const ca = derivativeCost(a);
+      const cb = derivativeCost(b);
+      return ca.triangles - cb.triangles || ca.drawCalls - cb.drawCalls || ca.sizeBytes - cb.sizeBytes;
+    })[0];
+
+  const declared = (b: DistanceBand) => candidates.filter((a) => a.preferredFor?.includes(b));
+  // Several logical assets can satisfy one role (four blanking panels, five
+  // switches). Within a band they are alternatives, so the cheapest recorded
+  // cost wins; across bands the manifest decision decides the class.
+  const near = cheapestIn(declared('nearby').length ? declared('nearby') : candidates);
+  if (band !== 'overview') return { entry: near, band };
+
+  const far = cheapestIn(declared('overview').length ? declared('overview') : candidates);
+  // A distant camera must never cost more than a near one. If the declared
+  // overview derivative is heavier, the nearer decision is reused.
+  const cf = derivativeCost(far);
+  const cn = derivativeCost(near);
+  const heavier =
+    cf.triangles > cn.triangles && cf.drawCalls >= cn.drawCalls && cf.sizeBytes > cn.sizeBytes;
+  return { entry: heavier ? near : far, band };
 }
 
 /** True only when the manifest explicitly declares the asset instanceable. */

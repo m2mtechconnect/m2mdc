@@ -21,8 +21,15 @@ export interface RoleCoverage {
   state: RoleRuntimeState;
   assetId: string | null;
   quality: QualityLevel | null;
-  /** Objects of this role currently mounted from an approved derivative. */
+  /**
+   * Logical scene objects of this role mounted from an approved derivative.
+   * One placement is one logical object, never a manifest row or a variant.
+   */
   mountedObjects: number;
+  /** GLB instances in the graph for those logical objects. */
+  glbInstances: number;
+  /** Derivative file backing the mount; one network fetch per unique URL. */
+  derivativeUrl: string | null;
   /** Objects of this role currently rendered as AURA procedural geometry. */
   proceduralObjects: number;
   triangles: number;
@@ -50,8 +57,17 @@ export const useRuntimeCoverageStore = create<CoverageState>((set, get) => ({
 
 export function coverageTotals(roles: Record<string, RoleCoverage>) {
   const list = Object.values(roles);
+  const derivativeUrls = new Set(
+    list.filter((r) => r.mountedObjects > 0 && r.derivativeUrl).map((r) => r.derivativeUrl as string),
+  );
+  const logicalAssets = new Set(
+    list.filter((r) => r.mountedObjects > 0 && r.assetId).map((r) => r.assetId as string),
+  );
   return {
     mountedObjects: list.reduce((n, r) => n + r.mountedObjects, 0),
+    glbInstances: list.reduce((n, r) => n + r.glbInstances, 0),
+    uniqueDerivatives: derivativeUrls.size,
+    logicalAssets: logicalAssets.size,
     proceduralObjects: list.reduce((n, r) => n + r.proceduralObjects, 0),
     triangles: list.reduce((n, r) => n + r.triangles, 0),
     drawCalls: list.reduce((n, r) => n + r.drawCalls, 0),

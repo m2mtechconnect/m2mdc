@@ -1,6 +1,6 @@
 {
-  "manifestVersion": 4,
-  "generatedAt": "2026-08-14T21:44:46Z",
+  "manifestVersion": 5,
+  "generatedAt": "2026-08-15T03:56:28Z",
   "assets": [
     {
       "assetId": "nvidia.rack.42u_a_01",
@@ -298,7 +298,38 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 1996,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 91356,
+        "boundsMin": [
+          -0.0033,
+          0,
+          -0.2413
+        ],
+        "boundsMax": [
+          0.0033,
+          0.0434,
+          0.2413
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 12.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (200 vs 1996) and transfer (9572 vs 91356 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.blanking_panel.blank_1u_black.lod",
@@ -337,7 +368,37 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 200,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 9572,
+        "boundsMin": [
+          -0.0033,
+          0,
+          -0.2413
+        ],
+        "boundsMax": [
+          0.0033,
+          0.0434,
+          0.2413
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 12.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (200 vs 1996) and transfer (9572 vs 91356 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.blanking_panel.blank_1u_blackgold.operations",
@@ -376,7 +437,38 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 2000,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 56380,
+        "boundsMin": [
+          -0.0212,
+          0,
+          -0.2412
+        ],
+        "boundsMax": [
+          0.0212,
+          0.045,
+          0.2412
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 12.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (200 vs 2000) and transfer (6872 vs 56380 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.blanking_panel.blank_1u_blackgold.lod",
@@ -415,7 +507,37 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 200,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 6872,
+        "boundsMin": [
+          -0.0219,
+          0,
+          -0.2411
+        ],
+        "boundsMax": [
+          0.0219,
+          0.0448,
+          0.2411
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 12.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (200 vs 2000) and transfer (6872 vs 56380 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.blanking_panel.blank_1u_snapon_gray.operations",
@@ -454,7 +576,39 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 52,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 3832,
+        "boundsMin": [
+          -0.0014,
+          0,
+          -0.243
+        ],
+        "boundsMax": [
+          0.0014,
+          0.0445,
+          0.243
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby",
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD rejected: 52 triangles / 3832 bytes against operations 52 / 3832, draw-call saving 0. Objectively more expensive with no overview benefit; operations is used at every distance. LOD retained for audit only."
     },
     {
       "assetId": "nvidia.blanking_panel.blank_1u_snapon_gray.lod",
@@ -493,7 +647,32 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 52,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 3832,
+        "boundsMin": [
+          -0.0014,
+          0,
+          -0.243
+        ],
+        "boundsMax": [
+          0.0014,
+          0.0445,
+          0.243
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": false,
+      "preferredFor": [],
+      "cameraDistanceMeters": null,
+      "qualityDecision": "LOD rejected: 52 triangles / 3832 bytes against operations 52 / 3832, draw-call saving 0. Objectively more expensive with no overview benefit; operations is used at every distance. LOD retained for audit only."
     },
     {
       "assetId": "nvidia.blanking_panel.blank_1u_white.operations",
@@ -532,7 +711,38 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 1998,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 35976,
+        "boundsMin": [
+          -0.0045,
+          0,
+          -0.2413
+        ],
+        "boundsMax": [
+          0.0045,
+          0.0438,
+          0.2413
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 12.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (200 vs 1998) and transfer (4964 vs 35976 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.blanking_panel.blank_1u_white.lod",
@@ -571,7 +781,37 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 200,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 4964,
+        "boundsMin": [
+          -0.0046,
+          0,
+          -0.2413
+        ],
+        "boundsMax": [
+          0.0046,
+          0.0439,
+          0.2413
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 12.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (200 vs 1998) and transfer (4964 vs 35976 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.cable_tray.cable_tray_25.operations",
@@ -610,7 +850,38 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 660,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 32600,
+        "boundsMin": [
+          -0.1299,
+          0,
+          -0.3048
+        ],
+        "boundsMax": [
+          0.1299,
+          0.0508,
+          0.3048
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 12.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (300 vs 660) and transfer (14836 vs 32600 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.cable_tray.cable_tray_25.lod",
@@ -649,7 +920,37 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 300,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 14836,
+        "boundsMin": [
+          -0.1299,
+          0,
+          -0.3048
+        ],
+        "boundsMax": [
+          0.1299,
+          0.0508,
+          0.3048
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 12.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (300 vs 660) and transfer (14836 vs 32600 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.cable_tray.cable_tray_299.operations",
@@ -688,7 +989,38 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 804,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 38368,
+        "boundsMin": [
+          -1.4935,
+          0,
+          -0.3048
+        ],
+        "boundsMax": [
+          1.4935,
+          0.0507,
+          0.3048
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 12.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (300 vs 804) and transfer (14580 vs 38368 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.cable_tray.cable_tray_299.lod",
@@ -727,7 +1059,37 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 300,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 14580,
+        "boundsMin": [
+          -1.4935,
+          0,
+          -0.3048
+        ],
+        "boundsMax": [
+          1.4935,
+          0.0507,
+          0.3048
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 12.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (300 vs 804) and transfer (14580 vs 38368 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.cable_tray.cable_tray_tee.operations",
@@ -766,7 +1128,38 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 476,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 27928,
+        "boundsMin": [
+          -0.4348,
+          0,
+          -0.5553
+        ],
+        "boundsMax": [
+          0.4348,
+          0.0508,
+          0.5553
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 12.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (300 vs 476) and transfer (17152 vs 27928 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.cable_tray.cable_tray_tee.lod",
@@ -805,7 +1198,37 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 300,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 17152,
+        "boundsMin": [
+          -0.4348,
+          0,
+          -0.5553
+        ],
+        "boundsMax": [
+          0.4348,
+          0.0508,
+          0.5553
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 12.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (300 vs 476) and transfer (17152 vs 27928 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.liquid_cooling.dcp_a_01.operations",
@@ -844,7 +1267,38 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 15360,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 659872,
+        "boundsMin": [
+          -0.5699,
+          0,
+          -0.4971
+        ],
+        "boundsMax": [
+          0.5699,
+          3.4461,
+          0.4971
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 12.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (4997 vs 15360) and transfer (185580 vs 659872 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.liquid_cooling.dcp_a_01.lod",
@@ -883,7 +1337,37 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 4997,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 185580,
+        "boundsMin": [
+          -0.5697,
+          0,
+          -0.4971
+        ],
+        "boundsMax": [
+          0.5697,
+          3.4461,
+          0.4971
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 12.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (4997 vs 15360) and transfer (185580 vs 659872 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.network_switch.qm8700_01.operations",
@@ -922,7 +1406,39 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 50752,
+        "drawCalls": 3,
+        "meshes": 3,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 1397316,
+        "boundsMin": [
+          -0.2952,
+          0,
+          -0.2141
+        ],
+        "boundsMax": [
+          0.2952,
+          0.0447,
+          0.2141
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby",
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD rejected: 136653 triangles / 4197100 bytes against operations 50752 / 1397316, draw-call saving 0. Objectively more expensive with no overview benefit; operations is used at every distance. LOD retained for audit only."
     },
     {
       "assetId": "nvidia.network_switch.qm8700_01.lod",
@@ -961,7 +1477,32 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 136653,
+        "drawCalls": 3,
+        "meshes": 3,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 4197100,
+        "boundsMin": [
+          -0.298,
+          0,
+          -0.214
+        ],
+        "boundsMax": [
+          0.298,
+          0.0481,
+          0.214
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": false,
+      "preferredFor": [],
+      "cameraDistanceMeters": null,
+      "qualityDecision": "LOD rejected: 136653 triangles / 4197100 bytes against operations 50752 / 1397316, draw-call saving 0. Objectively more expensive with no overview benefit; operations is used at every distance. LOD retained for audit only."
     },
     {
       "assetId": "nvidia.network_switch.qm8700_c_01.operations",
@@ -1000,7 +1541,39 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 35098,
+        "drawCalls": 3,
+        "meshes": 3,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 1033364,
+        "boundsMin": [
+          -0.3388,
+          0,
+          -0.2405
+        ],
+        "boundsMax": [
+          0.3388,
+          0.046,
+          0.2405
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby",
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD rejected: 57455 triangles / 1935764 bytes against operations 35098 / 1033364, draw-call saving 0. Objectively more expensive with no overview benefit; operations is used at every distance. LOD retained for audit only."
     },
     {
       "assetId": "nvidia.network_switch.qm8700_c_01.lod",
@@ -1039,7 +1612,32 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 57455,
+        "drawCalls": 3,
+        "meshes": 3,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 1935764,
+        "boundsMin": [
+          -0.3412,
+          0,
+          -0.2405
+        ],
+        "boundsMax": [
+          0.3412,
+          0.0481,
+          0.2405
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": false,
+      "preferredFor": [],
+      "cameraDistanceMeters": null,
+      "qualityDecision": "LOD rejected: 57455 triangles / 1935764 bytes against operations 35098 / 1033364, draw-call saving 0. Objectively more expensive with no overview benefit; operations is used at every distance. LOD retained for audit only."
     },
     {
       "assetId": "nvidia.network_switch.qm8700_f_01.operations",
@@ -1079,7 +1677,39 @@
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
       },
-      "blocker": "lod:world-bounds-preserved [0.6301, 0.4146, 0.482] vs [0.6061, 0.4562, 0.5151]"
+      "blocker": "lod:world-bounds-preserved [0.6301, 0.4146, 0.482] vs [0.6061, 0.4562, 0.5151]",
+      "qualityMetrics": {
+        "triangles": 36273,
+        "drawCalls": 3,
+        "meshes": 3,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 1056416,
+        "boundsMin": [
+          -0.3029,
+          0,
+          -0.258
+        ],
+        "boundsMax": [
+          0.3029,
+          0.4571,
+          0.258
+        ],
+        "silhouette": "failed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": false,
+      "preferredFor": [
+        "selected",
+        "nearby",
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD rejected: 88476 triangles / 2802568 bytes against operations 36273 / 1056416, draw-call saving 0. Objectively more expensive with no overview benefit; operations is used at every distance. LOD retained for audit only."
     },
     {
       "assetId": "nvidia.network_switch.qm8700_f_01.lod",
@@ -1119,7 +1749,32 @@
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
       },
-      "blocker": "lod:world-bounds-preserved [0.6301, 0.4146, 0.482] vs [0.6061, 0.4562, 0.5151]"
+      "blocker": "lod:world-bounds-preserved [0.6301, 0.4146, 0.482] vs [0.6061, 0.4562, 0.5151]",
+      "qualityMetrics": {
+        "triangles": 88476,
+        "drawCalls": 3,
+        "meshes": 3,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 2802568,
+        "boundsMin": [
+          -0.315,
+          0,
+          -0.241
+        ],
+        "boundsMax": [
+          0.315,
+          0.4146,
+          0.241
+        ],
+        "silhouette": "failed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": false,
+      "preferredFor": [],
+      "cameraDistanceMeters": null,
+      "qualityDecision": "LOD rejected: 88476 triangles / 2802568 bytes against operations 36273 / 1056416, draw-call saving 0. Objectively more expensive with no overview benefit; operations is used at every distance. LOD retained for audit only."
     },
     {
       "assetId": "nvidia.rack.rack_42u_a_01.operations",
@@ -1158,7 +1813,38 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 59941,
+        "drawCalls": 2,
+        "meshes": 2,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 2646804,
+        "boundsMin": [
+          -0.3017,
+          0,
+          -0.7107
+        ],
+        "boundsMax": [
+          0.3017,
+          3.1663,
+          0.7107
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 12.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (16456 vs 59941) and transfer (585392 vs 2646804 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.rack.rack_42u_a_01.lod",
@@ -1197,7 +1883,37 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 16456,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 585392,
+        "boundsMin": [
+          -0.303,
+          0,
+          -0.7107
+        ],
+        "boundsMax": [
+          0.303,
+          3.1663,
+          0.7107
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 12.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (16456 vs 59941) and transfer (585392 vs 2646804 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.rack_core.rack_42u_a_core.operations",
@@ -1236,7 +1952,38 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 26872,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 899284,
+        "boundsMin": [
+          -0.3,
+          0,
+          -0.5942
+        ],
+        "boundsMax": [
+          0.3,
+          1.998,
+          0.5942
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 12.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (7998 vs 26872) and transfer (189376 vs 899284 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.rack_core.rack_42u_a_core.lod",
@@ -1275,7 +2022,37 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 7998,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 189376,
+        "boundsMin": [
+          -0.3,
+          0,
+          -0.5942
+        ],
+        "boundsMax": [
+          0.3,
+          1.998,
+          0.5942
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 12.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (7998 vs 26872) and transfer (189376 vs 899284 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.rack_pdu.rpdu_a_01.operations",
@@ -1314,7 +2091,38 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 14925,
+        "drawCalls": 2,
+        "meshes": 2,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 572396,
+        "boundsMin": [
+          -0.1712,
+          0,
+          -0.2413
+        ],
+        "boundsMax": [
+          0.1712,
+          0.1334,
+          0.2413
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 12.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (2169 vs 14925) and transfer (116600 vs 572396 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.rack_pdu.rpdu_a_01.lod",
@@ -1353,7 +2161,37 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 2169,
+        "drawCalls": 2,
+        "meshes": 2,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 116600,
+        "boundsMin": [
+          -0.172,
+          0,
+          -0.2403
+        ],
+        "boundsMax": [
+          0.172,
+          0.1334,
+          0.2403
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 12.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (2169 vs 14925) and transfer (116600 vs 572396 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.server.server_1u_a.operations",
@@ -1392,7 +2230,38 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 28326,
+        "drawCalls": 3,
+        "meshes": 3,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 783368,
+        "boundsMin": [
+          -0.3933,
+          0,
+          -0.241
+        ],
+        "boundsMax": [
+          0.3933,
+          0.0442,
+          0.241
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 12.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (17066 vs 28326) and transfer (446052 vs 783368 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.server.server_1u_a.lod",
@@ -1431,7 +2300,37 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 17066,
+        "drawCalls": 2,
+        "meshes": 2,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 446052,
+        "boundsMin": [
+          -0.3944,
+          0,
+          -0.2409
+        ],
+        "boundsMax": [
+          0.3944,
+          0.0474,
+          0.2409
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 12.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (17066 vs 28326) and transfer (446052 vs 783368 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.server.server_2u_b.operations",
@@ -1470,7 +2369,39 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 27208,
+        "drawCalls": 4,
+        "meshes": 4,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 717288,
+        "boundsMin": [
+          -0.3987,
+          0,
+          -0.5525
+        ],
+        "boundsMax": [
+          0.3987,
+          0.0931,
+          0.5525
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby",
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD rejected: 64750 triangles / 1435004 bytes against operations 27208 / 717288, draw-call saving 1. Objectively more expensive with no overview benefit; operations is used at every distance. LOD retained for audit only."
     },
     {
       "assetId": "nvidia.server.server_2u_b.lod",
@@ -1509,7 +2440,32 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 64750,
+        "drawCalls": 3,
+        "meshes": 3,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 1435004,
+        "boundsMin": [
+          -0.3988,
+          0,
+          -0.5525
+        ],
+        "boundsMax": [
+          0.3988,
+          0.0931,
+          0.5525
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": false,
+      "preferredFor": [],
+      "cameraDistanceMeters": null,
+      "qualityDecision": "LOD rejected: 64750 triangles / 1435004 bytes against operations 27208 / 717288, draw-call saving 1. Objectively more expensive with no overview benefit; operations is used at every distance. LOD retained for audit only."
     },
     {
       "assetId": "nvidia.server.server_2u_c.operations",
@@ -1548,7 +2504,39 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 27208,
+        "drawCalls": 4,
+        "meshes": 4,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 717284,
+        "boundsMin": [
+          -0.3987,
+          0,
+          -0.5525
+        ],
+        "boundsMax": [
+          0.3987,
+          0.0931,
+          0.5525
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby",
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD rejected: 64734 triangles / 1440680 bytes against operations 27208 / 717284, draw-call saving 0. Objectively more expensive with no overview benefit; operations is used at every distance. LOD retained for audit only."
     },
     {
       "assetId": "nvidia.server.server_2u_c.lod",
@@ -1587,7 +2575,32 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 64734,
+        "drawCalls": 4,
+        "meshes": 4,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 1440680,
+        "boundsMin": [
+          -0.3988,
+          0,
+          -0.5525
+        ],
+        "boundsMax": [
+          0.3988,
+          0.0931,
+          0.5525
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": false,
+      "preferredFor": [],
+      "cameraDistanceMeters": null,
+      "qualityDecision": "LOD rejected: 64734 triangles / 1440680 bytes against operations 27208 / 717284, draw-call saving 0. Objectively more expensive with no overview benefit; operations is used at every distance. LOD retained for audit only."
     },
     {
       "assetId": "nvidia.network_switch.sn2700c_01.operations",
@@ -1626,7 +2639,39 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 58397,
+        "drawCalls": 2,
+        "meshes": 2,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 1439596,
+        "boundsMin": [
+          -0.383,
+          0,
+          -0.2414
+        ],
+        "boundsMax": [
+          0.383,
+          0.0503,
+          0.2414
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby",
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD rejected: 176676 triangles / 5201604 bytes against operations 58397 / 1439596, draw-call saving 0. Objectively more expensive with no overview benefit; operations is used at every distance. LOD retained for audit only."
     },
     {
       "assetId": "nvidia.network_switch.sn2700c_01.lod",
@@ -1665,7 +2710,32 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 176676,
+        "drawCalls": 2,
+        "meshes": 2,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 5201604,
+        "boundsMin": [
+          -0.3819,
+          0,
+          -0.2388
+        ],
+        "boundsMax": [
+          0.3819,
+          0.0442,
+          0.2388
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": false,
+      "preferredFor": [],
+      "cameraDistanceMeters": null,
+      "qualityDecision": "LOD rejected: 176676 triangles / 5201604 bytes against operations 58397 / 1439596, draw-call saving 0. Objectively more expensive with no overview benefit; operations is used at every distance. LOD retained for audit only."
     },
     {
       "assetId": "nvidia.network_switch.sn3700c_01.operations",
@@ -1704,7 +2774,38 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 47633,
+        "drawCalls": 3,
+        "meshes": 3,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 1556428,
+        "boundsMin": [
+          -0.3879,
+          0,
+          -0.2412
+        ],
+        "boundsMax": [
+          0.3879,
+          0.0535,
+          0.2412
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 12.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (42614 vs 47633) and transfer (1430268 vs 1556428 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.network_switch.sn3700c_01.lod",
@@ -1743,7 +2844,37 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 42614,
+        "drawCalls": 2,
+        "meshes": 2,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 1430268,
+        "boundsMin": [
+          -0.3868,
+          0,
+          -0.2412
+        ],
+        "boundsMax": [
+          0.3868,
+          0.0523,
+          0.2412
+        ],
+        "silhouette": "passed-with-budget-exception",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 12.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (42614 vs 47633) and transfer (1430268 vs 1556428 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.network_switch.ua950h_2sf_01.operations",
@@ -1782,7 +2913,38 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 34751,
+        "drawCalls": 3,
+        "meshes": 3,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 1459908,
+        "boundsMin": [
+          -0.4061,
+          0,
+          -0.2423
+        ],
+        "boundsMax": [
+          0.4061,
+          0.0441,
+          0.2423
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 2,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "selected",
+        "nearby"
+      ],
+      "cameraDistanceMeters": {
+        "min": 0.0,
+        "max": 12.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (3909 vs 34751) and transfer (144928 vs 1459908 bytes); selected for overview."
     },
     {
       "assetId": "nvidia.network_switch.ua950h_2sf_01.lod",
@@ -1821,7 +2983,38 @@
       "gpuValidation": {
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
-      }
+      },
+      "qualityMetrics": {
+        "triangles": 3909,
+        "drawCalls": 2,
+        "meshes": 2,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 144928,
+        "boundsMin": [
+          -0.4059,
+          0,
+          -0.2409
+        ],
+        "boundsMax": [
+          0.4059,
+          0.0464,
+          0.2409
+        ],
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "runtimePreferred": true,
+      "preferredFor": [
+        "overview"
+      ],
+      "cameraDistanceMeters": {
+        "min": 12.0,
+        "max": 400.0
+      },
+      "qualityDecision": "LOD is cheaper on triangles (3909 vs 34751) and transfer (144928 vs 1459908 bytes); selected for overview."
     }
-  ]
+  ],
+  "qualityPolicyVersion": "1.0.0"
 }

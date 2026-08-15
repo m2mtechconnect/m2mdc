@@ -736,17 +736,11 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
         props.fill ? '' : 'rounded-lg border border-slate-700/50'
       }`}
     >
-      {/* Canvas right rail: ONE protected column holding every view control.
-          The host owns the top-left corner (layer selector, 3D/2D), the rail
-          owns the right edge, and neither can grow into the other because the
-          rail is a fixed-width column that scrolls instead of wrapping. */}
-      <div
-        data-testid="canvas-right-rail"
-        className={`pointer-events-none absolute right-3 z-30 flex max-h-[calc(100%-5rem)] w-[13.5rem] flex-col items-end gap-2 overflow-y-auto ${
-          props.hostChromeTop ? 'top-[3.75rem]' : 'top-3'
-        }`}
-      >
-        <div className="pointer-events-auto w-full">
+      {/* Compact persistent rail. Continuous controls only; everything else
+          lives in a collapsed Scene controls popover so no control column can
+          sit over the racks the operator is inspecting. */}
+      {props.compact ? (
+        <div className="pointer-events-auto absolute right-3 top-3 z-30 w-[11rem]">
           <ZoomControlsOverlay
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
@@ -756,99 +750,28 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             inline
           />
         </div>
-
-        {!props.compact && (
-          <div
-            className="pointer-events-auto flex w-full flex-col items-stretch gap-1.5"
-            role="group"
-            aria-label="View settings"
-          >
-            <label className="flex items-center justify-between gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
-              <span className="sr-only">Camera view</span>
-              <select
-                aria-label="Camera view"
-                data-testid="twin-camera-preset"
-                value=""
-                onChange={(e) => {
-                  const preset = e.target.value as CameraPresetId;
-                  if (preset) applyPreset(preset);
-                }}
-                className="w-full min-w-0 bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
-              >
-                <option value="" className="bg-slate-900">
-                  Camera view
-                </option>
-                {(
-                  [
-                    'fitFacility',
-                    'topDown',
-                    'rackFront',
-                    'rackRear',
-                    'rackSide',
-                    'rackElevated',
-                    'frontAisles',
-                    'rearInfrastructure',
-                    'coolingTopology',
-                    'powerTopology',
-                    'fitSelection',
-                  ] as CameraPresetId[]
-                ).map((preset) => (
-                  <option key={preset} value={preset} className="bg-slate-900">
-                    {CAMERA_PRESET_LABELS[preset]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="flex items-center justify-between gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
-              <span className="sr-only">Rendering quality</span>
-              <select
-                aria-label="Rendering quality"
-                value={qualityProfile}
-                onChange={(e) => changeQuality(e.target.value as QualityProfileId)}
-                className="w-full min-w-0 bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
-              >
-                {Object.values(QUALITY_PROFILES).map((p) => (
-                  <option key={p.id} value={p.id} className="bg-slate-900">
-                    {p.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="flex items-center justify-between gap-1.5 rounded-md border border-slate-600/70 bg-slate-900/85 px-2 py-1 text-xs text-slate-100">
-              <span className="text-slate-300">Shell</span>
-              <span className="sr-only">Facility shell</span>
-              <select
-                aria-label="Facility shell"
-                data-testid="twin-shell-mode"
-                value={props.shellMode ?? 'off'}
-                onChange={(e) => props.onShellModeChange?.(e.target.value as ShellMode)}
-                className="bg-transparent text-xs text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
-              >
-                <option value="off" className="bg-slate-900">Off</option>
-                <option value="cutaway" className="bg-slate-900">Cutaway</option>
-                <option value="full" className="bg-slate-900">Full</option>
-              </select>
-            </label>
-            <button
-              type="button"
-              data-testid="twin-labels-toggle"
-              aria-pressed={props.showLabels !== false}
-              onClick={() => props.onShowLabelsChange?.(!(props.showLabels !== false))}
-              className="rounded-md border border-slate-600/70 bg-slate-900/85 px-2.5 py-1.5 text-xs text-slate-100 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
-            >
-              Labels: {props.showLabels !== false ? 'On' : 'Off'}
-            </button>
-            <button
-              type="button"
-              onClick={() => applyPreset('reset')}
-              title="Reset camera to the calculated facility overview"
-              className="rounded-md border border-slate-600/70 bg-slate-900/85 px-2.5 py-1.5 text-xs text-slate-100 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
-            >
-              Reset camera
-            </button>
-          </div>
-        )}
-      </div>
+      ) : (
+        <SceneControlsRail
+          containerRef={canvasContainerRef}
+          offsetTop={props.hostChromeTop}
+          zoomLevel={zoomLevel}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          onZoomReset={handleReset}
+          disabled={contextLost}
+          inspecting={!!props.selectedAssetId}
+          onPreset={applyPreset}
+          quality={qualityProfile}
+          onQualityChange={changeQuality}
+          shellMode={props.shellMode ?? 'off'}
+          onShellModeChange={props.onShellModeChange}
+          showLabels={props.showLabels !== false}
+          onShowLabelsChange={props.onShowLabelsChange}
+          infrastructure={infrastructure}
+          onInfrastructureChange={setInfrastructure}
+          onResetCamera={() => applyPreset('reset')}
+        />
+      )}
 
       {/* Context lost overlay */}
       {contextLost && (

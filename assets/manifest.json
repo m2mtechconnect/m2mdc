@@ -1,5 +1,5 @@
 {
-  "manifestVersion": 5,
+  "manifestVersion": 6,
   "generatedAt": "2026-08-15T03:56:28Z",
   "assets": [
     {
@@ -2886,7 +2886,7 @@
       "sourceFormat": "OpenUSD (usd)",
       "usdVersion": "OpenUSD 26.08 (usd-core)",
       "glbVersion": "1.1.0",
-      "glbUrl": "/__l5e/assets-v1/4f53bdf0-960d-42f4-86e1-8e108962327b/ua950h_2sf_01_operations.glb",
+      "glbUrl": null,
       "dimensionsMeters": {
         "x": 0.8122,
         "y": 0.0441,
@@ -2900,7 +2900,7 @@
       "lastValidatedAt": "2026-08-14T20:18:48.105Z",
       "checksum": "sha256:551988833c3fc8918a712a53075a52cbcf17fd673e126d6f9cb9f60f8e7e373c",
       "approvalStatus": "approved",
-      "runtimeEligible": true,
+      "runtimeEligible": false,
       "semanticRole": "network-switch",
       "qualityLevel": "operations",
       "qualityVariants": {
@@ -2935,16 +2935,16 @@
         "decodeMsMeasured": null
       },
       "renderCostRank": 2,
-      "runtimePreferred": true,
-      "preferredFor": [
-        "selected",
-        "nearby"
-      ],
+      "runtimePreferred": false,
+      "preferredFor": [],
       "cameraDistanceMeters": {
         "min": 0.0,
         "max": 12.0
       },
-      "qualityDecision": "LOD is cheaper on triangles (3909 vs 34751) and transfer (144928 vs 1459908 bytes); selected for overview."
+      "qualityDecision": "LOD is cheaper on triangles (3909 vs 34751) and transfer (144928 vs 1459908 bytes); selected for overview.",
+      "publishedChecksum": "sha256:b45e594f9c94f95616f47349cd7c533b5182c1122e9e1191d5146c184b11621d",
+      "publishedBytes": 1460232,
+      "blocker": "Lineage discrepancy: the published bytes (sha256:b45e594f9c94f95616f47349cd7c533b5182c1122e9e1191d5146c184b11621d, 1460232 bytes) do not match the recorded conversion derivative (sha256:551988833c3fc8918a712a53075a52cbcf17fd673e126d6f9cb9f60f8e7e373c, 1459908 bytes). The published file cannot be traced to a validated conversion run, so it is quarantined from runtime and retained for audit until reconverted and republished."
     },
     {
       "assetId": "nvidia.network_switch.ua950h_2sf_01.lod",
@@ -2956,7 +2956,7 @@
       "sourceFormat": "OpenUSD (usd)",
       "usdVersion": "OpenUSD 26.08 (usd-core)",
       "glbVersion": "1.1.0",
-      "glbUrl": "/__l5e/assets-v1/0c229e7b-2137-4b0b-92d1-758c90eb8045/ua950h_2sf_01_lod.glb",
+      "glbUrl": null,
       "dimensionsMeters": {
         "x": 0.8118,
         "y": 0.0464,
@@ -2970,7 +2970,7 @@
       "lastValidatedAt": "2026-08-14T20:18:48.631Z",
       "checksum": "sha256:dd42690ca986e25eea1b85d2a0f497fb4ddc01fad2034962dc9e0bf8bba96973",
       "approvalStatus": "approved",
-      "runtimeEligible": true,
+      "runtimeEligible": false,
       "semanticRole": "network-switch",
       "qualityLevel": "lod",
       "qualityVariants": {
@@ -3005,15 +3005,16 @@
         "decodeMsMeasured": null
       },
       "renderCostRank": 1,
-      "runtimePreferred": true,
-      "preferredFor": [
-        "overview"
-      ],
+      "runtimePreferred": false,
+      "preferredFor": [],
       "cameraDistanceMeters": {
         "min": 12.0,
         "max": 400.0
       },
-      "qualityDecision": "LOD is cheaper on triangles (3909 vs 34751) and transfer (144928 vs 1459908 bytes); selected for overview."
+      "qualityDecision": "LOD is cheaper on triangles (3909 vs 34751) and transfer (144928 vs 1459908 bytes); selected for overview.",
+      "publishedChecksum": "sha256:c94f480e15c208b6ce024ca1f626fa9e833452a892c54084296e92a24d83dcf1",
+      "publishedBytes": 145928,
+      "blocker": "Lineage discrepancy: the published bytes (sha256:c94f480e15c208b6ce024ca1f626fa9e833452a892c54084296e92a24d83dcf1, 145928 bytes) do not match the recorded conversion derivative (sha256:dd42690ca986e25eea1b85d2a0f497fb4ddc01fad2034962dc9e0bf8bba96973, 144928 bytes). The published file cannot be traced to a validated conversion run, so it is quarantined from runtime and retained for audit until reconverted and republished."
     }
   ],
   "qualityPolicyVersion": "1.0.0"

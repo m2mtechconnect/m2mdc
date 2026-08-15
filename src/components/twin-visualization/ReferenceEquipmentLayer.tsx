@@ -60,7 +60,10 @@ function InstancedRole({
 }: {
   mount: RoleMount;
   token: string;
-  coverage: Omit<RoleCoverage, 'mountedObjects' | 'triangles' | 'drawCalls' | 'state'>;
+  coverage: Omit<
+    RoleCoverage,
+    'mountedObjects' | 'glbInstances' | 'triangles' | 'drawCalls' | 'state'
+  >;
 }) {
   const { scene } = useGLTF(mount.url);
   const report = useRuntimeCoverageStore((s) => s.reportRole);

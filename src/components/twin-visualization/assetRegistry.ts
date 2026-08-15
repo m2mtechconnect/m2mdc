@@ -207,6 +207,44 @@ export function resolveQualityVariant(
   return getAsset(variantId) ?? null;
 }
 
+/**
+ * Runtime derivative for a semantic role at a camera distance band.
+ *
+ * The decision is read from the manifest (`preferredFor` + `runtimePreferred`),
+ * which the ingestion pipeline records from measured triangles, draw calls and
+ * transfer size. Filenames, class names and triangle counts are never used to
+ * infer quality at runtime, so a declared LOD that is objectively more
+ * expensive than its operations build can never be selected.
+ */
+export function resolveRoleAssetForBand(
+  role: SemanticRole,
+  band: DistanceBand,
+): { entry: AssetManifestEntry; band: DistanceBand } | null {
+  const candidates = listAssetsForRole(role).filter((a) => a.runtimePreferred !== false);
+  const declared = candidates.filter((a) => a.preferredFor?.includes(band));
+  const pool = declared.length > 0 ? declared : candidates;
+  if (pool.length === 0) return null;
+  // Within a band several logical assets may qualify (four blanking panels,
+  // five switches). Take the cheapest recorded cost: they are alternatives of
+  // the same role, not quality variants of one another.
+  const best = [...pool].sort((a, b) => {
+    const ca = derivativeCost(a);
+    const cb = derivativeCost(b);
+    return ca.triangles - cb.triangles || ca.drawCalls - cb.drawCalls || ca.sizeBytes - cb.sizeBytes;
+  })[0];
+  return { entry: best, band };
+}
+
+function legacyResolveQualityVariant(
+  assetId: string,
+  quality: QualityLevel,
+): AssetManifestEntry | null {
+  const entry = getAsset(assetId);
+  const variantId = entry?.qualityVariants?.[quality];
+  if (!variantId) return null;
+  return getAsset(variantId) ?? null;
+}
+
 /** True only when the manifest explicitly declares the asset instanceable. */
 export function isInstanceable(assetId: string): boolean {
   return getAsset(assetId)?.instanceable === true;

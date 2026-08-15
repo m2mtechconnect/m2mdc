@@ -54,6 +54,12 @@ import { SovereigntyOverlayLayer } from './SovereigntyOverlayLayer';
 import { CoolingOverlayLayer } from './CoolingOverlayLayer';
 import { WorkloadOverlayLayer } from './WorkloadOverlayLayer';
 import { ZoomControlsOverlay } from './ZoomControlsOverlay';
+import { SceneControlsRail } from './SceneControlsRail';
+import {
+  DEFAULT_INFRASTRUCTURE,
+  shellModeForInfrastructure,
+  type InfrastructureLevel,
+} from './infrastructureLevel';
 import { AssetProvenanceBadge } from './AssetProvenancePanel';
 import { ScenarioRackLayer } from './ScenarioRackLayer';
 import { ReferenceEquipmentLayer } from './ReferenceEquipmentLayer';
@@ -134,6 +140,8 @@ interface DataCenter3DSceneProps {
    * OpenUSD derivatives wherever a semantic role resolves.
    */
   facilityGeometry?: FacilityGeometryMode;
+  /** Overhead infrastructure detail. Defaults to Essential. */
+  infrastructure?: InfrastructureLevel;
 }
 
 interface CanvasMountBoundaryProps {

@@ -221,28 +221,30 @@ export function resolveRoleAssetForBand(
   band: DistanceBand,
 ): { entry: AssetManifestEntry; band: DistanceBand } | null {
   const candidates = listAssetsForRole(role).filter((a) => a.runtimePreferred !== false);
-  const declared = candidates.filter((a) => a.preferredFor?.includes(band));
-  const pool = declared.length > 0 ? declared : candidates;
-  if (pool.length === 0) return null;
-  // Within a band several logical assets may qualify (four blanking panels,
-  // five switches). Take the cheapest recorded cost: they are alternatives of
-  // the same role, not quality variants of one another.
-  const best = [...pool].sort((a, b) => {
-    const ca = derivativeCost(a);
-    const cb = derivativeCost(b);
-    return ca.triangles - cb.triangles || ca.drawCalls - cb.drawCalls || ca.sizeBytes - cb.sizeBytes;
-  })[0];
-  return { entry: best, band };
-}
+  if (candidates.length === 0) return null;
 
-function legacyResolveQualityVariant(
-  assetId: string,
-  quality: QualityLevel,
-): AssetManifestEntry | null {
-  const entry = getAsset(assetId);
-  const variantId = entry?.qualityVariants?.[quality];
-  if (!variantId) return null;
-  return getAsset(variantId) ?? null;
+  const cheapestIn = (pool: AssetManifestEntry[]) =>
+    [...pool].sort((a, b) => {
+      const ca = derivativeCost(a);
+      const cb = derivativeCost(b);
+      return ca.triangles - cb.triangles || ca.drawCalls - cb.drawCalls || ca.sizeBytes - cb.sizeBytes;
+    })[0];
+
+  const declared = (b: DistanceBand) => candidates.filter((a) => a.preferredFor?.includes(b));
+  // Several logical assets can satisfy one role (four blanking panels, five
+  // switches). Within a band they are alternatives, so the cheapest recorded
+  // cost wins; across bands the manifest decision decides the class.
+  const near = cheapestIn(declared('nearby').length ? declared('nearby') : candidates);
+  if (band !== 'overview') return { entry: near, band };
+
+  const far = cheapestIn(declared('overview').length ? declared('overview') : candidates);
+  // A distant camera must never cost more than a near one. If the declared
+  // overview derivative is heavier, the nearer decision is reused.
+  const cf = derivativeCost(far);
+  const cn = derivativeCost(near);
+  const heavier =
+    cf.triangles > cn.triangles && cf.drawCalls >= cn.drawCalls && cf.sizeBytes > cn.sizeBytes;
+  return { entry: heavier ? near : far, band };
 }
 
 /** True only when the manifest explicitly declares the asset instanceable. */

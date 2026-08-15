@@ -517,6 +517,12 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const [qualityProfile, setQualityProfile] = useState<QualityProfileId>(() => readQualityProfile());
   const [placement, setPlacement] = useState<CameraPlacement | null>(null);
+  const [infrastructure, setInfrastructure] = useState<InfrastructureLevel>(
+    props.infrastructure ?? DEFAULT_INFRASTRUCTURE,
+  );
+  useEffect(() => {
+    if (props.infrastructure) setInfrastructure(props.infrastructure);
+  }, [props.infrastructure]);
 
   const reducedMotion = useMemo(
     () =>

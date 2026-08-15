@@ -936,9 +936,19 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             </span>
             <span className="font-medium">NVIDIA reference facility</span>
           </div>
-          <p className="mt-1 text-slate-300" data-testid="reference-facility-coverage">
-            OpenUSD-derived equipment: {runtimeTotals.mountedObjects} mounted objects across{' '}
-            {runtimeTotals.derivedRoles} of {referenceFacilityCoverage().length} roles.
+          <p
+            className="mt-1 text-slate-300"
+            data-testid="reference-facility-coverage"
+            data-mounted-logical-objects={runtimeTotals.mountedObjects}
+            data-glb-instances={runtimeTotals.glbInstances}
+            data-unique-derivatives={runtimeTotals.uniqueDerivatives}
+            data-logical-assets={runtimeTotals.logicalAssets}
+            data-procedural-objects={runtimeTotals.proceduralObjects}
+          >
+            OpenUSD-derived equipment: {runtimeTotals.mountedObjects} visible scene objects across{' '}
+            {runtimeTotals.derivedRoles} of {referenceFacilityCoverage().length} roles, drawn from{' '}
+            {runtimeTotals.logicalAssets} logical assets and {runtimeTotals.uniqueDerivatives}{' '}
+            loaded derivative files. Counts are visible objects, not manifest rows.
             Representative NVIDIA equipment, not verified as installed. Roles without an approved
             derivative render AURA procedural geometry.
           </p>

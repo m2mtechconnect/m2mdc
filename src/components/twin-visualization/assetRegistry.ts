@@ -77,6 +77,57 @@ export interface AssetManifestEntry {
   qualityVariants?: Partial<Record<QualityLevel, string>>;
   /** True when the entry may be instanced across many placements. */
   instanceable?: boolean;
+  /** Measured cost of this derivative, recorded by the ingestion pipeline. */
+  qualityMetrics?: {
+    triangles: number;
+    drawCalls: number;
+    meshes: number;
+    materials: number;
+    textures: number;
+    sizeBytes: number;
+    boundsMin?: number[];
+    boundsMax?: number[];
+    silhouette?: string | null;
+    decodeMsMeasured?: number | null;
+  };
+  /** 1 = cheapest derivative of the same logical asset. */
+  renderCostRank?: number;
+  /** Explicit runtime permission. False keeps the entry for audit only. */
+  runtimePreferred?: boolean;
+  /** Camera distance bands this derivative is the recorded choice for. */
+  preferredFor?: DistanceBand[];
+  cameraDistanceMeters?: { min: number; max: number } | null;
+  /** Human-readable justification for the quality decision. */
+  qualityDecision?: string;
+}
+
+/** Camera distance bands the runtime selects derivatives for. */
+export type DistanceBand = 'selected' | 'nearby' | 'overview';
+
+export const DISTANCE_BANDS: DistanceBand[] = ['selected', 'nearby', 'overview'];
+
+/** Band a camera distance in metres falls into. */
+export function bandForDistance(metres: number): DistanceBand {
+  if (metres <= 3) return 'selected';
+  if (metres <= 12) return 'nearby';
+  return 'overview';
+}
+
+/**
+ * Composite render cost of a derivative, from measured pipeline metrics.
+ * Used by tests to prove distance never selects a more expensive derivative.
+ */
+export function derivativeCost(entry: AssetManifestEntry): {
+  triangles: number;
+  drawCalls: number;
+  sizeBytes: number;
+} {
+  const m = entry.qualityMetrics;
+  return {
+    triangles: m?.triangles ?? entry.triangleCount ?? Number.POSITIVE_INFINITY,
+    drawCalls: m?.drawCalls ?? entry.drawCallBudget ?? Number.POSITIVE_INFINITY,
+    sizeBytes: m?.sizeBytes ?? Number.POSITIVE_INFINITY,
+  };
 }
 
 interface AssetManifestFile {

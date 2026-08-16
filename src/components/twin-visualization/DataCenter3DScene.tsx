@@ -45,6 +45,7 @@ import {
   bandForDistance,
   getAssetCapabilityParts,
   getGpuValidationStatus,
+  isAuraAuthoredAsset,
   resolveRuntimeAsset,
 } from './assetRegistry';
 import { useRBAC } from '@/contexts/RBACContext';

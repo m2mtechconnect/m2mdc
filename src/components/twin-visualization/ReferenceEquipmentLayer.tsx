@@ -44,6 +44,8 @@ interface RoleMount {
   entry: AssetManifestEntry;
   url: string;
   placements: Placement[];
+  /** Camera band that selected this derivative; drives material presentation. */
+  band: DistanceBand;
 }
 
 /**
@@ -210,7 +212,7 @@ export function ReferenceEquipmentLayer({
       if (!entry || placements.length === 0) return;
       const url = resolveRuntimeAsset(entry.assetId).glbUrl;
       if (!url) return;
-      out.push({ role, entry, url, placements });
+      out.push({ role, entry, url, placements, band });
     };
 
     // In-rack equipment: 1U servers, 2U servers, one switch, one PDU and

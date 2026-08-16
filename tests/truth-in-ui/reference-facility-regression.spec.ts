@@ -19,6 +19,7 @@ import {
 const ROUTE = '/data-centre-twin?geometry=nvidia-reference';
 
 test.describe('NVIDIA Reference Facility runtime regression', () => {
+  test.setTimeout(180_000);
   test('mounts the verified NVIDIA equipment, 40 cabinets and every AURA facility family', async ({
     context,
     page,

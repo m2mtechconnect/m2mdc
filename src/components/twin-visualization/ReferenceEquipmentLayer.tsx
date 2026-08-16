@@ -160,34 +160,6 @@ type PendingCoverage = Omit<
 >;
 
 /**
- * Reports the honest interim state while a derivative is still downloading or
- * decoding, so a stalled load reads as "preparing" with its URL rather than
- * silently as an absent role.
- */
-function PendingRole({
-  token,
-  coverage,
-}: {
-  token: string;
-  coverage: PendingCoverage;
-}) {
-  const report = useRuntimeCoverageStore((s) => s.reportRole);
-  useEffect(() => {
-    report(token, {
-      ...coverage,
-      state: 'preparing',
-      mountedObjects: 0,
-      glbInstances: 0,
-      triangles: 0,
-      drawCalls: 0,
-      detail: `Loading derivative ${coverage.derivativeUrl ?? ''}`.trim(),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, coverage.assetId]);
-  return null;
-}
-
-/**
  * A derivative that fails to download or decode must say so in the coverage
  * report. Without this, a failed load is indistinguishable from an asset that
  * was never requested.

@@ -1,6 +1,6 @@
 {
-  "manifestVersion": 6,
-  "generatedAt": "2026-08-15T03:56:28Z",
+  "manifestVersion": 7,
+  "generatedAt": "2026-08-16T03:04:03Z",
   "assets": [
     {
       "assetId": "nvidia.rack.42u_a_01",
@@ -3015,6 +3015,318 @@
       "publishedChecksum": "sha256:c94f480e15c208b6ce024ca1f626fa9e833452a892c54084296e92a24d83dcf1",
       "publishedBytes": 145928,
       "blocker": "Lineage discrepancy: the published bytes (sha256:c94f480e15c208b6ce024ca1f626fa9e833452a892c54084296e92a24d83dcf1, 145928 bytes) do not match the recorded conversion derivative (sha256:dd42690ca986e25eea1b85d2a0f497fb4ddc01fad2034962dc9e0bf8bba96973, 144928 bytes). The published file cannot be traced to a validated conversion run, so it is quarantined from runtime and retained for audit until reconverted and republished."
+    },
+    {
+      "assetId": "aura.floor.standard_tile_600.operations",
+      "displayName": "Raised-floor tile 600 mm (AURA-authored OpenUSD)",
+      "manufacturer": null,
+      "model": null,
+      "sourceUrl": "assets/floor/aura_raised_floor_tile_600/aura_raised_floor_tile_600.usda",
+      "licence": "AURA-authored generic asset, internal use by M2M Technology Connect. Not vendor-certified, not SimReady, no NVIDIA authorship.",
+      "authoredBy": "M2M AURA",
+      "sourceFormat": "OpenUSD (usda)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.0.0",
+      "glbUrl": "/__l5e/assets-v1/210a5aa0-674a-43e1-8f55-9bbe1c7fafb3/aura_raised_floor_tile_600.glb",
+      "dimensionsMeters": {
+        "x": 0.6,
+        "y": 0.035,
+        "z": 0.6
+      },
+      "triangleCount": 12,
+      "textureMemoryMb": 0,
+      "lods": [],
+      "lastValidatedAt": "2026-08-16T03:04:03Z",
+      "checksum": "sha256:77138b9e1639df498a0da8388f9d9f52a9bb72dddaafd7b8ef7427538d1ccaaa",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "raised-floor-tile",
+      "qualityLevel": "operations",
+      "instanceable": true,
+      "notes": "AURA-authored OpenUSD master converted with usd-core 26.8 and the AURA deterministic USD->glTF converter 1.0.0 (flat-shaded, untextured PBR). Geometry is generic: no vendor identity, no SimReady certification, no NVIDIA authorship.",
+      "provenance": {
+        "authoredBy": "M2M AURA",
+        "usdMasterSha256": "sha256:21f2df12fa2b9e8618d91830e559d2fd4e429ed8febf9ab89ad376132e1c13e6",
+        "primPath": "/AURA_Facility/Building/RaisedFloor/TileStandard",
+        "meshCount": 1,
+        "materialCount": 1,
+        "imageCount": 0,
+        "derivativeBytes": 2076,
+        "boundsMinMeters": [
+          -0.3,
+          0.0,
+          -0.3
+        ],
+        "boundsMaxMeters": [
+          0.3,
+          0.035,
+          0.3
+        ],
+        "floorContactY": 0.0,
+        "conversionPipeline": "aura-facility-1.0.0",
+        "tools": [
+          "usd-core 26.8",
+          "AURA deterministic USD->glTF converter 1.0.0"
+        ],
+        "publishedDerivative": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/210a5aa0-674a-43e1-8f55-9bbe1c7fafb3/aura_raised_floor_tile_600.glb",
+        "variants": {},
+        "drawCallMeshes": 1
+      },
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      },
+      "drawCallBudget": 4
+    },
+    {
+      "assetId": "aura.floor.perforated_tile_600.operations",
+      "displayName": "Perforated airflow tile 600 mm (AURA-authored OpenUSD)",
+      "manufacturer": null,
+      "model": null,
+      "sourceUrl": "assets/floor/aura_perforated_floor_tile_600/aura_perforated_floor_tile_600.usda",
+      "licence": "AURA-authored generic asset, internal use by M2M Technology Connect. Not vendor-certified, not SimReady, no NVIDIA authorship.",
+      "authoredBy": "M2M AURA",
+      "sourceFormat": "OpenUSD (usda)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.0.0",
+      "glbUrl": "/__l5e/assets-v1/6918fa89-0507-48fc-b173-84c3d585c83e/aura_perforated_floor_tile_600.glb",
+      "dimensionsMeters": {
+        "x": 0.6,
+        "y": 0.0385,
+        "z": 0.6
+      },
+      "triangleCount": 444,
+      "textureMemoryMb": 0,
+      "lods": [],
+      "lastValidatedAt": "2026-08-16T03:04:03Z",
+      "checksum": "sha256:0bc4404af6f646fdc35110a760e446a61eb785e7cbd327107acd42565dabd7a1",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "perforated-floor-tile",
+      "qualityLevel": "operations",
+      "instanceable": true,
+      "notes": "AURA-authored OpenUSD master converted with usd-core 26.8 and the AURA deterministic USD->glTF converter 1.0.0 (flat-shaded, untextured PBR). Geometry is generic: no vendor identity, no SimReady certification, no NVIDIA authorship.",
+      "provenance": {
+        "authoredBy": "M2M AURA",
+        "usdMasterSha256": "sha256:cedee9bd63fda3340042baaecc626beb897fbd95c2253fb876c4f958d4ee4d50",
+        "primPath": "/AURA_Facility/Building/RaisedFloor/TilePerforated",
+        "meshCount": 37,
+        "materialCount": 2,
+        "imageCount": 0,
+        "derivativeBytes": 53004,
+        "boundsMinMeters": [
+          -0.3,
+          0.0,
+          -0.3
+        ],
+        "boundsMaxMeters": [
+          0.3,
+          0.0385,
+          0.3
+        ],
+        "floorContactY": 0.0,
+        "conversionPipeline": "aura-facility-1.0.0",
+        "tools": [
+          "usd-core 26.8",
+          "AURA deterministic USD->glTF converter 1.0.0"
+        ],
+        "publishedDerivative": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/6918fa89-0507-48fc-b173-84c3d585c83e/aura_perforated_floor_tile_600.glb",
+        "variants": {},
+        "drawCallMeshes": 37
+      },
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      },
+      "drawCallBudget": 37
+    },
+    {
+      "assetId": "aura.lighting.linear_luminaire_1500.operations",
+      "displayName": "Linear data-hall luminaire 1500 mm (AURA-authored OpenUSD)",
+      "manufacturer": null,
+      "model": null,
+      "sourceUrl": "assets/lighting/aura_linear_luminaire_1500/aura_linear_luminaire_1500.usda",
+      "licence": "AURA-authored generic asset, internal use by M2M Technology Connect. Not vendor-certified, not SimReady, no NVIDIA authorship.",
+      "authoredBy": "M2M AURA",
+      "sourceFormat": "OpenUSD (usda)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.0.0",
+      "glbUrl": "/__l5e/assets-v1/76740cbd-2633-405e-9aca-11bb4acbfd5f/aura_linear_luminaire_1500.glb",
+      "dimensionsMeters": {
+        "x": 1.5,
+        "y": 0.381,
+        "z": 0.12
+      },
+      "triangleCount": 48,
+      "textureMemoryMb": 0,
+      "lods": [],
+      "lastValidatedAt": "2026-08-16T03:04:03Z",
+      "checksum": "sha256:98f39b4567356e0731a4bdd546ddc0e5418b72d1e8576b139e4c28ea6207cef9",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "data-hall-luminaire",
+      "qualityLevel": "operations",
+      "instanceable": true,
+      "notes": "AURA-authored OpenUSD master converted with usd-core 26.8 and the AURA deterministic USD->glTF converter 1.0.0 (flat-shaded, untextured PBR). Geometry is generic: no vendor identity, no SimReady certification, no NVIDIA authorship.",
+      "provenance": {
+        "authoredBy": "M2M AURA",
+        "usdMasterSha256": "sha256:4bf66d6f4e5bc06fc17f514b95d533b5698f20a55f375cbe72bb7486919d79a2",
+        "primPath": "/AURA_Facility/Building/Lighting/Luminaire_Generic",
+        "meshCount": 4,
+        "materialCount": 2,
+        "imageCount": 0,
+        "derivativeBytes": 6468,
+        "boundsMinMeters": [
+          -0.75,
+          -0.081,
+          -0.06
+        ],
+        "boundsMaxMeters": [
+          0.75,
+          0.3,
+          0.06
+        ],
+        "floorContactY": -0.081,
+        "conversionPipeline": "aura-facility-1.0.0",
+        "tools": [
+          "usd-core 26.8",
+          "AURA deterministic USD->glTF converter 1.0.0"
+        ],
+        "publishedDerivative": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/76740cbd-2633-405e-9aca-11bb4acbfd5f/aura_linear_luminaire_1500.glb",
+        "variants": {},
+        "drawCallMeshes": 4
+      },
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      },
+      "drawCallBudget": 4
+    },
+    {
+      "assetId": "aura.structural.column_400.operations",
+      "displayName": "Structural column 400 mm (AURA-authored OpenUSD)",
+      "manufacturer": null,
+      "model": null,
+      "sourceUrl": "assets/structural/aura_structural_column_400/aura_structural_column_400.usda",
+      "licence": "AURA-authored generic asset, internal use by M2M Technology Connect. Not vendor-certified, not SimReady, no NVIDIA authorship.",
+      "authoredBy": "M2M AURA",
+      "sourceFormat": "OpenUSD (usda)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.0.0",
+      "glbUrl": "/__l5e/assets-v1/30bd1bc5-745b-4cff-bc44-43813b70aa01/aura_structural_column_400.glb",
+      "dimensionsMeters": {
+        "x": 0.4,
+        "y": 4.2,
+        "z": 0.4
+      },
+      "triangleCount": 12,
+      "textureMemoryMb": 0,
+      "lods": [],
+      "lastValidatedAt": "2026-08-16T03:04:03Z",
+      "checksum": "sha256:121a5f3dea10488c3a9083782720a22802b8099da44f345d4490c58cb5963398",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "structural-column",
+      "qualityLevel": "operations",
+      "instanceable": true,
+      "notes": "AURA-authored OpenUSD master converted with usd-core 26.8 and the AURA deterministic USD->glTF converter 1.0.0 (flat-shaded, untextured PBR). Geometry is generic: no vendor identity, no SimReady certification, no NVIDIA authorship.",
+      "provenance": {
+        "authoredBy": "M2M AURA",
+        "usdMasterSha256": "sha256:44106bddc28329bb1c7f149487a32a2e5e7f7412676eb12a71ba684ec146fa72",
+        "primPath": "/AURA_Facility/Building/Structural/Column",
+        "meshCount": 1,
+        "materialCount": 1,
+        "imageCount": 0,
+        "derivativeBytes": 2068,
+        "boundsMinMeters": [
+          -0.2,
+          0.0,
+          -0.2
+        ],
+        "boundsMaxMeters": [
+          0.2,
+          4.2,
+          0.2
+        ],
+        "floorContactY": 0.0,
+        "conversionPipeline": "aura-facility-1.0.0",
+        "tools": [
+          "usd-core 26.8",
+          "AURA deterministic USD->glTF converter 1.0.0"
+        ],
+        "publishedDerivative": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/30bd1bc5-745b-4cff-bc44-43813b70aa01/aura_structural_column_400.glb",
+        "variants": {},
+        "drawCallMeshes": 1
+      },
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      },
+      "drawCallBudget": 4
+    },
+    {
+      "assetId": "aura.shell.facility_shell.operations",
+      "displayName": "Parametric facility shell (AURA-authored OpenUSD)",
+      "manufacturer": null,
+      "model": null,
+      "sourceUrl": "assets/shell/aura_facility_shell/aura_facility_shell.usda",
+      "licence": "AURA-authored generic asset, internal use by M2M Technology Connect. Not vendor-certified, not SimReady, no NVIDIA authorship.",
+      "authoredBy": "M2M AURA",
+      "sourceFormat": "OpenUSD (usda)",
+      "usdVersion": "OpenUSD 26.08 (usd-core)",
+      "glbVersion": "1.0.0",
+      "glbUrl": "/__l5e/assets-v1/1326b77e-3497-4a8b-bd23-50eb77a854ff/aura_facility_shell.glb",
+      "dimensionsMeters": {
+        "x": 26.2,
+        "y": 4.2,
+        "z": 18.2
+      },
+      "triangleCount": 48,
+      "textureMemoryMb": 0,
+      "lods": [],
+      "lastValidatedAt": "2026-08-16T03:04:03Z",
+      "checksum": "sha256:70d727220cacd2ba59c75d526f2f1c2727d5c4945074b53639878eda584864a4",
+      "approvalStatus": "approved",
+      "runtimeEligible": true,
+      "semanticRole": "facility-shell",
+      "qualityLevel": "operations",
+      "instanceable": true,
+      "notes": "AURA-authored OpenUSD master converted with usd-core 26.8 and the AURA deterministic USD->glTF converter 1.0.0 (flat-shaded, untextured PBR). Geometry is generic: no vendor identity, no SimReady certification, no NVIDIA authorship.",
+      "provenance": {
+        "authoredBy": "M2M AURA",
+        "usdMasterSha256": "sha256:d9d0df1fb5ab77fcad60958f1dde86ddf8ac4ec99116fb830dc2eac527867bab",
+        "primPath": "/AURA_Facility/Building/Shell",
+        "meshCount": 4,
+        "materialCount": 1,
+        "imageCount": 0,
+        "derivativeBytes": 6112,
+        "boundsMinMeters": [
+          -13.1,
+          0.0,
+          -9.1
+        ],
+        "boundsMaxMeters": [
+          13.1,
+          4.2,
+          9.1
+        ],
+        "floorContactY": 0.0,
+        "conversionPipeline": "aura-facility-1.0.0",
+        "tools": [
+          "usd-core 26.8",
+          "AURA deterministic USD->glTF converter 1.0.0"
+        ],
+        "publishedDerivative": "a/v1/33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b/1326b77e-3497-4a8b-bd23-50eb77a854ff/aura_facility_shell.glb",
+        "variants": {
+          "shellMode": "full"
+        },
+        "drawCallMeshes": 4
+      },
+      "gpuValidation": {
+        "status": "awaiting-hardware-run",
+        "lastPassedRunId": null
+      },
+      "drawCallBudget": 4
     }
   ],
   "qualityPolicyVersion": "1.0.0"

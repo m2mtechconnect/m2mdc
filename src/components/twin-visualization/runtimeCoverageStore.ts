@@ -41,14 +41,32 @@ interface CoverageState {
   /** Increments whenever the scene is rebuilt, so stale reports are dropped. */
   token: string;
   roles: Record<string, RoleCoverage>;
+  /**
+   * Per-rack cabinet mount evidence. `true` only once the approved derivative
+   * actually mounted; `false` while the procedural cabinet is rendering.
+   */
+  rackMounts: Record<string, { mounted: boolean; assetId: string | null; url: string | null }>;
+  /** Procedural geometry the scene is rendering, reported by its owner. */
+  procedural: Record<string, { label: string; count: number; kind: 'physical' | 'overlay' }>;
   resetCoverage: (token: string) => void;
   reportRole: (token: string, coverage: RoleCoverage) => void;
+  reportRackMount: (
+    token: string,
+    rackId: string,
+    mount: { mounted: boolean; assetId: string | null; url: string | null },
+  ) => void;
+  reportProcedural: (
+    key: string,
+    entry: { label: string; count: number; kind: 'physical' | 'overlay' },
+  ) => void;
 }
 
 export const useRuntimeCoverageStore = create<CoverageState>((set, get) => ({
   token: 'initial',
   roles: {},
-  resetCoverage: (token) => set({ token, roles: {} }),
+  rackMounts: {},
+  procedural: {},
+  resetCoverage: (token) => set({ token, roles: {}, rackMounts: {} }),
   /**
    * A report carries the token of the scene build that produced it. A newer
    * token supersedes the previous build: the store rolls over to it and drops
@@ -64,6 +82,14 @@ export const useRuntimeCoverageStore = create<CoverageState>((set, get) => ({
     }
     set({ token, roles: { [coverage.role]: coverage } });
   },
+  reportRackMount: (token, rackId, mount) => {
+    // Cabinet reports are keyed by rack id and never roll the role token over:
+    // racks and the equipment layer rebuild on different schedules.
+    void token;
+    set((s) => ({ rackMounts: { ...s.rackMounts, [rackId]: mount } }));
+  },
+  reportProcedural: (key, entry) =>
+    set((s) => ({ procedural: { ...s.procedural, [key]: entry } })),
 }));
 
 declare global {
@@ -99,5 +125,68 @@ export function coverageTotals(roles: Record<string, RoleCoverage>) {
     drawCalls: list.reduce((n, r) => n + r.drawCalls, 0),
     derivedRoles: list.filter((r) => r.state === 'openusd-derived').length,
     totalRoles: list.length,
+  };
+}
+
+/**
+ * Hybrid provenance breakdown (Phase 9).
+ *
+ * The scene is never reduced to a single "OpenUSD facility" claim. Three
+ * origins are counted separately from runtime evidence only:
+ *
+ *  - NVIDIA OpenUSD-derived equipment: approved derivatives of NVIDIA Data
+ *    Center pack masters that actually mounted (including the AURA-authored
+ *    component selection of NVIDIA rack geometry, which stays NVIDIA-sourced);
+ *  - AURA OpenUSD-derived facility assets: approved derivatives of
+ *    AURA-authored USD masters that actually mounted;
+ *  - AURA procedural geometry: physical geometry and analytical overlays that
+ *    have no USD master behind them at runtime.
+ */
+export interface ProvenanceBreakdown {
+  nvidiaDerivedObjects: number;
+  auraUsdDerivedObjects: number;
+  proceduralPhysicalObjects: number;
+  proceduralOverlayObjects: number;
+  cabinetsMounted: number;
+  cabinetsProcedural: number;
+  label: string;
+}
+
+export function provenanceBreakdown(
+  roles: Record<string, RoleCoverage>,
+  rackMounts: Record<string, { mounted: boolean }>,
+  procedural: Record<string, { count: number; kind: 'physical' | 'overlay' }>,
+  isAuraAuthored: (assetId: string | null) => boolean,
+): ProvenanceBreakdown {
+  let nvidia = 0;
+  let aura = 0;
+  for (const r of Object.values(roles)) {
+    if (r.mountedObjects <= 0) continue;
+    if (isAuraAuthored(r.assetId)) aura += r.mountedObjects;
+    else nvidia += r.mountedObjects;
+  }
+  const cabinets = Object.values(rackMounts);
+  const cabinetsMounted = cabinets.filter((c) => c.mounted).length;
+  const cabinetsProcedural = cabinets.length - cabinetsMounted;
+  nvidia += cabinetsMounted;
+
+  let physical = cabinetsProcedural;
+  let overlay = 0;
+  for (const p of Object.values(procedural)) {
+    if (p.kind === 'overlay') overlay += p.count;
+    else physical += p.count;
+  }
+  return {
+    nvidiaDerivedObjects: nvidia,
+    auraUsdDerivedObjects: aura,
+    proceduralPhysicalObjects: physical,
+    proceduralOverlayObjects: overlay,
+    cabinetsMounted,
+    cabinetsProcedural,
+    label:
+      `NVIDIA OpenUSD-derived equipment: ${nvidia} · ` +
+      `AURA OpenUSD-derived facility assets: ${aura} · ` +
+      `AURA procedural physical geometry: ${physical} · ` +
+      `Procedural operational overlays: ${overlay}`,
   };
 }

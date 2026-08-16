@@ -9,9 +9,10 @@
  * declares them) is rendered by the asset components instead.
  */
 
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { RowVisual } from './types';
 import type { QualityProfile } from '@/three/qualityProfiles';
+import { useRuntimeCoverageStore } from './runtimeCoverageStore';
 import {
   floorMaterial,
   perforatedTileMaterial,
@@ -78,6 +79,32 @@ export function DataHall({ bounds, rows, profile, crahUnits = 0, shellMode = 'of
   const paint = surfaceMaterial('safetyPaint');
   const steel = surfaceMaterial('powderCoatedSteel');
   const perforatedTile = perforatedTileMaterial();
+
+  /**
+   * Environmental geometry is AURA procedural, not OpenUSD-derived. It is
+   * reported so the provenance breakdown can separate it from the approved
+   * NVIDIA derivatives instead of implying one uniform OpenUSD facility.
+   */
+  const reportProcedural = useRuntimeCoverageStore((s) => s.reportProcedural);
+  const coldAisles = rows.filter((r) => !r.isHotAisle).length;
+  const hotAisles = rows.filter((r) => r.isHotAisle).length;
+  const proceduralCount =
+    1 + // raised floor plane
+    coldAisles + // perforated supply tile strips
+    2 + // painted aisle markings
+    (showShell ? (fullShell ? 4 : 2) : 0) + // perimeter walls
+    rows.length + // overhead cable tray runs
+    (structural ? rows.length : 0) + // busway
+    (structural ? 2 : 0) + // chilled water pipes
+    (structural ? hotAisles * 2 : 0) + // containment end doors
+    crahUnits * 2; // CRAH body + filter face
+  useEffect(() => {
+    reportProcedural('data-hall-environment', {
+      label: 'AURA procedural environmental geometry (floor, walls, services)',
+      count: proceduralCount,
+      kind: 'physical',
+    });
+  }, [reportProcedural, proceduralCount]);
 
   return (
     <group name="OperationalScene:environment" userData={{ classification: 'environmental-geometry' }}>

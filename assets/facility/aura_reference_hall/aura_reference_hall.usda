@@ -1,0 +1,25 @@
+#usda 1.0
+(
+    defaultPrim = "AURA_Facility"
+    doc = "AURA reference data hall. Canonical OpenUSD composition: metres, Y-up, floor origin. Composed from sublayers; no flattened monolith."
+    metersPerUnit = 1
+    subLayers = [
+        @./layers/semantic_bindings.usda@,
+        @./layers/design_scenarios.usda@,
+        @./layers/systems.usda@,
+        @./layers/equipment.usda@,
+        @./layers/building.usda@
+    ]
+    upAxis = "Y"
+)
+
+def Xform "AURA_Facility" (
+    kind = "assembly"
+)
+{
+    custom string aura:facilityId = "aura.facility.reference_hall"
+    custom string aura:stageVersion = "1.0.0"
+    custom string aura:units = "metres"
+    custom string aura:upAxis = "Y"
+}
+

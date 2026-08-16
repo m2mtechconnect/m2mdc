@@ -1,0 +1,527 @@
+#usda 1.0
+(
+    doc = "AURA facility equipment layer: racks and rack-mounted equipment. Geometry for NVIDIA pack equipment is delivered to the browser through approved GLB derivatives; the licence-restricted USD masters are not redistributed into this stage."
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "AURA_Facility"
+{
+    def Xform "Equipment"
+    {
+        def Xform "Racks"
+        {
+            def Xform "Rack_A01" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-A01"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "A"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:A01"
+                double3 xformOp:translate = (-2.2, 0, -5.4)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_A02" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-A02"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "A"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:A02"
+                double3 xformOp:translate = (-1.1, 0, -5.4)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_A03" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-A03"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "A"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:A03"
+                double3 xformOp:translate = (0, 0, -5.4)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_A04" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-A04"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "A"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:A04"
+                double3 xformOp:translate = (1.1, 0, -5.4)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_A05" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-A05"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "A"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:A05"
+                double3 xformOp:translate = (2.2, 0, -5.4)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_B01" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-B01"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "B"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:B01"
+                double3 xformOp:translate = (-2.2, 0, -1.8000000000000003)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_B02" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-B02"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "B"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:B02"
+                double3 xformOp:translate = (-1.1, 0, -1.8000000000000003)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_B03" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-B03"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "B"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:B03"
+                double3 xformOp:translate = (0, 0, -1.8000000000000003)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_B04" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-B04"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "B"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:B04"
+                double3 xformOp:translate = (1.1, 0, -1.8000000000000003)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_B05" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-B05"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "B"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:B05"
+                double3 xformOp:translate = (2.2, 0, -1.8000000000000003)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_C01" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-C01"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "C"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:C01"
+                double3 xformOp:translate = (-2.2, 0, 1.7999999999999998)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_C02" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-C02"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "C"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:C02"
+                double3 xformOp:translate = (-1.1, 0, 1.7999999999999998)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_C03" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-C03"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "C"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:C03"
+                double3 xformOp:translate = (0, 0, 1.7999999999999998)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_C04" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-C04"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "C"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:C04"
+                double3 xformOp:translate = (1.1, 0, 1.7999999999999998)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_C05" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-C05"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "C"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:C05"
+                double3 xformOp:translate = (2.2, 0, 1.7999999999999998)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_D01" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-D01"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "D"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:D01"
+                double3 xformOp:translate = (-2.2, 0, 5.4)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_D02" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-D02"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "D"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:D02"
+                double3 xformOp:translate = (-1.1, 0, 5.4)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_D03" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-D03"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "D"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:D03"
+                double3 xformOp:translate = (0, 0, 5.4)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_D04" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-D04"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "D"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:D04"
+                double3 xformOp:translate = (1.1, 0, 5.4)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Rack_D05" (
+                kind = "component"
+            )
+            {
+                custom string aura:assetId = "nvidia.rack_core.rack_42u_a_core.operations"
+                custom string aura:author = "AURA-authored component selection of NVIDIA Data Center OpenUSD pack geometry"
+                custom string aura:derivativeChecksum = "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb"
+                custom string aura:evidenceMode = "SIMULATED"
+                custom string aura:facilityEquipmentId = "RACK-D05"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:rowId = "D"
+                custom string aura:semanticRole = "rack-core-reference"
+                custom string aura:sourceChecksum = ""
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+                custom string aura:telemetryBindingId = "rack:D05"
+                double3 xformOp:translate = (2.2, 0, 5.4)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Class_blank_1u_black"
+            {
+                custom string aura:assetId = "nvidia.blanking_panel.blank_1u_black.operations"
+                custom string aura:derivativeChecksum = "sha256:d3ee5c7cc58c2b72b3f5e4816b836e06500ec88121c08ed2befc0c95e1e6b697"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/b0080883-a74a-4b10-886a-edf9cdd881b9/blank_1u_black_operations.glb"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:placementOwner = "AURA runtime (ReferenceEquipmentLayer)"
+                custom string aura:semanticRole = "blanking-panel"
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Accessories/Blank_1U_Black_A_01.usd"
+            }
+        }
+
+        def Xform "Servers"
+        {
+            def Xform "Class_server_1u_a"
+            {
+                custom string aura:assetId = "nvidia.server.server_1u_a.operations"
+                custom string aura:derivativeChecksum = "sha256:7011e15c504e162f9def0b5a687cd66e53615f6bf391352b368e738d6d38fce7"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/c8fcb6be-6d4c-464e-a197-165ed8ce584a/server_1u_a_operations.glb"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:placementOwner = "AURA runtime (ReferenceEquipmentLayer)"
+                custom string aura:semanticRole = "server-1u"
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Server_Nodes/Servers/Server_1U_A_01.usd"
+            }
+
+            def Xform "Class_server_2u_b"
+            {
+                custom string aura:assetId = "nvidia.server.server_2u_b.operations"
+                custom string aura:derivativeChecksum = "sha256:d185e4250312a0a6d99fae00a5734c5006c5b582afc78056fa28e23fb140b518"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/0fb1d0d4-78a1-474a-b65e-0a43a19f4f71/server_2u_b_operations.glb"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:placementOwner = "AURA runtime (ReferenceEquipmentLayer)"
+                custom string aura:semanticRole = "server-2u"
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Server_Nodes/Servers/Server_2U_B_01.usd"
+            }
+
+            def Xform "Class_server_2u_c"
+            {
+                custom string aura:assetId = "nvidia.server.server_2u_c.operations"
+                custom string aura:derivativeChecksum = "sha256:11686ea31d7a23dd55f17d518dabd9ec5661fd545570523838452b86d29464db"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/d27cfe7b-010c-4d39-a3b3-b3c057638542/server_2u_c_operations.glb"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:placementOwner = "AURA runtime (ReferenceEquipmentLayer)"
+                custom string aura:semanticRole = "server-2u"
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Server_Nodes/Servers/Server_2U_C_01.usd"
+            }
+        }
+
+        def Xform "Network"
+        {
+            def Xform "Class_sn3700c_01"
+            {
+                custom string aura:assetId = "nvidia.network_switch.sn3700c_01.operations"
+                custom string aura:derivativeChecksum = "sha256:5b01bc5ab42781eac6c259ebea6e45672fcd9bb92745b8efa50a6deaa55cec4c"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/2c0b9f4a-af53-44c0-8600-871b8da3e0f8/sn3700c_01_operations.glb"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:placementOwner = "AURA runtime (ReferenceEquipmentLayer)"
+                custom string aura:semanticRole = "network-switch"
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Network_Switches/NVIDIA/SN3700/SN3700C_01.usd"
+            }
+
+            def Xform "Class_cable_tray_299"
+            {
+                custom string aura:assetId = "nvidia.cable_tray.cable_tray_299.operations"
+                custom string aura:derivativeChecksum = "sha256:c49603d313dc6cfa5eb3bd862147537e294ded9b5f97d05cbde157d7a1d18c74"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/6ebc50a6-19be-4f61-a19a-173d34c768f8/cable_tray_299_operations.glb"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:placementOwner = "AURA runtime (ReferenceEquipmentLayer)"
+                custom string aura:semanticRole = "cable-tray"
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Facilities/Cable_Tray/Cable_Tray_61x299x5cm_A01_01.usd"
+            }
+        }
+
+        def Xform "Power"
+        {
+            def Xform "Class_rpdu_a_01"
+            {
+                custom string aura:assetId = "nvidia.rack_pdu.rpdu_a_01.operations"
+                custom string aura:derivativeChecksum = "sha256:65e368d3799832745b5672e948b61bd3f72cdba9f2914c153c9799134c6a5ed4"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/f5977476-f86f-4f56-ba2b-9d9bc3f754d1/rpdu_a_01_operations.glb"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:placementOwner = "AURA runtime (ReferenceEquipmentLayer)"
+                custom string aura:semanticRole = "rack-pdu"
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Power_Distribution/Controllers/PDU_A/rPDU_A_01.usd"
+            }
+        }
+
+        def Xform "Cooling"
+        {
+            def Xform "Class_dcp_a_01"
+            {
+                custom string aura:assetId = "nvidia.liquid_cooling.dcp_a_01.operations"
+                custom string aura:derivativeChecksum = "sha256:74e3c2b4279d0c95d6ab25c01d4ffefc21fb94a2768936f07af0618a8024cf36"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/f8193412-27b4-44bd-a8bf-bbaedab1e4a5/dcp_a_01_operations.glb"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:placementOwner = "AURA runtime (ReferenceEquipmentLayer)"
+                custom string aura:semanticRole = "liquid-cooling-equipment"
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Liquid_Cooling/Data_Hall/DCP_A/DCP_A_01.usd"
+            }
+
+            def Xform "Class_rack_42u_a_01"
+            {
+                custom string aura:assetId = "nvidia.rack.rack_42u_a_01.operations"
+                custom string aura:derivativeChecksum = "sha256:844e3e26d5f8b810fe3ab88c91b68bd16302267316bb36cfa49b591bc376061a"
+                custom string aura:derivativeUrl = "/__l5e/assets-v1/55a699c2-77c1-4f89-99d1-f2aad017797b/rack_42u_a_01_operations.glb"
+                custom string aura:licence = "NVIDIA Data Center OpenUSD Assets Pack (omniverse-content-production /Assets/DigitalTwin), used under the pack's NVIDIA licence terms"
+                custom string aura:placementOwner = "AURA runtime (ReferenceEquipmentLayer)"
+                custom string aura:semanticRole = "liquid-cooled-rack"
+                custom string aura:sourceUsdIdentifier = "Assets/DigitalTwin/Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+            }
+        }
+    }
+}
+

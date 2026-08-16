@@ -1,0 +1,231 @@
+{
+  "stage": "assets/facility/aura_reference_hall/aura_reference_hall.usda",
+  "generatedBy": "scripts/asset-ingestion/author_aura_facility_stage.py",
+  "counts": {
+    "tiles": 1290,
+    "luminaires": 16,
+    "columns": 6
+  },
+  "bindings": [
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_A01",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-A01",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:A01",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_A02",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-A02",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:A02",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_A03",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-A03",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:A03",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_A04",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-A04",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:A04",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_A05",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-A05",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:A05",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_B01",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-B01",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:B01",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_B02",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-B02",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:B02",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_B03",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-B03",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:B03",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_B04",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-B04",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:B04",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_B05",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-B05",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:B05",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_C01",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-C01",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:C01",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_C02",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-C02",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:C02",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_C03",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-C03",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:C03",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_C04",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-C04",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:C04",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_C05",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-C05",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:C05",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_D01",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-D01",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:D01",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_D02",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-D02",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:D02",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_D03",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-D03",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:D03",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_D04",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-D04",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:D04",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Equipment/Racks/Rack_D05",
+      "auraAssetId": "nvidia.rack_core.rack_42u_a_core.operations",
+      "facilityEquipmentId": "RACK-D05",
+      "semanticRole": "rack-core-reference",
+      "telemetryBindingId": "rack:D05",
+      "sourceChecksum": "",
+      "derivativeChecksum": "sha256:a77ae674e917c8f4dd75c6395875d7ec0a019e72efb5571490a30cdd86c5bd98"
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Building/RaisedFloor",
+      "auraAssetId": "aura.floor.standard_tile_600",
+      "facilityEquipmentId": null,
+      "semanticRole": "raised-floor-tile",
+      "telemetryBindingId": null,
+      "sourceChecksum": null,
+      "derivativeChecksum": null,
+      "note": "AURA-authored OpenUSD master. No browser derivative published yet; the runtime renders documented procedural geometry for this role."
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Building/Lighting",
+      "auraAssetId": "aura.lighting.linear_luminaire_1500",
+      "facilityEquipmentId": null,
+      "semanticRole": "luminaire",
+      "telemetryBindingId": null,
+      "sourceChecksum": null,
+      "derivativeChecksum": null,
+      "note": "AURA-authored OpenUSD master. No browser derivative published yet; the runtime renders documented procedural geometry for this role."
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Building/Structural",
+      "auraAssetId": "aura.structural.column_400",
+      "facilityEquipmentId": null,
+      "semanticRole": "structural-member",
+      "telemetryBindingId": null,
+      "sourceChecksum": null,
+      "derivativeChecksum": null,
+      "note": "AURA-authored OpenUSD master. No browser derivative published yet; the runtime renders documented procedural geometry for this role."
+    },
+    {
+      "usdPrimPath": "/AURA_Facility/Building/Shell",
+      "auraAssetId": "aura.shell.facility_shell",
+      "facilityEquipmentId": null,
+      "semanticRole": "facility-shell",
+      "telemetryBindingId": null,
+      "sourceChecksum": null,
+      "derivativeChecksum": null,
+      "note": "AURA-authored OpenUSD master. No browser derivative published yet; the runtime renders documented procedural geometry for this role."
+    }
+  ]
+}

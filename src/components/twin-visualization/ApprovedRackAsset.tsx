@@ -42,6 +42,11 @@ interface ApprovedRackAssetProps {
   onResolution?: (resolution: RuntimeAssetResolution) => void;
   /** Runtime loader failure after a derivative resolved (network/decode). */
   onDerivativeFailure?: (reason: string) => void;
+  /**
+   * Runtime mount evidence for this cabinet. `mounted` is true only once the
+   * approved derivative is actually in the scene graph.
+   */
+  onRuntimeState?: (state: { mounted: boolean; assetId: string; url: string | null }) => void;
 }
 
 function ImportedRack({
@@ -51,6 +56,7 @@ function ImportedRack({
   onClick,
   fallback,
   onFailure,
+  onRuntimeState,
 }: {
   url: string;
   rack: RackVisual;
@@ -59,12 +65,17 @@ function ImportedRack({
   /** Procedural cabinet shown while the derivative loads or if it fails. */
   fallback: ReactNode;
   onFailure?: (reason: string) => void;
+  onRuntimeState?: (mounted: boolean) => void;
 }) {
   const { scene, status, error } = useDerivativeGltf(url);
 
   useEffect(() => {
     if (status === 'failed' && error) onFailure?.(error);
   }, [status, error, onFailure]);
+
+  useEffect(() => {
+    onRuntimeState?.(scene != null && status === 'ready');
+  }, [scene, status, onRuntimeState]);
 
   /**
    * The USD pack's MDL materials do not survive glTF conversion, so the
@@ -150,6 +161,12 @@ export function ApprovedRackAsset(props: ApprovedRackAssetProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolution]);
 
+  // No approved derivative resolved: the procedural cabinet is what mounts.
+  useEffect(() => {
+    if (!resolution.glbUrl) props.onRuntimeState?.({ mounted: false, assetId, url: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolution.glbUrl, assetId]);
+
   if (resolution.glbUrl) {
     const procedural = (
       <Rack
@@ -171,6 +188,9 @@ export function ApprovedRackAsset(props: ApprovedRackAssetProps) {
           onClick={props.onClick}
           fallback={procedural}
           onFailure={props.onDerivativeFailure}
+          onRuntimeState={(mounted) =>
+            props.onRuntimeState?.({ mounted, assetId, url: resolution.glbUrl })
+          }
         />
       </DerivativeBoundary>
     );

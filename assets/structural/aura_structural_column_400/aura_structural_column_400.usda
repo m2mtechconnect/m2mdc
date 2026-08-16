@@ -1,0 +1,55 @@
+#usda 1.0
+(
+    defaultPrim = "StructuralColumn"
+    doc = "AURA-authored generic 400 mm square structural column, 4.2 m clear height. Authored slim so it never occludes rack inspection."
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "StructuralColumn" (
+    kind = "component"
+)
+{
+    custom string aura:assetId = "aura.structural.column_400"
+    custom string aura:author = "M2M AURA (AURA-authored generic asset)"
+    custom string aura:equipmentClass = "structural-member"
+    custom string aura:evidenceMode = "SIMULATED"
+    custom string aura:licence = "AURA-authored, internal use by M2M Technology Connect. Generic geometry, not vendor-certified, not SimReady."
+    custom string aura:semanticRole = "structural-member"
+    custom bool aura:simReady = 0
+    custom string aura:telemetryBindingId = ""
+    custom bool aura:vendorCertified = 0
+
+    def "Materials"
+    {
+        def Material "Concrete"
+        {
+            token outputs:surface.connect = </StructuralColumn/Materials/Concrete/PreviewSurface.outputs:surface>
+
+            def Shader "PreviewSurface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.55, 0.55, 0.54)
+                float inputs:metallic = 0
+                float inputs:roughness = 0.85
+                token outputs:surface
+            }
+        }
+    }
+
+    def "Geometry"
+    {
+        def Mesh "Column" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            float3[] extent = [(-0.2, 0, -0.2), (0.2, 4.2, 0.2)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+            rel material:binding = </StructuralColumn/Materials/Concrete>
+            point3f[] points = [(-0.2, 0, -0.2), (0.2, 0, -0.2), (0.2, 4.2, -0.2), (-0.2, 4.2, -0.2), (-0.2, 0, 0.2), (0.2, 0, 0.2), (0.2, 4.2, 0.2), (-0.2, 4.2, 0.2)]
+            uniform token subdivisionScheme = "none"
+        }
+    }
+}
+

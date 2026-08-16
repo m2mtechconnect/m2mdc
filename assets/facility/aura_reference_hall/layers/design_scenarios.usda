@@ -1,0 +1,29 @@
+#usda 1.0
+(
+    doc = "Approved design scenarios as USD variant selections. Live telemetry is never stored here; scenarios describe geometry and configuration only."
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "AURA_Facility"
+{
+    def Xform "DesignScenarios" (
+        variants = {
+            string designScenario = "baseline"
+        }
+        prepend variantSets = "designScenario"
+    )
+    {
+        variantSet "designScenario" = {
+            "SIM-LIQUID-COOLED-RACK-PILOT-001" {
+                custom string aura:scenarioNote = "Simulated design scenario. The complete NVIDIA liquid-cooled rack is mounted only where the facility model declares compatible liquid cooling and clearance."
+
+            }
+            "baseline" {
+                custom string aura:scenarioNote = "Reference hall as modelled. All racks use the AURA-authored rack-core selection."
+
+            }
+        }
+    }
+}
+

@@ -181,8 +181,10 @@ export function SimulatePanel({ facility }: Props) {
   const setScenario = useWorkspaceStore((s) => s.setScenario);
   const handoff = useWorkspaceStore((s) => s.handoff);
   const setReviewed = useWorkspaceStore((s) => s.setAssumptionsReviewed);
+  const lastRunError = useWorkspaceStore((s) => s.lastRunError);
   const run = useActiveRun();
-  const { scenario, scenarioId, reviewed, blockedReason, canConfigureSimulation, design } = useRunGate();
+  const gate = useRunGate();
+  const { scenario, scenarioId, reviewed, blockedReason, canConfigureSimulation, design, setTool } = gate;
   const mode: 'operational' | 'design' = design.active ? 'design' : 'operational';
 
   return (
@@ -380,10 +382,21 @@ export function SimulatePanel({ facility }: Props) {
       </div>
       )}
 
-      {blockedReason && (
-        <p className="flex items-start gap-1.5 text-xs text-muted-foreground" data-testid="simulation-blocked-reason">
-          <Lock className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
-          {blockedReason}
+      <RunBlockedExplanation
+        blockedReason={gate.blockedReason}
+        missingInputs={gate.missingInputs}
+        fixStep={gate.fixStep}
+        onFix={(step) => setTool(step)}
+      />
+
+      {!blockedReason && lastRunError && (
+        <p
+          role="alert"
+          data-testid="simulation-run-error"
+          className="flex items-start gap-1.5 rounded-md border border-destructive/40 bg-destructive/10 p-2.5 text-xs text-destructive"
+        >
+          <XCircle className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
+          {lastRunError} No run record was created.
         </p>
       )}
 

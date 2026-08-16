@@ -5,7 +5,7 @@
  * live runtime coverage store (not the manifest) and compares it against the
  * frozen baseline in `src/validation/referenceFacility/regressionBaseline.ts`.
  */
-import { test, expect } from './_setup/fixtures';
+import { test, expect } from '@playwright/test';
 import { installSupabaseMock } from './_setup/supabase-mock';
 import {
   BASELINE_AURA_FACILITY_OBJECTS,

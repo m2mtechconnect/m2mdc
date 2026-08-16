@@ -638,6 +638,16 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
     [bounds, racks, props.selectedAssetId, scenarioRack],
   );
 
+  // Validation harness bridge: an administrator-operated acceptance run needs
+  // a deterministic camera path in the real scene, not a screenshot mock.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.__auraTwinCamera = (preset: string) => applyPreset(preset as CameraPresetId);
+    return () => {
+      delete window.__auraTwinCamera;
+    };
+  }, [applyPreset]);
+
   const changeQuality = useCallback((id: QualityProfileId) => {
     setQualityProfile(id);
     writeQualityProfile(id);

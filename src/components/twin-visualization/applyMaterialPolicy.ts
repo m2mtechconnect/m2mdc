@@ -10,6 +10,7 @@
 import { MeshStandardMaterial, type Material, type Mesh, type Object3D } from 'three';
 import type { DistanceBand, SemanticRole } from './assetRegistry';
 import { materialCacheKey, resolveMaterialSpec } from './materialPolicy';
+import { BASELINE_UNIFORM_SPEC, getRealismMode, type RealismMode } from './realismMode';
 
 const SHARED = new Map<string, MeshStandardMaterial>();
 
@@ -38,13 +39,24 @@ export function sharedMaterialCount() {
 
 export function applyMaterialPolicy(
   root: Object3D,
-  options: { role: SemanticRole; band: DistanceBand; hasStateEvidence?: boolean; stateEmissive?: number },
+  options: {
+    role: SemanticRole;
+    band: DistanceBand;
+    hasStateEvidence?: boolean;
+    stateEmissive?: number;
+    /** Admin A/B lane. Presentation only; geometry and counts are unchanged. */
+    mode?: RealismMode;
+  },
 ) {
+  const mode = options.mode ?? getRealismMode();
   root.traverse((object) => {
     const mesh = object as Mesh;
     if (!mesh.isMesh) return;
     const list: Material[] = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     const replaced = list.map((existing) => {
+      if (mode === 'baseline') {
+        return sharedMaterial({ ...BASELINE_UNIFORM_SPEC, materialClass: 'painted-steel' });
+      }
       const name = existing?.name || mesh.name;
       const spec = resolveMaterialSpec({
         role: options.role,

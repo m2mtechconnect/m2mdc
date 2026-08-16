@@ -23,6 +23,7 @@ import { useFacilityModel } from './facilityModel';
 import { ROLE_VIEWS, useWorkspaceStore } from './workspaceStore';
 import { useSeededRunFixtures } from './runFixtures';
 import { parseSimulationHandoff } from '@/simulation/handoff';
+import { STEP_PARAM, isWorkflowStep, useWorkflowStep } from './useWorkflowStep';
 
 /** Docked inspector width envelope (Salesforce-style split workspace). */
 const PANEL_DEFAULT = 368;
@@ -114,13 +115,19 @@ export default function AuraWorkspace() {
     setPanelOpen(!overlayInspector);
   }, [overlayInspector, setPanelOpen]);
 
-  // This surface is the simulation workspace, so it always opens on the
-  // scenario step. Later role changes still move to the role's default tool.
+  // The workflow step is URL-owned on /simulation. A `?step=` deep link wins
+  // over every default, so refresh and back/forward are lossless.
+  const isSimulation = pathname.startsWith('/simulation');
+  const urlOwnsStep = isSimulation && isWorkflowStep(searchParams.get(STEP_PARAM));
+  const { notice: stepNotice } = useWorkflowStep(isSimulation);
+
+  // Without an explicit step the simulation workspace opens on the scenario
+  // step. Later role changes still move to the role's default tool.
   const initialTool = useRef(true);
   useEffect(() => {
     if (initialTool.current) {
       initialTool.current = false;
-      setTool('simulate');
+      if (!urlOwnsStep) setTool('simulate');
       return;
     }
     setTool(ROLE_VIEWS[roleView].defaultTool);
@@ -196,6 +203,17 @@ export default function AuraWorkspace() {
           onOpenPanel={() => setPanelOpen(true)}
           panelToggleRef={panelToggleRef}
         />
+
+        {stepNotice && (
+          <div
+            role="status"
+            aria-live="polite"
+            data-testid="workflow-step-notice"
+            className="border-b border-border bg-muted/60 px-4 py-2 text-xs text-foreground"
+          >
+            {stepNotice}
+          </div>
+        )}
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:flex-row">
           {!isMobile && <WorkspaceToolRail />}

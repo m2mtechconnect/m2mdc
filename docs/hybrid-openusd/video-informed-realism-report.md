@@ -191,4 +191,30 @@ Per the instruction that selected-rack inspection, rack population, cable detail
 lighting/AO and thermal changes follow the Phase 5 visual go/no-go, none of that work
 was started: it has no evidence to justify it yet.
 
+### Cloud GPU handoff - Phase 1 executed, Phases 2-11 blocked (2026-08-16)
+
+| Item | Result |
+| --- | --- |
+| Published host | `https://auradc.m2mtechconnect.com` reachable, `/data-centre-twin` returns 200 |
+| Build ID served | `bmsv7jcuh` (newer than the pinned `bmsv58pp8`) |
+| Manifest version served | 6 |
+| Documented validation candidate | `bmsv7jcuh` - republication not required |
+| Realism parameter admin gating | Confirmed: `window.__auraRealismMode` is null for an unauthenticated session |
+| Mounted-count parity across modes | Not confirmed - requires an admin session on GPU hardware |
+| Renderer in this environment | SwiftShader (software) - disqualified from visual acceptance |
+| Brev credential / credits | Not available; no instance provisioned |
+| AWS authorization | Not given (and gated behind a Brev pass regardless) |
+| Cloud spend incurred | USD 0 |
+
+Evidence: `docs/evidence/cloud-gpu/brev/phase-1-preflight.json`.
+
+No GPU-rendered image, benchmark number or visual go/no-go decision exists. Nothing was
+provisioned, no credential was created or stored, and no further geometry, cabling,
+inspection-mode, lighting, AO or thermal work was started - all of it remains gated
+behind the Brev visual comparison.
+
+To proceed, the account owner must supply Brev organization access and credits
+(USD 50 requested) and run the runbook in `docs/evidence/cloud-gpu/brev/README.md`
+against build `bmsv7jcuh`.
+
 Verdict: **AURA_VIDEO_INFORMED_OPENUSD_REALISM_AWAITING_BREV_VALIDATION**

@@ -1,0 +1,39 @@
+{
+  "phase": "Phase 1 - published validation candidate preflight (pre-credit)",
+  "recordedAt": "2026-08-16T04:10:00Z",
+  "probe": {
+    "method": "headless Chromium (Playwright) against the published host",
+    "host": "https://auradc.m2mtechconnect.com",
+    "route": "/data-centre-twin?geometry=nvidia-reference&realism=video-informed",
+    "httpStatus": 200
+  },
+  "publishedCandidate": {
+    "auraBuildId": "bmsv7jcuh",
+    "auraBuildTimestamp": "2026-08-16T02:50:27.401Z",
+    "auraManifestVersion": "6",
+    "auraCommitSha": "unknown",
+    "auraAppVersion": "0.0.0"
+  },
+  "expectedFromBaselineSnapshot": { "buildId": "bmsv58pp8" },
+  "candidateReconciliation": "The published host serves a NEWER candidate than the pinned baseline snapshot. bmsv7jcuh (manifest version 6) is therefore the documented validation candidate for the Brev run. No older bundle is to be validated; no republication was required because the newer candidate already carries the realism A/B lane.",
+  "adminOnlyRealismParameter": {
+    "recognisedForOperators": false,
+    "observed": "window.__auraRealismMode was null on an unauthenticated session, i.e. the parameter is correctly NOT honoured without an asset-admin session. Confirming that both modes mount identical geometry requires an admin session and must be performed inside the Brev instance, not from this environment."
+  },
+  "mountedCountsVerified": false,
+  "mountedCountsNote": "178 NVIDIA objects / 916 AURA facility objects / 40 cabinets / 0 fallbacks could not be confirmed here: the unauthenticated probe exposes no window.__auraRuntimeCoverage, and this environment has no hardware GPU lane. These counts are Phase 3/4 items inside the Brev session.",
+  "rendererInThisEnvironment": {
+    "vendor": "Google Inc. (Google)",
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "webgl2": true,
+    "classification": "software",
+    "consequence": "Per the acceptance rules, a SwiftShader renderer disqualifies this environment from producing any visual-acceptance or benchmark evidence. No screenshots from here may be used for visual acceptance."
+  },
+  "creditGate": {
+    "brevCredentialAvailable": false,
+    "brevCreditsConfirmed": false,
+    "gpuProvisioned": false,
+    "awsProvisioned": false,
+    "spendIncurredUsd": 0
+  }
+}

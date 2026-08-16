@@ -116,12 +116,7 @@ test.describe('NVIDIA Reference Facility runtime regression', () => {
         },
         { timeout: 90_000, intervals: [1_000] },
       )
-      .toBeGreaterThanOrEqual(BASELINE_NVIDIA_OBJECTS)
-      .catch((error) => {
-        // eslint-disable-next-line no-console
-        console.log('DEBUG_SNAPSHOT', JSON.stringify(snapshot, null, 1).slice(0, 4000));
-        throw error;
-      });
+      .toBeGreaterThanOrEqual(BASELINE_NVIDIA_OBJECTS);
 
     const data = snapshot!;
     const auraRoles = new Set(data.auraAuthoredRoles);

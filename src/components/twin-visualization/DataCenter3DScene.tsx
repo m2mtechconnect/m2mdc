@@ -7,6 +7,7 @@
 
 import { Component, Suspense, useState, useRef, useEffect, useCallback, useMemo, WheelEvent, type ReactNode } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
+import { SceneStatsBridge } from './SceneStatsBridge';
 import { ContactShadows, OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import { FacilityLighting } from './FacilityLighting';
@@ -399,6 +400,8 @@ function Scene({
         }
       />
 
+      <SceneStatsBridge />
+
       {/* Industrial lighting rig (neutral 4000-5000K, quality-profile aware) */}
       <FacilityLighting centre={centre} radius={hallRadius} profile={profile} />
 
@@ -637,6 +640,16 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
     },
     [bounds, racks, props.selectedAssetId, scenarioRack],
   );
+
+  // Validation harness bridge: an administrator-operated acceptance run needs
+  // a deterministic camera path in the real scene, not a screenshot mock.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.__auraTwinCamera = (preset: string) => applyPreset(preset as CameraPresetId);
+    return () => {
+      delete window.__auraTwinCamera;
+    };
+  }, [applyPreset]);
 
   const changeQuality = useCallback((id: QualityProfileId) => {
     setQualityProfile(id);

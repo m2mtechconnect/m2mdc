@@ -37,6 +37,21 @@ export default function AssetPipeline() {
         </p>
       </header>
 
+      <Card className="flex flex-wrap items-center justify-between gap-3 p-5">
+        <div className="space-y-1">
+          <h2 className="text-sm font-semibold">NVIDIA Reference Facility</h2>
+          <p className="max-w-2xl text-sm text-muted-foreground">
+            Hardware visual acceptance for the whole reference facility: live asset reconciliation,
+            a fixed-path benchmark and recorded human visual verdicts.
+          </p>
+        </div>
+        <Button asChild size="lg" data-testid="run-reference-facility-validation">
+          <Link to="/admin/reference-facility-validation">
+            Run facility validation <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+      </Card>
+
       {!expected ? (
         <Card className="p-6 text-sm">No approved derivative is registered.</Card>
       ) : (

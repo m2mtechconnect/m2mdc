@@ -1,0 +1,632 @@
+{
+  "nav": {
+    "/dashboard": {
+      "links": [
+        {
+          "t": "Data Centre Twin Studio home",
+          "h": "/dashboard"
+        },
+        {
+          "t": "Dashboard",
+          "h": "/dashboard"
+        },
+        {
+          "t": "Blueprint",
+          "h": "/blueprint"
+        },
+        {
+          "t": "Simulation",
+          "h": "/simulation"
+        },
+        {
+          "t": "Evidence",
+          "h": "/dsx/evidence-beta/overview"
+        },
+        {
+          "t": "Start simulation",
+          "h": "/simulation?twin=b8f9f3ad-126d-49ae-be0b-ba1bf3e7b646"
+        },
+        {
+          "t": "Open Blueprint",
+          "h": "/blueprint/b8f9f3ad-126d-49ae-be0b-ba1bf3e7b646"
+        },
+        {
+          "t": "View Evidence",
+          "h": "/dsx/evidence-beta"
+        },
+        {
+          "t": "View source",
+          "h": "/dsx/evidence-beta/carbon?kpi=pue&claim=efficiency_ratio"
+        },
+        {
+          "t": "View source",
+          "h": "/dsx/evidence-beta/carbon?kpi=itLoadKw&claim=facility_power_draw"
+        },
+        {
+          "t": "View source",
+          "h": "/dsx/evidence-beta/financials?kpi=capacityHeadroom&claim=capacity_driver"
+        },
+        {
+          "t": "View source",
+          "h": "/dsx/evidence-beta/sovereignty?kpi=sovereigntyScore&claim=data_residency"
+        },
+        {
+          "t": "Inspect in Blueprint",
+          "h": "/blueprint/b8f9f3ad-126d-49ae-be0b-ba1bf3e7b646?tab=model&layer=pue"
+        },
+        {
+          "t": "Inspect in Blueprint",
+          "h": "/blueprint/b8f9f3ad-126d-49ae-be0b-ba1bf3e7b646?tab=model&layer=sovereigntyScore"
+        },
+        {
+          "t": "Review model assumptions",
+          "h": "/blueprint/b8f9f3ad-126d-49ae-be0b-ba1bf3e7b646?tab=model"
+        },
+        {
+          "t": "Operating mode\nSimulated",
+          "h": "/manage/integrations"
+        },
+        {
+          "t": "Live telemetry\nNot connected",
+          "h": "/manage/integrations"
+        },
+        {
+          "t": "NVIDIA runtime\nNot available",
+          "h": "/manage/integrations#nvidia-dsx"
+        },
+        {
+          "t": "Evidence requiring review\n2",
+          "h": "/dsx/evidence-beta"
+        },
+        {
+          "t": "Production readiness\nNo-Go",
+          "h": "/manage/integrations#nvidia-dsx"
+        },
+        {
+          "t": "View Integrations",
+          "h": "/manage/integrations"
+        },
+        {
+          "t": "Review Evidence",
+          "h": "/dsx/evidence-beta"
+        },
+        {
+          "t": "Blueprint",
+          "h": "/blueprint/b8f9f3ad-126d-49ae-be0b-ba1bf3e7b646?tab=model&layer=thermal"
+        },
+        {
+          "t": "Create simulation",
+          "h": "/simulation?twin=b8f9f3ad-126d-49ae-be0b-ba1bf3e7b646"
+        },
+        {
+          "t": "Documentation",
+          "h": "/help"
+        },
+        {
+          "t": "Compliance",
+          "h": "/compliance"
+        }
+      ],
+      "buttons": 34,
+      "disabledButtons": [
+        "Send message"
+      ]
+    },
+    "/simulation": {
+      "links": [
+        {
+          "t": "Data Centre Twin Studio home",
+          "h": "/dashboard"
+        },
+        {
+          "t": "Dashboard",
+          "h": "/dashboard"
+        },
+        {
+          "t": "Blueprint",
+          "h": "/blueprint"
+        },
+        {
+          "t": "Simulation",
+          "h": "/simulation"
+        },
+        {
+          "t": "Evidence",
+          "h": "/dsx/evidence-beta/overview"
+        },
+        {
+          "t": "Documentation",
+          "h": "/help"
+        },
+        {
+          "t": "Compliance",
+          "h": "/compliance"
+        }
+      ],
+      "buttons": 49,
+      "disabledButtons": [
+        "Run simulation",
+        "Send message"
+      ]
+    },
+    "/blueprint/default": {
+      "links": [
+        {
+          "t": "Data Centre Twin Studio home",
+          "h": "/dashboard"
+        },
+        {
+          "t": "Dashboard",
+          "h": "/dashboard"
+        },
+        {
+          "t": "Blueprint",
+          "h": "/blueprint"
+        },
+        {
+          "t": "Simulation",
+          "h": "/simulation"
+        },
+        {
+          "t": "Evidence",
+          "h": "/dsx/evidence-beta/overview"
+        },
+        {
+          "t": "Open Assets & Systems",
+          "h": "/blueprint/default?tab=assets"
+        },
+        {
+          "t": "Assets & Systems",
+          "h": "/blueprint/default?tab=assets"
+        },
+        {
+          "t": "Open Validation",
+          "h": "/blueprint/default?tab=validation"
+        },
+        {
+          "t": "Agents9 configured",
+          "h": "/blueprint/default?tab=controls&sub=agents"
+        },
+        {
+          "t": "KPIs58 tracked",
+          "h": "/blueprint/default?tab=controls&sub=kpis"
+        },
+        {
+          "t": "Workflows25 enabled",
+          "h": "/blueprint/default?tab=controls&sub=workflows"
+        },
+        {
+          "t": "Data sources23 in readiness result",
+          "h": "/blueprint/default?tab=validation"
+        },
+        {
+          "t": "Integrations10 managed in Manage",
+          "h": "/integrations"
+        },
+        {
+          "t": "Data sovereigntyCA-QC validation status",
+          "h": "/blueprint/default?tab=validation"
+        },
+        {
+          "t": "Documentation",
+          "h": "/help"
+        },
+        {
+          "t": "Compliance",
+          "h": "/compliance"
+        }
+      ],
+      "buttons": 85,
+      "disabledButtons": [
+        "Send message"
+      ]
+    },
+    "/data-centre-twin": {
+      "links": [
+        {
+          "t": "Data Centre Twin Studio home",
+          "h": "/dashboard"
+        },
+        {
+          "t": "Dashboard",
+          "h": "/dashboard"
+        },
+        {
+          "t": "Blueprint",
+          "h": "/blueprint"
+        },
+        {
+          "t": "Simulation",
+          "h": "/simulation"
+        },
+        {
+          "t": "Evidence",
+          "h": "/dsx/evidence-beta/overview"
+        },
+        {
+          "t": "Documentation",
+          "h": "/help"
+        },
+        {
+          "t": "Compliance",
+          "h": "/compliance"
+        }
+      ],
+      "buttons": 91,
+      "disabledButtons": [
+        "Ask AURA Assistant",
+        "Send message"
+      ]
+    },
+    "/manage/facilities": {
+      "links": [
+        {
+          "t": "Data Centre Twin Studio home",
+          "h": "/dashboard"
+        },
+        {
+          "t": "Dashboard",
+          "h": "/dashboard"
+        },
+        {
+          "t": "Blueprint",
+          "h": "/blueprint"
+        },
+        {
+          "t": "Simulation",
+          "h": "/simulation"
+        },
+        {
+          "t": "Evidence",
+          "h": "/dsx/evidence-beta/overview"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=b8f9f3ad-126d-49ae-be0b-ba1bf3e7b646"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=6e0976d8-a8dc-4cfb-a74a-c7c6866e3dc7"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=112f859d-f384-459e-af9c-007470004778"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=66fb358e-89b6-486d-9b8f-796d11c4bfb1"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=9c84bc01-ff5e-47cf-8d0f-dc5731993e18"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=234c08bc-11e0-41f3-a357-5385ef895703"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=3d6ca662-dd19-43f6-85f8-1e17f0473edd"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=25b02df6-9077-47e5-8b9e-88447c5a13ca"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=49e71835-ac8a-42f3-8741-78bcef988e2f"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=e1d08571-9d10-4381-9c3e-51c13aa4cd70"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=99d9e553-33aa-484c-ae3c-113db476c126"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=5d009b6a-421d-4f32-8205-cddc0b61f718"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=41dad6df-93f6-4744-8322-cad6ea0731c7"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=19d14d2b-2dd5-4bdf-81e7-685672e6bc32"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=7fad266d-dbf5-46c7-8b90-2ec44299f15d"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=f286a942-c166-4d1b-970c-4224634b48a9"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=5323f410-faf6-4529-b059-da6f456fc5ee"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=fae8318a-1d7a-4486-a6d3-0c42e92161fd"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=65bdd602-165f-4a1b-a3e5-3011451bc823"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=44f2c111-839e-460b-b7dd-6b122f98436f"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=262e9434-37da-49ee-b42b-699e377afd58"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=b45f3acf-0ed6-422b-a57d-399d23b1728c"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=3889685b-987f-471d-bcfc-6c263867a751"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=947cfa1b-41c0-41a4-a286-cca55b238932"
+        },
+        {
+          "t": "Edit",
+          "h": "/builder?twinId=0a93c7f1-cfec-40b7-93b5-3f9f32869284"
+        },
+        {
+          "t": "Documentation",
+          "h": "/help"
+        },
+        {
+          "t": "Compliance",
+          "h": "/compliance"
+        }
+      ],
+      "buttons": 37,
+      "disabledButtons": [
+        "Send message"
+      ]
+    },
+    "/admin/asset-pipeline": {
+      "links": [
+        {
+          "t": "Data Centre Twin Studio home",
+          "h": "/dashboard"
+        },
+        {
+          "t": "Dashboard",
+          "h": "/dashboard"
+        },
+        {
+          "t": "Blueprint",
+          "h": "/blueprint"
+        },
+        {
+          "t": "Simulation",
+          "h": "/simulation"
+        },
+        {
+          "t": "Evidence",
+          "h": "/dsx/evidence-beta/overview"
+        },
+        {
+          "t": "Run facility validation",
+          "h": "/admin/reference-facility-validation"
+        },
+        {
+          "t": "Run hardware validation",
+          "h": "/admin/asset-validation/nvidia.rack.42u_a_01.ops"
+        },
+        {
+          "t": "Admin preview",
+          "h": "/admin/asset-preview"
+        },
+        {
+          "t": "Opt-in simulated scenario",
+          "h": "/data-centre-twin?designScenario=SIM-LIQUID-COOLED-RACK-PILOT-001"
+        },
+        {
+          "t": "Documentation",
+          "h": "/help"
+        },
+        {
+          "t": "Compliance",
+          "h": "/compliance"
+        }
+      ],
+      "buttons": 11,
+      "disabledButtons": [
+        "Send message"
+      ]
+    }
+  },
+  "rbac": {
+    "keys": [
+      "__auraSceneBridge",
+      "__auraRuntimeCoverage",
+      "__auraFacilityFamilies"
+    ]
+  },
+  "workflow": {
+    "inspect": {
+      "url": "https://auradc.m2mtechconnect.com/simulation?step=inspect",
+      "h1": "Montreal Data centre - Simulation",
+      "body": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Montreal Data centre - Simulation | SIMULATED | Design baseline | No run recorded | Synthetic inputs | View | Engineering | Inspect | Configure | Simulate | Compare | Review | Assista"
+    },
+    "configure": {
+      "url": "https://auradc.m2mtechconnect.com/simulation?step=configure",
+      "h1": "Montreal Data centre - Simulation",
+      "body": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Montreal Data centre - Simulation | SIMULATED | Design baseline | No run recorded | Synthetic inputs | View | Engineering | Inspect | Configure | Simulate | Compare | Review | Assista"
+    },
+    "simulate": {
+      "url": "https://auradc.m2mtechconnect.com/simulation?step=simulate",
+      "h1": "Montreal Data centre - Simulation",
+      "body": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Montreal Data centre - Simulation | SIMULATED | Design baseline | No run recorded | Synthetic inputs | View | Engineering | Inspect | Configure | Simulate | Compare | Review | Assista"
+    },
+    "compare": {
+      "url": "https://auradc.m2mtechconnect.com/simulation?step=compare",
+      "h1": "Montreal Data centre - Simulation",
+      "body": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Montreal Data centre - Simulation | SIMULATED | Design baseline | No run recorded | Synthetic inputs | View | Engineering | Inspect | Configure | Simulate | Compare | Review | Assista"
+    },
+    "review": {
+      "url": "https://auradc.m2mtechconnect.com/simulation?step=review",
+      "h1": "Montreal Data centre - Simulation",
+      "body": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Montreal Data centre - Simulation | SIMULATED | Design baseline | No run recorded | Synthetic inputs | View | Engineering | Inspect | Configure | Simulate | Compare | Review | Assista"
+    },
+    "tabClicks": [
+      {
+        "tab": "Inspect",
+        "error": "Locator.click: Timeout 4000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"tab\", name=\"Inspect\")"
+      },
+      {
+        "tab": "Configure",
+        "error": "Locator.click: Timeout 4000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"tab\", name=\"Configure"
+      },
+      {
+        "tab": "Simulate",
+        "error": "Locator.click: Timeout 4000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"tab\", name=\"Simulate\""
+      },
+      {
+        "tab": "Compare",
+        "error": "Locator.click: Timeout 4000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"tab\", name=\"Compare\")"
+      },
+      {
+        "tab": "Review",
+        "error": "Locator.click: Timeout 4000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"tab\", name=\"Review\")."
+      }
+    ],
+    "refresh": {
+      "before": "https://auradc.m2mtechconnect.com/simulation",
+      "after": "https://auradc.m2mtechconnect.com/simulation",
+      "h1": "Montreal Data centre - Simulation"
+    }
+  },
+  "twin": {
+    "?facility=nvidia-reference": {
+      "url": "https://auradc.m2mtechconnect.com/data-centre-twin?facility=nvidia-reference",
+      "realism": null,
+      "stats": null,
+      "coverage": null,
+      "body": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Facility Model (Simulated) | 1 |  | 40 Racks \u2022 5 Rows \u2022 5000 kW Capacity |  | FACILITY GEOMETRY | Baseline preview | Twin Preview | Zoom | 100% | Scroll to zoo",
+      "afterRefreshUrl": "https://auradc.m2mtechconnect.com/data-centre-twin?facility=nvidia-reference"
+    },
+    "?view=2d": {
+      "url": "https://auradc.m2mtechconnect.com/data-centre-twin?view=2d",
+      "realism": null,
+      "stats": null,
+      "coverage": null,
+      "body": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Facility Model (Simulated) | 1 |  | 40 Racks \u2022 5 Rows \u2022 5000 kW Capacity |  | FACILITY GEOMETRY | Baseline preview | Twin Preview | Zoom | 100% | Scroll to zoo",
+      "afterRefreshUrl": "https://auradc.m2mtechconnect.com/data-centre-twin?view=2d"
+    },
+    "?layer=thermal": {
+      "url": "https://auradc.m2mtechconnect.com/data-centre-twin?layer=thermal",
+      "realism": null,
+      "stats": null,
+      "coverage": null,
+      "body": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Facility Model (Simulated) | 1 |  | 40 Racks \u2022 5 Rows \u2022 5000 kW Capacity |  | FACILITY GEOMETRY | Baseline preview | Twin Preview | Zoom | 100% | Scroll to zoo",
+      "afterRefreshUrl": "https://auradc.m2mtechconnect.com/data-centre-twin?layer=thermal"
+    },
+    "?layer=power": {
+      "url": "https://auradc.m2mtechconnect.com/data-centre-twin?layer=power",
+      "realism": null,
+      "stats": null,
+      "coverage": null,
+      "body": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Facility Model (Simulated) | 1 |  | 40 Racks \u2022 5 Rows \u2022 5000 kW Capacity |  | FACILITY GEOMETRY | Baseline preview | Twin Preview | Zoom | 100% | Scroll to zoo",
+      "afterRefreshUrl": "https://auradc.m2mtechconnect.com/data-centre-twin?layer=power"
+    },
+    "?layer=carbon": {
+      "url": "https://auradc.m2mtechconnect.com/data-centre-twin?layer=carbon",
+      "realism": null,
+      "stats": null,
+      "coverage": null,
+      "body": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Facility Model (Simulated) | 1 |  | 40 Racks \u2022 5 Rows \u2022 5000 kW Capacity |  | FACILITY GEOMETRY | Baseline preview | Twin Preview | Zoom | 100% | Scroll to zoo",
+      "afterRefreshUrl": "https://auradc.m2mtechconnect.com/data-centre-twin?layer=carbon"
+    },
+    "?layer=sovereignty": {
+      "url": "https://auradc.m2mtechconnect.com/data-centre-twin?layer=sovereignty",
+      "realism": null,
+      "stats": null,
+      "coverage": null,
+      "body": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Facility Model (Simulated) | 1 |  | 40 Racks \u2022 5 Rows \u2022 5000 kW Capacity |  | FACILITY GEOMETRY | Baseline preview | Twin Preview | Zoom | 100% | Scroll to zoo",
+      "afterRefreshUrl": "https://auradc.m2mtechconnect.com/data-centre-twin?layer=sovereignty"
+    },
+    "?realism=video-informed": {
+      "url": "https://auradc.m2mtechconnect.com/data-centre-twin?realism=video-informed",
+      "realism": null,
+      "stats": null,
+      "coverage": null,
+      "body": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Facility Model (Simulated) | 1 |  | 40 Racks \u2022 5 Rows \u2022 5000 kW Capacity |  | FACILITY GEOMETRY | Baseline preview | Twin Preview | Zoom | 100% | Scroll to zoo",
+      "afterRefreshUrl": "https://auradc.m2mtechconnect.com/data-centre-twin?realism=video-informed"
+    },
+    "?layer=notARealLayer": {
+      "url": "https://auradc.m2mtechconnect.com/data-centre-twin?layer=notARealLayer",
+      "realism": null,
+      "stats": null,
+      "coverage": null,
+      "body": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Facility Model (Simulated) | 1 |  | 40 Racks \u2022 5 Rows \u2022 5000 kW Capacity |  | FACILITY GEOMETRY | Baseline preview | Twin Preview | Zoom | 100% | Scroll to zoo",
+      "afterRefreshUrl": "https://auradc.m2mtechconnect.com/data-centre-twin?layer=notARealLayer"
+    },
+    "?view=simulation": {
+      "url": "https://auradc.m2mtechconnect.com/data-centre-twin?view=simulation",
+      "realism": null,
+      "stats": null,
+      "coverage": null,
+      "body": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Facility Model (Simulated) | 1 |  | 40 Racks \u2022 5 Rows \u2022 5000 kW Capacity |  | FACILITY GEOMETRY | Baseline preview | Twin Preview | Zoom | 100% | Scroll to zoo",
+      "afterRefreshUrl": "https://auradc.m2mtechconnect.com/data-centre-twin?view=simulation"
+    }
+  },
+  "responsive": {
+    "1920x1080": {
+      "overflowX": false,
+      "tabsVisible": 2,
+      "primaryCta": {
+        "text": "Simulate",
+        "inView": true,
+        "disabled": false
+      }
+    },
+    "1440x900": {
+      "overflowX": false,
+      "tabsVisible": 2,
+      "primaryCta": {
+        "text": "Simulate",
+        "inView": true,
+        "disabled": false
+      }
+    },
+    "1366x768": {
+      "overflowX": false,
+      "tabsVisible": 2,
+      "primaryCta": {
+        "text": "Simulate",
+        "inView": true,
+        "disabled": false
+      }
+    },
+    "1280x720": {
+      "overflowX": false,
+      "tabsVisible": 2,
+      "primaryCta": {
+        "text": "Simulate",
+        "inView": true,
+        "disabled": false
+      }
+    },
+    "390x844": {
+      "overflowX": false,
+      "tabsVisible": 0,
+      "primaryCta": {
+        "text": "Simulate",
+        "inView": true,
+        "disabled": false
+      }
+    }
+  }
+}

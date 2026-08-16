@@ -1,0 +1,1247 @@
+[
+  {
+    "route": "/",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+    "title": "Montreal Data centre | AURA command centre",
+    "h1": "Montreal Data centre",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Data centre |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 04:31 AM |  | Change facility | Start simulation | Open Blueprint | View Evidence | PUE",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "GET https://auradc.m2mtechconnect.com/__l5e/assets-v1/64f21cbc-9211-4c3d-9fff-357ba1eaee03/rack_42u_a.glb net::ERR_ABORTED",
+      "POST https://e.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://e.clarity.ms/collect net::ERR_ABORTED",
+      "GET https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2 net::ERR_ABORTED",
+      "GET https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2 net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/onboarding",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "404",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | 404 |  | Oops! Page not found |  | Return to Home |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documentation | Compliance",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [
+      "404 Error: User attempted to access non-existent route: /onboarding",
+      "404 Error: User attempted to access non-existent route: /onboarding"
+    ],
+    "failedRequests": [
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/login",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/login",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "404",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | 404 |  | Oops! Page not found |  | Return to Home |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documentation | Compliance",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [
+      "404 Error: User attempted to access non-existent route: /login",
+      "404 Error: User attempted to access non-existent route: /login",
+      "404 Error: User attempted to access non-existent route: /login"
+    ],
+    "failedRequests": [
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/auth",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+    "title": "Montreal Data centre | AURA command centre",
+    "h1": "Montreal Data centre",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Data centre |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 04:32 AM |  | Change facility | Start simulation | Open Blueprint | View Evidence | PUE",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/sign-in",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+    "title": "Montreal Data centre | AURA command centre",
+    "h1": "Montreal Data centre",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Data centre |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 04:32 AM |  | Change facility | Start simulation | Open Blueprint | View Evidence | PUE",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://e.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://e.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://e.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://e.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://e.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/sign-up",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+    "title": "Montreal Data centre | AURA command centre",
+    "h1": "Montreal Data centre",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Data centre |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 04:32 AM |  | Change facility | Start simulation | Open Blueprint | View Evidence | PUE",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/forgot-password",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+    "title": "Montreal Data centre | AURA command centre",
+    "h1": "Montreal Data centre",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Data centre |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 04:32 AM |  | Change facility | Start simulation | Open Blueprint | View Evidence | PUE",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/mfa",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+    "title": "Montreal Data centre | AURA command centre",
+    "h1": "Montreal Data centre",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Data centre |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 04:32 AM |  | Change facility | Start simulation | Open Blueprint | View Evidence | PUE",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/twin-datacentre",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/blueprint/default",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Montreal Data centre",
+    "bodyHead": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Back | Montreal Data centre | Designer - editable | AURA Assistant | Open in Simulation | Montreal | Tier III | 5 MW | 200 Racks | v1 | Updated 8/16/2026, 4:32:20 AM | Model | Assets & Systems | Controls | Validation | Versions |",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/data-centre-twin",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/data-centre-twin",
+    "title": "Data Centre Twin | 1",
+    "h1": "Data centre twin 1",
+    "bodyHead": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Facility Model (Simulated) | 1 |  | 40 Racks \u2022 5 Rows \u2022 5000 kW Capacity |  | FACILITY GEOMETRY | Baseline preview | Twin Preview | Zoom | 100% | Scroll to zoom | Row A | Row B | Row D | Row E | Procedural 3D preview | 1.33 | PUE",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/omniverse-scene",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/omniverse-scene",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "AURA Twin Preview",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | AURA Twin Preview |  | AURA application rendering \u2022 0 racks \u2022 Simulated scene |  | Kit disabled | 4:32:40 AM | Kit disabled by configuration \u2014 displaying local demonstration data. | Local demonstration scene | disabled |  | Local",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dashboard",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+    "title": "Montreal Data centre | AURA command centre",
+    "h1": "Montreal Data centre",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Data centre |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 04:32 AM |  | Change facility | Start simulation | Open Blueprint | View Evidence | PUE",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/builder",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/builder",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Start a new build",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Start a new build |  | Pick a template from the marketplace, resume a saved draft, or begin from scratch. |  | Choose a template | Start blank | Your builds | Untitled Agent | Updated 4 days ago | Draft | Untitled Agent | Updated",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/deploy",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/builder",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Start a new build",
+    "bodyHead": "No system selected | Please select a system to deploy | E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Start a new build |  | Pick a template from the marketplace, resume a saved draft, or begin from scratch. |  | Choose a template | Start blank | Your builds | Untitled Agent",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/deployments",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/deployments",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Deployments",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Deployments |  | Complete audit trail of all system deployments |  | TOTAL DEPLOYMENTS | 0 |  | All time |  | ACTIVE | 0 |  | Running systems |  | FAILED | 0 |  | Requires attention |  | PENDING | 0 |  | In progress |  | All Stat",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/analytics",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/analytics",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Telemetry and analytics",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Telemetry and analytics |  | 1 - Montreal. Executive and operations overview. Drill into Thermal, Power, GPU, Sovereignty, and Carbon tabs for engineering detail. |  | Last refreshed: 2 min ago | | | Auto-refresh 60s | Blueprint ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/account/profile",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/account/profile",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Profile",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Profile |  | Manage your personal account settings and preferences |  | Profile Picture | E | Upload Photo |  | JPG, PNG, GIF, or WebP. Max 2MB. |  | Personal Information | Email | Full Name | Job Title | Phone | Organization | R",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/account/settings",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/account/settings",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Workspace settings",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Workspace settings |  | Manage workspace configuration and team defaults |  | Admin access required | No Workspace Found |  | Your account is not associated with a workspace yet. |  | View Teams |  | \u00a9 2025 Data Centre Digital Tw",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/account/access-control",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/account/access-control",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Access control",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Access control |  | Manage user roles and permissions across the platform |  | Grant Role | Role Permissions | Viewer |  | \u2022 View agents and their status | \u2022 Access logs and metrics | \u2022 Cannot run or modify agents |  | Operator |",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/admin/onboarding-submissions",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/admin/onboarding-submissions",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Onboarding submissions",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Onboarding submissions |  | Prospect questionnaire responses from the marketing page |  | 14 submissions | Total Leads | 14 | This Week | 0 | Enterprise (1000+) | 0 | Ready (1-3 mo) | 8 | Name\tEmail\tCompany\tRole\tSize\tTimeline\tSub",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://x.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://x.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://x.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://x.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://x.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://x.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/admin/user-approvals",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/admin/user-approvals",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "User approvals",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | User approvals |  | Manage access for new user signups |  | 304 pending | Pending | Approved | All |  | No name |  | test-1784557534314@m2m.studio |  | Signed up: 7/20/2026 |  | Pending | Approve |  | No name |  | test-1784557341",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/admin/asset-preview",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/admin/asset-preview",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Admin asset preview",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Admin asset preview |  | Run the hardware GPU acceptance harness for nvidia.rack.42u_a_01.ops |  | NVIDIA liquid-cooled rack canary - not assigned to facility. NVIDIA OpenUSD-derived geometry; 0 converted textures. Validated visu",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/admin/asset-pipeline",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/admin/asset-pipeline",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Asset pipeline",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Asset pipeline |  | Approved OpenUSD-derived runtime assets and their validation state. Private USD source URLs are never exposed here. |  | NVIDIA Reference Facility |  | Hardware visual acceptance for the whole reference facili",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/admin/asset-validation/nvidia.rack.42u_a_01.ops",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/admin/asset-validation/nvidia.rack.42u_a_01.ops",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Hardware GPU acceptance - nvidia.rack.42u_a_01.ops",
+    "bodyHead": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Hardware GPU acceptance - nvidia.rack.42u_a_01.ops |  | Administrator-operated validation of the approved operations derivative against the published delivery path. Nothing is measured or stored until you start the run, and nothi",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/admin/reference-facility-validation",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/admin/reference-facility-validation",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "NVIDIA Reference Facility - hardware visual acceptance",
+    "bodyHead": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | NVIDIA Reference Facility - hardware visual acceptance |  | Runs against the live twin route below. Measurements come from the mounted scene; the visual verdicts are yours. This scene mixes NVIDIA OpenUSD-derived equipment with A",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "GET https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=avatar_url%2Cavatar_bg_color%2Cavatar_initials&user_id= net::ERR_ABORTED",
+      "GET https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=avatar_url%2Cavatar_bg_color%2Cavatar_initials&user_id= net::ERR_ABORTED",
+      "GET https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=avatar_url%2Cavatar_bg_color%2Cavatar_initials&user_id= net::ERR_ABORTED",
+      "GET https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=avatar_url%2Cavatar_bg_color%2Cavatar_initials&user_id= net::ERR_ABORTED",
+      "GET https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=avatar_url%2Cavatar_bg_color%2Cavatar_initials&user_id= net::ERR_ABORTED",
+      "GET https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=avatar_url%2Cavatar_bg_color%2Cavatar_initials&user_id= net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/admin/signups-dashboard",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/admin/signups-dashboard",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Signups and approvals",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Signups and approvals |  | Real-time user registrations and approval status |  | Live | User approvals | Onboarding submissions | Teams and roles | Total Users | 324 | Pending Approval | 304 | Approved | 20 | Last 7 Days | 0 | Al",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/manage/integrations",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/manage/integrations",
+    "title": "Integrations | AURA DC",
+    "h1": "Integrations",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Integrations |  | Connection and readiness state for every external system. Nothing listed here is currently supplying data to AURA DC. |  | Data sources |  | What AURA DC would read from, and whether it is attached. |  | Facilit",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/manage/facilities",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/manage/facilities",
+    "title": "Facilities | AURA DC",
+    "h1": "Facilities",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Facilities |  | Facility administration: create, configure and retire modelled data-centre facilities. All values remain simulated. |  | Create facility | Facility list |  | Facilities you have access to. |  | 1 | Current |  | Mo",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/compliance",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/compliance",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Sovereignty & Safety Audit",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Sovereignty & Safety Audit |  | 1 - Montreal |  | Export Audit Report | SOVEREIGN COMPLIANCE | Unavailable | Not assessed | Applicable frameworks: PIPEDA, Quebec Law 25 (configured, not achieved). | CROSS-BORDER FLOWS (DEMO) | De",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/teams",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/teams",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Teams and roles",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Teams and roles |  | Manage team members, roles, and access controls |  | Invite Team Member | Team Members | User Approvals | 304 | Total Members | 324 | Active Now | 163 | Systems | 0 | Pending | 0 | Roles | 2 | Departments | 2",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/marketplace",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/marketplace",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Template Marketplace",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Template Marketplace |  | Discover Digital Twin & AI Agent Blueprints tailored to your industry and department |  | Filters: | All Industries | All Departments | All Types | All Levels | Recommended for You |  | Showing 1 templat",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/app/agents",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/app/agents",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Subsystem Agents",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Introducing Agent Operations Center |  | Your mission control for deployed AI agents |  | Real-Time Control |  | Start, pause, stop agents on demand |  | Live Monitoring |  | Stream activity logs in real-time |  | Performance Met",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/simulation",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/simulation",
+    "title": "Montreal Data centre | AURA simulation workspace",
+    "h1": "Montreal Data centre - Simulation",
+    "bodyHead": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Montreal Data centre - Simulation | SIMULATED | Design baseline | No run recorded | Synthetic inputs | View | Engineering | Inspect | Configure | Simulate | Compare | Review | Assistant | 100% | Row A | Row B | Row D | Row E | Pr",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/simulation/preview",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/simulation/preview",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "No Recommendation to Preview",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | No Recommendation to Preview |  | Scan a website URL first to generate a recommendation, then preview simulation scenarios. |  | Back to Dashboard |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documenta",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [
+      "TypeError: Failed to fetch\n    at https://auradc.m2mtechconnect.com/assets/vendor-supabase-BJo9PGMe.js:24:3209\n    at si (https://auradc.m2mtechconnect.com/assets/vendor-supabase-BJo9PGMe.js:24:9569)\n",
+      "TypeError: Failed to fetch\n    at https://auradc.m2mtechconnect.com/assets/vendor-supabase-BJo9PGMe.js:24:3209\n    at si (https://auradc.m2mtechconnect.com/assets/vendor-supabase-BJo9PGMe.js:24:9569)\n",
+      "TypeError: Failed to fetch\n    at https://auradc.m2mtechconnect.com/assets/vendor-supabase-BJo9PGMe.js:24:3209\n    at si (https://auradc.m2mtechconnect.com/assets/vendor-supabase-BJo9PGMe.js:24:9569)\n",
+      "TypeError: Failed to fetch\n    at https://auradc.m2mtechconnect.com/assets/vendor-supabase-BJo9PGMe.js:24:3209\n    at si (https://auradc.m2mtechconnect.com/assets/vendor-supabase-BJo9PGMe.js:24:9569)\n",
+      "TypeError: Failed to fetch\n    at https://auradc.m2mtechconnect.com/assets/vendor-supabase-BJo9PGMe.js:24:3209\n    at si (https://auradc.m2mtechconnect.com/assets/vendor-supabase-BJo9PGMe.js:24:9569)\n",
+      "TypeError: Failed to fetch\n    at https://auradc.m2mtechconnect.com/assets/vendor-supabase-BJo9PGMe.js:24:3209\n    at si (https://auradc.m2mtechconnect.com/assets/vendor-supabase-BJo9PGMe.js:24:9569)\n"
+    ],
+    "failedRequests": [
+      "GET https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user net::ERR_ABORTED",
+      "GET https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user net::ERR_ABORTED",
+      "GET https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user net::ERR_ABORTED",
+      "GET https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user net::ERR_ABORTED",
+      "GET https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user net::ERR_ABORTED",
+      "GET https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/blueprint/preview",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/blueprint/preview",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "No Recommendation to Preview",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | No Recommendation to Preview |  | Scan a website URL first to generate a recommendation, then preview the blueprint. |  | Back to Dashboard |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documentation | ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/blueprint/default",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/blueprint/default",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Montreal Data centre",
+    "bodyHead": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Back | Montreal Data centre | Designer - editable | AURA Assistant | Open in Simulation | Montreal | Tier III | 5 MW | 200 Racks | v1 | Updated 8/16/2026, 4:34:31 AM | Model | Assets & Systems | Controls | Validation | Versions |",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/help",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/help",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Learning Hub",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Learning Hub |  | Resources, tutorials, and expert support to accelerate your AI transformation |  | \ud83c\udf93 Build Your First AI System |  | 5-minute quickstart guide to deploying your first AI workflow |  | Watch Tutorial | View Docum",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/playbook",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/playbook",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "AI Initiative",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Back to Recommendations | Implementation Playbook | AI Initiative |  | Comprehensive implementation guide and best practices |  | Export PDF | Executive Summary | Executive Summary |  | Business Context: B2B Enterprise SaaS opera",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/connect/monitor",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/connect/monitor",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Sync Monitor",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Sync Monitor |  | Real-time status of all data connections and background jobs. |  | View Health | RUNNING | 1 | SUCCEEDED | 3 | FAILED | 1 | TOTAL DOCS | 12.4k | Filters | All Status | 0 | Pending | 0 | Running | 0 | Completed |",
+    "spinner": true,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/connect/health",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/connect/health",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Data Health",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Data Health |  | Monitor quality, freshness, and issues across all data sources |  | Back to Monitor | Overall System Health |  | Aggregate health score across all data sources |  | 85% | +2.3% from yesterday | HEALTHY SOURCES | ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/search",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/search",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Search",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Search |  | Find documents, pages, and apps across all your connected sources. |  | Search | Start searching |  | Enter a query to search across all your connected documents, pages, and apps. |  | Try searching for: |  | HIPAA | ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/settings/ai",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/settings/ai",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "AI settings",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | AI settings |  | Configure Google Gemini (Vertex AI) for AURA Assistant |  | These settings are stored in your current browser only. They are not synced to a server, are not shared with other users, and clearing browser storage r",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/infrastructure",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/infrastructure",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Infrastructure",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | PHYSICAL AI \u00b7 DIGITAL TWIN | Infrastructure |  | Ready to build your infrastructure? |  | Use the Pod Designer to configure your NVIDIA + DDN hardware stack for your specific data centre scenario. Get recommendations, cost estima",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/twin-debug",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/twin-debug",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Twin Debug Console",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Twin Debug Console |  | Multi-tenant isolation debugging |  | Refresh | Current Twin Context |  | Twin ID |  | b8f9f3ad-126d-49ae-be0b-ba1bf3e7b646 |  | Twin Name |  | 1 |  | Region |  | ca-central-1 |  | Total Twins |  | 25 |  |",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/digital-twins-demo/funding-intake",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/digital-twins-demo/funding-intake",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": null,
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Funding Intake & Triage Twin \u2013 Demo |  | Submit a company funding intake form to see the Digital Twin in action. |  | Company Intake Form |  | Fill out the form below to simulate a funding opportunity submission |  | Company Name",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/overview",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/overview?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+    "title": "DSX Operator Workspace | AURA Data Centre Twin",
+    "h1": "Overview",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATI",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/operations/thermal",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/operations/thermal?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+    "title": "DSX Operator Workspace | AURA Data Centre Twin",
+    "h1": "Thermal",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATI",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/operations/power",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/operations/power?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+    "title": "DSX Operator Workspace | AURA Data Centre Twin",
+    "h1": "Power",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATI",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/operations/cooling",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/operations/cooling?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+    "title": "DSX Operator Workspace | AURA Data Centre Twin",
+    "h1": "Cooling",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATI",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/operations/compute",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/operations/compute?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+    "title": "DSX Operator Workspace | AURA Data Centre Twin",
+    "h1": "Compute",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATI",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/operations/workload",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/operations/workload?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+    "title": "DSX Operator Workspace | AURA Data Centre Twin",
+    "h1": "Workload",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATI",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/sustainability",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/sustainability?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+    "title": "DSX Operator Workspace | AURA Data Centre Twin",
+    "h1": "Sustainability: Energy and carbon",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATI",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/sustainability/financial",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/sustainability/financial?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+    "title": "DSX Operator Workspace | AURA Data Centre Twin",
+    "h1": "Sustainability: Financial exposure",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATI",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://v.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://v.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://v.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://v.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://v.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://v.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/sustainability/sovereignty",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/sustainability/sovereignty?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+    "title": "DSX Operator Workspace | AURA Data Centre Twin",
+    "h1": "Sustainability: Sovereignty",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATI",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/decisions",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/decisions?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+    "title": "DSX Operator Workspace | AURA Data Centre Twin",
+    "h1": "Decisions: Results",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATI",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/decisions/log",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/decisions/log?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+    "title": "DSX Operator Workspace | AURA Data Centre Twin",
+    "h1": "Decisions: Decision log",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATI",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/assets",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/assets?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+    "title": "DSX Operator Workspace | AURA Data Centre Twin",
+    "h1": "Assets",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATI",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/pilot/overview",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/pilot/overview",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Data-centre twins",
+    "bodyHead": "M2M AURA Pilot | Overview | edouard@m2mtechconnect.com | Sign out | Data-centre twins |  | Source: public.data_centre_twins. Row visibility is enforced server-side by row-level security scoped to the record owner. |  | Montreal Sovereign AI DC | Montreal - QC - Tier Tier III - 10000 kW | Updated 202",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/agents",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/app/agents",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Subsystem Agents",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Introducing Agent Operations Center |  | Your mission control for deployed AI agents |  | Real-Time Control |  | Start, pause, stop agents on demand |  | Live Monitoring |  | Stream activity logs in real-time |  | Performance Met",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/integrations",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/manage/integrations",
+    "title": "Integrations | AURA DC",
+    "h1": "Integrations",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Integrations |  | Connection and readiness state for every external system. Nothing listed here is currently supplying data to AURA DC. |  | Data sources |  | What AURA DC would read from, and whether it is attached. |  | Facilit",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/evidence",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/evidence?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+    "title": "DSX Operator Workspace | AURA Data Centre Twin",
+    "h1": "Overview",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATI",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/command",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+    "title": "Montreal Data centre | AURA command centre",
+    "h1": "Montreal Data centre",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Data centre |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 04:36 AM |  | Change facility | Start simulation | Open Blueprint | View Evidence | PUE",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/facilities",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/manage/facilities",
+    "title": "Facilities | AURA DC",
+    "h1": "Facilities",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Facilities |  | Facility administration: create, configure and retire modelled data-centre facilities. All values remain simulated. |  | Create facility | Facility list |  | Facilities you have access to. |  | 1 | Current |  | Mo",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/universal-search",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/search",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "Search",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Search |  | Find documents, pages, and apps across all your connected sources. |  | Search | Start searching |  | Enter a query to search across all your connected documents, pages, and apps. |  | Try searching for: |  | HIPAA | ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/this-route-does-not-exist",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/this-route-does-not-exist",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "404",
+    "bodyHead": "E | SIMULATED | Design baseline | No run recorded | Synthetic inputs | 404 |  | Oops! Page not found |  | Return to Home |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documentation | Compliance",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [
+      "404 Error: User attempted to access non-existent route: /this-route-does-not-exist",
+      "404 Error: User attempted to access non-existent route: /this-route-does-not-exist",
+      "404 Error: User attempted to access non-existent route: /this-route-does-not-exist",
+      "404 Error: User attempted to access non-existent route: /this-route-does-not-exist",
+      "404 Error: User attempted to access non-existent route: /this-route-does-not-exist",
+      "404 Error: User attempted to access non-existent route: /this-route-does-not-exist"
+    ],
+    "failedRequests": [
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  }
+]

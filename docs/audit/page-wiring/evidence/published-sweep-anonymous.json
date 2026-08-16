@@ -1,0 +1,1224 @@
+[
+  {
+    "route": "/",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 404 ()"
+    ],
+    "failedRequests": [
+      "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/onboarding",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+    "title": "Start Onboarding | M2M AURA",
+    "h1": null,
+    "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of employees | Back | Continue",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/login",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/login",
+    "title": "Sign In | M2M AURA",
+    "h1": "Sovereign AI Twin Studio",
+    "bodyHead": "Sovereign AI Twin Studio |  | Enterprise-grade autonomous AI systems for sovereign data centre operations. Build, simulate, and deploy intelligent digital twins. |  | Carbon Neutral | Sovereign Cloud | AI-Powered | Sign in to your account |  | Enter your credentials to access the studio |  | Email A",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/auth",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+    "title": "Start Onboarding | M2M AURA",
+    "h1": null,
+    "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of employees | Back | Continue",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/sign-in",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+    "title": "Start Onboarding | M2M AURA",
+    "h1": null,
+    "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of employees | Back | Continue",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/sign-up",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+    "title": "Start Onboarding | M2M AURA",
+    "h1": null,
+    "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of employees | Back | Continue",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/forgot-password",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+    "title": "Start Onboarding | M2M AURA",
+    "h1": null,
+    "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of employees | Back | Continue",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/mfa",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+    "title": "Start Onboarding | M2M AURA",
+    "h1": null,
+    "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of employees | Back | Continue",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/twin-datacentre",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/twin-datacentre",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/data-centre-twin",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/data-centre-twin",
+    "title": "Data Centre Twin | Demo Mode",
+    "h1": "Montreal Sovereign AI Data Centre",
+    "bodyHead": "Dashboard | Montreal Sovereign AI Data Centre | operational | Tier 4 |  | Montreal, Canada \u2022 20 Racks \u2022 12,000 kW Capacity |  | Blueprint | 9 agents | SIMULATION \u2022 4:27:33 AM | Ask AURA Assistant | PUE | GPU Load | Thermals | Cooling | Simulation | Sovereignty | -2.3% |  | 1.22 |  | Power Usage Effe",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/omniverse-scene",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/omniverse-scene",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "AURA Twin Preview",
+    "bodyHead": "AURA Twin Preview |  | AURA application rendering \u2022 0 racks \u2022 Simulated scene |  | Kit disabled | 4:27:39 AM | Kit disabled by configuration \u2014 displaying local demonstration data. | Local demonstration scene | disabled |  | Local demonstration scene |  | Omniverse stream unavailable in this build. S",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dashboard",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/builder",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://o.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/deploy",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/deployments",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/analytics",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/account/profile",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/account/settings",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/account/access-control",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/admin/onboarding-submissions",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/admin/user-approvals",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://e.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://e.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://e.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://e.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://e.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://e.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/admin/asset-preview",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://g.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/admin/asset-pipeline",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/admin/asset-validation/nvidia.rack.42u_a_01.ops",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://b.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/admin/reference-facility-validation",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/admin/signups-dashboard",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/manage/integrations",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/manage/facilities",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/compliance",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/teams",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/marketplace",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/app/agents",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/simulation",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/simulation/preview",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/blueprint/preview",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/blueprint/default",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://p.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/help",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/playbook",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/connect/monitor",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://n.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/connect/health",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/search",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/settings/ai",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://u.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/infrastructure",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/twin-debug",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://h.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/digital-twins-demo/funding-intake",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://z.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/overview",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/operations/thermal",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/operations/power",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/operations/cooling",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/operations/compute",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/operations/workload",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/sustainability",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/sustainability/financial",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/sustainability/sovereignty",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/decisions",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://t.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/decisions/log",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://f.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/dsx/evidence-beta/assets",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://k.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/pilot/overview",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://x.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://x.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://x.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://x.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://x.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://x.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/agents",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://a.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/integrations",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://i.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/evidence",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://l.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/command",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://y.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/facilities",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/universal-search",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://r.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  },
+  {
+    "route": "/this-route-does-not-exist",
+    "status": 200,
+    "finalUrl": "https://auradc.m2mtechconnect.com/",
+    "title": "M2M AURA | Sovereign AI Data Centre Digital Twin Platform",
+    "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+    "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin ",
+    "spinner": false,
+    "build": null,
+    "consoleErrors": [],
+    "failedRequests": [
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED",
+      "POST https://j.clarity.ms/collect net::ERR_ABORTED"
+    ]
+  }
+]

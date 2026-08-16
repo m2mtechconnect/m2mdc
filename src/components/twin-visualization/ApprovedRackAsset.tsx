@@ -90,8 +90,9 @@ function ImportedRack({
     applyMaterialPolicy(scene, {
       role: 'rack-core-reference',
       band: selected ? 'selected' : 'nearby',
+      mode: realismMode,
     });
-  }, [scene, selected]);
+  }, [scene, selected, realismMode]);
 
   if (!scene) return <>{fallback}</>;
   return (

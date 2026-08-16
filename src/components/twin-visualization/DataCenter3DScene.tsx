@@ -41,10 +41,12 @@ import type {
 import { RackGroup } from './RackGroup';
 import { isAssetAdmin } from '@/auth/assetAdmin';
 import {
+  AURA_FACILITY_ROLES,
   FALLBACK_REASON_LABEL,
   bandForDistance,
   getAssetCapabilityParts,
   getGpuValidationStatus,
+  isAuraAuthoredAsset,
   resolveRuntimeAsset,
 } from './assetRegistry';
 import { useRBAC } from '@/contexts/RBACContext';
@@ -70,6 +72,7 @@ import {
 import { AssetProvenanceBadge } from './AssetProvenancePanel';
 import { ScenarioRackLayer } from './ScenarioRackLayer';
 import { ReferenceEquipmentLayer } from './ReferenceEquipmentLayer';
+import { AuraFacilityLayer } from './AuraFacilityLayer';
 import { useRuntimeCoverageStore, coverageTotals, provenanceBreakdown } from './runtimeCoverageStore';
 import {
   FACILITY_GEOMETRY_MODES,
@@ -525,6 +528,7 @@ function Scene({
 
       {/* Simulated design scenario: additive, never part of the as-built rows. */}
       {facilityGeometry === 'nvidia-reference' && (
+        <>
         <ReferenceEquipmentLayer
           racks={racks}
           rows={rows}
@@ -532,6 +536,24 @@ function Scene({
           infrastructure={infrastructure}
           band={bandForDistance(targetDistance)}
         />
+
+        {/* AURA-authored OpenUSD facility derivatives: floor tiles, supply
+            tiles, luminaires, columns and the parametric shell. DataHall keeps
+            its procedural stand-in for anything that does not mount. */}
+        <AuraFacilityLayer
+          bounds={extents}
+          rows={rows}
+          infrastructure={infrastructure}
+          shellMode={
+            infrastructure === 'off'
+              ? 'off'
+              : shellMode && shellMode !== 'off'
+                ? shellMode
+                : shellModeForInfrastructure(infrastructure)
+          }
+          band={bandForDistance(targetDistance)}
+        />
+        </>
       )}
 
       {scenario &&
@@ -670,16 +692,25 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
 
   // Coverage reported by the objects that actually mounted this frame.
   const runtimeRoles = useRuntimeCoverageStore((s) => s.roles);
-  const runtimeTotals = useMemo(() => coverageTotals(runtimeRoles), [runtimeRoles]);
+  // Equipment claim: NVIDIA-derived roles only. AURA-authored facility
+  // families are counted separately so neither claim borrows the other's
+  // objects.
+  const runtimeTotals = useMemo(
+    () => coverageTotals(runtimeRoles, (r) => !isAuraAuthoredAsset(r.assetId)),
+    [runtimeRoles],
+  );
+  const auraFacilityTotals = useMemo(
+    () => coverageTotals(runtimeRoles, (r) => isAuraAuthoredAsset(r.assetId)),
+    [runtimeRoles],
+  );
   const rackMounts = useRuntimeCoverageStore((s) => s.rackMounts);
   const proceduralGeometry = useRuntimeCoverageStore((s) => s.procedural);
   // Hybrid provenance: NVIDIA-derived, AURA-authored USD-derived and procedural
   // are counted separately from runtime evidence, never merged into one claim.
   const provenance = useMemo(
     () =>
-      provenanceBreakdown(runtimeRoles, rackMounts, proceduralGeometry, (assetId) =>
-        (assetId ?? '').startsWith('aura.'),
-      ),
+      // Authorship is read from the manifest entry, never inferred from an id.
+      provenanceBreakdown(runtimeRoles, rackMounts, proceduralGeometry, isAuraAuthoredAsset),
     [runtimeRoles, rackMounts, proceduralGeometry],
   );
 
@@ -998,6 +1029,21 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             loaded derivative files. Counts are visible objects, not manifest rows.
             Representative NVIDIA equipment, not verified as installed. Roles without an approved
             derivative render AURA procedural geometry.
+          </p>
+          <p
+            className="mt-1 text-slate-300"
+            data-testid="aura-facility-coverage"
+            data-mounted-logical-objects={auraFacilityTotals.mountedObjects}
+            data-derived-roles={auraFacilityTotals.derivedRoles}
+            data-unique-derivatives={auraFacilityTotals.uniqueDerivatives}
+            data-draw-calls={auraFacilityTotals.drawCalls}
+          >
+            AURA-authored OpenUSD facility: {auraFacilityTotals.mountedObjects} visible scene
+            objects across {auraFacilityTotals.derivedRoles} of {AURA_FACILITY_ROLES.length}{' '}
+            families, from {auraFacilityTotals.uniqueDerivatives} loaded derivative files in{' '}
+            {auraFacilityTotals.drawCalls} instanced draw calls. Generic AURA-authored geometry:
+            not vendor-certified, not SimReady, no NVIDIA authorship. Families without a mounted
+            derivative keep AURA procedural geometry.
           </p>
           <p
             className="mt-1 font-mono text-[11px] text-slate-300"

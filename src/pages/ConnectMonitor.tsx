@@ -10,19 +10,16 @@ import { DCKPITile } from "@/components/dc-ui";
 import SyncTable from "@/components/connect/SyncTable";
 import JobDetailsDrawer from "@/components/connect/JobDetailsDrawer";
 import JobMonitor from "@/components/connect/JobMonitor";
+import { useSyncJobFeed, type SyncJobRow } from "@/hooks/useSyncJobFeed";
 
-const syncJobs: Array<{
-  id: string;
-  source: string;
-  status: "success" | "running" | "failed";
-  docs: number;
-  duration: string;
-  timestamp: string;
-  error: string | null;
-}> = [
+/**
+ * Demonstration rows. These are fixtures, never telemetry, and are only
+ * rendered behind an explicit "demonstration data" label.
+ */
+const demonstrationJobs: SyncJobRow[] = [
   { id: "job-001", source: "Google Drive", status: "success", docs: 342, duration: "2.3s", timestamp: "2 min ago", error: null },
   { id: "job-002", source: "Zapier: Zendesk", status: "success", docs: 28, duration: "1.8s", timestamp: "8 min ago", error: null },
-  { id: "job-003", source: "Website Crawler", status: "running", docs: 156, duration: "—", timestamp: "12 min ago", error: null },
+  { id: "job-003", source: "Website Crawler", status: "running", docs: 156, duration: "-", timestamp: "12 min ago", error: null },
   { id: "job-004", source: "SharePoint", status: "failed", docs: 0, duration: "0.5s", timestamp: "15 min ago", error: "Authentication expired" },
   { id: "job-005", source: "Zapier: Slack", status: "success", docs: 89, duration: "3.1s", timestamp: "22 min ago", error: null },
 ];
@@ -34,17 +31,24 @@ export default function ConnectMonitor() {
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const filteredJobs = syncJobs.filter(job => {
+  const feed = useSyncJobFeed(demonstrationJobs);
+
+  const filteredJobs = feed.jobs.filter(job => {
     const matchesSearch = job.source.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === "all" || job.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
+  // Counters describe exactly the rows on screen. When no ingestion service
+  // is connected there is nothing to count, so they read as unavailable.
+  const countersAvailable = feed.status === 'connected' || feed.isDemonstration;
+  const na = "n/a";
   const stats = {
-    running: syncJobs.filter(j => j.status === "running").length,
-    success: syncJobs.filter(j => j.status === "success").length,
-    failed: syncJobs.filter(j => j.status === "failed").length,
+    running: countersAvailable ? feed.jobs.filter(j => j.status === "running").length : na,
+    success: countersAvailable ? feed.jobs.filter(j => j.status === "success").length : na,
+    failed: countersAvailable ? feed.jobs.filter(j => j.status === "failed").length : na,
   };
+  const failedCount = countersAvailable ? feed.jobs.filter(j => j.status === "failed").length : 0;
 
   return (
     <div className="min-h-screen bg-background section-padding-lg">
@@ -62,32 +66,53 @@ export default function ConnectMonitor() {
           }
         />
 
+        {/* Truthful feed state. This surface always settles - it never shows
+            an unbounded spinner (finding PW-P2-04). */}
+        <div
+          role="status"
+          aria-live="polite"
+          data-testid="sync-feed-status"
+          className="flex flex-wrap items-center gap-3 rounded-md border border-border bg-muted/40 px-4 py-2.5 text-xs text-foreground"
+        >
+          <span className="font-medium">{feed.message}</span>
+          {feed.lastCheckedAt && (
+            <span className="text-muted-foreground">
+              Last checked {new Date(feed.lastCheckedAt).toLocaleTimeString()}
+            </span>
+          )}
+          {feed.status !== 'loading' && feed.status !== 'retrying' && (
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={feed.retry}>
+              Check again
+            </Button>
+          )}
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <DCKPITile
-            label="Running"
+            label={feed.isDemonstration ? "Running (demonstration)" : "Running"}
             value={stats.running}
             icon={<Clock className="h-4 w-4" />}
             status="info"
             size="sm"
           />
           <DCKPITile
-            label="Succeeded"
+            label={feed.isDemonstration ? "Succeeded (demonstration)" : "Succeeded"}
             value={stats.success}
             icon={<CheckCircle className="h-4 w-4" />}
             status="normal"
             size="sm"
           />
           <DCKPITile
-            label="Failed"
+            label={feed.isDemonstration ? "Failed (demonstration)" : "Failed"}
             value={stats.failed}
             icon={<AlertCircle className="h-4 w-4" />}
-            status={stats.failed > 0 ? "critical" : "normal"}
+            status={failedCount > 0 ? "critical" : "normal"}
             size="sm"
           />
           <DCKPITile
-            label="Total Docs"
-            value="12.4k"
+            label="Total documents"
+            value={countersAvailable ? feed.jobs.reduce((sum, j) => sum + j.docs, 0).toLocaleString() : na}
             icon={<Database className="h-4 w-4" />}
             status="normal"
             size="sm"
@@ -117,7 +142,7 @@ export default function ConnectMonitor() {
                 <SelectItem value="failed">{t('connectMonitor.failed')}</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="icon" aria-label="Refresh sync jobs" onClick={feed.retry}>
               <RefreshCw className="h-4 w-4" />
             </Button>
           </div>
@@ -127,6 +152,11 @@ export default function ConnectMonitor() {
         <JobMonitor />
 
         {/* Sync Jobs Table */}
+        {feed.isDemonstration && (
+          <p className="text-xs text-muted-foreground">
+            The table below shows demonstration data. Connect an ingestion service to see real sync jobs.
+          </p>
+        )}
         <SyncTable jobs={filteredJobs} onJobClick={setSelectedJob} />
       </div>
 

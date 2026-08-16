@@ -87,17 +87,16 @@ function AuthenticatedApp() {
         return;
       }
       
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('is_approved')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      
-      if (error) {
-        console.error('Error checking approval:', error);
+      // Guarded read: a session that has not resolved a real user id must not
+      // issue `user_id=eq.` (finding PW-P2-02).
+      const result = await fetchProfileFields(user.id, 'is_approved');
+      if (result.status === 'error') {
+        console.error('Error checking approval:', result.message);
         setIsApproved(false);
+      } else if (result.status === 'success') {
+        setIsApproved(Boolean(result.data.is_approved));
       } else {
-        setIsApproved(data?.is_approved ?? false);
+        setIsApproved(false);
       }
       setApprovalLoading(false);
     };

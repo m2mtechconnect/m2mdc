@@ -41,14 +41,32 @@ interface CoverageState {
   /** Increments whenever the scene is rebuilt, so stale reports are dropped. */
   token: string;
   roles: Record<string, RoleCoverage>;
+  /**
+   * Per-rack cabinet mount evidence. `true` only once the approved derivative
+   * actually mounted; `false` while the procedural cabinet is rendering.
+   */
+  rackMounts: Record<string, { mounted: boolean; assetId: string | null; url: string | null }>;
+  /** Procedural geometry the scene is rendering, reported by its owner. */
+  procedural: Record<string, { label: string; count: number; kind: 'physical' | 'overlay' }>;
   resetCoverage: (token: string) => void;
   reportRole: (token: string, coverage: RoleCoverage) => void;
+  reportRackMount: (
+    token: string,
+    rackId: string,
+    mount: { mounted: boolean; assetId: string | null; url: string | null },
+  ) => void;
+  reportProcedural: (
+    key: string,
+    entry: { label: string; count: number; kind: 'physical' | 'overlay' },
+  ) => void;
 }
 
 export const useRuntimeCoverageStore = create<CoverageState>((set, get) => ({
   token: 'initial',
   roles: {},
-  resetCoverage: (token) => set({ token, roles: {} }),
+  rackMounts: {},
+  procedural: {},
+  resetCoverage: (token) => set({ token, roles: {}, rackMounts: {} }),
   /**
    * A report carries the token of the scene build that produced it. A newer
    * token supersedes the previous build: the store rolls over to it and drops
@@ -64,6 +82,16 @@ export const useRuntimeCoverageStore = create<CoverageState>((set, get) => ({
     }
     set({ token, roles: { [coverage.role]: coverage } });
   },
+  reportRackMount: (token, rackId, mount) => {
+    const current = get().token;
+    if (current !== token) {
+      set({ token, roles: {}, rackMounts: { [rackId]: mount } });
+      return;
+    }
+    set((s) => ({ rackMounts: { ...s.rackMounts, [rackId]: mount } }));
+  },
+  reportProcedural: (key, entry) =>
+    set((s) => ({ procedural: { ...s.procedural, [key]: entry } })),
 }));
 
 declare global {

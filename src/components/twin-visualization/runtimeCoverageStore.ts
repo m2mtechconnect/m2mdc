@@ -49,9 +49,20 @@ export const useRuntimeCoverageStore = create<CoverageState>((set, get) => ({
   token: 'initial',
   roles: {},
   resetCoverage: (token) => set({ token, roles: {} }),
+  /**
+   * A report carries the token of the scene build that produced it. A newer
+   * token supersedes the previous build: the store rolls over to it and drops
+   * the stale rows. Reports are never dropped for being "early", because child
+   * effects always run before the parent's - dropping them was how a fully
+   * mounted scene could still read as zero coverage.
+   */
   reportRole: (token, coverage) => {
-    if (get().token !== token) return;
-    set((s) => ({ roles: { ...s.roles, [coverage.role]: coverage } }));
+    const current = get().token;
+    if (current === token) {
+      set((s) => ({ roles: { ...s.roles, [coverage.role]: coverage } }));
+      return;
+    }
+    set({ token, roles: { [coverage.role]: coverage } });
   },
 }));
 

@@ -139,10 +139,7 @@ export function ReferenceEquipmentLayer({
     () => `${racks.length}:${rows.length}:${infrastructure}:${band}`,
     [racks.length, rows.length, infrastructure, band],
   );
-  const reset = useRuntimeCoverageStore((s) => s.resetCoverage);
   const report = useRuntimeCoverageStore((s) => s.reportRole);
-
-  useEffect(() => reset(token), [token, reset]);
 
   const mounts = useMemo<RoleMount[]>(() => {
     const out: RoleMount[] = [];

@@ -1,0 +1,44 @@
+{
+  "phase": "Phase 1 - protected baseline before cloud-GPU realism work",
+  "recordedAt": "2026-08-16T03:55:00Z",
+  "build": {
+    "buildId": "bmsv58pp8",
+    "publishedUrl": "https://m2mdc.lovable.app",
+    "route": "/data-centre-twin?geometry=nvidia-reference",
+    "manifestVersion": "see getManifestVersion() in src/components/twin-visualization/assetRegistry.ts"
+  },
+  "mountedCounts": {
+    "nvidiaObjects": 178,
+    "nvidiaEquipment": 138,
+    "rackCabinets": 40,
+    "auraFacilityObjects": 916,
+    "auraFacilityFamilies": 5,
+    "physicalFallbacks": 0
+  },
+  "renderState": {
+    "drawCalls": "not recorded on hardware GPU - software lane only",
+    "triangles": "not recorded on hardware GPU - software lane only",
+    "geometries": "not recorded on hardware GPU - software lane only",
+    "materials": "7 shared AURA material classes (bounded, name-hint classified)",
+    "textures": 0,
+    "loadedDerivativeFiles": "38 published GLB derivatives",
+    "downloadedBytes": "not recorded on hardware GPU - software lane only"
+  },
+  "invariants": {
+    "blockedAssetsRemainBlocked": true,
+    "quarantinedAssetsRemainQuarantined": true,
+    "overrideLayerChangesRuntimeEligibility": false,
+    "blockedDerivativeRequested": false,
+    "nvidiaSourceGeometryModified": false,
+    "publishedGlbEditedInPlace": false
+  },
+  "regressionGuards": [
+    "src/validation/referenceFacility/__tests__/regressionBaseline.test.ts",
+    "src/validation/cloudGpu/__tests__/realismMode.test.ts",
+    "src/components/twin-visualization/__tests__/qualityPolicy.test.ts",
+    "tests/truth-in-ui/reference-facility-regression.spec.ts"
+  ],
+  "limitations": [
+    "Renderer counters (draw calls, triangles, bytes) cannot be recorded here: this environment has no hardware GPU lane. They are captured by the Brev run in Phase 4."
+  ]
+}

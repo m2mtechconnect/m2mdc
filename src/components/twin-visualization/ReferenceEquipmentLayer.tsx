@@ -18,7 +18,7 @@
 import { Component, useEffect, useMemo, type ReactNode } from 'react';
 import { Clone } from '@react-three/drei';
 import { useDerivativeGltf } from './useDerivativeGltf';
-import type { Mesh, MeshStandardMaterial } from 'three';
+import { applyMaterialPolicy } from './applyMaterialPolicy';
 import {
   getAsset,
   listAssetsForRole,
@@ -44,6 +44,8 @@ interface RoleMount {
   entry: AssetManifestEntry;
   url: string;
   placements: Placement[];
+  /** Camera band that selected this derivative; drives material presentation. */
+  band: DistanceBand;
 }
 
 /**
@@ -70,22 +72,16 @@ function InstancedRole({
   const scene = load.scene;
   const report = useRuntimeCoverageStore((s) => s.reportRole);
 
+  /**
+   * NVIDIA OpenUSD-derived geometry with AURA-authored material, lighting and
+   * visualization enhancements. MDL materials do not survive glTF conversion,
+   * so the shared AURA presentation policy assigns physically separated
+   * painted-steel / bare-metal / plastic / faceplate / cable / LED values.
+   */
   useEffect(() => {
     if (!scene) return;
-    scene.traverse((object) => {
-      const mesh = object as Mesh;
-      if (!mesh.isMesh) return;
-      const list = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-      for (const m of list as MeshStandardMaterial[]) {
-        if (!m || m.userData.auraTuned) continue;
-        m.metalness = 0.5;
-        m.roughness = 0.55;
-        m.envMapIntensity = 0.5;
-        m.userData.auraTuned = true;
-        m.needsUpdate = true;
-      }
-    });
-  }, [scene]);
+    applyMaterialPolicy(scene, { role: mount.role, band: mount.band });
+  }, [scene, mount.role, mount.band]);
 
   const count = mount.placements.length;
   useEffect(() => {
@@ -216,7 +212,7 @@ export function ReferenceEquipmentLayer({
       if (!entry || placements.length === 0) return;
       const url = resolveRuntimeAsset(entry.assetId).glbUrl;
       if (!url) return;
-      out.push({ role, entry, url, placements });
+      out.push({ role, entry, url, placements, band });
     };
 
     // In-rack equipment: 1U servers, 2U servers, one switch, one PDU and

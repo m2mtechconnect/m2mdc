@@ -3076,7 +3076,19 @@
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
       },
-      "drawCallBudget": 4
+      "drawCallBudget": 4,
+      "qualityMetrics": {
+        "triangles": 12,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 2076,
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "qualityDecision": "Single published operations derivative: measured 12 triangles, 1 draw call(s), 1 material(s), 2076 bytes downloaded from the published derivative. No cheaper LOD exists, so operations is selected for every camera band."
     },
     {
       "assetId": "aura.floor.perforated_tile_600.operations",
@@ -3138,7 +3150,19 @@
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
       },
-      "drawCallBudget": 37
+      "drawCallBudget": 37,
+      "qualityMetrics": {
+        "triangles": 444,
+        "drawCalls": 37,
+        "meshes": 37,
+        "materials": 2,
+        "textures": 0,
+        "sizeBytes": 53004,
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "qualityDecision": "Single published operations derivative: measured 444 triangles, 37 draw call(s), 2 material(s), 53004 bytes downloaded from the published derivative. No cheaper LOD exists, so operations is selected for every camera band."
     },
     {
       "assetId": "aura.lighting.linear_luminaire_1500.operations",
@@ -3200,7 +3224,19 @@
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
       },
-      "drawCallBudget": 4
+      "drawCallBudget": 4,
+      "qualityMetrics": {
+        "triangles": 48,
+        "drawCalls": 4,
+        "meshes": 4,
+        "materials": 2,
+        "textures": 0,
+        "sizeBytes": 6468,
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "qualityDecision": "Single published operations derivative: measured 48 triangles, 4 draw call(s), 2 material(s), 6468 bytes downloaded from the published derivative. No cheaper LOD exists, so operations is selected for every camera band."
     },
     {
       "assetId": "aura.structural.column_400.operations",
@@ -3262,7 +3298,19 @@
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
       },
-      "drawCallBudget": 4
+      "drawCallBudget": 4,
+      "qualityMetrics": {
+        "triangles": 12,
+        "drawCalls": 1,
+        "meshes": 1,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 2068,
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "qualityDecision": "Single published operations derivative: measured 12 triangles, 1 draw call(s), 1 material(s), 2068 bytes downloaded from the published derivative. No cheaper LOD exists, so operations is selected for every camera band."
     },
     {
       "assetId": "aura.shell.facility_shell.operations",
@@ -3326,7 +3374,19 @@
         "status": "awaiting-hardware-run",
         "lastPassedRunId": null
       },
-      "drawCallBudget": 4
+      "drawCallBudget": 4,
+      "qualityMetrics": {
+        "triangles": 48,
+        "drawCalls": 4,
+        "meshes": 4,
+        "materials": 1,
+        "textures": 0,
+        "sizeBytes": 6112,
+        "silhouette": "passed",
+        "decodeMsMeasured": null
+      },
+      "renderCostRank": 1,
+      "qualityDecision": "Single published operations derivative: measured 48 triangles, 4 draw call(s), 1 material(s), 6112 bytes downloaded from the published derivative. No cheaper LOD exists, so operations is selected for every camera band."
     }
   ],
   "qualityPolicyVersion": "1.0.0"

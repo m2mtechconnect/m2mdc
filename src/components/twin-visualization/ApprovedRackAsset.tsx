@@ -14,10 +14,10 @@
  * passed through unchanged.
  */
 
-import type { Mesh, MeshStandardMaterial } from 'three';
 import { Component, useEffect, useMemo, type ReactNode } from 'react';
 import { Clone } from '@react-three/drei';
 import { loadDerivative, useDerivativeGltf } from './useDerivativeGltf';
+import { applyMaterialPolicy } from './applyMaterialPolicy';
 import { Rack, type RackDetailLevel } from './Rack';
 import type { RackVisual } from './types';
 import {
@@ -79,28 +79,18 @@ function ImportedRack({
 
   /**
    * The USD pack's MDL materials do not survive glTF conversion, so the
-   * derivative arrives as a single untextured metal. Apply physically
-   * reasonable powder-coated-steel values so the cabinet reads correctly under
-   * facility lighting. These are AURA-authored values, not the original MDL
-   * library.
+   * derivative arrives as a single untextured metal. The shared AURA-authored
+   * presentation policy separates painted cabinet steel from rails, handles
+   * and faceplates so the cabinet reads correctly under facility lighting.
+   * These are AURA-authored values, not the original MDL library.
    */
   useEffect(() => {
     if (!scene) return;
-    scene.traverse((object) => {
-      const mesh = object as Mesh;
-      if (!mesh.isMesh) return;
-      const material = mesh.material as MeshStandardMaterial | MeshStandardMaterial[];
-      for (const m of Array.isArray(material) ? material : [material]) {
-        if (!m || m.userData.auraTuned) continue;
-        m.metalness = 0.55;
-        m.roughness = 0.52;
-        m.envMapIntensity = 0.55;
-        m.color?.setHex(0x6b7280);
-        m.userData.auraTuned = true;
-        m.needsUpdate = true;
-      }
+    applyMaterialPolicy(scene, {
+      role: 'rack-core-reference',
+      band: selected ? 'selected' : 'nearby',
     });
-  }, [scene]);
+  }, [scene, selected]);
 
   if (!scene) return <>{fallback}</>;
   return (

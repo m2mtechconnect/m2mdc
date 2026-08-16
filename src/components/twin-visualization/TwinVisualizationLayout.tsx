@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,11 @@ import { useSimulationVisualization } from '@/hooks/useSimulationVisualization';
 import { useTwinOverlaySafe, OVERLAY_CONFIG, type TwinOverlay } from '@/context/TwinOverlayContext';
 import type { TwinVisualizationMode } from './types';
 import { DataCenter3DScene, type OverlayDomain } from './DataCenter3DScene';
+import {
+  isFacilityGeometryMode,
+  type FacilityGeometryMode,
+} from './facilityGeometry';
+import { FacilityGeometrySelector } from '@/workspace/FacilityGeometrySelector';
 
 interface TwinVisualizationLayoutProps {
   mode: TwinVisualizationMode;
@@ -50,6 +56,23 @@ export function TwinVisualizationLayout({
 }: TwinVisualizationLayoutProps) {
   const data = useTwinVisualizationData();
   const simulation = useSimulationVisualization();
+
+  // Geometry source is URL-owned on the canonical twin route too, so a shared
+  // `?geometry=nvidia-reference` link reproduces the same mounted geometry.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const geometryParam = searchParams.get('geometry');
+  const facilityGeometry: FacilityGeometryMode = isFacilityGeometryMode(geometryParam)
+    ? geometryParam
+    : 'aura-model';
+  const setFacilityGeometry = useCallback(
+    (next: FacilityGeometryMode) => {
+      const params = new URLSearchParams(searchParams);
+      if (next === 'aura-model') params.delete('geometry');
+      else params.set('geometry', next);
+      setSearchParams(params, { replace: true });
+    },
+    [searchParams, setSearchParams],
+  );
   
   // Use global overlay context - single source of truth
   const { activeOverlay: contextOverlay, setOverlay } = useTwinOverlaySafe();
@@ -126,6 +149,7 @@ export function TwinVisualizationLayout({
         </div>
         
         <div className="flex items-center gap-2">
+          <FacilityGeometrySelector value={facilityGeometry} onChange={setFacilityGeometry} />
           {simulation.isSimulating && (
             <Badge variant="default" className="bg-success text-success-foreground animate-pulse">
               Simulating
@@ -243,6 +267,7 @@ export function TwinVisualizationLayout({
                 onRackClick={onRackSelect}
                 activeOverlay={activeOverlay}
                 simulationKpis={simulation.currentKpis}
+                facilityGeometry={facilityGeometry}
               />
             </SimulationErrorBoundary>
 

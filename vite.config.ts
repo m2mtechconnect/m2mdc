@@ -47,6 +47,16 @@ export default defineConfig(({ mode }) => ({
   define: {
     'import.meta.env.VITE_BUILD_VERSION': JSON.stringify(process.env.npm_package_version || '1.0.0'),
     'import.meta.env.VITE_BUILD_TIMESTAMP': JSON.stringify(new Date().toISOString()),
+    // Non-sensitive deployment fingerprint, read back from <html> data attrs.
+    __AURA_BUILD_ID__: JSON.stringify(
+      process.env.AURA_BUILD_ID ||
+        `b${Date.now().toString(36)}`,
+    ),
+    __AURA_COMMIT_SHA__: JSON.stringify(
+      process.env.AURA_COMMIT_SHA || process.env.VERCEL_GIT_COMMIT_SHA || 'unknown',
+    ),
+    __AURA_BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
+    __AURA_APP_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0'),
   },
   build: {
     rollupOptions: {

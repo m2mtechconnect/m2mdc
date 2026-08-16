@@ -31,7 +31,7 @@ const SOFTWARE_ARGS = ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'];
 
 export default defineConfig({
   testDir: './tests/truth-in-ui',
-  testMatch: /twin-canvas-mounting\.spec\.ts/,
+  testMatch: /(twin-canvas-mounting|reference-facility-regression)\.spec\.ts/,
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: 0,

@@ -1,10 +1,23 @@
 # Brev GPU lane - access status and runbook
 
+## Validation candidate (Phase 1, verified 2026-08-16)
+
+The published host `https://auradc.m2mtechconnect.com` serves build **`bmsv7jcuh`**
+(manifest version 6, built 2026-08-16T02:50:27Z), which is newer than the pinned
+baseline snapshot `bmsv58pp8`. `bmsv7jcuh` is the documented validation candidate;
+no republication is required. Full probe output: `phase-1-preflight.json`.
+
+The unauthenticated probe correctly reported no `window.__auraRealismMode`, confirming
+the realism parameter is admin-only. Mounted-count parity between the two realism modes
+must be confirmed from the admin session inside the Brev instance (Phase 3/4), because
+this environment has only a SwiftShader software renderer and cannot produce acceptance
+evidence.
+
 ## Access status (Phase 3 preflight)
 
 | Check | Result |
 | --- | --- |
-| Brev account reachable from this environment | **No** - no Brev credential or API token is configured, and none may be created here |
+| Brev account reachable from this environment (re-checked 2026-08-16) | **No** - no Brev credential or API token is configured, and none may be created here |
 | Credits available | **Unknown / not granted** |
 | GPU instance started | **No** |
 | `nvidia-smi` recorded | **No** |

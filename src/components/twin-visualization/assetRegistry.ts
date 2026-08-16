@@ -43,6 +43,10 @@ export interface AssetManifestEntry {
   model: string | null;
   sourceUrl: string | null;
   licence: string;
+  /** Author of the USD master. 'M2M AURA' for AURA-authored generic assets. */
+  authoredBy?: string;
+  /** Conversion and publication evidence recorded by the ingestion pipeline. */
+  provenance?: Record<string, unknown> & { authoredBy?: string };
   sourceFormat: string;
   usdVersion: string | null;
   glbVersion: string | null;

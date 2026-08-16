@@ -117,9 +117,9 @@ def building_layer():
     col = rel(LAYERS, os.path.join(ROOT, "assets/structural/aura_structural_column_400/aura_structural_column_400.usda"))
     cols = 0
     for x in (-11.4, 11.4):
-        for z in (-7.6, 0.0, 7.6):
+        for zi, z in enumerate((-7.6, 0.0, 7.6)):
             c = UsdGeom.Xform.Define(
-                stage, f"/AURA_Facility/Building/Structural/Column_{'W' if x < 0 else 'E'}_{int(z)}")
+                stage, f"/AURA_Facility/Building/Structural/Column_{'W' if x < 0 else 'E'}_{zi}")
             c.GetPrim().GetReferences().AddReference(col)
             c.AddTranslateOp().Set(Gf.Vec3d(x, 0.0, z))
             c.GetPrim().SetInstanceable(True)

@@ -1,0 +1,31 @@
+#usda 1.0
+(
+    doc = "AURA facility systems layer: electrical, cooling loops and data network topology. Identity and topology only. No live telemetry is stored in USD."
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "AURA_Facility"
+{
+    def Xform "Systems"
+    {
+        def Xform "Electrical"
+        {
+            custom string aura:telemetryBindingId = "system:electrical"
+            custom string aura:telemetryOwner = "AURA operational services (not stored in USD)"
+        }
+
+        def Xform "CoolingLoops"
+        {
+            custom string aura:telemetryBindingId = "system:cooling-loop"
+            custom string aura:telemetryOwner = "AURA operational services (not stored in USD)"
+        }
+
+        def Xform "DataNetwork"
+        {
+            custom string aura:telemetryBindingId = "system:data-network"
+            custom string aura:telemetryOwner = "AURA operational services (not stored in USD)"
+        }
+    }
+}
+

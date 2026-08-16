@@ -1,0 +1,16 @@
+#usda 1.0
+(
+    doc = "Stable identity bindings: USD prim path <-> AURA asset id <-> facility equipment id <-> semantic role <-> telemetry binding id <-> checksums."
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "AURA_Facility"
+{
+    def Xform "SemanticBindings"
+    {
+        custom string aura:bindingContract = "assets/facility/aura_reference_hall/semantic_bindings.json"
+        custom string aura:dsxAlignment = "Aligned with the NVIDIA Omniverse DSX Blueprint (Flex, Boost, Exchange)."
+    }
+}
+

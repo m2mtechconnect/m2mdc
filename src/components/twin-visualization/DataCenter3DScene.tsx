@@ -525,6 +525,7 @@ function Scene({
 
       {/* Simulated design scenario: additive, never part of the as-built rows. */}
       {facilityGeometry === 'nvidia-reference' && (
+        <>
         <ReferenceEquipmentLayer
           racks={racks}
           rows={rows}
@@ -532,6 +533,24 @@ function Scene({
           infrastructure={infrastructure}
           band={bandForDistance(targetDistance)}
         />
+
+        {/* AURA-authored OpenUSD facility derivatives: floor tiles, supply
+            tiles, luminaires, columns and the parametric shell. DataHall keeps
+            its procedural stand-in for anything that does not mount. */}
+        <AuraFacilityLayer
+          bounds={extents}
+          rows={rows}
+          infrastructure={infrastructure}
+          shellMode={
+            infrastructure === 'off'
+              ? 'off'
+              : shellMode && shellMode !== 'off'
+                ? shellMode
+                : shellModeForInfrastructure(infrastructure)
+          }
+          band={bandForDistance(targetDistance)}
+        />
+        </>
       )}
 
       {scenario &&

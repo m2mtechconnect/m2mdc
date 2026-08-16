@@ -16,7 +16,8 @@
  */
 
 import { Component, Suspense, useEffect, useMemo, type ReactNode } from 'react';
-import { useGLTF, Clone } from '@react-three/drei';
+import { Clone } from '@react-three/drei';
+import { useDerivativeGltf } from './useDerivativeGltf';
 import type { Mesh, MeshStandardMaterial } from 'three';
 import {
   getAsset,

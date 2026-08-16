@@ -41,6 +41,11 @@ interface WorkspaceState {
   overrides: ConfigOverrides;
   scenarioId: string;
   isRunning: boolean;
+  /**
+   * Outcome of the most recent execution attempt. A failed run must never be
+   * presentable as a success, so the failure is stored explicitly.
+   */
+  lastRunError: string | null;
   runs: WorkspaceRun[];
   activeRunId: string | null;
   compareRunIds: string[];
@@ -63,6 +68,7 @@ interface WorkspaceState {
   setHandoff: (handoff: HandoffDraft | null) => void;
   setAssumptionsReviewed: (reviewed: boolean) => void;
   runScenario: (facility: FacilityDefinition) => Promise<string | null>;
+  clearRunError: () => void;
   setActiveRun: (runId: string) => void;
   toggleCompareRun: (runId: string) => void;
   recordDecision: (runId: string, recommendationId: string, decision: DecisionState) => void;
@@ -84,6 +90,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       overrides: { ...DEFAULT_OVERRIDES },
       scenarioId: WORKSPACE_SCENARIOS[0].id,
       isRunning: false,
+      lastRunError: null,
       runs: [],
       activeRunId: null,
       compareRunIds: [],
@@ -102,17 +109,25 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       setScenario: (scenarioId) => set({ scenarioId, assumptionsReviewed: false }),
       setHandoff: (handoff) => set({ handoff, assumptionsReviewed: false }),
       setAssumptionsReviewed: (assumptionsReviewed) => set({ assumptionsReviewed }),
+      clearRunError: () => set({ lastRunError: null }),
 
       runScenario: async (facility) => {
         const { scenarioId, overrides, runs, isRunning, assumptionsReviewed } = get();
+        // Duplicate-submission guard: one run in flight at a time.
         if (isRunning) return null;
         // Execution requires an explicit review inside Simulation. This is the
         // single place a run record is created.
-        if (!assumptionsReviewed) return null;
+        if (!assumptionsReviewed) {
+          set({ lastRunError: 'Run inputs have not been reviewed. Execution was not attempted.' });
+          return null;
+        }
         const scenario = WORKSPACE_SCENARIOS.find((s) => s.id === scenarioId);
-        if (!scenario) return null;
+        if (!scenario) {
+          set({ lastRunError: 'No scenario is selected. Execution was not attempted.' });
+          return null;
+        }
 
-        set({ isRunning: true });
+        set({ isRunning: true, lastRunError: null });
         const startedAt = new Date();
         const sameDay = runs.filter((r) => r.id.includes(startedAt.toISOString().slice(0, 10))).length;
         const runId = formatRunId(startedAt, sameDay + 1);
@@ -120,17 +135,31 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         // Short deterministic settle so the canvas can show the running state.
         await new Promise((resolve) => setTimeout(resolve, 600));
 
-        const run = executeScenario({
-          facility,
-          overrides,
-          scenario,
-          runId,
-          startedAt: startedAt.toISOString(),
-          completedAt: new Date().toISOString(),
-        });
+        let run: WorkspaceRun;
+        try {
+          run = executeScenario({
+            facility,
+            overrides,
+            scenario,
+            runId,
+            startedAt: startedAt.toISOString(),
+            completedAt: new Date().toISOString(),
+          });
+        } catch (error) {
+          // A failed run produces no record and never advances the workflow.
+          set({
+            isRunning: false,
+            lastRunError:
+              error instanceof Error
+                ? `Simulation failed: ${error.message.slice(0, 200)}`
+                : 'Simulation failed for an unknown reason. No run was recorded.',
+          });
+          return null;
+        }
 
         set((s) => ({
           isRunning: false,
+          lastRunError: null,
           runs: [run, ...s.runs].slice(0, 20),
           activeRunId: run.id,
           activeTool: 'compare',

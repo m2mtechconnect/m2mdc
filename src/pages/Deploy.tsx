@@ -77,12 +77,9 @@ export default function Deploy() {
 
   useEffect(() => {
     if (!systemId) {
-      toast({
-        title: t('deploy.noSystemSelected'),
-        description: t('deploy.selectSystem'),
-        variant: "destructive",
-      });
-      navigate('/builder');
+      // PW-P3-01: /deploy is a contextual workflow route. Without a system it
+      // explains itself instead of bouncing the user to another page.
+      setLoading(false);
       return;
     }
 
@@ -108,6 +105,22 @@ export default function Deploy() {
 
     initializeDeploy();
   }, [systemId]);
+
+  if (!systemId) {
+    return (
+      <div className="container mx-auto max-w-2xl py-16">
+        <DCCard title="No system selected">
+          <div className="space-y-3 p-1" role="status" aria-live="polite">
+            <p className="text-sm text-muted-foreground">
+              Deployment runs against one configured system. Open a system in the Builder and start the
+              deployment from there; this route needs an <code>?id=</code> system identifier.
+            </p>
+            <Button onClick={() => navigate('/builder')}>Open Builder</Button>
+          </div>
+        </DCCard>
+      </div>
+    );
+  }
 
   const loadSystemSummary = async () => {
     try {

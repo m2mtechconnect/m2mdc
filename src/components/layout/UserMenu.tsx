@@ -19,6 +19,7 @@ import { UserAvatar } from '@/components/ui/user-avatar';
 import { Globe, HelpCircle, LogOut, User as UserIcon, Settings, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRBAC } from '@/contexts/RBACContext';
+import { fetchProfileFields } from '@/lib/auth/profileQuery';
 
 const LANGUAGES = [
   { code: 'en', label: 'English', short: 'EN' },
@@ -38,37 +39,42 @@ export function UserMenu() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
 
+  // One authoritative session source. The auth listener only writes local
+  // state - calling back into the auth client from inside the callback is
+  // what produced the repeating, aborted /auth/v1/user loop (PW-P2-03).
   useEffect(() => {
-    // Get current user and profile
-    const loadUserData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      
-      if (user) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('avatar_url, avatar_bg_color, avatar_initials')
-          .eq('user_id', user.id)
-          .maybeSingle();
-        
-        setProfile(profileData);
-      }
-    };
-
-    loadUserData();
-
-    // Listen for auth changes
+    let cancelled = false;
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (cancelled) return;
       setUser(session?.user ?? null);
-      if (session?.user) {
-        loadUserData();
-      } else {
-        setProfile(null);
-      }
+      if (!session?.user) setProfile(null);
     });
-
-    return () => subscription.unsubscribe();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!cancelled) setUser(session?.user ?? null);
+    });
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
+
+  // Profile read is keyed on the resolved user id and never runs before it
+  // exists, so no request can carry an empty `user_id` filter (PW-P2-02).
+  const userId = user?.id ?? null;
+  useEffect(() => {
+    if (!userId) {
+      setProfile(null);
+      return;
+    }
+    let stale = false;
+    void fetchProfileFields(userId, 'avatar_url, avatar_bg_color, avatar_initials').then((result) => {
+      if (stale) return;
+      setProfile(result.status === 'success' ? (result.data as unknown as ProfileData) : null);
+    });
+    return () => {
+      stale = true;
+    };
+  }, [userId]);
 
   const handleSignOut = async () => {
     try {

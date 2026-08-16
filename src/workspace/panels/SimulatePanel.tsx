@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Check, Loader2, PlayCircle, Lock, AlertTriangle, Snowflake } from 'lucide-react';
+import { Check, Loader2, PlayCircle, Lock, AlertTriangle, Snowflake, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { WORKSPACE_SCENARIOS } from '../scenarioEngine';
 import { useActiveRun, useWorkspaceStore } from '../workspaceStore';
@@ -10,37 +10,121 @@ import { useSimulationPermissions } from '@/simulation/handoff';
 import { CLASSIFICATION_LABEL } from '@/lib/provenance/twinFieldProvenance';
 import { DESIGN_SCENARIOS } from '@/components/twin-visualization/designScenario';
 import { useDesignScenario } from '../useDesignScenario';
+import { stepLabel } from '../useWorkflowStep';
+import type { WorkspaceTool } from '../workspaceStore';
 import type { FacilityDefinition } from '../facilityModel';
 
 interface Props {
   facility: FacilityDefinition;
 }
 
+/** Identifier used to associate the disabled button with its explanation. */
+export const RUN_BLOCKED_DESCRIPTION_ID = 'simulation-run-blocked-reason';
+
+export interface RunGate {
+  blockedReason: string | null;
+  /** Specific missing or invalid inputs, listed for the operator. */
+  missingInputs: string[];
+  /** Step that fixes the blocker, when one exists. */
+  fixStep: WorkspaceTool | null;
+}
+
 /**
  * Shared run gate. Execution rules are unchanged: a run requires the execute
- * permission, a selected scenario and an explicit input review.
+ * permission, a selected scenario and an explicit input review. The gate now
+ * also reports *what* is missing and *where* to fix it - it never relaxes a
+ * predicate to enable the button.
  */
 function useRunGate() {
   const scenarioId = useWorkspaceStore((s) => s.scenarioId);
   const reviewed = useWorkspaceStore((s) => s.assumptionsReviewed);
   const isRunning = useWorkspaceStore((s) => s.isRunning);
+  const setTool = useWorkspaceStore((s) => s.setTool);
   const { canConfigureSimulation, canExecuteSimulation } = useSimulationPermissions();
   const scenario = WORKSPACE_SCENARIOS.find((s) => s.id === scenarioId);
   // A proposed design has no complete engineering inputs, so it can never be
   // executed as an operational run.
   const design = useDesignScenario();
 
-  const blockedReason = design.active
-    ? 'Run simulation is unavailable for a proposed design: engineering inputs are incomplete.'
-    : !canExecuteSimulation
-    ? 'Your role cannot execute simulations. Ask an administrator for run permission.'
-    : !scenario
-      ? 'Select a scenario before running.'
-      : !reviewed
-        ? 'Review the run inputs to enable execution.'
-        : null;
+  let blockedReason: string | null = null;
+  let missingInputs: string[] = [];
+  let fixStep: WorkspaceTool | null = null;
 
-  return { scenario, scenarioId, reviewed, isRunning, blockedReason, canConfigureSimulation, design };
+  if (design.active) {
+    blockedReason = 'Run simulation is unavailable for a proposed design: engineering inputs are incomplete.';
+    missingInputs = (design.scenario?.engineeringInputs ?? []).map((i) => `${i.label} (${i.unit}): not provided`);
+    missingInputs.push('Chilled-water loop connection: unverified');
+    fixStep = 'simulate';
+  } else if (!canExecuteSimulation) {
+    blockedReason = 'Your role cannot execute simulations. Ask an administrator for the run permission.';
+    missingInputs = ['Permission deployment.execute: not granted to your role'];
+  } else if (!scenario) {
+    blockedReason = 'Select an operational scenario before running.';
+    missingInputs = ['Operational scenario: none selected'];
+    fixStep = 'simulate';
+  } else if (!reviewed) {
+    blockedReason = 'Review the run inputs to enable execution.';
+    missingInputs = ['Run-input review: not confirmed'];
+    fixStep = 'simulate';
+  }
+
+  return {
+    scenario,
+    scenarioId,
+    reviewed,
+    isRunning,
+    blockedReason,
+    missingInputs,
+    fixStep,
+    setTool,
+    canConfigureSimulation,
+    design,
+  };
+}
+
+/**
+ * Visible, screen-reader-addressable explanation of a disabled run. Colour or
+ * a disabled style is never the only signal.
+ */
+export function RunBlockedExplanation({
+  blockedReason,
+  missingInputs,
+  fixStep,
+  onFix,
+}: RunGate & { onFix?: (step: WorkspaceTool) => void }) {
+  if (!blockedReason) return null;
+  return (
+    <div
+      id={RUN_BLOCKED_DESCRIPTION_ID}
+      role="status"
+      aria-live="polite"
+      data-testid="simulation-blocked-reason"
+      className="rounded-md border border-border bg-muted/40 p-2.5 text-xs text-foreground"
+    >
+      <p className="flex items-start gap-1.5 font-medium">
+        <Lock className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
+        {blockedReason}
+      </p>
+      {missingInputs.length > 0 && (
+        <ul className="mt-1.5 space-y-0.5 pl-5 text-muted-foreground" data-testid="simulation-missing-inputs">
+          {missingInputs.map((item) => (
+            <li key={item}>- {item}</li>
+          ))}
+        </ul>
+      )}
+      {fixStep && onFix && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-2 h-7 text-xs"
+          data-testid="simulation-fix-step"
+          onClick={() => onFix(fixStep)}
+        >
+          Go to {stepLabel(fixStep)}
+        </Button>
+      )}
+    </div>
+  );
 }
 
 /**
@@ -49,7 +133,7 @@ function useRunGate() {
  */
 export function SimulateFooterAction({ facility }: Props) {
   const runScenario = useWorkspaceStore((s) => s.runScenario);
-  const { isRunning, blockedReason } = useRunGate();
+  const { isRunning, blockedReason, missingInputs } = useRunGate();
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -60,6 +144,7 @@ export function SimulateFooterAction({ facility }: Props) {
               className="h-9 w-full"
               size="sm"
               disabled={isRunning || blockedReason !== null}
+              aria-describedby={blockedReason ? RUN_BLOCKED_DESCRIPTION_ID : undefined}
               data-testid="workspace-run-scenario"
               onClick={() => void runScenario(facility)}
             >
@@ -70,6 +155,11 @@ export function SimulateFooterAction({ facility }: Props) {
               )}
               {isRunning ? 'Running simulation' : 'Run simulation'}
             </Button>
+            {blockedReason && (
+              <span className="sr-only" data-testid="run-disabled-reason-sr">
+                {blockedReason} {missingInputs.join('. ')}
+              </span>
+            )}
           </span>
         </TooltipTrigger>
         {blockedReason && (
@@ -91,8 +181,10 @@ export function SimulatePanel({ facility }: Props) {
   const setScenario = useWorkspaceStore((s) => s.setScenario);
   const handoff = useWorkspaceStore((s) => s.handoff);
   const setReviewed = useWorkspaceStore((s) => s.setAssumptionsReviewed);
+  const lastRunError = useWorkspaceStore((s) => s.lastRunError);
   const run = useActiveRun();
-  const { scenario, scenarioId, reviewed, blockedReason, canConfigureSimulation, design } = useRunGate();
+  const gate = useRunGate();
+  const { scenario, scenarioId, reviewed, blockedReason, canConfigureSimulation, design, setTool } = gate;
   const mode: 'operational' | 'design' = design.active ? 'design' : 'operational';
 
   return (
@@ -290,10 +382,21 @@ export function SimulatePanel({ facility }: Props) {
       </div>
       )}
 
-      {blockedReason && (
-        <p className="flex items-start gap-1.5 text-xs text-muted-foreground" data-testid="simulation-blocked-reason">
-          <Lock className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
-          {blockedReason}
+      <RunBlockedExplanation
+        blockedReason={gate.blockedReason}
+        missingInputs={gate.missingInputs}
+        fixStep={gate.fixStep}
+        onFix={(step) => setTool(step)}
+      />
+
+      {!blockedReason && lastRunError && (
+        <p
+          role="alert"
+          data-testid="simulation-run-error"
+          className="flex items-start gap-1.5 rounded-md border border-destructive/40 bg-destructive/10 p-2.5 text-xs text-destructive"
+        >
+          <XCircle className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
+          {lastRunError} No run record was created.
         </p>
       )}
 

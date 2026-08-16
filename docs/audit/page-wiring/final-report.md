@@ -62,3 +62,23 @@ asset was modified during this audit.
 ## Final verdict
 
 AURA_PAGE_WIRING_AUDIT_PARTIAL
+
+## Remediation status (this pass)
+
+Verified in the running application with a headless sweep: zero console errors
+and zero failed application requests across the remediated routes.
+
+| Finding | Change | Runtime evidence |
+| --- | --- | --- |
+| P1 simulation run | `runScenario` guards duplicate submission, records `lastRunError`, and never fabricates a run on failure. The disabled control now renders a visible, `aria-describedby`-linked reason plus the specific missing inputs and a "go to step" action. | `/simulation` shows "Compare is unavailable" inline rather than a bare disabled control. |
+| P2-01 step in URL | `?step=` is authoritative via `useWorkflowStep`; unknown and gated steps fall back with a visible notice and the URL is rewritten. | `?step=compare` (no run) rewrites to `?step=simulate`; `?step=bogus` falls back and rewrites. |
+| P2-02 empty `user_id` | All guarded through `fetchProfileFields`, which refuses non-UUID ids before any network call. | No `user_id=` requests observed. |
+| P2-03 auth fetch loop | `UserMenu` no longer calls the auth client from inside `onAuthStateChange`; session and profile reads are split and keyed on the resolved id. | Zero failed requests, zero console errors. |
+| P2-04 monitor spinner | `useSyncJobFeed` always settles and models real states; counters read `n/a` when nothing is connected and fixture rows are labelled demonstration data. | `/connect/monitor` states "No ingestion service is connected". |
+| P2-05 dead auth routes | `/login` and `/onboarding` redirect signed-in users to their default workspace, with open-redirect-safe return paths. | Both land on `/dashboard`. |
+| P3-01 `/deploy` | Explains the missing system in place instead of toasting and bouncing. | `/deploy` renders "No system selected" with an Open Builder action. |
+| P3-02 duplicate route | Blueprint links to canonical `/manage/integrations`. | - |
+
+Regression coverage added: `useWorkflowStep`, `safeReturnPath` and the profile
+query guard (17 new assertions); 147 existing workspace, simulation and
+reference-facility tests still pass and the typecheck is clean.

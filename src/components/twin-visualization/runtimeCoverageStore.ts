@@ -94,14 +94,19 @@ export const useRuntimeCoverageStore = create<CoverageState>((set, get) => ({
 
 declare global {
   interface Window {
-    __auraRuntimeCoverage?: () => { token: string; roles: Record<string, RoleCoverage> };
+    __auraRuntimeCoverage?: () => {
+      token: string;
+      roles: Record<string, RoleCoverage>;
+      rackMounts: Record<string, { mounted: boolean; assetId: string | null; url: string | null }>;
+      procedural: Record<string, { label: string; count: number; kind: 'physical' | 'overlay' }>;
+    };
   }
 }
 
 if (typeof window !== 'undefined') {
   window.__auraRuntimeCoverage = () => {
-    const { token, roles } = useRuntimeCoverageStore.getState();
-    return { token, roles };
+    const { token, roles, rackMounts, procedural } = useRuntimeCoverageStore.getState();
+    return { token, roles, rackMounts, procedural };
   };
 }
 

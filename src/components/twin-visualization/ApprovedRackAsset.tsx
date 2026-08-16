@@ -16,7 +16,8 @@
 
 import type { Mesh, MeshStandardMaterial } from 'three';
 import { Component, Suspense, useEffect, useMemo, type ReactNode } from 'react';
-import { useGLTF, Clone } from '@react-three/drei';
+import { Clone } from '@react-three/drei';
+import { loadDerivative, useDerivativeGltf } from './useDerivativeGltf';
 import { Rack, type RackDetailLevel } from './Rack';
 import type { RackVisual } from './types';
 import {
@@ -54,7 +55,12 @@ function ImportedRack({
   selected?: boolean;
   onClick?: (rackId: string) => void;
 }) {
-  const { scene } = useGLTF(url);
+  const { scene, status, error } = useDerivativeGltf(url);
+  const onFailure = useContext(DerivativeFailureContext);
+
+  useEffect(() => {
+    if (status === 'failed' && error) onFailure?.(error);
+  }, [status, error, onFailure]);
 
   /**
    * The USD pack's MDL materials do not survive glTF conversion, so the
@@ -64,6 +70,7 @@ function ImportedRack({
    * library.
    */
   useEffect(() => {
+    if (!scene) return;
     scene.traverse((object) => {
       const mesh = object as Mesh;
       if (!mesh.isMesh) return;
@@ -80,6 +87,7 @@ function ImportedRack({
     });
   }, [scene]);
 
+  if (!scene) return null;
   return (
     <group
       position={rack.position}

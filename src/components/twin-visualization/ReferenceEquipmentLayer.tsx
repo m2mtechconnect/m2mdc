@@ -15,7 +15,7 @@
  *    is claimed from the manifest alone.
  */
 
-import { Suspense, useEffect, useMemo } from 'react';
+import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { useGLTF, Clone } from '@react-three/drei';
 import type { Mesh, MeshStandardMaterial } from 'three';
 import {
@@ -142,7 +142,14 @@ export function ReferenceEquipmentLayer({
   const reset = useRuntimeCoverageStore((s) => s.resetCoverage);
   const report = useRuntimeCoverageStore((s) => s.reportRole);
 
-  useEffect(() => reset(token), [token, reset]);
+  // The reset must happen while this layer renders, before any child mounts.
+  // Child effects run before the parent's, so resetting in an effect here
+  // would wipe the very reports the children just filed.
+  const resetToken = useRef<string | null>(null);
+  if (resetToken.current !== token) {
+    resetToken.current = token;
+    reset(token);
+  }
 
   const mounts = useMemo<RoleMount[]>(() => {
     const out: RoleMount[] = [];

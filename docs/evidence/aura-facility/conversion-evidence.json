@@ -1,0 +1,187 @@
+{
+  "pipelineVersion": "aura-facility-1.0.0",
+  "records": [
+    {
+      "name": "aura_raised_floor_tile_600",
+      "sourceUsd": "assets/floor/aura_raised_floor_tile_600/aura_raised_floor_tile_600.usda",
+      "sourceSha256": "sha256:21f2df12fa2b9e8618d91830e559d2fd4e429ed8febf9ab89ad376132e1c13e6",
+      "derivativeFile": "dist/aura-derivatives/aura_raised_floor_tile_600.glb",
+      "derivativeSha256": "sha256:77138b9e1639df498a0da8388f9d9f52a9bb72dddaafd7b8ef7427538d1ccaaa",
+      "derivativeBytes": 2076,
+      "variants": {},
+      "meshCount": 1,
+      "triangleCount": 12,
+      "vertexCount": 36,
+      "materialCount": 1,
+      "imageCount": 0,
+      "boundsMinMeters": [
+        -0.30000001192092896,
+        0.0,
+        -0.30000001192092896
+      ],
+      "boundsMaxMeters": [
+        0.30000001192092896,
+        0.03500000014901161,
+        0.30000001192092896
+      ],
+      "dimensionsMeters": {
+        "x": 0.6000000238418579,
+        "y": 0.03500000014901161,
+        "z": 0.6000000238418579
+      },
+      "floorContactY": 0.0,
+      "upAxis": "Y",
+      "metersPerUnit": 1,
+      "tools": [
+        "usd-core 26.8",
+        "AURA deterministic USD->glTF converter 1.0.0"
+      ]
+    },
+    {
+      "name": "aura_perforated_floor_tile_600",
+      "sourceUsd": "assets/floor/aura_perforated_floor_tile_600/aura_perforated_floor_tile_600.usda",
+      "sourceSha256": "sha256:cedee9bd63fda3340042baaecc626beb897fbd95c2253fb876c4f958d4ee4d50",
+      "derivativeFile": "dist/aura-derivatives/aura_perforated_floor_tile_600.glb",
+      "derivativeSha256": "sha256:0bc4404af6f646fdc35110a760e446a61eb785e7cbd327107acd42565dabd7a1",
+      "derivativeBytes": 53004,
+      "variants": {},
+      "meshCount": 37,
+      "triangleCount": 444,
+      "vertexCount": 1332,
+      "materialCount": 2,
+      "imageCount": 0,
+      "boundsMinMeters": [
+        -0.30000001192092896,
+        0.0,
+        -0.30000001192092896
+      ],
+      "boundsMaxMeters": [
+        0.30000001192092896,
+        0.03849999979138374,
+        0.30000001192092896
+      ],
+      "dimensionsMeters": {
+        "x": 0.6000000238418579,
+        "y": 0.03849999979138374,
+        "z": 0.6000000238418579
+      },
+      "floorContactY": 0.0,
+      "upAxis": "Y",
+      "metersPerUnit": 1,
+      "tools": [
+        "usd-core 26.8",
+        "AURA deterministic USD->glTF converter 1.0.0"
+      ]
+    },
+    {
+      "name": "aura_linear_luminaire_1500",
+      "sourceUsd": "assets/lighting/aura_linear_luminaire_1500/aura_linear_luminaire_1500.usda",
+      "sourceSha256": "sha256:4bf66d6f4e5bc06fc17f514b95d533b5698f20a55f375cbe72bb7486919d79a2",
+      "derivativeFile": "dist/aura-derivatives/aura_linear_luminaire_1500.glb",
+      "derivativeSha256": "sha256:98f39b4567356e0731a4bdd546ddc0e5418b72d1e8576b139e4c28ea6207cef9",
+      "derivativeBytes": 6468,
+      "variants": {},
+      "meshCount": 4,
+      "triangleCount": 48,
+      "vertexCount": 144,
+      "materialCount": 2,
+      "imageCount": 0,
+      "boundsMinMeters": [
+        -0.75,
+        -0.08100000023841858,
+        -0.05999999865889549
+      ],
+      "boundsMaxMeters": [
+        0.75,
+        0.30000001192092896,
+        0.05999999865889549
+      ],
+      "dimensionsMeters": {
+        "x": 1.5,
+        "y": 0.38100001215934753,
+        "z": 0.11999999731779099
+      },
+      "floorContactY": -0.08100000023841858,
+      "upAxis": "Y",
+      "metersPerUnit": 1,
+      "tools": [
+        "usd-core 26.8",
+        "AURA deterministic USD->glTF converter 1.0.0"
+      ]
+    },
+    {
+      "name": "aura_structural_column_400",
+      "sourceUsd": "assets/structural/aura_structural_column_400/aura_structural_column_400.usda",
+      "sourceSha256": "sha256:44106bddc28329bb1c7f149487a32a2e5e7f7412676eb12a71ba684ec146fa72",
+      "derivativeFile": "dist/aura-derivatives/aura_structural_column_400.glb",
+      "derivativeSha256": "sha256:121a5f3dea10488c3a9083782720a22802b8099da44f345d4490c58cb5963398",
+      "derivativeBytes": 2068,
+      "variants": {},
+      "meshCount": 1,
+      "triangleCount": 12,
+      "vertexCount": 36,
+      "materialCount": 1,
+      "imageCount": 0,
+      "boundsMinMeters": [
+        -0.20000000298023224,
+        0.0,
+        -0.20000000298023224
+      ],
+      "boundsMaxMeters": [
+        0.20000000298023224,
+        4.199999809265137,
+        0.20000000298023224
+      ],
+      "dimensionsMeters": {
+        "x": 0.4000000059604645,
+        "y": 4.199999809265137,
+        "z": 0.4000000059604645
+      },
+      "floorContactY": 0.0,
+      "upAxis": "Y",
+      "metersPerUnit": 1,
+      "tools": [
+        "usd-core 26.8",
+        "AURA deterministic USD->glTF converter 1.0.0"
+      ]
+    },
+    {
+      "name": "aura_facility_shell",
+      "sourceUsd": "assets/shell/aura_facility_shell/aura_facility_shell.usda",
+      "sourceSha256": "sha256:d9d0df1fb5ab77fcad60958f1dde86ddf8ac4ec99116fb830dc2eac527867bab",
+      "derivativeFile": "dist/aura-derivatives/aura_facility_shell.glb",
+      "derivativeSha256": "sha256:70d727220cacd2ba59c75d526f2f1c2727d5c4945074b53639878eda584864a4",
+      "derivativeBytes": 6112,
+      "variants": {
+        "shellMode": "full"
+      },
+      "meshCount": 4,
+      "triangleCount": 48,
+      "vertexCount": 144,
+      "materialCount": 1,
+      "imageCount": 0,
+      "boundsMinMeters": [
+        -13.100000381469727,
+        0.0,
+        -9.100000381469727
+      ],
+      "boundsMaxMeters": [
+        13.100000381469727,
+        4.199999809265137,
+        9.100000381469727
+      ],
+      "dimensionsMeters": {
+        "x": 26.200000762939453,
+        "y": 4.199999809265137,
+        "z": 18.200000762939453
+      },
+      "floorContactY": 0.0,
+      "upAxis": "Y",
+      "metersPerUnit": 1,
+      "tools": [
+        "usd-core 26.8",
+        "AURA deterministic USD->glTF converter 1.0.0"
+      ]
+    }
+  ]
+}

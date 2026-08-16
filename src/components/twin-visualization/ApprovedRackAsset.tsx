@@ -18,6 +18,7 @@ import { Component, useEffect, useMemo, type ReactNode } from 'react';
 import { Clone } from '@react-three/drei';
 import { loadDerivative, useDerivativeGltf } from './useDerivativeGltf';
 import { applyMaterialPolicy } from './applyMaterialPolicy';
+import { useRealismMode } from './hooks/useRealismMode';
 import { Rack, type RackDetailLevel } from './Rack';
 import type { RackVisual } from './types';
 import {

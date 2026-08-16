@@ -82,3 +82,22 @@ and zero failed application requests across the remediated routes.
 Regression coverage added: `useWorkflowStep`, `safeReturnPath` and the profile
 query guard (17 new assertions); 147 existing workspace, simulation and
 reference-facility tests still pass and the typecheck is clean.
+
+## Published remediation build
+
+| Field | Value |
+| --- | --- |
+| Host | `https://auradc.m2mtechconnect.com` |
+| Build id | `bmswgpn7a` |
+| Build timestamp | 2026-08-16T23:55:03.478Z |
+| Bundle | `/assets/index-BzLbfBq-.js` |
+| Manifest version | 7 |
+| Superseded build | `bmsvbnhr0` (2026-08-16T04:45:38.844Z) |
+| Security scan at publish | 2026-08-16T23:54:19Z - 0 critical, 5 warnings |
+
+Anonymous post-publish sweep of the new build: `/simulation`, `/connect/monitor`
+and `/deploy` all redirect unauthenticated visitors to the landing page, `/login`
+renders the sign-in page (the signed-in redirect added in this pass applies only
+to authenticated sessions), and no application request failed. One pre-existing,
+unrelated defect remains on the published landing page: `/landing/hero-datacenter.mp4`
+returns 404 and the poster fallback renders in its place.

@@ -12,6 +12,7 @@
  * the /pilot/* route graph can reach.
  */
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
+import { AuthenticatedEntryRedirect } from "@/routing/AuthenticatedEntryRedirect";
 import { Layout } from "@/components/Layout";
 import { PreserveNavigate } from "@/routing/PreserveNavigate";
 import { ROUTE_ALIASES } from "@/config/routeAliases";
@@ -87,6 +88,11 @@ function ApprovedUserRoutes() {
     <Routes>
       {/* Stage 6G: /dashboard is canonical; `/` redirects via ROUTE_ALIASES. */}
       <Route path="/dashboard" element={<Dashboard />} />
+      {/* PW-P2-05: signed-in users must never see a 404 on an auth entry
+          route. They are sent to their authorized default workspace, keeping
+          a safe same-origin return path when one was supplied. */}
+      <Route path="/login" element={<AuthenticatedEntryRedirect />} />
+      <Route path="/onboarding" element={<AuthenticatedEntryRedirect />} />
       <Route path="/builder" element={<Builder />} />
       <Route path="/deploy" element={<Deploy />} />
       <Route path="/deployments" element={<DeploymentHistory />} />

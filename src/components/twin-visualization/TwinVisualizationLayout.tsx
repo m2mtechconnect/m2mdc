@@ -149,6 +149,7 @@ export function TwinVisualizationLayout({
         </div>
         
         <div className="flex items-center gap-2">
+          <FacilityGeometrySelector value={facilityGeometry} onChange={setFacilityGeometry} />
           {simulation.isSimulating && (
             <Badge variant="default" className="bg-success text-success-foreground animate-pulse">
               Simulating

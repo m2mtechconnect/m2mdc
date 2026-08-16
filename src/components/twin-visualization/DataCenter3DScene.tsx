@@ -697,9 +697,8 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   // are counted separately from runtime evidence, never merged into one claim.
   const provenance = useMemo(
     () =>
-      provenanceBreakdown(runtimeRoles, rackMounts, proceduralGeometry, (assetId) =>
-        (assetId ?? '').startsWith('aura.'),
-      ),
+      // Authorship is read from the manifest entry, never inferred from an id.
+      provenanceBreakdown(runtimeRoles, rackMounts, proceduralGeometry, isAuraAuthoredAsset),
     [runtimeRoles, rackMounts, proceduralGeometry],
   );
 

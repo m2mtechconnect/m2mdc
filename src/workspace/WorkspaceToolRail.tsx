@@ -46,6 +46,7 @@ export function WorkspaceToolRail({ orientation = 'vertical' }: Props) {
         {TOOLS.map(({ tool, label, hint, icon: Icon }) => {
           const isActive = activeTool === tool;
           const isGated = gatedTools.has(tool) && !hasRun;
+          const reasonId = `workspace-tool-${tool}-reason`;
           return (
             <Tooltip key={tool}>
               <TooltipTrigger asChild>
@@ -54,6 +55,7 @@ export function WorkspaceToolRail({ orientation = 'vertical' }: Props) {
                   aria-pressed={isActive}
                   aria-label={label}
                   aria-disabled={isGated}
+                  aria-describedby={isGated ? reasonId : undefined}
                   data-testid={`workspace-tool-${tool}`}
                   onClick={() => {
                     if (isGated) return;
@@ -70,6 +72,11 @@ export function WorkspaceToolRail({ orientation = 'vertical' }: Props) {
                 >
                   <Icon className="h-[18px] w-[18px]" aria-hidden />
                   <span className="text-[10px] leading-none">{label}</span>
+                  {isGated && (
+                    <span id={reasonId} className="sr-only">
+                      {label} is unavailable until a scenario run has completed.
+                    </span>
+                  )}
                 </button>
               </TooltipTrigger>
               <TooltipContent side={isVertical ? 'right' : 'top'} className="text-xs">

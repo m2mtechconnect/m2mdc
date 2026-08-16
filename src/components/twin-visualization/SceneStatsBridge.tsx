@@ -32,6 +32,7 @@ let snapshot: SceneStatsSnapshot | null = null;
 
 declare global {
   interface Window {
+    __auraTwinCamera?: (preset: string) => void;
     __auraSceneBridge?: {
       getStats: () => SceneStatsSnapshot | null;
       startSampling: () => void;

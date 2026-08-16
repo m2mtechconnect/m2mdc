@@ -1,5 +1,5 @@
 {
-  "allPassed": false,
+  "allPassed": true,
   "stages": {
     "assets/facility/aura_reference_hall/aura_reference_hall.usda": [
       {
@@ -39,18 +39,18 @@
       },
       {
         "check": "geometry_non_zero",
-        "ok": false,
-        "detail": "0 meshes, 0 points"
+        "ok": true,
+        "detail": "7556 meshes, 60448 points"
       },
       {
         "check": "bounds_physically_credible",
         "ok": true,
-        "detail": "size_m=(25.800, 5.200, 18.000)"
+        "detail": "size_m=(26.200, 5.200, 18.200)"
       },
       {
         "check": "prim_paths_stable",
         "ok": true,
-        "detail": "1363 prims"
+        "detail": "1367 prims"
       }
     ],
     "assets/floor/aura_raised_floor_tile_600/aura_raised_floor_tile_600.usda": [
@@ -299,18 +299,18 @@
       },
       {
         "check": "geometry_non_zero",
-        "ok": false,
-        "detail": "0 meshes, 0 points"
+        "ok": true,
+        "detail": "4 meshes, 32 points"
       },
       {
         "check": "bounds_physically_credible",
-        "ok": false,
-        "detail": "size_m=(0.000, 0.000, 0.000)"
+        "ok": true,
+        "detail": "size_m=(26.200, 4.200, 18.200)"
       },
       {
         "check": "prim_paths_stable",
         "ok": true,
-        "detail": "5 prims"
+        "detail": "9 prims"
       }
     ]
   }

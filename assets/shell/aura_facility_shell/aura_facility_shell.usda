@@ -9,7 +9,7 @@
 def Xform "FacilityShell" (
     kind = "component"
     variants = {
-        string shellMode = "off"
+        string shellMode = "full"
     }
     prepend variantSets = "shellMode"
 )

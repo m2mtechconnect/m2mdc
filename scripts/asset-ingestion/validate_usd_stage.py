@@ -66,7 +66,9 @@ def check(stage_path):
     rec("no_absolute_local_paths", not absolute, "; ".join(sorted(set(absolute))[:5]))
     rec("no_missing_dependencies", not missing, f"{len(set(missing))} missing")
 
-    meshes = [p for p in stage.TraverseAll() if p.IsA(UsdGeom.Mesh)]
+    # Instance proxies are traversed so instanced prototypes count as geometry.
+    meshes = [p for p in Usd.PrimRange.Stage(stage, Usd.TraverseInstanceProxies())
+              if p.IsA(UsdGeom.Mesh)]
     points = 0
     for m in meshes:
         attr = UsdGeom.Mesh(m).GetPointsAttr()

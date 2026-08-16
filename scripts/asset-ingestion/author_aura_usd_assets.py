@@ -188,8 +188,9 @@ def facility_shell():
         stage.GetPrimAtPath("/FacilityShell/PerimeterWalls/South").SetActive(False)
         stage.GetPrimAtPath("/FacilityShell/PerimeterWalls/East").SetActive(False)
     vs.SetVariantSelection("full")
-    vs.SetVariantSelection("off")
-
+    # The master ships with the complete authored shell selected so the stage
+    # always validates with non-zero geometry. The AURA runtime selects 'off'
+    # for operator views and 'cutaway' for spatial review.
     identity(root, "aura.shell.facility_shell", "facility-shell", "facility-shell")
     root.GetPrim().CreateAttribute("aif:core:width", Sdf.ValueTypeNames.Float).Set(W)
     root.GetPrim().CreateAttribute("aif:core:depth", Sdf.ValueTypeNames.Float).Set(D)

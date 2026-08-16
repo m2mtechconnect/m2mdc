@@ -33,10 +33,10 @@ def check(stage_path):
     dp = stage.GetDefaultPrim()
     rec("default_prim_resolves", bool(dp and dp.IsValid()), dp.GetPath().pathString if dp else "none")
     mpu = UsdGeom.GetStageMetersPerUnit(stage)
-    units_authored = any(l.HasInfo("metersPerUnit") for l in stage.GetLayerStack())
+    units_authored = any(l.pseudoRoot.HasInfo("metersPerUnit") for l in stage.GetLayerStack())
     rec("units_explicit", units_authored and mpu > 0, f"metersPerUnit={mpu}")
     up = UsdGeom.GetStageUpAxis(stage)
-    up_authored = any(l.HasInfo("upAxis") for l in stage.GetLayerStack())
+    up_authored = any(l.pseudoRoot.HasInfo("upAxis") for l in stage.GetLayerStack())
     rec("up_axis_explicit", up_authored and up in ("Y", "Z"), f"upAxis={up}")
 
     # Composition: every reference / payload / sublayer asset path resolves and

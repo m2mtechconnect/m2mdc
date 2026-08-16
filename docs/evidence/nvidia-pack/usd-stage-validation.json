@@ -1,0 +1,317 @@
+{
+  "allPassed": false,
+  "stages": {
+    "assets/facility/aura_reference_hall/aura_reference_hall.usda": [
+      {
+        "check": "stage_opens",
+        "ok": true,
+        "detail": "/dev-server/assets/facility/aura_reference_hall/aura_reference_hall.usda"
+      },
+      {
+        "check": "default_prim_resolves",
+        "ok": true,
+        "detail": "/AURA_Facility"
+      },
+      {
+        "check": "units_explicit",
+        "ok": true,
+        "detail": "metersPerUnit=1.0"
+      },
+      {
+        "check": "up_axis_explicit",
+        "ok": true,
+        "detail": "upAxis=Y"
+      },
+      {
+        "check": "references_and_payloads_resolve",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "check": "no_absolute_local_paths",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "check": "no_missing_dependencies",
+        "ok": true,
+        "detail": "0 missing"
+      },
+      {
+        "check": "geometry_non_zero",
+        "ok": false,
+        "detail": "0 meshes, 0 points"
+      },
+      {
+        "check": "bounds_physically_credible",
+        "ok": true,
+        "detail": "size_m=(25.800, 5.200, 18.000)"
+      },
+      {
+        "check": "prim_paths_stable",
+        "ok": true,
+        "detail": "1363 prims"
+      }
+    ],
+    "assets/floor/aura_raised_floor_tile_600/aura_raised_floor_tile_600.usda": [
+      {
+        "check": "stage_opens",
+        "ok": true,
+        "detail": "/dev-server/assets/floor/aura_raised_floor_tile_600/aura_raised_floor_tile_600.usda"
+      },
+      {
+        "check": "default_prim_resolves",
+        "ok": true,
+        "detail": "/FloorTile"
+      },
+      {
+        "check": "units_explicit",
+        "ok": true,
+        "detail": "metersPerUnit=1.0"
+      },
+      {
+        "check": "up_axis_explicit",
+        "ok": true,
+        "detail": "upAxis=Y"
+      },
+      {
+        "check": "references_and_payloads_resolve",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "check": "no_absolute_local_paths",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "check": "no_missing_dependencies",
+        "ok": true,
+        "detail": "0 missing"
+      },
+      {
+        "check": "geometry_non_zero",
+        "ok": true,
+        "detail": "1 meshes, 8 points"
+      },
+      {
+        "check": "bounds_physically_credible",
+        "ok": true,
+        "detail": "size_m=(0.600, 0.035, 0.600)"
+      },
+      {
+        "check": "prim_paths_stable",
+        "ok": true,
+        "detail": "6 prims"
+      }
+    ],
+    "assets/floor/aura_perforated_floor_tile_600/aura_perforated_floor_tile_600.usda": [
+      {
+        "check": "stage_opens",
+        "ok": true,
+        "detail": "/dev-server/assets/floor/aura_perforated_floor_tile_600/aura_perforated_floor_tile_600.usda"
+      },
+      {
+        "check": "default_prim_resolves",
+        "ok": true,
+        "detail": "/FloorTile"
+      },
+      {
+        "check": "units_explicit",
+        "ok": true,
+        "detail": "metersPerUnit=1.0"
+      },
+      {
+        "check": "up_axis_explicit",
+        "ok": true,
+        "detail": "upAxis=Y"
+      },
+      {
+        "check": "references_and_payloads_resolve",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "check": "no_absolute_local_paths",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "check": "no_missing_dependencies",
+        "ok": true,
+        "detail": "0 missing"
+      },
+      {
+        "check": "geometry_non_zero",
+        "ok": true,
+        "detail": "37 meshes, 296 points"
+      },
+      {
+        "check": "bounds_physically_credible",
+        "ok": true,
+        "detail": "size_m=(0.600, 0.038, 0.600)"
+      },
+      {
+        "check": "prim_paths_stable",
+        "ok": true,
+        "detail": "45 prims"
+      }
+    ],
+    "assets/lighting/aura_linear_luminaire_1500/aura_linear_luminaire_1500.usda": [
+      {
+        "check": "stage_opens",
+        "ok": true,
+        "detail": "/dev-server/assets/lighting/aura_linear_luminaire_1500/aura_linear_luminaire_1500.usda"
+      },
+      {
+        "check": "default_prim_resolves",
+        "ok": true,
+        "detail": "/Luminaire"
+      },
+      {
+        "check": "units_explicit",
+        "ok": true,
+        "detail": "metersPerUnit=1.0"
+      },
+      {
+        "check": "up_axis_explicit",
+        "ok": true,
+        "detail": "upAxis=Y"
+      },
+      {
+        "check": "references_and_payloads_resolve",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "check": "no_absolute_local_paths",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "check": "no_missing_dependencies",
+        "ok": true,
+        "detail": "0 missing"
+      },
+      {
+        "check": "geometry_non_zero",
+        "ok": true,
+        "detail": "4 meshes, 32 points"
+      },
+      {
+        "check": "bounds_physically_credible",
+        "ok": true,
+        "detail": "size_m=(1.500, 0.381, 0.120)"
+      },
+      {
+        "check": "prim_paths_stable",
+        "ok": true,
+        "detail": "12 prims"
+      }
+    ],
+    "assets/structural/aura_structural_column_400/aura_structural_column_400.usda": [
+      {
+        "check": "stage_opens",
+        "ok": true,
+        "detail": "/dev-server/assets/structural/aura_structural_column_400/aura_structural_column_400.usda"
+      },
+      {
+        "check": "default_prim_resolves",
+        "ok": true,
+        "detail": "/StructuralColumn"
+      },
+      {
+        "check": "units_explicit",
+        "ok": true,
+        "detail": "metersPerUnit=1.0"
+      },
+      {
+        "check": "up_axis_explicit",
+        "ok": true,
+        "detail": "upAxis=Y"
+      },
+      {
+        "check": "references_and_payloads_resolve",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "check": "no_absolute_local_paths",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "check": "no_missing_dependencies",
+        "ok": true,
+        "detail": "0 missing"
+      },
+      {
+        "check": "geometry_non_zero",
+        "ok": true,
+        "detail": "1 meshes, 8 points"
+      },
+      {
+        "check": "bounds_physically_credible",
+        "ok": true,
+        "detail": "size_m=(0.400, 4.200, 0.400)"
+      },
+      {
+        "check": "prim_paths_stable",
+        "ok": true,
+        "detail": "6 prims"
+      }
+    ],
+    "assets/shell/aura_facility_shell/aura_facility_shell.usda": [
+      {
+        "check": "stage_opens",
+        "ok": true,
+        "detail": "/dev-server/assets/shell/aura_facility_shell/aura_facility_shell.usda"
+      },
+      {
+        "check": "default_prim_resolves",
+        "ok": true,
+        "detail": "/FacilityShell"
+      },
+      {
+        "check": "units_explicit",
+        "ok": true,
+        "detail": "metersPerUnit=1.0"
+      },
+      {
+        "check": "up_axis_explicit",
+        "ok": true,
+        "detail": "upAxis=Y"
+      },
+      {
+        "check": "references_and_payloads_resolve",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "check": "no_absolute_local_paths",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "check": "no_missing_dependencies",
+        "ok": true,
+        "detail": "0 missing"
+      },
+      {
+        "check": "geometry_non_zero",
+        "ok": false,
+        "detail": "0 meshes, 0 points"
+      },
+      {
+        "check": "bounds_physically_credible",
+        "ok": false,
+        "detail": "size_m=(0.000, 0.000, 0.000)"
+      },
+      {
+        "check": "prim_paths_stable",
+        "ok": true,
+        "detail": "5 prims"
+      }
+    ]
+  }
+}

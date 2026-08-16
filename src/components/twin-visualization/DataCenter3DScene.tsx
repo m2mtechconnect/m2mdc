@@ -7,6 +7,7 @@
 
 import { Component, Suspense, useState, useRef, useEffect, useCallback, useMemo, WheelEvent, type ReactNode } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
+import { SceneStatsBridge } from './SceneStatsBridge';
 import { ContactShadows, OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import { FacilityLighting } from './FacilityLighting';
@@ -398,6 +399,8 @@ function Scene({
             : null
         }
       />
+
+      <SceneStatsBridge />
 
       {/* Industrial lighting rig (neutral 4000-5000K, quality-profile aware) */}
       <FacilityLighting centre={centre} radius={hallRadius} profile={profile} />

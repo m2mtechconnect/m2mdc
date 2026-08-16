@@ -70,6 +70,7 @@ import {
 import { AssetProvenanceBadge } from './AssetProvenancePanel';
 import { ScenarioRackLayer } from './ScenarioRackLayer';
 import { ReferenceEquipmentLayer } from './ReferenceEquipmentLayer';
+import { AuraFacilityLayer } from './AuraFacilityLayer';
 import { useRuntimeCoverageStore, coverageTotals, provenanceBreakdown } from './runtimeCoverageStore';
 import {
   FACILITY_GEOMETRY_MODES,

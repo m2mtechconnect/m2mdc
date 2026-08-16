@@ -7,6 +7,7 @@
  * coverage list read only this store.
  */
 import { create } from 'zustand';
+import { isAuraAuthoredAsset } from './assetRegistry';
 import type { QualityLevel, SemanticRole } from './assetRegistry';
 
 export type RoleRuntimeState =
@@ -94,14 +95,29 @@ export const useRuntimeCoverageStore = create<CoverageState>((set, get) => ({
 
 declare global {
   interface Window {
-    __auraRuntimeCoverage?: () => { token: string; roles: Record<string, RoleCoverage> };
+    __auraRuntimeCoverage?: () => {
+      token: string;
+      roles: Record<string, RoleCoverage>;
+      rackMounts: Record<string, { mounted: boolean; assetId: string | null; url: string | null }>;
+      procedural: Record<string, { label: string; count: number; kind: 'physical' | 'overlay' }>;
+      /** Role keys whose mounted asset has an AURA-authored USD master. */
+      auraAuthoredRoles: string[];
+    };
   }
 }
 
 if (typeof window !== 'undefined') {
   window.__auraRuntimeCoverage = () => {
-    const { token, roles } = useRuntimeCoverageStore.getState();
-    return { token, roles };
+    const { token, roles, rackMounts, procedural } = useRuntimeCoverageStore.getState();
+    return {
+      token,
+      roles,
+      rackMounts,
+      procedural,
+      auraAuthoredRoles: Object.entries(roles)
+        .filter(([, r]) => isAuraAuthoredAsset(r.assetId))
+        .map(([key]) => key),
+    };
   };
 }
 

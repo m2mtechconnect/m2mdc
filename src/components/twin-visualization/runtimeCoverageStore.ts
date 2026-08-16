@@ -105,10 +105,18 @@ if (typeof window !== 'undefined') {
   };
 }
 
-export function coverageTotals(roles: Record<string, RoleCoverage>) {
+export function coverageTotals(
+  roles: Record<string, RoleCoverage>,
+  /**
+   * Optional role filter. The equipment claim counts NVIDIA-derived roles
+   * only, so AURA-authored facility families are never folded into a claim
+   * about NVIDIA equipment.
+   */
+  include?: (role: RoleCoverage) => boolean,
+) {
   // Diagnostic surface: the acceptance harness reads the same store the badge
   // reads, so runtime evidence can never be taken from a manifest promise.
-  const list = Object.values(roles);
+  const list = Object.values(roles).filter((r) => (include ? include(r) : true));
   const derivativeUrls = new Set(
     list.filter((r) => r.mountedObjects > 0 && r.derivativeUrl).map((r) => r.derivativeUrl as string),
   );

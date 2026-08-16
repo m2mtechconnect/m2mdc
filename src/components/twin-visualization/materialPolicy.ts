@@ -90,8 +90,8 @@ const NAME_HINTS: Array<[RegExp, MaterialClass]> = [
   [/(glass|window|acrylic|perspex)/i, 'glass'],
   [/(rail|bracket|screw|bolt|frame|chassis|tray|steelwork|mesh)/i, 'bare-metal'],
   [/(handle|bezel|trim|plastic|rubber|gasket|blank)/i, 'plastic-composite'],
-  [/(faceplate|front|panel|fascia|vent|grill|grille|port)/i, 'faceplate'],
   [/(paint|body|door|side|cabinet|enclosure|shell)/i, 'painted-steel'],
+  [/(faceplate|frontplate|panel|fascia|vent|grill|grille|port)/i, 'faceplate'],
 ];
 
 /**

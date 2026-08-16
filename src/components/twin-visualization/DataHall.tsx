@@ -13,6 +13,7 @@ import { useEffect, useMemo } from 'react';
 import type { RowVisual } from './types';
 import type { QualityProfile } from '@/three/qualityProfiles';
 import { useRuntimeCoverageStore } from './runtimeCoverageStore';
+import { familyMounted, useFacilityDerivativeStore } from './facilityDerivativeStore';
 import {
   floorMaterial,
   perforatedTileMaterial,

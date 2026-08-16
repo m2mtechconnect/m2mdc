@@ -83,11 +83,9 @@ export const useRuntimeCoverageStore = create<CoverageState>((set, get) => ({
     set({ token, roles: { [coverage.role]: coverage } });
   },
   reportRackMount: (token, rackId, mount) => {
-    const current = get().token;
-    if (current !== token) {
-      set({ token, roles: {}, rackMounts: { [rackId]: mount } });
-      return;
-    }
+    // Cabinet reports are keyed by rack id and never roll the role token over:
+    // racks and the equipment layer rebuild on different schedules.
+    void token;
     set((s) => ({ rackMounts: { ...s.rackMounts, [rackId]: mount } }));
   },
   reportProcedural: (key, entry) =>

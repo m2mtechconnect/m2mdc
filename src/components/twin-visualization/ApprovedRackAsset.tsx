@@ -161,6 +161,12 @@ export function ApprovedRackAsset(props: ApprovedRackAssetProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolution]);
 
+  // No approved derivative resolved: the procedural cabinet is what mounts.
+  useEffect(() => {
+    if (!resolution.glbUrl) props.onRuntimeState?.({ mounted: false, assetId, url: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolution.glbUrl, assetId]);
+
   if (resolution.glbUrl) {
     const procedural = (
       <Rack

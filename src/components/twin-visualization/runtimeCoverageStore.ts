@@ -66,6 +66,19 @@ export const useRuntimeCoverageStore = create<CoverageState>((set, get) => ({
   },
 }));
 
+declare global {
+  interface Window {
+    __auraRuntimeCoverage?: () => { token: string; roles: Record<string, RoleCoverage> };
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.__auraRuntimeCoverage = () => {
+    const { token, roles } = useRuntimeCoverageStore.getState();
+    return { token, roles };
+  };
+}
+
 export function coverageTotals(roles: Record<string, RoleCoverage>) {
   // Diagnostic surface: the acceptance harness reads the same store the badge
   // reads, so runtime evidence can never be taken from a manifest promise.

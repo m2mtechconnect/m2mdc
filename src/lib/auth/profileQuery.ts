@@ -38,5 +38,5 @@ export async function fetchProfileFields(
     .maybeSingle();
   if (error) return { status: 'error', message: error.message };
   if (!data) return { status: 'empty' };
-  return { status: 'success', data: data as Record<string, unknown> };
+  return { status: 'success', data: data as unknown as Record<string, unknown> };
 }

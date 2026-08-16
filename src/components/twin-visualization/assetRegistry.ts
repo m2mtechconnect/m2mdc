@@ -151,7 +151,14 @@ export type SemanticRole =
   | 'rack-pdu'
   | 'liquid-cooling-equipment'
   | 'cable-tray'
-  | 'blanking-panel';
+  | 'blanking-panel'
+  // AURA-authored facility families (Phase 2). Generic geometry authored by
+  // M2M AURA: no vendor identity, no SimReady claim, no NVIDIA authorship.
+  | 'raised-floor-tile'
+  | 'perforated-floor-tile'
+  | 'data-hall-luminaire'
+  | 'structural-column'
+  | 'facility-shell';
 
 /** Derivative classes, ordered from most to least detailed. */
 export type QualityLevel = 'inspection' | 'operations' | 'lod';
@@ -168,7 +175,32 @@ export const SEMANTIC_ROLE_LABEL: Record<SemanticRole, string> = {
   'liquid-cooling-equipment': 'Liquid-cooling equipment',
   'cable-tray': 'Cable tray',
   'blanking-panel': 'Blanking panel',
+  'raised-floor-tile': 'Raised-floor tile (AURA-authored)',
+  'perforated-floor-tile': 'Perforated airflow tile (AURA-authored)',
+  'data-hall-luminaire': 'Data-hall luminaire (AURA-authored)',
+  'structural-column': 'Structural column (AURA-authored)',
+  'facility-shell': 'Facility shell (AURA-authored)',
 };
+
+/** Semantic roles owned by the AURA-authored facility families. */
+export const AURA_FACILITY_ROLES: SemanticRole[] = [
+  'raised-floor-tile',
+  'perforated-floor-tile',
+  'data-hall-luminaire',
+  'structural-column',
+  'facility-shell',
+];
+
+/**
+ * True when the manifest records AURA as the author of the USD master behind
+ * an asset. Authorship is read from the manifest, never inferred from an id.
+ */
+export function isAuraAuthoredAsset(assetId: string | null): boolean {
+  if (!assetId) return false;
+  const entry = getAsset(assetId);
+  if (!entry) return false;
+  return (entry.authoredBy ?? entry.provenance?.authoredBy) === 'M2M AURA';
+}
 
 /** Every runtime-resolvable asset declaring the given semantic role. */
 export function listAssetsForRole(role: SemanticRole): AssetManifestEntry[] {

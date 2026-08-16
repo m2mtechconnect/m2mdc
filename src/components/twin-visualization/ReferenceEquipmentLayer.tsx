@@ -15,7 +15,7 @@
  *    is claimed from the manifest alone.
  */
 
-import { Suspense, useEffect, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import { useGLTF, Clone } from '@react-three/drei';
 import type { Mesh, MeshStandardMaterial } from 'three';
 import {

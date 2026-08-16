@@ -11,6 +11,7 @@ import { CoPilotCommandProvider } from "@/contexts/CoPilotCommandContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemeProvider } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchProfileFields } from "@/lib/auth/profileQuery";
 import type { Session, User } from "@supabase/supabase-js";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
 import { initChangeLogMiddleware } from "@/stores/dcBuilderChangeLogMiddleware";

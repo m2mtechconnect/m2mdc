@@ -15,8 +15,9 @@
  */
 
 import type { Mesh, MeshStandardMaterial } from 'three';
-import { Component, Suspense, useEffect, useMemo, type ReactNode } from 'react';
-import { useGLTF, Clone } from '@react-three/drei';
+import { Component, useEffect, useMemo, type ReactNode } from 'react';
+import { Clone } from '@react-three/drei';
+import { loadDerivative, useDerivativeGltf } from './useDerivativeGltf';
 import { Rack, type RackDetailLevel } from './Rack';
 import type { RackVisual } from './types';
 import {
@@ -48,13 +49,22 @@ function ImportedRack({
   rack,
   selected,
   onClick,
+  fallback,
+  onFailure,
 }: {
   url: string;
   rack: RackVisual;
   selected?: boolean;
   onClick?: (rackId: string) => void;
+  /** Procedural cabinet shown while the derivative loads or if it fails. */
+  fallback: ReactNode;
+  onFailure?: (reason: string) => void;
 }) {
-  const { scene } = useGLTF(url);
+  const { scene, status, error } = useDerivativeGltf(url);
+
+  useEffect(() => {
+    if (status === 'failed' && error) onFailure?.(error);
+  }, [status, error, onFailure]);
 
   /**
    * The USD pack's MDL materials do not survive glTF conversion, so the
@@ -64,6 +74,7 @@ function ImportedRack({
    * library.
    */
   useEffect(() => {
+    if (!scene) return;
     scene.traverse((object) => {
       const mesh = object as Mesh;
       if (!mesh.isMesh) return;
@@ -80,6 +91,7 @@ function ImportedRack({
     });
   }, [scene]);
 
+  if (!scene) return <>{fallback}</>;
   return (
     <group
       position={rack.position}
@@ -152,14 +164,14 @@ export function ApprovedRackAsset(props: ApprovedRackAssetProps) {
     );
     return (
       <DerivativeBoundary fallback={procedural} onFailure={props.onDerivativeFailure}>
-        <Suspense fallback={procedural}>
-          <ImportedRack
-            url={resolution.glbUrl}
-            rack={props.rack}
-            selected={props.selected}
-            onClick={props.onClick}
-          />
-        </Suspense>
+        <ImportedRack
+          url={resolution.glbUrl}
+          rack={props.rack}
+          selected={props.selected}
+          onClick={props.onClick}
+          fallback={procedural}
+          onFailure={props.onDerivativeFailure}
+        />
       </DerivativeBoundary>
     );
   }
@@ -181,7 +193,7 @@ export function ApprovedRackAsset(props: ApprovedRackAssetProps) {
 export function preloadApprovedRackAsset() {
   for (const id of [RACK_ASSET_ID, CANARY_RACK_ASSET_ID]) {
     const { glbUrl } = resolveRuntimeAsset(id);
-    if (glbUrl) useGLTF.preload(glbUrl);
+    if (glbUrl) void loadDerivative(glbUrl).catch(() => undefined);
   }
 }
 

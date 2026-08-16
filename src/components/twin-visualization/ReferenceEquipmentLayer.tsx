@@ -15,8 +15,9 @@
  *    is claimed from the manifest alone.
  */
 
-import { Component, Suspense, useEffect, useMemo, type ReactNode } from 'react';
-import { useGLTF, Clone } from '@react-three/drei';
+import { Component, useEffect, useMemo, type ReactNode } from 'react';
+import { Clone } from '@react-three/drei';
+import { useDerivativeGltf } from './useDerivativeGltf';
 import type { Mesh, MeshStandardMaterial } from 'three';
 import {
   getAsset,
@@ -65,10 +66,12 @@ function InstancedRole({
     'mountedObjects' | 'glbInstances' | 'triangles' | 'drawCalls' | 'state'
   >;
 }) {
-  const { scene } = useGLTF(mount.url);
+  const load = useDerivativeGltf(mount.url);
+  const scene = load.scene;
   const report = useRuntimeCoverageStore((s) => s.reportRole);
 
   useEffect(() => {
+    if (!scene) return;
     scene.traverse((object) => {
       const mesh = object as Mesh;
       if (!mesh.isMesh) return;
@@ -86,6 +89,30 @@ function InstancedRole({
 
   const count = mount.placements.length;
   useEffect(() => {
+    if (load.status === 'loading') {
+      report(token, {
+        ...coverage,
+        state: 'preparing',
+        mountedObjects: 0,
+        glbInstances: 0,
+        triangles: 0,
+        drawCalls: 0,
+        detail: `Loading derivative ${mount.url}`,
+      });
+      return;
+    }
+    if (load.status === 'failed') {
+      report(token, {
+        ...coverage,
+        state: 'blocked',
+        mountedObjects: 0,
+        glbInstances: 0,
+        triangles: 0,
+        drawCalls: 0,
+        detail: `Derivative failed to load: ${load.error}`,
+      });
+      return;
+    }
     report(token, {
       ...coverage,
       state: 'openusd-derived',
@@ -95,8 +122,9 @@ function InstancedRole({
       drawCalls: (mount.entry.drawCallBudget ?? 1) * count,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, count, mount.entry.assetId]);
+  }, [token, count, mount.entry.assetId, load.status, load.error]);
 
+  if (!scene) return null;
   return (
     <group name={`ReferenceEquipment:${mount.role}`}>
       {mount.placements.map((p, i) => (
@@ -130,34 +158,6 @@ type PendingCoverage = Omit<
   RoleCoverage,
   'mountedObjects' | 'glbInstances' | 'triangles' | 'drawCalls' | 'state'
 >;
-
-/**
- * Reports the honest interim state while a derivative is still downloading or
- * decoding, so a stalled load reads as "preparing" with its URL rather than
- * silently as an absent role.
- */
-function PendingRole({
-  token,
-  coverage,
-}: {
-  token: string;
-  coverage: PendingCoverage;
-}) {
-  const report = useRuntimeCoverageStore((s) => s.reportRole);
-  useEffect(() => {
-    report(token, {
-      ...coverage,
-      state: 'preparing',
-      mountedObjects: 0,
-      glbInstances: 0,
-      triangles: 0,
-      drawCalls: 0,
-      detail: `Loading derivative ${coverage.derivativeUrl ?? ''}`.trim(),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, coverage.assetId]);
-  return null;
-}
 
 /**
  * A derivative that fails to download or decode must say so in the coverage
@@ -316,9 +316,7 @@ export function ReferenceEquipmentLayer({
         };
         return (
           <RoleLoadBoundary key={mount.entry.assetId} token={token} coverage={coverage}>
-            <Suspense fallback={<PendingRole token={token} coverage={coverage} />}>
-              <InstancedRole mount={mount} token={token} coverage={coverage} />
-            </Suspense>
+            <InstancedRole mount={mount} token={token} coverage={coverage} />
           </RoleLoadBoundary>
         );
       })}

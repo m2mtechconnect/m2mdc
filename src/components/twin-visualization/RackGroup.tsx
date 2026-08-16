@@ -9,6 +9,7 @@ import type { RowVisual, RackVisual } from './types';
 import type { RackDetailLevel } from './Rack';
 import { ApprovedRackAsset } from './ApprovedRackAsset';
 import { assetIdForRack, type CanaryRolloutConfig } from './canaryRollout';
+import { useRuntimeCoverageStore } from './runtimeCoverageStore';
 
 interface RackGroupProps {
   row: RowVisual;
@@ -47,6 +48,7 @@ export function RackGroup({
   referenceAssetId = null,
 }: RackGroupProps) {
   const rowRacks = racks.filter(r => r.rowId === row.id);
+  const reportRackMount = useRuntimeCoverageStore((s) => s.reportRackMount);
   const rowWidth = rowRacks.length * 1.1 + 0.5;
   const [expanded, setExpanded] = useState(false);
   const selectedInRow = rowRacks.some((r) => r.id === selectedRackId);
@@ -111,6 +113,13 @@ export function RackGroup({
         <ApprovedRackAsset
           key={rack.id} 
           assetId={referenceAssetId ?? (canary ? assetIdForRack(rack.id, canary) : undefined)}
+          onRuntimeState={(state) =>
+            reportRackMount('rack-cabinets', rack.id, {
+              mounted: state.mounted,
+              assetId: state.assetId,
+              url: state.url,
+            })
+          }
           rack={{
             ...rack,
             position: [rack.position[0] - row.position[0], rack.position[1], 0]

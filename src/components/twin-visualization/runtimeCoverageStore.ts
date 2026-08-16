@@ -127,3 +127,66 @@ export function coverageTotals(roles: Record<string, RoleCoverage>) {
     totalRoles: list.length,
   };
 }
+
+/**
+ * Hybrid provenance breakdown (Phase 9).
+ *
+ * The scene is never reduced to a single "OpenUSD facility" claim. Three
+ * origins are counted separately from runtime evidence only:
+ *
+ *  - NVIDIA OpenUSD-derived equipment: approved derivatives of NVIDIA Data
+ *    Center pack masters that actually mounted (including the AURA-authored
+ *    component selection of NVIDIA rack geometry, which stays NVIDIA-sourced);
+ *  - AURA OpenUSD-derived facility assets: approved derivatives of
+ *    AURA-authored USD masters that actually mounted;
+ *  - AURA procedural geometry: physical geometry and analytical overlays that
+ *    have no USD master behind them at runtime.
+ */
+export interface ProvenanceBreakdown {
+  nvidiaDerivedObjects: number;
+  auraUsdDerivedObjects: number;
+  proceduralPhysicalObjects: number;
+  proceduralOverlayObjects: number;
+  cabinetsMounted: number;
+  cabinetsProcedural: number;
+  label: string;
+}
+
+export function provenanceBreakdown(
+  roles: Record<string, RoleCoverage>,
+  rackMounts: Record<string, { mounted: boolean }>,
+  procedural: Record<string, { count: number; kind: 'physical' | 'overlay' }>,
+  isAuraAuthored: (assetId: string | null) => boolean,
+): ProvenanceBreakdown {
+  let nvidia = 0;
+  let aura = 0;
+  for (const r of Object.values(roles)) {
+    if (r.mountedObjects <= 0) continue;
+    if (isAuraAuthored(r.assetId)) aura += r.mountedObjects;
+    else nvidia += r.mountedObjects;
+  }
+  const cabinets = Object.values(rackMounts);
+  const cabinetsMounted = cabinets.filter((c) => c.mounted).length;
+  const cabinetsProcedural = cabinets.length - cabinetsMounted;
+  nvidia += cabinetsMounted;
+
+  let physical = cabinetsProcedural;
+  let overlay = 0;
+  for (const p of Object.values(procedural)) {
+    if (p.kind === 'overlay') overlay += p.count;
+    else physical += p.count;
+  }
+  return {
+    nvidiaDerivedObjects: nvidia,
+    auraUsdDerivedObjects: aura,
+    proceduralPhysicalObjects: physical,
+    proceduralOverlayObjects: overlay,
+    cabinetsMounted,
+    cabinetsProcedural,
+    label:
+      `NVIDIA OpenUSD-derived equipment: ${nvidia} · ` +
+      `AURA OpenUSD-derived facility assets: ${aura} · ` +
+      `AURA procedural physical geometry: ${physical} · ` +
+      `Procedural operational overlays: ${overlay}`,
+  };
+}

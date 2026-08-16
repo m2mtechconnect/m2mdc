@@ -69,6 +69,7 @@ function ImportedRack({
   onRuntimeState?: (mounted: boolean) => void;
 }) {
   const { scene, status, error } = useDerivativeGltf(url);
+  const realismMode = useRealismMode();
 
   useEffect(() => {
     if (status === 'failed' && error) onFailure?.(error);

@@ -65,10 +65,12 @@ function InstancedRole({
     'mountedObjects' | 'glbInstances' | 'triangles' | 'drawCalls' | 'state'
   >;
 }) {
-  const { scene } = useGLTF(mount.url);
+  const load = useDerivativeGltf(mount.url);
+  const scene = load.scene;
   const report = useRuntimeCoverageStore((s) => s.reportRole);
 
   useEffect(() => {
+    if (!scene) return;
     scene.traverse((object) => {
       const mesh = object as Mesh;
       if (!mesh.isMesh) return;
@@ -86,6 +88,30 @@ function InstancedRole({
 
   const count = mount.placements.length;
   useEffect(() => {
+    if (load.status === 'loading') {
+      report(token, {
+        ...coverage,
+        state: 'preparing',
+        mountedObjects: 0,
+        glbInstances: 0,
+        triangles: 0,
+        drawCalls: 0,
+        detail: `Loading derivative ${mount.url}`,
+      });
+      return;
+    }
+    if (load.status === 'failed') {
+      report(token, {
+        ...coverage,
+        state: 'blocked',
+        mountedObjects: 0,
+        glbInstances: 0,
+        triangles: 0,
+        drawCalls: 0,
+        detail: `Derivative failed to load: ${load.error}`,
+      });
+      return;
+    }
     report(token, {
       ...coverage,
       state: 'openusd-derived',
@@ -95,8 +121,9 @@ function InstancedRole({
       drawCalls: (mount.entry.drawCallBudget ?? 1) * count,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, count, mount.entry.assetId]);
+  }, [token, count, mount.entry.assetId, load.status, load.error]);
 
+  if (!scene) return null;
   return (
     <group name={`ReferenceEquipment:${mount.role}`}>
       {mount.placements.map((p, i) => (

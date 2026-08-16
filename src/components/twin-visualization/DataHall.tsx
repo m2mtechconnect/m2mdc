@@ -67,7 +67,14 @@ export function DataHall({ bounds, rows, profile, crahUnits = 0, shellMode = 'of
 
   const { minX, maxX, minZ, maxZ, width, depth, cx, cz } = geometry;
   const structural = profile.id !== 'low';
-  const showShell = shellMode !== 'off';
+  // Procedural geometry stands in only where an AURA-authored OpenUSD
+  // derivative has NOT mounted. State comes from the live scene, never from
+  // the manifest, so a failed or pending derivative keeps its stand-in.
+  const families = useFacilityDerivativeStore((s) => s.families);
+  const floorDerived = familyMounted(families, 'raised-floor-tile');
+  const supplyTilesDerived = familyMounted(families, 'perforated-floor-tile');
+  const shellDerived = familyMounted(families, 'facility-shell');
+  const showShell = shellMode !== 'off' && !shellDerived;
   const fullShell = shellMode === 'full';
 
   const floor = floorMaterial(Math.max(8, Math.round(Math.max(width, depth) / 0.6)));
@@ -89,8 +96,8 @@ export function DataHall({ bounds, rows, profile, crahUnits = 0, shellMode = 'of
   const coldAisles = rows.filter((r) => !r.isHotAisle).length;
   const hotAisles = rows.filter((r) => r.isHotAisle).length;
   const proceduralCount =
-    1 + // raised floor plane
-    coldAisles + // perforated supply tile strips
+    (floorDerived ? 0 : 1) + // raised floor plane
+    (supplyTilesDerived ? 0 : coldAisles) + // perforated supply tile strips
     2 + // painted aisle markings
     (showShell ? (fullShell ? 4 : 2) : 0) + // perimeter walls
     rows.length + // overhead cable tray runs
@@ -108,13 +115,17 @@ export function DataHall({ bounds, rows, profile, crahUnits = 0, shellMode = 'of
 
   return (
     <group name="OperationalScene:environment" userData={{ classification: 'environmental-geometry' }}>
-      {/* Raised floor with 600 mm tile grid */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[cx, 0, cz]} material={floor} receiveShadow>
-        <planeGeometry args={[width, depth]} />
-      </mesh>
+      {/* Raised floor with 600 mm tile grid. Suppressed once the AURA-authored
+          OpenUSD tile derivative has mounted, so the two never z-fight. */}
+      {!floorDerived && (
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[cx, 0, cz]} material={floor} receiveShadow>
+          <planeGeometry args={[width, depth]} />
+        </mesh>
+      )}
 
       {/* Perforated supply tiles in the cold aisles */}
-      {rows
+      {!supplyTilesDerived &&
+        rows
         .filter((r) => !r.isHotAisle)
         .map((row) => (
           <mesh

@@ -1,0 +1,129 @@
+#usda 1.0
+(
+    defaultPrim = "FacilityShell"
+    doc = "AURA-authored parametric facility shell. Dimensions are driven by the active AURA facility configuration; the values here are the reference-hall defaults. The variant set 'shellMode' provides off / cutaway / full. Roof and ceiling enclosure are intentionally absent from every mode so rack inspection is never obstructed."
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "FacilityShell" (
+    kind = "component"
+    variants = {
+        string shellMode = "off"
+    }
+    prepend variantSets = "shellMode"
+)
+{
+    custom float aif:core:depth = 18
+    custom float aif:core:height = 4.2
+    custom float aif:core:width = 26
+    custom string aura:assetId = "aura.shell.facility_shell"
+    custom string aura:author = "M2M AURA (AURA-authored generic asset)"
+    custom string aura:equipmentClass = "facility-shell"
+    custom string aura:evidenceMode = "SIMULATED"
+    custom string aura:licence = "AURA-authored, internal use by M2M Technology Connect. Generic geometry, not vendor-certified, not SimReady."
+    custom bool aura:roofEnclosure = 0
+    custom string aura:semanticRole = "facility-shell"
+    custom bool aura:simReady = 0
+    custom string aura:telemetryBindingId = ""
+    custom bool aura:vendorCertified = 0
+
+    def "Materials"
+    {
+        def Material "WallPanel"
+        {
+            token outputs:surface.connect = </FacilityShell/Materials/WallPanel/PreviewSurface.outputs:surface>
+
+            def Shader "PreviewSurface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.3, 0.32, 0.35)
+                float inputs:metallic = 0.05
+                float inputs:roughness = 0.8
+                token outputs:surface
+            }
+        }
+    }
+
+    def Scope "PerimeterWalls"
+    {
+        def Mesh "North" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            float3[] extent = [(-13, 0, -9.1), (13, 4.2, -8.9)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+            rel material:binding = </FacilityShell/Materials/WallPanel>
+            point3f[] points = [(-13, 0, -9.1), (13, 0, -9.1), (13, 4.2, -9.1), (-13, 4.2, -9.1), (-13, 0, -8.9), (13, 0, -8.9), (13, 4.2, -8.9), (-13, 4.2, -8.9)]
+            uniform token subdivisionScheme = "none"
+        }
+
+        def Mesh "West" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            float3[] extent = [(-13.1, 0, -9), (-12.9, 4.2, 9)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+            rel material:binding = </FacilityShell/Materials/WallPanel>
+            point3f[] points = [(-13.1, 0, -9), (-12.9, 0, -9), (-12.9, 4.2, -9), (-13.1, 4.2, -9), (-13.1, 0, 9), (-12.9, 0, 9), (-12.9, 4.2, 9), (-13.1, 4.2, 9)]
+            uniform token subdivisionScheme = "none"
+        }
+
+        def Mesh "South" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            float3[] extent = [(-13, 0, 8.9), (13, 4.2, 9.1)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+            rel material:binding = </FacilityShell/Materials/WallPanel>
+            point3f[] points = [(-13, 0, 8.9), (13, 0, 8.9), (13, 4.2, 8.9), (-13, 4.2, 8.9), (-13, 0, 9.1), (13, 0, 9.1), (13, 4.2, 9.1), (-13, 4.2, 9.1)]
+            uniform token subdivisionScheme = "none"
+        }
+
+        def Mesh "East" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            float3[] extent = [(12.9, 0, -9), (13.1, 4.2, 9)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+            rel material:binding = </FacilityShell/Materials/WallPanel>
+            point3f[] points = [(12.9, 0, -9), (13.1, 0, -9), (13.1, 4.2, -9), (12.9, 4.2, -9), (12.9, 0, 9), (13.1, 0, 9), (13.1, 4.2, 9), (12.9, 4.2, 9)]
+            uniform token subdivisionScheme = "none"
+        }
+    }
+    variantSet "shellMode" = {
+        "cutaway" {
+            over "PerimeterWalls"
+            {
+                over "South" (
+                    active = false
+                )
+                {
+                }
+
+                over "East" (
+                    active = false
+                )
+                {
+                }
+            }
+
+        }
+        "full" {
+
+        }
+        "off" {
+            over "PerimeterWalls" (
+                active = false
+            )
+            {
+            }
+
+        }
+    }
+}
+

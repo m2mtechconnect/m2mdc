@@ -57,7 +57,7 @@ def new_stage(rel_path, default_prim_name, doc):
     stage.GetRootLayer().Clear()
     UsdGeom.SetStageMetersPerUnit(stage, 1.0)
     UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.y)
-    stage.SetDocumentation(doc)
+    stage.GetRootLayer().documentation = doc
     root = UsdGeom.Xform.Define(stage, "/" + default_prim_name)
     Usd.ModelAPI(root).SetKind(Kind.Tokens.component)
     stage.SetDefaultPrim(root.GetPrim())

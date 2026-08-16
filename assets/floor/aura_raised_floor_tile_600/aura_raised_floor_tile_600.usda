@@ -1,2 +1,58 @@
 #usda 1.0
+(
+    defaultPrim = "FloorTile"
+    doc = "AURA-authored generic 600 mm raised-floor tile. Metric, Y-up, origin at the tile centre on the finished floor plane. Generic geometry, no vendor identity."
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "FloorTile" (
+    kind = "component"
+)
+{
+    custom float aif:core:depth = 0.6
+    custom float aif:core:height = 0.035
+    custom float aif:core:width = 0.6
+    custom string aura:assetId = "aura.floor.standard_tile_600"
+    custom string aura:author = "M2M AURA (AURA-authored generic asset)"
+    custom string aura:equipmentClass = "raised-floor-tile"
+    custom string aura:evidenceMode = "SIMULATED"
+    custom string aura:licence = "AURA-authored, internal use by M2M Technology Connect. Generic geometry, not vendor-certified, not SimReady."
+    custom string aura:semanticRole = "raised-floor-tile"
+    custom bool aura:simReady = 0
+    custom string aura:telemetryBindingId = ""
+    custom bool aura:vendorCertified = 0
+
+    def Scope "Geometry"
+    {
+        def Mesh "Panel" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            float3[] extent = [(-0.3, 0, -0.3), (0.3, 0.035, 0.3)]
+            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+            int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+            rel material:binding = </FloorTile/Materials/TilePanel>
+            point3f[] points = [(-0.3, 0, -0.3), (0.3, 0, -0.3), (0.3, 0.035, -0.3), (-0.3, 0.035, -0.3), (-0.3, 0, 0.3), (0.3, 0, 0.3), (0.3, 0.035, 0.3), (-0.3, 0.035, 0.3)]
+            uniform token subdivisionScheme = "none"
+        }
+    }
+
+    def "Materials"
+    {
+        def Material "TilePanel"
+        {
+            token outputs:surface.connect = </FloorTile/Materials/TilePanel/PreviewSurface.outputs:surface>
+
+            def Shader "PreviewSurface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.2, 0.21, 0.23)
+                float inputs:metallic = 0.15
+                float inputs:roughness = 0.72
+                token outputs:surface
+            }
+        }
+    }
+}
 

@@ -316,9 +316,7 @@ export function ReferenceEquipmentLayer({
         };
         return (
           <RoleLoadBoundary key={mount.entry.assetId} token={token} coverage={coverage}>
-            <Suspense fallback={<PendingRole token={token} coverage={coverage} />}>
-              <InstancedRole mount={mount} token={token} coverage={coverage} />
-            </Suspense>
+            <InstancedRole mount={mount} token={token} coverage={coverage} />
           </RoleLoadBoundary>
         );
       })}

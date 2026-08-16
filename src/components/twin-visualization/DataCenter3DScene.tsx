@@ -70,7 +70,7 @@ import {
 import { AssetProvenanceBadge } from './AssetProvenancePanel';
 import { ScenarioRackLayer } from './ScenarioRackLayer';
 import { ReferenceEquipmentLayer } from './ReferenceEquipmentLayer';
-import { useRuntimeCoverageStore, coverageTotals } from './runtimeCoverageStore';
+import { useRuntimeCoverageStore, coverageTotals, provenanceBreakdown } from './runtimeCoverageStore';
 import {
   FACILITY_GEOMETRY_MODES,
   referenceCoverageSummary,
@@ -671,6 +671,17 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   // Coverage reported by the objects that actually mounted this frame.
   const runtimeRoles = useRuntimeCoverageStore((s) => s.roles);
   const runtimeTotals = useMemo(() => coverageTotals(runtimeRoles), [runtimeRoles]);
+  const rackMounts = useRuntimeCoverageStore((s) => s.rackMounts);
+  const proceduralGeometry = useRuntimeCoverageStore((s) => s.procedural);
+  // Hybrid provenance: NVIDIA-derived, AURA-authored USD-derived and procedural
+  // are counted separately from runtime evidence, never merged into one claim.
+  const provenance = useMemo(
+    () =>
+      provenanceBreakdown(runtimeRoles, rackMounts, proceduralGeometry, (assetId) =>
+        (assetId ?? '').startsWith('aura.'),
+      ),
+    [runtimeRoles, rackMounts, proceduralGeometry],
+  );
 
   const baseDistance = props.compact ? 22 : 30;
   const [targetDistance, setTargetDistance] = useState(baseDistance);
@@ -964,6 +975,18 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             loaded derivative files. Counts are visible objects, not manifest rows.
             Representative NVIDIA equipment, not verified as installed. Roles without an approved
             derivative render AURA procedural geometry.
+          </p>
+          <p
+            className="mt-1 font-mono text-[11px] text-slate-300"
+            data-testid="hybrid-provenance-breakdown"
+            data-nvidia-derived={provenance.nvidiaDerivedObjects}
+            data-aura-usd-derived={provenance.auraUsdDerivedObjects}
+            data-procedural-physical={provenance.proceduralPhysicalObjects}
+            data-procedural-overlays={provenance.proceduralOverlayObjects}
+            data-cabinets-mounted={provenance.cabinetsMounted}
+            data-cabinets-procedural={provenance.cabinetsProcedural}
+          >
+            {provenance.label}
           </p>
           <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-slate-400">
             {referenceFacilityCoverage().map((row) => {

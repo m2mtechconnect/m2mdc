@@ -28,7 +28,18 @@ scenario by design.
 
 ## Residual gaps, stated plainly
 
-- AURA-authored facility masters (floor tiles, luminaires, columns, shell) have validated USD but **no published GLB derivative**, so the raised floor, lighting and shell still render procedurally. The count above reports this as 0 rather than implying otherwise.
+- AURA-authored facility masters now have published, checksum-verified GLB derivatives and mount at runtime. Verified in a headless SwiftShader run of `/data-centre-twin?geometry=nvidia-reference` with the derivatives served from the asset CDN:
+
+  ```
+  AURA-authored OpenUSD facility: 916 visible scene objects
+  across 5 of 5 families, 5 derivative files, 45 instanced draw calls
+  Cabinets mounted from approved derivative: 40 / 40
+  AURA procedural physical geometry: 28 (was 34; floor and shell stand-ins now suppressed)
+  ```
+
+  Families are mounted through `AuraFacilityLayer` as `InstancedMesh` per source mesh, and `DataHall` suppresses only the procedural geometry a derivative actually replaced. A family that fails or is still loading keeps its stand-in.
+- The equipment and facility claims are now counted separately: the NVIDIA equipment line never borrows AURA-authored objects, and vice versa.
+- The NVIDIA equipment roles report `preparing` in the sandboxed software-rendered run because the multi-megabyte pack derivatives are proxied over a slow path there; they mount on the published host (178 objects, 8 roles) as recorded above.
 - Brev: `awaiting-execution`. No Brev credentials are reachable here.
 - AWS: `publication-blocked`. No AWS credentials or infrastructure authority are reachable here; derivatives continue to be served by the existing asset CDN.
 - No Omniverse Kit, Nucleus, CFD or PhysicsX coupling exists; the viewer boundary fails closed rather than simulating one.

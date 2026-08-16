@@ -15,7 +15,7 @@
  *    is claimed from the manifest alone.
  */
 
-import { Suspense, useEffect, useMemo } from 'react';
+import { Component, Suspense, useEffect, useMemo, type ReactNode } from 'react';
 import { useGLTF, Clone } from '@react-three/drei';
 import type { Mesh, MeshStandardMaterial } from 'three';
 import {
@@ -124,6 +124,73 @@ interface Props {
   band?: DistanceBand;
   /** Rack index limit for detailed in-rack equipment (performance bound). */
   detailBudget?: number;
+}
+
+type PendingCoverage = Omit<
+  RoleCoverage,
+  'mountedObjects' | 'glbInstances' | 'triangles' | 'drawCalls' | 'state'
+>;
+
+/**
+ * Reports the honest interim state while a derivative is still downloading or
+ * decoding, so a stalled load reads as "preparing" with its URL rather than
+ * silently as an absent role.
+ */
+function PendingRole({
+  token,
+  coverage,
+}: {
+  token: string;
+  coverage: PendingCoverage;
+}) {
+  const report = useRuntimeCoverageStore((s) => s.reportRole);
+  useEffect(() => {
+    report(token, {
+      ...coverage,
+      state: 'preparing',
+      mountedObjects: 0,
+      glbInstances: 0,
+      triangles: 0,
+      drawCalls: 0,
+      detail: `Loading derivative ${coverage.derivativeUrl ?? ''}`.trim(),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, coverage.assetId]);
+  return null;
+}
+
+/**
+ * A derivative that fails to download or decode must say so in the coverage
+ * report. Without this, a failed load is indistinguishable from an asset that
+ * was never requested.
+ */
+class RoleLoadBoundary extends Component<
+  { token: string; coverage: PendingCoverage; children: ReactNode },
+  { error: string | null }
+> {
+  state = { error: null as string | null };
+
+  static getDerivedStateFromError(error: unknown) {
+    return { error: error instanceof Error ? error.message : String(error) };
+  }
+
+  componentDidCatch(error: unknown) {
+    const { token, coverage } = this.props;
+    useRuntimeCoverageStore.getState().reportRole(token, {
+      ...coverage,
+      state: 'blocked',
+      mountedObjects: 0,
+      glbInstances: 0,
+      triangles: 0,
+      drawCalls: 0,
+      detail: `Derivative failed to load: ${error instanceof Error ? error.message : String(error)}`,
+    });
+  }
+
+  render() {
+    if (this.state.error) return null;
+    return this.props.children;
+  }
 }
 
 export function ReferenceEquipmentLayer({
@@ -238,22 +305,23 @@ export function ReferenceEquipmentLayer({
 
   return (
     <group name="ReferenceEquipmentLayer">
-      {mounts.map((mount) => (
-        <Suspense key={mount.entry.assetId} fallback={null}>
-          <InstancedRole
-            mount={mount}
-            token={token}
-            coverage={{
-              role: mount.role,
-              assetId: mount.entry.assetId,
-              quality: (mount.entry.qualityLevel as QualityLevel) ?? null,
-              derivativeUrl: mount.url,
-              proceduralObjects: 0,
-              detail: getAsset(mount.entry.assetId)?.displayName,
-            }}
-          />
-        </Suspense>
-      ))}
+      {mounts.map((mount) => {
+        const coverage: PendingCoverage = {
+          role: mount.role,
+          assetId: mount.entry.assetId,
+          quality: (mount.entry.qualityLevel as QualityLevel) ?? null,
+          derivativeUrl: mount.url,
+          proceduralObjects: 0,
+          detail: getAsset(mount.entry.assetId)?.displayName,
+        };
+        return (
+          <RoleLoadBoundary key={mount.entry.assetId} token={token} coverage={coverage}>
+            <Suspense fallback={<PendingRole token={token} coverage={coverage} />}>
+              <InstancedRole mount={mount} token={token} coverage={coverage} />
+            </Suspense>
+          </RoleLoadBoundary>
+        );
+      })}
     </group>
   );
 }

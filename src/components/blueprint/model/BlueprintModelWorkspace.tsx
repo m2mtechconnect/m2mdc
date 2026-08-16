@@ -213,7 +213,7 @@ export function BlueprintModelWorkspace({
             value={`${blueprint.dataSources.length} in readiness result`}
           />
           <LinkRow
-            to="/integrations"
+            to="/manage/integrations"
             label="Integrations"
             value={`${blueprint.integrations.length} managed in Manage`}
           />

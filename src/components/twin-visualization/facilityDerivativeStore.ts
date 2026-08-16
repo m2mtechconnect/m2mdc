@@ -43,6 +43,17 @@ export const useFacilityDerivativeStore = create<FacilityDerivativeState>((set) 
   resetFamilies: () => set({ families: { ...IDLE } }),
 }));
 
+declare global {
+  interface Window {
+    /** Runtime evidence surface for the facility regression harness. */
+    __auraFacilityFamilies?: () => Record<FacilityFamily, FacilityFamilyState>;
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.__auraFacilityFamilies = () => ({ ...useFacilityDerivativeStore.getState().families });
+}
+
 /** True only once the derivative for a family is mounted in the live scene. */
 export function familyMounted(
   families: Record<FacilityFamily, FacilityFamilyState>,

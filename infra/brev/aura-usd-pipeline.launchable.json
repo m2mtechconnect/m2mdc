@@ -1,0 +1,54 @@
+{
+  "name": "aura-usd-derivative-pipeline",
+  "description": "Reproducible GPU environment for AURA OpenUSD authoring, USD->GLB conversion and derivative validation. Aligned with the NVIDIA Omniverse DSX Blueprint; Brev is the reproducible compute environment, not a replacement for Omniverse, OpenUSD or DSX.",
+  "instance": {
+    "gpu": "NVIDIA L4 (minimum) or A10G",
+    "vcpu": 8,
+    "memoryGb": 32,
+    "diskGb": 200,
+    "note": "Disk sized for the NVIDIA Data Center OpenUSD Assets Pack plus derivative output."
+  },
+  "repository": {
+    "url": "<AURA repository URL>",
+    "ref": "main",
+    "workdir": "/workspace/aura"
+  },
+  "toolchain": {
+    "python": "3.11",
+    "pip": {
+      "usd-core": "26.8",
+      "numpy": "*"
+    },
+    "blender": {
+      "version": "5.0.1",
+      "usage": "headless OpenUSD import and glTF 2.0 export",
+      "note": "Draco encoding stays disabled: the 5.0.1 build aborts inside the Draco encoder. Mesh optimisation is done by gltf-transform."
+    },
+    "node": "20.x",
+    "npm": {
+      "@gltf-transform/cli": "4.4.2"
+    }
+  },
+  "environmentVariables": {
+    "AURA_PACK_ARCHIVE": "Local path to Datacenter_NVD@10012.zip (licensed NVIDIA pack, never committed).",
+    "AURA_PACK_SHA256": "4972d1a9726b36279d7c26531b4d0a084156b7d512f5340b6e1063a9cf458fd4",
+    "AURA_ASSET_OUTPUT": "Directory for generated derivatives and evidence.",
+    "AWS_REGION": "ca-central-1",
+    "AURA_S3_SOURCE_BUCKET": "Private bucket for versioned USD masters and dependencies.",
+    "AURA_S3_DERIVATIVE_BUCKET": "Controlled bucket for approved browser derivatives.",
+    "AWS_ROLE_ARN": "Deployment role assumed for publication. No long-lived keys."
+  },
+  "commands": {
+    "setup": "pip install usd-core==26.8 && npm i -g @gltf-transform/cli@4.4.2",
+    "authorAuraMasters": "python3 scripts/asset-ingestion/author_aura_usd_assets.py && python3 scripts/asset-ingestion/author_aura_facility_stage.py",
+    "validateStages": "python3 scripts/asset-ingestion/validate_usd_stage.py",
+    "batchConvert": "python3 scripts/asset-ingestion/run_batches.py",
+    "normalizeAndOptimize": "node scripts/asset-ingestion/normalize_glb.mjs && node scripts/asset-ingestion/build_ops_derivative.mjs",
+    "validateDerivatives": "node scripts/asset-ingestion/validate_ops_derivative.mjs",
+    "exportEvidence": "python3 scripts/asset-ingestion/verify_and_activate.py --report docs/evidence/nvidia-pack/conversion-state.json"
+  },
+  "executionStatus": {
+    "state": "awaiting-execution",
+    "reason": "No Brev credentials or execution access are available from this environment. The configuration is reproducible and complete; no Brev run is claimed."
+  }
+}

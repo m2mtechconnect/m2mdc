@@ -139,3 +139,56 @@ Honest gaps against the requested scope:
 Material realism, provenance and detail-band policy are implemented, tested and
 non-destructive, but rack population, inspection mode, and Brev/AWS GPU visual
 acceptance remain outstanding.
+
+---
+
+## Cloud GPU execution phase (Brev / AWS)
+
+### Phase 1 - protected baseline
+
+Recorded in `docs/evidence/cloud-gpu/baseline-snapshot.json`: build `bmsv58pp8`,
+route `/data-centre-twin?geometry=nvidia-reference`, 178 NVIDIA objects
+(138 equipment + 40 cabinets), 916 AURA facility objects across 5 families,
+0 physical fallbacks, 7 shared material classes, 20 NVIDIA sources with
+non-destructive override layers, `geometryModified=false`.
+
+Renderer counters (draw calls, triangles, geometries, downloaded bytes) are the one
+part of the requested baseline that cannot be recorded here: no hardware GPU lane is
+reachable from this environment. They are captured by the Brev run in Phase 4 and are
+explicitly marked "not recorded" rather than estimated.
+
+Invariants re-confirmed: blocked assets stay blocked, quarantined assets stay
+quarantined, the AURA override layer never alters runtime eligibility, no blocked
+derivative is requested, no NVIDIA source geometry is modified, no published GLB is
+edited in place. Guarded by `regressionBaseline.test.ts`, `qualityPolicy.test.ts`,
+`realismMode.test.ts` and `tests/truth-in-ui/reference-facility-regression.spec.ts`.
+
+### Phase 2 - admin-only A/B realism lane (implemented)
+
+- `src/components/twin-visualization/realismMode.ts` - two modes, `baseline`
+  (the pre-policy uniform tuning, recorded verbatim as `BASELINE_UNIFORM_SPEC`) and
+  `video-informed` (the seven-class policy). Default is `video-informed`.
+- `?realism=baseline` / `?realism=video-informed`, honoured only for asset
+  administrators via `useRealismMode` + `isAssetAdmin`; operators always see the
+  default. The switch is presentation only - same geometry, same facility data, same
+  camera, same lighting, same quality, one scene mount, no telemetry or simulation
+  effect.
+- `window.__auraRealismMode` labels captured evidence.
+- `src/validation/cloudGpu/views.ts` - the ten deterministic capture views
+  (facility overview, nearby rack row, selected rack front/rear, server faceplates,
+  network switch, PDU, cable-tray clearance, luminaires, localized thermal), each bound
+  to an existing camera preset, all captured at 1920x1080 / DPR 1 with paired filenames.
+
+### Phases 3-14 - not executed
+
+No Brev credential, credits or GPU instance is reachable from this environment, and no
+authorization for billable AWS resources has been given. Nothing was provisioned and no
+GPU evidence exists. Access status, requested credits, estimated cost, duration and the
+exact run steps are in `docs/evidence/cloud-gpu/brev/README.md` and
+`docs/evidence/cloud-gpu/aws/README.md`.
+
+Per the instruction that selected-rack inspection, rack population, cable detail,
+lighting/AO and thermal changes follow the Phase 5 visual go/no-go, none of that work
+was started: it has no evidence to justify it yet.
+
+Verdict: **AURA_VIDEO_INFORMED_OPENUSD_REALISM_AWAITING_BREV_VALIDATION**

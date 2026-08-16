@@ -18,6 +18,7 @@ import { Component, useEffect, useMemo, type ReactNode } from 'react';
 import { Clone } from '@react-three/drei';
 import { loadDerivative, useDerivativeGltf } from './useDerivativeGltf';
 import { applyMaterialPolicy } from './applyMaterialPolicy';
+import { useRealismMode } from './hooks/useRealismMode';
 import { Rack, type RackDetailLevel } from './Rack';
 import type { RackVisual } from './types';
 import {
@@ -68,6 +69,7 @@ function ImportedRack({
   onRuntimeState?: (mounted: boolean) => void;
 }) {
   const { scene, status, error } = useDerivativeGltf(url);
+  const realismMode = useRealismMode();
 
   useEffect(() => {
     if (status === 'failed' && error) onFailure?.(error);
@@ -89,8 +91,9 @@ function ImportedRack({
     applyMaterialPolicy(scene, {
       role: 'rack-core-reference',
       band: selected ? 'selected' : 'nearby',
+      mode: realismMode,
     });
-  }, [scene, selected]);
+  }, [scene, selected, realismMode]);
 
   if (!scene) return <>{fallback}</>;
   return (

@@ -19,6 +19,7 @@ import { Component, useEffect, useMemo, type ReactNode } from 'react';
 import { Clone } from '@react-three/drei';
 import { useDerivativeGltf } from './useDerivativeGltf';
 import { applyMaterialPolicy } from './applyMaterialPolicy';
+import { useRealismMode } from './hooks/useRealismMode';
 import {
   getAsset,
   listAssetsForRole,
@@ -71,6 +72,7 @@ function InstancedRole({
   const load = useDerivativeGltf(mount.url);
   const scene = load.scene;
   const report = useRuntimeCoverageStore((s) => s.reportRole);
+  const realismMode = useRealismMode();
 
   /**
    * NVIDIA OpenUSD-derived geometry with AURA-authored material, lighting and
@@ -80,8 +82,8 @@ function InstancedRole({
    */
   useEffect(() => {
     if (!scene) return;
-    applyMaterialPolicy(scene, { role: mount.role, band: mount.band });
-  }, [scene, mount.role, mount.band]);
+    applyMaterialPolicy(scene, { role: mount.role, band: mount.band, mode: realismMode });
+  }, [scene, mount.role, mount.band, realismMode]);
 
   const count = mount.placements.length;
   useEffect(() => {

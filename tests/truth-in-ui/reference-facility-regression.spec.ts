@@ -18,6 +18,14 @@ import {
 
 const ROUTE = '/data-centre-twin?geometry=nvidia-reference';
 
+/**
+ * Published derivatives are served by the deployment CDN. A local dev server
+ * does not carry the durable asset index, so the spec fetches the published
+ * artefact and fulfils the request with those exact bytes. It never fabricates
+ * geometry: a missing derivative still fails the run.
+ */
+const ASSET_ORIGIN = process.env.AURA_ASSET_ORIGIN ?? 'https://m2mdc.lovable.app';
+
 test.describe('NVIDIA Reference Facility runtime regression', () => {
   test.setTimeout(180_000);
   test('mounts the verified NVIDIA equipment, 40 cabinets and every AURA facility family', async ({
@@ -55,6 +63,24 @@ test.describe('NVIDIA Reference Facility runtime regression', () => {
       });
     });
     await context.addInitScript((id) => localStorage.setItem('dc_active_twin_id', id), twinId);
+
+    const api = await test.request.newContext();
+    await context.route('**/__l5e/assets-v1/**', async (route) => {
+      const url = new URL(route.request().url());
+      const local = await route.fetch().catch(() => null);
+      const type = local?.headers()['content-type'] ?? '';
+      if (local && local.ok() && !type.includes('text/html')) {
+        await route.fulfill({ response: local });
+        return;
+      }
+      const upstream = await api.get(`${ASSET_ORIGIN}${url.pathname}`);
+      await route.fulfill({
+        status: upstream.status(),
+        contentType: 'model/gltf-binary',
+        headers: { 'access-control-allow-origin': '*' },
+        body: await upstream.body(),
+      });
+    });
 
     await page.goto(ROUTE, { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('twin-visualization-layout')).toBeVisible();

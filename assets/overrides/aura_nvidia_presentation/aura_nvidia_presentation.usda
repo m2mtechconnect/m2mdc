@@ -1,0 +1,348 @@
+#usda 1.0
+(
+    """AURA-authored material and presentation override layer.
+
+       Provenance: NVIDIA OpenUSD-derived geometry with AURA-authored material,
+       lighting and visualization enhancements.
+
+       This layer is NON-DESTRUCTIVE. It references the unchanged NVIDIA source
+       stages and authors only material class assignments and presentation
+       metadata as `over` prims. No geometry, prim path, dimension, transform or
+       vendor identity is modified. Not NVIDIA-authored. Not SimReady-certified.
+       Not Omniverse-rendered. Not RTX-rendered.
+    """
+    defaultPrim = "AURA_Presentation"
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Scope "AURA_Presentation" (
+    assetInfo = {
+        string name = "aura_nvidia_presentation"
+        string version = "1.0.0"
+        string identifier = "aura.override.nvidia_presentation"
+        string authoredBy = "M2M AURA"
+    }
+)
+{
+    over "blank_1u_black" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Racks/Accessories/Blank_1U_Black_A_01.usd"
+            string nvidiaSourceChecksum = "sha256:fbfdfbc2b739e28ae3af041b40a2498c46bc92a9756de0c0a5fd912d5fd8c31a"
+            string auraSemanticRole = "blanking-panel"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "blank_1u_blackgold" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Racks/Accessories/Blank_1U_BlackGold_A_01.usd"
+            string nvidiaSourceChecksum = "sha256:d75fc239b11059568deb5ff8c04686b1470a237e683797b07105c4dbd4203aeb"
+            string auraSemanticRole = "blanking-panel"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "blank_1u_snapon_gray" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Racks/Accessories/Blank_1U_Snap_on_Gray_A_01.usd"
+            string nvidiaSourceChecksum = "sha256:e73801f4adb3bebba858309f889549eaf2c00bbac11f976783924e1db5dde14c"
+            string auraSemanticRole = "blanking-panel"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "blank_1u_white" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Racks/Accessories/Blank_1U_White_A_01.usd"
+            string nvidiaSourceChecksum = "sha256:754eab02be342a93a8eaee2130f82de1701d55e5b5c439f840bdd469b1e7105f"
+            string auraSemanticRole = "blanking-panel"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "cable_tray_25" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Facilities/Cable_Tray/Cable_Tray_Segment_25x61x5cm_A01_01.usd"
+            string nvidiaSourceChecksum = "sha256:b914c3ada3c8a4f7200af02c14255b4377141a7072ae00aa842556658416b48e"
+            string auraSemanticRole = "cable-tray"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "cable_tray_299" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Facilities/Cable_Tray/Cable_Tray_61x299x5cm_A01_01.usd"
+            string nvidiaSourceChecksum = "sha256:09dafc5a9b52b7ff34935255af8839778ecb28534a9bef46034531bc1fff9df8"
+            string auraSemanticRole = "cable-tray"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "cable_tray_tee" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Facilities/Cable_Tray/Cable_Tray_Tee_A01_01.usd"
+            string nvidiaSourceChecksum = "sha256:0d6536157b5c36cb879495334a0e634d41e222fc8479296902828a04ad5b1113"
+            string auraSemanticRole = "cable-tray"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "dcp_a_01" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Liquid_Cooling/Data_Hall/DCP_A/DCP_A_01.usd"
+            string nvidiaSourceChecksum = "sha256:c58df0f50ea4f97f36cfdbaa071cc9383ebdc28bb665aa14de486f04fd28e9ae"
+            string auraSemanticRole = "liquid-cooling-equipment"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "qm8700_01" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Network_Switches/NVIDIA/QM8700/QM8700_01.usd"
+            string nvidiaSourceChecksum = "sha256:524c08e1c35b26a02b4c8338e9ca5130dc1017363c8884a2304a44d0d407dc3b"
+            string auraSemanticRole = "network-switch"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "qm8700_c_01" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Network_Switches/NVIDIA/QM8700/QM8700_C_01.usd"
+            string nvidiaSourceChecksum = "sha256:0cabd218c5e5534b8646c603ca1cb69f0511516d1c52223b93a71cbea4a75dc6"
+            string auraSemanticRole = "network-switch"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "qm8700_f_01" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Network_Switches/NVIDIA/QM8700/QM8700_F_01.usd"
+            string nvidiaSourceChecksum = "sha256:a2f55f8782e5a20fd0f7e66695916b27604cbf66552542a012fb979bca56d645"
+            string auraSemanticRole = "network-switch"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "rack_42u_a_01" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+            string nvidiaSourceChecksum = "sha256:f8505db78c2d0b3a85e2ee187e09a1bef2f9ee0fb826b9ca59e9db44c26eb1b3"
+            string auraSemanticRole = "liquid-cooled-rack"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "rack_42u_a_core" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Racks/Rack_42U_A/Rack_42U_A_01.usd"
+            string nvidiaSourceChecksum = "sha256:f8505db78c2d0b3a85e2ee187e09a1bef2f9ee0fb826b9ca59e9db44c26eb1b3"
+            string auraSemanticRole = "rack-core-reference"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "rpdu_a_01" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Power_Distribution/Controllers/PDU_A/rPDU_A_01.usd"
+            string nvidiaSourceChecksum = "sha256:846a3b7a7df6d107575347caec2b542d641315f561f75fe334a95c077645b18b"
+            string auraSemanticRole = "rack-pdu"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "server_1u_a" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Server_Nodes/Servers/Server_1U_A_01.usd"
+            string nvidiaSourceChecksum = "sha256:43b816ec986782a647ff5a8f05b98b9c6c9ab73b2569af13f03e60140433d200"
+            string auraSemanticRole = "server-1u"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "server_2u_b" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Server_Nodes/Servers/Server_2U_B_01.usd"
+            string nvidiaSourceChecksum = "sha256:d66781e17b85ba6e8710cc07e46e78ed4cfdeec07ba7be535eabc79163573ec1"
+            string auraSemanticRole = "server-2u"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "server_2u_c" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Server_Nodes/Servers/Server_2U_C_01.usd"
+            string nvidiaSourceChecksum = "sha256:762e901c74286827fc56e325222ce83d1483c70d03878a9e98f024b3002dd053"
+            string auraSemanticRole = "server-2u"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "sn2700c_01" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Network_Switches/NVIDIA/SN2700/SN2700C_01.usd"
+            string nvidiaSourceChecksum = "sha256:6e38f985b1b62024c8501ed4096420bc45a57c3e8d29781f0e66aa06af70a158"
+            string auraSemanticRole = "network-switch"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "sn3700c_01" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Network_Switches/NVIDIA/SN3700/SN3700C_01.usd"
+            string nvidiaSourceChecksum = "sha256:d9e1bc3dc0a87cfa5aa74752cc56418a446ae7cf4f818c6138ffefd810e1a313"
+            string auraSemanticRole = "network-switch"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+    over "ua950h_2sf_01" (
+        # Unchanged NVIDIA source, referenced read-only.
+        customData = {
+            string nvidiaSourceStage = "Datacenter/Network_Switches/NVIDIA/UA950H-2SF/UA950H-2SF_01.usd"
+            string nvidiaSourceChecksum = "sha256:c98b0be87c6e523171c35a79fdd32056e92a4574458249b9662b5eba4fa3b876"
+            string auraSemanticRole = "network-switch"
+            string auraOverrideKind = "material-presentation"
+            string auraOverrideScope = "material class assignment, roughness, metalness, envMapIntensity, emissive gating"
+            string geometryModified = "false"
+            string primPathsModified = "false"
+            string dimensionsModified = "false"
+        }
+    )
+    {
+    }
+
+}

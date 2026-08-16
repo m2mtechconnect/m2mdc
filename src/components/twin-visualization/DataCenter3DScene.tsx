@@ -683,6 +683,29 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
     [runtimeRoles, rackMounts, proceduralGeometry],
   );
 
+  // Analytical overlays are switchable procedural layers, never physical
+  // geometry, and never permanently recolour an approved derivative.
+  const reportProceduralLayer = useRuntimeCoverageStore((s) => s.reportProcedural);
+  const activeOverlayLayers = useMemo(() => {
+    const layers = new Set<string>();
+    if (props.showThermal || props.activeOverlay === 'thermal') layers.add('thermal');
+    if (props.showPower || props.activeOverlay === 'pue' || props.activeOverlay === 'power') {
+      layers.add('power');
+    }
+    if (props.activeOverlay === 'cooling') layers.add('cooling');
+    if (props.activeOverlay === 'sovereignty') layers.add('sovereignty');
+    if (props.activeOverlay === 'gpu' || props.activeOverlay === 'workload') layers.add('workload');
+    if (props.activeOverlay === 'carbon') layers.add('carbon');
+    return layers.size;
+  }, [props.showThermal, props.showPower, props.activeOverlay]);
+  useEffect(() => {
+    reportProceduralLayer('analytical-overlays', {
+      label: 'AURA procedural analytical overlay layers',
+      count: activeOverlayLayers,
+      kind: 'overlay',
+    });
+  }, [reportProceduralLayer, activeOverlayLayers]);
+
   const baseDistance = props.compact ? 22 : 30;
   const [targetDistance, setTargetDistance] = useState(baseDistance);
   

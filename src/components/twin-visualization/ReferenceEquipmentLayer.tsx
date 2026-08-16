@@ -139,17 +139,7 @@ export function ReferenceEquipmentLayer({
     () => `${racks.length}:${rows.length}:${infrastructure}:${band}`,
     [racks.length, rows.length, infrastructure, band],
   );
-  const reset = useRuntimeCoverageStore((s) => s.resetCoverage);
   const report = useRuntimeCoverageStore((s) => s.reportRole);
-
-  // The reset must happen while this layer renders, before any child mounts.
-  // Child effects run before the parent's, so resetting in an effect here
-  // would wipe the very reports the children just filed.
-  const resetToken = useRef<string | null>(null);
-  if (resetToken.current !== token) {
-    resetToken.current = token;
-    reset(token);
-  }
 
   const mounts = useMemo<RoleMount[]>(() => {
     const out: RoleMount[] = [];

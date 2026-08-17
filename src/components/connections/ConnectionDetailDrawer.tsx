@@ -17,11 +17,18 @@ import {
   deactivateConnection,
   deleteConnection,
   runHealthCheck,
+  runRuntimeVerification,
   type AuditEventRecord,
   type CredentialMetadata,
   type DataContractRecord,
   type FacilityOption,
 } from '@/connections/api';
+import {
+  VERIFICATION_LABEL,
+  VERIFICATION_MEANING,
+  VERIFICATION_TONE,
+  type VerificationState,
+} from '@/connections/managedVerification';
 import { canRunHealthCheck, type HealthCheckRecord, type IngestRunRecord, type TwinMappingRecord } from '@/connections/model';
 import { formatDateTime, type ConnectionRow } from '@/connections/presentation';
 
@@ -60,6 +67,13 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
+const VERIFICATION_TONE_CLASS: Record<string, string> = {
+  positive: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+  caution: 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300',
+  critical: 'border-destructive/40 bg-destructive/10 text-destructive',
+  neutral: 'border-border bg-muted text-muted-foreground',
+};
+
 export function ConnectionDetailDrawer(props: Props) {
   const {
     row, open, onOpenChange, isAdmin, credential, contracts, mappings,
@@ -88,7 +102,7 @@ export function ConnectionDetailDrawer(props: Props) {
 
   if (!row || !connection) return null;
 
-  async function act(kind: 'test' | 'activate' | 'deactivate' | 'delete') {
+  async function act(kind: 'test' | 'verify' | 'activate' | 'deactivate' | 'delete') {
     if (!connection) return;
     if (kind === 'delete' && !window.confirm(`Delete "${connection.display_name}"? The audit trail is retained.`)) return;
     setBusy(kind);
@@ -98,6 +112,13 @@ export function ConnectionDetailDrawer(props: Props) {
         toast({
           title: result.status === 'PASSED' ? 'Health check passed' : 'Health check failed',
           description: `${result.safe_message ?? ''} A passing check proves reachability, not data flow.`,
+        });
+      } else if (kind === 'verify') {
+        const result = await runRuntimeVerification(connection.id);
+        toast({
+          title: `Runtime verification: ${VERIFICATION_LABEL[result.verification_state]}`,
+          description: result.safe_message,
+          variant: result.verification_state === 'FAILED' ? 'destructive' : undefined,
         });
       } else if (kind === 'activate') {
         const status = await activateConnection(connection.id);

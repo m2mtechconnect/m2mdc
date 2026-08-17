@@ -44,3 +44,14 @@ on these tables.
 Not covered: authenticated same-tenant / cross-tenant read matrices are moot
 here because no role holds a table grant, but they remain unexecuted for the
 wider schema - BLOCKED_UNVERIFIED.
+
+## Second pass
+
+Two further permissive `SELECT USING (true)` policies were found and dropped:
+`ai_recommendations_cache` ("Anyone can read cached recommendations") and
+`content_embeddings` ("Anyone can view embeddings"). Both hold customer-derived
+content, both had zero `anon`/`authenticated` table grants (so anonymous reads
+returned 401 before the change as well), and both are written and read only by
+edge functions under the service role. Six permissive read policies were
+removed in total. `captured_pages` was inspected and left unchanged: its
+policies are correctly scoped to `auth.uid() = user_id`.

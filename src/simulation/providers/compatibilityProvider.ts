@@ -148,6 +148,8 @@ export function createCompatibilityProvider(): SimulationProvider {
       live: false,
       executionClass: 'aura-deterministic',
       nvidiaIntegrated: false,
+      executionClass: 'aura-deterministic',
+      nvidiaIntegrated: false,
     },
 
     listScenarios(): ProviderOutcome<ScenarioDescriptor[]> {

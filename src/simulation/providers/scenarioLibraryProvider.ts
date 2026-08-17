@@ -98,6 +98,8 @@ export function createScenarioLibraryProvider(): SimulationProvider {
       live: false,
       executionClass: 'fixture-preview',
       nvidiaIntegrated: false,
+      executionClass: 'fixture-preview',
+      nvidiaIntegrated: false,
     },
 
     listScenarios(): ProviderOutcome<ScenarioDescriptor[]> {

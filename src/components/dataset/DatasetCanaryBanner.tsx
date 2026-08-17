@@ -16,9 +16,11 @@ export function DatasetCanaryBanner() {
       role="status"
     >
       <span>
-        <strong className="font-semibold">Dataset canary active:</strong> {descriptor.label}.
-        Reference data only - not measured, not live, not commissioned, not an NVIDIA runtime
-        integration. {descriptor.licenceStatement}
+        <strong className="font-semibold">{descriptor.label}</strong> - administrator-only canary.
+        Official-source normalized reference data, read-only. Not operational telemetry, not
+        commissioned, not an NVIDIA DSX runtime service, not SimReady validation. NGC-dependent
+        fields remain unavailable. Production default is unchanged.{' '}
+        {descriptor.licenceStatement}
         {reason === 'unauthorized-fallback' ? ' Requested dataset was denied.' : ''}
       </span>
       <Button size="sm" variant="outline" onClick={rollback} data-testid="dataset-rollback">

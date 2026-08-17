@@ -1,0 +1,8 @@
+{
+  "policyState": "verified via pg_policies on 2026-08-17: ai_recommendations_cache, capture_cache, content_embeddings, crawl_jobs, recommendations, site_pages, website_content_cache retain service_role management policies only; no USING (true) read policy remains for anon or authenticated.",
+  "anonymousRead": "401 permission denied (no table GRANT to anon)",
+  "administratorRead": "service_role paths unchanged; application workflows unaffected (full suite green)",
+  "engineerSameTenant": "BLOCKED_UNVERIFIED - no engineer browser session could be minted in this phase",
+  "engineerCrossTenant": "BLOCKED_UNVERIFIED - no controlled second tenant fixture exists; no customer data was used",
+  "characterisation": "latent policy defect closed; no demonstrated historical breach"
+}

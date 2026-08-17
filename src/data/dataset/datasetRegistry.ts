@@ -59,9 +59,9 @@ export const DATASET_DESCRIPTORS: Readonly<Record<DatasetMode, DatasetDescriptor
   },
   'nvidia-dsx-reference': {
     id: 'nvidia-dsx-reference',
-    label: 'NVIDIA DSX reference baseline (admin canary)',
+    label: 'NVIDIA DSX Reference - Read-only',
     description:
-      'Normalized records ingested from the pinned NVIDIA DSX blueprint repository. Reference data only: not measured, not live, not commissioned.',
+      'Official-source normalized reference data ingested from the pinned NVIDIA DSX blueprint repository. Administrator-only canary, read-only. Not operational telemetry, not commissioned, not an NVIDIA DSX runtime service, not SimReady validation. NGC-dependent fields remain unavailable. The production default is unchanged.',
     adminOnly: true,
     datasetId: 'nvidia-dsx-blueprint',
     datasetVersion: DSX_DATASET_VERSION,

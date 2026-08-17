@@ -1,0 +1,11 @@
+{
+  "canonicalHost": "https://auradc.m2mtechconnect.com",
+  "previousBundle": "assets/index-C22J_hmq.js",
+  "newBundle": "assets/index-CCUS0faN.js",
+  "htmlReferencesNewBundle": true,
+  "gitRevisionBeforeChange": "74828541642d558a3bcf27ece2a1d6757164fcf9",
+  "deploymentVerifiedAtUtc": "2026-08-17T14:12Z",
+  "productionDefaultDataset": "legacy-synthetic",
+  "capabilityTotalsChanged": false,
+  "changeShipped": "read-only canary labelling only (datasetRegistry descriptor + DatasetCanaryBanner)"
+}

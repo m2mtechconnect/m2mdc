@@ -1,0 +1,15 @@
+{
+  "totalCases": 928,
+  "measuredCaseCountByDirectory": {"tests/e2e": 784, "tests/truth-in-ui": 93, "tests/visual": 20, "tests/builder": 2, "tests/settings": 1, "tests/audit": 2},
+  "classification": {
+    "relevantToCanary": ["tests/truth-in-ui/deep-link-redirects.spec.ts", "tests/truth-in-ui/navigation-full-surface.spec.ts", "tests/truth-in-ui/surface-inventory.spec.ts"],
+    "relevantToSharedPlatform": ["tests/truth-in-ui/axe-*.spec.ts", "tests/truth-in-ui/overlay-focus-rings.spec.ts", "tests/truth-in-ui/user-menu-signout.spec.ts"],
+    "requiresControlledBackend": ["tests/e2e/* (agents, builder, deploy, marketplace, integrations)"],
+    "requiresUnavailableExternalService": ["tests/truth-in-ui/runtime-states.spec.ts (needs the dedicated Kit dev server on port 8091 with VITE_OMNIVERSE_KIT_URL)"],
+    "unrelatedLegacy": ["tests/e2e/* aviation-era remnants"],
+    "obsoleteWithReplacement": ["tests/e2e/yvr-*.spec.ts (deleted at 9a7e83af)"]
+  },
+  "executedThisPhase": {"cases": 38, "passed": 30, "environmentBlocked": 8},
+  "blockerForEnvironmentBlocked": "runtime-states.spec.ts was executed against the shared dev server instead of its own instrumented server; recorded BLOCKED_UNVERIFIED, not a pass.",
+  "notExecuted": 890
+}

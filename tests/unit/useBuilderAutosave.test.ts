@@ -221,16 +221,20 @@ describe('useBuilderAutosave', () => {
   });
 
   it('should reset error flag on successful save after failure', async () => {
-    mockSave.mockRejectedValueOnce(new Error('First error'));
+    // The debounce is armed by the state-change effect, so each save cycle is
+    // driven by an actual edit rather than by advancing timers alone.
+    const setState = (systemName: string) => {
+      vi.mocked(useBuilderStore).mockImplementation((selector: any) =>
+        selector({
+          isDirty: true,
+          save: mockSave,
+          state: { systemName, department: '' },
+        })
+      );
+    };
 
-    vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
-      const state = {
-        isDirty: true,
-        save: mockSave,
-        state: { systemName: 'Test', department: '' },
-      };
-      return selector(state);
-    });
+    mockSave.mockRejectedValueOnce(new Error('First error'));
+    setState('Test');
 
     const { rerender } = renderHook(() => useBuilderAutosave());
 
@@ -244,6 +248,8 @@ describe('useBuilderAutosave', () => {
 
     // Now save succeeds
     mockSave.mockResolvedValueOnce(undefined);
+    setState('Test 2');
+    rerender();
 
     act(() => {
       vi.advanceTimersByTime(500);
@@ -253,8 +259,10 @@ describe('useBuilderAutosave', () => {
       expect(mockSave).toHaveBeenCalledTimes(2);
     });
 
-    // Another error should show toast again
+    // Another error should show the toast again
     mockSave.mockRejectedValueOnce(new Error('Second error'));
+    setState('Test 3');
+    rerender();
 
     act(() => {
       vi.advanceTimersByTime(500);

@@ -1,0 +1,218 @@
+[
+ {
+  "tab": "connections",
+  "viewport": "1920x1080",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "catalogue",
+  "viewport": "1920x1080",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "mappings",
+  "viewport": "1920x1080",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "activity",
+  "viewport": "1920x1080",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "dsx-exchange",
+  "viewport": "1920x1080",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "agent-tools",
+  "viewport": "1920x1080",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "connections",
+  "viewport": "1440x900",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "catalogue",
+  "viewport": "1440x900",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "mappings",
+  "viewport": "1440x900",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "activity",
+  "viewport": "1440x900",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "dsx-exchange",
+  "viewport": "1440x900",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "agent-tools",
+  "viewport": "1440x900",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "connections",
+  "viewport": "1280x800",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "catalogue",
+  "viewport": "1280x800",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "mappings",
+  "viewport": "1280x800",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "activity",
+  "viewport": "1280x800",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "dsx-exchange",
+  "viewport": "1280x800",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "agent-tools",
+  "viewport": "1280x800",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "connections",
+  "viewport": "1024x768",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "catalogue",
+  "viewport": "1024x768",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "mappings",
+  "viewport": "1024x768",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "activity",
+  "viewport": "1024x768",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "dsx-exchange",
+  "viewport": "1024x768",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "agent-tools",
+  "viewport": "1024x768",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "connections",
+  "viewport": "768x1024",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "catalogue",
+  "viewport": "768x1024",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "mappings",
+  "viewport": "768x1024",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "activity",
+  "viewport": "768x1024",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "dsx-exchange",
+  "viewport": "768x1024",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "agent-tools",
+  "viewport": "768x1024",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "connections",
+  "viewport": "390x844",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "catalogue",
+  "viewport": "390x844",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "mappings",
+  "viewport": "390x844",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "activity",
+  "viewport": "390x844",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "dsx-exchange",
+  "viewport": "390x844",
+  "overflow_px": 0,
+  "console_errors": 0
+ },
+ {
+  "tab": "agent-tools",
+  "viewport": "390x844",
+  "overflow_px": 0,
+  "console_errors": 0
+ }
+]

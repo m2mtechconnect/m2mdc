@@ -99,14 +99,21 @@ export function classifyDepartment(content: string): Department {
     
     // Primary keywords (higher weight)
     for (const keyword of pattern.keywords) {
-      const keywordCount = (normalizedContent.match(new RegExp(keyword, 'g')) || []).length;
+      const keywordCount = countWord(normalizedContent, keyword);
       score += keywordCount * 3;
     }
     
     // Context keywords (lower weight)
     for (const keyword of pattern.contextKeywords) {
-      const keywordCount = (normalizedContent.match(new RegExp(keyword, 'g')) || []).length;
+      const keywordCount = countWord(normalizedContent, keyword);
       score += keywordCount;
+    }
+
+    // Naming the department itself is the strongest available signal, and it
+    // outranks generic nouns that several departments share ("network",
+    // "infrastructure", "systems").
+    if (departmentNameTokens(pattern.department).some((token) => countWord(normalizedContent, token) > 0)) {
+      score += 5;
     }
     
     if (score > 0) {

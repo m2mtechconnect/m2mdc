@@ -101,7 +101,7 @@ export function templateToBlueprint(
     triggers = Array.isArray(workflowLegacy.triggers) 
       ? workflowLegacy.triggers.map((t: any) => typeof t === 'string' ? { name: t, type: 'trigger' } : t)
       : [];
-    actions = Array.isArray(workflowLegacy.actions) 
+    actions = Array.isArray(workflowLegacy.actions) && workflowLegacy.actions.length > 0
       ? workflowLegacy.actions.map((a: any) => typeof a === 'string' ? { name: a, type: 'action' } : a)
       : blueprint.workflow_steps?.map((s: any) => ({ name: s.label, type: s.type })) || [];
     integrations = Array.isArray(workflowLegacy.integrations) 

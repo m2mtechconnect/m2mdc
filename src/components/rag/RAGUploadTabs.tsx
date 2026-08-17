@@ -111,6 +111,17 @@ export function RAGUploadTabs({ systemId }: RAGUploadTabsProps) {
   };
 
   const handleCloudConnect = async (provider: 'google' | 'microsoft') => {
+    if (provider === 'google') {
+      // Quarantined: the legacy parallel authorization path is disabled.
+      toast({
+        title: "Authorization unavailable",
+        description:
+          "Drive authorization must use the managed connector path, which is not enabled for this workspace yet.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const hasSecrets = await checkSecrets(provider);
     
     if (!hasSecrets) {
@@ -122,12 +133,7 @@ export function RAGUploadTabs({ systemId }: RAGUploadTabsProps) {
       return;
     }
 
-    // Initiate OAuth flow
-    const oauthUrl = provider === 'google' 
-      ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rag-oauth-google`
-      : `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rag-oauth-microsoft`;
-    
-    window.location.href = oauthUrl;
+    window.location.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rag-oauth-microsoft`;
   };
 
   const handleDbConnect = async () => {

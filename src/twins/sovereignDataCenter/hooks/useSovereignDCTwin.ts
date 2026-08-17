@@ -101,9 +101,23 @@ export function useSovereignDCTwin(options: UseSovereignDCTwinOptions = {}) {
     // Simulate delay for realism
     await new Promise(resolve => setTimeout(resolve, 1500));
 
-    // Run simulation
-    const result = runSimulation(currentKpis, type, params, facility);
-    
+    // Phase 4: compat engines are reached through the simulation facade
+    // bridge, so a failure is a typed outcome instead of a thrown render.
+    const outcome = runSovereignScenario({
+      baseKpis: currentKpis,
+      type,
+      params,
+      facility,
+    });
+
+    if (outcome.kind !== 'ok') {
+      setIsSimulating(false);
+      setActiveScenario(null);
+      return;
+    }
+
+    const result = outcome.value;
+
     // Apply deltas to KPIs
     const newKpis: SovereignKpis = {
       sovereignComputeRatioPct: currentKpis.sovereignComputeRatioPct + (result.kpiDeltas.sovereignComputeRatioPct || 0),
@@ -120,8 +134,11 @@ export function useSovereignDCTwin(options: UseSovereignDCTwinOptions = {}) {
     setCurrentKpis(newKpis);
 
     // Create simulation run record
-    const newRun = createSimulationRun(facility.id, type, params || {}, result);
-    setSimulationRuns(prev => [newRun, ...prev]);
+    const runOutcome = createSovereignRun(facility.id, type, params || {}, result);
+    const newRun = runOutcome.kind === 'ok' ? runOutcome.value : null;
+    if (newRun) {
+      setSimulationRuns(prev => [newRun, ...prev]);
+    }
 
     setIsSimulating(false);
     setActiveScenario(null);

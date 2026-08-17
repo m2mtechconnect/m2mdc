@@ -25,7 +25,28 @@ export type SimulationProviderId =
   | 'compatibility'
   | 'scenario-library'
   | 'blueprint'
+  /** NVIDIA DSX Sim / specialist-solver boundary. Not implemented. */
+  | 'nvidia-dsx-sim'
+  /** Third-party CFD / electrical specialist solver boundary. Not implemented. */
+  | 'specialist-solver'
+  /** @deprecated naming alias for `nvidia-dsx-sim`. Kept for existing deep config. */
   | 'omniverse';
+
+/**
+ * AURA_ARCHITECTURE_CONSOLIDATION_AND_NVIDIA_ALIGNMENT (Phase 3).
+ *
+ * Who actually executes the run. This is a truth field: it may never be set
+ * to an NVIDIA class unless NVIDIA code or an NVIDIA service really runs.
+ */
+export type SimulationExecutionClass =
+  /** AURA's own deterministic solvers running in the browser or edge runtime. */
+  | 'aura-deterministic'
+  /** NVIDIA DSX Sim executing the run. Requires a proven runtime connection. */
+  | 'nvidia-dsx-sim'
+  /** A third-party specialist solver (CFD, electrical, thermal). */
+  | 'specialist-solver'
+  /** Static fixtures or recorded records replayed for preview purposes. */
+  | 'fixture-preview';
 
 /** Declared capabilities let the facade route without instanceof-dispatch. */
 export interface SimulationProviderCapabilities {
@@ -39,6 +60,10 @@ export interface SimulationProviderCapabilities {
   /** True when the provider represents an actual live source. Compatibility
    *  and demo fixtures MUST be false. */
   live: boolean;
+  /** Who executes the run. Never an NVIDIA class without a proven runtime. */
+  executionClass: SimulationExecutionClass;
+  /** True only when NVIDIA code or an NVIDIA service actually executes. */
+  nvidiaIntegrated: boolean;
 }
 
 export interface ScenarioDescriptor {

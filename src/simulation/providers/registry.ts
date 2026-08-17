@@ -15,7 +15,15 @@ export interface ProviderRegistry {
 export function createDefaultRegistry(): ProviderRegistry {
   const providers = new Map<SimulationProviderId, SimulationProvider>();
   providers.set('compatibility', createCompatibilityProvider());
-  providers.set('omniverse', createOmniverseProvider());
+  // AURA_ARCHITECTURE_CONSOLIDATION_AND_NVIDIA_ALIGNMENT (Phase 3): the
+  // NVIDIA boundary is named for what it would call (DSX Sim), not for the
+  // Omniverse product. `omniverse` stays registered as a deprecated alias so
+  // existing configuration keeps resolving to the same disabled stub.
+  providers.set('nvidia-dsx-sim', createOmniverseProvider({ id: 'nvidia-dsx-sim' }));
+  providers.set('omniverse', createOmniverseProvider({ id: 'omniverse' }));
+  // Third-party CFD / electrical solvers share the same disabled boundary
+  // until a real solver connection with a health check exists.
+  providers.set('specialist-solver', createOmniverseProvider({ id: 'specialist-solver' }));
   // Phase 1B.5 — read-only scenario library provider (folds the three
   // historical scenario constants behind the facade seam).
   providers.set('scenario-library', createScenarioLibraryProvider());
@@ -35,6 +43,8 @@ const KNOWN_IDS: readonly SimulationProviderId[] = [
   'compatibility',
   'scenario-library',
   'blueprint',
+  'nvidia-dsx-sim',
+  'specialist-solver',
   'omniverse',
 ];
 

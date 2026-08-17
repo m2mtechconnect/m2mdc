@@ -25,10 +25,11 @@ import type {
   ScenarioDescriptor,
   ScenarioInput,
   SimulationProvider,
+  SimulationProviderId,
   SimulationRunPayload,
 } from './types';
 
-const PROVIDER_ID = 'omniverse' as const;
+const DEFAULT_PROVIDER_ID: SimulationProviderId = 'omniverse';
 
 // PR-0.1 Checkpoint B7: browser-side feature flags are not permitted for
 // Omniverse. The provider is always disabled in the client build; any
@@ -38,24 +39,31 @@ function isEnabled(): boolean {
 }
 
 export function createOmniverseProvider(
-  options: { enabled?: boolean } = {},
+  options: { enabled?: boolean; id?: SimulationProviderId } = {},
 ): SimulationProvider {
   const enabled = options.enabled ?? isEnabled();
+  const PROVIDER_ID = options.id ?? DEFAULT_PROVIDER_ID;
 
   const disabledOutcome = <T>(): ProviderOutcome<T> => ({
     kind: 'disabled',
     providerId: PROVIDER_ID,
     provenance: 'unavailable',
     reason:
-      'omniverse provider is disabled in this build; a server-mediated transport is required to enable it.',
+      `${PROVIDER_ID} provider is disabled in this build; a server-mediated transport is required to enable it.`,
   });
 
   const notImplementedOutcome = <T>(op: string): ProviderOutcome<T> => ({
     kind: 'not-implemented',
     providerId: PROVIDER_ID,
     provenance: 'unavailable',
-    reason: `omniverse provider does not yet implement ${op}; no NVIDIA Kit / DSX integration is present in this build`,
+    reason: `${PROVIDER_ID} provider does not yet implement ${op}; no NVIDIA Kit / DSX integration is present in this build`,
   });
+
+/**
+ * AURA_ARCHITECTURE_CONSOLIDATION_AND_NVIDIA_ALIGNMENT (Phase 3):
+ * canonical name for this boundary. `createOmniverseProvider` is retained
+ * as a deprecated alias so existing configuration keeps resolving.
+ */
 
   return {
     id: PROVIDER_ID,
@@ -64,6 +72,10 @@ export function createOmniverseProvider(
       determinism: 'none',
       cancellable: true,
       live: false, // gated off; even a real Kit implementation would be scored per response
+      executionClass: 'nvidia-dsx-sim',
+      // No NVIDIA code or service executes in this build. This flag may only
+      // become true alongside a proven runtime connection and health check.
+      nvidiaIntegrated: false,
     },
 
     listScenarios(): ProviderOutcome<ScenarioDescriptor[]> {

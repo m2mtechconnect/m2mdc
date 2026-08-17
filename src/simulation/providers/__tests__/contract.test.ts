@@ -121,7 +121,7 @@ describe('cancellation and sanitized failures', () => {
   it('facade converts thrown provider errors into sanitized error outcomes', async () => {
     const throwing: SimulationProvider = {
       id: 'compatibility',
-      capabilities: { streaming: false, determinism: 'none', cancellable: false, live: false },
+      capabilities: { streaming: false, determinism: 'none', cancellable: false, live: false, executionClass: 'aura-deterministic', nvidiaIntegrated: false },
       listScenarios() { throw new Error('boom: SECRET_TOKEN=xyz'); },
       async runScenario() { throw new Error('async boom'); },
     };

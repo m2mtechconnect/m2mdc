@@ -7,6 +7,12 @@ import {
 } from '@/lib/builderValidation';
 import { BuilderState } from '@/stores/builderStore';
 
+/**
+ * Step semantics follow the current builder:
+ *   1 Define Goal, 2 Choose Template, 3 Configure Intelligence,
+ *   4 Connect Business Systems.
+ * Outcome and success metric are optional on step 1.
+ */
 describe('Builder Validation', () => {
   const createMockState = (overrides: Partial<BuilderState> = {}): BuilderState => ({
     systemName: 'Test System',
@@ -33,204 +39,140 @@ describe('Builder Validation', () => {
       errorCost: 500,
     },
     ...overrides,
-  });
+  } as BuilderState);
 
-  describe('Step 1 Validation', () => {
+  describe('Step 1 - Define Goal', () => {
     it('should pass with valid inputs', () => {
-      const state = createMockState();
-      const result = validateStep1(state);
-      
+      const result = validateStep1(createMockState());
+
       expect(result.valid).toBe(true);
       expect(result.errors).toHaveLength(0);
     });
 
     it('should fail with empty system name', () => {
-      const state = createMockState({ systemName: '' });
-      const result = validateStep1(state);
-      
+      const result = validateStep1(createMockState({ systemName: '' }));
+
       expect(result.valid).toBe(false);
       expect(result.errors).toContainEqual(
-        expect.objectContaining({
-          field: 'systemName',
-          message: expect.stringContaining('System name is required'),
-        })
+        expect.objectContaining({ field: 'systemName' })
       );
     });
 
     it('should fail with system name too short', () => {
-      const state = createMockState({ systemName: 'AB' });
-      const result = validateStep1(state);
-      
+      const result = validateStep1(createMockState({ systemName: 'AB' }));
+
       expect(result.valid).toBe(false);
       expect(result.errors[0].message).toContain('at least 3 characters');
     });
 
     it('should fail with system name too long', () => {
-      const state = createMockState({ 
-        systemName: 'A'.repeat(81) 
-      });
-      const result = validateStep1(state);
-      
+      const result = validateStep1(createMockState({ systemName: 'A'.repeat(81) }));
+
       expect(result.valid).toBe(false);
       expect(result.errors[0].message).toContain('80 characters');
     });
 
     it('should fail without department', () => {
-      const state = createMockState({ department: '' });
-      const result = validateStep1(state);
-      
+      const result = validateStep1(createMockState({ department: '' }));
+
       expect(result.valid).toBe(false);
       expect(result.errors).toContainEqual(
-        expect.objectContaining({
-          field: 'department',
-        })
+        expect.objectContaining({ field: 'department' })
       );
     });
 
-    it('should fail with short outcome', () => {
-      const state = createMockState({ outcome: 'Short' });
-      const result = validateStep1(state);
-      
-      expect(result.valid).toBe(false);
-      expect(result.errors[0].message).toContain('at least 10 characters');
-    });
+    it('should pass without an outcome or success metric', () => {
+      const result = validateStep1(createMockState({ outcome: '', successMetric: '' }));
 
-    it('should fail with empty success metric', () => {
-      const state = createMockState({ successMetric: '' });
-      const result = validateStep1(state);
-      
-      expect(result.valid).toBe(false);
-      expect(result.errors).toContainEqual(
-        expect.objectContaining({
-          field: 'successMetric',
-        })
-      );
+      expect(result.valid).toBe(true);
     });
   });
 
-  describe('Step 2 Validation', () => {
+  describe('Step 2 - Choose Template', () => {
     it('should pass even without template selected', () => {
-      const state = createMockState({ selectedTemplate: null });
-      const result = validateStep2(state);
-      
-      expect(result.valid).toBe(true);
+      expect(validateStep2(createMockState({ selectedTemplate: null })).valid).toBe(true);
     });
 
     it('should pass with template selected', () => {
-      const state = createMockState({ selectedTemplate: 'compliance' });
-      const result = validateStep2(state);
-      
-      expect(result.valid).toBe(true);
+      expect(validateStep2(createMockState({ selectedTemplate: 'compliance' })).valid).toBe(true);
     });
   });
 
-  describe('Step 3 Validation', () => {
-    it('should pass with no template requirements', () => {
-      const state = createMockState();
-      const result = validateStep3(state, undefined);
-      
-      expect(result.valid).toBe(true);
-    });
-
-    it('should fail when template requires grounding but no sources', () => {
-      const state = createMockState({ 
-        knowledgeSources: [],
-        vertexEnabled: true 
-      });
-      
-      const template = {
-        id: 'compliance',
-        name: 'Compliance',
-        category: 'Operations',
-        description: 'Test',
-        icon: 'shield',
-        defaults: { grounding: true },
-      };
-      
-      const result = validateStep3(state, template);
-      
-      expect(result.valid).toBe(false);
-      expect(result.errors[0].message).toContain('knowledge source');
-    });
-
-    it('should pass when template requires grounding and sources exist', () => {
-      const state = createMockState({
-        knowledgeSources: [{ id: 'ks-1', name: 'Test Doc', type: 'file', status: 'indexed' }],
-        vertexEnabled: true
-      });
-      
-      const template = {
-        id: 'compliance',
-        name: 'Compliance',
-        category: 'Operations',
-        description: 'Test',
-        icon: 'shield',
-        defaults: { grounding: true },
-      };
-      
-      const result = validateStep3(state, template);
-      
-      expect(result.valid).toBe(true);
-    });
-  });
-
-  describe('Step 4 Validation', () => {
+  describe('Step 3 - Configure Intelligence', () => {
     it('should pass with valid AI configuration', () => {
-      const state = createMockState();
-      const result = validateStep4(state);
-      
-      expect(result.valid).toBe(true);
+      expect(validateStep3(createMockState()).valid).toBe(true);
     });
 
     it('should fail without model selected', () => {
-      const state = createMockState({ selectedModel: '' });
-      const result = validateStep4(state);
-      
+      const result = validateStep3(createMockState({ selectedModel: '' }));
+
       expect(result.valid).toBe(false);
       expect(result.errors[0].message).toContain('AI model');
     });
 
     it('should fail without system prompt', () => {
-      const state = createMockState({ systemPrompt: '' });
-      const result = validateStep4(state);
-      
+      const result = validateStep3(createMockState({ systemPrompt: '' }));
+
       expect(result.valid).toBe(false);
-      expect(result.errors[0].message).toContain('System prompt');
+      expect(result.errors[0].field).toBe('systemPrompt');
     });
 
     it('should fail with invalid temperature', () => {
-      const state = createMockState({ temperature: 2.5 });
-      const result = validateStep4(state);
-      
+      const result = validateStep3(createMockState({ temperature: 2.5 }));
+
       expect(result.valid).toBe(false);
-      expect(result.errors[0].message).toContain('Temperature');
+      expect(result.errors[0].field).toBe('temperature');
     });
 
     it('should fail with invalid topK', () => {
-      const state = createMockState({ topK: 0 });
-      const result = validateStep4(state);
-      
-      expect(result.valid).toBe(false);
+      expect(validateStep3(createMockState({ topK: 0 })).valid).toBe(false);
     });
 
     it('should fail with invalid topN', () => {
-      const state = createMockState({ topN: 25 });
-      const result = validateStep4(state);
-      
+      expect(validateStep3(createMockState({ topN: 25 })).valid).toBe(false);
+    });
+
+    it('should fail when no AI engine is enabled', () => {
+      const result = validateStep3(
+        createMockState({ geminiEnabled: false, vertexEnabled: false })
+      );
+
       expect(result.valid).toBe(false);
+      expect(result.errors[0].field).toBe('aiEngines');
     });
   });
 
-  describe('Step 5 Validation (Workflow)', () => {
-    it('should pass with valid workflow', () => {
-      const state = createMockState({
-        workflowNodes: [
-          { id: 'n1', type: 'analyze', x: 0, y: 0, config: { model: 'gemini' } },
-          { id: 'n2', type: 'classify', x: 100, y: 0, config: { labels: ['A', 'B'] } }
-        ]
-      });
-      
-      expect(state.workflowNodes.length).toBeGreaterThan(0);
+  describe('Step 4 - Connect Business Systems', () => {
+    it('should pass with no template requirements', () => {
+      expect(validateStep4(createMockState(), undefined).valid).toBe(true);
+    });
+
+    it('should fail when the template requires an unconnected integration', () => {
+      const template = {
+        id: 'compliance',
+        name: 'Compliance',
+        requiredIntegrations: [{ id: 'sharepoint', name: 'SharePoint' }],
+      };
+
+      const result = validateStep4(createMockState({ connectors: {} }), template);
+
+      expect(result.valid).toBe(false);
+      expect(result.errors[0].message).toContain('SharePoint');
+    });
+
+    it('should pass when the required integration is connected', () => {
+      const template = {
+        id: 'compliance',
+        name: 'Compliance',
+        requiredIntegrations: [{ id: 'sharepoint', name: 'SharePoint' }],
+      };
+
+      const result = validateStep4(
+        createMockState({ connectors: { sharepoint: 'connected' } }),
+        template
+      );
+
+      expect(result.valid).toBe(true);
     });
   });
 });

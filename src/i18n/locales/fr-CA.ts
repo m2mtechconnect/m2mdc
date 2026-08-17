@@ -135,7 +135,7 @@ const frCA = {
     termsOfService: "Conditions d'utilisation",
     security: 'Sécurité',
     copyright: '© {{year}} M2M Tech Connect Inc. Tous droits réservés.',
-    carbonNeutral: 'Carboneutre',
+    carbonNeutral: 'Modélisation du carbone',
     madeInCanada: 'Conçu au Canada',
     footerDescription: "Jumeaux numériques souverains de centres de données IA pour des opérations d'infrastructure durables et conformes.",
     // Héros
@@ -183,7 +183,7 @@ const frCA = {
     viewLiveDashboard: 'Voir la démo du tableau de bord en direct',
     configureOwnTwin: 'Configurer votre propre jumeau',
     runSimulations: 'Lancer des scénarios de simulation',
-    carbonNeutralInfra: 'Infrastructure carboneutre',
+    carbonNeutralInfra: 'Modélisation d\'infrastructure sobre en carbone',
     canadianDataSovereignty: 'Souveraineté des données canadiennes',
     // Différenciateurs
     theM2MDifference: 'La différence M2M',

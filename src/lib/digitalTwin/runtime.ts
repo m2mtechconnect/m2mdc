@@ -175,7 +175,11 @@ function createNodeHandler(node: DigitalTwinNode, config: DigitalTwinConfig) {
           updates = await handleEventEntry(node, context);
           break;
         case "decision":
-          updates = await handleAIDecision(node, context, config);
+          // A decision node that declares explicit rules is deterministic and
+          // must not be routed to the LLM.
+          updates = Array.isArray((node.config as any)?.rules) && (node.config as any).rules.length > 0
+            ? await handleRuleDecision(node, context)
+            : await handleAIDecision(node, context, config);
           break;
         case "condition":
           updates = await handleRuleDecision(node, context);

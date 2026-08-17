@@ -1,0 +1,3 @@
+scope,status,reason
+role matrix (viewer/engineer/designer/admin/owner),NOT_EXECUTED,only one injected internal session was available; no second-role or second-tenant credential
+cross-tenant negative checks,NOT_EXECUTED,no authorized second tenant fixture

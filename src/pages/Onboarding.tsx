@@ -105,24 +105,29 @@ export default function Onboarding() {
     setSubmitting(true);
     const data = form.getValues();
 
-    const { error } = await supabase.from("onboarding_submissions").insert({
-      full_name: data.full_name,
-      email: data.email,
-      job_title: data.job_title,
-      company_name: data.company_name,
-      company_size: data.company_size,
-      num_data_centres: data.num_data_centres,
-      rack_count: data.rack_count,
-      workload_types: data.workload_types as any,
-      current_pue: data.current_pue || null,
-      goals: data.goals as any,
-      challenge: data.challenge || null,
-      timeline: data.timeline,
+    // Public onboarding is server-controlled: direct anonymous table inserts
+    // are revoked, so this goes through the validated, rate-limited intake.
+    const { data: result, error } = await supabase.functions.invoke("public-intake", {
+      body: {
+        kind: "onboarding",
+        full_name: data.full_name,
+        email: data.email,
+        job_title: data.job_title,
+        company_name: data.company_name,
+        company_size: data.company_size,
+        num_data_centres: data.num_data_centres,
+        rack_count: data.rack_count,
+        workload_types: data.workload_types,
+        current_pue: data.current_pue || null,
+        goals: data.goals,
+        challenge: data.challenge || null,
+        timeline: data.timeline,
+      },
     });
 
     setSubmitting(false);
 
-    if (error) {
+    if (error || !result?.ok) {
       toast({ title: t('onboarding.somethingWentWrong'), description: t('onboarding.pleaseTryAgain'), variant: "destructive" });
       return;
     }

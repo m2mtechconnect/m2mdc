@@ -5,7 +5,7 @@
  * query parameter themselves and never import a mock array while the reference
  * canary is active.
  */
-import { createContext, useCallback, useContext, useMemo, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useRBAC } from '@/contexts/RBACContext';
 import type { DatasetMode } from '@/data/dsxReference';
@@ -51,8 +51,38 @@ export function DatasetProvider({ children }: { children: ReactNode }) {
   );
   const resolution = useMemo(() => resolveDataset(requested, { isAdmin }), [requested, isAdmin]);
 
+  /**
+   * The dataset the operator last activated deliberately.
+   *
+   * The URL remains the single owner of the selection, but most navigation in
+   * the app uses plain links that do not carry a query string. Without this,
+   * one sidebar click silently dropped the canary back to the production
+   * default and rendered legacy synthetic data under no banner at all. The
+   * effect below repairs the URL instead of holding a second source of truth:
+   * the param is re-applied, so the address bar always states what is in
+   * effect, and an explicit rollback clears the intent for good.
+   */
+  const activeIntent = useRef<DatasetMode | null>(null);
+  if (resolution.reason === 'requested' && resolution.canaryActive) {
+    activeIntent.current = resolution.mode;
+  }
+
+  useEffect(() => {
+    const intent = activeIntent.current;
+    if (!intent || intent === PRODUCTION_DEFAULT_DATASET) return;
+    if (!isAdmin) {
+      // Authority was lost mid-session: drop the intent rather than re-asserting it.
+      activeIntent.current = null;
+      return;
+    }
+    if (requested !== null) return;
+    navigate(withDataset(`${location.pathname}${location.search}`, intent), { replace: true });
+  }, [requested, isAdmin, location.pathname, location.search, navigate]);
+
   const setDataset = useCallback(
     (mode: DatasetMode) => {
+      // An explicit selection always wins, including a rollback to the default.
+      activeIntent.current = mode === PRODUCTION_DEFAULT_DATASET ? null : mode;
       navigate(withDataset(`${location.pathname}${location.search}`, mode), { replace: false });
       void recordCanaryEvent({
         action: mode === PRODUCTION_DEFAULT_DATASET ? 'rollback' : 'activate',

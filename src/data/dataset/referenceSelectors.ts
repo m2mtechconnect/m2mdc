@@ -112,6 +112,25 @@ export function referenceSpecifications(configurationId?: string): DatasetValue[
     .map(toDatasetValue);
 }
 
+/** Specifications are published per site, not per configuration. */
+export function referenceSpecificationsForSite(site?: string | null): DatasetValue[] {
+  return recordsByClass('REFERENCE_SPECIFICATION')
+    .filter((r) => !site || r.site === site)
+    .map(toDatasetValue);
+}
+
+/** Every normalized record as a dataset value, for evidence and export. */
+export function allReferenceValues(): DatasetValue[] {
+  return DSX_REFERENCE_RECORDS.map(toDatasetValue);
+}
+
+/** Reference configuration ids, in source order. */
+export function referenceConfigurationIds(): string[] {
+  return recordsByClass('REFERENCE_CONFIGURATION')
+    .map((r) => r.configuration_id)
+    .filter((id): id is string => Boolean(id));
+}
+
 export function referenceConfigurations(): DatasetValue[] {
   return recordsByClass('REFERENCE_CONFIGURATION').map(toDatasetValue);
 }

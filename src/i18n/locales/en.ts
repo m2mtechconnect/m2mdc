@@ -28,7 +28,7 @@ const en = {
     improvement: 'improvement',
     fromBaseline: 'from baseline',
     stable: 'Stable',
-    canadaCompliant: 'Canada-compliant',
+    canadaCompliant: 'Canadian data residency',
     returnToHome: 'Return to Home',
     pageNotFound: 'Oops! Page not found',
   },
@@ -134,7 +134,7 @@ const en = {
     termsOfService: 'Terms of Service',
     security: 'Security',
     copyright: '© {{year}} M2M Tech Connect Inc. All rights reserved.',
-    carbonNeutral: 'Carbon Neutral',
+    carbonNeutral: 'Carbon Modelling',
     madeInCanada: 'Made in Canada',
     footerDescription: 'Sovereign AI Data Centre Twins for sustainable, compliant infrastructure operations.',
     // Hero
@@ -182,7 +182,7 @@ const en = {
     viewLiveDashboard: 'View live dashboard demo',
     configureOwnTwin: 'Configure your own twin',
     runSimulations: 'Run simulation scenarios',
-    carbonNeutralInfra: 'Carbon Neutral Infrastructure',
+    carbonNeutralInfra: 'Carbon-Aware Infrastructure Modelling',
     canadianDataSovereignty: 'Canadian Data Sovereignty',
     // Differentiators
     theM2MDifference: 'The M2M Difference',
@@ -293,10 +293,10 @@ const en = {
     featureCoolingB2: 'Humidity monitoring from 43% to 51% across zones',
     featureCoolingB3: 'Airflow rates from 54,000 to 76,000 CFM per zone',
     featureSovereigntyTitle: 'Sovereignty & Compliance Visibility',
-    featureSovereigntySubtitle: 'Track data residency, sovereignty score, and compliance certifications directly within your digital twin.',
-    featureSovereigntyB1: '100% Sovereignty Score with Data Residency Compliant status',
-    featureSovereigntyB2: '5 certified compliance frameworks (OSFI, HIPAA, PIPEDA)',
-    featureSovereigntyB3: '95% Audit Readiness with data classification breakdown',
+    featureSovereigntySubtitle: 'Track modelled data residency, sovereignty score, and configured compliance frameworks directly within your digital twin.',
+    featureSovereigntyB1: 'Modelled Sovereignty Score with data-residency status per workload',
+    featureSovereigntyB2: '5 configured compliance frameworks (OSFI, HIPAA, PIPEDA)',
+    featureSovereigntyB3: 'Modelled audit-readiness score with data classification breakdown',
     featureCarbonTitle: 'Carbon & Sustainability Tracking',
     featureCarbonSubtitle: 'Monitor carbon efficiency, emissions per GPU-hour, renewable mix, and regional grid comparison.',
     featureCarbonB1: '100% Carbon Efficiency Score vs 150g baseline',
@@ -431,7 +431,7 @@ const en = {
     totalConfigured: 'Total number of Data Centre Twins configured',
     avgPueTooltip: 'Average Power Usage Effectiveness across all facilities',
     openDcTwinDashboard: 'Open Data Centre Twin Dashboard',
-    nocViewDescription: 'Full NOC view with 8 domain twins, real-time telemetry, and simulation controls',
+    nocViewDescription: 'Full NOC view with 8 domain twins, simulated telemetry, and simulation controls',
     viewBlueprint: 'View Blueprint',
     runSimulation: 'Run Simulation',
     liveTwinPreview: 'AURA Twin Preview',
@@ -442,9 +442,9 @@ const en = {
   marketplace: {
     title: 'Template Marketplace',
     subtitle: 'Discover Digital Twin & AI Agent Blueprints tailored to your industry and department',
-    certifiedTemplates: 'M2M Certified Templates',
+    certifiedTemplates: 'M2M Reference Templates',
     heroTitle: 'Template Marketplace',
-    heroSubtitle: 'Production-ready templates for digital twins and AI agents. Certified by industry experts.',
+    heroSubtitle: 'Reference templates for digital twins and AURA agents, reviewed against industry configurations.',
     searchPlaceholder: 'Search templates by name, industry, or capability...',
   },
 
@@ -561,7 +561,7 @@ const en = {
 
   // Agents
   agents: {
-    sectionIntro: 'Autonomous agents monitor domains, detect anomalies, and trigger automated responses. Each agent binds to specific KPIs and workflows to maintain operational stability.',
+    sectionIntro: 'AURA agents monitor domains, detect anomalies, and recommend remediation for human approval. Each agent binds to specific KPIs and workflows to support operational stability.',
     subsystemAgents: 'Subsystem Agents',
     deployNewAgent: 'Deploy New Agent',
     totalAgents: 'Total Agents',
@@ -1423,7 +1423,7 @@ const en = {
   // Infrastructure Page
   infrastructure: {
     heroTitle: 'Data Centre AI Infrastructure',
-    heroSubtitle: 'End-to-end GPU compute, DDN storage, and edge inference for autonomous data centre operations.',
+    heroSubtitle: 'End-to-end GPU compute, storage, and edge inference modelling for AI data centre operations.',
   },
 
   // Language selector

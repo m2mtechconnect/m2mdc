@@ -1,0 +1,15 @@
+{
+ "generated_at": "2026-08-17T15:42:47.312468Z",
+ "git_revision": "96d6b4b7171948c5a1ebc5961d3d7e63c7af17f8",
+ "production_default_dataset": "legacy-synthetic",
+ "canary_name": "NVIDIA DSX Reference - Read-only",
+ "routes_probed_for_overflow": 40,
+ "breakpoints": [
+  "1440x900",
+  "1280x800",
+  "1024x768",
+  "768x1024",
+  "390x844"
+ ],
+ "screenshots": 54
+}

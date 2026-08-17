@@ -1,0 +1,142 @@
+{
+ "reference_mode": {
+  "/dashboard": {
+   "n": 1,
+   "label": "NVIDIA DSX Reference - Read-only",
+   "url": "?dataset=nvidia-dsx-reference"
+  },
+  "/blueprint/default": {
+   "n": 1,
+   "label": "NVIDIA DSX Reference - Read-only",
+   "url": "?dataset=nvidia-dsx-reference"
+  },
+  "/simulation/preview": {
+   "n": 1,
+   "label": "NVIDIA DSX Reference - Read-only",
+   "url": "?dataset=nvidia-dsx-reference"
+  },
+  "/dsx/evidence-beta": {
+   "n": 1,
+   "label": "NVIDIA DSX Reference - Read-only",
+   "url": "?dataset=nvidia-dsx-reference"
+  },
+  "/search": {
+   "n": 1,
+   "label": "NVIDIA DSX Reference - Read-only",
+   "url": "?dataset=nvidia-dsx-reference"
+  },
+  "/analytics": {
+   "n": 1,
+   "label": "NVIDIA DSX Reference - Read-only",
+   "url": "?dataset=nvidia-dsx-reference"
+  },
+  "/operations": {
+   "n": 1,
+   "label": "NVIDIA DSX Reference - Read-only",
+   "url": "?dataset=nvidia-dsx-reference"
+  },
+  "/compliance": {
+   "n": 1,
+   "label": "NVIDIA DSX Reference - Read-only",
+   "url": "?dataset=nvidia-dsx-reference"
+  },
+  "/teams": {
+   "n": 1,
+   "label": "NVIDIA DSX Reference - Read-only",
+   "url": "?dataset=nvidia-dsx-reference"
+  },
+  "/marketplace": {
+   "n": 1,
+   "label": "NVIDIA DSX Reference - Read-only",
+   "url": "?dataset=nvidia-dsx-reference"
+  },
+  "/infrastructure": {
+   "n": 1,
+   "label": "NVIDIA DSX Reference - Read-only",
+   "url": "?dataset=nvidia-dsx-reference"
+  },
+  "/data-centre-twin": {
+   "n": 1,
+   "label": "NVIDIA DSX Reference - Read-only",
+   "url": "?dataset=nvidia-dsx-reference"
+  },
+  "/admin/dataset-registry": {
+   "n": 1,
+   "label": "NVIDIA DSX Reference - Read-only",
+   "url": "?dataset=nvidia-dsx-reference"
+  }
+ },
+ "legacy_mode": {
+  "/dashboard": {
+   "n": 0,
+   "label": null,
+   "url": ""
+  },
+  "/blueprint/default": {
+   "n": 0,
+   "label": null,
+   "url": ""
+  },
+  "/simulation/preview": {
+   "n": 0,
+   "label": null,
+   "url": ""
+  },
+  "/dsx/evidence-beta": {
+   "n": 0,
+   "label": null,
+   "url": "?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0"
+  },
+  "/search": {
+   "n": 0,
+   "label": null,
+   "url": ""
+  },
+  "/analytics": {
+   "n": 0,
+   "label": null,
+   "url": ""
+  },
+  "/operations": {
+   "n": 0,
+   "label": null,
+   "url": ""
+  },
+  "/compliance": {
+   "n": 0,
+   "label": null,
+   "url": ""
+  },
+  "/teams": {
+   "n": 0,
+   "label": null,
+   "url": ""
+  },
+  "/marketplace": {
+   "n": 0,
+   "label": null,
+   "url": ""
+  },
+  "/infrastructure": {
+   "n": 0,
+   "label": null,
+   "url": ""
+  },
+  "/data-centre-twin": {
+   "n": 0,
+   "label": null,
+   "url": ""
+  },
+  "/admin/dataset-registry": {
+   "n": 0,
+   "label": null,
+   "url": ""
+  }
+ },
+ "summary": {
+  "routes": 13,
+  "labelled": 13,
+  "duplicates": 0,
+  "legacy_labels": 0
+ }
+}

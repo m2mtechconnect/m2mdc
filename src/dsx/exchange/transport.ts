@@ -1,5 +1,5 @@
 /**
- * Transport abstraction for the DSX Exchange adapter.
+ * Transport abstraction for the AURA Message Bridge (see `exchangeBoundary.ts`).
  *
  * Deliberately broker-agnostic: MQTT and NATS both reduce to
  * "subscribe to subjects, receive raw byte/string payloads". The adapter

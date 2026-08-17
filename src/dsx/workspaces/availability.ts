@@ -103,8 +103,8 @@ export const CAPABILITIES: Record<string, Capability> = {
     'No management-network telemetry source is connected.', ['reachability', 'error_rate'],
   ),
   dsx_exchange_runtime: cap(
-    'dsx_exchange_runtime', 'DSX Exchange runtime', 'unavailable',
-    'No DSX Exchange broker is connected to this browser session. The Exchange adapter is verified only by the local Phase 7 harness.',
+    'dsx_exchange_runtime', 'Message bridge runtime', 'unavailable',
+    'No broker is connected to this browser session. AURA\'s own MQTT/NATS message bridge is verified only against a local harness broker, and NVIDIA DSX Exchange is not deployed.',
     ['broker_endpoint', 'authenticated_session'],
   ),
 

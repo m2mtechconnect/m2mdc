@@ -18,6 +18,9 @@ partnership or certification. No point-in-time value is rendered as a trend.
 - "Tenant isolation pass" was unsupported: SELECT policies are unscoped. Corrected to a known gap.
 - "Engineer may test permitted connections" was unsupported: the health-check function is
   administrator-only. Corrected in `rbac-matrix.md`.
-- The connection wizard and mapping editor were described as implemented. Both are design-only;
-  corrected in `connection-workflow.md` and `mapping-validation.md`.
+- The connection wizard was described as implemented; it is design-only, corrected in
+  `connection-workflow.md`.
+- The mapping editor was design-only at audit time and has since been implemented:
+  `src/connections/mappingValidation.ts`, `src/components/connections/MappingEditorDialog.tsx`,
+  admin/owner-gated writes on `connection_twin_mappings`, 7 unit tests.
 - Counts were stated as 22 definitions and 4 instances; the database holds 25 and 5.

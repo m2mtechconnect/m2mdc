@@ -27,7 +27,8 @@ Date: 2026-08-17. Scope: everything shipped in AURA_CONNECTIONS_CONTROL_PLANE_RE
 
 ## Open gaps (unchanged by this audit)
 - No connection setup wizard; instances are provisioned by migration only.
-- Mappings tab is read-only; no create, validate, activate, export or import.
+- ~~Mappings tab is read-only~~ CLOSED: create, edit, validate, activate/deactivate and delete are
+  implemented and admin/owner-gated. Export and import remain unimplemented.
 - No tenant or facility scoping in SELECT policies.
 - No credential vault, so no credential-bearing connector can be configured.
 - MQTT unwired, DSX Exchange not deployed, MCP not implemented.

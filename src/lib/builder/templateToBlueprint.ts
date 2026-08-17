@@ -19,13 +19,16 @@ export function templateToBlueprint(
   const workflowsArray = Array.isArray(config.workflows) ? config.workflows : [];
   const workflowLegacy = config.workflow || { triggers: [], actions: [], integrations: [] };
   
-  const metrics = config.metrics_defaults || {};
-  const blueprint = config.blueprint_json || config.blueprint || {};
+  // Templates authored as JSON files carry these at the top level; builder
+  // drafts carry them inside default_config. Support both.
+  const metrics = config.metrics_defaults || (template as any).metrics_defaults || {};
+  const blueprint = config.blueprint_json || config.blueprint || (template as any).blueprint || {};
+  const llm = config.llm || (template as any).llm || {};
   
   // Extract KPI block - handle various structures
   const kpiBlock = config.kpi_block || {};
   const roiBlock = config.roi_block || {};
-  const kpis = kpiBlock.kpis || config.kpis || [];
+  const kpis = kpiBlock.kpis || config.kpis || blueprint.kpis || [];
   
   // Extract day in the life content
   const previewSections = config.preview_sections || {};
@@ -56,7 +59,11 @@ export function templateToBlueprint(
   if (kpis.length > 0) {
     goals = kpis.map((k: any) => {
       const label = k.label || k.name || k.key;
-      return k.target_value ? `${label}: ${k.target_value}` : label;
+      const target = k.target_value ?? k.target;
+      if (target === undefined || target === null) return label;
+      const rawUnit = k.unit || k.metric || '';
+      const unit = rawUnit === 'percentage' ? '%' : rawUnit === 'ratio' || rawUnit === 'score' ? '' : rawUnit;
+      return `${label}: ${target}${unit}`;
     });
   } else if (config.problem_statement) {
     goals = [config.problem_statement];
@@ -101,6 +108,23 @@ export function templateToBlueprint(
       ? workflowLegacy.integrations 
       : [];
   }
+
+  // Templates may describe their flow as a flat node list.
+  if (triggers.length === 0 && actions.length === 0 && Array.isArray(config.workflowNodes)) {
+    config.workflowNodes.forEach((node: any, idx: number) => {
+      const entry = {
+        id: node.id || `node-${idx}`,
+        name: node.name || node.label || node.type || 'Step',
+        type: node.type || 'action',
+        config: node,
+      };
+      if (node.type === 'trigger' || node.type === 'ingest' || node.type === 'monitor') {
+        triggers.push(entry);
+      } else {
+        actions.push(entry);
+      }
+    });
+  }
   
   // Extract data sources from blueprint_json
   const dataSources = Array.isArray(blueprint.data_sources) ? blueprint.data_sources : [];
@@ -110,7 +134,7 @@ export function templateToBlueprint(
   const allIntegrations = [
     ...integrations,
     ...dataSources.filter((ds: any) => ds.required).map((ds: any) => ds.name),
-    ...blueprintIntegrations.map((bi: any) => bi.name)
+    ...blueprintIntegrations.map((bi: any) => (typeof bi === 'string' ? bi : bi.name))
   ];
   const uniqueIntegrations = Array.from(new Set(allIntegrations));
 
@@ -144,8 +168,8 @@ export function templateToBlueprint(
     industry: primaryIndustry,
     department: primaryDepartment,
     useCase: config.problem_statement || config.summary || template.description,
-    level: template.difficulty as any || null,
-    type: 'agent', // Map all to agent for builder compatibility
+    level: template.difficulty as any || config.level || null,
+    type: ((template as any).twin_type || config.type || 'agent') as any,
     
     // Business metrics
     goals,
@@ -155,9 +179,9 @@ export function templateToBlueprint(
     
     // Step 2: Intelligence Setup
     model: {
-      provider: config.provider || 'google',
-      modelName: config.model || 'google/gemini-2.5-flash',
-      temperature: config.temperature !== undefined ? config.temperature : 0.7,
+      provider: config.provider || llm.provider || (config.selectedModel ? String(config.selectedModel).split('/')[0] : null) || 'google',
+      modelName: config.model || llm.model || config.selectedModel || 'google/gemini-2.5-flash',
+      temperature: config.temperature ?? llm.temperature ?? 0.7,
       topK: config.rag?.top_k || 20,
       topP: 0.95,
     },
@@ -174,12 +198,12 @@ export function templateToBlueprint(
     },
     
     behavior: {
-      systemPrompt: config.system_prompt || `You are ${template.name}. ${config.problem_statement || 'Assist users professionally and accurately.'}`,
+      systemPrompt: config.system_prompt || config.systemPrompt || (template as any).system_prompt || `You are ${template.name}. ${config.problem_statement || 'Assist users professionally and accurately.'}`,
       personaTemplate: dayInLifeNarrative || null,
       communicationStyle: {
-        formal: true,
-        emojis: false,
-        detailedExplanations: true,
+        formal: config.communicationStyle?.formal ?? true,
+        emojis: config.communicationStyle?.emojis ?? false,
+        detailedExplanations: config.communicationStyle?.detailedExplanations ?? true,
       },
       safety: {
         hallucinationPrevention: true,

@@ -20,60 +20,89 @@ import { CoPilotProvider } from "@/contexts/CoPilotContext";
 import { CoPilotCommandProvider } from "@/contexts/CoPilotCommandContext";
 import { TourProvider } from "@/context/TourContext";
 import { TourRenderer } from "@/tours/TourRenderer";
+import { lazy, Suspense } from "react";
 import Dashboard from "./pages/Dashboard";
-import Builder from "./pages/Builder";
-import Deploy from "./pages/Deploy";
-import DeploymentHistory from "./pages/DeploymentHistory";
-import IntelligenceDashboard from "./pages/IntelligenceDashboard";
-import Compliance from "./pages/Compliance";
-import Teams from "./pages/Teams";
-import Marketplace from "./pages/Marketplace";
-import Help from "./pages/Help";
-import Search from "./pages/Search";
-import AISettings from "./pages/AISettings";
-import Connections from "./pages/Connections";
-import PlatformReadiness from "./pages/admin/PlatformReadiness";
-import ManageFacilities from "./pages/manage/Facilities";
-import { SignOut } from "./pages/auth/index";
-import NotFound from "./pages/NotFound";
-import AgentWorkspace from "./pages/AgentWorkspace";
-import AgentChat from "./pages/AgentChat";
-import Playbook from "./pages/Playbook";
-import FundingIntakeDemo from "./pages/FundingIntakeDemo";
-import ManageAgents from "./pages/ManageAgents";
-import SystemManage from "./pages/SystemManage";
-import TwinManage from "./pages/TwinManage";
-import DataCentreTwin from "./pages/DataCentreTwin";
-import Blueprint from "./pages/Blueprint";
-import BlueprintPreview from "./pages/BlueprintPreview";
-import SimulationPreview from "./pages/SimulationPreview";
-import AuraWorkspace from "./workspace/AuraWorkspace";
-import InfrastructurePage from "./pages/InfrastructurePage";
-import TwinPreview from "./pages/TwinPreview";
-import OnboardingSubmissions from "./pages/OnboardingSubmissions";
-import AgentDetail from "./pages/AgentDetail";
-import TwinDebug from "./pages/TwinDebug";
-import Profile from "./pages/account/Profile";
-import Settings from "./pages/account/Settings";
-import AccessControl from "./pages/account/AccessControl";
-import AdminUserApproval from "./pages/AdminUserApproval";
-import AdminSignupsDashboard from "./pages/AdminSignupsDashboard";
-import AssetPreview from '@/pages/admin/AssetPreview';
-import AssetPipeline from '@/pages/admin/AssetPipeline';
-import AssetValidation from '@/pages/admin/AssetValidation';
-import ReferenceFacilityValidation from '@/pages/admin/ReferenceFacilityValidation';
-import DsxCapabilityRegistryPage from '@/pages/admin/DsxCapabilityRegistryPage';
-import DatasetRegistryPage from '@/pages/admin/DatasetRegistryPage';
 import { DatasetProvider } from '@/data/dataset/DatasetProvider';
 import DatasetCanaryBanner from '@/components/dataset/DatasetCanaryBanner';
 import ReferenceRouteGate from '@/components/dataset/ReferenceRouteGate';
-import { lazy } from "react";
+import { AdminRouteGuard } from '@/routing/AdminRouteGuard';
+import NotFound from "./pages/NotFound";
+
+/**
+ * Phase 11 - route-level code splitting.
+ *
+ * Every page below used to be a static import, so the single
+ * AuthenticatedShell chunk (2.4 MB pre-split) had to download and parse
+ * before the dashboard could paint - including the 3D twin stack, the admin
+ * console and the Evidence workspaces that most sessions never open.
+ *
+ * Only Dashboard (the post-login landing route) and NotFound stay eager.
+ * Everything else is fetched when its route is first visited.
+ */
+const Builder = lazy(() => import("./pages/Builder"));
+const Deploy = lazy(() => import("./pages/Deploy"));
+const DeploymentHistory = lazy(() => import("./pages/DeploymentHistory"));
+const IntelligenceDashboard = lazy(() => import("./pages/IntelligenceDashboard"));
+const Compliance = lazy(() => import("./pages/Compliance"));
+const Teams = lazy(() => import("./pages/Teams"));
+const Marketplace = lazy(() => import("./pages/Marketplace"));
+const Help = lazy(() => import("./pages/Help"));
+const Search = lazy(() => import("./pages/Search"));
+const AISettings = lazy(() => import("./pages/AISettings"));
+const Connections = lazy(() => import("./pages/Connections"));
+const ManageFacilities = lazy(() => import("./pages/manage/Facilities"));
+const SignOut = lazy(() =>
+  import("./pages/auth/index").then((m) => ({ default: m.SignOut })),
+);
+const AgentWorkspace = lazy(() => import("./pages/AgentWorkspace"));
+const AgentChat = lazy(() => import("./pages/AgentChat"));
+const Playbook = lazy(() => import("./pages/Playbook"));
+const FundingIntakeDemo = lazy(() => import("./pages/FundingIntakeDemo"));
+const ManageAgents = lazy(() => import("./pages/ManageAgents"));
+const SystemManage = lazy(() => import("./pages/SystemManage"));
+const TwinManage = lazy(() => import("./pages/TwinManage"));
+const DataCentreTwin = lazy(() => import("./pages/DataCentreTwin"));
+const Blueprint = lazy(() => import("./pages/Blueprint"));
+const BlueprintPreview = lazy(() => import("./pages/BlueprintPreview"));
+const SimulationPreview = lazy(() => import("./pages/SimulationPreview"));
+const AuraWorkspace = lazy(() => import("./workspace/AuraWorkspace"));
+const InfrastructurePage = lazy(() => import("./pages/InfrastructurePage"));
+const TwinPreview = lazy(() => import("./pages/TwinPreview"));
+const TwinDebug = lazy(() => import("./pages/TwinDebug"));
+const AgentDetail = lazy(() => import("./pages/AgentDetail"));
+const Profile = lazy(() => import("./pages/account/Profile"));
+const Settings = lazy(() => import("./pages/account/Settings"));
+const AccessControl = lazy(() => import("./pages/account/AccessControl"));
+
+/* Administration console - lazy AND permission-gated (AdminRouteGuard). */
+const OnboardingSubmissions = lazy(() => import("./pages/OnboardingSubmissions"));
+const AdminUserApproval = lazy(() => import("./pages/AdminUserApproval"));
+const AdminSignupsDashboard = lazy(() => import("./pages/AdminSignupsDashboard"));
+const PlatformReadiness = lazy(() => import("./pages/admin/PlatformReadiness"));
+const AssetPreview = lazy(() => import("@/pages/admin/AssetPreview"));
+const AssetPipeline = lazy(() => import("@/pages/admin/AssetPipeline"));
+const AssetValidation = lazy(() => import("@/pages/admin/AssetValidation"));
+const ReferenceFacilityValidation = lazy(
+  () => import("@/pages/admin/ReferenceFacilityValidation"),
+);
+const DsxCapabilityRegistryPage = lazy(
+  () => import("@/pages/admin/DsxCapabilityRegistryPage"),
+);
+const DatasetRegistryPage = lazy(() => import("@/pages/admin/DatasetRegistryPage"));
+
 const EvidenceBetaShell = lazy(() => import("./pages/dsx/EvidenceBetaShell"));
-import {
-  OverviewWorkspace, SimulationsWorkspace, ThermalWorkspace, PowerWorkspace, CoolingWorkspace, NetworkWorkspace,
-  FacilityWorkspace, WorkloadWorkspace, SovereigntyWorkspace, CarbonWorkspace,
-  FinancialWorkspace, EvidenceWorkspace,
-} from "./pages/dsx/workspaces";
+const OverviewWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.OverviewWorkspace })));
+const SimulationsWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.SimulationsWorkspace })));
+const ThermalWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.ThermalWorkspace })));
+const PowerWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.PowerWorkspace })));
+const CoolingWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.CoolingWorkspace })));
+const NetworkWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.NetworkWorkspace })));
+const FacilityWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.FacilityWorkspace })));
+const WorkloadWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.WorkloadWorkspace })));
+const SovereigntyWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.SovereigntyWorkspace })));
+const CarbonWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.CarbonWorkspace })));
+const FinancialWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.FinancialWorkspace })));
+const EvidenceWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.EvidenceWorkspace })));
 const OverlayFixtures = import.meta.env.DEV
   ? lazy(() => import("./pages/test/OverlayFixtures"))
   : null;
@@ -106,19 +135,19 @@ function ApprovedUserRoutes() {
       <Route path="/account/profile" element={<Profile />} />
       <Route path="/account/settings" element={<Settings />} />
       <Route path="/account/access-control" element={<AccessControl />} />
-      <Route path="/admin/onboarding-submissions" element={<OnboardingSubmissions />} />
-      <Route path="/admin/user-approvals" element={<AdminUserApproval />} />
-      <Route path="/admin/asset-preview" element={<AssetPreview />} />
-      <Route path="/admin/asset-pipeline" element={<AssetPipeline />} />
-      <Route path="/admin/asset-validation/:assetId" element={<AssetValidation />} />
+      <Route path="/admin/onboarding-submissions" element={<AdminRouteGuard><OnboardingSubmissions /></AdminRouteGuard>} />
+      <Route path="/admin/user-approvals" element={<AdminRouteGuard><AdminUserApproval /></AdminRouteGuard>} />
+      <Route path="/admin/asset-preview" element={<AdminRouteGuard><AssetPreview /></AdminRouteGuard>} />
+      <Route path="/admin/asset-pipeline" element={<AdminRouteGuard><AssetPipeline /></AdminRouteGuard>} />
+      <Route path="/admin/asset-validation/:assetId" element={<AdminRouteGuard><AssetValidation /></AdminRouteGuard>} />
       <Route
         path="/admin/reference-facility-validation"
-        element={<ReferenceFacilityValidation />}
+        element={<AdminRouteGuard><ReferenceFacilityValidation /></AdminRouteGuard>}
       />
-      <Route path="/admin/signups-dashboard" element={<AdminSignupsDashboard />} />
-      <Route path="/admin/dsx-capabilities" element={<DsxCapabilityRegistryPage />} />
-      <Route path="/admin/dataset-registry" element={<DatasetRegistryPage />} />
-      <Route path="/admin/platform-readiness" element={<PlatformReadiness />} />
+      <Route path="/admin/signups-dashboard" element={<AdminRouteGuard><AdminSignupsDashboard /></AdminRouteGuard>} />
+      <Route path="/admin/dsx-capabilities" element={<AdminRouteGuard><DsxCapabilityRegistryPage /></AdminRouteGuard>} />
+      <Route path="/admin/dataset-registry" element={<AdminRouteGuard><DatasetRegistryPage /></AdminRouteGuard>} />
+      <Route path="/admin/platform-readiness" element={<AdminRouteGuard><PlatformReadiness /></AdminRouteGuard>} />
       {/* Canonical connections destination. /manage/connections, /connect/*
           and every legacy integrations path alias to it via ROUTE_ALIASES. */}
       <Route path="/manage/integrations" element={<Connections />} />
@@ -212,7 +241,19 @@ export default function AuthenticatedShell() {
               <DatasetCanaryBanner />
               <TourRenderer />
               <ReferenceRouteGate>
-                <ApprovedUserRoutes />
+                <Suspense
+                  fallback={
+                    <div
+                      role="status"
+                      aria-live="polite"
+                      className="p-6 text-sm text-muted-foreground"
+                    >
+                      Loading workspace...
+                    </div>
+                  }
+                >
+                  <ApprovedUserRoutes />
+                </Suspense>
               </ReferenceRouteGate>
             </Layout>
           </DatasetProvider>

@@ -7,7 +7,8 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataCentreDashboard } from '@/components/data-centre-twin';
@@ -59,12 +60,23 @@ export default function DataCentreTwin() {
   const effectiveTab = (isDemoMode && urlTab === 'simulation') ? 'dashboard' : (urlTab || defaultTab);
   const [activeTab, setActiveTab] = useState(effectiveTab);
   
+  // An explicit identifier that resolves to nothing must fail closed rather
+  // than quietly rendering the default twin.
+  const requestedUnknownTwin =
+    !!id &&
+    id !== 'default' &&
+    isInitialized &&
+    !isLoading &&
+    !isDemoMode &&
+    twins.length > 0 &&
+    !twins.some((candidate) => candidate.id === id);
+
   // Set twin from URL param if provided
   useEffect(() => {
-    if (id && id !== 'default' && id !== activeTwinId) {
+    if (id && id !== 'default' && id !== activeTwinId && !requestedUnknownTwin) {
       setActiveTwin(id);
     }
-  }, [id, activeTwinId, setActiveTwin]);
+  }, [id, activeTwinId, setActiveTwin, requestedUnknownTwin]);
   
   // Auto-select first twin if none selected and twins are available (skip in demo mode)
   useEffect(() => {

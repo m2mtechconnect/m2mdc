@@ -29,8 +29,6 @@ import Compliance from "./pages/Compliance";
 import Teams from "./pages/Teams";
 import Marketplace from "./pages/Marketplace";
 import Help from "./pages/Help";
-import ConnectMonitor from "./pages/ConnectMonitor";
-import ConnectHealth from "./pages/ConnectHealth";
 import Search from "./pages/Search";
 import AISettings from "./pages/AISettings";
 import Connections from "./pages/Connections";
@@ -104,7 +102,6 @@ function ApprovedUserRoutes() {
       <Route path="/deployments" element={<DeploymentHistory />} />
       <Route path="/agent/:id" element={<AgentWorkspace />} />
       <Route path="/agents/:id/chat" element={<AgentChat />} />
-      <Route path="/agent-chat" element={<AgentChat />} />
       <Route path="/analytics" element={<IntelligenceDashboard />} />
       <Route path="/account/profile" element={<Profile />} />
       <Route path="/account/settings" element={<Settings />} />
@@ -122,9 +119,9 @@ function ApprovedUserRoutes() {
       <Route path="/admin/dsx-capabilities" element={<DsxCapabilityRegistryPage />} />
       <Route path="/admin/dataset-registry" element={<DatasetRegistryPage />} />
       <Route path="/admin/platform-readiness" element={<PlatformReadiness />} />
-      {/* Canonical connections destination. /manage/connections is an alias. */}
+      {/* Canonical connections destination. /manage/connections, /connect/*
+          and every legacy integrations path alias to it via ROUTE_ALIASES. */}
       <Route path="/manage/integrations" element={<Connections />} />
-      <Route path="/manage/connections" element={<Connections />} />
       <Route path="/manage/facilities" element={<ManageFacilities />} />
       <Route path="/compliance" element={<Compliance />} />
       <Route path="/teams" element={<Teams />} />
@@ -142,8 +139,6 @@ function ApprovedUserRoutes() {
       <Route path="/simulation" element={<AuraWorkspace />} />
       <Route path="/simulation/preview" element={<SimulationPreview />} />
       <Route path="/help" element={<Help />} />
-      <Route path="/connect/monitor" element={<ConnectMonitor />} />
-      <Route path="/connect/health" element={<ConnectHealth />} />
       <Route path="/search" element={<Search />} />
       <Route path="/settings/ai" element={<AISettings />} />
       <Route path="/sign-out" element={<SignOut />} />
@@ -179,18 +174,25 @@ function ApprovedUserRoutes() {
         <Route path="decisions" element={<SimulationsWorkspace />} />
         <Route path="decisions/log" element={<EvidenceWorkspace />} />
         <Route path="assets" element={<FacilityWorkspace />} />
-        {/* Legacy children keep working, query string preserved. */}
-        <Route path="thermal" element={<ThermalWorkspace />} />
-        <Route path="power" element={<PowerWorkspace />} />
-        <Route path="cooling" element={<CoolingWorkspace />} />
-        <Route path="network" element={<NetworkWorkspace />} />
-        <Route path="facility" element={<FacilityWorkspace />} />
-        <Route path="workload" element={<WorkloadWorkspace />} />
-        <Route path="simulations" element={<SimulationsWorkspace />} />
-        <Route path="sovereignty" element={<SovereigntyWorkspace />} />
-        <Route path="carbon" element={<CarbonWorkspace />} />
-        <Route path="financials" element={<FinancialWorkspace />} />
-        <Route path="evidence" element={<EvidenceWorkspace />} />
+        {/*
+          AURA_IA_DUP_CLEANUP: these legacy children used to mount the same
+          workspace components a second time, so every Evidence workspace had
+          two live URLs and two entries in analytics, deep links and the
+          dataset gate. They are now redirects: bookmarks keep working and the
+          query string is preserved, but the canonical five-section IA above
+          is the only address a workspace renders at.
+        */}
+        <Route path="thermal" element={<PreserveNavigate to="/dsx/evidence-beta/operations/thermal" />} />
+        <Route path="power" element={<PreserveNavigate to="/dsx/evidence-beta/operations/power" />} />
+        <Route path="cooling" element={<PreserveNavigate to="/dsx/evidence-beta/operations/cooling" />} />
+        <Route path="network" element={<PreserveNavigate to="/dsx/evidence-beta/operations/compute" />} />
+        <Route path="workload" element={<PreserveNavigate to="/dsx/evidence-beta/operations/workload" />} />
+        <Route path="facility" element={<PreserveNavigate to="/dsx/evidence-beta/assets" />} />
+        <Route path="simulations" element={<PreserveNavigate to="/dsx/evidence-beta/decisions" />} />
+        <Route path="evidence" element={<PreserveNavigate to="/dsx/evidence-beta/decisions/log" />} />
+        <Route path="carbon" element={<PreserveNavigate to="/dsx/evidence-beta/sustainability" />} />
+        <Route path="financials" element={<PreserveNavigate to="/dsx/evidence-beta/sustainability/financial" />} />
+        <Route path="sovereignty" element={<PreserveNavigate to="/dsx/evidence-beta/sustainability/sovereignty" />} />
       </Route>
       {import.meta.env.DEV && OverlayFixtures ? (
         <Route path="/dev-overlays" element={<OverlayFixtures />} />

@@ -153,7 +153,7 @@ export function UserMenu() {
         <DropdownMenuItem asChild>
           <Link to="/help" className="cursor-pointer">
             <HelpCircle className="mr-2 h-4 w-4" />
-            <span>Help and guided tours</span>
+            <span>Learning Hub</span>
           </Link>
         </DropdownMenuItem>
         {can('tenant.view_members') && (

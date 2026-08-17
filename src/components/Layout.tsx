@@ -406,7 +406,7 @@ export function Layout({ children }: LayoutProps) {
             </div>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
               <Link to="/help" className="hover:text-foreground transition-smooth">
-                Documentation
+                Learning Hub
               </Link>
               <Link to="/compliance" className="hover:text-foreground transition-smooth">
                 Compliance

@@ -257,37 +257,7 @@ export const REFERENCE_ADAPTERS: readonly ReferenceAdapter[] = [
       'Enable, configure and dispatch are disabled: an agent would need a connected facility, and none is connected.',
     ],
   }),
-  adapter({
-    path: '/connect/monitor',
-    pageId: 'connect-monitor',
-    pageTitle: 'Ingestion Monitor',
-    navGroup: 'operate',
-    userJob: 'See whether data is arriving.',
-    showConfigurationSelector: false,
-    exportStem: 'aura-ingestion',
-    assistantContext: 'Source registration state only.',
-    tabs: [
-      { id: 'sources', label: 'Sources', sections: ['integrations'], intent: 'Registered reference sources and their authorization state.' },
-      { id: 'blockers', label: 'Blockers', sections: ['ngc'], intent: 'NGC authorization required; automatic retry disabled.' },
-    ],
-    workflowLimitations: ['No ingestion job runs: the reference dataset is a pinned snapshot, not a stream.'],
-  }),
-  adapter({
-    path: '/connect/health',
-    pageId: 'connect-health',
-    pageTitle: 'Source Health',
-    navGroup: 'operate',
-    userJob: 'Judge whether a source can be trusted right now.',
-    showConfigurationSelector: false,
-    exportStem: 'aura-source-health',
-    assistantContext: 'Source health and authorization state only.',
-    tabs: [
-      { id: 'health', label: 'Health', sections: ['integrations'], intent: 'Per-source state, with the last observed result.' },
-      { id: 'blockers', label: 'Blockers', sections: ['ngc'], intent: 'Why a source is unavailable.' },
-    ],
-    workflowLimitations: ['Refresh is disabled: no polling loop runs, so no health timestamp is generated.'],
-  }),
-  adapter({
+      adapter({
     path: '/manage/integrations',
     pageId: 'integrations',
     pageTitle: 'Integrations',

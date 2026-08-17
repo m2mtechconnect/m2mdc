@@ -31,7 +31,7 @@ const dcSearchResults: SearchResult[] = [
   { id: "3", title: "PIPEDA Data Residency Policy", type: "file", source: "Sovereignty", path: "/builder?doc=pipeda-policy", icon: Shield },
   { id: "4", title: "Telemetry & Analytics Dashboard", type: "page", path: "/analytics", icon: BarChart3 },
   { id: "5", title: "Sovereignty & Safety Audit", type: "page", path: "/compliance", icon: Shield },
-  { id: "6", title: "Prometheus Integration", type: "app", source: "Metrics Backend", path: "/connect/monitor", icon: Zap },
+  { id: "6", title: "Prometheus Integration", type: "app", source: "Metrics Backend", path: "/manage/integrations?tab=connections", icon: Zap },
   { id: "7", title: "DCIM Platform Settings", type: "setting", path: "/builder", icon: Settings },
   { id: "8", title: "Carbon Intensity Dashboard", type: "page", path: "/data-centre-twin?tab=financial", icon: BarChart3 },
   { id: "9", title: "GPU Scheduler Agent Config", type: "setting", path: "/app/agents", icon: Database },

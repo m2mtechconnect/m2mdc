@@ -179,8 +179,6 @@ export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
   consumer('/search', 'Search', ['search', 'assistant'], [KPI, SPEC, CONFIG, SCENARIO]),
   consumer('/compliance', 'Evidence and compliance', ['evidence', 'export'], [KPI, SPEC, CONFIG, SCENARIO]),
   consumer('/app/agents', 'Subsystem agents', ['agents', 'ngc'], [SCENARIO]),
-  consumer('/connect/monitor', 'Ingestion monitor', ['integrations', 'ngc'], []),
-  consumer('/connect/health', 'Source health', ['integrations', 'ngc'], []),
   consumer('/manage/integrations', 'Integrations', ['integrations'], []),
   consumer('/deploy', 'Deployment lanes', ['deployments'], []),
   consumer('/deployments', 'Deployment history', ['deployments'], []),
@@ -216,7 +214,7 @@ export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
   neutral('/onboarding', 'Onboarding redirect', 'Redirect only.'),
   neutral('/agent/:id', 'Agent workspace', 'Server-backed agent records only.'),
   neutral('/agents/:id/chat', 'Agent chat', 'Server-backed conversation only.'),
-  neutral('/agent-chat', 'Agent chat', 'Server-backed conversation only.'),
+  neutral('/agent-chat', 'Agent chat redirect', 'Redirect only.'),
   neutral('/app/agents/:slug/detail', 'Agent detail', 'Server-backed agent definition only.'),
   neutral('/app/agents/:agentId/manage', 'Twin manage', 'Server-backed twin record only.'),
   neutral('/app/agents/:agentId/operations', 'Agent operations redirect', 'Redirect only.'),
@@ -225,14 +223,16 @@ export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
   neutral('/digital-twins-demo/funding-intake', 'Funding intake demo', 'Demonstration form only.'),
   neutral('/dev-overlays', 'Overlay fixtures', 'Development fixtures only.'),
 
-  // Connections control plane and platform readiness read live server-backed
-  // connection, health and capability records. They render no reference
-  // facility values at all, so the canary must leave them mounted.
-  neutral(
-    '/manage/connections',
-    'Connections and data exchange',
-    'Server-backed connection, health and audit records only; no facility dataset values.',
-  ),
+  // AURA_IA_DUP_CLEANUP: the connections control plane now has exactly one
+  // mount (/manage/integrations, classified above). These three are pure
+  // redirects, kept classified so the gate never sees an unclassified route.
+  neutral('/manage/connections', 'Connections redirect', 'Redirect only.'),
+  neutral('/connect/monitor', 'Ingestion monitor redirect', 'Redirect only.'),
+  neutral('/connect/health', 'Source health redirect', 'Redirect only.'),
+
+  // Platform readiness reads live server-backed capability and runtime
+  // records. It renders no reference facility values at all, so the canary
+  // must leave it mounted.
   neutral(
     '/admin/platform-readiness',
     'Platform readiness',

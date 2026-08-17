@@ -39,7 +39,10 @@ function resolveAlias(path: string): { target: string; hash: string | undefined;
   for (;;) {
     const next = ROUTE_ALIASES.find((a) => a.from === target);
     if (!next) break;
-    const [nextPath, nextHash] = next.to.split('#');
+    const [nextBeforeHash, nextHash] = next.to.split('#');
+    // A destination may declare default query parameters; they never change
+    // the pathname the harness asserts on.
+    const [nextPath] = nextBeforeHash.split('?');
     if (seen.has(nextPath)) break;
     seen.add(nextPath);
     target = nextPath;

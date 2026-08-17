@@ -138,6 +138,12 @@ export function templateToBlueprint(
   ];
   const uniqueIntegrations = Array.from(new Set(allIntegrations));
 
+  // Templates that declare explicit connectors (id + mode) are authoritative
+  // for the Tools step; the derived string list is only a fallback.
+  const connectorIntegrations = Array.isArray(config.connectors) && config.connectors.length > 0
+    ? config.connectors
+    : uniqueIntegrations;
+
   // Auto-repair workflow to prevent deployment failures
   const rawWorkflow = { triggers, actions, integrations: uniqueIntegrations };
   const repairedWorkflow = autoRepairWorkflow(rawWorkflow);
@@ -214,8 +220,8 @@ export function templateToBlueprint(
     
     // Step 3: Tools & Integrations
     tools: {
-      recommendedIntegrations: uniqueIntegrations,
-      preselectedIntegrations: uniqueIntegrations,
+      recommendedIntegrations: connectorIntegrations,
+      preselectedIntegrations: connectorIntegrations,
       customApis: [],
     },
     

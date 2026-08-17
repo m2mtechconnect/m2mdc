@@ -63,7 +63,7 @@ describe('Blueprint Store Integration', () => {
 
     expect(result.current.currentBlueprint).not.toBeNull();
     expect(result.current.currentBlueprint?.source).toBe('template');
-    expect(result.current.currentBlueprint?.templateId).toBe('multi-location-inventory-twin');
+    expect(result.current.currentBlueprint?.templateId).toBe(inventoryOptimizationTemplate.id);
   });
 
   it('should mark blueprint as dirty when updated', () => {

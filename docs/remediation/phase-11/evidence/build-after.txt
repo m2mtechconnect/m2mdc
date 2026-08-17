@@ -1,0 +1,40 @@
+Browserslist: browsers data (caniuse-lite) is 14 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Export "useSovereignty" of module "src/sovereignty/useSovereignty.ts" was reexported through module "src/sovereignty/index.ts" while both modules are dependencies of each other and will end up in different chunks by current Rollup settings. This scenario is not well supported at the moment as it will produce a circular dependency between chunks and will likely lead to broken execution order.
+Either change the import in "src/pages/Compliance.tsx" to point directly to the exporting module or reconfigure "output.manualChunks" to ensure these modules end up in the same chunk.
+Export "useSovereignty" of module "src/sovereignty/useSovereignty.ts" was reexported through module "src/sovereignty/index.ts" while both modules are dependencies of each other and will end up in different chunks by current Rollup settings. This scenario is not well supported at the moment as it will produce a circular dependency between chunks and will likely lead to broken execution order.
+Either change the import in "src/components/telemetry/SovereigntyAnalyticsTab.tsx" to point directly to the exporting module or reconfigure "output.manualChunks" to ensure these modules end up in the same chunk.
+[plugin:vite:reporter] [plugin vite:reporter] 
+(!) /dev-server/src/lib/workflow/workflowGenerator.ts is dynamically imported by /dev-server/src/stores/wizardBuilderStore.ts, /dev-server/src/stores/wizardBuilderStore.ts, /dev-server/src/stores/wizardBuilderStore.ts, /dev-server/src/stores/wizardBuilderStore.ts, /dev-server/src/stores/wizardBuilderStore.ts but also statically imported by /dev-server/src/components/builder/steps/Step4Workflow.tsx, dynamic import will not move module into another chunk.
+
+[plugin:vite:reporter] [plugin vite:reporter] 
+(!) /dev-server/src/components/twin-visualization/DataCenter3DScene.tsx is dynamically imported by /dev-server/src/components/data-centre-twin/overview/MiniTwinPreview.tsx but also statically imported by /dev-server/src/components/twin-visualization/TwinVisualizationLayout.tsx, /dev-server/src/components/twin-visualization/index.ts, /dev-server/src/workspace/FacilityCanvas.tsx, dynamic import will not move module into another chunk.
+
+
+(!) Some chunks are larger than 1000 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+────────────────────────────────────────────────────────────────
+ SEO Validation Report
+────────────────────────────────────────────────────────────────
+ Status   : PASS ✓
+ Errors   : 0
+ Warnings : 0
+ Artifacts: index.html=true  robots.txt=true  sitemap.xml=true
+ Report   : /dev-server/dist/seo-report.json
+────────────────────────────────────────────────────────────────
+ All SEO checks passed. Safe to publish.
+────────────────────────────────────────────────────────────────
+
+dist_bytes=44410841
+1590055 dist/assets/index-DRrJgtr2.js
+897992 dist/assets/vendor-3d-CewHjxIX.js
+561388 dist/assets/Builder-ChilqJ7L.js
+433129 dist/assets/vendor-charts-Dh7E872M.js
+385545 dist/assets/AuthenticatedShell-KRdbMi0q.js
+193350 dist/assets/Marketplace-CQcXhBcn.js
+165061 dist/assets/vendor-react-ZUJOdUz4.js
+159030 dist/assets/vendor-supabase-T4bzftos.js

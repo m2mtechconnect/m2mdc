@@ -67,6 +67,7 @@ import DsxCapabilityRegistryPage from '@/pages/admin/DsxCapabilityRegistryPage';
 import DatasetRegistryPage from '@/pages/admin/DatasetRegistryPage';
 import { DatasetProvider } from '@/data/dataset/DatasetProvider';
 import DatasetCanaryBanner from '@/components/dataset/DatasetCanaryBanner';
+import ReferenceRouteGate from '@/components/dataset/ReferenceRouteGate';
 import { lazy } from "react";
 const EvidenceBetaShell = lazy(() => import("./pages/dsx/EvidenceBetaShell"));
 import {
@@ -205,7 +206,9 @@ export default function AuthenticatedShell() {
             <Layout>
               <DatasetCanaryBanner />
               <TourRenderer />
-              <ApprovedUserRoutes />
+              <ReferenceRouteGate>
+                <ApprovedUserRoutes />
+              </ReferenceRouteGate>
             </Layout>
           </DatasetProvider>
         </CoPilotCommandProvider>

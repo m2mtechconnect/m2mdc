@@ -108,7 +108,11 @@ export default function Connections() {
           />
         </TabsContent>
         <TabsContent value="catalogue" className="mt-4 min-w-0">
-          <CatalogueTab definitions={definitions.data ?? []} connections={connections.data ?? []} />
+          <CatalogueTab
+            definitions={definitions.data ?? []}
+            connections={connections.data ?? []}
+            onRefresh={refresh}
+          />
         </TabsContent>
         <TabsContent value="mappings" className="mt-4 min-w-0">
           <MappingsTab

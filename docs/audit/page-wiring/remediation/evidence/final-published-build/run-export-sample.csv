@@ -1,0 +1,26 @@
+# aura-export schema=1.0.0 surface=workspace.simulation-run generatedAt=2026-08-17T00:47:04.702Z
+# operating_mode=SIMULATED input_classification=Synthetic inputs scenario=Baseline operations
+# simulation_run_id=SIM-2026-08-17-001 calculation_timestamp=2026-08-17T00:46:06.052Z
+# source_generator=AURA deterministic simulation human_review=Not reviewed
+# nvidia_runtime_used=No live_facility_data_used=No
+# known_limitations=Values are produced by a deterministic AURA simulation with synthetic inputs. Not calibrated against a physical facility. No OpenUSD stage, SimReady-validated asset or DSX Exchange transport is involved.
+# unavailable rows carry empty value; stale=true means source exceeded freshness budget
+metric_id,metric_name,value,unit,provenance,source,observed_at,stale,downgrade_reason,description
+baseline.pue,PUE (baseline),1.324,,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,"total facility power / IT load, modelled from cooling setpoint, workload density and design capacity."
+baseline.itLoadKw,IT load (baseline),3500, kW,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,design capacity x workload density.
+baseline.gpuUtilization,GPU utilisation (baseline),70,%,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,workload density adjusted by the applied GPU power cap.
+baseline.thermalStability,Thermal stability (baseline),97,%,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,inverse of modelled hotspot pressure across all rack rows.
+baseline.coolingEfficiency,Cooling efficiency (baseline),78,%,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,modelled cooling delivered per unit of cooling power at the current setpoint.
+baseline.capacityHeadroom,Capacity headroom (baseline),30,%,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,100 minus modelled workload density against design capacity.
+baseline.carbonIntensity,Carbon intensity (baseline),12, gCO2e/kWh,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,configured grid intensity scaled by the modelled renewable mix.
+baseline.energyCostPerMwh,Energy cost (baseline),76.792, /MWh,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,regional tariff band scaled by modelled PUE.
+baseline.sovereigntyScore,Sovereignty posture (baseline),98,%,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,configured sovereignty level and residency region mapped to the applicable control set.
+result.pue,PUE (scenario),1.324,,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,"total facility power / IT load, modelled from cooling setpoint, workload density and design capacity."
+result.itLoadKw,IT load (scenario),3500, kW,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,design capacity x workload density.
+result.gpuUtilization,GPU utilisation (scenario),70,%,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,workload density adjusted by the applied GPU power cap.
+result.thermalStability,Thermal stability (scenario),97,%,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,inverse of modelled hotspot pressure across all rack rows.
+result.coolingEfficiency,Cooling efficiency (scenario),78,%,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,modelled cooling delivered per unit of cooling power at the current setpoint.
+result.capacityHeadroom,Capacity headroom (scenario),30,%,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,100 minus modelled workload density against design capacity.
+result.carbonIntensity,Carbon intensity (scenario),12, gCO2e/kWh,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,configured grid intensity scaled by the modelled renewable mix.
+result.energyCostPerMwh,Energy cost (scenario),76.792, /MWh,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,regional tariff band scaled by modelled PUE.
+result.sovereigntyScore,Sovereignty posture (scenario),98,%,simulated,AURA deterministic scenario engine,2026-08-17T00:46:06.052Z,false,,configured sovereignty level and residency region mapped to the applicable control set.

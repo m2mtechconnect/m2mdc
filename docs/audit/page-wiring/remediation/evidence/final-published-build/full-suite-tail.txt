@@ -1,0 +1,400 @@
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Blueprint JSON > should have integrations array
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/unit/yvr-template-integrity.test.ts:296:58
+    294| 
+    295|     it('should have integrations array', () => {
+    296|       expect(Array.isArray(blueprintJson?.integrations)).toBe(true);
+       |                                                          ^
+    297|       expect(blueprintJson?.integrations.length).toBeGreaterThanOrEqua…
+    298|       
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[192/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Blueprint JSON > should have workflow_steps array
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/unit/yvr-template-integrity.test.ts:306:60
+    304| 
+    305|     it('should have workflow_steps array', () => {
+    306|       expect(Array.isArray(blueprintJson?.workflow_steps)).toBe(true);
+       |                                                            ^
+    307|       expect(blueprintJson?.workflow_steps.length).toBeGreaterThanOrEq…
+    308|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[193/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Blueprint JSON > should have human_approval_points
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/unit/yvr-template-integrity.test.ts:311:67
+    309| 
+    310|     it('should have human_approval_points', () => {
+    311|       expect(Array.isArray(blueprintJson?.human_approval_points)).toBe…
+       |                                                                   ^
+    312|       expect(blueprintJson?.human_approval_points.length).toBeGreaterT…
+    313|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[194/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Blueprint JSON > should have kpis
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/unit/yvr-template-integrity.test.ts:316:50
+    314| 
+    315|     it('should have kpis', () => {
+    316|       expect(Array.isArray(blueprintJson?.kpis)).toBe(true);
+       |                                                  ^
+    317|       expect(blueprintJson?.kpis.length).toBeGreaterThanOrEqual(4);
+    318|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[195/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Cloud Metadata > should have cloud_metadata object
+AssertionError: expected undefined to be defined
+ ❯ tests/unit/yvr-template-integrity.test.ts:329:29
+    327| 
+    328|     it('should have cloud_metadata object', () => {
+    329|       expect(cloudMetadata).toBeDefined();
+       |                             ^
+    330|       expect(typeof cloudMetadata).toBe('object');
+    331|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[196/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Cloud Metadata > should have AWS configuration
+AssertionError: expected undefined to be defined
+ ❯ tests/unit/yvr-template-integrity.test.ts:334:34
+    332| 
+    333|     it('should have AWS configuration', () => {
+    334|       expect(cloudMetadata?.aws).toBeDefined();
+       |                                  ^
+    335|       expect(cloudMetadata?.aws?.tagline).toBeDefined();
+    336|       expect(cloudMetadata?.aws?.recommended_architecture).toBeDefined…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[197/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Cloud Metadata > should have Azure configuration
+AssertionError: expected undefined to be defined
+ ❯ tests/unit/yvr-template-integrity.test.ts:342:36
+    340| 
+    341|     it('should have Azure configuration', () => {
+    342|       expect(cloudMetadata?.azure).toBeDefined();
+       |                                    ^
+    343|       expect(cloudMetadata?.azure?.tagline).toBeDefined();
+    344|       expect(cloudMetadata?.azure?.recommended_architecture).toBeDefin…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[198/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Cloud Metadata > should have GCP configuration
+AssertionError: expected undefined to be defined
+ ❯ tests/unit/yvr-template-integrity.test.ts:349:34
+    347| 
+    348|     it('should have GCP configuration', () => {
+    349|       expect(cloudMetadata?.gcp).toBeDefined();
+       |                                  ^
+    350|       expect(cloudMetadata?.gcp?.tagline).toBeDefined();
+    351|       expect(cloudMetadata?.gcp?.recommended_architecture).toBeDefined…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[199/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Cloud Metadata > should have cost estimates for all clouds
+AssertionError: expected undefined to be defined
+ ❯ tests/unit/yvr-template-integrity.test.ts:356:58
+    354| 
+    355|     it('should have cost estimates for all clouds', () => {
+    356|       expect(cloudMetadata?.aws?.estimated_monthly_cost).toBeDefined();
+       |                                                          ^
+    357|       expect(cloudMetadata?.azure?.estimated_monthly_cost).toBeDefined…
+    358|       expect(cloudMetadata?.gcp?.estimated_monthly_cost).toBeDefined();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[200/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Cloud Metadata > should have learn more links
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/unit/yvr-template-integrity.test.ts:362:61
+    360| 
+    361|     it('should have learn more links', () => {
+    362|       expect(Array.isArray(cloudMetadata?.aws?.learn_more)).toBe(true);
+       |                                                             ^
+    363|       expect(Array.isArray(cloudMetadata?.azure?.learn_more)).toBe(tru…
+    364|       expect(Array.isArray(cloudMetadata?.gcp?.learn_more)).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[201/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Sample Prompts > should have sample prompts array
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/unit/yvr-template-integrity.test.ts:370:58
+    368|   describe('Sample Prompts', () => {
+    369|     it('should have sample prompts array', () => {
+    370|       expect(Array.isArray(yvrTemplate?.sample_prompts)).toBe(true);
+       |                                                          ^
+    371|       expect(yvrTemplate?.sample_prompts.length).toBeGreaterThanOrEqua…
+    372|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[202/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Sample Prompts > should have aviation-specific prompts
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/unit/yvr-template-integrity.test.ts:380:31
+    378|       const hasSecurityPrompt = prompts.some(p => p.toLowerCase().incl…
+    379|       
+    380|       expect(hasFlightPrompt).toBe(true);
+       |                               ^
+    381|       expect(hasBaggagePrompt).toBe(true);
+    382|       expect(hasSecurityPrompt).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[203/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Recommended Models > should have recommended models array
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/unit/yvr-template-integrity.test.ts:388:62
+    386|   describe('Recommended Models', () => {
+    387|     it('should have recommended models array', () => {
+    388|       expect(Array.isArray(yvrTemplate?.recommended_models)).toBe(true…
+       |                                                              ^
+    389|       expect(yvrTemplate?.recommended_models.length).toBeGreaterThanOr…
+    390|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[204/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Recommended Models > should include Gemini models
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/unit/yvr-template-integrity.test.ts:395:25
+    393|       const models = yvrTemplate?.recommended_models || [];
+    394|       const hasGemini = models.some(m => m.includes('gemini'));
+    395|       expect(hasGemini).toBe(true);
+       |                         ^
+    396|     });
+    397|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[205/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Schema Validation > should pass schema validation
+Error: YVR template not loaded
+ ❯ tests/unit/yvr-template-integrity.test.ts:402:15
+    400|     it('should pass schema validation', () => {
+    401|       if (!yvrTemplate) {
+    402|         throw new Error('YVR template not loaded');
+       |               ^
+    403|       }
+    404|       
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[206/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Uniqueness > should be the only template with this ID
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/unit/yvr-template-integrity.test.ts:417:35
+    415|       
+    416|       const yvrTemplates = allTemplates.filter(t => t.id === 'YVR_AIRP…
+    417|       expect(yvrTemplates.length).toBe(1);
+       |                                   ^
+    418|     });
+    419| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[207/236]⎯
+
+ FAIL  tests/unit/yvr-template-integrity.test.ts > YVR Template Backend Integrity > Uniqueness > should be the only template with this slug
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/unit/yvr-template-integrity.test.ts:425:35
+    423|       
+    424|       const yvrTemplates = allTemplates.filter(t => t.slug === 'yvr-ai…
+    425|       expect(yvrTemplates.length).toBe(1);
+       |                                   ^
+    426|     });
+    427|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[208/236]⎯
+
+ FAIL  src/lib/__tests__/simulationTemplates.test.ts > simulationTemplates > SIMULATION_TEMPLATES > each template should have required fields
+AssertionError: expected [ { …(5) }, { …(5) }, { …(5) }, …(2) ] to have a length of 3 but got 5
+
+- Expected
++ Received
+
+- 3
++ 5
+
+ ❯ forEach src/lib/__tests__/simulationTemplates.test.ts:30:31
+     28|         expect(template.defaultQuery).toBeTruthy();
+     29|         expect(template.scenarioSummary).toBeTruthy();
+     30|         expect(template.kpis).toHaveLength(3);
+       |                               ^
+     31|         expect(template.events.length).toBeGreaterThanOrEqual(3);
+     32|       });
+ ❯ src/lib/__tests__/simulationTemplates.test.ts:24:44
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[209/236]⎯
+
+ FAIL  src/lib/__tests__/simulationTemplates.test.ts > simulationTemplates > getSimulationTemplateForIndustry > should handle loose matching for common variations
+AssertionError: expected 'government_transport' to be 'travel_hospitality' // Object.is equality
+
+Expected: "travel_hospitality"
+Received: "government_transport"
+
+ ❯ src/lib/__tests__/simulationTemplates.test.ts:81:69
+     79|       expect(getSimulationTemplateForIndustry('hospital').industry).to…
+     80|       expect(getSimulationTemplateForIndustry('hotel').industry).toBe(…
+     81|       expect(getSimulationTemplateForIndustry('aviation').industry).to…
+       |                                                                     ^
+     82|       expect(getSimulationTemplateForIndustry('airport').industry).toB…
+     83|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[210/236]⎯
+
+ FAIL  src/lib/__tests__/twinNameMigration.test.ts > twinNameMigration > migrateTwinBuilderState > migrates broken state using sourceRecommendation url
+AssertionError: expected 'TELUS Sovereign Green AI Data Centre …' to be 'Telus Sovereign Green AI Data Centre …' // Object.is equality
+
+Expected: "Telus Sovereign Green AI Data Centre Twin"
+Received: "TELUS Sovereign Green AI Data Centre Twin"
+
+ ❯ src/lib/__tests__/twinNameMigration.test.ts:134:30
+    132|       const result = migrateTwinBuilderState(state);
+    133|       expect(result.migrated).toBe(true);
+    134|       expect(result.newName).toBe('Telus Sovereign Green AI Data Centr…
+       |                              ^
+    135|     });
+    136| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[211/236]⎯
+
+ FAIL  src/lib/utils/normalizeCompanyName.test.ts > normalizeCompanyName > should convert hyphens to spaces and capitalize
+AssertionError: expected 'My' to be 'My Health System' // Object.is equality
+
+Expected: "My Health System"
+Received: "My"
+
+ ❯ src/lib/utils/normalizeCompanyName.test.ts:34:54
+     32| 
+     33|   it('should convert hyphens to spaces and capitalize', () => {
+     34|     expect(normalizeCompanyName('my-health-system')).toBe('My Health S…
+       |                                                      ^
+     35|     expect(normalizeCompanyName('some_company_name')).toBe('Some Compa…
+     36|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[212/236]⎯
+
+ FAIL  src/lib/utils/normalizeCompanyName.test.ts > extractCompanyNameFromUrl > should handle malformed URLs gracefully
+AssertionError: expected 'Not' to be 'Not A Url' // Object.is equality
+
+Expected: "Not A Url"
+Received: "Not"
+
+ ❯ src/lib/utils/normalizeCompanyName.test.ts:66:52
+     64|     expect(extractCompanyNameFromUrl('')).toBe('');
+     65|     expect(extractCompanyNameFromUrl(null as any)).toBe('');
+     66|     expect(extractCompanyNameFromUrl('not-a-url')).toBe('Not A Url');
+       |                                                    ^
+     67|   });
+     68| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[213/236]⎯
+
+ FAIL  src/lib/utils/normalizeCompanyName.test.ts > sanitizeTwinName > should fix malformed twin names
+AssertionError: expected 'Https Sovereign Green AI Data Centre …' to be 'Sovereign Green AI Data Centre Twin' // Object.is equality
+
+Expected: "Sovereign Green AI Data Centre Twin"
+Received: "Https Sovereign Green AI Data Centre Twin"
+
+ ❯ src/lib/utils/normalizeCompanyName.test.ts:112:8
+    110|   it('should fix malformed twin names', () => {
+    111|     expect(sanitizeTwinName('!(https Sovereign Green AI Data Centre Tw…
+    112|       .toBe('Sovereign Green AI Data Centre Twin');
+       |        ^
+    113|     expect(sanitizeTwinName('https://example.com Sovereign Green AI Da…
+    114|       .toBe('Sovereign Green AI Data Centre Twin');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[214/236]⎯
+
+ FAIL  src/simulation/providers/__tests__/contract.test.ts > no consumer migration in Phase 1B.1 > src/simulation/index.ts still exports the legacy SimulationEngine class
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/simulation/providers/__tests__/contract.test.ts:279:3
+    277| // -------------------------------------------------------------------…
+    278| describe('no consumer migration in Phase 1B.1', () => {
+    279|   it('src/simulation/index.ts still exports the legacy SimulationEngin…
+       |   ^
+    280|     const mod = await import('../../index');
+    281|     expect(typeof (mod as { SimulationEngine?: unknown }).SimulationEn…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[215/236]⎯
+
+
+ Test Files  40 failed | 108 passed (148)
+      Tests  228 failed | 1339 passed | 109 skipped (1676)
+   Start at  00:47:32
+   Duration  47.32s (transform 13.49s, setup 232.23s, collect 236.08s, tests 56.48s, environment 1576.09s, prepare 24.70s)
+

@@ -1,0 +1,1174 @@
+{
+ "mode": "authenticated",
+ "host": "https://auradc.m2mtechconnect.com",
+ "routes": [
+  {
+   "route": "/",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Sovereign AI DC |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:39 AM |  | Start simulation | Open Blueprint | View Evidence | PUE | 1.32 | Watch | View source | IT LOAD | 3.5 MW | Within design target | View source | CAPACITY HEADROOM | 30% | Within design target | View source | SOVEREIGNTY POST",
+   "bodyLen": 454,
+   "consoleErrors": [
+    "TypeError: Failed to fetch\n    at https://auradc.m2mtechconnect.com/assets/vendor-supabase-BJo9PGMe.js:24:3209\n    at si (https://auradc.m2mtechconnect.com/asse"
+   ],
+   "failed": [
+    "https://auradc.m2mtechconnect.com/__l5e/assets-v1/64f21cbc-9211-4c3d-9fff-357ba1eaee03/rack_42u_a.glb",
+    "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+    "https://u.clarity.ms/collect",
+    "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+    "https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/onboarding",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Sovereign AI DC |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:39 AM |  | Start simulation | Open Blueprint | View Evidence | PUE | 1.32 | Watch | View source | IT LOAD | 3.5 MW | Within design target | View source | CAPACITY HEADROOM | 30% | Within design target | View source | SOVEREIGNTY POST",
+   "bodyLen": 454,
+   "consoleErrors": [],
+   "failed": [
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/login",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Sovereign AI DC |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:39 AM |  | Start simulation | Open Blueprint | View Evidence | PUE | 1.32 | Watch | View source | IT LOAD | 3.5 MW | Within design target | View source | CAPACITY HEADROOM | 30% | Within design target | View source | SOVEREIGNTY POST",
+   "bodyLen": 454,
+   "consoleErrors": [],
+   "failed": [
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/auth",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Sovereign AI DC |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:39 AM |  | Start simulation | Open Blueprint | View Evidence | PUE | 1.32 | Watch | View source | IT LOAD | 3.5 MW | Within design target | View source | CAPACITY HEADROOM | 30% | Within design target | View source | SOVEREIGNTY POST",
+   "bodyLen": 454,
+   "consoleErrors": [],
+   "failed": [
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/sign-in",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Sovereign AI DC |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:40 AM |  | Start simulation | Open Blueprint | View Evidence | PUE | 1.32 | Watch | View source | IT LOAD | 3.5 MW | Within design target | View source | CAPACITY HEADROOM | 30% | Within design target | View source | SOVEREIGNTY POST",
+   "bodyLen": 454,
+   "consoleErrors": [],
+   "failed": [
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/sign-up",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Sovereign AI DC |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:40 AM |  | Start simulation | Open Blueprint | View Evidence | PUE | 1.32 | Watch | View source | IT LOAD | 3.5 MW | Within design target | View source | CAPACITY HEADROOM | 30% | Within design target | View source | SOVEREIGNTY POST",
+   "bodyLen": 454,
+   "consoleErrors": [],
+   "failed": [
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/forgot-password",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Sovereign AI DC |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:40 AM |  | Start simulation | Open Blueprint | View Evidence | PUE | 1.32 | Watch | View source | IT LOAD | 3.5 MW | Within design target | View source | CAPACITY HEADROOM | 30% | Within design target | View source | SOVEREIGNTY POST",
+   "bodyLen": 454,
+   "consoleErrors": [],
+   "failed": [
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/mfa",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Sovereign AI DC |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:40 AM |  | Start simulation | Open Blueprint | View Evidence | PUE | 1.32 | Watch | View source | IT LOAD | 3.5 MW | Within design target | View source | CAPACITY HEADROOM | 30% | Within design target | View source | SOVEREIGNTY POST",
+   "bodyLen": 454,
+   "consoleErrors": [],
+   "failed": [
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/twin-datacentre",
+   "finalUrl": "https://auradc.m2mtechconnect.com/blueprint/default",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Back | Montreal Sovereign AI DC | Designer - editable | AURA Assistant | Open in Simulation | Montreal | Tier III | 5 MW | 200 Racks | v1 | Updated 8/17/2026, 12:40:15 AM | Model | Assets & Systems | Controls | Validation | Versions | CA-QC / Montreal / Sovereign Green AI Data Centre Twin |  | Modelled facility: Sovereign Green AI Data Centre Twin \u00b7 Tier III \u00b7 Sovereign AI",
+   "bodyLen": 446,
+   "consoleErrors": [],
+   "failed": [
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/data-centre-twin",
+   "finalUrl": "https://auradc.m2mtechconnect.com/data-centre-twin",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Facility Model (Simulated) | Montreal Sovereign AI DC |  | 40 Racks \u2022 5 Rows \u2022 5000 kW Capacity |  | FACILITY GEOMETRY | Baseline preview | Twin Preview | Zoom | 100% | Scroll to zoom | Row A | Row B | Row C | Row D | Row E | Procedural 3D preview | 1.32 | PUE | 1070 kW | 30 gCO\u2082 | Montreal Sovereign AI DC | operational | Tier 4 |  | Montreal, Canada \u2022 20 Racks \u2022 12,000 kW Capacity |  | Blu",
+   "bodyLen": 464,
+   "consoleErrors": [],
+   "failed": [
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/omniverse-scene",
+   "finalUrl": "https://auradc.m2mtechconnect.com/omniverse-scene",
+   "h1": "AURA Twin Preview",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | AURA Twin Preview |  | AURA application rendering \u2022 0 racks \u2022 Simulated scene |  | Kit disabled | 12:40:30 AM | Kit disabled by configuration \u2014 displaying local demonstration data. | Local demonstration scene | disabled |  | Local demonstration scene |  | Omniverse stream unavailable in this build. Server-mediated transport is required. |  | Connect to Stream | Over",
+   "bodyLen": 440,
+   "consoleErrors": [],
+   "failed": [
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dashboard",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Sovereign AI DC |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:40 AM |  | Start simulation | Open Blueprint | View Evidence | PUE | 1.32 | Watch | View source | IT LOAD | 3.5 MW | Within design target | View source | CAPACITY HEADROOM | 30% | Within design target | View source | SOVEREIGNTY POST",
+   "bodyLen": 454,
+   "consoleErrors": [],
+   "failed": [
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/builder",
+   "finalUrl": "https://auradc.m2mtechconnect.com/builder",
+   "h1": "Start a new build",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Start a new build |  | Pick a template from the marketplace, resume a saved draft, or begin from scratch. |  | Choose a template | Start blank | Your builds | Production-grade Data Centre Digital Twin with 9 domain twins (Thermal, Power, Cooling, Network, Facility, Workload, Sovereignty, Carbon, Financial), 50+ KPIs, 15+ simulation scenarios, and com",
+   "bodyLen": 424,
+   "consoleErrors": [],
+   "failed": [
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/deploy",
+   "finalUrl": "https://auradc.m2mtechconnect.com/deploy",
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | No system selected |  | Deployment runs against one configured system. Open a system in the Builder and start the deployment from there; this route needs an ?id= system identifier. |  | Open Builder |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documentation | Compliance",
+   "bodyLen": 370,
+   "consoleErrors": [],
+   "failed": [
+    "https://u.clarity.ms/collect",
+    "https://u.clarity.ms/collect",
+    "https://u.clarity.ms/collect",
+    "https://u.clarity.ms/collect",
+    "https://u.clarity.ms/collect",
+    "https://u.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/deployments",
+   "finalUrl": "https://auradc.m2mtechconnect.com/deployments",
+   "h1": "Deployments",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Deployments |  | Complete audit trail of all system deployments |  | TOTAL DEPLOYMENTS | 0 |  | All time |  | ACTIVE | 0 |  | Running systems |  | FAILED | 0 |  | Requires attention |  | PENDING | 0 |  | In progress |  | All Statuses | All Health | Newest First | System\tStatus\tHealth\tModel\tVersion\tRegion\tDeployed\tUpdated\tActions | No deployments yet. Deploy your first system to get started! | ",
+   "bodyLen": 468,
+   "consoleErrors": [],
+   "failed": [
+    "https://g.clarity.ms/collect",
+    "https://g.clarity.ms/collect",
+    "https://g.clarity.ms/collect",
+    "https://g.clarity.ms/collect",
+    "https://g.clarity.ms/collect",
+    "https://g.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/analytics",
+   "finalUrl": "https://auradc.m2mtechconnect.com/analytics",
+   "h1": "Telemetry and analytics",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Telemetry and analytics |  | Montreal Sovereign AI DC - Montreal. Executive and operations overview. Drill into Thermal, Power, GPU, Sovereignty, and Carbon tabs for engineering detail. |  | Last refreshed: 2 min ago | | | Auto-refresh 60s | Blueprint | 58 KPIs | Export Report | Last 7 days | All Facilities | All Subsystems | All Regions | Quick Tools: | GPU | Power | C",
+   "bodyLen": 444,
+   "consoleErrors": [],
+   "failed": [
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/account/profile",
+   "finalUrl": "https://auradc.m2mtechconnect.com/account/profile",
+   "h1": "Profile",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Profile |  | Manage your personal account settings and preferences |  | Profile Picture | LH | Upload Photo |  | JPG, PNG, GIF, or WebP. Max 2MB. |  | Personal Information | Email | Full Name | Job Title | Phone | Organization | Role | Department | Localization | Language | English | Timezone | UTC | Cancel | Save Changes |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Doc",
+   "bodyLen": 472,
+   "consoleErrors": [],
+   "failed": [
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/account/settings",
+   "finalUrl": "https://auradc.m2mtechconnect.com/account/settings",
+   "h1": "Workspace settings",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Workspace settings |  | Manage workspace configuration and team defaults |  | Admin access required | No Workspace Found |  | Your account is not associated with a workspace yet. |  | View Teams |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documentation | Compliance",
+   "bodyLen": 366,
+   "consoleErrors": [],
+   "failed": [
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/account/access-control",
+   "finalUrl": "https://auradc.m2mtechconnect.com/account/access-control",
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Access Denied |  | You need global admin permissions to access this page. |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documentation | Compliance",
+   "bodyLen": 245,
+   "consoleErrors": [],
+   "failed": [
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/admin/onboarding-submissions",
+   "finalUrl": "https://auradc.m2mtechconnect.com/admin/onboarding-submissions",
+   "h1": "Onboarding submissions",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Onboarding submissions |  | Prospect questionnaire responses from the marketing page |  | 0 submissions |  | No submissions yet. |  | Prospects who complete the onboarding questionnaire will appear here. |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documentation | Compliance",
+   "bodyLen": 375,
+   "consoleErrors": [],
+   "failed": [
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/admin/user-approvals",
+   "finalUrl": "https://auradc.m2mtechconnect.com/admin/user-approvals",
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Access Restricted |  | You don't have permission to access this page. |  | Your role: engineer |  | Required: executive, manager, admin |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documentation | Compliance",
+   "bodyLen": 307,
+   "consoleErrors": [],
+   "failed": [
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/admin/asset-preview",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Sovereign AI DC |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:41 AM |  | Start simulation | Open Blueprint | View Evidence | PUE | 1.32 | Watch | View source | IT LOAD | 3.5 MW | Within design target | View source | CAPACITY HEADROOM | 30% | Within design target | View source | SOVEREIGNTY POST",
+   "bodyLen": 454,
+   "consoleErrors": [],
+   "failed": [
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/admin/asset-pipeline",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Sovereign AI DC |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:41 AM |  | Start simulation | Open Blueprint | View Evidence | PUE | 1.32 | Watch | View source | IT LOAD | 3.5 MW | Within design target | View source | CAPACITY HEADROOM | 30% | Within design target | View source | SOVEREIGNTY POST",
+   "bodyLen": 454,
+   "consoleErrors": [],
+   "failed": [
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/admin/asset-validation/nvidia.rack.42u_a_01.ops",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Sovereign AI DC |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:41 AM |  | Start simulation | Open Blueprint | View Evidence | PUE | 1.32 | Watch | View source | IT LOAD | 3.5 MW | Within design target | View source | CAPACITY HEADROOM | 30% | Within design target | View source | SOVEREIGNTY POST",
+   "bodyLen": 454,
+   "consoleErrors": [],
+   "failed": [
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/admin/reference-facility-validation",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Sovereign AI DC |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:41 AM |  | Start simulation | Open Blueprint | View Evidence | PUE | 1.32 | Watch | View source | IT LOAD | 3.5 MW | Within design target | View source | CAPACITY HEADROOM | 30% | Within design target | View source | SOVEREIGNTY POST",
+   "bodyLen": 454,
+   "consoleErrors": [],
+   "failed": [
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/admin/signups-dashboard",
+   "finalUrl": "https://auradc.m2mtechconnect.com/admin/signups-dashboard",
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Access Restricted |  | You don't have permission to access this page. |  | Your role: engineer |  | Required: executive, manager, admin |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documentation | Compliance",
+   "bodyLen": 307,
+   "consoleErrors": [],
+   "failed": [
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/manage/integrations",
+   "finalUrl": "https://auradc.m2mtechconnect.com/manage/integrations",
+   "h1": "Integrations",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Integrations |  | Connection and readiness state for every external system. Nothing listed here is currently supplying data to AURA DC. |  | Data sources |  | What AURA DC would read from, and whether it is attached. |  | Facility telemetry (BMS / DCIM) |  | No building-management or DCIM source is attached. Every value in AURA DC is modelled. |  | Not connect",
+   "bodyLen": 434,
+   "consoleErrors": [],
+   "failed": [
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/manage/facilities",
+   "finalUrl": "https://auradc.m2mtechconnect.com/manage/facilities",
+   "h1": "Facilities",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Facilities |  | Facility administration: create, configure and retire modelled data-centre facilities. All values remain simulated. |  | Create facility | Facility list |  | Facilities you have access to. |  | Montreal Sovereign AI DC | Current |  | Montreal | \u00b7 | Tier III | \u00b7 | 5000 kW |  | Set as current | Edit |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Do",
+   "bodyLen": 462,
+   "consoleErrors": [],
+   "failed": [
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/compliance",
+   "finalUrl": "https://auradc.m2mtechconnect.com/compliance",
+   "h1": "Sovereignty & Safety Audit",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Sovereignty & Safety Audit |  | Montreal Sovereign AI DC - Montreal |  | Export Audit Report | SOVEREIGN COMPLIANCE | Unavailable | Not assessed | Applicable frameworks: PIPEDA, Quebec Law 25 (configured, not achieved). | CROSS-BORDER FLOWS (DEMO) | Demo data | 0 | Monitored flows from demonstration fixture. | AUDIT READINESS | Unavailable | Not assessed | Evidence no",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/teams",
+   "finalUrl": "https://auradc.m2mtechconnect.com/teams",
+   "h1": "Teams and roles",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Teams and roles |  | Manage team members, roles, and access controls |  | Invite Team Member | Team Members | Total Members | 2 | Active Now | 1 | Systems | 0 | Pending | 1 | Roles | 1 | Departments | 1 | Team Members | 1 of 1 | All Roles | All Status | LH | Lucas Ho | Engineer | Online | 0 systems | View Profile | Roles Overview | Executive | Full platform access and strategic oversight | 0 | Manag",
+   "bodyLen": 474,
+   "consoleErrors": [],
+   "failed": [
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/marketplace",
+   "finalUrl": "https://auradc.m2mtechconnect.com/marketplace",
+   "h1": "Template Marketplace",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Template Marketplace |  | Discover Digital Twin & AI Agent Blueprints tailored to your industry and department |  | Filters: | All Industries | All Departments | All Types | All Levels | Recommended for You |  | Showing 1 template |  | \ud83c\udfe2 | Data Centre Digital Twin |  | Production-grade Data Centre Digital Twin with 9 domain twins (Thermal, Power, Cooling, Network, Fac",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/app/agents",
+   "finalUrl": "https://auradc.m2mtechconnect.com/app/agents",
+   "h1": "Subsystem Agents",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Introducing Agent Operations Center |  | Your mission control for deployed AI agents |  | Real-Time Control |  | Start, pause, stop agents on demand |  | Live Monitoring |  | Stream activity logs in real-time |  | Performance Metrics |  | Track success rate and latency |  | Team Collaboration |  | See who's viewing and recent changes |  | \u2318K | Quick actions | \u2022 | ? | Keyboard shortcu",
+   "bodyLen": 458,
+   "consoleErrors": [],
+   "failed": [
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/simulation",
+   "finalUrl": "https://auradc.m2mtechconnect.com/simulation?step=inspect",
+   "h1": "Montreal Sovereign AI DC - Simulation",
+   "spinner": false,
+   "bodyHead": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Montreal Sovereign AI DC - Simulation | SIMULATED | Design baseline | No run recorded | Synthetic inputs | View | Engineering | Inspect | Configure | Simulate | Compare | Compare is unavailable until a scenario run has completed. | Review | Review is unavailable until a scenario run has completed. | Assistant | 100% | Row A | Row B | Row C | Row D | Row E | Procedural 3D preview",
+   "bodyLen": 452,
+   "consoleErrors": [],
+   "failed": [
+    "https://u.clarity.ms/collect",
+    "https://u.clarity.ms/collect",
+    "https://u.clarity.ms/collect",
+    "https://u.clarity.ms/collect",
+    "https://u.clarity.ms/collect",
+    "https://u.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/simulation/preview",
+   "finalUrl": "https://auradc.m2mtechconnect.com/simulation/preview",
+   "h1": "No Recommendation to Preview",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | No Recommendation to Preview |  | Scan a website URL first to generate a recommendation, then preview simulation scenarios. |  | Back to Dashboard |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documentation | Compliance",
+   "bodyLen": 318,
+   "consoleErrors": [],
+   "failed": [
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/blueprint/preview",
+   "finalUrl": "https://auradc.m2mtechconnect.com/blueprint/preview",
+   "h1": "No Recommendation to Preview",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | No Recommendation to Preview |  | Scan a website URL first to generate a recommendation, then preview the blueprint. |  | Back to Dashboard |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documentation | Compliance",
+   "bodyLen": 311,
+   "consoleErrors": [],
+   "failed": [
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/blueprint/default",
+   "finalUrl": "https://auradc.m2mtechconnect.com/blueprint/default",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Back | Montreal Sovereign AI DC | Designer - editable | AURA Assistant | Open in Simulation | Montreal | Tier III | 5 MW | 200 Racks | v1 | Updated 8/17/2026, 12:42:11 AM | Model | Assets & Systems | Controls | Validation | Versions | CA-QC / Montreal / Sovereign Green AI Data Centre Twin |  | Modelled facility: Sovereign Green AI Data Centre Twin \u00b7 Tier III \u00b7 Sovereign AI",
+   "bodyLen": 446,
+   "consoleErrors": [],
+   "failed": [
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/help",
+   "finalUrl": "https://auradc.m2mtechconnect.com/help",
+   "h1": "Learning Hub",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Learning Hub |  | Resources, tutorials, and expert support to accelerate your AI transformation |  | \ud83c\udf93 Build Your First AI System |  | 5-minute quickstart guide to deploying your first AI workflow |  | Watch Tutorial | View Documentation | How to Use the Data Centre Simulation |  | Learn how to run scenarios and interpret KPI deltas |  | Master the simulation engi",
+   "bodyLen": 438,
+   "consoleErrors": [],
+   "failed": [
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/playbook",
+   "finalUrl": "https://auradc.m2mtechconnect.com/playbook",
+   "h1": "AI Initiative",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Back to Recommendations | Implementation Playbook | AI Initiative |  | Comprehensive implementation guide and best practices |  | Export PDF | Executive Summary | Executive Summary |  | Business Context: B2B Enterprise SaaS operating in the Technology sector. |  | Challenge Identified: Current Operations processes are manual, time-consuming, and prone to error",
+   "bodyLen": 434,
+   "consoleErrors": [],
+   "failed": [
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/connect/monitor",
+   "finalUrl": "https://auradc.m2mtechconnect.com/connect/monitor",
+   "h1": "Sync Monitor",
+   "spinner": true,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Sync Monitor |  | Real-time status of all data connections and background jobs. |  | View Health | No ingestion service is connected to this workspace. The jobs below are demonstration data, not live telemetry. | Last checked 12:42:25 AM | Check again | RUNNING (DEMONSTRATION) | 1 | SUCCEEDED (DEMONSTRATION) | 3 | FAILED (DEMONSTRATION) | 1 | TOTAL DOCUMENTS | 615 | F",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/connect/health",
+   "finalUrl": "https://auradc.m2mtechconnect.com/connect/health",
+   "h1": "Data Health",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Data Health |  | Monitor quality, freshness, and issues across all data sources |  | Back to Monitor | Overall System Health |  | Aggregate health score across all data sources |  | 85% | +2.3% from yesterday | HEALTHY SOURCES | 3 | WARNINGS | 1 | CRITICAL ISSUES | 1 | Avg Processing Time | 2.1s | -0.3s | Success Rate | 96.8% | +1.2% | Data Freshness | 94% | +3% | Failed Jobs (24h) | 12 | +4",
+   "bodyLen": 466,
+   "consoleErrors": [],
+   "failed": [
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/search",
+   "finalUrl": "https://auradc.m2mtechconnect.com/search",
+   "h1": "Search",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Search |  | Find documents, pages, and apps across all your connected sources. |  | Search | Start searching |  | Enter a query to search across all your connected documents, pages, and apps. |  | Try searching for: |  | HIPAA | Marketing report | Support tickets | Compliance |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documentation | Compliance",
+   "bodyLen": 448,
+   "consoleErrors": [],
+   "failed": [
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/settings/ai",
+   "finalUrl": "https://auradc.m2mtechconnect.com/settings/ai",
+   "h1": "AI settings",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | AI settings |  | Configure Google Gemini (Vertex AI) for AURA Assistant |  | These settings are stored in your current browser only. They are not synced to a server, are not shared with other users, and clearing browser storage removes them. No credentials or API keys are stored here. | Google Cloud Configuration | Google Cloud Project ID | Region | \ud83c\udde8\ud83c\udde6",
+   "bodyLen": 426,
+   "consoleErrors": [],
+   "failed": [
+    "https://p.clarity.ms/collect",
+    "https://p.clarity.ms/collect",
+    "https://p.clarity.ms/collect",
+    "https://p.clarity.ms/collect",
+    "https://p.clarity.ms/collect",
+    "https://p.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/infrastructure",
+   "finalUrl": "https://auradc.m2mtechconnect.com/infrastructure",
+   "h1": "Infrastructure",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | PHYSICAL AI \u00b7 DIGITAL TWIN | Infrastructure |  | Ready to build your infrastructure? |  | Use the Pod Designer to configure your NVIDIA + DDN hardware stack for your specific data centre scenario. Get recommendations, cost estimates, and deploy in minutes. |  | How it comes together: Sensors collect facility data, GPUs train AI models, a living digit",
+   "bodyLen": 424,
+   "consoleErrors": [],
+   "failed": [
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/twin-debug",
+   "finalUrl": "https://auradc.m2mtechconnect.com/twin-debug",
+   "h1": "Twin Debug Console",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Twin Debug Console |  | Multi-tenant isolation debugging |  | Refresh | Current Twin Context |  | Twin ID |  | 99d9e553-33aa-484c-ae3c-113db476c126 |  | Twin Name |  | Montreal Sovereign AI DC |  | Region |  | CA-QC |  | Total Twins |  | 1 |  | Query Status | Telemetry | Errors | All Twins | Query Logs | Table\tTwin ID Filter\tStatus\tError | twin_telemetry\t99d9e553...\tSuccess\t- | twin_kpi_snapshot",
+   "bodyLen": 470,
+   "consoleErrors": [],
+   "failed": [
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/digital-twins-demo/funding-intake",
+   "finalUrl": "https://auradc.m2mtechconnect.com/digital-twins-demo/funding-intake",
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Funding Intake & Triage Twin \u2013 Demo |  | Submit a company funding intake form to see the Digital Twin in action. |  | Company Intake Form |  | Fill out the form below to simulate a funding opportunity submission |  | Company Name * | Website URL * | Sector * | SaaS | Manufacturing | Energy | Agri-food | SaaS | Healthcare | Other | Company Size * | Small (10-49 employees) | Mi",
+   "bodyLen": 450,
+   "consoleErrors": [],
+   "failed": [
+    "https://v.clarity.ms/collect",
+    "https://v.clarity.ms/collect",
+    "https://v.clarity.ms/collect",
+    "https://v.clarity.ms/collect",
+    "https://v.clarity.ms/collect",
+    "https://v.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/overview",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/overview?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+   "h1": "Overview",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATION WINDOW | 08:00:00 \u2192 08:00:00 UTC | CONNECTION HEALTH | Source: disabled | DATA FRESHNESS | Fresh | EVIDENCE QUALITY | 18 accepted \u00b7 0 quarantine",
+   "bodyLen": 448,
+   "consoleErrors": [],
+   "failed": [
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/operations/thermal",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/operations/thermal?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+   "h1": "Thermal",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATION WINDOW | 08:00:00 \u2192 08:00:00 UTC | CONNECTION HEALTH | Source: disabled | DATA FRESHNESS | Fresh | EVIDENCE QUALITY | 18 accepted \u00b7 0 quarantine",
+   "bodyLen": 448,
+   "consoleErrors": [],
+   "failed": [
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/operations/power",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/operations/power?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+   "h1": "Power",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATION WINDOW | 08:00:00 \u2192 08:00:00 UTC | CONNECTION HEALTH | Source: disabled | DATA FRESHNESS | Fresh | EVIDENCE QUALITY | 18 accepted \u00b7 0 quarantine",
+   "bodyLen": 448,
+   "consoleErrors": [],
+   "failed": [
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/operations/cooling",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/operations/cooling?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+   "h1": "Cooling",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATION WINDOW | 08:00:00 \u2192 08:00:00 UTC | CONNECTION HEALTH | Source: disabled | DATA FRESHNESS | Fresh | EVIDENCE QUALITY | 18 accepted \u00b7 0 quarantine",
+   "bodyLen": 448,
+   "consoleErrors": [],
+   "failed": [
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/operations/compute",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/operations/compute?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+   "h1": "Compute",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATION WINDOW | 08:00:00 \u2192 08:00:00 UTC | CONNECTION HEALTH | Source: disabled | DATA FRESHNESS | Fresh | EVIDENCE QUALITY | 18 accepted \u00b7 0 quarantine",
+   "bodyLen": 448,
+   "consoleErrors": [],
+   "failed": [
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/operations/workload",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/operations/workload?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+   "h1": "Workload",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATION WINDOW | 08:00:00 \u2192 08:00:00 UTC | CONNECTION HEALTH | Source: disabled | DATA FRESHNESS | Fresh | EVIDENCE QUALITY | 18 accepted \u00b7 0 quarantine",
+   "bodyLen": 448,
+   "consoleErrors": [],
+   "failed": [
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/sustainability",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/sustainability?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+   "h1": "Sustainability: Energy and carbon",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATION WINDOW | 08:00:00 \u2192 08:00:00 UTC | CONNECTION HEALTH | Source: disabled | DATA FRESHNESS | Fresh | EVIDENCE QUALITY | 18 accepted \u00b7 0 quarantine",
+   "bodyLen": 448,
+   "consoleErrors": [],
+   "failed": [
+    "https://u.clarity.ms/collect",
+    "https://u.clarity.ms/collect",
+    "https://u.clarity.ms/collect",
+    "https://u.clarity.ms/collect",
+    "https://u.clarity.ms/collect",
+    "https://u.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/sustainability/financial",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/sustainability/financial?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+   "h1": "Sustainability: Financial exposure",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATION WINDOW | 08:00:00 \u2192 08:00:00 UTC | CONNECTION HEALTH | Source: disabled | DATA FRESHNESS | Fresh | EVIDENCE QUALITY | 18 accepted \u00b7 0 quarantine",
+   "bodyLen": 448,
+   "consoleErrors": [],
+   "failed": [
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/sustainability/sovereignty",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/sustainability/sovereignty?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+   "h1": "Sustainability: Sovereignty",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATION WINDOW | 08:00:00 \u2192 08:00:00 UTC | CONNECTION HEALTH | Source: disabled | DATA FRESHNESS | Fresh | EVIDENCE QUALITY | 18 accepted \u00b7 0 quarantine",
+   "bodyLen": 448,
+   "consoleErrors": [],
+   "failed": [
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/decisions",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/decisions?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+   "h1": "Decisions: Results",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATION WINDOW | 08:00:00 \u2192 08:00:00 UTC | CONNECTION HEALTH | Source: disabled | DATA FRESHNESS | Fresh | EVIDENCE QUALITY | 18 accepted \u00b7 0 quarantine",
+   "bodyLen": 448,
+   "consoleErrors": [],
+   "failed": [
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/decisions/log",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/decisions/log?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+   "h1": "Decisions: Decision log",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATION WINDOW | 08:00:00 \u2192 08:00:00 UTC | CONNECTION HEALTH | Source: disabled | DATA FRESHNESS | Fresh | EVIDENCE QUALITY | 18 accepted \u00b7 0 quarantine",
+   "bodyLen": 448,
+   "consoleErrors": [],
+   "failed": [
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/assets",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/assets?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+   "h1": "Assets",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATION WINDOW | 08:00:00 \u2192 08:00:00 UTC | CONNECTION HEALTH | Source: disabled | DATA FRESHNESS | Fresh | EVIDENCE QUALITY | 18 accepted \u00b7 0 quarantine",
+   "bodyLen": 448,
+   "consoleErrors": [],
+   "failed": [
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/pilot/overview",
+   "finalUrl": "https://auradc.m2mtechconnect.com/pilot/overview",
+   "h1": "Data-centre twins",
+   "spinner": false,
+   "bodyHead": "M2M AURA Pilot | Overview | lucas@m2mtechconnect.com | Sign out | Data-centre twins |  | Source: public.data_centre_twins. Row visibility is enforced server-side by row-level security scoped to the record owner. |  | Montreal Sovereign AI DC | Montreal - CA-QC - Tier Tier III - 5000 kW | Updated 2026-08-05T20:18:07.005Z | Controlled pilot surface. Read-only. Displays only records visible under your account's row-level ",
+   "bodyLen": 422,
+   "consoleErrors": [],
+   "failed": [
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/agents",
+   "finalUrl": "https://auradc.m2mtechconnect.com/app/agents",
+   "h1": "Subsystem Agents",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Introducing Agent Operations Center |  | Your mission control for deployed AI agents |  | Real-Time Control |  | Start, pause, stop agents on demand |  | Live Monitoring |  | Stream activity logs in real-time |  | Performance Metrics |  | Track success rate and latency |  | Team Collaboration |  | See who's viewing and recent changes |  | \u2318K | Quick actions | \u2022 | ? | Keyboard shortcu",
+   "bodyLen": 458,
+   "consoleErrors": [],
+   "failed": [
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/integrations",
+   "finalUrl": "https://auradc.m2mtechconnect.com/manage/integrations",
+   "h1": "Integrations",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Integrations |  | Connection and readiness state for every external system. Nothing listed here is currently supplying data to AURA DC. |  | Data sources |  | What AURA DC would read from, and whether it is attached. |  | Facility telemetry (BMS / DCIM) |  | No building-management or DCIM source is attached. Every value in AURA DC is modelled. |  | Not connect",
+   "bodyLen": 434,
+   "consoleErrors": [],
+   "failed": [
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/evidence",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dsx/evidence-beta/evidence?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+   "h1": "Overview",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | FACILITY | Evidence Beta Site | DATA MODE | Simulated | CALIBRATION | Uncalibrated | LAST VALIDATED OBSERVATION | 2026-03-02T08:00:00.000Z | DSX EXCHANGE | Exchange: unavailable | ACTIVE SCENARIO | cooling degradation | OBSERVATION WINDOW | 08:00:00 \u2192 08:00:00 UTC | CONNECTION HEALTH | Source: disabled | DATA FRESHNESS | Fresh | EVIDENCE QUALITY | 18 accepted \u00b7 0 quarantine",
+   "bodyLen": 448,
+   "consoleErrors": [],
+   "failed": [
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/command",
+   "finalUrl": "https://auradc.m2mtechconnect.com/dashboard",
+   "h1": "Montreal Sovereign AI DC",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs |  | DATA CENTRE FACILITY |  | Montreal Sovereign AI DC |  | Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:43 AM |  | Start simulation | Open Blueprint | View Evidence | PUE | 1.32 | Watch | View source | IT LOAD | 3.5 MW | Within design target | View source | CAPACITY HEADROOM | 30% | Within design target | View source | SOVEREIGNTY POST",
+   "bodyLen": 454,
+   "consoleErrors": [],
+   "failed": [
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/facilities",
+   "finalUrl": "https://auradc.m2mtechconnect.com/manage/facilities",
+   "h1": "Facilities",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Facilities |  | Facility administration: create, configure and retire modelled data-centre facilities. All values remain simulated. |  | Create facility | Facility list |  | Facilities you have access to. |  | Montreal Sovereign AI DC | Current |  | Montreal | \u00b7 | Tier III | \u00b7 | 5000 kW |  | Set as current | Edit |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Do",
+   "bodyLen": 462,
+   "consoleErrors": [],
+   "failed": [
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/universal-search",
+   "finalUrl": "https://auradc.m2mtechconnect.com/search",
+   "h1": "Search",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Search |  | Find documents, pages, and apps across all your connected sources. |  | Search | Start searching |  | Enter a query to search across all your connected documents, pages, and apps. |  | Try searching for: |  | HIPAA | Marketing report | Support tickets | Compliance |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documentation | Compliance",
+   "bodyLen": 448,
+   "consoleErrors": [],
+   "failed": [
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/this-route-does-not-exist",
+   "finalUrl": "https://auradc.m2mtechconnect.com/this-route-does-not-exist",
+   "h1": "404",
+   "spinner": false,
+   "bodyHead": "LH | SIMULATED | Design baseline | No run recorded | Synthetic inputs | 404 |  | Oops! Page not found |  | Return to Home |  | \u00a9 2025 Data Centre Digital Twin Studio |  | vpilot | \u2022 | 1/1/1970 | Documentation | Compliance",
+   "bodyLen": 221,
+   "consoleErrors": [
+    "404 Error: User attempted to access non-existent route: /this-route-does-not-exist",
+    "404 Error: User attempted to access non-existent route: /this-route-does-not-exist",
+    "404 Error: User attempted to access non-existent route: /this-route-does-not-exist",
+    "404 Error: User attempted to access non-existent route: /this-route-does-not-exist",
+    "404 Error: User attempted to access non-existent route: /this-route-does-not-exist",
+    "404 Error: User attempted to access non-existent route: /this-route-does-not-exist"
+   ],
+   "failed": [
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect"
+   ],
+   "http4xx": []
+  }
+ ]
+}

@@ -1,0 +1,42 @@
+{
+ "stepUrl": "https://auradc.m2mtechconnect.com/simulation?step=simulate",
+ "runIdsAfterRun": [
+  "SIM-2026-08-17-001"
+ ],
+ "runIdsAfterRefresh": [
+  "SIM-2026-08-17-001"
+ ],
+ "compare": {
+  "url": "https://auradc.m2mtechconnect.com/simulation?step=compare",
+  "runIds": [
+   "SIM-2026-08-17-001"
+  ],
+  "export": 1
+ },
+ "decide": {
+  "url": "https://auradc.m2mtechconnect.com/simulation?step=decide",
+  "runIds": [
+   "SIM-2026-08-17-001"
+  ],
+  "export": 1
+ },
+ "export_csv": {
+  "file": "aura-run-sim-2026-08-17-001.csv",
+  "bytes": 4410
+ },
+ "export_json": {
+  "file": "aura-run-sim-2026-08-17-001.json",
+  "bytes": 8072
+ },
+ "back": "https://auradc.m2mtechconnect.com/simulation?step=compare",
+ "forward": "https://auradc.m2mtechconnect.com/simulation?step=decide",
+ "consoleErrors": [],
+ "failed": [
+  "https://a.clarity.ms/collect",
+  "https://f.clarity.ms/collect",
+  "https://l.clarity.ms/collect",
+  "https://n.clarity.ms/collect",
+  "https://r.clarity.ms/collect",
+  "https://z.clarity.ms/collect"
+ ]
+}

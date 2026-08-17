@@ -104,7 +104,15 @@ describe('Template URL Loading Integration', () => {
   });
 
   it('should handle missing template gracefully', async () => {
-    // Mock database to return error
+    // Make the database lookup miss for this test only.
+    const { supabase } = await import('@/integrations/supabase/client');
+    vi.mocked(supabase.from).mockReturnValueOnce({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          single: vi.fn(() => ({ data: null, error: { message: 'Not found' } })),
+        })),
+      })),
+    } as any);
 
     const { result } = renderHook(() => useWizardBuilderStore());
     

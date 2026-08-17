@@ -72,6 +72,9 @@ export function useWorkflowStep(enabled: boolean): WorkflowStepState {
   // step and immediately overwrites a valid deep link (`?step=simulate` was
   // being rewritten back to `?step=inspect`).
   const urlSyncPending = useRef(false);
+  // Step the hook itself last rewrote the URL to. The follow-up effect pass
+  // caused by that rewrite must not erase the explanation the user needs.
+  const rewroteTo = useRef<WorkspaceTool | null>(null);
 
   const writeStep = useCallback(
     (step: WorkspaceTool, replace: boolean) => {
@@ -92,12 +95,16 @@ export function useWorkflowStep(enabled: boolean): WorkflowStepState {
   useEffect(() => {
     if (!enabled) return;
     const resolved = resolveWorkflowStep(raw, hasRun, activeTool);
-    setNotice(resolved.notice);
+    if (resolved.notice !== null) setNotice(resolved.notice);
+    else if (raw !== rewroteTo.current) setNotice(null);
     if (resolved.step !== activeTool) {
       urlSyncPending.current = true;
       setTool(resolved.step);
     }
-    if (resolved.rewrite && raw !== resolved.step) writeStep(resolved.step, true);
+    if (resolved.rewrite && raw !== resolved.step) {
+      rewroteTo.current = resolved.step;
+      writeStep(resolved.step, true);
+    }
     // `activeTool` is deliberately excluded: it is the *output* of this
     // effect, and the store->URL effect below owns the opposite direction.
     // eslint-disable-next-line react-hooks/exhaustive-deps

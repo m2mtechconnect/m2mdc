@@ -1315,6 +1315,109 @@ export type Database = {
           },
         ]
       }
+      connection_credential_events: {
+        Row: {
+          action: string
+          actor_id: string | null
+          connection_id: string
+          correlation_id: string | null
+          created_at: string
+          fingerprint: string | null
+          id: string
+          tenant_id: string | null
+          version: number
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          connection_id: string
+          correlation_id?: string | null
+          created_at?: string
+          fingerprint?: string | null
+          id?: string
+          tenant_id?: string | null
+          version: number
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          connection_id?: string
+          correlation_id?: string | null
+          created_at?: string
+          fingerprint?: string | null
+          id?: string
+          tenant_id?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connection_credential_events_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "connection_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      connection_credentials: {
+        Row: {
+          auth_method: string
+          ciphertext: string
+          connection_id: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          fingerprint: string
+          id: string
+          last_rotated_at: string
+          rotated_by: string | null
+          status: string
+          tenant_id: string | null
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          auth_method: string
+          ciphertext: string
+          connection_id: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          fingerprint: string
+          id?: string
+          last_rotated_at?: string
+          rotated_by?: string | null
+          status?: string
+          tenant_id?: string | null
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          auth_method?: string
+          ciphertext?: string
+          connection_id?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          fingerprint?: string
+          id?: string
+          last_rotated_at?: string
+          rotated_by?: string | null
+          status?: string
+          tenant_id?: string | null
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connection_credentials_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: true
+            referencedRelation: "connection_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       connection_data_contracts: {
         Row: {
           checksum: string | null

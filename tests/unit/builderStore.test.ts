@@ -2,40 +2,52 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useBuilderStore } from '@/stores/builderStore';
 
-// Mock Supabase
+// Mock Supabase.
+//
+// The client is used through fluent chains, and the store also reads the
+// session. A hand-written literal drifted from the real call chain (missing
+// getSession and maybeSingle), so every save and load test failed on the mock
+// rather than on the store. This chainable stub answers any chain and resolves
+// with the same shape the store expects.
+const singleRow = {
+  id: 'system-123',
+  state: { systemName: 'Loaded System' },
+  step: 1,
+};
+
+function chain(): any {
+  const result = { data: singleRow, error: null };
+  const target: any = vi.fn(() => proxy);
+  const proxy: any = new Proxy(target, {
+    get(_t, prop) {
+      if (prop === 'then') {
+        return (resolve: (v: unknown) => unknown) => Promise.resolve(result).then(resolve);
+      }
+      if (prop === 'single' || prop === 'maybeSingle') {
+        return vi.fn(() => Promise.resolve(result));
+      }
+      return vi.fn(() => proxy);
+    },
+    apply: () => proxy,
+  });
+  return proxy;
+}
+
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     auth: {
-      getUser: vi.fn(() => 
+      getUser: vi.fn(() =>
         Promise.resolve({ data: { user: { id: 'test-user-123' } }, error: null })
       ),
+      getSession: vi.fn(() =>
+        Promise.resolve({
+          data: { session: { user: { id: 'test-user-123' }, access_token: 'test-token' } },
+          error: null,
+        })
+      ),
     },
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          single: vi.fn(() => 
-            Promise.resolve({ 
-              data: { 
-                id: 'system-123', 
-                state: { systemName: 'Loaded System' } 
-              }, 
-              error: null 
-            })
-          ),
-        })),
-      })),
-      insert: vi.fn(() => 
-        Promise.resolve({ data: [{ id: 'new-system-123' }], error: null })
-      ),
-      update: vi.fn(() => ({
-        eq: vi.fn(() => 
-          Promise.resolve({ error: null })
-        ),
-      })),
-      upsert: vi.fn(() => 
-        Promise.resolve({ error: null })
-      ),
-    })),
+    from: vi.fn(() => chain()),
+    functions: { invoke: vi.fn(() => Promise.resolve({ data: null, error: null })) },
   },
 }));
 

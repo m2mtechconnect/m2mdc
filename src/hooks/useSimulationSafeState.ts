@@ -71,13 +71,16 @@ export function validateSimulationState(state: {
   status?: string;
 }): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
+  // Requirements only apply once a simulation is actually running; an idle
+  // workspace legitimately has no twin or scenario selected yet.
+  const isRunning = state.status === 'running';
 
-  if (!state.twinId) {
-    errors.push('No twin selected');
+  if (!state.twinId && isRunning) {
+    errors.push('Twin ID is required for running simulation');
   }
 
-  if (!state.scenarioId && state.status === 'running') {
-    errors.push('Running simulation requires active scenario');
+  if (!state.scenarioId && isRunning) {
+    errors.push('Scenario ID is required for running simulation');
   }
 
   return {

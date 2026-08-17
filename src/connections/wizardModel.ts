@@ -1,9 +1,10 @@
 /**
  * Connection setup wizard: pure, testable step model.
  *
- * The wizard never accepts credential material — no server-side credential
- * vault exists yet, so any connector whose authentication needs a secret is
- * refused with a named blocker instead of a fake success path.
+ * Secret-bearing authentication methods are supported through the server-side
+ * credential vault: the wizard collects the credential in memory, hands it to
+ * the vault edge function once, and never reads it back. Credential material is
+ * never persisted in the draft, in query state or in the connection record.
  */
 import { canAddConnection, type ConnectorDefinition } from './model';
 
@@ -24,6 +25,14 @@ export const DIRECTIONS = ['READ', 'WRITE', 'READ_WRITE'] as const;
 /** Authentication methods that require no stored secret. */
 export const VAULT_FREE_AUTH = new Set(['jwt', 'none', 'iam_role', 'workload_identity', 'service_account']);
 
+/** True when the method needs credential material held in the vault. */
+export function requiresVaultCredential(authMethod: string): boolean {
+  return Boolean(authMethod) && !VAULT_FREE_AUTH.has(authMethod);
+}
+
+/** Minimum credential length the vault will accept. Mirrors the server rule. */
+export const MIN_CREDENTIAL_LENGTH = 12;
+
 export interface WizardDraft {
   connector_id: string;
   tenant_id: string | null;
@@ -34,6 +43,8 @@ export interface WizardDraft {
   data_classes: string[];
   auth_method: string;
   endpoint_reference: string | null;
+  /** In-memory only. Sent once to the vault, never persisted client-side. */
+  credential_secret: string;
 }
 
 export function emptyWizardDraft(): WizardDraft {
@@ -47,6 +58,7 @@ export function emptyWizardDraft(): WizardDraft {
     data_classes: [],
     auth_method: '',
     endpoint_reference: null,
+    credential_secret: '',
   };
 }
 
@@ -58,14 +70,21 @@ export function selectableConnectors(definitions: ConnectorDefinition[]): Connec
 export function authBlocker(
   definition: ConnectorDefinition | undefined,
   authMethod: string,
+  credentialSecret = '',
 ): string | null {
   if (!definition) return 'Select a connector first.';
   if (!authMethod) return 'Select the authentication method this connection will use.';
   if (!definition.supported_auth_methods.includes(authMethod)) {
     return 'This connector does not support the selected authentication method.';
   }
-  if (!VAULT_FREE_AUTH.has(authMethod)) {
-    return 'No server-side credential vault is available, so a secret-bearing authentication method cannot be configured yet.';
+  if (requiresVaultCredential(authMethod)) {
+    const secret = credentialSecret.trim();
+    if (!secret) {
+      return 'This authentication method needs a credential. Enter it here; it is encrypted server-side and never read back.';
+    }
+    if (secret.length < MIN_CREDENTIAL_LENGTH) {
+      return `The credential must be at least ${MIN_CREDENTIAL_LENGTH} characters.`;
+    }
   }
   return null;
 }
@@ -109,7 +128,7 @@ export function validateStep(
       return { complete: true, reason: null };
     }
     case 'authentication': {
-      const blocker = authBlocker(definition, draft.auth_method);
+      const blocker = authBlocker(definition, draft.auth_method, draft.credential_secret);
       return { complete: !blocker, reason: blocker };
     }
     case 'test':

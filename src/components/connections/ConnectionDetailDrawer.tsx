@@ -17,11 +17,18 @@ import {
   deactivateConnection,
   deleteConnection,
   runHealthCheck,
+  runRuntimeVerification,
   type AuditEventRecord,
   type CredentialMetadata,
   type DataContractRecord,
   type FacilityOption,
 } from '@/connections/api';
+import {
+  VERIFICATION_LABEL,
+  VERIFICATION_MEANING,
+  VERIFICATION_TONE,
+  type VerificationState,
+} from '@/connections/managedVerification';
 import { canRunHealthCheck, type HealthCheckRecord, type IngestRunRecord, type TwinMappingRecord } from '@/connections/model';
 import { formatDateTime, type ConnectionRow } from '@/connections/presentation';
 
@@ -60,6 +67,13 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
+const VERIFICATION_TONE_CLASS: Record<string, string> = {
+  positive: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+  caution: 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300',
+  critical: 'border-destructive/40 bg-destructive/10 text-destructive',
+  neutral: 'border-border bg-muted text-muted-foreground',
+};
+
 export function ConnectionDetailDrawer(props: Props) {
   const {
     row, open, onOpenChange, isAdmin, credential, contracts, mappings,
@@ -88,7 +102,7 @@ export function ConnectionDetailDrawer(props: Props) {
 
   if (!row || !connection) return null;
 
-  async function act(kind: 'test' | 'activate' | 'deactivate' | 'delete') {
+  async function act(kind: 'test' | 'verify' | 'activate' | 'deactivate' | 'delete') {
     if (!connection) return;
     if (kind === 'delete' && !window.confirm(`Delete "${connection.display_name}"? The audit trail is retained.`)) return;
     setBusy(kind);
@@ -98,6 +112,13 @@ export function ConnectionDetailDrawer(props: Props) {
         toast({
           title: result.status === 'PASSED' ? 'Health check passed' : 'Health check failed',
           description: `${result.safe_message ?? ''} A passing check proves reachability, not data flow.`,
+        });
+      } else if (kind === 'verify') {
+        const result = await runRuntimeVerification(connection.id);
+        toast({
+          title: `Runtime verification: ${VERIFICATION_LABEL[result.verification_state]}`,
+          description: result.safe_message,
+          variant: result.verification_state === 'FAILED' ? 'destructive' : undefined,
         });
       } else if (kind === 'activate') {
         const status = await activateConnection(connection.id);
@@ -151,6 +172,16 @@ export function ConnectionDetailDrawer(props: Props) {
             <Button size="sm" className="h-10" disabled={!isAdmin || !testable || busy !== null} onClick={() => act('test')}>
               {busy === 'test' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden /> : null}
               Test connection
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-10"
+              disabled={busy !== null}
+              onClick={() => act('verify')}
+            >
+              {busy === 'verify' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden /> : null}
+              Verify live data
             </Button>
             <Button size="sm" variant="outline" className="h-10" disabled={!isAdmin} onClick={onManageCredential}>
               {credential ? 'Rotate credential' : 'Store credential'}
@@ -210,6 +241,24 @@ export function ConnectionDetailDrawer(props: Props) {
                 <Field label="Environment" value={connection.environment} />
                 <Field label="Direction" value={connection.data_direction} />
                 <Field label="Last health check" value={formatDateTime(connection.last_tested_at)} />
+                <Field
+                  label="Runtime verification"
+                  value={
+                    <span className="flex flex-wrap items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className={`text-xs ${VERIFICATION_TONE_CLASS[VERIFICATION_TONE[(connection.verification_state ?? 'NOT_VERIFIED') as VerificationState]]}`}
+                      >
+                        {VERIFICATION_LABEL[(connection.verification_state ?? 'NOT_VERIFIED') as VerificationState]}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {connection.verification_reason ??
+                          VERIFICATION_MEANING[(connection.verification_state ?? 'NOT_VERIFIED') as VerificationState]}
+                      </span>
+                    </span>
+                  }
+                />
+                <Field label="Last verification" value={formatDateTime(connection.last_verification_at ?? null)} />
                 <Field label="Last data received" value={formatDateTime(connection.last_ingest_at)} />
                 <Field label="Throughput" value={row.throughput.label} />
                 <Field label="Mapping coverage" value={row.coverage.label} />

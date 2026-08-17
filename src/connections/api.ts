@@ -150,6 +150,38 @@ export async function runHealthCheck(connectionId: string): Promise<HealthCheckR
   return data as HealthCheckResult;
 }
 
+export interface RuntimeVerificationResult {
+  previous_state: string;
+  verification_state: 'NOT_VERIFIED' | 'PARTIAL' | 'VERIFIED' | 'FAILED';
+  reason_code: string;
+  safe_message: string;
+  record_count: number | null;
+  latency_ms: number;
+  correlation_id: string;
+}
+
+/**
+ * Operator-triggered runtime verification. The server runs the managed
+ * read-only probe and derives the state; the client cannot assert it.
+ */
+export async function runRuntimeVerification(connectionId: string): Promise<RuntimeVerificationResult> {
+  const { data, error } = await supabase.functions.invoke<RuntimeVerificationResult>('managed-connector-verify', {
+    body: { connection_id: connectionId },
+  });
+  if (error) {
+    const detail = 'context' in error && error.context ? await (error.context as Response).text().catch(() => '') : '';
+    let message = error.message;
+    try {
+      const parsed = detail ? JSON.parse(detail) : null;
+      if (parsed?.safe_message || parsed?.error_code) message = parsed.safe_message ?? parsed.error_code;
+    } catch {
+      /* keep the transport message */
+    }
+    throw new Error(message);
+  }
+  return data as RuntimeVerificationResult;
+}
+
 export interface FacilityOption {
   id: string;
   name: string;

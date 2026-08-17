@@ -1774,6 +1774,7 @@ export type Database = {
           last_ingest_at: string | null
           last_success_at: string | null
           last_tested_at: string | null
+          last_verification_at: string | null
           last_verified_at: string | null
           owner_id: string | null
           platform_binding_state: string
@@ -1781,6 +1782,10 @@ export type Database = {
           status_reason: string | null
           tenant_id: string | null
           updated_at: string
+          verification_evidence: Json | null
+          verification_reason: string | null
+          verification_state: string
+          verified_by: string | null
         }
         Insert: {
           binding_class?: string
@@ -1802,6 +1807,7 @@ export type Database = {
           last_ingest_at?: string | null
           last_success_at?: string | null
           last_tested_at?: string | null
+          last_verification_at?: string | null
           last_verified_at?: string | null
           owner_id?: string | null
           platform_binding_state?: string
@@ -1809,6 +1815,10 @@ export type Database = {
           status_reason?: string | null
           tenant_id?: string | null
           updated_at?: string
+          verification_evidence?: Json | null
+          verification_reason?: string | null
+          verification_state?: string
+          verified_by?: string | null
         }
         Update: {
           binding_class?: string
@@ -1830,6 +1840,7 @@ export type Database = {
           last_ingest_at?: string | null
           last_success_at?: string | null
           last_tested_at?: string | null
+          last_verification_at?: string | null
           last_verified_at?: string | null
           owner_id?: string | null
           platform_binding_state?: string
@@ -1837,6 +1848,10 @@ export type Database = {
           status_reason?: string | null
           tenant_id?: string | null
           updated_at?: string
+          verification_evidence?: Json | null
+          verification_reason?: string | null
+          verification_state?: string
+          verified_by?: string | null
         }
         Relationships: [
           {

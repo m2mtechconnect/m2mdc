@@ -308,12 +308,14 @@ export default function Settings() {
                     <div className="space-y-1">
                       <Label>Multi-Factor Authentication (MFA)</Label>
                       <p className="text-sm text-muted-foreground">
-                        Require MFA for all team members
+                        UNAVAILABLE - second-factor enrollment and enforcement
+                        are not implemented on this platform.
                       </p>
                     </div>
                     <Switch
-                      checked={organization.mfa_enabled}
+                      checked={false}
                       disabled
+                      aria-label="Multi-factor authentication (unavailable)"
                     />
                   </div>
 

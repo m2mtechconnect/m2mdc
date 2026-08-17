@@ -7,6 +7,10 @@
  * leaves a gap instead of a zero.
  */
 import { cn } from '@/lib/utils';
+import {
+  SERIES_LABEL,
+  type SeriesClassification,
+} from '@/data/dataset/chartSemantics';
 
 /** Minimum accepted observations in one series before a line can be drawn. */
 const MIN_POINTS = 2;
@@ -38,7 +42,56 @@ function path(points: (number | null)[], width: number, height: number): string 
   return d.trim();
 }
 
-export function TrendStrip({ series, className }: { series: TrendSeries[]; className?: string }) {
+export function TrendStrip({
+  series,
+  className,
+  classification = 'TRUE_TIME_SERIES',
+}: {
+  series: TrendSeries[];
+  className?: string;
+  /**
+   * Semantics of the underlying records. Point-in-time reference values are
+   * never drawn as a line: they render as snapshot cards with an explicit
+   * "historical trend unavailable" statement.
+   */
+  classification?: SeriesClassification;
+}) {
+  if (classification === 'POINT_IN_TIME' || classification === 'UNAVAILABLE') {
+    return (
+      <div
+        className={cn('grid gap-3 sm:grid-cols-2 xl:grid-cols-4', className)}
+        data-testid="dsx-trend-strip"
+        data-trend-state="snapshot"
+        data-series-classification={classification}
+      >
+        {series.map((s) => {
+          const values = s.points.filter((p): p is number => p !== null);
+          const last = values.length ? values[values.length - 1] : null;
+          const digits = s.digits ?? 2;
+          return (
+            <div key={s.id} className="min-w-0 rounded-md border border-border bg-card p-3">
+              <p className="truncate text-[12px] uppercase tracking-wide text-muted-foreground">
+                {s.label}
+              </p>
+              <p className="text-[14px] font-semibold tabular-nums">
+                {last === null ? (
+                  <span className="text-[12px] font-normal italic text-muted-foreground">
+                    Unavailable
+                  </span>
+                ) : (
+                  `${last.toFixed(digits)} ${s.unit}`
+                )}
+              </p>
+              <p className="mt-1 text-[12px] text-muted-foreground">
+                {SERIES_LABEL[classification]}. Historical trend unavailable.
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   // A run with fewer than two accepted observations produces one identical
   // empty state per series. Collapse them into a single truthful statement.
   const drawable = series.filter((s) => s.points.filter((p) => p !== null).length >= 2);

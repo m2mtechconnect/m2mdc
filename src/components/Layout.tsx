@@ -387,8 +387,8 @@ export function Layout({ children }: LayoutProps) {
         data-testid="page-content"
         className={
           fullBleed
-            ? "flex-1 w-full min-h-0 overflow-hidden"
-            : "flex-1 w-full mx-auto max-w-[1920px] px-3 sm:px-4 md:px-5 lg:px-6"
+            ? "flex-1 w-full min-w-0 min-h-0 overflow-hidden"
+            : "flex-1 w-full min-w-0 mx-auto max-w-[1920px] px-3 sm:px-4 md:px-5 lg:px-6"
         }
       >
         {children}

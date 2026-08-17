@@ -1,0 +1,5 @@
+{
+ "console_errors": 0,
+ "failed_requests": "not instrumented in this pass",
+ "note": "Playwright sweep recorded no page errors on the probed routes."
+}

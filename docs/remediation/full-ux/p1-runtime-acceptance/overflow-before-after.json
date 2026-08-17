@@ -1,0 +1,362 @@
+[
+ {
+  "vp": "1440x900",
+  "route": "/dashboard",
+  "c": 1440,
+  "s": 1440,
+  "off": [],
+  "spinner": true,
+  "text": 22
+ },
+ {
+  "vp": "1440x900",
+  "route": "/blueprint/default",
+  "c": 1440,
+  "s": 1440,
+  "off": [],
+  "spinner": false,
+  "text": 2381
+ },
+ {
+  "vp": "1440x900",
+  "route": "/simulation/preview",
+  "c": 1440,
+  "s": 1440,
+  "off": [],
+  "spinner": false,
+  "text": 283
+ },
+ {
+  "vp": "1440x900",
+  "route": "/dsx/evidence-beta",
+  "c": 1440,
+  "s": 1440,
+  "off": [],
+  "spinner": false,
+  "text": 5492
+ },
+ {
+  "vp": "1440x900",
+  "route": "/search",
+  "c": 1440,
+  "s": 1440,
+  "off": [],
+  "spinner": false,
+  "text": 393
+ },
+ {
+  "vp": "1440x900",
+  "route": "/data-centre-twin",
+  "c": 1440,
+  "s": 1440,
+  "off": [],
+  "spinner": true,
+  "text": 2173
+ },
+ {
+  "vp": "1440x900",
+  "route": "/onboarding",
+  "c": 1440,
+  "s": 1440,
+  "off": [],
+  "spinner": false,
+  "text": 2250
+ },
+ {
+  "vp": "1440x900",
+  "route": "/analytics",
+  "c": 1440,
+  "s": 1440,
+  "off": [],
+  "spinner": false,
+  "text": 4014
+ },
+ {
+  "vp": "1280x800",
+  "route": "/dashboard",
+  "c": 1280,
+  "s": 1280,
+  "off": [],
+  "spinner": true,
+  "text": 22
+ },
+ {
+  "vp": "1280x800",
+  "route": "/blueprint/default",
+  "c": 1280,
+  "s": 1280,
+  "off": [],
+  "spinner": false,
+  "text": 2381
+ },
+ {
+  "vp": "1280x800",
+  "route": "/simulation/preview",
+  "c": 1280,
+  "s": 1280,
+  "off": [],
+  "spinner": false,
+  "text": 283
+ },
+ {
+  "vp": "1280x800",
+  "route": "/dsx/evidence-beta",
+  "c": 1280,
+  "s": 1280,
+  "off": [],
+  "spinner": false,
+  "text": 5492
+ },
+ {
+  "vp": "1280x800",
+  "route": "/search",
+  "c": 1280,
+  "s": 1280,
+  "off": [],
+  "spinner": false,
+  "text": 393
+ },
+ {
+  "vp": "1280x800",
+  "route": "/data-centre-twin",
+  "c": 1280,
+  "s": 1280,
+  "off": [],
+  "spinner": true,
+  "text": 2201
+ },
+ {
+  "vp": "1280x800",
+  "route": "/onboarding",
+  "c": 1280,
+  "s": 1280,
+  "off": [],
+  "spinner": false,
+  "text": 2250
+ },
+ {
+  "vp": "1280x800",
+  "route": "/analytics",
+  "c": 1280,
+  "s": 1280,
+  "off": [],
+  "spinner": false,
+  "text": 4016
+ },
+ {
+  "vp": "1024x768",
+  "route": "/dashboard",
+  "c": 1024,
+  "s": 1024,
+  "off": [],
+  "spinner": true,
+  "text": 22
+ },
+ {
+  "vp": "1024x768",
+  "route": "/blueprint/default",
+  "c": 1024,
+  "s": 1024,
+  "off": [],
+  "spinner": true,
+  "text": 2363
+ },
+ {
+  "vp": "1024x768",
+  "route": "/simulation/preview",
+  "c": 1024,
+  "s": 1024,
+  "off": [],
+  "spinner": false,
+  "text": 283
+ },
+ {
+  "vp": "1024x768",
+  "route": "/dsx/evidence-beta",
+  "c": 1024,
+  "s": 1024,
+  "off": [],
+  "spinner": false,
+  "text": 5437
+ },
+ {
+  "vp": "1024x768",
+  "route": "/search",
+  "c": 1024,
+  "s": 1024,
+  "off": [],
+  "spinner": false,
+  "text": 393
+ },
+ {
+  "vp": "1024x768",
+  "route": "/data-centre-twin",
+  "c": 1024,
+  "s": 1024,
+  "off": [],
+  "spinner": true,
+  "text": 2188
+ },
+ {
+  "vp": "1024x768",
+  "route": "/onboarding",
+  "c": 1024,
+  "s": 1024,
+  "off": [],
+  "spinner": false,
+  "text": 2065
+ },
+ {
+  "vp": "1024x768",
+  "route": "/analytics",
+  "c": 1024,
+  "s": 1024,
+  "off": [],
+  "spinner": false,
+  "text": 4016
+ },
+ {
+  "vp": "768x1024",
+  "route": "/dashboard",
+  "c": 768,
+  "s": 768,
+  "off": [],
+  "spinner": true,
+  "text": 22
+ },
+ {
+  "vp": "768x1024",
+  "route": "/blueprint/default",
+  "c": 768,
+  "s": 768,
+  "off": [],
+  "spinner": false,
+  "text": 2363
+ },
+ {
+  "vp": "768x1024",
+  "route": "/simulation/preview",
+  "c": 768,
+  "s": 768,
+  "off": [],
+  "spinner": false,
+  "text": 283
+ },
+ {
+  "vp": "768x1024",
+  "route": "/dsx/evidence-beta",
+  "c": 768,
+  "s": 768,
+  "off": [],
+  "spinner": false,
+  "text": 5437
+ },
+ {
+  "vp": "768x1024",
+  "route": "/search",
+  "c": 768,
+  "s": 768,
+  "off": [],
+  "spinner": false,
+  "text": 393
+ },
+ {
+  "vp": "768x1024",
+  "route": "/data-centre-twin",
+  "c": 768,
+  "s": 768,
+  "off": [],
+  "spinner": true,
+  "text": 2171
+ },
+ {
+  "vp": "768x1024",
+  "route": "/onboarding",
+  "c": 768,
+  "s": 768,
+  "off": [],
+  "spinner": false,
+  "text": 1921
+ },
+ {
+  "vp": "768x1024",
+  "route": "/analytics",
+  "c": 768,
+  "s": 768,
+  "off": [],
+  "spinner": false,
+  "text": 3944
+ },
+ {
+  "vp": "390x844",
+  "route": "/dashboard",
+  "c": 390,
+  "s": 390,
+  "off": [],
+  "spinner": true,
+  "text": 22
+ },
+ {
+  "vp": "390x844",
+  "route": "/blueprint/default",
+  "c": 390,
+  "s": 390,
+  "off": [],
+  "spinner": true,
+  "text": 1365
+ },
+ {
+  "vp": "390x844",
+  "route": "/simulation/preview",
+  "c": 390,
+  "s": 390,
+  "off": [],
+  "spinner": true,
+  "text": 22
+ },
+ {
+  "vp": "390x844",
+  "route": "/dsx/evidence-beta",
+  "c": 390,
+  "s": 390,
+  "off": [],
+  "spinner": false,
+  "text": 5409
+ },
+ {
+  "vp": "390x844",
+  "route": "/search",
+  "c": 390,
+  "s": 390,
+  "off": [],
+  "spinner": false,
+  "text": 367
+ },
+ {
+  "vp": "390x844",
+  "route": "/data-centre-twin",
+  "c": 390,
+  "s": 390,
+  "off": [],
+  "spinner": true,
+  "text": 2024
+ },
+ {
+  "vp": "390x844",
+  "route": "/onboarding",
+  "c": 390,
+  "s": 390,
+  "off": [],
+  "spinner": false,
+  "text": 1421
+ },
+ {
+  "vp": "390x844",
+  "route": "/analytics",
+  "c": 390,
+  "s": 390,
+  "off": [],
+  "spinner": false,
+  "text": 3858
+ }
+]

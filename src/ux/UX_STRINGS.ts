@@ -148,7 +148,7 @@ export type DomainKey = keyof typeof DOMAINS;
 
 export const AGENTS = {
   SECTION_INTRO: 
-    'Autonomous agents monitor domains, detect anomalies, and trigger automated responses. Each agent binds to specific KPIs and workflows to maintain operational stability.',
+    'AURA agents analyse domain telemetry, flag anomalies and recommend responses for human approval. Each agent binds to specific KPIs and workflows; none applies a change on its own.',
   
   ITEMS: {
     'thermal-guardian': {

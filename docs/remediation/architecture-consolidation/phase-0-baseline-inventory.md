@@ -141,9 +141,30 @@ with the bridge as their migration target, and
 `src/simulation/compat/__tests__/previewSessionBridge.test.ts` fails if any app
 module constructs either engine directly.
 
+## Phase 7 - AI agent positioning (complete)
+
+Agents were described three incompatible ways: "autonomous agents ... trigger
+automated responses" (`src/ux/UX_STRINGS.ts`), "autonomous AI systems"
+(auth and template surfaces), and, in the capability registry, deterministic
+services performing no closed-loop control. Only the registry statement
+matches the shipped code, and NVIDIA NIM / NeMo Retriever remain
+documentation-only (the `rag-*` edge functions still return 501).
+
+`src/agents/agentPositioning.ts` now declares the single position:
+autonomy `human-approved`, inference limited to `aura-deterministic` and
+`hosted-llm-advisory`, `nvidia-nim` explicitly unavailable, and
+`actuatesInfrastructure: false`.
+
+Copy remediated: the agents section intro, the auth layout strapline, the
+template preview agent blurb, and the infrastructure pod-designer pipeline
+copy (now labelled a reference design rather than a deployed closed loop).
+
+`src/agents/__tests__/agentPositioning.test.ts` fails if "autonomous agent",
+"self-healing", "closed-loop control", "NIM-powered" or "NeMo Retriever"
+returns to an agent copy surface.
+
 ### Remaining open phases
 
-7. AI agent positioning audit (no NIM claims).
 8. Data-mode contract enforcement across every KPI surface.
 
 ## Phase 6 - exchange boundary naming (complete)
@@ -173,7 +194,28 @@ unchanged - it correctly refers to the vendor product.
 `src/dsx/exchange/__tests__/exchangeBoundary.test.ts` fails if AURA
 transport code reintroduces the vendor name outside explanatory comments.
 
+## Phase 7 - AI agent positioning (complete)
+
+Agents were described three incompatible ways: "autonomous agents ... trigger
+automated responses" (`src/ux/UX_STRINGS.ts`), "autonomous AI systems"
+(auth and template surfaces), and, in the capability registry, deterministic
+services performing no closed-loop control. Only the registry statement
+matches the shipped code, and NVIDIA NIM / NeMo Retriever remain
+documentation-only (the `rag-*` edge functions still return 501).
+
+`src/agents/agentPositioning.ts` now declares the single position:
+autonomy `human-approved`, inference limited to `aura-deterministic` and
+`hosted-llm-advisory`, `nvidia-nim` explicitly unavailable, and
+`actuatesInfrastructure: false`.
+
+Copy remediated: the agents section intro, the auth layout strapline, the
+template preview agent blurb, and the infrastructure pod-designer pipeline
+copy (now labelled a reference design rather than a deployed closed loop).
+
+`src/agents/__tests__/agentPositioning.test.ts` fails if "autonomous agent",
+"self-healing", "closed-loop control", "NIM-powered" or "NeMo Retriever"
+returns to an agent copy surface.
+
 ### Remaining open phases
 
-7. AI agent positioning audit (no NIM claims).
 8. Data-mode contract enforcement across every KPI surface.

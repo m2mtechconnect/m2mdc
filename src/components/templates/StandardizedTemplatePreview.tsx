@@ -230,7 +230,7 @@ export function StandardizedTemplatePreview({
                     Agents
                   </h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Autonomous AI agents that power the digital twin's capabilities
+                    AURA agents that analyse this digital twin and recommend actions for approval
                   </p>
                 </div>
                 <div className="grid grid-cols-1 gap-4">

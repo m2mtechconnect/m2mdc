@@ -175,31 +175,45 @@ export class EvidenceStore {
   }) {
     const d = params.decision;
     const target = d.mapping.target_entity ?? d.mapping.target_prim_path ?? 'unknown';
-    const { error } = await this.client
+    const property = d.mapping.target_property ?? 'unknown';
+    const now = new Date().toISOString();
+    const row = {
+      tenant_id: params.tenantId,
+      facility_id: d.mapping.target_facility_id,
+      target_entity: target,
+      target_prim_path: d.mapping.target_prim_path,
+      target_property: property,
+      value_numeric: d.value,
+      unit: d.unit,
+      observed_at: d.observed_at,
+      received_at: now,
+      applied_at: now,
+      source_connection_id: params.connectionId,
+      source_contract_id: d.contract_id,
+      source_mapping_id: d.mapping.id,
+      source_message_id: params.messageId,
+      correlation_id: d.correlation_id,
+      provenance_class: d.provenance.provenance_class,
+      provenance_reason: d.provenance.reason,
+      updated_at: now,
+    };
+
+    // The uniqueness index is expression-based (COALESCE on tenant_id), so an
+    // explicit read-then-write is used rather than an ON CONFLICT target.
+    let existing = this.client
       .from('twin_property_values')
-      .upsert(
-        {
-          tenant_id: params.tenantId,
-          facility_id: d.mapping.target_facility_id,
-          target_entity: target,
-          target_prim_path: d.mapping.target_prim_path,
-          target_property: d.mapping.target_property ?? 'unknown',
-          value_numeric: d.value,
-          unit: d.unit,
-          observed_at: d.observed_at,
-          received_at: new Date().toISOString(),
-          applied_at: new Date().toISOString(),
-          source_connection_id: params.connectionId,
-          source_contract_id: d.contract_id,
-          source_mapping_id: d.mapping.id,
-          source_message_id: params.messageId,
-          correlation_id: d.correlation_id,
-          provenance_class: d.provenance.provenance_class,
-          provenance_reason: d.provenance.reason,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'tenant_id,target_entity,target_property', ignoreDuplicates: false },
-      );
+      .select('id')
+      .eq('target_entity', target)
+      .eq('target_property', property);
+    existing = params.tenantId
+      ? existing.eq('tenant_id', params.tenantId)
+      : existing.is('tenant_id', null);
+    const { data: found, error: findError } = await existing.maybeSingle();
+    if (findError) throw new Error(`twin property lookup failed: ${findError.message}`);
+
+    const { error } = found
+      ? await this.client.from('twin_property_values').update(row).eq('id', found.id)
+      : await this.client.from('twin_property_values').insert(row);
     if (error) throw new Error(`twin property write failed: ${error.message}`);
 
     const { error: mapError } = await this.client

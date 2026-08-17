@@ -101,6 +101,10 @@ export interface ConnectionInstance {
   last_error: string | null;
   created_at: string;
   updated_at: string;
+  /** Operator-triggered runtime verification evidence. */
+  verification_state?: 'NOT_VERIFIED' | 'PARTIAL' | 'VERIFIED' | 'FAILED' | null;
+  verification_reason?: string | null;
+  last_verification_at?: string | null;
 }
 
 export interface HealthCheckRecord {

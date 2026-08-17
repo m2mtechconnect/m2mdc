@@ -29,7 +29,7 @@ const frCA = {
     improvement: 'amélioration',
     fromBaseline: 'par rapport à la référence',
     stable: 'Stable',
-    canadaCompliant: 'Conforme au Canada',
+    canadaCompliant: 'Résidence des données au Canada',
     returnToHome: "Retour à l'accueil",
     pageNotFound: 'Oups! Page introuvable',
   },
@@ -135,7 +135,7 @@ const frCA = {
     termsOfService: "Conditions d'utilisation",
     security: 'Sécurité',
     copyright: '© {{year}} M2M Tech Connect Inc. Tous droits réservés.',
-    carbonNeutral: 'Carboneutre',
+    carbonNeutral: 'Modélisation du carbone',
     madeInCanada: 'Conçu au Canada',
     footerDescription: "Jumeaux numériques souverains de centres de données IA pour des opérations d'infrastructure durables et conformes.",
     // Héros
@@ -183,7 +183,7 @@ const frCA = {
     viewLiveDashboard: 'Voir la démo du tableau de bord en direct',
     configureOwnTwin: 'Configurer votre propre jumeau',
     runSimulations: 'Lancer des scénarios de simulation',
-    carbonNeutralInfra: 'Infrastructure carboneutre',
+    carbonNeutralInfra: 'Modélisation d\'infrastructure sobre en carbone',
     canadianDataSovereignty: 'Souveraineté des données canadiennes',
     // Différenciateurs
     theM2MDifference: 'La différence M2M',
@@ -294,9 +294,9 @@ const frCA = {
     featureCoolingB2: 'Surveillance de l\'humidité de 43% à 51% à travers les zones',
     featureCoolingB3: 'Débits d\'air de 54 000 à 76 000 PCM par zone',
     featureSovereigntyTitle: 'Visibilité de la souveraineté et de la conformité',
-    featureSovereigntySubtitle: 'Suivez la résidence des données, le score de souveraineté et les certifications de conformité directement dans votre jumeau numérique.',
+    featureSovereigntySubtitle: 'Suivez la résidence des données modélisée, le score de souveraineté et les cadres de conformité configurés directement dans votre jumeau numérique.',
     featureSovereigntyB1: 'Score de souveraineté de 100% avec statut de conformité de résidence des données',
-    featureSovereigntyB2: '5 cadres de conformité certifiés (OSFI, HIPAA, PIPEDA)',
+    featureSovereigntyB2: '5 cadres de conformité configurés (OSFI, HIPAA, PIPEDA)',
     featureSovereigntyB3: '95% de préparation à l\'audit avec ventilation de classification des données',
     featureCarbonTitle: 'Suivi carbone et développement durable',
     featureCarbonSubtitle: 'Surveillez l\'efficacité carbone, les émissions par heure-GPU, le mix renouvelable et la comparaison de réseau régional.',
@@ -443,9 +443,9 @@ const frCA = {
   marketplace: {
     title: 'Marché de modèles',
     subtitle: "Découvrez des plans de jumeaux numériques et d'agents IA adaptés à votre industrie et département",
-    certifiedTemplates: 'Modèles certifiés M2M',
+    certifiedTemplates: 'Modèles de référence M2M',
     heroTitle: 'Marché de modèles',
-    heroSubtitle: "Modèles prêts à la production pour les jumeaux numériques et les agents IA. Certifiés par des experts de l'industrie.",
+    heroSubtitle: "Modèles de référence pour les jumeaux numériques et les agents AURA, revus selon les configurations de l'industrie.",
     searchPlaceholder: 'Rechercher des modèles par nom, industrie ou capacité...',
   },
 
@@ -562,7 +562,7 @@ const frCA = {
 
   // Agents
   agents: {
-    sectionIntro: "Les agents autonomes surveillent les domaines, détectent les anomalies et déclenchent des réponses automatisées. Chaque agent est lié à des IRC et des flux de travail spécifiques pour maintenir la stabilité opérationnelle.",
+    sectionIntro: "Les agents AURA surveillent les domaines, détectent les anomalies et recommandent des correctifs soumis à l'approbation humaine. Chaque agent est lié à des IRC et des flux de travail spécifiques pour soutenir la stabilité opérationnelle.",
     subsystemAgents: 'Agents de sous-système',
     deployNewAgent: 'Déployer un nouvel agent',
     totalAgents: 'Total des agents',
@@ -1424,7 +1424,7 @@ const frCA = {
   // Page d'infrastructure
   infrastructure: {
     heroTitle: 'Infrastructure IA de centre de données',
-    heroSubtitle: "Calcul GPU de bout en bout, stockage DDN et inférence en périphérie pour des opérations autonomes de centre de données.",
+    heroSubtitle: "Modélisation du calcul GPU de bout en bout, du stockage et de l'inférence en périphérie pour les opérations de centre de données IA.",
   },
 
   // Sélecteur de langue

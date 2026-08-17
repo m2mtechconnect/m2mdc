@@ -57,3 +57,26 @@ rendered.
   profiles) is untouched - those are modelled attributes, not AURA assertions.
 
 Certification itself stays an external blocker (external-blockers.md section 5).
+
+## Phase 10 - marketing and localized copy truth pass
+
+Public-facing localized strings were the last uncontrolled claim surface.
+Corrected in both `en` and `fr-CA`:
+
+| Before | After | Reason |
+| --- | --- | --- |
+| Carbon Neutral / Carboneutre | Carbon Modelling / Modelisation du carbone | no neutrality evidence |
+| Carbon Neutral Infrastructure | Carbon-Aware Infrastructure Modelling | same |
+| 5 certified compliance frameworks | 5 configured compliance frameworks | frameworks are configured per twin, not certified |
+| 100% Sovereignty Score with Data Residency Compliant status | Modelled Sovereignty Score with data-residency status per workload | score is modelled |
+| 95% Audit Readiness | Modelled audit-readiness score | modelled output |
+| M2M Certified Templates / Certified by industry experts | M2M Reference Templates / reviewed against industry configurations | no certification body |
+| Autonomous agents ... trigger automated responses | AURA agents ... recommend remediation for human approval | matches Phase 7 positioning |
+| real-time telemetry (NOC view) | simulated telemetry | no live source connected |
+| Canada-compliant | Canadian data residency | no legal opinion on file |
+| autonomous data centre operations | AI data centre operations | no closed-loop control |
+
+Guard: `src/i18n/__tests__/marketingClaims.test.ts` walks both locale bundles
+and fails on any of those phrases returning.
+
+Verification: full suite 1715 passing / 91 skipped, typecheck clean.

@@ -1,4 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from "react";
+import { boundedRetryDelay, retryUnlessTerminal } from '@/lib/queryRetry';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -35,8 +36,6 @@ const AuthenticatedShell = lazy(() => import("./AuthenticatedShell"));
 const OverlayFixtures = import.meta.env.DEV
   ? lazy(() => import("./pages/test/OverlayFixtures"))
   : null;
-
-import { boundedRetryDelay, retryUnlessTerminal } from '@/lib/queryRetry';
 
 // Initialize changelog middleware for builder store
 initChangeLogMiddleware();

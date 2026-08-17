@@ -547,7 +547,7 @@ textarea:focus {
   }
   
   .kpi-label {
-    font-size: 0.75rem;
+    font-size: 12px;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -555,7 +555,7 @@ textarea:focus {
   }
   
   .kpi-delta {
-    font-size: 0.75rem;
+    font-size: 12px;
     font-weight: 500;
     display: flex;
     align-items: center;
@@ -594,7 +594,7 @@ textarea:focus {
 
   /* Severity badges */
   .severity-badge {
-    font-size: 0.625rem;
+    font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -1049,4 +1049,18 @@ html:not(.dark) .aura-workspace-theme {
 .dashboard-main,
 .dashboard-rail {
   min-width: 0;
+}
+
+
+/* P2 typography floor: shared correction so no user-facing label renders
+   below the 11px minimum. Applied at the utility layer instead of dozens of
+   route-specific overrides. */
+@layer utilities {
+  .text-\[8px\],
+  .text-\[9px\],
+  .text-\[10px\],
+  .text-\[10\.5px\] {
+    font-size: 11px;
+    line-height: 1.4;
+  }
 }

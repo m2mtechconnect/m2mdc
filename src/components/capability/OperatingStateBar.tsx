@@ -82,7 +82,7 @@ export function OperatingStateBar({ className, scenario, runId, srOnly }: Props)
           <TooltipTrigger
             type="button"
             aria-label="About the current operating state"
-            className="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="ml-auto inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Info className="h-3.5 w-3.5" aria-hidden />
           </TooltipTrigger>

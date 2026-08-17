@@ -1,3 +1,4 @@
+import { DisabledActionExplanation } from '@/components/shared/DisabledActionExplanation';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -236,6 +237,7 @@ export default function Compliance() {
                       variant="outline"
                       disabled
                       aria-disabled="true"
+                      aria-describedby="compliance-export-audit-reason"
                       data-export-blocked="sovereignty-not-assessed"
                     >
                       <Download className="h-4 w-4 mr-2" />
@@ -247,6 +249,12 @@ export default function Compliance() {
                   {describeExportBlock('sovereignty-not-assessed')}
                 </TooltipContent>
               </Tooltip>
+              <DisabledActionExplanation
+                id="compliance-export-audit-reason"
+                className="mt-1 max-w-sm text-right"
+                reason={describeExportBlock('sovereignty-not-assessed')}
+                recovery="Complete a sovereignty assessment for this facility to enable the audit export."
+              />
             </TooltipProvider>
           </div>
 
@@ -519,7 +527,8 @@ export default function Compliance() {
                       { label: 'Carbon Emissions Report', reason: 'no-audited-source' as const },
                       { label: 'Power Stability Log', reason: 'no-audited-source' as const },
                     ].map((r) => (
-                      <Tooltip key={r.label}>
+                      <div key={r.label} className="space-y-1">
+                        <Tooltip>
                         <TooltipTrigger asChild>
                           <span tabIndex={0} className="block">
                             <Button
@@ -527,6 +536,7 @@ export default function Compliance() {
                               className="w-full justify-start"
                               disabled
                               aria-disabled="true"
+                              aria-describedby={`compliance-report-reason-${r.reason}`}
                               data-export-blocked={r.reason}
                             >
                               <Download className="h-4 w-4 mr-2" />
@@ -537,7 +547,13 @@ export default function Compliance() {
                         <TooltipContent className="max-w-sm">
                           {describeExportBlock(r.reason)}
                         </TooltipContent>
-                      </Tooltip>
+                        </Tooltip>
+                        <DisabledActionExplanation
+                          id={`compliance-report-reason-${r.reason}`}
+                          reason={describeExportBlock(r.reason)}
+                          recovery="Connect an audited data source in Manage > Integrations to enable this report."
+                        />
+                      </div>
                     ))}
                     <p className="text-[10px] text-muted-foreground pt-1">
                       These reports will be enabled in Phase 1B once an audited data source is wired.
@@ -610,8 +626,16 @@ export default function Compliance() {
                   <div className="text-xs text-muted-foreground">
                     {complianceScenarios.length} compliance scenarios from Blueprint
                   </div>
+                  {!selectedStressScenario && (
+                    <DisabledActionExplanation
+                      id="compliance-open-simulation-reason"
+                      reason="No compliance scenario is selected."
+                      recovery="Choose a scenario above to open it in Simulation."
+                    />
+                  )}
                   <Button 
                     className="w-full gap-2"
+                    aria-describedby={!selectedStressScenario ? 'compliance-open-simulation-reason' : undefined}
                     disabled={!selectedStressScenario}
                     onClick={() => navigate(`/data-centre-twin?view=simulation&scenarioId=${selectedStressScenario}`)}
                   >

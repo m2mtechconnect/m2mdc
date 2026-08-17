@@ -92,7 +92,7 @@ function ActionRow({
             onClick={() => onOpen(item.id)}
             data-testid={`action-item-open-${item.id}`}
             aria-haspopup="dialog"
-            className="inline-flex min-h-[44px] items-center line-clamp-1 break-words text-left underline-offset-4 sm:min-h-0 sm:block hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+            className="inline-flex min-h-[44px] items-center line-clamp-1 break-words text-left underline-offset-4 sm:min-h-[24px] sm:inline-flex hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
           >
             {item.title}
           </button>

@@ -45,7 +45,7 @@ export function MetricProvenanceManifest({
         'rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-xs'
       }
     >
-      <summary className="cursor-pointer select-none font-medium text-muted-foreground">
+      <summary className="flex min-h-[24px] cursor-pointer select-none items-center font-medium text-muted-foreground">
         {heading}
       </summary>
       <dl className="mt-2 divide-y divide-border/40">

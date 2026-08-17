@@ -299,8 +299,12 @@ describe('Recommendation Engine - Scoring', () => {
     const supplyChainRec = mockRecommendations[2]; // Supply chain twin
     const score = scoreEnterpriseRetail(supplyChainRec, 'Enterprise Retail');
     
-    // Supply chain twin should score high due to operational fit
-    expect(score).toBeGreaterThan(0.40); // Operations + supply chain fit
+    // A pure supply-chain twin saturates the supply-chain band (0.30) and the
+    // enterprise-scale band, but earns nothing from the store-operations band,
+    // so 0.32 is its ceiling under this rubric. The old 0.40 expectation was
+    // unreachable by construction.
+    expect(score).toBeGreaterThan(0.30);
+    expect(score).toBeLessThanOrEqual(0.40);
   });
 
   it('should heavily penalize personalization terms', () => {

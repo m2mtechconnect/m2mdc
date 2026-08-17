@@ -3,27 +3,39 @@
  * Classifies companies into one of 20 industry categories
  */
 
-export type Industry =
-  | 'Enterprise Retail'
-  | 'Fashion / Apparel Retail'
-  | 'Grocery & Food Retail'
-  | 'Logistics / Supply Chain / 3PL'
-  | 'Manufacturing – Automotive'
-  | 'Manufacturing – Industrial'
-  | 'Manufacturing – Consumer Goods'
-  | 'Energy / Utilities'
-  | 'Healthcare / Hospitals'
-  | 'Pharmaceuticals & Life Sciences'
-  | 'Financial Services / Banking'
-  | 'Insurance'
-  | 'Real Estate / PropTech'
-  | 'Construction / Engineering'
-  | 'Telecommunications'
-  | 'Travel / Transportation'
-  | 'Education / EdTech'
-  | 'Agriculture / Agritech'
-  | 'Government / Public Sector'
-  | 'Software / Enterprise SaaS';
+/**
+ * The complete industry vocabulary, exported as data so callers and tests read
+ * the same list instead of maintaining a second hand-copied copy that drifts.
+ */
+export const INDUSTRIES = [
+  'Enterprise Retail',
+  'Fashion / Apparel Retail',
+  'Grocery & Food Retail',
+  'Logistics / Supply Chain / 3PL',
+  'Manufacturing – Automotive',
+  'Manufacturing – Industrial',
+  'Manufacturing – Consumer Goods',
+  'Energy / Utilities',
+  'Healthcare / Hospitals',
+  'Pharmaceuticals & Life Sciences',
+  'Financial Services / Banking',
+  'Insurance',
+  'Real Estate / PropTech',
+  'Construction / Engineering',
+  'Telecommunications',
+  'Travel / Transportation',
+  'Education / EdTech',
+  'Agriculture / Agritech',
+  'Government / Public Sector',
+  'Software / Enterprise SaaS',
+] as const;
+
+export type Industry = (typeof INDUSTRIES)[number];
+
+/** Exposed so tests can assert the patterns stay domain-shaped. */
+export function industryDomainPatterns(): Array<{ industry: Industry; patterns: string[] }> {
+  return industryPatterns.map((p) => ({ industry: p.industry, patterns: p.domainPatterns }));
+}
 
 interface IndustryPattern {
   industry: Industry;

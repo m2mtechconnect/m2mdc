@@ -49,6 +49,16 @@ export function validateDigitalTwinWithContext(
 
   // ========== HARD REJECTIONS ==========
 
+  // 0. Policy rejections first.
+  //    Whether a department is permitted for an industry is a policy decision
+  //    and must be reported as such. Evaluating it after the content checks
+  //    meant a blocked recommendation was rejected for vague wording instead,
+  //    hiding the real reason from the caller.
+  if (department === 'Marketing' && !isMarketingAllowedForIndustry(industry)) {
+    reasons.push(`REJECTED: Marketing not allowed for ${industry}`);
+    return { isValid: false, reasons, scores };
+  }
+
   // 1. Check if recommendation is in blocked categories
   for (const blocked of blockedTypes) {
     if (text.includes(blocked.toLowerCase())) {
@@ -97,12 +107,6 @@ export function validateDigitalTwinWithContext(
     return { isValid: false, reasons, scores };
   }
 
-  // 4. Reject marketing unless allowed for industry
-  if (department === 'Marketing' && !isMarketingAllowedForIndustry(industry)) {
-    reasons.push(`REJECTED: Marketing not allowed for ${industry}`);
-    return { isValid: false, reasons, scores };
-  }
-
   // 5. Reject if missing critical digital twin elements
   const hasDataSources =
     text.includes('erp') ||
@@ -132,6 +136,20 @@ export function validateDigitalTwinWithContext(
     text.includes('reduction') ||
     text.includes('improvement');
 
+  // Vague phrasing with no named system is a generic pitch, not a twin. It is
+  // reported under its own reason rather than the data-source reason, because
+  // adding an acronym would not make it specific.
+  const hasGenericPhrases =
+    text.includes('improve efficiency') ||
+    text.includes('enhance performance') ||
+    text.includes('optimize processes') ||
+    text.includes('leverage ai');
+
+  if (hasGenericPhrases && !hasDataSources) {
+    reasons.push('REJECTED: Generic AI phrasing without specific digital twin context');
+    return { isValid: false, reasons, scores };
+  }
+
   if (!hasDataSources) {
     reasons.push('REJECTED: No data sources or systems integration mentioned');
     return { isValid: false, reasons, scores };
@@ -147,9 +165,7 @@ export function validateDigitalTwinWithContext(
   // Industry Fit (0-35 points)
   let industryScore = 0;
   for (const allowedType of allowedTypes) {
-    if (text.includes(allowedType.toLowerCase())) {
-      industryScore += 10;
-    }
+    industryScore += allowedTypeScore(text, allowedType);
   }
   
   // Check template keywords
@@ -216,6 +232,15 @@ export function validateDigitalTwinWithContext(
       integrationScore += 2;
     }
   }
+
+  // Naming concrete systems of record is the strongest integration signal
+  // there is, and it was previously worth nothing unless the generic word
+  // "system" also happened to appear.
+  for (const source of NAMED_DATA_SOURCES) {
+    if (text.includes(source)) {
+      integrationScore += 2;
+    }
+  }
   
   scores.integrationDepth = Math.min(10, integrationScore);
 
@@ -223,12 +248,6 @@ export function validateDigitalTwinWithContext(
   scores.total = scores.industryFit + scores.departmentFit + scores.twinSpecificity + scores.integrationDepth;
 
   // Apply generic penalty if detected
-  const hasGenericPhrases =
-    text.includes('improve efficiency') ||
-    text.includes('enhance performance') ||
-    text.includes('optimize processes') ||
-    text.includes('leverage ai');
-  
   if (hasGenericPhrases && !hasDigitalTwinMention) {
     scores.total -= 30;
     reasons.push('PENALTY: Generic AI phrasing without specific digital twin context');

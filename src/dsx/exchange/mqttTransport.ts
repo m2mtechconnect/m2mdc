@@ -1,5 +1,7 @@
 /**
- * Real MQTT transport for the DSX Exchange adapter.
+ * Real MQTT transport for the AURA Message Bridge (see
+ * `exchangeBoundary.ts`). This is AURA's own generic MQTT transport - it is
+ * not NVIDIA's DSX Exchange distribution.
  *
  * The only module in the DSX tree that imports a broker client. It is a
  * pure transport: it decodes nothing and validates nothing, so the adapter
@@ -9,6 +11,7 @@
  * refused host never results in a socket being opened.
  */
 import mqtt, { type MqttClient } from 'mqtt';
+import { AURA_MESSAGE_BRIDGE } from './exchangeBoundary';
 import {
   assessEndpoint,
   type ExchangeTransport,
@@ -19,7 +22,7 @@ import {
 
 export class EndpointRefusedError extends Error {
   constructor(reason: string) {
-    super(`DSX Exchange endpoint refused: ${reason}`);
+    super(`${AURA_MESSAGE_BRIDGE.label} endpoint refused: ${reason}`);
     this.name = 'EndpointRefusedError';
   }
 }

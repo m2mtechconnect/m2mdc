@@ -1,5 +1,8 @@
 /**
- * DSX Exchange adapter.
+ * AURA Message Bridge adapter (see `exchangeBoundary.ts`).
+ *
+ * AURA-implemented generic MQTT/NATS ingest. NOT NVIDIA's DSX Exchange
+ * distribution, which is not deployed in any AURA environment.
  *
  * Subscribes to a LOCAL broker, decodes each message into a DSX envelope
  * and pushes it through the SHARED ingestion pipeline. It has no private
@@ -85,7 +88,7 @@ export interface ExchangeAdapterOptions {
 }
 
 /**
- * Local-broker DSX Exchange source. Fails closed to UNAVAILABLE whenever
+ * Local-broker AURA Message Bridge source. Fails closed to UNAVAILABLE whenever
  * the endpoint is refused, the transport is not connected, or no validated
  * observation exists. It NEVER substitutes simulated data.
  */

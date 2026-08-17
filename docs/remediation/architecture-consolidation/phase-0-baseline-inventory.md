@@ -143,6 +143,37 @@ module constructs either engine directly.
 
 ### Remaining open phases
 
-6. DSX Exchange boundary naming audit for MQTT surfaces.
+7. AI agent positioning audit (no NIM claims).
+8. Data-mode contract enforcement across every KPI surface.
+
+## Phase 6 - exchange boundary naming (complete)
+
+Two different things were both called "DSX Exchange": AURA's own generic
+MQTT/NATS ingest bridge (`src/dsx/exchange/*`, `src/runtime/mqtt/*`) and
+NVIDIA's DSX Exchange distribution, which is not deployed anywhere and is
+gated on an entitlement. The capability registry already stated that a
+generic MQTT transport is not DSX Exchange, while the transport modules and
+one workspace availability label said the opposite.
+
+`src/dsx/exchange/exchangeBoundary.ts` now declares both boundaries once:
+
+| Boundary | Label | Owner | Implemented by AURA |
+| --- | --- | --- | --- |
+| `aura-message-bridge` | AURA Message Bridge (MQTT/NATS) | aura | yes |
+| `nvidia-dsx-exchange` | NVIDIA DSX Exchange | nvidia | no |
+
+Changes: the refusal error raised by the MQTT transport now names the AURA
+bridge, the transport and adapter headers say what they are, and the
+`dsx_exchange_runtime` workspace capability reads "Message bridge runtime"
+with an explanation that AURA's bridge is local-harness only and the NVIDIA
+product is not deployed. The connector catalogue category `DSX Exchange`
+(the `dsx_exchange` connector, status `PLANNED` / `NOT_DEPLOYED`) is
+unchanged - it correctly refers to the vendor product.
+
+`src/dsx/exchange/__tests__/exchangeBoundary.test.ts` fails if AURA
+transport code reintroduces the vendor name outside explanatory comments.
+
+### Remaining open phases
+
 7. AI agent positioning audit (no NIM claims).
 8. Data-mode contract enforcement across every KPI surface.

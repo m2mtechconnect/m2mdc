@@ -241,6 +241,24 @@ export function ConnectionDetailDrawer(props: Props) {
                 <Field label="Environment" value={connection.environment} />
                 <Field label="Direction" value={connection.data_direction} />
                 <Field label="Last health check" value={formatDateTime(connection.last_tested_at)} />
+                <Field
+                  label="Runtime verification"
+                  value={
+                    <span className="flex flex-wrap items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className={`text-xs ${VERIFICATION_TONE_CLASS[VERIFICATION_TONE[(connection.verification_state ?? 'NOT_VERIFIED') as VerificationState]]}`}
+                      >
+                        {VERIFICATION_LABEL[(connection.verification_state ?? 'NOT_VERIFIED') as VerificationState]}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {connection.verification_reason ??
+                          VERIFICATION_MEANING[(connection.verification_state ?? 'NOT_VERIFIED') as VerificationState]}
+                      </span>
+                    </span>
+                  }
+                />
+                <Field label="Last verification" value={formatDateTime(connection.last_verification_at ?? null)} />
                 <Field label="Last data received" value={formatDateTime(connection.last_ingest_at)} />
                 <Field label="Throughput" value={row.throughput.label} />
                 <Field label="Mapping coverage" value={row.coverage.label} />

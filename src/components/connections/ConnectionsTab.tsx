@@ -75,6 +75,32 @@ export function ConnectionsTab({ connections, definitions, healthChecks, eventCo
     }
   }
 
+  async function handleLifecycle(connection: ConnectionInstance, action: 'activate' | 'deactivate' | 'delete') {
+    if (action === 'delete' && !window.confirm(`Delete "${connection.display_name}"? The audit trail is retained.`)) return;
+    setMutating(connection.id);
+    try {
+      if (action === 'activate') {
+        const status = await activateConnection(connection.id);
+        toast({ title: 'Connection activated', description: `Status is now ${status}.` });
+      } else if (action === 'deactivate') {
+        await deactivateConnection(connection.id);
+        toast({ title: 'Connection disabled', description: 'The connection is no longer enabled.' });
+      } else {
+        await deleteConnection(connection.id);
+        toast({ title: 'Connection deleted', description: 'The connection record was removed.' });
+      }
+      onRefresh();
+    } catch (error) {
+      toast({
+        title: 'Action refused',
+        description: error instanceof Error ? error.message : 'The server rejected the request.',
+        variant: 'destructive',
+      });
+    } finally {
+      setMutating(null);
+    }
+  }
+
   const cards = [
     { label: 'Operational data sources', value: summary.operationalDataSources, hint: 'Facility/OT sources supplying data now.' },
     { label: 'Platform services', value: summary.platformServices, hint: 'Application-plane services proven healthy.' },
@@ -107,13 +133,26 @@ export function ConnectionsTab({ connections, definitions, healthChecks, eventCo
       <section aria-labelledby="connections-list-heading" className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id="connections-list-heading" className="text-base font-semibold">Configured connections</h2>
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search connections"
-            aria-label="Search connections"
-            className="h-9 w-full max-w-xs text-sm"
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search connections"
+              aria-label="Search connections"
+              className="h-9 w-full max-w-xs text-sm"
+            />
+            <Button
+              size="sm"
+              className="min-h-[32px]"
+              onClick={() => setWizardOpen(true)}
+              disabled={!isAdmin}
+            >
+              Add connection
+            </Button>
+            {!isAdmin && (
+              <span className="text-xs text-muted-foreground">Creating a connection requires an administrator role.</span>
+            )}
+          </div>
         </div>
 
         {loading && <p className="text-sm text-muted-foreground">Loading connection records…</p>}

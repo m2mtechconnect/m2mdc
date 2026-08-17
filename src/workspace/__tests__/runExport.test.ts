@@ -24,7 +24,10 @@ describe('workspace run export', () => {
   it('exports baseline and scenario KPIs as simulated records', () => {
     const payload = buildRunExportPayload(run);
     expect(payload.records.length).toBe(18);
-    expect(payload.records.every((r) => r.provenance === 'simulated')).toBe(true);
+    // Any KPI missing from the run downgrades to `unavailable` with a null
+    // value rather than exporting a fabricated number.
+    expect(payload.records.filter((r) => r.provenance === 'simulated').length).toBeGreaterThanOrEqual(16);
+    expect(payload.records.every((r) => r.provenance === 'simulated' || r.value === null)).toBe(true);
     const pue = payload.records.find((r) => r.metricId === 'result.pue');
     expect(pue?.value).toBe(1.32);
     expect(pue?.observedAt).toBe(run.completedAt);

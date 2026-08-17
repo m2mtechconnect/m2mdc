@@ -113,11 +113,7 @@ function AuthenticatedApp() {
   }, [user]);
 
   if (loading || approvalLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <BoundedLoading stage={loading ? 'session' : 'approval'} />;
   }
 
   // If not authenticated, show only Auth pages and public landing pages
@@ -169,11 +165,7 @@ function AuthenticatedApp() {
 }
 
 function LoadingScreen() {
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-    </div>
-  );
+  return <BoundedLoading stage="authorization" />;
 }
 
 function ApprovedUserRouter() {

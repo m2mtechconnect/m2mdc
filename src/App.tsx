@@ -28,6 +28,8 @@ import PendingApproval from "./pages/PendingApproval";
 import PilotShell from "./pilot/PilotShell";
 import AuthorizationError from "./pages/AuthorizationError";
 import BoundedLoading from "@/components/shared/BoundedLoading";
+import ManagedUserReturn from '@/pages/oauth/ManagedUserReturn';
+import { MANAGED_USER_RETURN_PATH } from '@/connections/managedUserBinding';
 // Role-Aware Application Routing - Approved *internal* users (users with
 // an explicit row in public.user_roles) receive the full AURA DC
 // application via the legacy AuthenticatedShell, loaded lazily so that
@@ -145,6 +147,7 @@ function AuthenticatedApp() {
         />
         <Route path="/omniverse-scene" element={<OmniverseScene />} />
         <Route path="/onboarding" element={<Onboarding />} />
+        <Route path={MANAGED_USER_RETURN_PATH} element={<ManagedUserReturn />} />
         {import.meta.env.DEV && OverlayFixtures ? <Route path="/dev-overlays" element={<OverlayFixtures />} /> : null}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -193,6 +196,7 @@ function ApprovedUserRouter() {
         <Routes>
           <Route path="/pilot/*" element={<PilotShell />} />
           <Route path="/sign-out" element={<SignOut />} />
+          <Route path={MANAGED_USER_RETURN_PATH} element={<ManagedUserReturn />} />
           <Route path="/*" element={<AuthenticatedShell />} />
         </Routes>
       </Suspense>
@@ -204,6 +208,7 @@ function ApprovedUserRouter() {
     <Routes>
       <Route path="/pilot/*" element={<PilotShell />} />
       <Route path="/sign-out" element={<SignOut />} />
+      <Route path={MANAGED_USER_RETURN_PATH} element={<ManagedUserReturn />} />
       <Route path="*" element={<Navigate to="/pilot/overview" replace />} />
     </Routes>
   );

@@ -7,6 +7,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { MANAGED_CONNECTOR_MANIFEST, isRuntimeSelectable } from '../_shared/managedConnectorManifest.ts';
 import { resolveCallerTenant } from '../_shared/connectionTenant.ts';
+import { isManagedUserClientConfigured, managedUserBinding } from '../_shared/managedUserBindings.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -43,13 +44,23 @@ Deno.serve(async (req) => {
     const userBinding = (userConnections ?? []).find(
       (c: { connector_definition_id: string }) => c.connector_definition_id === entry.connector_definition_id,
     );
+    const userBindingTransport = managedUserBinding(entry.connector_definition_id);
+    const userClientConfigured = userBindingTransport ? isManagedUserClientConfigured(userBindingTransport) : false;
+    // A per-user connector only becomes runtime-eligible once a connector
+    // client actually exists for this project. Absent that, it stays
+    // "supported, not linked" - never implied as available.
+    const eligibility = userBindingTransport && userClientConfigured ? 'RUNTIME_USER_SUPPORTED' : entry.eligibility;
+    const linkedToProject = entry.linked_to_project || userClientConfigured;
     return {
       connector_definition_id: entry.connector_definition_id,
       provider: entry.display_provider,
       connection_class: entry.connection_class,
-      eligibility: entry.eligibility,
-      linked_to_project: entry.linked_to_project,
-      runtime_selectable: isRuntimeSelectable(entry),
+      eligibility,
+      linked_to_project: linkedToProject,
+      runtime_selectable: isRuntimeSelectable({ ...entry, eligibility, linked_to_project: linkedToProject }),
+      user_bindable: Boolean(userBindingTransport),
+      user_client_configured: userClientConfigured,
+      requested_scopes: userBindingTransport?.scopes ?? [],
       data_classes: entry.data_classes,
       operations: entry.supported_operations.map((op) => ({
         id: op.id,

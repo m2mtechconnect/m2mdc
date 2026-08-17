@@ -29,7 +29,7 @@ import type {
   SimulationRunPayload,
 } from './types';
 
-const DEFAULT_PROVIDER_ID: SimulationProviderId = 'nvidia-dsx-sim';
+const DEFAULT_PROVIDER_ID: SimulationProviderId = 'omniverse';
 
 // PR-0.1 Checkpoint B7: browser-side feature flags are not permitted for
 // Omniverse. The provider is always disabled in the client build; any

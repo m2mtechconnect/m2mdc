@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
     .from('connection_credentials')
     .select('id', { count: 'exact', head: true })
     .eq('connection_id', connectionId)
-    .eq('revoked', false);
+    .eq('status', 'ACTIVE');
   if (!credentialCount) {
     blockers.push({ code: 'NO_VAULTED_CREDENTIAL', detail: 'The connection has no active vaulted credential.' });
   }

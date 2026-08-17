@@ -1,0 +1,4 @@
+{"status":"BLOCKED_UNVERIFIED",
+ "verifiedStatically":"Assistant grounding uses live RBAC authority and may cite only records rendered on the active surface; asserted in src/data/dataset/__tests__/canaryEndToEnd.test.ts.",
+ "notExecuted":["nine deterministic grounding evaluations on the published host","dataset switch","facility switch","Montreal isolation","unknown question","missing NGC value","unit-sensitive question","non-admin access","stale-context check","citation-record inspection"],
+ "note":"No abstention or citation claim is made from published-host behaviour in this phase."}

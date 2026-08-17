@@ -12,6 +12,7 @@ import type { ProvenanceMeta } from '@/lib/provenance/types';
 import { provenanceLabel } from '@/lib/provenance';
 import { SIMULATION_SOURCE } from '@/capabilities/operatingState';
 import { RUN_UNAVAILABLE_LABEL, useRunProvenance } from '@/capabilities/runProvenance';
+import { dataModeFor, effectiveProvenance, requiresRunId } from '@/data/dataModeContract';
 import { cn } from '@/lib/utils';
 
 interface ProvenanceBadgeProps {
@@ -39,14 +40,18 @@ const variantFor = {
 } as const;
 
 export function ProvenanceBadge({ meta, compact = false, className }: ProvenanceBadgeProps) {
-  const Icon = iconFor[meta.provenance];
-  const label = provenanceLabel(meta.provenance);
+  // Phase 8: a stale live/derived reading is not a current measurement, so
+  // the badge degrades it instead of showing "Live" over an old value.
+  const provenance = effectiveProvenance(meta);
+  const dataMode = dataModeFor(meta.provenance, meta.stale === true);
+  const Icon = iconFor[provenance];
+  const label = provenanceLabel(provenance);
   const runProvenance = useRunProvenance();
 
   const timestamp = meta.at ? meta.at.toLocaleString() : 'no timestamp';
   const stale = meta.stale ? ' (stale)' : '';
   const connection = meta.connection ? ` · ${meta.connection}` : '';
-  const synthetic = meta.provenance === 'simulated' || meta.provenance === 'demo';
+  const synthetic = requiresRunId(provenance);
   const runId = synthetic ? runProvenance.runId ?? RUN_UNAVAILABLE_LABEL : null;
 
   return (
@@ -56,8 +61,8 @@ export function ProvenanceBadge({ meta, compact = false, className }: Provenance
           <Badge
             variant="outline"
             role="img"
-            aria-label={`Provenance: ${label}. Source: ${meta.source}. ${timestamp}${stale}${connection}.${runId ? ` Simulation run ${runId}.` : ''}`}
-            className={cn('gap-1 font-medium', variantFor[meta.provenance], className)}
+            aria-label={`Provenance: ${label}. Data mode: ${dataMode}. Source: ${meta.source}. ${timestamp}${stale}${connection}.${runId ? ` Simulation run ${runId}.` : ''}`}
+            className={cn('gap-1 font-medium', variantFor[provenance], className)}
           >
             <Icon className="h-3 w-3" aria-hidden />
             {!compact && <span>{label}</span>}
@@ -66,6 +71,7 @@ export function ProvenanceBadge({ meta, compact = false, className }: Provenance
         <TooltipContent side="top" className="max-w-xs text-xs">
           <div className="space-y-1">
             <div className="font-semibold">{label}</div>
+            <div>Data mode: <span className="font-mono">{dataMode}</span></div>
             <div>Source: <span className="font-mono">{meta.source}</span></div>
             {synthetic && (
               <>

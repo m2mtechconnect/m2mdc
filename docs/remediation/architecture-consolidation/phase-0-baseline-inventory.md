@@ -163,9 +163,39 @@ copy (now labelled a reference design rather than a deployed closed loop).
 "self-healing", "closed-loop control", "NIM-powered" or "NeMo Retriever"
 returns to an agent copy surface.
 
+## Phase 8 - data-mode contract (complete)
+
+Two vocabularies described the same thing and were never reconciled:
+`DataProvenance` (live | derived | simulated | demo | static | unavailable),
+used app-wide by KPI surfaces and `ProvenanceBadge`, and DSX `DataMode`
+(SIMULATED | REPLAYED | LIVE | UNAVAILABLE), used by Evidence Beta. A surface
+could therefore badge a value "Live" while the DSX mode for the same reading
+was UNAVAILABLE, and a stale live reading kept its live badge.
+
+`src/data/dataModeContract.ts` is the mapping, and it fails closed:
+
+| Provenance | DSX mode | Notes |
+| --- | --- | --- |
+| live | LIVE | UNAVAILABLE once stale |
+| derived | LIVE | measurement-backed; UNAVAILABLE once stale |
+| simulated | SIMULATED | run id required |
+| demo | SIMULATED | run id required |
+| static | UNAVAILABLE | a configured target is not an observation |
+| unavailable | UNAVAILABLE | - |
+
+Helpers: `dataModeFor`, `effectiveProvenance` (degrades stale live/derived,
+never upgrades), `isPresentableAsOperational`, `requiresRunId` and
+`mayRenderValue`. `ProvenanceBadge` now renders the effective provenance and
+names the DSX data mode in its label and tooltip, so a stale live reading
+shows as Unavailable rather than Live.
+
+`src/data/__tests__/dataModeContract.test.ts` covers the full mapping, the
+no-upgrade rule and the stale-degradation rule.
+
 ### Remaining open phases
 
-8. Data-mode contract enforcement across every KPI surface.
+None. Phases 0-8 of AURA_ARCHITECTURE_CONSOLIDATION_AND_NVIDIA_ALIGNMENT are
+closed.
 
 ## Phase 6 - exchange boundary naming (complete)
 
@@ -216,6 +246,36 @@ copy (now labelled a reference design rather than a deployed closed loop).
 "self-healing", "closed-loop control", "NIM-powered" or "NeMo Retriever"
 returns to an agent copy surface.
 
+## Phase 8 - data-mode contract (complete)
+
+Two vocabularies described the same thing and were never reconciled:
+`DataProvenance` (live | derived | simulated | demo | static | unavailable),
+used app-wide by KPI surfaces and `ProvenanceBadge`, and DSX `DataMode`
+(SIMULATED | REPLAYED | LIVE | UNAVAILABLE), used by Evidence Beta. A surface
+could therefore badge a value "Live" while the DSX mode for the same reading
+was UNAVAILABLE, and a stale live reading kept its live badge.
+
+`src/data/dataModeContract.ts` is the mapping, and it fails closed:
+
+| Provenance | DSX mode | Notes |
+| --- | --- | --- |
+| live | LIVE | UNAVAILABLE once stale |
+| derived | LIVE | measurement-backed; UNAVAILABLE once stale |
+| simulated | SIMULATED | run id required |
+| demo | SIMULATED | run id required |
+| static | UNAVAILABLE | a configured target is not an observation |
+| unavailable | UNAVAILABLE | - |
+
+Helpers: `dataModeFor`, `effectiveProvenance` (degrades stale live/derived,
+never upgrades), `isPresentableAsOperational`, `requiresRunId` and
+`mayRenderValue`. `ProvenanceBadge` now renders the effective provenance and
+names the DSX data mode in its label and tooltip, so a stale live reading
+shows as Unavailable rather than Live.
+
+`src/data/__tests__/dataModeContract.test.ts` covers the full mapping, the
+no-upgrade rule and the stale-degradation rule.
+
 ### Remaining open phases
 
-8. Data-mode contract enforcement across every KPI surface.
+None. Phases 0-8 of AURA_ARCHITECTURE_CONSOLIDATION_AND_NVIDIA_ALIGNMENT are
+closed.

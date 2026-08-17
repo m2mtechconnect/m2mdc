@@ -65,7 +65,7 @@ const BLOCKERS: { code: string; detail: string }[] = [
   },
   { code: 'NO_BREV_TOKEN', detail: 'brev CLI not installed and no Brev API token or organisation authorization is available.' },
   { code: 'NO_CONTAINER_RUNTIME', detail: 'docker is not installed, so the worker image cannot be built, digested or pushed from here.' },
-  { code: 'NO_SERVICE_ROLE_KEY', detail: 'SUPABASE_SERVICE_ROLE_KEY is absent, so the worker durable write path cannot be exercised.' },
+  { code: 'NO_SERVICE_ROLE_KEY', detail: 'The runtime service token is absent, so the worker durable write path cannot be exercised.' },
   { code: 'NO_CANARY_CONNECTION', detail: '0 active signal-to-twin mappings and 0 vaulted credentials exist, so no canary connection is configured end to end.' },
   { code: 'NO_SPEND_AUTHORIZATION', detail: 'No budget or spending authorization has been recorded for either cloud lane.' },
 ];

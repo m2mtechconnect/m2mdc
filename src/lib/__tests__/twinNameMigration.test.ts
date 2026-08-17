@@ -131,7 +131,7 @@ describe('twinNameMigration', () => {
       };
       const result = migrateTwinBuilderState(state);
       expect(result.migrated).toBe(true);
-      expect(result.newName).toBe('Telus Sovereign Green AI Data Centre Twin');
+      expect(result.newName).toBe('TELUS Sovereign Green AI Data Centre Twin');
     });
 
     it('extracts domain from broken name as last resort', () => {

@@ -116,7 +116,7 @@ describe('URL Turbo Capture - Configuration Audit', () => {
     const scenarios = [
       {
         name: 'Cache with summary',
-        cached: { summary: 'Existing summary', content: 'Content' },
+        cached: { summary: 'Existing summary that is long enough to be treated as a usable cached analysis result.', content: 'Content' },
         shouldSkipAnalysis: true,
       },
       {
@@ -137,7 +137,7 @@ describe('URL Turbo Capture - Configuration Audit', () => {
     ];
 
     scenarios.forEach(scenario => {
-      const hasSummary = scenario.cached?.summary && scenario.cached.summary.length > 50;
+      const hasSummary = Boolean(scenario.cached?.summary && scenario.cached.summary.length > 50);
       expect(hasSummary).toBe(scenario.shouldSkipAnalysis);
     });
   });

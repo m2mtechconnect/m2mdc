@@ -49,6 +49,7 @@ export default function Integrations() {
             Connection and readiness state for every external system. Nothing listed here is
             currently supplying data to AURA DC.
           </p>
+          <PagePurpose route="/manage/integrations" />
         </header>
 
         <Card>

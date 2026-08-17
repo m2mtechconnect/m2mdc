@@ -36,7 +36,10 @@ export function normalizeCompanyName(raw: string | undefined | null): string {
   // Remove common suffixes that leak through
   cleaned = cleaned
     .replace(/\s*[-–|:]\s*(Home|Homepage|Official Site|Welcome|Main).*$/i, '')
-    .replace(/\s*[-–|]\s*.*$/g, '') // Remove everything after dash/pipe (common title separators)
+    // Only treat a dash/pipe as a title separator when it is surrounded by
+    // whitespace ("Acme - Home"); bare hyphens belong to slug-style names
+    // such as "my-health-system" and must survive.
+    .replace(/\s+[-–|]\s+.*$/g, '')
     .replace(/\s+Home$/i, '')
     .replace(/\s+Official$/i, '')
     .replace(/\s+Inc\.?$/i, '')
@@ -208,7 +211,10 @@ export function sanitizeTwinName(twinName: string | undefined | null): string {
     if (suffixIndex > 0) {
       const potentialName = twinName.slice(0, suffixIndex);
       const normalized = normalizeCompanyName(potentialName);
-      if (normalized) {
+      // A salvaged prefix that is only a URL artifact ("https", "http", "www")
+      // is not a company name - fall through to the generic twin name.
+      const isUrlArtifact = /^(https?|www)$/i.test(normalized);
+      if (normalized && !isUrlArtifact) {
         return `${normalized}${suffix}`;
       }
     }

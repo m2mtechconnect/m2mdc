@@ -124,7 +124,9 @@ export function validateDigitalTwinWithContext(
     text.includes('workforce') ||
     text.includes('production') ||
     text.includes('manufacturing') ||
-    text.includes('operations') ||
+    // "operations" on its own is filler ("Improve Business Operations"); it
+    // only signals a real process when it names one.
+    /\b(store|facility|network|fleet|warehouse|data ?cent(re|er)|field|plant|retail|branch|site)\s+operations\b/.test(text) ||
     text.includes('fleet') ||
     text.includes('compliance');
 

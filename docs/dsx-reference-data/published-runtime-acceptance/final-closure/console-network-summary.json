@@ -1,0 +1,10 @@
+{
+  "host": "https://auradc.m2mtechconnect.com",
+  "sessions": ["administrator + nvidia-dsx-reference", "administrator + legacy-synthetic", "anonymous + nvidia-dsx-reference"],
+  "routesChecked": {"adminReference": 20, "adminLegacy": 20, "anonymous": 20, "evidenceBeta": 25},
+  "consoleErrors": 0,
+  "failedRequests": 0,
+  "thirdPartyExcluded": ["*.clarity.ms/collect"],
+  "permanentLoadingStates": 0,
+  "note": "One spinner observed on legacy /connect/monitor (live sync feed, resolves) - not present in reference mode."
+}

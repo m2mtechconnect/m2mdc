@@ -49,7 +49,7 @@ export interface BuilderPreviewSession {
   /** True when the run replays scripted template fixtures. */
   fixtureBacked: boolean;
   /** Baseline KPI row available before the first tick, when known. */
-  baselineMetrics: Record<string, number> | null;
+  baselineMetrics: unknown;
 }
 
 export interface BuilderPreviewSessionUnavailable {
@@ -100,9 +100,9 @@ export function createBuilderPreviewSession(
         previewConfig: input.previewConfig,
         speed: input.speed,
       });
-      let baselineMetrics: Record<string, number> | null = null;
+      let baselineMetrics: unknown = null;
       try {
-        baselineMetrics = engine.getBaselineMetrics() as Record<string, number>;
+        baselineMetrics = engine.getBaselineMetrics();
       } catch {
         baselineMetrics = null;
       }

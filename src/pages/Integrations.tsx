@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { NvidiaDsxReadinessPanel } from '@/components/integrations/NvidiaDsxReadinessPanel';
 import { ArrowRight, Plug } from 'lucide-react';
+import { PagePurpose } from '@/components/capability/PagePurpose';
 
 const SOURCES: Array<{ name: string; state: string; detail: string; href?: string; cta?: string }> = [
   {

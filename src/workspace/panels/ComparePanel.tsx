@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { KPI_DESCRIPTORS, formatKpi, type KpiKey } from '../facilityModel';
 import { deltaDirection } from '../scenarioEngine';
 import { ROLE_VIEWS, useWorkspaceStore } from '../workspaceStore';
+import { RunProvenanceBadge } from '../RunProvenanceBadge';
 import { RunExportControls } from './RunExportControls';
 
 export function ComparePanel() {

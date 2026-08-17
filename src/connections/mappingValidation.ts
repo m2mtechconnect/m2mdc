@@ -38,7 +38,7 @@ export const UNIT_FAMILIES: Record<string, string[]> = {
   energy: ['Wh', 'kWh', 'MWh'],
   pressure: ['Pa', 'kPa', 'bar', 'inH2O'],
   flow: ['l/s', 'm3/h', 'cfm'],
-  ratio: ['%', 'ratio'],
+  ratio: ['%', 'pct', 'ratio'],
   dimensionless: ['none'],
 };
 

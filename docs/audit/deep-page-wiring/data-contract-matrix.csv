@@ -1,0 +1,8 @@
+page,read_or_mutation,source,scoping,observed,classification
+Simulation workspace,run create,zustand persist (localStorage key aura-workspace),browser profile only,no write to public.simulation_runs observed in source or network,DATA_INTEGRITY_DEFECT
+Dashboard,read,workspace store + facility model,client,renders "No run recorded" honestly when empty,WIRED_READ_ONLY
+Admin signups,read,public.profiles,server RLS,324 rows rendered with tab counts All/Pending/Approved,WIRED_READ_ONLY
+Agent detail,read,public.agent_definitions?slug=eq.<id>,server,406 on unknown slug retried 3x then spinner persists,PERMANENT_LOADING
+System manage,read,public.agents?id=eq.<id>,server,400 on non-uuid id retried 3x then spinner persists,PERMANENT_LOADING
+Connect monitor,read,none (static demo jobs),n/a,labelled "No ingestion service is connected",PLACEHOLDER_OR_DEMO
+Evidence workspaces,read,simulated scenario provider,client,mode=SIMULATED carried in URL,WIRED_WITH_LIMITATIONS

@@ -1,0 +1,2 @@
+mutation,status,reason
+all controlled AUDIT-2026-08-17-* fixtures,NOT_EXECUTED,audit time budget exhausted before Phase 7; no audit records were created and nothing needs cleanup

@@ -1,0 +1,572 @@
+{
+ "routes": [
+  {
+   "path": "/",
+   "component": "DataCentreTwinLanding",
+   "shell": "public/App"
+  },
+  {
+   "path": "/login",
+   "component": "SignIn",
+   "shell": "public/App"
+  },
+  {
+   "path": "/sign-out",
+   "component": "SignOut",
+   "shell": "public/App"
+  },
+  {
+   "path": "/twin-datacentre",
+   "component": "DataCentreTwinLanding",
+   "shell": "public/App"
+  },
+  {
+   "path": "/omniverse-scene",
+   "component": "OmniverseScene",
+   "shell": "public/App"
+  },
+  {
+   "path": "/onboarding",
+   "component": "Onboarding",
+   "shell": "public/App"
+  },
+  {
+   "path": "/dev-overlays",
+   "component": "OverlayFixtures",
+   "shell": "public/App"
+  },
+  {
+   "path": "*",
+   "component": "Navigate",
+   "shell": "public/App"
+  },
+  {
+   "path": "/sign-out",
+   "component": "SignOut",
+   "shell": "public/App"
+  },
+  {
+   "path": "*",
+   "component": "PendingApproval",
+   "shell": "public/App"
+  },
+  {
+   "path": "/sign-out",
+   "component": "SignOut",
+   "shell": "public/App"
+  },
+  {
+   "path": "*",
+   "component": "AuthorizationError",
+   "shell": "public/App"
+  },
+  {
+   "path": "/pilot/*",
+   "component": "PilotShell",
+   "shell": "public/App"
+  },
+  {
+   "path": "/sign-out",
+   "component": "SignOut",
+   "shell": "public/App"
+  },
+  {
+   "path": "/*",
+   "component": "AuthenticatedShell",
+   "shell": "public/App"
+  },
+  {
+   "path": "/pilot/*",
+   "component": "PilotShell",
+   "shell": "public/App"
+  },
+  {
+   "path": "/sign-out",
+   "component": "SignOut",
+   "shell": "public/App"
+  },
+  {
+   "path": "*",
+   "component": "Navigate",
+   "shell": "public/App"
+  },
+  {
+   "path": "/dashboard",
+   "component": "Dashboard",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/login",
+   "component": "AuthenticatedEntryRedirect",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/onboarding",
+   "component": "AuthenticatedEntryRedirect",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/builder",
+   "component": "Builder",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/deploy",
+   "component": "Deploy",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/deployments",
+   "component": "DeploymentHistory",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/agent/:id",
+   "component": "AgentWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/agents/:id/chat",
+   "component": "AgentChat",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/agent-chat",
+   "component": "AgentChat",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/analytics",
+   "component": "IntelligenceDashboard",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/account/profile",
+   "component": "Profile",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/account/settings",
+   "component": "Settings",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/account/access-control",
+   "component": "AccessControl",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/admin/onboarding-submissions",
+   "component": "OnboardingSubmissions",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/admin/user-approvals",
+   "component": "AdminUserApproval",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/admin/asset-preview",
+   "component": "AssetPreview",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/admin/asset-pipeline",
+   "component": "AssetPipeline",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/admin/asset-validation/:assetId",
+   "component": "AssetValidation",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/admin/reference-facility-validation",
+   "component": "ReferenceFacilityValidation",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/admin/signups-dashboard",
+   "component": "AdminSignupsDashboard",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/manage/integrations",
+   "component": "Integrations",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/manage/facilities",
+   "component": "ManageFacilities",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/compliance",
+   "component": "Compliance",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/teams",
+   "component": "Teams",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/marketplace",
+   "component": "Marketplace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/app/agents",
+   "component": "ManageAgents",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/app/agents/:slug/detail",
+   "component": "AgentDetail",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/app/agents/:agentId/manage",
+   "component": "TwinManage",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/app/agents/:agentId/operations",
+   "component": "AgentOperationsRedirect",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/twins/:instanceId/manage",
+   "component": "TwinManageRedirect",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/studio/systems/:systemId/manage",
+   "component": "SystemManage",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/data-centre-twin/:id/blueprint",
+   "component": "Blueprint",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/blueprint/preview",
+   "component": "BlueprintPreview",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/blueprint/:id",
+   "component": "Blueprint",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/simulation",
+   "component": "AuraWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/simulation/preview",
+   "component": "SimulationPreview",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/help",
+   "component": "Help",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/connect/monitor",
+   "component": "ConnectMonitor",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/connect/health",
+   "component": "ConnectHealth",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/search",
+   "component": "Search",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/settings/ai",
+   "component": "AISettings",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/sign-out",
+   "component": "SignOut",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/playbook",
+   "component": "Playbook",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/data-centre-twin",
+   "component": "DataCentreTwin",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/data-centre-twin/:id",
+   "component": "DataCentreTwin",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/omniverse-scene",
+   "component": "OmniverseScene",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/twin-debug",
+   "component": "TwinDebug",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/digital-twins-demo/funding-intake",
+   "component": "FundingIntakeDemo",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/infrastructure",
+   "component": "InfrastructurePage",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/dsx/evidence-beta",
+   "component": "EvidenceBetaShell",
+   "shell": "authenticated"
+  },
+  {
+   "path": "overview",
+   "component": "OverviewWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "operations",
+   "component": "PreserveNavigate",
+   "shell": "authenticated"
+  },
+  {
+   "path": "operations/thermal",
+   "component": "ThermalWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "operations/power",
+   "component": "PowerWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "operations/cooling",
+   "component": "CoolingWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "operations/compute",
+   "component": "NetworkWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "operations/workload",
+   "component": "WorkloadWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "sustainability",
+   "component": "CarbonWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "sustainability/financial",
+   "component": "FinancialWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "sustainability/sovereignty",
+   "component": "SovereigntyWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "decisions",
+   "component": "SimulationsWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "decisions/log",
+   "component": "EvidenceWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "assets",
+   "component": "FacilityWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "thermal",
+   "component": "ThermalWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "power",
+   "component": "PowerWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "cooling",
+   "component": "CoolingWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "network",
+   "component": "NetworkWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "facility",
+   "component": "FacilityWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "workload",
+   "component": "WorkloadWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "simulations",
+   "component": "SimulationsWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "sovereignty",
+   "component": "SovereigntyWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "carbon",
+   "component": "CarbonWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "financials",
+   "component": "FinancialWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "evidence",
+   "component": "EvidenceWorkspace",
+   "shell": "authenticated"
+  },
+  {
+   "path": "/dev-overlays",
+   "component": "OverlayFixtures",
+   "shell": "authenticated"
+  },
+  {
+   "path": "*",
+   "component": "NotFound",
+   "shell": "authenticated"
+  }
+ ],
+ "aliases": [
+  [
+   "/",
+   "/dashboard"
+  ],
+  [
+   "/command",
+   "/dashboard"
+  ],
+  [
+   "/evidence",
+   "/dsx/evidence-beta/evidence"
+  ],
+  [
+   "/build",
+   "/builder"
+  ],
+  [
+   "/admin",
+   "/admin/signups-dashboard"
+  ],
+  [
+   "/operations",
+   "/analytics"
+  ],
+  [
+   "/intelligence",
+   "/analytics"
+  ],
+  [
+   "/integrations",
+   "/manage/integrations"
+  ],
+  [
+   "/marketplace/integrations",
+   "/manage/integrations"
+  ],
+  [
+   "/settings/integrations",
+   "/manage/integrations"
+  ],
+  [
+   "/facilities",
+   "/manage/facilities"
+  ],
+  [
+   "/agents",
+   "/app/agents"
+  ],
+  [
+   "/subsystem-agents",
+   "/app/agents"
+  ],
+  [
+   "/blueprint",
+   "/blueprint/default"
+  ],
+  [
+   "/universal-search",
+   "/search"
+  ],
+  [
+   "/settings/integrations/nvidia-dsx",
+   "/manage/integrations#nvidia-dsx"
+  ],
+  [
+   "/twin-datacentre",
+   "/blueprint/default"
+  ],
+  [
+   "/auth",
+   "/"
+  ],
+  [
+   "/sign-in",
+   "/"
+  ],
+  [
+   "/sign-up",
+   "/"
+  ],
+  [
+   "/forgot-password",
+   "/"
+  ],
+  [
+   "/mfa",
+   "/"
+  ],
+  [
+   "/digital-twins",
+   "/"
+  ],
+  [
+   "/digital-twins/:slug",
+   "/"
+  ]
+ ]
+}

@@ -1,0 +1,1537 @@
+[
+ {
+  "route": "/",
+  "final": "/dashboard",
+  "h1": [
+   "Montreal Data centre"
+  ],
+  "tabs": [],
+  "buttons": 33,
+  "disabledButtons": 1,
+  "links": 26,
+  "spinners": 0,
+  "textLen": 2250,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs DATA CENTRE FACILITY Montreal Data centre Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:53 AM Change facility Start simulation Open Blueprint View Evidence PUE 1.32 Watch View source IT LOAD 3.5 MW Within design target View source CAPACITY HEADROOM 30% Within design target View source SOVEREIGN",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/dashboard",
+  "final": "/dashboard",
+  "h1": [
+   "Montreal Data centre"
+  ],
+  "tabs": [],
+  "buttons": 33,
+  "disabledButtons": 1,
+  "links": 26,
+  "spinners": 0,
+  "textLen": 2250,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs DATA CENTRE FACILITY Montreal Data centre Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 12:53 AM Change facility Start simulation Open Blueprint View Evidence PUE 1.32 Watch View source IT LOAD 3.5 MW Within design target View source CAPACITY HEADROOM 30% Within design target View source SOVEREIGN",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/blueprint",
+  "final": "/blueprint/default",
+  "h1": [
+   "Montreal Data centre"
+  ],
+  "tabs": [
+   "Model",
+   "Assets & Systems",
+   "Controls",
+   "Validation",
+   "Versions"
+  ],
+  "buttons": 84,
+  "disabledButtons": 1,
+  "links": 16,
+  "spinners": 0,
+  "textLen": 2376,
+  "snippet": "? SIMULATED Design baseline No run recorded Synthetic inputs Back Montreal Data centre Designer - editable AURA Assistant Open in Simulation Montreal Tier III 5 MW 200 Racks v1 Updated 8/17/2026, 12:53:49 AM Model Assets & Systems Controls Validation Versions CA-QC / Montreal / Sovereign Green AI Data Centre Twin Modelled facility: Sovereign Green AI Data Centre Twin \u00b7 Tier III \u00b7 Sovereign AI data",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/blueprint/default",
+  "final": "/blueprint/default",
+  "h1": [
+   "Montreal Data centre"
+  ],
+  "tabs": [
+   "Model",
+   "Assets & Systems",
+   "Controls",
+   "Validation",
+   "Versions"
+  ],
+  "buttons": 84,
+  "disabledButtons": 1,
+  "links": 16,
+  "spinners": 0,
+  "textLen": 2376,
+  "snippet": "? SIMULATED Design baseline No run recorded Synthetic inputs Back Montreal Data centre Designer - editable AURA Assistant Open in Simulation Montreal Tier III 5 MW 200 Racks v1 Updated 8/17/2026, 12:53:57 AM Model Assets & Systems Controls Validation Versions CA-QC / Montreal / Sovereign Green AI Data Centre Twin Modelled facility: Sovereign Green AI Data Centre Twin \u00b7 Tier III \u00b7 Sovereign AI data",
+  "consoleErrors": [],
+  "failedReq": [
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/copilot_memory?on_conflict=user_id%2Ckey|net::ERR_ABORTED"
+  ],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/blueprint/preview",
+  "final": "/blueprint/preview",
+  "h1": [
+   "No Recommendation to Preview"
+  ],
+  "tabs": [],
+  "buttons": 15,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 276,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs No Recommendation to Preview Scan a website URL first to generate a recommendation, then preview the blueprint. Back to Dashboard \u00a9 2025 Data Centre Digital Twin Studio vpilot \u2022 1/1/1970 Documentation Compliance",
+  "consoleErrors": [],
+  "failedReq": [
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/copilot_memory?select=key%2Cvalue|net::ERR_ABORTED"
+  ],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/simulation",
+  "final": "/simulation?step=inspect",
+  "h1": [
+   "Montreal Data centre - Simulation"
+  ],
+  "tabs": [],
+  "buttons": 79,
+  "disabledButtons": 2,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 1602,
+  "snippet": "? SIMULATED Design baseline No run recorded Synthetic inputs Montreal Data centre - Simulation SIMULATED Design baseline No run recorded Synthetic inputs View Engineering Inspect Configure Simulate Compare Compare is unavailable until a scenario run has completed. Review Review is unavailable until a scenario run has completed. Assistant 100% Row A Row B Row D Row E Procedural 3D preview Thermal F",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/simulation?step=inspect",
+  "final": "/simulation?step=inspect",
+  "h1": [
+   "Montreal Data centre - Simulation"
+  ],
+  "tabs": [],
+  "buttons": 79,
+  "disabledButtons": 2,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 1602,
+  "snippet": "? SIMULATED Design baseline No run recorded Synthetic inputs Montreal Data centre - Simulation SIMULATED Design baseline No run recorded Synthetic inputs View Engineering Inspect Configure Simulate Compare Compare is unavailable until a scenario run has completed. Review Review is unavailable until a scenario run has completed. Assistant 100% Row A Row B Row D Row E Procedural 3D preview Thermal F",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/simulation?step=configure",
+  "final": "/simulation?step=configure",
+  "h1": [
+   "Montreal Data centre - Simulation"
+  ],
+  "tabs": [],
+  "buttons": 41,
+  "disabledButtons": 2,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 1209,
+  "snippet": "? SIMULATED Design baseline No run recorded Synthetic inputs Montreal Data centre - Simulation SIMULATED Design baseline No run recorded Synthetic inputs View Engineering Inspect Configure Simulate Compare Compare is unavailable until a scenario run has completed. Review Review is unavailable until a scenario run has completed. Assistant 100% Row A Row B Row D Row E Procedural 3D preview Thermal F",
+  "consoleErrors": [],
+  "failedReq": [
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/copilot_memory?select=key%2Cvalue|net::ERR_ABORTED"
+  ],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/simulation?step=simulate",
+  "final": "/simulation?step=simulate",
+  "h1": [
+   "Montreal Data centre - Simulation"
+  ],
+  "tabs": [
+   "Operational scenarios",
+   "Proposed designs"
+  ],
+  "buttons": 48,
+  "disabledButtons": 2,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 2001,
+  "snippet": "? SIMULATED Design baseline No run recorded Synthetic inputs Montreal Data centre - Simulation SIMULATED Design baseline No run recorded Synthetic inputs View Engineering Inspect Configure Simulate Compare Compare is unavailable until a scenario run has completed. Review Review is unavailable until a scenario run has completed. Assistant 100% Row A Row B Row D Row E Procedural 3D preview Thermal F",
+  "consoleErrors": [],
+  "failedReq": [
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&id=eq.e5ff7f0c-6266-46f3-84cb-|net::ERR_ABORTED"
+  ],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/simulation?step=compare",
+  "final": "/simulation?step=simulate",
+  "h1": [
+   "Montreal Data centre - Simulation"
+  ],
+  "tabs": [
+   "Operational scenarios",
+   "Proposed designs"
+  ],
+  "buttons": 48,
+  "disabledButtons": 2,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 2054,
+  "snippet": "? SIMULATED Design baseline No run recorded Synthetic inputs Montreal Data centre - Simulation SIMULATED Design baseline No run recorded Synthetic inputs View Engineering Compare needs a completed run. Returned to Simulate. Inspect Configure Simulate Compare Compare is unavailable until a scenario run has completed. Review Review is unavailable until a scenario run has completed. Assistant 100% Ro",
+  "consoleErrors": [],
+  "failedReq": [
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&id=eq.e5ff7f0c-6266-46f3-84cb-|net::ERR_ABORTED"
+  ],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/simulation?step=decide",
+  "final": "/simulation?step=simulate",
+  "h1": [
+   "Montreal Data centre - Simulation"
+  ],
+  "tabs": [
+   "Operational scenarios",
+   "Proposed designs"
+  ],
+  "buttons": 48,
+  "disabledButtons": 2,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 2053,
+  "snippet": "? SIMULATED Design baseline No run recorded Synthetic inputs Montreal Data centre - Simulation SIMULATED Design baseline No run recorded Synthetic inputs View Engineering Review needs a completed run. Returned to Simulate. Inspect Configure Simulate Compare Compare is unavailable until a scenario run has completed. Review Review is unavailable until a scenario run has completed. Assistant 100% Row",
+  "consoleErrors": [],
+  "failedReq": [
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/copilot_memory?select=key%2Cvalue|net::ERR_ABORTED"
+  ],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/simulation/preview",
+  "final": "/simulation/preview",
+  "h1": [
+   "No Recommendation to Preview"
+  ],
+  "tabs": [],
+  "buttons": 9,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 283,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs No Recommendation to Preview Scan a website URL first to generate a recommendation, then preview simulation scenarios. Back to Dashboard \u00a9 2025 Data Centre Digital Twin Studio vpilot \u2022 1/1/1970 Documentation Compliance",
+  "consoleErrors": [],
+  "failedReq": [
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/copilot_memory?select=key%2Cvalue|net::ERR_ABORTED"
+  ],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/dsx/evidence-beta",
+  "final": "/dsx/evidence-beta?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "h1": [
+   "Overview"
+  ],
+  "tabs": [],
+  "buttons": 51,
+  "disabledButtons": 9,
+  "links": 29,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00.000Z DSX EXCHANGE Exchange: unavailable ACTIVE SCENARIO cooling degradation OBSERVATION WINDOW 08:00:00 \u2192 08:00:00 UTC CONNECTION HEALTH Source: disabled DATA FRESHNESS Fresh EVIDENCE QUALITY 18 accepted \u00b7 0 quarantined",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/dsx/evidence-beta/overview",
+  "final": "/dsx/evidence-beta/overview?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "h1": [
+   "Overview"
+  ],
+  "tabs": [],
+  "buttons": 51,
+  "disabledButtons": 9,
+  "links": 29,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00.000Z DSX EXCHANGE Exchange: unavailable ACTIVE SCENARIO cooling degradation OBSERVATION WINDOW 08:00:00 \u2192 08:00:00 UTC CONNECTION HEALTH Source: disabled DATA FRESHNESS Fresh EVIDENCE QUALITY 18 accepted \u00b7 0 quarantined",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/dsx/evidence-beta/operations",
+  "final": "/dsx/evidence-beta/operations/thermal?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "h1": [
+   "Thermal"
+  ],
+  "tabs": [],
+  "buttons": 44,
+  "disabledButtons": 1,
+  "links": 24,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00.000Z DSX EXCHANGE Exchange: unavailable ACTIVE SCENARIO cooling degradation OBSERVATION WINDOW 08:00:00 \u2192 08:00:00 UTC CONNECTION HEALTH Source: disabled DATA FRESHNESS Fresh EVIDENCE QUALITY 18 accepted \u00b7 0 quarantined",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/thermal",
+  "final": "/dsx/evidence-beta/operations/thermal?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "h1": [
+   "Thermal"
+  ],
+  "tabs": [],
+  "buttons": 44,
+  "disabledButtons": 1,
+  "links": 24,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00.000Z DSX EXCHANGE Exchange: unavailable ACTIVE SCENARIO cooling degradation OBSERVATION WINDOW 08:00:00 \u2192 08:00:00 UTC CONNECTION HEALTH Source: disabled DATA FRESHNESS Fresh EVIDENCE QUALITY 18 accepted \u00b7 0 quarantined",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/power",
+  "final": "/dsx/evidence-beta/operations/power?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "h1": [
+   "Power"
+  ],
+  "tabs": [],
+  "buttons": 47,
+  "disabledButtons": 1,
+  "links": 23,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00.000Z DSX EXCHANGE Exchange: unavailable ACTIVE SCENARIO cooling degradation OBSERVATION WINDOW 08:00:00 \u2192 08:00:00 UTC CONNECTION HEALTH Source: disabled DATA FRESHNESS Fresh EVIDENCE QUALITY 18 accepted \u00b7 0 quarantined",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/cooling",
+  "final": "/dsx/evidence-beta/operations/cooling?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "h1": [
+   "Cooling"
+  ],
+  "tabs": [],
+  "buttons": 42,
+  "disabledButtons": 1,
+  "links": 23,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00.000Z DSX EXCHANGE Exchange: unavailable ACTIVE SCENARIO cooling degradation OBSERVATION WINDOW 08:00:00 \u2192 08:00:00 UTC CONNECTION HEALTH Source: disabled DATA FRESHNESS Fresh EVIDENCE QUALITY 18 accepted \u00b7 0 quarantined",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/compute",
+  "final": "/dsx/evidence-beta/operations/compute?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "h1": [
+   "Compute"
+  ],
+  "tabs": [],
+  "buttons": 17,
+  "disabledButtons": 1,
+  "links": 24,
+  "spinners": 0,
+  "textLen": 1829,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00.000Z DSX EXCHANGE Exchange: unavailable ACTIVE SCENARIO cooling degradation OBSERVATION WINDOW 08:00:00 \u2192 08:00:00 UTC CONNECTION HEALTH Source: disabled DATA FRESHNESS Fresh EVIDENCE QUALITY 18 accepted \u00b7 0 quarantined",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/workload",
+  "final": "/dsx/evidence-beta/operations/workload?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "h1": [
+   "Workload"
+  ],
+  "tabs": [],
+  "buttons": 17,
+  "disabledButtons": 1,
+  "links": 25,
+  "spinners": 0,
+  "textLen": 1761,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00.000Z DSX EXCHANGE Exchange: unavailable ACTIVE SCENARIO cooling degradation OBSERVATION WINDOW 08:00:00 \u2192 08:00:00 UTC CONNECTION HEALTH Source: disabled DATA FRESHNESS Fresh EVIDENCE QUALITY 18 accepted \u00b7 0 quarantined",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/dsx/evidence-beta/sustainability",
+  "final": "/dsx/evidence-beta/sustainability?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "h1": [
+   "Sustainability: Energy and carbon"
+  ],
+  "tabs": [],
+  "buttons": 31,
+  "disabledButtons": 1,
+  "links": 25,
+  "spinners": 0,
+  "textLen": 2499,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00.000Z DSX EXCHANGE Exchange: unavailable ACTIVE SCENARIO cooling degradation OBSERVATION WINDOW 08:00:00 \u2192 08:00:00 UTC CONNECTION HEALTH Source: disabled DATA FRESHNESS Fresh EVIDENCE QUALITY 18 accepted \u00b7 0 quarantined",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/dsx/evidence-beta/sustainability/financial",
+  "final": "/dsx/evidence-beta/sustainability/financial?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "h1": [
+   "Sustainability: Financial exposure"
+  ],
+  "tabs": [],
+  "buttons": 27,
+  "disabledButtons": 1,
+  "links": 23,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00.000Z DSX EXCHANGE Exchange: unavailable ACTIVE SCENARIO cooling degradation OBSERVATION WINDOW 08:00:00 \u2192 08:00:00 UTC CONNECTION HEALTH Source: disabled DATA FRESHNESS Fresh EVIDENCE QUALITY 18 accepted \u00b7 0 quarantined",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/dsx/evidence-beta/sustainability/sovereignty",
+  "final": "/dsx/evidence-beta/sustainability/sovereignty?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "h1": [
+   "Sustainability: Sovereignty"
+  ],
+  "tabs": [],
+  "buttons": 24,
+  "disabledButtons": 1,
+  "links": 23,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00.000Z DSX EXCHANGE Exchange: unavailable ACTIVE SCENARIO cooling degradation OBSERVATION WINDOW 08:00:00 \u2192 08:00:00 UTC CONNECTION HEALTH Source: disabled DATA FRESHNESS Fresh EVIDENCE QUALITY 18 accepted \u00b7 0 quarantined",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/dsx/evidence-beta/decisions",
+  "final": "/dsx/evidence-beta/decisions?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "h1": [
+   "Decisions: Results"
+  ],
+  "tabs": [],
+  "buttons": 30,
+  "disabledButtons": 9,
+  "links": 29,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00.000Z DSX EXCHANGE Exchange: unavailable ACTIVE SCENARIO cooling degradation OBSERVATION WINDOW 08:00:00 \u2192 08:00:00 UTC CONNECTION HEALTH Source: disabled DATA FRESHNESS Fresh EVIDENCE QUALITY 18 accepted \u00b7 0 quarantined",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/dsx/evidence-beta/decisions/log",
+  "final": "/dsx/evidence-beta/decisions/log?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "h1": [
+   "Decisions: Decision log"
+  ],
+  "tabs": [],
+  "buttons": 22,
+  "disabledButtons": 1,
+  "links": 26,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00.000Z DSX EXCHANGE Exchange: unavailable ACTIVE SCENARIO cooling degradation OBSERVATION WINDOW 08:00:00 \u2192 08:00:00 UTC CONNECTION HEALTH Source: disabled DATA FRESHNESS Fresh EVIDENCE QUALITY 18 accepted \u00b7 0 quarantined",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/dsx/evidence-beta/assets",
+  "final": "/dsx/evidence-beta/assets?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "h1": [
+   "Assets"
+  ],
+  "tabs": [],
+  "buttons": 67,
+  "disabledButtons": 1,
+  "links": 20,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00.000Z DSX EXCHANGE Exchange: unavailable ACTIVE SCENARIO cooling degradation OBSERVATION WINDOW 08:00:00 \u2192 08:00:00 UTC CONNECTION HEALTH Source: disabled DATA FRESHNESS Fresh EVIDENCE QUALITY 18 accepted \u00b7 0 quarantined",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/evidence",
+  "final": "/dsx/evidence-beta/evidence?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "h1": [
+   "Overview"
+  ],
+  "tabs": [],
+  "buttons": 22,
+  "disabledButtons": 1,
+  "links": 26,
+  "spinners": 0,
+  "textLen": 2499,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00.000Z DSX EXCHANGE Exchange: unavailable ACTIVE SCENARIO cooling degradation OBSERVATION WINDOW 08:00:00 \u2192 08:00:00 UTC CONNECTION HEALTH Source: disabled DATA FRESHNESS Fresh EVIDENCE QUALITY 18 accepted \u00b7 0 quarantined",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/manage/facilities",
+  "final": "/manage/facilities",
+  "h1": [
+   "Facilities"
+  ],
+  "tabs": [],
+  "buttons": 36,
+  "disabledButtons": 1,
+  "links": 32,
+  "spinners": 0,
+  "textLen": 2283,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Facilities Facility administration: create, configure and retire modelled data-centre facilities. All values remain simulated. Create facility Facility list Facilities you have access to. 1 Current Montreal \u00b7 Tier III \u00b7 5000 kW Set as current Edit Eric DC Twin Test Vancouver \u00b7 Tier IV \u00b7 5000 kW Set as current Edit Fibre Centre Toronto \u00b7 ",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/manage/integrations",
+  "final": "/manage/integrations",
+  "h1": [
+   "Integrations"
+  ],
+  "tabs": [],
+  "buttons": 10,
+  "disabledButtons": 2,
+  "links": 10,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Integrations Connection and readiness state for every external system. Nothing listed here is currently supplying data to AURA DC. Data sources What AURA DC would read from, and whether it is attached. Facility telemetry (BMS / DCIM) No building-management or DCIM source is attached. Every value in AURA DC is modelled. Not connected View",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/integrations",
+  "final": "/manage/integrations",
+  "h1": [
+   "Integrations"
+  ],
+  "tabs": [],
+  "buttons": 10,
+  "disabledButtons": 2,
+  "links": 10,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Integrations Connection and readiness state for every external system. Nothing listed here is currently supplying data to AURA DC. Data sources What AURA DC would read from, and whether it is attached. Facility telemetry (BMS / DCIM) No building-management or DCIM source is attached. Every value in AURA DC is modelled. Not connected View",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/settings/integrations",
+  "final": "/manage/integrations",
+  "h1": [
+   "Integrations"
+  ],
+  "tabs": [],
+  "buttons": 10,
+  "disabledButtons": 2,
+  "links": 10,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Integrations Connection and readiness state for every external system. Nothing listed here is currently supplying data to AURA DC. Data sources What AURA DC would read from, and whether it is attached. Facility telemetry (BMS / DCIM) No building-management or DCIM source is attached. Every value in AURA DC is modelled. Not connected View",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/marketplace",
+  "final": "/marketplace",
+  "h1": [
+   "Template Marketplace"
+  ],
+  "tabs": [],
+  "buttons": 17,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 672,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Template Marketplace Discover Digital Twin & AI Agent Blueprints tailored to your industry and department Filters: All Industries All Departments All Types All Levels Recommended for You Showing 1 template \ud83c\udfe2 Data Centre Digital Twin Production-grade Data Centre Digital Twin with 9 domain twins (Thermal, Power, Cooling, Network, Facility,",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/connect/monitor",
+  "final": "/connect/monitor",
+  "h1": [
+   "Sync Monitor"
+  ],
+  "tabs": [],
+  "buttons": 19,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 1,
+  "textLen": 1019,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Sync Monitor Real-time status of all data connections and background jobs. View Health No ingestion service is connected to this workspace. The jobs below are demonstration data, not live telemetry. Last checked 12:56:44 AM Check again RUNNING (DEMONSTRATION) 1 SUCCEEDED (DEMONSTRATION) 3 FAILED (DEMONSTRATION) 1 TOTAL DOCUMENTS 615 Filt",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/connect/health",
+  "final": "/connect/health",
+  "h1": [
+   "Data Health"
+  ],
+  "tabs": [],
+  "buttons": 12,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 1390,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Data Health Monitor quality, freshness, and issues across all data sources Back to Monitor Overall System Health Aggregate health score across all data sources 85% +2.3% from yesterday HEALTHY SOURCES 3 WARNINGS 1 CRITICAL ISSUES 1 Avg Processing Time 2.1s -0.3s Success Rate 96.8% +1.2% Data Freshness 94% +3% Failed Jobs (24h) 12 +4 Sour",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/builder",
+  "final": "/builder",
+  "h1": [
+   "Start a new build"
+  ],
+  "tabs": [],
+  "buttons": 15,
+  "disabledButtons": 1,
+  "links": 18,
+  "spinners": 0,
+  "textLen": 932,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Start a new build Pick a template from the marketplace, resume a saved draft, or begin from scratch. Choose a template Start blank Your builds Untitled Agent Updated 5 days ago Draft Untitled Agent Updated 9 days ago Draft Untitled Agent Updated 13 days ago Draft Untitled Agent Updated 21 days ago Draft Untitled Agent Updated 21 days ago",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/build",
+  "final": "/builder",
+  "h1": [
+   "Start a new build"
+  ],
+  "tabs": [],
+  "buttons": 15,
+  "disabledButtons": 1,
+  "links": 18,
+  "spinners": 0,
+  "textLen": 932,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Start a new build Pick a template from the marketplace, resume a saved draft, or begin from scratch. Choose a template Start blank Your builds Untitled Agent Updated 5 days ago Draft Untitled Agent Updated 9 days ago Draft Untitled Agent Updated 13 days ago Draft Untitled Agent Updated 21 days ago Draft Untitled Agent Updated 21 days ago",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/app/agents",
+  "final": "/app/agents",
+  "h1": [
+   "Subsystem Agents"
+  ],
+  "tabs": [],
+  "buttons": 13,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 1656,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Introducing Agent Operations Center Your mission control for deployed AI agents Real-Time Control Start, pause, stop agents on demand Live Monitoring Stream activity logs in real-time Performance Metrics Track success rate and latency Team Collaboration See who's viewing and recent changes \u2318K Quick actions \u2022 ? Keyboard shortcuts Back to ",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/agents",
+  "final": "/app/agents",
+  "h1": [
+   "Subsystem Agents"
+  ],
+  "tabs": [],
+  "buttons": 13,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 1656,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Introducing Agent Operations Center Your mission control for deployed AI agents Real-Time Control Start, pause, stop agents on demand Live Monitoring Stream activity logs in real-time Performance Metrics Track success rate and latency Team Collaboration See who's viewing and recent changes \u2318K Quick actions \u2022 ? Keyboard shortcuts Back to ",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/subsystem-agents",
+  "final": "/app/agents",
+  "h1": [
+   "Subsystem Agents"
+  ],
+  "tabs": [],
+  "buttons": 13,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 1656,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Introducing Agent Operations Center Your mission control for deployed AI agents Real-Time Control Start, pause, stop agents on demand Live Monitoring Stream activity logs in real-time Performance Metrics Track success rate and latency Team Collaboration See who's viewing and recent changes \u2318K Quick actions \u2022 ? Keyboard shortcuts Back to ",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/analytics",
+  "final": "/analytics",
+  "h1": [
+   "Telemetry and analytics"
+  ],
+  "tabs": [
+   "Overview",
+   "Thermal Analysis",
+   "Power & Energy",
+   "GPU & Workload",
+   "Sovereignty",
+   "Simulation Replay"
+  ],
+  "buttons": 34,
+  "disabledButtons": 1,
+  "links": 8,
+  "spinners": 0,
+  "textLen": 2499,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Telemetry and analytics 1 - Montreal. Executive and operations overview. Drill into Thermal, Power, GPU, Sovereignty, and Carbon tabs for engineering detail. Last refreshed: 2 min ago | Auto-refresh 60s Blueprint 58 KPIs Export Report Last 7 days All Facilities All Subsystems All Regions Quick Tools: GPU Power Cooling Sovereignty Carbon ",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/intelligence",
+  "final": "/analytics",
+  "h1": [
+   "Telemetry and analytics"
+  ],
+  "tabs": [
+   "Overview",
+   "Thermal Analysis",
+   "Power & Energy",
+   "GPU & Workload",
+   "Sovereignty",
+   "Simulation Replay"
+  ],
+  "buttons": 34,
+  "disabledButtons": 1,
+  "links": 8,
+  "spinners": 0,
+  "textLen": 2499,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Telemetry and analytics 1 - Montreal. Executive and operations overview. Drill into Thermal, Power, GPU, Sovereignty, and Carbon tabs for engineering detail. Last refreshed: 2 min ago | Auto-refresh 60s Blueprint 58 KPIs Export Report Last 7 days All Facilities All Subsystems All Regions Quick Tools: GPU Power Cooling Sovereignty Carbon ",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/operations",
+  "final": "/analytics",
+  "h1": [
+   "Telemetry and analytics"
+  ],
+  "tabs": [
+   "Overview",
+   "Thermal Analysis",
+   "Power & Energy",
+   "GPU & Workload",
+   "Sovereignty",
+   "Simulation Replay"
+  ],
+  "buttons": 34,
+  "disabledButtons": 1,
+  "links": 8,
+  "spinners": 0,
+  "textLen": 2499,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Telemetry and analytics 1 - Montreal. Executive and operations overview. Drill into Thermal, Power, GPU, Sovereignty, and Carbon tabs for engineering detail. Last refreshed: 2 min ago | Auto-refresh 60s Blueprint 58 KPIs Export Report Last 7 days All Facilities All Subsystems All Regions Quick Tools: GPU Power Cooling Sovereignty Carbon ",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/deployments",
+  "final": "/deployments",
+  "h1": [
+   "Deployments"
+  ],
+  "tabs": [],
+  "buttons": 13,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 509,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Deployments Complete audit trail of all system deployments TOTAL DEPLOYMENTS 0 All time ACTIVE 0 Running systems FAILED 0 Requires attention PENDING 0 In progress All Statuses All Health Newest First System Status Health Model Version Region Deployed Updated Actions No deployments yet. Deploy your first system to get started! Showing 0 o",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/deploy",
+  "final": "/deploy",
+  "h1": [],
+  "tabs": [],
+  "buttons": 11,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 335,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs No system selected Deployment runs against one configured system. Open a system in the Builder and start the deployment from there; this route needs an ?id= system identifier. Open Builder \u00a9 2025 Data Centre Digital Twin Studio vpilot \u2022 1/1/1970 Documentation Compliance",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/settings/ai",
+  "final": "/settings/ai",
+  "h1": [
+   "AI settings"
+  ],
+  "tabs": [],
+  "buttons": 15,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 798,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs AI settings Configure Google Gemini (Vertex AI) for AURA Assistant These settings are stored in your current browser only. They are not synced to a server, are not shared with other users, and clearing browser storage removes them. No credentials or API keys are stored here. Google Cloud Configuration Google Cloud Project ID Region \ud83c\udde8\ud83c\udde6 no",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/admin",
+  "final": "/admin/signups-dashboard",
+  "h1": [
+   "Signups and approvals"
+  ],
+  "tabs": [
+   "All (324)",
+   "Pending (304)",
+   "Approved (20)"
+  ],
+  "buttons": 337,
+  "disabledButtons": 1,
+  "links": 10,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Signups and approvals Real-time user registrations and approval status Live User approvals Onboarding submissions Teams and roles Total Users 324 Pending Approval 304 Approved 20 Last 7 Days 0 All (324) Pending (304) Approved (20) User Email Role Signed Up Status Action SK Sumeet Kumar sumeet@m2mtechconnect.com - Aug 5, 2026 20:13 Approv",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/admin/signups-dashboard",
+  "final": "/admin/signups-dashboard",
+  "h1": [
+   "Signups and approvals"
+  ],
+  "tabs": [
+   "All (324)",
+   "Pending (304)",
+   "Approved (20)"
+  ],
+  "buttons": 337,
+  "disabledButtons": 1,
+  "links": 10,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Signups and approvals Real-time user registrations and approval status Live User approvals Onboarding submissions Teams and roles Total Users 324 Pending Approval 304 Approved 20 Last 7 Days 0 All (324) Pending (304) Approved (20) User Email Role Signed Up Status Action SK Sumeet Kumar sumeet@m2mtechconnect.com - Aug 5, 2026 20:13 Approv",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/admin/user-approvals",
+  "final": "/admin/user-approvals",
+  "h1": [
+   "User approvals"
+  ],
+  "tabs": [],
+  "buttons": 317,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs User approvals Manage access for new user signups 304 pending Pending Approved All No name test-1784557534314@m2m.studio Signed up: 7/20/2026 Pending Approve No name test-1784557341575@test.com Signed up: 7/20/2026 Pending Approve No name test-1784557341309@test.com Signed up: 7/20/2026 Pending Approve No name test-1784557341000@test.com",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/admin/onboarding-submissions",
+  "final": "/admin/onboarding-submissions",
+  "h1": [
+   "Onboarding submissions"
+  ],
+  "tabs": [],
+  "buttons": 10,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 1575,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Onboarding submissions Prospect questionnaire responses from the marketing page 14 submissions Total Leads 14 This Week 0 Enterprise (1000+) 0 Ready (1-3 mo) 8 Name Email Company Role Size Timeline Submitted Sumeet Kumar sumeet@m2mtechconnect.com M2M Tech Operations Lead 1-50 1-3 months Aug 5, 2026 20:13 sonia sonia@m2mtechconnect.com m2",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/admin/asset-pipeline",
+  "final": "/admin/asset-pipeline",
+  "h1": [
+   "Asset pipeline"
+  ],
+  "tabs": [],
+  "buttons": 10,
+  "disabledButtons": 1,
+  "links": 11,
+  "spinners": 0,
+  "textLen": 1169,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Asset pipeline Approved OpenUSD-derived runtime assets and their validation state. Private USD source URLs are never exposed here. NVIDIA Reference Facility Hardware visual acceptance for the whole reference facility: live asset reconciliation, a fixed-path benchmark and recorded human visual verdicts. Run facility validation nvidia.rack",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/admin/asset-preview",
+  "final": "/admin/asset-preview",
+  "h1": [
+   "Admin asset preview"
+  ],
+  "tabs": [],
+  "buttons": 11,
+  "disabledButtons": 1,
+  "links": 8,
+  "spinners": 0,
+  "textLen": 445,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Admin asset preview Run the hardware GPU acceptance harness for nvidia.rack.42u_a_01.ops NVIDIA liquid-cooled rack canary - not assigned to facility. NVIDIA OpenUSD-derived geometry; 0 converted textures. Validated visual derivative (546 draw calls). NVIDIA OpenUSD-derived rack - simulated design \u00a9 2025 Data Centre Digital Twin Studio vp",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/admin/asset-validation/nvidia.rack.42u_a_01",
+  "final": "/admin/asset-validation/nvidia.rack.42u_a_01",
+  "h1": [
+   "Hardware GPU acceptance - nvidia.rack.42u_a_01"
+  ],
+  "tabs": [],
+  "buttons": 23,
+  "disabledButtons": 5,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 2236,
+  "snippet": "? SIMULATED Design baseline No run recorded Synthetic inputs Hardware GPU acceptance - nvidia.rack.42u_a_01 Administrator-operated validation of the approved operations derivative against the published delivery path. Nothing is measured or stored until you start the run, and nothing is persisted until you save it. Private USD source URLs are never exposed here. AURA_NVIDIA_RACK_GPU_VALIDATION_AWAI",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/admin/reference-facility-validation",
+  "final": "/admin/reference-facility-validation",
+  "h1": [
+   "NVIDIA Reference Facility - hardware visual acceptance"
+  ],
+  "tabs": [],
+  "buttons": 55,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 2498,
+  "snippet": "? SIMULATED Design baseline No run recorded Synthetic inputs NVIDIA Reference Facility - hardware visual acceptance Runs against the live twin route below. Measurements come from the mounted scene; the visual verdicts are yours. This scene mixes NVIDIA OpenUSD-derived equipment with AURA procedural architecture, and the report records which is which. Build bmswiogqf Manifest v7 Software renderer -",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/teams",
+  "final": "/teams",
+  "h1": [
+   "Teams and roles"
+  ],
+  "tabs": [
+   "Team Members",
+   "User Approvals304"
+  ],
+  "buttons": 16,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Teams and roles Manage team members, roles, and access controls Invite Team Member Team Members User Approvals 304 Total Members 324 Active Now 163 Systems 0 Pending 0 Roles 2 Departments 2 Team Members 324 of 324 All Roles All Status V Vandana Engineer 4 hours ago 0 systems View Profile E edouard Admin Online 0 systems View Profile M Ma",
+  "consoleErrors": [],
+  "failedReq": [
+   "https://auradc.m2mtechconnect.com/data-centre-twin?geometry=nvidia-reference&harness=1|net::ERR_ABORTED",
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&id=eq.e5ff7f0c-6266-46f3-84cb-|net::ERR_ABORTED",
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&id=eq.e5ff7f0c-6266-46f3-84cb-|net::ERR_ABORTED"
+  ],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/account/access-control",
+  "final": "/account/access-control",
+  "h1": [
+   "Access control"
+  ],
+  "tabs": [],
+  "buttons": 13,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 724,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Access control Manage user roles and permissions across the platform Grant Role Role Permissions Viewer \u2022 View agents and their status \u2022 Access logs and metrics \u2022 Cannot run or modify agents Operator \u2022 All viewer permissions \u2022 Start/stop/restart agents \u2022 Run simulations \u2022 Cannot delete or manage permissions Admin \u2022 All operator permissio",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/account/profile",
+  "final": "/account/profile",
+  "h1": [
+   "Profile"
+  ],
+  "tabs": [],
+  "buttons": 16,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 419,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Profile Manage your personal account settings and preferences Profile Picture E Upload Photo JPG, PNG, GIF, or WebP. Max 2MB. Personal Information Email Full Name Job Title Phone Organization Role Department Localization Language English Timezone UTC Cancel Save Changes \u00a9 2025 Data Centre Digital Twin Studio vpilot \u2022 1/1/1970 Documentati",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/account/settings",
+  "final": "/account/settings",
+  "h1": [
+   "Workspace settings"
+  ],
+  "tabs": [],
+  "buttons": 11,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 321,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Workspace settings Manage workspace configuration and team defaults Admin access required No Workspace Found Your account is not associated with a workspace yet. View Teams \u00a9 2025 Data Centre Digital Twin Studio vpilot \u2022 1/1/1970 Documentation Compliance",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/search",
+  "final": "/search",
+  "h1": [
+   "Search"
+  ],
+  "tabs": [],
+  "buttons": 15,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 393,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Search Find documents, pages, and apps across all your connected sources. Search Start searching Enter a query to search across all your connected documents, pages, and apps. Try searching for: HIPAA Marketing report Support tickets Compliance \u00a9 2025 Data Centre Digital Twin Studio vpilot \u2022 1/1/1970 Documentation Compliance",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/universal-search",
+  "final": "/search",
+  "h1": [
+   "Search"
+  ],
+  "tabs": [],
+  "buttons": 15,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 393,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Search Find documents, pages, and apps across all your connected sources. Search Start searching Enter a query to search across all your connected documents, pages, and apps. Try searching for: HIPAA Marketing report Support tickets Compliance \u00a9 2025 Data Centre Digital Twin Studio vpilot \u2022 1/1/1970 Documentation Compliance",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/search?q=montreal",
+  "final": "/search?q=montreal",
+  "h1": [
+   "Search"
+  ],
+  "tabs": [],
+  "buttons": 15,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 393,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Search Find documents, pages, and apps across all your connected sources. Search Start searching Enter a query to search across all your connected documents, pages, and apps. Try searching for: HIPAA Marketing report Support tickets Compliance \u00a9 2025 Data Centre Digital Twin Studio vpilot \u2022 1/1/1970 Documentation Compliance",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/help",
+  "final": "/help",
+  "h1": [
+   "Learning Hub"
+  ],
+  "tabs": [],
+  "buttons": 27,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 2414,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Learning Hub Resources, tutorials, and expert support to accelerate your AI transformation \ud83c\udf93 Build Your First AI System 5-minute quickstart guide to deploying your first AI workflow Watch Tutorial View Documentation How to Use the Data Centre Simulation Learn how to run scenarios and interpret KPI deltas Master the simulation engine to t",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/playbook",
+  "final": "/playbook",
+  "h1": [
+   "AI Initiative"
+  ],
+  "tabs": [],
+  "buttons": 14,
+  "disabledButtons": 2,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Back to Recommendations Implementation Playbook AI Initiative Comprehensive implementation guide and best practices Export PDF Executive Summary Executive Summary Business Context: B2B Enterprise SaaS operating in the Technology sector. Challenge Identified: Current Operations processes are manual, time-consuming, and prone to errors, cr",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/compliance",
+  "final": "/compliance",
+  "h1": [
+   "Sovereignty & Safety Audit"
+  ],
+  "tabs": [],
+  "buttons": 22,
+  "disabledButtons": 7,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 2500,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Sovereignty & Safety Audit 1 - Montreal Export Audit Report SOVEREIGN COMPLIANCE Unavailable Not assessed Applicable frameworks: PIPEDA, Quebec Law 25 (configured, not achieved). CROSS-BORDER FLOWS (DEMO) Demo data 0 Monitored flows from demonstration fixture. AUDIT READINESS Unavailable Not assessed Evidence not collected. Customer vali",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/infrastructure",
+  "final": "/infrastructure",
+  "h1": [
+   "Infrastructure"
+  ],
+  "tabs": [],
+  "buttons": 27,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 2499,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs PHYSICAL AI \u00b7 DIGITAL TWIN Infrastructure Ready to build your infrastructure? Use the Pod Designer to configure your NVIDIA + DDN hardware stack for your specific data centre scenario. Get recommendations, cost estimates, and deploy in minutes. How it comes together: Sensors collect facility data, GPUs train AI models, a living digital t",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/data-centre-twin",
+  "final": "/data-centre-twin",
+  "h1": [
+   "Data centre twin 1"
+  ],
+  "tabs": [
+   "Overview",
+   "Simulation",
+   "Thermal",
+   "Power",
+   "Cooling",
+   "Network",
+   "Facility",
+   "Workload",
+   "Sovereignty",
+   "Carbon",
+   "Financial"
+  ],
+  "buttons": 89,
+  "disabledButtons": 2,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 2274,
+  "snippet": "? SIMULATED Design baseline No run recorded Synthetic inputs Facility Model (Simulated) 1 40 Racks \u2022 5 Rows \u2022 5000 kW Capacity FACILITY GEOMETRY Baseline preview Twin Preview Zoom 100% Scroll to zoom Row A Row B Row C Row D Row E Procedural 3D preview 1.33 PUE 1122 kW 25 gCO\u2082 Data centre twin 1 operational Tier 4 Montreal, Canada \u2022 20 Racks \u2022 12,000 kW Capacity Blueprint 9 agents SIMULATION \u2022 12:5",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/omniverse-scene",
+  "final": "/omniverse-scene",
+  "h1": [
+   "AURA Twin Preview"
+  ],
+  "tabs": [
+   "Metrics",
+   "Simulate",
+   "Racks"
+  ],
+  "buttons": 31,
+  "disabledButtons": 2,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 820,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs AURA Twin Preview AURA application rendering \u2022 0 racks \u2022 Simulated scene Kit disabled 12:59:38 AM Kit disabled by configuration \u2014 displaying local demonstration data. Local demonstration scene disabled Local demonstration scene Omniverse stream unavailable in this build. Server-mediated transport is required. Connect to Stream Overview E",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/twin-datacentre",
+  "final": "/blueprint/default",
+  "h1": [
+   "Montreal Data centre"
+  ],
+  "tabs": [
+   "Model",
+   "Assets & Systems",
+   "Controls",
+   "Validation",
+   "Versions"
+  ],
+  "buttons": 84,
+  "disabledButtons": 1,
+  "links": 16,
+  "spinners": 0,
+  "textLen": 2376,
+  "snippet": "? SIMULATED Design baseline No run recorded Synthetic inputs Back Montreal Data centre Designer - editable AURA Assistant Open in Simulation Montreal Tier III 5 MW 200 Racks v1 Updated 8/17/2026, 12:59:43 AM Model Assets & Systems Controls Validation Versions CA-QC / Montreal / Sovereign Green AI Data Centre Twin Modelled facility: Sovereign Green AI Data Centre Twin \u00b7 Tier III \u00b7 Sovereign AI data",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/twin-debug",
+  "final": "/twin-debug",
+  "h1": [
+   "Twin Debug Console"
+  ],
+  "tabs": [
+   "Query Status",
+   "Telemetry",
+   "Errors",
+   "All Twins"
+  ],
+  "buttons": 16,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 811,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Twin Debug Console Multi-tenant isolation debugging Refresh Current Twin Context Twin ID b8f9f3ad-126d-49ae-be0b-ba1bf3e7b646 Twin Name 1 Region ca-central-1 Total Twins 25 Region Profile Carbon Intensity 20 gCO\u2082/kWh Default PUE 1.25 Cost/kWh $0.065 CAD Provider AWS Query Status Telemetry Errors All Twins Query Logs Table Twin ID Filter ",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/digital-twins-demo/funding-intake",
+  "final": "/digital-twins-demo/funding-intake",
+  "h1": [],
+  "tabs": [],
+  "buttons": 13,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 688,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Funding Intake & Triage Twin \u2013 Demo Submit a company funding intake form to see the Digital Twin in action. Company Intake Form Fill out the form below to simulate a funding opportunity submission Company Name * Website URL * Sector * SaaS Manufacturing Energy Agri-food SaaS Healthcare Other Company Size * Small (10-49 employees) Micro (",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/pilot/overview",
+  "final": "/pilot/overview",
+  "h1": [
+   "Data-centre twins"
+  ],
+  "tabs": [],
+  "buttons": 1,
+  "disabledButtons": 0,
+  "links": 6,
+  "spinners": 0,
+  "textLen": 772,
+  "snippet": "M2M AURA Pilot Overview edouard@m2mtechconnect.com Sign out Data-centre twins Source: public.data_centre_twins. Row visibility is enforced server-side by row-level security scoped to the record owner. Montreal Sovereign AI DC Montreal - QC - Tier Tier III - 10000 kW Updated 2026-08-11T15:57:09.236Z Walmart Sovereign Green AI Data Centre Twin Toronto - CA-ON - Tier Tier IV - 20000 kW Updated 2025-1",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/command",
+  "final": "/dashboard",
+  "h1": [
+   "Montreal Data centre"
+  ],
+  "tabs": [],
+  "buttons": 33,
+  "disabledButtons": 1,
+  "links": 26,
+  "spinners": 0,
+  "textLen": 2250,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs DATA CENTRE FACILITY Montreal Data centre Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 01:00 AM Change facility Start simulation Open Blueprint View Evidence PUE 1.32 Watch View source IT LOAD 3.5 MW Within design target View source CAPACITY HEADROOM 30% Within design target View source SOVEREIGN",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/facilities",
+  "final": "/manage/facilities",
+  "h1": [
+   "Facilities"
+  ],
+  "tabs": [],
+  "buttons": 36,
+  "disabledButtons": 1,
+  "links": 32,
+  "spinners": 0,
+  "textLen": 2283,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Facilities Facility administration: create, configure and retire modelled data-centre facilities. All values remain simulated. Create facility Facility list Facilities you have access to. 1 Current Montreal \u00b7 Tier III \u00b7 5000 kW Set as current Edit Eric DC Twin Test Vancouver \u00b7 Tier IV \u00b7 5000 kW Set as current Edit Fibre Centre Toronto \u00b7 ",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/agent-chat",
+  "final": "/dashboard",
+  "h1": [
+   "Montreal Data centre"
+  ],
+  "tabs": [],
+  "buttons": 33,
+  "disabledButtons": 1,
+  "links": 26,
+  "spinners": 0,
+  "textLen": 2271,
+  "snippet": "Agent ID is required E SIMULATED Design baseline No run recorded Synthetic inputs DATA CENTRE FACILITY Montreal Data centre Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 01:00 AM Change facility Start simulation Open Blueprint View Evidence PUE 1.32 Watch View source IT LOAD 3.5 MW Within design target View source CAPACITY HEADROOM 30% Within design target ",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/studio/systems/does-not-exist/manage",
+  "final": "/studio/systems/does-not-exist/manage",
+  "h1": [],
+  "tabs": [],
+  "buttons": 10,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 1,
+  "textLen": 144,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs \u00a9 2025 Data Centre Digital Twin Studio vpilot \u2022 1/1/1970 Documentation Compliance",
+  "consoleErrors": [
+   "Failed to load resource: the server responded with a status of 400 ()",
+   "Failed to load resource: the server responded with a status of 400 ()",
+   "Failed to load resource: the server responded with a status of 400 ()"
+  ],
+  "failedReq": [],
+  "http4xx5xx": [
+   "400 https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/agents?select=*&id=eq.does-not-exist",
+   "400 https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/agents?select=*&id=eq.does-not-exist",
+   "400 https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/agents?select=*&id=eq.does-not-exist"
+  ]
+ },
+ {
+  "route": "/app/agents/does-not-exist/detail",
+  "final": "/app/agents/does-not-exist/detail",
+  "h1": [],
+  "tabs": [],
+  "buttons": 10,
+  "disabledButtons": 1,
+  "links": 7,
+  "spinners": 1,
+  "textLen": 144,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs \u00a9 2025 Data Centre Digital Twin Studio vpilot \u2022 1/1/1970 Documentation Compliance",
+  "consoleErrors": [
+   "Failed to load resource: the server responded with a status of 406 ()",
+   "Failed to load resource: the server responded with a status of 406 ()",
+   "Failed to load resource: the server responded with a status of 406 ()"
+  ],
+  "failedReq": [],
+  "http4xx5xx": [
+   "406 https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/agent_definitions?select=*&slug=eq.does-not-exist",
+   "406 https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/agent_definitions?select=*&slug=eq.does-not-exist",
+   "406 https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/agent_definitions?select=*&slug=eq.does-not-exist"
+  ]
+ },
+ {
+  "route": "/blueprint/%%%bad-id",
+  "final": "/blueprint/%%%bad-id",
+  "h1": [
+   "400 Bad Request"
+  ],
+  "tabs": [],
+  "buttons": 0,
+  "disabledButtons": 0,
+  "links": 0,
+  "spinners": 0,
+  "textLen": 26,
+  "snippet": "400 Bad Request cloudflare",
+  "consoleErrors": [
+   "Failed to load resource: the server responded with a status of 400 ()"
+  ],
+  "failedReq": [],
+  "http4xx5xx": [
+   "400 https://auradc.m2mtechconnect.com/blueprint/%%%bad-id"
+  ]
+ },
+ {
+  "route": "/data-centre-twin/00000000-0000-0000-0000-000000000000",
+  "final": "/data-centre-twin/00000000-0000-0000-0000-000000000000",
+  "h1": [
+   "Data centre twin 1"
+  ],
+  "tabs": [
+   "Overview",
+   "Simulation",
+   "Thermal",
+   "Power",
+   "Cooling",
+   "Network",
+   "Facility",
+   "Workload",
+   "Sovereignty",
+   "Carbon",
+   "Financial"
+  ],
+  "buttons": 89,
+  "disabledButtons": 2,
+  "links": 7,
+  "spinners": 0,
+  "textLen": 2272,
+  "snippet": "? SIMULATED Design baseline No run recorded Synthetic inputs Facility Model (Simulated) 1 40 Racks \u2022 5 Rows \u2022 5000 kW Capacity FACILITY GEOMETRY Baseline preview Twin Preview Zoom 100% Scroll to zoom Row A Row B Row C Row D Row E Procedural 3D preview 1.33 PUE 1026 kW 25 gCO\u2082 Data centre twin 1 operational Tier 4 Montreal, Canada \u2022 20 Racks \u2022 12,000 kW Capacity Blueprint 9 agents SIMULATION \u2022 1:00",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/this-route-does-not-exist",
+  "final": "/this-route-does-not-exist",
+  "h1": [
+   "404"
+  ],
+  "tabs": [],
+  "buttons": 10,
+  "disabledButtons": 1,
+  "links": 8,
+  "spinners": 0,
+  "textLen": 186,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs 404 Oops! Page not found Return to Home \u00a9 2025 Data Centre Digital Twin Studio vpilot \u2022 1/1/1970 Documentation Compliance",
+  "consoleErrors": [
+   "404 Error: User attempted to access non-existent route: /this-route-does-not-exist"
+  ],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/login",
+  "final": "/dashboard",
+  "h1": [
+   "Montreal Data centre"
+  ],
+  "tabs": [],
+  "buttons": 33,
+  "disabledButtons": 1,
+  "links": 26,
+  "spinners": 0,
+  "textLen": 2250,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs DATA CENTRE FACILITY Montreal Data centre Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 01:00 AM Change facility Start simulation Open Blueprint View Evidence PUE 1.32 Watch View source IT LOAD 3.5 MW Within design target View source CAPACITY HEADROOM 30% Within design target View source SOVEREIGN",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/onboarding",
+  "final": "/dashboard",
+  "h1": [
+   "Montreal Data centre"
+  ],
+  "tabs": [],
+  "buttons": 33,
+  "disabledButtons": 1,
+  "links": 26,
+  "spinners": 0,
+  "textLen": 2250,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs DATA CENTRE FACILITY Montreal Data centre Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 01:00 AM Change facility Start simulation Open Blueprint View Evidence PUE 1.32 Watch View source IT LOAD 3.5 MW Within design target View source CAPACITY HEADROOM 30% Within design target View source SOVEREIGN",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/auth",
+  "final": "/dashboard",
+  "h1": [
+   "Montreal Data centre"
+  ],
+  "tabs": [],
+  "buttons": 33,
+  "disabledButtons": 1,
+  "links": 26,
+  "spinners": 0,
+  "textLen": 2250,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs DATA CENTRE FACILITY Montreal Data centre Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 01:01 AM Change facility Start simulation Open Blueprint View Evidence PUE 1.32 Watch View source IT LOAD 3.5 MW Within design target View source CAPACITY HEADROOM 30% Within design target View source SOVEREIGN",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/sign-up",
+  "final": "/dashboard",
+  "h1": [
+   "Montreal Data centre"
+  ],
+  "tabs": [],
+  "buttons": 33,
+  "disabledButtons": 1,
+  "links": 26,
+  "spinners": 0,
+  "textLen": 2250,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs DATA CENTRE FACILITY Montreal Data centre Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 01:01 AM Change facility Start simulation Open Blueprint View Evidence PUE 1.32 Watch View source IT LOAD 3.5 MW Within design target View source CAPACITY HEADROOM 30% Within design target View source SOVEREIGN",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ },
+ {
+  "route": "/mfa",
+  "final": "/dashboard",
+  "h1": [
+   "Montreal Data centre"
+  ],
+  "tabs": [],
+  "buttons": 33,
+  "disabledButtons": 1,
+  "links": 26,
+  "spinners": 0,
+  "textLen": 2250,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs DATA CENTRE FACILITY Montreal Data centre Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs \u00b7 Calculated 01:01 AM Change facility Start simulation Open Blueprint View Evidence PUE 1.32 Watch View source IT LOAD 3.5 MW Within design target View source CAPACITY HEADROOM 30% Within design target View source SOVEREIGN",
+  "consoleErrors": [],
+  "failedReq": [],
+  "http4xx5xx": []
+ }
+]

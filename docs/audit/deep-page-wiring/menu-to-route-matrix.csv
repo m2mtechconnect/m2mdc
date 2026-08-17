@@ -1,0 +1,16 @@
+menu_item,href,observed_destination_auth,anonymous_result,permission,classification
+Dashboard,/dashboard,/dashboard,/,none,WIRED_READ_ONLY
+Blueprint,/blueprint,/blueprint/default,/,none,WIRED_READ_ONLY
+Simulation,/simulation,/simulation?step=inspect,/,none,WIRED_WITH_LIMITATIONS
+Evidence,/dsx/evidence-beta/overview,/dsx/evidence-beta/overview?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0,/,none,WIRED_WITH_LIMITATIONS
+Facilities,/manage/facilities,/manage/facilities,/,twin.edit,BLOCKED_UNVERIFIED
+Integrations,/manage/integrations,/manage/integrations,/,twin.edit,WIRED_WITH_LIMITATIONS
+Build twin,/builder,/builder,/,twin.edit,BLOCKED_UNVERIFIED
+Subsystem agents,/app/agents,/app/agents,/,agent.view,WIRED_READ_ONLY
+Telemetry and analytics,/analytics,/analytics,/,analytics.view,WIRED_READ_ONLY
+Deployments,/deployments,/deployments,/,deployment.view,WIRED_READ_ONLY
+AI settings,/settings/ai,/settings/ai,/,agent.administer,BLOCKED_UNVERIFIED
+Admin console,/admin/signups-dashboard,/admin/signups-dashboard,/,platform.view_admin_console,WIRED_READ_ONLY
+Learning Hub,/help,/help,/,none,WIRED_READ_ONLY
+Search,/search,/search,/,none,WIRED_WITH_LIMITATIONS
+Sign Out,/sign-out,not tested,/,none,BLOCKED_UNVERIFIED

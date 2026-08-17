@@ -1,0 +1,7 @@
+page,state,observed
+connect/monitor,unavailable,honest terminal message plus one inline refresh spinner
+studio/systems/:id,not found,permanent spinner
+app/agents/:slug/detail,not found,permanent spinner
+blueprint/%%%bad-id,malformed id,edge 400 page
+data-centre-twin/<unknown uuid>,stale id,default twin rendered
+simulation compare/decide,gated,notice and fallback to simulate

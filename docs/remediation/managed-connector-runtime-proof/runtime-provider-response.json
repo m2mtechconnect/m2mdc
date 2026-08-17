@@ -1,0 +1,9 @@
+{
+  "retrieved_utc": "2026-08-17",
+  "status": "NOT_EXECUTED",
+  "reason_code": "CONNECTOR_NOT_LINKED",
+  "gateway_path_that_would_run": "/google_drive/drive/v3/files",
+  "query_constraint": "name = 'AURA Connector Acceptance' parent folder only, fields=files(id,name,mimeType,modifiedTime,size)",
+  "records": [],
+  "verdict_effect": "VERIFIED not permitted; no provider records were returned"
+}

@@ -1,0 +1,15 @@
+{
+  "retrieved_utc": "2026-08-17",
+  "connector_catalog_entry": { "connector_id": "google_drive", "type": "app_user_connector", "workspace_enabled": true },
+  "workspace_clients_configured": 0,
+  "project_binding_state": "NOT_LINKED",
+  "oauth_application_configuration_state": "NOT_CONFIGURED",
+  "callback_registration_state": "NOT_VERIFIABLE",
+  "required_callback": "https://connector-gateway.lovable.dev/api/v1/app-users/oauth2/callback",
+  "allowed_scopes_requested_by_aura": ["https://www.googleapis.com/auth/drive.readonly"],
+  "client_api_key_env": "GOOGLE_DRIVE_APP_USER_CONNECTOR_CLIENT_API_KEY",
+  "client_api_key_present_in_edge_env": false,
+  "app_user_connection_key_secret_present": false,
+  "published_app_runtime_eligibility": "INELIGIBLE_UNTIL_CLIENT_LINKED",
+  "environments_available": []
+}

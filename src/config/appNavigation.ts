@@ -119,7 +119,10 @@ export const MANAGE_NAV: AppNavItem[] = [
     fullName: 'Connections',
     href: '/manage/integrations',
     icon: Cable,
-    matches: ['/manage/integrations', '/manage/connections', '/integrations', '/settings/integrations', '/marketplace', '/connect'],
+    // AURA_IA_DUP_CLEANUP: /marketplace is the twin template library, not a
+    // connection surface. Matching it here highlighted "Connections" while
+    // the user was somewhere unrelated.
+    matches: ['/manage/integrations', '/manage/connections', '/integrations', '/settings/integrations', '/connect'],
     permission: 'twin.edit',
     group: 'operate',
     description: 'Configure, test, map and monitor external system connections and data exchange.',
@@ -225,12 +228,16 @@ export const MANAGE_NAV: AppNavItem[] = [
         description: 'Per-resource permissions for the current account.',
       },
       {
-        name: 'Asset pipeline',
-        fullName: 'Asset pipeline',
+        // AURA_IA_DUP_CLEANUP: this label collided with the top-level
+        // "Asset pipeline" (/builder) while leading somewhere else entirely.
+        // Authoring lives at /builder; this is the approval and validation
+        // record for the derivatives that authoring produces.
+        name: 'Asset derivatives',
+        fullName: 'Asset derivatives and GPU validation',
         href: '/admin/asset-pipeline',
         icon: Shield,
         matches: ['/admin/asset-pipeline', '/admin/asset-validation', '/admin/asset-preview'],
-        description: 'Approved 3D derivatives and hardware GPU validation.',
+        description: 'Approved 3D derivatives and their hardware GPU validation runs.',
       },
       {
         name: 'DSX capabilities',

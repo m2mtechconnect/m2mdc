@@ -1005,8 +1005,8 @@ export default function IntelligenceDashboard() {
                 step={5}
                 question={t('telemetry.story.step5')}
                 description={t('telemetry.story.step5Desc')}
-                drillTabLabel="Connect Health"
-                onDrill={() => navigate('/connect/health')}
+                drillTabLabel="Activity & health"
+                onDrill={() => navigate('/manage/integrations?tab=activity')}
               />
               <DataTrustStrip state={dataTrust} />
             </section>

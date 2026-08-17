@@ -111,6 +111,15 @@ export function CatalogueTab({
           </section>
         );
       })}
+
+      <ConnectionSetupWizard
+        open={Boolean(wizardFor)}
+        onOpenChange={(open) => { if (!open) setWizardFor(null); }}
+        definitions={definitions}
+        connections={connections}
+        presetConnectorId={wizardFor ?? undefined}
+        onCompleted={() => onRefresh?.()}
+      />
     </div>
   );
 }

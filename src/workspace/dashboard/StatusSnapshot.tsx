@@ -5,7 +5,7 @@
  * evidence coverage, assistant) with a single five-row summary. Each row links
  * to the exact destination that owns the detail.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronDown, ChevronRight, Gauge } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -51,7 +51,21 @@ function useCompact() {
 export function StatusSnapshot({ rows, evidenceHref }: { rows: SnapshotRow[]; evidenceHref: string }) {
   const compact = useCompact();
   const [open, setOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement | null>(null);
   const expanded = !compact || open;
+
+  // Escape collapses the expanded compact panel and returns focus to the
+  // control that opened it.
+  useEffect(() => {
+    if (!compact || !open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      setOpen(false);
+      toggleRef.current?.focus();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [compact, open]);
   const summary = `${rows[0]?.value ?? ''} · Readiness ${rows[rows.length - 1]?.value ?? ''}`;
 
   return (
@@ -74,6 +88,7 @@ export function StatusSnapshot({ rows, evidenceHref }: { rows: SnapshotRow[]; ev
         </h2>
         {compact && (
           <button
+            ref={toggleRef}
             type="button"
             aria-expanded={open}
             aria-controls="status-snapshot-rows"

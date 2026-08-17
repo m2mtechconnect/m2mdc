@@ -19,7 +19,7 @@ import {
 import { OmniverseStreamViewer } from '@/components/twin-visualization/OmniverseStreamViewer';
 import { useOmniverseKit } from '@/hooks/useOmniverseKit';
 import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
-import { resolveKitStreamState } from '@/renderer/rendererModes';
+import { resolveRendererMode } from '@/renderer/rendererModes';
 import { kitMetric, targetMetric, notAssessedMetric, type KitMetricContext } from '@/lib/provenance/kitMetrics';
 import type { ProvenancedMetric } from '@/lib/provenance/types';
 import {
@@ -134,6 +134,8 @@ function MetricCard({
 
 export default function OmniverseScene() {
   const kit = useOmniverseKit();
+  // Phase 5 — single source of truth for what is actually drawing this view.
+  const rendererState = resolveRendererMode({ webgl2Available: true });
   const [activeTab, setActiveTab] = useState('metrics');
 
   const phase = kit.phase ? PHASE_LABELS[kit.phase] || { label: kit.phase, color: '' } : null;

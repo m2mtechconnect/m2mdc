@@ -47,18 +47,6 @@ function allowedTypeScore(text: string, allowedType: string): number {
   return 0;
 }
 
-interface LegacyEnhancedValidationResultShape {
-  isValid: boolean;
-  reasons: string[];
-  scores: {
-    industryFit: number;      // 0-35
-    departmentFit: number;    // 0-35
-    twinSpecificity: number;  // 0-20
-    integrationDepth: number; // 0-10
-    total: number;            // 0-100
-  };
-}
-
 /**
  * Validate a recommendation against industry + department requirements
  */

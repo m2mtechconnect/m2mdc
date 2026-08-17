@@ -10,20 +10,20 @@ import type { WorkspaceRun } from './scenarioEngine';
 export function RunProvenanceBadge({ run }: { run: WorkspaceRun }) {
   if (run.persistence === 'fixture') {
     return (
-      <Badge variant="outline" className="h-4 px-1 text-[10px]">
+      <Badge variant="outline" className="h-5 px-1 text-[11px]">
         Demonstration fixture
       </Badge>
     );
   }
   if (run.persistence === 'server' || run.serverId) {
     return (
-      <Badge variant="outline" className="h-4 px-1 text-[10px]">
+      <Badge variant="outline" className="h-5 px-1 text-[11px]">
         Saved record - client-computed
       </Badge>
     );
   }
   return (
-    <Badge variant="destructive" className="h-4 px-1 text-[10px]">
+    <Badge variant="destructive" className="h-5 px-1 text-[11px]">
       Legacy browser-only simulation - not a durable operational record
     </Badge>
   );

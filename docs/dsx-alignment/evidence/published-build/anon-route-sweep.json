@@ -1,0 +1,933 @@
+[
+ {
+  "route": "/",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/dashboard",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/blueprint",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/blueprint/default",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/blueprint/preview",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/simulation",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/simulation?step=inspect",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/simulation?step=configure",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/simulation?step=simulate",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/simulation?step=compare",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/simulation?step=decide",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/simulation/preview",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/dsx/evidence-beta",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/dsx/evidence-beta/overview",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/dsx/evidence-beta/operations",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/thermal",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/power",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/cooling",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/compute",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/workload",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/dsx/evidence-beta/sustainability",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/dsx/evidence-beta/sustainability/financial",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/dsx/evidence-beta/sustainability/sovereignty",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/dsx/evidence-beta/decisions",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/dsx/evidence-beta/decisions/log",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/dsx/evidence-beta/assets",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/evidence",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/manage/facilities",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/manage/integrations",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/integrations",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/settings/integrations",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/marketplace",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/connect/monitor",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/connect/health",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/builder",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/build",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/app/agents",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/agents",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/subsystem-agents",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/analytics",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/intelligence",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/operations",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/deployments",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/deploy",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/settings/ai",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/admin",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/admin/signups-dashboard",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/admin/user-approvals",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/admin/onboarding-submissions",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/admin/asset-pipeline",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/admin/asset-preview",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/admin/asset-validation/nvidia.rack.42u_a_01",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/admin/reference-facility-validation",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/teams",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/account/access-control",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/account/profile",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/account/settings",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/search",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/universal-search",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/search?q=montreal",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/help",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/playbook",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/compliance",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/infrastructure",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/data-centre-twin",
+  "final": "/data-centre-twin",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "Dashboard\nMontreal Sovereign AI Data Centre\noperational\nTier 4\n\nMontreal, Canada \u2022 20 Racks \u2022 12,000 kW Capacity\n\nBluepr"
+ },
+ {
+  "route": "/omniverse-scene",
+  "final": "/omniverse-scene",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "AURA Twin Preview\n\nAURA application rendering \u2022 0 racks \u2022 Simulated scene\n\nKit disabled\n2:26:04 AM\nKit disabled by confi"
+ },
+ {
+  "route": "/twin-datacentre",
+  "final": "/twin-datacentre",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/twin-debug",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/digital-twins-demo/funding-intake",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/pilot/overview",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/command",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/facilities",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/agent-chat",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/studio/systems/does-not-exist/manage",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/app/agents/does-not-exist/detail",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4",
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/blueprint/%%%bad-id",
+  "final": "/blueprint/%%%bad-id",
+  "spinners": 0,
+  "consoleErrors": [
+   "Failed to load resource: the server responded with a status of 400 ()"
+  ],
+  "failedRequests": [],
+  "textLen": 26,
+  "snippet": "400 Bad Request\ncloudflare"
+ },
+ {
+  "route": "/data-centre-twin/00000000-0000-0000-0000-000000000000",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/this-route-does-not-exist",
+  "final": "/",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ],
+  "textLen": 300,
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform\nM2MAURA\nSolutions\nFeatures\nUse Cases\nIntegrations\nWhy M2M\nEN\nL"
+ },
+ {
+  "route": "/login",
+  "final": "/login",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "Sovereign AI Twin Studio\n\nEnterprise-grade autonomous AI systems for sovereign data centre operations. Build, simulate, "
+ },
+ {
+  "route": "/onboarding",
+  "final": "/onboarding",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 244,
+  "snippet": "Step 1 of 4\n1\nAbout You\n2\nYour Data Centre\n3\nYour Goals\n4\nSummary\nAbout You\n\nTell us a bit about yourself and your organ"
+ },
+ {
+  "route": "/auth",
+  "final": "/onboarding",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 244,
+  "snippet": "Step 1 of 4\n1\nAbout You\n2\nYour Data Centre\n3\nYour Goals\n4\nSummary\nAbout You\n\nTell us a bit about yourself and your organ"
+ },
+ {
+  "route": "/sign-up",
+  "final": "/onboarding",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 244,
+  "snippet": "Step 1 of 4\n1\nAbout You\n2\nYour Data Centre\n3\nYour Goals\n4\nSummary\nAbout You\n\nTell us a bit about yourself and your organ"
+ },
+ {
+  "route": "/mfa",
+  "final": "/onboarding",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 244,
+  "snippet": "Step 1 of 4\n1\nAbout You\n2\nYour Data Centre\n3\nYour Goals\n4\nSummary\nAbout You\n\nTell us a bit about yourself and your organ"
+ }
+]

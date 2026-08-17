@@ -1,0 +1,763 @@
+[
+ {
+  "route": "/",
+  "final": "/dashboard",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/__l5e/assets-v1/64f21cbc-9211-4c3d-9fff-357ba1eaee03/rack_42u_a.glb",
+   "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+   "https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2"
+  ],
+  "textLen": 300,
+  "snippet": "?\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\n\nDATA CENTRE FACILITY\n\nMontreal Data centre\n\nMontreal \u00b7 Tie"
+ },
+ {
+  "route": "/dashboard",
+  "final": "/dashboard",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\n\nDATA CENTRE FACILITY\n\nMontreal Data centre\n\nMontreal \u00b7 Tie"
+ },
+ {
+  "route": "/blueprint",
+  "final": "/blueprint/default",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "?\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nBack\nMontreal Data centre\nDesigner - editable\nAURA Assistan"
+ },
+ {
+  "route": "/blueprint/default",
+  "final": "/blueprint/default",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "?\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nBack\nMontreal Data centre\nDesigner - editable\nAURA Assistan"
+ },
+ {
+  "route": "/blueprint/preview",
+  "final": "/blueprint/preview",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 276,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nNo Recommendation to Preview\n\nScan a website URL first to g"
+ },
+ {
+  "route": "/simulation",
+  "final": "/simulation?step=inspect",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "?\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nMontreal Data centre - Simulation\nSIMULATED\nDesign baseline"
+ },
+ {
+  "route": "/simulation?step=inspect",
+  "final": "/simulation?step=inspect",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "?\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nMontreal Data centre - Simulation\nSIMULATED\nDesign baseline"
+ },
+ {
+  "route": "/simulation?step=configure",
+  "final": "/simulation?step=configure",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "?\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nMontreal Data centre - Simulation\nSIMULATED\nDesign baseline"
+ },
+ {
+  "route": "/simulation?step=simulate",
+  "final": "/simulation?step=simulate",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "?\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nMontreal Data centre - Simulation\nSIMULATED\nDesign baseline"
+ },
+ {
+  "route": "/simulation?step=compare",
+  "final": "/simulation?step=simulate",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "?\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nMontreal Data centre - Simulation\nSIMULATED\nDesign baseline"
+ },
+ {
+  "route": "/simulation?step=decide",
+  "final": "/simulation?step=simulate",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "?\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nMontreal Data centre - Simulation\nSIMULATED\nDesign baseline"
+ },
+ {
+  "route": "/simulation/preview",
+  "final": "/simulation/preview",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 283,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nNo Recommendation to Preview\n\nScan a website URL first to g"
+ },
+ {
+  "route": "/dsx/evidence-beta",
+  "final": "/dsx/evidence-beta?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFACILITY\nEvidence Beta Site\nDATA MODE\nSimulated\nCALIBRATION"
+ },
+ {
+  "route": "/dsx/evidence-beta/overview",
+  "final": "/dsx/evidence-beta/overview?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFACILITY\nEvidence Beta Site\nDATA MODE\nSimulated\nCALIBRATION"
+ },
+ {
+  "route": "/dsx/evidence-beta/operations",
+  "final": "/dsx/evidence-beta/operations/thermal?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFACILITY\nEvidence Beta Site\nDATA MODE\nSimulated\nCALIBRATION"
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/thermal",
+  "final": "/dsx/evidence-beta/operations/thermal?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFACILITY\nEvidence Beta Site\nDATA MODE\nSimulated\nCALIBRATION"
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/power",
+  "final": "/dsx/evidence-beta/operations/power?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFACILITY\nEvidence Beta Site\nDATA MODE\nSimulated\nCALIBRATION"
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/cooling",
+  "final": "/dsx/evidence-beta/operations/cooling?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFACILITY\nEvidence Beta Site\nDATA MODE\nSimulated\nCALIBRATION"
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/compute",
+  "final": "/dsx/evidence-beta/operations/compute?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFACILITY\nEvidence Beta Site\nDATA MODE\nSimulated\nCALIBRATION"
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/workload",
+  "final": "/dsx/evidence-beta/operations/workload?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFACILITY\nEvidence Beta Site\nDATA MODE\nSimulated\nCALIBRATION"
+ },
+ {
+  "route": "/dsx/evidence-beta/sustainability",
+  "final": "/dsx/evidence-beta/sustainability?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFACILITY\nEvidence Beta Site\nDATA MODE\nSimulated\nCALIBRATION"
+ },
+ {
+  "route": "/dsx/evidence-beta/sustainability/financial",
+  "final": "/dsx/evidence-beta/sustainability/financial?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFACILITY\nEvidence Beta Site\nDATA MODE\nSimulated\nCALIBRATION"
+ },
+ {
+  "route": "/dsx/evidence-beta/sustainability/sovereignty",
+  "final": "/dsx/evidence-beta/sustainability/sovereignty?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFACILITY\nEvidence Beta Site\nDATA MODE\nSimulated\nCALIBRATION"
+ },
+ {
+  "route": "/dsx/evidence-beta/decisions",
+  "final": "/dsx/evidence-beta/decisions?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFACILITY\nEvidence Beta Site\nDATA MODE\nSimulated\nCALIBRATION"
+ },
+ {
+  "route": "/dsx/evidence-beta/decisions/log",
+  "final": "/dsx/evidence-beta/decisions/log?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFACILITY\nEvidence Beta Site\nDATA MODE\nSimulated\nCALIBRATION"
+ },
+ {
+  "route": "/dsx/evidence-beta/assets",
+  "final": "/dsx/evidence-beta/assets?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFACILITY\nEvidence Beta Site\nDATA MODE\nSimulated\nCALIBRATION"
+ },
+ {
+  "route": "/evidence",
+  "final": "/dsx/evidence-beta/evidence?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFACILITY\nEvidence Beta Site\nDATA MODE\nSimulated\nCALIBRATION"
+ },
+ {
+  "route": "/manage/facilities",
+  "final": "/manage/facilities",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFacilities\n\nFacility administration: create, configure and "
+ },
+ {
+  "route": "/manage/integrations",
+  "final": "/manage/integrations",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nIntegrations\n\nConnection and readiness state for every exte"
+ },
+ {
+  "route": "/integrations",
+  "final": "/manage/integrations",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nIntegrations\n\nConnection and readiness state for every exte"
+ },
+ {
+  "route": "/settings/integrations",
+  "final": "/manage/integrations",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nIntegrations\n\nConnection and readiness state for every exte"
+ },
+ {
+  "route": "/marketplace",
+  "final": "/marketplace",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nTemplate Marketplace\n\nDiscover Digital Twin & AI Agent Blue"
+ },
+ {
+  "route": "/connect/monitor",
+  "final": "/connect/monitor",
+  "spinners": 1,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nSync Monitor\n\nReal-time status of all data connections and "
+ },
+ {
+  "route": "/connect/health",
+  "final": "/connect/health",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nData Health\n\nMonitor quality, freshness, and issues across "
+ },
+ {
+  "route": "/builder",
+  "final": "/builder",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nStart a new build\n\nPick a template from the marketplace, re"
+ },
+ {
+  "route": "/build",
+  "final": "/builder",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nStart a new build\n\nPick a template from the marketplace, re"
+ },
+ {
+  "route": "/app/agents",
+  "final": "/app/agents",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nIntroducing Agent Operations Center\n\nYour mission control f"
+ },
+ {
+  "route": "/agents",
+  "final": "/app/agents",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nIntroducing Agent Operations Center\n\nYour mission control f"
+ },
+ {
+  "route": "/subsystem-agents",
+  "final": "/app/agents",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nIntroducing Agent Operations Center\n\nYour mission control f"
+ },
+ {
+  "route": "/analytics",
+  "final": "/analytics",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nOperations & Telemetry\n\nMeasured operational data, simulati"
+ },
+ {
+  "route": "/intelligence",
+  "final": "/analytics",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nOperations & Telemetry\n\nMeasured operational data, simulati"
+ },
+ {
+  "route": "/operations",
+  "final": "/analytics",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nOperations & Telemetry\n\nMeasured operational data, simulati"
+ },
+ {
+  "route": "/deployments",
+  "final": "/deployments",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nRuntime Environments\n\nWhere AURA applications, validation w"
+ },
+ {
+  "route": "/deploy",
+  "final": "/deploy",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nNo system selected\n\nDeployment runs against one configured "
+ },
+ {
+  "route": "/settings/ai",
+  "final": "/settings/ai",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nAI settings\n\nConfigure Google Gemini (Vertex AI) for AURA A"
+ },
+ {
+  "route": "/admin",
+  "final": "/admin/signups-dashboard",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nSignups and approvals\n\nReal-time user registrations and app"
+ },
+ {
+  "route": "/admin/signups-dashboard",
+  "final": "/admin/signups-dashboard",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nSignups and approvals\n\nReal-time user registrations and app"
+ },
+ {
+  "route": "/admin/user-approvals",
+  "final": "/admin/user-approvals",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nUser approvals\n\nManage access for new user signups\n\n304 pen"
+ },
+ {
+  "route": "/admin/onboarding-submissions",
+  "final": "/admin/onboarding-submissions",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nOnboarding submissions\n\nProspect questionnaire responses fr"
+ },
+ {
+  "route": "/admin/asset-pipeline",
+  "final": "/admin/asset-pipeline",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nAsset pipeline\n\nApproved OpenUSD-derived runtime assets and"
+ },
+ {
+  "route": "/admin/asset-preview",
+  "final": "/admin/asset-preview",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nAdmin asset preview\n\nRun the hardware GPU acceptance harnes"
+ },
+ {
+  "route": "/admin/asset-validation/nvidia.rack.42u_a_01",
+  "final": "/admin/asset-validation/nvidia.rack.42u_a_01",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "?\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nHardware GPU acceptance - nvidia.rack.42u_a_01\n\nAdministrat"
+ },
+ {
+  "route": "/admin/reference-facility-validation",
+  "final": "/admin/reference-facility-validation",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=avatar_url%2Cavatar_bg_color%2Cavatar_initials&user_id="
+  ],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nNVIDIA Reference Facility - hardware visual acceptance\n\nRun"
+ },
+ {
+  "route": "/teams",
+  "final": "/teams",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nTeams and roles\n\nManage team members, roles, and access con"
+ },
+ {
+  "route": "/account/access-control",
+  "final": "/account/access-control",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nAccess control\n\nManage user roles and permissions across th"
+ },
+ {
+  "route": "/account/profile",
+  "final": "/account/profile",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nProfile\n\nManage your personal account settings and preferen"
+ },
+ {
+  "route": "/account/settings",
+  "final": "/account/settings",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nWorkspace settings\n\nManage workspace configuration and team"
+ },
+ {
+  "route": "/search",
+  "final": "/search",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nSearch\n\nFind documents, pages, and apps across all your con"
+ },
+ {
+  "route": "/universal-search",
+  "final": "/search",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nSearch\n\nFind documents, pages, and apps across all your con"
+ },
+ {
+  "route": "/search?q=montreal",
+  "final": "/search?q=montreal",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nSearch\n\nFind documents, pages, and apps across all your con"
+ },
+ {
+  "route": "/help",
+  "final": "/help",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nLearning Hub\n\nResources, tutorials, and expert support to a"
+ },
+ {
+  "route": "/playbook",
+  "final": "/playbook",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nBack to Recommendations\nImplementation Playbook\nAI Initiati"
+ },
+ {
+  "route": "/compliance",
+  "final": "/compliance",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nSovereignty & Safety Audit\n\n1 - Montreal\n\nExport Audit Repo"
+ },
+ {
+  "route": "/infrastructure",
+  "final": "/infrastructure",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nPHYSICAL AI \u00b7 DIGITAL TWIN\nInfrastructure\n\nReady to build y"
+ },
+ {
+  "route": "/data-centre-twin",
+  "final": "/data-centre-twin",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "?\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFacility Model (Simulated)\n1\n\n40 Racks \u2022 5 Rows \u2022 5000 kW C"
+ },
+ {
+  "route": "/omniverse-scene",
+  "final": "/omniverse-scene",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nAURA Twin Preview\n\nAURA application rendering \u2022 0 racks \u2022 S"
+ },
+ {
+  "route": "/twin-datacentre",
+  "final": "/blueprint/default",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "?\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nBack\nMontreal Data centre\nDesigner - editable\nAURA Assistan"
+ },
+ {
+  "route": "/twin-debug",
+  "final": "/twin-debug",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nTwin Debug Console\n\nMulti-tenant isolation debugging\n\nRefre"
+ },
+ {
+  "route": "/digital-twins-demo/funding-intake",
+  "final": "/digital-twins-demo/funding-intake",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFunding Intake & Triage Twin \u2013 Demo\n\nSubmit a company fundi"
+ },
+ {
+  "route": "/pilot/overview",
+  "final": "/pilot/overview",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "M2M AURA Pilot\nOverview\nedouard@m2mtechconnect.com\nSign out\nData-centre twins\n\nSource: public.data_centre_twins. Row vis"
+ },
+ {
+  "route": "/command",
+  "final": "/dashboard",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\n\nDATA CENTRE FACILITY\n\nMontreal Data centre\n\nMontreal \u00b7 Tie"
+ },
+ {
+  "route": "/facilities",
+  "final": "/manage/facilities",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nFacilities\n\nFacility administration: create, configure and "
+ },
+ {
+  "route": "/agent-chat",
+  "final": "/dashboard",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "Agent ID is required\nE\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\n\nDATA CENTRE FACILITY\n\nMontreal Data c"
+ },
+ {
+  "route": "/studio/systems/does-not-exist/manage",
+  "final": "/studio/systems/does-not-exist/manage",
+  "spinners": 0,
+  "consoleErrors": [
+   "Failed to load resource: the server responded with a status of 400 ()"
+  ],
+  "failedRequests": [],
+  "textLen": 254,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nSystem not found\n\nThis record does not exist, or the addres"
+ },
+ {
+  "route": "/app/agents/does-not-exist/detail",
+  "final": "/app/agents/does-not-exist/detail",
+  "spinners": 0,
+  "consoleErrors": [
+   "Failed to load resource: the server responded with a status of 406 ()"
+  ],
+  "failedRequests": [],
+  "textLen": 252,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nAgent not found\n\nThis record does not exist, or the address"
+ },
+ {
+  "route": "/blueprint/%%%bad-id",
+  "final": "/blueprint/%%%bad-id",
+  "spinners": 0,
+  "consoleErrors": [
+   "Failed to load resource: the server responded with a status of 400 ()"
+  ],
+  "failedRequests": [],
+  "textLen": 26,
+  "snippet": "400 Bad Request\ncloudflare"
+ },
+ {
+  "route": "/data-centre-twin/00000000-0000-0000-0000-000000000000",
+  "final": "/data-centre-twin/00000000-0000-0000-0000-000000000000",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\nData centre twin not found\n\nNo twin matches the identifier "
+ },
+ {
+  "route": "/this-route-does-not-exist",
+  "final": "/this-route-does-not-exist",
+  "spinners": 0,
+  "consoleErrors": [
+   "404 Error: User attempted to access non-existent route: /this-route-does-not-exist"
+  ],
+  "failedRequests": [],
+  "textLen": 186,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\n404\n\nOops! Page not found\n\nReturn to Home\n\n\u00a9 2025 Data Cent"
+ },
+ {
+  "route": "/login",
+  "final": "/dashboard",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\n\nDATA CENTRE FACILITY\n\nMontreal Data centre\n\nMontreal \u00b7 Tie"
+ },
+ {
+  "route": "/onboarding",
+  "final": "/dashboard",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\n\nDATA CENTRE FACILITY\n\nMontreal Data centre\n\nMontreal \u00b7 Tie"
+ },
+ {
+  "route": "/auth",
+  "final": "/dashboard",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\n\nDATA CENTRE FACILITY\n\nMontreal Data centre\n\nMontreal \u00b7 Tie"
+ },
+ {
+  "route": "/sign-up",
+  "final": "/dashboard",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\n\nDATA CENTRE FACILITY\n\nMontreal Data centre\n\nMontreal \u00b7 Tie"
+ },
+ {
+  "route": "/mfa",
+  "final": "/dashboard",
+  "spinners": 0,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "textLen": 300,
+  "snippet": "E\nSIMULATED\nDesign baseline\nNo run recorded\nSynthetic inputs\n\nDATA CENTRE FACILITY\n\nMontreal Data centre\n\nMontreal \u00b7 Tie"
+ }
+]

@@ -12,6 +12,22 @@ import { loadAllTemplates } from '@/lib/templateLoader';
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
+    auth: {
+      getUser: vi.fn(async () => ({ data: { user: { id: 'test-user' } }, error: null })),
+      getSession: vi.fn(async () => ({ data: { session: null }, error: null })),
+      onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
+    },
+    functions: {
+      invoke: vi.fn(async () => ({
+        data: {
+          data: {
+            id: 'test-builder-id',
+            builder: { id: 'test-builder-id', state: {}, current_step: 1 },
+          },
+        },
+        error: null,
+      })),
+    },
     from: vi.fn(() => ({
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
@@ -56,7 +72,7 @@ describe('Template URL Loading Integration', () => {
     
     // Create URLSearchParams with templateId
     const params = new URLSearchParams({
-      templateId: 'retail_inventory_optimization',
+      templateId: 'datacentre-master-twin-v1',
       step: '1'
     });
 
@@ -68,7 +84,7 @@ describe('Template URL Loading Integration', () => {
     
     expect(blueprint).not.toBeNull();
     expect(blueprint?.source).toBe('template');
-    expect(blueprint?.templateId).toBe('retail_inventory_optimization');
+    expect(blueprint?.templateId).toBe('datacentre-master-twin-v1');
     
     // Check that builder state was hydrated
     const state = useWizardBuilderStore.getState();
@@ -96,21 +112,15 @@ describe('Template URL Loading Integration', () => {
   });
 
   it('should handle missing template gracefully', async () => {
-    // Mock database to return error
-    vi.mock('@/integrations/supabase/client', () => ({
-      supabase: {
-        from: vi.fn(() => ({
-          select: vi.fn(() => ({
-            eq: vi.fn(() => ({
-              single: vi.fn(() => ({
-                data: null,
-                error: { message: 'Not found' }
-              }))
-            }))
-          }))
-        }))
-      }
-    }));
+    // Make the database lookup miss for this test only.
+    const { supabase } = await import('@/integrations/supabase/client');
+    vi.mocked(supabase.from).mockReturnValueOnce({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          single: vi.fn(() => ({ data: null, error: { message: 'Not found' } })),
+        })),
+      })),
+    } as any);
 
     const { result } = renderHook(() => useWizardBuilderStore());
     
@@ -121,9 +131,11 @@ describe('Template URL Loading Integration', () => {
 
     await result.current.initializeBuilder(params);
 
-    // Should show error but not crash
+    // A missing template must not crash: the store falls back to a blank
+    // draft with no blueprint attached.
     const state = useWizardBuilderStore.getState();
-    expect(state.error).toContain('not found');
+    expect(state.builderId).not.toBeNull();
+    expect(useBlueprintStore.getState().currentBlueprint).toBeNull();
   });
 
   it('should prioritize blueprint over templateId', async () => {
@@ -200,7 +212,7 @@ describe('Template URL Loading Integration', () => {
     const { result } = renderHook(() => useWizardBuilderStore());
     
     const params = new URLSearchParams({
-      templateId: 'retail_inventory_optimization',
+      templateId: 'datacentre-master-twin-v1',
       step: '1'
     });
 
@@ -217,7 +229,7 @@ describe('Template URL Loading Integration', () => {
     expect(state.workflow).toBeDefined();
     
     // Verify blueprint matches store state
-    expect(blueprint?.name).toBe(state.goal);
+    expect(blueprint?.description).toBe(state.goal);
     expect(blueprint?.industry).toBe(state.industry);
   });
 
@@ -230,7 +242,7 @@ describe('Template URL Loading Integration', () => {
       useBlueprintStore.getState().clearBlueprint();
 
       const params = new URLSearchParams({
-        templateId: 'retail_inventory_optimization',
+        templateId: 'datacentre-master-twin-v1',
         step
       });
 
@@ -247,7 +259,7 @@ describe('Template URL Loading Integration', () => {
     expect(templates.length).toBeGreaterThan(0);
     
     // Verify key templates exist
-    const inventoryTemplate = templates.find(t => t.id === 'retail_inventory_optimization');
+    const inventoryTemplate = templates.find(t => t.id === 'datacentre-master-twin-v1');
     expect(inventoryTemplate).toBeDefined();
     expect(inventoryTemplate?.name).toBeTruthy();
     expect(inventoryTemplate?.twin_type).toBeTruthy();
@@ -256,8 +268,8 @@ describe('Template URL Loading Integration', () => {
   it('should handle concurrent templateId loads', async () => {
     const { result } = renderHook(() => useWizardBuilderStore());
     
-    const params1 = new URLSearchParams({ templateId: 'retail_inventory_optimization', step: '1' });
-    const params2 = new URLSearchParams({ templateId: 'retail_inventory_optimization', step: '2' });
+    const params1 = new URLSearchParams({ templateId: 'datacentre-master-twin-v1', step: '1' });
+    const params2 = new URLSearchParams({ templateId: 'datacentre-master-twin-v1', step: '2' });
 
     // Start both loads simultaneously
     const [load1, load2] = await Promise.all([

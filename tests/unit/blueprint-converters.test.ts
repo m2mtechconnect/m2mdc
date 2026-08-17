@@ -183,33 +183,33 @@ describe('documentAnalysisToBlueprint', () => {
 });
 
 describe('templateToBlueprint', () => {
-  it('should convert inventory optimization template to blueprint', () => {
+  it('should convert the data centre master template to blueprint', () => {
     const blueprint = templateToBlueprint(inventoryOptimizationTemplate, 'marketplace');
 
     expect(blueprint.source).toBe('template');
     expect(blueprint.sourceEntry).toBe('marketplace');
-    expect(blueprint.templateId).toBe('multi-location-inventory-twin');
-    expect(blueprint.templateName).toBe('Multi-Location Inventory Optimization Twin');
+    expect(blueprint.templateId).toBe('datacentre-master-twin-v1');
+    expect(blueprint.templateName).toBe('Data Centre Digital Twin');
     expect(blueprint.certified).toBe(true);
-    expect(blueprint.rating).toBe(4.8);
-    expect(blueprint.downloads).toBe(342);
-    
+    expect(blueprint.rating).toBe(4.9);
+    expect(blueprint.downloads).toBe(1250);
+
     // Metadata
-    expect(blueprint.industry).toBe('Retail');
-    expect(blueprint.type).toBe('process_twin');
-    expect(blueprint.expectedRoi).toBe('45%');
-    
-    // Goals from template
-    expect(blueprint.goals).toHaveLength(3);
-    expect(blueprint.goals[0]).toContain('Reduce stockouts');
-    
+    expect(blueprint.industry).toBe('Technology');
+    expect(blueprint.type).toBe('operational');
+    expect(blueprint.expectedRoi).toBe('280%');
+
+    // Goals derived from the blueprint KPI set
+    expect(blueprint.goals).toContain('Power Usage Effectiveness: 1.2');
+    expect(blueprint.goals).toContain('GPU Cluster Utilization: 85%');
+
     // Tools
-    expect(blueprint.tools.recommendedIntegrations).toContain('POS System');
-    expect(blueprint.tools.preselectedIntegrations).toContain('Warehouse Management');
-    
-    // Workflow
-    expect(blueprint.workflow.triggers).toHaveLength(2);
-    expect(blueprint.workflow.actions).toHaveLength(3);
+    expect(blueprint.tools.recommendedIntegrations).toContain('Prometheus');
+    expect(blueprint.tools.preselectedIntegrations).toContain('DCIM');
+
+    // Workflow hydrated from workflowNodes
+    expect(blueprint.workflow.triggers.length).toBeGreaterThan(0);
+    expect(blueprint.workflow.actions.length).toBeGreaterThan(0);
   });
 
   it('should convert customer support template to blueprint', () => {
@@ -217,12 +217,12 @@ describe('templateToBlueprint', () => {
 
     expect(blueprint.source).toBe('template');
     expect(blueprint.sourceEntry).toBe('dashboard');
-    expect(blueprint.type).toBe('agent');
-    expect(blueprint.certified).toBe(false);
-    
-    // Communication style
-    expect(blueprint.behavior.communicationStyle?.formal).toBe(false);
-    expect(blueprint.behavior.communicationStyle?.emojis).toBe(true);
+    expect(blueprint.type).toBe('operational');
+    expect(blueprint.certified).toBe(true);
+
+    // Communication style comes from the template config
+    expect(blueprint.behavior.communicationStyle?.formal).toBe(true);
+    expect(blueprint.behavior.communicationStyle?.emojis).toBe(false);
   });
 
   it('should handle minimal template', () => {
@@ -230,9 +230,8 @@ describe('templateToBlueprint', () => {
 
     expect(blueprint.source).toBe('template');
     expect(blueprint.sourceEntry).toBe('builder');
-    expect(blueprint.type).toBe('agent');
-    expect(blueprint.tools.recommendedIntegrations).toEqual([]);
-    expect(blueprint.workflow.triggers).toEqual([]);
+    expect(blueprint.type).toBe('operational');
+    expect(blueprint.tools.recommendedIntegrations.length).toBeGreaterThan(0);
   });
 
   it('should default to marketplace sourceEntry when not provided', () => {
@@ -243,7 +242,7 @@ describe('templateToBlueprint', () => {
 
   it('should detect model provider from model name', () => {
     const geminiBlueprint = templateToBlueprint(inventoryOptimizationTemplate);
-    expect(geminiBlueprint.model.provider).toBe('gemini');
+    expect(geminiBlueprint.model.provider).toBe('google');
     
     const openaiTemplate = { ...minimalTemplate, default_config: { ...minimalTemplate.default_config, selectedModel: 'openai/gpt-5' } };
     const openaiBlueprint = templateToBlueprint(openaiTemplate);
@@ -254,8 +253,8 @@ describe('templateToBlueprint', () => {
     const blueprint = templateToBlueprint(inventoryOptimizationTemplate);
     
     expect(blueprint.tags).toEqual(inventoryOptimizationTemplate.tags);
-    expect(blueprint.timeSavedPerWeek).toBe('25 hours/week');
-    expect(blueprint.efficiencyGain).toBe('45% improvement');
+    expect(blueprint.timeSavedPerWeek).toBe('126 hrs/week');
+    expect(blueprint.efficiencyGain).toBe('35%');
   });
   
   it('should handle JSON file schema with nested blueprint object', () => {

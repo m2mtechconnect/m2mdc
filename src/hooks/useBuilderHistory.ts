@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useBuilderStore } from '@/stores/builderStore';
 import { useToast } from '@/hooks/use-toast';
 
@@ -10,94 +10,111 @@ interface HistoryEntry {
 
 const MAX_HISTORY = 50;
 
+/**
+ * Undo/redo history for the builder.
+ *
+ * The cursor is tracked in a ref as well as in state: several history
+ * operations can run in one React batch (a loop of edits, or two undo clicks
+ * before a re-render), and reading the cursor from state alone made those
+ * later calls reuse a stale index, which truncated history and silently
+ * dropped undo steps.
+ */
 export const useBuilderHistory = () => {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [currentIndex, setCurrentIndex] = useState(-1);
+  const indexRef = useRef(-1);
+  const historyRef = useRef<HistoryEntry[]>([]);
   const { toast } = useToast();
   const setState = useBuilderStore((state) => state.setState);
   const currentState = useBuilderStore((state) => state.state);
 
-  const addToHistory = useCallback((description: string) => {
-    // Use structuredClone for better deep cloning (handles circular refs better)
-    let clonedState;
-    try {
-      clonedState = structuredClone(currentState);
-    } catch {
-      // Fallback to JSON method if structuredClone fails
+  const commitIndex = useCallback((next: number) => {
+    indexRef.current = next;
+    setCurrentIndex(next);
+  }, []);
+
+  const commitHistory = useCallback((next: HistoryEntry[]) => {
+    historyRef.current = next;
+    setHistory(next);
+  }, []);
+
+  const addToHistory = useCallback(
+    (description: string) => {
+      let clonedState;
       try {
-        clonedState = JSON.parse(JSON.stringify(currentState));
+        clonedState = structuredClone(currentState);
       } catch {
-        console.error('Failed to clone state for history');
-        return;
+        // Fallback to JSON when structuredClone cannot handle the value
+        try {
+          clonedState = JSON.parse(JSON.stringify(currentState));
+        } catch {
+          console.error('Failed to clone state for history');
+          return;
+        }
       }
-    }
-    
-    const entry: HistoryEntry = {
-      state: clonedState,
-      timestamp: Date.now(),
-      description,
-    };
 
-    setHistory((prev) => {
-      // Remove any future history if we're not at the end
-      const newHistory = prev.slice(0, currentIndex + 1);
-      newHistory.push(entry);
-      
-      // Limit history size
-      if (newHistory.length > MAX_HISTORY) {
-        newHistory.shift();
-        return newHistory;
+      const entry: HistoryEntry = {
+        state: clonedState,
+        timestamp: Date.now(),
+        description,
+      };
+
+      // Drop any redo branch, then append and cap the length.
+      const next = historyRef.current.slice(0, indexRef.current + 1);
+      next.push(entry);
+      if (next.length > MAX_HISTORY) {
+        next.splice(0, next.length - MAX_HISTORY);
       }
-      
-      return newHistory;
-    });
 
-    setCurrentIndex((prev) => Math.min(prev + 1, MAX_HISTORY - 1));
-  }, [currentState, currentIndex]);
+      commitHistory(next);
+      commitIndex(next.length - 1);
+    },
+    [currentState, commitHistory, commitIndex]
+  );
 
   const undo = useCallback(() => {
-    if (currentIndex <= 0) {
+    if (indexRef.current < 0 || historyRef.current.length === 0) {
       toast({
-        title: "Nothing to undo",
+        title: 'Nothing to undo',
         description: "You're at the beginning of history",
       });
       return;
     }
 
-    const newIndex = currentIndex - 1;
-    const entry = history[newIndex];
-    
+    const newIndex = indexRef.current - 1;
+    const entry = historyRef.current[Math.max(newIndex, 0)];
+
     setState(entry.state);
-    setCurrentIndex(newIndex);
-    
+    commitIndex(newIndex);
+
     toast({
-      title: "Undone",
+      title: 'Undone',
       description: entry.description,
     });
-  }, [currentIndex, history, setState, toast]);
+  }, [setState, toast, commitIndex]);
 
   const redo = useCallback(() => {
-    if (currentIndex >= history.length - 1) {
+    if (indexRef.current >= historyRef.current.length - 1) {
       toast({
-        title: "Nothing to redo",
+        title: 'Nothing to redo',
         description: "You're at the latest version",
       });
       return;
     }
 
-    const newIndex = currentIndex + 1;
-    const entry = history[newIndex];
-    
+    const newIndex = indexRef.current + 1;
+    const entry = historyRef.current[newIndex];
+
     setState(entry.state);
-    setCurrentIndex(newIndex);
-    
+    commitIndex(newIndex);
+
     toast({
-      title: "Redone",
+      title: 'Redone',
       description: entry.description,
     });
-  }, [currentIndex, history, setState, toast]);
+  }, [setState, toast, commitIndex]);
 
-  const canUndo = currentIndex > 0;
+  const canUndo = currentIndex >= 0;
   const canRedo = currentIndex < history.length - 1;
 
   return {

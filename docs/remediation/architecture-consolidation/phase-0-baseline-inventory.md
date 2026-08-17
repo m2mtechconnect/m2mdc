@@ -102,3 +102,25 @@ resolver. No route or rendering behaviour changed.
 6. DSX Exchange boundary naming audit for MQTT surfaces.
 7. AI agent positioning audit (no NIM claims).
 8. Data-mode contract enforcement across every KPI surface.
+## Phase 4 - compat engines behind the facade (complete)
+
+- Added `src/simulation/compat/facadeBridge.ts`: the only sanctioned way to
+  reach the frozen compatibility engines. Returns `ProviderOutcome` envelopes
+  with `provenance: 'simulated'`, `providerId: 'compatibility'` and execution
+  class `aura-deterministic`; a thrown engine error becomes a typed
+  `error`/`unavailable` outcome instead of crashing a render.
+- Migrated the one live consumer, `useSovereignDCTwin.ts`, off the direct
+  engine import. It now branches on `outcome.kind` and exits the simulating
+  state cleanly on failure.
+- `src/twins/dataCenter/index.ts` retains a barrel re-export only; there is no
+  remaining UI consumer of the legacy data-centre engine.
+- `engineRegistry.ts` records the bridge as canonical and repoints the frozen
+  engines' `migrationTarget` at it.
+- Guard: `src/simulation/compat/__tests__/facadeBridge.test.ts` fails if any
+  app module re-acquires a direct import of the frozen sovereign engine.
+
+## Phase 5 addendum - route naming
+
+`/omniverse-scene` was renamed to `/twin-preview` (page file
+`src/pages/TwinPreview.tsx`), with a preserving redirect registered in
+`ROUTE_ALIASES` and in the unauthenticated router.

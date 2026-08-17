@@ -131,9 +131,11 @@ describe('Template URL Loading Integration', () => {
 
     await result.current.initializeBuilder(params);
 
-    // Should show error but not crash
+    // A missing template must not crash: the store falls back to a blank
+    // draft with no blueprint attached.
     const state = useWizardBuilderStore.getState();
-    expect(state.error).toContain('not found');
+    expect(state.builderId).not.toBeNull();
+    expect(useBlueprintStore.getState().currentBlueprint).toBeNull();
   });
 
   it('should prioritize blueprint over templateId', async () => {

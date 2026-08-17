@@ -416,7 +416,8 @@ export function ReferenceSurface({ surface }: { surface: SurfaceEntry }) {
             </Button>
           </div>
           <p className="mt-2 text-muted-foreground">
-            Every row carries dataset id and version, facility, record id, classification, unit,
+            This export contains {exportScopeLabel}. Every row carries dataset id and version,
+            facility, record id, classification, unit,
             source checksum, run id and availability state. Unavailable values export as their
             state, never as 0 or an empty measurement.
           </p>

@@ -156,7 +156,9 @@ export function isOperationallyRelevant(
     
     if (!hasRetailOps) {
       reasons.push('No operational focus for enterprise retail');
-      score -= 30;
+      // Operational focus is the whole point of this check: a retail
+      // recommendation with none of it must fail, not merely lose points.
+      score -= 50;
     }
   }
   

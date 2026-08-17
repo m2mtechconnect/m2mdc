@@ -22,9 +22,9 @@ describe('Recommendation Pipeline - Integration', () => {
     const knownRetailers = ['walmart.com', 'target.com', 'costco.com', 'homedepot.com'];
     
     const isEnterpriseRetail = knownRetailers.includes(domain);
-    const industry = isEnterpriseRetail ? 'Enterprise Retail + Global Supply Chain' : 'Unknown';
+    const industry = isEnterpriseRetail ? 'Enterprise Retail' : 'Unknown';
     
-    expect(industry).toBe('Enterprise Retail + Global Supply Chain');
+    expect(industry).toBe('Enterprise Retail');
   });
 
   it('should classify sap.com as Enterprise Software', async () => {
@@ -32,7 +32,7 @@ describe('Recommendation Pipeline - Integration', () => {
     const knownRetailers = ['walmart.com', 'target.com', 'costco.com', 'homedepot.com'];
     
     const isEnterpriseRetail = knownRetailers.includes(domain);
-    const industry = isEnterpriseRetail ? 'Enterprise Retail + Global Supply Chain' : 'Enterprise Software';
+    const industry = isEnterpriseRetail ? 'Enterprise Retail' : 'Enterprise Software';
     
     expect(industry).toBe('Enterprise Software');
   });
@@ -56,7 +56,7 @@ describe('Recommendation Pipeline - Integration', () => {
       },
     ];
     
-    const industry = 'Enterprise Retail + Global Supply Chain';
+    const industry = 'Enterprise Retail';
     
     // Filter logic
     const bannedTerms = ['customer personalization', 'personalized'];
@@ -191,17 +191,17 @@ describe('Recommendation Content Validation', () => {
 describe('Edge Function Integration', () => {
   it('should handle domain classification override', () => {
     const testCases = [
-      { domain: 'walmart.com', expected: 'Enterprise Retail + Global Supply Chain' },
-      { domain: 'target.com', expected: 'Enterprise Retail + Global Supply Chain' },
-      { domain: 'costco.com', expected: 'Enterprise Retail + Global Supply Chain' },
-      { domain: 'homedepot.com', expected: 'Enterprise Retail + Global Supply Chain' },
+      { domain: 'walmart.com', expected: 'Enterprise Retail' },
+      { domain: 'target.com', expected: 'Enterprise Retail' },
+      { domain: 'costco.com', expected: 'Enterprise Retail' },
+      { domain: 'homedepot.com', expected: 'Enterprise Retail' },
       { domain: 'sap.com', expected: 'Not Enterprise Retail' },
     ];
     
     testCases.forEach(({ domain, expected }) => {
       const knownRetailers = ['walmart.com', 'target.com', 'costco.com', 'homedepot.com'];
       const industry = knownRetailers.includes(domain) 
-        ? 'Enterprise Retail + Global Supply Chain' 
+        ? 'Enterprise Retail' 
         : 'Not Enterprise Retail';
       
       expect(industry).toBe(expected);
@@ -224,11 +224,11 @@ describe('Edge Function Integration', () => {
       },
     ];
     
-    const industry = 'Enterprise Retail + Global Supply Chain';
+    const industry = 'Enterprise Retail';
     
     // Post-generation filter
     const validated = mockRecommendations.filter(rec => {
-      if (industry === 'Enterprise Retail + Global Supply Chain') {
+      if (industry === 'Enterprise Retail') {
         return rec.isOperational;
       }
       return true;

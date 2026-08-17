@@ -53,6 +53,10 @@ export interface BuilderState {
   digitalTwinId?: string | null;
 }
 
+/** Inclusive bounds of the builder wizard. */
+export const BUILDER_MIN_STEP = 1;
+export const BUILDER_MAX_STEP = 6;
+
 interface BuilderStore {
   systemId: string | null;
   currentStep: number;
@@ -125,7 +129,10 @@ export const useBuilderStore = create<BuilderStore>()(
       isSaving: false,
 
       setSystemId: (id) => set({ systemId: id }),
-      setCurrentStep: (step) => set({ currentStep: step }),
+      // The builder has six steps; anything outside that range is a caller bug
+      // and previously navigated the wizard to a step that renders nothing.
+      setCurrentStep: (step) =>
+        set({ currentStep: Math.min(BUILDER_MAX_STEP, Math.max(BUILDER_MIN_STEP, Math.round(step))) }),
       setState: (updates) => set((state) => ({
         state: { ...state.state, ...updates },
         isDirty: true,

@@ -1,10 +1,11 @@
-import { describe, it, expect, beforeAll } from '@jest/globals';
+import { describe, it, expect, beforeAll } from 'vitest';
+import { describeWithBackend } from '../_setup/backendSuite';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || 'http://localhost:54321';
 const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || '';
 
-describe('Template Validation Integration Tests', () => {
+describeWithBackend('Template Validation Integration Tests', () => {
   let supabase: ReturnType<typeof createClient>;
 
   beforeAll(() => {

@@ -87,7 +87,7 @@ describe('Digital Twin Validators', () => {
         description: 'Optimize workforce scheduling and task distribution in stores using HRIS data',
       };
       
-      const result = isOperationallyRelevant(retailOps, 'Enterprise Retail + Global Supply Chain');
+      const result = isOperationallyRelevant(retailOps, 'Enterprise Retail');
       
       expect(result.isValid).toBe(true);
       expect(result.score).toBeGreaterThan(60);
@@ -99,7 +99,7 @@ describe('Digital Twin Validators', () => {
         description: 'Enhance customer personalization and improve shopping experience with AI recommendations',
       };
       
-      const result = isOperationallyRelevant(cxPersonalization, 'Enterprise Retail + Global Supply Chain');
+      const result = isOperationallyRelevant(cxPersonalization, 'Enterprise Retail');
       
       expect(result.isValid).toBe(false);
       expect(result.score).toBeLessThan(60);
@@ -161,7 +161,7 @@ describe('Digital Twin Validators', () => {
         description: 'SKU-level forecasting using POS and WMS data, triggered by forecast runs, improves inventory turns by 15%, reduces stockouts by 20%',
       };
       
-      const result = validateDigitalTwinRecommendation(completeTwin, 'Enterprise Retail + Global Supply Chain');
+      const result = validateDigitalTwinRecommendation(completeTwin, 'Enterprise Retail');
       
       expect(result.isValid).toBe(true);
       expect(result.score).toBeGreaterThan(80);

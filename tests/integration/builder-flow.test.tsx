@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
+import { describeWithBackend } from '../_setup/backendSuite';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { supabase } from '@/integrations/supabase/client';
 import { useBuilderStore } from '@/stores/builderStore';
@@ -19,7 +20,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 );
 
-describe('Builder Flow Integration Tests', () => {
+describeWithBackend('Builder Flow Integration Tests', () => {
   let testUserId: string;
   let testSystemId: string;
   const createdSystemIds: string[] = [];

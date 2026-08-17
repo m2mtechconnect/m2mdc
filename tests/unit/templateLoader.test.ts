@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
 import { loadAllTemplates, loadTemplateById, validateTemplate } from '@/lib/templateLoader';
 
 describe('Template Loader - Data Centre Only', () => {

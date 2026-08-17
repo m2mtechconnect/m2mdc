@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describeWithBackend } from '../_setup/backendSuite';
 import { supabase } from '@/integrations/supabase/client';
 import {
   seedTestEnvironment,
@@ -7,7 +8,7 @@ import {
 } from '../helpers/seedHelpers';
 import { TestDataFactory } from '../helpers/testDataFactory';
 
-describe('Analytics with Realistic Seed Data', () => {
+describeWithBackend('Analytics with Realistic Seed Data', () => {
   let seedResult: any;
 
   afterEach(async () => {

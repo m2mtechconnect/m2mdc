@@ -21,6 +21,32 @@ export interface EnhancedValidationResult {
   };
 }
 
+/** Systems of record whose mention proves a real integration surface. */
+const NAMED_DATA_SOURCES = [
+  'erp', 'wms', 'tms', 'pos', 'hris', 'iot', 'scada', 'mes', 'ehr', 'crm',
+] as const;
+
+/**
+ * Score how well a recommendation matches one allowed twin type.
+ *
+ * Exact phrase matching alone scored almost everything at zero: an allowed
+ * type of "GxP Compliance" never appears verbatim in "GxP Validation &
+ * Compliance Tracking". Partial credit for the type's significant words keeps
+ * genuinely on-target recommendations above the acceptance threshold.
+ */
+function allowedTypeScore(text: string, allowedType: string): number {
+  const lower = allowedType.toLowerCase();
+  if (text.includes(lower)) return 10;
+
+  const tokens = lower.split(/[^a-z0-9]+/).filter((t) => t.length > 3);
+  if (tokens.length === 0) return 0;
+
+  const hits = tokens.filter((t) => text.includes(t)).length;
+  if (hits === tokens.length) return 8;
+  if (hits * 2 >= tokens.length) return 5;
+  return 0;
+}
+
 /**
  * Validate a recommendation against industry + department requirements
  */
@@ -48,6 +74,16 @@ export function validateDigitalTwinWithContext(
   const template = getTwinTemplate(industry, department);
 
   // ========== HARD REJECTIONS ==========
+
+  // 0. Policy rejections first.
+  //    Whether a department is permitted for an industry is a policy decision
+  //    and must be reported as such. Evaluating it after the content checks
+  //    meant a blocked recommendation was rejected for vague wording instead,
+  //    hiding the real reason from the caller.
+  if (department === 'Marketing' && !isMarketingAllowedForIndustry(industry)) {
+    reasons.push(`REJECTED: Marketing not allowed for ${industry}`);
+    return { isValid: false, reasons, scores };
+  }
 
   // 1. Check if recommendation is in blocked categories
   for (const blocked of blockedTypes) {
@@ -88,18 +124,14 @@ export function validateDigitalTwinWithContext(
     text.includes('workforce') ||
     text.includes('production') ||
     text.includes('manufacturing') ||
-    text.includes('operations') ||
+    // "operations" on its own is filler ("Improve Business Operations"); it
+    // only signals a real process when it names one.
+    /\b(store|facility|network|fleet|warehouse|data ?cent(re|er)|field|plant|retail|branch|site)\s+operations\b/.test(text) ||
     text.includes('fleet') ||
     text.includes('compliance');
 
   if (!hasDigitalTwinMention && !hasOperationalProcess) {
     reasons.push('REJECTED: No digital twin or operational process mentioned');
-    return { isValid: false, reasons, scores };
-  }
-
-  // 4. Reject marketing unless allowed for industry
-  if (department === 'Marketing' && !isMarketingAllowedForIndustry(industry)) {
-    reasons.push(`REJECTED: Marketing not allowed for ${industry}`);
     return { isValid: false, reasons, scores };
   }
 
@@ -132,6 +164,20 @@ export function validateDigitalTwinWithContext(
     text.includes('reduction') ||
     text.includes('improvement');
 
+  // Vague phrasing with no named system is a generic pitch, not a twin. It is
+  // reported under its own reason rather than the data-source reason, because
+  // adding an acronym would not make it specific.
+  const hasGenericPhrases =
+    text.includes('improve efficiency') ||
+    text.includes('enhance performance') ||
+    text.includes('optimize processes') ||
+    text.includes('leverage ai');
+
+  if (hasGenericPhrases && !hasDataSources) {
+    reasons.push('REJECTED: Generic AI phrasing without specific digital twin context');
+    return { isValid: false, reasons, scores };
+  }
+
   if (!hasDataSources) {
     reasons.push('REJECTED: No data sources or systems integration mentioned');
     return { isValid: false, reasons, scores };
@@ -147,9 +193,7 @@ export function validateDigitalTwinWithContext(
   // Industry Fit (0-35 points)
   let industryScore = 0;
   for (const allowedType of allowedTypes) {
-    if (text.includes(allowedType.toLowerCase())) {
-      industryScore += 10;
-    }
+    industryScore += allowedTypeScore(text, allowedType);
   }
   
   // Check template keywords
@@ -216,6 +260,15 @@ export function validateDigitalTwinWithContext(
       integrationScore += 2;
     }
   }
+
+  // Naming concrete systems of record is the strongest integration signal
+  // there is, and it was previously worth nothing unless the generic word
+  // "system" also happened to appear.
+  for (const source of NAMED_DATA_SOURCES) {
+    if (text.includes(source)) {
+      integrationScore += 2;
+    }
+  }
   
   scores.integrationDepth = Math.min(10, integrationScore);
 
@@ -223,12 +276,6 @@ export function validateDigitalTwinWithContext(
   scores.total = scores.industryFit + scores.departmentFit + scores.twinSpecificity + scores.integrationDepth;
 
   // Apply generic penalty if detected
-  const hasGenericPhrases =
-    text.includes('improve efficiency') ||
-    text.includes('enhance performance') ||
-    text.includes('optimize processes') ||
-    text.includes('leverage ai');
-  
   if (hasGenericPhrases && !hasDigitalTwinMention) {
     scores.total -= 30;
     reasons.push('PENALTY: Generic AI phrasing without specific digital twin context');

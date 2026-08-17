@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import { describeWithBackend } from '../_setup/backendSuite';
 import { supabase } from '@/integrations/supabase/client';
 
-describe('Builder API Integration', () => {
+describeWithBackend('Builder API Integration', () => {
   let testSystemId: string;
   let testUserId: string;
 

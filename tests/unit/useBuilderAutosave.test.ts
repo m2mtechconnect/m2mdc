@@ -12,7 +12,9 @@ describe('useBuilderAutosave', () => {
   const mockToast = vi.fn();
 
   beforeEach(() => {
-    vi.useFakeTimers();
+    // shouldAdvanceTime lets testing-library's waitFor (which polls on real
+    // timers) make progress while the debounce runs on fake timers.
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     vi.mocked(useToast).mockReturnValue({ toast: mockToast, dismiss: vi.fn(), toasts: [] });
     vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
       const state = {

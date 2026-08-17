@@ -111,7 +111,11 @@ export default function Connections() {
           <CatalogueTab definitions={definitions.data ?? []} connections={connections.data ?? []} />
         </TabsContent>
         <TabsContent value="mappings" className="mt-4 min-w-0">
-          <MappingsTab mappings={mappings.data ?? []} connections={connections.data ?? []} />
+          <MappingsTab
+            mappings={mappings.data ?? []}
+            connections={connections.data ?? []}
+            onRefresh={() => { mappings.refetch(); }}
+          />
         </TabsContent>
         <TabsContent value="activity" className="mt-4 min-w-0">
           <ActivityTab

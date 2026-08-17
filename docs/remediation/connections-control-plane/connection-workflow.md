@@ -27,8 +27,19 @@ in place, and system connections cannot be deleted.
 
 ## Limitations
 No credential vault, so secret-bearing authentication methods (mtls, oauth2, api_key and similar)
-are refused with a named reason. Tenant scoping is recorded but row-level tenant isolation is not
-enforced. Drafts are not persisted before step 5; cancelling earlier discards the form.
+are refused with a named reason. Drafts are not persisted before step 5; cancelling earlier discards the form.
+
+## Tenant isolation
+Enforced. `public.current_tenant_id()` resolves the caller's organisation from their profile;
+`connection_tenant_visible()` and `connection_visible()` gate the SELECT policies on
+`connection_instances`, `connection_twin_mappings`, `connection_health_checks`,
+`connection_ingest_runs` and `connection_audit_events`, and the admin write policies on instances
+and mappings. Rows with a null tenant are platform-scope (system connections) and stay readable by
+every signed-in user. Edge functions use the service-role client, which bypasses RLS, so
+`supabase/functions/_shared/connectionTenant.ts` re-checks the same rule on every provisioning and
+health-check call and returns `tenant_scope_violation`. The catalogue (`connector_definitions`,
+`connection_data_contracts`) stays tenant-neutral because it describes capabilities, not
+customer data.
 
 ## Runtime evidence (2026-08-17)
 A wizard-created OpenUSD asset storage connection was created, health-checked (PASSED),

@@ -6,7 +6,8 @@
   "description": "Persistent MQTT ingestion worker for AURA connections. Runs on Brev/AWS or any container host; Supabase Edge Functions cannot hold a long-lived broker subscription.",
   "scripts": {
     "start": "tsx src/index.ts",
-    "once": "tsx src/index.ts --once"
+    "once": "tsx src/index.ts --once",
+    "acceptance": "tsx src/index.ts --acceptance"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.58.0",

@@ -165,9 +165,12 @@ export function answerFromDataset(question: string, ctx: GroundingContext): Grou
     };
   }
 
+  // A single weak term match is not grounding: it would let a plausible-looking
+  // but unsupported question borrow an unrelated record.
+  const minScore = terms.length >= 3 ? 2 : 1;
   const ranked = pool
     .map((r) => ({ r, score: scoreRecord(r, terms) }))
-    .filter((x) => x.score > 0)
+    .filter((x) => x.score >= minScore)
     .sort((a, b) => b.score - a.score || a.r.record_id.localeCompare(b.r.record_id));
 
   if (ranked.length === 0) {

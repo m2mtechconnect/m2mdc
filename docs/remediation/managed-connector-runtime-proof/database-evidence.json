@@ -1,0 +1,8 @@
+{
+  "retrieved_utc": "2026-08-17",
+  "app_user_connections": { "rows": 0, "client_grants": "none (service role only)" },
+  "managed_user_connections": { "rows": 0, "rls": "user_id = auth.uid()" },
+  "managed_connector_invocations": { "rows_for_google_drive": 0 },
+  "managed_connector_write_approvals": { "rows": 0 },
+  "connection_audit_events_managed_user": { "rows": 0 }
+}

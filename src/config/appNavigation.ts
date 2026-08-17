@@ -115,14 +115,14 @@ export const MANAGE_NAV: AppNavItem[] = [
     description: 'Sites, halls, capacity, infrastructure scope and lifecycle state.',
   },
   {
-    name: 'Integrations',
-    fullName: 'Integrations',
+    name: 'Connections',
+    fullName: 'Connections',
     href: '/manage/integrations',
     icon: Cable,
-    matches: ['/manage/integrations', '/integrations', '/settings/integrations', '/marketplace', '/connect'],
+    matches: ['/manage/integrations', '/manage/connections', '/integrations', '/settings/integrations', '/marketplace', '/connect'],
     permission: 'twin.edit',
     group: 'operate',
-    description: 'Compute, network, storage, power, cooling, grid and enterprise connections.',
+    description: 'Configure, test, map and monitor external system connections and data exchange.',
   },
   {
     name: 'Asset pipeline',

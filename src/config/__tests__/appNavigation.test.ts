@@ -34,7 +34,7 @@ describe('canonical navigation', () => {
     expect(manage['Operations & Telemetry']).toBe('/analytics');
     expect(manage['Runtime Environments']).toBe('/deployments');
     expect(manage['Agent Configuration']).toBe('/settings/ai');
-    expect(manage['Integrations']).toBe('/manage/integrations');
+    expect(manage['Connections']).toBe('/manage/integrations');
     expect(manage['Facilities']).toBe('/manage/facilities');
   });
 

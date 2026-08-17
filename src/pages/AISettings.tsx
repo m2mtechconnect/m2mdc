@@ -219,7 +219,7 @@ export default function AISettings() {
             <div className="space-y-2">
               <Label>Region</Label>
               <Select value={region} onValueChange={setRegion}>
-                <SelectTrigger>
+                <SelectTrigger aria-label="Region">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-card z-50">
@@ -233,7 +233,7 @@ export default function AISettings() {
             <div className="space-y-2">
               <Label>Model</Label>
               <Select value={model} onValueChange={setModel}>
-                <SelectTrigger>
+                <SelectTrigger aria-label="Model">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-card z-50">
@@ -255,7 +255,11 @@ export default function AISettings() {
               <Label>Enable Grounding</Label>
               <p className="text-xs text-muted-foreground">Connect to your Vertex AI Search data store</p>
             </div>
-            <Switch checked={groundingEnabled} onCheckedChange={setGroundingEnabled} />
+            <Switch
+              checked={groundingEnabled}
+              onCheckedChange={setGroundingEnabled}
+              aria-label="Enable grounding against Vertex AI Search"
+            />
           </div>
 
           {groundingEnabled && (
@@ -285,7 +289,7 @@ export default function AISettings() {
                   <Label>Top-K Documents</Label>
                   <span className="text-sm font-mono text-primary">{topK}</span>
                 </div>
-                <Slider value={[topK]} onValueChange={([v]) => setTopK(v)} min={5} max={50} step={5} />
+                <Slider value={[topK]} onValueChange={([v]) => setTopK(v)} min={5} max={50} step={5} aria-label="Top-K documents" />
                 <p className="text-xs text-muted-foreground">Initial documents to retrieve</p>
               </div>
 
@@ -294,7 +298,7 @@ export default function AISettings() {
                   <Label>Rerank to Top-N</Label>
                   <span className="text-sm font-mono text-primary">{topN}</span>
                 </div>
-                <Slider value={[topN]} onValueChange={([v]) => setTopN(v)} min={1} max={10} step={1} />
+                <Slider value={[topN]} onValueChange={([v]) => setTopN(v)} min={1} max={10} step={1} aria-label="Rerank to top-N" />
                 <p className="text-xs text-muted-foreground">Final snippets for generation</p>
               </div>
             </div>
@@ -312,7 +316,7 @@ export default function AISettings() {
                 <Label>Max Tokens</Label>
                 <span className="text-sm font-mono">{maxTokens}</span>
               </div>
-              <Slider value={[maxTokens]} onValueChange={([v]) => setMaxTokens(v)} min={256} max={8192} step={256} />
+              <Slider value={[maxTokens]} onValueChange={([v]) => setMaxTokens(v)} min={256} max={8192} step={256} aria-label="Maximum tokens" />
             </div>
 
             <div className="space-y-2">
@@ -320,7 +324,7 @@ export default function AISettings() {
                 <Label>Temperature</Label>
                 <span className="text-sm font-mono">{temperature.toFixed(1)}</span>
               </div>
-              <Slider value={[temperature * 10]} onValueChange={([v]) => setTemperature(v / 10)} min={0} max={10} step={1} />
+              <Slider value={[temperature * 10]} onValueChange={([v]) => setTemperature(v / 10)} min={0} max={10} step={1} aria-label="Temperature" />
               <p className="text-xs text-muted-foreground">Lower = more factual, Higher = more creative</p>
             </div>
 

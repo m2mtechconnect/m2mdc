@@ -1,0 +1,39 @@
+{
+ "step_url_initial": "http://localhost:8080/simulation?step=simulate",
+ "blocked_visible": true,
+ "blocked_text": "Review the run inputs to enable execution.\n\n- Run-input review: not confirmed\nGo to Simulate",
+ "run_disabled_before": true,
+ "aria_describedby": "simulation-run-blocked-reason",
+ "gated_compare_url": "http://localhost:8080/simulation?step=simulate",
+ "gated_notice": "? | SIMULATED | Design baseline | No run recorded | Synthetic inputs | Montreal Sovereign AI DC - Simulation | SIMULATED | Design baseline | No run recorded | Synthetic inputs | View | Engineering | Compare needs a completed run. Returned to Simulate. | Inspect | Configure | Simulate | Compare | Compare is unavailable until a scenario run has completed. | Review | Review is unavailable until a scenario run has completed. | Assistant | 100",
+ "invalid_step_url": "http://localhost:8080/simulation?step=inspect",
+ "review_control_found": true,
+ "run_disabled_after_review": false,
+ "second_click": "rejected: TimeoutError",
+ "runs_before": 0,
+ "runs_after": 1,
+ "activeRunId": "SIM-2026-08-17-001",
+ "run_ids": [
+  "SIM-2026-08-17-001"
+ ],
+ "compareRunIds": [
+  "SIM-2026-08-17-001"
+ ],
+ "url_after_run": "http://localhost:8080/simulation?step=simulate",
+ "persisted_runs": [
+  "SIM-2026-08-17-001"
+ ],
+ "persisted_active": "SIM-2026-08-17-001",
+ "run_id_visible_after_refresh": true,
+ "compare_url": "http://localhost:8080/simulation?step=compare",
+ "compare_shows_run": true,
+ "compare_body": "? | SIMULATED | Baseline operations | Run SIM-2026-08-17-001 | Calculated 8/17/2026, 12:13:26 AM | Montreal Sovereign AI DC - Simulation | SIMULATED | Baseline operations | Run SIM-2026-08-17-001 | Calculated 8/17/2026, 12:13:26 AM | View | Engineering | Inspect | Configure | Simulate | Compare | Review | Assistant | 100% | Row A | Row B | Row D | Row E | Procedural 3D preview | Thermal | FACILITY GEOMETRY | Baseline preview | 3D | 2D | Thermal | \u00b0C | Under 22 \u00b0C | 22 to 27 \u00b0C | 27 to 32 \u00b0C | Over 32 \u00b0C | No evidence | Details | Clear layer | PUE | 1.32 | No change | THERMAL ",
+ "decide_url": "http://localhost:8080/simulation?step=decide",
+ "decide_shows_run": true,
+ "decide_body": "? | SIMULATED | Baseline operations | Run SIM-2026-08-17-001 | Calculated 8/17/2026, 12:13:26 AM | Montreal Sovereign AI DC - Simulation | SIMULATED | Baseline operations | Run SIM-2026-08-17-001 | Calculated 8/17/2026, 12:13:26 AM | View | Engineering | Inspect | Configure | Simulate | Compare | Review | Assistant | 100% | Row A | Row B | Row D | Row E | Procedural 3D preview | Thermal | FACILITY GEOMETRY | Baseline preview | 3D | 2D | Thermal | \u00b0C | Under 22 \u00b0C | 22 to 27 \u00b0C | 27 to 32 \u00b0C | Over 32 \u00b0C | No evidence | Details | Clear layer | PUE | 1.32 | No change | THERMAL ",
+ "export_controls_in_workspace": [],
+ "back_url": "http://localhost:8080/simulation?step=compare",
+ "forward_url": "http://localhost:8080/simulation?step=decide",
+ "consoleErrors": [],
+ "failedRequests": []
+}

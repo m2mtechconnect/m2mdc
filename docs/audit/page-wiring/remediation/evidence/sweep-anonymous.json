@@ -1,0 +1,843 @@
+{
+ "mode": "anonymous",
+ "host": "https://auradc.m2mtechconnect.com",
+ "routes": [
+  {
+   "route": "/",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 ()"
+   ],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/onboarding",
+   "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+   "redirectChain": [],
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of",
+   "bodyLen": 244,
+   "consoleErrors": [],
+   "failedRequests": []
+  },
+  {
+   "route": "/login",
+   "finalUrl": "https://auradc.m2mtechconnect.com/login",
+   "redirectChain": [],
+   "h1": "Sovereign AI Twin Studio",
+   "spinner": false,
+   "bodyHead": "Sovereign AI Twin Studio |  | Enterprise-grade autonomous AI systems for sovereign data centre operations. Build, simulate, and deploy intelligent digital twins. |  | Carbon Neutral | Sovereign Cloud | AI-Powered | Sign in to your acc",
+   "bodyLen": 489,
+   "consoleErrors": [],
+   "failedRequests": []
+  },
+  {
+   "route": "/auth",
+   "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+   "redirectChain": [],
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of",
+   "bodyLen": 244,
+   "consoleErrors": [],
+   "failedRequests": []
+  },
+  {
+   "route": "/sign-in",
+   "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+   "redirectChain": [],
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of",
+   "bodyLen": 244,
+   "consoleErrors": [],
+   "failedRequests": []
+  },
+  {
+   "route": "/sign-up",
+   "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+   "redirectChain": [],
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of",
+   "bodyLen": 244,
+   "consoleErrors": [],
+   "failedRequests": []
+  },
+  {
+   "route": "/forgot-password",
+   "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+   "redirectChain": [],
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of",
+   "bodyLen": 244,
+   "consoleErrors": [],
+   "failedRequests": []
+  },
+  {
+   "route": "/mfa",
+   "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+   "redirectChain": [],
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of",
+   "bodyLen": 244,
+   "consoleErrors": [],
+   "failedRequests": []
+  },
+  {
+   "route": "/twin-datacentre",
+   "finalUrl": "https://auradc.m2mtechconnect.com/twin-datacentre",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/data-centre-twin",
+   "finalUrl": "https://auradc.m2mtechconnect.com/data-centre-twin",
+   "redirectChain": [],
+   "h1": "Montreal Sovereign AI Data Centre",
+   "spinner": false,
+   "bodyHead": "Dashboard | Montreal Sovereign AI Data Centre | operational | Tier 4 |  | Montreal, Canada \u2022 20 Racks \u2022 12,000 kW Capacity |  | Blueprint | 9 agents | SIMULATION \u2022 12:05:10 AM | Ask AURA Assistant | PUE | GPU Load | Thermals | Cooling | Simulation | So",
+   "bodyLen": 1934,
+   "consoleErrors": [],
+   "failedRequests": []
+  },
+  {
+   "route": "/omniverse-scene",
+   "finalUrl": "https://auradc.m2mtechconnect.com/omniverse-scene",
+   "redirectChain": [],
+   "h1": "AURA Twin Preview",
+   "spinner": false,
+   "bodyHead": "AURA Twin Preview |  | AURA application rendering \u2022 0 racks \u2022 Simulated scene |  | Kit disabled | 12:05:15 AM | Kit disabled by configuration \u2014 displaying local demonstration data. | Local demonstration scene | disabled |  | Local demonstra",
+   "bodyLen": 675,
+   "consoleErrors": [],
+   "failedRequests": []
+  },
+  {
+   "route": "/dashboard",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED",
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED",
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/builder",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/deploy",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/deployments",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/analytics",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/account/profile",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/account/settings",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/account/access-control",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/admin/onboarding-submissions",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/admin/user-approvals",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/admin/asset-preview",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/admin/asset-pipeline",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/admin/asset-validation/nvidia.rack.42u_a_01.ops",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/admin/reference-facility-validation",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/admin/signups-dashboard",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/manage/integrations",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/manage/facilities",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/compliance",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/teams",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/marketplace",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/app/agents",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/simulation",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/simulation/preview",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/blueprint/preview",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/blueprint/default",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/help",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/playbook",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/connect/monitor",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/connect/health",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/search",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/settings/ai",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED",
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED",
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/infrastructure",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED",
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED",
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/twin-debug",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/digital-twins-demo/funding-intake",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/dsx/evidence-beta/overview",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/dsx/evidence-beta/operations/thermal",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/dsx/evidence-beta/operations/power",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/dsx/evidence-beta/operations/cooling",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/dsx/evidence-beta/operations/compute",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/dsx/evidence-beta/operations/workload",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/dsx/evidence-beta/sustainability",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/dsx/evidence-beta/sustainability/financial",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/dsx/evidence-beta/sustainability/sovereignty",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/dsx/evidence-beta/decisions",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/dsx/evidence-beta/decisions/log",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/dsx/evidence-beta/assets",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/pilot/overview",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/agents",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/integrations",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED",
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED",
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/evidence",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/command",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/facilities",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/universal-search",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  },
+  {
+   "route": "/this-route-does-not-exist",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "redirectChain": [],
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterpris",
+   "bodyLen": 7615,
+   "consoleErrors": [],
+   "failedRequests": [
+    "GET https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+   ]
+  }
+ ]
+}

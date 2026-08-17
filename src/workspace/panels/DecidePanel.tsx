@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { SIGNAL_BASIS, SIGNAL_RULES } from '@/capabilities/recommendationSignal';
 import { useActiveRun, useWorkspaceStore } from '../workspaceStore';
 import type { DecisionState } from '../scenarioEngine';
+import { RunExportControls } from './RunExportControls';
 
 const DECISIONS: Array<{ value: DecisionState; label: string }> = [
   { value: 'accepted', label: 'Accept' },
@@ -34,6 +35,8 @@ export function DecidePanel() {
       <p className="text-xs text-muted-foreground">
         Recommendations for run {run.id}. Decisions are recorded against this run and stay with its evidence.
       </p>
+
+      <RunExportControls run={run} />
 
       <ul className="space-y-2">
         {run.recommendations.map((rec) => {

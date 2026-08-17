@@ -1,6 +1,11 @@
 /**
  * Server-backed reads for the Connections control plane. Every record in the
  * UI comes from these queries — nothing is a hardcoded status object.
+ *
+ * Tenant isolation: row-level security scopes every table to the caller's
+ * tenant (platform-scope rows have a null tenant). The client additionally
+ * filters connection instances by the resolved tenant so an over-broad policy
+ * change can never silently widen what the UI renders.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,6 +40,27 @@ async function selectAll<T>(table: string, order: string, ascending = false): Pr
   return (data ?? []) as T[];
 }
 
+/** The caller's tenant, resolved from their profile. Null means no tenant. */
+export async function fetchCurrentTenantId(): Promise<string | null> {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth?.user) return null;
+  const { data, error } = await db
+    .from('profiles')
+    .select('org_id')
+    .eq('user_id', auth.user.id)
+    .maybeSingle();
+  if (error) return null;
+  return (data?.org_id as string | null) ?? null;
+}
+
+export function useCurrentTenantId() {
+  return useQuery({
+    queryKey: ['current-tenant-id'],
+    queryFn: fetchCurrentTenantId,
+    staleTime: 300_000,
+  });
+}
+
 export function useConnectorDefinitions() {
   return useQuery({
     queryKey: ['connector-definitions'],
@@ -46,7 +72,15 @@ export function useConnectorDefinitions() {
 export function useConnectionInstances() {
   return useQuery({
     queryKey: ['connection-instances'],
-    queryFn: () => selectAll<ConnectionInstance>('connection_instances', 'created_at', true),
+    queryFn: async (): Promise<ConnectionInstance[]> => {
+      const tenantId = await fetchCurrentTenantId();
+      let query = db.from('connection_instances').select('*').order('created_at', { ascending: true });
+      // Platform-scope rows (null tenant) plus the caller's own tenant.
+      query = tenantId ? query.or(`tenant_id.is.null,tenant_id.eq.${tenantId}`) : query.is('tenant_id', null);
+      const { data, error } = await query;
+      if (error) throw error;
+      return (data ?? []) as ConnectionInstance[];
+    },
   });
 }
 

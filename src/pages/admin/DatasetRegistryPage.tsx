@@ -5,6 +5,7 @@
  * blocker and the current canary status, and provides activate / rollback.
  * Non-admins never reach the records.
  */
+import { DisabledActionExplanation } from '@/components/shared/DisabledActionExplanation';
 import { useEffect, useMemo } from 'react';
 import { useRBAC } from '@/contexts/RBACContext';
 import { Badge } from '@/components/ui/badge';
@@ -67,11 +68,12 @@ export default function DatasetRegistryPage() {
           </Badge>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               size="sm"
               onClick={() => setDataset('nvidia-dsx-reference')}
               disabled={mode === 'nvidia-dsx-reference'}
+              aria-describedby={mode === 'nvidia-dsx-reference' ? 'dataset-activate-reason' : undefined}
               data-testid="activate-reference-canary"
             >
               Activate NVIDIA DSX reference canary
@@ -81,12 +83,26 @@ export default function DatasetRegistryPage() {
               variant="outline"
               onClick={rollback}
               disabled={!canaryActive}
+              aria-describedby={!canaryActive ? 'dataset-rollback-reason' : undefined}
               data-testid="deactivate-reference-canary"
             >
               Roll back to default dataset
             </Button>
           </div>
-          <dl className="grid grid-cols-[auto,1fr] gap-x-4 gap-y-1 text-xs">
+          {mode === 'nvidia-dsx-reference' ? (
+            <DisabledActionExplanation
+              id="dataset-activate-reason"
+              reason="The reference canary is already active for this session."
+              recovery="Roll back to the default dataset before activating it again."
+            />
+          ) : (
+            <DisabledActionExplanation
+              id="dataset-rollback-reason"
+              reason="Rollback applies only while the reference canary is active."
+              recovery="Activate the canary first, or continue on the production default dataset."
+            />
+          )}
+          <dl className="grid grid-cols-1 gap-x-4 gap-y-1 break-words text-xs sm:grid-cols-[auto,1fr]">
             <dt className="text-muted-foreground">Dataset id</dt>
             <dd className="text-foreground">{reference.datasetId}</dd>
             <dt className="text-muted-foreground">Dataset version</dt>

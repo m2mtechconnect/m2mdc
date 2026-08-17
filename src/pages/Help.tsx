@@ -271,7 +271,6 @@ export default function Help() {
                   <li key={idx}>
                     <span
                       className="text-sm text-muted-foreground flex items-start gap-2"
-                      aria-disabled="true"
                     >
                       <span className="text-secondary mt-1">•</span>
                       <span>{item}</span>
@@ -295,7 +294,6 @@ export default function Help() {
                   <li key={idx}>
                     <span
                       className="text-sm text-muted-foreground flex items-start gap-2"
-                      aria-disabled="true"
                     >
                       <span className="text-secondary mt-1">•</span>
                       <span>{item}</span>
@@ -313,7 +311,6 @@ export default function Help() {
                     <li key={idx}>
                       <span
                         className="text-xs text-muted-foreground flex items-start gap-2"
-                        aria-disabled="true"
                       >
                         <span className="text-secondary mt-0.5">•</span>
                         <span>{item}</span>

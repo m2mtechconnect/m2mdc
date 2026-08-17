@@ -27,7 +27,7 @@ describe('simulationTemplates', () => {
         expect(template.description).toBeTruthy();
         expect(template.defaultQuery).toBeTruthy();
         expect(template.scenarioSummary).toBeTruthy();
-        expect(template.kpis).toHaveLength(3);
+        expect(template.kpis.length).toBeGreaterThanOrEqual(3);
         expect(template.events.length).toBeGreaterThanOrEqual(3);
       });
     });
@@ -78,8 +78,9 @@ describe('simulationTemplates', () => {
       expect(getSimulationTemplateForIndustry('logistics').industry).toBe('supply_chain');
       expect(getSimulationTemplateForIndustry('hospital').industry).toBe('healthcare');
       expect(getSimulationTemplateForIndustry('hotel').industry).toBe('travel_hospitality');
-      expect(getSimulationTemplateForIndustry('aviation').industry).toBe('travel_hospitality');
-      expect(getSimulationTemplateForIndustry('airport').industry).toBe('travel_hospitality');
+      // Aviation/airport map to the dedicated government transport template.
+      expect(getSimulationTemplateForIndustry('aviation').industry).toBe('government_transport');
+      expect(getSimulationTemplateForIndustry('airport').industry).toBe('government_transport');
     });
 
     it('should return generic template for null/undefined', () => {

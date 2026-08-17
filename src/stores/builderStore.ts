@@ -53,6 +53,10 @@ export interface BuilderState {
   digitalTwinId?: string | null;
 }
 
+/** Inclusive bounds of the builder wizard. */
+export const BUILDER_MIN_STEP = 1;
+export const BUILDER_MAX_STEP = 6;
+
 interface BuilderStore {
   systemId: string | null;
   currentStep: number;

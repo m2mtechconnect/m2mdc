@@ -75,7 +75,7 @@ describe('canonical navigation', () => {
     expect(visibleManageNav(() => false)).toHaveLength(0);
     expect(visibleManageNav((p) => p === 'twin.edit').map((i) => i.name)).toEqual([
       'Facilities',
-      'Integrations',
+      'Connections',
       'Asset pipeline',
     ]);
     expect(visibleManageNav(() => true)).toHaveLength(MANAGE_NAV.length);

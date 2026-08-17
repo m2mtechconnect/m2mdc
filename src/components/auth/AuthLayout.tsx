@@ -52,7 +52,7 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="text-lg text-white/60 leading-relaxed"
           >
-            Enterprise-grade autonomous AI systems for sovereign data centre operations. 
+            Enterprise-grade AI-assisted digital twin systems for sovereign data centre operations. 
             Build, simulate, and deploy intelligent digital twins.
           </motion.p>
           

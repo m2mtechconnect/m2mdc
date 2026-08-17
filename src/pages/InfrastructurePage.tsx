@@ -94,7 +94,7 @@ const SCENARIOS = [
   { id: "pue", label: "PUE Optimization", desc: "Train models to minimize Power Usage Effectiveness across facility zones.", gpus: 8, edge: 4, storage: "A3I TLC", icon: Zap },
   { id: "capacity", label: "Capacity Planning", desc: "Predict rack density limits and plan expansions with digital twin simulations.", gpus: 16, edge: 8, storage: "EXAScaler", icon: Server },
   { id: "cooling", label: "Cooling Management", desc: "Optimize CRAH units, liquid cooling loops, and airflow with real-time inference.", gpus: 4, edge: 12, storage: "A3I QLC", icon: Thermometer },
-  { id: "autonomy", label: "Full DC Autonomy", desc: "End-to-end autonomous operations: collect, train, act, simulate in closed loop.", gpus: 32, edge: 24, storage: "DDN Infinia", icon: Bot },
+  { id: "autonomy", label: "Full DC Autonomy", desc: "End-to-end operations reference design: collect, train, act, simulate.", gpus: 32, edge: 24, storage: "DDN Infinia", icon: Bot },
 ];
 
 const DDN_PRODUCTS = [
@@ -347,7 +347,7 @@ const InfrastructurePage = () => {
                     <p className="text-xs text-muted-foreground leading-relaxed">
                       <span className="font-semibold text-foreground">How it comes together:</span>{" "}
                       Sensors collect facility data, GPUs train AI models, a living digital twin is synthesized, and
-                      edge devices act autonomously.
+                      edge devices execute approved actions. Reference pipeline design, not a deployed runtime.
                     </p>
                   </div>
                 </div>
@@ -740,7 +740,7 @@ const InfrastructurePage = () => {
                     </motion.div>
                     <div>
                       <p className="text-sm font-bold text-foreground font-sans">Closed-Loop Feedback</p>
-                      <p className="text-xs text-muted-foreground font-sans">Act telemetry feeds back into Collect for continuous retraining. Every cycle improves model accuracy.</p>
+                      <p className="text-xs text-muted-foreground font-sans">Reference design: Act telemetry feeds back into Collect for retraining. Not a deployed AURA runtime.</p>
                     </div>
                   </div>
 

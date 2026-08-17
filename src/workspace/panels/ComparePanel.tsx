@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { KPI_DESCRIPTORS, formatKpi, type KpiKey } from '../facilityModel';
 import { deltaDirection } from '../scenarioEngine';
 import { ROLE_VIEWS, useWorkspaceStore } from '../workspaceStore';
+import { RunExportControls } from './RunExportControls';
 
 export function ComparePanel() {
   const runs = useWorkspaceStore((s) => s.runs);
@@ -28,6 +29,7 @@ export function ComparePanel() {
   }
 
   const selected = compareRunIds.map((id) => runs.find((r) => r.id === id)).filter(Boolean);
+  const exportRun = runs.find((r) => r.id === activeRunId) ?? selected[0] ?? null;
   const keys = ROLE_VIEWS[roleView].kpis;
 
   return (
@@ -64,6 +66,8 @@ export function ComparePanel() {
           ))}
         </ul>
       </div>
+
+      <RunExportControls run={exportRun ?? null} />
 
       <div className="overflow-x-auto rounded-md border border-border">
         <table className="w-full text-xs">

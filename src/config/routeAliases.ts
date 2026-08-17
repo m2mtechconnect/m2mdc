@@ -26,7 +26,9 @@ export const ROUTE_ALIASES: RouteAlias[] = [
   // Stage 6G: /dashboard is the canonical Dashboard destination.
   { from: '/', to: '/dashboard' },
   { from: '/command', to: '/dashboard' },
-  { from: '/evidence', to: '/dsx/evidence-beta/evidence' },
+  // `/dsx/evidence-beta/evidence` is itself a redirect to the Decision log,
+  // so the top-level alias points at the terminal destination directly.
+  { from: '/evidence', to: '/dsx/evidence-beta/decisions/log' },
   { from: '/build', to: '/builder' },
   { from: '/admin', to: '/admin/signups-dashboard' },
   { from: '/operations', to: '/analytics' },

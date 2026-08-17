@@ -27,6 +27,7 @@ import PendingApproval from "./pages/PendingApproval";
 // blocked-consumer imports (verified by scripts/pilot-bundle-canary.mjs).
 import PilotShell from "./pilot/PilotShell";
 import AuthorizationError from "./pages/AuthorizationError";
+import BoundedLoading from "@/components/shared/BoundedLoading";
 // Role-Aware Application Routing - Approved *internal* users (users with
 // an explicit row in public.user_roles) receive the full AURA DC
 // application via the legacy AuthenticatedShell, loaded lazily so that

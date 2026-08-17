@@ -164,13 +164,6 @@ export function RAGPanel({ systemId }: RAGPanelProps) {
     }
   };
 
-  const handleGoogleDriveConnect = async () => {
-    // Quarantined: the legacy parallel authorization path is disabled. Drive
-    // authorization must move to the managed connector path, which stores no
-    // provider tokens in AURA.
-    toast.error('Drive authorization is unavailable until the managed connector is enabled for this workspace.');
-  };
-
   const handleMicrosoftConnect = async () => {
     setIsConnectingDrive(true);
     try {
@@ -476,15 +469,6 @@ export function RAGPanel({ systemId }: RAGPanelProps) {
             <div>
               <h4 className="text-sm font-semibold mb-4">OAuth Providers</h4>
               <div className="grid gap-3">
-                <Button 
-                  variant="outline" 
-                  onClick={handleGoogleDriveConnect}
-                  disabled={isConnectingDrive}
-                  className="justify-start"
-                >
-                  <Cloud className="h-4 w-4 mr-2" />
-                  {driveConnections.includes('google_drive') ? '✓ ' : ''}Connect Google Drive
-                </Button>
                 <Button 
                   variant="outline" 
                   onClick={handleMicrosoftConnect}

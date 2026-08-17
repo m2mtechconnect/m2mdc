@@ -21,9 +21,8 @@ export function RAGUploadTabs({ systemId }: RAGUploadTabsProps) {
   const [missingSecrets, setMissingSecrets] = useState<string[]>([]);
   const { toast } = useToast();
 
-  const checkSecrets = async (provider: 'google' | 'microsoft' | 'aws') => {
+  const checkSecrets = async (provider: 'microsoft' | 'aws') => {
     const secretMap = {
-      google: ['GOOGLE_OAUTH_CLIENT_ID', 'GOOGLE_OAUTH_CLIENT_SECRET'],
       microsoft: ['MSFT_CLIENT_ID', 'MSFT_CLIENT_SECRET'],
       aws: ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
     };
@@ -110,18 +109,7 @@ export function RAGUploadTabs({ systemId }: RAGUploadTabsProps) {
     }
   };
 
-  const handleCloudConnect = async (provider: 'google' | 'microsoft') => {
-    if (provider === 'google') {
-      // Quarantined: the legacy parallel authorization path is disabled.
-      toast({
-        title: "Authorization unavailable",
-        description:
-          "Drive authorization must use the managed connector path, which is not enabled for this workspace yet.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const handleCloudConnect = async (provider: 'microsoft') => {
     const hasSecrets = await checkSecrets(provider);
     
     if (!hasSecrets) {
@@ -244,19 +232,6 @@ export function RAGUploadTabs({ systemId }: RAGUploadTabsProps) {
           )}
 
           <div className="space-y-3">
-            <Button 
-              onClick={() => handleCloudConnect('google')}
-              variant="outline"
-              className="w-full justify-start"
-            >
-              <img 
-                src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/googledrive.svg" 
-                className="h-5 w-5 mr-2"
-                alt="Google Drive"
-              />
-              Connect Google Drive
-            </Button>
-
             <Button 
               onClick={() => handleCloudConnect('microsoft')}
               variant="outline"

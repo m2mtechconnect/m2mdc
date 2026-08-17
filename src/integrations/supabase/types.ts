@@ -6176,6 +6176,12 @@ export type Database = {
       cleanup_old_copilot_cache: { Args: never; Returns: undefined }
       cleanup_old_copilot_events: { Args: never; Returns: undefined }
       cleanup_old_copilot_memory: { Args: never; Returns: undefined }
+      connection_tenant_visible: {
+        Args: { _tenant_id: string }
+        Returns: boolean
+      }
+      connection_visible: { Args: { _connection_id: string }; Returns: boolean }
+      current_tenant_id: { Args: never; Returns: string }
       delete_secret_from_vault: {
         Args: { vault_id: string }
         Returns: undefined

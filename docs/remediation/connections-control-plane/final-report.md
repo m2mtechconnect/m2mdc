@@ -10,13 +10,12 @@
 - Operational data sources: 0. DSX event count: 0. MQTT wiring: implemented but unwired.
 - DSX Exchange: not deployed. MCP: not implemented. Credential vault: not available.
 - Mapping count: 0. Health checks: 3 executed, all PASSED, all server-side, all audited.
-- RBAC: pass for administrator gating; tenant isolation NOT enforced (unscoped SELECT policies).
+- RBAC: pass for administrator gating; tenant isolation enforced in RLS and re-checked server-side.
 - SSRF: pass (fixed server-owned probe allowlist, no client-supplied targets).
 - Responsive: pass at all six viewports. Accessibility: pass. Console errors: 0. Failed requests: 0.
 - Tests: 24 passing across the new connections suite and the navigation suite; typecheck clean.
 
 ## Remaining blockers
-Tenant isolation not enforced,
 credential vault absent, MQTT resolver wiring, DSX Exchange deployment, genuine MCP,
 engineer/anonymous published-host verification.
 
@@ -25,6 +24,6 @@ AURA_CONNECTIONS_CONTROL_PLANE_REFACTOR_PARTIAL
 
 Rationale: the control plane is real, evidence-backed and truthful. The connection setup wizard is
 now implemented end to end (create, test, activate, disable, delete) with server-side role checks
-and audit events; tenant isolation remains unimplemented. The
+and audit events, and tenant isolation is enforced in both RLS and the edge functions. The
 mapping workspace is now implemented (create, edit, validate, activate, delete) with
 RLS-gated writes and a unit-family validation suite. See `implementation-audit.md`.

@@ -12,6 +12,7 @@
  *   - Every transition writes a connection_audit_events row.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { resolveCallerTenant, tenantVisible, TENANT_FORBIDDEN } from '../_shared/connectionTenant.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -45,6 +46,10 @@ Deno.serve(async (req) => {
   if (!isAdmin) {
     return json(403, { error_code: 'forbidden', safe_message: 'Administrator role required.', correlation_id: correlationId });
   }
+
+  // Tenant scope of the caller. The service-role client bypasses RLS, so this
+  // is the only thing standing between an admin and another tenant's records.
+  const callerTenantId = await resolveCallerTenant(admin, user.id);
 
   let body: Record<string, unknown>;
   try {
@@ -100,6 +105,9 @@ Deno.serve(async (req) => {
     if (tenantId) {
       const { data: tenant } = await admin.from('organizations').select('id').eq('id', tenantId).maybeSingle();
       if (!tenant) return json(400, { error_code: 'tenant_not_found', safe_message: 'The selected tenant does not exist.', correlation_id: correlationId });
+    }
+    if (!tenantVisible(tenantId, callerTenantId)) {
+      return json(403, { ...TENANT_FORBIDDEN, safe_message: 'A connection can only be created inside your own tenant.', correlation_id: correlationId });
     }
     if (facilityId) {
       const { data: facility } = await admin.from('data_centre_twins').select('id').eq('id', facilityId).maybeSingle();
@@ -157,6 +165,9 @@ Deno.serve(async (req) => {
     if (!connectionId) return json(400, { error_code: 'invalid_request', correlation_id: correlationId });
     const { data: connection } = await admin.from('connection_instances').select('*').eq('id', connectionId).maybeSingle();
     if (!connection) return json(404, { error_code: 'not_found', correlation_id: correlationId });
+    if (!tenantVisible(connection.tenant_id ?? null, callerTenantId)) {
+      return json(403, { ...TENANT_FORBIDDEN, correlation_id: correlationId });
+    }
 
     if (action === 'deactivate') {
       await admin.from('connection_instances').update({
@@ -218,6 +229,9 @@ Deno.serve(async (req) => {
     if (!connectionId) return json(400, { error_code: 'invalid_request', correlation_id: correlationId });
     const { data: connection } = await admin.from('connection_instances').select('*').eq('id', connectionId).maybeSingle();
     if (!connection) return json(404, { error_code: 'not_found', correlation_id: correlationId });
+    if (!tenantVisible(connection.tenant_id ?? null, callerTenantId)) {
+      return json(403, { ...TENANT_FORBIDDEN, correlation_id: correlationId });
+    }
     if (connection.is_system) {
       return json(403, { error_code: 'system_connection', safe_message: 'System connections cannot be removed.', correlation_id: correlationId });
     }

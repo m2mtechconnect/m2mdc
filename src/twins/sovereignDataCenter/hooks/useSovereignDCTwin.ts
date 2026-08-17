@@ -40,9 +40,9 @@ import type {
   SovereignKpis 
 } from '@/types/sovereignDataCenterTwin';
 import {
-  runSimulation,
-  createSimulationRun,
-} from '@/simulation/compat/sovereignDataCenterEngine';
+  runSovereignScenario,
+  createSovereignRun,
+} from '@/simulation/compat/facadeBridge';
 import { 
   getDemoFacilityById, 
   getDemoSimulationRuns,

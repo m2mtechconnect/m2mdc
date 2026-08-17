@@ -13,6 +13,7 @@ import { readKitConfig } from '@/integrations/omniverseKit/config';
 import { StreamStatusBanner, type StreamBannerReason } from '@/components/provenance/ProvenanceBadge';
 import type { SourceConnectionState } from '@/lib/provenance/types';
 import { useOmniverseKit } from '@/hooks/useOmniverseKit';
+import { resolveKitStreamState } from '@/renderer/rendererModes';
 
 // AppStreamer is loaded globally via index.html <script> tag
 // The NVIDIA AppStreamer library ships without TS types; the `any` here is a
@@ -42,6 +43,8 @@ export function OmniverseStreamViewer({
   onConnectionChange,
 }: OmniverseStreamViewerProps) {
   const cfg = useMemo(() => readKitConfig(), []);
+  // Phase 5 — availability of the NVIDIA stream is decided in one place.
+  const kitStream = useMemo(() => resolveKitStreamState(), []);
   // Kit REST outcome — banner cause takes precedence over the WebRTC stream
   // state, because a bad REST payload/endpoint is the operationally relevant
   // failure to surface first.
@@ -56,7 +59,7 @@ export function OmniverseStreamViewer({
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const host = hostProp || cfg.signalingHost || '';
-  const canConnect = cfg.enabled && cfg.streamEnabled && Boolean(cfg.signalingHost);
+  const canConnect = kitStream.availability === 'active';
 
   const connect = useCallback(async () => {
     if (!canConnect) {

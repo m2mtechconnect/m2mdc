@@ -1,8 +1,8 @@
 # Remaining roadmap
 
 1. Credential vault: no approved server-side vault exists, so credential submission stays disabled.
-2. Connection setup wizard: currently limited to the implemented connectors; broader onboarding
-   depends on the vault.
+2. Connection setup wizard: implemented for connectors with a runtime adapter and vault-free
+   authentication; broader connector onboarding depends on the vault.
 3. Wire the MQTT client into the runtime source resolver to clear the BLOCKED state.
 4. Deploy DSX Exchange (Common Services Cluster, NATS, JetStream, AsyncAPI schema packages) under
    explicit authorization, then validate topic permissions and schema conformance.

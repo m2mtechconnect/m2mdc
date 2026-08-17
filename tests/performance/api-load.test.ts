@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describeWithBackend } from '../_setup/backendSuite';
 import { performance } from 'perf_hooks';
 import { supabase } from '@/integrations/supabase/client';
 import { seedTestEnvironment, cleanupTestData, createTestRuns } from '../helpers/seedHelpers';
@@ -9,7 +10,7 @@ import { TestDataFactory } from '../helpers/testDataFactory';
  * Tests system performance under realistic data volumes
  */
 
-describe('API Load Tests with Realistic Data', () => {
+describeWithBackend('API Load Tests with Realistic Data', () => {
   let testUserId: string;
   let testSystemIds: string[] = [];
 

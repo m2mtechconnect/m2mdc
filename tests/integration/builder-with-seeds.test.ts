@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describeWithBackend } from '../_setup/backendSuite';
 import { act } from '@testing-library/react';
 import { useBuilderStore } from '@/stores/builderStore';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,7 +11,7 @@ import {
 } from '../helpers/seedHelpers';
 import { TestDataFactory } from '../helpers/testDataFactory';
 
-describe('Builder Flow with Seed Helpers', () => {
+describeWithBackend('Builder Flow with Seed Helpers', () => {
   let seedResult: any;
 
   afterEach(async () => {

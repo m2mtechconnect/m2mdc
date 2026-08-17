@@ -42,8 +42,10 @@ initChangeLogMiddleware();
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 3,
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      // A 400/404/406 about a missing or malformed identifier is terminal:
+      // retrying it only produced a permanent spinner.
+      retry: retryUnlessTerminal,
+      retryDelay: boundedRetryDelay,
       staleTime: 5000,
       refetchOnWindowFocus: false,
     },

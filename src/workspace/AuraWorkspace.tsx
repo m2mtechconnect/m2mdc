@@ -110,6 +110,21 @@ export default function AuraWorkspace() {
     document.title = `${facility.name} | AURA simulation workspace`;
   }, [facility.name]);
 
+  // The server record list is authoritative. It is reloaded whenever the
+  // session identity or the routed facility changes, so a cached browser copy
+  // can never stand in for a durable run.
+  const hydrateRuns = useWorkspaceStore((s) => s.hydrateRuns);
+  useEffect(() => {
+    let cancelled = false;
+    supabase.auth.getUser().then(({ data }) => {
+      if (cancelled) return;
+      void hydrateRuns(data?.user?.id ?? null, facility.id);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrateRuns, facility.id]);
+
   // Below xl the panel is an overlay, so it must not cover the model on load.
   useEffect(() => {
     setPanelOpen(!overlayInspector);

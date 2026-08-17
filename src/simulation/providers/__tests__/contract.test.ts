@@ -279,12 +279,14 @@ describe('no consumer migration in Phase 1B.1', () => {
   it('src/simulation/index.ts still exports the legacy SimulationEngine class', async () => {
     const mod = await import('../../index');
     expect(typeof (mod as { SimulationEngine?: unknown }).SimulationEngine).toBe('function');
-  });
+    // The dynamic import pulls in the full legacy engine graph, which is slow
+    // when the whole suite runs in parallel.
+  }, 30000);
 
   it('src/simulation/index.ts does NOT re-export the new facade (facade is opt-in)', async () => {
     const mod = await import('../../index');
     expect('createSimulationFacade' in mod).toBe(false);
-  });
+  }, 30000);
 
   it('default registry is constructable and returns compatibility for unknown ids', () => {
     const reg = createDefaultRegistry();

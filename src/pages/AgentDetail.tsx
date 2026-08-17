@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { describeDataError } from '@/lib/queryRetry';
 /**
  * Agent Detail Page - Full editor for agent definitions
  */

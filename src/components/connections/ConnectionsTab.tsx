@@ -217,6 +217,40 @@ export function ConnectionsTab({ connections, definitions, healthChecks, eventCo
                     {connection.is_system && (
                       <Badge variant="outline" className="text-xs">System connection: cannot be removed</Badge>
                     )}
+                    {!connection.is_system && isAdmin && (
+                      <>
+                        {connection.enabled ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="min-h-[32px]"
+                            disabled={mutating === connection.id}
+                            onClick={() => handleLifecycle(connection, 'deactivate')}
+                          >
+                            Disable
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="min-h-[32px]"
+                            disabled={mutating === connection.id}
+                            onClick={() => handleLifecycle(connection, 'activate')}
+                          >
+                            Activate
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="min-h-[32px]"
+                          disabled={mutating === connection.id}
+                          onClick={() => handleLifecycle(connection, 'delete')}
+                        >
+                          Delete
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -224,6 +258,14 @@ export function ConnectionsTab({ connections, definitions, healthChecks, eventCo
           })}
         </div>
       </section>
+
+      <ConnectionSetupWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        definitions={definitions}
+        connections={connections}
+        onCompleted={onRefresh}
+      />
     </div>
   );
 }

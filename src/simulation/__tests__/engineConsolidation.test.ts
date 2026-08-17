@@ -48,7 +48,7 @@ describe('simulation engine consolidation', () => {
 
   it('never claims NVIDIA execution for an AURA engine', () => {
     for (const engine of SIMULATION_ENGINES) {
-      expect(engine.executionClass).toBe('aura-deterministic');
+      expect(['aura-deterministic', 'fixture-preview']).toContain(engine.executionClass);
     }
   });
 

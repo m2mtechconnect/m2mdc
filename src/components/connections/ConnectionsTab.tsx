@@ -1,308 +1,223 @@
+/**
+ * Operational connection register. One row per configured connection with
+ * runtime-derived status, last event, throughput and mapping coverage.
+ * Below the lg breakpoint the table becomes accessible summary cards.
+ */
 import { useMemo, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
+import { MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { useRBAC } from '@/contexts/RBACContext';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ConnectionStatusBadge } from './ConnectionStatusBadge';
-import { ConnectionSetupWizard } from './ConnectionSetupWizard';
-import { CredentialVaultDialog } from './CredentialVaultDialog';
-import {
-  canRunHealthCheck,
-  summariseConnections,
-  STATUS_DESCRIPTORS,
-  type ConnectionInstance,
-  type ConnectorDefinition,
-  type HealthCheckRecord,
-} from '@/connections/model';
-import {
-  runHealthCheck,
-  deactivateConnection,
-  deleteConnection,
-  activateConnection,
-  useConnectionCredentials,
-} from '@/connections/api';
+import { formatRelative, type ConnectionRow } from '@/connections/presentation';
 
 interface Props {
-  connections: ConnectionInstance[];
-  definitions: ConnectorDefinition[];
-  healthChecks: HealthCheckRecord[];
-  eventCount: number;
+  rows: ConnectionRow[];
   loading: boolean;
-  onRefresh: () => void;
+  isAdmin: boolean;
+  onOpen: (id: string) => void;
+  onAdd: () => void;
+  onTest: (id: string) => void;
+  onMap: (id: string) => void;
+  onCredential: (id: string) => void;
 }
 
-function fmt(value: string | null) {
-  if (!value) return 'Never';
-  return new Date(value).toLocaleString();
-}
-
-export function ConnectionsTab({ connections, definitions, healthChecks, eventCount, loading, onRefresh }: Props) {
-  const { can, role } = useRBAC();
-  const { toast } = useToast();
+export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, onMap, onCredential }: Props) {
   const [query, setQuery] = useState('');
-  const [testing, setTesting] = useState<string | null>(null);
-  const [wizardOpen, setWizardOpen] = useState(false);
-  const [mutating, setMutating] = useState<string | null>(null);
-  const [vaultTarget, setVaultTarget] = useState<ConnectionInstance | null>(null);
-  const isAdmin = role === 'admin' || role === 'owner' || can('twin.edit');
+  const [status, setStatus] = useState('all');
 
-  // Metadata only: fingerprint, version and rotation date. Never the material.
-  const credentials = useConnectionCredentials(isAdmin);
-  const credentialFor = (id: string) => (credentials.data ?? []).find((c) => c.connection_id === id) ?? null;
-
-  const byId = useMemo(() => new Map(definitions.map((d) => [d.id, d])), [definitions]);
-  const summary = useMemo(
-    () => summariseConnections(connections, definitions, eventCount),
-    [connections, definitions, eventCount],
-  );
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return connections;
-    return connections.filter(
-      (c) => c.display_name.toLowerCase().includes(q) || c.connector_id.toLowerCase().includes(q),
+    return rows.filter((r) => {
+      const matchesQuery =
+        !q ||
+        r.connection.display_name.toLowerCase().includes(q) ||
+        r.connection.connector_id.toLowerCase().includes(q) ||
+        (r.definition?.name ?? '').toLowerCase().includes(q);
+      const matchesStatus = status === 'all' || r.connection.status === status;
+      return matchesQuery && matchesStatus;
+    });
+  }, [rows, query, status]);
+
+  const statuses = useMemo(
+    () => Array.from(new Set(rows.map((r) => r.connection.status))).sort(),
+    [rows],
+  );
+
+  function Actions({ row }: { row: ConnectionRow }) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-10 w-10" aria-label={`Actions for ${row.connection.display_name}`}>
+            <MoreHorizontal className="h-4 w-4" aria-hidden />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuItem onSelect={() => onOpen(row.connection.id)}>Open details</DropdownMenuItem>
+          <DropdownMenuItem disabled={!isAdmin} onSelect={() => onTest(row.connection.id)}>Test connection</DropdownMenuItem>
+          <DropdownMenuItem disabled={!isAdmin} onSelect={() => onCredential(row.connection.id)}>Credential vault</DropdownMenuItem>
+          <DropdownMenuItem disabled={!isAdmin} onSelect={() => onMap(row.connection.id)}>Map data</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
-  }, [connections, query]);
-
-  const lastCheckFor = (id: string) => healthChecks.find((h) => h.connection_id === id) ?? null;
-
-  async function handleTest(connection: ConnectionInstance) {
-    setTesting(connection.id);
-    try {
-      const result = await runHealthCheck(connection.id);
-      toast({
-        title: result.status === 'PASSED' ? 'Health check passed' : 'Health check failed',
-        description: `${result.safe_message ?? ''} A passing check proves reachability, not data flow.`,
-      });
-      onRefresh();
-    } catch (error) {
-      toast({
-        title: 'Health check could not run',
-        description: error instanceof Error ? error.message : 'The server-side probe was rejected.',
-        variant: 'destructive',
-      });
-    } finally {
-      setTesting(null);
-    }
   }
 
-  async function handleLifecycle(connection: ConnectionInstance, action: 'activate' | 'deactivate' | 'delete') {
-    if (action === 'delete' && !window.confirm(`Delete "${connection.display_name}"? The audit trail is retained.`)) return;
-    setMutating(connection.id);
-    try {
-      if (action === 'activate') {
-        const status = await activateConnection(connection.id);
-        toast({ title: 'Connection activated', description: `Status is now ${status}.` });
-      } else if (action === 'deactivate') {
-        await deactivateConnection(connection.id);
-        toast({ title: 'Connection disabled', description: 'The connection is no longer enabled.' });
-      } else {
-        await deleteConnection(connection.id);
-        toast({ title: 'Connection deleted', description: 'The connection record was removed.' });
-      }
-      onRefresh();
-    } catch (error) {
-      toast({
-        title: 'Action refused',
-        description: error instanceof Error ? error.message : 'The server rejected the request.',
-        variant: 'destructive',
-      });
-    } finally {
-      setMutating(null);
-    }
+  if (loading) {
+    return (
+      <div className="space-y-3">
+        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-lg" />)}
+      </div>
+    );
   }
-
-  const cards = [
-    { label: 'Operational data sources', value: summary.operationalDataSources, hint: 'Facility/OT sources supplying data now.' },
-    { label: 'Platform services', value: summary.platformServices, hint: 'Application-plane services proven healthy.' },
-    { label: 'Healthy', value: summary.healthy, hint: 'Last check passed and data observed.' },
-    { label: 'Degraded', value: summary.degraded, hint: 'Partially working.' },
-    { label: 'Needs attention', value: summary.needsAttention, hint: 'Blocked, failed or awaiting configuration.' },
-    { label: 'DSX events received', value: summary.events, hint: 'Total events accepted by the DSX ingest gateway.' },
-  ];
 
   return (
-    <div className="space-y-6">
-      <section aria-labelledby="connections-summary-heading" className="space-y-3">
-        <h2 id="connections-summary-heading" className="text-base font-semibold">Evidence summary</h2>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-          {cards.map((c) => (
-            <Card key={c.label} className="min-w-0">
-              <CardContent className="space-y-1 p-4">
-                <p className="text-xs font-medium text-muted-foreground">{c.label}</p>
-                <p className="text-2xl font-semibold tabular-nums">{c.value}</p>
-                <p className="text-xs text-muted-foreground">{c.hint}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Last successful ingest: {fmt(summary.lastIngestAt)}. Catalogue definitions are not counted as connected systems.
-        </p>
-      </section>
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search connections"
+          aria-label="Search connections"
+          className="h-10 w-full max-w-xs text-sm"
+        />
+        <Select value={status} onValueChange={setStatus}>
+          <SelectTrigger className="h-10 w-[200px] text-sm" aria-label="Filter by status">
+            <SelectValue placeholder="All statuses" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All statuses</SelectItem>
+            {statuses.map((s) => (
+              <SelectItem key={s} value={s}>{s.replace(/_/g, ' ').toLowerCase()}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <span className="text-sm text-muted-foreground">{filtered.length} of {rows.length}</span>
+      </div>
 
-      <section aria-labelledby="connections-list-heading" className="space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 id="connections-list-heading" className="text-base font-semibold">Configured connections</h2>
-          <div className="flex flex-wrap items-center gap-2">
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search connections"
-              aria-label="Search connections"
-              className="h-9 w-full max-w-xs text-sm"
-            />
-            <Button
-              size="sm"
-              className="min-h-[32px]"
-              onClick={() => setWizardOpen(true)}
-              disabled={!isAdmin}
-            >
-              Add connection
-            </Button>
-            {!isAdmin && (
-              <span className="text-xs text-muted-foreground">Creating a connection requires an administrator role.</span>
+      {filtered.length === 0 ? (
+        <Card>
+          <CardContent className="space-y-3 p-8 text-center">
+            <p className="text-sm font-semibold">
+              {rows.length === 0 ? 'No connection is configured yet' : 'No connection matches this filter'}
+            </p>
+            <p className="mx-auto max-w-md text-sm text-muted-foreground">
+              {rows.length === 0
+                ? 'Add a connection to bind a facility, gateway or platform source to this tenant. Configuration alone never reports a healthy status: a server-side check must pass and data must arrive.'
+                : 'Clear the search or status filter to see all configured connections.'}
+            </p>
+            {rows.length === 0 && (
+              <Button className="h-10" disabled={!isAdmin} onClick={onAdd}>Add connection</Button>
             )}
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          {/* Desktop register */}
+          <div className="hidden min-w-0 overflow-x-auto rounded-lg border border-border lg:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs uppercase">Connection</TableHead>
+                  <TableHead className="text-xs uppercase">Environment</TableHead>
+                  <TableHead className="text-xs uppercase">Direction</TableHead>
+                  <TableHead className="text-xs uppercase">Status</TableHead>
+                  <TableHead className="text-xs uppercase">Last event</TableHead>
+                  <TableHead className="text-xs uppercase">Throughput</TableHead>
+                  <TableHead className="text-xs uppercase">Mapping</TableHead>
+                  <TableHead className="text-xs uppercase">Owner</TableHead>
+                  <TableHead className="text-right text-xs uppercase">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((row) => (
+                  <TableRow
+                    key={row.connection.id}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`Open ${row.connection.display_name}`}
+                    className="cursor-pointer"
+                    onClick={() => onOpen(row.connection.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(row.connection.id); }
+                    }}
+                  >
+                    <TableCell className="min-w-0">
+                      <div className="flex items-center gap-3">
+                        <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-md text-xs font-semibold ${row.glyph.className}`} aria-hidden>
+                          {row.glyph.mark}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium">{row.connection.display_name}</p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {row.definition?.name ?? row.connection.connector_id} · {row.glyph.label}
+                          </p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm">{row.connection.environment}</TableCell>
+                    <TableCell className="text-sm">{row.connection.data_direction}</TableCell>
+                    <TableCell><ConnectionStatusBadge status={row.connection.status} /></TableCell>
+                    <TableCell className="text-sm">{formatRelative(row.connection.last_ingest_at)}</TableCell>
+                    <TableCell className="text-sm tabular-nums">{row.throughput.label}</TableCell>
+                    <TableCell className="text-sm tabular-nums">{row.coverage.label}</TableCell>
+                    <TableCell className="text-sm">{row.connection.is_system ? 'Platform' : row.connection.owner_id ? 'Tenant' : 'Unassigned'}</TableCell>
+                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                      <Actions row={row} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
-        </div>
 
-        {loading && <p className="text-sm text-muted-foreground">Loading connection records…</p>}
-        {!loading && filtered.length === 0 && (
-          <Card><CardContent className="p-6 text-sm text-muted-foreground">No connection instance matches this filter.</CardContent></Card>
-        )}
-
-        <div className="space-y-3">
-          {filtered.map((connection) => {
-            const definition = byId.get(connection.connector_id);
-            const check = lastCheckFor(connection.id);
-            const testable = canRunHealthCheck(connection);
-            return (
-              <Card key={connection.id} className="min-w-0">
-                <CardHeader className="gap-2 pb-3">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <CardTitle className="text-base">{connection.display_name}</CardTitle>
-                      <CardDescription className="text-xs">
-                        {definition?.name ?? connection.connector_id} · {definition?.category ?? 'Uncategorised'} · {connection.environment}
-                      </CardDescription>
+          {/* Tablet and mobile summary cards */}
+          <ul className="space-y-3 lg:hidden">
+            {filtered.map((row) => (
+              <li key={row.connection.id}>
+                <Card className="min-w-0">
+                  <CardContent className="space-y-3 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex min-w-0 items-start gap-3">
+                        <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-md text-xs font-semibold ${row.glyph.className}`} aria-hidden>
+                          {row.glyph.mark}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium">{row.connection.display_name}</p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {row.definition?.name ?? row.connection.connector_id} · {row.connection.environment}
+                          </p>
+                        </div>
+                      </div>
+                      <ConnectionStatusBadge status={row.connection.status} />
                     </div>
-                    <ConnectionStatusBadge status={connection.status} />
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm">
-                  <dl className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2 xl:grid-cols-4">
-                    <div><dt className="text-xs text-muted-foreground">Direction</dt><dd className="text-sm">{connection.data_direction}</dd></div>
-                    <div><dt className="text-xs text-muted-foreground">Authentication</dt><dd className="text-sm">{definition?.supported_auth_methods?.join(', ') || 'None'}</dd></div>
-                    <div><dt className="text-xs text-muted-foreground">Last check</dt><dd className="text-sm">{fmt(connection.last_tested_at)}</dd></div>
-                    <div><dt className="text-xs text-muted-foreground">Last data received</dt><dd className="text-sm">{fmt(connection.last_ingest_at)}</dd></div>
-                    <div>
-                      <dt className="text-xs text-muted-foreground">Vault credential</dt>
-                      <dd className="text-sm">
-                        {!isAdmin
-                          ? 'Visible to administrators only'
-                          : credentialFor(connection.id)
-                            ? `v${credentialFor(connection.id)!.version} · ${credentialFor(connection.id)!.fingerprint} · rotated ${fmt(credentialFor(connection.id)!.last_rotated_at)}`
-                            : 'None stored'}
-                      </dd>
-                    </div>
-                  </dl>
-                  <p className="text-xs text-muted-foreground">
-                    {connection.status_reason ?? STATUS_DESCRIPTORS[connection.status]?.meaning}
-                  </p>
-                  {check && (
-                    <p className="text-xs text-muted-foreground">
-                      Last probe: {check.status} · network {check.network_result ?? 'n/a'} · auth {check.auth_result ?? 'n/a'} · data {check.data_availability ?? 'n/a'} · {check.latency_ms ?? '—'} ms
-                    </p>
-                  )}
-                  <div className="flex flex-wrap items-center gap-2">
-                    {testable ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="min-h-[32px]"
-                        disabled={!isAdmin || testing === connection.id}
-                        onClick={() => handleTest(connection)}
-                      >
-                        {testing === connection.id ? 'Testing…' : 'Test connection'}
+                    <dl className="grid grid-cols-2 gap-2 text-sm">
+                      <div><dt className="text-xs text-muted-foreground">Last event</dt><dd>{formatRelative(row.connection.last_ingest_at)}</dd></div>
+                      <div><dt className="text-xs text-muted-foreground">Throughput</dt><dd>{row.throughput.label}</dd></div>
+                      <div><dt className="text-xs text-muted-foreground">Mapping</dt><dd>{row.coverage.label}</dd></div>
+                      <div><dt className="text-xs text-muted-foreground">Direction</dt><dd>{row.connection.data_direction}</dd></div>
+                    </dl>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button size="sm" variant="outline" className="h-10" onClick={() => onOpen(row.connection.id)}>
+                        Open details
                       </Button>
-                    ) : (
-                      <Badge variant="outline" className="text-xs">
-                        Test unavailable: no server-side probe for this connector
-                      </Badge>
-                    )}
-                    {!isAdmin && (
-                      <span className="text-xs text-muted-foreground">
-                        Testing requires an administrator role.
-                      </span>
-                    )}
-                    {connection.is_system && (
-                      <Badge variant="outline" className="text-xs">System connection: cannot be removed</Badge>
-                    )}
-                    {!connection.is_system && isAdmin && (
-                      <>
-                        {connection.enabled ? (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="min-h-[32px]"
-                            disabled={mutating === connection.id}
-                            onClick={() => handleLifecycle(connection, 'deactivate')}
-                          >
-                            Disable
-                          </Button>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="min-h-[32px]"
-                            disabled={mutating === connection.id}
-                            onClick={() => handleLifecycle(connection, 'activate')}
-                          >
-                            Activate
-                          </Button>
-                        )}
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="min-h-[32px]"
-                          onClick={() => setVaultTarget(connection)}
-                        >
-                          {credentialFor(connection.id) ? 'Rotate credential' : 'Store credential'}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="min-h-[32px]"
-                          disabled={mutating === connection.id}
-                          onClick={() => handleLifecycle(connection, 'delete')}
-                        >
-                          Delete
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      </section>
-
-      <CredentialVaultDialog
-        connection={vaultTarget}
-        open={vaultTarget !== null}
-        onOpenChange={(next) => { if (!next) setVaultTarget(null); }}
-        onChanged={() => { credentials.refetch(); onRefresh(); }}
-      />
-
-      <ConnectionSetupWizard
-        open={wizardOpen}
-        onOpenChange={setWizardOpen}
-        definitions={definitions}
-        connections={connections}
-        onCompleted={onRefresh}
-      />
+                      <Actions row={row} />
+                    </div>
+                  </CardContent>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 }

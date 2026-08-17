@@ -173,6 +173,16 @@ export function ConnectionDetailDrawer(props: Props) {
               {busy === 'test' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden /> : null}
               Test connection
             </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-10"
+              disabled={busy !== null}
+              onClick={() => act('verify')}
+            >
+              {busy === 'verify' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden /> : null}
+              Verify live data
+            </Button>
             <Button size="sm" variant="outline" className="h-10" disabled={!isAdmin} onClick={onManageCredential}>
               {credential ? 'Rotate credential' : 'Store credential'}
             </Button>

@@ -84,6 +84,24 @@ export type DecisionState = 'pending' | 'accepted' | 'rejected' | 'deferred';
 
 export interface WorkspaceRun {
   id: string;
+  /**
+   * Durable database identifier. Present only when the run was written to
+   * `public.simulation_runs`. Runs without one are browser-only.
+   */
+  serverId?: string;
+  /**
+   * Where the authoritative copy of this run lives. `local-legacy` marks a
+   * run recorded before durable persistence existed - it is not an
+   * operational record.
+   */
+  persistence?: 'server' | 'local-legacy' | 'fixture';
+  /** Where the numbers were actually computed. Never overstated. */
+  executionOrigin?: 'client-browser' | 'server-edge-function' | 'imported-legacy';
+  validationStatus?:
+    | 'client-produced-unverified'
+    | 'server-validated'
+    | 'imported-unverified'
+    | 'invalid';
   scenarioId: string;
   scenarioLabel: string;
   facilityId: string;

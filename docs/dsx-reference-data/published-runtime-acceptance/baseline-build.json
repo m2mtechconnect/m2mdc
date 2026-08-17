@@ -1,0 +1,10 @@
+{
+  "previousBundle": "assets/index-BLh1dE2h.js",
+  "sourceRevisionBefore": "ae7c8049",
+  "manifestVersion": "1.1.0",
+  "productionDefaultBefore": "legacy-synthetic",
+  "productionDefaultAfter": "legacy-synthetic",
+  "canarySelector": "?dataset=nvidia-dsx-reference",
+  "canaryAudience": "authenticated administrators only",
+  "verdictBefore": "AURA_DSX_REFERENCE_CANARY_END_TO_END_PARTIAL"
+}

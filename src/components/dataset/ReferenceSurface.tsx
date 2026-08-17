@@ -4,6 +4,11 @@
  * While the reference canary is active this component replaces the legacy page
  * component for every REFERENCE_DATA_CONSUMER surface, so no legacy synthetic
  * value can reach the screen through a hidden import.
+ *
+ * Page identity is NOT generic: the route's adapter
+ * (`src/data/dataset/referenceAdapters.ts`) supplies the real page title,
+ * navigation group, user job, tab structure, controls, export identity and an
+ * explicit list of interactions that are unavailable in reference mode.
  */
 import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +19,7 @@ import { UnavailableState } from './UnavailableState';
 import { DatasetValueRow } from './DatasetValueRow';
 import { useDataset } from '@/data/dataset/DatasetProvider';
 import type { SurfaceEntry, SurfaceSection } from '@/data/dataset/surfaceRegistry';
+import { adapterForPath } from '@/data/dataset/referenceAdapters';
 import {
   allReferenceValues,
   derivedFacilities,
@@ -62,6 +68,8 @@ function download(name: string, content: string, type: string) {
 
 export function ReferenceSurface({ surface }: { surface: SurfaceEntry }) {
   const { mode, descriptor } = useDataset();
+  const pageAdapter = adapterForPath(surface.path);
+  const [activeTab, setActiveTab] = useState(pageAdapter?.tabs[0]?.id ?? 'default');
   const [configurationId, setConfigurationId] = useState(DEFAULT_CONFIG);
   const [compareWith, setCompareWith] = useState('sweden-gb300');
   const [query, setQuery] = useState('');
@@ -86,7 +94,13 @@ export function ReferenceSurface({ surface }: { surface: SurfaceEntry }) {
     [question, mode],
   );
 
-  const has = (s: SurfaceSection) => surface.sections.includes(s);
+  const currentTab =
+    pageAdapter?.tabs.find((t) => t.id === activeTab) ?? pageAdapter?.tabs[0] ?? null;
+  const activeSections: readonly SurfaceSection[] = currentTab
+    ? currentTab.sections
+    : surface.sections;
+  const has = (s: SurfaceSection) => activeSections.includes(s);
+  const exportStem = pageAdapter?.exportStem ?? 'aura-reference-export';
   const exportValues = kpis.length > 0 ? kpis : allReferenceValues();
   const exportCtx = {
     dataset: mode,
@@ -95,15 +109,49 @@ export function ReferenceSurface({ surface }: { surface: SurfaceEntry }) {
   };
 
   return (
-    <div className="space-y-4 py-6" data-testid="reference-surface" data-surface={surface.path}>
+    <div
+      className="space-y-4 py-6"
+      data-testid="reference-surface"
+      data-surface={surface.path}
+      data-page-id={pageAdapter?.pageId ?? 'unmapped'}
+    >
       <header>
-        <h1 className="text-xl font-semibold text-foreground">{surface.title}</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <h1 className="text-xl font-semibold text-foreground">
+            {pageAdapter?.pageTitle ?? surface.title}
+          </h1>
+          {pageAdapter && <Badge variant="outline">{pageAdapter.navGroup}</Badge>}
+        </div>
+        {pageAdapter && (
+          <p className="mt-1 text-xs text-foreground">{pageAdapter.userJob}</p>
+        )}
         <p className="mt-1 text-xs text-muted-foreground">
           Rendered from {descriptor.label}. Reference data only: not measured, not live, not
           commissioned, not an NVIDIA runtime integration.
         </p>
       </header>
 
+      {pageAdapter && pageAdapter.tabs.length > 1 && (
+        <div className="flex flex-wrap gap-1 border-b border-border pb-2" role="tablist" aria-label={`${pageAdapter.pageTitle} sections`}>
+          {pageAdapter.tabs.map((t) => (
+            <Button
+              key={t.id}
+              role="tab"
+              aria-selected={t.id === currentTab?.id}
+              size="sm"
+              variant={t.id === currentTab?.id ? 'default' : 'ghost'}
+              onClick={() => setActiveTab(t.id)}
+              data-testid={`reference-tab-${t.id}`}
+            >
+              {t.label}
+            </Button>
+          ))}
+        </div>
+      )}
+
+      {currentTab && <p className="text-xs text-muted-foreground">{currentTab.intent}</p>}
+
+      {(pageAdapter?.showConfigurationSelector ?? true) && (
       <div className="flex flex-wrap items-center gap-2 text-xs">
         <span className="text-muted-foreground">Reference configuration</span>
         {configIds.map((id) => (
@@ -117,6 +165,7 @@ export function ReferenceSurface({ surface }: { surface: SurfaceEntry }) {
           </Button>
         ))}
       </div>
+      )}
 
       {has('facilities') && (
         <Section title="Facilities">
@@ -328,7 +377,7 @@ export function ReferenceSurface({ surface }: { surface: SurfaceEntry }) {
               variant="outline"
               data-testid="export-csv"
               onClick={() =>
-                download('aura-reference-export.csv', toCsv(exportValues, exportCtx), 'text/csv')
+                download(`${exportStem}.csv`, toCsv(exportValues, exportCtx), 'text/csv')
               }
             >
               Export CSV
@@ -339,7 +388,7 @@ export function ReferenceSurface({ surface }: { surface: SurfaceEntry }) {
               data-testid="export-json"
               onClick={() =>
                 download(
-                  'aura-reference-export.json',
+                  `${exportStem}.json`,
                   JSON.stringify(toJsonExport(exportValues, exportCtx), null, 2),
                   'application/json',
                 )
@@ -483,6 +532,16 @@ export function ReferenceSurface({ surface }: { surface: SurfaceEntry }) {
               <UnavailableState key={cls} label={cls} />
             ))}
           </div>
+        </Section>
+      )}
+
+      {pageAdapter && pageAdapter.workflowLimitations.length > 0 && (
+        <Section title="Not available while the reference dataset is active">
+          <ul className="list-disc space-y-1 pl-4 text-muted-foreground">
+            {pageAdapter.workflowLimitations.map((l) => (
+              <li key={l}>{l}</li>
+            ))}
+          </ul>
         </Section>
       )}
 

@@ -107,7 +107,7 @@ function neutral(path: string, title: string, note = 'No dataset-bound values re
 export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
   consumer('/dashboard', 'Dashboard', ['facilities', 'kpis', 'ngc'], [KPI, CONFIG]),
   consumer('/manage/facilities', 'Facilities', ['facilities', 'montreal'], [CONFIG, SPEC]),
-  consumer('/blueprint/:id', 'Blueprint', ['specifications', 'configurations', 'derivation'], [SPEC, CONFIG]),
+  consumer('/blueprint/:id', 'Blueprint', ['specifications', 'configurations', 'derivation', 'evidence'], [SPEC, CONFIG]),
   consumer('/blueprint/preview', 'Blueprint preview', ['specifications', 'configurations'], [SPEC, CONFIG]),
   consumer('/data-centre-twin/:id/blueprint', 'Twin blueprint', ['specifications', 'configurations', 'derivation'], [SPEC, CONFIG]),
   consumer('/builder', 'Build twin', ['configurations', 'derivation'], [CONFIG, SPEC]),
@@ -130,7 +130,7 @@ export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
   consumer('/deploy', 'Deployment lanes', ['deployments'], []),
   consumer('/deployments', 'Deployment history', ['deployments'], []),
   consumer('/admin/asset-pipeline', 'Asset pipeline', ['assets', 'ngc'], []),
-  consumer('/help', 'Support and documentation', ['glossary'], []),
+  consumer('/help', 'Support and documentation', ['glossary', 'ngc'], []),
 
   neutral('/data-centre-twin', '3D twin', 'Geometry provenance only, no dataset values.'),
   neutral('/data-centre-twin/:id', '3D twin detail', 'Geometry provenance only.'),

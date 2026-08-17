@@ -58,9 +58,10 @@ const AgentDetail: React.FC = () => {
   
   if (error || !agent) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4">
+      <div className="flex flex-col items-center justify-center h-screen gap-4" role="alert" aria-live="polite">
         <AlertTriangle className="h-12 w-12 text-destructive" />
-        <p className="text-lg">{t("agentDetail.notFound")}</p>
+        <h1 className="text-lg font-semibold">{t("agentDetail.notFound")}</h1>
+        <p className="max-w-md text-center text-sm text-muted-foreground">{describeDataError(error)}</p>
         <Button variant="outline" onClick={() => navigate('/subsystem-agents')}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Agents

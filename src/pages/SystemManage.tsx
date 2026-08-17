@@ -7,6 +7,7 @@ import { Loader2, ArrowLeft, AlertCircle } from 'lucide-react';
 import { TwinDetailsLayout } from '@/components/system-manage/TwinDetailsLayout';
 import { useToast } from '@/hooks/use-toast';
 import type { DeployedSystem } from '@/types/system';
+import { describeDataError, isNotFoundError } from '@/lib/queryRetry';
 
 /**
  * System Management Page
@@ -160,20 +161,23 @@ export default function SystemManage() {
   }
 
   if (error || !systemData) {
+    const notFound = isNotFoundError(error);
     return (
       <div className="container mx-auto py-8 max-w-7xl">
-        <div className="text-center py-12">
+        <div className="text-center py-12" role="alert" aria-live="polite">
           <div className="max-w-md mx-auto">
             <div className="mb-4 p-4 rounded-full bg-destructive/10 w-16 h-16 flex items-center justify-center mx-auto">
               <AlertCircle className="h-8 w-8 text-destructive" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">System Not Found</h3>
+            <h1 className="text-lg font-semibold mb-2">
+              {notFound ? 'System not found' : 'System could not be loaded'}
+            </h1>
             <p className="text-muted-foreground mb-4">
-              {error instanceof Error ? error.message : 'The system you are looking for does not exist or you do not have access to it.'}
+              {describeDataError(error)}
             </p>
-            <Button onClick={() => navigate('/dashboard')}>
+            <Button onClick={() => navigate('/app/agents')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
+              Back to systems
             </Button>
           </div>
         </div>

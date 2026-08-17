@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { invokeEdgeFunction } from '@/hooks/useEdgeFunction';
 import { logger } from '@/lib/logger';
 import { useKpi } from '@/hooks/useKpi';
+import { PagePurpose } from '@/components/capability/PagePurpose';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -436,8 +437,9 @@ export default function IntelligenceDashboard() {
           <div className="min-w-0">
             <h1 className="text-2xl font-semibold flex items-center gap-3">
               <BarChart3 className="h-6 w-6 text-primary" />
-              Telemetry and analytics
+              Operations &amp; Telemetry
             </h1>
+            <PagePurpose route="/analytics" className="mt-1" />
             <p className="text-muted-foreground text-sm max-w-3xl">
               {twin
                 ? `${twin.name} - ${twin.city}. ${t('intelligenceDashboard.defaultSubtitle')}`

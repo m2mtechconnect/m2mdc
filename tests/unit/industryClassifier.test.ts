@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { classifyIndustry, type Industry } from '@/lib/digitalTwin/industryClassifier';
+import {
+  INDUSTRIES,
+  classifyIndustry,
+  industryDomainPatterns,
+  type Industry,
+} from '@/lib/digitalTwin/industryClassifier';
 
 /**
  * Unit Tests: Industry Classification (Top 20 Industries)
@@ -8,7 +13,7 @@ import { classifyIndustry, type Industry } from '@/lib/digitalTwin/industryClass
 
 describe('Industry Classifier - Top 20 Industries', () => {
   const testCases: Array<{ domain: string; expected: Industry; context?: string }> = [
-    { domain: 'walmart.com', expected: 'Enterprise Retail + Global Supply Chain' },
+    { domain: 'walmart.com', expected: 'Enterprise Retail' },
     { domain: 'costco.com', expected: 'Grocery & Food Retail' },
     { domain: 'nike.com', expected: 'Fashion / Apparel Retail' },
     { domain: 'fedex.com', expected: 'Logistics / Supply Chain / 3PL' },
@@ -46,28 +51,8 @@ describe('Industry Classifier - Top 20 Industries', () => {
   });
 
   it('should always return exactly one of the 20 valid industries', () => {
-    const validIndustries: Industry[] = [
-      'Enterprise Retail + Global Supply Chain',
-      'Fashion / Apparel Retail',
-      'Grocery & Food Retail',
-      'Logistics / Supply Chain / 3PL',
-      'Manufacturing – Automotive',
-      'Manufacturing – Industrial',
-      'Manufacturing – Consumer Goods',
-      'Energy / Utilities',
-      'Healthcare / Hospitals',
-      'Pharmaceuticals & Life Sciences',
-      'Financial Services / Banking',
-      'Insurance',
-      'Real Estate / PropTech',
-      'Construction / Engineering',
-      'Telecommunications',
-      'Travel / Transportation',
-      'Education / EdTech',
-      'Agriculture / Agritech',
-      'Government / Public Sector',
-      'Software / Enterprise SaaS',
-    ];
+    // Read from the module so the vocabulary cannot drift out of sync.
+    const validIndustries: readonly Industry[] = INDUSTRIES;
 
     testCases.forEach(({ domain }) => {
       const result = classifyIndustry(domain);
@@ -85,7 +70,7 @@ describe('Industry Classifier - Top 20 Industries', () => {
 
     variations.forEach(url => {
       const result = classifyIndustry(url);
-      expect(result).toBe('Enterprise Retail + Global Supply Chain');
+      expect(result).toBe('Enterprise Retail');
     });
   });
 
@@ -104,7 +89,7 @@ describe('Industry Classifier - Content-Based Classification', () => {
   it('should classify based on content when domain is ambiguous', () => {
     const retailContent = 'walmart supply chain inventory stores distribution retail';
     const result = classifyIndustry('walmart.com', retailContent);
-    expect(result).toBe('Enterprise Retail + Global Supply Chain');
+    expect(result).toBe('Enterprise Retail');
   });
 
   it('should classify pharma based on keywords', () => {
@@ -139,5 +124,24 @@ describe('Industry Classifier - Edge Cases', () => {
     
     expect(result1).toBe(result2);
     expect(result2).toBe(result3);
+  });
+});
+
+describe('Industry Classifier - Pattern Hygiene', () => {
+  /**
+   * Domain patterns are matched against a hostname, so a pattern containing a
+   * space can never match. Several did ("cleveland clinic", "whole foods"),
+   * which silently sent real companies to the default SaaS bucket.
+   */
+  it('has no domain pattern that a hostname could never contain', () => {
+    const offenders = industryDomainPatterns().flatMap(({ industry, patterns }) =>
+      patterns.filter((p) => /\s/.test(p)).map((p) => `${industry}: "${p}"`),
+    );
+    expect(offenders).toEqual([]);
+  });
+
+  it('covers every industry in the vocabulary with at least one pattern', () => {
+    const covered = new Set(industryDomainPatterns().map((p) => p.industry));
+    expect([...INDUSTRIES].filter((i) => !covered.has(i))).toEqual([]);
   });
 });

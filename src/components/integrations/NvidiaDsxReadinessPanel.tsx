@@ -24,7 +24,7 @@ interface Row {
  * asserts a status that the registry does not carry evidence for.
  */
 function gateRow(
-  key: Parameters<typeof gateDetail>[0],
+  key: keyof typeof CAPABILITIES,
   detail: string,
   tone: Row['tone'] = 'grey',
 ): Row {
@@ -35,10 +35,6 @@ function gateRow(
     tone: cap.enabled ? 'grey' : tone,
     detail: cap.enabled ? detail : cap.requirement,
   };
-}
-
-function gateDetail(key: keyof typeof CAPABILITIES) {
-  return CAPABILITIES[key].requirement;
 }
 
 const ROWS: Row[] = [

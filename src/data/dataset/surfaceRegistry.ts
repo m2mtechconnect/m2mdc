@@ -121,7 +121,7 @@ export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
   consumer('/analytics', 'Telemetry and analytics', ['telemetry', 'kpis'], [KPI], {
     missingBehaviour: 'No time series exists in the reference dataset: history is reported unavailable.',
   }),
-  consumer('/search', 'Search', ['search'], [KPI, SPEC, CONFIG, SCENARIO]),
+  consumer('/search', 'Search', ['search', 'assistant'], [KPI, SPEC, CONFIG, SCENARIO]),
   consumer('/compliance', 'Evidence and compliance', ['evidence', 'export'], [KPI, SPEC, CONFIG, SCENARIO]),
   consumer('/app/agents', 'Subsystem agents', ['agents', 'ngc'], [SCENARIO]),
   consumer('/connect/monitor', 'Ingestion monitor', ['integrations', 'ngc'], []),

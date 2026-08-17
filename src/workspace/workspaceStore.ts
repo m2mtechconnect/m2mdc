@@ -14,6 +14,7 @@ import {
   type DecisionState,
   type WorkspaceRun,
 } from './scenarioEngine';
+import { idempotencyKeyFor, loadServerRuns, persistRun } from './runPersistence';
 
 export type WorkspaceTool = 'inspect' | 'configure' | 'simulate' | 'compare' | 'decide' | 'assist';
 
@@ -48,6 +49,12 @@ interface WorkspaceState {
   lastRunError: string | null;
   runs: WorkspaceRun[];
   activeRunId: string | null;
+  /** True while the authoritative server records are being loaded. */
+  runsLoading: boolean;
+  /** Set when the server record list could not be read. */
+  runsError: string | null;
+  /** Identity the cached runs belong to; a change clears incompatible cache. */
+  runsOwnerKey: string | null;
   compareRunIds: string[];
   evidenceKpi: KpiKey | null;
   /** Blueprint handoff currently loaded as a draft configuration. */
@@ -68,6 +75,10 @@ interface WorkspaceState {
   setHandoff: (handoff: HandoffDraft | null) => void;
   setAssumptionsReviewed: (reviewed: boolean) => void;
   runScenario: (facility: FacilityDefinition) => Promise<string | null>;
+  /** Replaces cached server runs with the authoritative server records. */
+  hydrateRuns: (ownerKey: string | null, twinId?: string | null) => Promise<void>;
+  /** Drops every cached run when the session or tenant changes. */
+  resetRunCache: () => void;
   clearRunError: () => void;
   setActiveRun: (runId: string) => void;
   toggleCompareRun: (runId: string) => void;
@@ -93,6 +104,9 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       lastRunError: null,
       runs: [],
       activeRunId: null,
+      runsLoading: false,
+      runsError: null,
+      runsOwnerKey: null,
       compareRunIds: [],
       evidenceKpi: null,
       handoff: null,
@@ -157,17 +171,87 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           return null;
         }
 
+        // The database row is the authoritative record. A write failure must
+        // never present as a successful run.
+        const outcome = await persistRun({
+          run,
+          twinId: facility.id,
+          scenarioType: 'operational',
+          idempotencyKey: idempotencyKeyFor({
+            facilityId: facility.id,
+            scenarioId: scenario.id,
+            overrides,
+            startedAt: startedAt.toISOString(),
+          }),
+        });
+
+        if (outcome.status === 'unsaved') {
+          set({ isRunning: false, lastRunError: outcome.reason });
+          return null;
+        }
+
+        run = {
+          ...run,
+          id: outcome.runKey,
+          serverId: outcome.id,
+          persistence: 'server',
+          executionOrigin: 'client-browser',
+          validationStatus: 'client-produced-unverified',
+        };
+
         set((s) => ({
           isRunning: false,
           lastRunError: null,
-          runs: [run, ...s.runs].slice(0, 20),
+          runs: [run, ...s.runs.filter((r) => r.serverId !== run.serverId)].slice(0, 20),
           activeRunId: run.id,
           activeTool: 'compare',
           panelOpen: true,
-          compareRunIds: [run.id, ...s.compareRunIds].slice(0, 2),
+          compareRunIds: [run.id, ...s.compareRunIds.filter((id) => id !== run.id)].slice(0, 2),
         }));
         return run.id;
       },
+
+      hydrateRuns: async (ownerKey, twinId) => {
+        const previousOwner = get().runsOwnerKey;
+        if (previousOwner && ownerKey !== previousOwner) {
+          // Session or tenant changed: incompatible cache must not survive.
+          set({ runs: [], activeRunId: null, compareRunIds: [] });
+        }
+        if (!ownerKey) {
+          set({ runs: [], activeRunId: null, compareRunIds: [], runsOwnerKey: null });
+          return;
+        }
+        set({ runsLoading: true, runsError: null, runsOwnerKey: ownerKey });
+        try {
+          const server = await loadServerRuns(twinId);
+          set((s) => {
+            // Cached local-only runs are retained but stay clearly marked.
+            const legacy = s.runs
+              .filter((r) => !r.serverId && r.persistence !== 'fixture')
+              .map((r) => ({ ...r, persistence: 'local-legacy' as const }));
+            const runs = [...server, ...legacy].slice(0, 20);
+            const fixtures = s.runs.filter((r) => r.persistence === 'fixture');
+            const all = [...runs, ...fixtures].slice(0, 20);
+            return {
+              runs: all,
+              runsLoading: false,
+              activeRunId: all.some((r) => r.id === s.activeRunId) ? s.activeRunId : (all[0]?.id ?? null),
+              compareRunIds: s.compareRunIds.filter((id) => all.some((r) => r.id === id)),
+            };
+          });
+        } catch (error) {
+          set({
+            runsLoading: false,
+            runsError:
+              error instanceof Error
+                ? `Saved runs could not be loaded: ${error.message.slice(0, 160)}`
+                : 'Saved runs could not be loaded.',
+          });
+        }
+      },
+
+      resetRunCache: () =>
+        set({ runs: [], activeRunId: null, compareRunIds: [], runsOwnerKey: null, runsError: null }),
 
       setActiveRun: (activeRunId) => set({ activeRunId }),
 
@@ -216,6 +300,19 @@ export const useWorkspaceStore = create<WorkspaceState>()(
     }),
     {
       name: 'aura-workspace',
+      version: 2,
+      // v1 stored browser-only runs as if they were operational records.
+      migrate: (state, version) => {
+        const s = state as Partial<WorkspaceState> | undefined;
+        if (!s) return s as WorkspaceState;
+        if (version < 2) {
+          return {
+            ...s,
+            runs: (s.runs ?? []).map((r) => ({ ...r, persistence: 'local-legacy' as const })),
+          } as WorkspaceState;
+        }
+        return s as WorkspaceState;
+      },
       partialize: (s) => ({
         roleView: s.roleView,
         overrides: s.overrides,
@@ -223,6 +320,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         runs: s.runs,
         activeRunId: s.activeRunId,
         compareRunIds: s.compareRunIds,
+        runsOwnerKey: s.runsOwnerKey,
       }),
     },
   ),

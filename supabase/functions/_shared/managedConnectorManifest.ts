@@ -47,6 +47,11 @@ export interface ManifestEntry {
   disclosure_limitations: string[];
   /** Populated when strict white-labelling forbids a managed binding. */
   native_required_reason: string | null;
+  /**
+   * Read-only probe used by operator-triggered runtime verification. The path
+   * is resolved server-side only; a caller may never supply one.
+   */
+  health_probe: { operation_id: string; path: string } | null;
   verified_at: string | null;
   evidence_note: string;
 }
@@ -99,6 +104,7 @@ export const MANAGED_CONNECTOR_MANIFEST: ManifestEntry[] = [
     data_classes: ['web_presence_metrics'],
     disclosure_limitations: GATEWAY_DISCLOSURE,
     native_required_reason: null,
+    health_probe: { operation_id: 'search_analytics.sites.list', path: '/webmasters/v3/sites' },
     verified_at: '2026-08-17',
     evidence_note:
       'Connection is linked to this project and routes through the managed connector gateway. Not an operational data-centre telemetry source.',
@@ -117,6 +123,7 @@ export const MANAGED_CONNECTOR_MANIFEST: ManifestEntry[] = [
       'The per-user OAuth callback is served by the connector gateway host, not by an AURA domain.',
     ],
     native_required_reason: null,
+    health_probe: null,
     verified_at: '2026-08-17',
     evidence_note:
       'Per-user connector class is supported by the platform, but no connector client is configured for this project, so no user can authorize it yet.',
@@ -131,6 +138,7 @@ export const MANAGED_CONNECTOR_MANIFEST: ManifestEntry[] = [
     supported_operations: [],
     data_classes: ['work_orders'],
     disclosure_limitations: [],
+    health_probe: null,
     native_required_reason:
       'AURA_NATIVE_REQUIRED: the deployment contract for incident and change data forbids any third-party OAuth intermediary.',
     verified_at: '2026-08-17',
@@ -157,6 +165,7 @@ export const MANAGED_CONNECTOR_MANIFEST: ManifestEntry[] = [
     supported_operations: [],
     data_classes: [],
     disclosure_limitations: [],
+    health_probe: null,
     native_required_reason:
       'AURA_NATIVE_REQUIRED: industrial or long-lived transport. Short-lived managed functions cannot hold the subscription.',
     verified_at: '2026-08-17',

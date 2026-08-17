@@ -28,7 +28,63 @@ export interface SimulationEngineRecord {
   /** What this path exists to do. */
   purpose: string;
   /** Surfaces that still call it directly. */
-  consumers: string[];
+  consumers: string[  {
+    module: 'src/twins/sovereignDataCenter/enhancedSimulationEngine.ts',
+    status: 'frozen',
+    executionClass: 'aura-deterministic',
+    purpose: 'Sovereign twin enhancement layer over the canonical tick engine.',
+    consumers: ['src/twins/sovereignDataCenter/hooks/useEnhancedSimulation.ts'],
+    migrationTarget: 'src/simulation/api.ts',
+  },
+  {
+    module: 'src/components/builder/step5/BuilderPreviewEngine.ts',
+    status: 'frozen',
+    executionClass: 'aura-deterministic',
+    purpose: 'Builder step-5 preview estimator. Preview only; never a run of record.',
+    consumers: ['src/components/builder/step5/*'],
+    migrationTarget: 'src/simulation/api.ts',
+  },
+  {
+    module: 'src/dsx/scenario/degradationEngine.ts',
+    status: 'canonical',
+    executionClass: 'aura-deterministic',
+    purpose: 'Deterministic degradation curves used by evidence scenarios.',
+    consumers: ['src/dsx/*'],
+    migrationTarget: null,
+  },
+  {
+    module: 'src/engines/carbon/CarbonEngine.ts',
+    status: 'canonical',
+    executionClass: 'aura-deterministic',
+    purpose: 'Carbon accounting calculator. A domain solver, not a scenario runner.',
+    consumers: ['src/hooks/useCarbonEngine.ts'],
+    migrationTarget: null,
+  },
+  {
+    module: 'src/engines/financial/FinancialEngine.ts',
+    status: 'canonical',
+    executionClass: 'aura-deterministic',
+    purpose: 'Cost and financial calculator. A domain solver, not a scenario runner.',
+    consumers: ['src/hooks/useFinancialEngine.ts'],
+    migrationTarget: null,
+  },
+  {
+    module: 'src/engines/kpi/KPIOverlayEngine.ts',
+    status: 'canonical',
+    executionClass: 'aura-deterministic',
+    purpose: 'Derives KPI overlays from a run result. Presentation-side derivation only.',
+    consumers: ['src/workspace/*'],
+    migrationTarget: null,
+  },
+  {
+    module: 'src/sovereignty/SovereigntyEngine.ts',
+    status: 'canonical',
+    executionClass: 'aura-deterministic',
+    purpose: 'Data-sovereignty scoring. A domain solver, not a scenario runner.',
+    consumers: ['src/dsx/workspaces/*'],
+    migrationTarget: null,
+  },
+];
   /** Where this path is heading. Empty for canonical paths. */
   migrationTarget: string | null;
 }

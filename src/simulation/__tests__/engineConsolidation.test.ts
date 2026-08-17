@@ -24,6 +24,8 @@ function findEngineModules(dir: string, found: string[] = []): string[] {
     }
     if (!/\.tsx?$/.test(entry)) continue;
     if (/\.(test|spec)\.tsx?$/.test(entry)) continue;
+    // React hooks are wrappers around a declared engine, not engines.
+    if (/^use[A-Z]/.test(entry)) continue;
     if (/(^|[a-z])simulationEngine\.tsx?$|^SimulationEngine\.tsx?$|Engine\.ts$/i.test(entry)) {
       found.push(relative(ROOT, full).replace(/\\/g, '/'));
     }

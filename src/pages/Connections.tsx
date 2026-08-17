@@ -3,43 +3,56 @@
  * external system. Canonical route: /manage/integrations
  * Alias: /manage/connections
  *
- * Static DSX environment requirements and the platform capability assessment
- * now live at /admin/platform-readiness. This page is about configured,
- * configurable, degraded, unavailable or planned connections only.
+ * Static DSX environment requirements, the agent tool readiness assessment
+ * and the platform capability assessment live at /admin/platform-readiness.
+ * This workspace is about configured, configurable, degraded, unavailable or
+ * planned connections only.
  */
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Cable } from 'lucide-react';
+import { Cable, Plus, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { useRBAC } from '@/contexts/RBACContext';
 import { PagePurpose } from '@/components/capability/PagePurpose';
+import { OverviewTab } from '@/components/connections/OverviewTab';
 import { ConnectionsTab } from '@/components/connections/ConnectionsTab';
 import { CatalogueTab } from '@/components/connections/CatalogueTab';
-import { MappingsTab } from '@/components/connections/MappingsTab';
+import { DataFlowsTab } from '@/components/connections/DataFlowsTab';
 import { ActivityTab } from '@/components/connections/ActivityTab';
-import { DsxExchangeTab } from '@/components/connections/DsxExchangeTab';
-import { AgentToolsTab } from '@/components/connections/AgentToolsTab';
+import { ConnectionDetailDrawer } from '@/components/connections/ConnectionDetailDrawer';
+import { ConnectionSetupWizard } from '@/components/connections/ConnectionSetupWizard';
+import { CredentialVaultDialog } from '@/components/connections/CredentialVaultDialog';
+import { buildConnectionRows } from '@/connections/presentation';
 import {
+  runHealthCheck,
   useAuditEvents,
+  useConnectionCredentials,
   useConnectionInstances,
   useConnectorDefinitions,
+  useDataContracts,
   useDsxEventCount,
+  useFacilityOptions,
   useHealthChecks,
   useIngestRuns,
   useTwinMappings,
 } from '@/connections/api';
 
 const TABS = [
+  { value: 'overview', label: 'Overview' },
   { value: 'connections', label: 'Connections' },
+  { value: 'data-flows', label: 'Data flows' },
   { value: 'catalogue', label: 'Catalogue' },
-  { value: 'mappings', label: 'Mappings' },
   { value: 'activity', label: 'Activity & health' },
-  { value: 'dsx-exchange', label: 'DSX Exchange' },
-  { value: 'agent-tools', label: 'Agent tools' },
 ];
 
 export default function Connections() {
   const [params, setParams] = useSearchParams();
-  const tab = TABS.some((t) => t.value === params.get('tab')) ? (params.get('tab') as string) : 'connections';
+  const tab = TABS.some((t) => t.value === params.get('tab')) ? (params.get('tab') as string) : 'overview';
+  const { toast } = useToast();
+  const { role, can } = useRBAC();
+  const isAdmin = role === 'admin' || role === 'owner' || can('twin.edit');
 
   const definitions = useConnectorDefinitions();
   const connections = useConnectionInstances();
@@ -48,65 +61,163 @@ export default function Connections() {
   const ingestRuns = useIngestRuns();
   const auditEvents = useAuditEvents();
   const eventCount = useDsxEventCount();
+  const contracts = useDataContracts();
+  const credentials = useConnectionCredentials();
+  const facilities = useFacilityOptions();
+
+  const [lastRefreshedAt, setLastRefreshedAt] = useState(() => Date.now());
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [credentialFor, setCredentialFor] = useState<string | null>(null);
+  const [mapRequestFor, setMapRequestFor] = useState<string | null>(null);
+  const [testing, setTesting] = useState(false);
 
   useEffect(() => {
     document.title = 'Connections & Data Exchange | AURA DC';
   }, []);
 
-  const refresh = () => {
+  const setTab = useCallback((value: string) => {
+    setParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('tab', value);
+      return next;
+    }, { replace: true });
+  }, [setParams]);
+
+  const refresh = useCallback(() => {
     connections.refetch();
     healthChecks.refetch();
+    ingestRuns.refetch();
     auditEvents.refetch();
-  };
+    mappings.refetch();
+    credentials.refetch();
+    eventCount.refetch();
+    setLastRefreshedAt(Date.now());
+  }, [connections, healthChecks, ingestRuns, auditEvents, mappings, credentials, eventCount]);
+
+  const rows = useMemo(
+    () => buildConnectionRows(
+      connections.data ?? [],
+      definitions.data ?? [],
+      healthChecks.data ?? [],
+      mappings.data ?? [],
+      ingestRuns.data ?? [],
+    ),
+    [connections.data, definitions.data, healthChecks.data, mappings.data, ingestRuns.data],
+  );
+
+  const detailRow = rows.find((r) => r.connection.id === detailId) ?? null;
+  const credentialConnection = (connections.data ?? []).find((c) => c.id === credentialFor) ?? null;
+
+  async function handleTest(connectionId: string) {
+    if (testing) return;
+    setTesting(true);
+    try {
+      const result = await runHealthCheck(connectionId);
+      toast({
+        title: `Health check ${result.status.toLowerCase()}`,
+        description: result.safe_message ?? 'The check completed and its evidence was recorded.',
+        variant: result.status === 'PASSED' ? 'default' : 'destructive',
+      });
+      refresh();
+    } catch (error) {
+      toast({
+        title: 'Health check could not run',
+        description: error instanceof Error ? error.message : 'The server rejected the request.',
+        variant: 'destructive',
+      });
+    } finally {
+      setTesting(false);
+    }
+  }
+
+  function handleMap(connectionId: string) {
+    setDetailId(null);
+    setMapRequestFor(connectionId);
+    setTab('data-flows');
+  }
+
+  const loading = connections.isLoading || definitions.isLoading;
 
   return (
     <div className="min-w-0 space-y-6 pb-10" data-testid="connections-page">
-      <header className="space-y-1">
-        <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-          <Cable className="h-5 w-5 text-muted-foreground" aria-hidden />
-          Connections &amp; Data Exchange
-        </h1>
-        <p className="max-w-3xl text-sm text-muted-foreground">
-          Configure, test, map, monitor and govern every external connection. Status is derived
-          from runtime evidence. Environment requirements and the platform capability assessment
-          live on{' '}
-          <Link className="underline underline-offset-4" to="/admin/platform-readiness">
-            platform readiness
-          </Link>
-          .
-        </p>
-        <PagePurpose route="/manage/integrations" />
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0 space-y-1">
+          <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
+            <Cable className="h-5 w-5 text-muted-foreground" aria-hidden />
+            Connections &amp; Data Exchange
+          </h1>
+          <p className="max-w-3xl text-sm text-muted-foreground">
+            Configure, test, map, monitor and govern every external connection. Status is derived
+            from runtime evidence. Environment requirements and the platform capability assessment
+            live on{' '}
+            <Link className="underline underline-offset-4" to="/admin/platform-readiness">
+              platform readiness
+            </Link>
+            .
+          </p>
+          <PagePurpose route="/manage/integrations" />
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" className="h-10" onClick={refresh}>
+            <RefreshCw className="mr-2 h-4 w-4" aria-hidden />
+            Refresh
+          </Button>
+          <Button className="h-10" disabled={!isAdmin} onClick={() => setWizardOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" aria-hidden />
+            Add connection
+          </Button>
+        </div>
       </header>
 
-      <Tabs
-        value={tab}
-        onValueChange={(value) => setParams((prev) => {
-          const next = new URLSearchParams(prev);
-          next.set('tab', value);
-          return next;
-        }, { replace: true })}
-        className="min-w-0"
-      >
+      <Tabs value={tab} onValueChange={setTab} className="min-w-0">
         <div className="-mx-1 overflow-x-auto px-1 pb-1">
           <TabsList className="inline-flex w-max">
             {TABS.map((t) => (
-              <TabsTrigger key={t.value} value={t.value} className="min-h-[32px] text-xs sm:text-sm">
+              <TabsTrigger key={t.value} value={t.value} className="min-h-[40px] px-4 text-sm">
                 {t.label}
               </TabsTrigger>
             ))}
           </TabsList>
         </div>
 
-        <TabsContent value="connections" className="mt-4 min-w-0">
-          <ConnectionsTab
-            connections={connections.data ?? []}
-            definitions={definitions.data ?? []}
-            healthChecks={healthChecks.data ?? []}
+        <TabsContent value="overview" className="mt-4 min-w-0">
+          <OverviewTab
+            rows={rows}
+            mappings={mappings.data ?? []}
+            ingestRuns={ingestRuns.data ?? []}
+            auditEvents={auditEvents.data ?? []}
             eventCount={eventCount.data ?? 0}
-            loading={connections.isLoading || definitions.isLoading}
-            onRefresh={refresh}
+            loading={loading}
+            lastRefreshedAt={lastRefreshedAt}
+            onOpenConnection={setDetailId}
+            onGoToTab={setTab}
           />
         </TabsContent>
+
+        <TabsContent value="connections" className="mt-4 min-w-0">
+          <ConnectionsTab
+            rows={rows}
+            loading={loading}
+            isAdmin={isAdmin}
+            onOpen={setDetailId}
+            onAdd={() => setWizardOpen(true)}
+            onTest={handleTest}
+            onMap={handleMap}
+            onCredential={setCredentialFor}
+          />
+        </TabsContent>
+
+        <TabsContent value="data-flows" className="mt-4 min-w-0">
+          <DataFlowsTab
+            mappings={mappings.data ?? []}
+            connections={connections.data ?? []}
+            onRefresh={() => { mappings.refetch(); }}
+            requestedConnectionId={mapRequestFor}
+            onRequestHandled={() => setMapRequestFor(null)}
+          />
+        </TabsContent>
+
         <TabsContent value="catalogue" className="mt-4 min-w-0">
           <CatalogueTab
             definitions={definitions.data ?? []}
@@ -114,13 +225,7 @@ export default function Connections() {
             onRefresh={refresh}
           />
         </TabsContent>
-        <TabsContent value="mappings" className="mt-4 min-w-0">
-          <MappingsTab
-            mappings={mappings.data ?? []}
-            connections={connections.data ?? []}
-            onRefresh={() => { mappings.refetch(); }}
-          />
-        </TabsContent>
+
         <TabsContent value="activity" className="mt-4 min-w-0">
           <ActivityTab
             connections={connections.data ?? []}
@@ -129,13 +234,39 @@ export default function Connections() {
             auditEvents={auditEvents.data ?? []}
           />
         </TabsContent>
-        <TabsContent value="dsx-exchange" className="mt-4 min-w-0">
-          <DsxExchangeTab />
-        </TabsContent>
-        <TabsContent value="agent-tools" className="mt-4 min-w-0">
-          <AgentToolsTab />
-        </TabsContent>
       </Tabs>
+
+      <ConnectionDetailDrawer
+        row={detailRow}
+        open={detailRow !== null}
+        onOpenChange={(open) => { if (!open) setDetailId(null); }}
+        isAdmin={isAdmin}
+        credential={(credentials.data ?? []).find((c) => c.connection_id === detailRow?.connection.id) ?? null}
+        contracts={(contracts.data ?? []).filter((c) => c.connection_id === detailRow?.connection.id)}
+        mappings={(mappings.data ?? []).filter((m) => m.connection_id === detailRow?.connection.id)}
+        healthChecks={(healthChecks.data ?? []).filter((h) => h.connection_id === detailRow?.connection.id)}
+        ingestRuns={(ingestRuns.data ?? []).filter((r) => r.connection_id === detailRow?.connection.id)}
+        auditEvents={(auditEvents.data ?? []).filter((a) => a.connection_id === detailRow?.connection.id)}
+        facilities={facilities.data ?? []}
+        onRefresh={refresh}
+        onManageCredential={() => detailRow && setCredentialFor(detailRow.connection.id)}
+        onMapData={() => detailRow && handleMap(detailRow.connection.id)}
+      />
+
+      <ConnectionSetupWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        definitions={definitions.data ?? []}
+        connections={connections.data ?? []}
+        onCompleted={refresh}
+      />
+
+      <CredentialVaultDialog
+        connection={credentialConnection}
+        open={credentialConnection !== null}
+        onOpenChange={(open) => { if (!open) setCredentialFor(null); }}
+        onChanged={refresh}
+      />
     </div>
   );
 }

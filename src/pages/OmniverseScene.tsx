@@ -19,6 +19,7 @@ import {
 import { OmniverseStreamViewer } from '@/components/twin-visualization/OmniverseStreamViewer';
 import { useOmniverseKit } from '@/hooks/useOmniverseKit';
 import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
+import { resolveRendererMode } from '@/renderer/rendererModes';
 import { kitMetric, targetMetric, notAssessedMetric, type KitMetricContext } from '@/lib/provenance/kitMetrics';
 import type { ProvenancedMetric } from '@/lib/provenance/types';
 import {
@@ -133,6 +134,8 @@ function MetricCard({
 
 export default function OmniverseScene() {
   const kit = useOmniverseKit();
+  // Phase 5 — single source of truth for what is actually drawing this view.
+  const rendererState = resolveRendererMode({ webgl2Available: true });
   const [activeTab, setActiveTab] = useState('metrics');
 
   const phase = kit.phase ? PHASE_LABELS[kit.phase] || { label: kit.phase, color: '' } : null;
@@ -166,11 +169,21 @@ export default function OmniverseScene() {
             <div>
               <h1 className="text-2xl font-bold tracking-tight">AURA Twin Preview</h1>
               <p className="text-sm text-muted-foreground font-mono">
-                AURA application rendering • {kit.rackCount} racks • Simulated scene
+                {rendererState.mode.label} • {kit.rackCount} racks • Simulated scene
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Phase 5 — renderer identity comes from the renderer mode
+                registry, so this surface cannot describe itself as an
+                Omniverse session while AURA draws the pixels. */}
+            <Badge
+              variant="outline"
+              className="bg-slate-500/10 text-muted-foreground"
+              title={rendererState.reason}
+            >
+              Renderer: {rendererState.mode.label}
+            </Badge>
             {/* Phase 1A.1 — the badge reflects the validated REST connection
                 state, not just fetch success. `connected` requires a schema-
                 valid payload; `unavailable` covers both unreachable and

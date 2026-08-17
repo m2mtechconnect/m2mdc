@@ -19,7 +19,16 @@ export function useManagedConnectorCapabilities() {
     queryFn: async () => {
       const { data, error } = await supabase.functions.invoke('managed-connector-capabilities', { body: {} });
       if (error) return null;
-      return (data as ManagedCapabilityResponse) ?? null;
+      if (!data || typeof data !== 'object') return null;
+      // Defensive normalisation: a partial or mocked response must never
+      // reach the UI with a missing `entries` array.
+      const payload = data as Partial<ManagedCapabilityResponse>;
+      return {
+        correlation_id: payload.correlation_id ?? '',
+        tenant_id: payload.tenant_id ?? null,
+        caller_roles: Array.isArray(payload.caller_roles) ? payload.caller_roles : [],
+        entries: Array.isArray(payload.entries) ? payload.entries : [],
+      };
     },
     staleTime: 60_000,
     retry: false,

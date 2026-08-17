@@ -85,6 +85,8 @@ describe('simulation/compat/facadeBridge', () => {
         // The twins barrel re-exports for backwards compatibility only.
         if (rel === 'twins/sovereignDataCenter/index.ts') continue;
         if (rel === 'twins/dataCenter/index.ts') continue;
+        // The registry lists module paths as documentation strings.
+        if (rel === 'simulation/engineRegistry.ts') continue;
         const src = fs.readFileSync(full, 'utf8');
         if (src.includes('simulation/compat/sovereignDataCenterEngine')) offenders.push(rel);
       }

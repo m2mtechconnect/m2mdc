@@ -20,7 +20,11 @@ Retrieved: 2026-08-17 (UTC)
 6. managed-user-oauth-complete calls exchangeAppUserOAuthCode against POST /api/v1/app-users/oauth2/exchange on the official gateway, checks the returned connector id against the binding, and stores the returned handle encrypted.
 
 ## Parallel OAuth check - PASS
-No code path calls oauth2.googleapis.com, accounts.google.com/o/oauth2/token, or any provider token endpoint. The only outbound authorization hosts are the official managed connector gateway. GOOGLE_OAUTH_CLIENT_ID / GOOGLE_OAUTH_CLIENT_SECRET exist as project secrets for unrelated Google Cloud service usage and are not referenced by any managed-user function (verified by grep across supabase/functions).
+No code path calls oauth2.googleapis.com, accounts.google.com/o/oauth2/token, or any provider token endpoint. The only outbound authorization hosts are the official managed connector gateway. GOOGLE_OAUTH_CLIENT_ID / GOOGLE_OAUTH_CLIENT_SECRET are not referenced by any managed-user function (verified by grep across supabase/functions).
+
+However, a separate legacy path does exist and must not be retained: supabase/functions/rag-oauth-google performs its own Google authorization (accounts.google.com) and its own token exchange (oauth2.googleapis.com/token) using GOOGLE_OAUTH_CLIENT_ID/SECRET, then writes the full token JSON - access token and refresh token - into public.rag_tokens.token_encrypted with no encryption (TextEncoder over JSON, despite the column name). It is reachable from src/components/rag/RAGPanel.tsx and RAGUploadTabs.tsx and targets the same provider (google_drive).
+
+Live exposure today: public.rag_tokens has row level security enabled, one policy, no table grants to anon or authenticated, and zero rows, so no provider token is currently stored or client-readable. The defect is architectural and latent, not an active leak.
 
 Conclusion: the implementation uses the official managed connector mechanism. AURA_MANAGED_CONNECTOR_RUNTIME_REJECTED_PARALLEL_OAUTH_IMPLEMENTATION does not apply.
 
@@ -39,4 +43,5 @@ Runtime confirmation of the stored shape is deferred until a real authorization 
 |---|---------|----------|--------|
 | 1 | No Google Drive App User Connector client exists in the workspace; GOOGLE_DRIVE_APP_USER_CONNECTOR_CLIENT_API_KEY is absent from the edge environment | Blocker | Open - owner action required |
 | 2 | APP_USER_CONNECTION_KEY_SECRET is provisioned only when an App User Connector is linked, so the encryption path is untested at runtime | Blocker (dependent on 1) | Open |
-| 3 | Runtime provider proof, isolation, and revocation tests cannot execute without 1 | Blocker | Open |
+| 3 | Retained parallel Google OAuth proxy rag-oauth-google stores raw provider access and refresh tokens unencrypted in public.rag_tokens | Critical (latent - 0 rows, no client grants) | Open - must be removed or migrated onto the managed connector before pilot |
+| 4 | Runtime provider proof, isolation, and revocation tests cannot execute without 1 | Blocker | Open |

@@ -13,4 +13,6 @@ Method: static inspection of client bundle sources, edge functions, table grants
 | Error messages | None | Errors are error_code + safe_message + correlation_id |
 | Evidence files | None | This directory contains no ciphertext, handle or key |
 
+Out-of-band defect: supabase/functions/rag-oauth-google would persist Google access and refresh tokens unencrypted into public.rag_tokens. The table has row level security enabled, no anon or authenticated grants and zero rows today, so nothing is exposed now, but the code path must be removed or migrated onto the managed connector.
+
 Residual risk: the exchange response handling is untested at runtime, so the no-exposure claim for the live path is provisional.

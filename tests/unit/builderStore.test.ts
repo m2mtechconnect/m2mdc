@@ -39,6 +39,9 @@ vi.mock('@/integrations/supabase/client', () => ({
       getUser: vi.fn(() =>
         Promise.resolve({ data: { user: { id: 'test-user-123' } }, error: null })
       ),
+      onAuthStateChange: vi.fn(() => ({
+        data: { subscription: { unsubscribe: vi.fn() } },
+      })),
       getSession: vi.fn(() =>
         Promise.resolve({
           data: { session: { user: { id: 'test-user-123' }, access_token: 'test-token' } },

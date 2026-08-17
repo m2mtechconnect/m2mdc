@@ -4,8 +4,9 @@
  * Edge functions use the service-role client, which bypasses RLS, so every
  * connection read or write must be re-checked against the caller's tenant.
  * The rule mirrors the database policies exactly: a connection with a null
- * tenant is platform-scope and visible to callers who themselves have no
- * tenant; otherwise the tenant must match the caller's organisation.
+ * tenant is platform-scope (system and unscoped connections) and visible to
+ * every signed-in caller; otherwise the tenant must match the caller's
+ * organisation.
  */
 type Db = { from: (table: string) => any };
 
@@ -19,7 +20,7 @@ export async function resolveCallerTenant(admin: Db, userId: string): Promise<st
 }
 
 export function tenantVisible(rowTenantId: string | null, callerTenantId: string | null): boolean {
-  if (rowTenantId === null) return callerTenantId === null;
+  if (rowTenantId === null) return true;
   return rowTenantId === callerTenantId;
 }
 

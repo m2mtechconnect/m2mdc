@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TwinOverlayProvider } from '@/context/TwinOverlayContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { supabase } from '@/integrations/supabase/client';
 import { useShellLayoutStore } from '@/stores/shellLayoutStore';
 import { FacilityCanvas } from './FacilityCanvas';
 import { KpiStrip } from './KpiStrip';

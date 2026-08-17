@@ -1,0 +1,28 @@
+{
+  "source_commit": "d940314d0593bbba1bae51e40ae7f9fd48358e18",
+  "dataset_version": "1.0.0-repo@d940314",
+  "total_records": 65,
+  "by_class": {
+    "REFERENCE_KPI_VALUE": 36,
+    "REFERENCE_SPECIFICATION": 21,
+    "REFERENCE_CONFIGURATION": 6,
+    "REFERENCE_SCENARIO": 2
+  },
+  "exposed_through_selectors": {
+    "referenceKpiValues": 36,
+    "referenceSpecifications": 21,
+    "referenceConfigurations": 6,
+    "referenceScenarios": 2,
+    "searchDataset": 65
+  },
+  "consumed_by_migrated_surfaces": {
+    "admin_dataset_registry": 65,
+    "other_pages": 0
+  },
+  "ngc_dependent_classes": {
+    "SAMPLE_SIMULATION_OUTPUT": 0,
+    "SAMPLE_CFD_OUTPUT": 0,
+    "SAMPLE_ELECTRICAL_OUTPUT": 0,
+    "ASSET_METADATA": 0
+  }
+}

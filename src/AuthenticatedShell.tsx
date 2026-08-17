@@ -64,6 +64,9 @@ import AssetPipeline from '@/pages/admin/AssetPipeline';
 import AssetValidation from '@/pages/admin/AssetValidation';
 import ReferenceFacilityValidation from '@/pages/admin/ReferenceFacilityValidation';
 import DsxCapabilityRegistryPage from '@/pages/admin/DsxCapabilityRegistryPage';
+import DatasetRegistryPage from '@/pages/admin/DatasetRegistryPage';
+import { DatasetProvider } from '@/data/dataset/DatasetProvider';
+import DatasetCanaryBanner from '@/components/dataset/DatasetCanaryBanner';
 import { lazy } from "react";
 const EvidenceBetaShell = lazy(() => import("./pages/dsx/EvidenceBetaShell"));
 import {
@@ -115,6 +118,7 @@ function ApprovedUserRoutes() {
       />
       <Route path="/admin/signups-dashboard" element={<AdminSignupsDashboard />} />
       <Route path="/admin/dsx-capabilities" element={<DsxCapabilityRegistryPage />} />
+      <Route path="/admin/dataset-registry" element={<DatasetRegistryPage />} />
       {/* Canonical integrations destination. */}
       <Route path="/manage/integrations" element={<Integrations />} />
       <Route path="/manage/facilities" element={<ManageFacilities />} />
@@ -197,10 +201,13 @@ export default function AuthenticatedShell() {
     <TourProvider>
       <CoPilotProvider>
         <CoPilotCommandProvider>
-          <Layout>
-            <TourRenderer />
-            <ApprovedUserRoutes />
-          </Layout>
+          <DatasetProvider>
+            <Layout>
+              <DatasetCanaryBanner />
+              <TourRenderer />
+              <ApprovedUserRoutes />
+            </Layout>
+          </DatasetProvider>
         </CoPilotCommandProvider>
       </CoPilotProvider>
     </TourProvider>

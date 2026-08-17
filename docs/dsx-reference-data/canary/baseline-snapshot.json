@@ -1,0 +1,51 @@
+{
+  "snapshot_id": "AURA_DSX_REFERENCE_CANARY_BASELINE_V1",
+  "captured_at": "2026-08-17T03:00:00Z",
+  "published_host": "https://auradc.m2mtechconnect.com",
+  "published_bundle": "assets/index-BLh1dE2h.js",
+  "source_revision": "ae7c8049",
+  "manifest_version": "1.1.0",
+  "production_default_dataset": "legacy-synthetic",
+  "default_dataset_changed": false,
+  "route_inventory": {
+    "unique_route_path_declarations_in_src": 87,
+    "route_aliases": 26,
+    "previously_exercised_runtime_routes": 83,
+    "previous_migration_matrix_rows": 86
+  },
+  "capability_registry": {
+    "total": 16,
+    "aura_native": 7,
+    "dsx_aligned": 5,
+    "planned": 2,
+    "unavailable": 2,
+    "nvidia_integrated": 0,
+    "simready_validated": 0,
+    "changed_this_phase": false
+  },
+  "reference_records": {
+    "REFERENCE_KPI_VALUE": 36,
+    "REFERENCE_SPECIFICATION": 21,
+    "REFERENCE_CONFIGURATION": 6,
+    "REFERENCE_SCENARIO": 2,
+    "total": 65,
+    "source_commit": "d940314d0593bbba1bae51e40ae7f9fd48358e18"
+  },
+  "legacy_synthetic_sources": {
+    "baseline_snapshot": "AURA_LEGACY_SYNTHETIC_BASELINE_V1",
+    "checksummed_files": 135,
+    "production_files_with_nondeterministic_values": 44,
+    "files_with_mock_demo_fixture_symbols": 87,
+    "preserved": true,
+    "deleted": false
+  },
+  "tests_before": { "scoped": 208, "passing": 208, "typecheck": "clean" },
+  "prior_verdicts": [
+    "AURA_DSX_PAGE_ALIGNMENT_VERIFIED_WITH_LIMITATIONS",
+    "AURA_DSX_REFERENCE_BASELINE_CUTOVER_PARTIAL"
+  ],
+  "rollback": {
+    "mechanism": "remove ?dataset= from the URL, or press \"Return to default dataset\"",
+    "one_action": true
+  }
+}

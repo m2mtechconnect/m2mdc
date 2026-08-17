@@ -9,6 +9,21 @@ import { useBuilderStore } from '@/stores/builderStore';
 // getSession and maybeSingle), so every save and load test failed on the mock
 // rather than on the store. This chainable stub answers any chain and resolves
 // with the same shape the store expects.
+/**
+ * A structurally valid, unsigned JWT with a far-future expiry. The store calls
+ * requireSession(), which decodes and expiry-checks the token, so an opaque
+ * placeholder string sent every save down the redirect-to-auth path.
+ */
+const TEST_ACCESS_TOKEN = (() => {
+  const b64 = (value: object) =>
+    Buffer.from(JSON.stringify(value)).toString('base64url');
+  return [
+    b64({ alg: 'HS256', typ: 'JWT' }),
+    b64({ sub: 'test-user-123', role: 'authenticated', exp: 4102444800 }),
+    'test-signature',
+  ].join('.');
+})();
+
 const singleRow = {
   id: 'system-123',
   state: { systemName: 'Loaded System' },
@@ -44,7 +59,7 @@ vi.mock('@/integrations/supabase/client', () => ({
       })),
       getSession: vi.fn(() =>
         Promise.resolve({
-          data: { session: { user: { id: 'test-user-123' }, access_token: 'test-token' } },
+          data: { session: { user: { id: 'test-user-123' }, access_token: TEST_ACCESS_TOKEN } },
           error: null,
         })
       ),

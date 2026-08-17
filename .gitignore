@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files (Phase 11 security P0)
+# Real environment files must never be tracked or distributed.
+.env
+.env.*
+!.env.example
+!.env.test.example

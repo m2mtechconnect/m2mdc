@@ -33,7 +33,8 @@ import ConnectMonitor from "./pages/ConnectMonitor";
 import ConnectHealth from "./pages/ConnectHealth";
 import Search from "./pages/Search";
 import AISettings from "./pages/AISettings";
-import Integrations from "./pages/Integrations";
+import Connections from "./pages/Connections";
+import PlatformReadiness from "./pages/admin/PlatformReadiness";
 import ManageFacilities from "./pages/manage/Facilities";
 import { SignOut } from "./pages/auth/index";
 import NotFound from "./pages/NotFound";
@@ -120,8 +121,10 @@ function ApprovedUserRoutes() {
       <Route path="/admin/signups-dashboard" element={<AdminSignupsDashboard />} />
       <Route path="/admin/dsx-capabilities" element={<DsxCapabilityRegistryPage />} />
       <Route path="/admin/dataset-registry" element={<DatasetRegistryPage />} />
-      {/* Canonical integrations destination. */}
-      <Route path="/manage/integrations" element={<Integrations />} />
+      <Route path="/admin/platform-readiness" element={<PlatformReadiness />} />
+      {/* Canonical connections destination. /manage/connections is an alias. */}
+      <Route path="/manage/integrations" element={<Connections />} />
+      <Route path="/manage/connections" element={<Connections />} />
       <Route path="/manage/facilities" element={<ManageFacilities />} />
       <Route path="/compliance" element={<Compliance />} />
       <Route path="/teams" element={<Teams />} />

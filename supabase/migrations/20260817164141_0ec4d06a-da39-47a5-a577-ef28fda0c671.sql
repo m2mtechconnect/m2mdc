@@ -1,0 +1,1 @@
+UPDATE public.connector_definitions SET name = 'Application platform (managed backend)', provider = 'AURA managed backend' WHERE id = 'supabase_platform';

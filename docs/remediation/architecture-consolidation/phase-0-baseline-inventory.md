@@ -72,11 +72,33 @@ rows and `data-testid` values; only their source of truth changed.
 None. Phase 3 changed classification and guards only; no run path, route or
 user-facing behaviour was removed.
 
+## Phase 5 - renderer interface modes (done)
+
+- `src/renderer/rendererModes.ts` is the single source of truth for how AURA
+  puts a twin on screen. Three declared modes: `aura-web-runtime` (WebGL2,
+  GLB derivatives of the OpenUSD masters), `aura-2d-fallback` (deterministic
+  plan view) and `nvidia-kit-stream` (Omniverse Kit / RTX pixel stream).
+- `resolveRendererMode()` picks the mode from real browser capability, and
+  `resolveKitStreamState()` derives NVIDIA stream availability from
+  `readKitConfig()`. Kit is typed-unavailable in every build variant, so the
+  resolver fails closed to the AURA Web Runtime with a stated reason.
+- `src/renderer/__tests__/rendererModes.test.ts` asserts that no AURA renderer
+  carries an NVIDIA product name in its label, that the Kit mode stays
+  unavailable with an explanation, and that WebGL2 loss routes to the 2D plan
+  view rather than a blank canvas.
+- Wired: the twin preview header now shows "Renderer: AURA Web Runtime" from
+  the registry instead of prose, and `OmniverseStreamViewer` takes its
+  connect gate from `resolveKitStreamState()` rather than re-deriving config.
+
+### Retired / merged surfaces
+
+None. Phase 5 replaced three independent renderer-naming decisions with one
+resolver. No route or rendering behaviour changed.
+
 ## Open phases
 
 4. Migrate the two frozen compat engines and the builder preview estimator
    onto the facade.
-5. Renderer interface modes (AURA Web Runtime vs future Kit/RTX session).
 6. DSX Exchange boundary naming audit for MQTT surfaces.
 7. AI agent positioning audit (no NIM claims).
 8. Data-mode contract enforcement across every KPI surface.

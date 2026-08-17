@@ -1,5 +1,6 @@
 /** Stage 7D - compact related list for recorded simulation runs (latest three). */
 import { Link } from 'react-router-dom';
+import { RunProvenanceBadge } from '../RunProvenanceBadge';
 import { ArrowRight, FlaskConical, Play } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -70,7 +71,8 @@ export function RecentSimulations({ runs, facilityId }: Props) {
                       )}
                     </div>
                     <p className="truncate text-[13px] tabular-nums text-muted-foreground">
-                      Run {run.id} · PUE {formatKpi('pue', run.result.pue)} ·{' '}
+                      <RunProvenanceBadge run={run} />
+                      {' '}Run {run.id} · PUE {formatKpi('pue', run.result.pue)} ·{' '}
                       {new Date(run.completedAt).toLocaleString()}
                     </p>
                   </div>

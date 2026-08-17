@@ -60,7 +60,7 @@ export function buildRunFixtures(facility: FacilityDefinition): WorkspaceRun[] {
       else if (spec.decisions === 'mixed') decisions[rec.id] = recIndex === 0 ? 'accepted' : 'pending';
     });
 
-    return { ...run, decisions };
+    return { ...run, decisions, persistence: 'fixture' as const };
   });
 }
 

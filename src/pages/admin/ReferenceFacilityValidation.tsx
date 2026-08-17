@@ -94,6 +94,9 @@ export default function ReferenceFacilityValidation() {
   const [renderer, setRenderer] = useState<RendererReport | null>(null);
   const [coverage, setCoverage] = useState<Record<string, RoleCoverage>>(EMPTY_COVERAGE);
   const [running, setRunning] = useState(false);
+  // The harness twin is heavy and its request is aborted if the operator
+  // navigates away before a run starts. It is mounted on demand only.
+  const [harnessMounted, setHarnessMounted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [phase, setPhase] = useState<string>('Idle');
   const [frames, setFrames] = useState<FrameStats | null>(null);
@@ -139,6 +142,7 @@ export default function ReferenceFacilityValidation() {
       toast.error('The embedded twin has not published its scene bridge yet. Wait for the scene to mount.');
       return;
     }
+    setHarnessMounted(true);
     setRunning(true);
     setSavedId(null);
     setSegmentFps([]);
@@ -347,15 +351,22 @@ export default function ReferenceFacilityValidation() {
         )}
         <div className="overflow-hidden rounded-md border border-border bg-muted/30">
           <div className="relative w-full" style={{ paddingTop: `${(1080 / 1920) * 100}%` }}>
-            <iframe
-              ref={frameRef}
-              title="NVIDIA Reference Facility"
-              src={HARNESS_URL}
-              width={1920}
-              height={1080}
-              className="absolute left-0 top-0 origin-top-left border-0"
-              style={{ transform: 'scale(0.5)', width: 1920, height: 1080 }}
-            />
+            {harnessMounted ? (
+              <iframe
+                ref={frameRef}
+                title="NVIDIA Reference Facility"
+                src={HARNESS_URL}
+                loading="lazy"
+                width={1920}
+                height={1080}
+                className="absolute left-0 top-0 origin-top-left border-0"
+                style={{ transform: 'scale(0.5)', width: 1920, height: 1080 }}
+              />
+            ) : (
+              <p className="absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-muted-foreground">
+                The reference facility loads when a validation run is started.
+              </p>
+            )}
           </div>
         </div>
         <p className="text-xs text-muted-foreground">

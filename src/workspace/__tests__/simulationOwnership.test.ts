@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useWorkspaceStore } from '../workspaceStore';
 import type { FacilityDefinition } from '../facilityModel';
 
@@ -38,7 +38,24 @@ describe('Blueprint cannot execute simulations', () => {
   });
 });
 
+const persistRunMock = vi.fn();
+
+vi.mock('../runPersistence', async () => {
+  const actual = await vi.importActual<typeof import('../runPersistence')>('../runPersistence');
+  return {
+    ...actual,
+    persistRun: (...args: unknown[]) => persistRunMock(...args),
+    loadServerRuns: vi.fn(async () => []),
+  };
+});
+
 describe('Simulation run gate', () => {
+  beforeEach(() => {
+    persistRunMock.mockReset();
+    persistRunMock.mockResolvedValue({ status: 'saved', id: 'e1d9e3a2-0000-4000-8000-000000000002', runKey: 'SIM-TEST-0002' });
+    useWorkspaceStore.setState({ runs: [], activeRunId: null, lastRunError: null, isRunning: false });
+  });
+
   const facility: FacilityDefinition = {
     id: 'test-facility',
     name: 'Test facility',
@@ -63,11 +80,27 @@ describe('Simulation run gate', () => {
     expect(useWorkspaceStore.getState().runs.length).toBe(0);
   });
 
-  it('runs only after explicit review', async () => {
+  it('refuses to record a run that could not be saved durably', async () => {
+    persistRunMock.mockResolvedValueOnce({ status: 'unsaved', reason: 'You are not signed in, so the run could not be saved.' });
     useWorkspaceStore.setState({ runs: [], activeRunId: null });
     useWorkspaceStore.getState().setAssumptionsReviewed(true);
     const runId = await useWorkspaceStore.getState().runScenario(facility);
-    expect(runId).toBeTruthy();
+    expect(runId).toBeNull();
+    expect(useWorkspaceStore.getState().runs.length).toBe(0);
+    expect(useWorkspaceStore.getState().lastRunError).toBeTruthy();
+  });
+
+  it('records a run once review passed and the durable write succeeded', async () => {
+    persistRunMock.mockResolvedValueOnce({ status: 'saved', id: 'e1d9e3a2-0000-4000-8000-000000000001', runKey: 'SIM-TEST-0001' });
+    useWorkspaceStore.setState({ runs: [], activeRunId: null });
+    useWorkspaceStore.getState().setAssumptionsReviewed(true);
+    const runId = await useWorkspaceStore.getState().runScenario(facility);
+    expect(runId).toBe('SIM-TEST-0001');
+    const stored = useWorkspaceStore.getState().runs[0];
+    expect(stored.serverId).toBe('e1d9e3a2-0000-4000-8000-000000000001');
+    expect(stored.persistence).toBe('server');
+    expect(stored.executionOrigin).toBe('client-browser');
+    expect(stored.validationStatus).toBe('client-produced-unverified');
   });
 
   it('invalidates the review whenever a run input changes', () => {

@@ -7,7 +7,8 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataCentreDashboard } from '@/components/data-centre-twin';
@@ -59,12 +60,23 @@ export default function DataCentreTwin() {
   const effectiveTab = (isDemoMode && urlTab === 'simulation') ? 'dashboard' : (urlTab || defaultTab);
   const [activeTab, setActiveTab] = useState(effectiveTab);
   
+  // An explicit identifier that resolves to nothing must fail closed rather
+  // than quietly rendering the default twin.
+  const requestedUnknownTwin =
+    !!id &&
+    id !== 'default' &&
+    isInitialized &&
+    !isLoading &&
+    !isDemoMode &&
+    twins.length > 0 &&
+    !twins.some((candidate) => candidate.id === id);
+
   // Set twin from URL param if provided
   useEffect(() => {
-    if (id && id !== 'default' && id !== activeTwinId) {
+    if (id && id !== 'default' && id !== activeTwinId && !requestedUnknownTwin) {
       setActiveTwin(id);
     }
-  }, [id, activeTwinId, setActiveTwin]);
+  }, [id, activeTwinId, setActiveTwin, requestedUnknownTwin]);
   
   // Auto-select first twin if none selected and twins are available (skip in demo mode)
   useEffect(() => {
@@ -107,7 +119,24 @@ export default function DataCentreTwin() {
   if (!isDemoMode && !activeTwinId && !twin && twins.length > 0) {
     return <LoadingState message="Selecting Data Centre Twin..." />;
   }
-  
+
+  // Fail closed on an unknown identifier. Silently falling back to the default
+  // twin made the page claim to show a facility the address did not name.
+  if (requestedUnknownTwin) {
+    return (
+      <div className="container mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center gap-3 px-4 text-center">
+        <h1 className="text-lg font-semibold text-foreground">Data centre twin not found</h1>
+        <p className="text-sm text-muted-foreground">
+          No twin matches the identifier <span className="font-mono">{id}</span> in this account.
+          It may have been deleted, or the address may be incorrect.
+        </p>
+        <Button asChild variant="outline">
+          <Link to="/manage/facilities">Back to facilities</Link>
+        </Button>
+      </div>
+    );
+  }
+
   // DEMO MODE: Show simulation with mock data
   if (isDemoMode || hasBuilderSession) {
     return (

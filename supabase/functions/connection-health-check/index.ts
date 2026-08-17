@@ -64,6 +64,8 @@ Deno.serve(async (req) => {
     return json(403, { status: 'FAILED', error_code: 'forbidden', safe_message: 'Administrator role required.', correlation_id: correlationId });
   }
 
+  const callerTenantId = await resolveCallerTenant(admin, user.id);
+
   let connectionId = '';
   try {
     const body = await req.json();
@@ -79,6 +81,9 @@ Deno.serve(async (req) => {
     .eq('id', connectionId)
     .maybeSingle();
   if (!connection) return json(404, { status: 'FAILED', error_code: 'not_found', correlation_id: correlationId });
+  if (!tenantVisible(connection.tenant_id ?? null, callerTenantId)) {
+    return json(403, { status: 'FAILED', ...TENANT_FORBIDDEN, correlation_id: correlationId });
+  }
 
   const probe = PROBES[connection.connector_id as string];
   if (!probe) {

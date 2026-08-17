@@ -20,8 +20,12 @@ import {
   Play, Pause, RotateCcw, Zap, TrendingUp, Clock, 
   Activity, AlertTriangle, CheckCircle2, Info, Rocket, Brain
 } from 'lucide-react';
-import { BuilderPreviewEngine, BuilderPreviewEvent } from './BuilderPreviewEngine';
-import { MockSimulationEngine, SimulationPreviewConfig } from './fixtures/builderMock';
+import type { BuilderPreviewEvent } from './BuilderPreviewEngine';
+import type { SimulationPreviewConfig } from './fixtures/builderMock';
+import {
+  createBuilderPreviewSession,
+  type BuilderPreviewSessionEngine,
+} from '@/simulation/compat/previewSessionBridge';
 import { EnhancedKPIChartsPanel } from '@/components/simulation/EnhancedKPIChartsPanel';
 import { EnhancedEventLogPanel, type SimulationEvent as EnhancedSimulationEvent } from '@/components/simulation/EnhancedEventLogPanel';
 import { ScenarioPicker } from './ScenarioPicker';
@@ -55,7 +59,7 @@ export function SimulationDashboard({
   const [selectedScenario, setSelectedScenario] = useState<any>(null);
   const [events, setEvents] = useState<BuilderPreviewEvent[]>([]);
   const [kpiData, setKPIData] = useState<any[]>([]);
-  const [engine, setEngine] = useState<BuilderPreviewEngine | MockSimulationEngine | null>(null);
+  const [engine, setEngine] = useState<BuilderPreviewSessionEngine | null>(null);
   
   // Bi-directional linking state
   const [highlightedEventId, setHighlightedEventId] = useState<string | null>(null);
@@ -94,8 +98,7 @@ export function SimulationDashboard({
     setEvents([]);
     setStatus('idle');
 
-    let newEngine: BuilderPreviewEngine | MockSimulationEngine;
-
+    let normalizedScenario: any = selectedScenario;
     if (useMockSimulation && simulationPreviewConfig) {
       // Map scenario from preview section to simulation_preview_config
       // Try to match by ID or title to find the correct scenario key
@@ -119,33 +122,30 @@ export function SimulationDashboard({
       }
 
       // Create a normalized scenario object with the CORRECT scenario key as ID
-      const normalizedScenario = {
-        ...selectedScenario,
-        id: matchedScenarioKey
-      };
+      normalizedScenario = { ...selectedScenario, id: matchedScenarioKey };
+    }
 
-      // Use mock simulation engine with preview config
-      newEngine = new MockSimulationEngine({
-        scenario: normalizedScenario,
-        previewConfig: simulationPreviewConfig,
-        speed
-      });
+    // Phase 4: engine selection is owned by the preview session bridge.
+    const session = createBuilderPreviewSession({
+      scenario: normalizedScenario,
+      speed,
+      previewConfig: simulationPreviewConfig,
+      useFixturePreview: useMockSimulation,
+      workflows,
+      kpis: kpiBlock.kpis || [],
+      template,
+    });
 
-      // Initialize with baseline metrics immediately
-      const baselineData = {
-        timestamp: '00:00',
-        metrics: (newEngine as MockSimulationEngine).getBaselineMetrics()
-      };
-      setKPIData([baselineData]);
-    } else {
-      // Use real simulation engine
-      newEngine = new BuilderPreviewEngine({
-        scenario: selectedScenario,
-        workflows,
-        kpis: kpiBlock.kpis || [],
-        template,
-        speed
-      });
+    if (session.kind !== 'ok') {
+      setStatus('error');
+      setEngine(null);
+      return;
+    }
+
+    const newEngine = session.engine;
+
+    if (session.baselineMetrics) {
+      setKPIData([{ timestamp: '00:00', metrics: session.baselineMetrics }]);
     }
 
     // Subscribe to engine events

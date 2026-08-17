@@ -12,6 +12,7 @@
  *   - Every check is persisted with a correlation id and audited.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { resolveCallerTenant, tenantVisible, TENANT_FORBIDDEN } from '../_shared/connectionTenant.ts';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',

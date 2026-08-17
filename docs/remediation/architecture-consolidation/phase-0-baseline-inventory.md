@@ -45,10 +45,37 @@ DSX-integrated.
 Nothing user-facing was removed in Phase 1. The readiness table keeps the same
 rows and `data-testid` values; only their source of truth changed.
 
+## Phase 3 - simulation engine and provider consolidation (done)
+
+- `src/simulation/engineRegistry.ts` is the declared inventory of every
+  execution path in the repository: 13 modules, each with a status
+  (`canonical` or `frozen`), an execution class, its consumers and its
+  migration target. Frozen paths accept bug fixes only; new behaviour goes
+  behind the `src/simulation/api.ts` facade.
+- `src/simulation/__tests__/engineConsolidation.test.ts` turns
+  "do not add another simulation engine" into a failing test: any new
+  `*Engine.ts` / `simulationEngine.ts` module under `src/` that is not
+  declared in the registry breaks the build.
+- Provider taxonomy corrected. `SimulationProviderId` now carries
+  `nvidia-dsx-sim` and `specialist-solver`; `omniverse` remains registered as
+  a deprecated naming alias so existing configuration keeps resolving to the
+  same disabled stub. Nothing was renamed away from a user.
+- Every provider now declares `executionClass` and `nvidiaIntegrated`.
+  Compatibility is `aura-deterministic`, the scenario library is
+  `fixture-preview`, and the NVIDIA/specialist boundary is `nvidia-dsx-sim`
+  with `nvidiaIntegrated: false`. The guard test asserts no provider claims
+  NVIDIA execution or live data, and that all three NVIDIA-boundary ids return
+  `disabled` outcomes with `provenance: 'unavailable'`.
+
+### Retired / merged surfaces
+
+None. Phase 3 changed classification and guards only; no run path, route or
+user-facing behaviour was removed.
+
 ## Open phases
 
-3. Simulation engine unification behind `src/simulation/api.ts` (7 execution
-   paths still reachable).
+4. Migrate the two frozen compat engines and the builder preview estimator
+   onto the facade.
 5. Renderer interface modes (AURA Web Runtime vs future Kit/RTX session).
 6. DSX Exchange boundary naming audit for MQTT surfaces.
 7. AI agent positioning audit (no NIM claims).

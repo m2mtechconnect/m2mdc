@@ -1,0 +1,1113 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.6 [39m[90m/dev-server[39m
+
+ [32m✓[39m src/test/whiteLabelSurfaces.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 400[2mms[22m[39m
+ [32m✓[39m tests/unit/legacyGoogleOAuthRetired.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 395[2mms[22m[39m
+ [32m✓[39m src/dsx/__tests__/evidenceBoundary.test.ts [2m([22m[2m21 tests[22m[2m)[22m[32m 237[2mms[22m[39m
+ [32m✓[39m tests/performance/load.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 765[2mms[22m[39m
+     [33m[2m✓[22m[39m should debounce search input efficiently [33m 604[2mms[22m[39m
+ [32m✓[39m src/simulation/compat/__tests__/facadeBridge.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 460[2mms[22m[39m
+     [33m[2m✓[22m[39m leaves no app consumer importing the frozen sovereign engine directly [33m 451[2mms[22m[39m
+[90mstdout[2m | src/workspace/__tests__/simulationOwnership.test.ts
+[22m[39m[DCTwinBuilder] Auto-created deployment checks
+[DCTwinBuilder] State rehydrated and validated
+
+[90mstdout[2m | src/simulation/providers/__tests__/contract.test.ts[2m > [22m[2mno consumer migration in Phase 1B.1[2m > [22m[2msrc/simulation/index.ts still exports the legacy SimulationEngine class
+[22m[39m[DCTwinBuilder] Auto-created deployment checks
+[DCTwinBuilder] State rehydrated and validated
+
+[90mstdout[2m | tests/unit/non-dc-templates-removed.test.ts[2m > [22m[2mnon-data-centre templates remain removed[2m > [22m[2mdoes not resolve YVR_AIRPORT_DIGITAL_TWIN from the template loader
+[22m[39m[TemplateService] Loading template: YVR_AIRPORT_DIGITAL_TWIN
+
+[90mstderr[2m | tests/unit/non-dc-templates-removed.test.ts[2m > [22m[2mnon-data-centre templates remain removed[2m > [22m[2mdoes not resolve YVR_AIRPORT_DIGITAL_TWIN from the template loader
+[22m[39m[TemplateService] Error loading template: {
+  message: [32m'LiveBackendBlockedError: AURA live-backend guard BLOCKED a request to https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/agent_templates. Tests may not reach an ambient or production Supabase project. Reasons: denylisted production hostname'[39m,
+  details: [32m'LiveBackendBlockedError: AURA live-backend guard BLOCKED a request to https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/agent_templates. Tests may not reach an ambient or production Supabase project. Reasons: denylisted production hostname\n'[39m +
+    [32m'    at globalThis.fetch (/dev-server/tests/_setup/liveBackendGuard.ts:129:13)\n'[39m +
+    [32m'    at /dev-server/node_modules/@supabase/supabase-js/dist/main/lib/fetch.js:50:25\n'[39m +
+    [32m'    at /dev-server/node_modules/@supabase/supabase-js/dist/main/lib/fetch.js:73:16\n'[39m +
+    [32m'    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n'[39m +
+    [32m'    at loadTemplateById (/dev-server/src/lib/templates/unifiedTemplateService.ts:315:29)\n'[39m +
+    [32m'    at /dev-server/tests/unit/non-dc-templates-removed.test.ts:54:20\n'[39m +
+    [32m'    at file:///dev-server/node_modules/@vitest/runner/dist/index.js:753:20'[39m,
+  hint: [32m''[39m,
+  code: [32m''[39m
+}
+
+[90mstdout[2m | tests/unit/non-dc-templates-removed.test.ts[2m > [22m[2mnon-data-centre templates remain removed[2m > [22m[2mdoes not resolve TRANSPORT_CANADA_TWIN from the template loader
+[22m[39m[TemplateService] Loading template: TRANSPORT_CANADA_TWIN
+
+[90mstderr[2m | tests/unit/non-dc-templates-removed.test.ts[2m > [22m[2mnon-data-centre templates remain removed[2m > [22m[2mdoes not resolve TRANSPORT_CANADA_TWIN from the template loader
+[22m[39m[TemplateService] Error loading template: {
+  message: [32m'LiveBackendBlockedError: AURA live-backend guard BLOCKED a request to https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/agent_templates. Tests may not reach an ambient or production Supabase project. Reasons: denylisted production hostname'[39m,
+  details: [32m'LiveBackendBlockedError: AURA live-backend guard BLOCKED a request to https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/agent_templates. Tests may not reach an ambient or production Supabase project. Reasons: denylisted production hostname\n'[39m +
+    [32m'    at globalThis.fetch (/dev-server/tests/_setup/liveBackendGuard.ts:129:13)\n'[39m +
+    [32m'    at /dev-server/node_modules/@supabase/supabase-js/dist/main/lib/fetch.js:50:25\n'[39m +
+    [32m'    at /dev-server/node_modules/@supabase/supabase-js/dist/main/lib/fetch.js:73:16\n'[39m +
+    [32m'    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n'[39m +
+    [32m'    at loadTemplateById (/dev-server/src/lib/templates/unifiedTemplateService.ts:315:29)\n'[39m +
+    [32m'    at /dev-server/tests/unit/non-dc-templates-removed.test.ts:54:20\n'[39m +
+    [32m'    at file:///dev-server/node_modules/@vitest/runner/dist/index.js:753:20'[39m,
+  hint: [32m''[39m,
+  code: [32m''[39m
+}
+
+ [32m✓[39m tests/unit/non-dc-templates-removed.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 296[2mms[22m[39m
+ [32m✓[39m src/simulation/compat/__tests__/previewSessionBridge.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 382[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps direct engine construction out of app modules [33m 376[2mms[22m[39m
+[90mstderr[2m | tests/unit/useBuilderAutosave.test.ts[2m > [22m[2museBuilderAutosave[2m > [22m[2mshould show error toast only once on autosave failure
+[22m[39mAutosave failed: Error: Network error
+    at [90m/dev-server/[39mtests/unit/useBuilderAutosave.test.ts:158:19
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:157:11
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:753:26
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1636:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1602:10[90m)[39m
+    at runTest [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1309:12[90m)[39m
+    at runSuite [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1468:8[90m)[39m
+    at runSuite [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1468:8[90m)[39m
+    at runFiles [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1526:3[90m)[39m
+
+[90mstderr[2m | tests/unit/useBuilderAutosave.test.ts[2m > [22m[2museBuilderAutosave[2m > [22m[2mshould handle non-Error exceptions in autosave
+[22m[39mAutosave failed: String error
+
+[90mstderr[2m | tests/unit/useBuilderAutosave.test.ts[2m > [22m[2museBuilderAutosave[2m > [22m[2mshould reset error flag on successful save after failure
+[22m[39mAutosave failed: Error: First error
+    at [90m/dev-server/[39mtests/unit/useBuilderAutosave.test.ts:236:36
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:157:11
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:753:26
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1636:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1602:10[90m)[39m
+    at runTest [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1309:12[90m)[39m
+    at runSuite [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1468:8[90m)[39m
+    at runSuite [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1468:8[90m)[39m
+    at runFiles [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1526:3[90m)[39m
+
+[90mstderr[2m | tests/unit/useBuilderAutosave.test.ts[2m > [22m[2museBuilderAutosave[2m > [22m[2mshould reset error flag on successful save after failure
+[22m[39mAutosave failed: Error: Second error
+    at [90m/dev-server/[39mtests/unit/useBuilderAutosave.test.ts:263:36
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:753:20
+
+ [32m✓[39m src/simulation/providers/__tests__/contract.test.ts [2m([22m[2m24 tests[22m[2m)[22m[33m 1712[2mms[22m[39m
+     [33m[2m✓[22m[39m src/simulation/index.ts still exports the legacy SimulationEngine class [33m 1695[2mms[22m[39m
+[90mstderr[2m | tests/unit/useBuilderAutosave.test.ts[2m > [22m[2museBuilderAutosave[2m > [22m[2mmanualSave[2m > [22m[2mshould show error toast and return false on manual save failure
+[22m[39mManual save failed: Error: Save failed
+    at [90m/dev-server/[39mtests/unit/useBuilderAutosave.test.ts:321:21
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:157:11
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:753:26
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1636:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1602:10[90m)[39m
+    at runTest [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1309:12[90m)[39m
+    at runSuite [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1468:8[90m)[39m
+    at runSuite [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1468:8[90m)[39m
+    at runSuite [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1468:8[90m)[39m
+
+[90mstderr[2m | tests/unit/useBuilderAutosave.test.ts[2m > [22m[2museBuilderAutosave[2m > [22m[2mmanualSave[2m > [22m[2mshould handle non-Error exceptions in manual save
+[22m[39mManual save failed: String error
+
+ [32m✓[39m tests/unit/useBuilderAutosave.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 474[2mms[22m[39m
+[90mstdout[2m | tests/integration/template-url-loading.test.ts
+[22m[39m[templateLoader] Data Centre Master Template loaded
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39m🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m1[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39m🔍 [STORE] templateId detected in URL - loading template: non-existent-template
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39m📥 [STORE] Template not in JSON, fetching from database...
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Database Template: { triggers: [33m1[39m, actions: [33m1[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Database Template'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mfalse[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Database Template'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Database Template'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m1[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39m🔍 [STORE] templateId detected in URL - loading template: truly-non-existent
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39m📥 [STORE] Template not in JSON, fetching from database...
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39m🆕 [STORE] Creating new draft {
+  goal: [32m''[39m,
+  industry: [32m''[39m,
+  department: [32m''[39m,
+  template: [32m''[39m,
+  type: [1mnull[22m,
+  source: [1mnull[22m,
+  hasGeminiAnalysis: [33mfalse[39m,
+  hasPrefilled: [33mfalse[39m
+}
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39m❌ [STORE] Failed to fetch template from database: { message: [32m'Not found'[39m }
+⚠️ [STORE] Template not found: truly-non-existent
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39m✅ [STORE] Draft created: {
+  id: [32m'test-builder-id'[39m,
+  builder: { id: [32m'test-builder-id'[39m, state: {}, current_step: [33m1[39m }
+}
+🔧 [STORE] Auto-generating default workflow
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39m💾 [STORE] Default workflow saved
+💾 [STORE] State updated {
+  builderId: [32m'test-builder-id'[39m,
+  goal: [90mundefined[39m,
+  industry: [90mundefined[39m,
+  workflow: {
+    triggers: [ [32m'Event Triggered'[39m ],
+    actions: [ [32m'Process Request'[39m, [32m'Execute Action'[39m, [32m'Send Response'[39m ],
+    integrations: [ [32m'Email'[39m, [32m'Slack'[39m, [32m'Database'[39m ],
+    hitl: []
+  },
+  modelConfig: {
+    provider: [32m'google'[39m,
+    model: [32m'google/gemini-2.5-flash'[39m,
+    rag: {},
+    policies: {},
+    mcp_servers: []
+  }
+}
+📍 [STORE] Using requested step: [33m1[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39m🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Existing Blueprint'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Existing Blueprint'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m1[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39m🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m1[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintStore] Clearing blueprint
+🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m1[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintStore] Clearing blueprint
+🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m2[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintStore] Clearing blueprint
+🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m3[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintStore] Clearing blueprint
+🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m4[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintStore] Clearing blueprint
+🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m5[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould load all available templates from JSON
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39m🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+⏭️ [STORE] initializeBuilder skipped — already in flight
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m1[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+ [32m✓[39m src/workspace/__tests__/simulationOwnership.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1277[2mms[22m[39m
+     [33m[2m✓[22m[39m refuses to record a run that could not be saved durably [33m 604[2mms[22m[39m
+     [33m[2m✓[22m[39m records a run once review passed and the durable write succeeded [33m 601[2mms[22m[39m
+ [32m✓[39m tests/integration/template-url-loading.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 203[2mms[22m[39m
+[90mstderr[2m | src/components/data-centre-twin/domains/__tests__/domainProvenance.test.tsx[2m > [22m[2mDomain views — Phase 1A.3.c provenance retrofit[2m > [22m[2mthermal-domain-view root exposes data-provenance="demo", manifest is present, and no descendant is live
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ [32m✓[39m src/data/dsxReference/__tests__/mockDataGuard.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 313[2mms[22m[39m
+ [32m✓[39m src/dsx/__tests__/evidenceBeta.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 174[2mms[22m[39m
+ [32m✓[39m tests/unit/urlCapture.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 5715[2mms[22m[39m
+     [33m[2m✓[22m[39m should normalize HTTP/2 URLs [33m 302[2mms[22m[39m
+     [33m[2m✓[22m[39m should handle retry logic [33m 3603[2mms[22m[39m
+     [33m[2m✓[22m[39m should parse readable text from HTML [33m 301[2mms[22m[39m
+     [33m[2m✓[22m[39m should use stealth render mode when specified [33m 301[2mms[22m[39m
+     [33m[2m✓[22m[39m should handle robots.txt blocked pages [33m 301[2mms[22m[39m
+     [33m[2m✓[22m[39m should handle empty pages gracefully [33m 301[2mms[22m[39m
+     [33m[2m✓[22m[39m should include proper user-agent headers [33m 302[2mms[22m[39m
+     [33m[2m✓[22m[39m should timeout after 30 seconds [33m 301[2mms[22m[39m
+ [32m✓[39m scripts/__tests__/dsxDisposableVerify.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 127[2mms[22m[39m
+ [32m✓[39m src/components/provenance/__tests__/MetricValue.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 161[2mms[22m[39m
+[90mstderr[2m | src/components/aoc/__tests__/AOCIntegration.test.tsx[2m > [22m[2mAOC Integration Tests[2m > [22m[2mAOCQuickStats[2m > [22m[2mshould display stats correctly
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ [32m✓[39m src/dsx/__tests__/operatorWorkspaces.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 129[2mms[22m[39m
+ [32m✓[39m src/components/aoc/__tests__/AOCIntegration.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 158[2mms[22m[39m
+ [32m✓[39m src/dsx/__tests__/decisionWorkflow.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 141[2mms[22m[39m
+ [32m✓[39m src/components/simulation/__tests__/kpiProvenance.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 629[2mms[22m[39m
+[90mstderr[2m | src/dsx/__tests__/investigationContext.test.tsx[2m > [22m[2mshared context bar[2m > [22m[2mstarts at facility scope and writes the selection into the URL
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ [32m✓[39m src/dsx/__tests__/investigationContext.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[32m 152[2mms[22m[39m
+[90mstderr[2m | src/components/data-centre-twin/domains/__tests__/domainProvenance.test.tsx[2m > [22m[2mDomain views — Phase 1A.3.c provenance retrofit[2m > [22m[2msovereignty-domain-view root exposes data-provenance="unavailable", manifest is present, and no descendant is live
+[22m[39mWarning: validateDOMNesting(...): <button> cannot appear as a descendant of <button>.
+    at button
+    at /dev-server/src/components/ui/button.tsx:36:66
+    at div
+    at div
+    at div
+    at /dev-server/src/components/ui/card.tsx:23:70
+    at button
+    at file:///dev-server/node_modules/@radix-ui/react-primitive/dist/index.mjs:28:13
+    at file:///dev-server/node_modules/@radix-ui/react-collapsible/dist/index.mjs:58:13
+    at div
+    at /dev-server/src/components/ui/card.tsx:13:64
+    at div
+    at file:///dev-server/node_modules/@radix-ui/react-primitive/dist/index.mjs:28:13
+    at Provider (file:///dev-server/node_modules/@radix-ui/react-context/dist/index.mjs:27:15)
+    at file:///dev-server/node_modules/@radix-ui/react-collapsible/dist/index.mjs:20:7
+    at CollapsibleSection (/dev-server/src/components/shared/CollapsibleSection.tsx:16:31)
+    at div
+    at SovereigntyDomainView (/dev-server/src/components/data-centre-twin/domains/SovereigntyDomainView.tsx:31:34)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1207:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1101:7)
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould set saving state during save
+[22m[39m[builder:save:57e39061-d164-4e5d-8c01-f8ecf15fa206] Starting save {
+  systemId: [32m'save-test-123'[39m,
+  currentStep: [33m1[39m,
+  hasSystemName: [33mtrue[39m,
+  hasDepartment: [33mfalse[39m
+}
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould set saving state during save
+[22m[39m[auth:validate] JWT valid { userId: [32m'test-user-123'[39m, exp: [32m'2100-01-01T00:00:00.000Z'[39m }
+[auth:require] Valid session found { userId: [32m'test-user-123'[39m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould set saving state during save
+[22m[39m[builder:save:57e39061-d164-4e5d-8c01-f8ecf15fa206] Session validated { userId: [32m'test-user-123'[39m, domain: [32m'localhost'[39m, hasToken: [33mtrue[39m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould set saving state during save
+[22m[39m[builder:save:57e39061-d164-4e5d-8c01-f8ecf15fa206] Updating system {
+  systemId: [32m'save-test-123'[39m,
+  fields: [
+    [32m'id'[39m,            [32m'name'[39m,
+    [32m'department'[39m,    [32m'outcome'[39m,
+    [32m'successMetric'[39m, [32m'step'[39m,
+    [32m'templateId'[39m,    [32m'selectedModel'[39m,
+    [32m'geminiEnabled'[39m, [32m'vertexEnabled'[39m,
+    [32m'hybridSearch'[39m,  [32m'topK'[39m,
+    [32m'topN'[39m,          [32m'temperature'[39m,
+    [32m'systemPrompt'[39m,  [32m'connectors'[39m,
+    [32m'workflowNodes'[39m, [32m'recommendationData'[39m
+  ]
+}
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould set saving state during save
+[22m[39m[builder:save:57e39061-d164-4e5d-8c01-f8ecf15fa206] Response from systems-update { hasData: [33mfalse[39m, hasError: [33mfalse[39m, data: [1mnull[22m, error: [1mnull[22m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould set saving state during save
+[22m[39m[builder:save:57e39061-d164-4e5d-8c01-f8ecf15fa206] Save completed successfully
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould update lastSaved after successful save
+[22m[39m[builder:save:e9f062f3-c5c3-4173-a812-567e98528cfb] Starting save {
+  systemId: [32m'save-test-123'[39m,
+  currentStep: [33m1[39m,
+  hasSystemName: [33mtrue[39m,
+  hasDepartment: [33mfalse[39m
+}
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould update lastSaved after successful save
+[22m[39m[auth:validate] JWT valid { userId: [32m'test-user-123'[39m, exp: [32m'2100-01-01T00:00:00.000Z'[39m }
+[auth:require] Valid session found { userId: [32m'test-user-123'[39m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould update lastSaved after successful save
+[22m[39m[builder:save:e9f062f3-c5c3-4173-a812-567e98528cfb] Session validated { userId: [32m'test-user-123'[39m, domain: [32m'localhost'[39m, hasToken: [33mtrue[39m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould update lastSaved after successful save
+[22m[39m[builder:save:e9f062f3-c5c3-4173-a812-567e98528cfb] Updating system {
+  systemId: [32m'save-test-123'[39m,
+  fields: [
+    [32m'id'[39m,            [32m'name'[39m,
+    [32m'department'[39m,    [32m'outcome'[39m,
+    [32m'successMetric'[39m, [32m'step'[39m,
+    [32m'templateId'[39m,    [32m'selectedModel'[39m,
+    [32m'geminiEnabled'[39m, [32m'vertexEnabled'[39m,
+    [32m'hybridSearch'[39m,  [32m'topK'[39m,
+    [32m'topN'[39m,          [32m'temperature'[39m,
+    [32m'systemPrompt'[39m,  [32m'connectors'[39m,
+    [32m'workflowNodes'[39m, [32m'recommendationData'[39m
+  ]
+}
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould update lastSaved after successful save
+[22m[39m[builder:save:e9f062f3-c5c3-4173-a812-567e98528cfb] Response from systems-update { hasData: [33mfalse[39m, hasError: [33mfalse[39m, data: [1mnull[22m, error: [1mnull[22m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould update lastSaved after successful save
+[22m[39m[builder:save:e9f062f3-c5c3-4173-a812-567e98528cfb] Save completed successfully
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould clear dirty state after successful save
+[22m[39m[builder:save:bc0527af-02c9-4e3b-ad93-c7a7b3ccd8f5] Starting save {
+  systemId: [32m'save-test-123'[39m,
+  currentStep: [33m1[39m,
+  hasSystemName: [33mtrue[39m,
+  hasDepartment: [33mfalse[39m
+}
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould clear dirty state after successful save
+[22m[39m[auth:validate] JWT valid { userId: [32m'test-user-123'[39m, exp: [32m'2100-01-01T00:00:00.000Z'[39m }
+[auth:require] Valid session found { userId: [32m'test-user-123'[39m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould clear dirty state after successful save
+[22m[39m[builder:save:bc0527af-02c9-4e3b-ad93-c7a7b3ccd8f5] Session validated { userId: [32m'test-user-123'[39m, domain: [32m'localhost'[39m, hasToken: [33mtrue[39m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould clear dirty state after successful save
+[22m[39m[builder:save:bc0527af-02c9-4e3b-ad93-c7a7b3ccd8f5] Updating system {
+  systemId: [32m'save-test-123'[39m,
+  fields: [
+    [32m'id'[39m,            [32m'name'[39m,
+    [32m'department'[39m,    [32m'outcome'[39m,
+    [32m'successMetric'[39m, [32m'step'[39m,
+    [32m'templateId'[39m,    [32m'selectedModel'[39m,
+    [32m'geminiEnabled'[39m, [32m'vertexEnabled'[39m,
+    [32m'hybridSearch'[39m,  [32m'topK'[39m,
+    [32m'topN'[39m,          [32m'temperature'[39m,
+    [32m'systemPrompt'[39m,  [32m'connectors'[39m,
+    [32m'workflowNodes'[39m, [32m'recommendationData'[39m
+  ]
+}
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould clear dirty state after successful save
+[22m[39m[builder:save:bc0527af-02c9-4e3b-ad93-c7a7b3ccd8f5] Response from systems-update { hasData: [33mfalse[39m, hasError: [33mfalse[39m, data: [1mnull[22m, error: [1mnull[22m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould clear dirty state after successful save
+[22m[39m[builder:save:bc0527af-02c9-4e3b-ad93-c7a7b3ccd8f5] Save completed successfully
+
+ [32m✓[39m tests/unit/builderStore.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 128[2mms[22m[39m
+ [32m✓[39m src/components/simulation/__tests__/enterpriseKPICardProvenance.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 194[2mms[22m[39m
+ [32m✓[39m src/pages/__tests__/IntelligenceDashboardKPIs.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 150[2mms[22m[39m
+ [32m✓[39m src/components/data-centre-twin/domains/__tests__/domainProvenance.test.tsx [2m([22m[2m59 tests[22m[2m)[22m[33m 5700[2mms[22m[39m
+     [33m[2m✓[22m[39m thermal-domain-view root exposes data-provenance="demo", manifest is present, and no descendant is live [33m 875[2mms[22m[39m
+       [33m[2m✓[22m[39m renders metric thermal.avg-inlet-temp with data-provenance="demo" [33m 424[2mms[22m[39m
+     [33m[2m✓[22m[39m ThermalDomainView no longer renders a "Live" pill (renamed to Snapshot) [33m 318[2mms[22m[39m
+ [32m✓[39m src/components/simulation/__tests__/phase1a3b2.test.tsx [2m([22m[2m19 tests[22m[2m)[22m[33m 1632[2mms[22m[39m

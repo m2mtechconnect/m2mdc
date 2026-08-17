@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRBAC } from '@/contexts/RBACContext';
 import { ConnectionStatusBadge } from './ConnectionStatusBadge';
+import { ConnectionSetupWizard } from './ConnectionSetupWizard';
 import {
   canRunHealthCheck,
   summariseConnections,
@@ -14,7 +15,7 @@ import {
   type ConnectorDefinition,
   type HealthCheckRecord,
 } from '@/connections/model';
-import { runHealthCheck } from '@/connections/api';
+import { runHealthCheck, deactivateConnection, deleteConnection, activateConnection } from '@/connections/api';
 
 interface Props {
   connections: ConnectionInstance[];
@@ -35,6 +36,8 @@ export function ConnectionsTab({ connections, definitions, healthChecks, eventCo
   const { toast } = useToast();
   const [query, setQuery] = useState('');
   const [testing, setTesting] = useState<string | null>(null);
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [mutating, setMutating] = useState<string | null>(null);
   const isAdmin = role === 'admin' || role === 'owner' || can('twin.edit');
 
   const byId = useMemo(() => new Map(definitions.map((d) => [d.id, d])), [definitions]);

@@ -76,10 +76,6 @@ export function createOmniverseProvider(
       // No NVIDIA code or service executes in this build. This flag may only
       // become true alongside a proven runtime connection and health check.
       nvidiaIntegrated: false,
-      executionClass: 'nvidia-dsx-sim',
-      // No NVIDIA code or service executes in this build. This flag may only
-      // become true alongside a proven runtime connection and health check.
-      nvidiaIntegrated: false,
     },
 
     listScenarios(): ProviderOutcome<ScenarioDescriptor[]> {

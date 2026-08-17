@@ -173,7 +173,7 @@ export function templateToBlueprint(
     
     // Business metrics
     goals,
-    expectedRoi: config.roi_block?.example_impact_estimates?.[0]?.estimated_range || (template.roi_pct ? `${template.roi_pct}%` : null),
+    expectedRoi: config.roi_block?.example_impact_estimates?.[0]?.estimated_range || (template.roi_pct ?? (template as any).roi_hint ? `${template.roi_pct ?? (template as any).roi_hint}%` : null),
     timeSavedPerWeek,
     efficiencyGain,
     

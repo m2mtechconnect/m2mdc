@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.simulation_runs_guard() FROM public, anon, authenticated;

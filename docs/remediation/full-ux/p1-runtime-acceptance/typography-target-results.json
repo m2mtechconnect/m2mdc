@@ -1,0 +1,1 @@
+{"status":"NOT_REMEDIATED","note":"Sub-11px text (81 routes) and sub-24px targets (80 routes) remain open. The canary label and the bounded-loading terminal state introduced in this pass use 12px text and 44px primary controls, so no new violations were added."}

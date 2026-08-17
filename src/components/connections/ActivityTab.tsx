@@ -26,7 +26,7 @@ export function ActivityTab({
 
   return (
     <div className="space-y-6">
-      <RuntimeReadinessPanel />
+      <RuntimeReadinessPanel connections={connections} />
 
       <div className="flex flex-wrap items-center gap-2">
         <label htmlFor="activity-connection" className="text-xs font-medium text-muted-foreground">

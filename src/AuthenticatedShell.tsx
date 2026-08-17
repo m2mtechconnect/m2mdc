@@ -63,6 +63,7 @@ import AssetPreview from '@/pages/admin/AssetPreview';
 import AssetPipeline from '@/pages/admin/AssetPipeline';
 import AssetValidation from '@/pages/admin/AssetValidation';
 import ReferenceFacilityValidation from '@/pages/admin/ReferenceFacilityValidation';
+import DsxCapabilityRegistryPage from '@/pages/admin/DsxCapabilityRegistryPage';
 import { lazy } from "react";
 const EvidenceBetaShell = lazy(() => import("./pages/dsx/EvidenceBetaShell"));
 import {
@@ -113,6 +114,7 @@ function ApprovedUserRoutes() {
         element={<ReferenceFacilityValidation />}
       />
       <Route path="/admin/signups-dashboard" element={<AdminSignupsDashboard />} />
+      <Route path="/admin/dsx-capabilities" element={<DsxCapabilityRegistryPage />} />
       {/* Canonical integrations destination. */}
       <Route path="/manage/integrations" element={<Integrations />} />
       <Route path="/manage/facilities" element={<ManageFacilities />} />

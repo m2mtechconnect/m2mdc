@@ -119,6 +119,20 @@ export function referenceSpecificationsForSite(site?: string | null): DatasetVal
     .map(toDatasetValue);
 }
 
+/**
+ * The site a configuration belongs to, read from the record itself.
+ *
+ * Never derive this by splitting the configuration id: that only worked while
+ * every id happened to match `<site>-<platform>` and silently produced a wrong
+ * site (and therefore an empty specification list) for any other id shape.
+ */
+export function siteForConfiguration(configurationId: string): string | null {
+  const record = DSX_REFERENCE_RECORDS.find(
+    (r) => r.configuration_id === configurationId && Boolean(r.site),
+  );
+  return record?.site ?? null;
+}
+
 /** Every normalized record as a dataset value, for evidence and export. */
 export function allReferenceValues(): DatasetValue[] {
   return DSX_REFERENCE_RECORDS.map(toDatasetValue);

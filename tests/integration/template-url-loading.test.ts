@@ -64,7 +64,7 @@ describe('Template URL Loading Integration', () => {
     
     // Create URLSearchParams with templateId
     const params = new URLSearchParams({
-      templateId: 'retail_inventory_optimization',
+      templateId: 'datacentre-master-twin-v1',
       step: '1'
     });
 
@@ -76,7 +76,7 @@ describe('Template URL Loading Integration', () => {
     
     expect(blueprint).not.toBeNull();
     expect(blueprint?.source).toBe('template');
-    expect(blueprint?.templateId).toBe('retail_inventory_optimization');
+    expect(blueprint?.templateId).toBe('datacentre-master-twin-v1');
     
     // Check that builder state was hydrated
     const state = useWizardBuilderStore.getState();
@@ -208,7 +208,7 @@ describe('Template URL Loading Integration', () => {
     const { result } = renderHook(() => useWizardBuilderStore());
     
     const params = new URLSearchParams({
-      templateId: 'retail_inventory_optimization',
+      templateId: 'datacentre-master-twin-v1',
       step: '1'
     });
 
@@ -238,7 +238,7 @@ describe('Template URL Loading Integration', () => {
       useBlueprintStore.getState().clearBlueprint();
 
       const params = new URLSearchParams({
-        templateId: 'retail_inventory_optimization',
+        templateId: 'datacentre-master-twin-v1',
         step
       });
 
@@ -255,7 +255,7 @@ describe('Template URL Loading Integration', () => {
     expect(templates.length).toBeGreaterThan(0);
     
     // Verify key templates exist
-    const inventoryTemplate = templates.find(t => t.id === 'retail_inventory_optimization');
+    const inventoryTemplate = templates.find(t => t.id === 'datacentre-master-twin-v1');
     expect(inventoryTemplate).toBeDefined();
     expect(inventoryTemplate?.name).toBeTruthy();
     expect(inventoryTemplate?.twin_type).toBeTruthy();
@@ -264,8 +264,8 @@ describe('Template URL Loading Integration', () => {
   it('should handle concurrent templateId loads', async () => {
     const { result } = renderHook(() => useWizardBuilderStore());
     
-    const params1 = new URLSearchParams({ templateId: 'retail_inventory_optimization', step: '1' });
-    const params2 = new URLSearchParams({ templateId: 'retail_inventory_optimization', step: '2' });
+    const params1 = new URLSearchParams({ templateId: 'datacentre-master-twin-v1', step: '1' });
+    const params2 = new URLSearchParams({ templateId: 'datacentre-master-twin-v1', step: '2' });
 
     // Start both loads simultaneously
     const [load1, load2] = await Promise.all([

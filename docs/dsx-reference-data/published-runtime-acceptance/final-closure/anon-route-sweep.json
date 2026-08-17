@@ -1,0 +1,200 @@
+[
+ {
+  "route": "/",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/?dataset=nvidia-dsx-reference",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/dashboard",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/manage/facilities",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/simulation",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/search",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/compliance",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/analytics",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/builder",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/app/agents",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/deploy",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/deployments",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/manage/integrations",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/admin/dataset-registry",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/dsx/evidence-beta",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/dsx/evidence-beta/power",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/help",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/data-centre-twin",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/data-centre-twin?dataset=nvidia-dsx-reference",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": []
+ },
+ {
+  "route": "/blueprint/default",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/connect/monitor",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ },
+ {
+  "route": "/teams",
+  "status": 200,
+  "finalUrl": "https://auradc.m2mtechconnect.com/",
+  "canaryBanner": false,
+  "consoleErrors": [],
+  "failedRequests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+  ]
+ }
+]

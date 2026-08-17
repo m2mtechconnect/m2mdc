@@ -1,0 +1,227 @@
+[
+ {
+  "route": "/dsx/evidence-beta",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/overview",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/operations",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/thermal",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/power",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/cooling",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/compute",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/operations/workload",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/sustainability",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/sustainability/financial",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/sustainability/sovereignty",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/decisions",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/decisions/log",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/assets",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/thermal",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/power",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/cooling",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/network",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/facility",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/workload",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/simulations",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/sovereignty",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/carbon",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/financials",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ },
+ {
+  "route": "/dsx/evidence-beta/evidence",
+  "banner": true,
+  "unavailableStated": true,
+  "namesMissingSource": true,
+  "rollbackOffered": true,
+  "spinners": 0,
+  "consoleErrors": []
+ }
+]

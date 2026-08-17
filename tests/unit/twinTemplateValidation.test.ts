@@ -57,7 +57,7 @@ describe('Digital Twin Template Validation - Required Elements', () => {
     );
 
     expect(result.isValid).toBe(false);
-    expect(result.reasons).toContain(expect.stringContaining('No digital twin or operational process'));
+    expect(result.reasons).toEqual(expect.arrayContaining([expect.stringContaining('No digital twin or operational process')]));
   });
 
   it('should require data sources or systems integration', () => {
@@ -73,7 +73,7 @@ describe('Digital Twin Template Validation - Required Elements', () => {
     );
 
     expect(result.isValid).toBe(false);
-    expect(result.reasons).toContain(expect.stringContaining('No data sources'));
+    expect(result.reasons).toEqual(expect.arrayContaining([expect.stringContaining('No data sources')]));
   });
 
   it('should require events or KPIs', () => {
@@ -89,7 +89,7 @@ describe('Digital Twin Template Validation - Required Elements', () => {
     );
 
     expect(result.isValid).toBe(false);
-    expect(result.reasons).toContain(expect.stringContaining('Missing both event triggers and KPIs'));
+    expect(result.reasons).toEqual(expect.arrayContaining([expect.stringContaining('Missing both event triggers and KPIs')]));
   });
 
   invalidTwins.forEach(twin => {
@@ -135,7 +135,7 @@ describe('Digital Twin Template Validation - Industry Rules', () => {
     );
 
     // Should not be blocked for fashion retail
-    expect(result.reasons).not.toContain(expect.stringContaining('Marketing not allowed'));
+    expect(result.reasons).not.toEqual(expect.arrayContaining([expect.stringContaining('Marketing not allowed')]));
   });
 
   it('should enforce industry-specific allowed types', () => {

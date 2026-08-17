@@ -117,7 +117,7 @@ export default function Connections() {
       toast({
         title: `Health check ${result.status.toLowerCase()}`,
         description: result.safe_message ?? 'The check completed and its evidence was recorded.',
-        variant: result.status === 'PASS' ? 'default' : 'destructive',
+        variant: result.status === 'PASSED' ? 'default' : 'destructive',
       });
       refresh();
     } catch (error) {

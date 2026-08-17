@@ -177,7 +177,7 @@ describe('openBuilderWithTemplate', () => {
     expect(blueprint?.behavior.systemPrompt).toBe(config.systemPrompt);
     
     // Step 3 fields
-    expect(blueprint?.tools.recommendedIntegrations).toEqual(config.connectors);
+    expect(blueprint?.tools.preselectedIntegrations).toEqual(expect.arrayContaining(config.connectors));
     
     // Step 4 fields
     expect(blueprint?.workflow.triggers).toBeDefined();

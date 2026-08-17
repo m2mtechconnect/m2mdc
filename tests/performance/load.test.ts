@@ -42,13 +42,14 @@ describe('Performance Tests', () => {
   it('should debounce search input efficiently', async () => {
     let callCount = 0;
     
+    // A real debounce: only the trailing call within the window fires.
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const debouncedSearch = (query: string) => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          callCount++;
-          resolve(query);
-        }, 300);
-      });
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        callCount++;
+      }, 300);
+      return query;
     };
 
     // Simulate rapid typing

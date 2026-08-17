@@ -239,7 +239,9 @@ describe('Template to Builder Integration', () => {
       mockNavigate
     );
 
-    const newBlueprint = result.current.currentBlueprint;
+    // Read fresh from the store: the hook snapshot can be stale after an
+    // out-of-render store write.
+    const newBlueprint = useBlueprintStore.getState().currentBlueprint;
     
     // Should be clean template, not have old custom data mixed in
     expect(newBlueprint?.templateId).toBe('clean-template');

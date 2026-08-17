@@ -12,6 +12,14 @@ import { loadAllTemplates } from '@/lib/templateLoader';
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
+    auth: {
+      getUser: vi.fn(async () => ({ data: { user: { id: 'test-user' } }, error: null })),
+      getSession: vi.fn(async () => ({ data: { session: null }, error: null })),
+      onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
+    },
+    functions: {
+      invoke: vi.fn(async () => ({ data: { id: 'test-system-id' }, error: null })),
+    },
     from: vi.fn(() => ({
       select: vi.fn(() => ({
         eq: vi.fn(() => ({

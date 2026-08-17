@@ -130,7 +130,7 @@ export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
   consumer('/deploy', 'Deployment lanes', ['deployments'], []),
   consumer('/deployments', 'Deployment history', ['deployments'], []),
   consumer('/admin/asset-pipeline', 'Asset pipeline', ['assets', 'ngc'], []),
-  consumer('/help', 'Support and documentation', ['glossary'], []),
+  consumer('/help', 'Support and documentation', ['glossary', 'ngc'], []),
 
   neutral('/data-centre-twin', '3D twin', 'Geometry provenance only, no dataset values.'),
   neutral('/data-centre-twin/:id', '3D twin detail', 'Geometry provenance only.'),

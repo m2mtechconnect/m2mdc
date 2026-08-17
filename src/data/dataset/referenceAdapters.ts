@@ -173,7 +173,7 @@ export const REFERENCE_ADAPTERS: readonly ReferenceAdapter[] = [
       { id: 'evidence', label: 'Evidence', sections: ['evidence', 'export'], intent: 'Record-level evidence and lineage-complete export.' },
     ],
     workflowLimitations: [
-      'A run is refused, not approximated, when a required engineering input is unavailable.',
+      'Execution is refused, not approximated, when a required engineering input is unavailable: no value is substituted.',
     ],
   }),
   adapter({

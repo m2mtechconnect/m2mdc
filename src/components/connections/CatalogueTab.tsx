@@ -1,7 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useRBAC } from '@/contexts/RBACContext';
+import { ConnectionSetupWizard } from './ConnectionSetupWizard';
 import { canAddConnection, CATALOGUE_CATEGORIES, type ConnectionInstance, type ConnectorDefinition } from '@/connections/model';
 
 const IMPLEMENTATION_LABEL: Record<string, string> = {
@@ -14,10 +16,15 @@ const IMPLEMENTATION_LABEL: Record<string, string> = {
 export function CatalogueTab({
   definitions,
   connections,
+  onRefresh,
 }: {
   definitions: ConnectorDefinition[];
   connections: ConnectionInstance[];
+  onRefresh?: () => void;
 }) {
+  const { can, role } = useRBAC();
+  const isAdmin = role === 'admin' || role === 'owner' || can('twin.edit');
+  const [wizardFor, setWizardFor] = useState<string | null>(null);
   const configuredCounts = useMemo(() => {
     const map = new Map<string, number>();
     connections.forEach((c) => map.set(c.connector_id, (map.get(c.connector_id) ?? 0) + 1));
@@ -70,7 +77,13 @@ export function CatalogueTab({
                       )}
                       <div className="flex flex-wrap items-center gap-2 pt-1">
                         {addable ? (
-                          <Button size="sm" variant="outline" className="min-h-[32px]" disabled>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="min-h-[32px]"
+                            disabled={!isAdmin}
+                            onClick={() => setWizardFor(definition.id)}
+                          >
                             Add connection
                           </Button>
                         ) : (
@@ -84,7 +97,9 @@ export function CatalogueTab({
                         )}
                         <span className="text-xs text-muted-foreground">
                           {addable
-                            ? 'Setup wizard is not enabled yet: system connections are provisioned server-side.'
+                            ? isAdmin
+                              ? 'Opens the setup wizard. Credentials are never collected and activation needs a passing check.'
+                              : 'Creating a connection requires an administrator role.'
                             : 'No runtime adapter exists, so a connection cannot be created.'}
                         </span>
                       </div>
@@ -96,6 +111,15 @@ export function CatalogueTab({
           </section>
         );
       })}
+
+      <ConnectionSetupWizard
+        open={Boolean(wizardFor)}
+        onOpenChange={(open) => { if (!open) setWizardFor(null); }}
+        definitions={definitions}
+        connections={connections}
+        presetConnectorId={wizardFor ?? undefined}
+        onCompleted={() => onRefresh?.()}
+      />
     </div>
   );
 }

@@ -137,6 +137,73 @@ export function useFacilityOptions() {
   });
 }
 
+export interface TenantOption {
+  id: string;
+  name: string;
+}
+
+/** Tenants a connection may be scoped to. Read is RLS-scoped to the caller. */
+export function useTenantOptions() {
+  return useQuery({
+    queryKey: ['connection-tenant-options'],
+    queryFn: async (): Promise<TenantOption[]> => {
+      const { data, error } = await db.from('organizations').select('id, name').order('name', { ascending: true });
+      if (error) return [];
+      return (data ?? []) as TenantOption[];
+    },
+    staleTime: 60_000,
+  });
+}
+
+/**
+ * Provisioning runs server-side only: role checks, connector eligibility,
+ * duplicate rejection and audit writes all happen in the edge function.
+ */
+async function provision<T>(payload: Record<string, unknown>): Promise<T> {
+  const { data, error } = await supabase.functions.invoke('connection-provision', { body: payload });
+  if (error) {
+    const details = 'context' in error && (error as { context?: { text?: () => Promise<string> } }).context?.text
+      ? await (error as { context: { text: () => Promise<string> } }).context.text()
+      : error.message;
+    let message = details;
+    try {
+      const parsed = JSON.parse(details);
+      message = parsed.safe_message ?? parsed.error_code ?? details;
+    } catch { /* details is not JSON */ }
+    throw new Error(message);
+  }
+  return data as T;
+}
+
+export interface CreateConnectionInput {
+  connector_id: string;
+  tenant_id: string | null;
+  facility_id: string | null;
+  environment: string;
+  display_name: string;
+  data_direction: string;
+  data_classes: string[];
+  auth_method: string;
+}
+
+export async function createConnection(input: CreateConnectionInput): Promise<ConnectionInstance> {
+  const result = await provision<{ connection: ConnectionInstance }>({ action: 'create', ...input });
+  return result.connection;
+}
+
+export async function activateConnection(connectionId: string): Promise<string> {
+  const result = await provision<{ status: string }>({ action: 'activate', connection_id: connectionId });
+  return result.status;
+}
+
+export async function deactivateConnection(connectionId: string): Promise<void> {
+  await provision({ action: 'deactivate', connection_id: connectionId });
+}
+
+export async function deleteConnection(connectionId: string): Promise<void> {
+  await provision({ action: 'delete', connection_id: connectionId });
+}
+
 type MappingWrite = Omit<TwinMappingRecord, 'id' | 'last_mapped_value' | 'last_mapped_at'> & {
   validation_status: string;
 };

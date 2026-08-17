@@ -26,7 +26,9 @@ Date: 2026-08-17. Scope: everything shipped in AURA_CONNECTIONS_CONTROL_PLANE_RE
    All four documents corrected; counts corrected.
 
 ## Open gaps (unchanged by this audit)
-- No connection setup wizard; instances are provisioned by migration only.
+- ~~No connection setup wizard~~ CLOSED: a six-step wizard provisions connections through the
+  `connection-provision` edge function, with role checks, duplicate rejection, credential refusal
+  and audit events. Secret-bearing auth methods stay blocked until a vault exists.
 - ~~Mappings tab is read-only~~ CLOSED: create, edit, validate, activate/deactivate and delete are
   implemented and admin/owner-gated. Export and import remain unimplemented.
 - No tenant or facility scoping in SELECT policies.

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRBAC } from '@/contexts/RBACContext';
 import { ConnectionStatusBadge } from './ConnectionStatusBadge';
+import { ConnectionSetupWizard } from './ConnectionSetupWizard';
 import {
   canRunHealthCheck,
   summariseConnections,
@@ -14,7 +15,7 @@ import {
   type ConnectorDefinition,
   type HealthCheckRecord,
 } from '@/connections/model';
-import { runHealthCheck } from '@/connections/api';
+import { runHealthCheck, deactivateConnection, deleteConnection, activateConnection } from '@/connections/api';
 
 interface Props {
   connections: ConnectionInstance[];
@@ -35,6 +36,8 @@ export function ConnectionsTab({ connections, definitions, healthChecks, eventCo
   const { toast } = useToast();
   const [query, setQuery] = useState('');
   const [testing, setTesting] = useState<string | null>(null);
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [mutating, setMutating] = useState<string | null>(null);
   const isAdmin = role === 'admin' || role === 'owner' || can('twin.edit');
 
   const byId = useMemo(() => new Map(definitions.map((d) => [d.id, d])), [definitions]);
@@ -72,6 +75,32 @@ export function ConnectionsTab({ connections, definitions, healthChecks, eventCo
     }
   }
 
+  async function handleLifecycle(connection: ConnectionInstance, action: 'activate' | 'deactivate' | 'delete') {
+    if (action === 'delete' && !window.confirm(`Delete "${connection.display_name}"? The audit trail is retained.`)) return;
+    setMutating(connection.id);
+    try {
+      if (action === 'activate') {
+        const status = await activateConnection(connection.id);
+        toast({ title: 'Connection activated', description: `Status is now ${status}.` });
+      } else if (action === 'deactivate') {
+        await deactivateConnection(connection.id);
+        toast({ title: 'Connection disabled', description: 'The connection is no longer enabled.' });
+      } else {
+        await deleteConnection(connection.id);
+        toast({ title: 'Connection deleted', description: 'The connection record was removed.' });
+      }
+      onRefresh();
+    } catch (error) {
+      toast({
+        title: 'Action refused',
+        description: error instanceof Error ? error.message : 'The server rejected the request.',
+        variant: 'destructive',
+      });
+    } finally {
+      setMutating(null);
+    }
+  }
+
   const cards = [
     { label: 'Operational data sources', value: summary.operationalDataSources, hint: 'Facility/OT sources supplying data now.' },
     { label: 'Platform services', value: summary.platformServices, hint: 'Application-plane services proven healthy.' },
@@ -104,13 +133,26 @@ export function ConnectionsTab({ connections, definitions, healthChecks, eventCo
       <section aria-labelledby="connections-list-heading" className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id="connections-list-heading" className="text-base font-semibold">Configured connections</h2>
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search connections"
-            aria-label="Search connections"
-            className="h-9 w-full max-w-xs text-sm"
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search connections"
+              aria-label="Search connections"
+              className="h-9 w-full max-w-xs text-sm"
+            />
+            <Button
+              size="sm"
+              className="min-h-[32px]"
+              onClick={() => setWizardOpen(true)}
+              disabled={!isAdmin}
+            >
+              Add connection
+            </Button>
+            {!isAdmin && (
+              <span className="text-xs text-muted-foreground">Creating a connection requires an administrator role.</span>
+            )}
+          </div>
         </div>
 
         {loading && <p className="text-sm text-muted-foreground">Loading connection records…</p>}
@@ -175,6 +217,40 @@ export function ConnectionsTab({ connections, definitions, healthChecks, eventCo
                     {connection.is_system && (
                       <Badge variant="outline" className="text-xs">System connection: cannot be removed</Badge>
                     )}
+                    {!connection.is_system && isAdmin && (
+                      <>
+                        {connection.enabled ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="min-h-[32px]"
+                            disabled={mutating === connection.id}
+                            onClick={() => handleLifecycle(connection, 'deactivate')}
+                          >
+                            Disable
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="min-h-[32px]"
+                            disabled={mutating === connection.id}
+                            onClick={() => handleLifecycle(connection, 'activate')}
+                          >
+                            Activate
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="min-h-[32px]"
+                          disabled={mutating === connection.id}
+                          onClick={() => handleLifecycle(connection, 'delete')}
+                        >
+                          Delete
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -182,6 +258,14 @@ export function ConnectionsTab({ connections, definitions, healthChecks, eventCo
           })}
         </div>
       </section>
+
+      <ConnectionSetupWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        definitions={definitions}
+        connections={connections}
+        onCompleted={onRefresh}
+      />
     </div>
   );
 }

@@ -1,7 +1,13 @@
 # AURA Page-Wiring Remediation - Evidence and Acceptance
 
-Published build under test: **bmswgpn7a** (bundle `index-BzLbfBq-.js`, manifest v7, stamped 2026-08-16T23:55:03Z) at https://auradc.m2mtechconnect.com.
-Two later fixes below are verified on the local build and require a re-publish.
+Published build under test: **bmswhjinq** (bundle `index-ClVSf2Gk.js`, manifest v7, stamped 2026-08-17T00:18:17Z) at https://auradc.m2mtechconnect.com, superseding `bmswgpn7a` (`index-BzLbfBq-.js`).
+All remediation fixes, including the deep-link race fix and the run export path, are included in this build.
+
+## Post-publish verification on bmswhjinq (engineer session)
+- `/simulation?step=simulate` deep link holds; no rewrite to `?step=inspect` (the defect found during acceptance).
+- `/simulation?step=compare` with no run rewrites to `?step=simulate` and states the "completed run" requirement.
+- Compare with no run shows the explicit empty state; export controls render once a run exists.
+- Only remaining console error is the known aborted `GET /auth/v1/user`; other failed requests are third-party analytics beacons.
 
 ## Findings resolved by severity
 - P1 - Simulation workflow unreachable/unrunnable: closed. `?step=` is authoritative (`src/workspace/useWorkflowStep.ts`), gated steps rewrite to `simulate` with a stated reason, run gating explained accessibly (`aria-describedby="simulation-run-blocked-reason"`).
@@ -24,4 +30,4 @@ Two later fixes below are verified on the local build and require a re-publish.
 - Tests: 80 remediation-scoped tests passing across `src/workspace`, `src/routing`, `src/lib/auth`, `src/validation`; typecheck clean.
 
 ## Final verdict
-**AURA_PAGE_WIRING_REMEDIATION_VERIFIED_PENDING_REPUBLISH**
+**AURA_PAGE_WIRING_REMEDIATION_VERIFIED**

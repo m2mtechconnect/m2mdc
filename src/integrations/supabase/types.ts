@@ -1728,12 +1728,14 @@ export type Database = {
       }
       connection_instances: {
         Row: {
+          binding_class: string
           configuration: Json
           connector_id: string
           created_at: string
           created_by: string | null
           credential_reference: string | null
           data_direction: string
+          disclosure_limitations: string[]
           display_name: string
           enabled: boolean
           endpoint_reference: string | null
@@ -1745,19 +1747,23 @@ export type Database = {
           last_ingest_at: string | null
           last_success_at: string | null
           last_tested_at: string | null
+          last_verified_at: string | null
           owner_id: string | null
+          platform_binding_state: string
           status: string
           status_reason: string | null
           tenant_id: string | null
           updated_at: string
         }
         Insert: {
+          binding_class?: string
           configuration?: Json
           connector_id: string
           created_at?: string
           created_by?: string | null
           credential_reference?: string | null
           data_direction?: string
+          disclosure_limitations?: string[]
           display_name: string
           enabled?: boolean
           endpoint_reference?: string | null
@@ -1769,19 +1775,23 @@ export type Database = {
           last_ingest_at?: string | null
           last_success_at?: string | null
           last_tested_at?: string | null
+          last_verified_at?: string | null
           owner_id?: string | null
+          platform_binding_state?: string
           status?: string
           status_reason?: string | null
           tenant_id?: string | null
           updated_at?: string
         }
         Update: {
+          binding_class?: string
           configuration?: Json
           connector_id?: string
           created_at?: string
           created_by?: string | null
           credential_reference?: string | null
           data_direction?: string
+          disclosure_limitations?: string[]
           display_name?: string
           enabled?: boolean
           endpoint_reference?: string | null
@@ -1793,7 +1803,9 @@ export type Database = {
           last_ingest_at?: string | null
           last_success_at?: string | null
           last_tested_at?: string | null
+          last_verified_at?: string | null
           owner_id?: string | null
+          platform_binding_state?: string
           status?: string
           status_reason?: string | null
           tenant_id?: string | null
@@ -3921,6 +3933,151 @@ export type Database = {
           tags?: string[] | null
           thumbnail_url?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      managed_connector_invocations: {
+        Row: {
+          actor_id: string | null
+          connection_id: string | null
+          correlation_id: string | null
+          created_at: string
+          decision: string
+          id: string
+          latency_ms: number | null
+          operation_id: string
+          reason_code: string | null
+          tenant_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          connection_id?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          decision: string
+          id?: string
+          latency_ms?: number | null
+          operation_id: string
+          reason_code?: string | null
+          tenant_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          connection_id?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          decision?: string
+          id?: string
+          latency_ms?: number | null
+          operation_id?: string
+          reason_code?: string | null
+          tenant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "managed_connector_invocations_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "connection_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      managed_connector_write_approvals: {
+        Row: {
+          approved_by: string | null
+          connection_id: string
+          correlation_id: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          operation_id: string
+          requested_by: string | null
+          status: string
+          tenant_id: string | null
+        }
+        Insert: {
+          approved_by?: string | null
+          connection_id: string
+          correlation_id?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          operation_id: string
+          requested_by?: string | null
+          status?: string
+          tenant_id?: string | null
+        }
+        Update: {
+          approved_by?: string | null
+          connection_id?: string
+          correlation_id?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          operation_id?: string
+          requested_by?: string | null
+          status?: string
+          tenant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "managed_connector_write_approvals_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "connection_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      managed_user_connections: {
+        Row: {
+          binding_class: string
+          connector_definition_id: string
+          consented_at: string | null
+          correlation_id: string | null
+          created_at: string
+          granted_scopes: string[]
+          id: string
+          last_success_at: string | null
+          provider_account_label: string | null
+          revoked_at: string | null
+          status: string
+          tenant_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          binding_class?: string
+          connector_definition_id: string
+          consented_at?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          granted_scopes?: string[]
+          id?: string
+          last_success_at?: string | null
+          provider_account_label?: string | null
+          revoked_at?: string | null
+          status?: string
+          tenant_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          binding_class?: string
+          connector_definition_id?: string
+          consented_at?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          granted_scopes?: string[]
+          id?: string
+          last_success_at?: string | null
+          provider_account_label?: string | null
+          revoked_at?: string | null
+          status?: string
+          tenant_id?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

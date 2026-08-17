@@ -19,7 +19,7 @@ import { initChangeLogMiddleware } from "@/stores/dcBuilderChangeLogMiddleware";
 import { SignIn, SignUp, SignOut, ForgotPassword, MFA } from "./pages/auth/index";
 import DataCentreTwin from "./pages/DataCentreTwin";
 import DataCentreTwinLanding from "./pages/DataCentreTwinLanding";
-import OmniverseScene from "./pages/OmniverseScene";
+import TwinPreview from "./pages/TwinPreview";
 import Onboarding from "./pages/Onboarding";
 import PendingApproval from "./pages/PendingApproval";
 // PR-0.1 Checkpoint B7.4F - Pilot shell imported statically because it is
@@ -145,7 +145,7 @@ function AuthenticatedApp() {
             </CoPilotProvider>
           )}
         />
-        <Route path="/omniverse-scene" element={<OmniverseScene />} />
+        <Route path="/twin-preview" element={<TwinPreview />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path={MANAGED_USER_RETURN_PATH} element={<ManagedUserReturn />} />
         {import.meta.env.DEV && OverlayFixtures ? <Route path="/dev-overlays" element={<OverlayFixtures />} /> : null}

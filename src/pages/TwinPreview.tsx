@@ -132,7 +132,7 @@ function MetricCard({
   );
 }
 
-export default function OmniverseScene() {
+export default function TwinPreview() {
   const kit = useOmniverseKit();
   // Phase 5 — single source of truth for what is actually drawing this view.
   const rendererState = resolveRendererMode({ webgl2Available: true });

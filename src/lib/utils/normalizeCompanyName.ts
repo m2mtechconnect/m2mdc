@@ -211,9 +211,10 @@ export function sanitizeTwinName(twinName: string | undefined | null): string {
     if (suffixIndex > 0) {
       const potentialName = twinName.slice(0, suffixIndex);
       const normalized = normalizeCompanyName(potentialName);
-      // A salvaged prefix that is only a URL artifact ("https", "http", "www")
-      // is not a company name - fall through to the generic twin name.
-      const isUrlArtifact = /^(https?|www)$/i.test(normalized);
+      // A prefix that is a URL (or a leftover protocol token) is an artifact,
+      // not a company name - fall through to the generic twin name.
+      const isUrlArtifact =
+        /https?:\/\//i.test(potentialName) || /^(https?|www)$/i.test(normalized);
       if (normalized && !isUrlArtifact) {
         return `${normalized}${suffix}`;
       }

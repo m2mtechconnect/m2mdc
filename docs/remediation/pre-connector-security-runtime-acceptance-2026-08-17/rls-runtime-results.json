@@ -1,0 +1,73 @@
+{
+  "phase": "AURA_PRE_CONNECTOR_SECURITY_AND_RUNTIME_ACCEPTANCE",
+  "date": "2026-08-17",
+  "method": "direct PostgREST calls with per-identity JWTs; no application code in the path",
+  "tenant_resolution": "public.current_tenant_id() = profiles.org_id for auth.uid()",
+  "identities": {
+    "anonymous": { "jwt": false },
+    "user_a": { "role": "engineer", "tenant": "11111111-1111-1111-1111-1111111111a1" },
+    "user_b": { "role": "engineer", "tenant": "22222222-2222-2222-2222-2222222222b1" },
+    "admin": { "role": "admin", "tenant": null }
+  },
+  "tables": [
+    {
+      "table": "connection_data_contracts",
+      "anonymous_unfiltered": { "status": 401, "rows": 0 },
+      "user_a_unfiltered": { "status": 200, "own_tenant_row_present": true, "other_tenant_row_present": false },
+      "user_a_filtered_other_tenant": { "status": 200, "rows": 0 },
+      "user_b_unfiltered": { "status": 200, "own_tenant_row_present": true, "other_tenant_row_present": false },
+      "user_b_filtered_other_tenant": { "status": 200, "rows": 0 },
+      "user_a_insert_cross_tenant": { "status": 403 },
+      "user_a_insert_own_tenant": { "status": 403, "note": "contract authoring is admin-only by design" },
+      "admin_unfiltered": { "status": 200, "all_rows": true }
+    },
+    {
+      "table": "connection_instances",
+      "anonymous_unfiltered": { "status": 401, "rows": 0 },
+      "user_a_unfiltered": { "status": 200, "own_tenant_row_present": true, "other_tenant_row_present": false },
+      "user_b_unfiltered": { "status": 200, "own_tenant_row_present": true, "other_tenant_row_present": false },
+      "cross_tenant_filtered": { "status": 200, "rows": 0 }
+    },
+    {
+      "table": "connection_health_checks",
+      "anonymous_unfiltered": { "status": 401, "rows": 0 },
+      "user_a_unfiltered": { "status": 200, "own_tenant_row_present": true, "other_tenant_row_present": false },
+      "user_b_unfiltered": { "status": 200, "own_tenant_row_present": true, "other_tenant_row_present": false },
+      "cross_tenant_filtered": { "status": 200, "rows": 0 }
+    },
+    {
+      "table": "connection_audit_events",
+      "anonymous_unfiltered": { "status": 401, "rows": 0 },
+      "user_a_unfiltered": { "status": 200, "own_tenant_row_present": true, "other_tenant_row_present": false },
+      "user_b_unfiltered": { "status": 200, "own_tenant_row_present": true, "other_tenant_row_present": false },
+      "cross_tenant_filtered": { "status": 200, "rows": 0 }
+    },
+    {
+      "table": "connector_definitions",
+      "scope": "publication, not tenant",
+      "anonymous": { "rows": 0 },
+      "user_a": { "published_visible": true, "draft_visible": false },
+      "user_b": { "published_visible": true, "draft_visible": false },
+      "admin": { "published_visible": true, "draft_visible": true }
+    },
+    {
+      "table": "app_user_connections",
+      "non_service_identities": { "status": 200, "rows": 0, "reason": "policy USING (false), fail-closed denial" },
+      "service_role": "edge functions only"
+    },
+    {
+      "table": "rag_tokens",
+      "row_count": 0,
+      "client_policy": "USING (false) WITH CHECK (false)",
+      "anon_authenticated_grants": "revoked"
+    }
+  ],
+  "bypass_attempts": {
+    "tenant_id_in_query_string": "ignored",
+    "tenant_id_in_insert_body": 403,
+    "unfiltered_query": "isolated without any client filter",
+    "direct_rest_instead_of_app": "identical result",
+    "anonymous_access": "401 on every connection-plane table"
+  },
+  "conclusion": "positive same-tenant access and negative cross-tenant access both proved, in both directions, for every affected table"
+}

@@ -1,0 +1,107 @@
+{
+ "/dashboard": {
+  "status": 200,
+  "final": "/dashboard",
+  "console_errors": [
+   "TypeError: Failed to fetch\n    at https://auradc.m2mtechconnect.com/assets/vendor-supabase-BJo9PGMe.js:24:3209\n    at si (https://auradc.m2mtechconnec",
+   "Failed to fetch locations: {message: TypeError: Failed to fetch, details: TypeError: Failed to fetch\n    at https://auradc.m\u2026echconnect.com/assets/ind",
+   "Failed to fetch twins: {message: TypeError: Failed to fetch, details: TypeError: Failed to fetch\n    at https://auradc.m\u2026echconnect.com/assets/index-C",
+   "Error fetching user roles: {message: TypeError: Failed to fetch, details: TypeError: Failed to fetch\n    at https://auradc.m\u2026chconnect.com/assets/inde"
+  ],
+  "failed": [
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.d309b3bd-88c",
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/profiles?select=is_approved&user_id=eq.d309b3bd-88c",
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_locations?select=*&order=name.asc",
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc"
+  ],
+  "google_drive_mentions": 0,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs  DATA CENTRE FACILITY  Montreal Data centre  Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs "
+ },
+ "/manage/connections": {
+  "status": 200,
+  "final": "/manage/connections",
+  "console_errors": [
+   "404 Error: User attempted to access non-existent route: /manage/connections",
+   "404 Error: User attempted to access non-existent route: /manage/connections"
+  ],
+  "failed": [
+   "https://e.clarity.ms/collect",
+   "https://e.clarity.ms/collect"
+  ],
+  "google_drive_mentions": 0,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs 404  Oops! Page not found  Return to Home  \u00a9 2025 Data Centre Digital Twin Studio  vpilot \u2022 1/1/1970 Documentation Comp"
+ },
+ "/admin/platform-readiness": {
+  "status": 200,
+  "final": "/admin/platform-readiness",
+  "console_errors": [
+   "404 Error: User attempted to access non-existent route: /admin/platform-readiness",
+   "404 Error: User attempted to access non-existent route: /admin/platform-readiness",
+   "404 Error: User attempted to access non-existent route: /admin/platform-readiness"
+  ],
+  "failed": [
+   "https://n.clarity.ms/collect",
+   "https://n.clarity.ms/collect",
+   "https://n.clarity.ms/collect"
+  ],
+  "google_drive_mentions": 0,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs 404  Oops! Page not found  Return to Home  \u00a9 2025 Data Centre Digital Twin Studio  vpilot \u2022 1/1/1970 Documentation Comp"
+ },
+ "/builder": {
+  "status": 200,
+  "final": "/builder",
+  "console_errors": [],
+  "failed": [
+   "https://z.clarity.ms/collect",
+   "https://z.clarity.ms/collect",
+   "https://z.clarity.ms/collect",
+   "https://z.clarity.ms/collect"
+  ],
+  "google_drive_mentions": 0,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Start a new build  Pick a template from the marketplace, resume a saved draft, or begin from scratch.  Choose a templat"
+ },
+ "/simulation": {
+  "status": 200,
+  "final": "/simulation?step=inspect",
+  "console_errors": [],
+  "failed": [
+   "https://l.clarity.ms/collect",
+   "https://l.clarity.ms/collect",
+   "https://l.clarity.ms/collect",
+   "https://l.clarity.ms/collect"
+  ],
+  "google_drive_mentions": 0,
+  "snippet": "? SIMULATED Design baseline No run recorded Synthetic inputs Montreal Data centre - Simulation SIMULATED Design baseline No run recorded Synthetic inputs View Engineering Inspect C"
+ },
+ "/evidence": {
+  "status": 200,
+  "final": "/dsx/evidence-beta/evidence?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "console_errors": [],
+  "failed": [
+   "https://y.clarity.ms/collect",
+   "https://y.clarity.ms/collect",
+   "https://y.clarity.ms/collect",
+   "https://y.clarity.ms/collect"
+  ],
+  "google_drive_mentions": 0,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00"
+ },
+ "/manage/connections?tab=catalogue": {
+  "status": 200,
+  "final": "/manage/connections?tab=catalogue",
+  "console_errors": [
+   "404 Error: User attempted to access non-existent route: /manage/connections",
+   "404 Error: User attempted to access non-existent route: /manage/connections",
+   "404 Error: User attempted to access non-existent route: /manage/connections",
+   "404 Error: User attempted to access non-existent route: /manage/connections"
+  ],
+  "failed": [
+   "https://h.clarity.ms/collect",
+   "https://h.clarity.ms/collect",
+   "https://h.clarity.ms/collect",
+   "https://h.clarity.ms/collect"
+  ],
+  "google_drive_mentions": 0,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs 404  Oops! Page not found  Return to Home  \u00a9 2025 Data Centre Digital Twin Studio  vpilot \u2022 1/1/1970 Documentation Comp"
+ }
+}

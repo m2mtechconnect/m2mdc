@@ -127,7 +127,7 @@ export function RAGUploadTabs({ systemId }: RAGUploadTabsProps) {
     if (!hasSecrets) {
       toast({
         title: "Missing credentials",
-        description: `Please configure ${provider === 'google' ? 'Google' : 'Microsoft'} OAuth credentials`,
+        description: 'Please configure Microsoft OAuth credentials',
         variant: "destructive",
       });
       return;

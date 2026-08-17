@@ -1,0 +1,20 @@
+{
+  "source_repository": "https://github.com/NVIDIA-Omniverse-blueprints/omniverse-dsx-blueprint-for-ai-factories",
+  "source_commit": "d940314d0593bbba1bae51e40ae7f9fd48358e18",
+  "source_committed_at": "2026-05-07T18:20:46Z",
+  "retrieved_at": "2026-08-17T02:44:43.424Z",
+  "algorithm": "sha256",
+  "files": {
+    "web/src/data/options.ts": "3c51421116da7c366dfc9e34ed29de03cbbdae5da50b3b6381ab24777c3bac80",
+    "web/src/data/kpis.ts": "c40c7f91e7ba8a3ff27121667d8372822601c6161e4f8c7971c1c81bbb342adc",
+    "web/src/data/configs.ts": "ee4ae99c177874631131628a6773079349e176a2ecca041cddeace3cb86001e9",
+    "ARCHITECTURE.md": "98075cd4c26000d5413fc3921be8eeffbd9e12e6edffc7ca4238e6ed36d6435f",
+    "PRODUCT_TERMS_OMNIVERSE": "4d63bd7409fec811c3a426bdc5070bb2240dba1cd54d389947418a9c49c1b666"
+  },
+  "ngc_dataset": {
+    "resource": "nvidia/omniverse/dsx_dataset",
+    "version": "2.1",
+    "status": "NOT_RETRIEVED",
+    "reason": "NGC API returned HTTP 401; no NGC credentials are present in this environment."
+  }
+}

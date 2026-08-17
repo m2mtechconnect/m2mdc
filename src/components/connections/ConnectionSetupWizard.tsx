@@ -253,8 +253,9 @@ export function ConnectionSetupWizard({
                 </Select>
               </div>
               <p className="text-xs text-muted-foreground sm:col-span-3">
-                Tenant scoping is recorded on the connection record. Row-level tenant isolation is not
-                enforced yet, so every administrator can still read every connection.
+                Tenant scoping is enforced. Only tenants you belong to are listed, reads and writes are
+                restricted to your tenant by row-level security, and the server re-checks the scope on
+                every provisioning call. Platform-wide connections stay visible to all signed-in users.
               </p>
             </div>
           )}

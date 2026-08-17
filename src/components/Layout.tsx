@@ -38,6 +38,7 @@ import {
 } from "@/config/appNavigation";
 import { OperatingStateBar } from "@/components/capability/OperatingStateBar";
 import { useShellLayoutStore } from "@/stores/shellLayoutStore";
+import { useDataset } from "@/data/dataset/DatasetProvider";
 import {
   useAssistantLayoutStore,
   useAssistantPresentation,
@@ -50,6 +51,9 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const fullBleed = useShellLayoutStore((s) => s.fullBleed);
+  // Navigation must carry the active dataset selection, otherwise a single
+  // click silently exits the admin canary back to the default dataset.
+  const { linkTo } = useDataset();
   const pageOwnsOperatingState = useShellLayoutStore((s) => s.pageOwnsOperatingState);
   const location = useLocation();
   const navigate = useNavigate();

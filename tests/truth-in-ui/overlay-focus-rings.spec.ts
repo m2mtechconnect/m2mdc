@@ -235,7 +235,7 @@ test.describe('decorative glow layers must never be focus targets', () => {
     '/',
     '/login',
     '/data-centre-twin?demo=true',
-    '/omniverse-scene',
+    '/twin-preview',
   ];
 
   for (const path of ROUTES) {

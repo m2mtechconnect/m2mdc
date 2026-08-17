@@ -43,9 +43,9 @@ test.describe('MetricProvenanceManifest — a11y', () => {
     void guard;
   });
 
-  test('every KPI card on /omniverse-scene has accessible provenance disclosure', async ({ page, guard }) => {
+  test('every KPI card on /twin-preview has accessible provenance disclosure', async ({ page, guard }) => {
     await mockKit(page, 'validated-live');
-    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
 
     const cards = ['pue', 'gpu-util', 'avg-temp', 'total-power', 'cooling-eff', 'tokens-per-watt', 'pue-target', 'sovereignty'];
     for (const id of cards) {

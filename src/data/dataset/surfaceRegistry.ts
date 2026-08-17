@@ -187,7 +187,7 @@ export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
 
   neutral('/data-centre-twin', '3D twin', 'Geometry provenance only, no dataset values.'),
   neutral('/data-centre-twin/:id', '3D twin detail', 'Geometry provenance only.'),
-  neutral('/omniverse-scene', 'Omniverse scene', 'Geometry only.'),
+  neutral('/twin-preview', 'Twin preview', 'Geometry only.'),
   neutral('/infrastructure', 'Infrastructure', 'Asset registry only.'),
   neutral('/teams', 'Teams'),
   neutral('/marketplace', 'Marketplace'),

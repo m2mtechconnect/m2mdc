@@ -62,7 +62,7 @@ const PUBLIC_SURFACES: Surface[] = [
   { name: 'landing', path: '/' },
   { name: 'login', path: '/login' },
   { name: 'signup', path: '/signup' },
-  { name: 'omniverse-scene', path: '/omniverse-scene' },
+  { name: 'twin-preview', path: '/twin-preview' },
   { name: 'data-centre-twin (demo)', path: '/data-centre-twin?demo=true' },
 ];
 
@@ -274,7 +274,7 @@ test.describe('a11y — color contrast + focus indicators (public)', () => {
     test(`${surface.name} — contrast + focus rings`, async ({ page, guard }) => {
       if (
         surface.path.includes('data-centre-twin') ||
-        surface.path.includes('omniverse-scene')
+        surface.path.includes('twin-preview')
       ) {
         await mockKit(page, 'network-unavailable');
       }

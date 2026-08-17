@@ -55,7 +55,7 @@ async function shot(page: Page, name: string) {
 test.use({ viewport: VIEWPORT });
 
 // =============================================================
-// A. Kit runtime states — /omniverse-scene (no auth required)
+// A. Kit runtime states — /twin-preview (no auth required)
 // =============================================================
 test.describe('Phase 1A.3.f — Kit runtime states', () => {
 
@@ -69,7 +69,7 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
       }
       await held; return route.abort('failed');
     });
-    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('metric-pue')).toBeVisible();
     await page.waitForTimeout(500);
     await shot(page, '01-omniverse-connecting-unavailable.png');
@@ -78,7 +78,7 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
 
   test('02 validated live', async ({ page, guard }) => {
     await mockKit(page, 'validated-live');
-    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
     await expect(page.getByText(/Kit connected.*validated/)).toBeVisible();
     await shot(page, '02-omniverse-validated-live.png');
     void guard;
@@ -86,7 +86,7 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
 
   test('03 kit disabled (aborted before validation)', async ({ page, guard }) => {
     await page.route('**/kit-api/**', r => r.abort('failed'));
-    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
     await expect(page.getByText(/Kit unavailable|Kit response invalid/).first()).toBeVisible();
     await shot(page, '03-omniverse-disabled-unavailable.png');
     void guard;
@@ -94,7 +94,7 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
 
   test('04 network unavailable', async ({ page, guard }) => {
     await mockKit(page, 'network-unavailable');
-    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
     await expect(page.getByText('Kit unavailable').first()).toBeVisible();
     await shot(page, '04-omniverse-unavailable.png');
     void guard;
@@ -102,7 +102,7 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
 
   test('05 schema invalid (demo fallback)', async ({ page, guard }) => {
     await mockKit(page, 'schema-invalid');
-    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
     // Checkpoint B7 lockdown: `readKitConfig()` is hard-disabled in every
     // browser build, so the Kit mock is never reached and the truthful
     // fallback is the disabled-by-configuration demo disclosure rather
@@ -125,7 +125,7 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
       }
       await held; return route.abort('failed');
     });
-    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('metric-pue')).toBeVisible();
     await page.waitForTimeout(1000);
     await shot(page, '06-omniverse-stale-unavailable.png');
@@ -134,7 +134,7 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
 
   test('07 demo fallback (invalid → demo, sovereignty=Not assessed)', async ({ page, guard }) => {
     await mockKit(page, 'schema-invalid');
-    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('metric-sovereignty')).toContainText('Not assessed');
     await shot(page, '07-omniverse-demo-fallback.png');
     void guard;
@@ -142,7 +142,7 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
 
   test('08 simulation running (anomaly phase)', async ({ page, guard }) => {
     await mockKit(page, 'running');
-    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
     await expect(page.getByText('Anomaly', { exact: true }).first()).toBeVisible();
     await shot(page, '08-omniverse-simulation-running.png');
     void guard;
@@ -150,7 +150,7 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
 
   test('09 simulation baseline (steady phase)', async ({ page, guard }) => {
     await mockKit(page, 'baseline');
-    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
     await expect(page.getByText('Steady', { exact: true }).first()).toBeVisible();
     await shot(page, '09-omniverse-simulation-baseline.png');
     void guard;
@@ -158,7 +158,7 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
 
   test('10 static target (target PUE card)', async ({ page, guard }) => {
     await mockKit(page, 'validated-live');
-    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
     const target = page.getByTestId('metric-pue-target');
     await expect(target).toHaveAttribute('data-provenance', 'static');
     await target.scrollIntoViewIfNeeded();
@@ -168,7 +168,7 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
 
   test('11 unavailable / not assessed (sovereignty)', async ({ page, guard }) => {
     await mockKit(page, 'validated-live');
-    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
     const card = page.getByTestId('metric-sovereignty');
     await expect(card).toContainText('Not assessed');
     await card.scrollIntoViewIfNeeded();

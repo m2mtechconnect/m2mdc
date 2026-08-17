@@ -6831,6 +6831,10 @@ export type Database = {
         Returns: boolean
       }
       connection_visible: { Args: { _connection_id: string }; Returns: boolean }
+      consume_public_intake_quota: {
+        Args: { _bucket_key: string; _intake_kind: string; _limit: number }
+        Returns: boolean
+      }
       current_tenant_id: { Args: never; Returns: string }
       delete_secret_from_vault: {
         Args: { vault_id: string }

@@ -34,10 +34,13 @@ interface ProfileRow {
   avatar_bg_color: string | null;
 }
 
+const PAGE_SIZE = 25;
+
 function SignupsDashboardContent() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<'all' | 'pending' | 'approved'>('all');
+  const [page, setPage] = useState(1);
 
   // Fetch profiles
   const { data: profiles, isLoading } = useQuery({
@@ -100,11 +103,22 @@ function SignupsDashboardContent() {
     p.created_at && isAfter(new Date(p.created_at), subDays(new Date(), 7))
   ).length ?? 0;
 
+  useEffect(() => {
+    setPage(1);
+  }, [tab]);
+
   const filtered = profiles?.filter(p => {
     if (tab === 'pending') return !p.is_approved;
     if (tab === 'approved') return p.is_approved;
     return true;
   }) ?? [];
+
+  // Rendering every signup at once produced hundreds of rows and action
+  // buttons in one pass. Paging keeps the table interactive.
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const pageStart = (safePage - 1) * PAGE_SIZE;
+  const visible = filtered.slice(pageStart, pageStart + PAGE_SIZE);
 
   return (
     <div className="space-y-6">
@@ -212,7 +226,7 @@ function SignupsDashboardContent() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filtered.map((profile) => (
+                    {visible.map((profile) => (
                       <TableRow key={profile.user_id}>
                         <TableCell>
                           <div className="flex items-center gap-2.5">
@@ -278,6 +292,37 @@ function SignupsDashboardContent() {
                   </TableBody>
                 </Table>
                 </div>
+              )}
+              {filtered.length > PAGE_SIZE && (
+                <nav
+                  aria-label="Signup pages"
+                  className="flex items-center justify-between gap-3 border-t border-border pt-3 mt-3"
+                >
+                  <p className="text-xs text-muted-foreground" aria-live="polite">
+                    Showing {pageStart + 1}-{Math.min(pageStart + PAGE_SIZE, filtered.length)} of {filtered.length}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={safePage <= 1}
+                    >
+                      Previous
+                    </Button>
+                    <span className="text-xs text-muted-foreground">
+                      Page {safePage} of {pageCount}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+                      disabled={safePage >= pageCount}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </nav>
               )}
             </CardContent>
           </Card>

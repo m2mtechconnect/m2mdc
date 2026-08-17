@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { DCCard } from "@/components/dc-ui/DCCard";
+import { PagePurpose } from "@/components/capability/PagePurpose";
 import { DCSectionHeader } from "@/components/dc-ui/DCSectionHeader";
 import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 

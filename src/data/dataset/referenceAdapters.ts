@@ -120,7 +120,7 @@ export const REFERENCE_ADAPTERS: readonly ReferenceAdapter[] = [
     tabs: [
       { id: 'resolved', label: 'Resolved values', sections: ['specifications', 'configurations'], intent: 'Read-only resolution of the selected reference configuration.' },
     ],
-    workflowLimitations: ['Preview is read-only by design in every dataset.'],
+    workflowLimitations: ['Editing is unavailable here: preview is read-only in every dataset, by design.'],
   }),
   adapter({
     path: '/data-centre-twin/:id/blueprint',
@@ -189,7 +189,7 @@ export const REFERENCE_ADAPTERS: readonly ReferenceAdapter[] = [
       { id: 'scenarios', label: 'Scenarios', sections: ['scenarios'], intent: 'Scenario records in the reference dataset.' },
       { id: 'lineage', label: 'Prospective lineage', sections: ['run-lineage'], intent: 'What a run would record, or why it would be blocked.' },
     ],
-    workflowLimitations: ['Preview never persists a run record.'],
+    workflowLimitations: ['Nothing is persisted here: preview never writes a run record.'],
   }),
   adapter({
     path: '/analytics',
@@ -285,7 +285,7 @@ export const REFERENCE_ADAPTERS: readonly ReferenceAdapter[] = [
       { id: 'health', label: 'Health', sections: ['integrations'], intent: 'Per-source state, with the last observed result.' },
       { id: 'blockers', label: 'Blockers', sections: ['ngc'], intent: 'Why a source is unavailable.' },
     ],
-    workflowLimitations: ['No polling loop runs, so no health timestamp is generated.'],
+    workflowLimitations: ['Refresh is disabled: no polling loop runs, so no health timestamp is generated.'],
   }),
   adapter({
     path: '/manage/integrations',
@@ -346,7 +346,7 @@ export const REFERENCE_ADAPTERS: readonly ReferenceAdapter[] = [
       { id: 'assets', label: 'Assets', sections: ['assets'], intent: 'OpenUSD-derived asset provenance, reported as provenance rather than DSX integration.' },
       { id: 'blockers', label: 'Blockers', sections: ['ngc'], intent: 'Source availability.' },
     ],
-    workflowLimitations: ['Publication actions stay with the legacy pipeline and are not driven by the dataset selector.'],
+    workflowLimitations: ['Publication actions are not shown here: asset publication stays with the legacy pipeline and is not driven by the dataset selector.'],
   }),
   adapter({
     path: '/help',

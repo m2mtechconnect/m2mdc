@@ -6,8 +6,8 @@
     "before": "Integrations",
     "after": "Connections"
   },
-  "connectorDefinitions": 22,
-  "connectionInstances": 4,
+  "connectorDefinitions": 25,
+  "connectionInstances": 5,
   "operationalDataSources": 0,
   "platformServices": 1,
   "dsxEventsReceived": 0,
@@ -18,5 +18,9 @@
   "twinMappings": 0,
   "removedFiles": [
     "src/pages/Integrations.tsx"
-  ]
+  ],
+  "setupWizard": "NOT_IMPLEMENTED",
+  "mappingEditor": "NOT_IMPLEMENTED",
+  "tenantIsolation": "NOT_ENFORCED - select policies are unscoped",
+  "healthCheckRole": "admin or owner only"
 }

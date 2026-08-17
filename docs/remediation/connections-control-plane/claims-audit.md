@@ -13,3 +13,11 @@
 
 No capability was promoted to NVIDIA_INTEGRATED or SIMREADY_VALIDATED. No vendor logo implies
 partnership or certification. No point-in-time value is rendered as a trend.
+
+## Claims corrected by the implementation audit
+- "Tenant isolation pass" was unsupported: SELECT policies are unscoped. Corrected to a known gap.
+- "Engineer may test permitted connections" was unsupported: the health-check function is
+  administrator-only. Corrected in `rbac-matrix.md`.
+- The connection wizard and mapping editor were described as implemented. Both are design-only;
+  corrected in `connection-workflow.md` and `mapping-validation.md`.
+- Counts were stated as 22 definitions and 4 instances; the database holds 25 and 5.

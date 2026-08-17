@@ -1,16 +1,21 @@
 # RBAC matrix
 
-Existing roles only; no role invented.
+Existing roles only; no role invented. Corrected after implementation audit.
 
 | Capability | admin / owner | engineer / operator | viewer | anonymous |
 | --- | --- | --- | --- | --- |
-| View connections, catalogue, mappings, activity | yes | yes | yes | no (route requires auth) |
-| Run health check | yes | yes (permitted connections) | no | no |
-| Configure / activate / disable | yes | no | no | no |
-| Manage credential references | yes | no | no | no |
-| Manage mappings | yes | no | no | no |
-| Remove connection | yes (confirmation; system connections blocked) | no | no | no |
+| View connections, catalogue, mappings, activity | yes | yes | yes | no (auth required) |
+| Run health check | yes | **no** (edge function requires admin or owner) | no | no |
+| Insert/update connection instances | yes (RLS `has_role admin/owner`) | no | no | no |
+| Insert/update twin mappings | yes (RLS `has_role admin/owner`) | no | no | no |
+| Write health checks, ingest runs, audit events | no client write path; service role only | no | no | no |
 | Platform readiness page | yes | read-only | read-only | no |
 
-Enforced client-side through `RBACContext` (`twin.edit` gate on the navigation entry) and
-server-side by RLS plus the edge function's role check.
+Navigation entry is gated on `twin.edit`. Data API privileges were tightened after the audit: the
+five evidence tables grant `SELECT` only to `authenticated`; `connection_instances` and
+`connection_twin_mappings` grant write, gated by administrator RLS policies. `anon` has no
+privilege on any control-plane table.
+
+Known gap: SELECT policies are `USING (true)` for authenticated users. There is no tenant or
+facility scoping yet, so tenant isolation is NOT enforced at the row level. This must be added
+before multi-tenant data is stored.

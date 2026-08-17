@@ -89,6 +89,8 @@ export interface ConnectionInstance {
   data_direction: string;
   endpoint_reference: string | null;
   credential_reference: string | null;
+  /** Non-secret provisioning metadata (auth method, data classes, origin). */
+  configuration?: Record<string, unknown> | null;
   owner_id: string | null;
   is_system: boolean;
   enabled: boolean;

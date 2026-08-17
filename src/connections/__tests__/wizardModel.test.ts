@@ -4,6 +4,7 @@ import {
   canPersistDraft,
   emptyWizardDraft,
   isDuplicateScope,
+  requiresVaultCredential,
   selectableConnectors,
   validateStep,
   type WizardDraft,
@@ -55,10 +56,18 @@ describe('connection setup wizard model', () => {
     expect(result.reason).toMatch(/runtime adapter/);
   });
 
-  it('refuses secret-bearing authentication because no vault exists', () => {
-    expect(authBlocker(implemented, 'mtls')).toMatch(/credential vault/);
+  it('requires vault credential material for secret-bearing authentication', () => {
+    expect(authBlocker(implemented, 'mtls')).toMatch(/needs a credential/);
+    expect(authBlocker(implemented, 'mtls', 'short')).toMatch(/at least 12 characters/);
+    expect(authBlocker(implemented, 'mtls', 'a-real-client-certificate-key')).toBeNull();
     expect(authBlocker(implemented, 'jwt')).toBeNull();
     expect(authBlocker(implemented, 'oauth2')).toMatch(/does not support/);
+  });
+
+  it('knows which methods need the vault', () => {
+    expect(requiresVaultCredential('mtls')).toBe(true);
+    expect(requiresVaultCredential('jwt')).toBe(false);
+    expect(requiresVaultCredential('')).toBe(false);
   });
 
   it('rejects an unsupported direction', () => {
@@ -92,5 +101,8 @@ describe('connection setup wizard model', () => {
     expect(canPersistDraft(draft(), implemented, [])).toBe(true);
     expect(canPersistDraft(draft({ display_name: 'x' }), implemented, [])).toBe(false);
     expect(canPersistDraft(draft({ auth_method: 'mtls' }), implemented, [])).toBe(false);
+    expect(
+      canPersistDraft(draft({ auth_method: 'mtls', credential_secret: 'a-real-client-key' }), implemented, []),
+    ).toBe(true);
   });
 });

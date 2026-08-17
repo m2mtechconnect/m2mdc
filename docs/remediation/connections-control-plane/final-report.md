@@ -8,7 +8,7 @@
 - Connector definitions created: 25. Connection instances created: 5.
 - Actual connected systems: application platform and managed asset storage (both platform services).
 - Operational data sources: 0. DSX event count: 0. MQTT wiring: implemented but unwired.
-- DSX Exchange: not deployed. MCP: not implemented. Credential vault: not available.
+- DSX Exchange: not deployed. MCP: not implemented. Credential vault: implemented (encrypted, backend-only, rotatable).
 - Mapping count: 0. Health checks: 3 executed, all PASSED, all server-side, all audited.
 - RBAC: pass for administrator gating; tenant isolation enforced in RLS and re-checked server-side.
 - SSRF: pass (fixed server-owned probe allowlist, no client-supplied targets).
@@ -16,7 +16,7 @@
 - Tests: 24 passing across the new connections suite and the navigation suite; typecheck clean.
 
 ## Remaining blockers
-credential vault absent, MQTT resolver wiring, DSX Exchange deployment, genuine MCP,
+MQTT resolver wiring, DSX Exchange deployment, genuine MCP,
 engineer/anonymous published-host verification.
 
 ## Verdict (revised after implementation audit)

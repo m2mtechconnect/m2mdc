@@ -28,14 +28,18 @@ Date: 2026-08-17. Scope: everything shipped in AURA_CONNECTIONS_CONTROL_PLANE_RE
 ## Open gaps (unchanged by this audit)
 - ~~No connection setup wizard~~ CLOSED: a six-step wizard provisions connections through the
   `connection-provision` edge function, with role checks, duplicate rejection, credential refusal
-  and audit events. Secret-bearing auth methods stay blocked until a vault exists.
+  and audit events. Secret-bearing auth methods are configured through the credential vault.
 - ~~Mappings tab is read-only~~ CLOSED: create, edit, validate, activate/deactivate and delete are
   implemented and admin/owner-gated. Export and import remain unimplemented.
 - ~~No tenant or facility scoping in SELECT policies~~ CLOSED: SELECT and write policies on the
   five tenant-owned tables are scoped through `current_tenant_id()`, and edge functions re-check
   the same rule because the service-role client bypasses RLS. Facility-level scoping within a
   tenant is still not enforced.
-- No credential vault, so no credential-bearing connector can be configured.
+- ~~No credential vault~~ CLOSED: `connection_credentials` and `connection_credential_events`
+  store AES-GCM ciphertext readable by the service role only, and the `connection-credential`
+  edge function implements store, rotate, revoke, status and list with admin/owner and tenant
+  checks. Plaintext never leaves the browser except on the single write path and is never
+  returned. Automated expiry enforcement is not implemented.
 - MQTT unwired, DSX Exchange not deployed, MCP not implemented.
 - Engineer-role and anonymous verification on the published host not executed.
 

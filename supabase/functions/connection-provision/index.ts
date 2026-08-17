@@ -5,8 +5,9 @@
  *   - Caller must present a valid session JWT and hold admin or owner.
  *   - Only connectors with IMPLEMENTED status and a runtime adapter may be
  *     instantiated. Everything else is refused with a named reason.
- *   - No credential material is accepted, stored or echoed. Secret-bearing
- *     authentication methods are refused because no vault exists.
+ *   - No credential material is accepted, stored or echoed here. Secret-bearing
+ *     methods are provisioned unconfigured; the credential is submitted
+ *     separately to the connection-credential vault function.
  *   - Endpoint targets are server-owned; the caller never supplies a URL.
  *   - Activation requires a persisted PASSED health check.
  *   - Every transition writes a connection_audit_events row.
@@ -96,9 +97,6 @@ Deno.serve(async (req) => {
     if (!definition.supported_auth_methods?.includes(authMethod)) {
       return json(400, { error_code: 'unsupported_auth_method', safe_message: 'This connector does not support the selected authentication method.', correlation_id: correlationId });
     }
-    if (!VAULT_FREE_AUTH.has(authMethod)) {
-      return json(400, { error_code: 'credential_vault_unavailable', safe_message: 'No server-side credential vault is available, so a secret-bearing authentication method cannot be configured yet.', correlation_id: correlationId });
-    }
     if (!(definition.supported_directions ?? []).some((d: string) => direction.includes(d))) {
       return json(400, { error_code: 'unsupported_direction', safe_message: 'This connector does not support the selected direction.', correlation_id: correlationId });
     }
@@ -131,7 +129,9 @@ Deno.serve(async (req) => {
         created_by: user.id,
         is_system: false,
         enabled: false,
-        status_reason: 'Created by the setup wizard. No health check has been executed yet.',
+        status_reason: VAULT_FREE_AUTH.has(authMethod)
+          ? 'Created by the setup wizard. No health check has been executed yet.'
+          : 'Created by the setup wizard. A vault credential must be stored before this connection can authenticate.',
       })
       .select('*')
       .single();

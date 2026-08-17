@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRBAC } from '@/contexts/RBACContext';
 import { ConnectionStatusBadge } from './ConnectionStatusBadge';
 import { ConnectionSetupWizard } from './ConnectionSetupWizard';
+import { CredentialVaultDialog } from './CredentialVaultDialog';
 import {
   canRunHealthCheck,
   summariseConnections,
@@ -15,7 +16,13 @@ import {
   type ConnectorDefinition,
   type HealthCheckRecord,
 } from '@/connections/model';
-import { runHealthCheck, deactivateConnection, deleteConnection, activateConnection } from '@/connections/api';
+import {
+  runHealthCheck,
+  deactivateConnection,
+  deleteConnection,
+  activateConnection,
+  useConnectionCredentials,
+} from '@/connections/api';
 
 interface Props {
   connections: ConnectionInstance[];
@@ -38,7 +45,12 @@ export function ConnectionsTab({ connections, definitions, healthChecks, eventCo
   const [testing, setTesting] = useState<string | null>(null);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [mutating, setMutating] = useState<string | null>(null);
+  const [vaultTarget, setVaultTarget] = useState<ConnectionInstance | null>(null);
   const isAdmin = role === 'admin' || role === 'owner' || can('twin.edit');
+
+  // Metadata only: fingerprint, version and rotation date. Never the material.
+  const credentials = useConnectionCredentials(isAdmin);
+  const credentialFor = (id: string) => (credentials.data ?? []).find((c) => c.connection_id === id) ?? null;
 
   const byId = useMemo(() => new Map(definitions.map((d) => [d.id, d])), [definitions]);
   const summary = useMemo(
@@ -184,6 +196,16 @@ export function ConnectionsTab({ connections, definitions, healthChecks, eventCo
                     <div><dt className="text-xs text-muted-foreground">Authentication</dt><dd className="text-sm">{definition?.supported_auth_methods?.join(', ') || 'None'}</dd></div>
                     <div><dt className="text-xs text-muted-foreground">Last check</dt><dd className="text-sm">{fmt(connection.last_tested_at)}</dd></div>
                     <div><dt className="text-xs text-muted-foreground">Last data received</dt><dd className="text-sm">{fmt(connection.last_ingest_at)}</dd></div>
+                    <div>
+                      <dt className="text-xs text-muted-foreground">Vault credential</dt>
+                      <dd className="text-sm">
+                        {!isAdmin
+                          ? 'Visible to administrators only'
+                          : credentialFor(connection.id)
+                            ? `v${credentialFor(connection.id)!.version} · ${credentialFor(connection.id)!.fingerprint} · rotated ${fmt(credentialFor(connection.id)!.last_rotated_at)}`
+                            : 'None stored'}
+                      </dd>
+                    </div>
                   </dl>
                   <p className="text-xs text-muted-foreground">
                     {connection.status_reason ?? STATUS_DESCRIPTORS[connection.status]?.meaning}
@@ -242,6 +264,14 @@ export function ConnectionsTab({ connections, definitions, healthChecks, eventCo
                         )}
                         <Button
                           size="sm"
+                          variant="outline"
+                          className="min-h-[32px]"
+                          onClick={() => setVaultTarget(connection)}
+                        >
+                          {credentialFor(connection.id) ? 'Rotate credential' : 'Store credential'}
+                        </Button>
+                        <Button
+                          size="sm"
                           variant="ghost"
                           className="min-h-[32px]"
                           disabled={mutating === connection.id}
@@ -258,6 +288,13 @@ export function ConnectionsTab({ connections, definitions, healthChecks, eventCo
           })}
         </div>
       </section>
+
+      <CredentialVaultDialog
+        connection={vaultTarget}
+        open={vaultTarget !== null}
+        onOpenChange={(next) => { if (!next) setVaultTarget(null); }}
+        onChanged={() => { credentials.refetch(); onRefresh(); }}
+      />
 
       <ConnectionSetupWizard
         open={wizardOpen}

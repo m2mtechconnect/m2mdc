@@ -25,9 +25,21 @@ caller never supplies a URL.
 Cancellation is non-destructive, no secret is ever displayed or stored, every blocker is explained
 in place, and system connections cannot be deleted.
 
+## Credentials
+Secret-bearing authentication methods (mtls, oauth2, api_key and similar) are supported through the
+server-side credential vault. The wizard collects the credential at step 4, submits it once to the
+`connection-credential` edge function immediately after the instance is created, and clears it from
+component state. The value is AES-GCM encrypted with a key derived from `CONNECTION_CREDENTIAL_KEY`
+and written to `connection_credentials`, a table whose only RLS policy is `USING (false)` for
+signed-in users; only the service role can read it. No endpoint returns plaintext, so the UI exposes
+a fingerprint, version, rotation date and expiry only. Rotation replaces the material in place,
+increments the version and refuses an unchanged value; revocation destroys the material and disables
+the connection. Every store, rotation and revocation writes both a `connection_credential_events`
+row and a `connection_audit_events` row.
+
 ## Limitations
-No credential vault, so secret-bearing authentication methods (mtls, oauth2, api_key and similar)
-are refused with a named reason. Drafts are not persisted before step 5; cancelling earlier discards the form.
+Drafts are not persisted before step 5; cancelling earlier discards the form. Credential expiry is
+recorded but not yet enforced by an automated rotation reminder.
 
 ## Tenant isolation
 Enforced. `public.current_tenant_id()` resolves the caller's organisation from their profile;

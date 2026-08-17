@@ -267,3 +267,86 @@ export async function deleteTwinMapping(id: string): Promise<void> {
   const { error } = await db.from('connection_twin_mappings').delete().eq('id', id);
   if (error) throw error;
 }
+/* ------------------------------------------------------------------ */
+/* Credential vault                                                    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Credential metadata is the only credential-shaped thing that ever reaches
+ * the browser. Ciphertext lives in a backend-only table, the plaintext exists
+ * solely inside an edge function invocation, and no endpoint returns either.
+ */
+export interface CredentialMetadata {
+  connection_id: string;
+  auth_method: string;
+  /** Short SHA-256 prefix operators can compare with the source system. */
+  fingerprint: string;
+  version: number;
+  status: string;
+  expires_at: string | null;
+  last_rotated_at: string;
+  created_at: string;
+}
+
+async function vault<T>(payload: Record<string, unknown>): Promise<T> {
+  const { data, error } = await supabase.functions.invoke('connection-credential', { body: payload });
+  if (error) {
+    const details = 'context' in error && (error as { context?: { text?: () => Promise<string> } }).context?.text
+      ? await (error as { context: { text: () => Promise<string> } }).context.text()
+      : error.message;
+    let message = details;
+    try {
+      const parsed = JSON.parse(details);
+      message = parsed.safe_message ?? parsed.error_code ?? details;
+    } catch { /* details is not JSON */ }
+    throw new Error(message);
+  }
+  return data as T;
+}
+
+/** Vault metadata for every connection visible to the caller's tenant. */
+export function useConnectionCredentials(enabled = true) {
+  return useQuery({
+    queryKey: ['connection-credentials'],
+    enabled,
+    queryFn: async (): Promise<CredentialMetadata[]> => {
+      try {
+        const result = await vault<{ credentials: CredentialMetadata[] }>({ action: 'list' });
+        return result.credentials ?? [];
+      } catch {
+        // Non-admins are refused by design; the UI renders "not visible".
+        return [];
+      }
+    },
+    staleTime: 30_000,
+  });
+}
+
+/** Stores or rotates the credential. The value leaves the browser exactly once. */
+export async function storeConnectionCredential(
+  connectionId: string,
+  secret: string,
+  options: { authMethod?: string; expiresAt?: string | null; rotate?: boolean } = {},
+): Promise<CredentialMetadata> {
+  const result = await vault<{ credential: CredentialMetadata }>({
+    action: options.rotate ? 'rotate' : 'store',
+    connection_id: connectionId,
+    secret,
+    auth_method: options.authMethod,
+    expires_at: options.expiresAt ?? null,
+  });
+  return result.credential;
+}
+
+export async function getConnectionCredentialStatus(connectionId: string): Promise<CredentialMetadata | null> {
+  const result = await vault<{ credential: CredentialMetadata | null }>({
+    action: 'status',
+    connection_id: connectionId,
+  });
+  return result.credential;
+}
+
+/** Destroys the stored material and disables the connection. */
+export async function revokeConnectionCredential(connectionId: string): Promise<void> {
+  await vault({ action: 'revoke', connection_id: connectionId });
+}

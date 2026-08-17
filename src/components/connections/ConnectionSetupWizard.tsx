@@ -1,7 +1,9 @@
 /**
  * Connection setup wizard. Drafts are non-destructive, cancellation discards
- * nothing already proven, secrets are never collected, and activation is only
- * offered after a passing server-side health check.
+ * nothing already proven, and activation is only offered after a passing
+ * server-side health check. Credential material, when the method needs one, is
+ * held in component state, submitted once to the vault edge function, and
+ * cleared immediately; it is never persisted or read back in the browser.
  */
 import { useEffect, useMemo, useState } from 'react';
 import { Check, CircleAlert, Loader2 } from 'lucide-react';
@@ -24,6 +26,7 @@ import {
   activateConnection,
   createConnection,
   runHealthCheck,
+  storeConnectionCredential,
   useFacilityOptions,
   useTenantOptions,
   type HealthCheckResult,
@@ -34,6 +37,7 @@ import {
   ENVIRONMENTS,
   WIZARD_STEPS,
   emptyWizardDraft,
+  requiresVaultCredential,
   selectableConnectors,
   validateStep,
   type WizardDraft,
@@ -104,6 +108,13 @@ export function ConnectionSetupWizard({
           data_classes: draft.data_classes,
           auth_method: draft.auth_method,
         });
+        if (requiresVaultCredential(draft.auth_method)) {
+          await storeConnectionCredential(connection.id, draft.credential_secret, {
+            authMethod: draft.auth_method,
+          });
+          // The plaintext never survives the submission.
+          set('credential_secret', '');
+        }
         setCreated(connection);
         setStepIndex((i) => i + 1);
       } catch (error) {
@@ -167,8 +178,9 @@ export function ConnectionSetupWizard({
         <DialogHeader>
           <DialogTitle>Add connection</DialogTitle>
           <DialogDescription className="text-xs">
-            Step {stepIndex + 1} of {WIZARD_STEPS.length}: {step.description} Credentials are never
-            collected here and no connection is activated without a passing server-side check.
+            Step {stepIndex + 1} of {WIZARD_STEPS.length}: {step.description} Credentials go straight
+            to the encrypted server-side vault and no connection is activated without a passing
+            server-side check.
           </DialogDescription>
         </DialogHeader>
 
@@ -314,10 +326,31 @@ export function ConnectionSetupWizard({
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">
-                No credential is entered in AURA. Methods that need a stored secret stay unavailable
-                until a server-side credential vault exists.
-              </p>
+              {requiresVaultCredential(draft.auth_method) && (
+                <div className="space-y-2 pt-2">
+                  <Label htmlFor="wizard-credential" className="text-xs">Credential</Label>
+                  <Input
+                    id="wizard-credential"
+                    type="password"
+                    autoComplete="new-password"
+                    value={draft.credential_secret}
+                    onChange={(e) => set('credential_secret', e.target.value)}
+                    className="h-9 text-sm"
+                    placeholder="Paste the credential issued by the source system"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Submitted once to the credential vault, encrypted with AES-GCM server-side and
+                    stored in a table no signed-in user can read. AURA shows only a fingerprint,
+                    version and rotation date afterwards. It cannot be displayed again; rotate it to
+                    replace it.
+                  </p>
+                </div>
+              )}
+              {!requiresVaultCredential(draft.auth_method) && (
+                <p className="text-xs text-muted-foreground">
+                  This method authenticates without a stored secret, so nothing is written to the vault.
+                </p>
+              )}
             </div>
           )}
 

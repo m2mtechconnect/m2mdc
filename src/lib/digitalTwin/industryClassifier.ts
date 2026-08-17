@@ -27,6 +27,14 @@ export type Industry =
 
 interface IndustryPattern {
   industry: Industry;
+  /**
+   * Host fragments, matched against the lowercased domain.
+   *
+   * These must be domain-shaped. Human-readable names containing spaces
+   * ("cleveland clinic", "whole foods") can never match a hostname, so every
+   * such entry was dead weight that silently pushed the company into the
+   * default SaaS bucket.
+   */
   domainPatterns: string[];
   keywords: string[];
   exclusions?: string[];
@@ -35,7 +43,7 @@ interface IndustryPattern {
 const industryPatterns: IndustryPattern[] = [
   {
     industry: 'Enterprise Retail',
-    domainPatterns: ['walmart.com', 'target.com', 'costco.com', 'homedepot.com', 'lowes.com', 'bestbuy.com'],
+    domainPatterns: ['walmart.com', 'target.com', 'homedepot.com', 'lowes.com', 'bestbuy.com'],
     keywords: ['retail', 'stores', 'merchandise', 'shopping', 'distribution center', 'point of sale', 'inventory management'],
   },
   {
@@ -45,12 +53,14 @@ const industryPatterns: IndustryPattern[] = [
   },
   {
     industry: 'Grocery & Food Retail',
-    domainPatterns: ['kroger.com', 'albertsons.com', 'whole foods', 'safeway.com'],
+    // Costco's operating model is grocery and fresh-goods led, so it belongs
+    // here rather than in general enterprise retail.
+    domainPatterns: ['kroger.com', 'albertsons.com', 'wholefoods.com', 'wholefoodsmarket.com', 'safeway.com', 'costco.com', 'loblaws.ca', 'sobeys.com'],
     keywords: ['grocery', 'food retail', 'supermarket', 'fresh produce', 'perishable', 'refrigeration'],
   },
   {
     industry: 'Logistics / Supply Chain / 3PL',
-    domainPatterns: ['fedex.com', 'ups.com', 'dhl.com', 'maersk.com', 'coyote.com', 'ch robinson'],
+    domainPatterns: ['fedex.com', 'ups.com', 'dhl.com', 'maersk.com', 'coyote.com', 'chrobinson.com'],
     keywords: ['logistics', '3pl', 'freight', 'shipping', 'warehousing', 'last mile', 'fleet management', 'transportation management'],
   },
   {
@@ -75,7 +85,7 @@ const industryPatterns: IndustryPattern[] = [
   },
   {
     industry: 'Healthcare / Hospitals',
-    domainPatterns: ['mayo clinic', 'cleveland clinic', 'johns hopkins', 'kaiser'],
+    domainPatterns: ['mayoclinic.org', 'clevelandclinic.org', 'hopkinsmedicine.org', 'johnshopkins.edu', 'kaiserpermanente.org', 'kp.org'],
     keywords: ['hospital', 'healthcare', 'patient care', 'clinical', 'medical center', 'health system'],
   },
   {
@@ -90,12 +100,12 @@ const industryPatterns: IndustryPattern[] = [
   },
   {
     industry: 'Insurance',
-    domainPatterns: ['metlife.com', 'prudential.com', 'allstate.com', 'statefarm', 'aig.com'],
+    domainPatterns: ['metlife.com', 'prudential.com', 'allstate.com', 'statefarm.com', 'aig.com', 'manulife.com', 'sunlife.com', 'intact.ca'],
     keywords: ['insurance', 'underwriting', 'claims', 'actuarial', 'risk assessment', 'policy'],
   },
   {
     industry: 'Real Estate / PropTech',
-    domainPatterns: ['zillow.com', 'redfin.com', 'cbre.com', 'cushman', 'colliers'],
+    domainPatterns: ['zillow.com', 'redfin.com', 'cbre.com', 'cushmanwakefield.com', 'colliers.com'],
     keywords: ['real estate', 'property', 'proptech', 'leasing', 'facilities', 'building management'],
   },
   {
@@ -105,27 +115,29 @@ const industryPatterns: IndustryPattern[] = [
   },
   {
     industry: 'Telecommunications',
-    domainPatterns: ['verizon.com', 'att.com', 't-mobile', 'vodafone', 'orange'],
+    domainPatterns: ['verizon.com', 'att.com', 't-mobile.com', 'vodafone.com', 'bell.ca', 'telus.com', 'rogers.com'],
     keywords: ['telecom', 'telecommunications', 'network', '5g', 'wireless', 'carrier'],
   },
   {
     industry: 'Travel / Transportation',
-    domainPatterns: ['delta.com', 'united.com', 'marriott.com', 'hilton.com', 'expedia'],
+    domainPatterns: ['delta.com', 'united.com', 'marriott.com', 'hilton.com', 'expedia.com', 'aircanada.com'],
     keywords: ['travel', 'hospitality', 'airline', 'hotel', 'booking', 'passenger'],
   },
   {
     industry: 'Education / EdTech',
-    domainPatterns: ['coursera.com', 'udemy.com', 'blackboard.com', 'canvas.com'],
+    domainPatterns: ['coursera.org', 'coursera.com', 'udemy.com', 'blackboard.com', 'instructure.com', '.edu'],
     keywords: ['education', 'edtech', 'learning', 'university', 'school', 'training platform'],
   },
   {
     industry: 'Agriculture / Agritech',
-    domainPatterns: ['johndeere.com', 'cargill.com', 'monsanto', 'syngenta'],
+    domainPatterns: ['johndeere.com', 'deere.com', 'cargill.com', 'monsanto.com', 'syngenta.com'],
     keywords: ['agriculture', 'agritech', 'farming', 'crop', 'livestock', 'precision agriculture'],
   },
   {
     industry: 'Government / Public Sector',
-    domainPatterns: ['.gov', '.gc.ca', '.mil'],
+    // canada.ca is the Government of Canada's primary domain and carries no
+    // .gc.ca suffix, so it has to be listed explicitly.
+    domainPatterns: ['.gov', '.gc.ca', '.mil', 'canada.ca', 'gouv.qc.ca', 'ontario.ca'],
     keywords: ['government', 'public sector', 'municipality', 'federal', 'state', 'civic'],
   },
   {

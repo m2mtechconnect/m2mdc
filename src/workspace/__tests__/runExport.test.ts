@@ -23,7 +23,7 @@ const run: WorkspaceRun = {
 describe('workspace run export', () => {
   it('exports baseline and scenario KPIs as simulated records', () => {
     const payload = buildRunExportPayload(run);
-    expect(payload.records.length).toBe(16);
+    expect(payload.records.length).toBe(18);
     expect(payload.records.every((r) => r.provenance === 'simulated')).toBe(true);
     const pue = payload.records.find((r) => r.metricId === 'result.pue');
     expect(pue?.value).toBe(1.32);
@@ -40,7 +40,7 @@ describe('workspace run export', () => {
   it('serializes to CSV and JSON containing the run id', () => {
     const payload = buildRunExportPayload(run);
     expect(toCsv(payload)).toContain('SIM-2026-08-17-001');
-    expect(JSON.parse(toJson(payload)).records.length).toBe(16);
+    expect(JSON.parse(toJson(payload)).records.length).toBe(18);
   });
 
   it('produces a filesystem-safe filename', () => {

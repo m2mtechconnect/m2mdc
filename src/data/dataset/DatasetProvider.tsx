@@ -67,6 +67,17 @@ export function DatasetProvider({ children }: { children: ReactNode }) {
     activeIntent.current = resolution.mode;
   }
 
+  /**
+   * The pathname the intent was last observed on. Removing the parameter while
+   * staying on the same page is a deliberate URL decision and must win; the
+   * provider only re-applies the parameter when the route actually changed
+   * (a plain in-app link that could not carry the query string).
+   */
+  const intentPath = useRef<string | null>(null);
+  if (resolution.reason === 'requested' && resolution.canaryActive) {
+    intentPath.current = location.pathname;
+  }
+
   useEffect(() => {
     const intent = activeIntent.current;
     if (!intent || intent === PRODUCTION_DEFAULT_DATASET) return;
@@ -76,6 +87,13 @@ export function DatasetProvider({ children }: { children: ReactNode }) {
       return;
     }
     if (requested !== null) return;
+    if (intentPath.current === location.pathname) {
+      // Same page, parameter deliberately removed: honour the URL.
+      activeIntent.current = null;
+      intentPath.current = null;
+      return;
+    }
+    intentPath.current = location.pathname;
     navigate(withDataset(`${location.pathname}${location.search}`, intent), { replace: true });
   }, [requested, isAdmin, location.pathname, location.search, navigate]);
 
@@ -83,6 +101,7 @@ export function DatasetProvider({ children }: { children: ReactNode }) {
     (mode: DatasetMode) => {
       // An explicit selection always wins, including a rollback to the default.
       activeIntent.current = mode === PRODUCTION_DEFAULT_DATASET ? null : mode;
+      intentPath.current = mode === PRODUCTION_DEFAULT_DATASET ? null : location.pathname;
       navigate(withDataset(`${location.pathname}${location.search}`, mode), { replace: false });
       void recordCanaryEvent({
         action: mode === PRODUCTION_DEFAULT_DATASET ? 'rollback' : 'activate',

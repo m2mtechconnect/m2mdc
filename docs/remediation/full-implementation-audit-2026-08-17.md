@@ -3,8 +3,12 @@
 Evidence-based, all checks executed against the current working tree.
 
 ## Verdict
-AURA_IMPLEMENTATION_AUDIT_PASS_WITH_DEFECTS - the platform builds, typechecks and is
-RLS-complete, but one truth-suite test fails and several hygiene/perf items remain open.
+SUPERSEDED - the P1 and P2 items below were remediated in
+`docs/remediation/audit-security-closure-2026-08-17/`, verdict
+AURA_IMPLEMENTATION_AUDIT_SECURITY_CLOSURE_VERIFIED_WITH_LIMITATIONS. The truth suite is
+now 1635 passed / 0 failed, the parallel Google OAuth path is quarantined, and the broad
+read policies and anonymous intake paths are closed. Only the P3 hygiene and performance
+items remain open, tracked in that pack's `deferred-p3-backlog.md`.
 
 ## Evidence
 

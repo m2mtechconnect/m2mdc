@@ -86,6 +86,15 @@ export const SIMULATION_ENGINES: SimulationEngineRecord[] = [
     migrationTarget: null,
   },
   {
+    module: 'src/simulation/compat/previewSessionBridge.ts',
+    status: 'canonical',
+    executionClass: 'aura-deterministic',
+    purpose:
+      'Phase 4 migration seam for builder step-5 previews. Owns engine selection and returns a labelled, non-throwing preview session.',
+    consumers: ['src/components/builder/step5/SimulationDashboard.tsx'],
+    migrationTarget: null,
+  },
+  {
     module: 'src/simulation/compat/dataCenterEngine.ts',
     status: 'frozen',
     executionClass: 'aura-deterministic',
@@ -114,8 +123,17 @@ export const SIMULATION_ENGINES: SimulationEngineRecord[] = [
     status: 'frozen',
     executionClass: 'aura-deterministic',
     purpose: 'Builder step-5 preview estimator. Preview only; never a run of record.',
-    consumers: ['src/components/builder/step5/*'],
-    migrationTarget: 'src/simulation/api.ts',
+    consumers: ['src/simulation/compat/previewSessionBridge.ts'],
+    migrationTarget: 'src/simulation/compat/previewSessionBridge.ts',
+  },
+  {
+    module: 'src/components/builder/step5/fixtures/builderMock.ts',
+    status: 'frozen',
+    executionClass: 'fixture-preview',
+    purpose:
+      'Replays scripted template preview fixtures for builder step 5. Never a run of record.',
+    consumers: ['src/simulation/compat/previewSessionBridge.ts'],
+    migrationTarget: 'src/simulation/compat/previewSessionBridge.ts',
   },
   {
     module: 'src/dsx/scenario/degradationEngine.ts',

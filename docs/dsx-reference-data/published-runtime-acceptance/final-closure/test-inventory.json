@@ -1,0 +1,60 @@
+{
+ "command": "npx vitest run",
+ "collected": 1625,
+ "passed": 1534,
+ "failed": 0,
+ "skipped": 91,
+ "todo": 0,
+ "files": 151,
+ "excludedByConfig": {
+  "playwrightSpecDirs": [
+   "tests/e2e",
+   "tests/truth-in-ui",
+   "tests/visual",
+   "tests/builder",
+   "tests/settings",
+   "tests/audit"
+  ],
+  "caseCount": 928,
+  "reason": "Playwright specs; owned by playwright.*.config.ts, never executable under vitest"
+ },
+ "skippedBreakdown": [
+  {
+   "file": "tests/integration/analytics-with-seeds.test.ts",
+   "skipped": 9
+  },
+  {
+   "file": "tests/integration/analytics.test.ts",
+   "skipped": 9
+  },
+  {
+   "file": "tests/integration/builder-flow.test.tsx",
+   "skipped": 10
+  },
+  {
+   "file": "tests/integration/builder-with-seeds.test.ts",
+   "skipped": 13
+  },
+  {
+   "file": "tests/integration/builder.test.ts",
+   "skipped": 6
+  },
+  {
+   "file": "tests/integration/integrations.test.ts",
+   "skipped": 9
+  },
+  {
+   "file": "tests/integration/operations.test.ts",
+   "skipped": 10
+  },
+  {
+   "file": "tests/integration/template-validation.test.ts",
+   "skipped": 10
+  },
+  {
+   "file": "tests/performance/api-load.test.ts",
+   "skipped": 15
+  }
+ ],
+ "skipReason": "describeWithBackend gate in tests/_setup/backendSuite.ts: requires the disposable aura-dc-security-test backend. Reported BLOCKED_UNVERIFIED, not passing."
+}

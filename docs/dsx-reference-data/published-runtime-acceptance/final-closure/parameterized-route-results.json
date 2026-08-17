@@ -1,0 +1,3 @@
+{"status":"NOT_EXECUTED","classification":"BLOCKED_UNVERIFIED",
+ "reason":"Parameterized and invalid-ID published cases (unknown twin/agent/system ids, malformed ids, alias resolution for the 26 aliases) were not executed in this phase.",
+ "preservedHostLimitation":"/blueprint/%%%bad-id returns HTTP 400 at the static host before SPA execution; application code cannot and does not change this."}

@@ -1,0 +1,9 @@
+{
+  "endpoint": "PostgREST, publishable (anon) key",
+  "before": {"site_pages":401,"crawl_jobs":401,"recommendations":401,"website_content_cache":401,
+    "note":"401 42501 permission denied for table - blocked by absent GRANT, not by policy"},
+  "after": {"site_pages":401,"crawl_jobs":401,"recommendations":401,"website_content_cache":401},
+  "policiesRemaining": ["service_role manage policies only"],
+  "authenticatedCrossTenant": "NOT_EXECUTED - no table grant exists for authenticated on these tables",
+  "otherTablesProbed": {"profiles":401,"user_roles":401,"data_centre_locations":401,"agents":401}
+}

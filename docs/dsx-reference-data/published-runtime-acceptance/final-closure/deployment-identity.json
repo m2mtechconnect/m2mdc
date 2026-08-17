@@ -1,0 +1,16 @@
+{
+  "canonicalHost": "https://auradc.m2mtechconnect.com",
+  "previousBundle": "assets/index-BLh1dE2h.js",
+  "newBundle": "assets/index-FdvYIjv6.js",
+  "bundleHttpStatus": 200,
+  "bundleContentType": "text/javascript; charset=utf-8",
+  "bundleEtag": "d7cd7b272079b7ac61ff90bdc0c4cc25",
+  "serviceWorker": "none (/sw.js returns 404) - no cache masking possible",
+  "staleBundleStillCached": "assets/index-BLh1dE2h.js still 200 (immutable asset retention); the served HTML references only index-FdvYIjv6.js",
+  "gitRevisionAtVerification": "f7bad7f8b1781f934e2307a90c0d5ba291b1ce07",
+  "workingTree": "clean at Phase 1 freeze; one file changed afterwards (src/data/dataset/DatasetProvider.tsx)",
+  "manifestVersion": 7,
+  "productionDefaultDataset": "legacy-synthetic",
+  "canarySelector": "?dataset=nvidia-dsx-reference (administrator only)",
+  "verifiedAtUtc": "2026-08-17T13:01Z"
+}

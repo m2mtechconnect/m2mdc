@@ -256,7 +256,7 @@ export const DSX_CAPABILITIES: DsxCapability[] = [
     dsxArea: 'DSX Exchange integration boundary',
     owner: 'AURA',
     status: 'DSX_ALIGNED',
-    runtimeEvidence: 'src/pages/Integrations.tsx',
+    runtimeEvidence: 'src/pages/Connections.tsx',
     dataSource: 'Connector configuration records',
     lastValidatedAt: '2026-08-17',
     validationMethod: 'static-inspection',

@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { ConnectionStatusBadge } from './ConnectionStatusBadge';
+import { ManagedAccessPanel } from './ManagedAccessPanel';
 import {
   activateConnection,
   deactivateConnection,
@@ -56,6 +57,7 @@ const PANELS = [
   { id: 'mappings', label: 'Mappings' },
   { id: 'health', label: 'Health and ingest' },
   { id: 'audit', label: 'Audit and access' },
+  { id: 'managed-access', label: 'Managed access' },
 ];
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
@@ -423,6 +425,13 @@ export function ConnectionDetailDrawer(props: Props) {
                   </div>
                 ))
               )}
+            </TabsContent>
+
+            <TabsContent value="managed-access" className="mt-0">
+              <ManagedAccessPanel
+                connectionId={connection.id}
+                connectorDefinitionId={connection.connector_id}
+              />
             </TabsContent>
           </div>
         </Tabs>

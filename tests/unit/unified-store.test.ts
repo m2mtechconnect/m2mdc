@@ -9,22 +9,24 @@ describe('UnifiedStore', () => {
 
   describe('Filter Management', () => {
     it('should update filters without mutation', () => {
-      const store = useUnifiedStore.getState();
-      
+      // Read state fresh after each update: getState() returns a snapshot,
+      // not a live view of the store.
+      const store = useUnifiedStore.getState();      
       store.updateFilters({ industry: 'Healthcare' });
-      expect(store.filters.industry).toBe('Healthcare');
+      expect(useUnifiedStore.getState().filters.industry).toBe('Healthcare');
       
       store.updateFilters({ level: 'advanced' });
-      expect(store.filters.industry).toBe('Healthcare');
-      expect(store.filters.level).toBe('advanced');
+      expect(useUnifiedStore.getState().filters.industry).toBe('Healthcare');
+      expect(useUnifiedStore.getState().filters.level).toBe('advanced');
     });
 
     it('should preserve filters across updates', () => {
-      const store = useUnifiedStore.getState();
-      
+      // Read state fresh after each update: getState() returns a snapshot,
+      // not a live view of the store.
+      const store = useUnifiedStore.getState();      
       store.updateFilters({ certified: true, q: 'test' });
-      expect(store.filters.certified).toBe(true);
-      expect(store.filters.q).toBe('test');
+      expect(useUnifiedStore.getState().filters.certified).toBe(true);
+      expect(useUnifiedStore.getState().filters.q).toBe('test');
     });
   });
 
@@ -139,33 +141,36 @@ describe('UnifiedStore', () => {
 
   describe('Filter Parity (Marketplace ↔ Builder)', () => {
     it('should maintain same filters for templates', () => {
-      const store = useUnifiedStore.getState();
-      
+      // Read state fresh after each update: getState() returns a snapshot,
+      // not a live view of the store.
+      const store = useUnifiedStore.getState();      
       store.updateFilters({ industry: 'Healthcare', level: 'advanced', certified: true });
       
       // Filters should be identical whether accessed from Marketplace or Builder
-      expect(store.filters.industry).toBe('Healthcare');
-      expect(store.filters.level).toBe('advanced');
-      expect(store.filters.certified).toBe(true);
+      expect(useUnifiedStore.getState().filters.industry).toBe('Healthcare');
+      expect(useUnifiedStore.getState().filters.level).toBe('advanced');
+      expect(useUnifiedStore.getState().filters.certified).toBe(true);
     });
 
     it('should maintain same filters for industry apps', () => {
-      const store = useUnifiedStore.getState();
-      
+      // Read state fresh after each update: getState() returns a snapshot,
+      // not a live view of the store.
+      const store = useUnifiedStore.getState();      
       store.updateFilters({ category: 'CRM', connection: 'connected' });
       
-      expect(store.filters.category).toBe('CRM');
-      expect(store.filters.connection).toBe('connected');
+      expect(useUnifiedStore.getState().filters.category).toBe('CRM');
+      expect(useUnifiedStore.getState().filters.connection).toBe('connected');
     });
 
     it('should maintain same filters for MCP servers', () => {
-      const store = useUnifiedStore.getState();
-      
+      // Read state fresh after each update: getState() returns a snapshot,
+      // not a live view of the store.
+      const store = useUnifiedStore.getState();      
       store.updateFilters({ mcpCategory: 'Developer Tools', type: 'tool', designation: 'verified' });
       
-      expect(store.filters.mcpCategory).toBe('Developer Tools');
-      expect(store.filters.type).toBe('tool');
-      expect(store.filters.designation).toBe('verified');
+      expect(useUnifiedStore.getState().filters.mcpCategory).toBe('Developer Tools');
+      expect(useUnifiedStore.getState().filters.type).toBe('tool');
+      expect(useUnifiedStore.getState().filters.designation).toBe('verified');
     });
   });
 });

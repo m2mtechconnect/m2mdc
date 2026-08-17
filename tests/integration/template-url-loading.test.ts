@@ -227,7 +227,7 @@ describe('Template URL Loading Integration', () => {
     expect(state.workflow).toBeDefined();
     
     // Verify blueprint matches store state
-    expect(blueprint?.name).toBe(state.goal);
+    expect(blueprint?.description).toBe(state.goal);
     expect(blueprint?.industry).toBe(state.industry);
   });
 

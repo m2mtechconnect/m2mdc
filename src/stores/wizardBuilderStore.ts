@@ -350,7 +350,8 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
 
       console.log('✅ [STORE] Draft created:', { id, builder });
 
-      const config = builder.config as BuilderConfig;
+      // A freshly created draft may come back without a config payload.
+      const config = (builder?.config ?? {}) as BuilderConfig;
 
       // Auto-generate workflow with gemini analysis if available
       let workflow = config.workflow || initialState.workflow;
@@ -504,7 +505,8 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
         console.info('[Builder] loadBuilder gen', myGen, 'superseded by', loadBuilderGen, '- discarding stale result');
         return;
       }
-      const config = builder.config as BuilderConfig;
+      // A freshly created draft may come back without a config payload.
+      const config = (builder?.config ?? {}) as BuilderConfig;
 
       console.log('[Builder] Draft loaded:', { builderId, config });
 
@@ -560,7 +562,8 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
         // Create new draft without params
         try {
           const { id, builder } = await builderService.create({ source: 'dashboard' });
-          const config = builder.config as BuilderConfig;
+          // A freshly created draft may come back without a config payload.
+      const config = (builder?.config ?? {}) as BuilderConfig;
           
           // Auto-generate workflow if empty
           let workflow = config.workflow || initialState.workflow;

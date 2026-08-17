@@ -1262,6 +1262,474 @@ export type Database = {
           },
         ]
       }
+      connection_audit_events: {
+        Row: {
+          action: string
+          actor_id: string | null
+          approval_reference: string | null
+          connection_id: string | null
+          correlation_id: string | null
+          created_at: string
+          evidence: Json
+          facility_id: string | null
+          id: string
+          new_state: string | null
+          previous_state: string | null
+          tenant_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          approval_reference?: string | null
+          connection_id?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          evidence?: Json
+          facility_id?: string | null
+          id?: string
+          new_state?: string | null
+          previous_state?: string | null
+          tenant_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          approval_reference?: string | null
+          connection_id?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          evidence?: Json
+          facility_id?: string | null
+          id?: string
+          new_state?: string | null
+          previous_state?: string | null
+          tenant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connection_audit_events_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "connection_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      connection_data_contracts: {
+        Row: {
+          checksum: string | null
+          compatibility: string | null
+          connector_id: string
+          created_at: string
+          data_classification: string
+          direction: string
+          id: string
+          official_source: string | null
+          schema_type: string
+          schema_version: string
+          timestamp_rules: Json
+          unit_rules: Json
+          validation_status: string
+        }
+        Insert: {
+          checksum?: string | null
+          compatibility?: string | null
+          connector_id: string
+          created_at?: string
+          data_classification?: string
+          direction?: string
+          id?: string
+          official_source?: string | null
+          schema_type: string
+          schema_version: string
+          timestamp_rules?: Json
+          unit_rules?: Json
+          validation_status?: string
+        }
+        Update: {
+          checksum?: string | null
+          compatibility?: string | null
+          connector_id?: string
+          created_at?: string
+          data_classification?: string
+          direction?: string
+          id?: string
+          official_source?: string | null
+          schema_type?: string
+          schema_version?: string
+          timestamp_rules?: Json
+          unit_rules?: Json
+          validation_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connection_data_contracts_connector_id_fkey"
+            columns: ["connector_id"]
+            isOneToOne: false
+            referencedRelation: "connector_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      connection_health_checks: {
+        Row: {
+          auth_result: string | null
+          check_type: string
+          completed_at: string | null
+          connection_id: string
+          correlation_id: string | null
+          data_availability: string | null
+          dns_result: string | null
+          error_code: string | null
+          evidence_reference: string | null
+          id: string
+          latency_ms: number | null
+          mapping_result: string | null
+          network_result: string | null
+          requested_by: string | null
+          safe_message: string | null
+          schema_result: string | null
+          started_at: string
+          status: string
+          tls_result: string | null
+        }
+        Insert: {
+          auth_result?: string | null
+          check_type: string
+          completed_at?: string | null
+          connection_id: string
+          correlation_id?: string | null
+          data_availability?: string | null
+          dns_result?: string | null
+          error_code?: string | null
+          evidence_reference?: string | null
+          id?: string
+          latency_ms?: number | null
+          mapping_result?: string | null
+          network_result?: string | null
+          requested_by?: string | null
+          safe_message?: string | null
+          schema_result?: string | null
+          started_at?: string
+          status?: string
+          tls_result?: string | null
+        }
+        Update: {
+          auth_result?: string | null
+          check_type?: string
+          completed_at?: string | null
+          connection_id?: string
+          correlation_id?: string | null
+          data_availability?: string | null
+          dns_result?: string | null
+          error_code?: string | null
+          evidence_reference?: string | null
+          id?: string
+          latency_ms?: number | null
+          mapping_result?: string | null
+          network_result?: string | null
+          requested_by?: string | null
+          safe_message?: string | null
+          schema_result?: string | null
+          started_at?: string
+          status?: string
+          tls_result?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connection_health_checks_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "connection_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      connection_ingest_runs: {
+        Row: {
+          completed_at: string | null
+          connection_id: string
+          dead_letter_count: number
+          duplicate_events: number
+          final_status: string
+          id: string
+          mapping_failures: number
+          records_accepted: number
+          records_received: number
+          records_rejected: number
+          retries: number
+          started_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          connection_id: string
+          dead_letter_count?: number
+          duplicate_events?: number
+          final_status?: string
+          id?: string
+          mapping_failures?: number
+          records_accepted?: number
+          records_received?: number
+          records_rejected?: number
+          retries?: number
+          started_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          connection_id?: string
+          dead_letter_count?: number
+          duplicate_events?: number
+          final_status?: string
+          id?: string
+          mapping_failures?: number
+          records_accepted?: number
+          records_received?: number
+          records_rejected?: number
+          retries?: number
+          started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connection_ingest_runs_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "connection_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      connection_instances: {
+        Row: {
+          configuration: Json
+          connector_id: string
+          created_at: string
+          created_by: string | null
+          credential_reference: string | null
+          data_direction: string
+          display_name: string
+          enabled: boolean
+          endpoint_reference: string | null
+          environment: string
+          facility_id: string | null
+          id: string
+          is_system: boolean
+          last_error: string | null
+          last_ingest_at: string | null
+          last_success_at: string | null
+          last_tested_at: string | null
+          owner_id: string | null
+          status: string
+          status_reason: string | null
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          configuration?: Json
+          connector_id: string
+          created_at?: string
+          created_by?: string | null
+          credential_reference?: string | null
+          data_direction?: string
+          display_name: string
+          enabled?: boolean
+          endpoint_reference?: string | null
+          environment?: string
+          facility_id?: string | null
+          id?: string
+          is_system?: boolean
+          last_error?: string | null
+          last_ingest_at?: string | null
+          last_success_at?: string | null
+          last_tested_at?: string | null
+          owner_id?: string | null
+          status?: string
+          status_reason?: string | null
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          configuration?: Json
+          connector_id?: string
+          created_at?: string
+          created_by?: string | null
+          credential_reference?: string | null
+          data_direction?: string
+          display_name?: string
+          enabled?: boolean
+          endpoint_reference?: string | null
+          environment?: string
+          facility_id?: string | null
+          id?: string
+          is_system?: boolean
+          last_error?: string | null
+          last_ingest_at?: string | null
+          last_success_at?: string | null
+          last_tested_at?: string | null
+          owner_id?: string | null
+          status?: string
+          status_reason?: string | null
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connection_instances_connector_id_fkey"
+            columns: ["connector_id"]
+            isOneToOne: false
+            referencedRelation: "connector_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      connection_twin_mappings: {
+        Row: {
+          active: boolean
+          connection_id: string
+          conversion_rule: string | null
+          created_at: string
+          data_type: string
+          direction: string
+          id: string
+          last_mapped_at: string | null
+          last_mapped_value: Json | null
+          mapping_owner: string | null
+          quality_rule: string | null
+          sample_value: Json | null
+          source_identifier: string
+          source_unit: string | null
+          target_entity: string | null
+          target_facility_id: string | null
+          target_prim_path: string | null
+          target_property: string | null
+          target_unit: string | null
+          timestamp_rule: string | null
+          updated_at: string
+          validation_status: string
+        }
+        Insert: {
+          active?: boolean
+          connection_id: string
+          conversion_rule?: string | null
+          created_at?: string
+          data_type?: string
+          direction?: string
+          id?: string
+          last_mapped_at?: string | null
+          last_mapped_value?: Json | null
+          mapping_owner?: string | null
+          quality_rule?: string | null
+          sample_value?: Json | null
+          source_identifier: string
+          source_unit?: string | null
+          target_entity?: string | null
+          target_facility_id?: string | null
+          target_prim_path?: string | null
+          target_property?: string | null
+          target_unit?: string | null
+          timestamp_rule?: string | null
+          updated_at?: string
+          validation_status?: string
+        }
+        Update: {
+          active?: boolean
+          connection_id?: string
+          conversion_rule?: string | null
+          created_at?: string
+          data_type?: string
+          direction?: string
+          id?: string
+          last_mapped_at?: string | null
+          last_mapped_value?: Json | null
+          mapping_owner?: string | null
+          quality_rule?: string | null
+          sample_value?: Json | null
+          source_identifier?: string
+          source_unit?: string | null
+          target_entity?: string | null
+          target_facility_id?: string | null
+          target_prim_path?: string | null
+          target_property?: string | null
+          target_unit?: string | null
+          timestamp_rule?: string | null
+          updated_at?: string
+          validation_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connection_twin_mappings_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "connection_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      connector_definitions: {
+        Row: {
+          availability: string
+          capability_evidence: Json
+          category: string
+          configuration_schema: Json
+          created_at: string
+          documentation_url: string | null
+          id: string
+          implementation_status: string
+          mapping_required: boolean
+          name: string
+          provider: string
+          runtime_adapter: string | null
+          supported_auth_methods: string[]
+          supported_data_classes: string[]
+          supported_directions: string[]
+          supported_protocols: string[]
+          updated_at: string
+          validation_status: string
+          version: string
+        }
+        Insert: {
+          availability?: string
+          capability_evidence?: Json
+          category: string
+          configuration_schema?: Json
+          created_at?: string
+          documentation_url?: string | null
+          id: string
+          implementation_status?: string
+          mapping_required?: boolean
+          name: string
+          provider: string
+          runtime_adapter?: string | null
+          supported_auth_methods?: string[]
+          supported_data_classes?: string[]
+          supported_directions?: string[]
+          supported_protocols?: string[]
+          updated_at?: string
+          validation_status?: string
+          version?: string
+        }
+        Update: {
+          availability?: string
+          capability_evidence?: Json
+          category?: string
+          configuration_schema?: Json
+          created_at?: string
+          documentation_url?: string | null
+          id?: string
+          implementation_status?: string
+          mapping_required?: boolean
+          name?: string
+          provider?: string
+          runtime_adapter?: string | null
+          supported_auth_methods?: string[]
+          supported_data_classes?: string[]
+          supported_directions?: string[]
+          supported_protocols?: string[]
+          updated_at?: string
+          validation_status?: string
+          version?: string
+        }
+        Relationships: []
+      }
       contact_expert_logs: {
         Row: {
           created_at: string

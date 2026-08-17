@@ -1,0 +1,5 @@
+{"status":"BLOCKED_UNVERIFIED",
+ "attempted":"87 route declarations + 26 aliases across admin-reference, admin-legacy and anonymous sessions on the published host",
+ "outcome":"the sweep exceeded the execution time limit before writing results; no partial matrix is claimed",
+ "previouslyEvidenced":"20 admin routes, 20 anonymous routes and 25 evidence-beta routes (see declared-route-role-matrix.json, anon-route-sweep.json, evidence-beta-results.json) against the earlier bundle",
+ "engineerSession":"BLOCKED_UNVERIFIED - no engineer browser session minted"}

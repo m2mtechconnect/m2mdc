@@ -1,0 +1,4 @@
+{"executed":["tests/truth-in-ui/deep-link-redirects.spec.ts","tests/truth-in-ui/runtime-states.spec.ts"],
+ "cases":38,"passed":30,"failed":0,"environmentBlocked":8,
+ "blocker":"runtime-states requires the dedicated Kit-instrumented dev server (port 8091, VITE_OMNIVERSE_KIT_URL); it was run against the shared dev server. Recorded BLOCKED_UNVERIFIED.",
+ "remaining":890,"remainingStatus":"NOT_EXECUTED"}

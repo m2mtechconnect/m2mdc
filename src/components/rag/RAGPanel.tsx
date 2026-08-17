@@ -165,47 +165,10 @@ export function RAGPanel({ systemId }: RAGPanelProps) {
   };
 
   const handleGoogleDriveConnect = async () => {
-    setIsConnectingDrive(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error('Please log in to connect Google Drive');
-        return;
-      }
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rag-oauth-google?action=start&system_id=${systemId}`,
-        {
-          headers: { 'Authorization': `Bearer ${session.access_token}` }
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      
-      if (result.error) {
-        throw new Error(result.error);
-      }
-      
-      if (result.auth_url) {
-        const authWindow = window.open(result.auth_url, 'GoogleDriveAuth', 'width=600,height=700');
-        if (!authWindow) {
-          toast.error('Please allow popups to connect Google Drive');
-          return;
-        }
-        toast.success('Complete authorization in the popup window');
-        setDriveConnections([...driveConnections, 'google_drive']);
-      }
-    } catch (error) {
-      console.error('Google Drive connect error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to connect Google Drive';
-      toast.error(errorMessage);
-    } finally {
-      setIsConnectingDrive(false);
-    }
+    // Quarantined: the legacy parallel authorization path is disabled. Drive
+    // authorization must move to the managed connector path, which stores no
+    // provider tokens in AURA.
+    toast.error('Drive authorization is unavailable until the managed connector is enabled for this workspace.');
   };
 
   const handleMicrosoftConnect = async () => {

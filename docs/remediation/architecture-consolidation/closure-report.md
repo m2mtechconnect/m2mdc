@@ -36,3 +36,24 @@ statement must go through an evidence-gated record in the capability registry.
 Tracked in `docs/remediation/external-blockers.md`: NVIDIA runtime licensing,
 SimReady certification, and customer live-telemetry endpoints. None are
 resolvable inside this repository.
+
+## Phase 9 - platform compliance claim boundary (added after closure)
+
+Separates AURA *product* compliance claims from compliance frameworks
+*modelled inside a facility twin*. `src/config/complianceClaims.ts` is the
+single record of platform claims; each carries a status and evidence, and only
+`certified` / `implemented-uncertified` records with a public statement may be
+rendered.
+
+- Removed "SOC 2 Compliant" and "PIPEDA Ready" from the auth security badge -
+  no audit evidence exists for either. The badge now renders only the
+  implemented controls: encrypted in transit, encrypted at rest, RBAC.
+- "Secured by M2M Sovereign Cloud" -> "Secured by M2M AURA".
+- Auth layout: "Carbon Neutral" -> "Carbon Modelling", "Sovereign Cloud" ->
+  "Data Residency Controls".
+- Guard: `src/config/__tests__/complianceClaims.test.ts` fails the build if
+  certification phrasing returns to platform chrome.
+- Facility-level framework data (blueprints, KPI catalogues, industry
+  profiles) is untouched - those are modelled attributes, not AURA assertions.
+
+Certification itself stays an external blocker (external-blockers.md section 5).

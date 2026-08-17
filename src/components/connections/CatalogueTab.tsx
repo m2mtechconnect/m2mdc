@@ -1,7 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useRBAC } from '@/contexts/RBACContext';
+import { ConnectionSetupWizard } from './ConnectionSetupWizard';
 import { canAddConnection, CATALOGUE_CATEGORIES, type ConnectionInstance, type ConnectorDefinition } from '@/connections/model';
 
 const IMPLEMENTATION_LABEL: Record<string, string> = {
@@ -14,10 +16,15 @@ const IMPLEMENTATION_LABEL: Record<string, string> = {
 export function CatalogueTab({
   definitions,
   connections,
+  onRefresh,
 }: {
   definitions: ConnectorDefinition[];
   connections: ConnectionInstance[];
+  onRefresh?: () => void;
 }) {
+  const { can, role } = useRBAC();
+  const isAdmin = role === 'admin' || role === 'owner' || can('twin.edit');
+  const [wizardFor, setWizardFor] = useState<string | null>(null);
   const configuredCounts = useMemo(() => {
     const map = new Map<string, number>();
     connections.forEach((c) => map.set(c.connector_id, (map.get(c.connector_id) ?? 0) + 1));

@@ -14,7 +14,7 @@ describe('Full Pipeline - Industry + Department Classification → Twin Generati
     {
       domain: 'walmart.com',
       content: 'supply chain inventory forecasting distribution retail stores',
-      expectedIndustry: 'Enterprise Retail + Global Supply Chain',
+      expectedIndustry: 'Enterprise Retail',
       expectedDepartment: 'Supply Chain',
       expectedTwinTypes: ['Supply Chain & Inventory'],
     },
@@ -112,7 +112,7 @@ describe('Full Pipeline - Filtering and Ranking', () => {
       },
     ];
 
-    const industry = 'Enterprise Retail + Global Supply Chain';
+    const industry = 'Enterprise Retail';
     const department = 'Supply Chain';
 
     const filtered = filterAndRankRecommendations(mockRecommendations, industry, department, 3);
@@ -142,7 +142,7 @@ describe('Full Pipeline - Filtering and Ranking', () => {
       },
     ];
 
-    const industry = 'Enterprise Retail + Global Supply Chain';
+    const industry = 'Enterprise Retail';
     const department = 'Supply Chain';
 
     const ranked = filterAndRankRecommendations(mockRecommendations, industry, department, 3);
@@ -193,7 +193,7 @@ describe('Full Pipeline - Top 3 Selection', () => {
       description: `Optimize process ${i} using ERP and WMS data with forecasting triggers and efficiency KPIs targeting ${3 + i}% improvement`,
     }));
 
-    const industry = 'Enterprise Retail + Global Supply Chain';
+    const industry = 'Enterprise Retail';
     const department = 'Supply Chain';
 
     const top3 = filterAndRankRecommendations(mockRecommendations, industry, department, 3);
@@ -214,7 +214,7 @@ describe('Full Pipeline - Top 3 Selection', () => {
       },
     ];
 
-    const industry = 'Enterprise Retail + Global Supply Chain';
+    const industry = 'Enterprise Retail';
     const department = 'Supply Chain';
 
     const filtered = filterAndRankRecommendations(mockRecommendations, industry, department, 3);
@@ -257,7 +257,7 @@ describe('Full Pipeline - Top 3 Selection', () => {
 
 describe('Full Pipeline - Cross-Industry Coverage', () => {
   const industries = [
-    'Enterprise Retail + Global Supply Chain',
+    'Enterprise Retail',
     'Pharmaceuticals & Life Sciences',
     'Financial Services / Banking',
     'Manufacturing – Automotive',

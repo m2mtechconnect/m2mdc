@@ -36,7 +36,7 @@ describe('Digital Twin Template Validation - Required Elements', () => {
   it('should validate a proper digital twin blueprint', () => {
     const result = validateDigitalTwinWithContext(
       validTwin,
-      'Enterprise Retail + Global Supply Chain',
+      'Enterprise Retail',
       'Supply Chain'
     );
     
@@ -52,7 +52,7 @@ describe('Digital Twin Template Validation - Required Elements', () => {
 
     const result = validateDigitalTwinWithContext(
       noTwinMention,
-      'Enterprise Retail + Global Supply Chain',
+      'Enterprise Retail',
       'Operations'
     );
 
@@ -68,7 +68,7 @@ describe('Digital Twin Template Validation - Required Elements', () => {
 
     const result = validateDigitalTwinWithContext(
       noDataSources,
-      'Enterprise Retail + Global Supply Chain',
+      'Enterprise Retail',
       'Operations'
     );
 
@@ -84,7 +84,7 @@ describe('Digital Twin Template Validation - Required Elements', () => {
 
     const result = validateDigitalTwinWithContext(
       noEventsOrKPIs,
-      'Enterprise Retail + Global Supply Chain',
+      'Enterprise Retail',
       'Supply Chain'
     );
 
@@ -96,7 +96,7 @@ describe('Digital Twin Template Validation - Required Elements', () => {
     it(`should reject generic/invalid: "${twin.title}"`, () => {
       const result = validateDigitalTwinWithContext(
         twin,
-        'Enterprise Retail + Global Supply Chain',
+        'Enterprise Retail',
         'Operations'
       );
 
@@ -114,7 +114,7 @@ describe('Digital Twin Template Validation - Industry Rules', () => {
 
     const result = validateDigitalTwinWithContext(
       cxTwin,
-      'Enterprise Retail + Global Supply Chain',
+      'Enterprise Retail',
       'Marketing'
     );
 
@@ -212,7 +212,7 @@ describe('Digital Twin Template Validation - Scoring Components', () => {
 
     const result = validateDigitalTwinWithContext(
       genericTwin,
-      'Enterprise Retail + Global Supply Chain',
+      'Enterprise Retail',
       'Operations'
     );
 
@@ -227,7 +227,7 @@ describe('Digital Twin Template Validation - Scoring Components', () => {
 
     const result = validateDigitalTwinWithContext(
       lowScoreTwin,
-      'Enterprise Retail + Global Supply Chain',
+      'Enterprise Retail',
       'Operations'
     );
 
@@ -257,7 +257,7 @@ describe('Digital Twin Template Validation - Blocked Categories', () => {
     it(`should hard-block: "${rec.title}"`, () => {
       const result = validateDigitalTwinWithContext(
         rec,
-        'Enterprise Retail + Global Supply Chain',
+        'Enterprise Retail',
         'Operations'
       );
 

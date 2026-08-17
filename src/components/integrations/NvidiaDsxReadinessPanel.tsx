@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Info, Lock } from 'lucide-react';
-import { NVIDIA_READINESS } from '@/capabilities/registry';
+import { CAPABILITIES, NVIDIA_READINESS } from '@/capabilities/registry';
 
 interface Row {
   capability: string;
@@ -17,15 +17,56 @@ interface Row {
   detail: string;
 }
 
+/**
+ * AURA_ARCHITECTURE_CONSOLIDATION_AND_NVIDIA_ALIGNMENT (Phase 1):
+ * rows are derived from the coarse capability gates, which are themselves
+ * derived from the canonical DSX capability registry. Nothing on this panel
+ * asserts a status that the registry does not carry evidence for.
+ */
+function gateRow(
+  key: Parameters<typeof gateDetail>[0],
+  detail: string,
+  tone: Row['tone'] = 'grey',
+): Row {
+  const cap = CAPABILITIES[key];
+  return {
+    capability: cap.label,
+    status: cap.enabled ? 'Enabled' : cap.status,
+    tone: cap.enabled ? 'grey' : tone,
+    detail: cap.enabled ? detail : cap.requirement,
+  };
+}
+
+function gateDetail(key: keyof typeof CAPABILITIES) {
+  return CAPABILITIES[key].requirement;
+}
+
 const ROWS: Row[] = [
-  { capability: 'NVIDIA GPU runtime', status: 'Not connected', tone: 'grey', detail: 'No GPU device, driver or container toolkit is available to the application.' },
-  { capability: 'Omniverse DSX Blueprint', status: 'Access required', tone: 'amber', detail: 'An entitled NVIDIA account is required to obtain the blueprint distribution.' },
-  { capability: 'OpenUSD stage', status: 'Not configured', tone: 'grey', detail: 'No OpenUSD stage has been authored or mounted. The preview uses the AURA application asset model.' },
-  { capability: 'SimReady assets', status: 'None validated', tone: 'grey', detail: 'No asset has been validated against SimReady requirements.' },
-  { capability: 'DSX Exchange', status: 'Not deployed', tone: 'grey', detail: 'The official DSX Exchange distribution is not deployed. Generic messaging transports are not DSX Exchange.' },
-  { capability: 'Official AsyncAPI schemas', status: 'Not available', tone: 'amber', detail: 'Official event schemas have not been obtained, so event conformance cannot be proven.' },
-  { capability: 'Telemetry-to-prim mapping', status: 'Not configured', tone: 'grey', detail: 'Mapping requires both an OpenUSD stage and a verified telemetry source.' },
-  { capability: 'Vertical-slice validation', status: 'Blocked by infrastructure', tone: 'amber', detail: 'End-to-end validation cannot run without a GPU runner, entitlements and a disposable backend.' },
+  gateRow('nvidiaRuntime', 'A validated GPU runner is attached.'),
+  {
+    capability: 'Omniverse DSX Blueprint',
+    status: 'Access required',
+    tone: 'amber',
+    detail: 'An entitled NVIDIA account is required to obtain the blueprint distribution.',
+  },
+  gateRow('openUsdStage', 'An NVIDIA runtime resolves the canonical OpenUSD stage.'),
+  gateRow('simReadyAssets', 'Every published asset carries a SimReady validation result.'),
+  gateRow('dsxExchange', 'The official DSX Exchange distribution is deployed.', 'amber'),
+  {
+    capability: 'Official AsyncAPI schemas',
+    status: 'Not available',
+    tone: 'amber',
+    detail: 'Official event schemas have not been obtained, so event conformance cannot be proven.',
+  },
+  gateRow('telemetryPrimMapping', 'Telemetry is bound to OpenUSD prims.'),
+  {
+    capability: 'Vertical-slice validation',
+    status:
+      NVIDIA_READINESS.verticalSlice === 'VALIDATED' ? 'Validated' : 'Blocked by infrastructure',
+    tone: 'amber',
+    detail:
+      'End-to-end validation cannot run without a GPU runner, entitlements and a disposable backend.',
+  },
 ];
 
 function StatusBadge({ status, tone }: { status: string; tone: Row['tone'] }) {
@@ -64,8 +105,9 @@ export function NvidiaDsxReadinessPanel({ heading = 'h2' }: { heading?: 'h1' | '
             <CardTitle className="text-base">Capability status</CardTitle>
             <CardDescription>
               Vertical slice {NVIDIA_READINESS.verticalSlice.replace(/_/g, ' ').toLowerCase()} ·
-              {' '}{NVIDIA_READINESS.staticallyProvenComponents} components statically proven ·
-              {' '}{NVIDIA_READINESS.runtimeProvenComponents} runtime proven
+              {' '}{NVIDIA_READINESS.runtimeProvenComponents} NVIDIA-integrated capabilities ·
+              {' '}{NVIDIA_READINESS.simReadyValidatedAssets} SimReady-validated assets ·
+              {' '}{NVIDIA_READINESS.openUsdCanonicalCapabilities} AURA-authored OpenUSD capabilities
             </CardDescription>
           </CardHeader>
           <CardContent className="overflow-x-auto">

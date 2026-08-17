@@ -77,20 +77,29 @@ export const SIMULATION_ENGINES: SimulationEngineRecord[] = [
     migrationTarget: null,
   },
   {
+    module: 'src/simulation/compat/facadeBridge.ts',
+    status: 'canonical',
+    executionClass: 'aura-deterministic',
+    purpose:
+      'Phase 4 migration seam. Wraps the frozen compatibility engines in ProviderOutcome envelopes so consumers get provenance and typed failures.',
+    consumers: ['src/twins/sovereignDataCenter/hooks/useSovereignDCTwin.ts'],
+    migrationTarget: null,
+  },
+  {
     module: 'src/simulation/compat/dataCenterEngine.ts',
     status: 'frozen',
     executionClass: 'aura-deterministic',
     purpose: 'Legacy data-centre twin engine retained for the original twin surfaces.',
-    consumers: ['src/twins/dataCenter/*'],
-    migrationTarget: 'src/simulation/api.ts',
+    consumers: ['src/twins/dataCenter/index.ts (barrel re-export only)'],
+    migrationTarget: 'src/simulation/compat/facadeBridge.ts',
   },
   {
     module: 'src/simulation/compat/sovereignDataCenterEngine.ts',
     status: 'frozen',
     executionClass: 'aura-deterministic',
     purpose: 'Legacy sovereign data-centre pure-function engine.',
-    consumers: ['src/twins/sovereignDataCenter/*'],
-    migrationTarget: 'src/simulation/api.ts',
+    consumers: ['src/simulation/compat/facadeBridge.ts'],
+    migrationTarget: 'src/simulation/compat/facadeBridge.ts',
   },
   {
     module: 'src/twins/sovereignDataCenter/enhancedSimulationEngine.ts',

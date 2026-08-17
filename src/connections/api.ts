@@ -350,3 +350,36 @@ export async function getConnectionCredentialStatus(connectionId: string): Promi
 export async function revokeConnectionCredential(connectionId: string): Promise<void> {
   await vault({ action: 'revoke', connection_id: connectionId });
 }
+
+/* ------------------------------------------------------------------ */
+/* Data contracts                                                      */
+/* ------------------------------------------------------------------ */
+
+export interface DataContractRecord {
+  id: string;
+  connection_id: string;
+  name: string;
+  version: string | null;
+  direction: string | null;
+  schema_reference: string | null;
+  validation_status: string | null;
+  unit_rules: unknown;
+  required_fields: unknown;
+  created_at: string;
+}
+
+/** Contracts declare the shape a connection is allowed to exchange. */
+export function useDataContracts() {
+  return useQuery({
+    queryKey: ['connection-data-contracts'],
+    queryFn: async (): Promise<DataContractRecord[]> => {
+      const { data, error } = await db
+        .from('connection_data_contracts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) return [];
+      return (data ?? []) as DataContractRecord[];
+    },
+    staleTime: 60_000,
+  });
+}

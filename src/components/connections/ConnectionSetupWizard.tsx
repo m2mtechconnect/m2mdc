@@ -32,6 +32,13 @@ import {
   type HealthCheckResult,
 } from '@/connections/api';
 import type { ConnectionInstance, ConnectorDefinition } from '@/connections/model';
+import { useManagedConnectorCapabilities } from '@/connections/managedConnectorApi';
+import {
+  CONNECTION_CLASS_DESCRIPTION,
+  CONNECTION_CLASS_LABEL,
+  ELIGIBILITY_LABEL,
+  EXTERNAL_AUTHORIZATION_NOTICE,
+} from '@/connections/managedConnectors';
 import {
   DIRECTIONS,
   ENVIRONMENTS,
@@ -64,6 +71,7 @@ export function ConnectionSetupWizard({
   const { toast } = useToast();
   const tenants = useTenantOptions();
   const facilities = useFacilityOptions();
+  const capabilities = useManagedConnectorCapabilities();
 
   const [stepIndex, setStepIndex] = useState(0);
   const [draft, setDraft] = useState<WizardDraft>(() => emptyWizardDraft());
@@ -75,6 +83,11 @@ export function ConnectionSetupWizard({
   const definition = useMemo(
     () => definitions.find((d) => d.id === draft.connector_id),
     [definitions, draft.connector_id],
+  );
+  // Implementation class for the selected connector, resolved server-side.
+  const capability = useMemo(
+    () => capabilities.data?.entries.find((e) => e.connector_definition_id === draft.connector_id) ?? null,
+    [capabilities.data, draft.connector_id],
   );
 
   useEffect(() => {
@@ -219,6 +232,32 @@ export function ConnectionSetupWizard({
                 <p className="text-xs text-muted-foreground">
                   {definition.provider} · protocols {definition.supported_protocols.join(', ') || 'none'} · adapter {definition.runtime_adapter}
                 </p>
+              )}
+              {capability && (
+                <div className="rounded-md border border-border bg-muted/40 p-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant="outline" className="text-xs">
+                      {CONNECTION_CLASS_LABEL[capability.connection_class]}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">{ELIGIBILITY_LABEL[capability.eligibility]}</Badge>
+                  </div>
+                  <p className="mt-1.5 text-xs text-muted-foreground">
+                    {CONNECTION_CLASS_DESCRIPTION[capability.connection_class]}
+                  </p>
+                  <p className="mt-1.5 text-xs text-muted-foreground">
+                    Data classes requested: {capability.data_classes.join(', ') || 'none declared'}.
+                    {capability.operations.length > 0 &&
+                      ` Permissions: ${capability.operations
+                        .map((op) => `${op.label} (${op.classification === 'WRITE' ? 'write, approval required' : 'read'})`)
+                        .join('; ')}.`}
+                  </p>
+                  {capability.native_required_reason && (
+                    <p className="mt-1.5 text-xs text-muted-foreground">{capability.native_required_reason}</p>
+                  )}
+                  {(capability.connection_class === 'MANAGED_USER' || capability.connection_class === 'MANAGED_SHARED') && (
+                    <p className="mt-1.5 text-xs text-muted-foreground">{EXTERNAL_AUTHORIZATION_NOTICE}</p>
+                  )}
+                </div>
               )}
             </div>
           )}

@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useRBAC } from '@/contexts/RBACContext';
 import { ConnectionSetupWizard } from './ConnectionSetupWizard';
+import { ManagedConnectorInventory } from './ManagedConnectorInventory';
 import { canAddConnection, type ConnectionInstance, type ConnectorDefinition } from '@/connections/model';
 import {
   AVAILABILITY_LABEL,
@@ -62,6 +63,7 @@ export function CatalogueTab({
 
   return (
     <div className="space-y-5">
+      <ManagedConnectorInventory />
       <div className="flex flex-wrap items-center gap-2">
         <Input
           value={query}

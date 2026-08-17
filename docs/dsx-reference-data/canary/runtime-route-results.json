@@ -1,0 +1,15 @@
+{
+  "status": "NOT_RUN",
+  "reason": "No new build was published in this phase and the published bundle assets/index-BLh1dE2h.js does not contain the canary. Running the sweep against the published host would only re-verify the previous phase, and running it against the preview host would not constitute published-route evidence.",
+  "published_host": "https://auradc.m2mtechconnect.com",
+  "published_bundle_unchanged": "assets/index-BLh1dE2h.js",
+  "default_dataset_unchanged": true,
+  "routes_declared": 87,
+  "aliases": 26,
+  "routes_exercised_legacy_mode": 0,
+  "routes_exercised_reference_mode": 0,
+  "roles_exercised": [],
+  "console_errors": null,
+  "failed_requests": null,
+  "permanent_loading_states": null
+}

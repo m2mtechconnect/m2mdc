@@ -169,5 +169,11 @@ export const DATASET_MODES: readonly DatasetMode[] = [
   'montreal-derived',
 ];
 
-/** The default demonstration dataset mode. Flipped only when all gates pass. */
-export const DEFAULT_DATASET_MODE: DatasetMode = 'nvidia-dsx-reference';
+/**
+ * The production default dataset is owned by
+ * `src/data/dataset/datasetRegistry.ts` (`PRODUCTION_DEFAULT_DATASET`). This
+ * module deliberately exports no competing default: a second constant here
+ * previously claimed `nvidia-dsx-reference` was the default, which was never
+ * true at runtime and is exactly the kind of contradiction the registry exists
+ * to prevent.
+ */

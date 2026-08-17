@@ -82,7 +82,7 @@ export function buildRunLineage(request: ReferenceRunRequest): RunLineageResult 
     sourceCommit: DSX_SOURCE_COMMIT,
     configurationId: request.configurationId,
     inputRecordIds: values.map((v) => v.recordId).filter((id): id is string => Boolean(id)),
-    scenarioRecordIds: [...request.scenarioRecordIds],
+    scenarioRecordIds: [...request.scenarioRecordIds].sort(),
     ownership: 'AURA',
     resultClassification: 'SIMULATED_RESULT',
     commissioned: false,

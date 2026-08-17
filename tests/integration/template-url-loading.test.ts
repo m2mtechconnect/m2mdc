@@ -18,7 +18,15 @@ vi.mock('@/integrations/supabase/client', () => ({
       onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
     },
     functions: {
-      invoke: vi.fn(async () => ({ data: { id: 'test-system-id' }, error: null })),
+      invoke: vi.fn(async () => ({
+        data: {
+          data: {
+            id: 'test-builder-id',
+            builder: { id: 'test-builder-id', state: {}, current_step: 1 },
+          },
+        },
+        error: null,
+      })),
     },
     from: vi.fn(() => ({
       select: vi.fn(() => ({

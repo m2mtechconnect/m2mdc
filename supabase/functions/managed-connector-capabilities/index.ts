@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
       connection_class: entry.connection_class,
       eligibility,
       linked_to_project: linkedToProject,
-      runtime_selectable: isRuntimeSelectable({ eligibility, linked_to_project: linkedToProject }),
+      runtime_selectable: isRuntimeSelectable({ ...entry, eligibility, linked_to_project: linkedToProject }),
       user_bindable: Boolean(userBindingTransport),
       user_client_configured: userClientConfigured,
       requested_scopes: userBindingTransport?.scopes ?? [],

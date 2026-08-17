@@ -184,6 +184,11 @@ export interface ManagedCapabilityEntry {
   native_required_reason: string | null;
   verified_at: string | null;
   evidence_note: string;
+  /** True when this connector can be authorized per user at all. */
+  user_bindable?: boolean;
+  /** True only when a connector client exists for this project. */
+  user_client_configured?: boolean;
+  requested_scopes?: string[];
   user_binding: {
     status: string;
     granted_scopes: string[];

@@ -71,7 +71,14 @@
 
   <body>
     <div id="root"></div>
-    <script src="/omniverse-webrtc-streaming-library.umd.js"></script>
+    <!--
+      Phase 11 (bundle hardening): the NVIDIA Omniverse WebRTC streaming
+      library (722 KB) is no longer loaded globally. It shipped to every
+      anonymous visitor even though `readKitConfig()` reports Kit as
+      typed-unavailable in every build. It is now loaded on demand by
+      src/integrations/omniverseKit/streamingLibraryLoader.ts, only after
+      the provider, health check and permission gates all pass.
+    -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

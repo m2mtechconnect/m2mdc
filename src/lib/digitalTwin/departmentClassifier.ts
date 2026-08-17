@@ -87,6 +87,26 @@ const departmentPatterns: DepartmentPattern[] = [
 ];
 
 /**
+ * Count whole-word occurrences of a keyword.
+ *
+ * Plain substring matching made short keywords fire constantly: "it" matched
+ * inside "digital", "unit" and "monitor", which pushed unrelated content into
+ * IT / Engineering. Word boundaries keep short keywords usable.
+ */
+function countWord(content: string, keyword: string): number {
+  const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return (content.match(new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, 'g')) || []).length;
+}
+
+/** The distinctive words in a department label, e.g. "IT / Engineering" -> it, engineering. */
+function departmentNameTokens(department: Department): string[] {
+  return department
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((token) => token.length > 2);
+}
+
+/**
  * Classify a use case into a department based on content
  */
 export function classifyDepartment(content: string): Department {

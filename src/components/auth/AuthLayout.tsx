@@ -65,11 +65,11 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
           >
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-dc-green" />
-              <span>Carbon Neutral</span>
+              <span>Carbon Modelling</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-secondary" />
-              <span>Sovereign Cloud</span>
+              <span>Data Residency Controls</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-accent" />

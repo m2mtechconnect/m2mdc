@@ -35,6 +35,7 @@ import {
   SUPPORT_NAV,
   isNavItemActive,
   visibleManageNav,
+  navGroups,
 } from "@/config/appNavigation";
 import { OperatingStateBar } from "@/components/capability/OperatingStateBar";
 import { useShellLayoutStore } from "@/stores/shellLayoutStore";
@@ -66,6 +67,8 @@ export function Layout({ children }: LayoutProps) {
   // authoring and administration collapse into a single Manage group.
   const workspaceNavigation = WORKSPACE_NAV;
   const manageNavigation = roleLoading ? [] : visibleManageNav(can);
+  // DSX lifecycle grouping used by the mobile drawer.
+  const drawerGroups = roleLoading ? [] : navGroups(can);
   const headerRef = useRef<HTMLElement>(null);
 
   // Auto-start tours based on route and user state
@@ -297,44 +300,22 @@ export function Layout({ children }: LayoutProps) {
             </SheetTitle>
           </SheetHeader>
 
+          {/* DSX lifecycle drawer: Overview, Design, Simulate, Operate,
+              Govern, Support. Labels changed; every href is unchanged. */}
           <nav className="mt-6 space-y-1" aria-label="Mobile navigation">
-            {/* Workspaces */}
-            <div className="pb-4">
-              <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Workspaces
-              </h3>
-              {workspaceNavigation.map((item) => {
-                const isActive = isNavItemActive(item, location.pathname);
-                return (
-                  <Button
-                    key={item.name}
-                    asChild
-                    variant={isActive ? "secondary" : "ghost"}
-                    className="w-full justify-start gap-3 min-h-[44px] text-base"
-                  >
-                    <Link
-                      to={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      aria-current={isActive ? "page" : undefined}
-                    >
-                      <item.icon className="h-5 w-5" aria-hidden="true" />
-                      {item.fullName}
-                    </Link>
-                  </Button>
-                );
-              })}
-            </div>
-
-            {/* Manage */}
-            {manageNavigation.length > 0 && (
-              <div className="pb-4 border-t border-border pt-4">
+            {drawerGroups.map((group, groupIndex) => (
+              <div
+                key={group.id}
+                data-nav-group={group.id}
+                className={groupIndex === 0 ? "pb-4" : "pb-4 border-t border-border pt-4"}
+              >
                 <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Manage
+                  {group.label}
                 </h3>
-                {manageNavigation.map((item) => {
+                {group.items.map((item) => {
                   const isActive = isNavItemActive(item, location.pathname);
                   return (
-                    <div key={item.name}>
+                    <div key={item.href}>
                       <Button
                         asChild
                         variant={isActive ? "secondary" : "ghost"}
@@ -342,6 +323,7 @@ export function Layout({ children }: LayoutProps) {
                       >
                         <Link
                           to={item.href}
+                          data-nav-item={item.name}
                           onClick={() => setMobileMenuOpen(false)}
                           aria-current={isActive ? "page" : undefined}
                         >
@@ -377,34 +359,7 @@ export function Layout({ children }: LayoutProps) {
                   );
                 })}
               </div>
-            )}
-
-            {/* Help Section */}
-            <div className="pb-4 border-t border-border pt-4">
-              <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Support
-              </h3>
-              {SUPPORT_NAV.map((item) => {
-                const isActive = isNavItemActive(item, location.pathname);
-                return (
-                  <Button
-                    key={item.href}
-                    asChild
-                    variant={isActive ? "secondary" : "ghost"}
-                    className="w-full justify-start gap-3 min-h-[44px] text-base"
-                  >
-                    <Link
-                      to={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      aria-current={isActive ? "page" : undefined}
-                    >
-                      <item.icon className="h-5 w-5" aria-hidden="true" />
-                      {item.fullName}
-                    </Link>
-                  </Button>
-                );
-              })}
-            </div>
+            ))}
           </nav>
 
           {/* Mobile Sheet Footer - Sign Out */}

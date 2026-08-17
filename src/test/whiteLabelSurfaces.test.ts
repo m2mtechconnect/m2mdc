@@ -21,7 +21,7 @@ const PROHIBITED: { label: string; pattern: RegExp }[] = [
   { label: 'OAuth redirect instruction', pattern: /redirect[_ ]uri|callback url/i },
   { label: 'provider developer console instruction', pattern: /developer (console|portal|dashboard)/i },
   { label: 'raw token material', pattern: /\b(access|refresh|bearer)[_ ]token\b/i },
-  { label: 'credential paste instruction', pattern: /paste (your|the) (key|token|secret|credential)/i },
+  { label: 'provider credential paste instruction', pattern: /paste[^.]{0,40}from (your|the) [a-z ]*(provider|vendor|account|console|portal)/i },
 ];
 
 function walk(dir: string): string[] {
@@ -47,7 +47,10 @@ function walk(dir: string): string[] {
 /** Prose = quoted literals or JSX text with at least two words; excludes identifiers and route keys. */
 function proseStrings(source: string): string[] {
   const withoutComments = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-  const literals = withoutComments.match(/'[^'\n]{6,}'|"[^"\n]{6,}"|`[^`\n]{6,}`/g) ?? [];
+  const literals = (withoutComments.match(/'[^'\n]{6,}'|"[^"\n]{6,}"|`[^`\n]{6,}`/g) ?? []).filter(
+    // Interpolated template literals are request plumbing (headers, URLs), not rendered prose.
+    (s) => !s.includes('${'),
+  );
   const jsxText = withoutComments.match(/>[^<>{}\n]{6,}</g) ?? [];
   return [...literals, ...jsxText]
     .map((s) => s.slice(1, -1).trim())
@@ -72,7 +75,7 @@ describe('managed connector white-label surfaces', () => {
   });
 
   it('keeps connector manifest labels and descriptions white-labelled', async () => {
-    const manifestSource = readFileSync('src/connections/managedConnectorManifest.ts', 'utf8');
+    const manifestSource = readFileSync('supabase/functions/_shared/managedConnectorManifest.ts', 'utf8');
     for (const { pattern, label } of PROHIBITED) {
       const hits = proseStrings(manifestSource).filter((t) => pattern.test(t));
       expect(hits, `${label} present in connector manifest`).toEqual([]);

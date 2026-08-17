@@ -7,7 +7,7 @@
  * forward move between steps. There is exactly one writer in each direction,
  * so the URL and the store can never disagree.
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { WORKFLOW_STEPS, useWorkspaceStore, type WorkspaceTool } from './workspaceStore';
 
@@ -67,6 +67,11 @@ export function useWorkflowStep(enabled: boolean): WorkflowStepState {
   const hasRun = useWorkspaceStore((s) => s.runs.length > 0);
   const [notice, setNotice] = useState<string | null>(null);
   const raw = searchParams.get(STEP_PARAM);
+  // True while a URL-driven step change is still propagating into the store.
+  // Without it the store->URL effect fires on mount with the *stale* store
+  // step and immediately overwrites a valid deep link (`?step=simulate` was
+  // being rewritten back to `?step=inspect`).
+  const urlSyncPending = useRef(false);
 
   const writeStep = useCallback(
     (step: WorkspaceTool, replace: boolean) => {
@@ -88,7 +93,10 @@ export function useWorkflowStep(enabled: boolean): WorkflowStepState {
     if (!enabled) return;
     const resolved = resolveWorkflowStep(raw, hasRun, activeTool);
     setNotice(resolved.notice);
-    if (resolved.step !== activeTool) setTool(resolved.step);
+    if (resolved.step !== activeTool) {
+      urlSyncPending.current = true;
+      setTool(resolved.step);
+    }
     if (resolved.rewrite && raw !== resolved.step) writeStep(resolved.step, true);
     // `activeTool` is deliberately excluded: it is the *output* of this
     // effect, and the store->URL effect below owns the opposite direction.
@@ -100,6 +108,12 @@ export function useWorkflowStep(enabled: boolean): WorkflowStepState {
   useEffect(() => {
     if (!enabled) return;
     if (raw === activeTool) return;
+    if (urlSyncPending.current) {
+      // This render is the result of the URL writing into the store, not a
+      // user step change. Consume the flag and leave the URL alone.
+      urlSyncPending.current = false;
+      return;
+    }
     if (raw !== null && isWorkflowStep(raw)) writeStep(activeTool, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, activeTool]);

@@ -60,6 +60,7 @@ export function SimulationDashboard({
   const [events, setEvents] = useState<BuilderPreviewEvent[]>([]);
   const [kpiData, setKPIData] = useState<any[]>([]);
   const [engine, setEngine] = useState<BuilderPreviewSessionEngine | null>(null);
+  const [baselineMetrics, setBaselineMetrics] = useState<unknown>(null);
   
   // Bi-directional linking state
   const [highlightedEventId, setHighlightedEventId] = useState<string | null>(null);
@@ -144,6 +145,7 @@ export function SimulationDashboard({
 
     const newEngine = session.engine;
 
+    setBaselineMetrics(session.baselineMetrics ?? null);
     if (session.baselineMetrics) {
       setKPIData([{ timestamp: '00:00', metrics: session.baselineMetrics }]);
     }
@@ -185,12 +187,8 @@ export function SimulationDashboard({
       if (status === 'completed') {
         engine.reset();
         setEvents([]);
-        if (useMockSimulation && engine instanceof MockSimulationEngine) {
-          const baselineData = {
-            timestamp: '00:00',
-            metrics: engine.getBaselineMetrics()
-          };
-          setKPIData([baselineData]);
+        if (baselineMetrics) {
+          setKPIData([{ timestamp: '00:00', metrics: baselineMetrics }]);
         } else {
           setKPIData([]);
         }
@@ -198,7 +196,7 @@ export function SimulationDashboard({
       engine.start();
       setStatus('running');
     }
-  }, [engine, status, useMockSimulation]);
+  }, [engine, status, baselineMetrics]);
 
   // Handle reset
   const handleReset = useCallback(() => {
@@ -209,16 +207,12 @@ export function SimulationDashboard({
     setEvents([]);
     
     // Re-initialize baseline metrics for mock simulation
-    if (useMockSimulation && engine instanceof MockSimulationEngine) {
-      const baselineData = {
-        timestamp: '00:00',
-        metrics: engine.getBaselineMetrics()
-      };
-      setKPIData([baselineData]);
+    if (baselineMetrics) {
+      setKPIData([{ timestamp: '00:00', metrics: baselineMetrics }]);
     } else {
       setKPIData([]);
     }
-  }, [engine, useMockSimulation]);
+  }, [engine, baselineMetrics]);
 
   // Handle speed change
   const handleSpeedChange = useCallback(() => {

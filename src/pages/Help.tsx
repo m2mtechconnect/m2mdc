@@ -128,7 +128,7 @@ export default function Help() {
       });
 
       if (error) {
-        console.error("Supabase error:", error);
+        console.error("Backend error:", error);
         toast.error("Failed to send message. Please try again.");
         return;
       }

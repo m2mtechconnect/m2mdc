@@ -215,9 +215,10 @@ export default function DeploymentHistory() {
             <div className="p-2 rounded-lg bg-primary/10 border border-primary/30">
               <Rocket className="h-6 w-6 text-primary" />
             </div>
-            <h1 className="text-2xl font-semibold text-foreground">{t('deploy.deploymentHistory', 'Deployments')}</h1>
+            <h1 className="text-2xl font-semibold text-foreground">Runtime Environments</h1>
           </div>
-          <p className="text-muted-foreground text-sm">
+          <PagePurpose route="/deployments" />
+          <p className="mt-1 text-muted-foreground text-sm">
             {t('deploy.completeAuditTrail', 'Complete audit trail of all system deployments')}
           </p>
         </div>

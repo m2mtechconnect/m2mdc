@@ -1457,6 +1457,7 @@ export type Database = {
           official_source: string | null
           schema_type: string
           schema_version: string
+          tenant_id: string | null
           timestamp_rules: Json
           unit_rules: Json
           validation_status: string
@@ -1472,6 +1473,7 @@ export type Database = {
           official_source?: string | null
           schema_type: string
           schema_version: string
+          tenant_id?: string | null
           timestamp_rules?: Json
           unit_rules?: Json
           validation_status?: string
@@ -1487,6 +1489,7 @@ export type Database = {
           official_source?: string | null
           schema_type?: string
           schema_version?: string
+          tenant_id?: string | null
           timestamp_rules?: Json
           unit_rules?: Json
           validation_status?: string
@@ -2030,6 +2033,7 @@ export type Database = {
           mapping_required: boolean
           name: string
           provider: string
+          publication_status: string
           runtime_adapter: string | null
           supported_auth_methods: string[]
           supported_data_classes: string[]
@@ -2051,6 +2055,7 @@ export type Database = {
           mapping_required?: boolean
           name: string
           provider: string
+          publication_status?: string
           runtime_adapter?: string | null
           supported_auth_methods?: string[]
           supported_data_classes?: string[]
@@ -2072,6 +2077,7 @@ export type Database = {
           mapping_required?: boolean
           name?: string
           provider?: string
+          publication_status?: string
           runtime_adapter?: string | null
           supported_auth_methods?: string[]
           supported_data_classes?: string[]
@@ -2085,27 +2091,36 @@ export type Database = {
       }
       contact_expert_logs: {
         Row: {
+          correlation_id: string
           created_at: string
           email: string
           id: string
+          intake_source: string
+          is_anonymous: boolean
           message: string | null
           name: string
           status: string | null
           user_id: string | null
         }
         Insert: {
+          correlation_id?: string
           created_at?: string
           email: string
           id?: string
+          intake_source?: string
+          is_anonymous?: boolean
           message?: string | null
           name: string
           status?: string | null
           user_id?: string | null
         }
         Update: {
+          correlation_id?: string
           created_at?: string
           email?: string
           id?: string
+          intake_source?: string
+          is_anonymous?: boolean
           message?: string | null
           name?: string
           status?: string | null
@@ -4361,12 +4376,14 @@ export type Database = {
           challenge: string | null
           company_name: string
           company_size: string
+          correlation_id: string
           created_at: string
           current_pue: string | null
           email: string
           full_name: string
           goals: Json
           id: string
+          intake_source: string
           job_title: string
           num_data_centres: string
           rack_count: string
@@ -4377,12 +4394,14 @@ export type Database = {
           challenge?: string | null
           company_name: string
           company_size: string
+          correlation_id?: string
           created_at?: string
           current_pue?: string | null
           email: string
           full_name: string
           goals?: Json
           id?: string
+          intake_source?: string
           job_title: string
           num_data_centres: string
           rack_count: string
@@ -4393,12 +4412,14 @@ export type Database = {
           challenge?: string | null
           company_name?: string
           company_size?: string
+          correlation_id?: string
           created_at?: string
           current_pue?: string | null
           email?: string
           full_name?: string
           goals?: Json
           id?: string
+          intake_source?: string
           job_title?: string
           num_data_centres?: string
           rack_count?: string
@@ -4737,6 +4758,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      public_intake_rate_limits: {
+        Row: {
+          bucket_key: string
+          created_at: string
+          id: string
+          intake_kind: string
+          request_count: number
+          updated_at: string
+          window_start: string
+        }
+        Insert: {
+          bucket_key: string
+          created_at?: string
+          id?: string
+          intake_kind: string
+          request_count?: number
+          updated_at?: string
+          window_start?: string
+        }
+        Update: {
+          bucket_key?: string
+          created_at?: string
+          id?: string
+          intake_kind?: string
+          request_count?: number
+          updated_at?: string
+          window_start?: string
+        }
+        Relationships: []
       }
       rag_chunks: {
         Row: {

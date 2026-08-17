@@ -49,7 +49,7 @@ import BlueprintPreview from "./pages/BlueprintPreview";
 import SimulationPreview from "./pages/SimulationPreview";
 import AuraWorkspace from "./workspace/AuraWorkspace";
 import InfrastructurePage from "./pages/InfrastructurePage";
-import OmniverseScene from "./pages/OmniverseScene";
+import TwinPreview from "./pages/TwinPreview";
 import OnboardingSubmissions from "./pages/OnboardingSubmissions";
 import AgentDetail from "./pages/AgentDetail";
 import TwinDebug from "./pages/TwinDebug";
@@ -145,7 +145,7 @@ function ApprovedUserRoutes() {
       <Route path="/playbook" element={<Playbook />} />
       <Route path="/data-centre-twin" element={<DataCentreTwin />} />
       <Route path="/data-centre-twin/:id" element={<DataCentreTwin />} />
-      <Route path="/omniverse-scene" element={<OmniverseScene />} />
+      <Route path="/twin-preview" element={<TwinPreview />} />
       <Route path="/twin-debug" element={<TwinDebug />} />
       <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
       <Route path="/infrastructure" element={<InfrastructurePage />} />

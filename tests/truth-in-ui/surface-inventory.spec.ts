@@ -8,7 +8,7 @@
  *   • /              — DataCentreTwinLanding (marketing; provenance
  *                       manifests do not apply, so we only assert
  *                       "no fabricated LIVE" here).
- *   • /omniverse-scene — covered in runtime-states.spec.ts (10 states).
+ *   • /twin-preview — covered in runtime-states.spec.ts (10 states).
  *   • /data-centre-twin?demo=true — 9 domain views + overview tabs.
  *
  * OUT OF SCOPE (auth-gated — recorded as harness-blocked):

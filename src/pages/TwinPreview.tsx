@@ -1,5 +1,5 @@
 /**
- * Omniverse Scene Page
+ * Twin Preview Page
  * AURA Twin Preview. Application-rendered preview of the AURA data centre
  * model. No NVIDIA Omniverse runtime, OpenUSD stage or live scene is used.
  * Shows WebRTC stream viewport, live Kit metrics, simulation controls,
@@ -132,7 +132,7 @@ function MetricCard({
   );
 }
 
-export default function OmniverseScene() {
+export default function TwinPreview() {
   const kit = useOmniverseKit();
   // Phase 5 — single source of truth for what is actually drawing this view.
   const rendererState = resolveRendererMode({ webgl2Available: true });

@@ -1,5 +1,5 @@
 /**
- * Phase 1A.3.e — runtime-state coverage on /omniverse-scene.
+ * Phase 1A.3.e — runtime-state coverage on /twin-preview.
  *
  * Each state below is asserted through THREE independent signals:
  *   (1) A visible disclosure element (badge or banner text).
@@ -28,9 +28,9 @@
 import { test, expect } from './_setup/fixtures';
 import { mockKit, type KitMockState } from './_setup/kit-mock';
 
-/** Shared: navigate to omniverse-scene and wait for KPI cards to render. */
+/** Shared: navigate to twin-preview and wait for KPI cards to render. */
 async function open(page: import('@playwright/test').Page) {
-  await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+  await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
   await expect(page.getByTestId('metric-pue')).toBeVisible();
 }
 
@@ -44,7 +44,7 @@ async function assertNoMisleadingLive(page: import('@playwright/test').Page) {
   await expect(badgeLive, 'no ProvenanceBadge is labelled "Live"').toHaveCount(0);
 }
 
-test.describe('Kit runtime states — /omniverse-scene', () => {
+test.describe('Kit runtime states — /twin-preview', () => {
   test('1) validated live — connected badge, per-metric provenance=live', async ({ page, guard }) => {
     await mockKit(page, 'validated-live');
     await open(page);
@@ -113,7 +113,7 @@ test.describe('Kit runtime states — /omniverse-scene', () => {
       await held;
       return route.abort('failed'); // request only ever completes on teardown
     });
-    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('metric-pue')).toBeVisible();
     // Give the app a full second — no live badge may appear while the
     // Kit response has not yet validated.
@@ -149,7 +149,7 @@ test.describe('Kit runtime states — /omniverse-scene', () => {
         body: JSON.stringify(VALID_STATUS),
       });
     });
-    await page.goto('/omniverse-scene', { waitUntil: 'domcontentloaded' });
+    await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('metric-pue')).toBeVisible();
     // Pre-release invariant: NEVER live while the response is pending.
     await expect(page.locator('[data-provenance="live"]')).toHaveCount(0);

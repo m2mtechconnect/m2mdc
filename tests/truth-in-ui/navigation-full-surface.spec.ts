@@ -60,7 +60,7 @@ const DEEP_LINK_ROUTES: readonly string[] = [
   '/data-centre-twin',
   '/data-centre-twin?view=simulation',
   '/data-centre-twin/default',
-  '/omniverse-scene',
+  '/twin-preview',
   '/twin-datacentre',
   '/twin-debug',
   '/infrastructure',

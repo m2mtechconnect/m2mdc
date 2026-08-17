@@ -35,7 +35,7 @@ const SURFACES: Surface[] = [
   { name: 'landing', path: '/', waitFor: 'main' },
   { name: 'login', path: '/login', waitFor: 'form' },
   { name: 'signup', path: '/signup', waitFor: 'form' },
-  { name: 'omniverse-scene', path: '/omniverse-scene', waitFor: 'main' },
+  { name: 'twin-preview', path: '/twin-preview', waitFor: 'main' },
   { name: 'data-centre-twin (demo)', path: '/data-centre-twin?demo=true', waitFor: 'main' },
 ];
 
@@ -43,7 +43,7 @@ for (const surface of SURFACES) {
   test(`axe: ${surface.name} — no unlabeled inputs or ARIA violations`, async ({ page, guard }) => {
     // Neutralise the Kit so the demo route renders a deterministic
     // "unavailable" state without emitting real fetches.
-    if (surface.path.includes('data-centre-twin') || surface.path.includes('omniverse-scene')) {
+    if (surface.path.includes('data-centre-twin') || surface.path.includes('twin-preview')) {
       await mockKit(page, 'network-unavailable');
     }
 

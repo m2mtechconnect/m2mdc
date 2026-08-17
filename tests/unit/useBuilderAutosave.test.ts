@@ -27,7 +27,9 @@ describe('useBuilderAutosave', () => {
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    // resetAllMocks (not clearAllMocks) also drops queued mockRejectedValueOnce
+    // implementations, which otherwise leak into the next test.
+    vi.resetAllMocks();
     vi.useRealTimers();
   });
 

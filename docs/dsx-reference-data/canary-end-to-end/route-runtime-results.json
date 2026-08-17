@@ -1,0 +1,388 @@
+{
+ "routes": [
+  {
+   "route": "/dashboard",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/dashboard?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/manage/facilities",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/manage/facilities?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/blueprint/demo",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/blueprint/demo?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/blueprint/preview",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/blueprint/preview?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/builder",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/builder?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/simulation",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/simulation?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/simulation/preview",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/simulation/preview?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/analytics",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/analytics?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/search",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/search?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/compliance",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/compliance?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/app/agents",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/app/agents?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/connect/monitor",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/connect/monitor?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/connect/health",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/connect/health?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/manage/integrations",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/manage/integrations?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/deploy",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/deploy?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/deployments",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/deployments?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/admin/asset-pipeline",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/admin/asset-pipeline?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/help",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/help?dataset=nvidia-dsx-reference",
+   "reference_surface": 1,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/admin/dataset-registry",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/admin/dataset-registry?dataset=nvidia-dsx-reference",
+   "reference_surface": 0,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/teams",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/teams?dataset=nvidia-dsx-reference",
+   "reference_surface": 0,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/marketplace",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/marketplace?dataset=nvidia-dsx-reference",
+   "reference_surface": 0,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/settings/ai",
+   "dataset": "nvidia-dsx-reference",
+   "final_url": "http://localhost:8080/settings/ai?dataset=nvidia-dsx-reference",
+   "reference_surface": 0,
+   "banner": 1,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/dashboard",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/dashboard?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/manage/facilities",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/manage/facilities?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 1
+  },
+  {
+   "route": "/blueprint/demo",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/blueprint/demo?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/blueprint/preview",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/blueprint/preview?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/builder",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/builder?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/simulation",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/simulation?dataset=legacy-synthetic&step=inspect",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/simulation/preview",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/simulation/preview?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/analytics",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/analytics?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/search",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/search?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/compliance",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/compliance?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/app/agents",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/app/agents?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/connect/monitor",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/connect/monitor?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/connect/health",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/connect/health?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/manage/integrations",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/manage/integrations?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/deploy",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/deploy?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/deployments",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/deployments?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/admin/asset-pipeline",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/admin/asset-pipeline?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/help",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/help?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/admin/dataset-registry",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/admin/dataset-registry?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/teams",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/teams?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/marketplace",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/marketplace?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 0
+  },
+  {
+   "route": "/settings/ai",
+   "dataset": "legacy-synthetic",
+   "final_url": "http://localhost:8080/settings/ai?dataset=legacy-synthetic",
+   "reference_surface": 0,
+   "banner": 0,
+   "new_console_errors": 3
+  }
+ ],
+ "anonymous": {
+  "final_url": "http://localhost:8080/",
+  "reference_surface": 0
+ },
+ "console_errors": [
+  "Warning: validateDOMNesting(...): %s cannot appear as a descendant of <%s>.%s <div> p \n    at div\n    at _c (http://localhost:8080/src/components/ui/badge.tsx:39:54)\n    at p\n    at div\n    at div\n    at div\n    at _c8 (http://localhost:8080/src/components/ui/card.tsx:67:61)\n    at div\n    at _c (http://localhost:8080/src/components/ui/card.tsx:23:53)\n    at div\n    at ManageFacilities (http://localhost:8080/src/pages/manage/Facilities.tsx:68:22)\n    at RenderedRoute (http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=06289a37:4088:5)\n    at Routes (http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=06289a37:4558:5)\n    at ApprovedUserRoutes\n    at ReferenceRouteGate (http://localhost:8080/src/components/dataset/ReferenceRouteGate.tsx?t=1786936964799:31:38)\n    at main\n    at div\n    at Layout (http://localhost:8080/src/components/Layout.tsx:44:26)\n    at DatasetProvider (http://localhost:8080/src/data/dataset/DatasetProvider.tsx:43:35)\n    at CoPilotCommandProvider (http://localhost:8080/src/contexts/CoPilotCommandContext.tsx:51:42)\n    at CoPilotProvider (http://localhost:8080/src/contexts/CoPilotContext.tsx:38:35)\n    at TourProvider (http://localhost:8080/src/context/TourContext.tsx:47:32)\n    at AuthenticatedShell\n    at RenderedRoute (http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=06289a37:4088:5)\n    at Routes (http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=06289a37:4558:5)\n    at Suspense\n    at ApprovedUserRouter (http://localhost:8080/src/App.tsx?t=1786936964799:438:28)\n    at AuthenticatedApp (http://localhost:8080/src/App.tsx?t=1786936964799:74:35)\n    at ActiveTwinProvider (http://localhost:8080/src/context/ActiveTwinContext.tsx:36:38)\n    at Router (http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=06289a37:4501:15)\n    at BrowserRouter (http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=06289a37:5247:5)\n    at RBACProvider (http://localhost:8080/src/contexts/RBACContext.tsx:45:32)\n    at Provider (http://localhost:8080/node_modules/.vite/deps/chunk-3RXG37ZK.js?v=06289a37:38:15)\n    at TooltipProvider (http://localhost:8080/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=06289a37:65:5)\n    at QueryClientProvider (http://localhost:8080/node_modules/.vite/deps/@tanstack_react-query.js?v=06289a37:2934:3)\n    at O (http://localhost:8080/node_modules/.vite/deps/next-themes.js?v=06289a37:23:25)\n    at z (http://localhost:8080/node_modules/.vite/deps/next-themes.js?v=06289a37:21:18)\n    at ErrorBoundary (http://localhost:8080/src/components/ErrorBoundary.tsx:168:9)\n    at App\n    at _a (http://localhost:8080/node_modules/.vite/deps/react-helmet-async.js?v=06289a37:627:5)",
+  "2026-08-17T03:31:56.678Z [useEdgeFunction:catalog-templates-industry?pageSize=50] Edge function catalog-templates-industry?pageSize=50 failed {error: Failed to send a request to the Edge Function, stack: FunctionsFetchError: Failed to send a request to t\u2026/deps/@supabase_supabase-js.js?v=06289a37:1331:17}",
+  "2026-08-17T03:31:56.680Z [useEdgeFunction:catalog-templates-industry?pageSize=50] Edge function catalog-templates-industry?pageSize=50 error {error: Failed to send a request to the Edge Function, stack: FunctionsFetchError: Failed to send a request to t\u2026/deps/@supabase_supabase-js.js?v=06289a37:1331:17}",
+  "Error loading industry templates: FunctionsFetchError: Failed to send a request to the Edge Function\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=06289a37:1331:17"
+ ],
+ "failed_requests": [
+  "https://y.clarity.ms/collect",
+  "https://r.clarity.ms/collect",
+  "https://r.clarity.ms/collect",
+  "https://i.clarity.ms/collect",
+  "https://a.clarity.ms/collect",
+  "https://r.clarity.ms/collect",
+  "https://n.clarity.ms/collect",
+  "https://i.clarity.ms/collect",
+  "https://a.clarity.ms/collect",
+  "https://i.clarity.ms/collect",
+  "https://f.clarity.ms/collect",
+  "https://i.clarity.ms/collect",
+  "https://i.clarity.ms/collect",
+  "https://g.clarity.ms/collect",
+  "https://h.clarity.ms/collect",
+  "https://t.clarity.ms/collect",
+  "https://v.clarity.ms/collect",
+  "https://j.clarity.ms/collect",
+  "https://u.clarity.ms/collect",
+  "https://r.clarity.ms/collect"
+ ]
+}

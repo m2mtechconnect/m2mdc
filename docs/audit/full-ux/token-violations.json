@@ -1,0 +1,1073 @@
+{
+ "measuredAt": "2026-08-17",
+ "viewport": "1440x900",
+ "routes": [
+  {
+   "route": "/",
+   "sub11pxTextElements": 40,
+   "sampleText": [
+    "22% @10.5px",
+    "92% @10.5px",
+    "40% @10.5px",
+    "44% @10.5px",
+    "79% @10.5px"
+   ],
+   "hardcodedBlackWhiteUtilities": 1,
+   "controlsUnder24px": 3
+  },
+  {
+   "route": "/auth",
+   "sub11pxTextElements": 40,
+   "sampleText": [
+    "22% @10.5px",
+    "92% @10.5px",
+    "40% @10.5px",
+    "44% @10.5px",
+    "79% @10.5px"
+   ],
+   "hardcodedBlackWhiteUtilities": 1,
+   "controlsUnder24px": 3
+  },
+  {
+   "route": "/login",
+   "sub11pxTextElements": 40,
+   "sampleText": [
+    "22% @10.5px",
+    "92% @10.5px",
+    "40% @10.5px",
+    "44% @10.5px",
+    "79% @10.5px"
+   ],
+   "hardcodedBlackWhiteUtilities": 1,
+   "controlsUnder24px": 3
+  },
+  {
+   "route": "/sign-in",
+   "sub11pxTextElements": 40,
+   "sampleText": [
+    "22% @10.5px",
+    "92% @10.5px",
+    "40% @10.5px",
+    "44% @10.5px",
+    "79% @10.5px"
+   ],
+   "hardcodedBlackWhiteUtilities": 1,
+   "controlsUnder24px": 3
+  },
+  {
+   "route": "/sign-up",
+   "sub11pxTextElements": 40,
+   "sampleText": [
+    "22% @10.5px",
+    "92% @10.5px",
+    "40% @10.5px",
+    "44% @10.5px",
+    "79% @10.5px"
+   ],
+   "hardcodedBlackWhiteUtilities": 1,
+   "controlsUnder24px": 3
+  },
+  {
+   "route": "/sign-out",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/forgot-password",
+   "sub11pxTextElements": 0,
+   "sampleText": [],
+   "hardcodedBlackWhiteUtilities": 1,
+   "controlsUnder24px": 0
+  },
+  {
+   "route": "/mfa",
+   "sub11pxTextElements": 0,
+   "sampleText": [],
+   "hardcodedBlackWhiteUtilities": 1,
+   "controlsUnder24px": 1
+  },
+  {
+   "route": "/twin-datacentre",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/data-centre-twin",
+   "sub11pxTextElements": 53,
+   "sampleText": [
+    "9 agents @10px",
+    "Ready @10px",
+    "PUE is excellent. Cooling optimization i @10px",
+    "GPU clusters operating at optimal capaci @10px",
+    "Thermal conditions stable across all zon @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 0,
+   "controlsUnder24px": 0
+  },
+  {
+   "route": "/omniverse-scene",
+   "sub11pxTextElements": 5,
+   "sampleText": [
+    "normal @10px",
+    "emergency @10px",
+    "night @10px",
+    "maintenance @10px",
+    "blackout @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 2,
+   "controlsUnder24px": 0
+  },
+  {
+   "route": "/pilot",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/dashboard",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/builder",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/deploy",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/deployments",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/agent/default",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/agents/default/chat",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/agent-chat",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/analytics",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/account/profile",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/account/settings",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/account/access-control",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/admin/onboarding-submissions",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/admin/user-approvals",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/admin/asset-preview",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/admin/asset-pipeline",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/admin/asset-validation/nvidia.rack.42u_a_01.ops",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/admin/reference-facility-validation",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/admin/signups-dashboard",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/admin/dsx-capabilities",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/admin/dataset-registry",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/manage/integrations",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/manage/facilities",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/compliance",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/teams",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/marketplace",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/app/agents",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/app/agents/thermal-agent/detail",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/app/agents/demo-agent/manage",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/app/agents/demo-agent/operations",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/twins/default/manage",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/studio/systems/demo-system/manage",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/data-centre-twin/default/blueprint",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/blueprint/preview",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/blueprint/default",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/simulation",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/simulation/preview",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/help",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/connect/monitor",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/connect/health",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/search",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/settings/ai",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/playbook",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/data-centre-twin/default",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/twin-debug",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/digital-twins-demo/funding-intake",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/infrastructure",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/dsx/evidence-beta",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/overview",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/operations",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/operations/thermal",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/operations/power",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/operations/cooling",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/operations/compute",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/operations/workload",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/sustainability",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/sustainability/financial",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/sustainability/sovereignty",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/decisions",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/decisions/log",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/assets",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/thermal",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/power",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/cooling",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/network",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/facility",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/workload",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/simulations",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/sovereignty",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/carbon",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/financials",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  },
+  {
+   "route": "/evidence",
+   "sub11pxTextElements": 8,
+   "sampleText": [
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Cloud Providers @10px",
+    "Compute @10px",
+    "DCIM @10px"
+   ],
+   "hardcodedBlackWhiteUtilities": 5,
+   "controlsUnder24px": 6
+  }
+ ]
+}

@@ -1,0 +1,213 @@
+{
+  "host": "https://auradc.m2mtechconnect.com",
+  "public": [
+    "/",
+    "/auth",
+    "/login",
+    "/sign-in",
+    "/sign-up",
+    "/sign-out",
+    "/forgot-password",
+    "/mfa",
+    "/twin-datacentre",
+    "/data-centre-twin",
+    "/omniverse-scene",
+    "/onboarding",
+    "/dev-overlays",
+    "*",
+    "/sign-out",
+    "*",
+    "/sign-out",
+    "*",
+    "/pilot/*",
+    "/sign-out",
+    "/*",
+    "/pilot/*",
+    "/sign-out",
+    "*"
+  ],
+  "authenticated": [
+    "/dashboard",
+    "/login",
+    "/onboarding",
+    "/builder",
+    "/deploy",
+    "/deployments",
+    "/agent/:id",
+    "/agents/:id/chat",
+    "/agent-chat",
+    "/analytics",
+    "/account/profile",
+    "/account/settings",
+    "/account/access-control",
+    "/admin/onboarding-submissions",
+    "/admin/user-approvals",
+    "/admin/asset-preview",
+    "/admin/asset-pipeline",
+    "/admin/asset-validation/:assetId",
+    "/admin/reference-facility-validation",
+    "/admin/signups-dashboard",
+    "/admin/dsx-capabilities",
+    "/admin/dataset-registry",
+    "/manage/integrations",
+    "/manage/facilities",
+    "/compliance",
+    "/teams",
+    "/marketplace",
+    "/app/agents",
+    "/app/agents/:slug/detail",
+    "/app/agents/:agentId/manage",
+    "/app/agents/:agentId/operations",
+    "/twins/:instanceId/manage",
+    "/studio/systems/:systemId/manage",
+    "/data-centre-twin/:id/blueprint",
+    "/blueprint/preview",
+    "/blueprint/:id",
+    "/simulation",
+    "/simulation/preview",
+    "/help",
+    "/connect/monitor",
+    "/connect/health",
+    "/search",
+    "/settings/ai",
+    "/sign-out",
+    "/playbook",
+    "/data-centre-twin",
+    "/data-centre-twin/:id",
+    "/omniverse-scene",
+    "/twin-debug",
+    "/digital-twins-demo/funding-intake",
+    "/infrastructure",
+    "/dsx/evidence-beta",
+    "overview",
+    "operations",
+    "operations/thermal",
+    "operations/power",
+    "operations/cooling",
+    "operations/compute",
+    "operations/workload",
+    "sustainability",
+    "sustainability/financial",
+    "sustainability/sovereignty",
+    "decisions",
+    "decisions/log",
+    "assets",
+    "thermal",
+    "power",
+    "cooling",
+    "network",
+    "facility",
+    "workload",
+    "simulations",
+    "sovereignty",
+    "carbon",
+    "financials",
+    "evidence",
+    "/dev-overlays",
+    "*"
+  ],
+  "aliases": [
+    {
+      "from": "/",
+      "to": "/dashboard"
+    },
+    {
+      "from": "/command",
+      "to": "/dashboard"
+    },
+    {
+      "from": "/evidence",
+      "to": "/dsx/evidence-beta/evidence"
+    },
+    {
+      "from": "/build",
+      "to": "/builder"
+    },
+    {
+      "from": "/admin",
+      "to": "/admin/signups-dashboard"
+    },
+    {
+      "from": "/operations",
+      "to": "/analytics"
+    },
+    {
+      "from": "/intelligence",
+      "to": "/analytics"
+    },
+    {
+      "from": "/integrations",
+      "to": "/manage/integrations"
+    },
+    {
+      "from": "/marketplace/integrations",
+      "to": "/manage/integrations"
+    },
+    {
+      "from": "/settings/integrations",
+      "to": "/manage/integrations"
+    },
+    {
+      "from": "/facilities",
+      "to": "/manage/facilities"
+    },
+    {
+      "from": "/agents",
+      "to": "/app/agents"
+    },
+    {
+      "from": "/subsystem-agents",
+      "to": "/app/agents"
+    },
+    {
+      "from": "/blueprint",
+      "to": "/blueprint/default"
+    },
+    {
+      "from": "/universal-search",
+      "to": "/search"
+    },
+    {
+      "from": "/settings/integrations/nvidia-dsx",
+      "to": "/manage/integrations#nvidia-dsx"
+    },
+    {
+      "from": "/twin-datacentre",
+      "to": "/blueprint/default"
+    },
+    {
+      "from": "/auth",
+      "to": "/"
+    },
+    {
+      "from": "/sign-in",
+      "to": "/"
+    },
+    {
+      "from": "/sign-up",
+      "to": "/"
+    },
+    {
+      "from": "/forgot-password",
+      "to": "/"
+    },
+    {
+      "from": "/mfa",
+      "to": "/"
+    },
+    {
+      "from": "/digital-twins",
+      "to": "/"
+    },
+    {
+      "from": "/digital-twins/:slug",
+      "to": "/"
+    }
+  ],
+  "counts": {
+    "public": 24,
+    "authenticated": 78,
+    "aliases": 24,
+    "declared": 102
+  }
+}

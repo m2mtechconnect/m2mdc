@@ -85,33 +85,29 @@ Deno.serve(async (req) => {
     userId = data.user?.id ?? null;
   }
 
+  // Client-supplied forwarding headers are not trusted as a distinct identity:
+  // the edge runtime normalises x-forwarded-for to the true client address, and
+  // no other client header participates in the bucket key.
   const forwarded = req.headers.get('x-forwarded-for') ?? '';
   const ip = forwarded.split(',')[0]?.trim() || 'unknown';
   const bucketKey = userId ? `user:${userId}` : `ip:${ip}`;
-  const windowStart = new Date(new Date().setMinutes(0, 0, 0)).toISOString();
 
-  const { data: limitRow } = await supabase
-    .from('public_intake_rate_limits')
-    .select('id, request_count')
-    .eq('bucket_key', bucketKey)
-    .eq('intake_kind', kind)
-    .eq('window_start', windowStart)
-    .maybeSingle();
+  // Atomic count-and-check: a single upsert increments and returns the new
+  // count, so a concurrent burst cannot all read the same pre-limit value.
+  const { data: allowed, error: quotaError } = await supabase.rpc('consume_public_intake_quota', {
+    _bucket_key: bucketKey,
+    _intake_kind: kind,
+    _limit: RATE_LIMIT_PER_HOUR,
+  });
 
-  if (limitRow && limitRow.request_count >= RATE_LIMIT_PER_HOUR) {
-    console.warn(`public-intake ${correlationId}: rate limited (${kind})`);
-    return json(429, { error: 'rate_limited', correlation_id: correlationId });
+  if (quotaError) {
+    console.error(`public-intake ${correlationId}: quota check failed`, quotaError.message);
+    return json(503, { error: 'intake_unavailable', correlation_id: correlationId });
   }
 
-  if (limitRow) {
-    await supabase
-      .from('public_intake_rate_limits')
-      .update({ request_count: limitRow.request_count + 1, updated_at: new Date().toISOString() })
-      .eq('id', limitRow.id);
-  } else {
-    await supabase
-      .from('public_intake_rate_limits')
-      .insert({ bucket_key: bucketKey, intake_kind: kind, window_start: windowStart });
+  if (allowed !== true) {
+    console.warn(`public-intake ${correlationId}: rate limited (${kind})`);
+    return json(429, { error: 'rate_limited', correlation_id: correlationId });
   }
 
   try {

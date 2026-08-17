@@ -1,0 +1,13 @@
+{
+  "runner": "vitest run",
+  "collected": 1625,
+  "passed": 1534,
+  "failed": 0,
+  "skipped": 91,
+  "todo": 0,
+  "backendBlocked": 91,
+  "excludedByConfiguration": 928,
+  "notCollected": 928,
+  "statement": "1,534 executable tests passed, 91 backend-dependent tests remain BLOCKED_UNVERIFIED, and 928 Playwright cases are handled separately.",
+  "typecheck": "clean"
+}

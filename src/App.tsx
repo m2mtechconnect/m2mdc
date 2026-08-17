@@ -146,6 +146,8 @@ function AuthenticatedApp() {
           )}
         />
         <Route path="/twin-preview" element={<TwinPreview />} />
+        {/* Phase 5: AURA renders this preview; the legacy vendor-named path redirects. */}
+        <Route path="/omniverse-scene" element={<Navigate to="/twin-preview" replace />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path={MANAGED_USER_RETURN_PATH} element={<ManagedUserReturn />} />
         {import.meta.env.DEV && OverlayFixtures ? <Route path="/dev-overlays" element={<OverlayFixtures />} /> : null}

@@ -30,6 +30,9 @@ export const ROUTE_ALIASES: RouteAlias[] = [
   // so the top-level alias points at the terminal destination directly.
   { from: '/evidence', to: '/dsx/evidence-beta/decisions/log' },
   { from: '/build', to: '/builder' },
+  // Phase 5: the twin preview is rendered by the AURA Web Runtime, not an
+  // NVIDIA Omniverse session, so the vendor-named path is retired.
+  { from: '/omniverse-scene', to: '/twin-preview' },
   { from: '/admin', to: '/admin/signups-dashboard' },
   { from: '/operations', to: '/analytics' },
   { from: '/intelligence', to: '/analytics' },

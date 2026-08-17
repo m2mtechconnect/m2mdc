@@ -32,7 +32,6 @@ import { useTourAutoStart } from "@/tours/useTourAutoStart";
 import { useRBAC } from "@/contexts/RBACContext";
 import {
   WORKSPACE_NAV,
-  SUPPORT_NAV,
   isNavItemActive,
   visibleManageNav,
   navGroups,

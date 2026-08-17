@@ -31,6 +31,7 @@ import {
   referenceScenarios,
   referenceSpecificationsForSite,
   searchDataset,
+  siteForConfiguration,
 } from '@/data/dataset/referenceSelectors';
 import { buildRunLineage, compareConfigurations, deriveDesignFromReference } from '@/data/dataset/referenceRun';
 import { toCsv, toJsonExport } from '@/data/dataset/exportProvenance';
@@ -67,7 +68,7 @@ function download(name: string, content: string, type: string) {
 }
 
 export function ReferenceSurface({ surface }: { surface: SurfaceEntry }) {
-  const { mode, descriptor } = useDataset();
+  const { mode, descriptor, canActivateReference } = useDataset();
   const pageAdapter = adapterForPath(surface.path);
   const [activeTab, setActiveTab] = useState(pageAdapter?.tabs[0]?.id ?? 'default');
   const [configurationId, setConfigurationId] = useState(DEFAULT_CONFIG);
@@ -78,7 +79,8 @@ export function ReferenceSurface({ surface }: { surface: SurfaceEntry }) {
 
   const configIds = useMemo(referenceConfigurationIds, []);
   const kpis = useMemo(() => referenceKpiValues(configurationId), [configurationId]);
-  const site = configurationId.split('-').slice(0, -1).join(' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  // Read the site off the record. Never re-derive it from the id string.
+  const site = siteForConfiguration(configurationId) ?? '';
   const specs = useMemo(() => referenceSpecificationsForSite(site), [site]);
   const lineage = useMemo(
     () =>
@@ -90,8 +92,17 @@ export function ReferenceSurface({ surface }: { surface: SurfaceEntry }) {
     [mode, configurationId],
   );
   const answer = useMemo(
-    () => (question ? answerFromDataset(question, { dataset: mode, facilityId: null, isAdmin: true }) : null),
-    [question, mode],
+    () =>
+      question
+        ? answerFromDataset(question, {
+            dataset: mode,
+            facilityId: null,
+            // Live authority, never a hardcoded true: the grounding layer must
+            // be able to abstain if this surface is ever mounted un-gated.
+            isAdmin: canActivateReference,
+          })
+        : null,
+    [question, mode, canActivateReference],
   );
 
   const currentTab =
@@ -101,10 +112,17 @@ export function ReferenceSurface({ surface }: { surface: SurfaceEntry }) {
     : surface.sections;
   const has = (s: SurfaceSection) => activeSections.includes(s);
   const exportStem = pageAdapter?.exportStem ?? 'aura-reference-export';
-  const exportValues = kpis.length > 0 ? kpis : allReferenceValues();
+  // The Evidence tab describes the whole normalized set, so an evidence-bearing
+  // surface must export that same set. Exporting only the selected
+  // configuration's KPIs there would contradict the caption on screen.
+  const exportsEvidence = activeSections.includes('evidence');
+  const exportValues = !exportsEvidence && kpis.length > 0 ? kpis : allReferenceValues();
+  const exportScopeLabel = exportsEvidence
+    ? `all ${allReferenceValues().length} normalized records`
+    : `the ${kpis.length} published values for ${configurationId}`;
   const exportCtx = {
     dataset: mode,
-    facilityId: `dsx-reference-${site.toLowerCase().replace(/\s+/g, '-')}`,
+    facilityId: site ? `dsx-reference-${site.toLowerCase().replace(/\s+/g, '-')}` : 'dsx-reference',
     simulationRunId: lineage.status === 'READY' ? lineage.lineageId : null,
   };
 
@@ -398,7 +416,8 @@ export function ReferenceSurface({ surface }: { surface: SurfaceEntry }) {
             </Button>
           </div>
           <p className="mt-2 text-muted-foreground">
-            Every row carries dataset id and version, facility, record id, classification, unit,
+            This export contains {exportScopeLabel}. Every row carries dataset id and version,
+            facility, record id, classification, unit,
             source checksum, run id and availability state. Unavailable values export as their
             state, never as 0 or an empty measurement.
           </p>

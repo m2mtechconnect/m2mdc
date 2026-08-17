@@ -104,6 +104,61 @@ function neutral(path: string, title: string, note = 'No dataset-bound values re
   };
 }
 
+/**
+ * A surface whose legacy implementation reads a synthetic fixture that the
+ * reference dataset cannot supply (for example per-second telemetry, which the
+ * pinned NVIDIA source does not publish at all).
+ *
+ * While the canary is active these pages are NOT mounted: rendering them would
+ * put fixture values on screen under a reference-data banner. The gate shows a
+ * terminal unavailable state naming the missing source instead.
+ */
+function unavailable(path: string, title: string, blockingSource: string): SurfaceEntry {
+  return {
+    path,
+    title,
+    classification: 'REFERENCE_UNAVAILABLE',
+    currentSource: blockingSource,
+    targetSelectors: [],
+    requiredRecordTypes: [],
+    sections: [],
+    missingBehaviour:
+      'Page is not mounted in reference mode. A terminal unavailable state names the missing source.',
+    exportImplications: 'No export: there is no defensible value to export.',
+    assistantImplications: 'Assistant may not cite this surface while the canary is active.',
+    migrated: true,
+  };
+}
+
+/** Evidence workspace routes, all served by the synthetic evidence-beta fixture. */
+const EVIDENCE_BETA_ROUTES: readonly [string, string][] = [
+  ['/dsx/evidence-beta', 'Evidence workspaces'],
+  ['/dsx/evidence-beta/overview', 'Evidence overview'],
+  ['/dsx/evidence-beta/operations', 'Operations'],
+  ['/dsx/evidence-beta/operations/thermal', 'Thermal'],
+  ['/dsx/evidence-beta/operations/power', 'Power'],
+  ['/dsx/evidence-beta/operations/cooling', 'Cooling'],
+  ['/dsx/evidence-beta/operations/compute', 'Compute and network'],
+  ['/dsx/evidence-beta/operations/workload', 'Workload'],
+  ['/dsx/evidence-beta/sustainability', 'Sustainability'],
+  ['/dsx/evidence-beta/sustainability/financial', 'Financial'],
+  ['/dsx/evidence-beta/sustainability/sovereignty', 'Sovereignty'],
+  ['/dsx/evidence-beta/decisions', 'Decisions'],
+  ['/dsx/evidence-beta/decisions/log', 'Decision log'],
+  ['/dsx/evidence-beta/assets', 'Facility assets'],
+  ['/dsx/evidence-beta/thermal', 'Thermal'],
+  ['/dsx/evidence-beta/power', 'Power'],
+  ['/dsx/evidence-beta/cooling', 'Cooling'],
+  ['/dsx/evidence-beta/network', 'Network'],
+  ['/dsx/evidence-beta/facility', 'Facility'],
+  ['/dsx/evidence-beta/workload', 'Workload'],
+  ['/dsx/evidence-beta/simulations', 'Simulations'],
+  ['/dsx/evidence-beta/sovereignty', 'Sovereignty'],
+  ['/dsx/evidence-beta/carbon', 'Carbon'],
+  ['/dsx/evidence-beta/financials', 'Financials'],
+  ['/dsx/evidence-beta/evidence', 'Evidence log'],
+];
+
 export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
   consumer('/dashboard', 'Dashboard', ['facilities', 'kpis', 'ngc'], [KPI, CONFIG]),
   consumer('/manage/facilities', 'Facilities', ['facilities', 'montreal'], [CONFIG, SPEC]),
@@ -153,6 +208,30 @@ export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
   neutral('/admin/reference-facility-validation', 'Reference facility validation'),
   neutral('/twin-debug', 'Twin debug'),
   neutral('/sign-out', 'Sign out'),
+
+  // Routes that exist in the authenticated shell and were previously
+  // unclassified. An unclassified route is a hole: the gate never sees it, so
+  // the legacy page renders while the canary claims to be active.
+  neutral('/login', 'Authenticated entry redirect', 'Redirect only.'),
+  neutral('/onboarding', 'Onboarding redirect', 'Redirect only.'),
+  neutral('/agent/:id', 'Agent workspace', 'Server-backed agent records only.'),
+  neutral('/agents/:id/chat', 'Agent chat', 'Server-backed conversation only.'),
+  neutral('/agent-chat', 'Agent chat', 'Server-backed conversation only.'),
+  neutral('/app/agents/:slug/detail', 'Agent detail', 'Server-backed agent definition only.'),
+  neutral('/app/agents/:agentId/manage', 'Twin manage', 'Server-backed twin record only.'),
+  neutral('/app/agents/:agentId/operations', 'Agent operations redirect', 'Redirect only.'),
+  neutral('/twins/:instanceId/manage', 'Twin manage redirect', 'Redirect only.'),
+  neutral('/studio/systems/:systemId/manage', 'System manage', 'Server-backed system record only.'),
+  neutral('/digital-twins-demo/funding-intake', 'Funding intake demo', 'Demonstration form only.'),
+  neutral('/dev-overlays', 'Overlay fixtures', 'Development fixtures only.'),
+
+  ...EVIDENCE_BETA_ROUTES.map(([path, title]) =>
+    unavailable(
+      path,
+      title,
+      'Synthetic evidence-beta fixture (EVIDENCE_BETA_SEED) and per-interval run series, which the pinned NVIDIA reference source does not publish.',
+    ),
+  ),
 ];
 
 export function surfacesByClassification(c: SurfaceClassification): SurfaceEntry[] {

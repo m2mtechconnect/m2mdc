@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
   CLASSIFIED_FACILITIES,
-  DEFAULT_DATASET_MODE,
   DEFAULT_REFERENCE_CONFIGURATION_ID,
   DSX_REFERENCE_BASELINE,
   DSX_REFERENCE_RECORDS,
@@ -139,7 +138,11 @@ describe('compare guard', () => {
 });
 
 describe('cutover configuration', () => {
-  it('defaults the demonstration baseline to the NVIDIA reference dataset', () => {
-    expect(DEFAULT_DATASET_MODE).toBe('nvidia-dsx-reference');
+  it('exposes the reference dataset as a selectable mode without making it the default', async () => {
+    const { DATASET_MODES } = await import('..');
+    const { PRODUCTION_DEFAULT_DATASET } = await import('@/data/dataset/datasetRegistry');
+    expect(DATASET_MODES).toContain('nvidia-dsx-reference');
+    // One owner of the production default, and it is not the reference dataset.
+    expect(PRODUCTION_DEFAULT_DATASET).toBe('legacy-synthetic');
   });
 });

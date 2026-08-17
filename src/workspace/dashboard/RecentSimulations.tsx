@@ -70,11 +70,13 @@ export function RecentSimulations({ runs, facilityId }: Props) {
                         <Badge variant="outline" className="shrink-0 text-[12px]">Seeded fixture</Badge>
                       )}
                     </div>
-                    <p className="truncate text-[13px] tabular-nums text-muted-foreground">
+                    <div className="flex min-w-0 flex-wrap items-center gap-1.5 text-[13px] tabular-nums text-muted-foreground">
                       <RunProvenanceBadge run={run} />
-                      {' '}Run {run.id} · PUE {formatKpi('pue', run.result.pue)} ·{' '}
-                      {new Date(run.completedAt).toLocaleString()}
-                    </p>
+                      <span className="truncate">
+                        Run {run.id} · PUE {formatKpi('pue', run.result.pue)} ·{' '}
+                        {new Date(run.completedAt).toLocaleString()}
+                      </span>
+                    </div>
                   </div>
                   <Badge variant={pending > 0 ? 'secondary' : 'outline'} className="text-[12px]">
                     {pending > 0 ? `${pending} to review` : 'Reviewed'}

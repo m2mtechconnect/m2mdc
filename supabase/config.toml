@@ -16,3 +16,10 @@ verify_jwt = true
 # connection status, subject allowlist) before any state read or ingest.
 [functions.dsx-ingest]
 verify_jwt = false
+
+# Public intake (onboarding + contact). Anonymous callers must reach it, so the
+# gateway JWT check is off; the handler derives identity server-side from any
+# supplied bearer token, validates schema, rate limits per IP/user and
+# suppresses duplicates. Direct anonymous table inserts are revoked.
+[functions.public-intake]
+verify_jwt = false

@@ -119,15 +119,18 @@ export default function Help() {
       // Validate input
       const validatedData = contactSchema.parse({ name, email, message });
 
-      // Submit to Supabase
-      const { error } = await supabase.from("contact_expert_logs").insert({
-        name: validatedData.name,
-        email: validatedData.email,
-        message: validatedData.message || "",
-        created_at: new Date().toISOString(),
+      // Server-controlled intake: identity is derived from the session on the
+      // server, never from a client-supplied user id.
+      const { data: result, error } = await supabase.functions.invoke("public-intake", {
+        body: {
+          kind: "contact",
+          name: validatedData.name,
+          email: validatedData.email,
+          message: validatedData.message || "",
+        },
       });
 
-      if (error) {
+      if (error || !result?.ok) {
         console.error("Backend error:", error);
         toast.error("Failed to send message. Please try again.");
         return;

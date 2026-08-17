@@ -225,6 +225,20 @@ export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
   neutral('/digital-twins-demo/funding-intake', 'Funding intake demo', 'Demonstration form only.'),
   neutral('/dev-overlays', 'Overlay fixtures', 'Development fixtures only.'),
 
+  // Connections control plane and platform readiness read live server-backed
+  // connection, health and capability records. They render no reference
+  // facility values at all, so the canary must leave them mounted.
+  neutral(
+    '/manage/connections',
+    'Connections and data exchange',
+    'Server-backed connection, health and audit records only; no facility dataset values.',
+  ),
+  neutral(
+    '/admin/platform-readiness',
+    'Platform readiness',
+    'Capability registry and runtime readiness evidence only; no facility dataset values.',
+  ),
+
   ...EVIDENCE_BETA_ROUTES.map(([path, title]) =>
     unavailable(
       path,

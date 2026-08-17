@@ -111,23 +111,29 @@ export function RAGUploadTabs({ systemId }: RAGUploadTabsProps) {
   };
 
   const handleCloudConnect = async (provider: 'google' | 'microsoft') => {
-    const hasSecrets = await checkSecrets(provider);
-    
-    if (!hasSecrets) {
+    if (provider === 'google') {
+      // Quarantined: the legacy parallel authorization path is disabled.
       toast({
-        title: "Missing credentials",
-        description: `Please configure ${provider === 'google' ? 'Google' : 'Microsoft'} OAuth credentials`,
+        title: "Authorization unavailable",
+        description:
+          "Drive authorization must use the managed connector path, which is not enabled for this workspace yet.",
         variant: "destructive",
       });
       return;
     }
 
-    // Initiate OAuth flow
-    const oauthUrl = provider === 'google' 
-      ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rag-oauth-google`
-      : `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rag-oauth-microsoft`;
+    const hasSecrets = await checkSecrets(provider);
     
-    window.location.href = oauthUrl;
+    if (!hasSecrets) {
+      toast({
+        title: "Missing credentials",
+        description: 'Please configure Microsoft OAuth credentials',
+        variant: "destructive",
+      });
+      return;
+    }
+
+    window.location.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rag-oauth-microsoft`;
   };
 
   const handleDbConnect = async () => {

@@ -1,18 +1,21 @@
 /**
- * AURA DC front-end capability registry (Stage 5).
+ * AURA DC front-end capability gates.
  *
- * Single source of truth for what the platform can actually do today.
- * Components MUST read capability truth from here — never hardcode it.
+ * AURA_ARCHITECTURE_CONSOLIDATION_AND_NVIDIA_ALIGNMENT (Phase 1):
+ * this module is NO LONGER a second source of truth. Every NVIDIA, OpenUSD,
+ * SimReady, DSX Exchange and live-telemetry fact below is DERIVED from the
+ * canonical registry in `src/config/dsxCapabilityRegistry.ts`. This file only
+ * translates that registry into the coarse UI gates (`CapabilityGuard`) that
+ * components consume.
  *
- * Authoritative capability state (2026-08-07):
- *   AURA DC simulated demo: CONTROLLED_DEMO_READY
- *   Operating mode: SIMULATED
- *   NVIDIA components proven (static/runtime): 0 / 0
- *   OpenUSD stages: 0 · SimReady-validated assets: 0
- *   Live telemetry sources: 0 · DSX Exchange: not deployed
- *   NVIDIA vertical slice: BLOCKED_BY_INFRASTRUCTURE
- *   Pilot readiness: 24% · Production: NO-GO
+ * Rules enforced here:
+ *   - A capability can only be enabled when the canonical registry carries
+ *     runtime evidence for it. No hardcoded `enabled: true` for an NVIDIA,
+ *     OpenUSD, SimReady or live-data claim.
+ *   - Reference, simulated, replayed and fixture data are never "live".
  */
+
+import { DSX_CAPABILITIES } from '@/config/dsxCapabilityRegistry';
 
 export type CapabilityKey =
   | 'simulatedMode'
@@ -44,6 +47,47 @@ export interface CapabilityDescriptor {
     | 'Blocked by infrastructure';
 }
 
+/* ------------------------------------------------------------------ *
+ * Derivations from the canonical DSX capability registry.
+ * ------------------------------------------------------------------ */
+
+/** OpenUSD stages actually mounted by an NVIDIA runtime (never AURA-authored masters). */
+const openUsdStagesMountedByNvidia = DSX_CAPABILITIES.filter(
+  (c) => c.dsxArea === 'USD storage' && c.nvidiaCodeOrServiceIntegrated,
+).length;
+
+/** Capabilities whose canonical geometry source is an OpenUSD master authored in AURA. */
+const openUsdCanonicalCapabilities = DSX_CAPABILITIES.filter((c) => c.openUsdCanonical).length;
+
+const simReadyValidatedAssets = DSX_CAPABILITIES.filter((c) => c.simReadyValidated).length;
+
+const nvidiaIntegratedCapabilities = DSX_CAPABILITIES.filter(
+  (c) => c.nvidiaCodeOrServiceIntegrated,
+).length;
+
+const nvidiaRuntimeConnected = DSX_CAPABILITIES.some(
+  (c) => c.dsxArea === 'Runtime and execution environment' && c.nvidiaCodeOrServiceIntegrated,
+);
+
+const dsxExchangeDeployed = DSX_CAPABILITIES.some(
+  (c) => c.dsxArea === 'DSX Exchange integration boundary' && c.status === 'NVIDIA_INTEGRATED',
+);
+
+/** A telemetry source only counts as live when the delegate capability proves it. */
+const liveTelemetrySources = DSX_CAPABILITIES.filter(
+  (c) => c.dsxArea === 'Simulation Data Delegate' && c.status === 'NVIDIA_INTEGRATED',
+).length;
+
+const calibratedSimulation = DSX_CAPABILITIES.some(
+  (c) =>
+    c.dsxArea === 'Simulation layer' &&
+    (c.status === 'NVIDIA_INTEGRATED' || c.status === 'SIMREADY_VALIDATED'),
+);
+
+const evidencedCapabilities = DSX_CAPABILITIES.filter(
+  (c) => c.lastValidatedAt !== null && c.validationMethod !== 'none',
+).length;
+
 export const CAPABILITIES: Record<CapabilityKey, CapabilityDescriptor> = {
   simulatedMode: {
     key: 'simulatedMode',
@@ -62,28 +106,30 @@ export const CAPABILITIES: Record<CapabilityKey, CapabilityDescriptor> = {
   liveTelemetry: {
     key: 'liveTelemetry',
     label: 'Live facility telemetry',
-    enabled: false,
+    enabled: liveTelemetrySources > 0,
     requirement: 'No facility telemetry source has been connected or verified.',
     status: 'Not connected',
   },
   openUsdStage: {
     key: 'openUsdStage',
-    label: 'OpenUSD stage',
-    enabled: false,
-    requirement: 'No OpenUSD stage has been authored, validated or mounted.',
+    label: 'OpenUSD stage mounted by an NVIDIA runtime',
+    enabled: openUsdStagesMountedByNvidia > 0,
+    requirement:
+      'AURA authors canonical OpenUSD masters, but no stage is mounted or resolved by an NVIDIA runtime.',
     status: 'Not configured',
   },
   simReadyAssets: {
     key: 'simReadyAssets',
     label: 'SimReady assets',
-    enabled: false,
-    requirement: 'No asset has passed SimReady validation.',
+    enabled: simReadyValidatedAssets > 0,
+    requirement:
+      'No asset version and checksum carries an NVIDIA-compatible SimReady validation result.',
     status: 'None validated',
   },
   nvidiaRuntime: {
     key: 'nvidiaRuntime',
     label: 'NVIDIA GPU runtime',
-    enabled: false,
+    enabled: nvidiaRuntimeConnected,
     requirement:
       'A GPU runner with the NVIDIA driver and container toolkit is required, plus NVIDIA entitlements.',
     status: 'Not connected',
@@ -91,21 +137,22 @@ export const CAPABILITIES: Record<CapabilityKey, CapabilityDescriptor> = {
   dsxExchange: {
     key: 'dsxExchange',
     label: 'DSX Exchange',
-    enabled: false,
-    requirement: 'The official DSX Exchange distribution has not been deployed.',
+    enabled: dsxExchangeDeployed,
+    requirement:
+      'The official DSX Exchange distribution has not been deployed. Generic MQTT or messaging transports are not DSX Exchange.',
     status: 'Not deployed',
   },
   telemetryPrimMapping: {
     key: 'telemetryPrimMapping',
     label: 'Telemetry-to-prim mapping',
-    enabled: false,
+    enabled: openUsdStagesMountedByNvidia > 0 && liveTelemetrySources > 0,
     requirement: 'Mapping requires an OpenUSD stage and a verified telemetry source.',
     status: 'Not configured',
   },
   calibratedSimulation: {
     key: 'calibratedSimulation',
     label: 'Calibrated simulation',
-    enabled: false,
+    enabled: calibratedSimulation,
     requirement: 'No calibration dataset or validated model has been supplied.',
     status: 'Not configured',
   },
@@ -134,15 +181,37 @@ export function useCapabilities(): Record<CapabilityKey, CapabilityDescriptor> {
   return CAPABILITIES;
 }
 
-/** Readiness facts surfaced in the NVIDIA DSX readiness page. */
-export const NVIDIA_READINESS = {
-  staticallyProvenComponents: 0,
-  runtimeProvenComponents: 0,
-  openUsdStages: 0,
-  simReadyValidatedAssets: 0,
-  liveTelemetrySources: 0,
-  verticalSlice: 'BLOCKED_BY_INFRASTRUCTURE' as const,
-  pilotReadinessPercent: 24,
-  productionVerdict: 'NO-GO' as const,
-  demoVerdict: 'CONTROLLED_DEMO_READY' as const,
-} as const;
+/**
+ * Readiness facts surfaced in the NVIDIA DSX readiness surfaces.
+ * Every number is computed from the canonical registry, so a claim can only
+ * move by editing an evidence-gated registry record.
+ */
+export const NVIDIA_READINESS: {
+  staticallyProvenComponents: number;
+  runtimeProvenComponents: number;
+  openUsdStages: number;
+  openUsdCanonicalCapabilities: number;
+  simReadyValidatedAssets: number;
+  liveTelemetrySources: number;
+  verticalSlice: 'BLOCKED_BY_INFRASTRUCTURE' | 'VALIDATED';
+  pilotReadinessPercent: number;
+  productionVerdict: 'NO-GO' | 'GO';
+  demoVerdict: 'CONTROLLED_DEMO_READY';
+} = {
+  staticallyProvenComponents: nvidiaIntegratedCapabilities,
+  runtimeProvenComponents: nvidiaIntegratedCapabilities,
+  openUsdStages: openUsdStagesMountedByNvidia,
+  openUsdCanonicalCapabilities,
+  simReadyValidatedAssets,
+  liveTelemetrySources,
+  verticalSlice:
+    nvidiaIntegratedCapabilities > 0 && simReadyValidatedAssets > 0
+      ? 'VALIDATED'
+      : 'BLOCKED_BY_INFRASTRUCTURE',
+  pilotReadinessPercent: Math.round((evidencedCapabilities / DSX_CAPABILITIES.length) * 100),
+  productionVerdict:
+    nvidiaIntegratedCapabilities > 0 && simReadyValidatedAssets > 0 && liveTelemetrySources > 0
+      ? 'GO'
+      : 'NO-GO',
+  demoVerdict: 'CONTROLLED_DEMO_READY',
+};

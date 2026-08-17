@@ -18,7 +18,7 @@ import { useRBAC } from '@/contexts/RBACContext';
 import type { AppRole } from '@/auth/permissions';
 
 /** Roles permitted to reach an administration route. */
-export const ADMIN_ROUTE_ROLES: AppRole[] = ['admin', 'super_admin'];
+export const ADMIN_ROUTE_ROLES: AppRole[] = ['admin', 'security_admin'];
 
 export function AdminRouteGuard({
   children,

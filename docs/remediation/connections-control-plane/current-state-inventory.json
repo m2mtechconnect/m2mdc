@@ -1,0 +1,22 @@
+{
+  "canonicalRoute": "/manage/integrations",
+  "aliasRoute": "/manage/connections",
+  "readinessRoute": "/admin/platform-readiness",
+  "navigationLabel": {
+    "before": "Integrations",
+    "after": "Connections"
+  },
+  "connectorDefinitions": 22,
+  "connectionInstances": 4,
+  "operationalDataSources": 0,
+  "platformServices": 1,
+  "dsxEventsReceived": 0,
+  "mqttWiring": "IMPLEMENTED_NOT_WIRED",
+  "dsxExchange": "NOT_DEPLOYED",
+  "mcp": "NOT_IMPLEMENTED",
+  "credentialVault": "NOT_AVAILABLE - credential submission disabled",
+  "twinMappings": 0,
+  "removedFiles": [
+    "src/pages/Integrations.tsx"
+  ]
+}

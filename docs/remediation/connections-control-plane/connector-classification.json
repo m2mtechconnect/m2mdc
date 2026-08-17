@@ -1,0 +1,42 @@
+{
+  "implemented": [
+    "supabase_platform",
+    "dsx_ingest_gateway",
+    "openusd_storage"
+  ],
+  "implementedNotWired": [
+    "mqtt_transport"
+  ],
+  "planned": [
+    "dsx_exchange",
+    "bms_edge_gateway",
+    "bacnet_ip",
+    "modbus_tcp",
+    "opcua",
+    "snmp",
+    "dcim_rest",
+    "aws",
+    "azure",
+    "gcp",
+    "kubernetes",
+    "prometheus_otel",
+    "grafana",
+    "s3_object_storage",
+    "plm_cad_import",
+    "bim_ifc_import",
+    "asset_manifest",
+    "servicenow",
+    "generic_webhook",
+    "rest_api"
+  ],
+  "notInOperationalCatalogue": {
+    "brev": "GPU development and validation environment - represented under deployments/validation, not as an operational data source",
+    "omniverse_kit": "disabled by design"
+  },
+  "rules": [
+    "Add connection is offered only when runtime_adapter is non-null and implementation_status is IMPLEMENTED",
+    "Planned connectors expose View requirements only",
+    "Generic REST is never labelled ServiceNow integration",
+    "No connector is named DSX Exchange unless it implements the official event-bus contracts"
+  ]
+}

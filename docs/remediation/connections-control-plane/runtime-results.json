@@ -1,0 +1,58 @@
+{
+  "executedAt": "2026-08-17T16:42:00Z",
+  "session": "authenticated administrator",
+  "routes": [
+    {
+      "route": "/manage/integrations",
+      "h1": "Connections & Data Exchange",
+      "overflow": false,
+      "result": "pass"
+    },
+    {
+      "route": "/manage/connections",
+      "h1": "Connections & Data Exchange",
+      "overflow": false,
+      "result": "pass"
+    },
+    {
+      "route": "/admin/platform-readiness",
+      "h1": "Platform readiness",
+      "overflow": false,
+      "result": "pass"
+    }
+  ],
+  "tabs": [
+    "connections",
+    "catalogue",
+    "mappings",
+    "activity",
+    "dsx-exchange",
+    "agent-tools"
+  ],
+  "healthChecks": [
+    {
+      "connection": "Application platform",
+      "checkType": "platform_query",
+      "status": "PASSED",
+      "latencyMs": 32
+    },
+    {
+      "connection": "OpenUSD asset storage",
+      "checkType": "storage_read",
+      "status": "PASSED",
+      "latencyMs": 132
+    },
+    {
+      "connection": "OpenUSD asset storage",
+      "checkType": "storage_read",
+      "status": "PASSED",
+      "latencyMs": 277
+    }
+  ],
+  "auditEventsWritten": 3,
+  "ingestRuns": 0,
+  "emptyStateRendered": "No events have been received from this connection.",
+  "consoleErrors": 0,
+  "failedRequests": 0,
+  "mobileOverflow390": false
+}

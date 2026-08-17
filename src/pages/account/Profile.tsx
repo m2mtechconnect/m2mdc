@@ -3,6 +3,7 @@
  * Full backend integration with profiles table
  */
 
+import { DisabledActionExplanation } from '@/components/shared/DisabledActionExplanation';
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -318,11 +319,18 @@ export default function Profile() {
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
+              <DisabledActionExplanation
+                id="profile-email-reason"
+                permanent
+                reason="Your sign-in email is managed by the authentication provider."
+                recovery="Contact an administrator to change the address on your account."
+              />
               <div className="flex items-center gap-2">
                 <Input
                   id="email"
                   type="email"
                   value={profile.email}
+                  aria-describedby="profile-email-reason"
                   disabled
                   className="bg-muted"
                 />
@@ -387,9 +395,16 @@ export default function Profile() {
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="profile-role">Role</Label>
+              <DisabledActionExplanation
+                id="profile-role-reason"
+                permanent
+                reason="Roles are assigned by an administrator and cannot be edited here."
+                recovery="Request a change from your workspace administrator in Teams."
+              />
               <Input
                 id="profile-role"
                 value={profile.role ? profile.role.replace(/_/g, ' ').toUpperCase() : 'Not assigned'}
+                aria-describedby="profile-role-reason"
                 disabled
                 className="bg-muted"
               />
@@ -397,8 +412,15 @@ export default function Profile() {
 
             <div className="grid gap-2">
               <Label htmlFor="profile-department">Department</Label>
+              <DisabledActionExplanation
+                id="profile-department-reason"
+                permanent
+                reason="Department membership is managed by an administrator."
+                recovery="Request a change from your workspace administrator in Teams."
+              />
               <Input
                 id="profile-department"
+                aria-describedby="profile-department-reason"
                 value={
                   profile.department_id
                     ? departments.find(d => d.id === profile.department_id)?.name || 'Unknown'

@@ -4,6 +4,7 @@
  * Shows the real 3D data center scene (racks, Carter bot, Franka arm, etc.)
  */
 
+import { DisabledActionExplanation } from '@/components/shared/DisabledActionExplanation';
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -219,11 +220,26 @@ export function OmniverseStreamViewer({
                   ? 'Real-time ray-traced Omniverse stream available on connect.'
                   : 'Omniverse stream unavailable in this build. Server-mediated transport is required.'}
               </p>
+              {!canConnect && (
+                <DisabledActionExplanation
+                  id="omniverse-connect-reason"
+                  permanent
+                  className="mt-1 text-white/60"
+                  reason="Interactive streaming needs a server-mediated transport that this build does not provide."
+                  recovery="Use the local 3D twin view instead."
+                />
+              )}
               {canConnect && host && (
                 <p className="text-xs text-white/30 mt-0.5 font-mono">{host}:{cfg.signalingPort}</p>
               )}
             </div>
-            <Button size="sm" onClick={connect} className="gap-2" disabled={!canConnect}>
+            <Button
+              size="sm"
+              onClick={connect}
+              className="gap-2"
+              disabled={!canConnect}
+              aria-describedby={!canConnect ? 'omniverse-connect-reason' : undefined}
+            >
               <Play className="h-4 w-4" /> Connect to Stream
             </Button>
           </div>

@@ -26,6 +26,10 @@ const TEST_ACCESS_TOKEN = (() => {
 
 const singleRow = {
   id: 'system-123',
+  // `agents` row shape: the store reads the system name from the column, not
+  // from the builder state blob.
+  name: 'Loaded System',
+  config: {},
   state: { systemName: 'Loaded System' },
   step: 1,
 };
@@ -238,7 +242,9 @@ describe('Builder Store', () => {
       
       await act(async () => {
         const savePromise = result.current.save();
-        savingState = result.current.isSaving;
+        // Read the store directly: `result.current` is a render snapshot and
+        // does not reflect a store update made in the same tick.
+        savingState = useBuilderStore.getState().isSaving;
         await savePromise;
       });
       

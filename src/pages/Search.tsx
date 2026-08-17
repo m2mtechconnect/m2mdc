@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -40,10 +41,31 @@ const mockSearchResults = [
 
 export default function Search() {
   const { t } = useTranslation();
-  const [query, setQuery] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  // `?q=` is the authoritative query so a search result page is deep-linkable
+  // and survives a refresh.
+  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [filters, setFilters] = useState<Array<{ id: string; label: string; value: string }>>([]);
   const [searchStartTime, setSearchStartTime] = useState<number | null>(null);
   const [searchLatency, setSearchLatency] = useState<number | null>(null);
+
+  // Keep the address bar in step with the query without stacking history entries.
+  useEffect(() => {
+    const current = searchParams.get("q") ?? "";
+    if (current === query) return;
+    const next = new URLSearchParams(searchParams);
+    if (query) next.set("q", query);
+    else next.delete("q");
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
+
+  // Adopt back/forward navigation and externally supplied deep links.
+  useEffect(() => {
+    const incoming = searchParams.get("q") ?? "";
+    if (incoming !== query) setQuery(incoming);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

@@ -21,6 +21,44 @@ export interface EnhancedValidationResult {
   };
 }
 
+/** Systems of record whose mention proves a real integration surface. */
+const NAMED_DATA_SOURCES = [
+  'erp', 'wms', 'tms', 'pos', 'hris', 'iot', 'scada', 'mes', 'ehr', 'crm',
+] as const;
+
+/**
+ * Score how well a recommendation matches one allowed twin type.
+ *
+ * Exact phrase matching alone scored almost everything at zero: an allowed
+ * type of "GxP Compliance" never appears verbatim in "GxP Validation &
+ * Compliance Tracking". Partial credit for the type's significant words keeps
+ * genuinely on-target recommendations above the acceptance threshold.
+ */
+function allowedTypeScore(text: string, allowedType: string): number {
+  const lower = allowedType.toLowerCase();
+  if (text.includes(lower)) return 10;
+
+  const tokens = lower.split(/[^a-z0-9]+/).filter((t) => t.length > 3);
+  if (tokens.length === 0) return 0;
+
+  const hits = tokens.filter((t) => text.includes(t)).length;
+  if (hits === tokens.length) return 8;
+  if (hits * 2 >= tokens.length) return 5;
+  return 0;
+}
+
+interface LegacyEnhancedValidationResultShape {
+  isValid: boolean;
+  reasons: string[];
+  scores: {
+    industryFit: number;      // 0-35
+    departmentFit: number;    // 0-35
+    twinSpecificity: number;  // 0-20
+    integrationDepth: number; // 0-10
+    total: number;            // 0-100
+  };
+}
+
 /**
  * Validate a recommendation against industry + department requirements
  */

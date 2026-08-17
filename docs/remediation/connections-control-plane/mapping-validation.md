@@ -1,10 +1,16 @@
 # Mapping validation
 
-Example binding: `bms/crah-03/supply_temp` -> `/World/Hall/CRAH_03.supplyTemperature` (degC -> degC).
+Status: SCHEMA IMPLEMENTED, EDITOR NOT IMPLEMENTED.
 
-A mapping cannot be activated when the source type is incompatible, the target property does not
-exist on the prim, units are incompatible, the facility does not match the connection facility, or
-required provenance is missing. Validation status, sample value and last mapped value are stored on
-the mapping row.
+`connection_twin_mappings` carries source identifier, facility, target asset, OpenUSD prim path,
+target property, source and target units, conversion rule, data type, direction, quality rule,
+timestamp rule, validation status, sample value, last mapped value and owner. Write access is
+restricted to administrators by RLS.
 
-Current count: 0 active mappings, because no operational source supplies signals.
+The Mappings tab is read-only in this phase: it lists and searches mappings and renders an empty
+state. Create, edit, validate, activate, preview, export and import are not implemented.
+
+Validation rules to enforce when the editor is built: reject incompatible source types, missing
+target properties, incompatible units, mismatched facilities and missing provenance.
+
+Current count: 0 mappings, because no operational source supplies signals.

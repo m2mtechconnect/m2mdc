@@ -53,6 +53,9 @@ export function ComparePanel() {
               >
                 <span className="font-medium text-foreground">{run.scenarioLabel}</span>
                 <span className="ml-2 text-[10px] text-muted-foreground">{run.id}</span>
+                <span className="mt-1 block">
+                  <RunProvenanceBadge run={run} />
+                </span>
               </button>
               <Button
                 size="sm"

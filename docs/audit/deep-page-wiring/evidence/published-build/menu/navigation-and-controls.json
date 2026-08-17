@@ -1,0 +1,330 @@
+{
+ "role_label": null,
+ "headerLinks": [
+  {
+   "t": "",
+   "h": "/dashboard",
+   "aria": "Data Centre Twin Studio home"
+  },
+  {
+   "t": "Dashboard",
+   "h": "/dashboard",
+   "aria": "Dashboard"
+  },
+  {
+   "t": "Blueprint",
+   "h": "/blueprint",
+   "aria": "Blueprint"
+  },
+  {
+   "t": "Simulation",
+   "h": "/simulation",
+   "aria": "Simulation"
+  },
+  {
+   "t": "Evidence",
+   "h": "/dsx/evidence-beta/overview",
+   "aria": "Evidence"
+  }
+ ],
+ "drawerLinks": [
+  {
+   "t": "Operating modeSimulated",
+   "h": "/manage/integrations"
+  },
+  {
+   "t": "Live telemetryNot connected",
+   "h": "/manage/integrations"
+  },
+  {
+   "t": "NVIDIA runtimeNot available",
+   "h": "/manage/integrations#nvidia-dsx"
+  },
+  {
+   "t": "Evidence requiring review2",
+   "h": "/dsx/evidence-beta"
+  },
+  {
+   "t": "Production readinessNo-Go",
+   "h": "/manage/integrations#nvidia-dsx"
+  },
+  {
+   "t": "View Integrations",
+   "h": "/manage/integrations"
+  },
+  {
+   "t": "Review Evidence",
+   "h": "/dsx/evidence-beta"
+  }
+ ],
+ "drawerClosedOnEscape": false,
+ "controls": {
+  "/dashboard": {
+   "buttons": 34,
+   "disabled": 1,
+   "links": 26,
+   "tabs": [],
+   "inputs": 2,
+   "tables": 0,
+   "rows": 0,
+   "iconOnlyUnnamed": 0,
+   "spinners": 0,
+   "emptyStateText": [
+    "No run recorded",
+    "No simulation runs yet"
+   ]
+  },
+  "/blueprint/default": {
+   "buttons": 85,
+   "disabled": 1,
+   "links": 16,
+   "tabs": [
+    "Model",
+    "Assets & Systems",
+    "Controls",
+    "Validation",
+    "Versions"
+   ],
+   "inputs": 2,
+   "tables": 0,
+   "rows": 0,
+   "iconOnlyUnnamed": 0,
+   "spinners": 0,
+   "emptyStateText": [
+    "No run recorded",
+    "No evidence",
+    "No unresolved validation issues"
+   ]
+  },
+  "/simulation": {
+   "buttons": 81,
+   "disabled": 2,
+   "links": 7,
+   "tabs": [],
+   "inputs": 2,
+   "tables": 0,
+   "rows": 0,
+   "iconOnlyUnnamed": 0,
+   "spinners": 0,
+   "emptyStateText": [
+    "No run recorded",
+    "No run recorded",
+    "No evidence"
+   ]
+  },
+  "/dsx/evidence-beta/overview": {
+   "buttons": 60,
+   "disabled": 9,
+   "links": 29,
+   "tabs": [],
+   "inputs": 1,
+   "tables": 0,
+   "rows": 0,
+   "iconOnlyUnnamed": 0,
+   "spinners": 0,
+   "emptyStateText": [
+    "No run recorded",
+    "No DSX Exchange broker is connected to this",
+    "No trend can be drawn yet",
+    "no accepted observation is never shown as h",
+    "No observation"
+   ]
+  },
+  "/manage/facilities": {
+   "buttons": 37,
+   "disabled": 1,
+   "links": 32,
+   "tabs": [],
+   "inputs": 1,
+   "tables": 0,
+   "rows": 0,
+   "iconOnlyUnnamed": 0,
+   "spinners": 0,
+   "emptyStateText": [
+    "No run recorded"
+   ]
+  },
+  "/manage/integrations": {
+   "buttons": 12,
+   "disabled": 2,
+   "links": 10,
+   "tabs": [],
+   "inputs": 1,
+   "tables": 1,
+   "rows": 8,
+   "iconOnlyUnnamed": 0,
+   "spinners": 0,
+   "emptyStateText": [
+    "No run recorded",
+    "No building",
+    "No GPU device",
+    "No OpenUSD stage has been authored or mount",
+    "No asset has been validated against SimRead"
+   ]
+  },
+  "/builder": {
+   "buttons": 16,
+   "disabled": 1,
+   "links": 18,
+   "tabs": [],
+   "inputs": 1,
+   "tables": 0,
+   "rows": 0,
+   "iconOnlyUnnamed": 0,
+   "spinners": 0,
+   "emptyStateText": [
+    "No run recorded"
+   ]
+  },
+  "/app/agents": {
+   "buttons": 14,
+   "disabled": 1,
+   "links": 7,
+   "tabs": [],
+   "inputs": 1,
+   "tables": 0,
+   "rows": 0,
+   "iconOnlyUnnamed": 0,
+   "spinners": 0,
+   "emptyStateText": [
+    "No run recorded",
+    "No agents created yet"
+   ]
+  },
+  "/analytics": {
+   "buttons": 35,
+   "disabled": 1,
+   "links": 8,
+   "tabs": [
+    "Overview",
+    "Thermal Analysis",
+    "Power & Energy",
+    "GPU & Workload",
+    "Sovereignty",
+    "Simulation Replay"
+   ],
+   "inputs": 1,
+   "tables": 1,
+   "rows": 3,
+   "iconOnlyUnnamed": 0,
+   "spinners": 0,
+   "emptyStateText": [
+    "No run recorded"
+   ]
+  },
+  "/deployments": {
+   "buttons": 14,
+   "disabled": 1,
+   "links": 7,
+   "tabs": [],
+   "inputs": 2,
+   "tables": 1,
+   "rows": 1,
+   "iconOnlyUnnamed": 0,
+   "spinners": 0,
+   "emptyStateText": [
+    "No run recorded",
+    "No deployments yet"
+   ]
+  },
+  "/settings/ai": {
+   "buttons": 16,
+   "disabled": 1,
+   "links": 7,
+   "tabs": [],
+   "inputs": 3,
+   "tables": 0,
+   "rows": 0,
+   "iconOnlyUnnamed": 1,
+   "spinners": 0,
+   "emptyStateText": [
+    "No run recorded",
+    "No credentials or API keys are stored here"
+   ]
+  },
+  "/admin/signups-dashboard": {
+   "buttons": 338,
+   "disabled": 1,
+   "links": 10,
+   "tabs": [
+    "All (324)",
+    "Pending (304)",
+    "Approved (20)"
+   ],
+   "inputs": 1,
+   "tables": 1,
+   "rows": 324,
+   "iconOnlyUnnamed": 0,
+   "spinners": 0,
+   "emptyStateText": [
+    "No run recorded",
+    "No name",
+    "No name",
+    "No name",
+    "No name"
+   ]
+  },
+  "/search": {
+   "buttons": 16,
+   "disabled": 1,
+   "links": 7,
+   "tabs": [],
+   "inputs": 2,
+   "tables": 0,
+   "rows": 0,
+   "iconOnlyUnnamed": 0,
+   "spinners": 0,
+   "emptyStateText": [
+    "No run recorded"
+   ]
+  },
+  "/help": {
+   "buttons": 28,
+   "disabled": 1,
+   "links": 7,
+   "tabs": [],
+   "inputs": 4,
+   "tables": 0,
+   "rows": 0,
+   "iconOnlyUnnamed": 0,
+   "spinners": 0,
+   "emptyStateText": [
+    "No run recorded"
+   ]
+  },
+  "/teams": {
+   "buttons": 17,
+   "disabled": 1,
+   "links": 7,
+   "tabs": [
+    "Team Members",
+    "User Approvals304"
+   ],
+   "inputs": 2,
+   "tables": 0,
+   "rows": 0,
+   "iconOnlyUnnamed": 0,
+   "spinners": 0,
+   "emptyStateText": [
+    "No run recorded",
+    "No recent activity"
+   ]
+  },
+  "/connect/monitor": {
+   "buttons": 20,
+   "disabled": 1,
+   "links": 7,
+   "tabs": [],
+   "inputs": 2,
+   "tables": 1,
+   "rows": 5,
+   "iconOnlyUnnamed": 0,
+   "spinners": 1,
+   "emptyStateText": [
+    "No run recorded",
+    "No ingestion service is connected to this w",
+    "No active jobs"
+   ]
+  }
+ }
+}

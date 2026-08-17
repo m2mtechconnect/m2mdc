@@ -1,0 +1,84 @@
+page_or_subpage,route,h1,tabs,classification
+Montreal Data centre,/,Montreal Data centre,,see deep-link-refresh-matrix.csv
+Montreal Data centre,/dashboard,Montreal Data centre,,see deep-link-refresh-matrix.csv
+Montreal Data centre,/blueprint,Montreal Data centre,Model|Assets & Systems|Controls|Validation|Versions,see deep-link-refresh-matrix.csv
+Montreal Data centre,/blueprint/default,Montreal Data centre,Model|Assets & Systems|Controls|Validation|Versions,see deep-link-refresh-matrix.csv
+No Recommendation to Preview,/blueprint/preview,No Recommendation to Preview,,see deep-link-refresh-matrix.csv
+Montreal Data centre - Simulation,/simulation,Montreal Data centre - Simulation,,see deep-link-refresh-matrix.csv
+Montreal Data centre - Simulation,/simulation?step=inspect,Montreal Data centre - Simulation,,see deep-link-refresh-matrix.csv
+Montreal Data centre - Simulation,/simulation?step=configure,Montreal Data centre - Simulation,,see deep-link-refresh-matrix.csv
+Montreal Data centre - Simulation,/simulation?step=simulate,Montreal Data centre - Simulation,Operational scenarios|Proposed designs,see deep-link-refresh-matrix.csv
+Montreal Data centre - Simulation,/simulation?step=compare,Montreal Data centre - Simulation,Operational scenarios|Proposed designs,see deep-link-refresh-matrix.csv
+Montreal Data centre - Simulation,/simulation?step=decide,Montreal Data centre - Simulation,Operational scenarios|Proposed designs,see deep-link-refresh-matrix.csv
+No Recommendation to Preview,/simulation/preview,No Recommendation to Preview,,see deep-link-refresh-matrix.csv
+Overview,/dsx/evidence-beta,Overview,,see deep-link-refresh-matrix.csv
+Overview,/dsx/evidence-beta/overview,Overview,,see deep-link-refresh-matrix.csv
+Thermal,/dsx/evidence-beta/operations,Thermal,,see deep-link-refresh-matrix.csv
+Thermal,/dsx/evidence-beta/operations/thermal,Thermal,,see deep-link-refresh-matrix.csv
+Power,/dsx/evidence-beta/operations/power,Power,,see deep-link-refresh-matrix.csv
+Cooling,/dsx/evidence-beta/operations/cooling,Cooling,,see deep-link-refresh-matrix.csv
+Compute,/dsx/evidence-beta/operations/compute,Compute,,see deep-link-refresh-matrix.csv
+Workload,/dsx/evidence-beta/operations/workload,Workload,,see deep-link-refresh-matrix.csv
+Sustainability: Energy and carbon,/dsx/evidence-beta/sustainability,Sustainability: Energy and carbon,,see deep-link-refresh-matrix.csv
+Sustainability: Financial exposure,/dsx/evidence-beta/sustainability/financial,Sustainability: Financial exposure,,see deep-link-refresh-matrix.csv
+Sustainability: Sovereignty,/dsx/evidence-beta/sustainability/sovereignty,Sustainability: Sovereignty,,see deep-link-refresh-matrix.csv
+Decisions: Results,/dsx/evidence-beta/decisions,Decisions: Results,,see deep-link-refresh-matrix.csv
+Decisions: Decision log,/dsx/evidence-beta/decisions/log,Decisions: Decision log,,see deep-link-refresh-matrix.csv
+Assets,/dsx/evidence-beta/assets,Assets,,see deep-link-refresh-matrix.csv
+Overview,/evidence,Overview,,see deep-link-refresh-matrix.csv
+Facilities,/manage/facilities,Facilities,,see deep-link-refresh-matrix.csv
+Integrations,/manage/integrations,Integrations,,see deep-link-refresh-matrix.csv
+Integrations,/integrations,Integrations,,see deep-link-refresh-matrix.csv
+Integrations,/settings/integrations,Integrations,,see deep-link-refresh-matrix.csv
+Template Marketplace,/marketplace,Template Marketplace,,see deep-link-refresh-matrix.csv
+Sync Monitor,/connect/monitor,Sync Monitor,,see deep-link-refresh-matrix.csv
+Data Health,/connect/health,Data Health,,see deep-link-refresh-matrix.csv
+Start a new build,/builder,Start a new build,,see deep-link-refresh-matrix.csv
+Start a new build,/build,Start a new build,,see deep-link-refresh-matrix.csv
+Subsystem Agents,/app/agents,Subsystem Agents,,see deep-link-refresh-matrix.csv
+Subsystem Agents,/agents,Subsystem Agents,,see deep-link-refresh-matrix.csv
+Subsystem Agents,/subsystem-agents,Subsystem Agents,,see deep-link-refresh-matrix.csv
+Telemetry and analytics,/analytics,Telemetry and analytics,Overview|Thermal Analysis|Power & Energy|GPU & Workload|Sovereignty|Simulation Replay,see deep-link-refresh-matrix.csv
+Telemetry and analytics,/intelligence,Telemetry and analytics,Overview|Thermal Analysis|Power & Energy|GPU & Workload|Sovereignty|Simulation Replay,see deep-link-refresh-matrix.csv
+Telemetry and analytics,/operations,Telemetry and analytics,Overview|Thermal Analysis|Power & Energy|GPU & Workload|Sovereignty|Simulation Replay,see deep-link-refresh-matrix.csv
+Deployments,/deployments,Deployments,,see deep-link-refresh-matrix.csv
+(no h1),/deploy,,,see deep-link-refresh-matrix.csv
+AI settings,/settings/ai,AI settings,,see deep-link-refresh-matrix.csv
+Signups and approvals,/admin,Signups and approvals,All (324)|Pending (304)|Approved (20),see deep-link-refresh-matrix.csv
+Signups and approvals,/admin/signups-dashboard,Signups and approvals,All (324)|Pending (304)|Approved (20),see deep-link-refresh-matrix.csv
+User approvals,/admin/user-approvals,User approvals,,see deep-link-refresh-matrix.csv
+Onboarding submissions,/admin/onboarding-submissions,Onboarding submissions,,see deep-link-refresh-matrix.csv
+Asset pipeline,/admin/asset-pipeline,Asset pipeline,,see deep-link-refresh-matrix.csv
+Admin asset preview,/admin/asset-preview,Admin asset preview,,see deep-link-refresh-matrix.csv
+Hardware GPU acceptance - nvidia.rack.42u_a_01,/admin/asset-validation/nvidia.rack.42u_a_01,Hardware GPU acceptance - nvidia.rack.42u_a_01,,see deep-link-refresh-matrix.csv
+NVIDIA Reference Facility - hardware visual acceptance,/admin/reference-facility-validation,NVIDIA Reference Facility - hardware visual acceptance,,see deep-link-refresh-matrix.csv
+Teams and roles,/teams,Teams and roles,Team Members|User Approvals304,see deep-link-refresh-matrix.csv
+Access control,/account/access-control,Access control,,see deep-link-refresh-matrix.csv
+Profile,/account/profile,Profile,,see deep-link-refresh-matrix.csv
+Workspace settings,/account/settings,Workspace settings,,see deep-link-refresh-matrix.csv
+Search,/search,Search,,see deep-link-refresh-matrix.csv
+Search,/universal-search,Search,,see deep-link-refresh-matrix.csv
+Search,/search?q=montreal,Search,,see deep-link-refresh-matrix.csv
+Learning Hub,/help,Learning Hub,,see deep-link-refresh-matrix.csv
+AI Initiative,/playbook,AI Initiative,,see deep-link-refresh-matrix.csv
+Sovereignty & Safety Audit,/compliance,Sovereignty & Safety Audit,,see deep-link-refresh-matrix.csv
+Infrastructure,/infrastructure,Infrastructure,,see deep-link-refresh-matrix.csv
+Data centre twin 1,/data-centre-twin,Data centre twin 1,Overview|Simulation|Thermal|Power|Cooling|Network|Facility|Workload|Sovereignty|Carbon|Financial,see deep-link-refresh-matrix.csv
+AURA Twin Preview,/omniverse-scene,AURA Twin Preview,Metrics|Simulate|Racks,see deep-link-refresh-matrix.csv
+Montreal Data centre,/twin-datacentre,Montreal Data centre,Model|Assets & Systems|Controls|Validation|Versions,see deep-link-refresh-matrix.csv
+Twin Debug Console,/twin-debug,Twin Debug Console,Query Status|Telemetry|Errors|All Twins,see deep-link-refresh-matrix.csv
+(no h1),/digital-twins-demo/funding-intake,,,see deep-link-refresh-matrix.csv
+Data-centre twins,/pilot/overview,Data-centre twins,,see deep-link-refresh-matrix.csv
+Montreal Data centre,/command,Montreal Data centre,,see deep-link-refresh-matrix.csv
+Facilities,/facilities,Facilities,,see deep-link-refresh-matrix.csv
+Montreal Data centre,/agent-chat,Montreal Data centre,,see deep-link-refresh-matrix.csv
+(no h1),/studio/systems/does-not-exist/manage,,,see deep-link-refresh-matrix.csv
+(no h1),/app/agents/does-not-exist/detail,,,see deep-link-refresh-matrix.csv
+400 Bad Request,/blueprint/%%%bad-id,400 Bad Request,,see deep-link-refresh-matrix.csv
+Data centre twin 1,/data-centre-twin/00000000-0000-0000-0000-000000000000,Data centre twin 1,Overview|Simulation|Thermal|Power|Cooling|Network|Facility|Workload|Sovereignty|Carbon|Financial,see deep-link-refresh-matrix.csv
+404,/this-route-does-not-exist,404,,see deep-link-refresh-matrix.csv
+Montreal Data centre,/login,Montreal Data centre,,see deep-link-refresh-matrix.csv
+Montreal Data centre,/onboarding,Montreal Data centre,,see deep-link-refresh-matrix.csv
+Montreal Data centre,/auth,Montreal Data centre,,see deep-link-refresh-matrix.csv
+Montreal Data centre,/sign-up,Montreal Data centre,,see deep-link-refresh-matrix.csv
+Montreal Data centre,/mfa,Montreal Data centre,,see deep-link-refresh-matrix.csv

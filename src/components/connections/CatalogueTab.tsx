@@ -77,7 +77,13 @@ export function CatalogueTab({
                       )}
                       <div className="flex flex-wrap items-center gap-2 pt-1">
                         {addable ? (
-                          <Button size="sm" variant="outline" className="min-h-[32px]" disabled>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="min-h-[32px]"
+                            disabled={!isAdmin}
+                            onClick={() => setWizardFor(definition.id)}
+                          >
                             Add connection
                           </Button>
                         ) : (
@@ -91,7 +97,9 @@ export function CatalogueTab({
                         )}
                         <span className="text-xs text-muted-foreground">
                           {addable
-                            ? 'Setup wizard is not enabled yet: system connections are provisioned server-side.'
+                            ? isAdmin
+                              ? 'Opens the setup wizard. Credentials are never collected and activation needs a passing check.'
+                              : 'Creating a connection requires an administrator role.'
                             : 'No runtime adapter exists, so a connection cannot be created.'}
                         </span>
                       </div>

@@ -10,7 +10,7 @@
  * bottom sheet on mobile - so no hidden responsive duplicate reaches the
  * accessibility tree.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FacilityCanvas } from './FacilityCanvas';
 import { InspectorPanel } from './panels/InspectorPanel';
@@ -43,6 +43,25 @@ export function BlueprintModelSection({ facilityOverride }: BlueprintModelSectio
   const { setOverlay } = useTwinOverlaySafe();
   const isMobile = useIsMobile();
   const [inspectorOpen, setInspectorOpen] = useState(false);
+  // The Assistant panel narrows the content region without changing the
+  // viewport, so viewport breakpoints keep a two-column model layout that
+  // squeezes the canvas to a few hundred pixels and stacks the canvas
+  // overlays on top of each other. Measure the section instead.
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const [isNarrow, setIsNarrow] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? 0;
+      setIsNarrow(width > 0 && width < 900);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const stacked = isMobile || isNarrow;
 
   // Drilldown context from the Command Centre: `layer` selects the model
   // overlay, `kpi` explains which indicator the user came from.
@@ -58,7 +77,7 @@ export function BlueprintModelSection({ facilityOverride }: BlueprintModelSectio
   }, [requestedLayer, setOverlay]);
 
   return (
-    <section className="space-y-3" data-testid="blueprint-model-section">
+    <section ref={sectionRef} className="space-y-3" data-testid="blueprint-model-section">
       {kpiDescriptor && (
         <div
           className="rounded-md border border-border bg-muted/40 px-3 py-2"
@@ -89,7 +108,7 @@ export function BlueprintModelSection({ facilityOverride }: BlueprintModelSectio
             in the Designer header. No duplicate entry point lives here. */}
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_21rem]">
+      <div className={stacked ? 'grid gap-3' : 'grid gap-3 grid-cols-[minmax(0,1fr)_21rem]'}>
         <div
           className="h-[24rem] overflow-hidden rounded-lg border border-border md:h-[30rem]"
           data-testid="blueprint-model-canvas"

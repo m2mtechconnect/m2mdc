@@ -160,7 +160,7 @@ export function Layout({ children }: LayoutProps) {
                         }`}
                       >
                         <Link
-                          to={item.href}
+                          to={linkTo(item.href)}
                           data-tour={tourId}
                           data-nav-item={item.name}
                           aria-label={item.fullName}
@@ -202,7 +202,7 @@ export function Layout({ children }: LayoutProps) {
                         return (
                           <DropdownMenuItem key={item.name} asChild>
                             <Link
-                              to={item.href}
+                              to={linkTo(item.href)}
                               className={`flex items-start gap-2 ${isActive ? 'text-primary' : ''}`}
                               aria-current={isActive ? "page" : undefined}
                             >
@@ -325,7 +325,7 @@ export function Layout({ children }: LayoutProps) {
                         className="w-full justify-start gap-3 min-h-[44px] text-base"
                       >
                         <Link
-                          to={item.href}
+                          to={linkTo(item.href)}
                           data-nav-item={item.name}
                           onClick={() => setMobileMenuOpen(false)}
                           aria-current={isActive ? "page" : undefined}
@@ -347,7 +347,7 @@ export function Layout({ children }: LayoutProps) {
                                 className="w-full justify-start min-h-11 text-sm"
                               >
                                 <Link
-                                  to={child.href}
+                                  to={linkTo(child.href)}
                                   onClick={() => setMobileMenuOpen(false)}
                                   aria-current={childActive ? "page" : undefined}
                                 >

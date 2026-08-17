@@ -36,6 +36,8 @@ const OverlayFixtures = import.meta.env.DEV
   ? lazy(() => import("./pages/test/OverlayFixtures"))
   : null;
 
+import { boundedRetryDelay, retryUnlessTerminal } from '@/lib/queryRetry';
+
 // Initialize changelog middleware for builder store
 initChangeLogMiddleware();
 

@@ -97,8 +97,6 @@ resolver. No route or rendering behaviour changed.
 
 ## Open phases
 
-4. Migrate the two frozen compat engines and the builder preview estimator
-   onto the facade.
 6. DSX Exchange boundary naming audit for MQTT surfaces.
 7. AI agent positioning audit (no NIM claims).
 8. Data-mode contract enforcement across every KPI surface.
@@ -124,3 +122,27 @@ resolver. No route or rendering behaviour changed.
 `/omniverse-scene` was renamed to `/twin-preview` (page file
 `src/pages/TwinPreview.tsx`), with a preserving redirect registered in
 `ROUTE_ALIASES` and in the unauthenticated router.
+
+## Phase 4 addendum - builder preview estimator (complete)
+
+`src/components/builder/step5/SimulationDashboard.tsx` used to choose between
+`BuilderPreviewEngine` and the fixture-scripted `MockSimulationEngine` inline.
+That choice now lives in `src/simulation/compat/previewSessionBridge.ts`,
+which returns a labelled session:
+
+- `executionClass: 'aura-deterministic'` for the estimator path,
+  `'fixture-preview'` for scripted template fixtures;
+- `provenance: 'simulated'` always - a builder preview is never a run of record;
+- a constructor failure returns `kind: 'unavailable'` instead of throwing into
+  a React effect.
+
+Both engines are recorded as `frozen` in `src/simulation/engineRegistry.ts`
+with the bridge as their migration target, and
+`src/simulation/compat/__tests__/previewSessionBridge.test.ts` fails if any app
+module constructs either engine directly.
+
+### Remaining open phases
+
+6. DSX Exchange boundary naming audit for MQTT surfaces.
+7. AI agent positioning audit (no NIM claims).
+8. Data-mode contract enforcement across every KPI surface.

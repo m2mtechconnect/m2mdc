@@ -115,3 +115,54 @@ export async function runHealthCheck(connectionId: string): Promise<HealthCheckR
   if (error) throw error;
   return data as HealthCheckResult;
 }
+
+export interface FacilityOption {
+  id: string;
+  name: string;
+}
+
+/** Facilities a mapping may target. Sourced from the twin records themselves. */
+export function useFacilityOptions() {
+  return useQuery({
+    queryKey: ['mapping-facility-options'],
+    queryFn: async (): Promise<FacilityOption[]> => {
+      const { data, error } = await db
+        .from('data_centre_twins')
+        .select('id, name')
+        .order('name', { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as FacilityOption[];
+    },
+    staleTime: 60_000,
+  });
+}
+
+type MappingWrite = Omit<TwinMappingRecord, 'id' | 'last_mapped_value' | 'last_mapped_at'> & {
+  validation_status: string;
+};
+
+/** Writes are RLS-gated to admin and owner roles; failures surface verbatim. */
+export async function saveTwinMapping(id: string | null, record: MappingWrite): Promise<string> {
+  if (id) {
+    const { error } = await db.from('connection_twin_mappings').update(record).eq('id', id);
+    if (error) throw error;
+    return id;
+  }
+  const { data, error } = await db
+    .from('connection_twin_mappings')
+    .insert(record)
+    .select('id')
+    .single();
+  if (error) throw error;
+  return (data as { id: string }).id;
+}
+
+export async function setTwinMappingActive(id: string, active: boolean): Promise<void> {
+  const { error } = await db.from('connection_twin_mappings').update({ active }).eq('id', id);
+  if (error) throw error;
+}
+
+export async function deleteTwinMapping(id: string): Promise<void> {
+  const { error } = await db.from('connection_twin_mappings').delete().eq('id', id);
+  if (error) throw error;
+}

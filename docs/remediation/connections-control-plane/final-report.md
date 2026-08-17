@@ -16,7 +16,7 @@
 - Tests: 24 passing across the new connections suite and the navigation suite; typecheck clean.
 
 ## Remaining blockers
-Connection setup wizard not implemented, mapping editor read-only, tenant isolation not enforced,
+Connection setup wizard not implemented, tenant isolation not enforced,
 credential vault absent, MQTT resolver wiring, DSX Exchange deployment, genuine MCP,
 engineer/anonymous published-host verification.
 
@@ -24,5 +24,6 @@ engineer/anonymous published-host verification.
 AURA_CONNECTIONS_CONTROL_PLANE_REFACTOR_PARTIAL
 
 Rationale: the control plane is real, evidence-backed and truthful, but two required capabilities
-of the phase - the connection setup workflow and the mapping workspace - are not implemented, and
-tenant isolation is not yet enforced. See `implementation-audit.md`.
+of the phase - the connection setup workflow and tenant isolation - are not implemented. The
+mapping workspace is now implemented (create, edit, validate, activate, delete) with
+RLS-gated writes and a unit-family validation suite. See `implementation-audit.md`.

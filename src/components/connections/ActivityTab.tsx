@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { ConnectionInstance, HealthCheckRecord, IngestRunRecord } from '@/connections/model';
 import type { AuditEventRecord } from '@/connections/api';
 import { RuntimeReadinessPanel } from './RuntimeReadinessPanel';
+import { RuntimeDiagnosticsPanel } from './RuntimeDiagnosticsPanel';
 
 export function ActivityTab({
   connections,
@@ -27,6 +28,7 @@ export function ActivityTab({
   return (
     <div className="space-y-6">
       <RuntimeReadinessPanel connections={connections} />
+      <RuntimeDiagnosticsPanel />
 
       <div className="flex flex-wrap items-center gap-2">
         <label htmlFor="activity-connection" className="text-xs font-medium text-muted-foreground">

@@ -4200,57 +4200,99 @@ export type Database = {
       simulation_runs: {
         Row: {
           baseline_kpis: Json | null
+          blueprint_id: string | null
+          blueprint_version: string | null
+          checksum: string | null
           created_at: string
           duration_ms: number | null
+          engine_version: string
+          error_detail: string | null
           events: Json | null
+          execution_origin: string
           final_kpis: Json | null
           finished_at: string | null
           id: string
+          idempotency_key: string | null
+          input_snapshot: Json
           kpi_snapshots: Json | null
           metadata: Json | null
+          metric_provenance: Json
+          output_snapshot: Json
+          run_key: string | null
           run_label: string | null
           scenario_key: string
           scenario_name: string | null
+          scenario_type: string
           started_at: string
           status: string
           twin_id: string
+          updated_at: string
           user_id: string
+          validation_status: string
         }
         Insert: {
           baseline_kpis?: Json | null
+          blueprint_id?: string | null
+          blueprint_version?: string | null
+          checksum?: string | null
           created_at?: string
           duration_ms?: number | null
+          engine_version?: string
+          error_detail?: string | null
           events?: Json | null
+          execution_origin?: string
           final_kpis?: Json | null
           finished_at?: string | null
           id?: string
+          idempotency_key?: string | null
+          input_snapshot?: Json
           kpi_snapshots?: Json | null
           metadata?: Json | null
+          metric_provenance?: Json
+          output_snapshot?: Json
+          run_key?: string | null
           run_label?: string | null
           scenario_key: string
           scenario_name?: string | null
+          scenario_type?: string
           started_at?: string
           status?: string
           twin_id: string
+          updated_at?: string
           user_id: string
+          validation_status?: string
         }
         Update: {
           baseline_kpis?: Json | null
+          blueprint_id?: string | null
+          blueprint_version?: string | null
+          checksum?: string | null
           created_at?: string
           duration_ms?: number | null
+          engine_version?: string
+          error_detail?: string | null
           events?: Json | null
+          execution_origin?: string
           final_kpis?: Json | null
           finished_at?: string | null
           id?: string
+          idempotency_key?: string | null
+          input_snapshot?: Json
           kpi_snapshots?: Json | null
           metadata?: Json | null
+          metric_provenance?: Json
+          output_snapshot?: Json
+          run_key?: string | null
           run_label?: string | null
           scenario_key?: string
           scenario_name?: string | null
+          scenario_type?: string
           started_at?: string
           status?: string
           twin_id?: string
+          updated_at?: string
           user_id?: string
+          validation_status?: string
         }
         Relationships: [
           {

@@ -154,6 +154,9 @@ function generateSystemPrompt(answers: QuestionnaireAnswers): string {
   // Add safety guidance for high-risk scenarios
   if (answers.riskLevel === 'high') {
     prompt += `\n\nIMPORTANT: You handle sensitive ${answers.dataSensitivity} data. Always prioritize security, accuracy, and compliance with ${answers.complianceNeeds.join(', ') || 'industry standards'}.`;
+  } else if (answers.complianceNeeds.length > 0) {
+    // Compliance obligations apply at every risk level, not only high risk.
+    prompt += `\n\nYou must operate in compliance with ${answers.complianceNeeds.join(', ')}.`;
   }
 
   // Add success metric focus

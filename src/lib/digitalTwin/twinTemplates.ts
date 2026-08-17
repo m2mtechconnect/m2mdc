@@ -3,7 +3,7 @@
  * Defines blueprints for 20 industries × 12 departments = 240 combinations
  */
 
-import type { Industry } from './industryClassifier';
+import { getAllowedTwinTypes, getBlockedTwinTypes, type Industry } from './industryClassifier';
 import type { Department } from './departmentClassifier';
 
 export interface TwinTemplate {
@@ -15,12 +15,19 @@ export interface TwinTemplate {
   kpis: string[];
   humanInLoop: string[];
   integrationPoints: string[];
+  /**
+   * Twin types this industry may run, and the ones it must not. The industry
+   * classifier owns this vocabulary; templates carry it so a caller holding a
+   * template can gate twin creation without re-deriving it from the industry.
+   */
+  allowedTwinTypes: string[];
+  blockedTwinTypes: string[];
 }
 
 /**
  * Base templates that can be inherited and customized
  */
-const baseTemplates: Record<string, Partial<TwinTemplate>> = {
+const baseTemplates: Record<string, Partial<TwinTemplateCore>> = {
   supplyChain: {
     processDescription: 'Supply chain planning, inventory optimization, and demand forecasting',
     eventTriggers: ['Low stock alert', 'New forecast run', 'Supplier delay', 'Demand spike'],
@@ -56,9 +63,22 @@ const baseTemplates: Record<string, Partial<TwinTemplate>> = {
 };
 
 /**
- * Get template for a specific industry-department combination
+ * Get template for a specific industry-department combination.
+ *
+ * Every return path is completed with the industry's allowed and blocked twin
+ * types, so the field is guaranteed present regardless of which branch matched.
  */
 export function getTwinTemplate(industry: Industry, department: Department): TwinTemplate {
+  return {
+    ...buildTwinTemplate(industry, department),
+    allowedTwinTypes: getAllowedTwinTypes(industry),
+    blockedTwinTypes: getBlockedTwinTypes(industry),
+  };
+}
+
+type TwinTemplateCore = Omit<TwinTemplate, 'allowedTwinTypes' | 'blockedTwinTypes'>;
+
+function buildTwinTemplate(industry: Industry, department: Department): TwinTemplateCore {
   const key = `${industry}::${department}`;
   
   // Retail + Supply Chain
@@ -203,16 +223,16 @@ export function getTwinTemplate(industry: Industry, department: Department): Twi
 
   // Fallback: Generate from base templates
   if (department === 'Supply Chain') {
-    return { industry, department, ...baseTemplates.supplyChain } as TwinTemplate;
+    return { industry, department, ...baseTemplates.supplyChain } as TwinTemplateCore;
   }
   if (department === 'Operations') {
-    return { industry, department, ...baseTemplates.operations } as TwinTemplate;
+    return { industry, department, ...baseTemplates.operations } as TwinTemplateCore;
   }
   if (department === 'HR / People / Workforce') {
-    return { industry, department, ...baseTemplates.workforce } as TwinTemplate;
+    return { industry, department, ...baseTemplates.workforce } as TwinTemplateCore;
   }
   if (department === 'Logistics / Fleet') {
-    return { industry, department, ...baseTemplates.logistics } as TwinTemplate;
+    return { industry, department, ...baseTemplates.logistics } as TwinTemplateCore;
   }
 
   // Default template

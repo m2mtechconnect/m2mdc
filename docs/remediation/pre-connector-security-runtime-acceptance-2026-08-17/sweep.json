@@ -1,0 +1,106 @@
+{
+ "/": {
+  "status": 200,
+  "final": "/",
+  "console_errors": [],
+  "failed_requests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+  ],
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform M2MAURA Solutions Features Use Cases Integrations Why M2M EN Login Get Started 1.28 Avg PUE Achieved 89% GPU Utilization 28 gCO\u2082/kWh Avg 50+ E"
+ },
+ "/login": {
+  "status": 200,
+  "final": "/login",
+  "console_errors": [],
+  "failed_requests": [],
+  "snippet": "Sovereign AI Twin Studio  Enterprise-grade autonomous AI systems for sovereign data centre operations. Build, simulate, and deploy intelligent digital twins.  Carbon Neutral Sovereign Cloud AI-Powered"
+ },
+ "/onboarding": {
+  "status": 200,
+  "final": "/onboarding",
+  "console_errors": [],
+  "failed_requests": [],
+  "snippet": "Step 1 of 4 1 About You 2 Your Data Centre 3 Your Goals 4 Summary About You  Tell us a bit about yourself and your organization.  Full Name Work Email Job Title / Role Select your role Company Name Co"
+ },
+ "/contact": {
+  "status": 200,
+  "final": "/",
+  "console_errors": [],
+  "failed_requests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+  ],
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform M2MAURA Solutions Features Use Cases Integrations Why M2M EN Login Get Started 1.28 Avg PUE Achieved 89% GPU Utilization 28 gCO\u2082/kWh Avg 50+ E"
+ },
+ "/pricing": {
+  "status": 200,
+  "final": "/",
+  "console_errors": [],
+  "failed_requests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+  ],
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform M2MAURA Solutions Features Use Cases Integrations Why M2M EN Login Get Started 1.28 Avg PUE Achieved 89% GPU Utilization 28 gCO\u2082/kWh Avg 50+ E"
+ },
+ "/solutions": {
+  "status": 200,
+  "final": "/",
+  "console_errors": [],
+  "failed_requests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+  ],
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform M2MAURA Solutions Features Use Cases Integrations Why M2M EN Login Get Started 1.28 Avg PUE Achieved 89% GPU Utilization 28 gCO\u2082/kWh Avg 50+ E"
+ },
+ "/dashboard": {
+  "status": 200,
+  "final": "/",
+  "console_errors": [],
+  "failed_requests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+  ],
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform M2MAURA Solutions Features Use Cases Integrations Why M2M EN Login Get Started 1.28 Avg PUE Achieved 89% GPU Utilization 28 gCO\u2082/kWh Avg 50+ E"
+ },
+ "/manage/connections": {
+  "status": 200,
+  "final": "/",
+  "console_errors": [],
+  "failed_requests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+  ],
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform M2MAURA Solutions Features Use Cases Integrations Why M2M EN Login Get Started 1.28 Avg PUE Achieved 89% GPU Utilization 28 gCO\u2082/kWh Avg 50+ E"
+ },
+ "/admin/platform-readiness": {
+  "status": 200,
+  "final": "/",
+  "console_errors": [],
+  "failed_requests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+  ],
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform M2MAURA Solutions Features Use Cases Integrations Why M2M EN Login Get Started 1.28 Avg PUE Achieved 89% GPU Utilization 28 gCO\u2082/kWh Avg 50+ E"
+ },
+ "/builder": {
+  "status": 200,
+  "final": "/",
+  "console_errors": [],
+  "failed_requests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+  ],
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform M2MAURA Solutions Features Use Cases Integrations Why M2M EN Login Get Started 1.28 Avg PUE Achieved 89% GPU Utilization 28 gCO\u2082/kWh Avg 50+ E"
+ },
+ "/simulation": {
+  "status": 200,
+  "final": "/",
+  "console_errors": [],
+  "failed_requests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+  ],
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform M2MAURA Solutions Features Use Cases Integrations Why M2M EN Login Get Started 1.28 Avg PUE Achieved 89% GPU Utilization 28 gCO\u2082/kWh Avg 50+ E"
+ },
+ "/evidence": {
+  "status": 200,
+  "final": "/",
+  "console_errors": [],
+  "failed_requests": [
+   "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4 net::ERR_ABORTED"
+  ],
+  "snippet": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform M2MAURA Solutions Features Use Cases Integrations Why M2M EN Login Get Started 1.28 Avg PUE Achieved 89% GPU Utilization 28 gCO\u2082/kWh Avg 50+ E"
+ }
+}

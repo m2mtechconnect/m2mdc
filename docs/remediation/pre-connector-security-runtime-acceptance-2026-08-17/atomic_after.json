@@ -1,0 +1,29 @@
+{
+ "onboarding_concurrent_12": {
+  "statuses": [
+   400,
+   429,
+   400,
+   429,
+   429,
+   429,
+   429,
+   429,
+   429,
+   429,
+   429,
+   429
+  ],
+  "admitted": 2,
+  "rejected": 10
+ },
+ "spoof_xff_after_exhaustion": [
+  429,
+  429,
+  429
+ ],
+ "spoof_xrealip": [
+  429,
+  429
+ ]
+}

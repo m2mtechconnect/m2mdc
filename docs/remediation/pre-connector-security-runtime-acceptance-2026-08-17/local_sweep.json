@@ -1,0 +1,94 @@
+{
+ "/dashboard": {
+  "status": 200,
+  "final": "/dashboard",
+  "console_errors": [],
+  "failed": [
+   "https://a.clarity.ms/collect"
+  ],
+  "google_drive_mentions": 0,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs  DATA CENTRE FACILITY  Montreal Data centre  Montreal \u00b7 Tier III design \u00b7 Simulated design baseline \u00b7 Synthetic inputs "
+ },
+ "/manage/connections": {
+  "status": 200,
+  "final": "/manage/connections",
+  "console_errors": [],
+  "failed": [
+   "https://r.clarity.ms/collect",
+   "https://r.clarity.ms/collect",
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/dsx_events?select=id",
+   "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/dsx_events?select=id"
+  ],
+  "google_drive_mentions": 0,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Connections & Data Exchange  Configure, test, map, monitor and govern every external connection. Status is derived from"
+ },
+ "/admin/platform-readiness": {
+  "status": 200,
+  "final": "/admin/platform-readiness",
+  "console_errors": [],
+  "failed": [
+   "https://a.clarity.ms/collect",
+   "https://a.clarity.ms/collect",
+   "https://a.clarity.ms/collect"
+  ],
+  "google_drive_mentions": 0,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Platform readiness  A capability assessment, not a list of configured connections. For connection management see Connec"
+ },
+ "/builder": {
+  "status": 200,
+  "final": "/builder",
+  "console_errors": [],
+  "failed": [
+   "https://k.clarity.ms/collect",
+   "https://k.clarity.ms/collect",
+   "https://k.clarity.ms/collect",
+   "https://k.clarity.ms/collect"
+  ],
+  "google_drive_mentions": 0,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Start a new build  Pick a template from the marketplace, resume a saved draft, or begin from scratch.  Choose a templat"
+ },
+ "/simulation": {
+  "status": 200,
+  "final": "/simulation?step=inspect",
+  "console_errors": [],
+  "failed": [
+   "https://y.clarity.ms/collect",
+   "https://y.clarity.ms/collect",
+   "https://y.clarity.ms/collect",
+   "https://y.clarity.ms/collect"
+  ],
+  "google_drive_mentions": 0,
+  "snippet": "? SIMULATED Design baseline No run recorded Synthetic inputs Montreal Data centre - Simulation SIMULATED Design baseline No run recorded Synthetic inputs View Engineering Inspect C"
+ },
+ "/evidence": {
+  "status": 200,
+  "final": "/dsx/evidence-beta/evidence?scenario=cooling_degradation&mode=SIMULATED&run=sim%3Acooling_degradation%3A20260804%3A2026-03-02T08%3A00%3A00.000Z&tick=0",
+  "console_errors": [
+   "TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=06289a37:6064:23\n    at _handleRequest3 (ht",
+   "TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=06289a37:6064:23\n    at _handleRequest3 (ht",
+   "TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=06289a37:6064:23\n    at _handleRequest3 (ht",
+   "TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=06289a37:6064:23\n    at _handleRequest3 (ht"
+  ],
+  "failed": [
+   "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+   "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+   "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user",
+   "https://psfvrskpnwcshvajzeix.supabase.co/auth/v1/user"
+  ],
+  "google_drive_mentions": 0,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs FACILITY Evidence Beta Site DATA MODE Simulated CALIBRATION Uncalibrated LAST VALIDATED OBSERVATION 2026-03-02T08:00:00"
+ },
+ "/manage/connections?tab=catalogue": {
+  "status": 200,
+  "final": "/manage/connections?tab=catalogue",
+  "console_errors": [],
+  "failed": [
+   "https://i.clarity.ms/collect",
+   "https://i.clarity.ms/collect",
+   "https://i.clarity.ms/collect",
+   "https://i.clarity.ms/collect"
+  ],
+  "google_drive_mentions": 0,
+  "snippet": "E SIMULATED Design baseline No run recorded Synthetic inputs Connections & Data Exchange  Configure, test, map, monitor and govern every external connection. Status is derived from"
+ }
+}

@@ -7,9 +7,13 @@
  * docs/evidence/mqtt-cloud-runtime/preflight.md (revision 9d420a6d) - nothing
  * here is inferred, simulated or live-probed from the browser.
  */
-import { AlertTriangle, ShieldAlert } from 'lucide-react';
+import { useState } from 'react';
+import { AlertTriangle, Loader2, Rocket, ShieldAlert } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
+import type { ConnectionInstance } from '@/connections/model';
 
 type LaneState = 'not-authenticated' | 'not-available' | 'not-authorized';
 
@@ -72,7 +76,54 @@ const STATE_LABEL: Record<LaneState, string> = {
   'not-authorized': 'Not authorized',
 };
 
-export function RuntimeReadinessPanel() {
+interface CanaryResult {
+  status: 'AUTHORIZED' | 'BLOCKED' | 'FAILED' | 'ERROR';
+  lane: string;
+  resources_changed?: boolean;
+  blockers?: { code: string; detail: string }[];
+  worker?: { worker_id: string; state: string } | null;
+  approval_reference?: string | null;
+  correlation_id?: string;
+  message?: string;
+}
+
+export function RuntimeReadinessPanel({ connections = [] }: { connections?: ConnectionInstance[] }) {
+  const [connectionId, setConnectionId] = useState<string>(connections[0]?.id ?? '');
+  const [pendingLane, setPendingLane] = useState<string | null>(null);
+  const [result, setResult] = useState<CanaryResult | null>(null);
+
+  const selected = connectionId || connections[0]?.id || '';
+
+  /**
+   * One-click canary deployment. The gate is server-side and fail-closed: the
+   * function only creates or updates a runtime worker when authentication,
+   * region/target, spend approval, worker image, an active mapping and a
+   * vaulted credential are all confirmed. Otherwise it records the blocker
+   * and changes nothing.
+   */
+  const deploy = async (lane: 'brev' | 'aws') => {
+    if (!selected) return;
+    setPendingLane(lane);
+    setResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('canary-deploy', {
+        body: { lane, connection_id: selected },
+      });
+      if (error) {
+        const details = 'context' in error && error.context ? await (error.context as Response).text() : error.message;
+        let parsed: CanaryResult | null = null;
+        try { parsed = JSON.parse(details) as CanaryResult; } catch { parsed = null; }
+        setResult(parsed ?? { status: 'ERROR', lane, message: details });
+      } else {
+        setResult(data as CanaryResult);
+      }
+    } catch (err) {
+      setResult({ status: 'ERROR', lane, message: err instanceof Error ? err.message : 'Deployment request failed.' });
+    } finally {
+      setPendingLane(null);
+    }
+  };
+
   return (
     <Card data-testid="runtime-readiness-panel" className="border-destructive/40">
       <CardHeader className="pb-2">
@@ -109,6 +160,95 @@ export function RuntimeReadinessPanel() {
               </ul>
             </div>
           ))}
+        </div>
+
+        <div className="rounded-md border border-border p-3" data-testid="canary-deploy">
+          <p className="flex items-center gap-2 text-sm font-medium">
+            <Rocket className="h-4 w-4 text-muted-foreground" aria-hidden />
+            One-click canary deployment
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Runtime resources are created or updated only when lane authentication, target region,
+            spend approval, a published worker image, an active mapping and a vaulted credential are
+            all confirmed server-side. Otherwise nothing is provisioned and the blocker is recorded
+            in the connection audit trail.
+          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <label htmlFor="canary-connection" className="text-xs font-medium text-muted-foreground">
+              Canary connection
+            </label>
+            <select
+              id="canary-connection"
+              value={selected}
+              onChange={(e) => setConnectionId(e.target.value)}
+              className="h-9 min-h-[32px] min-w-0 max-w-full rounded-md border border-input bg-background px-2 text-xs"
+            >
+              {connections.length === 0 && <option value="">No connection available</option>}
+              {connections.map((c) => (
+                <option key={c.id} value={c.id}>{c.display_name}</option>
+              ))}
+            </select>
+            {(['brev', 'aws'] as const).map((lane) => (
+              <Button
+                key={lane}
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-9 text-xs"
+                disabled={!selected || pendingLane !== null}
+                aria-describedby={!selected ? 'canary-disabled-reason' : undefined}
+                onClick={() => deploy(lane)}
+                data-testid={`canary-deploy-${lane}`}
+              >
+                {pendingLane === lane && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" aria-hidden />}
+                Deploy canary ({lane === 'aws' ? 'AWS' : 'Brev'})
+              </Button>
+            ))}
+          </div>
+          {!selected && (
+            <p id="canary-disabled-reason" className="mt-2 text-xs text-muted-foreground">
+              Currently unavailable: no connection exists to deploy a canary for. Create a connection
+              in the Catalogue tab first.
+            </p>
+          )}
+
+          {result && (
+            <div
+              className="mt-3 rounded-md border border-border p-3"
+              role="status"
+              aria-live="polite"
+              data-testid="canary-deploy-result"
+            >
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <Badge variant="outline" className={result.status === 'AUTHORIZED' ? 'text-[11px]' : 'border-destructive/50 text-[11px] text-destructive'}>
+                  {result.status}
+                </Badge>
+                <span className="text-muted-foreground">
+                  {result.resources_changed ? 'Runtime resources updated' : 'No runtime resources created or updated'}
+                </span>
+                {result.correlation_id && (
+                  <code className="rounded bg-muted px-1 py-0.5 text-[11px]">{result.correlation_id}</code>
+                )}
+              </div>
+              {result.status === 'AUTHORIZED' && result.worker && (
+                <p className="mt-2 break-words text-xs text-muted-foreground">
+                  Worker {result.worker.worker_id} is {result.worker.state}
+                  {result.approval_reference ? ` under approval ${result.approval_reference}` : ''}.
+                </p>
+              )}
+              {result.blockers && result.blockers.length > 0 && (
+                <ul className="mt-2 space-y-2">
+                  {result.blockers.map((b) => (
+                    <li key={b.code} className="min-w-0 text-xs">
+                      <code className="rounded bg-muted px-1 py-0.5 text-[11px] text-destructive">{b.code}</code>
+                      <p className="mt-0.5 break-words text-muted-foreground">{b.detail}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {result.message && <p className="mt-2 break-words text-xs text-muted-foreground">{result.message}</p>}
+            </div>
+          )}
         </div>
 
         <div className="rounded-md border border-border p-3">

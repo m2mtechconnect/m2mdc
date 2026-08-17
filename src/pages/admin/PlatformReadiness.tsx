@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { NvidiaDsxReadinessPanel } from '@/components/integrations/NvidiaDsxReadinessPanel';
 import { ClipboardCheck } from 'lucide-react';
+import { DsxExchangeTab } from '@/components/connections/DsxExchangeTab';
+import { AgentToolsTab } from '@/components/connections/AgentToolsTab';
 
 interface Capability {
   domain: string;
@@ -89,6 +91,16 @@ export default function PlatformReadiness() {
       </section>
 
       <NvidiaDsxReadinessPanel />
+
+      <section aria-labelledby="dsx-exchange-heading" className="space-y-3">
+        <h2 id="dsx-exchange-heading" className="text-base font-semibold">DSX exchange environment</h2>
+        <DsxExchangeTab />
+      </section>
+
+      <section aria-labelledby="agent-tools-heading" className="space-y-3">
+        <h2 id="agent-tools-heading" className="text-base font-semibold">Agent tool readiness</h2>
+        <AgentToolsTab />
+      </section>
     </div>
   );
 }

@@ -96,6 +96,8 @@ export function createScenarioLibraryProvider(): SimulationProvider {
       determinism: 'best-effort',
       cancellable: false,
       live: false,
+      executionClass: 'fixture-preview',
+      nvidiaIntegrated: false,
     },
 
     listScenarios(): ProviderOutcome<ScenarioDescriptor[]> {

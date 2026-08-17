@@ -107,7 +107,24 @@ export default function DataCentreTwin() {
   if (!isDemoMode && !activeTwinId && !twin && twins.length > 0) {
     return <LoadingState message="Selecting Data Centre Twin..." />;
   }
-  
+
+  // Fail closed on an unknown identifier. Silently falling back to the default
+  // twin made the page claim to show a facility the address did not name.
+  if (requestedUnknownTwin) {
+    return (
+      <div className="container mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center gap-3 px-4 text-center">
+        <h1 className="text-lg font-semibold text-foreground">Data centre twin not found</h1>
+        <p className="text-sm text-muted-foreground">
+          No twin matches the identifier <span className="font-mono">{id}</span> in this account.
+          It may have been deleted, or the address may be incorrect.
+        </p>
+        <Button asChild variant="outline">
+          <Link to="/manage/facilities">Back to facilities</Link>
+        </Button>
+      </div>
+    );
+  }
+
   // DEMO MODE: Show simulation with mock data
   if (isDemoMode || hasBuilderSession) {
     return (

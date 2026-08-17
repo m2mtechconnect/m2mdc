@@ -1,18 +1,14 @@
 /**
- * Canonical AURA DC information architecture (Stage 6D).
+ * Canonical AURA DC information architecture, organised around the DSX
+ * AI-factory lifecycle: Overview, Design, Simulate, Operate, Govern, Support.
  *
  * One list, one destination per concept. The header, the mobile sheet and
  * the command palette all read from here, so a destination can never appear
  * twice under two different labels.
  *
- * Workspaces (always visible):
- *   Dashboard   - read-only command centre
- *   Blueprint   - facility model, hierarchy, configuration
- *   Simulation  - scenario execution and comparison
- *   Evidence    - provenance, exports, decision record
- *   Integrations- connection and readiness state (nothing is live)
- *
- * Manage (permission gated): authoring and administration.
+ * Labels changed with the DSX alignment. Routes did NOT: every canonical
+ * href below is the same href the page has always been mounted at, and
+ * `src/config/routeAliases.ts` keeps every legacy path redirecting to it.
  */
 import {
   BarChart3,
@@ -46,6 +42,8 @@ export interface AppNavItem {
   permission?: Permission;
   /** One-line purpose, shown in the mobile sheet. */
   description: string;
+  /** DSX lifecycle group this destination belongs to. */
+  group?: NavGroupId;
   /**
    * Sub-destinations that belong to this item. Rendered indented under the
    * parent so previously orphaned pages are reachable from navigation
@@ -54,38 +52,54 @@ export interface AppNavItem {
   children?: AppNavItem[];
 }
 
+export type NavGroupId = 'overview' | 'design' | 'simulate' | 'operate' | 'govern' | 'support';
+
+export const NAV_GROUP_LABEL: Record<NavGroupId, string> = {
+  overview: 'Overview',
+  design: 'Design',
+  simulate: 'Simulate',
+  operate: 'Operate',
+  govern: 'Govern',
+  support: 'Support',
+};
+
 export const WORKSPACE_NAV: AppNavItem[] = [
   {
-    name: 'Dashboard',
-    fullName: 'Dashboard',
+    name: 'Overview',
+    fullName: 'AI Factory Overview',
     href: '/dashboard',
     icon: LayoutDashboard,
     matches: ['/dashboard', '/'],
-    description: 'Read-only overview of the modelled facility.',
+    group: 'overview',
+    description:
+      'Facility status, simulated outcomes and data availability across the modelled AI factory.',
   },
   {
     name: 'Blueprint',
-    fullName: 'Blueprint',
+    fullName: 'Facility Blueprint',
     href: '/blueprint',
     icon: Boxes,
     matches: ['/blueprint', '/data-centre-twin', '/infrastructure'],
-    description: 'Facility model, asset hierarchy and configuration.',
+    group: 'design',
+    description: 'Facility topology, OpenUSD assemblies, configuration and versions.',
   },
   {
-    name: 'Simulation',
-    fullName: 'Simulation',
+    name: 'Simulate',
+    fullName: 'Simulation Studio',
     href: '/simulation',
     icon: FlaskConical,
     matches: ['/simulation'],
-    description: 'Run, compare and review scenarios.',
+    group: 'simulate',
+    description: 'Configure, execute, compare and review simulation-backed scenarios.',
   },
   {
     name: 'Evidence',
-    fullName: 'Evidence',
+    fullName: 'Validation & Evidence',
     href: '/dsx/evidence-beta/overview',
     icon: FileSearch,
     matches: ['/dsx/evidence-beta', '/compliance'],
-    description: 'Provenance, decision record and exports.',
+    group: 'design',
+    description: 'Validation results, provenance, simulation evidence and exports.',
   },
 ];
 
@@ -97,7 +111,8 @@ export const MANAGE_NAV: AppNavItem[] = [
     icon: Building2,
     matches: ['/manage/facilities'],
     permission: 'twin.edit',
-    description: 'Facility list, creation, access and configuration.',
+    group: 'design',
+    description: 'Sites, halls, capacity, infrastructure scope and lifecycle state.',
   },
   {
     name: 'Integrations',
@@ -106,60 +121,67 @@ export const MANAGE_NAV: AppNavItem[] = [
     icon: Cable,
     matches: ['/manage/integrations', '/integrations', '/settings/integrations', '/marketplace', '/connect'],
     permission: 'twin.edit',
-    description: 'Connectors, credentials and external-system readiness.',
+    group: 'operate',
+    description: 'Compute, network, storage, power, cooling, grid and enterprise connections.',
   },
   {
-    name: 'Build',
-    fullName: 'Build twin',
+    name: 'Asset pipeline',
+    fullName: 'OpenUSD Asset Pipeline',
     href: '/builder',
     icon: Wrench,
     matches: ['/builder'],
     permission: 'twin.edit',
-    description: 'Author and edit facility twins.',
+    group: 'design',
+    description: 'Source acquisition, canonical OpenUSD masters and approved browser derivatives.',
   },
   {
     name: 'Agents',
-    fullName: 'Subsystem agents',
+    fullName: 'Agents & Optimization',
     href: '/app/agents',
     icon: Server,
     matches: ['/app/agents', '/agent'],
     permission: 'agent.view',
-    description: 'Configure the modelled subsystem agents.',
+    group: 'operate',
+    description: 'Agent scopes, data access, recommendations, execution state and audit history.',
   },
   {
-    name: 'Telemetry and analytics',
-    fullName: 'Telemetry and analytics',
+    name: 'Operations',
+    fullName: 'Operations & Telemetry',
     href: '/analytics',
     icon: BarChart3,
     matches: ['/intelligence', '/analytics', '/operations'],
     permission: 'analytics.view',
-    description: 'Aggregated trend views over modelled outputs.',
+    group: 'operate',
+    description: 'Operational data, simulation outputs and per-system data availability.',
   },
   {
-    name: 'Deployments',
-    fullName: 'Deployments',
+    name: 'Runtime',
+    fullName: 'Runtime Environments',
     href: '/deployments',
     icon: Rocket,
     matches: ['/deployments', '/deploy'],
     permission: 'deployment.view',
-    description: 'Deployment history, versions and rollout status.',
+    group: 'operate',
+    description: 'Where AURA runs today, plus the planned Brev and AWS lanes.',
   },
   {
-    name: 'AI settings',
-    fullName: 'AI settings',
+    name: 'Agent configuration',
+    fullName: 'Agent Configuration',
     href: '/settings/ai',
     icon: Sparkles,
     matches: ['/settings/ai'],
     permission: 'agent.administer',
-    description: 'Model selection and assistant configuration.',
+    group: 'govern',
+    description: 'Agent policy, approved providers, knowledge boundaries and governance.',
   },
   {
     name: 'Admin',
-    fullName: 'Admin console',
+    fullName: 'Admin Console',
     href: '/admin/signups-dashboard',
     icon: Shield,
     matches: ['/admin'],
     permission: 'platform.view_admin_console',
+    group: 'govern',
     description: 'Approvals, signups and platform administration.',
     children: [
       {
@@ -210,6 +232,14 @@ export const MANAGE_NAV: AppNavItem[] = [
         matches: ['/admin/asset-pipeline', '/admin/asset-validation', '/admin/asset-preview'],
         description: 'Approved 3D derivatives and hardware GPU validation.',
       },
+      {
+        name: 'DSX capabilities',
+        fullName: 'DSX capability registry',
+        href: '/admin/dsx-capabilities',
+        icon: Shield,
+        matches: ['/admin/dsx-capabilities'],
+        description: 'Capability status, evidence, owners, blockers and permitted claims.',
+      },
     ],
   },
 ];
@@ -222,6 +252,7 @@ export const SUPPORT_NAV: AppNavItem[] = [
     href: '/search',
     icon: Search,
     matches: ['/search'],
+    group: 'support',
     description: 'Search facilities, assets, agents and evidence.',
   },
   {
@@ -230,9 +261,42 @@ export const SUPPORT_NAV: AppNavItem[] = [
     href: '/help',
     icon: HelpCircle,
     matches: ['/help', '/playbook'],
+    group: 'support',
     description: 'Guides, playbooks and product documentation.',
   },
 ];
+
+export interface NavGroup {
+  id: NavGroupId;
+  label: string;
+  items: AppNavItem[];
+}
+
+/** Every destination, in DSX lifecycle order, deduplicated by href. */
+export const NAV_GROUP_ORDER: NavGroupId[] = [
+  'overview',
+  'design',
+  'simulate',
+  'operate',
+  'govern',
+  'support',
+];
+
+const ALL_NAV_ITEMS: AppNavItem[] = [...WORKSPACE_NAV, ...MANAGE_NAV, ...SUPPORT_NAV];
+
+/**
+ * DSX lifecycle grouping used by the navigation drawer. Items the caller
+ * cannot see are removed; empty groups are dropped.
+ */
+export function navGroups(can: (p: Permission) => boolean): NavGroup[] {
+  return NAV_GROUP_ORDER.map((id) => ({
+    id,
+    label: NAV_GROUP_LABEL[id],
+    items: ALL_NAV_ITEMS.filter(
+      (item) => item.group === id && (!item.permission || can(item.permission)),
+    ),
+  })).filter((g) => g.items.length > 0);
+}
 
 /** True when `pathname` belongs to the item's destination. */
 export function isNavItemActive(item: AppNavItem, pathname: string): boolean {

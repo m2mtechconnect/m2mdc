@@ -1,0 +1,220 @@
+{
+  "$schema": "aura.export/v1",
+  "schemaVersion": "1.0.0",
+  "surface": "workspace.simulation-run",
+  "title": "Simulation run SIM-2026-08-17-001 - Baseline operations",
+  "generatedAt": "2026-08-17T00:47:10.624Z",
+  "note": "Facility Montreal Sovereign AI DC. Scenario Baseline operations. Run started 2026-08-17T00:46:04.761Z, completed 2026-08-17T00:46:06.052Z.",
+  "operatingState": {
+    "operatingMode": "SIMULATED",
+    "inputClassification": "Synthetic inputs",
+    "simulationRunId": "SIM-2026-08-17-001",
+    "scenario": "Baseline operations",
+    "calculationTimestamp": "2026-08-17T00:46:06.052Z",
+    "sourceGenerator": "AURA deterministic simulation",
+    "humanReviewStatus": "Not reviewed",
+    "nvidiaRuntimeUsed": "No",
+    "liveFacilityDataUsed": "No",
+    "knownLimitations": "Values are produced by a deterministic AURA simulation with synthetic inputs. Not calibrated against a physical facility. No OpenUSD stage, SimReady-validated asset or DSX Exchange transport is involved."
+  },
+  "records": [
+    {
+      "metricId": "baseline.pue",
+      "metricName": "PUE (baseline)",
+      "value": 1.324,
+      "unit": null,
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "total facility power / IT load, modelled from cooling setpoint, workload density and design capacity."
+    },
+    {
+      "metricId": "baseline.itLoadKw",
+      "metricName": "IT load (baseline)",
+      "value": 3500,
+      "unit": " kW",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "design capacity x workload density."
+    },
+    {
+      "metricId": "baseline.gpuUtilization",
+      "metricName": "GPU utilisation (baseline)",
+      "value": 70,
+      "unit": "%",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "workload density adjusted by the applied GPU power cap."
+    },
+    {
+      "metricId": "baseline.thermalStability",
+      "metricName": "Thermal stability (baseline)",
+      "value": 97,
+      "unit": "%",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "inverse of modelled hotspot pressure across all rack rows."
+    },
+    {
+      "metricId": "baseline.coolingEfficiency",
+      "metricName": "Cooling efficiency (baseline)",
+      "value": 78,
+      "unit": "%",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "modelled cooling delivered per unit of cooling power at the current setpoint."
+    },
+    {
+      "metricId": "baseline.capacityHeadroom",
+      "metricName": "Capacity headroom (baseline)",
+      "value": 30,
+      "unit": "%",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "100 minus modelled workload density against design capacity."
+    },
+    {
+      "metricId": "baseline.carbonIntensity",
+      "metricName": "Carbon intensity (baseline)",
+      "value": 12,
+      "unit": " gCO2e/kWh",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "configured grid intensity scaled by the modelled renewable mix."
+    },
+    {
+      "metricId": "baseline.energyCostPerMwh",
+      "metricName": "Energy cost (baseline)",
+      "value": 76.792,
+      "unit": " /MWh",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "regional tariff band scaled by modelled PUE."
+    },
+    {
+      "metricId": "baseline.sovereigntyScore",
+      "metricName": "Sovereignty posture (baseline)",
+      "value": 98,
+      "unit": "%",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "configured sovereignty level and residency region mapped to the applicable control set."
+    },
+    {
+      "metricId": "result.pue",
+      "metricName": "PUE (scenario)",
+      "value": 1.324,
+      "unit": null,
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "total facility power / IT load, modelled from cooling setpoint, workload density and design capacity."
+    },
+    {
+      "metricId": "result.itLoadKw",
+      "metricName": "IT load (scenario)",
+      "value": 3500,
+      "unit": " kW",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "design capacity x workload density."
+    },
+    {
+      "metricId": "result.gpuUtilization",
+      "metricName": "GPU utilisation (scenario)",
+      "value": 70,
+      "unit": "%",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "workload density adjusted by the applied GPU power cap."
+    },
+    {
+      "metricId": "result.thermalStability",
+      "metricName": "Thermal stability (scenario)",
+      "value": 97,
+      "unit": "%",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "inverse of modelled hotspot pressure across all rack rows."
+    },
+    {
+      "metricId": "result.coolingEfficiency",
+      "metricName": "Cooling efficiency (scenario)",
+      "value": 78,
+      "unit": "%",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "modelled cooling delivered per unit of cooling power at the current setpoint."
+    },
+    {
+      "metricId": "result.capacityHeadroom",
+      "metricName": "Capacity headroom (scenario)",
+      "value": 30,
+      "unit": "%",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "100 minus modelled workload density against design capacity."
+    },
+    {
+      "metricId": "result.carbonIntensity",
+      "metricName": "Carbon intensity (scenario)",
+      "value": 12,
+      "unit": " gCO2e/kWh",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "configured grid intensity scaled by the modelled renewable mix."
+    },
+    {
+      "metricId": "result.energyCostPerMwh",
+      "metricName": "Energy cost (scenario)",
+      "value": 76.792,
+      "unit": " /MWh",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "regional tariff band scaled by modelled PUE."
+    },
+    {
+      "metricId": "result.sovereigntyScore",
+      "metricName": "Sovereignty posture (scenario)",
+      "value": 98,
+      "unit": "%",
+      "provenance": "simulated",
+      "source": "AURA deterministic scenario engine",
+      "observedAt": "2026-08-17T00:46:06.052Z",
+      "stale": false,
+      "description": "configured sovereignty level and residency region mapped to the applicable control set."
+    }
+  ]
+}

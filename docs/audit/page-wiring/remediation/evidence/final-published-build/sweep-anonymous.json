@@ -1,0 +1,1168 @@
+{
+ "mode": "anonymous",
+ "host": "https://auradc.m2mtechconnect.com",
+ "routes": [
+  {
+   "route": "/",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 ()"
+   ],
+   "failed": [
+    "https://auradc.m2mtechconnect.com/landing/hero-datacenter.mp4"
+   ],
+   "http4xx": [
+    [
+     404,
+     "https://auradc.m2mtechconnect.com/grid-pattern.svg"
+    ]
+   ]
+  },
+  {
+   "route": "/onboarding",
+   "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of employees | Back | Continue",
+   "bodyLen": 286,
+   "consoleErrors": [],
+   "failed": [
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/login",
+   "finalUrl": "https://auradc.m2mtechconnect.com/login",
+   "h1": "Sovereign AI Twin Studio",
+   "spinner": false,
+   "bodyHead": "Sovereign AI Twin Studio |  | Enterprise-grade autonomous AI systems for sovereign data centre operations. Build, simulate, and deploy intelligent digital twins. |  | Carbon Neutral | Sovereign Cloud | AI-Powered | Sign in to your account |  | Enter your credentials to access the studio |  | Email Address | Password | Forgot password? | Sign In | Or continue with | Google | Microsoft | Enterprise SSO | Secured by M2M Sovereign Cloud |  | ",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/auth",
+   "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of employees | Back | Continue",
+   "bodyLen": 286,
+   "consoleErrors": [],
+   "failed": [
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/sign-in",
+   "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of employees | Back | Continue",
+   "bodyLen": 286,
+   "consoleErrors": [],
+   "failed": [
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/sign-up",
+   "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of employees | Back | Continue",
+   "bodyLen": 286,
+   "consoleErrors": [],
+   "failed": [
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/forgot-password",
+   "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of employees | Back | Continue",
+   "bodyLen": 286,
+   "consoleErrors": [],
+   "failed": [
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/mfa",
+   "finalUrl": "https://auradc.m2mtechconnect.com/onboarding",
+   "h1": null,
+   "spinner": false,
+   "bodyHead": "Step 1 of 4 | 1 | About You | 2 | Your Data Centre | 3 | Your Goals | 4 | Summary | About You |  | Tell us a bit about yourself and your organization. |  | Full Name | Work Email | Job Title / Role | Select your role | Company Name | Company Size | Number of employees | Back | Continue",
+   "bodyLen": 286,
+   "consoleErrors": [],
+   "failed": [
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/twin-datacentre",
+   "finalUrl": "https://auradc.m2mtechconnect.com/twin-datacentre",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/data-centre-twin",
+   "finalUrl": "https://auradc.m2mtechconnect.com/data-centre-twin",
+   "h1": "Montreal Sovereign AI Data Centre",
+   "spinner": false,
+   "bodyHead": "Dashboard | Montreal Sovereign AI Data Centre | operational | Tier 4 |  | Montreal, Canada \u2022 20 Racks \u2022 12,000 kW Capacity |  | Blueprint | 9 agents | SIMULATION \u2022 12:35:50 AM | Ask AURA Assistant | PUE | GPU Load | Thermals | Cooling | Simulation | Sovereignty | -2.3% |  | 1.25 |  | Power Usage Effectiveness |  | +5.2% |  | 82% |  | GPU Cluster Utilization |  | -8.1% |  | 2g/kWh |  | Carbon Intensity |  | 100% |  | Sovereign Compute |  | Overview | Simulation | Thermal | Power | C",
+   "bodyLen": 486,
+   "consoleErrors": [],
+   "failed": [
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect",
+    "https://f.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/omniverse-scene",
+   "finalUrl": "https://auradc.m2mtechconnect.com/omniverse-scene",
+   "h1": "AURA Twin Preview",
+   "spinner": false,
+   "bodyHead": "AURA Twin Preview |  | AURA application rendering \u2022 0 racks \u2022 Simulated scene |  | Kit disabled | 12:35:55 AM | Kit disabled by configuration \u2014 displaying local demonstration data. | Local demonstration scene | disabled |  | Local demonstration scene |  | Omniverse stream unavailable in this build. Server-mediated transport is required. |  | Connect to Stream | Overview | East | West | North | South | Top Down | Cinematic | Closeup | Aisle Ea",
+   "bodyLen": 446,
+   "consoleErrors": [],
+   "failed": [
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dashboard",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/builder",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/deploy",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/deployments",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/analytics",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/account/profile",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/account/settings",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/account/access-control",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect",
+    "https://k.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/admin/onboarding-submissions",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/admin/user-approvals",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/admin/asset-preview",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/admin/asset-pipeline",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/admin/asset-validation/nvidia.rack.42u_a_01.ops",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/admin/reference-facility-validation",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/admin/signups-dashboard",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/manage/integrations",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://p.clarity.ms/collect",
+    "https://p.clarity.ms/collect",
+    "https://p.clarity.ms/collect",
+    "https://p.clarity.ms/collect",
+    "https://p.clarity.ms/collect",
+    "https://p.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/manage/facilities",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/compliance",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/teams",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/marketplace",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/app/agents",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/simulation",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/simulation/preview",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://v.clarity.ms/collect",
+    "https://v.clarity.ms/collect",
+    "https://v.clarity.ms/collect",
+    "https://v.clarity.ms/collect",
+    "https://v.clarity.ms/collect",
+    "https://v.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/blueprint/preview",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect",
+    "https://i.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/blueprint/default",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/help",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/playbook",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/connect/monitor",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/connect/health",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/search",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/settings/ai",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/infrastructure",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/twin-debug",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/digital-twins-demo/funding-intake",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/overview",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://e.clarity.ms/collect",
+    "https://e.clarity.ms/collect",
+    "https://e.clarity.ms/collect",
+    "https://e.clarity.ms/collect",
+    "https://e.clarity.ms/collect",
+    "https://e.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/operations/thermal",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect",
+    "https://t.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/operations/power",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/operations/cooling",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/operations/compute",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/operations/workload",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/sustainability",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/sustainability/financial",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/sustainability/sovereignty",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect",
+    "https://n.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/decisions",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect",
+    "https://o.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/decisions/log",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect",
+    "https://z.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/dsx/evidence-beta/assets",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect",
+    "https://h.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/pilot/overview",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect",
+    "https://b.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/agents",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/integrations",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect",
+    "https://r.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/evidence",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect",
+    "https://y.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/command",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect",
+    "https://a.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/facilities",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect",
+    "https://l.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/universal-search",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect"
+   ],
+   "http4xx": []
+  },
+  {
+   "route": "/this-route-does-not-exist",
+   "finalUrl": "https://auradc.m2mtechconnect.com/",
+   "h1": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform",
+   "spinner": false,
+   "bodyHead": "M2M AURA - Sovereign AI Data Centre Digital Twin Platform | M2MAURA | Solutions | Features | Use Cases | Integrations | Why M2M | EN | Login | Get Started | 1.28 | Avg PUE Achieved | 89% | GPU Utilization | 28 | gCO\u2082/kWh Avg | 50+ | Enterprises | Enterprise Digital Twin Platform | Live Digital Twin of Your AI Data Centre |  | View real-time Power Usage Effectiveness (PUE), GPU Utilization, Carbon Intensity, and Sovereignty Status in a sin",
+   "bodyLen": 442,
+   "consoleErrors": [],
+   "failed": [
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect",
+    "https://j.clarity.ms/collect"
+   ],
+   "http4xx": []
+  }
+ ]
+}

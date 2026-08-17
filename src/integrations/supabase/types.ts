@@ -1548,48 +1548,173 @@ export type Database = {
           },
         ]
       }
+      connection_ingest_messages: {
+        Row: {
+          connection_id: string
+          contract_id: string | null
+          correlation_id: string
+          created_at: string
+          detail: string | null
+          event_id: string | null
+          evidence_class: string
+          id: string
+          ingest_run_id: string | null
+          mapping_id: string | null
+          observed_at: string | null
+          outcome: string
+          payload_bytes: number
+          payload_hash: string
+          processing_latency_ms: number | null
+          qos: number | null
+          received_at: string
+          rejection_reason: string | null
+          tenant_id: string | null
+          topic: string
+          transport_latency_ms: number | null
+          worker_id: string | null
+        }
+        Insert: {
+          connection_id: string
+          contract_id?: string | null
+          correlation_id: string
+          created_at?: string
+          detail?: string | null
+          event_id?: string | null
+          evidence_class?: string
+          id?: string
+          ingest_run_id?: string | null
+          mapping_id?: string | null
+          observed_at?: string | null
+          outcome: string
+          payload_bytes?: number
+          payload_hash: string
+          processing_latency_ms?: number | null
+          qos?: number | null
+          received_at?: string
+          rejection_reason?: string | null
+          tenant_id?: string | null
+          topic: string
+          transport_latency_ms?: number | null
+          worker_id?: string | null
+        }
+        Update: {
+          connection_id?: string
+          contract_id?: string | null
+          correlation_id?: string
+          created_at?: string
+          detail?: string | null
+          event_id?: string | null
+          evidence_class?: string
+          id?: string
+          ingest_run_id?: string | null
+          mapping_id?: string | null
+          observed_at?: string | null
+          outcome?: string
+          payload_bytes?: number
+          payload_hash?: string
+          processing_latency_ms?: number | null
+          qos?: number | null
+          received_at?: string
+          rejection_reason?: string | null
+          tenant_id?: string | null
+          topic?: string
+          transport_latency_ms?: number | null
+          worker_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connection_ingest_messages_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "connection_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "connection_ingest_messages_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "connection_data_contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "connection_ingest_messages_ingest_run_id_fkey"
+            columns: ["ingest_run_id"]
+            isOneToOne: false
+            referencedRelation: "connection_ingest_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "connection_ingest_messages_mapping_id_fkey"
+            columns: ["mapping_id"]
+            isOneToOne: false
+            referencedRelation: "connection_twin_mappings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       connection_ingest_runs: {
         Row: {
           completed_at: string | null
           connection_id: string
+          correlation_id: string | null
           dead_letter_count: number
           duplicate_events: number
+          evidence_class: string
           final_status: string
           id: string
+          mapped_properties: number
           mapping_failures: number
+          max_latency_ms: number | null
           records_accepted: number
           records_received: number
           records_rejected: number
           retries: number
+          source_endpoint: string | null
           started_at: string
+          tenant_id: string | null
+          worker_id: string | null
         }
         Insert: {
           completed_at?: string | null
           connection_id: string
+          correlation_id?: string | null
           dead_letter_count?: number
           duplicate_events?: number
+          evidence_class?: string
           final_status?: string
           id?: string
+          mapped_properties?: number
           mapping_failures?: number
+          max_latency_ms?: number | null
           records_accepted?: number
           records_received?: number
           records_rejected?: number
           retries?: number
+          source_endpoint?: string | null
           started_at?: string
+          tenant_id?: string | null
+          worker_id?: string | null
         }
         Update: {
           completed_at?: string | null
           connection_id?: string
+          correlation_id?: string | null
           dead_letter_count?: number
           duplicate_events?: number
+          evidence_class?: string
           final_status?: string
           id?: string
+          mapped_properties?: number
           mapping_failures?: number
+          max_latency_ms?: number | null
           records_accepted?: number
           records_received?: number
           records_rejected?: number
           retries?: number
+          source_endpoint?: string | null
           started_at?: string
+          tenant_id?: string | null
+          worker_id?: string | null
         }
         Relationships: [
           {
@@ -1680,6 +1805,77 @@ export type Database = {
             columns: ["connector_id"]
             isOneToOne: false
             referencedRelation: "connector_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      connection_runtime_workers: {
+        Row: {
+          broker_url: string | null
+          connect_count: number
+          connection_id: string
+          created_at: string
+          evidence_class: string
+          id: string
+          last_error: string | null
+          last_heartbeat_at: string
+          protocol: string | null
+          reconnect_count: number
+          runtime: string
+          started_at: string
+          state: string
+          stopped_at: string | null
+          subscribed_topics: string[]
+          tenant_id: string | null
+          updated_at: string
+          worker_id: string
+        }
+        Insert: {
+          broker_url?: string | null
+          connect_count?: number
+          connection_id: string
+          created_at?: string
+          evidence_class?: string
+          id?: string
+          last_error?: string | null
+          last_heartbeat_at?: string
+          protocol?: string | null
+          reconnect_count?: number
+          runtime: string
+          started_at?: string
+          state?: string
+          stopped_at?: string | null
+          subscribed_topics?: string[]
+          tenant_id?: string | null
+          updated_at?: string
+          worker_id: string
+        }
+        Update: {
+          broker_url?: string | null
+          connect_count?: number
+          connection_id?: string
+          created_at?: string
+          evidence_class?: string
+          id?: string
+          last_error?: string | null
+          last_heartbeat_at?: string
+          protocol?: string | null
+          reconnect_count?: number
+          runtime?: string
+          started_at?: string
+          state?: string
+          stopped_at?: string | null
+          subscribed_topics?: string[]
+          tenant_id?: string | null
+          updated_at?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connection_runtime_workers_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "connection_instances"
             referencedColumns: ["id"]
           },
         ]
@@ -5456,6 +5652,107 @@ export type Database = {
             columns: ["twin_id"]
             isOneToOne: false
             referencedRelation: "data_centre_twins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      twin_property_values: {
+        Row: {
+          applied_at: string
+          correlation_id: string | null
+          created_at: string
+          facility_id: string | null
+          id: string
+          observed_at: string
+          provenance_class: string
+          provenance_reason: string | null
+          received_at: string
+          source_connection_id: string | null
+          source_contract_id: string | null
+          source_mapping_id: string | null
+          source_message_id: string | null
+          target_entity: string
+          target_prim_path: string | null
+          target_property: string
+          tenant_id: string | null
+          unit: string | null
+          updated_at: string
+          value_numeric: number | null
+          value_text: string | null
+        }
+        Insert: {
+          applied_at?: string
+          correlation_id?: string | null
+          created_at?: string
+          facility_id?: string | null
+          id?: string
+          observed_at: string
+          provenance_class?: string
+          provenance_reason?: string | null
+          received_at?: string
+          source_connection_id?: string | null
+          source_contract_id?: string | null
+          source_mapping_id?: string | null
+          source_message_id?: string | null
+          target_entity: string
+          target_prim_path?: string | null
+          target_property: string
+          tenant_id?: string | null
+          unit?: string | null
+          updated_at?: string
+          value_numeric?: number | null
+          value_text?: string | null
+        }
+        Update: {
+          applied_at?: string
+          correlation_id?: string | null
+          created_at?: string
+          facility_id?: string | null
+          id?: string
+          observed_at?: string
+          provenance_class?: string
+          provenance_reason?: string | null
+          received_at?: string
+          source_connection_id?: string | null
+          source_contract_id?: string | null
+          source_mapping_id?: string | null
+          source_message_id?: string | null
+          target_entity?: string
+          target_prim_path?: string | null
+          target_property?: string
+          tenant_id?: string | null
+          unit?: string | null
+          updated_at?: string
+          value_numeric?: number | null
+          value_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "twin_property_values_source_connection_id_fkey"
+            columns: ["source_connection_id"]
+            isOneToOne: false
+            referencedRelation: "connection_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "twin_property_values_source_contract_id_fkey"
+            columns: ["source_contract_id"]
+            isOneToOne: false
+            referencedRelation: "connection_data_contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "twin_property_values_source_mapping_id_fkey"
+            columns: ["source_mapping_id"]
+            isOneToOne: false
+            referencedRelation: "connection_twin_mappings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "twin_property_values_source_message_id_fkey"
+            columns: ["source_message_id"]
+            isOneToOne: false
+            referencedRelation: "connection_ingest_messages"
             referencedColumns: ["id"]
           },
         ]

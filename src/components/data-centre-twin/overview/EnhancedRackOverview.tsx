@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Server, Thermometer, Cpu, Eye, PlayCircle, ChevronRight, Filter } from 'lucide-react';
 import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
 import { cn } from '@/lib/utils';
+import { mulberry32, deriveSeed } from '@/simulation/orchestrator/prng';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 interface EnhancedRackOverviewProps {

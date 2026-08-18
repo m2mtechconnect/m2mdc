@@ -47,10 +47,7 @@ function walk(dir: string): string[] {
 /** Prose = quoted literals or JSX text with at least two words; excludes identifiers and route keys. */
 function proseStrings(source: string): string[] {
   const withoutComments = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-  const literals: string[] = (withoutComments.match(/'[^'
-]{6,}'|"[^"
-]{6,}"|`[^`
-]{6,}`/g) ?? []).filter(
+  const literals: string[] = (withoutComments.match(/'[^'\n]{6,}'|"[^"\n]{6,}"|`[^`\n]{6,}`/g) ?? []).filter(
     // Interpolated template literals are request plumbing (headers, URLs), not rendered prose.
     (s) => !s.includes('${'),
   );

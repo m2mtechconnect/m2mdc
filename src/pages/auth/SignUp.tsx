@@ -15,6 +15,7 @@ import { Loader2, Lock, Mail, Eye, EyeOff, User } from "lucide-react";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthLayout, SecurityBadge, PasswordStrengthMeter, SSOButtons } from "@/components/auth";
+import { signInWithGoogle } from "@/auth/ssoProviders";
 
 const signUpSchema = z.object({
   name: z.string()

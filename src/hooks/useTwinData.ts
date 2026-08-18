@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { loadRunRecords } from '@/workspace/runRecords';
 
 // Twin Telemetry
 export function useTwinTelemetry(domain?: string) {

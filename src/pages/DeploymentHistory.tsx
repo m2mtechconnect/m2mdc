@@ -482,7 +482,7 @@ export default function DeploymentHistory() {
                       </TableCell>
                     </TableRow>
                   )}
-                  </>
+                  </React.Fragment>
                 ))
               )}
             </TableBody>

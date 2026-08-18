@@ -178,7 +178,7 @@ export function DomainHealthMap({ className }: { className?: string }) {
   return (
     <Card className={className}>
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle className="text-sm flex items-center gap-2">
             <Activity className="h-4 w-4" />
             Domain Health Overview

@@ -122,3 +122,21 @@ further UI work.
 
 **Interim labelling:** the scene is labelled "Procedural 3D preview" and the dev-only Asset
 Provenance panel reports `Fallback active: Yes` with the resolver's reason.
+
+## BLOCKER: Phase 3 external validation backend
+
+Real RLS and tenant-isolation execution, migration reproducibility on an empty
+database, and live HTTP tests of the `run-lifecycle` / `record-decision`
+boundaries cannot run in the build environment: there is no Docker daemon for
+an ephemeral local Supabase, no staging project has been supplied, and the
+sandbox database role is not permitted to `SET ROLE authenticated`. The
+production project must not be used for these write tests.
+
+Unblock by supplying a throwaway backend and running:
+
+```
+AURA_VALIDATION_DB_URL=... node scripts/phase3/external-validation.mjs
+```
+
+Owner: platform / infrastructure. Until then Phase 3 stays
+`PHASE_3_NOT_CLOSED_EXTERNAL_VALIDATION_REQUIRED`.

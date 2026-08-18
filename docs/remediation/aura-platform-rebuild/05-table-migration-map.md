@@ -15,7 +15,7 @@ records the family-level plan only; no drop may be planned from it.
 | Telemetry / KPI | `twin_property_values`, `twin_telemetry`, `twin_kpi_snapshots` | `twin_property_values` (observed) + `simulation_runs` KPI envelope (modelled) | **done (Phase 11)**: both legacy generations hold 0 rows and carry no provenance; all client reads repointed, grants revoked, tables commented as deprecated |
 | Deployments | `deployments`, `cloud_deployments`, `deployment_tracking` | `deployments` + `deployment_events` (immutable) | **done (Phase 9)**: events table added, timer-driven UI removed, `deployment_tracking` deprecated (0 rows, grants revoked); `cloud_deployments` retained for the AOC runtime feature |
 | Assets | asset/version/validation tables | one asset/version/validation model | Phase 6 |
-| Evidence/decisions | evidence-beta + decision tables | one evidence/decision model | Phase 2/4 |
+| Evidence/decisions | evidence-beta runtime state, `recommendations`, `ai_recommendations_cache` | `decision_records` (append-only decision log) | **done (Phase 12)**: decisions were browser-only state; a canonical append-only table now stores the frozen evidence snapshot, hash and session ownership. Scanner recommendation tables stay separate (different domain, edge-function owned) |
 
 Rule applied: tables with genuinely different retention, security or audit semantics
 (ingest evidence vs normalized telemetry; deployment events vs deployment state) are **not**

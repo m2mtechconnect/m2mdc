@@ -162,10 +162,6 @@ export default function IntelligenceDashboard() {
   // Twin context for scoped data
   const { twin, activeTwinId: twinId, twins } = useActiveTwin();
   
-  // Twin-scoped telemetry and KPIs
-  const { data: twinTelemetry } = useTwinTelemetry();
-  const { data: twinKpis } = useTwinKPIs();
-  
   // Get KPIs from simulation runs (single source of truth)
   const { kpis: simulationKpis, kpiValues, loading: kpisLoading } = useTwinKPIsFromSimulation(twinId || undefined);
   

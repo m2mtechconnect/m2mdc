@@ -364,7 +364,8 @@ export default function DeploymentHistory() {
                 </TableRow>
               ) : (
                 filteredDeployments.map((deployment) => (
-                  <TableRow key={deployment.id} className="hover:bg-muted/50">
+                  <React.Fragment key={deployment.id}>
+                  <TableRow className="hover:bg-muted/50">
                     <TableCell>
                       <div className="font-medium">{deployment.agent_name}</div>
                       {deployment.error_message && (

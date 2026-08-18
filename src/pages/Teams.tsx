@@ -167,14 +167,15 @@ export default function Teams() {
     },
   });
 
-  // Fetch team invites (with error handling for missing table)
+  // Fetch team invites. The acceptance token is deliberately not exposed over
+  // the Data API, so columns are listed explicitly rather than selecting "*".
   const { data: invites, isLoading: loadingInvites } = useQuery({
     queryKey: ["team-invites"],
     enabled: isAuthenticated,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("team_invites")
-        .select("*")
+        .select("id, email, role, status, invited_by, expires_at, created_at")
         .order("created_at", { ascending: false });
 
       // Gracefully handle if table doesn't exist or has permission issues

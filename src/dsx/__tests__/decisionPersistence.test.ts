@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const insertMock = vi.fn();
 const selectMock = vi.fn();
+const results: { insert: any; select: any } = { insert: null, select: null };
 const getUser = vi.fn();
 
 vi.mock('@/integrations/supabase/client', () => ({
@@ -12,11 +13,11 @@ vi.mock('@/integrations/supabase/client', () => ({
       return {
         insert: (payload: unknown) => {
           insertMock(payload);
-          return { select: () => ({ maybeSingle: async () => insertMock.result }) };
+          return { select: () => ({ maybeSingle: async () => results.insert }) };
         },
         select: (cols: string) => {
           selectMock(cols);
-          return { order: async () => selectMock.result };
+          return { order: async () => results.select };
         },
       };
     },
@@ -68,7 +69,7 @@ describe('decision persistence (Phase 12 canonical decision log)', () => {
 
   it('writes session ownership and the frozen snapshot hash', async () => {
     getUser.mockResolvedValue({ data: { user: { id: 'user-1' } } });
-    insertMock.result = { data: { id: 'row-1' }, error: null };
+    results.insert = { data: { id: 'row-1' }, error: null };
     const r = await persistDecision(decision);
     expect(r).toEqual({ status: 'saved', id: 'row-1' });
     const payload = insertMock.mock.calls[0][0];
@@ -80,13 +81,13 @@ describe('decision persistence (Phase 12 canonical decision log)', () => {
 
   it('treats a unique-violation replay as a duplicate, not a new record', async () => {
     getUser.mockResolvedValue({ data: { user: { id: 'user-1' } } });
-    insertMock.result = { data: null, error: { code: '23505', message: 'dup' } };
+    results.insert = { data: null, error: { code: '23505', message: 'dup' } };
     expect(await persistDecision(decision)).toEqual({ status: 'duplicate' });
   });
 
   it('restores durable rows into the runtime contract', async () => {
     getUser.mockResolvedValue({ data: { user: { id: 'user-1' } } });
-    selectMock.result = {
+    results.select = {
       data: [
         {
           id: 'row-1',
@@ -109,6 +110,6 @@ describe('decision persistence (Phase 12 canonical decision log)', () => {
     expect(rows[0].decision_id).toBe('row-1');
     expect(rows[0].escalated_to).toBe('duty manager');
     expect(rows[0].comment).toBeUndefined();
-    expect(rowToDecision({ ...selectMock.result.data[0], comment: 'note' }).comment).toBe('note');
+    expect(rowToDecision({ ...(results.select as any).data[0], comment: 'note' }).comment).toBe('note');
   });
 });

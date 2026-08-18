@@ -106,10 +106,6 @@ const EvidenceWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) =
 const OverlayFixtures = import.meta.env.DEV
   ? lazy(() => import("./pages/test/OverlayFixtures"))
   : null;
-// TEMPORARY diagnostic variant (DEV only) - removed after the A/B matrix.
-const MinimalLazyProbe = import.meta.env.DEV
-  ? lazy(() => import("./pages/test/MinimalLazyProbe"))
-  : null;
 
 function AgentOperationsRedirect() {
   const { agentId } = useParams();
@@ -232,19 +228,6 @@ function ApprovedUserRoutes() {
       </Route>
       {import.meta.env.DEV && OverlayFixtures ? (
         <Route path="/dev-overlays" element={<OverlayFixtures />} />
-      ) : null}
-      {import.meta.env.DEV && MinimalLazyProbe ? (
-        <Route path="/dev-minimal-lazy" element={<MinimalLazyProbe />} />
-      ) : null}
-      {import.meta.env.DEV && MinimalLazyProbe ? (
-        <Route
-          path="/dev-minimal-lazy-local"
-          element={
-            <Suspense fallback={<div>Local probe boundary...</div>}>
-              <MinimalLazyProbe />
-            </Suspense>
-          }
-        />
       ) : null}
       <Route path="*" element={<NotFound />} />
     </Routes>

@@ -1,10 +1,14 @@
 /**
  * SSO Login Buttons
- * Placeholder buttons for enterprise SSO providers
+ *
+ * Only providers configured on the backend are actionable. Unconfigured
+ * providers render disabled with an explicit reason so the UI never implies
+ * a capability that does not exist.
  */
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { SSO_PROVIDERS } from '@/auth/ssoProviders';
 
 interface SSOButtonsProps {
   onGoogleClick?: () => void;
@@ -21,6 +25,9 @@ export function SSOButtons({
   disabled,
   className 
 }: SSOButtonsProps) {
+  const google = SSO_PROVIDERS.google;
+  const microsoft = SSO_PROVIDERS.microsoft;
+  const enterprise = SSO_PROVIDERS.enterprise;
   return (
     <div className={cn("space-y-3", className)}>
       <div className="relative">

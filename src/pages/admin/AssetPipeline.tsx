@@ -124,6 +124,17 @@ export default function AssetPipeline() {
             </p>
           )}
 
+          {!validation.loading && (
+            <p className="mt-2 text-[12px] text-muted-foreground" data-testid="asset-validation-evidence">
+              Validation basis: {validation.evidence}
+              {validation.buildChecksum ? (
+                <>
+                  {' '}(current build <span className="font-mono">{validation.buildChecksum}</span>)
+                </>
+              ) : null}
+            </p>
+          )}
+
           <div className="mt-4 flex flex-wrap gap-3 text-[12px]">
             <Link className="inline-flex items-center gap-1 underline" to="/admin/asset-preview">
               Admin preview <ExternalLink className="h-3 w-3" />

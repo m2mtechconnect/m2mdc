@@ -100,7 +100,7 @@ export async function appendDeploymentEvent(params: {
     sequence: params.sequence,
     stage: params.stage,
     status: params.status,
-    detail: params.detail ?? {},
+    detail: (params.detail ?? {}) as never,
   }]);
 
   // Evidence loss must be visible, but it must not abort a deployment that

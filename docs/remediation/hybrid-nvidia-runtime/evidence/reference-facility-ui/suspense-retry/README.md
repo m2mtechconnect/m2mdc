@@ -44,6 +44,49 @@ Steps 5, 6, 7A-7D, 8, 9, 10, 11. Root cause is **not** proven, so no product cod
 was changed and no fix was retained.
 
 ## Verdicts
+
+## Parts 6-7 — suspending-resource inventory and partial A/B matrix
+
+Inventory (static, `rg` over `src/`): the only suspending resources reachable
+above/inside `/data-centre-twin` are `React.lazy` module thenables. There are no
+`use()`, no `useSuspenseQuery`, no `suspense: true`, no `.read()` resource
+patterns, no lazy i18n/flag loading. `AuthenticatedShell` is lazy in `App.tsx`
+(caught by the App-level `<Suspense fallback={<LoadingScreen/>}>`); every page
+including `DataCentreTwin` is lazy at module scope in `AuthenticatedShell.tsx`
+(caught by the shared `Loading workspace...` boundary). All promises are created
+once per module by `lazy()` and cached in the lazy payload, so retry reuses the
+same thenable and success is synchronously readable afterwards.
+
+A/B matrix executed with a temporary probe harness (24 warm navigations each,
+both geometries, direct + Back/Forward + reload; probes removed afterwards):
+
+| Variant | Route | Failures |
+| --- | --- | --- |
+| Warm baseline (real lazy page, shared boundary) | `/data-centre-twin` | 1 / 24 |
+| B — minimal module-scope lazy page (no stores, no queries, no effects), shared boundary | `/dev-minimal-lazy` | 8 / 24 |
+| C — same minimal lazy page, stable route-local `<Suspense>` | `/dev-minimal-lazy-local` | 2 / 24 |
+
+Raw rows: `variant-warm-baseline.json`, `variant-B-minimal-lazy.json`,
+`variant-C-local-boundary.json`.
+
+### What this proves
+- The defect is **not** in `DataCentreTwin`, its module graph, the visualization
+  subtree, or any store/query it owns: a page that returns a static `<div>`
+  immediately after import hangs *more* often (8/24 vs 1/24).
+- The defect is **not** the shared boundary alone: a stable route-local
+  boundary still hangs (2/24), and in that variant the shared fallback was not
+  even visible.
+- Therefore the lost retry originates **above** the route boundary — in the
+  shell ancestor chain (`TourProvider` → `CoPilotProvider` →
+  `CoPilotCommandProvider` → `DatasetProvider` → `Layout` →
+  `ReferenceRouteGate`) or in the App-level lazy/`Suspense` for
+  `AuthenticatedShell` itself. Variants A (eager), D (pre-resolved) and E
+  (visualization-free shell) and the Part 5 store-churn timelines were not run.
+
+Root cause is **not** proven, so no product code was changed and no fix was
+retained. Parts 8-11 were not started.
+
+## Verdicts
 - AURA_SUSPENSE_RETRY_NOT_CLOSED
 - AURA_TEST_HARNESS_NOT_CLOSED
 - AURA_DATA_CENTRE_ROUTE_NOT_CLOSED

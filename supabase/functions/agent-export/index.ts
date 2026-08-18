@@ -108,7 +108,7 @@ serve(createHandler({
         fileName = `agent-${agentId}-export-${Date.now()}.json`;
         break;
 
-      case 'csv':
+      case 'csv': {
         // CSV export of messages
         const csvHeader = 'Timestamp,Role,Content\n';
         const csvRows = messages?.map((msg: any) => 
@@ -118,6 +118,7 @@ serve(createHandler({
         contentType = 'text/csv';
         fileName = `agent-${agentId}-messages-${Date.now()}.csv`;
         break;
+      }
 
       case 'pdf':
         // For PDF, return JSON with metadata for now

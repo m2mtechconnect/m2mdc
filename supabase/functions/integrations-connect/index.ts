@@ -81,7 +81,7 @@ serve(async (req) => {
         response = { status: 'connected', message: 'OAuth flow completed' };
         break;
 
-      case 'apikey':
+      case 'apikey': {
         if (!apiKey) {
           return new Response(
             JSON.stringify({ error: 'API key required' }),
@@ -119,6 +119,7 @@ serve(async (req) => {
         };
         response = { status: 'connected', message: 'API key stored securely' };
         break;
+      }
 
       case 'zapier':
         // For Zapier, provide connection URL

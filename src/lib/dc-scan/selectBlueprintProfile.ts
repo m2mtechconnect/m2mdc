@@ -200,7 +200,7 @@ export function selectBlueprintProfile(signals: DCScanSignals): DCBlueprintProfi
     case "ai_compute":
       return "sovereign_ai_factory_dc";
     
-    default:
+    default: {
       // Rule 3: Check compliance keywords for fallback
       const hasHealthcareCompliance = complianceKeywords.some(k => 
         ["hipaa", "hitrust", "phi"].includes(k.toLowerCase())
@@ -225,6 +225,7 @@ export function selectBlueprintProfile(signals: DCScanSignals): DCBlueprintProfi
       
       // Default fallback
       return "saas_multi_tenant_dc";
+    }
   }
 }
 

@@ -87,13 +87,14 @@ export function CoPilotCommandProvider({ children }: { children: ReactNode }) {
       case 'openBuilderStep':
         commands.openBuilderStep(args?.step || args);
         return true;
-      case 'highlightKPI':
+      case 'highlightKPI': {
         const kpiId = args?.kpiId || args;
         setHighlightedKPI(kpiId);
         commands.highlightKPI(kpiId);
         // Auto-clear after 5 seconds
         setTimeout(() => setHighlightedKPI(null), 5000);
         return true;
+      }
       case 'toggleDomain':
         commands.toggleDomain(args?.domainName || args);
         return true;

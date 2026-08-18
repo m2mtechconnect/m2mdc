@@ -8,7 +8,7 @@
 
 import { useEffect, useState } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
-import { BoundedLoading } from '@/components/BoundedLoading';
+import BoundedLoading from '@/components/shared/BoundedLoading';
 
 export default function AuthCallback() {
   const [params] = useSearchParams();

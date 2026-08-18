@@ -48,6 +48,49 @@ export default tseslint.config(
     },
   },
   {
+    // Phase 2 - orchestrator bypass guard.
+    // Simulation engines may only be constructed by the orchestrator's own
+    // providers. Application code must dispatch through
+    // `simulationOrchestrator` so seeding, readiness and provenance are
+    // always recorded. The provider adapters and characterization tests are
+    // exempted below.
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: [
+      "src/simulation/orchestrator/**/*.{ts,tsx}",
+      "src/simulation/generateSimulationResult.ts",
+      "src/components/builder/step5/BuilderPreviewEngine.ts",
+      "src/components/builder/step5/fixtures/builderMock.ts",
+      "**/__tests__/**/*.{ts,tsx}",
+      "**/*.test.{ts,tsx}",
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@/components/builder/step5/BuilderPreviewEngine",
+              message:
+                "Do not construct simulation engines directly. Use simulationOrchestrator.openPreviewSession() from @/simulation/orchestrator.",
+            },
+            {
+              name: "@/components/builder/step5/fixtures/builderMock",
+              importNames: ["MockSimulationEngine"],
+              message:
+                "Do not construct simulation engines directly. Use simulationOrchestrator.openPreviewSession() from @/simulation/orchestrator.",
+            },
+            {
+              name: "@/simulation/generateSimulationResult",
+              importNames: ["generateSimulationResult"],
+              message:
+                "Do not call the summary engine directly. Use simulationOrchestrator.runSync() with the 'aura-panel-summary' provider.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     // Cypress specs use chai assertion expressions (`expect(x).to.exist`),
     // which are statements by design.
     files: ["cypress/**/*.{ts,tsx}"],

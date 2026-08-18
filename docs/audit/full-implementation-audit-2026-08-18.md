@@ -127,6 +127,14 @@ policy set is: read for system defaults, own rows, or rows sharing the caller's
 `profiles.org_id` (new `org_id` column, mirroring `agents`); write limited to
 the owner and blocked on `is_system_default` rows. Anonymous access removed.
 
+### 8b. `agent_suggestions_cache` - RESOLVED 2026-08-18
+
+Server-only cache for the `agent-suggestions` edge function (service role). The
+table now explicitly revokes `anon`/`authenticated`, forces RLS, and carries a
+table comment recording that having zero policies is intentional fail-closed
+behaviour. The linter's `rls_enabled_no_policy` INFO on it is accepted and
+recorded in security memory.
+
 ## Recommended order of work
 
 1. Fabricated telemetry on live routes (section 4) - truth violation, and one

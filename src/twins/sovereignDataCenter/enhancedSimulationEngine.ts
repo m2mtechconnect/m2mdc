@@ -4,7 +4,10 @@
  */
 
 import type { 
-
+  SovereignKpis, 
+  SimulationType, 
+  SovereignDCFacility,
+} from '@/types/sovereignDataCenterTwin';
 /**
  * Heterogeneous event listener. The concrete argument shapes are enforced by
  * the public `on(...)` overloads; this alias only exists for the internal
@@ -12,10 +15,6 @@ import type {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- overload implementation signature
 type AnyEventListener = (...args: any[]) => void;
-  SovereignKpis, 
-  SimulationType, 
-  SovereignDCFacility,
-} from '@/types/sovereignDataCenterTwin';
 
 // ============================================================================
 // EXPANDED SCENARIO DEFINITIONS

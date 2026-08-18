@@ -17,14 +17,20 @@ describe('run provenance (Stage 5A)', () => {
     expect(evidenceBoundaryNotice(p.runId)).toContain('No simulation run has been recorded');
   });
 
-  it('derives run id and calculation time from the persisted snapshot', () => {
+  it('labels a legacy snapshot as an unpersisted preview, never authoritative', () => {
     const p = resolveRunProvenance({
       blueprintId: 'bp', blueprintVersion: '1',
       simulationRunId: 'SIM-2026-08-07-001',
       capturedAt: '2026-08-07T10:00:00.000Z',
       config: {} as never,
     });
-    expect(p).toEqual({ runId: 'SIM-2026-08-07-001', calculatedAt: '2026-08-07T10:00:00.000Z', available: true });
+    expect(p).toEqual({
+      runId: 'SIM-2026-08-07-001',
+      calculatedAt: '2026-08-07T10:00:00.000Z',
+      available: true,
+      source: 'compatibility-snapshot',
+      persistenceLabel: 'Unpersisted preview',
+    });
   });
 
   it('never fabricates provenance from an incomplete snapshot', () => {

@@ -439,17 +439,23 @@ export interface GpuValidationStatus {
 }
 
 /**
- * Hardware GPU validation state for an asset. Until a saved administrator run
- * passes, the UI must keep saying "Awaiting hardware GPU validation".
+ * Design-time GPU validation state declared by the manifest.
+ *
+ * A status string alone is a claim without evidence, so this only reports
+ * validated when the manifest also cites the saved run that produced it.
+ * Runtime callers should prefer the canonical resolver in
+ * `@/validation/gpuAcceptance/assetValidationModel`, which additionally binds
+ * the saved runs to the current build checksum.
  */
 export function getGpuValidationStatus(assetId: string): GpuValidationStatus {
   const record = getAsset(assetId)?.gpuValidation;
-  const gpuValidated = record?.status === 'gpu-validated';
+  const lastPassedRunId = record?.lastPassedRunId ?? null;
+  const gpuValidated = record?.status === 'gpu-validated' && lastPassedRunId !== null;
   return {
     status: record?.status ?? 'awaiting-hardware-run',
     gpuValidated,
-    label: gpuValidated ? 'GPU-validated' : 'Awaiting hardware GPU validation',
-    lastPassedRunId: record?.lastPassedRunId ?? null,
+    label: gpuValidated ? 'GPU validated' : 'Awaiting hardware GPU validation',
+    lastPassedRunId,
   };
 }
 

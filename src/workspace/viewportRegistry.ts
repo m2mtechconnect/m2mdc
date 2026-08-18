@@ -36,6 +36,13 @@ export interface ViewportSurface {
   canMountApprovedGlb: boolean;
   /** The disclosure the surface is allowed to show. */
   disclosure: string;
+  /**
+   * Negative claim a surface must show when it cannot mount validated
+   * OpenUSD-derived geometry. Positive claims live in `disclosure`; this field
+   * exists so a 2D surface can state the limitation explicitly without the
+   * registry test mistaking it for a geometry claim.
+   */
+  limitation?: string;
   purpose: string;
 }
 
@@ -55,6 +62,7 @@ export const VIEWPORT_SURFACES: ViewportSurface[] = [
     renderer: 'svg-2d',
     canMountApprovedGlb: false,
     disclosure: 'Procedural 2D floor plan of the modelled design',
+    limitation: 'Not a validated OpenUSD stage',
     purpose: 'Command Centre facility card with rack search and quick view.',
   },
   {
@@ -86,4 +94,9 @@ export function viewportSurface(id: string): ViewportSurface {
 /** The disclosure a surface is allowed to display. */
 export function viewportDisclosure(id: string): string {
   return viewportSurface(id).disclosure;
+}
+
+/** The limitation a surface must display, when it has one. */
+export function viewportLimitation(id: string): string | undefined {
+  return viewportSurface(id).limitation;
 }

@@ -9,7 +9,7 @@ No row may be raised without the runtime evidence named in its Evidence gate col
 | Authoritative OpenUSD storage + stage composition | DSX system architecture | AURA-authored layered facility (`assets/facility/aura_reference_hall`) with systems/semantics/scenario sublayers | AURA-authored | real payload references to validated geometry, reproducible composition run |
 | Browser GLB fallback | n/a (AURA) | React Three Fiber + 39 published GLB derivatives | implemented | must be labelled `Browser GLB preview`; derivative lineage back to one USD master |
 | Omniverse Kit rendering | Kit App Streaming | `omniverseKit/config.ts` disabled in every build | absent | built Kit app, container image, GPU runtime, stage loads |
-| App Streaming session mgmt | developer.nvidia.com Kit-at-scale | `streamingLibraryLoader.ts` demand loader with **no production consumer**, global name may not match the vendored UMD bundle | absent (dead code) | server-mediated session issue, short-lived credentials, health/readiness, real streamed session log |
+| App Streaming session mgmt | developer.nvidia.com Kit-at-scale | `streamingLibraryLoader.ts` refuses with `asset-not-vendored`; the vendored UMD bundle was deleted in Phase 1 | absent (no vendored bundle) | server-mediated session issue, short-lived credentials, health/readiness, real streamed session log |
 | Simulation services / surrogate models | PhysicsNeMo, PhysicsNeMo-CFD | none; `omniverseProvider` is a permanently disabled stub returning `not-implemented` | absent | real solver endpoint, pinned version, validation dataset, tolerances |
 | Simulation Data Delegate | DSX architecture | no boundary exists | absent | delegate interface separating stage data from solver results |
 | Operational telemetry | DSX | MQTT ingest worker writes `connection_ingest_*` and `twin_property_values`; twin/simulation surfaces do not read them | partial | end-to-end vertical slice (Phase 5) |
@@ -19,9 +19,9 @@ No row may be raised without the runtime evidence named in its Evidence gate col
 
 ## Upstream pinning
 
-No upstream NVIDIA repository is vendored, and none is currently pinned by commit. The only
-vendored NVIDIA artifact is `public/omniverse-webrtc-streaming-library.umd.js`
-(NVIDIA Omniverse licence, entitlement-gated redistribution) which has **no production
-consumer**. Phase 1 must either wire it to a real Kit path or delete it.
+No upstream NVIDIA repository is vendored, and none is currently pinned by commit. The single vendored NVIDIA artifact,
+`public/omniverse-webrtc-streaming-library.umd.js` (NVIDIA Omniverse licence,
+entitlement-gated redistribution, no production consumer), was **deleted in Phase 1**; no
+NVIDIA binary is now shipped to browsers.
 **Blocker B-8:** DSX Blueprint / AIF pipeline / DSX Exchange commit SHAs and licence records
 must be captured from an environment with access to those repositories.

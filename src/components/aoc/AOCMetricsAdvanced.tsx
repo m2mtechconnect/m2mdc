@@ -35,19 +35,10 @@ export function AOCMetricsAdvanced({ agentId, recentRuns }: AOCMetricsAdvancedPr
   const p95Index = Math.floor(sortedDurations.length * 0.95);
   const p95Latency = sortedDurations[p95Index] || 0;
 
-  // Fetch token usage (mock)
-  const { data: tokenUsage } = useQuery({
-    queryKey: ['aoc-token-usage', agentId],
-    queryFn: async () => {
-      // In production, aggregate from agent_runs.output
-      return {
-        total: Math.floor(Math.random() * 100000) + 50000,
-        trend: Math.random() > 0.5 ? 'up' : 'down',
-        percentage: Math.floor(Math.random() * 20) + 5,
-      };
-    },
-    refetchInterval: 30000,
-  });
+  // Truth rule: token usage is not aggregated anywhere yet, so nothing is
+  // fabricated here. The tile reports "Not measured" until a real aggregate
+  // over agent run output exists.
+  const tokenUsage: { total: number; trend: 'up' | 'down'; percentage: number } | null = null;
 
   const metrics = [
     {
@@ -84,10 +75,10 @@ export function AOCMetricsAdvanced({ agentId, recentRuns }: AOCMetricsAdvancedPr
     },
     {
       label: 'Token Usage',
-      value: tokenUsage ? `${(tokenUsage.total / 1000).toFixed(1)}K` : '0',
+      value: tokenUsage ? `${(tokenUsage.total / 1000).toFixed(1)}K` : 'Not measured',
       icon: Activity,
       color: 'text-indigo-500',
-      trend: tokenUsage?.trend === 'up' ? `+${tokenUsage?.percentage || 0}%` : `-${tokenUsage?.percentage || 0}%`,
+      trend: tokenUsage ? (tokenUsage.trend === 'up' ? `+${tokenUsage.percentage}%` : `-${tokenUsage.percentage}%`) : '',
       subtitle: 'Total tokens',
     },
     {

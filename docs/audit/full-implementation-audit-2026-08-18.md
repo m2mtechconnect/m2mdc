@@ -86,13 +86,19 @@ This contradicts the operating-state/provenance model the platform advertises.
   Entry chunk unchanged (1,841 KB / 474 KB gzip) — the dead modules were
   already tree-shaken out, so this is a maintenance win, not a size win.
 
-## 6. Stubbed features presented as available
+## 6. Stubbed features presented as available - RESOLVED 2026-08-18
 
-SSO buttons on `pages/auth/SignIn.tsx:95,99,103` and `SignUp.tsx:114,118,122`
-(Google, Microsoft, Enterprise) only fire `toast.info("... coming soon")`.
-Notification settings (`pages/account/Settings.tsx:369`) and several TODO-gated
-ops-health wirings (`IntelligenceDashboard.tsx:150`,
-`telemetry/DataTrustStrip.tsx:15`) are likewise inert.
+- SSO: Google is now a real `signInWithOAuth` flow with the provider enabled on
+  the backend and a `/auth/callback` route (`src/auth/ssoProviders.ts`,
+  `src/pages/auth/AuthCallback.tsx`). Microsoft and SAML enterprise SSO render
+  disabled with a stated reason instead of a "coming soon" toast. Guarded by
+  `src/auth/__tests__/ssoProviders.test.ts`.
+- Notification settings: backed by `public.notification_preferences`
+  (owner-only RLS, GRANTs applied) via `useNotificationPreferences`; the copy
+  now states that email delivery is not configured.
+- Data trust: `DataTrustStrip` accepts `state={null}` and renders an explicit
+  "metrics not available" panel. `IntelligenceDashboard` no longer passes the
+  fabricated 412/438 sensor counts.
 
 ## 7. Bundle
 

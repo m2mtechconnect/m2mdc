@@ -56,7 +56,7 @@ export default function SystemManage() {
         id: agent.id,
         name: agent.name,
         description: agent.description || '',
-        department: 'Operations', // TODO: get from agent config
+        department: null, // not modelled on the agent record
         category: 'Digital Twin',
         type: 'system',
         status: agent.status as 'active' | 'draft' | 'paused' | 'archived',
@@ -65,7 +65,7 @@ export default function SystemManage() {
         createdAt: agent.created_at,
         updatedAt: agent.updated_at,
         deployedAt: agent.deployed_at,
-        roi: 0, // TODO: calculate from metrics
+        roi: null, // no measured ROI source bound
         successRate: agent.success_rate || 0,
         totalRuns: agent.total_runs || 0,
         avgDuration: undefined,
@@ -219,7 +219,7 @@ export default function SystemManage() {
         features={[
           `${systemData.totalRuns} total runs`,
           `${Math.round(systemData.successRate)}% success rate`,
-          `${systemData.roi}% ROI`,
+          ...(typeof systemData.roi === 'number' ? [`${systemData.roi}% ROI`] : []),
         ]}
         setupInstructions={[]}
         compatibility={{

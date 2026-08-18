@@ -1,0 +1,176 @@
+{
+  "summary": {
+    "cold": 10,
+    "warm": 10,
+    "total": 20,
+    "failures": 3,
+    "p50": 1385,
+    "p95": 1601,
+    "max": 1601
+  },
+  "rows": [
+    {
+      "id": "cold-0",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 19996,
+      "result": "fallback",
+      "fallbackText": "route suspense fallback visible"
+    },
+    {
+      "id": "cold-1",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1276,
+      "result": "committed"
+    },
+    {
+      "id": "cold-2",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1407,
+      "result": "committed"
+    },
+    {
+      "id": "cold-3",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1418,
+      "result": "committed"
+    },
+    {
+      "id": "cold-4",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1385,
+      "result": "committed"
+    },
+    {
+      "id": "cold-5",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1445,
+      "result": "committed"
+    },
+    {
+      "id": "cold-6",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1601,
+      "result": "committed"
+    },
+    {
+      "id": "cold-7",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1498,
+      "result": "committed"
+    },
+    {
+      "id": "cold-8",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1348,
+      "result": "committed"
+    },
+    {
+      "id": "cold-9",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1282,
+      "result": "committed"
+    },
+    {
+      "id": "warm-0",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1478,
+      "result": "committed"
+    },
+    {
+      "id": "warm-1",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1254,
+      "result": "committed"
+    },
+    {
+      "id": "warm-2",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1323,
+      "result": "committed"
+    },
+    {
+      "id": "warm-3",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "back",
+      "ms": 1415,
+      "result": "committed"
+    },
+    {
+      "id": "warm-4",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "reload",
+      "ms": 1132,
+      "result": "committed"
+    },
+    {
+      "id": "warm-5",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1308,
+      "result": "committed"
+    },
+    {
+      "id": "warm-6",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1252,
+      "result": "committed"
+    },
+    {
+      "id": "warm-7",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 19815,
+      "result": "fallback",
+      "fallbackText": "route suspense fallback visible"
+    },
+    {
+      "id": "warm-8",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "back",
+      "ms": 19774,
+      "result": "fallback",
+      "fallbackText": "route suspense fallback visible"
+    },
+    {
+      "id": "warm-9",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "reload",
+      "ms": 1541,
+      "result": "committed"
+    }
+  ]
+}

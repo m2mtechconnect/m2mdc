@@ -12,8 +12,9 @@
  * insight. If sensor coverage is low, the dashboard must not make a zone
  * look normal -- it should show that the state is unreliable.
  *
- * TODO: wire to a future `ops-health` edge function. For now we derive
- * conservative defaults from local state so the contract is stable.
+ * Truth rule: this strip must never invent coverage or quality counts. When no
+ * ops-health source is bound, callers pass `state={null}` and the strip renders
+ * an explicit "not bound" state instead of plausible-looking numbers.
  */
 
 import { Card } from '@/components/ui/card';
@@ -31,7 +32,8 @@ export interface DataTrustState {
 }
 
 interface DataTrustStripProps {
-  state: DataTrustState;
+  /** Null when no ops-health source is bound to this view. */
+  state: DataTrustState | null;
   compact?: boolean;
 }
 

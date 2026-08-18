@@ -136,5 +136,4 @@ the owner and blocked on `is_system_default` rows. Anonymous access removed.
 3. `team_invites` email authorisation (section 8).
 4. Dead code and duplicate-surface deletion (section 5).
 5. Stubbed SSO/notification affordances (section 6) - DONE.
-6. Remaining: `agent_definitions` missing the org-sharing policy its sibling
-   `agents` table has (section 8).
+6. `agent_definitions` grants and org-sharing policy (section 8a) - DONE.

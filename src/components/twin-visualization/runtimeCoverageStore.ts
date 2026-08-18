@@ -104,6 +104,17 @@ interface OwnerState {
   rackMounts: Record<string, RackMountReport>;
 }
 
+/**
+ * Who is allowed to own the active session.
+ *
+ * A page can mount more than one scene at once (the full model viewport plus a
+ * compact thumbnail). Both used to call `beginSession`, so the thumbnail's
+ * session replaced the viewport's and every viewport report was then dropped
+ * as stale. A `secondary` scene may report, but never takes the session away
+ * from a `primary` one.
+ */
+export type CoveragePriority = 'primary' | 'secondary';
+
 const STATE_RANK: Record<RoleRuntimeState, number> = {
   'openusd-derived': 5,
   'procedural-fallback': 4,

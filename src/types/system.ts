@@ -6,7 +6,8 @@ export interface DeployedSystem {
   id: string;
   name: string;
   description: string;
-  department: string;
+  /** Null when no department is bound to the record - never substitute a placeholder. */
+  department: string | null;
   category: string;
   type: 'system' | 'agent' | 'twin';
   status: 'active' | 'draft' | 'paused' | 'archived';
@@ -21,7 +22,8 @@ export interface DeployedSystem {
   deployedAt?: string;
   
   // Metrics
-  roi: number;
+  /** Null when ROI has not been computed from measured metrics. */
+  roi: number | null;
   successRate: number;
   totalRuns: number;
   avgDuration?: number;

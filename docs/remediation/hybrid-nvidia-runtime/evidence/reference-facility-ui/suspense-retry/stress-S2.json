@@ -1,0 +1,205 @@
+{
+  "summary": {
+    "cold": 0,
+    "warm": 24,
+    "total": 24,
+    "failures": 0,
+    "p50": 811,
+    "p95": 885,
+    "max": 983
+  },
+  "rows": [
+    {
+      "id": "warm-0",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 983,
+      "result": "committed"
+    },
+    {
+      "id": "warm-1",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 804,
+      "result": "committed"
+    },
+    {
+      "id": "warm-2",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 856,
+      "result": "committed"
+    },
+    {
+      "id": "warm-3",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "back",
+      "ms": 785,
+      "result": "committed"
+    },
+    {
+      "id": "warm-4",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "reload",
+      "ms": 790,
+      "result": "committed"
+    },
+    {
+      "id": "warm-5",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 713,
+      "result": "committed"
+    },
+    {
+      "id": "warm-6",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 722,
+      "result": "committed"
+    },
+    {
+      "id": "warm-7",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 706,
+      "result": "committed"
+    },
+    {
+      "id": "warm-8",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "back",
+      "ms": 827,
+      "result": "committed"
+    },
+    {
+      "id": "warm-9",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "reload",
+      "ms": 876,
+      "result": "committed"
+    },
+    {
+      "id": "warm-10",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 860,
+      "result": "committed"
+    },
+    {
+      "id": "warm-11",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 817,
+      "result": "committed"
+    },
+    {
+      "id": "warm-12",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 819,
+      "result": "committed"
+    },
+    {
+      "id": "warm-13",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "back",
+      "ms": 835,
+      "result": "committed"
+    },
+    {
+      "id": "warm-14",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "reload",
+      "ms": 863,
+      "result": "committed"
+    },
+    {
+      "id": "warm-15",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 788,
+      "result": "committed"
+    },
+    {
+      "id": "warm-16",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 811,
+      "result": "committed"
+    },
+    {
+      "id": "warm-17",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 885,
+      "result": "committed"
+    },
+    {
+      "id": "warm-18",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "back",
+      "ms": 778,
+      "result": "committed"
+    },
+    {
+      "id": "warm-19",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "reload",
+      "ms": 752,
+      "result": "committed"
+    },
+    {
+      "id": "warm-20",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 780,
+      "result": "committed"
+    },
+    {
+      "id": "warm-21",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 864,
+      "result": "committed"
+    },
+    {
+      "id": "warm-22",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 775,
+      "result": "committed"
+    },
+    {
+      "id": "warm-23",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "back",
+      "ms": 706,
+      "result": "committed"
+    }
+  ]
+}

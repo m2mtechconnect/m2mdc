@@ -92,3 +92,48 @@ retained. Parts 8-11 were not started.
 - AURA_DATA_CENTRE_ROUTE_NOT_CLOSED
 - AURA_NVIDIA_REFERENCE_UI_NOT_CLOSED
 - Phase 3 verdict unchanged.
+
+## Shell/route matrix (this pass) — nested lazy suspension is causal
+
+Harness: `tests/route-stress/route-commit-stress.spec.ts` (now accepts
+`AURA_STRESS_URLS`), dev server, 24 warm navigations per variant, both geometry
+values, direct + Back/Forward + reload, budget 15 s. Navigation discipline: the
+harness is strictly sequential (each navigation awaits a terminal state), so no
+overlapping navigations are possible; the URL was stable during every stall.
+
+| Variant | App shell | Route page | Failures / 24 | p50 |
+| --- | --- | --- | --- | --- |
+| S1 | lazy | lazy minimal | 11 | 842 ms |
+| S2 | eager (static import) | lazy minimal | 0 | 811 ms |
+| S3 | lazy | eager minimal | 0 | 475 ms |
+| S5 | pre-resolved lazy (import kicked off at module scope) | lazy minimal | 7 | 789 ms |
+
+### Proven
+The hang requires **two nested lazy suspensions in the same navigation**: the
+App-level `AuthenticatedShell` lazy AND a route-level lazy page under the shell's
+`Suspense`. Removing either side of the nesting eliminates it completely (S2, S3
+both 0/24). Pre-resolving the shell promise only reduces the rate (7/24), so the
+defect is a lost retry/ping on the inner boundary when the outer boundary retries
+in the same pass — not module-load timing and not any single provider.
+
+Store-churn, provider-peeling, ReferenceRouteGate and Layout isolation were NOT
+needed to reach this boundary and were not run: S3 shows the entire ancestor
+chain (TourProvider → CoPilotProvider → CoPilotCommandProvider → DatasetProvider
+→ Layout → ReferenceRouteGate) commits an eagerly-imported page 24/24 with the
+shell still lazy.
+
+### Not implemented
+No fix was retained. The obvious candidate (eager shell, S2) conflicts with the
+pilot bundle isolation contract enforced by `scripts/pilot-bundle-canary.mjs`,
+which forbids a static `AuthenticatedShell` import from `App.tsx`. A
+non-suspending shell loader was prototyped (S8) and failed 24/24, i.e. the
+prototype was wrong, not the idea; it needs redoing before adoption. All
+temporary variants, the minimal probe page and the loader prototype were removed;
+only the `AURA_STRESS_URLS` parameter on the stress harness is retained.
+
+### Verdicts (unchanged)
+- AURA_SUSPENSE_RETRY_NOT_CLOSED
+- AURA_TEST_HARNESS_NOT_CLOSED
+- AURA_DATA_CENTRE_ROUTE_NOT_CLOSED
+- AURA_NVIDIA_REFERENCE_UI_NOT_CLOSED
+- Phase 3 verdict unchanged.

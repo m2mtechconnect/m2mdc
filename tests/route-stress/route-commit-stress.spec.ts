@@ -71,7 +71,7 @@ async function settle(page: Page): Promise<Omit<Row, 'id' | 'mode' | 'url' | 'na
 test('route-commit stress', async ({ browser }) => {
   test.setTimeout(0);
   const rows: Row[] = [];
-  const urls = ['/data-centre-twin?geometry=aura', '/data-centre-twin?geometry=nvidia-reference'];
+  const urls = (process.env.AURA_STRESS_URLS ?? '/data-centre-twin?geometry=aura,/data-centre-twin?geometry=nvidia-reference').split(',');
 
   for (let i = 0; i < COLD; i++) {
     const context = await browser.newContext();

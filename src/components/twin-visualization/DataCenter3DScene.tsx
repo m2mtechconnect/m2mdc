@@ -73,7 +73,9 @@ import { AssetProvenanceBadge } from './AssetProvenancePanel';
 import { ScenarioRackLayer } from './ScenarioRackLayer';
 import { ReferenceEquipmentLayer } from './ReferenceEquipmentLayer';
 import { AuraFacilityLayer } from './AuraFacilityLayer';
-import { useRuntimeCoverageStore, coverageTotals, provenanceBreakdown } from './runtimeCoverageStore';
+import { useRuntimeCoverageStore, coverageTotals, provenanceBreakdown, previewLabel } from './runtimeCoverageStore';
+import { coverageSessionId, useCoverageSession } from './coverageSession';
+import { REFERENCE_ROLES } from '@/validation/referenceFacility/spec';
 import {
   FACILITY_GEOMETRY_MODES,
   referenceCoverageSummary,
@@ -357,6 +359,28 @@ function Scene({
   const referenceAssetId =
     facilityGeometry === 'nvidia-reference' ? referenceRackAssetId() : null;
 
+  /**
+   * Coverage session: stable semantic identity of this facility plus the
+   * selected geometry mode. Facility, equipment and rack owners all report
+   * into it, and switching geometry or facility clears the previous session.
+   */
+  const coverageSession = useMemo(
+    () =>
+      coverageSessionId({
+        facilityKey: `${mode ?? 'dashboard'}:${rows.length}x${racks.length}`,
+        geometry: facilityGeometry ?? 'aura-model',
+      }),
+    [mode, rows.length, racks.length, facilityGeometry],
+  );
+  const expectedRoles = useMemo(
+    () => (facilityGeometry === 'nvidia-reference' ? REFERENCE_ROLES : []),
+    [facilityGeometry],
+  );
+  useCoverageSession(coverageSession, {
+    expectedRoles,
+    expectedMounts: facilityGeometry === 'nvidia-reference' ? racks.length : 0,
+  });
+
   // Framing that fills the viewport with the hall instead of empty floor.
   const cameraPosition: [number, number, number] = [
     centre[0] + hallRadius * 0.9,
@@ -505,6 +529,7 @@ function Scene({
           showLabels={showLabels !== false}
           canary={canary}
           referenceAssetId={referenceAssetId}
+          sessionId={coverageSession}
           overlayColorFor={(rack) => {
             switch (activeOverlay) {
               case 'thermal':
@@ -535,6 +560,7 @@ function Scene({
           bounds={extents}
           infrastructure={infrastructure}
           band={bandForDistance(targetDistance)}
+          sessionId={coverageSession}
         />
 
         {/* AURA-authored OpenUSD facility derivatives: floor tiles, supply
@@ -552,6 +578,7 @@ function Scene({
                 : shellModeForInfrastructure(infrastructure)
           }
           band={bandForDistance(targetDistance)}
+          sessionId={coverageSession}
         />
         </>
       )}
@@ -707,6 +734,16 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   const proceduralGeometry = useRuntimeCoverageStore((s) => s.procedural);
   // Hybrid provenance: NVIDIA-derived, AURA-authored USD-derived and procedural
   // are counted separately from runtime evidence, never merged into one claim.
+  const referencePreviewLabel = useMemo(
+    () =>
+      previewLabel({
+        derivedObjects: runtimeTotals.mountedObjects + auraFacilityTotals.mountedObjects,
+        proceduralObjects: runtimeTotals.proceduralObjects,
+        lineageVerified: runtimeTotals.uniqueDerivatives > 0,
+      }),
+    [runtimeTotals, auraFacilityTotals],
+  );
+
   const provenance = useMemo(
     () =>
       // Authorship is read from the manifest entry, never inferred from an id.
@@ -994,28 +1031,41 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
         </div>
       </div>
 
-      {/* Top-centre notice stack. Every banner lives in this one column, so
-          disclosures stack vertically instead of landing on top of each other,
-          and the column is inset from both protected side rails. */}
+      {/* Canvas status, top-right: a compact chip that never covers the model.
+          Detail lives behind an expandable disclosure. */}
       <div
-        className={`pointer-events-none absolute left-1/2 z-20 flex w-[min(30rem,calc(100%-32rem))] -translate-x-1/2 flex-col gap-2 ${
+        className={`pointer-events-none absolute right-3 z-20 flex w-[min(26rem,calc(100%-22rem))] flex-col items-end gap-2 ${
           props.hostChromeTop ? 'top-[3.75rem]' : 'top-3'
         }`}
+        data-testid="canvas-top-right-status"
       >
       {props.facilityGeometry === 'nvidia-reference' && (
-        <div
+        <details
           data-testid="reference-facility-banner"
-          className="pointer-events-auto rounded-md border border-emerald-400/50 bg-slate-900/92 px-3 py-2 text-xs text-slate-100"
-          role="status"
+          data-preview-label={referencePreviewLabel}
+          className="pointer-events-auto w-full overflow-hidden rounded-md border border-border bg-card/95 text-xs text-foreground backdrop-blur"
         >
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded bg-emerald-400/20 px-1.5 py-0.5 font-semibold text-emerald-300">
-              REFERENCE
+          <summary
+            className="flex cursor-pointer list-none flex-wrap items-center gap-2 px-2.5 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            data-testid="reference-facility-status-summary"
+          >
+            <span className="rounded bg-accent/15 px-1.5 py-0.5 text-[11px] font-semibold text-accent-foreground">
+              {referencePreviewLabel}
             </span>
-            <span className="font-medium">NVIDIA reference facility</span>
-          </div>
+            <span className="text-[11px] text-muted-foreground">
+              {runtimeTotals.derivedRoles}/{referenceFacilityCoverage().length} roles
+            </span>
+            <span className="text-[11px] text-muted-foreground">
+              {runtimeTotals.mountedObjects + auraFacilityTotals.mountedObjects} objects
+            </span>
+            {runtimeTotals.proceduralObjects > 0 && (
+              <span className="text-[11px] text-muted-foreground">fallback in use</span>
+            )}
+            <span className="ml-auto text-[11px] text-muted-foreground">Details</span>
+          </summary>
+          <div className="border-t border-border px-2.5 py-2 text-muted-foreground">
           <p
-            className="mt-1 text-slate-300"
+            className="mt-1"
             data-testid="reference-facility-coverage"
             data-mounted-logical-objects={runtimeTotals.mountedObjects}
             data-glb-instances={runtimeTotals.glbInstances}
@@ -1031,7 +1081,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             derivative render AURA procedural geometry.
           </p>
           <p
-            className="mt-1 text-slate-300"
+            className="mt-1"
             data-testid="aura-facility-coverage"
             data-mounted-logical-objects={auraFacilityTotals.mountedObjects}
             data-derived-roles={auraFacilityTotals.derivedRoles}
@@ -1046,7 +1096,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             derivative keep AURA procedural geometry.
           </p>
           <p
-            className="mt-1 font-mono text-[11px] text-slate-300"
+            className="mt-1 font-mono text-[11px] text-muted-foreground"
             data-testid="hybrid-provenance-breakdown"
             data-nvidia-derived={provenance.nvidiaDerivedObjects}
             data-aura-usd-derived={provenance.auraUsdDerivedObjects}
@@ -1057,7 +1107,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
           >
             {provenance.label}
           </p>
-          <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-slate-400">
+          <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
             {referenceFacilityCoverage().map((row) => {
               const live = runtimeRoles[row.role];
               const state = live?.state ?? (row.resolved ? 'preparing' : 'not-represented');
@@ -1081,8 +1131,19 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
               );
             })}
           </ul>
-        </div>
+          </div>
+        </details>
       )}
+      </div>
+
+      {/* Top-centre notice stack. Every banner lives in this one column, so
+          disclosures stack vertically instead of landing on top of each other,
+          and the column is inset from both protected side rails. */}
+      <div
+        className={`pointer-events-none absolute left-1/2 z-20 flex w-[min(30rem,calc(100%-32rem))] -translate-x-1/2 flex-col gap-2 ${
+          props.hostChromeTop ? 'top-[3.75rem]' : 'top-3'
+        }`}
+      >
       {scenario && (
         <div
           data-testid="design-scenario-banner"

@@ -119,3 +119,26 @@ export function referenceCoverageSummary(): { mounted: number; total: number; la
     label: `${mounted} of ${rows.length} roles mounted from approved NVIDIA derivatives`,
   };
 }
+
+/**
+ * Canonical typed parser for the `geometry` query parameter.
+ *
+ * `geometry` is the only supported parameter name. An unsupported value falls
+ * back to the baseline mode *and says so*, so a bad deep link is visible
+ * rather than silently rewritten.
+ */
+export const FACILITY_GEOMETRY_PARAM = 'geometry';
+
+export interface ParsedFacilityGeometry {
+  mode: FacilityGeometryMode;
+  /** The raw value when it was present but unsupported. */
+  invalidValue: string | null;
+}
+
+export function parseFacilityGeometryParam(
+  raw: string | null | undefined,
+): ParsedFacilityGeometry {
+  if (raw == null || raw === '') return { mode: 'aura-model', invalidValue: null };
+  if (isFacilityGeometryMode(raw)) return { mode: raw, invalidValue: null };
+  return { mode: 'aura-model', invalidValue: raw };
+}

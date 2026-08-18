@@ -11,6 +11,11 @@ import { ModelPreview } from "@/components/builder/ModelPreview";
 import { ROICalculator } from "@/components/builder/ROICalculator";
 import { GroundedRecommendationsCard } from "@/components/builder/GroundedRecommendationsCard";
 import { DeployReadinessChecks } from "@/components/deploy/DeployReadinessChecks";
+import {
+  openDeployment,
+  appendDeploymentEvent,
+  closeDeployment,
+} from "@/workspace/deploymentRecords";
 import { SimulationChecklist } from "@/components/simulation/SimulationChecklist";
 import { 
   CheckCircle2, 

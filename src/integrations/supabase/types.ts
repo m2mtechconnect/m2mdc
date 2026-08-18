@@ -2611,59 +2611,111 @@ export type Database = {
       decision_records: {
         Row: {
           approver: string
+          authored_by: string
           comment: string | null
           created_at: string
           data_mode: string
           decided_at: string
+          decision_hash: string | null
+          decision_status: string
           escalated_to: string | null
+          evidence_schema_version: string
           evidence_snapshot: Json
           execution_status: string
           id: string
+          idempotency_key: string | null
           observation_tick: number
           outcome: string
+          prior_decision_hash: string | null
+          prior_decision_id: string | null
           rationale: string
           recommendation_id: string
+          run_id: string | null
           snapshot_hash: string
+          supersedes_decision_id: string | null
+          tenant_id: string | null
           timeline_id: string
           user_id: string
         }
         Insert: {
           approver: string
+          authored_by?: string
           comment?: string | null
           created_at?: string
           data_mode: string
           decided_at: string
+          decision_hash?: string | null
+          decision_status?: string
           escalated_to?: string | null
+          evidence_schema_version?: string
           evidence_snapshot: Json
           execution_status?: string
           id?: string
+          idempotency_key?: string | null
           observation_tick: number
           outcome: string
+          prior_decision_hash?: string | null
+          prior_decision_id?: string | null
           rationale: string
           recommendation_id: string
+          run_id?: string | null
           snapshot_hash: string
+          supersedes_decision_id?: string | null
+          tenant_id?: string | null
           timeline_id: string
           user_id?: string
         }
         Update: {
           approver?: string
+          authored_by?: string
           comment?: string | null
           created_at?: string
           data_mode?: string
           decided_at?: string
+          decision_hash?: string | null
+          decision_status?: string
           escalated_to?: string | null
+          evidence_schema_version?: string
           evidence_snapshot?: Json
           execution_status?: string
           id?: string
+          idempotency_key?: string | null
           observation_tick?: number
           outcome?: string
+          prior_decision_hash?: string | null
+          prior_decision_id?: string | null
           rationale?: string
           recommendation_id?: string
+          run_id?: string | null
           snapshot_hash?: string
+          supersedes_decision_id?: string | null
+          tenant_id?: string | null
           timeline_id?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "decision_records_prior_decision_id_fkey"
+            columns: ["prior_decision_id"]
+            isOneToOne: false
+            referencedRelation: "decision_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "decision_records_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "simulation_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "decision_records_supersedes_decision_id_fkey"
+            columns: ["supersedes_decision_id"]
+            isOneToOne: false
+            referencedRelation: "decision_records"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       departments: {
         Row: {
@@ -5317,102 +5369,187 @@ export type Database = {
       }
       simulation_runs: {
         Row: {
+          actual_provider: string | null
+          attempt: number
           baseline_kpis: Json | null
           blueprint_id: string | null
           blueprint_version: string | null
+          canonical_schema_version: string | null
           checksum: string | null
+          configuration_hash: string | null
           created_at: string
           duration_ms: number | null
           engine_version: string
           error_detail: string | null
           events: Json | null
           execution_origin: string
+          external_job_id: string | null
+          failure_code: string | null
+          failure_message: string | null
           final_kpis: Json | null
           finished_at: string | null
           id: string
           idempotency_key: string | null
+          input_hash: string | null
           input_snapshot: Json
           kpi_snapshots: Json | null
+          lifecycle_status: string | null
+          measured_duration_ms: number | null
           metadata: Json | null
           metric_provenance: Json
+          outcome_execution_class: string | null
+          output_hash: string | null
           output_snapshot: Json
+          prng_version: string | null
+          provenance_envelope: Json
+          provider_version: string | null
+          requested_execution_class: string | null
+          requested_provider: string | null
+          retry_of_run_id: string | null
+          run_intent: string | null
           run_key: string | null
           run_label: string | null
           scenario_key: string
           scenario_name: string | null
           scenario_type: string
+          seed: string | null
+          seed_derivation_version: string | null
+          server_created_at: string
           started_at: string
           status: string
+          telemetry_snapshot_hash: string | null
+          telemetry_snapshot_id: string | null
+          tenant_id: string | null
           twin_id: string
           updated_at: string
           user_id: string
           validation_status: string
+          verification_level: string | null
         }
         Insert: {
+          actual_provider?: string | null
+          attempt?: number
           baseline_kpis?: Json | null
           blueprint_id?: string | null
           blueprint_version?: string | null
+          canonical_schema_version?: string | null
           checksum?: string | null
+          configuration_hash?: string | null
           created_at?: string
           duration_ms?: number | null
           engine_version?: string
           error_detail?: string | null
           events?: Json | null
           execution_origin?: string
+          external_job_id?: string | null
+          failure_code?: string | null
+          failure_message?: string | null
           final_kpis?: Json | null
           finished_at?: string | null
           id?: string
           idempotency_key?: string | null
+          input_hash?: string | null
           input_snapshot?: Json
           kpi_snapshots?: Json | null
+          lifecycle_status?: string | null
+          measured_duration_ms?: number | null
           metadata?: Json | null
           metric_provenance?: Json
+          outcome_execution_class?: string | null
+          output_hash?: string | null
           output_snapshot?: Json
+          prng_version?: string | null
+          provenance_envelope?: Json
+          provider_version?: string | null
+          requested_execution_class?: string | null
+          requested_provider?: string | null
+          retry_of_run_id?: string | null
+          run_intent?: string | null
           run_key?: string | null
           run_label?: string | null
           scenario_key: string
           scenario_name?: string | null
           scenario_type?: string
+          seed?: string | null
+          seed_derivation_version?: string | null
+          server_created_at?: string
           started_at?: string
           status?: string
+          telemetry_snapshot_hash?: string | null
+          telemetry_snapshot_id?: string | null
+          tenant_id?: string | null
           twin_id: string
           updated_at?: string
           user_id: string
           validation_status?: string
+          verification_level?: string | null
         }
         Update: {
+          actual_provider?: string | null
+          attempt?: number
           baseline_kpis?: Json | null
           blueprint_id?: string | null
           blueprint_version?: string | null
+          canonical_schema_version?: string | null
           checksum?: string | null
+          configuration_hash?: string | null
           created_at?: string
           duration_ms?: number | null
           engine_version?: string
           error_detail?: string | null
           events?: Json | null
           execution_origin?: string
+          external_job_id?: string | null
+          failure_code?: string | null
+          failure_message?: string | null
           final_kpis?: Json | null
           finished_at?: string | null
           id?: string
           idempotency_key?: string | null
+          input_hash?: string | null
           input_snapshot?: Json
           kpi_snapshots?: Json | null
+          lifecycle_status?: string | null
+          measured_duration_ms?: number | null
           metadata?: Json | null
           metric_provenance?: Json
+          outcome_execution_class?: string | null
+          output_hash?: string | null
           output_snapshot?: Json
+          prng_version?: string | null
+          provenance_envelope?: Json
+          provider_version?: string | null
+          requested_execution_class?: string | null
+          requested_provider?: string | null
+          retry_of_run_id?: string | null
+          run_intent?: string | null
           run_key?: string | null
           run_label?: string | null
           scenario_key?: string
           scenario_name?: string | null
           scenario_type?: string
+          seed?: string | null
+          seed_derivation_version?: string | null
+          server_created_at?: string
           started_at?: string
           status?: string
+          telemetry_snapshot_hash?: string | null
+          telemetry_snapshot_id?: string | null
+          tenant_id?: string | null
           twin_id?: string
           updated_at?: string
           user_id?: string
           validation_status?: string
+          verification_level?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "simulation_runs_retry_of_run_id_fkey"
+            columns: ["retry_of_run_id"]
+            isOneToOne: false
+            referencedRelation: "simulation_runs"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "simulation_runs_twin_id_fkey"
             columns: ["twin_id"]

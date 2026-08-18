@@ -136,6 +136,36 @@ export default tseslint.config(
     },
   },
   {
+    // Phase 3 truth chain — the legacy simulation snapshot store is a
+    // compatibility selector, not a source of run identity. Only the
+    // enumerated adapters below may import it; everything else must read the
+    // canonical persisted run from @/truth/canonicalRunStore.
+    files: ["src/**/*.{ts,tsx}", "tests/**/*.{ts,tsx}"],
+    ignores: [
+      "src/capabilities/runProvenance.ts",
+      "src/components/simulation/DCSimulationPanel.tsx",
+      "src/components/simulation/ScenarioSimulationPanel.tsx",
+      "src/components/simulation/SimulationBlueprintSnapshotPanel.tsx",
+      "src/stores/simulationSnapshotStore.ts",
+      "**/__tests__/**/*.{ts,tsx}",
+      "**/*.test.{ts,tsx}",
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@/stores/simulationSnapshotStore",
+              message:
+                "The legacy snapshot store is a compatibility selector. Read the canonical persisted run from @/truth/canonicalRunStore (simulation_runs.id is the only run identity).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     // Test doubles legitimately model untyped third-party surfaces.
     files: ["**/__tests__/**/*.{ts,tsx}", "**/*.test.{ts,tsx}"],
     rules: {

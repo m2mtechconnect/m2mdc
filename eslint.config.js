@@ -56,6 +56,13 @@ export default tseslint.config(
     },
   },
   {
+    // Test doubles legitimately model untyped third-party surfaces.
+    files: ["**/__tests__/**/*.{ts,tsx}", "**/*.test.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "warn",
+    },
+  },
+  {
     // Phase 1A.3.g.1 — narrow override. Playwright's `test.extend`
     // fixture callbacks use argument names like `context`, `page`, and
     // `guard`, and call `use(...)` inside them. `eslint-plugin-react-hooks`

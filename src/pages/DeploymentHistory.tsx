@@ -40,6 +40,10 @@ import { DCCard } from "@/components/dc-ui/DCCard";
 import { PagePurpose } from "@/components/capability/PagePurpose";
 import { DCSectionHeader } from "@/components/dc-ui/DCSectionHeader";
 import { DCKPITile } from "@/components/dc-ui/DCKPITile";
+import {
+  listDeploymentEvents,
+  type DeploymentEventRecord,
+} from "@/workspace/deploymentRecords";
 
 interface Deployment {
   id: string;
@@ -69,6 +73,31 @@ export default function DeploymentHistory() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [healthFilter, setHealthFilter] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [events, setEvents] = useState<DeploymentEventRecord[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(false);
+
+  // Phase 9: the step log is the immutable evidence for a deployment.
+  const toggleEvents = async (deploymentId: string) => {
+    if (expandedId === deploymentId) {
+      setExpandedId(null);
+      return;
+    }
+    setExpandedId(deploymentId);
+    setEvents([]);
+    setEventsLoading(true);
+    try {
+      setEvents(await listDeploymentEvents(deploymentId));
+    } catch (error: any) {
+      toast({
+        title: "Failed to load deployment steps",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setEventsLoading(false);
+    }
+  };
 
   useEffect(() => {
     loadDeploymentHistory();
@@ -409,6 +438,10 @@ export default function DeploymentHistory() {
                       </div>
                     </TableCell>
                   </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
                 ))
               )}
             </TableBody>

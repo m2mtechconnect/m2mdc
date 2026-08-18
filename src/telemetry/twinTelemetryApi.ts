@@ -208,11 +208,10 @@ export function formatReadingValue(reading: TwinPropertyReading): string {
   return reading.valueText ?? '-';
 }
 
-/** Minimal shape of a Postgrest-style query builder; chaining is dynamic. */
-export type TelemetryQueryBuilder = Record<string, (...args: never[]) => unknown> & PromiseLike<unknown>;
-
 export interface TelemetryClient {
-  from: (table: string) => TelemetryQueryBuilder;
+  /** Postgrest-style builder; chaining is dynamic, rows are narrowed on read. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic query builder
+  from: (table: string) => any;
 }
 
 export interface FetchTelemetryOptions extends ResolveOptions {

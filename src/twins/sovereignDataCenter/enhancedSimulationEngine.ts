@@ -4,6 +4,14 @@
  */
 
 import type { 
+
+/**
+ * Heterogeneous event listener. The concrete argument shapes are enforced by
+ * the public `on(...)` overloads; this alias only exists for the internal
+ * registry and the overload implementation signature.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- overload implementation signature
+type AnyEventListener = (...args: any[]) => void;
   SovereignKpis, 
   SimulationType, 
   SovereignDCFacility,
@@ -590,7 +598,7 @@ export class EnhancedSimulationRunner {
   private tick: number = 0;
   private intervalId: number | null = null;
   private speed: number = 1;
-  private listeners: Map<string, ((...args: unknown[]) => void)[]> = new Map();
+  private listeners: Map<string, (AnyEventListener)[]> = new Map();
   private runHistory: SimulationSummary[] = [];
 
   constructor(scenario: EnhancedScenario, baselineKpis?: Record<string, number>) {
@@ -610,7 +618,7 @@ export class EnhancedSimulationRunner {
     this.currentKpis = { ...this.baselineKpis };
   }
 
-  on(event: string, callback: (...args: unknown[]) => void): void {
+  on(event: string, callback: AnyEventListener): void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, []);
     }

@@ -1,3 +1,11 @@
+
+/**
+ * Heterogeneous event listener. The concrete argument shapes are enforced by
+ * the public `on(...)` overloads; this alias only exists for the internal
+ * registry and the overload implementation signature.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- overload implementation signature
+type AnyEventListener = (...args: any[]) => void;
 /**
  * Mock Simulation Engine - Preview Data Generator
  * Uses simulation_preview_config from template to show realistic simulations
@@ -48,7 +56,7 @@ export class MockSimulationEngine {
   private tick: number = 0;
   private baseTickInterval = 1000; // 1 second base interval
   private events: SimulationEvent[] = [];
-  private listeners: Map<string, ((...args: unknown[]) => void)[]> = new Map();
+  private listeners: Map<string, (AnyEventListener)[]> = new Map();
   private currentScenarioData: any;
   private eventIndex = 0;
 
@@ -79,7 +87,7 @@ export class MockSimulationEngine {
   on(event: 'event', callback: EventListener): void;
   on(event: 'kpi-update', callback: KPIListener): void;
   on(event: 'complete' | 'error', callback: CompleteListener): void;
-  on(event: string, callback: (...args: unknown[]) => void): void {
+  on(event: string, callback: AnyEventListener): void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, []);
     }

@@ -21,7 +21,8 @@ import type {
 const db = supabase as unknown as {
   // Chaining on the Postgrest builder is dynamic; the concrete row shapes are
   // asserted at each call site below.
-  from: (table: string) => Record<string, (...args: never[]) => unknown> & PromiseLike<unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped generated tables
+  from: (table: string) => any;
   functions: typeof supabase.functions;
 };
 

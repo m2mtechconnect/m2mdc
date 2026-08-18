@@ -33,9 +33,7 @@ import { LoadingState, NoTwinSelectedEmptyState } from '@/components/ui/empty-st
 import { ModeBadge, SnapshotBadge } from '@/components/ui/snapshot-indicator';
 
 export default function DataCentreTwin() {
-  (window as any).__dctRender = ((window as any).__dctRender ?? 0) + 1;
   const { t } = useTranslation();
-  (window as any).__dctAfterI18n = ((window as any).__dctAfterI18n ?? 0) + 1;
   const { id } = useParams<{ id?: string }>();
   const [searchParams] = useSearchParams();
   const { twin, activeTwinId, setActiveTwin, isLoading, twins, isInitialized } = useActiveTwin();

@@ -39,71 +39,58 @@ import NotFound from "./pages/NotFound";
  * Only Dashboard (the post-login landing route) and NotFound stay eager.
  * Everything else is fetched when its route is first visited.
  */
-
-// TEMP DIAGNOSTIC
-const __lazyState: Record<string, string> = ((window as any).__lazyState = {});
-function tlazy(name: string, fn: () => Promise<any>) {
-  return lazy(() => {
-    __lazyState[name] = 'pending';
-    return fn().then(
-      (m) => { __lazyState[name] = 'resolved'; return m; },
-      (e) => { __lazyState[name] = 'rejected:' + String(e); throw e; },
-    );
-  });
-}
-
-const Builder = tlazy("Builder", () => import("./pages/Builder"));
-const Deploy = tlazy("Deploy", () => import("./pages/Deploy"));
-const DeploymentHistory = tlazy("DeploymentHistory", () => import("./pages/DeploymentHistory"));
-const IntelligenceDashboard = tlazy("IntelligenceDashboard", () => import("./pages/IntelligenceDashboard"));
-const Compliance = tlazy("Compliance", () => import("./pages/Compliance"));
-const Teams = tlazy("Teams", () => import("./pages/Teams"));
-const Marketplace = tlazy("Marketplace", () => import("./pages/Marketplace"));
-const Help = tlazy("Help", () => import("./pages/Help"));
-const Search = tlazy("Search", () => import("./pages/Search"));
-const AISettings = tlazy("AISettings", () => import("./pages/AISettings"));
-const Connections = tlazy("Connections", () => import("./pages/Connections"));
-const ManageFacilities = tlazy("ManageFacilities", () => import("./pages/manage/Facilities"));
+const Builder = lazy(() => import("./pages/Builder"));
+const Deploy = lazy(() => import("./pages/Deploy"));
+const DeploymentHistory = lazy(() => import("./pages/DeploymentHistory"));
+const IntelligenceDashboard = lazy(() => import("./pages/IntelligenceDashboard"));
+const Compliance = lazy(() => import("./pages/Compliance"));
+const Teams = lazy(() => import("./pages/Teams"));
+const Marketplace = lazy(() => import("./pages/Marketplace"));
+const Help = lazy(() => import("./pages/Help"));
+const Search = lazy(() => import("./pages/Search"));
+const AISettings = lazy(() => import("./pages/AISettings"));
+const Connections = lazy(() => import("./pages/Connections"));
+const ManageFacilities = lazy(() => import("./pages/manage/Facilities"));
 const SignOut = lazy(() =>
   import("./pages/auth/index").then((m) => ({ default: m.SignOut })),
 );
-const AgentWorkspace = tlazy("AgentWorkspace", () => import("./pages/AgentWorkspace"));
-const AgentChat = tlazy("AgentChat", () => import("./pages/AgentChat"));
-const Playbook = tlazy("Playbook", () => import("./pages/Playbook"));
-const FundingIntakeDemo = tlazy("FundingIntakeDemo", () => import("./pages/FundingIntakeDemo"));
-const ManageAgents = tlazy("ManageAgents", () => import("./pages/ManageAgents"));
-const SystemManage = tlazy("SystemManage", () => import("./pages/SystemManage"));
-const TwinManage = tlazy("TwinManage", () => import("./pages/TwinManage"));
-const DataCentreTwin = tlazy("DataCentreTwin", () => import("./pages/DataCentreTwin"));
-const Blueprint = tlazy("Blueprint", () => import("./pages/Blueprint"));
-const BlueprintPreview = tlazy("BlueprintPreview", () => import("./pages/BlueprintPreview"));
-const SimulationPreview = tlazy("SimulationPreview", () => import("./pages/SimulationPreview"));
-const AuraWorkspace = tlazy("AuraWorkspace", () => import("./workspace/AuraWorkspace"));
-const InfrastructurePage = tlazy("InfrastructurePage", () => import("./pages/InfrastructurePage"));
-const TwinPreview = tlazy("TwinPreview", () => import("./pages/TwinPreview"));
-const TwinDebug = tlazy("TwinDebug", () => import("./pages/TwinDebug"));
-const AgentDetail = tlazy("AgentDetail", () => import("./pages/AgentDetail"));
-const Profile = tlazy("Profile", () => import("./pages/account/Profile"));
-const Settings = tlazy("Settings", () => import("./pages/account/Settings"));
-const AccessControl = tlazy("AccessControl", () => import("./pages/account/AccessControl"));
+const AgentWorkspace = lazy(() => import("./pages/AgentWorkspace"));
+const AgentChat = lazy(() => import("./pages/AgentChat"));
+const Playbook = lazy(() => import("./pages/Playbook"));
+const FundingIntakeDemo = lazy(() => import("./pages/FundingIntakeDemo"));
+const ManageAgents = lazy(() => import("./pages/ManageAgents"));
+const SystemManage = lazy(() => import("./pages/SystemManage"));
+const TwinManage = lazy(() => import("./pages/TwinManage"));
+const DataCentreTwin = lazy(() => import("./pages/DataCentreTwin"));
+const Blueprint = lazy(() => import("./pages/Blueprint"));
+const BlueprintPreview = lazy(() => import("./pages/BlueprintPreview"));
+const SimulationPreview = lazy(() => import("./pages/SimulationPreview"));
+const AuraWorkspace = lazy(() => import("./workspace/AuraWorkspace"));
+const InfrastructurePage = lazy(() => import("./pages/InfrastructurePage"));
+const TwinPreview = lazy(() => import("./pages/TwinPreview"));
+const TwinDebug = lazy(() => import("./pages/TwinDebug"));
+const AgentDetail = lazy(() => import("./pages/AgentDetail"));
+const Profile = lazy(() => import("./pages/account/Profile"));
+const Settings = lazy(() => import("./pages/account/Settings"));
+const AccessControl = lazy(() => import("./pages/account/AccessControl"));
 
 /* Administration console - lazy AND permission-gated (AdminRouteGuard). */
-const OnboardingSubmissions = tlazy("OnboardingSubmissions", () => import("./pages/OnboardingSubmissions"));
-const AdminUserApproval = tlazy("AdminUserApproval", () => import("./pages/AdminUserApproval"));
-const AdminSignupsDashboard = tlazy("AdminSignupsDashboard", () => import("./pages/AdminSignupsDashboard"));
-const PlatformReadiness = tlazy("PlatformReadiness", () => import("./pages/admin/PlatformReadiness"));
-const AssetPreview = tlazy("AssetPreview", () => import("@/pages/admin/AssetPreview"));
-const AssetPipeline = tlazy("AssetPipeline", () => import("@/pages/admin/AssetPipeline"));
-const AssetValidation = tlazy("AssetValidation", () => import("@/pages/admin/AssetValidation"));
+const OnboardingSubmissions = lazy(() => import("./pages/OnboardingSubmissions"));
+const AdminUserApproval = lazy(() => import("./pages/AdminUserApproval"));
+const AdminSignupsDashboard = lazy(() => import("./pages/AdminSignupsDashboard"));
+const PlatformReadiness = lazy(() => import("./pages/admin/PlatformReadiness"));
+const AssetPreview = lazy(() => import("@/pages/admin/AssetPreview"));
+const AssetPipeline = lazy(() => import("@/pages/admin/AssetPipeline"));
+const AssetValidation = lazy(() => import("@/pages/admin/AssetValidation"));
 const ReferenceFacilityValidation = lazy(
   () => import("@/pages/admin/ReferenceFacilityValidation"),
 );
 const DsxCapabilityRegistryPage = lazy(
   () => import("@/pages/admin/DsxCapabilityRegistryPage"),
 );
-const DatasetRegistryPage = tlazy("DatasetRegistryPage", () => import("@/pages/admin/DatasetRegistryPage"));
+const DatasetRegistryPage = lazy(() => import("@/pages/admin/DatasetRegistryPage"));
 
-const EvidenceBetaShell = tlazy("EvidenceBetaShell", () => import("./pages/dsx/EvidenceBetaShell"));
+const EvidenceBetaShell = lazy(() => import("./pages/dsx/EvidenceBetaShell"));
 const OverviewWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.OverviewWorkspace })));
 const SimulationsWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.SimulationsWorkspace })));
 const ThermalWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.ThermalWorkspace })));

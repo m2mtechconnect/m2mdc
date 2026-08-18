@@ -48,6 +48,7 @@ import type {
   ScenarioDefinition,
   RackMetrics,
 } from './types';
+import { deriveSeed, mulberry32, type SeededRandom } from './orchestrator/prng';
 
 // KPI metadata for result generation
 const KPI_METADATA: Record<string, { label: string; unit: string; higherIsBetter: boolean }> = {

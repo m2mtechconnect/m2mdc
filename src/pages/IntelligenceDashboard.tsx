@@ -63,7 +63,6 @@ import { useBlueprintKPIs } from '@/hooks/useBlueprintKPIs';
 import { DcToolsStrip } from '@/components/dc-tools';
 import { SovereigntyAnalyticsTab } from '@/components/telemetry/SovereigntyAnalyticsTab';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
-import { useTwinTelemetry, useTwinKPIs } from '@/hooks/useTwinData';
 import { useTwinKPIsFromSimulation } from '@/hooks/useTwinKPIsFromSimulation';
 import { useAgentKPIBindings } from '@/hooks/useTwinAgentsCatalog';
 import { KPI_CATALOG, KPIKey } from '@/domain/greenDc/kpiCatalog';
@@ -162,10 +161,6 @@ export default function IntelligenceDashboard() {
 
   // Twin context for scoped data
   const { twin, activeTwinId: twinId, twins } = useActiveTwin();
-  
-  // Twin-scoped telemetry and KPIs
-  const { data: twinTelemetry } = useTwinTelemetry();
-  const { data: twinKpis } = useTwinKPIs();
   
   // Get KPIs from simulation runs (single source of truth)
   const { kpis: simulationKpis, kpiValues, loading: kpisLoading } = useTwinKPIsFromSimulation(twinId || undefined);

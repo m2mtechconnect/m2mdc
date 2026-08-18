@@ -29,14 +29,15 @@ import {
 } from 'lucide-react';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { 
-  useTwinTelemetry, 
-  useTwinKPIs, 
   useTwinSimulations,
   useTwinAgents,
   useTwinSovereigntyEvents,
   useTwinCarbonEmissions,
   useTwinFinancials
 } from '@/hooks/useTwinData';
+import { useFacilityTelemetry } from '@/telemetry/useFacilityTelemetry';
+import { formatReadingValue } from '@/telemetry/twinTelemetryApi';
+import { useTwinKPIsFromSimulation } from '@/hooks/useTwinKPIsFromSimulation';
 import { getRegionByCode } from '@/data/regions';
 import { useToast } from '@/hooks/use-toast';
 
@@ -56,9 +57,11 @@ export default function TwinDebug() {
   const { toast } = useToast();
   const [queryLogs, setQueryLogs] = useState<QueryLog[]>([]);
 
-  // Fetch all twin-scoped data for testing
-  const telemetry = useTwinTelemetry();
-  const kpis = useTwinKPIs();
+  // Fetch all twin-scoped data for testing.
+  // Phase 11: observed readings come from `twin_property_values`, KPIs from
+  // the canonical `simulation_runs` envelope.
+  const telemetry = useFacilityTelemetry(twinId);
+  const kpis = useTwinKPIsFromSimulation(twinId || undefined);
   const simulations = useTwinSimulations();
   const agents = useTwinAgents();
   const sovereignty = useTwinSovereigntyEvents({ limit: 50 });
@@ -68,8 +71,8 @@ export default function TwinDebug() {
   // Log query status
   useEffect(() => {
     const newLogs: QueryLog[] = [
-      { id: 'telemetry', timestamp: new Date(), table: 'twin_telemetry', twinId, status: telemetry.isLoading ? 'pending' : telemetry.error ? 'error' : 'success', error: telemetry.error?.message },
-      { id: 'kpis', timestamp: new Date(), table: 'twin_kpi_snapshots', twinId, status: kpis.isLoading ? 'pending' : kpis.error ? 'error' : 'success', error: kpis.error?.message },
+      { id: 'telemetry', timestamp: new Date(), table: 'twin_property_values', twinId, status: telemetry.isLoading ? 'pending' : (telemetry.error || telemetry.data?.error) ? 'error' : 'success', error: telemetry.error?.message ?? telemetry.data?.error ?? undefined },
+      { id: 'kpis', timestamp: new Date(), table: 'simulation_runs', twinId, status: kpis.loading ? 'pending' : kpis.error ? 'error' : 'success', error: kpis.error?.message },
       { id: 'simulations', timestamp: new Date(), table: 'simulation_runs', twinId, status: simulations.isLoading ? 'pending' : simulations.error ? 'error' : 'success', error: simulations.error?.message },
       { id: 'agents', timestamp: new Date(), table: 'agent_definitions', twinId, status: agents.isLoading ? 'pending' : agents.error ? 'error' : 'success', error: agents.error?.message },
       { id: 'sovereignty', timestamp: new Date(), table: 'twin_sovereignty_events', twinId, status: sovereignty.isLoading ? 'pending' : sovereignty.error ? 'error' : 'success', error: sovereignty.error?.message },
@@ -77,7 +80,7 @@ export default function TwinDebug() {
       { id: 'financials', timestamp: new Date(), table: 'twin_financial_records', twinId, status: financials.isLoading ? 'pending' : financials.error ? 'error' : 'success', error: financials.error?.message },
     ];
     setQueryLogs(newLogs);
-  }, [telemetry.status, kpis.status, simulations.status, agents.status, sovereignty.status, carbon.status, financials.status, twinId]);
+  }, [telemetry.status, kpis.loading, kpis.error, simulations.status, agents.status, sovereignty.status, carbon.status, financials.status, twinId]);
 
   const region = twin ? getRegionByCode(twin.region_code) : null;
 
@@ -226,30 +229,30 @@ export default function TwinDebug() {
         <TabsContent value="telemetry">
           <Card>
             <CardHeader>
-              <CardTitle>Telemetry Sources ({telemetry.data?.length || 0} records)</CardTitle>
+              <CardTitle>Telemetry Sources ({telemetry.data?.readings.length || 0} records)</CardTitle>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[400px]">
-                {telemetry.data && telemetry.data.length > 0 ? (
+                {telemetry.data && telemetry.data.readings.length > 0 ? (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Domain</TableHead>
-                        <TableHead>Metric</TableHead>
+                        <TableHead>Provenance</TableHead>
+                        <TableHead>Property</TableHead>
                         <TableHead>Value</TableHead>
-                        <TableHead>Recorded</TableHead>
+                        <TableHead>Observed</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {telemetry.data.slice(0, 50).map((t: any) => (
+                      {telemetry.data.readings.slice(0, 50).map((t) => (
                         <TableRow key={t.id}>
                           <TableCell>
-                            <Badge variant="outline">{t.domain}</Badge>
+                            <Badge variant="outline">{t.provenanceClass}</Badge>
                           </TableCell>
-                          <TableCell className="font-mono text-sm">{t.metric_key}</TableCell>
-                          <TableCell>{t.metric_value}</TableCell>
+                          <TableCell className="font-mono text-sm">{t.targetProperty}</TableCell>
+                          <TableCell>{formatReadingValue(t)}</TableCell>
                           <TableCell className="text-sm text-muted-foreground">
-                            {new Date(t.recorded_at).toLocaleString()}
+                            {t.observedAt ? new Date(t.observedAt).toLocaleString() : '-'}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -257,7 +260,7 @@ export default function TwinDebug() {
                   </Table>
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
-                    No telemetry data for this twin yet.
+                    No ingested readings recorded for this twin yet.
                   </div>
                 )}
               </ScrollArea>

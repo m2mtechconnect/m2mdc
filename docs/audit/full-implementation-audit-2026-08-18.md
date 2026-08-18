@@ -119,6 +119,14 @@ address, and `agent_definitions` lacking the org-sharing policy its sibling
 a user who edits their profile email to a pending invitee address can read that
 invite row.
 
+### 8a. `agent_definitions` - RESOLVED 2026-08-18
+
+The table had no Data API GRANTs at all and its policies were bound to the
+`public` role. It now grants `authenticated`/`service_role` explicitly, and the
+policy set is: read for system defaults, own rows, or rows sharing the caller's
+`profiles.org_id` (new `org_id` column, mirroring `agents`); write limited to
+the owner and blocked on `is_system_default` rows. Anonymous access removed.
+
 ## Recommended order of work
 
 1. Fabricated telemetry on live routes (section 4) - truth violation, and one

@@ -2,7 +2,7 @@
  * Network Domain View - Network monitoring
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -14,6 +14,7 @@ import type { DataCentreFacility } from '@/types/dataCenterTwin';
 import { DomainProvenanceHeader } from '@/components/provenance/DomainProvenanceHeader';
 import { MetricProvenanceManifest } from '@/components/provenance/MetricProvenanceManifest';
 import { NETWORK_METRICS } from './metricCatalogs';
+import { mulberry32, deriveSeed } from '@/simulation/orchestrator/prng';
 
 interface NetworkDomainViewProps {
   facility: DataCentreFacility;
@@ -22,30 +23,39 @@ interface NetworkDomainViewProps {
 type SwitchType = 'all' | 'ToR' | 'Spine' | 'Leaf';
 type StatusFilter = 'all' | 'normal' | 'warning' | 'critical';
 
-// Generate more switches for demo
-const generateSwitches = (baseSwitches: any[]) => {
+/**
+ * Demo fabric padding.
+ *
+ * Truth rule: this surface is classified `demo` (see DomainProvenanceHeader
+ * below). It must never call `Math.random()` — values are derived from the
+ * seeded `mulberry32-v1` generator so the same facility always renders the
+ * same fabric across renders, reloads and screenshots.
+ */
+const generateSwitches = (baseSwitches: any[], seedText: string) => {
   const switchTypes = ['ToR', 'Spine', 'Leaf'];
   const allSwitches = [...baseSwitches];
-  
+  const rand = mulberry32(deriveSeed(`network-fabric:${seedText}`));
+
   for (let i = baseSwitches.length; i < 24; i++) {
     const type = switchTypes[i % 3];
-    const hasWarning = Math.random() > 0.8;
-    const hasCritical = Math.random() > 0.95;
+    const hasWarning = rand() > 0.8;
+    const hasCritical = rand() > 0.95;
+    const portCount = Math.floor(rand() * 24) + 24;
     allSwitches.push({
       id: `sw-${i + 1}`,
       name: `${type} Switch ${i + 1}`,
       type,
       status: hasCritical ? 'critical' : hasWarning ? 'warning' : 'normal',
-      cpuUtilization: Math.floor(Math.random() * 60) + 20,
-      memoryUtilization: Math.floor(Math.random() * 50) + 30,
-      temperature: Math.floor(Math.random() * 20) + 25,
-      uptime: Math.floor(Math.random() * 86400) + 3600,
-      ports: Array.from({ length: Math.floor(Math.random() * 24) + 24 }, (_, j) => ({
+      cpuUtilization: Math.floor(rand() * 60) + 20,
+      memoryUtilization: Math.floor(rand() * 50) + 30,
+      temperature: Math.floor(rand() * 20) + 25,
+      uptime: Math.floor(rand() * 86400) + 3600,
+      ports: Array.from({ length: portCount }, (_, j) => ({
         id: `port-${j}`,
-        status: Math.random() > 0.1 ? 'up' : 'down',
-        utilizationPct: Math.random() * 100,
-        packetErrors: Math.floor(Math.random() * 5),
-        crcErrors: Math.floor(Math.random() * 2),
+        status: rand() > 0.1 ? 'up' : 'down',
+        utilizationPct: rand() * 100,
+        packetErrors: Math.floor(rand() * 5),
+        crcErrors: Math.floor(rand() * 2),
       })),
     });
   }
@@ -59,7 +69,10 @@ export function NetworkDomainView({ facility }: NetworkDomainViewProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
   const baseSwitches = facility.network.switches;
-  const allSwitches = generateSwitches(baseSwitches);
+  const allSwitches = useMemo(
+    () => generateSwitches(baseSwitches, facility.id ?? facility.name ?? 'facility'),
+    [baseSwitches, facility.id, facility.name],
+  );
   
   // Apply filters
   const switches = allSwitches.filter(sw => {

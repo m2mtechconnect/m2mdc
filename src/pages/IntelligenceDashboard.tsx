@@ -244,10 +244,13 @@ export default function IntelligenceDashboard() {
       return {
         ...sys,
         department: config?.department || 'Unknown',
-        roi: Math.floor(Math.random() * 400) + 100,
-        accuracy: Math.floor(Math.random() * 20) + 80,
-        total_runs: Math.floor(Math.random() * 10000),
-        last_updated: new Date().toISOString(),
+        // Truth rule: ROI, accuracy and run counts are not measured for these
+        // systems yet. They stay undefined so the UI renders "not available"
+        // instead of a fabricated figure.
+        roi: undefined,
+        accuracy: undefined,
+        total_runs: undefined,
+        last_updated: sys.updated_at ?? undefined,
         tags: [config?.department || 'General', sys.environment, sys.status]
       };
     });

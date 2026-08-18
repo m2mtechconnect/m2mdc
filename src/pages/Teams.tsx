@@ -152,7 +152,9 @@ export default function Teams() {
           role: userRole?.role || "engineer",
           email: profile.email || "",
           status: "active",
-          lastActive: Math.random() > 0.5 ? "Online" : (() => { const h = Math.floor(Math.random() * 5 + 1); return `${h} ${h === 1 ? 'hour' : 'hours'} ago`; })(),
+          // Truth rule: last-active is not tracked yet, so it is reported as
+          // unknown rather than fabricated from a random roll.
+          lastActive: "Not tracked",
           systems: userSystems,
           userId: profile.user_id,
           joinedDate: new Date(profile.created_at).toLocaleDateString(),

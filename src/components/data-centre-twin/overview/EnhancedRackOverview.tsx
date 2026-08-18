@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Server, Thermometer, Cpu, Eye, PlayCircle, ChevronRight, Filter } from 'lucide-react';
 import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
 import { cn } from '@/lib/utils';
+import { mulberry32, deriveSeed } from '@/simulation/orchestrator/prng';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 interface EnhancedRackOverviewProps {
@@ -51,9 +52,12 @@ export function EnhancedRackOverview({
   const [hoveredRack, setHoveredRack] = useState<string | null>(null);
   
   const processedRacks = useMemo<ProcessedRack[]>(() => {
-    return facility.thermalHardware.racks.map(rack => {
+    return facility.thermalHardware.racks.map((rack, rackIndex) => {
       const avgInlet = rack.servers.reduce((acc, s) => acc + s.cpuTempC, 0) / rack.servers.length * 0.35 + 18;
-      const avgOutlet = avgInlet + 6 + Math.random() * 4;
+      // Truth rule: outlet delta and cooling-zone assignment are derived
+      // deterministically from the rack itself, never re-rolled per render.
+      const rand = mulberry32(deriveSeed(`rack-thermal:${rack.id}`));
+      const avgOutlet = avgInlet + 6 + rand() * 4;
       const deltaT = avgOutlet - avgInlet;
       const gpuLoad = rack.servers.reduce((acc, s) => acc + (s.gpuTempC || 0), 0) / rack.servers.length;
       const powerKw = rack.servers.reduce((acc, s) => acc + s.powerDrawW, 0) / 1000;
@@ -70,7 +74,7 @@ export function EnhancedRackOverview({
         gpuLoad: Math.round(gpuLoad),
         powerKw: Math.round(powerKw * 10) / 10,
         healthScore: Math.round(100 - (deltaT * 3)),
-        coolingZone: ['A', 'B', 'C', 'D'][Math.floor(Math.random() * 4)],
+        coolingZone: ['A', 'B', 'C', 'D'][rackIndex % 4],
         status,
         hasGpu: gpuLoad > 30,
         isHighDensity: powerKw > 15,

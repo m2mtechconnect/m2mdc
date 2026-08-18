@@ -70,28 +70,32 @@ export function useStartAgentRun() {
         .single();
       
       if (error) throw error;
-      
-      // Simulate agent execution (in a real app, this would trigger an edge function)
-      setTimeout(async () => {
-        const completed = Math.random() > 0.1; // 90% success rate
-        const duration = Math.floor(Math.random() * 3000) + 500;
-        
-        await supabase
-          .from('agent_definition_runs')
-          .update({
-            status: completed ? 'completed' : 'failed',
-            completed_at: new Date().toISOString(),
-            duration_ms: duration,
-            output_data: completed ? { result: 'Agent completed successfully' } : null,
-            error_message: completed ? null : 'Simulated failure',
-            metrics: { tokensUsed: Math.floor(Math.random() * 1000) + 100 },
-          })
-          .eq('id', data.id);
-        
-        queryClient.invalidateQueries({ queryKey: ['agent-runs', agentDefinitionId] });
-      }, 2000);
-      
-      return transformRun(data);
+
+      // Truth rule: no execution backend is bound to agent definitions yet, so
+      // no outcome, duration or token usage may be fabricated and written to
+      // the database. The run is closed immediately with an explicit,
+      // truthful reason instead of a synthetic success/failure roll.
+      const startedAt = new Date(data.started_at ?? new Date().toISOString()).getTime();
+      const completedAt = new Date();
+
+      const { data: closed, error: closeError } = await supabase
+        .from('agent_definition_runs')
+        .update({
+          status: 'failed',
+          completed_at: completedAt.toISOString(),
+          duration_ms: Math.max(0, completedAt.getTime() - startedAt),
+          output_data: {},
+          error_message:
+            'Not executed: no execution backend is bound to this agent definition. No work was performed and no metrics were recorded.',
+          metrics: {},
+        })
+        .eq('id', data.id)
+        .select()
+        .single();
+
+      if (closeError) throw closeError;
+
+      return transformRun(closed ?? data);
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['agent-runs', variables.agentDefinitionId] });

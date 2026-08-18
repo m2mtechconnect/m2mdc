@@ -5,6 +5,7 @@
 
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
+import { mulberry32, deriveSeed } from '@/simulation/orchestrator/prng';
 
 interface SparklineChartProps {
   data: number[];
@@ -99,17 +100,20 @@ export function SparklineChart({
   );
 }
 
-// Generate mock sparkline data
 export function generateSparklineData(
   baseValue: number,
   variance: number = 0.1,
-  points: number = 24
+  points: number = 24,
+  seedText = 'overview-sparkline',
 ): number[] {
+  // Truth rule: illustrative trend shape, reproducible by construction.
+  // Seeded `mulberry32-v1`, never `Math.random()`.
+  const rand = mulberry32(deriveSeed(`${seedText}:${baseValue}:${variance}:${points}`));
   const data: number[] = [];
   let current = baseValue;
   
   for (let i = 0; i < points; i++) {
-    const change = (Math.random() - 0.5) * 2 * variance * baseValue;
+    const change = (rand() - 0.5) * 2 * variance * baseValue;
     current = Math.max(0, current + change);
     data.push(current);
   }

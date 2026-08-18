@@ -1,4 +1,4 @@
-# Database table-family inventory (measured at ad0ff04)
+# Database table-family inventory (measured at 66d2c2a)
 
 132 unique tables created across 57 migrations. Full per-object columns (readers, writers,
 edge-function callers, RLS, FKs, row counts, last access) require database statistics and

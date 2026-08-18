@@ -178,7 +178,7 @@ export function DomainHealthMap({ className }: { className?: string }) {
   return (
     <Card className={className}>
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle className="text-sm flex items-center gap-2">
             <Activity className="h-4 w-4" />
             Domain Health Overview
@@ -204,7 +204,7 @@ export function DomainHealthMap({ className }: { className?: string }) {
       </CardHeader>
       <CardContent>
         <TooltipProvider>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(104px,1fr))]">
             {domains.map((domain, index) => {
               const styles = getStatusStyles(domain.status);
               const Icon = domain.icon;
@@ -230,7 +230,7 @@ export function DomainHealthMap({ className }: { className?: string }) {
                         )}
                       />
 
-                      <div className="flex flex-col items-center text-center gap-2">
+                      <div className="flex flex-col items-center text-center gap-2 min-w-0">
                         <div className={cn(
                           'p-2.5 rounded-xl transition-all duration-300 group-hover:shadow-md',
                           styles.bg,
@@ -238,8 +238,8 @@ export function DomainHealthMap({ className }: { className?: string }) {
                         )}>
                           <Icon className={cn('h-5 w-5 transition-colors', styles.text)} />
                         </div>
-                        <div>
-                          <p className="text-xs font-medium group-hover:text-foreground transition-colors">{domain.name}</p>
+                        <div className="min-w-0 w-full">
+                          <p className="text-xs font-medium leading-tight break-words group-hover:text-foreground transition-colors">{domain.name}</p>
                           <p className={cn('text-[10px] font-medium', styles.text)}>{styles.label}</p>
                         </div>
                       </div>
@@ -272,20 +272,20 @@ export function DomainHealthMap({ className }: { className?: string }) {
         </TooltipProvider>
 
         {/* Legend */}
-        <div className="flex items-center justify-center gap-4 mt-4 pt-3 border-t">
-          <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-4 pt-3 border-t">
+          <div className="flex items-center gap-1.5 whitespace-nowrap">
             <div className="w-2 h-2 rounded-full bg-success" />
             <span className="text-[10px] text-muted-foreground">Healthy</span>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 whitespace-nowrap">
             <div className="w-2 h-2 rounded-full bg-warning" />
             <span className="text-[10px] text-muted-foreground">Degraded</span>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 whitespace-nowrap">
             <div className="w-2 h-2 rounded-full bg-destructive" />
             <span className="text-[10px] text-muted-foreground">Critical</span>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 whitespace-nowrap">
             <div className="w-2 h-2 rounded-full bg-muted-foreground" />
             <span className="text-[10px] text-muted-foreground">No Data</span>
           </div>

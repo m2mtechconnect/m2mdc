@@ -8,60 +8,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { loadRunRecords } from '@/workspace/runRecords';
 
-// Twin Telemetry
-export function useTwinTelemetry(domain?: string) {
-  const { activeTwinId: twinId } = useActiveTwin();
-  
-  return useQuery({
-    queryKey: ['twin-telemetry', twinId, domain],
-    queryFn: async () => {
-      if (!twinId) return [];
-      
-      let query = supabase
-        .from('twin_telemetry')
-        .select('*')
-        .eq('twin_id', twinId)
-        .order('recorded_at', { ascending: false })
-        .limit(1000);
-      
-      if (domain) {
-        query = query.eq('domain', domain);
-      }
-      
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!twinId,
-  });
-}
-
-// Twin KPI Snapshots
-export function useTwinKPIs(kpiKeys?: string[]) {
-  const { activeTwinId: twinId } = useActiveTwin();
-  
-  return useQuery({
-    queryKey: ['twin-kpis', twinId, kpiKeys],
-    queryFn: async () => {
-      if (!twinId) return [];
-      
-      let query = supabase
-        .from('twin_kpi_snapshots')
-        .select('*')
-        .eq('twin_id', twinId)
-        .order('snapshot_at', { ascending: false });
-      
-      if (kpiKeys && kpiKeys.length > 0) {
-        query = query.in('kpi_key', kpiKeys);
-      }
-      
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!twinId,
-  });
-}
+// Phase 11 - metric identity consolidation.
+// Observed telemetry is read from `twin_property_values` through
+// `@/telemetry/useFacilityTelemetry` (provenance-bearing, data-mode resolved).
+// KPIs are read from the canonical `simulation_runs` envelope through
+// `@/hooks/useTwinKPIsFromSimulation`. The legacy `twin_telemetry` and
+// `twin_kpi_snapshots` generations carried no provenance and are deprecated,
+// so no hook in this module reads or writes them.
 
 // Simulation runs for the active twin.
 // Reads the canonical `simulation_runs` table (Phase 7); the legacy

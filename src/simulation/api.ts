@@ -34,7 +34,9 @@ import type {
   SimulationEvent,
   SimulationResultSummary,
 } from './types';
-import { generateSimulationResult } from './generateSimulationResult';
+import { simulationOrchestrator } from './orchestrator';
+import { PANEL_SUMMARY_PROVIDER_ID } from './orchestrator/providers/panelSummaryProvider';
+import type { SimulationProvenance } from './orchestrator/types';
 
 export interface SimulationFacade {
   readonly activeProviderId: SimulationProviderId;
@@ -50,15 +52,16 @@ export interface SimulationFacade {
     signal?: AbortSignal,
   ): Promise<ProviderOutcome<SimulationRunPayload>>;
   /**
-   * Phase 1B.2a — panel-oriented adapter. Delegates to the existing
-   * deterministic `generateSimulationResult` engine and wraps the
-   * output in a `ProviderOutcome<SimulationResultSummary>`. This is the
-   * migration seam for `DCSimulationPanel`; no new estimator is added.
+   * Panel-oriented adapter. Phase 2: this no longer calls an engine directly;
+   * it dispatches through the SimulationOrchestrator, which owns seeding,
+   * hashing and provenance. The returned envelope is unchanged for callers.
    */
   generatePanelResult(
     input: PanelResultInput,
     signal?: AbortSignal,
   ): ProviderOutcome<SimulationResultSummary>;
+  /** Provenance record for the most recent `generatePanelResult` call. */
+  lastPanelProvenance(): SimulationProvenance | null;
 }
 
 export interface PanelResultInput {
@@ -104,6 +107,7 @@ function unknownConfigOutcome<T>(rawSanitized: string): ProviderOutcome<T> {
 
 export function createSimulationFacade(opts: FacadeOptions = {}): SimulationFacade {
   const registry = opts.registry ?? createDefaultRegistry();
+  let lastPanelProvenance: SimulationProvenance | null = null;
 
   // If the caller pinned a providerId explicitly, honour it verbatim.
   // Otherwise, use the richer selection helper so unknown env values
@@ -132,6 +136,10 @@ export function createSimulationFacade(opts: FacadeOptions = {}): SimulationFaca
   return {
     activeProviderId: provider.id,
     isConfigured,
+
+    lastPanelProvenance() {
+      return lastPanelProvenance;
+    },
 
     listScenarios() {
       if (!isConfigured) return unknownConfigOutcome<ScenarioDescriptor[]>(unknownRaw);
@@ -184,13 +192,41 @@ export function createSimulationFacade(opts: FacadeOptions = {}): SimulationFaca
         };
       }
       try {
-        const summary = generateSimulationResult(
-          input.scenario,
-          input.events,
-          input.baselineKpis,
-          input.currentKpis,
-          input.durationSec,
+        const outcome = simulationOrchestrator.runSync<SimulationResultSummary>(
+          {
+            providerId: PANEL_SUMMARY_PROVIDER_ID,
+            analysis: 'panel-summary',
+            intent: 'preview',
+            input: {
+              scenario: input.scenario,
+              events: input.events,
+              baselineKpis: input.baselineKpis,
+              currentKpis: input.currentKpis,
+              durationSec: input.durationSec,
+            },
+          },
+          signal,
         );
+        lastPanelProvenance = outcome.provenance;
+        if (outcome.kind !== 'ok') {
+          if (outcome.reason === 'cancelled') {
+            return { kind: 'cancelled', providerId: provider.id, provenance: 'unavailable' };
+          }
+          if (outcome.reason === 'invalid-request' || outcome.reason === 'provider-threw') {
+            return {
+              kind: 'invalid-input',
+              providerId: provider.id,
+              provenance: 'unavailable',
+              message: outcome.message,
+            };
+          }
+          return {
+            kind: 'unavailable',
+            providerId: provider.id,
+            provenance: 'unavailable',
+            reason: outcome.message,
+          };
+        }
         if (signal?.aborted) {
           return {
             kind: 'cancelled',
@@ -204,7 +240,7 @@ export function createSimulationFacade(opts: FacadeOptions = {}): SimulationFaca
           providerId: provider.id,
           provenance: 'simulated',
           observedAt,
-          value: summary,
+          value: outcome.value,
         });
       } catch (err) {
         return toErrorOutcome<SimulationResultSummary>(provider.id, err);

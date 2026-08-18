@@ -1,44 +1,31 @@
 /**
- * AURA_ARCHITECTURE_CONSOLIDATION_AND_NVIDIA_ALIGNMENT - Phase 4 (builder preview).
+ * Phase 2 - builder step-5 preview seam.
  *
- * Single seam for the builder step-5 preview engines.
- *
- * Builder step 5 previously picked between two engine classes inline in the
- * dashboard component. That decision is now made here so that:
- *
- *   - the caller receives a declared `executionClass` and provenance instead
- *     of inferring it from which class was constructed;
- *   - fixture-scripted previews are labelled `fixture-preview` and can never
- *     be mistaken for a run of record;
- *   - a constructor error becomes a typed unavailable session rather than a
- *     crash inside a React effect.
+ * This module no longer constructs engines. It is a thin adapter that asks the
+ * SimulationOrchestrator to open a preview session and translates the result
+ * into the shape the builder dashboard already consumes. All readiness,
+ * seeding and provenance decisions belong to the orchestrator.
  *
  * Neither path executes NVIDIA code or an NVIDIA service.
  */
 
+import type { SimulationPreviewConfig } from '@/components/builder/step5/fixtures/builderMock';
+import { simulationOrchestrator } from '../orchestrator';
 import {
-  BuilderPreviewEngine,
-  type BuilderPreviewEvent,
-} from '@/components/builder/step5/BuilderPreviewEngine';
-import {
-  MockSimulationEngine,
-  type SimulationPreviewConfig,
-} from '@/components/builder/step5/fixtures/builderMock';
-import type { SimulationExecutionClass } from '../providers/types';
+  BUILDER_PREVIEW_ESTIMATOR_PROVIDER_ID,
+  BUILDER_PREVIEW_FIXTURE_PROVIDER_ID,
+  type BuilderPreviewSessionValue,
+} from '../orchestrator/providers/builderPreviewProviders';
+import type {
+  SimulationExecutionClass,
+  SimulationProvenance,
+} from '../orchestrator/types';
 
-export type PreviewSpeedFactor = 1 | 2 | 4;
-
-/** The behaviour the builder dashboard actually depends on. */
-export interface BuilderPreviewSessionEngine {
-  on(event: 'event', callback: (event: BuilderPreviewEvent) => void): void;
-  on(event: 'kpi-update', callback: (data: unknown) => void): void;
-  on(event: 'complete' | 'error', callback: () => void): void;
-  start(): void;
-  pause(): void;
-  stop(): void;
-  reset(): void;
-  setSpeed(speed: PreviewSpeedFactor): void;
-}
+export type { PreviewSpeedFactor, BuilderPreviewSessionEngine } from '../orchestrator';
+import type {
+  BuilderPreviewSessionEngine,
+  PreviewSpeedFactor,
+} from '../orchestrator/providers/builderPreviewProviders';
 
 export interface BuilderPreviewSession {
   kind: 'ok';
@@ -50,12 +37,15 @@ export interface BuilderPreviewSession {
   fixtureBacked: boolean;
   /** Baseline KPI row available before the first tick, when known. */
   baselineMetrics: unknown;
+  /** Full orchestrator provenance record for this session. */
+  record: SimulationProvenance;
 }
 
 export interface BuilderPreviewSessionUnavailable {
   kind: 'unavailable';
   message: string;
   provenance: 'unavailable';
+  record: SimulationProvenance;
 }
 
 export type BuilderPreviewSessionOutcome =
@@ -73,66 +63,46 @@ export interface BuilderPreviewSessionInput {
   template?: unknown;
 }
 
-function unavailable(err: unknown): BuilderPreviewSessionUnavailable {
-  const message =
-    err instanceof Error && typeof err.message === 'string'
-      ? err.message.slice(0, 200)
-      : 'builder preview engine could not be created';
-  return { kind: 'unavailable', message, provenance: 'unavailable' };
-}
-
 /**
  * Creates a builder preview session. Never throws.
  */
 export function createBuilderPreviewSession(
   input: BuilderPreviewSessionInput
 ): BuilderPreviewSessionOutcome {
-  if (!input.scenario) {
-    return { kind: 'unavailable', message: 'no scenario selected', provenance: 'unavailable' };
-  }
+  const fixtureBacked = Boolean(input?.useFixturePreview && input?.previewConfig);
 
-  const fixtureBacked = Boolean(input.useFixturePreview && input.previewConfig);
+  const outcome = simulationOrchestrator.openPreviewSession<BuilderPreviewSessionValue>({
+    providerId: fixtureBacked
+      ? BUILDER_PREVIEW_FIXTURE_PROVIDER_ID
+      : BUILDER_PREVIEW_ESTIMATOR_PROVIDER_ID,
+    analysis: 'builder-preview',
+    intent: 'preview',
+    input: {
+      scenario: input?.scenario ?? null,
+      speed: input?.speed ?? 1,
+      previewConfig: input?.previewConfig ?? null,
+      workflows: input?.workflows ?? [],
+      kpis: input?.kpis ?? [],
+      template: input?.template,
+    },
+  });
 
-  try {
-    if (fixtureBacked && input.previewConfig) {
-      const engine = new MockSimulationEngine({
-        scenario: input.scenario,
-        previewConfig: input.previewConfig,
-        speed: input.speed,
-      });
-      let baselineMetrics: unknown = null;
-      try {
-        baselineMetrics = engine.getBaselineMetrics();
-      } catch {
-        baselineMetrics = null;
-      }
-      return {
-        kind: 'ok',
-        engine: engine as unknown as BuilderPreviewSessionEngine,
-        executionClass: 'fixture-preview',
-        provenance: 'simulated',
-        fixtureBacked: true,
-        baselineMetrics,
-      };
-    }
-
-    const engine = new BuilderPreviewEngine({
-      scenario: input.scenario,
-      workflows: (input.workflows ?? []) as unknown[],
-      kpis: (input.kpis ?? []) as unknown[],
-      template: input.template,
-      speed: input.speed,
-    } as never);
-
+  if (outcome.kind !== 'ok') {
     return {
-      kind: 'ok',
-      engine: engine as unknown as BuilderPreviewSessionEngine,
-      executionClass: 'aura-deterministic',
-      provenance: 'simulated',
-      fixtureBacked: false,
-      baselineMetrics: null,
+      kind: 'unavailable',
+      message: outcome.message,
+      provenance: 'unavailable',
+      record: outcome.provenance,
     };
-  } catch (err) {
-    return unavailable(err);
   }
+
+  return {
+    kind: 'ok',
+    engine: outcome.session.engine,
+    executionClass: outcome.provenance.executionClass,
+    provenance: 'simulated',
+    fixtureBacked,
+    baselineMetrics: outcome.session.baselineMetrics,
+    record: outcome.provenance,
+  };
 }

@@ -14,6 +14,8 @@ type AnyEventListener = (...args: any[]) => void;
 
 type SpeedFactor = 1 | 2 | 4;
 
+import { deriveSeed, mulberry32, type SeededRandom } from '@/simulation/orchestrator/prng';
+
 export interface BuilderPreviewEvent {
   id: string;
   timestamp: string;

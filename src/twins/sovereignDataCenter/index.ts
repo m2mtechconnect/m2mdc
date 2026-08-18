@@ -15,11 +15,11 @@ export {
   getAllDemoFacilities
 } from './mockData';
 
-// Simulation Engine — re-exported from the compat module behind the
-// simulation provider boundary (ADR-0007, Phase 1B.6). New consumers must
-// depend on `src/simulation/api.ts` instead of this barrel.
+// Simulation helpers. Phase 2: `runSimulation` is NO LONGER re-exported here.
+// Executing a sovereign scenario goes through `simulationOrchestrator` (the
+// `sovereign-scenario` provider) so seeding, timing and provenance are always
+// recorded; this barrel exposes only the pure record/suggestion helpers.
 export {
-  runSimulation,
   createSimulationRun,
   getScenarioSuggestions,
 } from '@/simulation/compat/sovereignDataCenterEngine';

@@ -165,7 +165,8 @@ export type SimulationRun = {
   resultsSummary: string;
   kpiDeltas: Partial<SovereignKpis>;
   createdAt: string;
-  durationMs?: number;
+  /** Measured elapsed time. `null` means unmeasured - zero never means unknown. */
+  durationMs?: number | null;
   status?: 'running' | 'completed' | 'failed';
 };
 

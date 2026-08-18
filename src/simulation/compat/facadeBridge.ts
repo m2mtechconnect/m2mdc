@@ -17,6 +17,11 @@
  * This is the migration seam recorded as `migrationTarget` for the frozen
  * engines in `src/simulation/engineRegistry.ts`. Behaviour of the engines
  * themselves is unchanged.
+ *
+ * Phase 2 closure: this adapter performs no simulation calculation. The
+ * scenario path dispatches through `simulationOrchestrator`, which owns
+ * readiness, hashing, timing and provenance; this module only translates the
+ * orchestrator outcome into the `ProviderOutcome` envelope its callers use.
  */
 
 import { assertOutcomeIntegrity } from '../providers/types';
@@ -30,11 +35,13 @@ import type {
   SimulationType,
 } from '@/types/sovereignDataCenterTwin';
 import {
-  runSimulation as runSovereignEngine,
   createSimulationRun as createSovereignRunRecord,
   type SimulationParams as SovereignSimulationParams,
   type SimulationResult as SovereignSimulationResult,
 } from './sovereignDataCenterEngine';
+import { simulationOrchestrator } from '../orchestrator';
+import { SOVEREIGN_SCENARIO_PROVIDER_ID } from '../orchestrator/providers/sovereignScenarioProvider';
+import type { SimulationProvenance } from '../orchestrator/types';
 
 /** Every compat path is executed by AURA's own deterministic code. */
 export const COMPAT_EXECUTION_CLASS: SimulationExecutionClass = 'aura-deterministic';
@@ -83,14 +90,42 @@ export interface SovereignScenarioInput {
 /**
  * Sovereign DC scenario run, routed through the facade envelope.
  * Consumers must branch on `outcome.kind` - there is no unwrapped value.
+ *
+ * Execution itself belongs to the orchestrator; nothing is computed here.
  */
 export function runSovereignScenario(
   input: SovereignScenarioInput,
 ): ProviderOutcome<SovereignSimulationResult> {
-  return runCompatEngine(
-    () => runSovereignEngine(input.baseKpis, input.type, input.params ?? {}, input.facility),
-    input.observedAt,
-  );
+  const outcome = simulationOrchestrator.runSync<SovereignSimulationResult>({
+    providerId: SOVEREIGN_SCENARIO_PROVIDER_ID,
+    analysis: 'sovereign-scenario',
+    intent: 'preview',
+    input: {
+      baseKpis: input.baseKpis,
+      type: input.type,
+      params: input.params ?? {},
+      facility: input.facility,
+    },
+    facilityId: input.facility?.id ?? null,
+  });
+  lastSovereignProvenance = outcome.provenance;
+  if (outcome.kind !== 'ok') {
+    return {
+      kind: 'error',
+      providerId: 'compatibility',
+      provenance: 'unavailable',
+      message: outcome.message,
+      code: 'COMPAT_ENGINE_THREW',
+    };
+  }
+  return assertOutcomeIntegrity(okOutcome(outcome.value, input.observedAt));
+}
+
+let lastSovereignProvenance: SimulationProvenance | null = null;
+
+/** Orchestrator provenance for the most recent sovereign scenario dispatch. */
+export function lastSovereignScenarioProvenance(): SimulationProvenance | null {
+  return lastSovereignProvenance;
 }
 
 /** Sovereign run record creation, wrapped in the same envelope. */

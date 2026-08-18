@@ -284,9 +284,11 @@ export function createSimulationRun(
     resultsSummary: result.resultsSummary,
     kpiDeltas: result.kpiDeltas,
     createdAt: new Date().toISOString(),
-    // Wall-clock duration is not known here; report 0 rather than inventing
-    // a random elapsed time that would read as a measured figure.
-    durationMs: 0,
+    // This record is assembled after the fact from a result, so no interval
+    // was measured. `null` means unavailable; zero would read as an instant
+    // run and is never used to mean unknown. Orchestrator-measured duration
+    // for the dispatch itself lives in the run's provenance record.
+    durationMs: null,
     status: 'completed',
   };
 }

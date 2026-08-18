@@ -236,6 +236,16 @@ function ApprovedUserRoutes() {
       {import.meta.env.DEV && MinimalLazyProbe ? (
         <Route path="/dev-minimal-lazy" element={<MinimalLazyProbe />} />
       ) : null}
+      {import.meta.env.DEV && MinimalLazyProbe ? (
+        <Route
+          path="/dev-minimal-lazy-local"
+          element={
+            <Suspense fallback={<div>Local probe boundary...</div>}>
+              <MinimalLazyProbe />
+            </Suspense>
+          }
+        />
+      ) : null}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

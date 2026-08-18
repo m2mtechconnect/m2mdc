@@ -123,16 +123,24 @@ export function groupRacksByAisle(racks: RackWithAisle[]): Record<string, RackWi
 /**
  * Generate sparkline data points
  */
-export function generateSparklineData(baseValue: number, points: number = 12, variance: number = 0.1): number[] {
+export function generateSparklineData(
+  baseValue: number,
+  points: number = 12,
+  variance: number = 0.1,
+  seedText = 'thermal-sparkline',
+): number[] {
+  // Truth rule: illustrative shape only, and it must be reproducible.
+  // Seeded `mulberry32-v1`, never `Math.random()`.
+  const rand = mulberry32(deriveSeed(`${seedText}:${baseValue}:${points}:${variance}`));
   const data: number[] = [];
   let current = baseValue;
-  
+
   for (let i = 0; i < points; i++) {
-    const change = (Math.random() - 0.5) * 2 * baseValue * variance;
+    const change = (rand() - 0.5) * 2 * baseValue * variance;
     current = Math.max(0, current + change);
     data.push(Math.round(current * 10) / 10);
   }
-  
+
   return data;
 }
 

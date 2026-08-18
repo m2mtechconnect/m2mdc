@@ -1,0 +1,165 @@
+[
+  {
+    "case": 3,
+    "rest": false,
+    "init": true,
+    "asset": false,
+    "layoutVisible": true,
+    "mainSnippet": "Facility Model (Simulated) Sovereign Green AI Data Centre Twin 40 Racks • 5 Rows • 5000 kW Capacity FACILITY GEOMETRY NVIDIA Reference Facility Twin Preview Z",
+    "lazyResponses": [
+      {
+        "url": "http://localhost:8091/src/pages/DataCentreTwinLanding.tsx",
+        "status": 200,
+        "contentType": "text/javascript",
+        "size": 25899
+      },
+      {
+        "url": "http://localhost:8091/src/pages/DataCentreTwin.tsx",
+        "status": 200,
+        "contentType": "text/javascript",
+        "size": 56130
+      },
+      {
+        "url": "http://localhost:8091/src/components/twin-visualization/TwinVisualizationLayout.tsx",
+        "status": 200,
+        "contentType": "text/javascript",
+        "size": 95662
+      }
+    ],
+    "interceptedCount": 0,
+    "interceptedSample": [],
+    "interceptedResourceTypes": [],
+    "consoleErrors": [],
+    "pageErrors": [],
+    "elapsedMs": 17324
+  },
+  {
+    "case": 5,
+    "rest": true,
+    "init": true,
+    "asset": false,
+    "layoutVisible": true,
+    "mainSnippet": "Facility Model (Simulated) Matrix Twin 40 Racks • 5 Rows • 5000 kW Capacity FACILITY GEOMETRY NVIDIA Reference Facility Twin Preview Zoom 100% Scroll to zoom ",
+    "lazyResponses": [
+      {
+        "url": "http://localhost:8091/src/pages/DataCentreTwin.tsx",
+        "status": 200,
+        "contentType": "text/javascript",
+        "size": 56130
+      },
+      {
+        "url": "http://localhost:8091/src/pages/DataCentreTwinLanding.tsx",
+        "status": 200,
+        "contentType": "text/javascript",
+        "size": 25899
+      },
+      {
+        "url": "http://localhost:8091/src/components/twin-visualization/TwinVisualizationLayout.tsx",
+        "status": 200,
+        "contentType": "text/javascript",
+        "size": 95662
+      }
+    ],
+    "interceptedCount": 3,
+    "interceptedSample": [
+      {
+        "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+        "type": "fetch",
+        "handler": "rest"
+      },
+      {
+        "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+        "type": "fetch",
+        "handler": "rest"
+      },
+      {
+        "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+        "type": "fetch",
+        "handler": "rest"
+      }
+    ],
+    "interceptedResourceTypes": [
+      "fetch"
+    ],
+    "consoleErrors": [],
+    "pageErrors": [],
+    "elapsedMs": 4597
+  },
+  {
+    "case": 8,
+    "rest": true,
+    "init": true,
+    "asset": true,
+    "layoutVisible": true,
+    "mainSnippet": "Facility Model (Simulated) Matrix Twin 40 Racks • 5 Rows • 5000 kW Capacity FACILITY GEOMETRY NVIDIA Reference Facility Twin Preview Zoom 100% Scroll to zoom ",
+    "lazyResponses": [
+      {
+        "url": "http://localhost:8091/src/pages/DataCentreTwin.tsx",
+        "status": 200,
+        "contentType": "text/javascript",
+        "size": 56130
+      },
+      {
+        "url": "http://localhost:8091/src/pages/DataCentreTwinLanding.tsx",
+        "status": 200,
+        "contentType": "text/javascript",
+        "size": 25899
+      },
+      {
+        "url": "http://localhost:8091/src/components/twin-visualization/TwinVisualizationLayout.tsx",
+        "status": 200,
+        "contentType": "text/javascript",
+        "size": 95662
+      }
+    ],
+    "interceptedCount": 17,
+    "interceptedSample": [
+      {
+        "url": "http://localhost:8091/__l5e/assets-v1/64f21cbc-9211-4c3d-9fff-357ba1eaee03/rack_42u_a.glb",
+        "type": "fetch",
+        "handler": "asset"
+      },
+      {
+        "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+        "type": "fetch",
+        "handler": "rest"
+      },
+      {
+        "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+        "type": "fetch",
+        "handler": "rest"
+      },
+      {
+        "url": "https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/data_centre_twins?select=*&order=name.asc",
+        "type": "fetch",
+        "handler": "rest"
+      },
+      {
+        "url": "http://localhost:8091/__l5e/assets-v1/1bf33646-78dc-43da-94af-8e23dd19b2c1/rack_42u_a_core_operations.glb",
+        "type": "fetch",
+        "handler": "asset"
+      },
+      {
+        "url": "http://localhost:8091/__l5e/assets-v1/735d81fb-d44b-43ba-8677-e608ca8cb8ae/server_1u_a_lod.glb",
+        "type": "fetch",
+        "handler": "asset"
+      },
+      {
+        "url": "http://localhost:8091/__l5e/assets-v1/d27cfe7b-010c-4d39-a3b3-b3c057638542/server_2u_c_operations.glb",
+        "type": "fetch",
+        "handler": "asset"
+      },
+      {
+        "url": "http://localhost:8091/__l5e/assets-v1/dc8e18b2-0ca9-4de9-87e4-2929c7b25deb/qm8700_c_01_operations.glb",
+        "type": "fetch",
+        "handler": "asset"
+      }
+    ],
+    "interceptedResourceTypes": [
+      "fetch"
+    ],
+    "consoleErrors": [],
+    "pageErrors": [],
+    "elapsedMs": 11900
+  }
+]

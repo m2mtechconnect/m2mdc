@@ -130,8 +130,8 @@ Compat bridges: `dataCenterEngine`, `facadeBridge`, `previewSessionBridge`,
 unseeded `Math.random()` and wall-clock reads. Corrected in Phase 1/3.
 
 ### 4.4 Edge functions
-**167** directories. Static scan of each `index.ts` (`04-edge-function-inventory.json`):
-- 1 directory with **no `index.ts`** at all.
+**166** deployable function directories (plus a `_shared` helper directory, excluded).
+Static scan of each `index.ts` (`04-edge-function-inventory.json`):
 - 76 with no first-party caller reference in `src/` or `services/` - review candidates only.
 - 92 not using `_shared/handler`.
 - 89 with a wildcard CORS origin in their own `index.ts`.

@@ -2608,6 +2608,63 @@ export type Database = {
           },
         ]
       }
+      decision_records: {
+        Row: {
+          approver: string
+          comment: string | null
+          created_at: string
+          data_mode: string
+          decided_at: string
+          escalated_to: string | null
+          evidence_snapshot: Json
+          execution_status: string
+          id: string
+          observation_tick: number
+          outcome: string
+          rationale: string
+          recommendation_id: string
+          snapshot_hash: string
+          timeline_id: string
+          user_id: string
+        }
+        Insert: {
+          approver: string
+          comment?: string | null
+          created_at?: string
+          data_mode: string
+          decided_at: string
+          escalated_to?: string | null
+          evidence_snapshot: Json
+          execution_status?: string
+          id?: string
+          observation_tick: number
+          outcome: string
+          rationale: string
+          recommendation_id: string
+          snapshot_hash: string
+          timeline_id: string
+          user_id?: string
+        }
+        Update: {
+          approver?: string
+          comment?: string | null
+          created_at?: string
+          data_mode?: string
+          decided_at?: string
+          escalated_to?: string | null
+          evidence_snapshot?: Json
+          execution_status?: string
+          id?: string
+          observation_tick?: number
+          outcome?: string
+          rationale?: string
+          recommendation_id?: string
+          snapshot_hash?: string
+          timeline_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       departments: {
         Row: {
           created_at: string | null

@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { FacilityFloorPlan, type CenterRequest } from '../FacilityFloorPlan';
 import type { FacilityDefinition } from '../facilityModel';
-import { viewportDisclosure } from '../viewportRegistry';
+import { viewportDisclosure, viewportLimitation } from '../viewportRegistry';
 import type { RackGrid } from './rackModel';
 import { RackQuickView, useRackDetail } from './RackQuickView';
 

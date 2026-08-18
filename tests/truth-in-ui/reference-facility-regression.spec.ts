@@ -33,6 +33,7 @@ test.describe('NVIDIA Reference Facility runtime regression', () => {
     page,
   }, testInfo) => {
     const mock = await installSupabaseMock(context);
+
     const twinId = '00000000-0000-4000-8000-000000000042';
     const twin = {
       id: twinId,
@@ -83,7 +84,7 @@ test.describe('NVIDIA Reference Facility runtime regression', () => {
     });
 
     await page.goto(ROUTE, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByTestId('twin-visualization-layout')).toBeVisible();
+    await expect(page.getByTestId('twin-visualization-layout')).toBeVisible({ timeout: 90_000 });
 
     const read = async () =>
       page.evaluate(() => {

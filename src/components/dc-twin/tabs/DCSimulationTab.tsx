@@ -35,6 +35,7 @@ import { EnhancedComparisonMode } from '@/components/simulation/EnhancedComparis
 import { LiveInsightsKPIPanel } from '@/components/simulation/LiveInsightsKPIPanel';
 import { SimulationCoPilotPanel, CoPilotModeHeader } from '@/components/copilot';
 import type { KPISnapshot, SimulationEvent } from '@/simulation/types';
+import { mulberry32, deriveSeed } from '@/simulation/orchestrator/prng';
 
 // UI Polish Components
 import { StatusBadge, NoSimulationHistoryEmptyState, LoadingState } from '@/components/ui';
@@ -130,8 +131,8 @@ export function DCSimulationTab() {
   });
   
   // Mock data for enterprise KPI system
-  const snapshots = useMemo(() => generateMockSnapshots(30), []);
-  const events = useMemo(() => generateMockEvents(), []);
+  const snapshots = useMemo(() => generatePreviewSnapshots(30), []);
+  const events = useMemo(() => generatePreviewEvents(), []);
   
   const enabledScenarios = scenarios.filter(s => s.enabled);
   const activeScenario = scenarios.find(s => s.id === selectedScenario);

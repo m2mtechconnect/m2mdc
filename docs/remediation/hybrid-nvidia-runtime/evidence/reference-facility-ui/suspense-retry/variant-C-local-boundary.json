@@ -1,0 +1,175 @@
+{
+  "errs": [],
+  "rows": [
+    {
+      "i": 0,
+      "url": "/dev-minimal-lazy-local",
+      "nav": "direct",
+      "ms": 14945,
+      "result": "fallback",
+      "fallbackVisible": false
+    },
+    {
+      "i": 1,
+      "url": "/dev-minimal-lazy-local?x=1",
+      "nav": "direct",
+      "ms": 988,
+      "result": "committed"
+    },
+    {
+      "i": 2,
+      "url": "/dev-minimal-lazy-local",
+      "nav": "direct",
+      "ms": 801,
+      "result": "committed"
+    },
+    {
+      "i": 3,
+      "url": "/dev-minimal-lazy-local?x=1",
+      "nav": "back",
+      "ms": 837,
+      "result": "committed"
+    },
+    {
+      "i": 4,
+      "url": "/dev-minimal-lazy-local",
+      "nav": "reload",
+      "ms": 804,
+      "result": "committed"
+    },
+    {
+      "i": 5,
+      "url": "/dev-minimal-lazy-local?x=1",
+      "nav": "direct",
+      "ms": 809,
+      "result": "committed"
+    },
+    {
+      "i": 6,
+      "url": "/dev-minimal-lazy-local",
+      "nav": "direct",
+      "ms": 844,
+      "result": "committed"
+    },
+    {
+      "i": 7,
+      "url": "/dev-minimal-lazy-local?x=1",
+      "nav": "direct",
+      "ms": 776,
+      "result": "committed"
+    },
+    {
+      "i": 8,
+      "url": "/dev-minimal-lazy-local",
+      "nav": "back",
+      "ms": 844,
+      "result": "committed"
+    },
+    {
+      "i": 9,
+      "url": "/dev-minimal-lazy-local?x=1",
+      "nav": "reload",
+      "ms": 787,
+      "result": "committed"
+    },
+    {
+      "i": 10,
+      "url": "/dev-minimal-lazy-local",
+      "nav": "direct",
+      "ms": 788,
+      "result": "committed"
+    },
+    {
+      "i": 11,
+      "url": "/dev-minimal-lazy-local?x=1",
+      "nav": "direct",
+      "ms": 1000,
+      "result": "committed"
+    },
+    {
+      "i": 12,
+      "url": "/dev-minimal-lazy-local",
+      "nav": "direct",
+      "ms": 811,
+      "result": "committed"
+    },
+    {
+      "i": 13,
+      "url": "/dev-minimal-lazy-local?x=1",
+      "nav": "back",
+      "ms": 770,
+      "result": "committed"
+    },
+    {
+      "i": 14,
+      "url": "/dev-minimal-lazy-local",
+      "nav": "reload",
+      "ms": 805,
+      "result": "committed"
+    },
+    {
+      "i": 15,
+      "url": "/dev-minimal-lazy-local?x=1",
+      "nav": "direct",
+      "ms": 841,
+      "result": "committed"
+    },
+    {
+      "i": 16,
+      "url": "/dev-minimal-lazy-local",
+      "nav": "direct",
+      "ms": 1052,
+      "result": "committed"
+    },
+    {
+      "i": 17,
+      "url": "/dev-minimal-lazy-local?x=1",
+      "nav": "direct",
+      "ms": 789,
+      "result": "committed"
+    },
+    {
+      "i": 18,
+      "url": "/dev-minimal-lazy-local",
+      "nav": "back",
+      "ms": 857,
+      "result": "committed"
+    },
+    {
+      "i": 19,
+      "url": "/dev-minimal-lazy-local?x=1",
+      "nav": "reload",
+      "ms": 833,
+      "result": "committed"
+    },
+    {
+      "i": 20,
+      "url": "/dev-minimal-lazy-local",
+      "nav": "direct",
+      "ms": 14880,
+      "result": "fallback",
+      "fallbackVisible": false
+    },
+    {
+      "i": 21,
+      "url": "/dev-minimal-lazy-local?x=1",
+      "nav": "direct",
+      "ms": 1040,
+      "result": "committed"
+    },
+    {
+      "i": 22,
+      "url": "/dev-minimal-lazy-local",
+      "nav": "direct",
+      "ms": 869,
+      "result": "committed"
+    },
+    {
+      "i": 23,
+      "url": "/dev-minimal-lazy-local?x=1",
+      "nav": "back",
+      "ms": 988,
+      "result": "committed"
+    }
+  ]
+}

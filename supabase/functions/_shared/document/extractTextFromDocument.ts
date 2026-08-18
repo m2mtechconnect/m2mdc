@@ -153,6 +153,7 @@ function extractTextFromPdf(content: string): string {
   
   // Remove PDF headers and binary markers
   const cleaned = content
+    // eslint-disable-next-line no-control-regex -- stripping binary control bytes is the purpose of this sanitiser
     .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F]/g, ' ') // Remove control chars except \t \n \r
     .replace(/\\[0-9]{3}/g, ' ') // Remove octal sequences
     .replace(/\/[A-Z][a-z]+/g, ' ') // Remove PDF commands
@@ -179,6 +180,7 @@ function cleanText(text: string): string {
     .replace(/\r/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
     .replace(/\s+/g, " ")
+    // eslint-disable-next-line no-control-regex -- stripping binary control bytes is the purpose of this sanitiser
     .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, "") // Remove control characters
     .trim();
 }

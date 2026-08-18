@@ -1,0 +1,538 @@
+{
+  "capturedAt": "2026-08-18T20:49:58.476Z",
+  "command": "SKIP_SEO_GATE=1 npx vite build",
+  "htmlEntryScripts": [
+    "assets/index-DO3VU0PM.js",
+    "assets/vendor-react-BPW5nD8t.js",
+    "assets/vendor-ui-BcoGh_5a.js",
+    "assets/vendor-3d-BDEDpQdp.js",
+    "assets/vendor-query-BW8HdnYm.js",
+    "assets/vendor-motion-B7-Sl99o.js",
+    "assets/vendor-charts-qhkDZTZt.js",
+    "assets/vendor-supabase-CrsbysO5.js"
+  ],
+  "totalJsBytes": 6154095,
+  "totalJsGzip": 1695926,
+  "chunks": [
+    {
+      "file": "index-DO3VU0PM.js",
+      "bytes": 1637856,
+      "gzip": 434381
+    },
+    {
+      "file": "vendor-3d-BDEDpQdp.js",
+      "bytes": 897992,
+      "gzip": 247753
+    },
+    {
+      "file": "Builder-Djcq9MeV.js",
+      "bytes": 561388,
+      "gzip": 151414
+    },
+    {
+      "file": "vendor-charts-qhkDZTZt.js",
+      "bytes": 433129,
+      "gzip": 114257
+    },
+    {
+      "file": "AuthenticatedShell-BACuVMmA.js",
+      "bytes": 387158,
+      "gzip": 94411
+    },
+    {
+      "file": "Marketplace-DH_R4UkL.js",
+      "bytes": 179014,
+      "gzip": 44067
+    },
+    {
+      "file": "vendor-react-BPW5nD8t.js",
+      "bytes": 165061,
+      "gzip": 53801
+    },
+    {
+      "file": "vendor-supabase-CrsbysO5.js",
+      "bytes": 159030,
+      "gzip": 40784
+    },
+    {
+      "file": "vendor-ui-BcoGh_5a.js",
+      "bytes": 156780,
+      "gzip": 49457
+    },
+    {
+      "file": "Connections-Bsm-DVsK.js",
+      "bytes": 131808,
+      "gzip": 33011
+    },
+    {
+      "file": "vendor-motion-B7-Sl99o.js",
+      "bytes": 118633,
+      "gzip": 39231
+    },
+    {
+      "file": "index-inX2QiV-.js",
+      "bytes": 117404,
+      "gzip": 35932
+    },
+    {
+      "file": "Blueprint-Cw5PAaXj.js",
+      "bytes": 91228,
+      "gzip": 24578
+    },
+    {
+      "file": "index-CLWqAx0Y.js",
+      "bytes": 76063,
+      "gzip": 19533
+    },
+    {
+      "file": "Deploy-BvBbKFAo.js",
+      "bytes": 59969,
+      "gzip": 15099
+    },
+    {
+      "file": "InfrastructurePage-hlRhQwUn.js",
+      "bytes": 56830,
+      "gzip": 13630
+    },
+    {
+      "file": "TwinManage-cHurqbs7.js",
+      "bytes": 56355,
+      "gzip": 13949
+    },
+    {
+      "file": "IntelligenceDashboard-CB_sDLoK.js",
+      "bytes": 53771,
+      "gzip": 15497
+    },
+    {
+      "file": "EvidenceQualityBar-DoIBYq2W.js",
+      "bytes": 49797,
+      "gzip": 15519
+    },
+    {
+      "file": "Playbook-Wt2Tri7a.js",
+      "bytes": 49695,
+      "gzip": 14479
+    },
+    {
+      "file": "AuraWorkspace-DemL-UIv.js",
+      "bytes": 43948,
+      "gzip": 12641
+    },
+    {
+      "file": "analyticsService-Cx1a8xNU.js",
+      "bytes": 42773,
+      "gzip": 13656
+    },
+    {
+      "file": "ManageAgents-Cr_I35GC.js",
+      "bytes": 41667,
+      "gzip": 11332
+    },
+    {
+      "file": "vendor-query-BW8HdnYm.js",
+      "bytes": 39223,
+      "gzip": 11725
+    },
+    {
+      "file": "EvidenceBetaShell-CJoytTaz.js",
+      "bytes": 38582,
+      "gzip": 10175
+    },
+    {
+      "file": "Teams-DFGZIxb2.js",
+      "bytes": 35752,
+      "gzip": 9520
+    },
+    {
+      "file": "AssetValidation-BqEhEnFe.js",
+      "bytes": 34161,
+      "gzip": 10910
+    },
+    {
+      "file": "Compliance-CPcveX7r.js",
+      "bytes": 29194,
+      "gzip": 8725
+    },
+    {
+      "file": "AgentChat-Cp7MQ8ux.js",
+      "bytes": 21311,
+      "gzip": 6476
+    },
+    {
+      "file": "simulationTemplates-BgO9EAqw.js",
+      "bytes": 21293,
+      "gzip": 6775
+    },
+    {
+      "file": "twinFieldProvenance-DGQKa_Vt.js",
+      "bytes": 19197,
+      "gzip": 6316
+    },
+    {
+      "file": "ReferenceFacilityValidation-D4GdWz1k.js",
+      "bytes": 18069,
+      "gzip": 6079
+    },
+    {
+      "file": "PlatformReadiness-CP34knUY.js",
+      "bytes": 18056,
+      "gzip": 5774
+    },
+    {
+      "file": "SystemManage-cosKpzyC.js",
+      "bytes": 16544,
+      "gzip": 4338
+    },
+    {
+      "file": "TwinDebug-CEHYiYkn.js",
+      "bytes": 16175,
+      "gzip": 4218
+    },
+    {
+      "file": "StandardFilters-CmrCyS10.js",
+      "bytes": 14966,
+      "gzip": 3961
+    },
+    {
+      "file": "AgentDetail-DE_8Qxfs.js",
+      "bytes": 14584,
+      "gzip": 4100
+    },
+    {
+      "file": "Help-C68_uXkb.js",
+      "bytes": 14571,
+      "gzip": 4494
+    },
+    {
+      "file": "UnifiedAgentPreview-DdOXtKi2.js",
+      "bytes": 14328,
+      "gzip": 3599
+    },
+    {
+      "file": "format-Be4eYQYl.js",
+      "bytes": 12826,
+      "gzip": 3358
+    },
+    {
+      "file": "AgentWorkspace-DAoXEvNw.js",
+      "bytes": 12560,
+      "gzip": 3833
+    },
+    {
+      "file": "AISettings-D_hL8W7O.js",
+      "bytes": 11541,
+      "gzip": 3672
+    },
+    {
+      "file": "BlueprintPreview-DJRuHPDG.js",
+      "bytes": 10715,
+      "gzip": 2418
+    },
+    {
+      "file": "Search-BOXjXbQd.js",
+      "bytes": 10450,
+      "gzip": 3934
+    },
+    {
+      "file": "Profile-DojcYb_w.js",
+      "bytes": 10275,
+      "gzip": 3508
+    },
+    {
+      "file": "DeploymentHistory-B41DozTo.js",
+      "bytes": 10144,
+      "gzip": 3441
+    },
+    {
+      "file": "AccessControl-meMkvIJG.js",
+      "bytes": 8954,
+      "gzip": 2929
+    },
+    {
+      "file": "FundingIntakeDemo-C8Wf7O6L.js",
+      "bytes": 8888,
+      "gzip": 2855
+    },
+    {
+      "file": "AdminSignupsDashboard-BHnHb9x6.js",
+      "bytes": 8608,
+      "gzip": 2702
+    },
+    {
+      "file": "AssetPipeline-BKyo67bd.js",
+      "bytes": 8130,
+      "gzip": 2891
+    },
+    {
+      "file": "Settings-DQ9Vv1xn.js",
+      "bytes": 7774,
+      "gzip": 2470
+    },
+    {
+      "file": "SimulationPreview-DTUuMCaE.js",
+      "bytes": 7459,
+      "gzip": 2181
+    },
+    {
+      "file": "OnboardingSubmissions-iBuebU1-.js",
+      "bytes": 6471,
+      "gzip": 1825
+    },
+    {
+      "file": "templateLoader-C0y5KN-f.js",
+      "bytes": 6464,
+      "gzip": 2639
+    },
+    {
+      "file": "PagePurpose-BaaD43fQ.js",
+      "bytes": 6051,
+      "gzip": 2134
+    },
+    {
+      "file": "DatasetRegistryPage-PEzzg3Ae.js",
+      "bytes": 5756,
+      "gzip": 1853
+    },
+    {
+      "file": "StateBadges-C9xcKDAM.js",
+      "bytes": 5332,
+      "gzip": 1793
+    },
+    {
+      "file": "Facilities-DYL-5crT.js",
+      "bytes": 5322,
+      "gzip": 2047
+    },
+    {
+      "file": "DsxCapabilityRegistryPage-C9bh-IyO.js",
+      "bytes": 3897,
+      "gzip": 1354
+    },
+    {
+      "file": "AdminUserApproval-BXdKH5Dy.js",
+      "bytes": 3887,
+      "gzip": 1545
+    },
+    {
+      "file": "benchmark-DcY5lKxD.js",
+      "bytes": 3653,
+      "gzip": 1640
+    },
+    {
+      "file": "useTwinData-DLVDj8pp.js",
+      "bytes": 3280,
+      "gzip": 1284
+    },
+    {
+      "file": "useFacilityTelemetry-BryMrwGu.js",
+      "bytes": 3217,
+      "gzip": 1392
+    },
+    {
+      "file": "DCKPITile-By_6acZS.js",
+      "bytes": 2897,
+      "gzip": 1297
+    },
+    {
+      "file": "AssetPreview-7SVhG8wQ.js",
+      "bytes": 2597,
+      "gzip": 1367
+    },
+    {
+      "file": "DCCard-CqKi-UzG.js",
+      "bytes": 2542,
+      "gzip": 941
+    },
+    {
+      "file": "dsxClaimsPolicy-russV0dW.js",
+      "bytes": 1903,
+      "gzip": 849
+    },
+    {
+      "file": "status-badge-CN6qVq0L.js",
+      "bytes": 1874,
+      "gzip": 779
+    },
+    {
+      "file": "MetricValue-BcG5N04x.js",
+      "bytes": 1841,
+      "gzip": 853
+    },
+    {
+      "file": "authBootstrap-BjJD2xzi.js",
+      "bytes": 1669,
+      "gzip": 850
+    },
+    {
+      "file": "ProtectedRoute-C-7HTb8S.js",
+      "bytes": 1405,
+      "gzip": 648
+    },
+    {
+      "file": "snapshot-indicator-BrYu69RG.js",
+      "bytes": 1236,
+      "gzip": 603
+    },
+    {
+      "file": "useAgentDefinitions-CEBOu-22.js",
+      "bytes": 1215,
+      "gzip": 628
+    },
+    {
+      "file": "blueprintHelpers-C2o-Arbo.js",
+      "bytes": 1181,
+      "gzip": 613
+    },
+    {
+      "file": "formatters-Dbjuvfai.js",
+      "bytes": 1174,
+      "gzip": 532
+    },
+    {
+      "file": "spec-D5lWGLGJ.js",
+      "bytes": 1161,
+      "gzip": 706
+    },
+    {
+      "file": "deploymentRecords-C5E-yBYm.js",
+      "bytes": 1084,
+      "gzip": 523
+    },
+    {
+      "file": "useEdgeFunction-CtT_R5kG.js",
+      "bytes": 1014,
+      "gzip": 502
+    },
+    {
+      "file": "accordion-DyXkyftv.js",
+      "bytes": 1009,
+      "gzip": 515
+    },
+    {
+      "file": "alert-DKBy5QQ8.js",
+      "bytes": 989,
+      "gzip": 505
+    },
+    {
+      "file": "useUserPermissions-BwuzDkA8.js",
+      "bytes": 897,
+      "gzip": 551
+    },
+    {
+      "file": "agentDefinition-CGynyZkr.js",
+      "bytes": 892,
+      "gzip": 427
+    },
+    {
+      "file": "handoff-CHwkYS8R.js",
+      "bytes": 738,
+      "gzip": 392
+    },
+    {
+      "file": "calculator-DW9wbhev.js",
+      "bytes": 699,
+      "gzip": 382
+    },
+    {
+      "file": "wand-sparkles-bKaFkhHb.js",
+      "bytes": 676,
+      "gzip": 389
+    },
+    {
+      "file": "star-n4T94WpZ.js",
+      "bytes": 636,
+      "gzip": 400
+    },
+    {
+      "file": "chevron-left-CbEwQjgj.js",
+      "bytes": 582,
+      "gzip": 309
+    },
+    {
+      "file": "radio-DDigiAnK.js",
+      "bytes": 538,
+      "gzip": 352
+    },
+    {
+      "file": "save-D2bbZ9Kv.js",
+      "bytes": 491,
+      "gzip": 324
+    },
+    {
+      "file": "shield-check-BZXWUsgb.js",
+      "bytes": 488,
+      "gzip": 350
+    },
+    {
+      "file": "modes-BNBPVaqS.js",
+      "bytes": 486,
+      "gzip": 327
+    },
+    {
+      "file": "user-plus-3mtw_fYf.js",
+      "bytes": 478,
+      "gzip": 335
+    },
+    {
+      "file": "useBlueprintScenarios-jX226Zo7.js",
+      "bytes": 456,
+      "gzip": 274
+    },
+    {
+      "file": "book-open-B-vtDHh4.js",
+      "bytes": 442,
+      "gzip": 306
+    },
+    {
+      "file": "pencil-Bmfw7T5S.js",
+      "bytes": 440,
+      "gzip": 324
+    },
+    {
+      "file": "download-CKWnM3Bh.js",
+      "bytes": 431,
+      "gzip": 316
+    },
+    {
+      "file": "calendar-Cq1lU2ca.js",
+      "bytes": 426,
+      "gzip": 304
+    },
+    {
+      "file": "upload-C6i-zxm-.js",
+      "bytes": 426,
+      "gzip": 316
+    },
+    {
+      "file": "plug-NBJt_ajs.js",
+      "bytes": 422,
+      "gzip": 295
+    },
+    {
+      "file": "link-2-BI_AUkLI.js",
+      "bytes": 410,
+      "gzip": 306
+    },
+    {
+      "file": "headphones-BV2iNnYN.js",
+      "bytes": 401,
+      "gzip": 285
+    },
+    {
+      "file": "useAnalytics-B22kGUIV.js",
+      "bytes": 369,
+      "gzip": 281
+    },
+    {
+      "file": "use-mobile-BRHCksGs.js",
+      "bytes": 332,
+      "gzip": 248
+    },
+    {
+      "file": "canvasFocusStore-CbdSqRYC.js",
+      "bytes": 139,
+      "gzip": 127
+    }
+  ]
+}

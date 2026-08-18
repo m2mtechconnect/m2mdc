@@ -4,7 +4,7 @@
  * Test-only fixtures. No network. No real Supabase client. Verifies:
  *  - classifyKpi (fresh / stale / unvalidated: null value, invalid ts, future ts)
  *  - listPilotTwins column projection + eq(created_by_user) + order + limit(25)
- *  - listPilotKpis eq(twin_id) + order + limit(50)
+ *  - listPilotKpis reads the canonical simulation_runs KPI envelope
  *  - getPilotTwin stable-identifier binding
  *  - empty overview
  *  - missing asset
@@ -55,7 +55,7 @@ function makeBuilder(table: string): any {
   const responseFor = () => {
     if (state.maybeSingle) return nextSingleTwinResponse;
     if (table === "data_centre_twins") return nextTwinsResponse;
-    if (table === "twin_kpi_snapshots") return nextKpiResponse;
+    if (table === "simulation_runs") return nextKpiResponse;
     return { data: null, error: null };
   };
 
@@ -127,7 +127,7 @@ import {
 
 const OWNER_COLUMNS =
   "id,name,city,region_code,tier,capacity_kw,pue_target,updated_at,created_at,created_by_user";
-const KPI_COLUMNS = "id,twin_id,kpi_key,kpi_value,kpi_unit,domain,snapshot_at";
+const KPI_COLUMNS = "id,twin_id,final_kpis,created_at";
 
 function kpi(overrides: Partial<PilotKpiRow>): PilotKpiRow {
   return {
@@ -260,11 +260,24 @@ describe("getPilotTwin", () => {
 });
 
 describe("listPilotKpis", () => {
-  it("projects permitted columns, filters by twin_id, orders desc, limits to 50", async () => {
+  it("reads the canonical simulation_runs envelope, filters by twin_id, orders desc", async () => {
     nextKpiResponse = {
       data: [
         {
-          id: "k1",
+          id: "r1",
+          twin_id: "t1",
+          final_kpis: { pue: 1.2, bad: "n/a" },
+          created_at: "2026-07-24T00:00:00Z",
+        },
+      ],
+      error: null,
+    };
+    const r = await listPilotKpis("t1");
+    expect(r.status).toBe("ok");
+    if (r.status === "ok") {
+      expect(r.data).toEqual([
+        {
+          id: "r1:pue",
           twin_id: "t1",
           kpi_key: "pue",
           kpi_value: 1.2,
@@ -272,21 +285,36 @@ describe("listPilotKpis", () => {
           domain: null,
           snapshot_at: "2026-07-24T00:00:00Z",
         },
-      ],
-      error: null,
-    };
-    const r = await listPilotKpis("t1");
-    expect(r.status).toBe("ok");
+        {
+          id: "r1:bad",
+          twin_id: "t1",
+          kpi_key: "bad",
+          kpi_value: null,
+          kpi_unit: null,
+          domain: null,
+          snapshot_at: "2026-07-24T00:00:00Z",
+        },
+      ]);
+    }
     const b = capturedBuilders[0];
-    expect(b.table).toBe("twin_kpi_snapshots");
+    expect(b.table).toBe("simulation_runs");
     expect(b.columns).toBe(KPI_COLUMNS);
     expect(b.eqs).toEqual([{ col: "twin_id", val: "t1" }]);
-    expect(b.ordered).toEqual({ col: "snapshot_at", asc: false });
-    expect(b.limited).toBe(50);
+    expect(b.ordered).toEqual({ col: "created_at", asc: false });
+    expect(b.limited).toBe(1);
   });
 
-  it("returns empty for zero rows without fabricating fallback KPIs", async () => {
+  it("returns empty for zero runs without fabricating fallback KPIs", async () => {
     nextKpiResponse = { data: [], error: null };
+    const r = await listPilotKpis("t1");
+    expect(r).toEqual({ status: "empty" });
+  });
+
+  it("returns empty when the latest run recorded no KPI map", async () => {
+    nextKpiResponse = {
+      data: [{ id: "r1", twin_id: "t1", final_kpis: null, created_at: "2026-07-24T00:00:00Z" }],
+      error: null,
+    };
     const r = await listPilotKpis("t1");
     expect(r).toEqual({ status: "empty" });
   });
@@ -300,7 +328,7 @@ describe("listPilotKpis", () => {
   it("returns unavailable with sanitized reason on read failure and no fallback rows", async () => {
     nextKpiResponse = { data: null, error: { code: "PGRST100", message: "bad" } };
     const r = await listPilotKpis("t1");
-    expect(r).toEqual({ status: "unavailable", reason: "twin_kpi_snapshots:PGRST100" });
+    expect(r).toEqual({ status: "unavailable", reason: "simulation_runs:PGRST100" });
   });
 });
 
@@ -316,7 +344,7 @@ describe("adapter never performs mutating operations", () => {
     expect(forbiddenMethodCalls).toEqual([]);
     // And every builder that WAS created only touched the SELECT surface.
     for (const b of capturedBuilders) {
-      expect(["data_centre_twins", "twin_kpi_snapshots"]).toContain(b.table);
+      expect(["data_centre_twins", "simulation_runs"]).toContain(b.table);
       expect(b.columns).toBeDefined(); // select() was called
     }
     for (const name of forbiddenNames) {

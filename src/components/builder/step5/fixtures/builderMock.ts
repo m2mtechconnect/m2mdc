@@ -44,6 +44,14 @@ interface MockSimulationEngineConfig {
   scenario: any;
   previewConfig: SimulationPreviewConfig;
   speed: SpeedFactor;
+  /**
+   * Injected by the SimulationOrchestrator. Fixture playback still decides
+   * *when* to emit a scripted event, so it needs a seeded generator; it must
+   * never call `Math.random()`.
+   */
+  random?: SeededRandom;
+  /** Stable prefix for generated event ids, so ids are reproducible. */
+  runTag?: string;
 }
 
 type EventListener = (event: SimulationEvent) => void;
@@ -59,9 +67,16 @@ export class MockSimulationEngine {
   private listeners: Map<string, (AnyEventListener)[]> = new Map();
   private currentScenarioData: any;
   private eventIndex = 0;
+  private random: SeededRandom;
+  private runTag: string;
+  private eventSeq = 0;
 
   constructor(config: MockSimulationEngineConfig) {
     this.config = config;
+    this.random =
+      config.random ??
+      mulberry32(deriveSeed(`builder-fixture|${String(config.scenario?.id ?? 'unknown')}`));
+    this.runTag = config.runTag ?? 'fixture';
     this.currentScenarioData = this.getScenarioData(config.scenario);
   }
 
@@ -220,14 +235,14 @@ export class MockSimulationEngine {
     if (events.length === 0) return;
     
     const eventsPerSecond = events.length / duration;
-    const shouldEmitEvent = Math.random() < eventsPerSecond;
+    const shouldEmitEvent = this.random() < eventsPerSecond;
 
     if (shouldEmitEvent && this.eventIndex < events.length) {
       const message = events[this.eventIndex];
       this.eventIndex++;
 
       const event: SimulationEvent = {
-        id: `event-${Date.now()}-${Math.random()}`,
+        id: `event-${this.runTag}-${++this.eventSeq}`,
         timestamp: this.formatTimestamp(this.tick),
         type: this.getEventType(message),
         message,

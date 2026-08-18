@@ -48,7 +48,7 @@ export class MockSimulationEngine {
   private tick: number = 0;
   private baseTickInterval = 1000; // 1 second base interval
   private events: SimulationEvent[] = [];
-  private listeners: Map<string, ((...args: never[]) => void)[]> = new Map();
+  private listeners: Map<string, ((...args: unknown[]) => void)[]> = new Map();
   private currentScenarioData: any;
   private eventIndex = 0;
 
@@ -79,7 +79,7 @@ export class MockSimulationEngine {
   on(event: 'event', callback: EventListener): void;
   on(event: 'kpi-update', callback: KPIListener): void;
   on(event: 'complete' | 'error', callback: CompleteListener): void;
-  on(event: string, callback: (...args: never[]) => void): void {
+  on(event: string, callback: (...args: unknown[]) => void): void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, []);
     }

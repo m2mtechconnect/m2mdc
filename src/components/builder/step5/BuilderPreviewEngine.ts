@@ -33,7 +33,7 @@ export class BuilderPreviewEngine {
   private tick: number = 0;
   private baseTickInterval = 300; // 300ms base interval
   private events: BuilderPreviewEvent[] = [];
-  private listeners: Map<string, ((...args: never[]) => void)[]> = new Map();
+  private listeners: Map<string, ((...args: unknown[]) => void)[]> = new Map();
 
   constructor(config: SimulationEngineConfig) {
     this.config = config;
@@ -43,7 +43,7 @@ export class BuilderPreviewEngine {
   on(event: 'event', callback: EventListener): void;
   on(event: 'kpi-update', callback: KPIListener): void;
   on(event: 'complete' | 'error', callback: CompleteListener): void;
-  on(event: string, callback: (...args: never[]) => void): void {
+  on(event: string, callback: (...args: unknown[]) => void): void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, []);
     }

@@ -590,7 +590,7 @@ export class EnhancedSimulationRunner {
   private tick: number = 0;
   private intervalId: number | null = null;
   private speed: number = 1;
-  private listeners: Map<string, ((...args: never[]) => void)[]> = new Map();
+  private listeners: Map<string, ((...args: unknown[]) => void)[]> = new Map();
   private runHistory: SimulationSummary[] = [];
 
   constructor(scenario: EnhancedScenario, baselineKpis?: Record<string, number>) {
@@ -610,7 +610,7 @@ export class EnhancedSimulationRunner {
     this.currentKpis = { ...this.baselineKpis };
   }
 
-  on(event: string, callback: (...args: never[]) => void): void {
+  on(event: string, callback: (...args: unknown[]) => void): void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, []);
     }

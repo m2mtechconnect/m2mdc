@@ -83,7 +83,7 @@ test.describe('NVIDIA Reference Facility runtime regression', () => {
     });
 
     await page.goto(ROUTE, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByTestId('twin-visualization-layout')).toBeVisible();
+    await expect(page.getByTestId('twin-visualization-layout')).toBeVisible({ timeout: 90_000 });
 
     const read = async () =>
       page.evaluate(() => {

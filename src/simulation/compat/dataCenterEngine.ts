@@ -205,7 +205,8 @@ export function createSimulationRun(
   facilityId: string,
   scenario: SimulationScenario
 ): SimulationRun {
-  const runId = `run-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  // Identifier only (not simulation output): UUID-backed, no Math.random.
+  const runId = newIdentifier('run');
   
   return {
     id: runId,

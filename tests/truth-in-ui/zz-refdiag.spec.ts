@@ -35,10 +35,17 @@ test('diagnose reference facility mounts', async ({ context, page }) => {
 
   await page.goto(ROUTE, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(45_000);
-  const snap = await page.evaluate(() => ({
-    coverage: window.__auraRuntimeCoverage?.() ?? null,
-    families: window.__auraFacilityFamilies?.() ?? null,
-  }));
-  console.log('SNAP', JSON.stringify(snap, null, 1).slice(0, 8000));
+  console.log('URL', page.url());
+  const snap = await page.evaluate(() => {
+    const c = window.__auraRuntimeCoverage?.() ?? null;
+    return {
+      sessionId: c?.sessionId, owners: c?.owners, roleKeys: Object.keys(c?.roles ?? {}),
+      mounted: Object.values(c?.rackMounts ?? {}).filter((m: any) => m.mounted).length,
+      rackCount: Object.keys(c?.rackMounts ?? {}).length,
+      families: window.__auraFacilityFamilies?.() ?? null,
+      canvases: document.querySelectorAll('canvas').length,
+    };
+  });
+  console.log('SNAP', JSON.stringify(snap, null, 1).slice(0, 4000));
   console.log('ASSETS', JSON.stringify(assetLog, null, 1).slice(0, 4000));
 });

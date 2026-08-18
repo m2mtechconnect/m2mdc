@@ -77,7 +77,7 @@ export function BlueprintOverviewTab({ blueprint }: BlueprintOverviewTabProps) {
       {/* Domain Health + Dependency Graph */}
       {/* Visual system overview and relationships */}
       {/* ============================================== */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid xl:grid-cols-2 gap-6">
         <DomainHealthMap />
         <DependencyGraph />
       </div>

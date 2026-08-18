@@ -52,6 +52,12 @@ interface Prepared {
   base: SimulationProvenance;
 }
 
+type FailedOutcome = Extract<SimulationOutcome<never>, { kind: 'failed' }>;
+
+type PrepareResult =
+  | { ok: true; prepared: Prepared; failure?: undefined }
+  | { ok: false; prepared?: undefined; failure: FailedOutcome };
+
 function fail<T>(
   base: SimulationProvenance,
   reason: SimulationFailureReason,
@@ -117,7 +123,7 @@ export function createSimulationOrchestrator(
     request: SimulationRequest,
     kind: 'value' | 'session',
     signal?: AbortSignal,
-  ): { ok: true; prepared: Prepared } | { ok: false; failure: SimulationOutcome<never> & { kind: 'failed' } } {
+  ): PrepareResult {
     const startedAt = now().toISOString();
     const base = blankProvenance(request ?? ({} as SimulationRequest), startedAt);
 

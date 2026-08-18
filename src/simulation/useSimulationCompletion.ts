@@ -24,7 +24,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 import type { SimulationFacade } from './api';
-import { generateSimulationResult } from './generateSimulationResult';
+import { simulationOrchestrator } from './orchestrator';
+import { PANEL_SUMMARY_PROVIDER_ID } from './orchestrator/providers/panelSummaryProvider';
 import type {
   ScenarioDefinition,
   SimulationEvent,
@@ -141,19 +142,32 @@ export function useSimulationCompletion(
           err = toCompletionError(outcome);
         }
       } else {
-        try {
-          ok = generateSimulationResult(
-            activeScenario,
-            events,
-            baselineKpis,
-            currentKpis,
-            elapsedTime,
-          );
-        } catch (e) {
+        // Phase 2: no facade configured, but still no direct engine call -
+        // dispatch through the orchestrator so the run is seeded and recorded.
+        const outcome = simulationOrchestrator.runSync<SimulationResultSummary>(
+          {
+            providerId: PANEL_SUMMARY_PROVIDER_ID,
+            analysis: 'panel-summary',
+            intent: 'preview',
+            input: {
+              scenario: activeScenario,
+              events,
+              baselineKpis,
+              currentKpis,
+              durationSec: elapsedTime,
+            },
+          },
+          controller.signal,
+        );
+        if (outcome.kind === 'ok') {
+          ok = outcome.value;
+        } else if (outcome.reason === 'cancelled') {
+          return;
+        } else {
           err = {
             kind: 'error',
-            providerId: 'legacy-engine',
-            message: e instanceof Error ? e.message.slice(0, 200) : 'engine threw',
+            providerId: PANEL_SUMMARY_PROVIDER_ID,
+            message: outcome.message,
           };
         }
       }

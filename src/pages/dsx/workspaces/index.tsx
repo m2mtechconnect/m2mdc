@@ -626,6 +626,22 @@ export function EvidenceWorkspace() {
   const { rt } = useWorkspace();
   return (
     <div className="space-y-6">
+      <Section
+        title="Production evidence"
+        description="Persisted run records visible to this account. This section never renders fixture data."
+      >
+        <CanonicalEvidencePanel />
+      </Section>
+
+      <Section
+        title="Demonstration workspace (labelled fixture)"
+        description="Everything below is a seeded Evidence Beta demonstration fixture, not production evidence. It cannot be approved as an authoritative decision."
+      >
+        <p className="text-xs text-muted-foreground" data-testid="evidence-fixture-label">
+          {FIXTURE_DEMONSTRATION_NOTICE}
+        </p>
+      </Section>
+
       <Section title="Evidence quality" description="Accepted against quarantined observations for this window. A quarantined record never contributes to a decision.">
         <EvidenceQualityBar accepted={rt.snapshot.accepted.length} rejected={rt.snapshot.rejected.length} />
       </Section>

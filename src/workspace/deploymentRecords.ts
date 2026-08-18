@@ -93,7 +93,7 @@ export async function appendDeploymentEvent(params: {
   status: DeploymentEventStatus;
   detail?: Record<string, unknown>;
 }): Promise<void> {
-  const { error } = await supabase.from('deployment_events').insert({
+  const { error } = await supabase.from('deployment_events').insert([{
     deployment_id: params.deploymentId,
     system_id: params.systemId,
     actor_id: params.actorId,
@@ -101,7 +101,7 @@ export async function appendDeploymentEvent(params: {
     stage: params.stage,
     status: params.status,
     detail: params.detail ?? {},
-  });
+  }]);
 
   // Evidence loss must be visible, but it must not abort a deployment that
   // otherwise succeeded; the terminal state below is still recorded.

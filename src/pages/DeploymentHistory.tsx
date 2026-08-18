@@ -431,6 +431,14 @@ export default function DeploymentHistory() {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => toggleEvents(deployment.id)}
+                          aria-expanded={expandedId === deployment.id}
+                        >
+                          {expandedId === deployment.id ? 'Hide steps' : 'Steps'}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => navigate(`/builder?id=${deployment.system_id}`)}
                         >
                           View System
@@ -438,6 +446,42 @@ export default function DeploymentHistory() {
                       </div>
                     </TableCell>
                   </TableRow>
+                  {expandedId === deployment.id && (
+                    <TableRow key={`${deployment.id}-events`}>
+                      <TableCell colSpan={9} className="bg-muted/30">
+                        {eventsLoading ? (
+                          <p className="text-sm text-muted-foreground" role="status">Loading step log...</p>
+                        ) : events.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">
+                            No step events recorded for this deployment.
+                          </p>
+                        ) : (
+                          <ol className="space-y-1">
+                            {events.map((event) => (
+                              <li key={event.id} className="flex flex-wrap items-center gap-2 text-xs">
+                                <span className="font-mono text-muted-foreground">
+                                  {format(new Date(event.occurred_at), 'PP p')}
+                                </span>
+                                <span className="font-medium">{event.stage}</span>
+                                <Badge
+                                  variant={
+                                    event.status === 'failed'
+                                      ? 'destructive'
+                                      : event.status === 'succeeded'
+                                        ? 'default'
+                                        : 'outline'
+                                  }
+                                >
+                                  {event.status}
+                                </Badge>
+                              </li>
+                            ))}
+                          </ol>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  </>
                 ))
               )}
             </TableBody>

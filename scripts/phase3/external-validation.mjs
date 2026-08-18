@@ -32,7 +32,7 @@
  * Exit codes: 0 pass, 1 fail, 78 BLOCKED (no validation backend supplied and
  * --require-infrastructure was not passed).
  */
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
@@ -206,9 +206,17 @@ if (fullSignature) {
 // 3. RLS matrix ------------------------------------------------------------
 function runRlsMatrix(label) {
   try {
-    const out = psql(['-f', 'scripts/phase3/rls-matrix.sql']);
+    // RAISE NOTICE output lands on stderr, so both streams are needed here.
+    const r = spawnSync('psql', [DB, '-v', 'ON_ERROR_STOP=1', '-f', 'scripts/phase3/rls-matrix.sql'], {
+      encoding: 'utf8',
+      maxBuffer: 64 * 1024 * 1024,
+    });
+    const out = `${r.stdout ?? ''}\n${r.stderr ?? ''}`;
+    if (r.status !== 0) throw new Error(out.slice(-1200));
     const passes = (out.match(/PASS /g) || []).length;
-    if (!out.includes('RLS MATRIX COMPLETE')) throw new Error(out.slice(-1200));
+    if (!out.includes('RLS MATRIX COMPLETE') || !out.includes('RLS MATRIX EXTENDED COMPLETE')) {
+      throw new Error(out.slice(-1200));
+    }
     record(label, 'PASS', `${passes} assertions executed as authenticated/anon`);
     return passes;
   } catch (e) {

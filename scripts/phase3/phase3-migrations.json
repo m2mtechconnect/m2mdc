@@ -1,0 +1,7 @@
+{
+  "comment": "Phase 3 truth-chain migrations. Used by the rollback/reapplication drill in scripts/phase3/external-validation.mjs. The rollback procedure rebuilds an empty database from every migration EXCEPT these, then reapplies them in order.",
+  "phase3": [
+    "20260818161325_e2c110f2-a306-47da-a3b3-b1f8ae4e34a6.sql",
+    "20260818161354_143923fa-6043-46cc-91d5-1c8a016e17e9.sql"
+  ]
+}

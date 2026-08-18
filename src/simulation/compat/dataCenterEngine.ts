@@ -11,6 +11,7 @@ import type {
   DomainType,
 } from '@/types/dataCenterTwin';
 import { getScenarioById } from '@/twins/dataCenter/simulationScenarios';
+import { newIdentifier } from '../orchestrator/prng';
 
 // ============================================================================
 // SIMULATION STATE

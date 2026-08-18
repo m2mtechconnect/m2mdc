@@ -6,6 +6,8 @@
  * simulation facade (`src/simulation/api.ts`) or, transitionally, on this
  * compat module directly.
  */
+
+import { newIdentifier } from '../orchestrator/prng';
 /**
  * Sovereign Data Center Simulation Engine
  * Deterministic frontend logic for simulating KPI changes

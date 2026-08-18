@@ -36,6 +36,7 @@
 import type { ScenarioDefinition, ScenarioTimelineStep, CustomScenarioConfig } from './types';
 import type { DomainType } from '@/types/dataCenterTwin';
 import { addCustomScenario } from './scenarioRegistry';
+import { newIdentifier } from './orchestrator/prng';
 
 /**
  * Create a custom scenario from user configuration

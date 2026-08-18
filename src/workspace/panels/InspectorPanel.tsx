@@ -5,6 +5,9 @@ import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { FacilityAsset, FacilityDefinition } from '../facilityModel';
 import { useWorkspaceStore } from '../workspaceStore';
+import { AssetTelemetrySection } from '@/telemetry/AssetTelemetrySection';
+import { useFacilityTelemetry } from '@/telemetry/useFacilityTelemetry';
+import { isFacilityRecordId } from '@/telemetry/twinTelemetryApi';
 
 interface Props {
   facility: FacilityDefinition;
@@ -15,6 +18,7 @@ export function InspectorPanel({ facility, assets }: Props) {
   const selectedAssetId = useWorkspaceStore((s) => s.selectedAssetId);
   const selectAsset = useWorkspaceStore((s) => s.selectAsset);
   const [query, setQuery] = useState('');
+  const telemetry = useFacilityTelemetry(facility.id);
 
   const selected = assets.find((a) => a.id === selectedAssetId) ?? assets[0];
   const filtered = useMemo(() => {
@@ -79,6 +83,14 @@ export function InspectorPanel({ facility, assets }: Props) {
               </div>
             ))}
           </dl>
+
+          <AssetTelemetrySection
+            asset={{ id: selected.id, name: selected.name }}
+            readings={telemetry.data?.readings ?? []}
+            facilityIsPersisted={isFacilityRecordId(facility.id)}
+            isLoading={telemetry.isLoading}
+            error={telemetry.data?.error ?? (telemetry.error ? String(telemetry.error) : null)}
+          />
 
           {selected.dependencies.length > 0 && (
             <div>

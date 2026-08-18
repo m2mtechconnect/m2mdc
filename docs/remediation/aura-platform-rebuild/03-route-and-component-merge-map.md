@@ -30,12 +30,17 @@
 |---|---|---|
 | `components/twin-visualization/DataCenter3DScene.tsx` | main 3D scene | **canonical viewport core** |
 | `workspace/FacilityCanvas.tsx` | workspace canvas | adapter over canonical |
-| `workspace/dashboard/FacilityCanvas.tsx` | dashboard canvas | delete after adapter proves parity |
+| `workspace/dashboard/FacilityPlanCard.tsx` | dashboard canvas | **superseded by Phase 3**: an SVG floor-plan card, not a duplicate viewport; retained and renamed |
 | `components/data-centre-twin/overview/MiniTwinPreview.tsx` | thumbnail | size variant of canonical |
 | `pages/TwinPreview.tsx` | standalone page | route wrapper only |
 
 Target viewport interface: one component with explicit `kit-stream` and `browser-fallback`
 adapters (`src/renderer/rendererModes.ts` already models the modes and is the seed for it).
+
+**Phase 3 revision:** these surfaces already share `DataCenter3DScene` (3D) and
+`FacilityFloorPlan` (2D); what differs is chrome, so they were not merged. What
+they now share instead is the provenance claim, enforced by
+`src/workspace/viewportRegistry.ts`. See `08-phase-3-viewport-consolidation.md`.
 
 ## Canonical lifecycle target
 `/dashboard` -> `/blueprint/:id` -> `/simulation` -> `/operations` -> `/evidence` ->

@@ -20,7 +20,7 @@ import { interpretKpi, type KpiInterpretation } from './dashboard/kpiInterpretat
 import { buildAttentionQueue, type AttentionItem } from './dashboard/attentionQueue';
 import { ActionCenter } from './dashboard/ActionCenter';
 import { FacilityHighlights } from './dashboard/FacilityHighlights';
-import { FacilityCanvas, type CanvasOverlayId } from './dashboard/FacilityCanvas';
+import { FacilityPlanCard, type CanvasOverlayId } from './dashboard/FacilityPlanCard';
 import { RecentSimulations } from './dashboard/RecentSimulations';
 import { StatusSnapshot, buildSnapshotRows } from './dashboard/StatusSnapshot';
 import { MetricQuickView } from './dashboard/MetricQuickView';
@@ -220,7 +220,7 @@ export default function CommandCentre() {
         </div>
 
         {/* Screen 2 - facility exploration. */}
-        <FacilityCanvas
+        <FacilityPlanCard
           facility={facility}
           grid={grid}
           overlay={overlay}

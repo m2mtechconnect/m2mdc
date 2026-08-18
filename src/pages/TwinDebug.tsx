@@ -70,7 +70,7 @@ export default function TwinDebug() {
     const newLogs: QueryLog[] = [
       { id: 'telemetry', timestamp: new Date(), table: 'twin_telemetry', twinId, status: telemetry.isLoading ? 'pending' : telemetry.error ? 'error' : 'success', error: telemetry.error?.message },
       { id: 'kpis', timestamp: new Date(), table: 'twin_kpi_snapshots', twinId, status: kpis.isLoading ? 'pending' : kpis.error ? 'error' : 'success', error: kpis.error?.message },
-      { id: 'simulations', timestamp: new Date(), table: 'twin_simulation_runs', twinId, status: simulations.isLoading ? 'pending' : simulations.error ? 'error' : 'success', error: simulations.error?.message },
+      { id: 'simulations', timestamp: new Date(), table: 'simulation_runs', twinId, status: simulations.isLoading ? 'pending' : simulations.error ? 'error' : 'success', error: simulations.error?.message },
       { id: 'agents', timestamp: new Date(), table: 'agent_definitions', twinId, status: agents.isLoading ? 'pending' : agents.error ? 'error' : 'success', error: agents.error?.message },
       { id: 'sovereignty', timestamp: new Date(), table: 'twin_sovereignty_events', twinId, status: sovereignty.isLoading ? 'pending' : sovereignty.error ? 'error' : 'success', error: sovereignty.error?.message },
       { id: 'carbon', timestamp: new Date(), table: 'twin_carbon_emissions', twinId, status: carbon.isLoading ? 'pending' : carbon.error ? 'error' : 'success', error: carbon.error?.message },

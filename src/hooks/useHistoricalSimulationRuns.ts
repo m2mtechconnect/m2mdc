@@ -1,14 +1,14 @@
 /**
  * Hook for loading historical simulation runs from the database
  * Used by the Simulation Comparison tab to compare past runs
+ *
+ * Reads through the canonical run-record model (Phase 7) so list, comparison
+ * and debug surfaces share one mapping and one envelope.
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
-import type { Database } from '@/integrations/supabase/types';
-
-type SimulationRunRow = Database['public']['Tables']['simulation_runs']['Row'];
+import { loadRunRecords } from '@/workspace/runRecords';
 
 export interface SimulationRunForComparison {
   id: string;
@@ -23,6 +23,11 @@ export interface SimulationRunForComparison {
   finalKpis: Record<string, number>;
   eventsCount: number;
   overallImpactScore: number;
+  /** Run envelope, cited by provenance UI. */
+  engineVersion: string | null;
+  executionOrigin: string | null;
+  validationStatus: string | null;
+  recordCitation: string;
 }
 
 export function useHistoricalSimulationRuns(options?: { limit?: number }) {
@@ -41,54 +46,11 @@ export function useHistoricalSimulationRuns(options?: { limit?: number }) {
     setError(null);
 
     try {
-      const { data, error: fetchError } = await supabase
-        .from('simulation_runs')
-        .select('*')
-        .eq('twin_id', activeTwinId)
-        .eq('status', 'completed')
-        .order('created_at', { ascending: false })
-        .limit(options?.limit || 20);
-
-      if (fetchError) {
-        throw fetchError;
-      }
-
-      const mappedRuns: SimulationRunForComparison[] = (data || []).map((run: SimulationRunRow) => {
-        const baselineKpis = (run.baseline_kpis as Record<string, number>) || {};
-        const finalKpis = (run.final_kpis as Record<string, number>) || {};
-        const events = (run.events as Array<unknown>) || [];
-
-        // Calculate overall impact score from KPI deltas
-        let impactScore = 0;
-        const kpiCount = Object.keys(finalKpis).length;
-        if (kpiCount > 0) {
-          Object.keys(finalKpis).forEach(kpiId => {
-            const baseline = baselineKpis[kpiId] || 0;
-            const final = finalKpis[kpiId] || 0;
-            if (baseline !== 0) {
-              impactScore += ((final - baseline) / Math.abs(baseline)) * 100;
-            }
-          });
-          impactScore = impactScore / kpiCount;
-        }
-
-        return {
-          id: run.id,
-          runId: run.id,
-          scenarioId: run.scenario_key,
-          scenarioName: run.scenario_name || run.scenario_key,
-          startTime: new Date(run.started_at),
-          durationSeconds: Math.round((run.duration_ms || 0) / 1000),
-          status: run.status,
-          createdAt: new Date(run.created_at),
-          baselineKpis,
-          finalKpis,
-          eventsCount: events.length,
-          overallImpactScore: Math.round(impactScore * 10) / 10,
-        };
+      const records = await loadRunRecords(activeTwinId, {
+        limit: options?.limit || 20,
+        status: 'completed',
       });
-
-      setRuns(mappedRuns);
+      setRuns(records);
     } catch (err) {
       console.error('Error fetching historical simulation runs:', err);
       setError(err instanceof Error ? err.message : 'Failed to load simulation runs');

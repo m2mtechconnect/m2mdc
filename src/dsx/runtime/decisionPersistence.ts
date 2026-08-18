@@ -66,9 +66,7 @@ export async function persistDecision(decision: DecisionRecord): Promise<Decisio
   if (!userId) return { status: 'unsaved', reason: 'no-session' };
 
   const snapshot = decision.evidence_snapshot;
-  const { data, error } = await supabase
-    .from(DECISION_RECORD_TABLE)
-    .insert({
+  const payload = {
       user_id: userId,
       recommendation_id: decision.recommendation_id,
       outcome: decision.outcome,
@@ -81,9 +79,14 @@ export async function persistDecision(decision: DecisionRecord): Promise<Decisio
       timeline_id: snapshot.timeline_id,
       data_mode: snapshot.data_mode,
       observation_tick: snapshot.observation_tick,
-      evidence_snapshot: snapshot as unknown as Record<string, unknown>,
+      evidence_snapshot: snapshot as unknown,
       snapshot_hash: snapshot.snapshot_hash,
-    })
+  };
+
+  const { data, error } = await supabase
+    .from(DECISION_RECORD_TABLE)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .insert(payload as any)
     .select('id')
     .maybeSingle();
 

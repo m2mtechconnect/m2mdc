@@ -145,19 +145,9 @@ export default function IntelligenceDashboard() {
     return 'critical';
   }
 
-  // Data trust state. Derived from local telemetry; replace with ops-health
-  // edge function output when wired.
-  // TODO: ops-health edge function -> {sensorCoverage, sourceHealth, qualityFlags}
-  const dataTrust: DataTrustState = useMemo(() => ({
-    lastRefreshed: new Date(Date.now() - 2 * 60 * 1000),
-    sensorCoverage: { reporting: 412, total: 438 },
-    sourceHealth: {
-      ok: 4,
-      total: 4,
-      sources: ['DCIM', 'BMS', 'IPMI', 'Grid API'],
-    },
-    qualityFlags: { good: 398, suspect: 9, stale: 5, missing: 0 },
-  }), []);
+  // Data trust state. No ops-health source is bound yet, so the strip renders
+  // an explicit "not available" state rather than fabricated coverage counts.
+  const dataTrust: DataTrustState | null = null;
 
   // Twin context for scoped data
   const { twin, activeTwinId: twinId, twins } = useActiveTwin();

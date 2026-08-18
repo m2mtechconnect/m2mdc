@@ -1,102 +1,83 @@
-import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+/**
+ * Phase 4 - `/search` over authorized backend records.
+ *
+ * This page previously rendered three hardcoded documents attributed to Google
+ * Drive, SharePoint and Zendesk, with a `Math.random()` latency tile, while the
+ * capability registry declared its data source as "Authorized AURA records".
+ * It now queries the record families the product actually owns; row-level
+ * security decides what comes back, and every tile reports a measured value.
+ */
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search as SearchIcon, Clock, FileSearch } from "lucide-react";
-import { EmptyState } from "@/components/ui/empty-state";
-import SearchResultsList from "@/components/search/SearchResultsList";
-import SearchFilters from "@/components/search/SearchFilters";
-import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
-import { DCKPITile } from "@/components/dc-ui/DCKPITile";
+import { useQuery } from '@tanstack/react-query';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Search as SearchIcon, Clock, FileSearch, Database, AlertTriangle } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
+import { DCCard, DCSectionHeader } from '@/components/dc-ui/DCCard';
+import { DCKPITile } from '@/components/dc-ui/DCKPITile';
+import RecordResultsList from '@/search/RecordResultsList';
+import RecordKindFilter from '@/search/RecordKindFilter';
+import {
+  searchPlatformRecords,
+  sanitizeSearchTerm,
+  labelForKind,
+  type SearchRecordKind,
+} from '@/search/platformSearchApi';
 
-const mockSearchResults = [
-  {
-    id: "1",
-    title: "HIPAA Compliance Guide 2024",
-    snippet: "Complete guide to HIPAA compliance requirements for healthcare organizations...",
-    source: "Google Drive",
-    sourceType: "drive" as const,
-    lastUpdated: "2 days ago",
-    url: "https://example.com/doc1",
-  },
-  {
-    id: "2",
-    title: "Q4 Marketing Performance Report",
-    snippet: "Quarterly marketing analysis showing 280% ROI improvement across channels...",
-    source: "SharePoint",
-    sourceType: "sharepoint" as const,
-    lastUpdated: "1 week ago",
-    url: "https://example.com/doc2",
-  },
-  {
-    id: "3",
-    title: "Zendesk Support Tickets Archive",
-    snippet: "Historical support ticket data for customer service analytics and insights...",
-    source: "Zapier: Zendesk",
-    sourceType: "zapier" as const,
-    lastUpdated: "3 hours ago",
-  },
-];
+const DEBOUNCE_MS = 350;
 
 export default function Search() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   // `?q=` is the authoritative query so a search result page is deep-linkable
   // and survives a refresh.
-  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
-  const [filters, setFilters] = useState<Array<{ id: string; label: string; value: string }>>([]);
-  const [searchStartTime, setSearchStartTime] = useState<number | null>(null);
-  const [searchLatency, setSearchLatency] = useState<number | null>(null);
+  const [query, setQuery] = useState(() => searchParams.get('q') ?? '');
+  const [kinds, setKinds] = useState<SearchRecordKind[]>([]);
+  const [debounced, setDebounced] = useState(() => sanitizeSearchTerm(query));
 
   // Keep the address bar in step with the query without stacking history entries.
   useEffect(() => {
-    const current = searchParams.get("q") ?? "";
+    const current = searchParams.get('q') ?? '';
     if (current === query) return;
     const next = new URLSearchParams(searchParams);
-    if (query) next.set("q", query);
-    else next.delete("q");
+    if (query) next.set('q', query);
+    else next.delete('q');
     setSearchParams(next, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   // Adopt back/forward navigation and externally supplied deep links.
   useEffect(() => {
-    const incoming = searchParams.get("q") ?? "";
+    const incoming = searchParams.get('q') ?? '';
     if (incoming !== query) setQuery(incoming);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Simulate search latency
-    const startTime = Date.now();
-    setSearchStartTime(startTime);
-    
-    setTimeout(() => {
-      const latency = Date.now() - startTime;
-      setSearchLatency(latency);
-    }, Math.random() * 300 + 100); // 100-400ms
-  };
+  // One request per settled query rather than one per keystroke.
+  useEffect(() => {
+    const handle = window.setTimeout(() => setDebounced(sanitizeSearchTerm(query)), DEBOUNCE_MS);
+    return () => window.clearTimeout(handle);
+  }, [query]);
 
-  const filteredResults = mockSearchResults.filter(result => {
-    const matchesQuery = query === "" || 
-      result.title.toLowerCase().includes(query.toLowerCase()) ||
-      result.snippet.toLowerCase().includes(query.toLowerCase());
-
-    const matchesFilters = filters.every(filter => {
-      if (filter.label === "type") return true; // Simplified for demo
-      if (filter.label === "source") {
-        return result.source.toLowerCase().includes(filter.value.toLowerCase());
-      }
-      return true;
-    });
-
-    return matchesQuery && matchesFilters;
+  const search = useQuery({
+    queryKey: ['platform-search', debounced, [...kinds].sort().join(',')],
+    queryFn: () => searchPlatformRecords(debounced, { kinds: kinds.length ? kinds : undefined }),
+    enabled: debounced.length > 0,
+    staleTime: 30_000,
   });
 
-  const showResults = query.length > 0 || filters.length > 0;
+  const results = search.data?.results ?? [];
+  const counts = useMemo(() => {
+    const tally: Partial<Record<SearchRecordKind, number>> = {};
+    for (const result of results) tally[result.kind] = (tally[result.kind] ?? 0) + 1;
+    return tally;
+  }, [results]);
+
+  const submitted = debounced.length > 0;
+  const failures = search.data?.failures ?? [];
 
   return (
     <div className="min-h-screen bg-background section-padding-lg">
@@ -108,47 +89,52 @@ export default function Search() {
           icon={<FileSearch className="h-5 w-5" />}
         />
 
-        {/* Search Stats */}
-        {searchLatency && showResults && (
+        {/* Measured query facts. Nothing here is synthesised. */}
+        {submitted && search.data && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <DCKPITile
               label={t('search.latency')}
-              value={searchLatency.toString()}
+              value={search.data.latencyMs.toString()}
               unit="ms"
-              status={searchLatency < 200 ? "normal" : searchLatency < 400 ? "warning" : "critical"}
+              status="normal"
               icon={<Clock className="h-4 w-4" />}
               compact
             />
             <DCKPITile
               label={t('search.resultsFound')}
-              value={filteredResults.length.toString()}
+              value={results.length.toString()}
               status="normal"
               icon={<SearchIcon className="h-4 w-4" />}
               compact
             />
             <DCKPITile
-              label={t('search.sourcesSearched')}
-              value="3"
+              label={t('search.recordTypesSearched')}
+              value={search.data.kindsQueried.length.toString()}
               status="normal"
+              icon={<Database className="h-4 w-4" />}
               compact
             />
           </div>
         )}
 
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="mb-8">
+        {/* Search bar. Submit is not required - results follow the query. */}
+        <form onSubmit={(e) => e.preventDefault()} className="mb-6" role="search">
           <DCCard noPadding>
             <div className="p-4">
               <div className="flex gap-3">
                 <div className="relative flex-1">
-                  <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <SearchIcon
+                    className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground"
+                    aria-hidden
+                  />
                   <Input
-                    type="text"
+                    type="search"
                     value={query}
-                    onChange={(e) => setQuery(e.target.value.slice(0, 500))}
+                    onChange={(e) => setQuery(e.target.value.slice(0, 120))}
                     placeholder={t('search.searchPlaceholder')}
+                    aria-label={t('search.searchPlaceholder')}
                     className="pl-12 h-12 text-body bg-card border-border"
-                    maxLength={500}
+                    maxLength={120}
                   />
                 </div>
                 <Button type="submit" className="glow-yellow h-12 min-w-[120px]">
@@ -159,47 +145,43 @@ export default function Search() {
           </DCCard>
         </form>
 
-        {/* Filters */}
-        {showResults && (
-          <div className="mb-6">
-            <SearchFilters onFilterChange={setFilters} />
-          </div>
+        <div className="mb-6">
+          <RecordKindFilter selected={kinds} counts={counts} onChange={setKinds} />
+        </div>
+
+        {failures.length > 0 && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertTriangle className="h-4 w-4" aria-hidden />
+            <AlertTitle>{t('search.partialResults')}</AlertTitle>
+            <AlertDescription>
+              {failures.map((failure) => `${labelForKind(failure.kind)}: ${failure.message}`).join(' | ')}
+            </AlertDescription>
+          </Alert>
         )}
 
-        {/* Results */}
-        {showResults ? (
-          filteredResults.length > 0 ? (
-            <SearchResultsList results={filteredResults} query={query} />
-          ) : (
+        <div aria-live="polite">
+          {!submitted ? (
             <EmptyState
               icon={SearchIcon}
-              title="No results found"
-              description="Try adjusting your search query or filters to find what you're looking for."
+              title={t('search.startSearching')}
+              description={t('search.startSearchingDesc')}
             />
-          )
-        ) : (
-          <EmptyState
-            icon={SearchIcon}
-            title="Start searching"
-            description="Enter a query to search across all your connected documents, pages, and apps."
-          >
-            <div className="mt-6">
-              <p className="text-caption text-muted-foreground mb-3">Try searching for:</p>
-              <div className="flex flex-wrap gap-2 justify-center">
-                {["HIPAA", "Marketing report", "Support tickets", "Compliance"].map((term) => (
-                  <Button
-                    key={term}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setQuery(term)}
-                  >
-                    {term}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </EmptyState>
-        )}
+          ) : search.isPending ? (
+            <p className="text-sm text-muted-foreground py-8 text-center">{t('search.searching')}</p>
+          ) : search.isError ? (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" aria-hidden />
+              <AlertTitle>{t('search.failedTitle')}</AlertTitle>
+              <AlertDescription>
+                {search.error instanceof Error ? search.error.message : String(search.error)}
+              </AlertDescription>
+            </Alert>
+          ) : results.length > 0 ? (
+            <RecordResultsList results={results} query={debounced} />
+          ) : (
+            <EmptyState icon={SearchIcon} title={t('search.noResults')} description={t('search.noResultsDesc')} />
+          )}
+        </div>
       </div>
     </div>
   );

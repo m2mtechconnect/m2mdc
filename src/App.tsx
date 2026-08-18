@@ -1,4 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from "react";
+import type React from "react";
 import { boundedRetryDelay, retryUnlessTerminal } from '@/lib/queryRetry';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -35,7 +36,37 @@ import { MANAGED_USER_RETURN_PATH } from '@/connections/managedUserBinding';
 // application via the legacy AuthenticatedShell, loaded lazily so that
 // pilot users' bundle graph is unaffected. Approved users *without* a
 // user_roles row remain sealed inside /pilot/*.
-const AuthenticatedShell = lazy(() => import("./AuthenticatedShell"));
+// TEMPORARY (suspense-retry isolation pass S1/S2/S5). Remove after.
+import EagerAuthenticatedShell from "./AuthenticatedShell";
+const SHELL_MODE = import.meta.env.VITE_AURA_SHELL_MODE ?? 'lazy';
+const shellPromise = SHELL_MODE === 'preresolved' ? import("./AuthenticatedShell") : null;
+const LazyAuthenticatedShell = lazy(() =>
+  shellPromise ? shellPromise : import("./AuthenticatedShell"),
+);
+const AuthenticatedShell = SHELL_MODE === 'eager' ? EagerAuthenticatedShell : LazyAuthenticatedShell;
+
+// TEMPORARY variant S8 (non-suspending shell loader).
+type ShellModule = { default: React.ComponentType };
+let shellModulePromise: Promise<ShellModule> | null = null;
+let shellModule: ShellModule | null = null;
+function loadShellModule(): Promise<ShellModule> {
+  shellModulePromise ??= import("./AuthenticatedShell").then((m) => {
+    shellModule = m as ShellModule;
+    return m as ShellModule;
+  });
+  return shellModulePromise;
+}
+function LoaderAuthenticatedShell() {
+  const [Comp, setComp] = useState<React.ComponentType | null>(() => shellModule?.default ?? null);
+  useEffect(() => {
+    let alive = true;
+    void loadShellModule().then((m) => { if (alive) setComp(() => m.default); });
+    return () => { alive = false; };
+  }, []);
+  if (!Comp) return <LoadingScreen />;
+  return <Comp />;
+}
+const ShellElement = SHELL_MODE === 'loader' ? <LoaderAuthenticatedShell /> : <AuthenticatedShell />;
 const OverlayFixtures = import.meta.env.DEV
   ? lazy(() => import("./pages/test/OverlayFixtures"))
   : null;
@@ -199,7 +230,7 @@ function ApprovedUserRouter() {
           <Route path="/pilot/*" element={<PilotShell />} />
           <Route path="/sign-out" element={<SignOut />} />
           <Route path={MANAGED_USER_RETURN_PATH} element={<ManagedUserReturn />} />
-          <Route path="/*" element={<AuthenticatedShell />} />
+          <Route path="/*" element={ShellElement} />
         </Routes>
       </Suspense>
     );

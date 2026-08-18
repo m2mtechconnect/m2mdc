@@ -1,0 +1,212 @@
+{
+  "summary": {
+    "cold": 0,
+    "warm": 24,
+    "total": 24,
+    "failures": 7,
+    "p50": 789,
+    "p95": 1189,
+    "max": 1189
+  },
+  "rows": [
+    {
+      "id": "warm-0",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 15006,
+      "result": "fallback",
+      "fallbackText": "route suspense fallback visible"
+    },
+    {
+      "id": "warm-1",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 948,
+      "result": "committed"
+    },
+    {
+      "id": "warm-2",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 14954,
+      "result": "fallback",
+      "fallbackText": "route suspense fallback visible"
+    },
+    {
+      "id": "warm-3",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "back",
+      "ms": 561,
+      "result": "committed"
+    },
+    {
+      "id": "warm-4",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "reload",
+      "ms": 14774,
+      "result": "fallback",
+      "fallbackText": "route suspense fallback visible"
+    },
+    {
+      "id": "warm-5",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 870,
+      "result": "committed"
+    },
+    {
+      "id": "warm-6",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 757,
+      "result": "committed"
+    },
+    {
+      "id": "warm-7",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 14995,
+      "result": "fallback",
+      "fallbackText": "route suspense fallback visible"
+    },
+    {
+      "id": "warm-8",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "back",
+      "ms": 540,
+      "result": "committed"
+    },
+    {
+      "id": "warm-9",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "reload",
+      "ms": 15003,
+      "result": "fallback",
+      "fallbackText": "route suspense fallback visible"
+    },
+    {
+      "id": "warm-10",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 561,
+      "result": "committed"
+    },
+    {
+      "id": "warm-11",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 524,
+      "result": "committed"
+    },
+    {
+      "id": "warm-12",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 556,
+      "result": "committed"
+    },
+    {
+      "id": "warm-13",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "back",
+      "ms": 829,
+      "result": "committed"
+    },
+    {
+      "id": "warm-14",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "reload",
+      "ms": 849,
+      "result": "committed"
+    },
+    {
+      "id": "warm-15",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 869,
+      "result": "committed"
+    },
+    {
+      "id": "warm-16",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 894,
+      "result": "committed"
+    },
+    {
+      "id": "warm-17",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 15012,
+      "result": "fallback",
+      "fallbackText": "route suspense fallback visible"
+    },
+    {
+      "id": "warm-18",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "back",
+      "ms": 789,
+      "result": "committed"
+    },
+    {
+      "id": "warm-19",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "reload",
+      "ms": 588,
+      "result": "committed"
+    },
+    {
+      "id": "warm-20",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 14928,
+      "result": "fallback",
+      "fallbackText": "route suspense fallback visible"
+    },
+    {
+      "id": "warm-21",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 579,
+      "result": "committed"
+    },
+    {
+      "id": "warm-22",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=aura",
+      "nav": "direct",
+      "ms": 1189,
+      "result": "committed"
+    },
+    {
+      "id": "warm-23",
+      "mode": "warm",
+      "url": "/dev-minimal-lazy?geometry=nvidia-reference",
+      "nav": "back",
+      "ms": 858,
+      "result": "committed"
+    }
+  ]
+}

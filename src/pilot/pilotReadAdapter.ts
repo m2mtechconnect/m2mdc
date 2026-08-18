@@ -3,13 +3,14 @@
  *
  * Narrowly scoped, SELECT-only client for the two existing read models
  * authorized for the controlled approved-user pilot:
- *   - public.data_centre_twins   (primary AURA overview)
- *   - public.twin_kpi_snapshots  (representative read-only metric inspection)
+ *   - public.data_centre_twins  (primary AURA overview)
+ *   - public.simulation_runs    (canonical KPI envelope; Phase 11 repoint from
+ *     the retired, provenance-free public.twin_kpi_snapshots)
  *
  * Contract (see docs/remediation/evidence/pr-0.1/checkpoint-b7/pilot-data-contract.md):
  *   - explicit column projection only
  *   - RLS relies on existing "created_by_user = auth.uid()" policy on
- *     data_centre_twins and the twin-ownership subselect on twin_kpi_snapshots.
+ *     data_centre_twins and the twin-ownership policy on simulation_runs.
  *     Client filters are defense-in-depth, NOT the security boundary.
  *   - bounded LIMIT
  *   - no insert/update/upsert/delete/rpc/storage/realtime
@@ -48,7 +49,10 @@ export type PilotResult<T> =
   | { status: "unavailable"; reason: string };
 
 const OVERVIEW_LIMIT = 25;
-const KPI_LIMIT = 50;
+/** Runs inspected when flattening the latest KPI envelope. */
+const RUN_LIMIT = 1;
+/** Upper bound on KPI rows derived from one run envelope. */
+export const KPI_LIMIT = 50;
 
 /**
  * Freshness horizon for KPI snapshots. Anything older than this is
@@ -130,15 +134,46 @@ export async function listPilotKpis(twinId: string): Promise<PilotResult<PilotKp
   if (authError || !authData?.user) return { status: "denied" };
   try {
     const { data, error } = await supabase
-      .from("twin_kpi_snapshots")
-      .select("id,twin_id,kpi_key,kpi_value,kpi_unit,domain,snapshot_at")
+      .from("simulation_runs")
+      .select("id,twin_id,final_kpis,created_at")
       .eq("twin_id", twinId)
-      .order("snapshot_at", { ascending: false })
-      .limit(KPI_LIMIT);
-    if (error) return sanitizeError("twin_kpi_snapshots", error);
+      .order("created_at", { ascending: false })
+      .limit(RUN_LIMIT);
+    if (error) return sanitizeError("simulation_runs", error);
     if (!data || data.length === 0) return { status: "empty" };
-    return { status: "ok", data: data as PilotKpiRow[] };
+    const rows = flattenRunKpis(data[0] as PilotRunRow);
+    if (rows.length === 0) return { status: "empty" };
+    return { status: "ok", data: rows };
   } catch (err) {
-    return sanitizeError("twin_kpi_snapshots", err);
+    return sanitizeError("simulation_runs", err);
   }
+}
+
+/** Row shape read from the canonical run table for KPI inspection. */
+export interface PilotRunRow {
+  id: string;
+  twin_id: string;
+  final_kpis: unknown;
+  created_at: string;
+}
+
+/**
+ * Flatten one run's recorded KPI map into inspection rows. Only finite numeric
+ * entries become values; anything else is carried as null so the UI labels it
+ * unvalidated rather than inventing a number.
+ */
+export function flattenRunKpis(run: PilotRunRow): PilotKpiRow[] {
+  const map = run.final_kpis;
+  if (!map || typeof map !== "object") return [];
+  return Object.entries(map as Record<string, unknown>)
+    .slice(0, KPI_LIMIT)
+    .map(([key, raw]) => ({
+      id: `${run.id}:${key}`,
+      twin_id: run.twin_id,
+      kpi_key: key,
+      kpi_value: typeof raw === "number" && Number.isFinite(raw) ? raw : null,
+      kpi_unit: null,
+      domain: null,
+      snapshot_at: run.created_at,
+    }));
 }

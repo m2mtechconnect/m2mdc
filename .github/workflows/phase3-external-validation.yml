@@ -1,0 +1,103 @@
+name: Phase 3 External Validation
+
+# Closes the Phase 3 infrastructure gate against an EPHEMERAL local Supabase
+# stack. The production project is never reachable from this job: no production
+# secrets are exposed to it, and the validator refuses any non-local API URL
+# when --require-infrastructure is set.
+
+on:
+  push:
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/functions/**'
+      - 'scripts/phase3/**'
+      - '.github/workflows/phase3-external-validation.yml'
+  pull_request:
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/functions/**'
+      - 'scripts/phase3/**'
+      - '.github/workflows/phase3-external-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase3-external-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Ephemeral Supabase stack
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      # Explicitly neutralise any ambient production configuration.
+      SUPABASE_PROJECT_ID: ''
+      VITE_SUPABASE_URL: ''
+      VITE_SUPABASE_PUBLISHABLE_KEY: ''
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.34.3
+
+      - name: Record tool versions
+        run: |
+          echo "AURA_VALIDATION_CLI_VERSION=$(supabase --version)" >> "$GITHUB_ENV"
+          psql --version || true
+
+      - name: Start ephemeral Supabase stack
+        run: supabase start -x studio,imgproxy,inbucket,logflare,vector,pgbouncer
+
+      - name: Capture local credentials
+        run: |
+          supabase status -o env > /tmp/supabase.env
+          set -a; . /tmp/supabase.env; set +a
+          {
+            echo "AURA_VALIDATION_DB_URL=$DB_URL"
+            echo "AURA_VALIDATION_API_URL=$API_URL"
+          } >> "$GITHUB_ENV"
+          {
+            echo "AURA_VALIDATION_ANON_KEY=$ANON_KEY"
+            echo "AURA_VALIDATION_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+          } >> "$GITHUB_ENV"
+          echo "::add-mask::$ANON_KEY"
+          echo "::add-mask::$SERVICE_ROLE_KEY"
+
+      - name: Serve edge functions
+        run: |
+          nohup supabase functions serve --no-verify-jwt=false > /tmp/functions.log 2>&1 &
+          for i in $(seq 1 60); do
+            curl -sf -o /dev/null "$AURA_VALIDATION_API_URL/functions/v1/run-lifecycle" -X OPTIONS && break
+            sleep 2
+          done
+
+      - name: Run Phase 3 external validation
+        run: |
+          node scripts/phase3/external-validation.mjs \
+            --require-infrastructure \
+            --json phase3-external-validation.json
+
+      - name: Edge function logs
+        if: always()
+        run: tail -n 200 /tmp/functions.log || true
+
+      - name: Upload validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase3-external-validation
+          path: phase3-external-validation.json
+          if-no-files-found: warn
+
+      - name: Stop stack
+        if: always()
+        run: supabase stop --no-backup || true

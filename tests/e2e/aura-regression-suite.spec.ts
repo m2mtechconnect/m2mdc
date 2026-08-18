@@ -594,7 +594,7 @@ test.describe('AURA Regression Suite @regression', () => {
 
   test.describe('11. Network & Performance', () => {
     test('should have no 4xx/5xx errors in core flows', async ({ page }) => {
-      const failed Requests: string[] = [];
+      const failedRequests: string[] = [];
 
       page.on('response', response => {
         if (response.status() >= 400 && response.status() < 600) {

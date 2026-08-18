@@ -39,7 +39,6 @@ export function SovereignDCDeploymentSteps({
   const [deploymentStarted, setDeploymentStarted] = useState(false);
   const [deploymentPhase, setDeploymentPhase] = useState<string>('');
   const [deploymentComplete, setDeploymentComplete] = useState(false);
-  const [smokeTestPassed, setSmokeTestPassed] = useState(false);
   const navigate = useNavigate();
   
   const config = template?.default_config || {};
@@ -107,7 +106,6 @@ export function SovereignDCDeploymentSteps({
       }
 
       // No post-deploy smoke test is executed here, so none is claimed.
-      setSmokeTestPassed(false);
       setDeploymentComplete(true);
       setDeploymentPhase('');
 

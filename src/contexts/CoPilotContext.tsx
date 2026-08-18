@@ -170,7 +170,7 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
         pageName = 'manage_agents';
       } else if (path.includes('/data-centre-twin')) {
         pageName = 'data_centre_twin';
-        const twinId = path.match(/\/data-centre-twin\/([^\/]+)/)?.[1] || 'default';
+        const twinId = path.match(/\/data-centre-twin\/([^/]+)/)?.[1] || 'default';
         additionalContext.agentId = twinId;
         
         // Detect view from query params
@@ -178,7 +178,7 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
         if (view === 'simulation') additionalContext.activeTab = 'simulation';
       } else if (path.includes('/blueprint')) {
         pageName = 'blueprint';
-        const blueprintId = path.match(/\/blueprint\/([^\/]+)/)?.[1] || 'default';
+        const blueprintId = path.match(/\/blueprint\/([^/]+)/)?.[1] || 'default';
         additionalContext.agentId = blueprintId;
       }
   

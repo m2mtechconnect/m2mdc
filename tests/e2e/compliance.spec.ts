@@ -42,7 +42,7 @@ test.describe('Compliance & Audit', () => {
     
     // Verify file is not empty
     const path = await download.path();
-    const fs = require('fs');
+    const fs = await import('node:fs');
     const stats = fs.statSync(path);
     expect(stats.size).toBeGreaterThan(0);
   });

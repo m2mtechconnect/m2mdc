@@ -161,7 +161,7 @@ function extractTextFromPdf(content: string): string {
     .replace(/%.*?\n/g, ' '); // Remove comments
   
   // Extract words (sequences of readable characters)
-  const words = cleaned.match(/[a-zA-Z0-9][a-zA-Z0-9\s.,;:!?'"()$%\-]{2,}/g);
+  const words = cleaned.match(/[a-zA-Z0-9][a-zA-Z0-9\s.,;:!?'"()$%-]{2,}/g);
   
   if (words && words.length > 10) {
     return words.join(' ');

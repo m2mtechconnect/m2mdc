@@ -40,7 +40,7 @@ function extractContentMultiPass(doc: any, html: string): { text: string; method
       results.push({ text, method: `semantic:${selector}`, wordCount });
     }
       }
-    } catch {}
+    } catch { /* best-effort capture step */ }
   }
   
   // PASS 2: Heading + Paragraph extraction (aggressive)
@@ -60,7 +60,7 @@ function extractContentMultiPass(doc: any, html: string): { text: string; method
     if (text.length > 20) {
       results.push({ text, method: 'heading-paragraph-list', wordCount });
     }
-  } catch {}
+  } catch { /* best-effort capture step */ }
   
   // PASS 3: Meta tag extraction (descriptions, OG tags)
   try {
@@ -95,7 +95,7 @@ function extractContentMultiPass(doc: any, html: string): { text: string; method
     if (text.length > 20) {
       results.push({ text, method: 'meta-tags', wordCount });
     }
-  } catch {}
+  } catch { /* best-effort capture step */ }
   
   // PASS 4: Body text as last resort (but clean it)
   try {
@@ -116,7 +116,7 @@ function extractContentMultiPass(doc: any, html: string): { text: string; method
         results.push({ text, method: 'body-cleaned', wordCount });
       }
     }
-  } catch {}
+  } catch { /* best-effort capture step */ }
   
   // Return the result with most words
   if (results.length === 0) {

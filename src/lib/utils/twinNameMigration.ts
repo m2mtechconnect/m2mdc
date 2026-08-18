@@ -38,7 +38,7 @@ export function isTwinNameBroken(name: string | undefined): boolean {
   if (twinBaseIndex > 0) {
     const prefix = name.substring(0, twinBaseIndex).trim();
     // Prefix should be a reasonable company name (not URL fragments, special chars, etc.)
-    if (prefix.length < 2 || /^[!()\[\]{}]/.test(prefix) || /^https?:/i.test(prefix)) {
+    if (prefix.length < 2 || /^[!()[\]{}]/.test(prefix) || /^https?:/i.test(prefix)) {
       return true;
     }
   }
@@ -86,7 +86,7 @@ export function extractDomainFromBrokenName(name: string): string | null {
   if (!name) return null;
   
   // Try to find URL pattern in the name
-  const urlMatch = name.match(/https?:\/\/([^\/\s]+)/i);
+  const urlMatch = name.match(/https?:\/\/([^/\s]+)/i);
   if (urlMatch) {
     return urlMatch[1].replace(/^www\./i, '');
   }

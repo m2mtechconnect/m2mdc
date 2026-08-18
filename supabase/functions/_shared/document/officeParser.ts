@@ -65,7 +65,7 @@ export async function extractFromDocx(bytes: Uint8Array): Promise<string> {
     // Fallback: try simple text extraction
     const decoder = new TextDecoder('utf-8', { fatal: false });
     const text = decoder.decode(bytes);
-    const words = text.match(/[a-zA-Z0-9][a-zA-Z0-9\s.,;:!?'"()$%\-]{2,}/g);
+    const words = text.match(/[a-zA-Z0-9][a-zA-Z0-9\s.,;:!?'"()$%-]{2,}/g);
     
     if (words && words.length > 10) {
       return words.join(' ');
@@ -117,7 +117,7 @@ export async function extractFromPptx(bytes: Uint8Array): Promise<string> {
     // Fallback: try simple text extraction
     const decoder = new TextDecoder('utf-8', { fatal: false });
     const text = decoder.decode(bytes);
-    const words = text.match(/[a-zA-Z0-9][a-zA-Z0-9\s.,;:!?'"()$%\-]{2,}/g);
+    const words = text.match(/[a-zA-Z0-9][a-zA-Z0-9\s.,;:!?'"()$%-]{2,}/g);
     
     if (words && words.length > 10) {
       return words.join(' ');

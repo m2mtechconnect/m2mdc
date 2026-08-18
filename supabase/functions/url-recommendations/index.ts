@@ -95,7 +95,7 @@ serve(async (req) => {
     const normalizedDomain = urlObj.hostname.replace(/^www\./, '');
 
     // Get or create site
-    let { data: site, error: siteError } = await supabase
+    const { data: site, error: siteError } = await supabase
       .from('sites')
       .select('*')
       .eq('domain', normalizedDomain)
@@ -166,7 +166,7 @@ serve(async (req) => {
     // Force Ingest mode with SSE streaming - DEPRECATED
     // Turbo-capture now handles capture and DB insertion
     // This SSE mode is kept for backwards compatibility but should not be used
-    if (forceIngest && false) {
+    if (false as boolean) { // DEPRECATED SSE path, retained for reference only
       console.log(`[Recommendations] Force Ingest mode with SSE for ${normalizedDomain}`);
       
       const keyPaths = ['', '/about', '/products', '/solutions', '/services', '/pricing', '/company'];

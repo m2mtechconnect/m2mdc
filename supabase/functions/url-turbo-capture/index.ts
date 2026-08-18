@@ -942,7 +942,7 @@ serve(async (req) => {
           console.log('[Turbo-Capture] Inserting analyzed pages into site_pages table...');
           
           // Get or create site
-          let { data: site, error: siteError } = await supabase
+          const { data: site, error: siteError } = await supabase
             .from('sites')
             .select('*')
             .eq('domain', domain)

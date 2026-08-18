@@ -33,7 +33,6 @@ import { LoadingState, NoTwinSelectedEmptyState } from '@/components/ui/empty-st
 import { ModeBadge, SnapshotBadge } from '@/components/ui/snapshot-indicator';
 
 export default function DataCentreTwin() {
-  console.log('[DIAG] DataCentreTwin render');
   const { t } = useTranslation();
   const { id } = useParams<{ id?: string }>();
   const [searchParams] = useSearchParams();

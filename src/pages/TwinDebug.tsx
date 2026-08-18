@@ -229,30 +229,30 @@ export default function TwinDebug() {
         <TabsContent value="telemetry">
           <Card>
             <CardHeader>
-              <CardTitle>Telemetry Sources ({telemetry.data?.length || 0} records)</CardTitle>
+              <CardTitle>Telemetry Sources ({telemetry.data?.readings.length || 0} records)</CardTitle>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[400px]">
-                {telemetry.data && telemetry.data.length > 0 ? (
+                {telemetry.data && telemetry.data.readings.length > 0 ? (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Domain</TableHead>
-                        <TableHead>Metric</TableHead>
+                        <TableHead>Provenance</TableHead>
+                        <TableHead>Property</TableHead>
                         <TableHead>Value</TableHead>
-                        <TableHead>Recorded</TableHead>
+                        <TableHead>Observed</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {telemetry.data.slice(0, 50).map((t: any) => (
+                      {telemetry.data.readings.slice(0, 50).map((t) => (
                         <TableRow key={t.id}>
                           <TableCell>
-                            <Badge variant="outline">{t.domain}</Badge>
+                            <Badge variant="outline">{t.provenanceClass}</Badge>
                           </TableCell>
-                          <TableCell className="font-mono text-sm">{t.metric_key}</TableCell>
-                          <TableCell>{t.metric_value}</TableCell>
+                          <TableCell className="font-mono text-sm">{t.targetProperty}</TableCell>
+                          <TableCell>{formatReadingValue(t)}</TableCell>
                           <TableCell className="text-sm text-muted-foreground">
-                            {new Date(t.recorded_at).toLocaleString()}
+                            {t.observedAt ? new Date(t.observedAt).toLocaleString() : '-'}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -260,7 +260,7 @@ export default function TwinDebug() {
                   </Table>
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
-                    No telemetry data for this twin yet.
+                    No ingested readings recorded for this twin yet.
                   </div>
                 )}
               </ScrollArea>

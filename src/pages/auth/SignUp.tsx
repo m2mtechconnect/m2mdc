@@ -15,6 +15,7 @@ import { Loader2, Lock, Mail, Eye, EyeOff, User } from "lucide-react";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthLayout, SecurityBadge, PasswordStrengthMeter, SSOButtons } from "@/components/auth";
+import { signInWithGoogle } from "@/auth/ssoProviders";
 
 const signUpSchema = z.object({
   name: z.string()
@@ -111,15 +112,12 @@ export default function SignUp() {
   };
 
   const handleGoogleSSO = async () => {
-    toast.info("Google SSO coming soon. Contact your administrator.");
-  };
-
-  const handleMicrosoftSSO = async () => {
-    toast.info("Microsoft SSO coming soon. Contact your administrator.");
-  };
-
-  const handleEnterpriseSSO = async () => {
-    toast.info("Enterprise SSO coming soon. Contact your administrator.");
+    setLoading(true);
+    const { error: ssoError } = await signInWithGoogle();
+    if (ssoError) {
+      setLoading(false);
+      toast.error(ssoError);
+    }
   };
 
   return (
@@ -246,8 +244,6 @@ export default function SignUp() {
         {/* SSO Options */}
         <SSOButtons
           onGoogleClick={handleGoogleSSO}
-          onMicrosoftClick={handleMicrosoftSSO}
-          onSSOClick={handleEnterpriseSSO}
           disabled={loading}
         />
 

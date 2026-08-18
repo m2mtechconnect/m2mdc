@@ -1,10 +1,14 @@
 /**
  * SSO Login Buttons
- * Placeholder buttons for enterprise SSO providers
+ *
+ * Only providers configured on the backend are actionable. Unconfigured
+ * providers render disabled with an explicit reason so the UI never implies
+ * a capability that does not exist.
  */
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { SSO_PROVIDERS } from '@/auth/ssoProviders';
 
 interface SSOButtonsProps {
   onGoogleClick?: () => void;
@@ -21,6 +25,9 @@ export function SSOButtons({
   disabled,
   className 
 }: SSOButtonsProps) {
+  const google = SSO_PROVIDERS.google;
+  const microsoft = SSO_PROVIDERS.microsoft;
+  const enterprise = SSO_PROVIDERS.enterprise;
   return (
     <div className={cn("space-y-3", className)}>
       <div className="relative">
@@ -39,7 +46,8 @@ export function SSOButtons({
           type="button"
           variant="outline"
           onClick={onGoogleClick}
-          disabled={disabled}
+          disabled={disabled || !google.available}
+          title={google.available ? undefined : google.unavailableReason}
           className="h-11 gap-2 font-medium hover:bg-muted/50"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24">
@@ -67,7 +75,8 @@ export function SSOButtons({
           type="button"
           variant="outline"
           onClick={onMicrosoftClick}
-          disabled={disabled}
+          disabled={disabled || !microsoft.available}
+          title={microsoft.available ? undefined : microsoft.unavailableReason}
           className="h-11 gap-2 font-medium hover:bg-muted/50"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24">
@@ -84,7 +93,8 @@ export function SSOButtons({
         type="button"
         variant="outline"
         onClick={onSSOClick}
-        disabled={disabled}
+        disabled={disabled || !enterprise.available}
+        title={enterprise.available ? undefined : enterprise.unavailableReason}
         className="w-full h-11 gap-2 font-medium hover:bg-muted/50"
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -92,6 +102,12 @@ export function SSOButtons({
         </svg>
         Enterprise SSO
       </Button>
+
+      {(!microsoft.available || !enterprise.available) && (
+        <p className="text-xs text-muted-foreground text-center">
+          Microsoft and SAML enterprise SSO are not configured for this tenant.
+        </p>
+      )}
     </div>
   );
 }

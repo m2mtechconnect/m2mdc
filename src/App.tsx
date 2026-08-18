@@ -16,7 +16,7 @@ import { fetchProfileFields } from "@/lib/auth/profileQuery";
 import type { Session, User } from "@supabase/supabase-js";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
 import { initChangeLogMiddleware } from "@/stores/dcBuilderChangeLogMiddleware";
-import { SignIn, SignUp, SignOut, ForgotPassword, MFA } from "./pages/auth/index";
+import { SignIn, SignUp, SignOut, ForgotPassword, MFA, AuthCallback } from "./pages/auth/index";
 import DataCentreTwin from "./pages/DataCentreTwin";
 import DataCentreTwinLanding from "./pages/DataCentreTwinLanding";
 import TwinPreview from "./pages/TwinPreview";
@@ -133,6 +133,7 @@ function AuthenticatedApp() {
         <Route path="/" element={<DataCentreTwinLanding />} />
         <Route path="/auth" element={onboardingDone ? <SignIn /> : <Navigate to="/onboarding" replace />} />
         <Route path="/login" element={<SignIn />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/sign-in" element={onboardingDone ? <SignIn /> : <Navigate to="/onboarding" replace />} />
         <Route path="/sign-up" element={onboardingDone ? <SignUp /> : <Navigate to="/onboarding" replace />} />
         <Route path="/sign-out" element={<SignOut />} />

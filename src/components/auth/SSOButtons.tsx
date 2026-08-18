@@ -46,7 +46,8 @@ export function SSOButtons({
           type="button"
           variant="outline"
           onClick={onGoogleClick}
-          disabled={disabled}
+          disabled={disabled || !google.available}
+          title={google.available ? undefined : google.unavailableReason}
           className="h-11 gap-2 font-medium hover:bg-muted/50"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24">
@@ -74,7 +75,8 @@ export function SSOButtons({
           type="button"
           variant="outline"
           onClick={onMicrosoftClick}
-          disabled={disabled}
+          disabled={disabled || !microsoft.available}
+          title={microsoft.available ? undefined : microsoft.unavailableReason}
           className="h-11 gap-2 font-medium hover:bg-muted/50"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24">
@@ -91,7 +93,8 @@ export function SSOButtons({
         type="button"
         variant="outline"
         onClick={onSSOClick}
-        disabled={disabled}
+        disabled={disabled || !enterprise.available}
+        title={enterprise.available ? undefined : enterprise.unavailableReason}
         className="w-full h-11 gap-2 font-medium hover:bg-muted/50"
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -99,6 +102,12 @@ export function SSOButtons({
         </svg>
         Enterprise SSO
       </Button>
+
+      {(!microsoft.available || !enterprise.available) && (
+        <p className="text-xs text-muted-foreground text-center">
+          Microsoft and SAML enterprise SSO are not configured for this tenant.
+        </p>
+      )}
     </div>
   );
 }

@@ -64,6 +64,19 @@ export default function Settings() {
     loadSettings();
   }, []);
 
+  const notifications = useNotificationPreferences();
+
+  const handleNotificationChange = async (
+    patch: Parameters<typeof notifications.update>[0]
+  ) => {
+    const { error } = await notifications.update(patch);
+    if (error) {
+      toast.error(error);
+      return;
+    }
+    toast.success('Notification preferences saved');
+  };
+
   const loadSettings = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();

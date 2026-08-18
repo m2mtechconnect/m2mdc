@@ -319,8 +319,11 @@ export function DecisionLog() {
       <CardHeader className="pb-2">
         <CardTitle className="text-sm">Decision log</CardTitle>
         <CardDescription className="text-xs">
-          Append-only record of human decisions in this session. Each entry keeps the evidence
-          snapshot that was on screen when the decision was made.
+          Append-only record of human decisions. Each entry keeps the evidence snapshot that was on
+          screen when the decision was made.{' '}
+          {rt.decisionPersistence === 'durable'
+            ? 'Recorded durably in the decision_records log.'
+            : 'Not signed in: decisions stay in this session only and are lost on reload.'}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3 text-xs">

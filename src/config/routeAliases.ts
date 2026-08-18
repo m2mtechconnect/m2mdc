@@ -69,17 +69,21 @@ export const ROUTE_ALIASES: RouteAlias[] = [
   { from: '/universal-search', to: '/search' },
   { from: '/settings/integrations/nvidia-dsx', to: '/manage/integrations#nvidia-dsx' },
   { from: '/twin-datacentre', to: '/blueprint/default' },
-  { from: '/auth', to: '/' },
-  { from: '/sign-in', to: '/' },
-  { from: '/sign-up', to: '/' },
-  { from: '/forgot-password', to: '/' },
-  { from: '/mfa', to: '/' },
-  { from: '/digital-twins', to: '/' },
+  // Phase 2: these used to redirect to `/`, which is itself an alias of
+  // `/dashboard`, so every signed-in hit on an auth path cost two history
+  // entries and could land on the landing page for a frame. They now point
+  // at the terminal destination directly.
+  { from: '/auth', to: '/dashboard' },
+  { from: '/sign-in', to: '/dashboard' },
+  { from: '/sign-up', to: '/dashboard' },
+  { from: '/forgot-password', to: '/dashboard' },
+  { from: '/mfa', to: '/dashboard' },
+  { from: '/digital-twins', to: '/dashboard' },
   {
     from: '/digital-twins/:slug',
-    to: '/',
+    to: '/dashboard',
     sample: '/digital-twins/montreal',
-    expected: '/',
+    expected: '/dashboard',
   },
 ];
 

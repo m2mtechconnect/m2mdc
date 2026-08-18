@@ -27,9 +27,6 @@ import DatasetCanaryBanner from '@/components/dataset/DatasetCanaryBanner';
 import ReferenceRouteGate from '@/components/dataset/ReferenceRouteGate';
 import { AdminRouteGuard } from '@/routing/AdminRouteGuard';
 import NotFound from "./pages/NotFound";
-// TEMPORARY (suspense-retry isolation pass). Remove after.
-import EagerMinimalProbe from "./pages/test/MinimalLazyProbe";
-const LazyMinimalProbe = lazy(() => import("./pages/test/MinimalLazyProbe"));
 
 /**
  * Phase 11 - route-level code splitting.
@@ -124,8 +121,6 @@ function ApprovedUserRoutes() {
     <Routes>
       {/* Stage 6G: /dashboard is canonical; `/` redirects via ROUTE_ALIASES. */}
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/dev-minimal-lazy" element={<LazyMinimalProbe />} />
-      <Route path="/dev-minimal-eager" element={<EagerMinimalProbe />} />
       {/* PW-P2-05: signed-in users must never see a 404 on an auth entry
           route. They are sent to their authorized default workspace, keeping
           a safe same-origin return path when one was supplied. */}

@@ -63,7 +63,6 @@ import { useBlueprintKPIs } from '@/hooks/useBlueprintKPIs';
 import { DcToolsStrip } from '@/components/dc-tools';
 import { SovereigntyAnalyticsTab } from '@/components/telemetry/SovereigntyAnalyticsTab';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
-import { useTwinTelemetry, useTwinKPIs } from '@/hooks/useTwinData';
 import { useTwinKPIsFromSimulation } from '@/hooks/useTwinKPIsFromSimulation';
 import { useAgentKPIBindings } from '@/hooks/useTwinAgentsCatalog';
 import { KPI_CATALOG, KPIKey } from '@/domain/greenDc/kpiCatalog';

@@ -48,6 +48,7 @@ import type {
   ScenarioDefinition,
   RackMetrics,
 } from './types';
+import { deriveSeed, mulberry32, type SeededRandom } from './orchestrator/prng';
 
 // KPI metadata for result generation
 const KPI_METADATA: Record<string, { label: string; unit: string; higherIsBetter: boolean }> = {
@@ -209,11 +210,15 @@ function generateRecommendations(
   return markdown;
 }
 
-// Generate rack metrics with scenario-based variations
+// Generate rack metrics with scenario-based variations.
+// `random` is supplied by the orchestrator so fluctuations are reproducible
+// from a recorded seed. It defaults to a fixed-seed generator rather than
+// `Math.random()` so no caller can produce an unreproducible result.
 export function generateRackMetrics(
   baseRacks: RackMetrics[],
   events: SimulationEvent[],
-  currentTime: number
+  currentTime: number,
+  random: SeededRandom = mulberry32(deriveSeed(`rack-metrics|${currentTime}`))
 ): RackMetrics[] {
   const thermalEvents = events.filter(e => e.domain === 'thermal_hardware' || e.domain === 'cooling');
   const hasHotEvent = thermalEvents.some(e => e.severity === 'critical' || e.severity === 'high' || e.severity === 'medium');
@@ -233,10 +238,10 @@ export function generateRackMetrics(
       }
     }
 
-    // Random fluctuations
-    tempDelta += (Math.random() - 0.5) * 2;
-    gpuDelta += (Math.random() - 0.5) * 10;
-    powerDelta += (Math.random() - 0.5) * 1;
+    // Seeded fluctuations
+    tempDelta += (random() - 0.5) * 2;
+    gpuDelta += (random() - 0.5) * 10;
+    powerDelta += (random() - 0.5) * 1;
 
     return {
       ...rack,
@@ -254,8 +259,12 @@ export function generateSimulationResult(
   events: SimulationEvent[],
   baselineKpis: Record<string, number>,
   finalKpis: Record<string, number>,
-  durationSec: number
+  durationSec: number,
+  options: { random?: SeededRandom } = {}
 ): SimulationResultSummary {
+  // Seeded by default: this function must never draw from `Math.random()`.
+  const random =
+    options.random ?? mulberry32(deriveSeed(`${scenario?.id ?? 'unknown'}|${durationSec}`));
   // Generate KPI deltas
   const kpiDeltas: SimulationKpiDelta[] = Object.keys(baselineKpis)
     .filter(key => KPI_METADATA[key])
@@ -279,7 +288,7 @@ export function generateSimulationResult(
 
   // Generate actual vs expected comparisons
   const actualVsExpected = kpiDeltas.slice(0, 4).map(kpi => {
-    const expectedDelta = (Math.random() - 0.3) * 15;
+    const expectedDelta = (random() - 0.3) * 15;
     const actualDelta = ((kpi.after - kpi.before) / kpi.before) * 100;
     return {
       metric: kpi.label,

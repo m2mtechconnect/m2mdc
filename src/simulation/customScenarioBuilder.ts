@@ -36,12 +36,14 @@
 import type { ScenarioDefinition, ScenarioTimelineStep, CustomScenarioConfig } from './types';
 import type { DomainType } from '@/types/dataCenterTwin';
 import { addCustomScenario } from './scenarioRegistry';
+import { newIdentifier } from './orchestrator/prng';
 
 /**
  * Create a custom scenario from user configuration
  */
 export function createCustomScenario(config: CustomScenarioConfig): ScenarioDefinition {
-  const id = `custom-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  // Identifier only (not simulation output): UUID-backed, no Math.random.
+  const id = newIdentifier('custom');
   
   // Build timeline from config steps
   const timeline: ScenarioTimelineStep[] = [];

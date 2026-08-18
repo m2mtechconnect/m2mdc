@@ -6,6 +6,8 @@
  * simulation facade (`src/simulation/api.ts`) or, transitionally, on this
  * compat module directly.
  */
+
+import { newIdentifier } from '../orchestrator/prng';
 /**
  * Sovereign Data Center Simulation Engine
  * Deterministic frontend logic for simulating KPI changes
@@ -273,7 +275,8 @@ export function createSimulationRun(
   };
 
   return {
-    id: `sim-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    // Identifier only (not simulation output): UUID-backed, no Math.random.
+    id: newIdentifier('sim'),
     facilityId,
     name: typeNames[type] || 'Simulation',
     type,
@@ -281,7 +284,9 @@ export function createSimulationRun(
     resultsSummary: result.resultsSummary,
     kpiDeltas: result.kpiDeltas,
     createdAt: new Date().toISOString(),
-    durationMs: Math.floor(Math.random() * 3000) + 1000,
+    // Wall-clock duration is not known here; report 0 rather than inventing
+    // a random elapsed time that would read as a measured figure.
+    durationMs: 0,
     status: 'completed',
   };
 }

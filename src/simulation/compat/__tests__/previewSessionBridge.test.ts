@@ -8,7 +8,8 @@ import { createBuilderPreviewSession } from '../previewSessionBridge';
 
 const ROOT = process.cwd();
 const ALLOWED = new Set([
-  'src/simulation/compat/previewSessionBridge.ts',
+  // Phase 2: engines are constructed only by the orchestrator's providers.
+  'src/simulation/orchestrator/providers/builderPreviewProviders.ts',
   'src/components/builder/step5/BuilderPreviewEngine.ts',
   'src/components/builder/step5/fixtures/builderMock.ts',
 ]);
@@ -35,7 +36,7 @@ describe('builder preview session bridge', () => {
     expect(outcome.provenance).toBe('unavailable');
   });
 
-  it('labels the estimator path as deterministic and simulated', () => {
+  it('labels the estimator path as seeded-stochastic and simulated', () => {
     const outcome = createBuilderPreviewSession({
       scenario: { id: 'demo', title: 'Demo' },
       speed: 1,
@@ -44,7 +45,11 @@ describe('builder preview session bridge', () => {
     });
     expect(outcome.kind).toBe('ok');
     if (outcome.kind !== 'ok') return;
-    expect(outcome.executionClass).toBe('aura-deterministic');
+    // Phase 2 correction: the estimator draws from a PRNG, so it is seeded,
+    // not deterministic. The seed is recorded on the provenance record.
+    expect(outcome.executionClass).toBe('aura-stochastic-seeded');
+    expect(outcome.record.seed).toBeTypeOf('number');
+    expect(outcome.record.prngAlgorithm).toBe('mulberry32-v1');
     expect(outcome.provenance).toBe('simulated');
     expect(outcome.fixtureBacked).toBe(false);
     outcome.engine.stop();

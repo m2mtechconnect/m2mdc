@@ -59,7 +59,11 @@ export function SystemConfigTabs({ system, onEdit }: SystemConfigTabsProps) {
               </div>
               <div className="flex justify-between items-center p-3 rounded-md bg-muted/50">
                 <span className="text-sm text-muted-foreground">Department</span>
-                <Badge variant="outline">{system.department}</Badge>
+                {system.department ? (
+                  <Badge variant="outline">{system.department}</Badge>
+                ) : (
+                  <span className="text-sm text-muted-foreground">Not assigned</span>
+                )}
               </div>
               <div className="flex justify-between items-center p-3 rounded-md bg-muted/50">
                 <span className="text-sm text-muted-foreground">Type</span>

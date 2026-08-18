@@ -7073,7 +7073,6 @@ export type Database = {
         Args: { _bucket_key: string; _intake_kind: string; _limit: number }
         Returns: boolean
       }
-      current_auth_email: { Args: never; Returns: string }
       current_tenant_id: { Args: never; Returns: string }
       delete_secret_from_vault: {
         Args: { vault_id: string }

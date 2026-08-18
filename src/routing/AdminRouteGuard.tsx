@@ -1,5 +1,5 @@
 /**
- * Phase 11 - route-level authorization for every /admin/* destination.
+ * Route-level authorization for every /admin/* destination.
  *
  * Before this guard, administration pages were mounted unconditionally by
  * AuthenticatedShell and relied on each page policing itself, while the nav
@@ -11,23 +11,33 @@
  *   - error    -> deny
  *   - pilot / non-internal / wrong role -> redirect to /dashboard
  */
+/*
+ * Phase 1 (authorization consolidation). The guard previously hardcoded
+ * `['admin','security_admin']` while `src/auth/permissions.ts` - the declared
+ * canonical model - grants `platform.view_admin_console` to admin,
+ * security_admin AND tenant `owner`, and two admin pages independently
+ * admitted `executive` and `manager`. Three sources of truth answered one
+ * question. The decision now runs through the canonical permission; role
+ * labels are no longer compared here.
+ */
 
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useRBAC } from '@/contexts/RBACContext';
-import type { AppRole } from '@/contexts/RBACContext';
+import type { Permission } from '@/auth/permissions';
 
-/** Roles permitted to reach an administration route. */
-export const ADMIN_ROUTE_ROLES: AppRole[] = ['admin', 'security_admin'];
+/** The single permission that admits a caller to the administration console. */
+export const ADMIN_CONSOLE_PERMISSION: Permission = 'platform.view_admin_console';
 
 export function AdminRouteGuard({
   children,
-  roles = ADMIN_ROUTE_ROLES,
+  permission = ADMIN_CONSOLE_PERMISSION,
 }: {
   children: ReactNode;
-  roles?: AppRole[];
+  /** Override only for a route that needs a narrower permission. */
+  permission?: Permission;
 }) {
-  const { resolution, hasAccess } = useRBAC();
+  const { resolution, can } = useRBAC();
 
   if (resolution.status === 'loading') {
     return (
@@ -41,7 +51,7 @@ export function AdminRouteGuard({
     );
   }
 
-  if (resolution.status !== 'internal' || !hasAccess(roles)) {
+  if (resolution.status !== 'internal' || !can(permission)) {
     return <Navigate to="/dashboard" replace />;
   }
 

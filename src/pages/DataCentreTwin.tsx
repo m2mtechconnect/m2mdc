@@ -144,7 +144,22 @@ export default function DataCentreTwin() {
       <div className="min-h-screen bg-background">
         <div className="container mx-auto py-6 px-4 space-y-6">
           {/* Demo/Session Header - Hidden for cleaner UI */}
-          
+
+          {/* Facility model is part of the twin page in every source mode:
+              a demo or draft session must still mount the 3D scene so that
+              deep links such as ?geometry=nvidia-reference resolve. */}
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Activity className="h-4 w-4 text-primary" />
+                Facility Model (Simulated)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TwinVisualizationLayout mode="dashboard" />
+            </CardContent>
+          </Card>
+
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="h-auto flex-wrap gap-1">
               <TabsTrigger value="dashboard" className="gap-2">

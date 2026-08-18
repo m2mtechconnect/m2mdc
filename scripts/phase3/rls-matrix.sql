@@ -144,4 +144,121 @@ BEGIN
   RAISE NOTICE 'RLS MATRIX COMPLETE';
 END $outer$;
 
+-- ---------------------------------------------------------------------------
+-- Extended identity matrix (Phase 3 infrastructure closure pass).
+--
+-- Identity model note, recorded honestly: AURA policies key on auth.uid() plus
+-- public.user_roles, NOT on a tenant claim in the JWT. A tenant is therefore a
+-- user identity here. "Approver" is not a database-level privilege: approval
+-- authority is enforced by the record-decision Edge Function, which is proven
+-- over HTTP by scripts/phase3/external-validation.mjs, not by these policies.
+-- No platform-administrator role exists beyond public.user_roles 'admin'.
+-- ---------------------------------------------------------------------------
+DO $ext$
+DECLARE
+  member_a uuid := gen_random_uuid();
+  approver_a uuid := gen_random_uuid();
+  admin_a uuid := gen_random_uuid();
+  member_b uuid := gen_random_uuid();
+  approver_b uuid := gen_random_uuid();
+  twin_a uuid;
+  run_a uuid;
+  n int;
+  ok boolean;
+BEGIN
+  INSERT INTO auth.users (id, instance_id, aud, role, email, encrypted_password,
+                          email_confirmed_at, created_at, updated_at)
+  SELECT u.id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
+         u.id || '@validation.invalid', '', now(), now(), now()
+  FROM (VALUES (member_a), (approver_a), (admin_a), (member_b), (approver_b)) AS u(id);
+
+  INSERT INTO public.user_roles (user_id, role) VALUES
+    (approver_a, 'operator'), (admin_a, 'admin'), (approver_b, 'operator');
+
+  INSERT INTO public.data_centre_twins (name, created_by_user)
+  VALUES ('validation-twin-ext-a', member_a) RETURNING id INTO twin_a;
+
+  INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, lifecycle_status)
+  VALUES (member_a, member_a, twin_a, 'succeeded') RETURNING id INTO run_a;
+
+  ------------------------------------------------------------- anon writes
+  PERFORM set_config('request.jwt.claims', NULL, true);
+  PERFORM set_config('role', 'anon', true);
+  ok := false;
+  BEGIN
+    INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, lifecycle_status)
+    VALUES (member_a, member_a, twin_a, 'queued');
+  EXCEPTION WHEN OTHERS THEN ok := true;
+  END;
+  PERFORM pg_temp.expect('anonymous insert into simulation_runs denied', ok, true);
+
+  ok := false;
+  BEGIN
+    UPDATE public.simulation_runs SET final_kpis = '{}'::jsonb WHERE id = run_a;
+    GET DIAGNOSTICS n = ROW_COUNT;
+    ok := (n = 0);
+  EXCEPTION WHEN OTHERS THEN ok := true;
+  END;
+  PERFORM pg_temp.expect('anonymous update of simulation_runs denied', ok, true);
+
+  ok := false;
+  BEGIN
+    SELECT count(*) INTO n FROM public.decision_records;
+    ok := (n = 0);
+  EXCEPTION WHEN insufficient_privilege THEN ok := true;
+  END;
+  PERFORM pg_temp.expect('anonymous read of decision_records denied', ok, true);
+  RESET role;
+
+  ------------------------------------------------ tenant A approver identity
+  PERFORM pg_temp.act_as(approver_a);
+  SELECT count(*) INTO n FROM public.simulation_runs WHERE id = run_a;
+  PERFORM pg_temp.expect('tenant A approver has no implicit read of another member run', n = 0, true);
+  RESET role;
+
+  -------------------------------------------------- tenant A administrator
+  PERFORM pg_temp.act_as(admin_a);
+  SELECT count(*) INTO n FROM public.simulation_runs WHERE id = run_a;
+  PERFORM pg_temp.expect('administrator read is policy-granted, not accidental', n = 1, true);
+  ok := false;
+  BEGIN
+    UPDATE public.simulation_runs SET lifecycle_status = 'running' WHERE id = run_a;
+    GET DIAGNOSTICS n = ROW_COUNT;
+    ok := (n = 0);
+  EXCEPTION WHEN OTHERS THEN ok := true;
+  END;
+  PERFORM pg_temp.expect('administrator read access does not imply write access', ok, true);
+  RESET role;
+
+  -------------------------------------------------- tenant B member/approver
+  PERFORM pg_temp.act_as(member_b);
+  SELECT count(*) INTO n FROM public.simulation_runs WHERE id = run_a;
+  PERFORM pg_temp.expect('tenant B member cannot read tenant A run', n = 0, true);
+  RESET role;
+
+  PERFORM pg_temp.act_as(approver_b);
+  SELECT count(*) INTO n FROM public.simulation_runs WHERE id = run_a;
+  PERFORM pg_temp.expect('tenant B approver cannot read tenant A run', n = 0, true);
+  ok := false;
+  BEGIN
+    INSERT INTO public.decision_records (user_id, run_id, recommendation_id, outcome, rationale)
+    VALUES (member_a, run_a, 'rec-ext', 'approved', 'cross tenant decision attempt');
+  EXCEPTION WHEN OTHERS THEN ok := true;
+  END;
+  PERFORM pg_temp.expect('tenant B approver cannot decide on tenant A run', ok, true);
+  RESET role;
+
+  ------------------------------------- ordinary member privilege escalation
+  PERFORM pg_temp.act_as(member_a);
+  ok := false;
+  BEGIN
+    INSERT INTO public.user_roles (user_id, role) VALUES (member_a, 'admin');
+  EXCEPTION WHEN OTHERS THEN ok := true;
+  END;
+  PERFORM pg_temp.expect('ordinary member cannot grant themselves admin', ok, true);
+  RESET role;
+
+  RAISE NOTICE 'RLS MATRIX EXTENDED COMPLETE';
+END $ext$;
+
 ROLLBACK;

@@ -33,6 +33,10 @@ test.describe('NVIDIA Reference Facility runtime regression', () => {
     page,
   }, testInfo) => {
     const mock = await installSupabaseMock(context);
+    page.on('console', (m) => { if (m.type() === 'error') console.log('[console]', m.text().slice(0, 400)); });
+    page.on('pageerror', (e) => console.log('[pageerror]', String(e).slice(0, 600)));
+    page.on('requestfailed', (r) => console.log('[reqfail]', r.url().slice(0, 200), r.failure()?.errorText));
+
     const twinId = '00000000-0000-4000-8000-000000000042';
     const twin = {
       id: twinId,

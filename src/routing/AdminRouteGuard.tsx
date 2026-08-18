@@ -15,7 +15,7 @@
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useRBAC } from '@/contexts/RBACContext';
-import type { AppRole } from '@/auth/permissions';
+import type { AppRole } from '@/contexts/RBACContext';
 
 /** Roles permitted to reach an administration route. */
 export const ADMIN_ROUTE_ROLES: AppRole[] = ['admin', 'security_admin'];

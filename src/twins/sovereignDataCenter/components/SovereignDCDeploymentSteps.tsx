@@ -291,7 +291,7 @@ export function SovereignDCDeploymentSteps({
               <div className="flex-1">
                 <h4 className="font-semibold mb-2">Step 6 — Deploy & Validate</h4>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Deploy the twin and run automated smoke tests to verify telemetry streaming, KPI updates, and simulation engine.
+                  Records the deployment request and its step log. Automated post-deploy verification of telemetry, KPI updates and the simulation engine is not implemented, so no verification result is reported here.
                 </p>
                 
                 {deploymentPhase && (
@@ -303,22 +303,11 @@ export function SovereignDCDeploymentSteps({
                   </div>
                 )}
                 
-                {smokeTestPassed && (
-                  <div className="mb-3 p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-lg">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-sm text-green-800 dark:text-green-200">
-                        <CheckCircle2 className="h-4 w-4" />
-                        <span>Telemetry streaming confirmed</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-green-800 dark:text-green-200">
-                        <CheckCircle2 className="h-4 w-4" />
-                        <span>KPI calculations active</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-green-800 dark:text-green-200">
-                        <CheckCircle2 className="h-4 w-4" />
-                        <span>Simulation engine operational</span>
-                      </div>
-                    </div>
+                {deploymentComplete && (
+                  <div className="mb-3 p-3 rounded-lg border border-border bg-muted/50" role="status">
+                    <p className="text-sm text-muted-foreground">
+                      Deployment recorded. Post-deploy verification: not run.
+                    </p>
                   </div>
                 )}
                 

@@ -68,6 +68,19 @@ disclosure gating them:
 
 This contradicts the operating-state/provenance model the platform advertises.
 
+### 4a. RESOLVED 2026-08-18
+
+All five items are closed. `useAgentRuns` no longer writes synthetic outcomes;
+`NetworkDomainView`, `DCSimulationTab`, `SparklineChart`, the thermal utils and
+`CompactRackOverview` derive their stochastic presentation terms from the
+seeded `mulberry32-v1` generator (keyed on stable ids, documented inline as
+derived rather than measured); `SystemManage` now reports `department: null`
+and `roi: null` instead of the `'Operations'` / `0` placeholders, and the UI
+renders "Not assigned" and omits the ROI chip when the values are absent.
+`DeployedSystem.department` and `.roi` are nullable at the type level so a
+placeholder cannot be reintroduced silently. Guarded by
+`src/truth/__tests__/noFabricatedTelemetry.test.ts` (12 tests).
+
 ## 5. Duplication and dead code
 
 - Six dashboard implementations; only `CommandCentre`, `IntelligenceDashboard`

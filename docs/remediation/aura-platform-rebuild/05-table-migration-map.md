@@ -13,7 +13,7 @@ records the family-level plan only; no drop may be planned from it.
 | Connections | `integrations_connections`, `dsx_connections`, `managed_user_connections`, `app_user_connections`, `connection_instances` | one connection-instance model with `binding_class` | migrate generations forward; per-user encrypted handles retained |
 | Ingest evidence | `connection_ingest_runs`, `connection_ingest_messages` | keep as-is | canonical raw evidence layer |
 | Telemetry / KPI | `twin_property_values` + overlapping KPI tables | raw -> normalized -> derived -> current-state projection | define layers in Phase 4, no merge across differing retention |
-| Deployments | `deployments`, `cloud_deployments`, `deployment_tracking` | `deployments` + immutable deployment events | after Phase 9 replaces timer-driven UI |
+| Deployments | `deployments`, `cloud_deployments`, `deployment_tracking` | `deployments` + `deployment_events` (immutable) | **done (Phase 9)**: events table added, timer-driven UI removed, `deployment_tracking` deprecated (0 rows, grants revoked); `cloud_deployments` retained for the AOC runtime feature |
 | Assets | asset/version/validation tables | one asset/version/validation model | Phase 6 |
 | Evidence/decisions | evidence-beta + decision tables | one evidence/decision model | Phase 2/4 |
 

@@ -335,7 +335,7 @@ function SignupsDashboardContent() {
 export default function AdminSignupsDashboard() {
   const { t } = useTranslation();
   return (
-    <ProtectedRoute allowedRoles={['executive', 'manager', 'admin' as any]}>
+    <ProtectedRoute requiredPermissions={['platform.view_admin_console']}>
       <SignupsDashboardContent />
     </ProtectedRoute>
   );

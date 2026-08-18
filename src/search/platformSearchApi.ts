@@ -86,6 +86,12 @@ export function buildOrFilter(columns: string[], term: string): string {
   return columns.map((column) => `${column}.ilike.%${term}%`).join(',');
 }
 
+/** Stored tiers are inconsistent: some rows hold "III", others "Tier III". */
+function formatTier(tier: string): string {
+  if (!tier) return '';
+  return /^tier\b/i.test(tier) ? tier : `Tier ${tier}`;
+}
+
 export const SEARCH_SOURCES: SearchSource[] = [
   {
     kind: 'facility',
@@ -97,7 +103,7 @@ export const SEARCH_SOURCES: SearchSource[] = [
     toResult: (row) => {
       const capacity = num(row.capacity_kw);
       const facts = [
-        str(row.tier) ? `Tier ${str(row.tier)}` : '',
+        formatTier(str(row.tier)),
         capacity !== null ? `${capacity.toLocaleString()} kW design capacity` : '',
         str(row.industry),
       ].filter(Boolean);

@@ -71,10 +71,13 @@ export default function Search() {
 
   const results = search.data?.results ?? [];
   const counts = useMemo(() => {
+    // Every queried kind gets a count, so a searched-but-empty kind reads "0"
+    // instead of silently rendering no number at all.
     const tally: Partial<Record<SearchRecordKind, number>> = {};
+    for (const kind of search.data?.kindsQueried ?? []) tally[kind] = 0;
     for (const result of results) tally[result.kind] = (tally[result.kind] ?? 0) + 1;
     return tally;
-  }, [results]);
+  }, [results, search.data?.kindsQueried]);
 
   const submitted = debounced.length > 0;
   const failures = search.data?.failures ?? [];

@@ -18,6 +18,7 @@ import { Building2, Shield, Bell, CreditCard, Info, Lock, Settings as SettingsIc
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui";
+import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
 
 interface OrganizationData {
   id: string;
@@ -351,7 +352,12 @@ export default function Settings() {
                         Receive notifications about system updates
                       </p>
                     </div>
-                    <Switch disabled />
+                    <Switch
+                      aria-label="System alerts"
+                      checked={notifications.preferences.systemAlerts}
+                      disabled={notifications.loading || notifications.saving}
+                      onCheckedChange={(checked) => handleNotificationChange({ systemAlerts: checked })}
+                    />
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -361,12 +367,20 @@ export default function Settings() {
                         Get notified about team member activity
                       </p>
                     </div>
-                    <Switch disabled />
+                    <Switch
+                      aria-label="Team activity"
+                      checked={notifications.preferences.teamActivity}
+                      disabled={notifications.loading || notifications.saving}
+                      onCheckedChange={(checked) => handleNotificationChange({ teamActivity: checked })}
+                    />
                   </div>
 
                   <div className="text-sm text-muted-foreground flex items-center gap-2 mt-4">
                     <Info className="h-4 w-4" />
-                    <span>Notification settings coming soon</span>
+                    <span>
+                      Preferences are saved to your account and control in-app
+                      alert delivery. Email delivery is not configured.
+                    </span>
                   </div>
                 </div>
               </DCCard>

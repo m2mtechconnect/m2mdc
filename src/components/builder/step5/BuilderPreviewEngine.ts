@@ -29,6 +29,14 @@ interface SimulationEngineConfig {
   kpis: any[];
   template?: any;
   speed: SpeedFactor;
+  /**
+   * Injected by the SimulationOrchestrator. This engine is
+   * `aura-stochastic-seeded`: it MUST NOT draw from `Math.random()`, so the
+   * only source of randomness is this generator.
+   */
+  random?: SeededRandom;
+  /** Stable prefix for generated event ids, so ids are reproducible. */
+  runTag?: string;
 }
 
 type EventListener = (event: BuilderPreviewEvent) => void;
@@ -42,9 +50,23 @@ export class BuilderPreviewEngine {
   private baseTickInterval = 300; // 300ms base interval
   private events: BuilderPreviewEvent[] = [];
   private listeners: Map<string, (AnyEventListener)[]> = new Map();
+  /** Seeded generator; falls back to a fixed seed, never to `Math.random()`. */
+  private random: SeededRandom;
+  private runTag: string;
+  private eventSeq = 0;
 
   constructor(config: SimulationEngineConfig) {
     this.config = config;
+    this.random =
+      config.random ??
+      mulberry32(deriveSeed(`builder-preview|${String(config.scenario?.id ?? 'unknown')}`));
+    this.runTag = config.runTag ?? 'preview';
+  }
+
+  /** Reproducible event identifier: no clock, no unseeded randomness. */
+  private nextEventId(): string {
+    this.eventSeq += 1;
+    return `event-${this.runTag}-${this.eventSeq}`;
   }
 
   // Event emitter methods
@@ -162,7 +184,7 @@ export class BuilderPreviewEngine {
       return;
     }
 
-    const workflow = workflows[Math.floor(Math.random() * workflows.length)];
+    const workflow = workflows[Math.floor(this.random() * workflows.length)];
     const event = this.generateWorkflowEvent(workflow);
     
     this.events.push(event);
@@ -196,7 +218,7 @@ export class BuilderPreviewEngine {
     }
 
     return {
-      id: `event-${Date.now()}-${Math.random()}`,
+      id: this.nextEventId(),
       timestamp: this.formatTimestamp(this.tick),
       type,
       message,
@@ -213,10 +235,10 @@ export class BuilderPreviewEngine {
       { type: 'info' as const, msg: 'Performance metrics within acceptable ranges', severity: 'low' as const },
     ];
 
-    const selected = messages[Math.floor(Math.random() * messages.length)];
+    const selected = messages[Math.floor(this.random() * messages.length)];
 
     const event: BuilderPreviewEvent = {
-      id: `event-${Date.now()}-${Math.random()}`,
+      id: this.nextEventId(),
       timestamp: this.formatTimestamp(this.tick),
       type: selected.type,
       message: selected.msg,
@@ -233,7 +255,7 @@ export class BuilderPreviewEngine {
       `DETECT: Anomaly in ${workflow.name}`,
       `DETECT: ${workflow.name} requires attention`
     ];
-    return templates[Math.floor(Math.random() * templates.length)];
+    return templates[Math.floor(this.random() * templates.length)];
   }
 
   private generateDecisionMessage(workflow: any): string {
@@ -242,13 +264,13 @@ export class BuilderPreviewEngine {
       `DECISION: Evaluating options for ${workflow.name}`,
       `DECISION: Optimal strategy determined for ${workflow.name}`
     ];
-    return templates[Math.floor(Math.random() * templates.length)];
+    return templates[Math.floor(this.random() * templates.length)];
   }
 
   private generateActionMessage(workflow: any): string {
     const actions = workflow.actions || [];
     if (actions.length > 0) {
-      const action = actions[Math.floor(Math.random() * actions.length)];
+      const action = actions[Math.floor(this.random() * actions.length)];
       return `ACTION: Executing ${action.type || 'action'} for ${workflow.name}`;
     }
     return `ACTION: Implementing recommended changes for ${workflow.name}`;
@@ -277,7 +299,7 @@ export class BuilderPreviewEngine {
     
     // Sine wave with noise
     const wave = Math.sin(timePoint / 10) * amplitude;
-    const noise = (Math.random() - 0.5) * amplitude * 0.5;
+    const noise = (this.random() - 0.5) * amplitude * 0.5;
     
     return wave + noise;
   }

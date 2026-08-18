@@ -100,7 +100,7 @@ export function SovereignDCSimulationDashboard({
   // deliverable would present demonstration values as a plan. Re-enable
   // once a defensible simulation metric catalog and audited data source
   // are wired (Phase 1B).
-  const playbookBlockReason: 'no-audited-source' = 'no-audited-source';
+  const playbookBlockReason = 'no-audited-source' as const;
   const playbookBlockCopy = describeExportBlock(playbookBlockReason);
 
   const handleFacilitySwitch = useCallback((newFacilityId: string) => {

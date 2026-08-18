@@ -57,6 +57,30 @@ function statusColor(coveragePct: number): string {
 }
 
 export function DataTrustStrip({ state, compact = false }: DataTrustStripProps) {
+  if (!state) {
+    return (
+      <Card
+        className={cn('border-border bg-card', compact ? 'p-3' : 'p-4')}
+        role="region"
+        aria-label="Data trust indicators"
+      >
+        <div className="flex items-start gap-2">
+          <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
+          <div className="min-w-0">
+            <div className="text-sm font-semibold text-foreground">
+              Data trust metrics not available
+            </div>
+            <p className="text-xs text-muted-foreground">
+              No ops-health source is bound to this view, so sensor coverage,
+              source health and quality flags cannot be reported. Connect a
+              telemetry source under Connections and Data Exchange to populate them.
+            </p>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
   const coveragePct = pct(state.sensorCoverage.reporting, state.sensorCoverage.total);
   const sourcePct = pct(state.sourceHealth.ok, state.sourceHealth.total);
   const totalReadings =

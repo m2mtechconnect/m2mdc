@@ -18,6 +18,8 @@ import { ConstraintStack } from '@/components/dsx/ConstraintStack';
 import { RackMap, RACK_OVERLAYS, type RackOverlay } from '@/components/dsx/RackMap';
 import { TrendStrip, type TrendSeries } from '@/components/dsx/TrendStrip';
 import { EvidenceQualityBar } from '@/components/dsx/EvidenceQualityBar';
+import { CanonicalEvidencePanel } from '@/components/dsx/CanonicalEvidencePanel';
+import { FIXTURE_DEMONSTRATION_NOTICE } from '@/dsx/runtime/evidenceFixturePolicy';
 import { ExceptionList } from '@/components/dsx/ExceptionList';
 import { MissingSourceState } from '@/components/dsx/MissingSourceState';
 import { PowerOneLine } from '@/components/dsx/PowerOneLine';

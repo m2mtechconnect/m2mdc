@@ -442,10 +442,6 @@ export default function DeploymentHistory() {
               )}
             </TableBody>
           </Table>
-                ))
-              )}
-            </TableBody>
-          </Table>
           </div>
         </DCCard>
 

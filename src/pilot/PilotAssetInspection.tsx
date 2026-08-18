@@ -1,8 +1,9 @@
 /**
  * PR-0.1 Checkpoint B7.4E - Representative read-only asset/metric inspection.
  *
- * Shows one data_centre_twins record and its latest twin_kpi_snapshots
- * rows. Provenance = source table + record owner. Freshness = snapshot_at.
+ * Shows one data_centre_twins record and the KPI envelope of its latest
+ * persisted simulation run. Provenance = source table + record owner.
+ * Freshness = the run timestamp.
  * Validation = value not null AND snapshot within KPI_FRESHNESS_HORIZON_MS.
  * Anything else is surfaced as "stale" or "unvalidated" - never fabricated.
  */
@@ -90,18 +91,18 @@ export default function PilotAssetInspection() {
 
       <section aria-labelledby="pilot-kpi-heading" className="space-y-2">
         <h2 id="pilot-kpi-heading" className="text-sm font-semibold">
-          Latest KPI snapshots
+          Latest recorded KPIs
         </h2>
         <p className="text-xs text-muted-foreground">
-          Source: <code>public.twin_kpi_snapshots</code>. Freshness is derived
-          from <code>snapshot_at</code>; records older than 24 hours are
-          labelled stale. Null values are labelled unvalidated. No values are
+          Source: <code>public.simulation_runs.final_kpis</code>. Freshness is
+          derived from the run timestamp; runs older than 24 hours are labelled
+          stale. Non-numeric entries are labelled unvalidated. No values are
           fabricated when the source is unavailable.
         </p>
 
         {kpis === null && (
           <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
-            Loading KPI snapshots...
+            Loading recorded KPIs...
           </p>
         )}
         {kpis?.status === "denied" && (
@@ -111,12 +112,12 @@ export default function PilotAssetInspection() {
         )}
         {kpis?.status === "unavailable" && (
           <p role="alert" className="text-sm text-destructive">
-            KPI snapshots unavailable ({kpis.reason}). No fallback rows shown.
+            Recorded KPIs unavailable ({kpis.reason}). No fallback rows shown.
           </p>
         )}
         {kpis?.status === "empty" && (
           <p role="status" className="text-sm text-muted-foreground">
-            No KPI snapshots recorded for this asset.
+            No simulation run has recorded KPIs for this asset.
           </p>
         )}
         {kpis?.status === "ok" && (

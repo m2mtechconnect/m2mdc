@@ -175,7 +175,10 @@ function ApprovedUserRoutes() {
       <Route path="/data-centre-twin" element={<DataCentreTwin />} />
       <Route path="/data-centre-twin/:id" element={<DataCentreTwin />} />
       <Route path="/twin-preview" element={<TwinPreview />} />
-      <Route path="/twin-debug" element={<TwinDebug />} />
+      {/* Phase 2: tenant diagnostics expose twin ids, raw query state and
+          telemetry sources, so this is an administration surface rather than
+          a general internal one. */}
+      <Route path="/twin-debug" element={<AdminRouteGuard><TwinDebug /></AdminRouteGuard>} />
       <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
       <Route path="/infrastructure" element={<InfrastructurePage />} />
       {/* Stage 6F: every legacy alias resolves from one registry and keeps

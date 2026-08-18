@@ -7,9 +7,32 @@
  *     must persist the seed that produced it.
  *   - The algorithm is versioned. Changing it is a breaking change and the
  *     fixed vectors in `__tests__/prng.test.ts` must be updated deliberately.
+ *
+ * Qualification - permitted scope of `mulberry32-v1`:
+ *   - fixture previews;
+ *   - product estimators;
+ *   - repeatable scenario exploration;
+ *   - non-cryptographic stochastic AURA calculations.
+ *
+ * It must NEVER be represented as, or used as evidence of:
+ *   - cryptographically secure randomness (it is a 32-bit-state PRNG, fully
+ *     predictable from one observed state);
+ *   - an engineering-grade Monte Carlo engine (the state space is far too
+ *     small for statistically meaningful sampling at scale);
+ *   - a validated thermal, electrical, network or CFD solver;
+ *   - evidence of physical fidelity;
+ *   - an NVIDIA solver.
+ *
+ * Seed identity vs run identity: the derived seed is 32 bits, so collisions
+ * exist by construction. Nothing that establishes identity may be derived
+ * from it. Run ids come from `newIdentifier` (UUID) and canonical hashes come
+ * from SHA-256 over the canonical text, neither of which touches PRNG state.
  */
 
 export const PRNG_ALGORITHM = 'mulberry32-v1' as const;
+
+/** Versioned name of the raw-text -> 32-bit seed derivation below. */
+export const SEED_DERIVATION_ALGORITHM = 'fnv1a-32-v1' as const;
 
 export type SeededRandom = () => number;
 

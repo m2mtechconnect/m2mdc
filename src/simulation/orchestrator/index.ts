@@ -17,12 +17,14 @@ import {
   createBuilderEstimatorPreviewProvider,
   createBuilderFixturePreviewProvider,
 } from './providers/builderPreviewProviders';
+import { createSovereignScenarioProvider } from './providers/sovereignScenarioProvider';
 
 export function createDefaultSimulationOrchestrator(): SimulationOrchestrator {
   return createSimulationOrchestrator({
     providers: [
       createAuraScenarioProvider(),
       createPanelSummaryProvider(),
+      createSovereignScenarioProvider(),
       createNvidiaSolverProvider(),
       createExternalSolverProvider(),
     ],
@@ -41,10 +43,31 @@ export { createSimulationOrchestrator } from './orchestrator';
 export type { SimulationOrchestrator, OrchestratorOptions } from './orchestrator';
 export * from './types';
 export * from './executionClass';
-export { deriveSeed, mulberry32, PRNG_ALGORITHM, type SeededRandom } from './prng';
-export { canonicalize, hashCanonical } from './canonical';
+export {
+  deriveSeed,
+  mulberry32,
+  PRNG_ALGORITHM,
+  SEED_DERIVATION_ALGORITHM,
+  type SeededRandom,
+} from './prng';
+export {
+  canonicalize,
+  hashCanonical,
+  CanonicalizationError,
+  CANONICAL_SCHEMA_VERSION,
+} from './canonical';
+export {
+  startExecutionTimer,
+  UNAVAILABLE_DURATION,
+  type ExecutionTimer,
+  type TimingMeasurement,
+} from './timing';
 export { AURA_SCENARIO_PROVIDER_ID } from './providers/auraScenarioProvider';
 export { PANEL_SUMMARY_PROVIDER_ID } from './providers/panelSummaryProvider';
+export {
+  SOVEREIGN_SCENARIO_PROVIDER_ID,
+  type SovereignScenarioProviderInput,
+} from './providers/sovereignScenarioProvider';
 export {
   EXTERNAL_SOLVER_PROVIDER_ID,
   NVIDIA_SOLVER_PROVIDER_ID,

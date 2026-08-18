@@ -52,16 +52,37 @@ export default tseslint.config(
     // Simulation engines may only be constructed by the orchestrator's own
     // providers. Application code must dispatch through
     // `simulationOrchestrator` so seeding, readiness and provenance are
-    // always recorded. The provider adapters and characterization tests are
-    // exempted below.
-    files: ["src/**/*.{ts,tsx}"],
+    // always recorded.
+    //
+    // Scope: the whole repository (app, tests, e2e specs, scripts, Edge
+    // Functions), not just `src/`. Every exemption is listed explicitly in
+    // `ignores` below and mirrored in
+    // `src/simulation/orchestrator/__tests__/bypassGuard.test.ts`.
+    //
+    // Exemptions and why each one exists:
+    //   1. the orchestrator itself, which owns dispatch;
+    //   2. the three frozen legacy engine modules, which the orchestrator's
+    //      providers adapt (they may not import each other's entry points);
+    //   3. the compat facade bridge, which is the orchestrator-backed shim
+    //      kept for legacy call sites;
+    //   4. characterization tests, which pin the frozen engines' behaviour
+    //      and must call them directly to do so.
+    files: ["**/*.{ts,tsx}"],
     ignores: [
+      // 1. orchestrator (owns dispatch)
       "src/simulation/orchestrator/**/*.{ts,tsx}",
+      // 2. frozen legacy engines (adapted by orchestrator providers)
       "src/simulation/generateSimulationResult.ts",
+      "src/simulation/compat/sovereignDataCenterEngine.ts",
       "src/components/builder/step5/BuilderPreviewEngine.ts",
       "src/components/builder/step5/fixtures/builderMock.ts",
-      "**/__tests__/**/*.{ts,tsx}",
-      "**/*.test.{ts,tsx}",
+      // 3. orchestrator-backed compatibility shim
+      "src/simulation/compat/facadeBridge.ts",
+      // 4. characterization tests pinning frozen engine behaviour
+      "src/simulation/__tests__/characterization/**/*.{ts,tsx}",
+      "src/simulation/compat/__tests__/**/*.{ts,tsx}",
+      "src/simulation/orchestrator/__tests__/**/*.{ts,tsx}",
+      "src/twins/sovereignDataCenter/__tests__/**/*.{ts,tsx}",
     ],
     rules: {
       "no-restricted-imports": [
@@ -84,6 +105,22 @@ export default tseslint.config(
               importNames: ["generateSimulationResult"],
               message:
                 "Do not call the summary engine directly. Use simulationOrchestrator.runSync() with the 'aura-panel-summary' provider.",
+            },
+            {
+              name: "@/simulation/compat/sovereignDataCenterEngine",
+              importNames: ["runSimulation"],
+              message:
+                "Do not call the sovereign engine directly. Use simulationOrchestrator.runSync() with the 'sovereign-scenario' provider.",
+            },
+          ],
+          patterns: [
+            {
+              group: [
+                "**/simulation/orchestrator/providers/*",
+                "!**/simulation/orchestrator/providers",
+              ],
+              message:
+                "Do not import orchestrator providers directly. Dispatch through simulationOrchestrator from @/simulation/orchestrator.",
             },
           ],
         },

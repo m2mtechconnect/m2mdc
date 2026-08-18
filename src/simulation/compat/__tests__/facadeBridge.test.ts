@@ -82,6 +82,9 @@ describe('simulation/compat/facadeBridge', () => {
         if (!/\.tsx?$/.test(entry.name)) continue;
         const rel = path.relative(root, full).replace(/\\/g, '/');
         if (rel.startsWith('simulation/compat/')) continue;
+        // Phase 2: the orchestrator provider is the sanctioned adapter for the
+        // frozen sovereign engine - it is the reason the engine still exists.
+        if (rel === 'simulation/orchestrator/providers/sovereignScenarioProvider.ts') continue;
         // The twins barrel re-exports for backwards compatibility only.
         if (rel === 'twins/sovereignDataCenter/index.ts') continue;
         if (rel === 'twins/dataCenter/index.ts') continue;

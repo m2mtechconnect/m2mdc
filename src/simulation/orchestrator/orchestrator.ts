@@ -12,9 +12,16 @@
  * `failed` outcome whose provenance records execution class `unavailable`.
  */
 
-import { hashCanonical } from './canonical';
-import { deriveSeed, mulberry32, newIdentifier, PRNG_ALGORITHM } from './prng';
+import { CANONICAL_SCHEMA_VERSION, hashCanonical } from './canonical';
+import {
+  deriveSeed,
+  mulberry32,
+  newIdentifier,
+  PRNG_ALGORITHM,
+  SEED_DERIVATION_ALGORITHM,
+} from './prng';
 import { isSimulationExecutionClass } from './executionClass';
+import { startExecutionTimer, UNAVAILABLE_DURATION, type ExecutionTimer } from './timing';
 import type {
   CanonicalSimulationProvider,
   PreviewSessionOutcome,
@@ -27,6 +34,7 @@ import type {
   SimulationProviderDescriptor,
   SimulationRequest,
 } from './types';
+import { SIMULATION_REQUEST_SCHEMA_VERSION } from './types';
 
 export interface OrchestratorOptions {
   providers?: CanonicalSimulationProvider[];
@@ -38,6 +46,12 @@ export interface OrchestratorOptions {
 export interface SimulationOrchestrator {
   describeProviders(): SimulationProviderDescriptor[];
   describeProvider(id: string): SimulationProviderDescriptor | null;
+  /**
+   * Registers a provider. Idempotent for an identical registration; a second,
+   * conflicting registration under the same id throws rather than silently
+   * replacing a provider mid-flight.
+   */
+  register(provider: CanonicalSimulationProvider | PreviewSessionProvider): void;
   /** Async entry point. Use for any provider that may await. */
   run<T = unknown>(request: SimulationRequest, signal?: AbortSignal): Promise<SimulationOutcome<T>>;
   /** Synchronous entry point for providers that declare synchronous execution. */
@@ -50,6 +64,7 @@ interface Prepared {
   provider: CanonicalSimulationProvider | PreviewSessionProvider;
   ctx: SimulationExecutionContext;
   base: SimulationProvenance;
+  timer: ExecutionTimer;
 }
 
 type FailedOutcome = Extract<SimulationOutcome<never>, { kind: 'failed' }>;
@@ -58,24 +73,56 @@ type PrepareResult =
   | { ok: true; prepared: Prepared; failure?: undefined }
   | { ok: false; prepared?: undefined; failure: FailedOutcome };
 
+/**
+ * Terminal failure. The outcome execution class becomes `unavailable`, but the
+ * requested provider identity is preserved: `requestedProviderId` and
+ * `requestedExecutionClass` still say what was asked for, and the readiness
+ * answer, structured code and message say what happened instead.
+ */
 function fail<T>(
   base: SimulationProvenance,
   reason: SimulationFailureReason,
   message: string,
-  completedAt: string,
+  timer: ExecutionTimer,
 ): SimulationOutcome<T> & { kind: 'failed' } {
+  const t = timer.stop();
+  const clipped = message.slice(0, 300);
   return {
     kind: 'failed',
     reason,
-    message: message.slice(0, 300),
+    message: clipped,
     provenance: {
       ...base,
       executionClass: 'unavailable',
       outputHash: null,
-      completedAt,
-      durationMs: Math.max(0, Date.parse(completedAt) - Date.parse(base.startedAt)),
-      failureReason: reason,
+      externalJobId: null,
+      completedAt: t.completedAt,
+      durationMs: t.durationMs,
+      durationSource: t.durationSource,
+      failureCode: reason,
+      failureMessage: clipped,
     },
+  };
+}
+
+/**
+ * Reproducibility hash input. Timestamps, run ids and tenancy are excluded on
+ * purpose: two faithful reproductions of the same run must agree here.
+ */
+function reproducibilityInput(p: SimulationProvenance) {
+  return {
+    requestSchemaVersion: p.requestSchemaVersion,
+    canonicalSchemaVersion: p.canonicalSchemaVersion,
+    providerId: p.providerId,
+    providerVersion: p.providerVersion,
+    executionClass: p.executionClass,
+    analysis: p.analysis,
+    intent: p.intent,
+    inputHash: p.inputHash,
+    configurationHash: p.configurationHash,
+    seed: p.seed,
+    seedDerivation: p.seedDerivation,
+    prngAlgorithm: p.prngAlgorithm,
   };
 }
 
@@ -83,35 +130,56 @@ export function createSimulationOrchestrator(
   options: OrchestratorOptions = {},
 ): SimulationOrchestrator {
   const now = options.now ?? (() => new Date());
+  // The ONLY state the orchestrator retains: immutable provider registration.
+  // No request, tenant, seed or provenance state is held between calls, so
+  // concurrent runs cannot observe one another.
   const providers = new Map<string, CanonicalSimulationProvider>();
   for (const p of options.providers ?? []) providers.set(p.descriptor.id, p);
   const previewProviders = new Map<string, PreviewSessionProvider>();
   for (const p of options.previewProviders ?? []) previewProviders.set(p.descriptor.id, p);
 
-  function blankProvenance(request: SimulationRequest, startedAt: string): SimulationProvenance {
+  function blankProvenance(
+    request: SimulationRequest,
+    startedAt: string,
+    inputHash: string,
+    configurationHash: string,
+  ): SimulationProvenance {
+    const requestedProviderId =
+      typeof request?.providerId === 'string' ? request.providerId : 'unknown';
     return {
       runId: newIdentifier('run'),
+      requestSchemaVersion: SIMULATION_REQUEST_SCHEMA_VERSION,
+      canonicalSchemaVersion: CANONICAL_SCHEMA_VERSION,
       tenantId: request?.tenantId ?? null,
       facilityId: request?.facilityId ?? null,
       twinId: request?.twinId ?? null,
-      providerId: typeof request?.providerId === 'string' ? request.providerId : 'unknown',
+      requestedProviderId,
+      requestedExecutionClass: null,
+      providerId: requestedProviderId,
       executionClass: 'unavailable',
       providerVersion: 'unknown',
       engineModule: 'unknown',
       analysis: typeof request?.analysis === 'string' ? request.analysis : 'unknown',
       intent: request?.intent === 'authoritative' ? 'authoritative' : 'preview',
+      providerReady: null,
+      providerReadinessReason: null,
       seed: null,
+      seedMaterial: null,
+      seedSource: null,
+      seedDerivation: null,
       prngAlgorithm: null,
-      inputHash: hashCanonical(request?.input ?? null),
-      configurationHash: hashCanonical(request?.configuration ?? null),
+      inputHash,
+      configurationHash,
+      reproducibilityHash: '',
       outputHash: null,
       startedAt,
       completedAt: startedAt,
-      durationMs: 0,
+      ...UNAVAILABLE_DURATION,
       runtimeEnvironment: 'browser',
       externalJobId: null,
       verificationLevel: 'unverified',
-      failureReason: null,
+      failureCode: null,
+      failureMessage: null,
     };
   }
 
@@ -124,12 +192,48 @@ export function createSimulationOrchestrator(
     kind: 'value' | 'session',
     signal?: AbortSignal,
   ): PrepareResult {
-    const startedAt = now().toISOString();
-    const base = blankProvenance(request ?? ({} as SimulationRequest), startedAt);
+    const timer = startExecutionTimer(now);
+    const startedAt = timer.startedAt;
 
-    const bail = (reason: SimulationFailureReason, message: string) => ({
+    // Hash the request first: a value with no canonical form (a cyclic
+    // structure) is an invalid request, not a silent partial hash.
+    let inputHash: string;
+    let configurationHash: string;
+    try {
+      inputHash = hashCanonical(request?.input ?? null);
+      configurationHash = hashCanonical(request?.configuration ?? null);
+    } catch (err) {
+      const base = blankProvenance(
+        request ?? ({} as SimulationRequest),
+        startedAt,
+        'unhashable',
+        'unhashable',
+      );
+      return {
+        ok: false,
+        failure: fail<never>(
+          base,
+          'invalid-request',
+          err instanceof Error ? err.message : 'request could not be canonicalized',
+          timer,
+        ),
+      };
+    }
+
+    const base = blankProvenance(
+      request ?? ({} as SimulationRequest),
+      startedAt,
+      inputHash,
+      configurationHash,
+    );
+
+    const bail = (
+      reason: SimulationFailureReason,
+      message: string,
+      extra: Partial<SimulationProvenance> = {},
+    ) => ({
       ok: false as const,
-      failure: fail<never>(base, reason, message, now().toISOString()),
+      failure: fail<never>({ ...base, ...extra }, reason, message, timer),
     });
 
     if (!request || typeof request !== 'object') {
@@ -154,26 +258,42 @@ export function createSimulationOrchestrator(
     }
 
     const d = provider.descriptor;
+    // From here on the requested provider identity is known and is retained on
+    // every outcome, including failures.
+    const identity: Partial<SimulationProvenance> = {
+      requestedExecutionClass: isSimulationExecutionClass(d.executionClass)
+        ? d.executionClass
+        : null,
+      providerVersion: d.version,
+      engineModule: d.engineModule,
+      runtimeEnvironment: d.runtimeEnvironment,
+    };
     if (!isSimulationExecutionClass(d.executionClass)) {
       return bail(
         'provider-contract-violation',
         `provider ${d.id} declares a non-canonical execution class`,
+        identity,
       );
     }
     if (!d.supportedAnalyses.includes(request.analysis)) {
-      return bail('analysis-unsupported', `provider ${d.id} does not support ${request.analysis}`);
+      return bail(
+        'analysis-unsupported',
+        `provider ${d.id} does not support ${request.analysis}`,
+        identity,
+      );
     }
     if (request.intent === 'preview' && !d.supportsPreview) {
-      return bail('intent-unsupported', `provider ${d.id} does not produce previews`);
+      return bail('intent-unsupported', `provider ${d.id} does not produce previews`, identity);
     }
     if (request.intent === 'authoritative') {
       if (!d.supportsAuthoritative) {
-        return bail('intent-unsupported', `provider ${d.id} may only produce previews`);
+        return bail('intent-unsupported', `provider ${d.id} may only produce previews`, identity);
       }
       if (d.runtimeEnvironment === 'browser') {
         return bail(
           'authoritative-runtime-unavailable',
           'authoritative runs must execute on a server, worker or external runtime; the browser may only produce previews',
+          identity,
         );
       }
     }
@@ -183,21 +303,39 @@ export function createSimulationOrchestrator(
       return bail(
         'provider-not-ready',
         readiness.reason ?? `provider ${d.id} is not ready and gave no reason`,
+        {
+          ...identity,
+          providerReady: false,
+          providerReadinessReason: readiness.reason ?? null,
+        },
       );
     }
 
-    if (signal?.aborted) return bail('cancelled', 'request was cancelled before execution');
+    if (signal?.aborted) {
+      return bail('cancelled', 'request was cancelled before execution', {
+        ...identity,
+        providerReady: true,
+      });
+    }
 
     // Seeding. Deterministic providers get no seed at all; seeded providers
     // get an explicit seed or one derived from the request (never the clock).
     let seed: number | null = null;
+    let seedMaterial: string | null = null;
+    let seedSource: 'request' | 'derived' | null = null;
     if (d.determinism === 'seeded-stochastic' || d.requiresSeed) {
       if (typeof request.seed === 'number' && Number.isFinite(request.seed)) {
         seed = request.seed >>> 0;
+        seedSource = 'request';
       } else if (d.requiresSeed && d.determinism !== 'seeded-stochastic') {
-        return bail('seed-missing', `provider ${d.id} requires an explicit seed`);
+        return bail('seed-missing', `provider ${d.id} requires an explicit seed`, {
+          ...identity,
+          providerReady: true,
+        });
       } else {
-        seed = deriveSeed(`${d.id}|${d.version}|${base.inputHash}|${base.configurationHash}`);
+        seedMaterial = `${d.id}|${d.version}|${base.inputHash}|${base.configurationHash}`;
+        seed = deriveSeed(seedMaterial);
+        seedSource = 'derived';
       }
     }
 
@@ -217,21 +355,27 @@ export function createSimulationOrchestrator(
       startedAt,
     };
 
+    const resolved: SimulationProvenance = {
+      ...base,
+      ...identity,
+      executionClass: d.executionClass,
+      verificationLevel: d.verificationLevel,
+      providerReady: true,
+      providerReadinessReason: readiness.reason ?? null,
+      seed,
+      seedMaterial,
+      seedSource,
+      seedDerivation: seedSource === 'derived' ? SEED_DERIVATION_ALGORITHM : null,
+      prngAlgorithm: seed === null ? null : PRNG_ALGORITHM,
+    };
+
     return {
       ok: true,
       prepared: {
         provider,
         ctx,
-        base: {
-          ...base,
-          executionClass: d.executionClass,
-          providerVersion: d.version,
-          engineModule: d.engineModule,
-          runtimeEnvironment: d.runtimeEnvironment,
-          verificationLevel: d.verificationLevel,
-          seed,
-          prngAlgorithm: seed === null ? null : PRNG_ALGORITHM,
-        },
+        timer,
+        base: { ...resolved, reproducibilityHash: hashCanonical(reproducibilityInput(resolved)) },
       },
     };
   }
@@ -242,16 +386,20 @@ export function createSimulationOrchestrator(
     signal?: AbortSignal,
   ): SimulationOutcome<T> {
     const d = prepared.provider.descriptor;
-    const completedAt = now().toISOString();
     if (signal?.aborted) {
-      return fail<T>(prepared.base, 'cancelled', 'request was cancelled during execution', completedAt);
+      return fail<T>(
+        prepared.base,
+        'cancelled',
+        'request was cancelled during execution',
+        prepared.timer,
+      );
     }
     if (!response || typeof response !== 'object' || !('value' in response)) {
       return fail<T>(
         prepared.base,
         'provider-contract-violation',
         `provider ${d.id} returned no value envelope`,
-        completedAt,
+        prepared.timer,
       );
     }
     if (d.requiresExternalRuntime && !response.externalJobId) {
@@ -259,7 +407,21 @@ export function createSimulationOrchestrator(
         prepared.base,
         'provider-contract-violation',
         `provider ${d.id} requires an external runtime but returned no external job identifier`,
-        completedAt,
+        prepared.timer,
+      );
+    }
+    // Only `value` and `externalJobId` are read. Any timing a provider tried to
+    // attach to its response is ignored: duration is orchestrator-owned.
+    const t = prepared.timer.stop();
+    let outputHash: string | null;
+    try {
+      outputHash = hashCanonical(response.value);
+    } catch {
+      return fail<T>(
+        prepared.base,
+        'provider-contract-violation',
+        `provider ${d.id} returned a value with no canonical form`,
+        prepared.timer,
       );
     }
     return {
@@ -267,10 +429,11 @@ export function createSimulationOrchestrator(
       value: response.value,
       provenance: {
         ...prepared.base,
-        outputHash: hashCanonical(response.value),
+        outputHash,
         externalJobId: response.externalJobId ?? null,
-        completedAt,
-        durationMs: Math.max(0, Date.parse(completedAt) - Date.parse(prepared.base.startedAt)),
+        completedAt: t.completedAt,
+        durationMs: t.durationMs,
+        durationSource: t.durationSource,
       },
     };
   }
@@ -293,6 +456,23 @@ export function createSimulationOrchestrator(
       return providers.get(id)?.descriptor ?? previewProviders.get(id)?.descriptor ?? null;
     },
 
+    register(provider) {
+      const id = provider.descriptor.id;
+      const isSession = typeof (provider as PreviewSessionProvider).openSession === 'function';
+      const target = isSession
+        ? (previewProviders as Map<string, unknown>)
+        : (providers as Map<string, unknown>);
+      const existing = target.get(id);
+      if (existing) {
+        // Idempotent: re-registering the very same instance is a no-op.
+        if (existing === provider) return;
+        throw new Error(
+          `a different provider is already registered under id ${id}; unregister it explicitly instead of replacing it`,
+        );
+      }
+      target.set(id, provider);
+    },
+
     async run<T>(request: SimulationRequest, signal?: AbortSignal): Promise<SimulationOutcome<T>> {
       const p = prepare(request, 'value', signal);
       if (!p.ok) return p.failure as SimulationOutcome<T>;
@@ -301,7 +481,7 @@ export function createSimulationOrchestrator(
         const response = await provider.execute(p.prepared.ctx);
         return finish<T>(p.prepared, response, signal);
       } catch (err) {
-        return fail<T>(p.prepared.base, 'provider-threw', sanitize(err), now().toISOString());
+        return fail<T>(p.prepared.base, 'provider-threw', sanitize(err), p.prepared.timer);
       }
     },
 
@@ -316,12 +496,12 @@ export function createSimulationOrchestrator(
             p.prepared.base,
             'provider-not-synchronous',
             `provider ${provider.descriptor.id} is asynchronous; use run() instead`,
-            now().toISOString(),
+            p.prepared.timer,
           );
         }
         return finish<T>(p.prepared, response, signal);
       } catch (err) {
-        return fail<T>(p.prepared.base, 'provider-threw', sanitize(err), now().toISOString());
+        return fail<T>(p.prepared.base, 'provider-threw', sanitize(err), p.prepared.timer);
       }
     },
 
@@ -334,7 +514,7 @@ export function createSimulationOrchestrator(
       const provider = p.prepared.provider as PreviewSessionProvider<S>;
       try {
         const session = provider.openSession(p.prepared.ctx);
-        const completedAt = now().toISOString();
+        const t = p.prepared.timer.stop();
         return {
           kind: 'ok',
           session,
@@ -342,17 +522,14 @@ export function createSimulationOrchestrator(
             ...p.prepared.base,
             // A session produces no single output value to hash.
             outputHash: null,
-            completedAt,
-            durationMs: 0,
+            completedAt: t.completedAt,
+            // This measures session construction, not the streamed run.
+            durationMs: t.durationMs,
+            durationSource: t.durationSource,
           },
         };
       } catch (err) {
-        const f = fail<never>(
-          p.prepared.base,
-          'provider-threw',
-          sanitize(err),
-          now().toISOString(),
-        );
+        const f = fail<never>(p.prepared.base, 'provider-threw', sanitize(err), p.prepared.timer);
         return { kind: 'failed', reason: f.reason, message: f.message, provenance: f.provenance };
       }
     },

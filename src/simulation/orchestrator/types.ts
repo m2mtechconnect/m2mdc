@@ -9,6 +9,12 @@
 import type { SimulationExecutionClass } from './executionClass';
 import type { SeededRandom } from './prng';
 
+/**
+ * Version of the request/provenance contract itself. Part of the
+ * reproducibility hash, so a contract change is visible in evidence.
+ */
+export const SIMULATION_REQUEST_SCHEMA_VERSION = 'simulation-request-v1' as const;
+
 /** Preview output may inform a user; authoritative output may be a record. */
 export type SimulationIntent = 'preview' | 'authoritative';
 
@@ -69,31 +75,72 @@ export interface SimulationRequest {
   timeoutMs?: number;
 }
 
+/**
+ * How the recorded elapsed time was measured.
+ *   - `monotonic`   : a monotonic clock was available; immune to clock skew.
+ *   - `wall-clock`  : only the wall clock was available (difference of two
+ *                     timestamps, clamped to a non-negative value).
+ *   - `unavailable` : elapsed time was never measured. `durationMs` is null.
+ *                     Zero is never used to mean unknown.
+ */
+export type DurationSource = 'monotonic' | 'wall-clock' | 'unavailable';
+
 export interface SimulationProvenance {
   runId: string;
+  /** Contract version of this record. */
+  requestSchemaVersion: string;
+  /** Version of the canonical serialization rules behind every hash below. */
+  canonicalSchemaVersion: string;
   tenantId: string | null;
   facilityId: string | null;
   twinId: string | null;
+  /**
+   * What the caller asked for. Retained verbatim even when the run failed, so
+   * a refused NVIDIA request still shows that NVIDIA was requested.
+   */
+  requestedProviderId: string;
+  requestedExecutionClass: SimulationExecutionClass | null;
   providerId: string;
+  /** What actually happened. `unavailable` when nothing executed. */
   executionClass: SimulationExecutionClass;
   providerVersion: string;
   engineModule: string;
   analysis: string;
   intent: SimulationIntent;
-  /** Null only for `deterministic` providers. */
+  /** Readiness answer recorded at dispatch time. Null when never asked. */
+  providerReady: boolean | null;
+  providerReadinessReason: string | null;
+  /** Derived 32-bit seed. Null only for `deterministic` providers. */
   seed: number | null;
+  /** Raw text the 32-bit seed was derived from; null for an explicit seed. */
+  seedMaterial: string | null;
+  /** Where the seed came from. */
+  seedSource: 'request' | 'derived' | null;
+  /** Versioned derivation algorithm; null when the seed was supplied. */
+  seedDerivation: string | null;
   prngAlgorithm: string | null;
   inputHash: string;
   configurationHash: string;
+  /**
+   * Hash over everything that determines the result: schema version, provider
+   * id/version, execution class, analysis, intent, input, configuration, seed
+   * and PRNG identity. Deliberately excludes timestamps, run ids and tenancy,
+   * so two reproductions of the same run share this hash.
+   */
+  reproducibilityHash: string;
   /** Hash of the returned value; `null` when nothing was produced. */
   outputHash: string | null;
   startedAt: string;
   completedAt: string;
-  durationMs: number;
+  /** Measured elapsed time. Null means unmeasured - never zero for unknown. */
+  durationMs: number | null;
+  durationSource: DurationSource;
   runtimeEnvironment: RuntimeEnvironment;
   externalJobId: string | null;
   verificationLevel: VerificationLevel;
-  failureReason: string | null;
+  /** Structured failure code, and its human-readable message. */
+  failureCode: SimulationFailureReason | null;
+  failureMessage: string | null;
 }
 
 export type SimulationFailureReason =

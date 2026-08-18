@@ -2,47 +2,122 @@
  * Phase 2 - canonical serialization and hashing.
  *
  * Hashes are part of the provenance contract, so serialization must be stable:
- * object key order, `undefined` members and numeric formatting may not change
- * a hash. SHA-256 is implemented here synchronously because provenance is
- * generated on synchronous preview paths as well as async provider paths.
+ * object key order and numeric formatting may not change a hash. SHA-256 is
+ * implemented here synchronously because provenance is generated on
+ * synchronous preview paths as well as async provider paths.
+ *
+ * Normalization rules (versioned - see CANONICAL_SCHEMA_VERSION). Every rule
+ * below is total and injective enough that two meaningfully different inputs
+ * cannot collapse to the same text. Nothing is silently dropped.
+ *
+ *   | input                | canonical text            |
+ *   | -------------------- | ------------------------- |
+ *   | `undefined` (member) | `"@undefined"` (key kept) |
+ *   | `null`               | `null`                    |
+ *   | `-0`                 | `"@-0"`                   |
+ *   | `NaN`                | `"@NaN"`                  |
+ *   | `Infinity`           | `"@Infinity"`             |
+ *   | `-Infinity`          | `"@-Infinity"`            |
+ *   | `bigint`             | `"@bigint:<digits>"`      |
+ *   | `Date`               | `"@date:<iso>"`           |
+ *   | invalid `Date`       | `"@date:invalid"`         |
+ *   | `function`           | `"@function:<name>"`      |
+ *   | `symbol`             | `"@symbol:<description>"` |
+ *   | `string`             | NFC-normalized JSON text; a leading `@` is
+ *                            doubled (`"@x"` -> `"@@x"`) so a user string can
+ *                            never collide with a tag above |
+ *   | `Map` / `Set`        | key-sorted object / array |
+ *   | cyclic reference     | throws `CanonicalizationError` |
+ *
+ * Array order is significant and preserved. Object key order is not: keys are
+ * sorted. A cyclic structure has no canonical form, so it is rejected rather
+ * than truncated - the orchestrator turns that into an `invalid-request`
+ * failure with provenance.
  */
 
-/** Deterministic JSON: object keys sorted, undefined dropped, NaN/Inf tagged. */
-export function canonicalize(value: unknown): string {
-  return serialize(value);
+/**
+ * Version of the normalization rules above. Recorded in provenance so a
+ * historical hash is always interpretable against the rules that produced it.
+ * Changing any rule requires bumping this value.
+ */
+export const CANONICAL_SCHEMA_VERSION = 'aura-canonical-v1' as const;
+
+export class CanonicalizationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'CanonicalizationError';
+  }
 }
 
-function serialize(value: unknown): string {
+/** Deterministic text form of any value. Throws only on cyclic structures. */
+export function canonicalize(value: unknown): string {
+  return serialize(value, new Set<object>());
+}
+
+function serialize(value: unknown, seen: Set<object>): string {
   if (value === null) return 'null';
   const t = typeof value;
   if (t === 'number') {
     const n = value as number;
     if (Number.isNaN(n)) return '"@NaN"';
     if (!Number.isFinite(n)) return n > 0 ? '"@Infinity"' : '"@-Infinity"';
+    // `-0` and `0` are distinct inputs; JSON.stringify renders both as `0`.
+    if (n === 0 && Object.is(n, -0)) return '"@-0"';
     return JSON.stringify(n);
   }
-  if (t === 'string' || t === 'boolean') return JSON.stringify(value);
+  if (t === 'string') {
+    const s = (value as string).normalize('NFC');
+    // Escape a leading `@` so a literal string can never equal a type tag.
+    return JSON.stringify(s.startsWith('@') ? `@${s}` : s);
+  }
+  if (t === 'boolean') return JSON.stringify(value);
   if (t === 'bigint') return JSON.stringify(`@bigint:${(value as bigint).toString()}`);
-  if (t === 'undefined' || t === 'function' || t === 'symbol') return '"@undefined"';
-  if (value instanceof Date) return JSON.stringify(`@date:${value.toISOString()}`);
-  if (Array.isArray(value)) return `[${value.map(serialize).join(',')}]`;
-  if (value instanceof Map) {
-    const entries = Array.from(value.entries()).map(
-      ([k, v]) => [String(k), v] as [string, unknown],
+  if (t === 'undefined') return '"@undefined"';
+  if (t === 'function') {
+    const name = (value as { name?: string }).name || 'anonymous';
+    return JSON.stringify(`@function:${name}`);
+  }
+  if (t === 'symbol') return JSON.stringify(`@symbol:${(value as symbol).description ?? ''}`);
+  if (value instanceof Date) {
+    const ms = value.getTime();
+    return JSON.stringify(Number.isNaN(ms) ? '@date:invalid' : `@date:${value.toISOString()}`);
+  }
+
+  const obj = value as object;
+  if (seen.has(obj)) {
+    throw new CanonicalizationError(
+      'value contains a cyclic reference and has no canonical form',
     );
-    entries.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
-    return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${serialize(v)}`).join(',')}}`;
   }
-  if (value instanceof Set) {
-    const items = Array.from(value.values()).map(serialize);
-    items.sort();
-    return `[${items.join(',')}]`;
+  seen.add(obj);
+  try {
+    if (Array.isArray(value)) {
+      // Order is significant for arrays and is preserved verbatim.
+      return `[${value.map((v) => serialize(v, seen)).join(',')}]`;
+    }
+    if (value instanceof Map) {
+      const entries = Array.from(value.entries()).map(
+        ([k, v]) => [String(k), v] as [string, unknown],
+      );
+      entries.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+      return `@map{${entries
+        .map(([k, v]) => `${JSON.stringify(k)}:${serialize(v, seen)}`)
+        .join(',')}}`;
+    }
+    if (value instanceof Set) {
+      const items = Array.from(value.values()).map((v) => serialize(v, seen));
+      items.sort();
+      return `@set[${items.join(',')}]`;
+    }
+    const rec = value as Record<string, unknown>;
+    // Keys are sorted, and every own enumerable key is kept - including keys
+    // whose value is `undefined` or a function, so `{a:1}` and
+    // `{a:1,b:undefined}` can never hash identically.
+    const keys = Object.keys(rec).sort();
+    return `{${keys.map((k) => `${JSON.stringify(k)}:${serialize(rec[k], seen)}`).join(',')}}`;
+  } finally {
+    seen.delete(obj);
   }
-  const obj = value as Record<string, unknown>;
-  const keys = Object.keys(obj)
-    .filter((k) => typeof obj[k] !== 'undefined' && typeof obj[k] !== 'function')
-    .sort();
-  return `{${keys.map((k) => `${JSON.stringify(k)}:${serialize(obj[k])}`).join(',')}}`;
 }
 
 /* ---------------------------------------------------------------- SHA-256 */

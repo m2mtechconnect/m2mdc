@@ -273,6 +273,7 @@ export type Database = {
           kpi_bindings: Json | null
           last_run_at: string | null
           name: string
+          org_id: string | null
           outputs: Json | null
           owner_id: string | null
           runtime_config: Json | null
@@ -299,6 +300,7 @@ export type Database = {
           kpi_bindings?: Json | null
           last_run_at?: string | null
           name: string
+          org_id?: string | null
           outputs?: Json | null
           owner_id?: string | null
           runtime_config?: Json | null
@@ -325,6 +327,7 @@ export type Database = {
           kpi_bindings?: Json | null
           last_run_at?: string | null
           name?: string
+          org_id?: string | null
           outputs?: Json | null
           owner_id?: string | null
           runtime_config?: Json | null

@@ -244,94 +244,140 @@ export default function Deploy() {
       return;
     }
 
+    // Phase 9: every stage below is a real operation. Stage state is set from
+    // the outcome of that operation and appended to the immutable
+    // deployment_events log - no stage is advanced by a timer.
+    const stageNames = [
+      t('deploy.stages.validateConfig'),
+      t('deploy.stages.packageWorkflow'),
+      t('deploy.stages.provisionRuntime'),
+      t('deploy.stages.registerWebhooks'),
+      t('deploy.stages.warmModel'),
+    ];
+    const stages: DeploymentStage[] = stageNames.map((name) => ({ name, status: 'pending' }));
+
+    const setStage = (index: number, status: DeploymentStage['status']) => {
+      const stage = stages[index];
+      if (stage) stage.status = status;
+      setDeploymentStages([...stages]);
+    };
+
     setIsDeploying(true);
     setShowProgressModal(true);
-
-    const stages: DeploymentStage[] = [
-      { name: t('deploy.stages.validateConfig'), status: 'running' },
-      { name: t('deploy.stages.packageWorkflow'), status: 'pending' },
-      { name: t('deploy.stages.provisionRuntime'), status: 'pending' },
-      { name: t('deploy.stages.registerWebhooks'), status: 'pending' },
-      { name: t('deploy.stages.warmModel'), status: 'pending' },
-    ];
-
     setDeploymentStages([...stages]);
 
+    let deploymentId: string | null = null;
+    let userId: string | null = null;
+    let currentStage = 0;
+
     try {
-      // Stage 1: Validate
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      if (stages[0]) stages[0].status = 'complete';
-      if (stages[1]) stages[1].status = 'running';
-      setDeploymentStages([...stages]);
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) throw new Error('Authentication required');
+      userId = user.id;
 
-      // Stage 2: Package
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      if (stages[1]) stages[1].status = 'complete';
-      if (stages[2]) stages[2].status = 'running';
-      setDeploymentStages([...stages]);
+      const deployment = await openDeployment({
+        systemId: systemId!,
+        actorId: user.id,
+        model: summary?.model ?? null,
+        grounding: summary?.grounding ?? null,
+      });
+      deploymentId = deployment.id;
 
-      // Stage 3: Provision - Update agent status to active
-      const { error: updateError } = await supabase
-        .from('agents')
-        .update({ 
-          status: 'active',
-          deployed_at: new Date().toISOString()
-        })
-        .eq('id', systemId);
+      const record = (
+        sequence: number,
+        stage: string,
+        status: 'started' | 'succeeded' | 'failed' | 'skipped',
+        detail?: Record<string, unknown>,
+      ) =>
+        appendDeploymentEvent({
+          deploymentId: deployment.id,
+          systemId: systemId!,
+          actorId: user.id,
+          sequence,
+          stage,
+          status,
+          detail,
+        });
 
-      if (updateError) throw updateError;
+      // Stage 1 - configuration validation (already executed against the record)
+      currentStage = 0;
+      setStage(0, 'running');
+      await record(1, 'validate-configuration', 'succeeded', {
+        errors: criticalErrors.length,
+        warnings: validationIssues.length - criticalErrors.length,
+      });
+      setStage(0, 'complete');
 
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      if (stages[2]) stages[2].status = 'complete';
-      if (stages[3]) stages[3].status = 'running';
-      setDeploymentStages([...stages]);
-
-      // Stage 4: Webhooks
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      if (stages[3]) stages[3].status = 'complete';
-      if (stages[4]) stages[4].status = 'running';
-      setDeploymentStages([...stages]);
-
-      // Stage 5: Warm model
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      if (stages[4]) stages[4].status = 'complete';
-      setDeploymentStages([...stages]);
-
-      // Get deployment tracking data
-      const { data: agentData } = await supabase
-        .from('agents')
-        .select('connector_ids')
-        .eq('id', systemId)
-        .maybeSingle();
-      
+      // Stage 2 - package workflow: read the workflow actually stored
+      currentStage = 1;
+      setStage(1, 'running');
       const { data: workflowData } = await supabase
         .from('workflows')
         .select('id')
         .eq('system_id', systemId)
         .maybeSingle();
-      
-      let workflowNodes = null;
+
+      let workflowNodes: { id: string }[] | null = null;
       if (workflowData?.id) {
         const { data: nodesData } = await supabase
           .from('workflow_nodes')
           .select('id')
           .eq('workflow_id', workflowData.id);
-        workflowNodes = nodesData;
+        workflowNodes = nodesData ?? [];
       }
-      
+      await record(2, 'package-workflow', workflowData?.id ? 'succeeded' : 'skipped', {
+        workflow_id: workflowData?.id ?? null,
+        node_count: workflowNodes?.length ?? 0,
+      });
+      setStage(1, 'complete');
+
+      // Stage 3 - activate the system record
+      currentStage = 2;
+      setStage(2, 'running');
+      const { error: updateError } = await supabase
+        .from('agents')
+        .update({
+          status: 'active',
+          deployed_at: new Date().toISOString(),
+        })
+        .eq('id', systemId);
+
+      if (updateError) {
+        await record(3, 'activate-system', 'failed', { message: updateError.message });
+        throw updateError;
+      }
+      await record(3, 'activate-system', 'succeeded');
+      setStage(2, 'complete');
+
+      // Stage 4 - resolve connected integrations and tools
+      currentStage = 3;
+      setStage(3, 'running');
+      const { data: agentData } = await supabase
+        .from('agents')
+        .select('connector_ids')
+        .eq('id', systemId)
+        .maybeSingle();
+
       const { data: intelligenceData } = await supabase
         .from('intelligence_settings')
         .select('mcp_servers')
         .eq('system_id', systemId)
         .maybeSingle();
-      
+
       const connectorCount = agentData?.connector_ids?.length || 0;
       const mcpServers = Array.isArray(intelligenceData?.mcp_servers) ? intelligenceData.mcp_servers : [];
       const toolCount = mcpServers.length;
 
-      // Save ROI metrics if available
+      await record(4, 'resolve-integrations', 'succeeded', {
+        connector_count: connectorCount,
+        tool_count: toolCount,
+      });
+      setStage(3, 'complete');
+
+      // Stage 5 - persist economics assumptions, when the operator supplied them
+      currentStage = 4;
+      setStage(4, 'running');
       if (roiMetrics) {
-        // Check if ROI assumptions already exist
         const { data: existingRoi } = await supabase
           .from('roi_assumptions')
           .select('id')
@@ -339,11 +385,10 @@ export default function Deploy() {
           .maybeSingle();
 
         if (existingRoi) {
-          // Update existing ROI assumptions
           await supabase
             .from('roi_assumptions')
             .update({
-              time_saved_per_run_min: roiMetrics.timeSavedPerWeek * 60 / 40, // Estimate
+              time_saved_per_run_min: roiMetrics.timeSavedPerWeek * 60 / 40,
               runs_per_week: 40,
               loaded_cost_per_hour: 75,
               accuracy_improvement_pct: roiMetrics.accuracyImprovement,
@@ -351,7 +396,6 @@ export default function Deploy() {
             })
             .eq('id', existingRoi.id);
         } else {
-          // Create new ROI assumptions
           await supabase.from('roi_assumptions').insert({
             system_id: systemId,
             time_saved_per_run_min: roiMetrics.timeSavedPerWeek * 60 / 40,
@@ -362,7 +406,6 @@ export default function Deploy() {
           });
         }
 
-        // Create ROI snapshot
         await supabase.from('roi_snapshots').insert({
           system_id: systemId,
           roi_pct: roiMetrics.roi,
@@ -371,65 +414,39 @@ export default function Deploy() {
           error_savings_year: 0,
           assumptions_json: roiMetrics,
         });
-      }
 
-      // Get authenticated user
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) throw new Error('Authentication required');
-
-      // Create deployment record
-      const { error: deployError } = await supabase
-        .from('deployments')
-        .insert({
-          system_id: systemId,
-          version: 'v1',
-          status: 'active',
-          region: 'northamerica-northeast1',
-          model: summary?.model,
-          grounding: summary?.grounding,
-          runtime_url: `https://runtime.m2m.ai/${systemId}`,
-          health: 'OK',
-          deployed_by: user.id,
+        await record(5, 'record-economics', 'succeeded', {
+          roi_pct: roiMetrics.roi,
+          annual_savings: roiMetrics.annualSavings,
         });
-
-      if (deployError) throw deployError;
-
-      // Create deployment tracking record
-      const { error: trackingError } = await supabase
-        .from('deployment_tracking')
-        .insert({
-          system_id: systemId,
-          deployed_by: user.id,
-          model_id: summary?.model,
-          status: 'deployed',
-          connector_count: connectorCount,
-          tool_count: toolCount,
-          accuracy_estimate: roiMetrics?.accuracyImprovement || 85,
-          roi_estimate: roiMetrics ? {
-            annual_savings: roiMetrics.annualSavings,
-            roi_pct: roiMetrics.roi,
-            time_saved_week: roiMetrics.timeSavedPerWeek,
-          } : null,
-          metadata: {
-            grounding: summary?.grounding,
-            region: 'northamerica-northeast1',
-            workflow_node_count: workflowNodes?.length || 0,
-            connectors: agentData?.connector_ids || [],
-            mcp_servers: mcpServers.map((s: any) => s.server_id || s),
-          },
-        });
-
-      if (trackingError) {
-        console.error('Deployment tracking error:', trackingError);
+      } else {
+        await record(5, 'record-economics', 'skipped', { reason: 'no economics assumptions supplied' });
       }
+      setStage(4, 'complete');
+
+      await closeDeployment({
+        deploymentId: deployment.id,
+        status: 'active',
+        runtimeUrl: null,
+        health: null,
+      });
+
+      await record(6, 'deployment-complete', 'succeeded', {
+        workflow_node_count: workflowNodes?.length ?? 0,
+        connectors: agentData?.connector_ids ?? [],
+        mcp_servers: mcpServers.map((s: any) => s.server_id || s),
+        region: 'northamerica-northeast1',
+        grounding: summary?.grounding ?? null,
+      });
 
       // Audit log
       await supabase.from('audit_logs').insert({
-        user_id: user?.id,
+        user_id: user.id,
         action: 'deploy',
         entity_type: 'system',
         entity_id: systemId,
         details: {
+          deployment_id: deployment.id,
           version: 'v1',
           model: summary?.model,
           grounding: summary?.grounding,
@@ -441,30 +458,33 @@ export default function Deploy() {
         description: t('deploy.systemLive'),
       });
 
-      setTimeout(() => {
-        setShowProgressModal(false);
-        navigate(`/dashboard`);
-      }, 2000);
+      setShowProgressModal(false);
+      navigate('/deployments');
 
     } catch (error: any) {
       console.error('Deployment error:', error);
-      
-      // Mark current stage as failed
-      const currentStageIndex = stages.findIndex(s => s.status === 'running');
-      if (currentStageIndex !== -1) {
-        stages[currentStageIndex].status = 'failed';
-        setDeploymentStages([...stages]);
-      }
 
-      // Update deployment record
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (!userError && user) {
-        await supabase.from('deployments').insert({
-          system_id: systemId,
+      setStage(currentStage, 'failed');
+
+      if (deploymentId && userId) {
+        await appendDeploymentEvent({
+          deploymentId,
+          systemId: systemId!,
+          actorId: userId,
+          sequence: 99,
+          stage: 'deployment-failed',
           status: 'failed',
-          error_message: error.message,
-          deployed_by: user.id,
+          detail: { message: error?.message ?? 'unknown error' },
         });
+        try {
+          await closeDeployment({
+            deploymentId,
+            status: 'failed',
+            errorMessage: error?.message ?? 'unknown error',
+          });
+        } catch (closeError) {
+          console.error('Failed to record deployment failure', closeError);
+        }
       }
 
       toast({
@@ -476,6 +496,7 @@ export default function Deploy() {
       setIsDeploying(false);
     }
   };
+
 
   const handleFixIssue = (step: number) => {
     navigate(`/builder?id=${systemId}&step=${step}`);

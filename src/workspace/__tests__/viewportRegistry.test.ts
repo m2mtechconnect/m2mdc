@@ -4,7 +4,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { VIEWPORT_SURFACES, viewportDisclosure } from '../viewportRegistry';
+import { VIEWPORT_SURFACES, viewportDisclosure, viewportLimitation } from '../viewportRegistry';
 
 const srcRoot = resolve(__dirname, '../..');
 const read = (module: string) => readFileSync(resolve(srcRoot, module), 'utf8');
@@ -50,5 +50,18 @@ describe('viewport registry', () => {
     expect(viewportDisclosure('command-centre-plan-card')).toBe(
       'Procedural 2D floor plan of the modelled design',
     );
+  });
+
+  it('makes every surface without approved GLB state the limitation', () => {
+    for (const surface of VIEWPORT_SURFACES) {
+      if (surface.canMountApprovedGlb) continue;
+      expect(surface.limitation, `${surface.id} limitation`).toBe('Not a validated OpenUSD stage');
+    }
+  });
+
+  it('renders the limitation on the Command Centre card', () => {
+    const source = read('workspace/dashboard/FacilityPlanCard.tsx');
+    expect(source).toContain('viewportLimitation');
+    expect(viewportLimitation('command-centre-plan-card')).toBe('Not a validated OpenUSD stage');
   });
 });

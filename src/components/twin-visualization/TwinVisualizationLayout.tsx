@@ -54,6 +54,7 @@ export function TwinVisualizationLayout({
   onRackSelect,
   className = '',
 }: TwinVisualizationLayoutProps) {
+  console.log('[DIAG] TVL render');
   const data = useTwinVisualizationData();
   const simulation = useSimulationVisualization();
 

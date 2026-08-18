@@ -83,7 +83,7 @@ test.describe('NVIDIA Reference Facility runtime regression', () => {
       });
     });
 
-    page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') console.log('[C]', m.type(), m.text().slice(0,300)); });
+    page.on('console', (m) => { if (m.text().includes('[DIAG]') || m.type() === 'error') console.log('[C]', m.type(), m.text().slice(0,300)); });
     page.on('pageerror', (e) => console.log('[PE]', String(e).slice(0,400)));
     page.on('requestfailed', (r) => console.log('[RF]', r.url().slice(0,160), r.failure()?.errorText));
     await page.goto(ROUTE, { waitUntil: 'domcontentloaded' });

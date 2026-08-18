@@ -62,58 +62,16 @@ export function useTwinKPIs(kpiKeys?: string[]) {
   });
 }
 
-// Twin Simulation Runs
+// Simulation runs for the active twin.
+// Reads the canonical `simulation_runs` table (Phase 7); the legacy
+// `twin_simulation_runs` generation carried no run envelope and is deprecated.
 export function useTwinSimulations() {
   const { activeTwinId: twinId } = useActiveTwin();
   
   return useQuery({
     queryKey: ['twin-simulations', twinId],
-    queryFn: async () => {
-      if (!twinId) return [];
-      
-      const { data, error } = await supabase
-        .from('twin_simulation_runs')
-        .select('*')
-        .eq('twin_id', twinId)
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => loadRunRecords(twinId, { limit: 50 }),
     enabled: !!twinId,
-  });
-}
-
-// Create Simulation Run
-export function useCreateSimulationRun() {
-  const { activeTwinId: twinId } = useActiveTwin();
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: async (data: {
-      scenario_id: string;
-      scenario_name?: string;
-    }) => {
-      if (!twinId) throw new Error('No twin selected');
-      
-      const { data: run, error } = await supabase
-        .from('twin_simulation_runs')
-        .insert({
-          twin_id: twinId,
-          scenario_id: data.scenario_id,
-          scenario_name: data.scenario_name,
-          status: 'running',
-          started_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return run;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['twin-simulations', twinId] });
-    },
   });
 }
 

@@ -21,6 +21,7 @@ import type {
 } from '../contracts/recommendation';
 import { validateDecisionInput } from '../contracts/recommendation';
 import { payloadHash, stableUuid } from '../fixtures/determinism';
+import { loadDecisions, persistDecision } from './decisionPersistence';
 
 export interface DecisionInput {
   outcome: DecisionOutcome;
@@ -30,6 +31,9 @@ export interface DecisionInput {
   escalated_to?: string;
 }
 
+/** Durability of the decision log for the current session. */
+export type DecisionPersistenceState = 'durable' | 'in-memory';
+
 const PLAY_INTERVAL_MS = 900;
 
 export function useEvidenceBeta() {
@@ -38,7 +42,26 @@ export function useEvidenceBeta() {
   const [tick, setTick] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [decisions, setDecisions] = useState<DecisionRecord[]>([]);
+  const [persistence, setPersistence] = useState<DecisionPersistenceState>('in-memory');
   const timer = useRef<number | null>(null);
+
+  // Restore the durable decision log so a reload never loses recorded decisions.
+  useEffect(() => {
+    let cancelled = false;
+    loadDecisions()
+      .then((rows) => {
+        if (cancelled || rows.length === 0) return;
+        setPersistence('durable');
+        setDecisions((prev) => {
+          const seen = new Set(prev.map((d) => d.recommendation_id));
+          return [...prev, ...rows.filter((r) => !seen.has(r.recommendation_id))];
+        });
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const source: OperationalSource = useMemo(
     () => resolveSource({ mode, timeline, startedAtIso: TIMELINE_START_ISO }),
@@ -121,6 +144,26 @@ export function useEvidenceBeta() {
           evidence_snapshot,
         },
       ]);
+
+      // Append to the durable log. Failure downgrades the reported durability
+      // instead of silently claiming the decision was recorded server-side.
+      void persistDecision({
+        decision_id: stableUuid(`decision:${recommendation.recommendation_id}:${input.outcome}`),
+        recommendation_id: recommendation.recommendation_id,
+        outcome: input.outcome,
+        rationale: input.rationale.trim(),
+        approver: input.approver,
+        comment: input.comment?.trim() ? input.comment.trim() : undefined,
+        escalated_to: input.escalated_to?.trim() ? input.escalated_to.trim() : undefined,
+        decided_at: nowIso,
+        execution_status: input.outcome === 'approved' ? 'manual_execution_pending' : 'not_executed',
+        evidence_snapshot,
+      })
+        .then((r) =>
+          setPersistence(r.status === 'saved' || r.status === 'duplicate' ? 'durable' : 'in-memory'),
+        )
+        .catch(() => setPersistence('in-memory'));
+
       return { ok: true, errors: [] };
     },
     [bundle, nowIso, tick, timeline],
@@ -154,6 +197,7 @@ export function useEvidenceBeta() {
     bundle,
     scenario,
     decisions,
+    decisionPersistence: persistence,
     recordDecision,
     pendingRecommendations,
     nowIso,

@@ -97,51 +97,29 @@ export function SovereignDCDeploymentSteps({
     // Track analytics
     sovereignDCAnalytics.templateViewed(template.id);
     
-    const phases = [
-      'Validating Canadian data sovereignty configuration...',
-      'Provisioning telemetry ingestion (GPU, DCIM, energy)...',
-      'Deploying AI/ML optimization models...',
-      'Configuring sovereign storage buckets...',
-      'Setting up KPI dashboards...',
-      'Activating operational workflows...',
-      'Running post-deploy smoke tests...'
-    ];
-    
     try {
-      // Simulate phased deployment
-      for (const phase of phases) {
-        setDeploymentPhase(phase);
-        await new Promise(resolve => setTimeout(resolve, 800));
-      }
-      
+      // Phase 9: no scripted phase animation. The only progress reported is
+      // the single real operation this component performs.
+      setDeploymentPhase('Recording deployment request...');
+
       if (onDeploy) {
         await onDeploy();
       }
-      
-      // Run smoke test
-      setDeploymentPhase('Verifying telemetry streaming...');
-      await new Promise(resolve => setTimeout(resolve, 600));
-      setDeploymentPhase('Confirming KPI calculations...');
-      await new Promise(resolve => setTimeout(resolve, 600));
-      setDeploymentPhase('Testing simulation engine...');
-      await new Promise(resolve => setTimeout(resolve, 600));
-      
-      setSmokeTestPassed(true);
+
+      // No post-deploy smoke test is executed here, so none is claimed.
+      setSmokeTestPassed(false);
       setDeploymentComplete(true);
       setDeploymentPhase('');
-      
-      toast.success('Sovereign DC Twin deployed successfully!', {
-        description: 'Telemetry streaming, KPIs active, simulation ready.'
+
+      toast.success('Deployment request recorded', {
+        description: 'Review the deployment record and its step log under Runtime Environments.'
       });
       
       // Track completion
       sovereignDCAnalytics.simulationRun(template.id, 'deployment', 'deploy_complete');
-      
-      // Redirect after success
-      setTimeout(() => {
-        navigate('/dashboard?tab=deployed');
-      }, 1500);
-      
+
+      navigate('/deployments');
+
     } catch (error) {
       console.error('Deployment error:', error);
       toast.error('Deployment failed', {

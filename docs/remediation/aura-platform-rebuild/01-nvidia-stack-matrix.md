@@ -1,4 +1,4 @@
-# NVIDIA stack gap matrix (measured at ad0ff04)
+# NVIDIA stack gap matrix (measured at 66d2c2a)
 
 Status vocabulary: **absent** | **fixture** | **AURA-authored** | **partial** | **implemented**.
 No row may be raised without the runtime evidence named in its Evidence gate column.

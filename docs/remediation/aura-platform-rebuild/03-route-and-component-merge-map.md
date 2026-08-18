@@ -1,6 +1,7 @@
-# Route and component duplication inventory (measured at ad0ff04)
+# Route and component duplication inventory (measured at 66d2c2a)
 
-105 `path=` declarations: 28 in `src/App.tsx`, 77 in `src/AuthenticatedShell.tsx`.
+101 `path=` declarations: 25 in `src/App.tsx`, 76 in `src/AuthenticatedShell.tsx`.
+8 literals are declared more than once.
 
 ## Duplicate path literals
 | Path | Count | Note |

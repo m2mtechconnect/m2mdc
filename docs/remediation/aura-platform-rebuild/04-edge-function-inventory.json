@@ -1,18 +1,9 @@
 {
   "commit": "66d2c2aa6bdfc50ea5acba5621d23ed5e7047c92",
   "generatedBy": "Phase 0 static scan (not proof of production use)",
-  "functionCount": 167,
+  "functionCount": 166,
   "noFirstPartyCaller": 76,
   "functions": [
-    {
-      "name": "_shared",
-      "hasIndex": false,
-      "usesSharedHandler": false,
-      "wildcardCors": false,
-      "usesServiceRole": false,
-      "firstPartyCallerFound": true,
-      "classification": "retain-pending-audit"
-    },
     {
       "name": "agent-create",
       "hasIndex": true,
@@ -1507,5 +1498,6 @@
       "firstPartyCallerFound": false,
       "classification": "review-candidate"
     }
-  ]
+  ],
+  "note": "_shared is a helper directory, not a deployable function; excluded."
 }

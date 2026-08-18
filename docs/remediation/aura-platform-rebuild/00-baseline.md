@@ -1,6 +1,8 @@
 # Phase 0 - Reproducible truth baseline
 
-Commit SHA at start: `ad0ff0452a9b334cc1aa3606895233cd27434462`
+Commit SHA of the scanned tree: `66d2c2aa6bdfc50ea5acba5621d23ed5e7047c92` (the SHA recorded
+by the inventory generator). The platform commits on every turn, so `git rev-parse HEAD`
+reports a later SHA than the scan; all counts below belong to the scanned tree.
 Branch: working branch of the Lovable project (no separate git branch can be created from this environment - git state is managed by the platform). **Blocker B-1.**
 
 ## 1. Toolchain and package identity
@@ -97,9 +99,10 @@ cannot simply be deleted from the working tree. Required actions, both needing h
 ## 4. Inventories (recalculated on this commit)
 
 ### 4.1 Routes
-105 `path=` declarations across `src/App.tsx` (28) and `src/AuthenticatedShell.tsx` (77).
-Duplicated path literals: `/sign-out` (x6), `*` (x5), `/twin-preview`, `/pilot/*`,
-`/onboarding`, `/login`, `/dev-overlays`, `/data-centre-twin` (x2 each).
+**101** `path=` declarations: `src/App.tsx` 25, `src/AuthenticatedShell.tsx` 76.
+8 path literals are declared more than once: `/sign-out` (x6 - 5 in `App.tsx`, 1 in the
+shell), `*`/`/*` (x6 across both files), and `/twin-preview`, `/pilot/*`, `/onboarding`,
+`/login`, `/dev-overlays`, `/data-centre-twin` (x2 each).
 Full merge map: `03-route-and-component-merge-map.md`.
 
 ### 4.2 Viewport implementations - 5 distinct
@@ -127,16 +130,21 @@ Compat bridges: `dataCenterEngine`, `facadeBridge`, `previewSessionBridge`,
 unseeded `Math.random()` and wall-clock reads. Corrected in Phase 1/3.
 
 ### 4.4 Edge functions
-**167** directories. Static scan (`04-edge-function-inventory.json`):
+**166** deployable function directories (plus a `_shared` helper directory, excluded).
+Static scan of each `index.ts` (`04-edge-function-inventory.json`):
 - 76 with no first-party caller reference in `src/` or `services/` - review candidates only.
-- 91 not using `_shared/handler`.
-- 91 with a wildcard CORS origin.
-- 47 referencing the service role.
+- 92 not using `_shared/handler`.
+- 89 with a wildcard CORS origin in their own `index.ts`.
+- 44 referencing the service role in their own `index.ts`.
+
+(An earlier repo-wide `grep -rl` produced 91/91/47; those figures counted `_shared/*` files
+too. The per-function figures above are the ones that may be cited.)
 Gateway-log, webhook-registration and cron-caller evidence is not obtainable from this
 sandbox, so no function may be deleted on this data. **Blocker B-7.**
 
 ### 4.5 Database
-**132** unique tables across **57** migrations. Family map and migration plan:
+**132** unique tables across **57** migrations - confirmed against the live schema
+(`information_schema.tables`, `public`, base tables = 132). Family map and migration plan:
 `05-table-migration-map.md`.
 
 ### 4.6 Authorization mismatch (confirmed, deferred to Phase 1)
@@ -156,4 +164,4 @@ exactly; no schema, route, dependency or runtime behaviour changed.
 
 Permitted: none newly permitted.
 Withdrawn: the claim that the suite total is 1,715 (superseded by 1,728 raw); the implicit
-claim that the repository typechecks cleanly at `ad0ff04` (it did not).
+claim that the repository typechecked cleanly before this phase (it did not).

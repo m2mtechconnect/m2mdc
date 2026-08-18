@@ -243,8 +243,6 @@ export default function SignUp() {
         {/* SSO Options */}
         <SSOButtons
           onGoogleClick={handleGoogleSSO}
-          onMicrosoftClick={handleMicrosoftSSO}
-          onSSOClick={handleEnterpriseSSO}
           disabled={loading}
         />
 

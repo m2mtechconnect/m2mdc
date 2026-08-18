@@ -15,6 +15,7 @@ import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthLayout, SecurityBadge, SSOButtons } from "@/components/auth";
 import { Helmet } from "react-helmet-async";
+import { signInWithGoogle } from "@/auth/ssoProviders";
 
 const signInSchema = z.object({
   email: z.string()
@@ -92,15 +93,12 @@ export default function SignIn() {
   };
 
   const handleGoogleSSO = async () => {
-    toast.info("Google SSO coming soon. Contact your administrator.");
-  };
-
-  const handleMicrosoftSSO = async () => {
-    toast.info("Microsoft SSO coming soon. Contact your administrator.");
-  };
-
-  const handleEnterpriseSSO = async () => {
-    toast.info("Enterprise SSO coming soon. Contact your administrator.");
+    setLoading(true);
+    const { error: ssoError } = await signInWithGoogle();
+    if (ssoError) {
+      setLoading(false);
+      toast.error(ssoError);
+    }
   };
 
   return (
@@ -208,8 +206,6 @@ export default function SignIn() {
         {/* SSO Options */}
         <SSOButtons
           onGoogleClick={handleGoogleSSO}
-          onMicrosoftClick={handleMicrosoftSSO}
-          onSSOClick={handleEnterpriseSSO}
           disabled={loading}
         />
 

@@ -9,7 +9,7 @@ import type { RowVisual, RackVisual } from './types';
 import type { RackDetailLevel } from './Rack';
 import { ApprovedRackAsset } from './ApprovedRackAsset';
 import { assetIdForRack, type CanaryRolloutConfig } from './canaryRollout';
-import { useRuntimeCoverageStore } from './runtimeCoverageStore';
+import { useCoverageOwner } from './coverageSession';
 
 interface RackGroupProps {
   row: RowVisual;
@@ -32,6 +32,8 @@ interface RackGroupProps {
    * approved derivative instead of the per-rack canary assignment.
    */
   referenceAssetId?: string | null;
+  /** Active coverage session; reports outside it are ignored by the store. */
+  sessionId: string;
 }
 
 export function RackGroup({
@@ -46,9 +48,10 @@ export function RackGroup({
   showLabels = true,
   canary,
   referenceAssetId = null,
+  sessionId,
 }: RackGroupProps) {
   const rowRacks = racks.filter(r => r.rowId === row.id);
-  const reportRackMount = useRuntimeCoverageStore((s) => s.reportRackMount);
+  const { reportMount } = useCoverageOwner(sessionId, 'racks');
   const rowWidth = rowRacks.length * 1.1 + 0.5;
   const [expanded, setExpanded] = useState(false);
   const selectedInRow = rowRacks.some((r) => r.id === selectedRackId);
@@ -114,10 +117,11 @@ export function RackGroup({
           key={rack.id} 
           assetId={referenceAssetId ?? (canary ? assetIdForRack(rack.id, canary) : undefined)}
           onRuntimeState={(state) =>
-            reportRackMount('rack-cabinets', rack.id, {
+            reportMount(rack.id, {
               mounted: state.mounted,
               assetId: state.assetId,
               url: state.url,
+              stage: state.mounted ? 'visible' : 'fallback',
             })
           }
           rack={{

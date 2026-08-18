@@ -16,7 +16,15 @@
  *    identity, no SimReady certification and no NVIDIA authorship.
  */
 
-import { Component, useEffect, useLayoutEffect, useMemo, useRef, type ReactNode } from 'react';
+import {
+  Component,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import * as THREE from 'three';
 import { useDerivativeGltf } from './useDerivativeGltf';
 import {
@@ -29,6 +37,7 @@ import {
   type SemanticRole,
 } from './assetRegistry';
 import { useRuntimeCoverageStore, type RoleCoverage } from './runtimeCoverageStore';
+import { useCoverageOwner } from './coverageSession';
 import { useFacilityDerivativeStore, type FacilityFamily } from './facilityDerivativeStore';
 import type { RowVisual } from './types';
 import type { InfrastructureLevel } from './infrastructureLevel';
@@ -96,19 +105,21 @@ export function tileGrid(
  */
 function InstancedFamily({
   mount,
-  token,
+  sessionId,
   coverage,
 }: {
   mount: FamilyMount;
-  token: string;
+  sessionId: string;
   coverage: PendingCoverage;
 }) {
   const load = useDerivativeGltf(mount.url);
   const scene = load.scene;
   const groupRef = useRef<THREE.Group>(null);
-  const report = useRuntimeCoverageStore((s) => s.reportRole);
+  const { reportRole: report } = useCoverageOwner(sessionId, `facility:${mount.family}`);
   const setFamily = useFacilityDerivativeStore((s) => s.setFamily);
   const count = mount.placements.length;
+  // Attachment evidence for this family's instanced group.
+  const [attached, setAttached] = useState<{ uuid: string; parentUuid: string } | null>(null);
 
   // Source meshes, with their transform inside the derivative preserved.
   const sources = useMemo(() => {
@@ -151,23 +162,37 @@ function InstancedFamily({
     });
   }, [sources, mount.placements]);
 
+  useLayoutEffect(() => {
+    const group = groupRef.current;
+    if (!group || sources.length === 0 || count === 0) {
+      setAttached(null);
+      return;
+    }
+    let root = group.parent as THREE.Object3D | null;
+    while (root?.parent) root = root.parent;
+    setAttached(root ? { uuid: group.uuid, parentUuid: root.uuid } : null);
+    return () => setAttached(null);
+  }, [sources.length, count]);
+
   useEffect(() => {
     if (load.status === 'loading') {
       setFamily(mount.family, 'loading');
-      report(token, {
+      report({
         ...coverage,
         state: 'preparing',
         mountedObjects: 0,
         glbInstances: 0,
         triangles: 0,
         drawCalls: 0,
+        stage: 'requested',
+        visible: false,
         detail: `Loading AURA-authored derivative ${mount.url}`,
       });
       return;
     }
     if (load.status === 'failed' || sources.length === 0) {
       setFamily(mount.family, 'fallback');
-      report(token, {
+      report({
         ...coverage,
         state: 'procedural-fallback',
         mountedObjects: 0,
@@ -175,6 +200,9 @@ function InstancedFamily({
         triangles: 0,
         drawCalls: 0,
         proceduralObjects: count,
+        stage: 'fallback',
+        visible: false,
+        failureReason: load.error,
         detail:
           load.status === 'failed'
             ? `AURA derivative failed to load, procedural geometry retained: ${load.error}`
@@ -182,17 +210,36 @@ function InstancedFamily({
       });
       return;
     }
+    if (!attached) {
+      report({
+        ...coverage,
+        state: 'preparing',
+        mountedObjects: 0,
+        glbInstances: 0,
+        triangles: 0,
+        drawCalls: 0,
+        stage: 'parsed',
+        visible: false,
+        detail: 'AURA derivative parsed; awaiting attachment to the scene root.',
+      });
+      return;
+    }
     setFamily(mount.family, 'mounted');
-    report(token, {
+    report({
       ...coverage,
       state: 'openusd-derived',
       mountedObjects: count,
       glbInstances: count * sources.length,
       triangles: (mount.entry.triangleCount ?? 0) * count,
       drawCalls: sources.length,
+      stage: 'visible',
+      visible: true,
+      objectUuid: attached.uuid,
+      parentUuid: attached.parentUuid,
+      mountedAt: Date.now(),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, count, sources.length, mount.entry.assetId, load.status, load.error]);
+  }, [sessionId, count, sources.length, mount.entry.assetId, load.status, load.error, attached]);
 
   // A family that unmounts must stop claiming a mount.
   useEffect(() => () => setFamily(mount.family, 'idle'), [setFamily, mount.family]);
@@ -219,7 +266,7 @@ function InstancedFamily({
 
 /** A derivative that throws during mount must report, never blank the hall. */
 class FamilyBoundary extends Component<
-  { token: string; family: FacilityFamily; coverage: PendingCoverage; children: ReactNode },
+  { sessionId: string; family: FacilityFamily; coverage: PendingCoverage; children: ReactNode },
   { error: string | null }
 > {
   state = { error: null as string | null };
@@ -229,16 +276,20 @@ class FamilyBoundary extends Component<
   }
 
   componentDidCatch(error: unknown) {
-    const { token, coverage, family } = this.props;
+    const { sessionId, coverage, family } = this.props;
+    const reason = error instanceof Error ? error.message : String(error);
     useFacilityDerivativeStore.getState().setFamily(family, 'fallback');
-    useRuntimeCoverageStore.getState().reportRole(token, {
+    useRuntimeCoverageStore.getState().reportRole(sessionId, `facility:${family}`, {
       ...coverage,
       state: 'procedural-fallback',
       mountedObjects: 0,
       glbInstances: 0,
       triangles: 0,
       drawCalls: 0,
-      detail: `AURA derivative failed to mount: ${error instanceof Error ? error.message : String(error)}`,
+      stage: 'fallback',
+      visible: false,
+      failureReason: reason,
+      detail: `AURA derivative failed to mount: ${reason}`,
     });
   }
 
@@ -256,6 +307,8 @@ interface Props {
   /** Resolved shell selection driving the shell variant. */
   shellMode: ShellMode;
   band?: DistanceBand;
+  /** Active coverage session; reports outside it are ignored by the store. */
+  sessionId: string;
 }
 
 const FAMILY_ROLE: Record<FacilityFamily, SemanticRole> = {
@@ -266,12 +319,15 @@ const FAMILY_ROLE: Record<FacilityFamily, SemanticRole> = {
   'facility-shell': 'facility-shell',
 };
 
-export function AuraFacilityLayer({ bounds, rows, infrastructure, shellMode, band = 'nearby' }: Props) {
+export function AuraFacilityLayer({
+  bounds,
+  rows,
+  infrastructure,
+  shellMode,
+  band = 'nearby',
+  sessionId,
+}: Props) {
   const showInfrastructure = infrastructure !== 'off';
-  const token = useMemo(
-    () => `aura-facility:${rows.length}:${infrastructure}:${shellMode}:${band}`,
-    [rows.length, infrastructure, shellMode, band],
-  );
 
   const mounts = useMemo<FamilyMount[]>(() => {
     const out: FamilyMount[] = [];
@@ -340,7 +396,7 @@ export function AuraFacilityLayer({ bounds, rows, infrastructure, shellMode, ban
   }, [bounds, rows, showInfrastructure, shellMode, band]);
 
   const setFamily = useFacilityDerivativeStore((s) => s.setFamily);
-  const report = useRuntimeCoverageStore((s) => s.reportRole);
+  const { reportRole: report } = useCoverageOwner(sessionId, 'facility');
 
   // Families with no resolvable derivative keep procedural geometry and say so.
   useEffect(() => {
@@ -349,7 +405,7 @@ export function AuraFacilityLayer({ bounds, rows, infrastructure, shellMode, ban
       if (resolved.has(family)) return;
       setFamily(family, 'fallback');
       const entry = resolveRoleAssetForBand(FAMILY_ROLE[family], band)?.entry ?? null;
-      report(token, {
+      report({
         role: FAMILY_ROLE[family],
         state: entry ? 'procedural-fallback' : 'not-represented',
         assetId: entry?.assetId ?? null,
@@ -360,12 +416,14 @@ export function AuraFacilityLayer({ bounds, rows, infrastructure, shellMode, ban
         proceduralObjects: 0,
         triangles: 0,
         drawCalls: 0,
+        stage: entry ? 'fallback' : 'requested',
+        visible: false,
         detail: entry
           ? 'Not placed in this view; procedural geometry retained.'
           : 'No approved AURA-authored derivative resolved.',
       });
     });
-  }, [mounts, token, band, report, setFamily]);
+  }, [mounts, band, report, setFamily]);
 
   return (
     <group name="AuraFacilityLayer" userData={{ classification: 'aura-openusd-derived-facility' }}>
@@ -381,11 +439,11 @@ export function AuraFacilityLayer({ bounds, rows, infrastructure, shellMode, ban
         return (
           <FamilyBoundary
             key={mount.family}
-            token={token}
+            sessionId={sessionId}
             family={mount.family}
             coverage={coverage}
           >
-            <InstancedFamily mount={mount} token={token} coverage={coverage} />
+            <InstancedFamily mount={mount} sessionId={sessionId} coverage={coverage} />
           </FamilyBoundary>
         );
       })}

@@ -15,7 +15,8 @@
  *    is claimed from the manifest alone.
  */
 
-import { Component, useEffect, useMemo, type ReactNode } from 'react';
+import { Component, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import type { Group } from 'three';
 import { Clone } from '@react-three/drei';
 import { useDerivativeGltf } from './useDerivativeGltf';
 import { applyMaterialPolicy } from './applyMaterialPolicy';
@@ -31,6 +32,7 @@ import {
   type SemanticRole,
 } from './assetRegistry';
 import { useRuntimeCoverageStore, type RoleCoverage } from './runtimeCoverageStore';
+import { useCoverageOwner } from './coverageSession';
 import type { RackVisual, RowVisual } from './types';
 import type { InfrastructureLevel } from './infrastructureLevel';
 
@@ -59,11 +61,11 @@ function forBand(role: SemanticRole, band: DistanceBand): AssetManifestEntry | n
 
 function InstancedRole({
   mount,
-  token,
+  sessionId,
   coverage,
 }: {
   mount: RoleMount;
-  token: string;
+  sessionId: string;
   coverage: Omit<
     RoleCoverage,
     'mountedObjects' | 'glbInstances' | 'triangles' | 'drawCalls' | 'state'
@@ -71,8 +73,12 @@ function InstancedRole({
 }) {
   const load = useDerivativeGltf(mount.url);
   const scene = load.scene;
-  const report = useRuntimeCoverageStore((s) => s.reportRole);
+  const { reportRole: report } = useCoverageOwner(sessionId, `equipment:${mount.role}`);
   const realismMode = useRealismMode();
+  const groupRef = useRef<Group>(null);
+  // Attachment evidence: a parsed derivative is only "mounted" once its group
+  // is actually attached under a live scene root. A 200 response is not proof.
+  const [attached, setAttached] = useState<{ uuid: string; parentUuid: string } | null>(null);
 
   /**
    * NVIDIA OpenUSD-derived geometry with AURA-authored material, lighting and
@@ -86,45 +92,87 @@ function InstancedRole({
   }, [scene, mount.role, mount.band, realismMode]);
 
   const count = mount.placements.length;
+
+  useEffect(() => {
+    if (!scene) {
+      setAttached(null);
+      return;
+    }
+    const group = groupRef.current;
+    if (!group) {
+      setAttached(null);
+      return;
+    }
+    // Walk to the scene root; an orphaned group is never reported as mounted.
+    let root = group.parent;
+    while (root?.parent) root = root.parent;
+    setAttached(root ? { uuid: group.uuid, parentUuid: root.uuid } : null);
+    return () => setAttached(null);
+  }, [scene, count]);
+
   useEffect(() => {
     if (load.status === 'loading') {
-      report(token, {
+      report({
         ...coverage,
         state: 'preparing',
         mountedObjects: 0,
         glbInstances: 0,
         triangles: 0,
         drawCalls: 0,
+        stage: 'requested',
+        visible: false,
         detail: `Loading derivative ${mount.url}`,
       });
       return;
     }
     if (load.status === 'failed') {
-      report(token, {
+      report({
         ...coverage,
         state: 'blocked',
         mountedObjects: 0,
         glbInstances: 0,
         triangles: 0,
         drawCalls: 0,
+        stage: 'failed',
+        visible: false,
+        failureReason: load.error,
         detail: `Derivative failed to load: ${load.error}`,
       });
       return;
     }
-    report(token, {
+    if (!attached) {
+      report({
+        ...coverage,
+        state: 'preparing',
+        mountedObjects: 0,
+        glbInstances: 0,
+        triangles: 0,
+        drawCalls: 0,
+        stage: 'parsed',
+        visible: false,
+        detail: 'Derivative parsed; awaiting attachment to the scene root.',
+      });
+      return;
+    }
+    report({
       ...coverage,
       state: 'openusd-derived',
       mountedObjects: count,
       glbInstances: count,
       triangles: (mount.entry.triangleCount ?? 0) * count,
       drawCalls: (mount.entry.drawCallBudget ?? 1) * count,
+      stage: 'visible',
+      visible: true,
+      objectUuid: attached.uuid,
+      parentUuid: attached.parentUuid,
+      mountedAt: Date.now(),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, count, mount.entry.assetId, load.status, load.error]);
+  }, [sessionId, count, mount.entry.assetId, load.status, load.error, attached]);
 
   if (!scene) return null;
   return (
-    <group name={`ReferenceEquipment:${mount.role}`}>
+    <group ref={groupRef} name={`ReferenceEquipment:${mount.role}`}>
       {mount.placements.map((p, i) => (
         <group
           key={`${mount.entry.assetId}-${i}`}
@@ -150,6 +198,8 @@ interface Props {
   band?: DistanceBand;
   /** Rack index limit for detailed in-rack equipment (performance bound). */
   detailBudget?: number;
+  /** Active coverage session; reports outside it are ignored by the store. */
+  sessionId: string;
 }
 
 type PendingCoverage = Omit<
@@ -163,7 +213,7 @@ type PendingCoverage = Omit<
  * was never requested.
  */
 class RoleLoadBoundary extends Component<
-  { token: string; coverage: PendingCoverage; children: ReactNode },
+  { sessionId: string; coverage: PendingCoverage; children: ReactNode },
   { error: string | null }
 > {
   state = { error: null as string | null };
@@ -173,16 +223,22 @@ class RoleLoadBoundary extends Component<
   }
 
   componentDidCatch(error: unknown) {
-    const { token, coverage } = this.props;
-    useRuntimeCoverageStore.getState().reportRole(token, {
-      ...coverage,
-      state: 'blocked',
-      mountedObjects: 0,
-      glbInstances: 0,
-      triangles: 0,
-      drawCalls: 0,
-      detail: `Derivative failed to load: ${error instanceof Error ? error.message : String(error)}`,
-    });
+    const { sessionId, coverage } = this.props;
+    const reason = error instanceof Error ? error.message : String(error);
+    useRuntimeCoverageStore
+      .getState()
+      .reportRole(sessionId, `equipment:${coverage.role}`, {
+        ...coverage,
+        state: 'blocked',
+        mountedObjects: 0,
+        glbInstances: 0,
+        triangles: 0,
+        drawCalls: 0,
+        stage: 'failed',
+        visible: false,
+        failureReason: reason,
+        detail: `Derivative failed to load: ${reason}`,
+      });
   }
 
   render() {
@@ -198,13 +254,10 @@ export function ReferenceEquipmentLayer({
   infrastructure,
   band = 'nearby',
   detailBudget = 8,
+  sessionId,
 }: Props) {
   const showInfrastructure = infrastructure !== 'off';
-  const token = useMemo(
-    () => `${racks.length}:${rows.length}:${infrastructure}:${band}`,
-    [racks.length, rows.length, infrastructure, band],
-  );
-  const report = useRuntimeCoverageStore((s) => s.reportRole);
+  const { reportRole: report } = useCoverageOwner(sessionId, 'equipment');
 
   const mounts = useMemo<RoleMount[]>(() => {
     const out: RoleMount[] = [];
@@ -285,7 +338,7 @@ export function ReferenceEquipmentLayer({
     for (const [role, detail] of unresolved) {
       if (mounted.has(role)) continue;
       const anyEntry = listAssetsForRole(role)[0] ?? null;
-      report(token, {
+      report({
         role,
         state: anyEntry ? 'procedural-fallback' : 'preparing',
         assetId: anyEntry?.assetId ?? null,
@@ -296,10 +349,12 @@ export function ReferenceEquipmentLayer({
         proceduralObjects: 0,
         triangles: 0,
         drawCalls: 0,
+        stage: anyEntry ? 'fallback' : 'requested',
+        visible: false,
         detail,
       });
     }
-  }, [mounts, token, report, showInfrastructure]);
+  }, [mounts, report, showInfrastructure]);
 
   return (
     <group name="ReferenceEquipmentLayer">
@@ -313,8 +368,8 @@ export function ReferenceEquipmentLayer({
           detail: getAsset(mount.entry.assetId)?.displayName,
         };
         return (
-          <RoleLoadBoundary key={mount.entry.assetId} token={token} coverage={coverage}>
-            <InstancedRole mount={mount} token={token} coverage={coverage} />
+          <RoleLoadBoundary key={mount.entry.assetId} sessionId={sessionId} coverage={coverage}>
+            <InstancedRole mount={mount} sessionId={sessionId} coverage={coverage} />
           </RoleLoadBoundary>
         );
       })}

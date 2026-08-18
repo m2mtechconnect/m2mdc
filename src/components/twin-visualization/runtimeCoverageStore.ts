@@ -2,9 +2,24 @@
  * Runtime geometry coverage.
  *
  * Every claim the UI makes about NVIDIA-derived geometry must come from what
- * actually mounted, never from a manifest promise. Components register the
- * objects they mounted here after the loader succeeded; the badge and the
- * coverage list read only this store.
+ * actually mounted, never from a manifest promise.
+ *
+ * Ownership model
+ * ---------------
+ * Coverage is scoped by a *session* (stable semantic identity of the active
+ * facility/twin plus the selected geometry mode) and partitioned by *owner*
+ * (the reporting subsystem: facility shell, equipment, racks, overlays).
+ *
+ *  - facility and equipment owners report into the same active session;
+ *  - one owner can never erase another owner's rows;
+ *  - duplicate reports are idempotent;
+ *  - reports carrying a stale session id are ignored;
+ *  - unregistering an owner removes only that owner's rows;
+ *  - ending a session clears its coverage entirely.
+ *
+ * The previous single-token model rolled the token on every report, so the
+ * facility layer and the equipment layer silently wiped each other and a fully
+ * mounted scene read as zero coverage.
  */
 import { create } from 'zustand';
 import { isAuraAuthoredAsset } from './assetRegistry';
@@ -16,6 +31,24 @@ export type RoleRuntimeState =
   | 'preparing'
   | 'blocked'
   | 'not-represented';
+
+/** Lifecycle stage of a derivative, from request through to disposal. */
+export type MountStage =
+  | 'requested'
+  | 'downloaded'
+  | 'parsed'
+  | 'attached'
+  | 'visible'
+  | 'fallback'
+  | 'failed'
+  | 'disposed';
+
+export type CoverageOwnerId =
+  | 'facility'
+  | 'equipment'
+  | 'racks'
+  | 'overlays'
+  | (string & {});
 
 export interface RoleCoverage {
   role: SemanticRole;
@@ -36,70 +69,255 @@ export interface RoleCoverage {
   triangles: number;
   drawCalls: number;
   detail?: string;
+  /** Furthest lifecycle stage this role reached in the active session. */
+  stage?: MountStage;
+  /** Runtime identity of the attached root (three.js uuid or equivalent). */
+  objectUuid?: string | null;
+  /** Identity of the scene root the object was attached under. */
+  parentUuid?: string | null;
+  /** Explicit visibility, or an intentional hide with a reason in `detail`. */
+  visible?: boolean;
+  /** Derivative checksum where the manifest publishes one. */
+  checksum?: string | null;
+  /** Epoch ms of the attach report. */
+  mountedAt?: number | null;
+  failureReason?: string | null;
 }
 
-interface CoverageState {
-  /** Increments whenever the scene is rebuilt, so stale reports are dropped. */
-  token: string;
-  roles: Record<string, RoleCoverage>;
-  /**
-   * Per-rack cabinet mount evidence. `true` only once the approved derivative
-   * actually mounted; `false` while the procedural cabinet is rendering.
-   */
-  rackMounts: Record<string, { mounted: boolean; assetId: string | null; url: string | null }>;
-  /** Procedural geometry the scene is rendering, reported by its owner. */
-  procedural: Record<string, { label: string; count: number; kind: 'physical' | 'overlay' }>;
-  resetCoverage: (token: string) => void;
-  reportRole: (token: string, coverage: RoleCoverage) => void;
-  reportRackMount: (
-    token: string,
-    rackId: string,
-    mount: { mounted: boolean; assetId: string | null; url: string | null },
-  ) => void;
-  reportProcedural: (
-    key: string,
-    entry: { label: string; count: number; kind: 'physical' | 'overlay' },
-  ) => void;
+export interface RackMountReport {
+  mounted: boolean;
+  assetId: string | null;
+  url: string | null;
+  stage?: MountStage;
+  objectUuid?: string | null;
+  failureReason?: string | null;
 }
+
+export interface ProceduralEntry {
+  label: string;
+  count: number;
+  kind: 'physical' | 'overlay';
+}
+
+interface OwnerState {
+  roles: Record<string, RoleCoverage>;
+  rackMounts: Record<string, RackMountReport>;
+}
+
+const STATE_RANK: Record<RoleRuntimeState, number> = {
+  'openusd-derived': 5,
+  'procedural-fallback': 4,
+  blocked: 3,
+  preparing: 2,
+  'not-represented': 1,
+};
+
+const STAGE_RANK: Record<MountStage, number> = {
+  requested: 1,
+  downloaded: 2,
+  parsed: 3,
+  attached: 4,
+  visible: 5,
+  fallback: 2,
+  failed: 2,
+  disposed: 0,
+};
+
+/** Deterministic merge of the same role reported by more than one owner. */
+function mergeRole(a: RoleCoverage, b: RoleCoverage): RoleCoverage {
+  const primary = STATE_RANK[b.state] > STATE_RANK[a.state] ? b : a;
+  const other = primary === a ? b : a;
+  return {
+    ...primary,
+    mountedObjects: a.mountedObjects + b.mountedObjects,
+    glbInstances: a.glbInstances + b.glbInstances,
+    proceduralObjects: a.proceduralObjects + b.proceduralObjects,
+    triangles: a.triangles + b.triangles,
+    drawCalls: a.drawCalls + b.drawCalls,
+    stage:
+      (STAGE_RANK[b.stage ?? 'requested'] > STAGE_RANK[a.stage ?? 'requested'] ? b.stage : a.stage) ??
+      primary.stage,
+    detail: primary.detail ?? other.detail,
+  };
+}
+
+function deriveRoles(owners: Record<string, OwnerState>): Record<string, RoleCoverage> {
+  const out: Record<string, RoleCoverage> = {};
+  // Sorted owner iteration keeps aggregation deterministic.
+  for (const ownerId of Object.keys(owners).sort()) {
+    for (const [role, coverage] of Object.entries(owners[ownerId].roles)) {
+      out[role] = out[role] ? mergeRole(out[role], coverage) : coverage;
+    }
+  }
+  return out;
+}
+
+function deriveRackMounts(owners: Record<string, OwnerState>): Record<string, RackMountReport> {
+  const out: Record<string, RackMountReport> = {};
+  for (const ownerId of Object.keys(owners).sort()) {
+    for (const [rackId, mount] of Object.entries(owners[ownerId].rackMounts)) {
+      // A mounted report always wins over a not-mounted one for the same rack.
+      if (!out[rackId] || (!out[rackId].mounted && mount.mounted)) out[rackId] = mount;
+    }
+  }
+  return out;
+}
+
+function shallowEqualRole(a: RoleCoverage | undefined, b: RoleCoverage): boolean {
+  if (!a) return false;
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]) as Set<keyof RoleCoverage>;
+  for (const k of keys) if (a[k] !== b[k]) return false;
+  return true;
+}
+
+export interface CoverageState {
+  /** Stable semantic identity of the active facility + geometry selection. */
+  sessionId: string;
+  /** Roles the active manifest requires for this session, when known. */
+  expectedRoles: SemanticRole[];
+  /** Rack cabinet mounts the active configuration requires, when known. */
+  expectedMounts: number;
+  owners: Record<string, OwnerState>;
+  /** Derived from active owner reports. Never written directly. */
+  roles: Record<string, RoleCoverage>;
+  rackMounts: Record<string, RackMountReport>;
+  /** Procedural geometry the scene is rendering, reported by its owner. */
+  procedural: Record<string, ProceduralEntry>;
+
+  beginSession: (
+    sessionId: string,
+    expected?: { expectedRoles?: SemanticRole[]; expectedMounts?: number },
+  ) => void;
+  registerOwner: (sessionId: string, ownerId: CoverageOwnerId) => void;
+  reportRole: (sessionId: string, ownerId: CoverageOwnerId, coverage: RoleCoverage) => void;
+  reportMount: (
+    sessionId: string,
+    ownerId: CoverageOwnerId,
+    rackId: string,
+    mount: RackMountReport,
+  ) => void;
+  unregisterOwner: (sessionId: string, ownerId: CoverageOwnerId) => void;
+  endSession: (sessionId: string) => void;
+  reportProcedural: (key: string, entry: ProceduralEntry) => void;
+}
+
+const EMPTY_OWNER: OwnerState = { roles: {}, rackMounts: {} };
 
 export const useRuntimeCoverageStore = create<CoverageState>((set, get) => ({
-  token: 'initial',
+  sessionId: 'initial',
+  expectedRoles: [],
+  expectedMounts: 0,
+  owners: {},
   roles: {},
   rackMounts: {},
   procedural: {},
-  resetCoverage: (token) => set({ token, roles: {}, rackMounts: {} }),
-  /**
-   * A report carries the token of the scene build that produced it. A newer
-   * token supersedes the previous build: the store rolls over to it and drops
-   * the stale rows. Reports are never dropped for being "early", because child
-   * effects always run before the parent's - dropping them was how a fully
-   * mounted scene could still read as zero coverage.
-   */
-  reportRole: (token, coverage) => {
-    const current = get().token;
-    if (current === token) {
-      set((s) => ({ roles: { ...s.roles, [coverage.role]: coverage } }));
+
+  beginSession: (sessionId, expected) => {
+    const s = get();
+    if (s.sessionId === sessionId) {
+      // Re-entering the same session (StrictMode remount) keeps live reports.
+      if (expected) {
+        set({
+          expectedRoles: expected.expectedRoles ?? s.expectedRoles,
+          expectedMounts: expected.expectedMounts ?? s.expectedMounts,
+        });
+      }
       return;
     }
-    set({ token, roles: { [coverage.role]: coverage } });
+    set({
+      sessionId,
+      expectedRoles: expected?.expectedRoles ?? [],
+      expectedMounts: expected?.expectedMounts ?? 0,
+      owners: {},
+      roles: {},
+      rackMounts: {},
+    });
   },
-  reportRackMount: (token, rackId, mount) => {
-    // Cabinet reports are keyed by rack id and never roll the role token over:
-    // racks and the equipment layer rebuild on different schedules.
-    void token;
-    set((s) => ({ rackMounts: { ...s.rackMounts, [rackId]: mount } }));
+
+  registerOwner: (sessionId, ownerId) => {
+    const s = get();
+    if (s.sessionId !== sessionId || s.owners[ownerId]) return;
+    const owners = { ...s.owners, [ownerId]: { ...EMPTY_OWNER } };
+    set({ owners });
   },
+
+  reportRole: (sessionId, ownerId, coverage) => {
+    const s = get();
+    if (s.sessionId !== sessionId) return; // stale session: ignored
+    const owner = s.owners[ownerId] ?? EMPTY_OWNER;
+    if (shallowEqualRole(owner.roles[coverage.role], coverage)) return; // idempotent
+    const owners = {
+      ...s.owners,
+      [ownerId]: { ...owner, roles: { ...owner.roles, [coverage.role]: coverage } },
+    };
+    set({ owners, roles: deriveRoles(owners), rackMounts: deriveRackMounts(owners) });
+  },
+
+  reportMount: (sessionId, ownerId, rackId, mount) => {
+    const s = get();
+    if (s.sessionId !== sessionId) return;
+    const owner = s.owners[ownerId] ?? EMPTY_OWNER;
+    const existing = owner.rackMounts[rackId];
+    if (
+      existing &&
+      existing.mounted === mount.mounted &&
+      existing.assetId === mount.assetId &&
+      existing.url === mount.url &&
+      existing.stage === mount.stage
+    ) {
+      return;
+    }
+    const owners = {
+      ...s.owners,
+      [ownerId]: { ...owner, rackMounts: { ...owner.rackMounts, [rackId]: mount } },
+    };
+    set({ owners, roles: deriveRoles(owners), rackMounts: deriveRackMounts(owners) });
+  },
+
+  unregisterOwner: (sessionId, ownerId) => {
+    const s = get();
+    if (s.sessionId !== sessionId || !s.owners[ownerId]) return;
+    const owners = { ...s.owners };
+    delete owners[ownerId];
+    set({ owners, roles: deriveRoles(owners), rackMounts: deriveRackMounts(owners) });
+  },
+
+  endSession: (sessionId) => {
+    const s = get();
+    if (s.sessionId !== sessionId) return;
+    set({ owners: {}, roles: {}, rackMounts: {}, expectedRoles: [], expectedMounts: 0 });
+  },
+
   reportProcedural: (key, entry) =>
-    set((s) => ({ procedural: { ...s.procedural, [key]: entry } })),
+    set((s) => {
+      const existing = s.procedural[key];
+      if (existing && existing.count === entry.count && existing.label === entry.label) return s;
+      return { procedural: { ...s.procedural, [key]: entry } };
+    }),
 }));
+
+/** Roles that are required by the session but have not reached `visible`. */
+export function preparingRoles(state: Pick<CoverageState, 'expectedRoles' | 'roles'>): string[] {
+  return state.expectedRoles.filter((role) => {
+    const r = state.roles[role];
+    return !r || r.mountedObjects <= 0;
+  });
+}
 
 declare global {
   interface Window {
     __auraRuntimeCoverage?: () => {
+      sessionId: string;
+      /** Kept for existing harnesses that read `token`. */
       token: string;
+      expectedRoles: SemanticRole[];
+      expectedMounts: number;
+      owners: string[];
       roles: Record<string, RoleCoverage>;
-      rackMounts: Record<string, { mounted: boolean; assetId: string | null; url: string | null }>;
-      procedural: Record<string, { label: string; count: number; kind: 'physical' | 'overlay' }>;
+      rackMounts: Record<string, RackMountReport>;
+      procedural: Record<string, ProceduralEntry>;
+      stages: Record<string, MountStage>;
+      preparingRoles: string[];
       /** Role keys whose mounted asset has an AURA-authored USD master. */
       auraAuthoredRoles: string[];
     };
@@ -108,13 +326,21 @@ declare global {
 
 if (typeof window !== 'undefined') {
   window.__auraRuntimeCoverage = () => {
-    const { token, roles, rackMounts, procedural } = useRuntimeCoverageStore.getState();
+    const s = useRuntimeCoverageStore.getState();
     return {
-      token,
-      roles,
-      rackMounts,
-      procedural,
-      auraAuthoredRoles: Object.entries(roles)
+      sessionId: s.sessionId,
+      token: s.sessionId,
+      expectedRoles: s.expectedRoles,
+      expectedMounts: s.expectedMounts,
+      owners: Object.keys(s.owners).sort(),
+      roles: s.roles,
+      rackMounts: s.rackMounts,
+      procedural: s.procedural,
+      stages: Object.fromEntries(
+        Object.entries(s.roles).map(([k, r]) => [k, r.stage ?? 'requested']),
+      ),
+      preparingRoles: preparingRoles(s),
+      auraAuthoredRoles: Object.entries(s.roles)
         .filter(([, r]) => isAuraAuthoredAsset(r.assetId))
         .map(([key]) => key),
     };
@@ -213,4 +439,22 @@ export function provenanceBreakdown(
       `AURA procedural physical geometry: ${physical} · ` +
       `Procedural operational overlays: ${overlay}`,
   };
+}
+
+/**
+ * Truthful preview label. This is browser GLB rendering, never NVIDIA Kit,
+ * RTX, NVCF or a solver session, so the vocabulary here is deliberately small.
+ */
+export function previewLabel(input: {
+  derivedObjects: number;
+  proceduralObjects: number;
+  lineageVerified: boolean;
+}): string {
+  if (input.derivedObjects <= 0) {
+    return input.proceduralObjects > 0 ? 'Procedural 3D preview' : 'Unavailable';
+  }
+  if (input.proceduralObjects > 0) return 'Mixed browser preview';
+  return input.lineageVerified
+    ? 'Browser GLB preview - NVIDIA-derived assets'
+    : 'Browser GLB preview';
 }

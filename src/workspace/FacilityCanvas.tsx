@@ -27,7 +27,8 @@ import { LayerSelector } from './LayerSelector';
 import { useCanvasFocusStore } from './canvasFocusStore';
 import { FacilityGeometrySelector } from './FacilityGeometrySelector';
 import {
-  isFacilityGeometryMode,
+  FACILITY_GEOMETRY_PARAM,
+  parseFacilityGeometryParam,
   type FacilityGeometryMode,
 } from '@/components/twin-visualization/facilityGeometry';
 import { FacilityFloorPlan } from './FacilityFloorPlan';
@@ -74,17 +75,17 @@ export function FacilityCanvas({ facility }: Props) {
 
   // Geometry source is URL-owned, so a shared link always reproduces the same
   // mounted geometry as the screenshot it came from.
-  const geometryParam = searchParams.get('geometry');
-  const facilityGeometry: FacilityGeometryMode = isFacilityGeometryMode(geometryParam)
-    ? geometryParam
-    : 'aura-model';
+  const parsedGeometry = parseFacilityGeometryParam(searchParams.get(FACILITY_GEOMETRY_PARAM));
+  const facilityGeometry: FacilityGeometryMode = parsedGeometry.mode;
 
   const setViewParam = useCallback(
-    (key: string, value: string | null) => {
+    (key: string, value: string | null, options?: { push?: boolean }) => {
       const next = new URLSearchParams(searchParams);
       if (value === null) next.delete(key);
       else next.set(key, value);
-      setSearchParams(next, { replace: true });
+      // Geometry is a navigational choice, so it is pushed and browser
+      // back/forward restores the previously mounted geometry.
+      setSearchParams(next, { replace: options?.push !== true });
     },
     [searchParams, setSearchParams],
   );
@@ -202,40 +203,66 @@ export function FacilityCanvas({ facility }: Props) {
         </div>
       )}
 
-      {/* Protected zone, top-left: layer selection and 3D/2D. */}
-      <div className="absolute left-3 top-3 z-20 flex max-w-[calc(100%-15rem)] flex-wrap items-center gap-2">
-        <LayerSelector
-          value={activeOverlay as TwinOverlay | 'none'}
-          onChange={(layer) => setOverlay(layer)}
-        />
-        <FacilityGeometrySelector
-          value={facilityGeometry}
-          onChange={(mode) => setViewParam('geometry', mode === 'aura-model' ? null : mode)}
-        />
-        <div className="flex items-center gap-1 rounded-md border border-border bg-card/90 p-1 backdrop-blur">
-          <Button
-            type="button"
-            size="sm"
-            variant={viewMode === '3d' ? 'secondary' : 'ghost'}
-            aria-pressed={viewMode === '3d'}
-            className="h-8 px-2.5 text-xs"
-            onClick={retry}
-          >
-            <Box className="mr-1 h-3.5 w-3.5" aria-hidden />
-            3D
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant={viewMode === '2d' ? 'secondary' : 'ghost'}
-            aria-pressed={viewMode === '2d'}
-            className="h-8 px-2.5 text-xs"
-            onClick={() => setViewMode('2d')}
-          >
-            <Grid2x2 className="mr-1 h-3.5 w-3.5" aria-hidden />
-            2D
-          </Button>
+      {/* Protected zone, top-left: one grouped canvas toolbar. */}
+      <div
+        className="absolute left-3 top-3 z-20 flex max-w-[calc(100%-15rem)] flex-col gap-1.5"
+        data-testid="canvas-top-left-zone"
+      >
+        <div
+          role="toolbar"
+          aria-label="Facility canvas controls"
+          data-testid="canvas-toolbar"
+          className="flex flex-wrap items-center gap-1 rounded-md border border-border bg-card/95 p-1 backdrop-blur"
+        >
+          <div className="flex items-center gap-0.5" role="group" aria-label="View mode">
+            <Button
+              type="button"
+              size="sm"
+              variant={viewMode === '3d' ? 'secondary' : 'ghost'}
+              aria-pressed={viewMode === '3d'}
+              className="h-8 px-2.5 text-xs focus-visible:ring-2"
+              onClick={retry}
+            >
+              <Box className="mr-1 h-3.5 w-3.5" aria-hidden />
+              3D
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant={viewMode === '2d' ? 'secondary' : 'ghost'}
+              aria-pressed={viewMode === '2d'}
+              className="h-8 px-2.5 text-xs focus-visible:ring-2"
+              onClick={() => setViewMode('2d')}
+            >
+              <Grid2x2 className="mr-1 h-3.5 w-3.5" aria-hidden />
+              2D
+            </Button>
+          </div>
+          <span className="mx-0.5 hidden h-6 w-px bg-border sm:block" aria-hidden />
+          <FacilityGeometrySelector
+            value={facilityGeometry}
+            onChange={(mode) =>
+              setViewParam(FACILITY_GEOMETRY_PARAM, mode === 'aura-model' ? null : mode, {
+                push: true,
+              })
+            }
+          />
+          <span className="mx-0.5 hidden h-6 w-px bg-border sm:block" aria-hidden />
+          <LayerSelector
+            value={activeOverlay as TwinOverlay | 'none'}
+            onChange={(layer) => setOverlay(layer)}
+          />
         </div>
+        {parsedGeometry.invalidValue !== null && (
+          <div
+            role="alert"
+            data-testid="geometry-param-invalid"
+            className="max-w-[26rem] rounded-md border border-destructive/40 bg-card/95 px-2.5 py-1.5 text-[11px] text-destructive backdrop-blur"
+          >
+            Unsupported geometry "{parsedGeometry.invalidValue}" in the link. Showing the baseline
+            preview instead.
+          </div>
+        )}
       </div>
 
       {/* Protected zone, top-right: zoom and camera controls only. */}

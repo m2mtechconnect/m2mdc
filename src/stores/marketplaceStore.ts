@@ -225,14 +225,15 @@ export const useMarketplaceStore = create<MarketplaceStore>((set, get) => ({
           nextStep = `/builder?systemId=${system_id}&step=2`;
           break;
 
-        case 'industry':
+        case 'industry': {
           // Add to connector_ids array (dedupe)
           const connectorIds = Array.from(new Set([...(system?.connector_ids || []), id]));
           updateData = { connector_ids: connectorIds };
           nextStep = `/builder?systemId=${system_id}&step=4`;
           break;
+        }
 
-        case 'mcp':
+        case 'mcp': {
           // Update intelligence_settings with MCP server
           const { data: intSettings } = await supabase
             .from('intelligence_settings')
@@ -259,6 +260,7 @@ export const useMarketplaceStore = create<MarketplaceStore>((set, get) => ({
 
           nextStep = `/builder?systemId=${system_id}&step=3`;
           break;
+        }
       }
 
       // Update system

@@ -33,7 +33,7 @@ test.describe('UI - Toast Safe Area in Wizard', () => {
         if (wizardActive) {
           // Trigger a toast
           await page.evaluate(() => {
-            // @ts-ignore
+            // @ts-expect-error -- test-only custom event bridge
             window.dispatchEvent(new CustomEvent('show-toast', { 
               detail: { message: 'Test toast message' } 
             }));

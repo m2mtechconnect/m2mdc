@@ -56,6 +56,7 @@ export function useTokenRefresh() {
     refreshTokens();
 
     // Then run every 5 minutes
+    // eslint-disable-next-line prefer-const -- referenced by the cleanup closure before assignment
     intervalId = setInterval(refreshTokens, 5 * 60 * 1000);
 
     return () => {

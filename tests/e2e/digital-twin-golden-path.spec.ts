@@ -114,7 +114,7 @@ test.describe('Digital Twin Builder - Golden Path @critical', () => {
   
   test('should fail if REST response shape is wrong', async ({ page }) => {
     // Intercept API calls and verify they return correct envelope
-    let capturedResponses: any[] = [];
+    const capturedResponses: any[] = [];
     
     page.on('response', async (response) => {
       const url = response.url();

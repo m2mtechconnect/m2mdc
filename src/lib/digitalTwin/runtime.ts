@@ -456,7 +456,7 @@ async function executeGraph(
   config: DigitalTwinConfig
 ): Promise<TwinRunResult> {
   // Simple sequential execution
-  let context = initialContext;
+  const context = initialContext;
   
   // Find entry node
   let currentNodeId = graph.entryPoint;

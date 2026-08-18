@@ -18,6 +18,7 @@ export interface ManagedUserOAuthMessage {
 
 function waitForCompletion(popup: Window): Promise<void> {
   return new Promise((resolve, reject) => {
+    // eslint-disable-next-line prefer-const -- read by `cleanup` before the interval is created
     let poll: number | undefined;
     const cleanup = () => {
       window.removeEventListener('message', onMessage);

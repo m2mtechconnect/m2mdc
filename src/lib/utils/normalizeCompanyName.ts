@@ -90,7 +90,7 @@ export function extractCompanyNameFromUrl(url: string | undefined | null): strin
     }
 
     const urlObj = new URL(cleanUrl);
-    let hostname = urlObj.hostname.replace(/^www\./i, '');
+    const hostname = urlObj.hostname.replace(/^www\./i, '');
 
     // Known mega-retailer/company domain mappings
     const knownCompanies: Record<string, string> = {

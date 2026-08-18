@@ -150,7 +150,7 @@ serve(async (req) => {
             if (jsonMatch) {
               try {
                 parsed = JSON.parse(jsonMatch[0]);
-              } catch {}
+              } catch { /* non-JSON model output is handled by the caller */ }
             }
           }
 

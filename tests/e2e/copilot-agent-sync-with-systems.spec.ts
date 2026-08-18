@@ -7,7 +7,7 @@ test.describe('CoPilot - Agent Sync with Your AI Systems', () => {
 
     // Get agents from "Your AI Systems" section
     const systemsSection = page.locator('text=Your AI Systems').first();
-    let systemsAgents: string[] = [];
+    const systemsAgents: string[] = [];
 
     if (await systemsSection.count() > 0) {
       // Wait for agents to load

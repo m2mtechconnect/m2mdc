@@ -1,3 +1,11 @@
+
+/**
+ * Heterogeneous event listener. The concrete argument shapes are enforced by
+ * the public `on(...)` overloads; this alias only exists for the internal
+ * registry and the overload implementation signature.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- overload implementation signature
+type AnyEventListener = (...args: any[]) => void;
 /**
  * Builder Preview Engine (Phase 1B.7 rename of former SimulationEngine)
  * Generates synthetic KPI updates and event logs
@@ -33,7 +41,7 @@ export class BuilderPreviewEngine {
   private tick: number = 0;
   private baseTickInterval = 300; // 300ms base interval
   private events: BuilderPreviewEvent[] = [];
-  private listeners: Map<string, Function[]> = new Map();
+  private listeners: Map<string, (AnyEventListener)[]> = new Map();
 
   constructor(config: SimulationEngineConfig) {
     this.config = config;
@@ -43,7 +51,7 @@ export class BuilderPreviewEngine {
   on(event: 'event', callback: EventListener): void;
   on(event: 'kpi-update', callback: KPIListener): void;
   on(event: 'complete' | 'error', callback: CompleteListener): void;
-  on(event: string, callback: Function): void {
+  on(event: string, callback: AnyEventListener): void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, []);
     }

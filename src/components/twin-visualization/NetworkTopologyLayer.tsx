@@ -30,8 +30,6 @@ const NODE_ICONS: Record<NetworkNodeVisual['type'], string> = {
 };
 
 export function NetworkTopologyLayer({ nodes, links, visible, compact = false }: NetworkTopologyLayerProps) {
-  if (!visible) return null;
-
   const scale = compact ? 0.6 : 1;
   const offsetX = compact ? 20 : 50;
   const offsetY = compact ? 20 : 60;
@@ -50,6 +48,8 @@ export function NetworkTopologyLayer({ nodes, links, visible, compact = false }:
 
   const width = compact ? 200 : 400;
   const height = compact ? 150 : 300;
+
+  if (!visible) return null;
 
   return (
     <div className={`absolute ${compact ? 'bottom-2 right-2' : 'top-4 right-4'} bg-background/90 backdrop-blur-sm border border-border rounded-lg p-2 shadow-lg`}>

@@ -209,6 +209,8 @@ export function formatReadingValue(reading: TwinPropertyReading): string {
 }
 
 export interface TelemetryClient {
+  /** Postgrest-style builder; chaining is dynamic, rows are narrowed on read. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic query builder
   from: (table: string) => any;
 }
 

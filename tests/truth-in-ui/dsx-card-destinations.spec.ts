@@ -190,7 +190,7 @@ test.describe('DSX Evidence Beta — clickable card destinations', () => {
       }
     }
 
-    // eslint-disable-next-line no-console
+     
     console.log('clickable cards audited per workspace:', JSON.stringify(tally));
 
     expect(failures, `card destination failures:\n${failures.join('\n')}`).toEqual([]);

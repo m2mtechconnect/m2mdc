@@ -192,7 +192,7 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
       case "save-report":
         toast.info("Save as report feature coming soon");
         break;
-      case "create-assistant":
+      case "create-assistant": {
         const websiteTitle = searchResult?.snapshot?.title || "Website";
         const summary = searchResult?.summary?.summary || "";
         navigate(
@@ -200,6 +200,7 @@ export default function HeroSearchBar({ onCoPilotQuery }: { onCoPilotQuery?: (qu
         );
         setSearchResult(null);
         break;
+      }
       case "index-site":
         toast.success(`Queuing deeper crawl for ${data}`);
         break;

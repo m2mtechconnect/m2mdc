@@ -20,7 +20,7 @@ export function AOCActivityStream({ agentId }: AOCActivityStreamProps) {
   const { data: logs, refetch } = useQuery({
     queryKey: ['aoc-activity-logs', agentId],
     queryFn: async () => {
-      let query = supabase
+      const query = supabase
         .from('agent_action_logs')
         .select('*')
         .eq('system_id', agentId)

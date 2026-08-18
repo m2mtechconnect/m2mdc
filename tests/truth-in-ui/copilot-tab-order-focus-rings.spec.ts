@@ -90,7 +90,7 @@ async function snapshotActive(page: Page): Promise<FocusSnapshot> {
 /** Blur active + read baseline computed style for a given selector. */
 async function baselineStyle(page: Page, keyFn: () => HTMLElement | null) {
   return page.evaluate((fnSrc) => {
-    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+     
     const getter = new Function(`return (${fnSrc})();`) as () => HTMLElement | null;
     const el = getter();
     if (!el) return null;

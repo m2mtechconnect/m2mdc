@@ -249,7 +249,9 @@ export function useTwinVisualizationData(): TwinVisualizationState {
     const scenarioEvents = simulation.isSimulating ? simulation.events : [];
     
     // Generate base layout
-    let { racks, rows } = generateRackLayout(capacityKw, scenarioEvents);
+    const layout = generateRackLayout(capacityKw, scenarioEvents);
+    const rows = layout.rows;
+    let racks = layout.racks;
     let powerSegments = generatePowerSegments(racks);
     let thermalZones = generateThermalZones(rows, racks);
     const { nodes: networkNodes, links: networkLinks } = generateNetworkTopology(racks);

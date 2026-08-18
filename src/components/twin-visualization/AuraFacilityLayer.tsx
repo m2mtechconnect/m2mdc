@@ -323,7 +323,6 @@ export function AuraFacilityLayer({ bounds, rows, infrastructure, shellMode, ban
       // live hall so the derivative always encloses the actual facility.
       const width = bounds.maxX - bounds.minX + WALL_CLEARANCE * 2;
       const depth = bounds.maxZ - bounds.minZ + WALL_CLEARANCE * 2;
-      out.length; // keep ordering explicit
       push(
         'facility-shell',
         [

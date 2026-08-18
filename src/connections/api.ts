@@ -19,6 +19,9 @@ import type {
 
 /** The generated types file does not yet know these tables. */
 const db = supabase as unknown as {
+  // Chaining on the Postgrest builder is dynamic; the concrete row shapes are
+  // asserted at each call site below.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped generated tables
   from: (table: string) => any;
   functions: typeof supabase.functions;
 };

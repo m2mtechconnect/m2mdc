@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-// @ts-ignore Deno type resolution
+// @ts-expect-error -- remote Deno module, no local types
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -95,7 +95,7 @@ serve(async (req) => {
     const normalizedDomain = urlObj.hostname.replace(/^www\./, '');
 
     // Get or create site
-    let { data: site, error: siteError } = await supabase
+    const { data: site, error: siteError } = await supabase
       .from('sites')
       .select('*')
       .eq('domain', normalizedDomain)
@@ -122,7 +122,7 @@ serve(async (req) => {
       (new Date().getTime() - new Date(site.last_crawled_at).getTime()) > 24 * 60 * 60 * 1000;
 
     // Track capture results for Force Ingest mode
-    let captureResults: Array<{ 
+    const captureResults: Array<{ 
       url: string; 
       status: 'success' | 'failed'; 
       wordCount?: number;
@@ -166,7 +166,7 @@ serve(async (req) => {
     // Force Ingest mode with SSE streaming - DEPRECATED
     // Turbo-capture now handles capture and DB insertion
     // This SSE mode is kept for backwards compatibility but should not be used
-    if (forceIngest && false) {
+    if (false as boolean) { // DEPRECATED SSE path, retained for reference only
       console.log(`[Recommendations] Force Ingest mode with SSE for ${normalizedDomain}`);
       
       const keyPaths = ['', '/about', '/products', '/solutions', '/services', '/pricing', '/company'];
@@ -936,7 +936,7 @@ If a recommendation fails any check → REMOVE IT`;
       required: ["company", "domain", "departmentsCovered", "items"]
     };
 
-    let aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${LOVABLE_API_KEY}`,

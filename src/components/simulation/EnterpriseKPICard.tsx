@@ -144,10 +144,6 @@ export function EnterpriseKPICard({
   const config = DEFAULT_KPI_CONFIGS[kpiId];
   const [hasChanged, setHasChanged] = useState(false);
   const prevValueRef = useRef(currentValue);
-  
-  if (!config) {
-    return null;
-  }
 
   // Detect significant value changes for pulse animation
   useEffect(() => {
@@ -159,6 +155,10 @@ export function EnterpriseKPICard({
     }
     prevValueRef.current = currentValue;
   }, [currentValue]);
+
+  if (!config) {
+    return null;
+  }
 
   // Resolve provenance: explicit prop wins; else infer from legacy isLive.
   // Simulation output is `simulated`, never `live` — the value is not a

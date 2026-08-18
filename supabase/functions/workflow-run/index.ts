@@ -381,7 +381,7 @@ async function simulateNode(node: WorkflowNode, inputData: any): Promise<any> {
         keyTopics: ['automation', 'workflow', 'efficiency']
       };
 
-    case 'classify':
+    case 'classify': {
       const labels = node.config?.labels || ['uncategorized'];
       return {
         ...inputData,
@@ -389,6 +389,7 @@ async function simulateNode(node: WorkflowNode, inputData: any): Promise<any> {
         label: labels[0],
         confidence: 0.85
       };
+    }
 
     case 'notify_teams':
       return {

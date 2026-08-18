@@ -213,7 +213,7 @@ serve(createHandler({
     });
 
     // Combine both arrays
-    let items = [...agentItems, ...twinItems];
+    const items = [...agentItems, ...twinItems];
 
     // Filter by ROI after transformation
     const filteredItems = items.filter((item: any) =>

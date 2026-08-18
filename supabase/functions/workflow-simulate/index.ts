@@ -72,7 +72,7 @@ serve(async (req) => {
       const nodeStart = Date.now();
       
       try {
-        let result: any = { status: 'success' };
+        const result: any = { status: 'success' };
 
         switch (node.type) {
           case 'LLM':

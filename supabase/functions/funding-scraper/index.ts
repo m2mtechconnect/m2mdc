@@ -323,7 +323,7 @@ serve(async (req) => {
 
       // Upsert programs (insert or update based on URL uniqueness)
       let inserted = 0;
-      let updated = 0;
+      const updated = 0;
       let skipped = 0;
 
       for (const program of programs) {

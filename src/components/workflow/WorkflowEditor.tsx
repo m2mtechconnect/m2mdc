@@ -487,8 +487,8 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
       }
 
       // Guarded deletes
-      try { await supabase.from('workflow_nodes').delete().eq('workflow_id', wfId); } catch {}
-      try { await supabase.from('workflow_edges').delete().eq('workflow_id', wfId); } catch {}
+      try { await supabase.from('workflow_nodes').delete().eq('workflow_id', wfId); } catch { /* node rows may not exist yet */ }
+      try { await supabase.from('workflow_edges').delete().eq('workflow_id', wfId); } catch { /* edge rows may not exist yet */ }
 
       if (nodes.length > 0) {
         const { error } = await supabase.from('workflow_nodes').insert(

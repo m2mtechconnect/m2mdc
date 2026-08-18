@@ -1,3 +1,4 @@
+import { getTransportCanadaSimulations } from '@/lib/mock/transportCanadaMockData';
 /**
  * Simulation Scenario Data for Agent Operations Center
  * Industry-accurate scenarios for Data Centre Twin operations
@@ -174,12 +175,8 @@ function generateTimestamps(hoursAgo: number, durationMs: number) {
 export function getMockSimulations(agentId: string, templateId?: string): SimulationScenario[] {
   // For Transport Canada twin, use transport-specific scenarios
   if (templateId === 'TRANSPORT_CANADA_TWIN' || templateId?.toLowerCase().includes('transport_canada')) {
-    try {
-      const { getTransportCanadaSimulations } = require('@/lib/mock/transportCanadaMockData');
-      return getTransportCanadaSimulations(agentId);
-    } catch {
-      // Fall through to DC scenarios if transport data not available
-    }
+    const transportScenarios = getTransportCanadaSimulations(agentId);
+    if (transportScenarios.length > 0) return transportScenarios;
   }
 
   // Thermal Guardian agent

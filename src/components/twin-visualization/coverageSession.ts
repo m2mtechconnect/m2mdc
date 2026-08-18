@@ -10,6 +10,7 @@ import { useEffect, useMemo } from 'react';
 import {
   useRuntimeCoverageStore,
   type CoverageOwnerId,
+  type CoveragePriority,
   type RackMountReport,
   type RoleCoverage,
 } from './runtimeCoverageStore';
@@ -31,15 +32,22 @@ export function coverageSessionId(parts: {
  */
 export function useCoverageSession(
   sessionId: string,
-  expected: { expectedRoles: SemanticRole[]; expectedMounts: number },
+  expected: {
+    expectedRoles: SemanticRole[];
+    expectedMounts: number;
+    /** Compact previews are secondary and never displace the main viewport. */
+    priority?: CoveragePriority;
+  },
 ) {
   const expectedRoles = expected.expectedRoles;
   const expectedMounts = expected.expectedMounts;
+  const priority = expected.priority ?? 'primary';
   const key = expectedRoles.join(',');
   useEffect(() => {
     useRuntimeCoverageStore.getState().beginSession(sessionId, {
       expectedRoles,
       expectedMounts,
+      priority,
     });
     return () => {
       // Only end the session that is still active; a session that already
@@ -47,7 +55,7 @@ export function useCoverageSession(
       useRuntimeCoverageStore.getState().endSession(sessionId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId, key, expectedMounts]);
+  }, [sessionId, key, expectedMounts, priority]);
 }
 
 /** Registers one reporting subsystem for the lifetime of the component. */

@@ -11,11 +11,17 @@
  *   3. a server-side health check succeeded,
  *   4. the current user holds the streaming permission.
  *
- * Provenance (recorded in the SBOM, docs/remediation/phase-11/sbom-supplement.md):
- *   source    vendored from the NVIDIA Omniverse AppStreaming web client SDK
- *   file      public/omniverse-webrtc-streaming-library.umd.js
- *   licence   NVIDIA Omniverse licence - redistribution is entitlement-gated
- *   update    replace the file, refresh the checksum, re-run the SBOM script
+ * Phase 1 (dead-code and redistribution closure): the vendored bundle at
+ * `public/omniverse-webrtc-streaming-library.umd.js` had NO production
+ * consumer - only this loader and its own tests referenced it - yet it was
+ * served publicly from the origin, redistributing an entitlement-gated NVIDIA
+ * artifact to anonymous visitors. The file has been removed and the loader now
+ * refuses with `asset-not-vendored` before touching the DOM.
+ *
+ * To reinstate: restore the bundle under an authenticated, entitlement-checked
+ * delivery path (not `public/`), set `STREAMING_LIBRARY_VENDORED`, record the
+ * source, licence and checksum in the SBOM, and confirm the exported global
+ * name matches the shipped bundle.
  */
 
 import { readKitConfig } from './config';
@@ -23,9 +29,16 @@ import { readKitConfig } from './config';
 export const STREAMING_LIBRARY_PATH = '/omniverse-webrtc-streaming-library.umd.js';
 export const STREAMING_LIBRARY_GLOBAL = 'OmniverseWebrtcStreamingLibrary';
 
+/**
+ * False while no entitlement-checked bundle is vendored in this build.
+ * Flipping this alone is not sufficient - see the reinstatement note above.
+ */
+export const STREAMING_LIBRARY_VENDORED = false;
+
 export type StreamingLoadRefusal =
   | 'provider-not-selected'
   | 'provider-unavailable'
+  | 'asset-not-vendored'
   | 'health-check-failed'
   | 'permission-denied'
   | 'load-failed';
@@ -67,6 +80,7 @@ export async function loadOmniverseStreamingLibrary(
 ): Promise<StreamingLoadResult> {
   if (!gates.providerSelected) return { loaded: false, refusal: 'provider-not-selected' };
   if (!gates.hasPermission) return { loaded: false, refusal: 'permission-denied' };
+  if (!STREAMING_LIBRARY_VENDORED) return { loaded: false, refusal: 'asset-not-vendored' };
 
   const cfg = readKitConfig();
   if (!cfg.enabled || !cfg.streamEnabled) {

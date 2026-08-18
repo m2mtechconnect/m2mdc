@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { FacilityFloorPlan, type CenterRequest } from '../FacilityFloorPlan';
 import type { FacilityDefinition } from '../facilityModel';
+import { viewportDisclosure } from '../viewportRegistry';
 import type { RackGrid } from './rackModel';
 import { RackQuickView, useRackDetail } from './RackQuickView';
 
@@ -411,10 +412,10 @@ export function FacilityCanvas({
           {rackCount} of approximately {facility.designRackEstimate} racks represented
         </span>
         <span aria-hidden>·</span>
-        <span>
-          Procedural 3D preview, except one canary rack rendered from a validated
-          USD-derived GLB
-        </span>
+        {/* Phase 3: this card renders an SVG floor plan and mounts no 3D scene
+            and no GLB, so it may not describe itself as one. The claim comes
+            from the viewport registry, which is proved against the imports. */}
+        <span>{viewportDisclosure('command-centre-plan-card')}</span>
       </div>
 
       {presentation !== 'inline' && (

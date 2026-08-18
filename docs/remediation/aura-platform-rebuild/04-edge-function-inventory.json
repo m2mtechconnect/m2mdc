@@ -1,0 +1,1511 @@
+{
+  "commit": "66d2c2aa6bdfc50ea5acba5621d23ed5e7047c92",
+  "generatedBy": "Phase 0 static scan (not proof of production use)",
+  "functionCount": 167,
+  "noFirstPartyCaller": 76,
+  "functions": [
+    {
+      "name": "_shared",
+      "hasIndex": false,
+      "usesSharedHandler": false,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "agent-create",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "agent-draft-from-reco",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "agent-execute",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "agent-export",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "agent-plan-chat",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "agent-run",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "agent-stream",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "agent-suggestions",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "agents-deploy",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "agents-list",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "agents-rollback",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "ai-config",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "ai-systems",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "ai-systems-unified",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "analytics-export",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "analytics-overview",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "analytics-systems",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "analyze-document-with-gemini",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "analyze-file",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "aoc-environment-promotion",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "aoc-runtime-action",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "aoc-runtime-control",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "aoc-simulate-test",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "arcade-servers",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "builder-generate-summary",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "builder-infer-goal",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "builder-test",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "builders-create",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "builders-deploy",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "builders-get",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "builders-update",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "canary-deploy",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "catalog-mcp",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "catalog-templates-industry",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "catalog-templates-m2m",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "chat-with-twin",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "classify-content",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "classify-intent",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "connection-credential",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "connection-health-check",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "connection-provision",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "copilot-chat",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "copilot-chat-simple",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "copilot-health",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "copilot-router",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "copilot-search",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "copilot-stream",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "dc-create-twin-from-recommendation",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "dc-scan-url",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "deterministic-recommendations",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "digital-twin-create",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "digital-twin-delete",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "digital-twin-event",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "digital-twin-get",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "digital-twin-list",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "digital-twin-run-get",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "digital-twin-runs-list",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "digital-twin-runtime",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "digital-twin-update",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "document-analysis-start",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "document-analysis-status",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "dsx-ingest",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "funding-query",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "funding-scraper",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "generate-ai-recommendations",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "generate-ctas",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "green-dc-recommend",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "grounded-summary",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "health",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "health-ai",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "health-check",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "ingest-file",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "integrations-connect",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "integrations-disconnect",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "integrations-list",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "integrations-test",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "integrations-zapier",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "knowledge-index",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "knowledge-upload",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "knowledge-url",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "langgraph-log-run",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "langgraph-run",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "langgraph-search-docs",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "langgraph-upsert-doc",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "langgraph-upsert-memory",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "managed-connector-capabilities",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "managed-connector-invoke",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "managed-connector-verify",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "managed-user-disconnect",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "managed-user-oauth-complete",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "managed-user-oauth-start",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "manual-recommendations",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "mcp-allowlist",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "mcp-connect",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "mcp-delete",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "mcp-register",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "mcp-sync",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "mcp-test-tool",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "mcp-validate",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "mcp-verify",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "metrics-summary",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "migrate-credentials-to-vault",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "models-test",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "ops-environments",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "ops-events",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "ops-heartbeat",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "ops-ingest-health",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "ops-overview",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "ops-systems",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "policy-evaluate",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "policy-validate",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "public-intake",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "query-answer",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "rag-db-connect",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "rag-items",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "rag-oauth-microsoft",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "rag-s3-connect",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "rag-test",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "rag-upload",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "rag-urls",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "reco-selftest",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "recommendations-generate",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "recommendations-generate-stream",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "runs-recent",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "search",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "search-suggestions",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "systems-create",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "systems-create-from-template",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "systems-delete",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "systems-update",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "teams-invite",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "template-preview-chat",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "template-test-run",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "template-validate",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "templates-list",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "templates-seed",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "url-capture",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "url-crawl",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "url-recommendations",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "url-turbo-capture",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "website-cache-clear",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "website-cache-status",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "website-scan",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "workflow-ai-suggestions",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "workflow-run",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "workflow-save",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "workflow-simulate",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "zapier-action-execute",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "zapier-app-connect",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "zapier-app-disconnect",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "zapier-apps-detail",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "zapier-apps-list",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "zapier-apps-sync",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "zapier-auto-refresh",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "zapier-connect",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "zapier-disconnect",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "zapier-integration-status",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "zapier-oauth-callback",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "zapier-oauth-connect",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "zapier-oauth-start",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "zapier-refresh-token",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "zapier-status",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "zapier-test",
+      "hasIndex": true,
+      "usesSharedHandler": true,
+      "wildcardCors": false,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "zapier-test-connection",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": true,
+      "usesServiceRole": false,
+      "firstPartyCallerFound": true,
+      "classification": "retain-pending-audit"
+    },
+    {
+      "name": "zapier-webhook",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": false,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    },
+    {
+      "name": "zapier-webhook-trigger",
+      "hasIndex": true,
+      "usesSharedHandler": false,
+      "wildcardCors": false,
+      "usesServiceRole": true,
+      "firstPartyCallerFound": false,
+      "classification": "review-candidate"
+    }
+  ]
+}

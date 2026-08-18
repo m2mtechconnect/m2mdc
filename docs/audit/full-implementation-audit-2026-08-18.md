@@ -127,5 +127,6 @@ invite row.
    (section 3).
 3. `team_invites` email authorisation (section 8).
 4. Dead code and duplicate-surface deletion (section 5).
-5. Stubbed SSO/notification affordances - either implement or remove the
-   buttons (section 6).
+5. Stubbed SSO/notification affordances (section 6) - DONE.
+6. Remaining: `agent_definitions` missing the org-sharing policy its sibling
+   `agents` table has (section 8).

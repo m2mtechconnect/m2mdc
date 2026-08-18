@@ -14,7 +14,6 @@ const GUARDED_FILES = [
   'src/hooks/useAgentRuns.ts',
   'src/pages/IntelligenceDashboard.tsx',
   'src/pages/Teams.tsx',
-  'src/components/aoc/AOCMetricsAdvanced.tsx',
   'src/components/dc-twin/tabs/DCSimulationTab.tsx',
   'src/components/data-centre-twin/domains/NetworkDomainView.tsx',
   'src/components/data-centre-twin/overview/SparklineChart.tsx',

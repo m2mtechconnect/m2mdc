@@ -76,12 +76,15 @@ This contradicts the operating-state/provenance model the platform advertises.
   duplicate run-id generation instead of sharing a util.
 - Six assistant panel implementations; `src/components/CoPilotDrawer.tsx`
   (44.5 KB) has zero importers.
-- Confirmed-dead modules (grep-verified, ~330 KB source): `CoPilotDrawer.tsx`,
-  `twins/dataCenter/omniverseAdapter.ts`, `rag/RAGPanel.tsx`,
-  `builder/MCPServerManager.tsx`, `dashboard/AdaptiveDashboardSections.tsx`,
-  `builder/UnifiedMarketplace.tsx`, `workflow/EnhancedWorkflowEditor.tsx`,
-  `builder/MCPMarketplace.tsx`, `lib/generators/mockSimulationData.ts`,
-  `aoc/AOCMetricsAdvanced.tsx`, and ~9 more.
+- RESOLVED (2026-08-18): 110 unreferenced modules deleted (~950 KB source),
+  including `CoPilotDrawer.tsx`, `rag/RAGPanel.tsx`, the `aoc/*` panel family,
+  the retired builder step/marketplace components and
+  `lib/generators/mockSimulationData.ts`. Test files that only covered deleted
+  modules were removed with them; `twins/dataCenter/omniverseAdapter.ts` was
+  retained because the Omniverse Kit runtime contract tests depend on it.
+  Verification: tsgo clean, 1897 tests pass, production build succeeds.
+  Entry chunk unchanged (1,841 KB / 474 KB gzip) — the dead modules were
+  already tree-shaken out, so this is a maintenance win, not a size win.
 
 ## 6. Stubbed features presented as available
 

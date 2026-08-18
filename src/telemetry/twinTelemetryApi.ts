@@ -208,8 +208,11 @@ export function formatReadingValue(reading: TwinPropertyReading): string {
   return reading.valueText ?? '-';
 }
 
+/** Minimal shape of a Postgrest-style query builder; chaining is dynamic. */
+export type TelemetryQueryBuilder = Record<string, (...args: never[]) => unknown> & PromiseLike<unknown>;
+
 export interface TelemetryClient {
-  from: (table: string) => any;
+  from: (table: string) => TelemetryQueryBuilder;
 }
 
 export interface FetchTelemetryOptions extends ResolveOptions {

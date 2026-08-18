@@ -136,7 +136,7 @@ export function CoPilotProvider({ children }: { children: ReactNode }) {
       
       let pageName: string = 'dashboard';
       let agentId: string | undefined;
-      let additionalContext: Partial<CoPilotContextType> = {};
+      const additionalContext: Partial<CoPilotContextType> = {};
 
       // Route detection
       if (path === '/' || path === '/app') {

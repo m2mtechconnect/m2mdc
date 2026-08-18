@@ -360,7 +360,7 @@ export async function searchTemplates(query: string, filters?: {
     .order('downloads', { ascending: false });
   
   // Apply text search
-  let finalQuery = query 
+  const finalQuery = query 
     ? queryBuilder.or(`name.ilike.%${query}%,description.ilike.%${query}%`) 
     : queryBuilder;
   

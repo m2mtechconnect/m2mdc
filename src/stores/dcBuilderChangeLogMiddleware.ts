@@ -9,7 +9,7 @@ import { useChangeLogStore, createChangeEntry, type ChangeType } from './changeL
 type BuilderState = ReturnType<typeof useDCTwinBuilderStore.getState>;
 
 // Track previous state for comparison
-let previousState: Partial<BuilderState> | null = null;
+const previousState: Partial<BuilderState> | null = null;
 
 /**
  * Initialize the changelog middleware

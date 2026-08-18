@@ -377,7 +377,7 @@ export function StandardizedTemplatePreview({
                   {previewCapabilities.bullets.map((bullet: string, idx: number) => {
                     // Auto-assign icons and tags based on capability content
                     let icon = Zap;
-                    let tags: string[] = [];
+                    const tags: string[] = [];
                     const lowerBullet = bullet.toLowerCase();
                     
                     // Data Centre / HPC domain matching

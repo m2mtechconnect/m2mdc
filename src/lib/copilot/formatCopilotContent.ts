@@ -213,7 +213,7 @@ export function formatCopilotContent(rawText: string, context?: { industry?: str
  */
 function formatFallbackContent(text: string): string {
   // Clean up markdown bold markers for display
-  let cleaned = text
+  const cleaned = text
     .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove ** markers
     .replace(/\n{3,}/g, '\n\n') // Normalize multiple newlines
     .trim();

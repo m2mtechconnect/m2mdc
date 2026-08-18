@@ -18,7 +18,7 @@ test('detail', async ({ page, context }) => {
     });
     const r = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     const v = r.violations.map((x) => `${x.id} :: ${x.nodes.slice(0, 2).map((n) => n.html.slice(0, 120)).join(' | ')}`);
-    // eslint-disable-next-line no-console
+     
     console.log('\n=== ' + route + '\n' + JSON.stringify({ ...info, axe: v }, null, 1));
   }
 });

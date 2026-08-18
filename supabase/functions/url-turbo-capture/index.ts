@@ -46,7 +46,7 @@ function extractReadableText(html: string): { text: string; title: string } {
     const title = titleMatch ? titleMatch[1].trim() : 'Untitled';
 
     // Remove only script, style, and minimal noise elements
-    let cleaned = html
+    const cleaned = html
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
       .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
       .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, '')
@@ -59,7 +59,7 @@ function extractReadableText(html: string): { text: string; title: string } {
     const bodyMatch = cleaned.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
     
     // Combine content from multiple areas for better coverage
-    let contentParts: string[] = [];
+    const contentParts: string[] = [];
     
     // Always include meta description
     const descriptionMatch = html.match(/<meta\s+(?:name|property)=["'](?:description|og:description)["']\s+content=["']([^"']+)["']/i);

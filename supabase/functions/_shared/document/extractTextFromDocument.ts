@@ -152,7 +152,7 @@ function extractTextFromPdf(content: string): string {
   // Look for text patterns and filter out PDF control sequences
   
   // Remove PDF headers and binary markers
-  let cleaned = content
+  const cleaned = content
     .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F]/g, ' ') // Remove control chars except \t \n \r
     .replace(/\\[0-9]{3}/g, ' ') // Remove octal sequences
     .replace(/\/[A-Z][a-z]+/g, ' ') // Remove PDF commands

@@ -160,7 +160,7 @@ type DCTwinBuilderStore = DCTwinBuilderState & DCTwinBuilderActions;
  * This function does NOT overwrite existing entries.
  */
 function ensureRequiredEntities(state: DCTwinBuilderState): DCTwinBuilderState {
-  let updated = { ...state };
+  const updated = { ...state };
   let hasChanges = false;
 
   // 1. Ensure all required KPIs exist
@@ -440,7 +440,7 @@ export const useDCTwinBuilderStore = create<DCTwinBuilderStore>()(
         // Update KPI targets based on recommendation + enable retail KPIs for mega-retailers
         const retailKpiIds = ['retail-edge-uptime', 'cold-chain-efficiency', 'gpu-fleet-saturation', 'retail-latency', 'carbon-cost-exposure'];
         const updatedKpis = defaultState.kpis.map(kpi => {
-          let updated = { ...kpi };
+          const updated = { ...kpi };
           if (kpi.id === 'effective-ai-pue') {
             updated.target = recommendation.kpiTargets.pueTarget;
           }

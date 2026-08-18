@@ -244,7 +244,7 @@ export function RecommendationsPanel({ recommendations }: RecommendationsPanelPr
       }
 
       // url-recommendations returns a different structure
-      let data = rawResponse;
+      const data = rawResponse;
       
       // Check if response has items array (direct response from url-recommendations)
       if (data && Array.isArray(data.items)) {

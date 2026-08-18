@@ -97,7 +97,7 @@ serve(createHandler({
     const startTime = Date.now();
 
     // Get auth token if needed
-    let headers: Record<string, string> = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 

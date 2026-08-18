@@ -122,7 +122,7 @@ serve(async (req) => {
       (new Date().getTime() - new Date(site.last_crawled_at).getTime()) > 24 * 60 * 60 * 1000;
 
     // Track capture results for Force Ingest mode
-    let captureResults: Array<{ 
+    const captureResults: Array<{ 
       url: string; 
       status: 'success' | 'failed'; 
       wordCount?: number;
@@ -936,7 +936,7 @@ If a recommendation fails any check → REMOVE IT`;
       required: ["company", "domain", "departmentsCovered", "items"]
     };
 
-    let aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${LOVABLE_API_KEY}`,

@@ -113,7 +113,7 @@ export function enhanceBuilderFromSignals(
   signals: DCScanSignals,
   template: DCBlueprintTemplate
 ): { overview: Partial<DCTwinOverview> } {
-  let overviewEnhancements: Partial<DCTwinOverview> = {};
+  const overviewEnhancements: Partial<DCTwinOverview> = {};
   
   // AI intensity affects GPU fleet recommendations
   if (signals.aiIntensityScore >= 60) {

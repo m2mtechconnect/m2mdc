@@ -91,7 +91,7 @@ serve(createHandler({
     }
 
     // Crawl pages (BFS, max 200 pages)
-    let depth = 0;
+    const depth = 0;
     const maxDepth = 3;
 
     while (toVisit.length > 0 && pages.length < 200 && depth <= maxDepth) {

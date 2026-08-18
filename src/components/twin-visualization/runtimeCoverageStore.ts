@@ -184,11 +184,21 @@ function shallowEqualRole(a: RoleCoverage | undefined, b: RoleCoverage): boolean
 export interface CoverageState {
   /** Stable semantic identity of the active facility + geometry selection. */
   sessionId: string;
+  /** Priority of the scene that owns the active session. */
+  sessionPriority: CoveragePriority;
   /** Roles the active manifest requires for this session, when known. */
   expectedRoles: SemanticRole[];
   /** Rack cabinet mounts the active configuration requires, when known. */
   expectedMounts: number;
   owners: Record<string, OwnerState>;
+  /**
+   * Reports that arrived for a session that is not (yet) active. React runs
+   * child effects before parent effects, so owners register before the scene
+   * opens the session. Buffering here means those reports are adopted when the
+   * session opens instead of being lost; buffers for sessions that never open
+   * are discarded on the next session switch.
+   */
+  pending: Record<string, Record<string, OwnerState>>;
   /** Derived from active owner reports. Never written directly. */
   roles: Record<string, RoleCoverage>;
   rackMounts: Record<string, RackMountReport>;
@@ -197,7 +207,11 @@ export interface CoverageState {
 
   beginSession: (
     sessionId: string,
-    expected?: { expectedRoles?: SemanticRole[]; expectedMounts?: number },
+    expected?: {
+      expectedRoles?: SemanticRole[];
+      expectedMounts?: number;
+      priority?: CoveragePriority;
+    },
   ) => void;
   registerOwner: (sessionId: string, ownerId: CoverageOwnerId) => void;
   reportRole: (sessionId: string, ownerId: CoverageOwnerId, coverage: RoleCoverage) => void;

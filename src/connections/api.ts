@@ -19,7 +19,9 @@ import type {
 
 /** The generated types file does not yet know these tables. */
 const db = supabase as unknown as {
-  from: (table: string) => any;
+  // Chaining on the Postgrest builder is dynamic; the concrete row shapes are
+  // asserted at each call site below.
+  from: (table: string) => Record<string, (...args: never[]) => unknown> & PromiseLike<unknown>;
   functions: typeof supabase.functions;
 };
 

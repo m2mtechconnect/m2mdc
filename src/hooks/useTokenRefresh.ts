@@ -12,6 +12,7 @@ export function useTokenRefresh() {
   const { toast } = useToast();
 
   useEffect(() => {
+    // eslint-disable-next-line prefer-const -- read by the cleanup closure before assignment
     let intervalId: NodeJS.Timeout;
 
     const refreshTokens = async () => {

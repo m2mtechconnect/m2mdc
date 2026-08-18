@@ -90,7 +90,9 @@ export function createBuilderFixturePreviewProvider(): PreviewSessionProvider<Bu
       id: BUILDER_PREVIEW_FIXTURE_PROVIDER_ID,
       executionClass: 'fixture-preview',
       engineModule: 'src/components/builder/step5/fixtures/builderMock.ts',
-      determinism: 'deterministic',
+      // Playback is scripted, but the emission schedule is drawn from a
+      // generator, so the session must be seeded to be reproducible.
+      determinism: 'seeded-stochastic',
     }),
     readiness(): ProviderReadiness {
       return { ready: true, reason: null };
@@ -105,6 +107,8 @@ export function createBuilderFixturePreviewProvider(): PreviewSessionProvider<Bu
         scenario: input.scenario,
         previewConfig: input.previewConfig,
         speed: input.speed,
+        random: ctx.random,
+        runTag: ctx.runId,
       });
       let baselineMetrics: unknown = null;
       try {

@@ -10,6 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Server, ChevronRight, Filter } from 'lucide-react';
 import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
 import { cn } from '@/lib/utils';
+import { mulberry32, deriveSeed } from '@/simulation/orchestrator/prng';
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 
 interface CompactRackOverviewProps {
@@ -32,7 +33,11 @@ export function CompactRackOverview({
   const processedRacks = useMemo(() => {
     return facility.thermalHardware.racks.map(rack => {
       const avgInlet = rack.servers.reduce((acc, s) => acc + s.cpuTempC, 0) / rack.servers.length * 0.35 + 18;
-      const avgOutlet = avgInlet + 6 + Math.random() * 4;
+      // Derived presentation value, not a measurement: the outlet spread is
+      // produced by the seeded `mulberry32-v1` generator keyed on the rack id so
+      // the same rack always renders the same delta-T.
+      const spread = mulberry32(deriveSeed(`rack-outlet:${rack.id}`))();
+      const avgOutlet = avgInlet + 6 + spread * 4;
       const deltaT = avgOutlet - avgInlet;
       
       return {

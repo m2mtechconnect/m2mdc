@@ -175,3 +175,33 @@ as `authenticated`, and the HTTP behaviour of the two edge boundaries - are
 blocked on infrastructure, not on code. Supply `AURA_VALIDATION_DB_URL` (and
 optionally `AURA_VALIDATION_FN_URL` with two tenant JWTs) and run
 `node scripts/phase3/external-validation.mjs` to close them.
+
+---
+
+## Infrastructure closure pass (ephemeral Supabase stack in CI)
+
+The infrastructure blocker above is now addressed by
+`.github/workflows/phase3-external-validation.yml`, which provisions an
+ephemeral local Supabase stack (CLI 2.34.3) per run and executes the real
+assertions against it in `--require-infrastructure` mode, where any blocked or
+skipped assertion is a failure.
+
+Scope executed there: migration replay to an empty schema, Phase 3 object
+inventory (functions, triggers, RLS flags, indexes, grants), a rollback and
+reapplication drill asserting an identical schema signature, the extended RLS
+and tenant matrix as `authenticated` and `anon`, and the trusted write boundary
+over HTTP using real GoTrue sessions for two tenants. Details, safety perimeter
+and verdict semantics:
+[`evidence/phase3-external-validation-ci.md`](evidence/phase3-external-validation-ci.md).
+
+Identity-model caveat recorded honestly: AURA policies key on `auth.uid()` and
+`public.user_roles`, not on a tenant claim in the JWT, so a tenant is a user
+identity in the matrix; approver authority is enforced by the `record-decision`
+edge function and is proven over HTTP, not by a database policy.
+
+**Status of the verdict above:** the code-side verdict is unchanged. Phase 3
+moves to `PHASE_3_CLOSED` only when this workflow publishes a
+`phase3-external-validation.json` artifact with verdict `PASS`; until such an
+artifact exists for the current commit, the recorded verdict remains
+`PHASE_3_NOT_CLOSED_EXTERNAL_VALIDATION_REQUIRED`. Running the script locally
+without the ephemeral stack still exits `78 BLOCKED` and proves nothing.

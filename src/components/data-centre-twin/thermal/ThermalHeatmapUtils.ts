@@ -4,6 +4,7 @@
  */
 
 import type { RackThermal } from '@/types/dataCenterTwin';
+import { mulberry32, deriveSeed } from '@/simulation/orchestrator/prng';
 
 // Temperature thresholds for color mapping
 export const TEMP_THRESHOLDS = {

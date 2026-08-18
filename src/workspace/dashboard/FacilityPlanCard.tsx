@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { FacilityFloorPlan, type CenterRequest } from '../FacilityFloorPlan';
 import type { FacilityDefinition } from '../facilityModel';
-import { viewportDisclosure } from '../viewportRegistry';
+import { viewportDisclosure, viewportLimitation } from '../viewportRegistry';
 import type { RackGrid } from './rackModel';
 import { RackQuickView, useRackDetail } from './RackQuickView';
 
@@ -418,6 +418,8 @@ export function FacilityPlanCard({
             and no GLB, so it may not describe itself as one. The claim comes
             from the viewport registry, which is proved against the imports. */}
         <span>{viewportDisclosure('command-centre-plan-card')}</span>
+        <span aria-hidden>·</span>
+        <span>{viewportLimitation('command-centre-plan-card')}</span>
       </div>
 
       {presentation !== 'inline' && (

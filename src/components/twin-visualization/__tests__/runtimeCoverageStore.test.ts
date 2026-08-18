@@ -40,9 +40,11 @@ const store = () => useRuntimeCoverageStore.getState();
 beforeEach(() => {
   useRuntimeCoverageStore.setState({
     sessionId: 'initial',
+    sessionPriority: 'primary',
     expectedRoles: [],
     expectedMounts: 0,
     owners: {},
+    pending: {},
     roles: {},
     rackMounts: {},
     procedural: {},
@@ -146,6 +148,41 @@ describe('runtime coverage ownership', () => {
     store().reportRole(SESSION_A, 'equipment', role({ role: 'server-1u' }));
     store().endSession(SESSION_A);
     expect(store().roles).toEqual({});
+  });
+
+  it('adopts reports that arrived before the session opened', () => {
+    // React runs child effects before the parent's: owners register and can
+    // report before the scene opens the session.
+    store().registerOwner(SESSION_A, 'facility');
+    store().reportRole(SESSION_A, 'facility', role({ role: 'facility-shell', mountedObjects: 916 }));
+    expect(store().roles).toEqual({});
+    store().beginSession(SESSION_A);
+    expect(store().roles['facility-shell'].mountedObjects).toBe(916);
+  });
+
+  it('drops buffered reports for a session that never opens', () => {
+    store().beginSession(SESSION_A);
+    store().reportRole(SESSION_B, 'equipment', role({ role: 'server-1u' }));
+    expect(store().roles).toEqual({});
+    store().beginSession(SESSION_AURA);
+    expect(store().roles).toEqual({});
+    store().beginSession(SESSION_B);
+    expect(store().roles).toEqual({});
+  });
+
+  it('never lets a secondary scene take the session from the viewport', () => {
+    store().beginSession(SESSION_A, { priority: 'primary' });
+    store().reportRole(SESSION_A, 'equipment', role({ role: 'server-1u', mountedObjects: 138 }));
+    store().beginSession(SESSION_AURA, { priority: 'secondary' });
+    expect(store().sessionId).toBe(SESSION_A);
+    expect(store().roles['server-1u'].mountedObjects).toBe(138);
+  });
+
+  it('lets a primary scene take over from a secondary one', () => {
+    store().beginSession(SESSION_AURA, { priority: 'secondary' });
+    store().beginSession(SESSION_A, { priority: 'primary' });
+    expect(store().sessionId).toBe(SESSION_A);
+    expect(store().sessionPriority).toBe('primary');
   });
 });
 

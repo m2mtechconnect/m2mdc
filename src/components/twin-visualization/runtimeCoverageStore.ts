@@ -104,6 +104,17 @@ interface OwnerState {
   rackMounts: Record<string, RackMountReport>;
 }
 
+/**
+ * Who is allowed to own the active session.
+ *
+ * A page can mount more than one scene at once (the full model viewport plus a
+ * compact thumbnail). Both used to call `beginSession`, so the thumbnail's
+ * session replaced the viewport's and every viewport report was then dropped
+ * as stale. A `secondary` scene may report, but never takes the session away
+ * from a `primary` one.
+ */
+export type CoveragePriority = 'primary' | 'secondary';
+
 const STATE_RANK: Record<RoleRuntimeState, number> = {
   'openusd-derived': 5,
   'procedural-fallback': 4,
@@ -173,11 +184,21 @@ function shallowEqualRole(a: RoleCoverage | undefined, b: RoleCoverage): boolean
 export interface CoverageState {
   /** Stable semantic identity of the active facility + geometry selection. */
   sessionId: string;
+  /** Priority of the scene that owns the active session. */
+  sessionPriority: CoveragePriority;
   /** Roles the active manifest requires for this session, when known. */
   expectedRoles: SemanticRole[];
   /** Rack cabinet mounts the active configuration requires, when known. */
   expectedMounts: number;
   owners: Record<string, OwnerState>;
+  /**
+   * Reports that arrived for a session that is not (yet) active. React runs
+   * child effects before parent effects, so owners register before the scene
+   * opens the session. Buffering here means those reports are adopted when the
+   * session opens instead of being lost; buffers for sessions that never open
+   * are discarded on the next session switch.
+   */
+  pending: Record<string, Record<string, OwnerState>>;
   /** Derived from active owner reports. Never written directly. */
   roles: Record<string, RoleCoverage>;
   rackMounts: Record<string, RackMountReport>;
@@ -186,7 +207,11 @@ export interface CoverageState {
 
   beginSession: (
     sessionId: string,
-    expected?: { expectedRoles?: SemanticRole[]; expectedMounts?: number },
+    expected?: {
+      expectedRoles?: SemanticRole[];
+      expectedMounts?: number;
+      priority?: CoveragePriority;
+    },
   ) => void;
   registerOwner: (sessionId: string, ownerId: CoverageOwnerId) => void;
   reportRole: (sessionId: string, ownerId: CoverageOwnerId, coverage: RoleCoverage) => void;
@@ -205,45 +230,83 @@ const EMPTY_OWNER: OwnerState = { roles: {}, rackMounts: {} };
 
 export const useRuntimeCoverageStore = create<CoverageState>((set, get) => ({
   sessionId: 'initial',
+  sessionPriority: 'primary',
   expectedRoles: [],
   expectedMounts: 0,
   owners: {},
+  pending: {},
   roles: {},
   rackMounts: {},
   procedural: {},
 
   beginSession: (sessionId, expected) => {
     const s = get();
+    const priority = expected?.priority ?? 'primary';
     if (s.sessionId === sessionId) {
       // Re-entering the same session (StrictMode remount) keeps live reports.
       if (expected) {
         set({
           expectedRoles: expected.expectedRoles ?? s.expectedRoles,
           expectedMounts: expected.expectedMounts ?? s.expectedMounts,
+          sessionPriority: priority === 'primary' ? 'primary' : s.sessionPriority,
         });
       }
       return;
     }
+    // A secondary scene (compact thumbnail) never displaces the primary
+    // viewport's session; its reports stay buffered instead.
+    if (priority === 'secondary' && s.sessionPriority === 'primary' && s.sessionId !== 'initial') {
+      return;
+    }
+    const adopted = s.pending[sessionId] ?? {};
     set({
       sessionId,
+      sessionPriority: priority,
       expectedRoles: expected?.expectedRoles ?? [],
       expectedMounts: expected?.expectedMounts ?? 0,
-      owners: {},
-      roles: {},
-      rackMounts: {},
+      owners: adopted,
+      pending: {},
+      roles: deriveRoles(adopted),
+      rackMounts: deriveRackMounts(adopted),
     });
   },
 
   registerOwner: (sessionId, ownerId) => {
     const s = get();
-    if (s.sessionId !== sessionId || s.owners[ownerId]) return;
+    if (s.sessionId !== sessionId) {
+      if (s.pending[sessionId]?.[ownerId]) return;
+      set({
+        pending: {
+          ...s.pending,
+          [sessionId]: { ...(s.pending[sessionId] ?? {}), [ownerId]: { ...EMPTY_OWNER } },
+        },
+      });
+      return;
+    }
+    if (s.owners[ownerId]) return;
     const owners = { ...s.owners, [ownerId]: { ...EMPTY_OWNER } };
     set({ owners });
   },
 
   reportRole: (sessionId, ownerId, coverage) => {
     const s = get();
-    if (s.sessionId !== sessionId) return; // stale session: ignored
+    if (s.sessionId !== sessionId) {
+      // Not the active session: buffer it. If the session never opens the
+      // buffer is dropped, so a stale report can never surface as coverage.
+      const bucket = s.pending[sessionId] ?? {};
+      const owner = bucket[ownerId] ?? EMPTY_OWNER;
+      if (shallowEqualRole(owner.roles[coverage.role], coverage)) return;
+      set({
+        pending: {
+          ...s.pending,
+          [sessionId]: {
+            ...bucket,
+            [ownerId]: { ...owner, roles: { ...owner.roles, [coverage.role]: coverage } },
+          },
+        },
+      });
+      return;
+    }
     const owner = s.owners[ownerId] ?? EMPTY_OWNER;
     if (shallowEqualRole(owner.roles[coverage.role], coverage)) return; // idempotent
     const owners = {
@@ -255,7 +318,20 @@ export const useRuntimeCoverageStore = create<CoverageState>((set, get) => ({
 
   reportMount: (sessionId, ownerId, rackId, mount) => {
     const s = get();
-    if (s.sessionId !== sessionId) return;
+    if (s.sessionId !== sessionId) {
+      const bucket = s.pending[sessionId] ?? {};
+      const owner = bucket[ownerId] ?? EMPTY_OWNER;
+      set({
+        pending: {
+          ...s.pending,
+          [sessionId]: {
+            ...bucket,
+            [ownerId]: { ...owner, rackMounts: { ...owner.rackMounts, [rackId]: mount } },
+          },
+        },
+      });
+      return;
+    }
     const owner = s.owners[ownerId] ?? EMPTY_OWNER;
     const existing = owner.rackMounts[rackId];
     if (
@@ -276,7 +352,14 @@ export const useRuntimeCoverageStore = create<CoverageState>((set, get) => ({
 
   unregisterOwner: (sessionId, ownerId) => {
     const s = get();
-    if (s.sessionId !== sessionId || !s.owners[ownerId]) return;
+    if (s.sessionId !== sessionId) {
+      if (!s.pending[sessionId]?.[ownerId]) return;
+      const bucket = { ...s.pending[sessionId] };
+      delete bucket[ownerId];
+      set({ pending: { ...s.pending, [sessionId]: bucket } });
+      return;
+    }
+    if (!s.owners[ownerId]) return;
     const owners = { ...s.owners };
     delete owners[ownerId];
     set({ owners, roles: deriveRoles(owners), rackMounts: deriveRackMounts(owners) });
@@ -284,7 +367,13 @@ export const useRuntimeCoverageStore = create<CoverageState>((set, get) => ({
 
   endSession: (sessionId) => {
     const s = get();
-    if (s.sessionId !== sessionId) return;
+    if (s.sessionId !== sessionId) {
+      if (!s.pending[sessionId]) return;
+      const pending = { ...s.pending };
+      delete pending[sessionId];
+      set({ pending });
+      return;
+    }
     set({ owners: {}, roles: {}, rackMounts: {}, expectedRoles: [], expectedMounts: 0 });
   },
 

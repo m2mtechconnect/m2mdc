@@ -379,6 +379,10 @@ function Scene({
   useCoverageSession(coverageSession, {
     expectedRoles,
     expectedMounts: facilityGeometry === 'nvidia-reference' ? racks.length : 0,
+    // A compact thumbnail may share the page with the full viewport. It still
+    // reports what it mounts, but it must not take the session away from the
+    // main scene, which is what made the viewport read as zero coverage.
+    priority: compact ? 'secondary' : 'primary',
   });
 
   // Framing that fills the viewport with the hall instead of empty floor.

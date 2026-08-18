@@ -16,10 +16,8 @@ import {
   BUILDER_PREVIEW_FIXTURE_PROVIDER_ID,
   type BuilderPreviewSessionValue,
 } from '../orchestrator/providers/builderPreviewProviders';
-import type {
-  SimulationExecutionClass,
-  SimulationProvenance,
-} from '../orchestrator/types';
+import type { SimulationExecutionClass } from '../orchestrator/executionClass';
+import type { SimulationProvenance } from '../orchestrator/types';
 
 export type { PreviewSpeedFactor, BuilderPreviewSessionEngine } from '../orchestrator';
 import type {

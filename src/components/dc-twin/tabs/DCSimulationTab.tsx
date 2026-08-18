@@ -56,29 +56,36 @@ const severityColors: Record<string, string> = {
   info: 'border-info/50 bg-info/5',
 };
 
-// Generate mock KPI snapshots with all required fields
-function generateMockSnapshots(count: number): KPISnapshot[] {
+/**
+ * Preview KPI snapshots.
+ *
+ * Truth rule: these are fixture previews, not solver output, and they must be
+ * reproducible. Stochastic terms come from the seeded `mulberry32-v1`
+ * generator, never from `Math.random()`.
+ */
+function generatePreviewSnapshots(count: number, seedText = 'dc-simulation-preview'): KPISnapshot[] {
+  const rand = mulberry32(deriveSeed(seedText));
   const snapshots: KPISnapshot[] = [];
   for (let i = 0; i < count; i++) {
     snapshots.push({
       timestamp: i * 10,
-      pue: 1.2 + Math.sin(i * 0.1) * 0.15 + Math.random() * 0.05,
-      gpuUtilization: 75 + Math.sin(i * 0.15) * 20 + Math.random() * 5,
-      thermalStabilityScore: 85 + Math.sin(i * 0.08) * 10 + Math.random() * 2,
-      powerReliabilityScore: 95 + Math.sin(i * 0.05) * 4 + Math.random() * 1,
+      pue: 1.2 + Math.sin(i * 0.1) * 0.15 + rand() * 0.05,
+      gpuUtilization: 75 + Math.sin(i * 0.15) * 20 + rand() * 5,
+      thermalStabilityScore: 85 + Math.sin(i * 0.08) * 10 + rand() * 2,
+      powerReliabilityScore: 95 + Math.sin(i * 0.05) * 4 + rand() * 1,
       sovereignComplianceScore: 98 - Math.abs(Math.sin(i * 0.05)) * 3,
-      emissionsVsTarget: -5 + Math.sin(i * 0.12) * 10 + Math.random() * 3,
-      coolingEfficiencyIndex: 92 - Math.cos(i * 0.08) * 8 + Math.random() * 2,
+      emissionsVsTarget: -5 + Math.sin(i * 0.12) * 10 + rand() * 3,
+      coolingEfficiencyIndex: 92 - Math.cos(i * 0.08) * 8 + rand() * 2,
       networkIntegrityScore: 99 - Math.abs(Math.sin(i * 0.1)) * 2,
       environmentalSafetyScore: 97 + Math.sin(i * 0.03) * 2,
-      avgUpsRuntime: 30 + Math.random() * 5,
+      avgUpsRuntime: 30 + rand() * 5,
     });
   }
   return snapshots;
 }
 
-// Generate mock events
-function generateMockEvents(): SimulationEvent[] {
+// Fixed preview timeline events
+function generatePreviewEvents(): SimulationEvent[] {
   return [
     { id: 'e1', timestamp: 30, type: 'THRESHOLD_BREACH', domain: 'thermal_hardware', severity: 'high', title: 'GPU Temperature Spike', description: 'GPU cluster A3 exceeded 82°C', affectedKpis: ['thermalStabilityScore'] },
     { id: 'e2', timestamp: 90, type: 'ANOMALY', domain: 'cooling', severity: 'medium', title: 'Cooling Efficiency Drop', description: 'CRAH unit 2 efficiency below target', affectedKpis: ['coolingEfficiencyIndex', 'pue'] },

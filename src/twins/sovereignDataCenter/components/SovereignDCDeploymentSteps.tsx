@@ -39,7 +39,6 @@ export function SovereignDCDeploymentSteps({
   const [deploymentStarted, setDeploymentStarted] = useState(false);
   const [deploymentPhase, setDeploymentPhase] = useState<string>('');
   const [deploymentComplete, setDeploymentComplete] = useState(false);
-  const [smokeTestPassed, setSmokeTestPassed] = useState(false);
   const navigate = useNavigate();
   
   const config = template?.default_config || {};
@@ -97,51 +96,28 @@ export function SovereignDCDeploymentSteps({
     // Track analytics
     sovereignDCAnalytics.templateViewed(template.id);
     
-    const phases = [
-      'Validating Canadian data sovereignty configuration...',
-      'Provisioning telemetry ingestion (GPU, DCIM, energy)...',
-      'Deploying AI/ML optimization models...',
-      'Configuring sovereign storage buckets...',
-      'Setting up KPI dashboards...',
-      'Activating operational workflows...',
-      'Running post-deploy smoke tests...'
-    ];
-    
     try {
-      // Simulate phased deployment
-      for (const phase of phases) {
-        setDeploymentPhase(phase);
-        await new Promise(resolve => setTimeout(resolve, 800));
-      }
-      
+      // Phase 9: no scripted phase animation. The only progress reported is
+      // the single real operation this component performs.
+      setDeploymentPhase('Recording deployment request...');
+
       if (onDeploy) {
         await onDeploy();
       }
-      
-      // Run smoke test
-      setDeploymentPhase('Verifying telemetry streaming...');
-      await new Promise(resolve => setTimeout(resolve, 600));
-      setDeploymentPhase('Confirming KPI calculations...');
-      await new Promise(resolve => setTimeout(resolve, 600));
-      setDeploymentPhase('Testing simulation engine...');
-      await new Promise(resolve => setTimeout(resolve, 600));
-      
-      setSmokeTestPassed(true);
+
+      // No post-deploy smoke test is executed here, so none is claimed.
       setDeploymentComplete(true);
       setDeploymentPhase('');
-      
-      toast.success('Sovereign DC Twin deployed successfully!', {
-        description: 'Telemetry streaming, KPIs active, simulation ready.'
+
+      toast.success('Deployment request recorded', {
+        description: 'Review the deployment record and its step log under Runtime Environments.'
       });
       
       // Track completion
       sovereignDCAnalytics.simulationRun(template.id, 'deployment', 'deploy_complete');
-      
-      // Redirect after success
-      setTimeout(() => {
-        navigate('/dashboard?tab=deployed');
-      }, 1500);
-      
+
+      navigate('/deployments');
+
     } catch (error) {
       console.error('Deployment error:', error);
       toast.error('Deployment failed', {
@@ -313,7 +289,7 @@ export function SovereignDCDeploymentSteps({
               <div className="flex-1">
                 <h4 className="font-semibold mb-2">Step 6 — Deploy & Validate</h4>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Deploy the twin and run automated smoke tests to verify telemetry streaming, KPI updates, and simulation engine.
+                  Records the deployment request and its step log. Automated post-deploy verification of telemetry, KPI updates and the simulation engine is not implemented, so no verification result is reported here.
                 </p>
                 
                 {deploymentPhase && (
@@ -325,22 +301,11 @@ export function SovereignDCDeploymentSteps({
                   </div>
                 )}
                 
-                {smokeTestPassed && (
-                  <div className="mb-3 p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-lg">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-sm text-green-800 dark:text-green-200">
-                        <CheckCircle2 className="h-4 w-4" />
-                        <span>Telemetry streaming confirmed</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-green-800 dark:text-green-200">
-                        <CheckCircle2 className="h-4 w-4" />
-                        <span>KPI calculations active</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-green-800 dark:text-green-200">
-                        <CheckCircle2 className="h-4 w-4" />
-                        <span>Simulation engine operational</span>
-                      </div>
-                    </div>
+                {deploymentComplete && (
+                  <div className="mb-3 p-3 rounded-lg border border-border bg-muted/50" role="status">
+                    <p className="text-sm text-muted-foreground">
+                      Deployment recorded. Post-deploy verification: not run.
+                    </p>
                   </div>
                 )}
                 

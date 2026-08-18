@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +40,10 @@ import { DCCard } from "@/components/dc-ui/DCCard";
 import { PagePurpose } from "@/components/capability/PagePurpose";
 import { DCSectionHeader } from "@/components/dc-ui/DCSectionHeader";
 import { DCKPITile } from "@/components/dc-ui/DCKPITile";
+import {
+  listDeploymentEvents,
+  type DeploymentEventRecord,
+} from "@/workspace/deploymentRecords";
 
 interface Deployment {
   id: string;
@@ -69,6 +73,31 @@ export default function DeploymentHistory() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [healthFilter, setHealthFilter] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [events, setEvents] = useState<DeploymentEventRecord[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(false);
+
+  // Phase 9: the step log is the immutable evidence for a deployment.
+  const toggleEvents = async (deploymentId: string) => {
+    if (expandedId === deploymentId) {
+      setExpandedId(null);
+      return;
+    }
+    setExpandedId(deploymentId);
+    setEvents([]);
+    setEventsLoading(true);
+    try {
+      setEvents(await listDeploymentEvents(deploymentId));
+    } catch (error: any) {
+      toast({
+        title: "Failed to load deployment steps",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setEventsLoading(false);
+    }
+  };
 
   useEffect(() => {
     loadDeploymentHistory();
@@ -335,7 +364,8 @@ export default function DeploymentHistory() {
                 </TableRow>
               ) : (
                 filteredDeployments.map((deployment) => (
-                  <TableRow key={deployment.id} className="hover:bg-muted/50">
+                  <React.Fragment key={deployment.id}>
+                  <TableRow className="hover:bg-muted/50">
                     <TableCell>
                       <div className="font-medium">{deployment.agent_name}</div>
                       {deployment.error_message && (
@@ -402,6 +432,14 @@ export default function DeploymentHistory() {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => toggleEvents(deployment.id)}
+                          aria-expanded={expandedId === deployment.id}
+                        >
+                          {expandedId === deployment.id ? 'Hide steps' : 'Steps'}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => navigate(`/builder?id=${deployment.system_id}`)}
                         >
                           View System
@@ -409,6 +447,42 @@ export default function DeploymentHistory() {
                       </div>
                     </TableCell>
                   </TableRow>
+                  {expandedId === deployment.id && (
+                    <TableRow key={`${deployment.id}-events`}>
+                      <TableCell colSpan={9} className="bg-muted/30">
+                        {eventsLoading ? (
+                          <p className="text-sm text-muted-foreground" role="status">Loading step log...</p>
+                        ) : events.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">
+                            No step events recorded for this deployment.
+                          </p>
+                        ) : (
+                          <ol className="space-y-1">
+                            {events.map((event) => (
+                              <li key={event.id} className="flex flex-wrap items-center gap-2 text-xs">
+                                <span className="font-mono text-muted-foreground">
+                                  {format(new Date(event.occurred_at), 'PP p')}
+                                </span>
+                                <span className="font-medium">{event.stage}</span>
+                                <Badge
+                                  variant={
+                                    event.status === 'failed'
+                                      ? 'destructive'
+                                      : event.status === 'succeeded'
+                                        ? 'default'
+                                        : 'outline'
+                                  }
+                                >
+                                  {event.status}
+                                </Badge>
+                              </li>
+                            ))}
+                          </ol>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  </React.Fragment>
                 ))
               )}
             </TableBody>

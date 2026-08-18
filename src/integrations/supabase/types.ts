@@ -2632,6 +2632,50 @@ export type Database = {
         }
         Relationships: []
       }
+      deployment_events: {
+        Row: {
+          actor_id: string | null
+          deployment_id: string
+          detail: Json
+          id: string
+          occurred_at: string
+          sequence: number
+          stage: string
+          status: string
+          system_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          deployment_id: string
+          detail?: Json
+          id?: string
+          occurred_at?: string
+          sequence: number
+          stage: string
+          status: string
+          system_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          deployment_id?: string
+          detail?: Json
+          id?: string
+          occurred_at?: string
+          sequence?: number
+          stage?: string
+          status?: string
+          system_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deployment_events_deployment_id_fkey"
+            columns: ["deployment_id"]
+            isOneToOne: false
+            referencedRelation: "deployments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deployment_tracking: {
         Row: {
           accuracy_estimate: number | null

@@ -9,7 +9,7 @@
  * What genuinely must be shared is the *provenance claim*: how a surface is
  * allowed to describe what the user is looking at. Before this registry each
  * surface hard-coded its own disclosure string, and the Command Centre card
- * claimed a "Procedural 3D preview ... rendered from a validated USD-derived
+ * (then also named `FacilityCanvas`) claimed a "Procedural 3D preview ... rendered from a validated USD-derived
  * GLB" while rendering a 2D SVG plan with no GLB in the tree.
  *
  * `src/workspace/__tests__/viewportRegistry.test.ts` proves each surface's
@@ -51,7 +51,7 @@ export const VIEWPORT_SURFACES: ViewportSurface[] = [
   },
   {
     id: 'command-centre-plan-card',
-    module: 'workspace/dashboard/FacilityCanvas.tsx',
+    module: 'workspace/dashboard/FacilityPlanCard.tsx',
     renderer: 'svg-2d',
     canMountApprovedGlb: false,
     disclosure: 'Procedural 2D floor plan of the modelled design',

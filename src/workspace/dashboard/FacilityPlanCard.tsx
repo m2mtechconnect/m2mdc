@@ -1,5 +1,7 @@
 /**
- * Stage 7D - facility visualisation card.
+ * Stage 7D - facility visualisation card (Phase 3: renamed from
+ * `FacilityCanvas`, which collided with the unrelated full-bleed 3D viewport
+ * at `src/workspace/FacilityCanvas.tsx`; this surface is a 2D floor plan card).
  *
  * The card owns the analytical layer, the viewport controls, rack search and
  * the Rack Quick View presentation. On desktop the quick view opens as an
@@ -81,7 +83,7 @@ interface Props {
   centerNonce?: number;
 }
 
-export function FacilityCanvas({
+export function FacilityPlanCard({
   facility,
   grid,
   overlay,

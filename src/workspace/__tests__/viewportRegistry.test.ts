@@ -44,7 +44,7 @@ describe('viewport registry', () => {
   });
 
   it('sources the Command Centre disclosure from the registry, not a literal', () => {
-    const source = read('workspace/dashboard/FacilityCanvas.tsx');
+    const source = read('workspace/dashboard/FacilityPlanCard.tsx');
     expect(source).toContain('viewportDisclosure');
     expect(source).not.toContain('USD-derived GLB');
     expect(viewportDisclosure('command-centre-plan-card')).toBe(

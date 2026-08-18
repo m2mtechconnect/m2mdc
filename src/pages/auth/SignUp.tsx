@@ -111,15 +111,12 @@ export default function SignUp() {
   };
 
   const handleGoogleSSO = async () => {
-    toast.info("Google SSO coming soon. Contact your administrator.");
-  };
-
-  const handleMicrosoftSSO = async () => {
-    toast.info("Microsoft SSO coming soon. Contact your administrator.");
-  };
-
-  const handleEnterpriseSSO = async () => {
-    toast.info("Enterprise SSO coming soon. Contact your administrator.");
+    setLoading(true);
+    const { error: ssoError } = await signInWithGoogle();
+    if (ssoError) {
+      setLoading(false);
+      toast.error(ssoError);
+    }
   };
 
   return (

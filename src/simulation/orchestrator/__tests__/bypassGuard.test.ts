@@ -27,6 +27,11 @@ const SUMMARY_ALLOWLIST = [
 /** Simulation code that must never draw unseeded randomness. */
 const SEEDED_ONLY_DIRS = ['src/simulation', 'src/components/builder/step5'];
 
+/** Strip comments so prose mentioning an engine or `Math.random()` is ignored. */
+function code(text: string): string {
+  return text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+}
+
 function walk(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
@@ -42,7 +47,7 @@ function walk(dir: string, out: string[] = []): string[] {
 
 const files = walk(SRC).map((f) => ({
   rel: f.slice(process.cwd().length + 1).replace(/\\/g, '/'),
-  text: readFileSync(f, 'utf8'),
+  text: code(readFileSync(f, 'utf8')),
 }));
 
 describe('simulation orchestrator bypass guard', () => {
@@ -65,12 +70,7 @@ describe('simulation orchestrator bypass guard', () => {
   it('simulation code draws no unseeded randomness', () => {
     const offenders = files
       .filter((f) => SEEDED_ONLY_DIRS.some((d) => f.rel.startsWith(d)))
-      .filter((f) =>
-        f.text
-          .split('\n')
-          // Ignore prose: only executable references to Math.random count.
-          .some((line) => /Math\.random\s*\(/.test(line) && !/^\s*(\*|\/\/)/.test(line)),
-      )
+      .filter((f) => /Math\.random\s*\(/.test(f.text))
       .map((f) => f.rel);
     expect(offenders).toEqual([]);
   });

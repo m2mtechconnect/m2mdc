@@ -73,7 +73,13 @@ import { AssetProvenanceBadge } from './AssetProvenancePanel';
 import { ScenarioRackLayer } from './ScenarioRackLayer';
 import { ReferenceEquipmentLayer } from './ReferenceEquipmentLayer';
 import { AuraFacilityLayer } from './AuraFacilityLayer';
-import { useRuntimeCoverageStore, coverageTotals, provenanceBreakdown, previewLabel } from './runtimeCoverageStore';
+import {
+  useRuntimeCoverageStore,
+  coverageTotals,
+  provenanceBreakdown,
+  previewLabel,
+  type CoveragePriority,
+} from './runtimeCoverageStore';
 import { coverageSessionId, useCoverageSession } from './coverageSession';
 import { REFERENCE_ROLES } from '@/validation/referenceFacility/spec';
 import {
@@ -120,6 +126,13 @@ interface DataCenter3DSceneProps {
   showThermal?: boolean;
   showEvents?: boolean;
   compact?: boolean;
+  /**
+   * Coverage authority. `compact` is only a layout-density flag: the dashboard
+   * viewport is compact too. A scene that is an ad-hoc thumbnail beside the
+   * real viewport must declare `coveragePriority="secondary"` so it reports
+   * what it mounts without taking the coverage session from the viewport.
+   */
+  coveragePriority?: CoveragePriority;
   /** Fill the parent container instead of using a fixed preview height. */
   fill?: boolean;
   mode?: 'dashboard' | 'blueprint' | 'simulation';
@@ -293,6 +306,7 @@ function Scene({
   showPower,
   showThermal,
   compact,
+  coveragePriority,
   mode,
   onRackClick,
   targetDistance,
@@ -379,10 +393,10 @@ function Scene({
   useCoverageSession(coverageSession, {
     expectedRoles,
     expectedMounts: facilityGeometry === 'nvidia-reference' ? racks.length : 0,
-    // A compact thumbnail may share the page with the full viewport. It still
-    // reports what it mounts, but it must not take the session away from the
-    // main scene, which is what made the viewport read as zero coverage.
-    priority: compact ? 'secondary' : 'primary',
+    // A thumbnail may share the page with the full viewport. It still reports
+    // what it mounts, but it must not take the session away from the main
+    // scene, which is what made the viewport read as zero coverage.
+    priority: coveragePriority ?? 'primary',
   });
 
   // Framing that fills the viewport with the hall instead of empty floor.

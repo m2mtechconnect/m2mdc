@@ -86,6 +86,7 @@ export function MiniTwinPreview({ onExpand, className }: MiniTwinPreviewProps) {
                 thermalZones={data.thermalZones}
                 events={[]}
                 compact
+                coveragePriority="secondary"
                 mode="dashboard"
                 activeOverlay={activeOverlay as any}
                 simulationKpis={simulation.currentKpis}

@@ -77,6 +77,9 @@ describe('SimulationOrchestrator', () => {
     const a = await o.run<number[]>({ ...request, seed: 42 });
     const b = await o.run<number[]>({ ...request, input: { totally: 'different' }, seed: 42 });
     expect(a.provenance.seed).toBe(42);
+    expect(a.kind).toBe('ok');
+    expect(b.kind).toBe('ok');
+    if (a.kind !== 'ok' || b.kind !== 'ok') return;
     expect(a.value).toEqual(b.value);
   });
 

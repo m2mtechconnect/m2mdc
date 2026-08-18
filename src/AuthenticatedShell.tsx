@@ -1,15 +1,19 @@
 /**
- * PR-0.1 Checkpoint B7.4F - Legacy authenticated shell isolated behind a
- * lazy boundary so that the controlled approved-user pilot at /pilot/*
- * does NOT pull the shared <Layout>, Co-Pilot, health-badge, token-refresh,
- * global search-suggestions, or any blocked-function-consumer code into
- * its initial dependency graph.
+ * Authenticated shell core.
  *
- * Everything imported in this file (pages, providers, Layout, CoPilot*,
- * HealthBadges, GlobalSearchBar, etc.) becomes part of the lazy chunk
- * produced by React.lazy(() => import("./AuthenticatedShell")) in App.tsx.
- * Do NOT import this module statically from App.tsx or from any file that
- * the /pilot/* route graph can reach.
+ * Imported SYNCHRONOUSLY by App.tsx. A lazy shell boundary wrapping the
+ * lazy route boundary reproduced an intermittent dropped Suspense retry
+ * (11/24 navigations); eager shell + lazy page measured 0/24.
+ *
+ * This module may contain ONLY the structural application frame:
+ * providers, Layout, navigation/footer/operating-state strip, the route
+ * table, the route-level Suspense fallback and the route recovery
+ * boundary. Every route page - including Dashboard - is lazy, so no page,
+ * visualization or admin module enters the synchronous core.
+ *
+ * The /pilot/* surface is unaffected: the pilot bundle canary walks the
+ * import graph from src/pilot/PilotShell.tsx, which never reaches this
+ * module. Do NOT import this module from any file the pilot graph reaches.
  */
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import { AuthenticatedEntryRedirect } from "@/routing/AuthenticatedEntryRedirect";
@@ -19,9 +23,10 @@ import { ROUTE_ALIASES } from "@/config/routeAliases";
 import { CoPilotProvider } from "@/contexts/CoPilotContext";
 import { CoPilotCommandProvider } from "@/contexts/CoPilotCommandContext";
 import { TourProvider } from "@/context/TourContext";
-import { TourRenderer } from "@/tours/TourRenderer";
+import { LazyTourRenderer } from "@/tours/LazyTourRenderer";
 import { lazy, Suspense } from "react";
-import Dashboard from "./pages/Dashboard";
+import { useLocation } from "react-router-dom";
+import { RouteLoadRecovery } from "@/routing/RouteLoadRecovery";
 import { DatasetProvider } from '@/data/dataset/DatasetProvider';
 import DatasetCanaryBanner from '@/components/dataset/DatasetCanaryBanner';
 import ReferenceRouteGate from '@/components/dataset/ReferenceRouteGate';
@@ -39,6 +44,8 @@ import NotFound from "./pages/NotFound";
  * Only Dashboard (the post-login landing route) and NotFound stay eager.
  * Everything else is fetched when its route is first visited.
  */
+// Route pages are lazy without exception - Dashboard included.
+const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Builder = lazy(() => import("./pages/Builder"));
 const Deploy = lazy(() => import("./pages/Deploy"));
 const DeploymentHistory = lazy(() => import("./pages/DeploymentHistory"));
@@ -235,6 +242,8 @@ function ApprovedUserRoutes() {
 }
 
 export default function AuthenticatedShell() {
+  // Scopes a failed route load to that route: navigating away clears it.
+  const location = useLocation();
   return (
     <TourProvider>
       <CoPilotProvider>
@@ -242,9 +251,10 @@ export default function AuthenticatedShell() {
           <DatasetProvider>
             <Layout>
               <DatasetCanaryBanner />
-              <TourRenderer />
+              <LazyTourRenderer />
               <ReferenceRouteGate>
-                <Suspense
+                <RouteLoadRecovery resetKey={location.pathname}>
+                  <Suspense
                   fallback={
                     <div
                       role="status"
@@ -256,7 +266,8 @@ export default function AuthenticatedShell() {
                   }
                 >
                   <ApprovedUserRoutes />
-                </Suspense>
+                  </Suspense>
+                </RouteLoadRecovery>
               </ReferenceRouteGate>
             </Layout>
           </DatasetProvider>

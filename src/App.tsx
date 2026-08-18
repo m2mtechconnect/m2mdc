@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, lazy } from "react";
 import { boundedRetryDelay, retryUnlessTerminal } from '@/lib/queryRetry';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -32,10 +32,14 @@ import ManagedUserReturn from '@/pages/oauth/ManagedUserReturn';
 import { MANAGED_USER_RETURN_PATH } from '@/connections/managedUserBinding';
 // Role-Aware Application Routing - Approved *internal* users (users with
 // an explicit row in public.user_roles) receive the full AURA DC
-// application via the legacy AuthenticatedShell, loaded lazily so that
-// pilot users' bundle graph is unaffected. Approved users *without* a
-// user_roles row remain sealed inside /pilot/*.
-const AuthenticatedShell = lazy(() => import("./AuthenticatedShell"));
+// application via the authenticated shell core. It is imported
+// SYNCHRONOUSLY: a lazy shell boundary wrapping the lazy route boundary
+// reproduced an intermittent dropped Suspense retry (11/24 navigations).
+// The shell core carries no route page, no visualization stack and no
+// admin module - those all stay behind their own route-level lazy
+// boundaries, so the pilot bundle graph is still unaffected (the pilot
+// canary walks from PilotShell.tsx and never reaches this module).
+import AuthenticatedShell from "./AuthenticatedShell";
 const OverlayFixtures = import.meta.env.DEV
   ? lazy(() => import("./pages/test/OverlayFixtures"))
   : null;
@@ -194,14 +198,12 @@ function ApprovedUserRouter() {
 
   if (resolution.status === 'internal') {
     return (
-      <Suspense fallback={<LoadingScreen />}>
-        <Routes>
-          <Route path="/pilot/*" element={<PilotShell />} />
-          <Route path="/sign-out" element={<SignOut />} />
-          <Route path={MANAGED_USER_RETURN_PATH} element={<ManagedUserReturn />} />
-          <Route path="/*" element={<AuthenticatedShell />} />
-        </Routes>
-      </Suspense>
+      <Routes>
+        <Route path="/pilot/*" element={<PilotShell />} />
+        <Route path="/sign-out" element={<SignOut />} />
+        <Route path={MANAGED_USER_RETURN_PATH} element={<ManagedUserReturn />} />
+        <Route path="/*" element={<AuthenticatedShell />} />
+      </Routes>
     );
   }
 

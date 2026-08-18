@@ -21,7 +21,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import GlobalSearchBar from "@/components/search/GlobalSearchBar";
-import { CoPilotPanel } from "@/components/copilot/CoPilotPanel";
+import { LazyCoPilotPanel } from "@/components/copilot/LazyCoPilotPanel";
 import { useCoPilot } from "@/contexts/CoPilotContext";
 import { HealthBadges } from "@/components/HealthBadges";
 import { UserMenu } from "@/components/layout/UserMenu";
@@ -417,7 +417,7 @@ export function Layout({ children }: LayoutProps) {
       </footer>
 
       {/* AURA Assistant (single instance) */}
-      <CoPilotPanel />
+      <LazyCoPilotPanel />
     </div>
   );
 }

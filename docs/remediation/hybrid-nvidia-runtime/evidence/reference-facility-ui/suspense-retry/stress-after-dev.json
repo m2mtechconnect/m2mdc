@@ -1,0 +1,653 @@
+{
+  "summary": {
+    "cold": 30,
+    "warm": 50,
+    "total": 80,
+    "failures": 0,
+    "p50": 1139,
+    "p95": 8306,
+    "max": 9627
+  },
+  "rows": [
+    {
+      "id": "cold-0",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1147,
+      "result": "committed"
+    },
+    {
+      "id": "cold-1",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1431,
+      "result": "committed"
+    },
+    {
+      "id": "cold-2",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1210,
+      "result": "committed"
+    },
+    {
+      "id": "cold-3",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1141,
+      "result": "committed"
+    },
+    {
+      "id": "cold-4",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1013,
+      "result": "committed"
+    },
+    {
+      "id": "cold-5",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1326,
+      "result": "committed"
+    },
+    {
+      "id": "cold-6",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1068,
+      "result": "committed"
+    },
+    {
+      "id": "cold-7",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1008,
+      "result": "committed"
+    },
+    {
+      "id": "cold-8",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1026,
+      "result": "committed"
+    },
+    {
+      "id": "cold-9",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1183,
+      "result": "committed"
+    },
+    {
+      "id": "cold-10",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 984,
+      "result": "committed"
+    },
+    {
+      "id": "cold-11",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1029,
+      "result": "committed"
+    },
+    {
+      "id": "cold-12",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1090,
+      "result": "committed"
+    },
+    {
+      "id": "cold-13",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1231,
+      "result": "committed"
+    },
+    {
+      "id": "cold-14",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1191,
+      "result": "committed"
+    },
+    {
+      "id": "cold-15",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1095,
+      "result": "committed"
+    },
+    {
+      "id": "cold-16",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1226,
+      "result": "committed"
+    },
+    {
+      "id": "cold-17",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 992,
+      "result": "committed"
+    },
+    {
+      "id": "cold-18",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1222,
+      "result": "committed"
+    },
+    {
+      "id": "cold-19",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1196,
+      "result": "committed"
+    },
+    {
+      "id": "cold-20",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1064,
+      "result": "committed"
+    },
+    {
+      "id": "cold-21",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1131,
+      "result": "committed"
+    },
+    {
+      "id": "cold-22",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1284,
+      "result": "committed"
+    },
+    {
+      "id": "cold-23",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1131,
+      "result": "committed"
+    },
+    {
+      "id": "cold-24",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1157,
+      "result": "committed"
+    },
+    {
+      "id": "cold-25",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1120,
+      "result": "committed"
+    },
+    {
+      "id": "cold-26",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1084,
+      "result": "committed"
+    },
+    {
+      "id": "cold-27",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1098,
+      "result": "committed"
+    },
+    {
+      "id": "cold-28",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1167,
+      "result": "committed"
+    },
+    {
+      "id": "cold-29",
+      "mode": "cold",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1113,
+      "result": "committed"
+    },
+    {
+      "id": "warm-0",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1093,
+      "result": "committed"
+    },
+    {
+      "id": "warm-1",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 5902,
+      "result": "committed"
+    },
+    {
+      "id": "warm-2",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 7657,
+      "result": "committed"
+    },
+    {
+      "id": "warm-3",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "back",
+      "ms": 919,
+      "result": "committed"
+    },
+    {
+      "id": "warm-4",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "reload",
+      "ms": 8921,
+      "result": "committed"
+    },
+    {
+      "id": "warm-5",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 744,
+      "result": "committed"
+    },
+    {
+      "id": "warm-6",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 8815,
+      "result": "committed"
+    },
+    {
+      "id": "warm-7",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 931,
+      "result": "committed"
+    },
+    {
+      "id": "warm-8",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "back",
+      "ms": 8306,
+      "result": "committed"
+    },
+    {
+      "id": "warm-9",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "reload",
+      "ms": 1226,
+      "result": "committed"
+    },
+    {
+      "id": "warm-10",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 5628,
+      "result": "committed"
+    },
+    {
+      "id": "warm-11",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 867,
+      "result": "committed"
+    },
+    {
+      "id": "warm-12",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 6476,
+      "result": "committed"
+    },
+    {
+      "id": "warm-13",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "back",
+      "ms": 971,
+      "result": "committed"
+    },
+    {
+      "id": "warm-14",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "reload",
+      "ms": 780,
+      "result": "committed"
+    },
+    {
+      "id": "warm-15",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 6234,
+      "result": "committed"
+    },
+    {
+      "id": "warm-16",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 6767,
+      "result": "committed"
+    },
+    {
+      "id": "warm-17",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 9627,
+      "result": "committed"
+    },
+    {
+      "id": "warm-18",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "back",
+      "ms": 1012,
+      "result": "committed"
+    },
+    {
+      "id": "warm-19",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "reload",
+      "ms": 870,
+      "result": "committed"
+    },
+    {
+      "id": "warm-20",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 5834,
+      "result": "committed"
+    },
+    {
+      "id": "warm-21",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 943,
+      "result": "committed"
+    },
+    {
+      "id": "warm-22",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 899,
+      "result": "committed"
+    },
+    {
+      "id": "warm-23",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "back",
+      "ms": 6284,
+      "result": "committed"
+    },
+    {
+      "id": "warm-24",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "reload",
+      "ms": 721,
+      "result": "committed"
+    },
+    {
+      "id": "warm-25",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 809,
+      "result": "committed"
+    },
+    {
+      "id": "warm-26",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 995,
+      "result": "committed"
+    },
+    {
+      "id": "warm-27",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 874,
+      "result": "committed"
+    },
+    {
+      "id": "warm-28",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "back",
+      "ms": 967,
+      "result": "committed"
+    },
+    {
+      "id": "warm-29",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "reload",
+      "ms": 1049,
+      "result": "committed"
+    },
+    {
+      "id": "warm-30",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1108,
+      "result": "committed"
+    },
+    {
+      "id": "warm-31",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1120,
+      "result": "committed"
+    },
+    {
+      "id": "warm-32",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 930,
+      "result": "committed"
+    },
+    {
+      "id": "warm-33",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "back",
+      "ms": 6257,
+      "result": "committed"
+    },
+    {
+      "id": "warm-34",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "reload",
+      "ms": 1670,
+      "result": "committed"
+    },
+    {
+      "id": "warm-35",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1139,
+      "result": "committed"
+    },
+    {
+      "id": "warm-36",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1271,
+      "result": "committed"
+    },
+    {
+      "id": "warm-37",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 1207,
+      "result": "committed"
+    },
+    {
+      "id": "warm-38",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "back",
+      "ms": 1165,
+      "result": "committed"
+    },
+    {
+      "id": "warm-39",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "reload",
+      "ms": 1163,
+      "result": "committed"
+    },
+    {
+      "id": "warm-40",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1016,
+      "result": "committed"
+    },
+    {
+      "id": "warm-41",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 6238,
+      "result": "committed"
+    },
+    {
+      "id": "warm-42",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 1218,
+      "result": "committed"
+    },
+    {
+      "id": "warm-43",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "back",
+      "ms": 1149,
+      "result": "committed"
+    },
+    {
+      "id": "warm-44",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "reload",
+      "ms": 985,
+      "result": "committed"
+    },
+    {
+      "id": "warm-45",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 6685,
+      "result": "committed"
+    },
+    {
+      "id": "warm-46",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "direct",
+      "ms": 914,
+      "result": "committed"
+    },
+    {
+      "id": "warm-47",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "direct",
+      "ms": 6032,
+      "result": "committed"
+    },
+    {
+      "id": "warm-48",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=aura",
+      "nav": "back",
+      "ms": 1193,
+      "result": "committed"
+    },
+    {
+      "id": "warm-49",
+      "mode": "warm",
+      "url": "/data-centre-twin?geometry=nvidia-reference",
+      "nav": "reload",
+      "ms": 1097,
+      "result": "committed"
+    }
+  ]
+}

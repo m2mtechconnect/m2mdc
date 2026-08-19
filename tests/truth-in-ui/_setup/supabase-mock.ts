@@ -207,7 +207,20 @@ export async function installSupabaseMock(
     if (pathname.startsWith('/rest/v1/user_roles')) {
       if (method === 'HEAD') return route.fulfill({ status: 200, headers: CORS_HEADERS, body: '' });
       return fulfillJson(
-        JSON.stringify([{ user_id: session.userId, role: opts.profileRole ?? 'admin' }]),
+        // Mirror the real row shape: the roster UI keys on `id` and renders
+        // `granted_at` / `expires_at`, so a stripped-down row is not a
+        // faithful stand-in for the API.
+        JSON.stringify([
+          {
+            id: `role-${session.userId}`,
+            user_id: session.userId,
+            role: opts.profileRole ?? 'admin',
+            scope: 'global',
+            granted_by: session.userId,
+            granted_at: '2026-01-01T00:00:00.000Z',
+            expires_at: null,
+          },
+        ]),
       );
     }
 

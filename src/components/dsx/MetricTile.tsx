@@ -28,9 +28,13 @@ export function MetricTile({ id, metric, digits = 2, label, className, hideValid
       data-testid={`dsx-metric-${id}`}
       data-mode={metric.data_mode}
       data-validation={metric.validation}
-      className={cn('border-border/60 bg-card/60', className)}
+      className={cn(
+        'overflow-hidden rounded-md border-y border-r border-l-4 border-border/60 border-l-primary bg-card shadow-sm transition-shadow hover:shadow-md',
+        unavailable && 'border-l-muted-foreground/30',
+        className,
+      )}
     >
-      <CardContent className="p-3">
+      <CardContent className="p-4">
         <button
           type="button"
           onClick={() => openProvenance(metric)}
@@ -39,17 +43,20 @@ export function MetricTile({ id, metric, digits = 2, label, className, hideValid
           data-testid={`dsx-metric-${id}-open`}
           data-metric-name={metric.metric_name}
         >
-          <span className="block text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          <span className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             {label ?? metric.metric_name}
           </span>
 
-          <span className="block font-mono text-2xl font-bold" data-testid={`dsx-metric-${id}-value`}>
+          <span
+            className="block font-mono text-3xl font-bold leading-none tabular-nums text-foreground"
+            data-testid={`dsx-metric-${id}-value`}
+          >
             {unavailable ? (
               <span className="text-base font-normal italic text-muted-foreground">Unavailable</span>
             ) : (
               <>
                 {metric.value!.toFixed(digits)}
-                <span className="ml-1 text-sm font-normal text-muted-foreground">{metric.unit}</span>
+                <span className="ml-1.5 text-xs font-medium text-muted-foreground">{metric.unit}</span>
               </>
             )}
           </span>
@@ -118,7 +125,7 @@ export function MetricGrid({
           />
         </div>
       )}
-      <div className={cn('grid gap-3', columns)}>
+      <div className={cn('grid gap-4', columns)}>
         {shown.map((id) => (
           <MetricTile key={id} id={id} metric={metrics[id]} hideValidation={Boolean(shared)} />
         ))}

@@ -17,9 +17,9 @@ export function ContextBar() {
     <div
       data-testid="dsx-context-bar"
       aria-label="Investigation context"
-      className="flex flex-wrap items-center gap-2 border-b border-border bg-background/80 px-3 py-2 sm:px-4"
+      className="flex flex-wrap items-center gap-2 border-b border-border bg-background px-3 py-2 sm:px-4"
     >
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
         Context
       </span>
 

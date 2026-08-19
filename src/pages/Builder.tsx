@@ -19,8 +19,7 @@ import { trackBuilderStep, trackDeployment, trackAnalytics } from '@/lib/analyti
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { Button } from '@/components/ui/button';
-import { Sparkles, LayoutTemplate, AlertTriangle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Sparkles, AlertTriangle } from 'lucide-react';
 import { BuilderStarterLists } from '@/components/builder/BuilderStarterLists';
 
 export default function Builder() {
@@ -428,13 +427,7 @@ export default function Builder() {
               <span>{initError}</span>
             </div>
           )}
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Button asChild size="lg" variant="outline" disabled={starting}>
-              <Link to="/marketplace">
-                <LayoutTemplate className="h-4 w-4 mr-2" aria-hidden="true" />
-                {t('builder.chooseTemplate', 'Choose a template')}
-              </Link>
-            </Button>
+          <div className="flex justify-center">
             <Button size="lg" onClick={startBlank} disabled={starting} aria-busy={starting}>
               {starting ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />

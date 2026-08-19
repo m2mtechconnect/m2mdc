@@ -89,7 +89,7 @@ export function BuilderStarterLists() {
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="grid items-start gap-6 md:grid-cols-2">
       <section aria-labelledby="builder-existing-heading" className="rounded-lg border border-border bg-card p-4 text-left">
         <div className="mb-3 flex items-center gap-2">
           <FolderOpen className="h-4 w-4 text-primary" aria-hidden="true" />
@@ -98,7 +98,7 @@ export function BuilderStarterLists() {
           </h2>
         </div>
         {builds && builds.length > 0 ? (
-          <ul className="space-y-2">
+          <ul className="max-h-[22rem] space-y-2 overflow-y-auto pr-1">
             {builds.map((build) => (
               <li key={build.id}>
                 <Link
@@ -106,7 +106,9 @@ export function BuilderStarterLists() {
                   className="flex items-center justify-between gap-3 rounded-md border border-transparent px-2 py-2 hover:border-border hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-medium">{build.name}</span>
+                    <span className="block truncate text-sm font-medium">
+                      {build.name?.trim() ? build.name : 'Untitled build'}
+                    </span>
                     <span className="block text-xs text-muted-foreground">
                       {build.updated_at
                         ? `Updated ${formatDistanceToNow(new Date(build.updated_at), { addSuffix: true })}`
@@ -137,7 +139,7 @@ export function BuilderStarterLists() {
           </div>
           <Button asChild variant="ghost" size="sm">
             <Link to="/marketplace">
-              All
+              Browse marketplace
               <ArrowRight className="ml-1 h-3.5 w-3.5" aria-hidden="true" />
             </Link>
           </Button>

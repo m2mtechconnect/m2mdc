@@ -206,6 +206,24 @@ interface CameraControllerProps {
 }
 
 // Camera controller component for smooth animations
+/**
+ * Frame governor for secondary viewports.
+ *
+ * A compact preview is glanceable chrome, not the surface an operator studies,
+ * so it does not need a 60fps loop competing with the dashboard for the main
+ * thread. In `demand` mode nothing renders unless something invalidates, so
+ * this drives a fixed low cadence that still animates the overlay pulses.
+ */
+function FrameRateGovernor({ fps }: { fps: number }) {
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => {
+    const interval = window.setInterval(() => invalidate(), Math.round(1000 / fps));
+    invalidate();
+    return () => window.clearInterval(interval);
+  }, [fps, invalidate]);
+  return null;
+}
+
 function CameraController({ 
   targetDistance, 
   baseDistance,

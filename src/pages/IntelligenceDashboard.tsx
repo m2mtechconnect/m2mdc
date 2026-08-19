@@ -435,15 +435,17 @@ export default function IntelligenceDashboard() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3 min-w-0">
-            <div
-              className="hidden md:flex items-center gap-2 text-xs text-muted-foreground border border-border rounded-md px-2.5 py-1.5"
-              title={dataTrust.lastRefreshed.toLocaleString()}
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-              <span>{t('telemetry.basis.lastRefreshed')}: 2 min ago</span>
-              <span className="text-muted-foreground/60">|</span>
-              <span>{t('telemetry.basis.autoRefresh')}</span>
-            </div>
+            {dataTrust && (
+              <div
+                className="hidden md:flex items-center gap-2 text-xs text-muted-foreground border border-border rounded-md px-2.5 py-1.5"
+                title={dataTrust.lastRefreshed.toLocaleString()}
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                <span>
+                  {t('telemetry.basis.lastRefreshed')}: {dataTrust.lastRefreshed.toLocaleString()}
+                </span>
+              </div>
+            )}
             <Button variant="outline" className="gap-2" onClick={() => navigate('/blueprint/default')}>
               <FileText className="h-4 w-4" />
               Blueprint

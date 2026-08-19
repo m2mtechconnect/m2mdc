@@ -60,8 +60,20 @@ test.describe('Surface inventory — public retrofitted routes', () => {
       // stability heuristic can never settle on the tab strip. Assert the tab
       // exists, then dispatch the click without actionability polling.
       await expect(tab).toBeVisible();
-      await tab.evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'instant' as ScrollBehavior }));
-      await tab.click({ force: true });
+      // A forced click can be swallowed while the tab strip reflows behind the
+      // render loop, so activate the trigger and confirm Radix registered it.
+      for (let attempt = 0; attempt < 5; attempt += 1) {
+        // Radix activates a tab trigger on mousedown / focus, not on a
+        // synthetic click, so drive both without actionability polling.
+        await tab.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+        await tab.focus();
+        await tab.dispatchEvent('mousedown', { button: 0, bubbles: true });
+        await tab.dispatchEvent('mouseup', { button: 0, bubbles: true });
+        await tab.dispatchEvent('click', { button: 0, bubbles: true });
+        if ((await tab.getAttribute('data-state')) === 'active') break;
+        await page.waitForTimeout(500);
+      }
+      await expect(tab, `${view.tab} tab activated`).toHaveAttribute('data-state', 'active');
       const panel = page.getByTestId(view.testid);
       await expect(panel, `${view.tab} view visible`).toBeVisible({ timeout: 30_000 });
       await expect(panel, `${view.tab} carries provenance=${view.provenance}`)

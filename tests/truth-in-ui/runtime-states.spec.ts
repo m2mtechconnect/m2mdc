@@ -45,6 +45,12 @@ async function assertNoMisleadingLive(page: import('@playwright/test').Page) {
 }
 
 test.describe('Kit runtime states — /twin-preview', () => {
+  // /twin-preview mounts the WebGL twin; under full-shard load the 20s global
+  // budget is exceeded by navigation alone, so each state gets its own budget.
+  test.beforeEach(() => {
+    test.setTimeout(90_000);
+  });
+
   // Product contract (see src/integrations/omniverseKit/config.ts): the browser
   // build holds Kit in a typed-unavailable, disabled state on EVERY build
   // variant. No `/kit-api` request is ever issued from the client. These tests

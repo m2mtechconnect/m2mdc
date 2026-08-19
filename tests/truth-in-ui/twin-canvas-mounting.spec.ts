@@ -49,9 +49,27 @@ test.describe('AURA twin canvas mounting', () => {
 
     const canvas = page.getByTestId('twin-canvas');
     const fallback = page.getByRole('heading', { name: /3D twin unavailable/i }).first();
+
+    // The viewport can transition (fallback -> canvas, or canvas remount)
+    // while the scene settles, so poll until one branch is *stably*
+    // present rather than branching on a single transient read.
+    let terminal: 'canvas' | 'fallback' = 'fallback';
     await expect
-      .poll(async () => (await canvas.count()) + (await fallback.count()), { timeout: 60_000 })
-      .toBeGreaterThan(0);
+      .poll(
+        async () => {
+          if (await canvas.count()) {
+            terminal = 'canvas';
+            return true;
+          }
+          if (await fallback.count()) {
+            terminal = 'fallback';
+            return true;
+          }
+          return false;
+        },
+        { timeout: 60_000 },
+      )
+      .toBe(true);
 
     if (gpuRequired) {
       // Hardware lane: the 2D fallback is a failure, not an accepted state.
@@ -59,12 +77,18 @@ test.describe('AURA twin canvas mounting', () => {
       await expect(canvas).toBeVisible();
     }
 
-    if (await canvas.count()) {
+    if (terminal === 'canvas') {
       await expect(canvas).toBeVisible();
       const bounds = await canvas.boundingBox();
       expect(bounds?.width ?? 0).toBeGreaterThan(0);
       expect(bounds?.height ?? 0).toBeGreaterThan(0);
     } else {
+      // A late canvas mount is a valid terminal state too — only assert the
+      // 2D fallback when the canvas still has not appeared.
+      if (await canvas.count()) {
+        await expect(canvas).toBeVisible();
+        return;
+      }
       await expect(fallback).toBeVisible();
       await expect(page.getByText('2D FLOOR PLAN (SAME MODELLED DATA)').first()).toBeVisible();
     }

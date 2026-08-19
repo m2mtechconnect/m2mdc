@@ -24,36 +24,19 @@ verify_jwt = false
 [functions.public-intake]
 verify_jwt = false
 
-# NVIDIA operational-readiness Phase 1 - CORS/authorization reconciliation.
-# These functions construct a SERVICE_ROLE client and perform no in-code
-# identity check while answering wildcard-CORS requests. Until each one is
-# rewritten to derive identity from the caller and scope its reads to that
-# tenant, the gateway JWT check is made explicit so an anonymous origin cannot
-# reach a service-role query. `zapier-oauth-callback` is deliberately excluded:
-# it is an OAuth redirect target that anonymous browsers must reach, and it
-# validates its own state parameter.
-[functions.metrics-summary]
-verify_jwt = true
-
-[functions.ops-environments]
-verify_jwt = true
-
-[functions.ops-events]
-verify_jwt = true
-
-[functions.ops-ingest-health]
-verify_jwt = true
-
-[functions.templates-seed]
-verify_jwt = true
-
+# NVIDIA operational-readiness Phase 2 - service-role attack surface closed.
+# `metrics-summary`, `ops-environments`, `ops-events`, `ops-ingest-health`,
+# `templates-seed` and `zapier-apps-sync` were orphaned service-role endpoints
+# with no caller anywhere in the product; they are deleted rather than guarded.
+# The four retained handlers below now verify the caller in code via
+# `_shared/callerIdentity.ts` and answer scoped CORS via `_shared/cors.ts`.
+# The gateway check is kept as defense in depth. `zapier-oauth-callback` is
+# deliberately excluded: it is an OAuth redirect target anonymous browsers must
+# reach, and it validates its own state parameter.
 [functions.website-cache-clear]
 verify_jwt = true
 
 [functions.funding-scraper]
-verify_jwt = true
-
-[functions.zapier-apps-sync]
 verify_jwt = true
 
 [functions.zapier-auto-refresh]

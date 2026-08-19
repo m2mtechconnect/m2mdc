@@ -25,8 +25,8 @@ serve(async (req) => {
   }
 
   try {
-    // This is a public background/cron function
-    // No authentication needed since it uses service role for operations
+    // Phase 2: caller identity is verified above; the service-role client
+    // below is only reachable by an authenticated caller.
     console.log('Starting token refresh check...');
     
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;

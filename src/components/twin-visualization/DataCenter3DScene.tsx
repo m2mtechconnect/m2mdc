@@ -254,7 +254,8 @@ function CameraController({
     
     // Auto-orbit in simulation mode when idle
     const isIdle = Date.now() - lastInteractionTime > IDLE_THRESHOLD_MS;
-    if (mode === 'simulation' && isIdle && hasAnimatedIn.current && !reducedMotion) {
+    const autoOrbiting = mode === 'simulation' && isIdle && hasAnimatedIn.current && !reducedMotion;
+    if (autoOrbiting) {
       thetaRef.current += 0.002; // Very slow rotation
     }
     
@@ -291,8 +292,16 @@ function CameraController({
     }
     camera.lookAt(focus);
     camera.updateProjectionMatrix();
-    
-    invalidate();
+
+    // Only keep the loop alive while something is actually moving. An
+    // unconditional invalidate() rendered every frame forever, which pinned
+    // the main thread even on a still dashboard preview and delayed the
+    // domain tabs above the scene from responding to clicks.
+    const settled = Math.abs(distanceRef.current - distance) < 0.01
+      && camera.position.distanceTo(new THREE.Vector3(x, y, z)) < 0.01;
+    if (!settled || autoOrbiting) {
+      invalidate();
+    }
   });
 
   return null;

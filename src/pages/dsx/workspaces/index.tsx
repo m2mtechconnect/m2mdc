@@ -45,10 +45,13 @@ import {
 
 function Section({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
-    <section className="space-y-3">
-      <div>
-        <h2 className="text-base font-semibold">{title}</h2>
-        {description && <p className="max-w-3xl text-xs text-muted-foreground">{description}</p>}
+    <section className="space-y-3 border-t border-border/60 pt-6 first:border-t-0 first:pt-0">
+      <div className="flex gap-3">
+        <span aria-hidden className="mt-1 h-4 w-1 shrink-0 rounded-full bg-primary" />
+        <div className="min-w-0 space-y-0.5">
+          <h2 className="text-[15px] font-semibold leading-tight tracking-tight">{title}</h2>
+          {description && <p className="max-w-3xl text-xs leading-relaxed text-muted-foreground">{description}</p>}
+        </div>
       </div>
       {children}
     </section>

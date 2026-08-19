@@ -1,13 +1,26 @@
-Resolving dependencies
-Resolved, downloaded and extracted [122]
-Saved lockfile
 {
-  "exports": [
-    "CAPABILITIES",
-    "hasCapability",
-    "capabilityRequirement",
-    "useCapability",
-    "useCapabilities",
-    "NVIDIA_READINESS"
-  ]
+  "totalCapabilities": 10,
+  "statuses": {
+    "Enabled": 2,
+    "Not configured": 4,
+    "Not connected": 2,
+    "None validated": 1,
+    "Not deployed": 1
+  },
+  "nvidiaCodeOrServiceIntegrated": 0,
+  "openUsdStageMountedByNvidiaRuntime": 0,
+  "simReadyValidated": 0,
+  "liveTelemetryVerified": 0,
+  "NVIDIA_READINESS": {
+    "staticallyProvenComponents": 0,
+    "runtimeProvenComponents": 0,
+    "openUsdStages": 0,
+    "openUsdCanonicalCapabilities": 3,
+    "simReadyValidatedAssets": 0,
+    "liveTelemetrySources": 0,
+    "verticalSlice": "BLOCKED_BY_INFRASTRUCTURE",
+    "pilotReadinessPercent": 81,
+    "productionVerdict": "NO-GO",
+    "demoVerdict": "CONTROLLED_DEMO_READY"
+  }
 }

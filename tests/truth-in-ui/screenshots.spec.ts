@@ -40,7 +40,18 @@ async function stabilize(page: Page) {
     content: `*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}`,
   });
   await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
-  await page.evaluate(() => new Promise<void>(r => requestAnimationFrame(() => requestAnimationFrame(() => r()))));
+  // On WebGL-heavy routes the render loop can starve rAF callbacks, so this
+  // settle step is best-effort and must never hold the test hostage.
+  await page
+    .evaluate(
+      () =>
+        new Promise<void>((r) => {
+          const done = () => r();
+          setTimeout(done, 2_000);
+          requestAnimationFrame(() => requestAnimationFrame(done));
+        }),
+    )
+    .catch(() => {});
 }
 
 async function shot(page: Page, name: string) {
@@ -281,29 +292,31 @@ test.describe('Phase 1A.3.f — Auth-gated surfaces', () => {
 //    Public demo route; no Supabase session needed.
 // =============================================================
 const DOMAINS = [
-  { file: '19-domain-thermal.png',     label: 'Thermal' },
-  { file: '20-domain-power.png',       label: 'Power' },
-  { file: '21-domain-cooling.png',     label: 'Cooling' },
-  { file: '22-domain-network.png',     label: 'Network' },
-  { file: '23-domain-facility.png',    label: 'Facility' },
-  { file: '24-domain-workload.png',    label: 'Workload' },
-  { file: '25-domain-sovereignty.png', label: 'Sovereignty' },
-  { file: '26-domain-carbon.png',      label: 'Carbon' },
-  { file: '27-domain-financial.png',   label: 'Financial' },
+  { file: '19-domain-thermal.png',     slug: 'thermal',     testid: 'thermal-domain-view' },
+  { file: '20-domain-power.png',       slug: 'power',       testid: 'power-domain-view' },
+  { file: '21-domain-cooling.png',     slug: 'cooling',     testid: 'cooling-domain-view' },
+  { file: '22-domain-network.png',     slug: 'network',     testid: 'network-domain-view' },
+  { file: '23-domain-facility.png',    slug: 'facility',    testid: 'facility-domain-view' },
+  { file: '24-domain-workload.png',    slug: 'workload',    testid: 'workload-domain-view' },
+  { file: '25-domain-sovereignty.png', slug: 'sovereignty', testid: 'sovereignty-domain-view' },
+  { file: '26-domain-carbon.png',      slug: 'carbon',      testid: 'carbon-domain-view' },
+  { file: '27-domain-financial.png',   slug: 'financial',   testid: 'financial-domain-view' },
 ] as const;
 
 test.describe('Phase 1A.3.f — Nine domain views', () => {
   for (const d of DOMAINS) {
     test(`${d.file}`, async ({ page, guard }) => {
+      // The twin route runs a continuous WebGL loop that starves pointer
+      // actionability, so each domain is deep-linked via ?tab=<domain>
+      // instead of being reached by clicking through the tab strip.
+      test.setTimeout(120_000);
       // Domain views are demo/simulated regardless of Kit; abort Kit
       // to keep the top KPI cards in `unavailable` (their real state).
       await page.route('**/kit-api/**', r => r.abort('failed'));
-      await page.goto('/data-centre-twin?demo=true', { waitUntil: 'domcontentloaded' });
-      await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
-      // Tabs render with icon + hidden-sm label; use accessible name.
-      const tab = page.getByRole('tab', { name: new RegExp(d.label, 'i') }).first();
-      await tab.click();
-      await page.waitForTimeout(300);
+      await page.goto(`/data-centre-twin?demo=true&tab=${d.slug}`, {
+        waitUntil: 'domcontentloaded',
+      });
+      await expect(page.getByTestId(d.testid)).toBeVisible({ timeout: 60_000 });
       await shot(page, d.file);
       void guard;
     });

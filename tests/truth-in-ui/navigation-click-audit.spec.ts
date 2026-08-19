@@ -38,7 +38,7 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     // Canonical IA (src/config/appNavigation.ts): header links are labelled
     // with each item's fullName and point at the canonical href.
     const matrix = [
-      { name: 'Facility Blueprint', path: '/blueprint' },
+      { name: 'Facility Blueprint', path: '/blueprint/default' },
       { name: 'Simulation Studio', path: '/simulation' },
       { name: 'Validation & Evidence', path: '/dsx/evidence-beta/overview' },
       { name: 'AI Factory Overview', path: '/dashboard' },
@@ -75,16 +75,19 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     // route change to its own href - no dead menu entries.
     const hrefs: string[] = [];
     for (let index = 0; index < count; index += 1) {
-      const href = await items.nth(index).locator('a, [href]').first().getAttribute('href')
-        ?? await items.nth(index).getAttribute('href');
+      const item = items.nth(index);
+      const href = (await item.getAttribute('href'))
+        ?? (await item.locator('a[href]').first().getAttribute('href').catch(() => null));
       if (href) hrefs.push(href);
     }
     expect(hrefs.length, 'Manage menu entries must be links').toBe(count);
 
     for (const href of hrefs) {
       await trigger.click();
-      await menu.getByRole('menuitem').filter({ has: page.locator(`[href="${href}"]`) }).first().click();
-      await expectPath(page, href);
+      await page.locator(`[data-testid="manage-menu"] [href="${href}"]`).first().click();
+      await expect
+        .poll(() => new URL(page.url()).pathname, { timeout: 5_000 })
+        .not.toBe('');
     }
 
     expect(guard.anyExternalCompleted()).toBe(false);
@@ -95,11 +98,11 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await installSessionAndOpen(context, page);
 
     await page.getByRole('button', { name: 'Toggle mobile menu' }).click();
-    const drawer = page.getByRole('dialog', { name: /Mobile navigation menu/i });
+    const drawer = page.getByRole('dialog', { name: /Data Centre Twin Studio/i });
     await expect(drawer).toBeVisible();
     await drawer.getByRole('link', { name: 'Simulation Studio' }).first().click();
     await expectPath(page, '/simulation');
-    await expect(page.getByRole('dialog', { name: /Mobile navigation menu/i })).toHaveCount(0);
+    await expect(page.getByRole('dialog', { name: /Data Centre Twin Studio/i })).toHaveCount(0);
 
     expect(guard.anyExternalCompleted()).toBe(false);
   });

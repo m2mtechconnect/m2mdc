@@ -29,7 +29,7 @@ function Cluster({ label, children }: { label: string; children: React.ReactNode
 
 function Chip({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex min-w-0 flex-col gap-1">
+    <div className="flex min-w-0 flex-col items-start gap-1">
       <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
       {children}
     </div>

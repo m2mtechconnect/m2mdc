@@ -5,7 +5,19 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { LayoutTemplate, FolderOpen, ArrowRight } from 'lucide-react';
+import { LayoutTemplate, FolderOpen, ArrowRight, Trash2, Loader2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { toast } from '@/hooks/use-toast';
 
 interface BuildRow {
   id: string;
@@ -32,6 +44,25 @@ export function BuilderStarterLists() {
   const [templates, setTemplates] = useState<TemplateRow[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const deleteBuild = async (build: BuildRow) => {
+    setDeletingId(build.id);
+    try {
+      const { error } = await supabase.from('agents').delete().eq('id', build.id);
+      if (error) throw error;
+      setBuilds((prev) => (prev ? prev.filter((row) => row.id !== build.id) : prev));
+      toast({ title: 'Draft deleted', description: `${build.name?.trim() || 'Untitled build'} was removed.` });
+    } catch (err) {
+      toast({
+        title: 'Could not delete draft',
+        description: err instanceof Error ? err.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -100,10 +131,10 @@ export function BuilderStarterLists() {
         {builds && builds.length > 0 ? (
           <ul className="max-h-[22rem] space-y-2 overflow-y-auto pr-1">
             {builds.map((build) => (
-              <li key={build.id}>
+              <li key={build.id} className="group flex items-center gap-1">
                 <Link
                   to={`/builder?draft=${build.id}`}
-                  className="flex items-center justify-between gap-3 rounded-md border border-transparent px-2 py-2 hover:border-border hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="flex min-w-0 flex-1 items-center justify-between gap-3 rounded-md border border-transparent px-2 py-2 hover:border-border hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-medium">
@@ -119,6 +150,35 @@ export function BuilderStarterLists() {
                     {build.status}
                   </Badge>
                 </Link>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
+                      disabled={deletingId === build.id}
+                      aria-label={`Delete ${build.name?.trim() || 'Untitled build'}`}
+                    >
+                      {deletingId === build.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" aria-hidden="true" />
+                      )}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete this draft?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {build.name?.trim() || 'Untitled build'} will be permanently removed. This cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => deleteBuild(build)}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </li>
             ))}
           </ul>

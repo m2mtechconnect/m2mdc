@@ -24,6 +24,9 @@ export interface HandlerContext {
   correlationId: string;
   userId?: string;
   user?: any;
+  organizationId?: string;
+  tenantId?: string;
+  roles?: string[];
   supabase: any;
   log: (message: string, extra?: Record<string, unknown>) => void;
 }
@@ -124,6 +127,9 @@ export function createHandler<TInput = any, TOutput = any>(
         correlationId,
         userId: authContext.userId,
         user: authContext.user,
+        organizationId: authContext.organizationId,
+        tenantId: authContext.tenantId,
+        roles: authContext.roles,
         supabase: authContext.supabase,
         log,
       };

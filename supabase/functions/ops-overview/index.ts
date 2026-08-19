@@ -30,7 +30,10 @@ serve(createHandler({
   inputSchema: InputSchema,
   handler: async (input, context) => {
     const { env } = input;
-    const { supabase, log } = context;
+    const { supabase, log, organizationId } = context;
+    if (!organizationId) {
+      throw { code: 'TENANT_CONTEXT_REQUIRED', message: 'Organization context is required', status: 403 };
+    }
 
     log("Fetching ops overview", { env });
 
@@ -49,6 +52,7 @@ serve(createHandler({
     let systemsQuery = supabase
       .from('agents')
       .select('id, last_heartbeat, status', { count: 'exact', head: false })
+      .eq('org_id', organizationId)
       .in('status', ['active', 'deployed', 'running']);
     
     if (envFilter) {

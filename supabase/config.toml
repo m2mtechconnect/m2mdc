@@ -44,3 +44,27 @@ verify_jwt = true
 
 [functions.zapier-action-execute]
 verify_jwt = true
+
+# Shared-handler administrative endpoints. Gateway validation remains enabled
+# as defense in depth; each handler also validates identity, canonical role and
+# profiles.org_id membership before constructing a service-role client.
+[functions.analytics-overview]
+verify_jwt = true
+
+[functions.analytics-export]
+verify_jwt = true
+
+[functions.analytics-systems]
+verify_jwt = true
+
+[functions.ai-systems]
+verify_jwt = true
+
+[functions.ops-heartbeat]
+verify_jwt = true
+
+[functions.ops-overview]
+verify_jwt = true
+
+[functions.ops-systems]
+verify_jwt = true

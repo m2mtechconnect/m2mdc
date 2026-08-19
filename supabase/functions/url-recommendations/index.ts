@@ -97,7 +97,7 @@ serve(async (req) => {
     const normalizedDomain = urlObj.hostname.replace(/^www\./, '');
 
     // Get or create site
-    let { data: site, error: siteError } = await supabase
+    const { data: fetchedSite, error: siteError } = await supabase
       .from('sites')
       .select('*')
       .eq('domain', normalizedDomain)

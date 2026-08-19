@@ -339,7 +339,10 @@ export default function AccessControl() {
               </TableHeader>
               <TableBody>
                 {userRoles?.map((userRole: any) => (
-                  <TableRow key={userRole.id}>
+                  // `id` is the natural key, but a row that arrives without one
+                  // (partial projection, older API shape) must still render a
+                  // stable, unique key rather than `undefined` for every row.
+                  <TableRow key={userRole.id ?? `${userRole.user_id}:${userRole.role}:${userRole.scope ?? 'global'}`}>
                     <TableCell>
                       <div>
                         <div className="font-medium">

@@ -1,0 +1,2432 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.6 [39m[90m/dev-server[39m
+
+ [32m✓[39m tests/unit/legacyGoogleOAuthRetired.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 359[2mms[22m[39m
+ [32m✓[39m src/telemetry/__tests__/metricIdentity.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 462[2mms[22m[39m
+     [33m[2m✓[22m[39m no client module queries the retired metric tables [33m 456[2mms[22m[39m
+ [32m✓[39m src/simulation/compat/__tests__/facadeBridge.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 338[2mms[22m[39m
+     [33m[2m✓[22m[39m leaves no app consumer importing the frozen sovereign engine directly [33m 325[2mms[22m[39m
+ [32m✓[39m src/simulation/compat/__tests__/previewSessionBridge.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 357[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps direct engine construction out of app modules [33m 346[2mms[22m[39m
+ [32m✓[39m tests/performance/load.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 764[2mms[22m[39m
+     [33m[2m✓[22m[39m should debounce search input efficiently [33m 603[2mms[22m[39m
+[90mstdout[2m | src/workspace/__tests__/simulationOwnership.test.ts
+[22m[39m[DCTwinBuilder] Auto-created deployment checks
+[DCTwinBuilder] State rehydrated and validated
+
+[90mstdout[2m | src/simulation/providers/__tests__/contract.test.ts[2m > [22m[2mno consumer migration in Phase 1B.1[2m > [22m[2msrc/simulation/index.ts still exports the legacy SimulationEngine class
+[22m[39m[DCTwinBuilder] Auto-created deployment checks
+[DCTwinBuilder] State rehydrated and validated
+
+ [32m✓[39m src/test/whiteLabelSurfaces.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 508[2mms[22m[39m
+[90mstdout[2m | tests/unit/non-dc-templates-removed.test.ts[2m > [22m[2mnon-data-centre templates remain removed[2m > [22m[2mdoes not resolve YVR_AIRPORT_DIGITAL_TWIN from the template loader
+[22m[39m[TemplateService] Loading template: YVR_AIRPORT_DIGITAL_TWIN
+
+[90mstderr[2m | tests/unit/non-dc-templates-removed.test.ts[2m > [22m[2mnon-data-centre templates remain removed[2m > [22m[2mdoes not resolve YVR_AIRPORT_DIGITAL_TWIN from the template loader
+[22m[39m[TemplateService] Error loading template: {
+  message: [32m'LiveBackendBlockedError: AURA live-backend guard BLOCKED a request to https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/agent_templates. Tests may not reach an ambient or production Supabase project. Reasons: denylisted production hostname'[39m,
+  details: [32m'LiveBackendBlockedError: AURA live-backend guard BLOCKED a request to https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/agent_templates. Tests may not reach an ambient or production Supabase project. Reasons: denylisted production hostname\n'[39m +
+    [32m'    at globalThis.fetch (/dev-server/tests/_setup/liveBackendGuard.ts:129:13)\n'[39m +
+    [32m'    at /dev-server/node_modules/@supabase/supabase-js/dist/main/lib/fetch.js:50:25\n'[39m +
+    [32m'    at /dev-server/node_modules/@supabase/supabase-js/dist/main/lib/fetch.js:73:16\n'[39m +
+    [32m'    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n'[39m +
+    [32m'    at loadTemplateById (/dev-server/src/lib/templates/unifiedTemplateService.ts:315:29)\n'[39m +
+    [32m'    at /dev-server/tests/unit/non-dc-templates-removed.test.ts:54:20\n'[39m +
+    [32m'    at file:///dev-server/node_modules/@vitest/runner/dist/index.js:753:20'[39m,
+  hint: [32m''[39m,
+  code: [32m''[39m
+}
+
+[90mstdout[2m | tests/unit/non-dc-templates-removed.test.ts[2m > [22m[2mnon-data-centre templates remain removed[2m > [22m[2mdoes not resolve TRANSPORT_CANADA_TWIN from the template loader
+[22m[39m[TemplateService] Loading template: TRANSPORT_CANADA_TWIN
+
+[90mstderr[2m | tests/unit/non-dc-templates-removed.test.ts[2m > [22m[2mnon-data-centre templates remain removed[2m > [22m[2mdoes not resolve TRANSPORT_CANADA_TWIN from the template loader
+[22m[39m[TemplateService] Error loading template: {
+  message: [32m'LiveBackendBlockedError: AURA live-backend guard BLOCKED a request to https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/agent_templates. Tests may not reach an ambient or production Supabase project. Reasons: denylisted production hostname'[39m,
+  details: [32m'LiveBackendBlockedError: AURA live-backend guard BLOCKED a request to https://psfvrskpnwcshvajzeix.supabase.co/rest/v1/agent_templates. Tests may not reach an ambient or production Supabase project. Reasons: denylisted production hostname\n'[39m +
+    [32m'    at globalThis.fetch (/dev-server/tests/_setup/liveBackendGuard.ts:129:13)\n'[39m +
+    [32m'    at /dev-server/node_modules/@supabase/supabase-js/dist/main/lib/fetch.js:50:25\n'[39m +
+    [32m'    at /dev-server/node_modules/@supabase/supabase-js/dist/main/lib/fetch.js:73:16\n'[39m +
+    [32m'    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n'[39m +
+    [32m'    at loadTemplateById (/dev-server/src/lib/templates/unifiedTemplateService.ts:315:29)\n'[39m +
+    [32m'    at /dev-server/tests/unit/non-dc-templates-removed.test.ts:54:20\n'[39m +
+    [32m'    at file:///dev-server/node_modules/@vitest/runner/dist/index.js:753:20'[39m,
+  hint: [32m''[39m,
+  code: [32m''[39m
+}
+
+ [32m✓[39m tests/unit/non-dc-templates-removed.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 307[2mms[22m[39m
+ [32m✓[39m scripts/__tests__/dsxDisposableVerify.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 157[2mms[22m[39m
+[90mstderr[2m | tests/unit/useBuilderAutosave.test.ts[2m > [22m[2museBuilderAutosave[2m > [22m[2mshould show error toast only once on autosave failure
+[22m[39mAutosave failed: Error: Network error
+    at [90m/dev-server/[39mtests/unit/useBuilderAutosave.test.ts:158:19
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:157:11
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:753:26
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1636:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1602:10[90m)[39m
+    at runTest [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1309:12[90m)[39m
+    at runSuite [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1468:8[90m)[39m
+    at runSuite [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1468:8[90m)[39m
+    at runFiles [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1526:3[90m)[39m
+
+[90mstderr[2m | tests/unit/useBuilderAutosave.test.ts[2m > [22m[2museBuilderAutosave[2m > [22m[2mshould handle non-Error exceptions in autosave
+[22m[39mAutosave failed: String error
+
+[90mstderr[2m | tests/unit/useBuilderAutosave.test.ts[2m > [22m[2museBuilderAutosave[2m > [22m[2mshould reset error flag on successful save after failure
+[22m[39mAutosave failed: Error: First error
+    at [90m/dev-server/[39mtests/unit/useBuilderAutosave.test.ts:236:36
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:157:11
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:753:26
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1636:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1602:10[90m)[39m
+    at runTest [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1309:12[90m)[39m
+    at runSuite [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1468:8[90m)[39m
+    at runSuite [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1468:8[90m)[39m
+    at runFiles [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1526:3[90m)[39m
+
+ [32m✓[39m src/simulation/providers/__tests__/contract.test.ts [2m([22m[2m24 tests[22m[2m)[22m[33m 1955[2mms[22m[39m
+     [33m[2m✓[22m[39m src/simulation/index.ts still exports the legacy SimulationEngine class [33m 1935[2mms[22m[39m
+[90mstderr[2m | tests/unit/useBuilderAutosave.test.ts[2m > [22m[2museBuilderAutosave[2m > [22m[2mshould reset error flag on successful save after failure
+[22m[39mAutosave failed: Error: Second error
+    at [90m/dev-server/[39mtests/unit/useBuilderAutosave.test.ts:263:36
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:753:20
+
+[90mstderr[2m | tests/unit/useBuilderAutosave.test.ts[2m > [22m[2museBuilderAutosave[2m > [22m[2mmanualSave[2m > [22m[2mshould show error toast and return false on manual save failure
+[22m[39mManual save failed: Error: Save failed
+    at [90m/dev-server/[39mtests/unit/useBuilderAutosave.test.ts:321:21
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:157:11
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:753:26
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1636:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1602:10[90m)[39m
+    at runTest [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1309:12[90m)[39m
+    at runSuite [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1468:8[90m)[39m
+    at runSuite [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1468:8[90m)[39m
+    at runSuite [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1468:8[90m)[39m
+
+[90mstderr[2m | tests/unit/useBuilderAutosave.test.ts[2m > [22m[2museBuilderAutosave[2m > [22m[2mmanualSave[2m > [22m[2mshould handle non-Error exceptions in manual save
+[22m[39mManual save failed: String error
+
+ [32m✓[39m tests/unit/useBuilderAutosave.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 468[2mms[22m[39m
+ [32m✓[39m src/workspace/__tests__/simulationOwnership.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1274[2mms[22m[39m
+     [33m[2m✓[22m[39m refuses to record a run that could not be saved durably [33m 604[2mms[22m[39m
+     [33m[2m✓[22m[39m records a run once review passed and the durable write succeeded [33m 602[2mms[22m[39m
+ [32m✓[39m tests/unit/urlCapture.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 5713[2mms[22m[39m
+     [33m[2m✓[22m[39m should normalize HTTP/2 URLs [33m 304[2mms[22m[39m
+     [33m[2m✓[22m[39m should handle retry logic [33m 3602[2mms[22m[39m
+     [33m[2m✓[22m[39m should parse readable text from HTML [33m 301[2mms[22m[39m
+     [33m[2m✓[22m[39m should use stealth render mode when specified [33m 301[2mms[22m[39m
+     [33m[2m✓[22m[39m should handle robots.txt blocked pages [33m 302[2mms[22m[39m
+     [33m[2m✓[22m[39m should handle empty pages gracefully [33m 301[2mms[22m[39m
+     [33m[2m✓[22m[39m should timeout after 30 seconds [32m 300[2mms[22m[39m
+ [32m✓[39m src/dsx/__tests__/evidenceBoundary.test.ts [2m([22m[2m21 tests[22m[2m)[22m[33m 343[2mms[22m[39m
+[90mstderr[2m | src/components/data-centre-twin/domains/__tests__/domainProvenance.test.tsx[2m > [22m[2mDomain views — Phase 1A.3.c provenance retrofit[2m > [22m[2mthermal-domain-view root exposes data-provenance="demo", manifest is present, and no descendant is live
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ [32m✓[39m src/data/dsxReference/__tests__/mockDataGuard.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 295[2mms[22m[39m
+ [32m✓[39m src/simulation/orchestrator/__tests__/bypassGuard.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 59[2mms[22m[39m
+ [32m✓[39m src/connections/__tests__/connectionIdentity.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 274[2mms[22m[39m
+ [32m✓[39m src/simulation/orchestrator/__tests__/prng.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 50[2mms[22m[39m
+ [32m✓[39m src/simulation/__tests__/useSimulationCompletion.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 103[2mms[22m[39m
+ [32m✓[39m src/dsx/__tests__/operatorWorkspaces.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 132[2mms[22m[39m
+[90mstdout[2m | tests/integration/template-url-loading.test.ts
+[22m[39m[templateLoader] Data Centre Master Template loaded
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39m🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m1[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould detect templateId in URL and load from JSON
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39m🔍 [STORE] templateId detected in URL - loading template: non-existent-template
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39m📥 [STORE] Template not in JSON, fetching from database...
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Database Template: { triggers: [33m1[39m, actions: [33m1[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Database Template'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mfalse[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Database Template'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Database Template'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m1[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould fall back to database if template not in JSON
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39m🔍 [STORE] templateId detected in URL - loading template: truly-non-existent
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39m📥 [STORE] Template not in JSON, fetching from database...
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39m❌ [STORE] Failed to fetch template from database: { message: [32m'Not found'[39m }
+⚠️ [STORE] Template not found: truly-non-existent
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39m🆕 [STORE] Creating new draft {
+  goal: [32m''[39m,
+  industry: [32m''[39m,
+  department: [32m''[39m,
+  template: [32m''[39m,
+  type: [1mnull[22m,
+  source: [1mnull[22m,
+  hasGeminiAnalysis: [33mfalse[39m,
+  hasPrefilled: [33mfalse[39m
+}
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39m✅ [STORE] Draft created: {
+  id: [32m'test-builder-id'[39m,
+  builder: { id: [32m'test-builder-id'[39m, state: {}, current_step: [33m1[39m }
+}
+🔧 [STORE] Auto-generating default workflow
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39m💾 [STORE] Default workflow saved
+💾 [STORE] State updated {
+  builderId: [32m'test-builder-id'[39m,
+  goal: [90mundefined[39m,
+  industry: [90mundefined[39m,
+  workflow: {
+    triggers: [ [32m'Event Triggered'[39m ],
+    actions: [ [32m'Process Request'[39m, [32m'Execute Action'[39m, [32m'Send Response'[39m ],
+    integrations: [ [32m'Email'[39m, [32m'Slack'[39m, [32m'Database'[39m ],
+    hitl: []
+  },
+  modelConfig: {
+    provider: [32m'google'[39m,
+    model: [32m'google/gemini-2.5-flash'[39m,
+    rag: {},
+    policies: {},
+    mcp_servers: []
+  }
+}
+📍 [STORE] Using requested step: [33m1[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle missing template gracefully
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39m🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Existing Blueprint'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Existing Blueprint'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m1[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould prioritize blueprint over templateId
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39m🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m1[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould convert template to builder state correctly
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintStore] Clearing blueprint
+🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m1[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintStore] Clearing blueprint
+🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m2[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintStore] Clearing blueprint
+🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m3[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintStore] Clearing blueprint
+🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m4[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintStore] Clearing blueprint
+🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m5[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould set correct currentStep based on step param
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould load all available templates from JSON
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39m🔍 [STORE] templateId detected in URL - loading template: datacentre-master-twin-v1
+⏭️ [STORE] initializeBuilder skipped — already in flight
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39m✅ [STORE] Template loaded - converting to blueprint
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m0[39m, actions: [33m8[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+🎯 [STORE] Blueprint detected - hydrating from blueprint { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'template'[39m, name: [32m'Data Centre Digital Twin'[39m }
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39m✅ [STORE] Draft created from blueprint: { id: [32m'test-builder-id'[39m }
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39m💾 [STORE] Blueprint data saved to backend
+📍 [STORE] Using requested step: [33m1[39m
+
+[90mstderr[2m | tests/integration/template-url-loading.test.ts[2m > [22m[2mTemplate URL Loading Integration[2m > [22m[2mshould handle concurrent templateId loads
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/dev-server/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+ [32m✓[39m tests/integration/template-url-loading.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 663[2mms[22m[39m
+     [33m[2m✓[22m[39m should detect templateId in URL and load from JSON [33m 357[2mms[22m[39m
+ [32m✓[39m src/dsx/__tests__/decisionWorkflow.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 286[2mms[22m[39m
+ [32m✓[39m src/components/simulation/__tests__/kpiProvenance.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 1085[2mms[22m[39m
+     [33m[2m✓[22m[39m exposes `demo` provenance when no caller data is supplied [33m 430[2mms[22m[39m
+[90mstderr[2m | src/components/data-centre-twin/domains/__tests__/domainProvenance.test.tsx[2m > [22m[2mDomain views — Phase 1A.3.c provenance retrofit[2m > [22m[2msovereignty-domain-view root exposes data-provenance="unavailable", manifest is present, and no descendant is live
+[22m[39mWarning: validateDOMNesting(...): <button> cannot appear as a descendant of <button>.
+    at button
+    at /dev-server/src/components/ui/button.tsx:36:66
+    at div
+    at div
+    at div
+    at /dev-server/src/components/ui/card.tsx:23:70
+    at button
+    at file:///dev-server/node_modules/@radix-ui/react-primitive/dist/index.mjs:28:13
+    at file:///dev-server/node_modules/@radix-ui/react-collapsible/dist/index.mjs:58:13
+    at div
+    at /dev-server/src/components/ui/card.tsx:13:64
+    at div
+    at file:///dev-server/node_modules/@radix-ui/react-primitive/dist/index.mjs:28:13
+    at Provider (file:///dev-server/node_modules/@radix-ui/react-context/dist/index.mjs:27:15)
+    at file:///dev-server/node_modules/@radix-ui/react-collapsible/dist/index.mjs:20:7
+    at CollapsibleSection (/dev-server/src/components/shared/CollapsibleSection.tsx:16:31)
+    at div
+    at SovereigntyDomainView (/dev-server/src/components/data-centre-twin/domains/SovereigntyDomainView.tsx:31:34)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1207:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1101:7)
+
+[90mstderr[2m | src/dsx/__tests__/investigationContext.test.tsx[2m > [22m[2mshared context bar[2m > [22m[2mstarts at facility scope and writes the selection into the URL
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ [32m✓[39m src/dsx/__tests__/investigationContext.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[32m 203[2mms[22m[39m
+ [32m✓[39m src/components/simulation/__tests__/phase1a3b2.test.tsx [2m([22m[2m19 tests[22m[2m)[22m[33m 2339[2mms[22m[39m
+     [33m[2m✓[22m[39m renders "Simulation Metrics" header and never surfaces the legacy "Live" badge [33m 340[2mms[22m[39m
+     [33m[2m✓[22m[39m renders "Simulation Dashboard" (never "Live Simulation Dashboard") [33m 344[2mms[22m[39m
+ [32m✓[39m src/components/data-centre-twin/domains/__tests__/domainProvenance.test.tsx [2m([22m[2m59 tests[22m[2m)[22m[33m 8038[2mms[22m[39m
+     [33m[2m✓[22m[39m thermal-domain-view root exposes data-provenance="demo", manifest is present, and no descendant is live [33m 1045[2mms[22m[39m
+       [33m[2m✓[22m[39m renders metric thermal.avg-inlet-temp with data-provenance="demo" [33m 491[2mms[22m[39m
+       [33m[2m✓[22m[39m renders metric thermal.hot-spot-count with data-provenance="demo" [33m 357[2mms[22m[39m
+       [33m[2m✓[22m[39m renders metric thermal.rack-inlet-map with data-provenance="demo" [33m 402[2mms[22m[39m
+       [33m[2m✓[22m[39m renders metric thermal.snapshot-mode with data-provenance="static" [33m 364[2mms[22m[39m
+     [33m[2m✓[22m[39m ThermalDomainView no longer renders a "Live" pill (renamed to Snapshot) [33m 468[2mms[22m[39m
+ [32m✓[39m src/dsx/__tests__/evidenceBeta.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 219[2mms[22m[39m
+ [32m✓[39m src/components/simulation/__tests__/enterpriseKPICardProvenance.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 196[2mms[22m[39m
+ [32m✓[39m src/simulation/__tests__/characterization/dataCenter.simulationEngine.spec.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m src/simulation/orchestrator/__tests__/duration.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 35[2mms[22m[39m
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould set saving state during save
+[22m[39m[builder:save:80e2c091-16b2-4fd2-8178-cef733462dc3] Starting save {
+  systemId: [32m'save-test-123'[39m,
+  currentStep: [33m1[39m,
+  hasSystemName: [33mtrue[39m,
+  hasDepartment: [33mfalse[39m
+}
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould set saving state during save
+[22m[39m[auth:validate] JWT valid { userId: [32m'test-user-123'[39m, exp: [32m'2100-01-01T00:00:00.000Z'[39m }
+[auth:require] Valid session found { userId: [32m'test-user-123'[39m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould set saving state during save
+[22m[39m[builder:save:80e2c091-16b2-4fd2-8178-cef733462dc3] Session validated { userId: [32m'test-user-123'[39m, domain: [32m'localhost'[39m, hasToken: [33mtrue[39m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould set saving state during save
+[22m[39m[builder:save:80e2c091-16b2-4fd2-8178-cef733462dc3] Updating system {
+  systemId: [32m'save-test-123'[39m,
+  fields: [
+    [32m'id'[39m,            [32m'name'[39m,
+    [32m'department'[39m,    [32m'outcome'[39m,
+    [32m'successMetric'[39m, [32m'step'[39m,
+    [32m'templateId'[39m,    [32m'selectedModel'[39m,
+    [32m'geminiEnabled'[39m, [32m'vertexEnabled'[39m,
+    [32m'hybridSearch'[39m,  [32m'topK'[39m,
+    [32m'topN'[39m,          [32m'temperature'[39m,
+    [32m'systemPrompt'[39m,  [32m'connectors'[39m,
+    [32m'workflowNodes'[39m, [32m'recommendationData'[39m
+  ]
+}
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould set saving state during save
+[22m[39m[builder:save:80e2c091-16b2-4fd2-8178-cef733462dc3] Response from systems-update { hasData: [33mfalse[39m, hasError: [33mfalse[39m, data: [1mnull[22m, error: [1mnull[22m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould set saving state during save
+[22m[39m[builder:save:80e2c091-16b2-4fd2-8178-cef733462dc3] Save completed successfully
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould update lastSaved after successful save
+[22m[39m[builder:save:34898478-93a9-4c9f-bda3-8ae3d9658d8a] Starting save {
+  systemId: [32m'save-test-123'[39m,
+  currentStep: [33m1[39m,
+  hasSystemName: [33mtrue[39m,
+  hasDepartment: [33mfalse[39m
+}
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould update lastSaved after successful save
+[22m[39m[auth:validate] JWT valid { userId: [32m'test-user-123'[39m, exp: [32m'2100-01-01T00:00:00.000Z'[39m }
+[auth:require] Valid session found { userId: [32m'test-user-123'[39m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould update lastSaved after successful save
+[22m[39m[builder:save:34898478-93a9-4c9f-bda3-8ae3d9658d8a] Session validated { userId: [32m'test-user-123'[39m, domain: [32m'localhost'[39m, hasToken: [33mtrue[39m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould update lastSaved after successful save
+[22m[39m[builder:save:34898478-93a9-4c9f-bda3-8ae3d9658d8a] Updating system {
+  systemId: [32m'save-test-123'[39m,
+  fields: [
+    [32m'id'[39m,            [32m'name'[39m,
+    [32m'department'[39m,    [32m'outcome'[39m,
+    [32m'successMetric'[39m, [32m'step'[39m,
+    [32m'templateId'[39m,    [32m'selectedModel'[39m,
+    [32m'geminiEnabled'[39m, [32m'vertexEnabled'[39m,
+    [32m'hybridSearch'[39m,  [32m'topK'[39m,
+    [32m'topN'[39m,          [32m'temperature'[39m,
+    [32m'systemPrompt'[39m,  [32m'connectors'[39m,
+    [32m'workflowNodes'[39m, [32m'recommendationData'[39m
+  ]
+}
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould update lastSaved after successful save
+[22m[39m[builder:save:34898478-93a9-4c9f-bda3-8ae3d9658d8a] Response from systems-update { hasData: [33mfalse[39m, hasError: [33mfalse[39m, data: [1mnull[22m, error: [1mnull[22m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould update lastSaved after successful save
+[22m[39m[builder:save:34898478-93a9-4c9f-bda3-8ae3d9658d8a] Save completed successfully
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould clear dirty state after successful save
+[22m[39m[builder:save:d2af33b6-9fb2-4f10-9b2c-2528b08ec696] Starting save {
+  systemId: [32m'save-test-123'[39m,
+  currentStep: [33m1[39m,
+  hasSystemName: [33mtrue[39m,
+  hasDepartment: [33mfalse[39m
+}
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould clear dirty state after successful save
+[22m[39m[auth:validate] JWT valid { userId: [32m'test-user-123'[39m, exp: [32m'2100-01-01T00:00:00.000Z'[39m }
+[auth:require] Valid session found { userId: [32m'test-user-123'[39m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould clear dirty state after successful save
+[22m[39m[builder:save:d2af33b6-9fb2-4f10-9b2c-2528b08ec696] Session validated { userId: [32m'test-user-123'[39m, domain: [32m'localhost'[39m, hasToken: [33mtrue[39m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould clear dirty state after successful save
+[22m[39m[builder:save:d2af33b6-9fb2-4f10-9b2c-2528b08ec696] Updating system {
+  systemId: [32m'save-test-123'[39m,
+  fields: [
+    [32m'id'[39m,            [32m'name'[39m,
+    [32m'department'[39m,    [32m'outcome'[39m,
+    [32m'successMetric'[39m, [32m'step'[39m,
+    [32m'templateId'[39m,    [32m'selectedModel'[39m,
+    [32m'geminiEnabled'[39m, [32m'vertexEnabled'[39m,
+    [32m'hybridSearch'[39m,  [32m'topK'[39m,
+    [32m'topN'[39m,          [32m'temperature'[39m,
+    [32m'systemPrompt'[39m,  [32m'connectors'[39m,
+    [32m'workflowNodes'[39m, [32m'recommendationData'[39m
+  ]
+}
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould clear dirty state after successful save
+[22m[39m[builder:save:d2af33b6-9fb2-4f10-9b2c-2528b08ec696] Response from systems-update { hasData: [33mfalse[39m, hasError: [33mfalse[39m, data: [1mnull[22m, error: [1mnull[22m }
+
+[90mstdout[2m | tests/unit/builderStore.test.ts[2m > [22m[2mBuilder Store[2m > [22m[2mSave Operation[2m > [22m[2mshould clear dirty state after successful save
+[22m[39m[builder:save:d2af33b6-9fb2-4f10-9b2c-2528b08ec696] Save completed successfully
+
+ [32m✓[39m tests/unit/builderStore.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 122[2mms[22m[39m
+[90mstderr[2m | src/components/aoc/__tests__/AOCIntegration.test.tsx[2m > [22m[2mAOC Integration Tests[2m > [22m[2mAOCQuickStats[2m > [22m[2mshould display stats correctly
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ [32m✓[39m src/components/aoc/__tests__/AOCIntegration.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 167[2mms[22m[39m
+ [32m✓[39m src/components/provenance/__tests__/MetricValue.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 176[2mms[22m[39m
+ [32m✓[39m src/pages/__tests__/IntelligenceDashboardKPIs.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 200[2mms[22m[39m
+ [32m✓[39m src/simulation/providers/__tests__/panelFacade.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m src/simulation/orchestrator/__tests__/orchestrator.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 26[2mms[22m[39m
+ [32m✓[39m src/simulation/orchestrator/__tests__/concurrency.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 55[2mms[22m[39m
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mInitial State[2m > [22m[2mshould have null initial blueprint
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mInitial State[2m > [22m[2mshould report no blueprint via hasBlueprint
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2msetBlueprint()[2m > [22m[2mshould set a new blueprint
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2msetBlueprint()[2m > [22m[2mshould set a new blueprint
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Test Blueprint'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mfalse[39m,
+  hasWorkflow: [33mfalse[39m
+}
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2msetBlueprint()[2m > [22m[2mshould reset dirty state when setting blueprint
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2msetBlueprint()[2m > [22m[2mshould reset dirty state when setting blueprint
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [90mundefined[39m,
+  name: [32m'New BP'[39m,
+  hasIndustry: [33mfalse[39m,
+  hasDepartment: [33mfalse[39m,
+  hasModel: [33mfalse[39m,
+  hasWorkflow: [33mfalse[39m
+}
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2msetBlueprint()[2m > [22m[2mshould update lastUpdated timestamp
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2msetBlueprint()[2m > [22m[2mshould update lastUpdated timestamp
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [90mundefined[39m,
+  name: [32m'Test'[39m,
+  hasIndustry: [33mfalse[39m,
+  hasDepartment: [33mfalse[39m,
+  hasModel: [33mfalse[39m,
+  hasWorkflow: [33mfalse[39m
+}
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mupdateBlueprint()[2m > [22m[2mshould update partial blueprint fields
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mupdateBlueprint()[2m > [22m[2mshould update partial blueprint fields
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [90mundefined[39m,
+  name: [32m'Original'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mfalse[39m,
+  hasWorkflow: [33mfalse[39m
+}
+[BlueprintStore] Updating blueprint: [ [32m'name'[39m ]
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mupdateBlueprint()[2m > [22m[2mshould mark as dirty after update
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mupdateBlueprint()[2m > [22m[2mshould mark as dirty after update
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [90mundefined[39m,
+  name: [32m'Original'[39m,
+  hasIndustry: [33mfalse[39m,
+  hasDepartment: [33mfalse[39m,
+  hasModel: [33mfalse[39m,
+  hasWorkflow: [33mfalse[39m
+}
+[BlueprintStore] Updating blueprint: [ [32m'name'[39m ]
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mupdateBlueprint()[2m > [22m[2mshould not update if no current blueprint
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mupdateBlueprint()[2m > [22m[2mshould deep merge nested objects
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mupdateBlueprint()[2m > [22m[2mshould deep merge nested objects
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [90mundefined[39m,
+  name: [32m'Test'[39m,
+  hasIndustry: [33mfalse[39m,
+  hasDepartment: [33mfalse[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mfalse[39m
+}
+[BlueprintStore] Updating blueprint: [ [32m'model'[39m ]
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mclearBlueprint()[2m > [22m[2mshould clear the current blueprint
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mclearBlueprint()[2m > [22m[2mshould clear the current blueprint
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [90mundefined[39m,
+  name: [32m'Test'[39m,
+  hasIndustry: [33mfalse[39m,
+  hasDepartment: [33mfalse[39m,
+  hasModel: [33mfalse[39m,
+  hasWorkflow: [33mfalse[39m
+}
+[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mclearBlueprint()[2m > [22m[2mshould reset all state
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mclearBlueprint()[2m > [22m[2mshould reset all state
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [90mundefined[39m,
+  name: [32m'Test'[39m,
+  hasIndustry: [33mfalse[39m,
+  hasDepartment: [33mfalse[39m,
+  hasModel: [33mfalse[39m,
+  hasWorkflow: [33mfalse[39m
+}
+[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mDirty State Management[2m > [22m[2mshould mark as dirty
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mDirty State Management[2m > [22m[2mshould mark as clean
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mDirty State Management[2m > [22m[2mshould mark as clean
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [90mundefined[39m,
+  name: [32m'Test'[39m,
+  hasIndustry: [33mfalse[39m,
+  hasDepartment: [33mfalse[39m,
+  hasModel: [33mfalse[39m,
+  hasWorkflow: [33mfalse[39m
+}
+[BlueprintStore] Updating blueprint: [ [32m'name'[39m ]
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mPersistence[2m > [22m[2mshould only persist currentBlueprint in storage
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mPersistence[2m > [22m[2mshould only persist currentBlueprint in storage
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [90mundefined[39m,
+  name: [32m'Persistent BP'[39m,
+  hasIndustry: [33mfalse[39m,
+  hasDepartment: [33mfalse[39m,
+  hasModel: [33mfalse[39m,
+  hasWorkflow: [33mfalse[39m
+}
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mComplex Scenarios[2m > [22m[2mshould handle rapid updates
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mComplex Scenarios[2m > [22m[2mshould handle rapid updates
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [90mundefined[39m,
+  name: [32m'Initial'[39m,
+  hasIndustry: [33mfalse[39m,
+  hasDepartment: [33mfalse[39m,
+  hasModel: [33mfalse[39m,
+  hasWorkflow: [33mfalse[39m
+}
+[BlueprintStore] Updating blueprint: [ [32m'name'[39m ]
+[BlueprintStore] Updating blueprint: [ [32m'name'[39m ]
+[BlueprintStore] Updating blueprint: [ [32m'name'[39m ]
+[BlueprintStore] Updating blueprint: [ [32m'name'[39m ]
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mComplex Scenarios[2m > [22m[2mshould maintain state across multiple hooks
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mComplex Scenarios[2m > [22m[2mshould maintain state across multiple hooks
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [90mundefined[39m,
+  name: [32m'Shared'[39m,
+  hasIndustry: [33mfalse[39m,
+  hasDepartment: [33mfalse[39m,
+  hasModel: [33mfalse[39m,
+  hasWorkflow: [33mfalse[39m
+}
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mComplex Scenarios[2m > [22m[2mshould handle set/clear/set cycle
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/unit/blueprintStore.test.ts[2m > [22m[2mBlueprint Store[2m > [22m[2mComplex Scenarios[2m > [22m[2mshould handle set/clear/set cycle
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [90mundefined[39m,
+  name: [32m'First'[39m,
+  hasIndustry: [33mfalse[39m,
+  hasDepartment: [33mfalse[39m,
+  hasModel: [33mfalse[39m,
+  hasWorkflow: [33mfalse[39m
+}
+[BlueprintStore] Clearing blueprint
+[BlueprintStore] Setting blueprint: {
+  source: [90mundefined[39m,
+  name: [32m'Second'[39m,
+  hasIndustry: [33mfalse[39m,
+  hasDepartment: [33mfalse[39m,
+  hasModel: [33mfalse[39m,
+  hasWorkflow: [33mfalse[39m
+}
+
+ [32m✓[39m tests/unit/blueprintStore.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 99[2mms[22m[39m
+[90mstdout[2m | tests/integration/intake-blueprint-flow.test.ts[2m > [22m[2mBlueprint Store Integration[2m > [22m[2mshould store and retrieve questionnaire blueprint
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/integration/intake-blueprint-flow.test.ts[2m > [22m[2mBlueprint Store Integration[2m > [22m[2mshould store and retrieve questionnaire blueprint
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [32m'questionnaire'[39m,
+  name: [32m'Customer Success Assistant'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+
+[90mstdout[2m | tests/integration/intake-blueprint-flow.test.ts[2m > [22m[2mBlueprint Store Integration[2m > [22m[2mshould store and retrieve document analysis blueprint
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/integration/intake-blueprint-flow.test.ts[2m > [22m[2mBlueprint Store Integration[2m > [22m[2mshould store and retrieve document analysis blueprint
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [32m'file'[39m,
+  name: [32m'Patient intake and scheduling optimization'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+
+[90mstdout[2m | tests/integration/intake-blueprint-flow.test.ts[2m > [22m[2mBlueprint Store Integration[2m > [22m[2mshould store and retrieve template blueprint
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/integration/intake-blueprint-flow.test.ts[2m > [22m[2mBlueprint Store Integration[2m > [22m[2mshould store and retrieve template blueprint
+[22m[39m[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m1[39m, actions: [33m4[39m, valid: [33mtrue[39m }
+[BlueprintStore] Setting blueprint: {
+  source: [32m'template'[39m,
+  name: [32m'Data Centre Digital Twin'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+
+[90mstdout[2m | tests/integration/intake-blueprint-flow.test.ts[2m > [22m[2mBlueprint Store Integration[2m > [22m[2mshould mark blueprint as dirty when updated
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/integration/intake-blueprint-flow.test.ts[2m > [22m[2mBlueprint Store Integration[2m > [22m[2mshould mark blueprint as dirty when updated
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [32m'questionnaire'[39m,
+  name: [32m'Customer Success Assistant'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+[BlueprintStore] Updating blueprint: [ [32m'name'[39m ]
+
+[90mstdout[2m | tests/integration/intake-blueprint-flow.test.ts[2m > [22m[2mBlueprint Store Integration[2m > [22m[2mshould deep merge nested objects on update
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/integration/intake-blueprint-flow.test.ts[2m > [22m[2mBlueprint Store Integration[2m > [22m[2mshould deep merge nested objects on update
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [32m'questionnaire'[39m,
+  name: [32m'Customer Success Assistant'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+[BlueprintStore] Updating blueprint: [ [32m'model'[39m ]
+
+[90mstdout[2m | tests/integration/intake-blueprint-flow.test.ts[2m > [22m[2mBlueprint Store Integration[2m > [22m[2mshould clear blueprint completely
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/integration/intake-blueprint-flow.test.ts[2m > [22m[2mBlueprint Store Integration[2m > [22m[2mshould clear blueprint completely
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [32m'questionnaire'[39m,
+  name: [32m'Customer Success Assistant'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/integration/intake-blueprint-flow.test.ts[2m > [22m[2mBlueprint Store Integration[2m > [22m[2mshould track lastUpdated timestamp
+[22m[39m[BlueprintStore] Clearing blueprint
+
+[90mstdout[2m | tests/integration/intake-blueprint-flow.test.ts[2m > [22m[2mBlueprint Store Integration[2m > [22m[2mshould track lastUpdated timestamp
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [32m'questionnaire'[39m,
+  name: [32m'Customer Success Assistant'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+
+[90mstdout[2m | tests/integration/intake-blueprint-flow.test.ts[2m > [22m[2mBlueprint Persistence[2m > [22m[2mshould persist blueprint to localStorage
+[22m[39m[BlueprintStore] Setting blueprint: {
+  source: [32m'questionnaire'[39m,
+  name: [32m'Customer Success Assistant'[39m,
+  hasIndustry: [33mtrue[39m,
+  hasDepartment: [33mtrue[39m,
+  hasModel: [33mtrue[39m,
+  hasWorkflow: [33mtrue[39m
+}
+
+ [32m✓[39m tests/integration/intake-blueprint-flow.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 90[2mms[22m[39m
+ [32m✓[39m src/dsx/__tests__/metricDrilldown.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 50[2mms[22m[39m
+[90mstdout[2m | tests/unit/useWorkflowSync.test.ts[2m > [22m[2museWorkflowSync[2m > [22m[2mshould add integration node when catalog update event is dispatched
+[22m[39mCatalog updated: { type: [32m'integration'[39m, id: [32m'zapier-crm'[39m, name: [32m'Zapier CRM'[39m }
+Emitted catalog update: { type: [32m'integration'[39m, id: [32m'zapier-crm'[39m, name: [32m'Zapier CRM'[39m }
+
+[90mstdout[2m | tests/unit/useWorkflowSync.test.ts[2m > [22m[2museWorkflowSync[2m > [22m[2mshould add MCP tool node when MCP server is connected
+[22m[39mCatalog updated: { type: [32m'mcp'[39m, id: [32m'github-mcp'[39m, name: [32m'GitHub MCP'[39m }
+Emitted catalog update: { type: [32m'mcp'[39m, id: [32m'github-mcp'[39m, name: [32m'GitHub MCP'[39m }
+
+[90mstdout[2m | tests/unit/useWorkflowSync.test.ts[2m > [22m[2museWorkflowSync[2m > [22m[2mshould not add duplicate nodes
+[22m[39mCatalog updated: { type: [32m'integration'[39m, id: [32m'existing-integration'[39m, name: [32m'Existing'[39m }
+Emitted catalog update: { type: [32m'integration'[39m, id: [32m'existing-integration'[39m, name: [32m'Existing'[39m }
+
+[90mstdout[2m | tests/unit/useWorkflowSync.test.ts[2m > [22m[2museWorkflowSync[2m > [22m[2mshould position new nodes based on existing nodes count
+[22m[39mCatalog updated: { type: [32m'integration'[39m, id: [32m'node3'[39m, name: [32m'Node 3'[39m }
+Emitted catalog update: { type: [32m'integration'[39m, id: [32m'node3'[39m, name: [32m'Node 3'[39m }
+
+[90mstdout[2m | tests/unit/useWorkflowSync.test.ts[2m > [22m[2museWorkflowSync[2m > [22m[2mshould handle empty workflowNodes array
+[22m[39mCatalog updated: { type: [32m'integration'[39m, id: [32m'first-node'[39m, name: [32m'First Node'[39m }
+Emitted catalog update: { type: [32m'integration'[39m, id: [32m'first-node'[39m, name: [32m'First Node'[39m }
+
+[90mstdout[2m | tests/unit/useWorkflowSync.test.ts[2m > [22m[2museWorkflowSync[2m > [22m[2mshould handle null workflowNodes
+[22m[39mCatalog updated: { type: [32m'integration'[39m, id: [32m'first-node'[39m, name: [32m'First Node'[39m }
+Emitted catalog update: { type: [32m'integration'[39m, id: [32m'first-node'[39m, name: [32m'First Node'[39m }
+
+[90mstdout[2m | tests/unit/useWorkflowSync.test.ts[2m > [22m[2museWorkflowSync[2m > [22m[2mshould not trigger when systemId changes to null
+[22m[39mEmitted catalog update: { type: [32m'integration'[39m, id: [32m'new-node'[39m, name: [32m'New Node'[39m }
+
+[90mstdout[2m | tests/unit/useWorkflowSync.test.ts[2m > [22m[2museWorkflowSync[2m > [22m[2memitCatalogUpdate[2m > [22m[2mshould work with MCP type
+[22m[39mEmitted catalog update: { type: [32m'mcp'[39m, id: [32m'mcp-server-id'[39m, name: [32m'MCP Server'[39m }
+
+ [32m✓[39m tests/unit/useWorkflowSync.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 78[2mms[22m[39m
+ [32m✓[39m src/dsx/__tests__/validationBadge.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 55[2mms[22m[39m
+ [32m✓[39m src/test/shellOwnership.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 53[2mms[22m[39m
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromTemplate[2m > [22m[2mshould create session and return result
+[22m[39m[UnifiedIntake] Starting builder from intake: {
+  source: [32m'template'[39m,
+  userId: [32m'test-user'[39m,
+  existingSessionId: [90mundefined[39m,
+  forceNew: [90mundefined[39m
+}
+[UnifiedIntake] Converting payload to blueprint: {
+  source: [32m'template'[39m,
+  templateId: [32m'test-template-id'[39m,
+  fileJobId: [90mundefined[39m
+}
+[TemplateService] Loading template: test-template-id
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromTemplate[2m > [22m[2mshould create session and return result
+[22m[39m[TemplateService] Template test-template-id validation: [
+  [32m'Auto-repaired: category: Required, icon: Required, created_at: Required, updated_at: Required'[39m
+]
+
+[90mstderr[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromTemplate[2m > [22m[2mshould create session and return result
+[22m[39m[templateToBlueprint] Workflow validation warnings for Test Template: [ [32m'Workflow must have at least one action'[39m ]
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromTemplate[2m > [22m[2mshould create session and return result
+[22m[39m[UnifiedIntake] Found template: Test Template
+[templateToBlueprint] Workflow after auto-repair for Test Template: { triggers: [33m0[39m, actions: [33m0[39m, valid: [33mfalse[39m }
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromTemplate[2m > [22m[2mshould create session and return result
+[22m[39m[UnifiedIntake] Blueprint created: { name: [32m'Test Template'[39m, source: [32m'template'[39m }
+[UnifiedIntake] Creating new session
+[SessionManager] Creating new builder session {
+  source: [32m'template'[39m,
+  userId: [32m'test-user'[39m,
+  blueprintName: [32m'Test Template'[39m
+}
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromTemplate[2m > [22m[2mshould create session and return result
+[22m[39m[SessionManager] Session created successfully: test-session-id
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromTemplate[2m > [22m[2mshould create session and return result
+[22m[39m[UnifiedIntake] Blueprint stored in global state
+[UnifiedIntake] Analytics tracked
+[UnifiedIntake] ✅ Intake complete: {
+  sessionId: [32m'test-session-id'[39m,
+  builderUrl: [32m'/builder?session=test-session-id&step=1'[39m
+}
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromTemplate[2m > [22m[2mshould set correct source in blueprint
+[22m[39m[UnifiedIntake] Starting builder from intake: {
+  source: [32m'template'[39m,
+  userId: [32m'test-user'[39m,
+  existingSessionId: [90mundefined[39m,
+  forceNew: [90mundefined[39m
+}
+[UnifiedIntake] Converting payload to blueprint: {
+  source: [32m'template'[39m,
+  templateId: [32m'test-template-id'[39m,
+  fileJobId: [90mundefined[39m
+}
+[TemplateService] Loading template: test-template-id
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromTemplate[2m > [22m[2mshould set correct source in blueprint
+[22m[39m[TemplateService] Template test-template-id validation: [
+  [32m'Auto-repaired: category: Required, icon: Required, created_at: Required, updated_at: Required'[39m
+]
+
+[90mstderr[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromTemplate[2m > [22m[2mshould set correct source in blueprint
+[22m[39m[templateToBlueprint] Workflow validation warnings for Test Template: [ [32m'Workflow must have at least one action'[39m ]
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromTemplate[2m > [22m[2mshould set correct source in blueprint
+[22m[39m[UnifiedIntake] Found template: Test Template
+[templateToBlueprint] Workflow after auto-repair for Test Template: { triggers: [33m0[39m, actions: [33m0[39m, valid: [33mfalse[39m }
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromTemplate[2m > [22m[2mshould set correct source in blueprint
+[22m[39m[UnifiedIntake] Blueprint created: { name: [32m'Test Template'[39m, source: [32m'template'[39m }
+[UnifiedIntake] Creating new session
+[SessionManager] Creating new builder session {
+  source: [32m'template'[39m,
+  userId: [32m'test-user'[39m,
+  blueprintName: [32m'Test Template'[39m
+}
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromTemplate[2m > [22m[2mshould set correct source in blueprint
+[22m[39m[SessionManager] Session created successfully: test-session-id
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromTemplate[2m > [22m[2mshould set correct source in blueprint
+[22m[39m[UnifiedIntake] Blueprint stored in global state
+[UnifiedIntake] Analytics tracked
+[UnifiedIntake] ✅ Intake complete: {
+  sessionId: [32m'test-session-id'[39m,
+  builderUrl: [32m'/builder?session=test-session-id&step=1'[39m
+}
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromUrl[2m > [22m[2mshould create minimal blueprint from URL
+[22m[39m[UnifiedIntake] Starting builder from intake: {
+  source: [32m'url'[39m,
+  userId: [32m'test-user'[39m,
+  existingSessionId: [90mundefined[39m,
+  forceNew: [90mundefined[39m
+}
+[UnifiedIntake] Converting payload to blueprint: { source: [32m'url'[39m, templateId: [90mundefined[39m, fileJobId: [90mundefined[39m }
+[UnifiedIntake] Analyzing URL: https://example.com
+
+[90mstderr[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromUrl[2m > [22m[2mshould create minimal blueprint from URL
+[22m[39m[UnifiedIntake] URL analysis error: TypeError: Cannot read properties of undefined (reading 'invoke')
+    at convertToBlueprint [90m(/dev-server/[39msrc/lib/intake/unifiedIntakeService.ts:203:85[90m)[39m
+    at startBuilderFromIntake [90m(/dev-server/[39msrc/lib/intake/unifiedIntakeService.ts:356:29[90m)[39m
+    at Module.startBuilderFromUrl [90m(/dev-server/[39msrc/lib/intake/unifiedIntakeService.ts:510:10[90m)[39m
+    at [90m/dev-server/[39mtests/integration/unified-intake-service.test.ts:119:28
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:157:11
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:753:26
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1636:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1602:10[90m)[39m
+    at runTest [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1309:12[90m)[39m
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromUrl[2m > [22m[2mshould create minimal blueprint from URL
+[22m[39m[UnifiedIntake] Blueprint created: { name: [32m'Assistant for example.com'[39m, source: [32m'url'[39m }
+[UnifiedIntake] Creating new session
+[SessionManager] Creating new builder session {
+  source: [32m'url'[39m,
+  userId: [32m'test-user'[39m,
+  blueprintName: [32m'Assistant for example.com'[39m
+}
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromUrl[2m > [22m[2mshould create minimal blueprint from URL
+[22m[39m[SessionManager] Session created successfully: test-session-id
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromUrl[2m > [22m[2mshould create minimal blueprint from URL
+[22m[39m[UnifiedIntake] Blueprint stored in global state
+[UnifiedIntake] Analytics tracked
+[UnifiedIntake] ✅ Intake complete: {
+  sessionId: [32m'test-session-id'[39m,
+  builderUrl: [32m'/builder?session=test-session-id&step=1'[39m
+}
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould handle template source
+[22m[39m[UnifiedIntake] Starting builder from intake: {
+  source: [32m'template'[39m,
+  userId: [32m'test-user'[39m,
+  existingSessionId: [90mundefined[39m,
+  forceNew: [90mundefined[39m
+}
+[UnifiedIntake] Converting payload to blueprint: {
+  source: [32m'template'[39m,
+  templateId: [32m'test-template-id'[39m,
+  fileJobId: [90mundefined[39m
+}
+[TemplateService] Loading template: test-template-id
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould handle template source
+[22m[39m[TemplateService] Template test-template-id validation: [
+  [32m'Auto-repaired: category: Required, icon: Required, created_at: Required, updated_at: Required'[39m
+]
+
+[90mstderr[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould handle template source
+[22m[39m[templateToBlueprint] Workflow validation warnings for Test Template: [ [32m'Workflow must have at least one action'[39m ]
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould handle template source
+[22m[39m[UnifiedIntake] Found template: Test Template
+[templateToBlueprint] Workflow after auto-repair for Test Template: { triggers: [33m0[39m, actions: [33m0[39m, valid: [33mfalse[39m }
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould handle template source
+[22m[39m[UnifiedIntake] Blueprint created: { name: [32m'Test Template'[39m, source: [32m'template'[39m }
+[UnifiedIntake] Creating new session
+[SessionManager] Creating new builder session {
+  source: [32m'template'[39m,
+  userId: [32m'test-user'[39m,
+  blueprintName: [32m'Test Template'[39m
+}
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould handle template source
+[22m[39m[SessionManager] Session created successfully: test-session-id
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould handle template source
+[22m[39m[UnifiedIntake] Blueprint stored in global state
+[UnifiedIntake] Analytics tracked
+[UnifiedIntake] ✅ Intake complete: {
+  sessionId: [32m'test-session-id'[39m,
+  builderUrl: [32m'/builder?session=test-session-id&step=1'[39m
+}
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould handle URL source
+[22m[39m[UnifiedIntake] Starting builder from intake: {
+  source: [32m'url'[39m,
+  userId: [32m'test-user'[39m,
+  existingSessionId: [90mundefined[39m,
+  forceNew: [90mundefined[39m
+}
+[UnifiedIntake] Converting payload to blueprint: { source: [32m'url'[39m, templateId: [90mundefined[39m, fileJobId: [90mundefined[39m }
+[UnifiedIntake] Analyzing URL: https://example.com
+
+[90mstderr[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould handle URL source
+[22m[39m[UnifiedIntake] URL analysis error: TypeError: Cannot read properties of undefined (reading 'invoke')
+    at convertToBlueprint [90m(/dev-server/[39msrc/lib/intake/unifiedIntakeService.ts:203:85[90m)[39m
+    at Module.startBuilderFromIntake [90m(/dev-server/[39msrc/lib/intake/unifiedIntakeService.ts:356:29[90m)[39m
+    at [90m/dev-server/[39mtests/integration/unified-intake-service.test.ts:143:28
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:157:11
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:753:26
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1636:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1602:10[90m)[39m
+    at runTest [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1309:12[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould handle URL source
+[22m[39m[UnifiedIntake] Blueprint created: { name: [32m'Assistant for example.com'[39m, source: [32m'url'[39m }
+[UnifiedIntake] Creating new session
+[SessionManager] Creating new builder session {
+  source: [32m'url'[39m,
+  userId: [32m'test-user'[39m,
+  blueprintName: [32m'Assistant for example.com'[39m
+}
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould handle URL source
+[22m[39m[SessionManager] Session created successfully: test-session-id
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould handle URL source
+[22m[39m[UnifiedIntake] Blueprint stored in global state
+[UnifiedIntake] Analytics tracked
+[UnifiedIntake] ✅ Intake complete: {
+  sessionId: [32m'test-session-id'[39m,
+  builderUrl: [32m'/builder?session=test-session-id&step=1'[39m
+}
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould handle missing required fields gracefully
+[22m[39m[UnifiedIntake] Starting builder from intake: {
+  source: [32m'template'[39m,
+  userId: [32m'test-user'[39m,
+  existingSessionId: [90mundefined[39m,
+  forceNew: [90mundefined[39m
+}
+[UnifiedIntake] Converting payload to blueprint: { source: [32m'template'[39m, templateId: [90mundefined[39m, fileJobId: [90mundefined[39m }
+
+[90mstderr[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould handle missing required fields gracefully
+[22m[39m[UnifiedIntake] ❌ Failed to process intake: Error: templateId required for template source
+    at convertToBlueprint [90m(/dev-server/[39msrc/lib/intake/unifiedIntakeService.ts:38:15[90m)[39m
+    at Module.startBuilderFromIntake [90m(/dev-server/[39msrc/lib/intake/unifiedIntakeService.ts:356:29[90m)[39m
+    at [90m/dev-server/[39mtests/integration/unified-intake-service.test.ts:154:28
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:157:11
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:753:26
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1636:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1602:10[90m)[39m
+    at runTest [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1309:12[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould generate correct builder URL
+[22m[39m[UnifiedIntake] Starting builder from intake: {
+  source: [32m'template'[39m,
+  userId: [32m'test-user'[39m,
+  existingSessionId: [90mundefined[39m,
+  forceNew: [90mundefined[39m
+}
+[UnifiedIntake] Converting payload to blueprint: {
+  source: [32m'template'[39m,
+  templateId: [32m'test-template-id'[39m,
+  fileJobId: [90mundefined[39m
+}
+[TemplateService] Loading template: test-template-id
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould generate correct builder URL
+[22m[39m[TemplateService] Template test-template-id validation: [
+  [32m'Auto-repaired: category: Required, icon: Required, created_at: Required, updated_at: Required'[39m
+]
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould generate correct builder URL
+[22m[39m[UnifiedIntake] Found template: Test Template
+[templateToBlueprint] Workflow after auto-repair for Test Template: { triggers: [33m0[39m, actions: [33m0[39m, valid: [33mfalse[39m }
+
+[90mstderr[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould generate correct builder URL
+[22m[39m[templateToBlueprint] Workflow validation warnings for Test Template: [ [32m'Workflow must have at least one action'[39m ]
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould generate correct builder URL
+[22m[39m[UnifiedIntake] Blueprint created: { name: [32m'Test Template'[39m, source: [32m'template'[39m }
+[UnifiedIntake] Creating new session
+[SessionManager] Creating new builder session {
+  source: [32m'template'[39m,
+  userId: [32m'test-user'[39m,
+  blueprintName: [32m'Test Template'[39m
+}
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould generate correct builder URL
+[22m[39m[SessionManager] Session created successfully: test-session-id
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mstartBuilderFromIntake - Generic[2m > [22m[2mshould generate correct builder URL
+[22m[39m[UnifiedIntake] Blueprint stored in global state
+[UnifiedIntake] Analytics tracked
+[UnifiedIntake] ✅ Intake complete: {
+  sessionId: [32m'test-session-id'[39m,
+  builderUrl: [32m'/builder?session=test-session-id&step=1'[39m
+}
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mError Handling[2m > [22m[2mshould return error on invalid source
+[22m[39m[UnifiedIntake] Starting builder from intake: {
+  source: [32m'invalid'[39m,
+  userId: [32m'test-user'[39m,
+  existingSessionId: [90mundefined[39m,
+  forceNew: [90mundefined[39m
+}
+[UnifiedIntake] Converting payload to blueprint: { source: [32m'invalid'[39m, templateId: [90mundefined[39m, fileJobId: [90mundefined[39m }
+
+[90mstderr[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mError Handling[2m > [22m[2mshould return error on invalid source
+[22m[39m[UnifiedIntake] ❌ Failed to process intake: Error: Unsupported intake source: invalid
+    at convertToBlueprint [90m(/dev-server/[39msrc/lib/intake/unifiedIntakeService.ts:326:13[90m)[39m
+    at Module.startBuilderFromIntake [90m(/dev-server/[39msrc/lib/intake/unifiedIntakeService.ts:356:29[90m)[39m
+    at [90m/dev-server/[39mtests/integration/unified-intake-service.test.ts:176:28
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:157:11
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:753:26
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1636:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1602:10[90m)[39m
+    at runTest [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1309:12[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+
+[90mstdout[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mError Handling[2m > [22m[2mshould handle conversion failures
+[22m[39m[UnifiedIntake] Starting builder from intake: {
+  source: [32m'file'[39m,
+  userId: [32m'test-user'[39m,
+  existingSessionId: [90mundefined[39m,
+  forceNew: [90mundefined[39m
+}
+[UnifiedIntake] Converting payload to blueprint: { source: [32m'file'[39m, templateId: [90mundefined[39m, fileJobId: [90mundefined[39m }
+
+[90mstderr[2m | tests/integration/unified-intake-service.test.ts[2m > [22m[2mUnified Intake Service[2m > [22m[2mError Handling[2m > [22m[2mshould handle conversion failures
+[22m[39m[UnifiedIntake] ❌ Failed to process intake: Error: fileJobId required for file source
+    at convertToBlueprint [90m(/dev-server/[39msrc/lib/intake/unifiedIntakeService.ts:54:15[90m)[39m
+    at Module.startBuilderFromIntake [90m(/dev-server/[39msrc/lib/intake/unifiedIntakeService.ts:356:29[90m)[39m
+    at [90m/dev-server/[39mtests/integration/unified-intake-service.test.ts:186:28
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:157:11
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:753:26
+    at [90mfile:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1636:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1602:10[90m)[39m
+    at runTest [90m(file:///dev-server/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1309:12[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+
+ [32m✓[39m tests/integration/unified-intake-service.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 41[2mms[22m[39m
+ [32m✓[39m src/simulation/__tests__/characterization/sovereign.enhancedSimulationEngine.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m src/config/__tests__/routeRegistry.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m src/simulation/__tests__/characterization/builder.simulationEngine.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m src/pages/blueprint/__tests__/assetsOwnership.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 36[2mms[22m[39m
+ [32m✓[39m src/pages/__tests__/exportWiring.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 51[2mms[22m[39m
+ [32m✓[39m src/data/dsxReference/__tests__/referenceBaseline.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 55[2mms[22m[39m
+ [32m✓[39m src/data/dataset/__tests__/canaryEndToEnd.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 44[2mms[22m[39m
+ [32m✓[39m src/simulation/__tests__/characterization/builder.mockSimulationEngine.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+[90mstdout[2m | src/workspace/__tests__/useWorkflowStepRouter.test.tsx
+[22m[39m[DCTwinBuilder] Auto-created deployment checks
+[DCTwinBuilder] State rehydrated and validated
+
+[90mstderr[2m | src/workspace/__tests__/useWorkflowStepRouter.test.tsx[2m > [22m[2museWorkflowStep against a real router[2m > [22m[2mkeeps a deep-linked step instead of rewriting it to the store default
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ [32m✓[39m src/workspace/__tests__/useWorkflowStepRouter.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 46[2mms[22m[39m
+ [32m✓[39m src/simulation/orchestrator/__tests__/failureProvenance.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m tests/unit/webhookSignature.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m src/twins/sovereignDataCenter/__tests__/simulationEngine.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 46[2mms[22m[39m
+ [32m✓[39m src/simulation/__tests__/engineConsolidation.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 74[2mms[22m[39m
+ [32m✓[39m src/lib/provenance/exporters/__tests__/exporters.test.ts [2m([22m[2m23 tests[22m[2m)[22m[32m 49[2mms[22m[39m
+ [32m✓[39m src/simulation/orchestrator/__tests__/canonical.test.ts [2m([22m[2m21 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+[90mstdout[2m | tests/unit/activeTwinContext-lifecycle.test.tsx
+[22m[39m[DCTwinBuilder] Auto-created deployment checks
+[DCTwinBuilder] State rehydrated and validated
+
+[90mstdout[2m | tests/unit/activeTwinContext-lifecycle.test.tsx[2m > [22m[2mActiveTwinContext lifecycle[2m > [22m[2mdrops fetch results that resolve after provider unmount without logging
+[22m[39m[ActiveTwinContext] Setting active twin: twin-late
+[RecommendationStore] Clearing recommendation
+[DCTwinBuilder] Resetting state
+[DCTwinBuilder] Auto-created deployment checks
+
+[90mstdout[2m | tests/unit/activeTwinContext-lifecycle.test.tsx[2m > [22m[2mActiveTwinContext lifecycle[2m > [22m[2mdrops superseded fetch results without logging when a newer generation is issued
+[22m[39m[ActiveTwinContext] Setting active twin: twin-A
+[RecommendationStore] Clearing recommendation
+[DCTwinBuilder] Resetting state
+[DCTwinBuilder] Auto-created deployment checks
+
+[90mstdout[2m | tests/unit/activeTwinContext-lifecycle.test.tsx[2m > [22m[2mActiveTwinContext lifecycle[2m > [22m[2mdrops superseded fetch results without logging when a newer generation is issued
+[22m[39m[ActiveTwinContext] Setting active twin: twin-B
+[RecommendationStore] Clearing recommendation
+[DCTwinBuilder] Resetting state
+[DCTwinBuilder] Auto-created deployment checks
+
+[90mstdout[2m | tests/unit/activeTwinContext-lifecycle.test.tsx[2m > [22m[2mActiveTwinContext lifecycle[2m > [22m[2mstill logs when the CURRENT generation fails with a genuine transport error
+[22m[39m[ActiveTwinContext] Setting active twin: twin-live
+[RecommendationStore] Clearing recommendation
+[DCTwinBuilder] Resetting state
+[DCTwinBuilder] Auto-created deployment checks
+
+ [32m✓[39m tests/unit/activeTwinContext-lifecycle.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 53[2mms[22m[39m
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Top 12 Departments[2m > [22m[2mshould classify "supply chain logistics fleet distributio..." as Supply Chain
+[22m[39m[DepartmentClassifier] Matched: Supply Chain (score: 15)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Top 12 Departments[2m > [22m[2mshould classify "procurement sourcing vendor management p..." as Procurement
+[22m[39m[DepartmentClassifier] Matched: Procurement (score: 20)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Top 12 Departments[2m > [22m[2mshould classify "finance accounting accounts payable rece..." as Finance
+[22m[39m[DepartmentClassifier] Matched: Finance (score: 20)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Top 12 Departments[2m > [22m[2mshould classify "hr human resources talent workforce sche..." as HR / People / Workforce
+[22m[39m[DepartmentClassifier] Matched: HR / People / Workforce (score: 29)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Top 12 Departments[2m > [22m[2mshould classify "operations workflow routing process opti..." as Operations
+[22m[39m[DepartmentClassifier] Matched: Operations (score: 17)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Top 12 Departments[2m > [22m[2mshould classify "engineering IT devops infrastructure pla..." as IT / Engineering
+[22m[39m[DepartmentClassifier] Matched: IT / Engineering (score: 29)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Top 12 Departments[2m > [22m[2mshould classify "risk compliance audit regulatory governa..." as Compliance / Risk
+[22m[39m[DepartmentClassifier] Matched: Compliance / Risk (score: 27)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Top 12 Departments[2m > [22m[2mshould classify "customer service support contact center ..." as Customer Service
+[22m[39m[DepartmentClassifier] Matched: Customer Service (score: 19)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Top 12 Departments[2m > [22m[2mshould classify "sales CRM pipeline deal quota territory ..." as Sales
+[22m[39m[DepartmentClassifier] Matched: Sales (score: 23)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Top 12 Departments[2m > [22m[2mshould classify "marketing branding campaign promotion ad..." as Marketing
+[22m[39m[DepartmentClassifier] Matched: Marketing (score: 23)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Top 12 Departments[2m > [22m[2mshould classify "factory production line assembly manufac..." as Manufacturing / Production
+[22m[39m[DepartmentClassifier] Matched: Manufacturing / Production (score: 30)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Top 12 Departments[2m > [22m[2mshould classify "delivery shipping transportation routing..." as Logistics / Fleet
+[22m[39m[DepartmentClassifier] Matched: Logistics / Fleet (score: 19)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Top 12 Departments[2m > [22m[2mshould always return exactly one of the 12 valid departments
+[22m[39m[DepartmentClassifier] Matched: Supply Chain (score: 15)
+[DepartmentClassifier] Matched: Procurement (score: 20)
+[DepartmentClassifier] Matched: Finance (score: 20)
+[DepartmentClassifier] Matched: HR / People / Workforce (score: 29)
+[DepartmentClassifier] Matched: Operations (score: 17)
+[DepartmentClassifier] Matched: IT / Engineering (score: 29)
+[DepartmentClassifier] Matched: Compliance / Risk (score: 27)
+[DepartmentClassifier] Matched: Customer Service (score: 19)
+[DepartmentClassifier] Matched: Sales (score: 23)
+[DepartmentClassifier] Matched: Marketing (score: 23)
+[DepartmentClassifier] Matched: Manufacturing / Production (score: 30)
+[DepartmentClassifier] Matched: Logistics / Fleet (score: 19)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Top 12 Departments[2m > [22m[2mshould never return undefined or empty string
+[22m[39m[DepartmentClassifier] No match found, defaulting to Operations
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Top 12 Departments[2m > [22m[2mshould handle multiple department keywords and choose the most prominent
+[22m[39m[DepartmentClassifier] Matched: Supply Chain (score: 17)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Keyword Weighting[2m > [22m[2mshould prioritize primary keywords over context keywords
+[22m[39m[DepartmentClassifier] Matched: Supply Chain (score: 14)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Keyword Weighting[2m > [22m[2mshould handle domain-specific terminology
+[22m[39m[DepartmentClassifier] Matched: Supply Chain (score: 5)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Keyword Weighting[2m > [22m[2mshould classify HR-related content correctly
+[22m[39m[DepartmentClassifier] Matched: HR / People / Workforce (score: 16)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Keyword Weighting[2m > [22m[2mshould classify compliance-related content correctly
+[22m[39m[DepartmentClassifier] Matched: Compliance / Risk (score: 25)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Edge Cases[2m > [22m[2mshould handle empty content gracefully
+[22m[39m[DepartmentClassifier] No match found, defaulting to Operations
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Edge Cases[2m > [22m[2mshould handle very short content
+[22m[39m[DepartmentClassifier] Matched: Operations (score: 3)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Edge Cases[2m > [22m[2mshould be case-insensitive
+[22m[39m[DepartmentClassifier] Matched: Supply Chain (score: 8)
+[DepartmentClassifier] Matched: Supply Chain (score: 8)
+[DepartmentClassifier] Matched: Supply Chain (score: 8)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Edge Cases[2m > [22m[2mshould handle special characters and punctuation
+[22m[39m[DepartmentClassifier] Matched: Supply Chain (score: 11)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Multi-Department Scenarios[2m > [22m[2mshould classify top-scoring department when multiple are present
+[22m[39m[DepartmentClassifier] Matched: Supply Chain (score: 8)
+
+[90mstdout[2m | tests/unit/departmentClassifier.test.ts[2m > [22m[2mDepartment Classifier - Multi-Department Scenarios[2m > [22m[2mshould not default to generic for ambiguous content
+[22m[39m[DepartmentClassifier] Matched: Operations (score: 4)
+
+ [32m✓[39m tests/unit/departmentClassifier.test.ts [2m([22m[2m25 tests[22m[2m)[22m[32m 73[2mms[22m[39m
+ [32m✓[39m src/twins/sovereignDataCenter/__tests__/generatePlaybook.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32m✓[39m tests/unit/builder-navigation.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 59[2mms[22m[39m
+ [32m✓[39m src/simulation/__tests__/characterization/generateSimulationResult.spec.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+[90mstdout[2m | scripts/__tests__/seoBuildGate.integration.test.ts[2m > [22m[2mseoBuildGate integration - duplicate OG/Twitter aborts the build[2m > [22m[2mpasses a clean fixture without calling this.error
+[22m[39m
+────────────────────────────────────────────────────────────────
+ SEO Validation Report
+────────────────────────────────────────────────────────────────
+ Status   : PASS ✓
+ Errors   : 0
+ Warnings : 0
+ Artifacts: index.html=true  robots.txt=true  sitemap.xml=true
+ Report   : /tmp/seo-gate-3rtZw3/dist/seo-report.json
+────────────────────────────────────────────────────────────────
+ All SEO checks passed. Safe to publish.
+────────────────────────────────────────────────────────────────
+
+
+[90mstdout[2m | scripts/__tests__/seoBuildGate.integration.test.ts[2m > [22m[2mseoBuildGate integration - duplicate OG/Twitter aborts the build[2m > [22m[2mFAILS the build when duplicate og:title is present
+[22m[39m
+────────────────────────────────────────────────────────────────
+ SEO Validation Report
+────────────────────────────────────────────────────────────────
+ Status   : FAIL ✗
+ Errors   : 1
+ Warnings : 0
+ Artifacts: index.html=true  robots.txt=true  sitemap.xml=true
+ Report   : /tmp/seo-gate-n7kNHW/dist/seo-report.json
+────────────────────────────────────────────────────────────────
+ Errors:
+   ✗ [og.duplicate.og:title] Duplicate <meta property="og:title"> found (2 tags with 2 different values: "M2M AURA", "Conflicting Title"). Only one is allowed; social crawlers will pick one unpredictably.
+────────────────────────────────────────────────────────────────
+
+
+[90mstdout[2m | scripts/__tests__/seoBuildGate.integration.test.ts[2m > [22m[2mseoBuildGate integration - duplicate OG/Twitter aborts the build[2m > [22m[2mFAILS the build when duplicate twitter:card is present
+[22m[39m
+────────────────────────────────────────────────────────────────
+ SEO Validation Report
+────────────────────────────────────────────────────────────────
+ Status   : FAIL ✗
+ Errors   : 1
+ Warnings : 0
+ Artifacts: index.html=true  robots.txt=true  sitemap.xml=true
+ Report   : /tmp/seo-gate-lMLXsG/dist/seo-report.json
+────────────────────────────────────────────────────────────────
+ Errors:
+   ✗ [twitter.duplicate.twitter:card] Duplicate <meta name="twitter:card"> found (2 tags with 2 different values: "summary_large_image", "summary"). Only one is allowed; X/Twitter will pick one unpredictably.
+────────────────────────────────────────────────────────────────
+
+
+[90mstdout[2m | scripts/__tests__/seoBuildGate.integration.test.ts[2m > [22m[2mseoBuildGate integration - duplicate OG/Twitter aborts the build[2m > [22m[2mFAILS the build when og and twitter duplicates are stacked
+[22m[39m
+────────────────────────────────────────────────────────────────
+ SEO Validation Report
+────────────────────────────────────────────────────────────────
+ Status   : FAIL ✗
+ Errors   : 2
+ Warnings : 0
+ Artifacts: index.html=true  robots.txt=true  sitemap.xml=true
+ Report   : /tmp/seo-gate-7QTQzU/dist/seo-report.json
+────────────────────────────────────────────────────────────────
+ Errors:
+   ✗ [og.duplicate.og:url] Duplicate <meta property="og:url"> found (2 tags with 2 different values: "https://auradc.m2mtechconnect.com/", "https://other.example.com/"). Only one is allowed; social crawlers will pick one unpredictably.
+   ✗ [twitter.duplicate.twitter:title] Duplicate <meta name="twitter:title"> found (2 tags with 2 different values: "Conflict", "Conflict 2"). Only one is allowed; X/Twitter will pick one unpredictably.
+────────────────────────────────────────────────────────────────
+
+
+[90mstdout[2m | scripts/__tests__/seoBuildGate.integration.test.ts[2m > [22m[2mseoBuildGate integration - duplicate OG/Twitter aborts the build[2m > [22m[2mdoes NOT fail the build when og:image is duplicated (warn-only)
+[22m[39m
+────────────────────────────────────────────────────────────────
+ SEO Validation Report
+────────────────────────────────────────────────────────────────
+ Status   : PASS ✓
+ Errors   : 0
+ Warnings : 3
+ Artifacts: index.html=true  robots.txt=true  sitemap.xml=true
+ Report   : /tmp/seo-gate-f1tjX6/dist/seo-report.json
+────────────────────────────────────────────────────────────────
+ Warnings:
+   ! [og.duplicate.og:image] Duplicate <meta property="og:image"> found (2 tags with 2 different values: "https://auradc.m2mtechconnect.com/og.png", "https://auradc.m2mtechconnect.com/og2.png"). Multiple og:image tags are allowed but social crawlers pick one unpredictably.
+   ! [og.image-group.alt-missing.1] og:image #2 ("https://auradc.m2mtechconnect.com/og2.png") is missing og:image:alt (other images in the group declare one — keep the set consistent).
+   ! [og.image-group.mismatched-alt] Inconsistent og:image:alt coverage: 1/2 og:image tags declare it. Either set it on every image or none.
+────────────────────────────────────────────────────────────────
+
+
+[90mstdout[2m | scripts/__tests__/seoBuildGate.integration.test.ts[2m > [22m[2mseoBuildGate integration - duplicate OG/Twitter aborts the build[2m > [22m[2mdetects duplicates across attribute order/case/quote variation
+[22m[39m
+────────────────────────────────────────────────────────────────
+ SEO Validation Report
+────────────────────────────────────────────────────────────────
+ Status   : FAIL ✗
+ Errors   : 1
+ Warnings : 0
+ Artifacts: index.html=true  robots.txt=true  sitemap.xml=true
+ Report   : /tmp/seo-gate-84wdyd/dist/seo-report.json
+────────────────────────────────────────────────────────────────
+ Errors:
+   ✗ [twitter.duplicate.twitter:card] Duplicate <meta name="twitter:card"> found (2 tags with 2 different values: "summary_large_image", "summary"). Only one is allowed; X/Twitter will pick one unpredictably.
+────────────────────────────────────────────────────────────────
+
+
+[90mstdout[2m | scripts/__tests__/seoBuildGate.integration.test.ts[2m > [22m[2mseoBuildGate integration - duplicate OG/Twitter aborts the build[2m > [22m[2mrespects SKIP_SEO_GATE=1 and does not abort even on duplicates
+[22m[39m
+[seo-build-gate] SKIP_SEO_GATE=1, skipping SEO validation.
+
+
+ [32m✓[39m scripts/__tests__/seoBuildGate.integration.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 92[2mms[22m[39m
+[90mstderr[2m | src/simulation/__tests__/characterization/simulationEngine.canonical.spec.ts[2m > [22m[2mSimulationEngine (canonical) — characterization[2m > [22m[2mtyped outcome: startScenario returns boolean and transitions status
+[22m[39m[SimulationEngine] Scenario not found: does-not-exist
+
+ [32m✓[39m src/simulation/__tests__/characterization/simulationEngine.canonical.spec.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32m✓[39m src/twins/dataCenter/__tests__/omniverseAdapter.test.ts [2m([22m[2m26 tests[22m[2m)[22m[32m 39[2mms[22m[39m
+ [32m✓[39m src/lib/__tests__/simulationTemplates.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 39[2mms[22m[39m
+ [32m✓[39m src/lib/units/__tests__/power.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 37[2mms[22m[39m
+ [32m✓[39m src/lib/units/__tests__/capacityQuarantine.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32m✓[39m src/config/__tests__/complianceClaims.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m src/pilot/__tests__/pilotReadAdapter.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 29[2mms[22m[39m
+ [32m✓[39m src/data/dataset/__tests__/datasetCanary.test.ts [2m([22m[2m23 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m src/search/__tests__/platformSearchApi.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 48[2mms[22m[39m
+ [32m✓[39m src/truth/__tests__/canonicalParity.test.ts [2m([22m[2m29 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+ [32m✓[39m src/telemetry/__tests__/twinTelemetryApi.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 43[2mms[22m[39m
+[90mstdout[2m | tests/unit/blueprint-converters.test.ts[2m > [22m[2mtemplateToBlueprint[2m > [22m[2mshould convert the data centre master template to blueprint
+[22m[39m[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m1[39m, actions: [33m4[39m, valid: [33mtrue[39m }
+
+[90mstdout[2m | tests/unit/blueprint-converters.test.ts[2m > [22m[2mtemplateToBlueprint[2m > [22m[2mshould convert customer support template to blueprint
+[22m[39m[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m1[39m, actions: [33m4[39m, valid: [33mtrue[39m }
+
+[90mstdout[2m | tests/unit/blueprint-converters.test.ts[2m > [22m[2mtemplateToBlueprint[2m > [22m[2mshould handle minimal template
+[22m[39m[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m1[39m, actions: [33m4[39m, valid: [33mtrue[39m }
+
+[90mstdout[2m | tests/unit/blueprint-converters.test.ts[2m > [22m[2mtemplateToBlueprint[2m > [22m[2mshould default to marketplace sourceEntry when not provided
+[22m[39m[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m1[39m, actions: [33m4[39m, valid: [33mtrue[39m }
+
+[90mstdout[2m | tests/unit/blueprint-converters.test.ts[2m > [22m[2mtemplateToBlueprint[2m > [22m[2mshould detect model provider from model name
+[22m[39m[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m1[39m, actions: [33m4[39m, valid: [33mtrue[39m }
+[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m1[39m, actions: [33m4[39m, valid: [33mtrue[39m }
+
+[90mstdout[2m | tests/unit/blueprint-converters.test.ts[2m > [22m[2mtemplateToBlueprint[2m > [22m[2mshould preserve all template metadata
+[22m[39m[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m1[39m, actions: [33m4[39m, valid: [33mtrue[39m }
+
+[90mstdout[2m | tests/unit/blueprint-converters.test.ts[2m > [22m[2mtemplateToBlueprint[2m > [22m[2mshould handle JSON file schema with nested blueprint object
+[22m[39m[templateToBlueprint] Workflow after auto-repair for Test JSON Template: { triggers: [33m0[39m, actions: [33m2[39m, valid: [33mtrue[39m }
+
+[90mstdout[2m | tests/unit/blueprint-converters.test.ts[2m > [22m[2mBlueprint validation[2m > [22m[2mshould create valid blueprints from all sources
+[22m[39m[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m1[39m, actions: [33m4[39m, valid: [33mtrue[39m }
+
+[90mstdout[2m | tests/unit/blueprint-converters.test.ts[2m > [22m[2mBlueprint validation[2m > [22m[2mshould have consistent model configuration structure
+[22m[39m[templateToBlueprint] Workflow after auto-repair for Data Centre Digital Twin: { triggers: [33m1[39m, actions: [33m4[39m, valid: [33mtrue[39m }
+
+ [32m✓[39m tests/unit/blueprint-converters.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 49[2mms[22m[39m
+ [32m✓[39m tests/digitalTwinRuntime.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m src/agents/__tests__/agentPositioning.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/integrations/omniverseKit/__tests__/fetchStatusValidated.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 26[2mms[22m[39m
+ [32m✓[39m src/renderer/__tests__/rendererModes.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/components/twin-visualization/__tests__/qualityPolicy.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m scripts/__tests__/dsxAuditLog.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 29[2mms[22m[39m
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify walmart.com as Enterprise Retail
+[22m[39m[IndustryClassifier] Matched domain pattern: walmart.com → Enterprise Retail
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify costco.com as Grocery & Food Retail
+[22m[39m[IndustryClassifier] Matched domain pattern: costco.com → Grocery & Food Retail
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify nike.com as Fashion / Apparel Retail
+[22m[39m[IndustryClassifier] Matched domain pattern: nike.com → Fashion / Apparel Retail
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify fedex.com as Logistics / Supply Chain / 3PL
+[22m[39m[IndustryClassifier] Matched domain pattern: fedex.com → Logistics / Supply Chain / 3PL
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify ford.com as Manufacturing – Automotive
+[22m[39m[IndustryClassifier] Matched domain pattern: ford.com → Manufacturing – Automotive
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify ge.com as Manufacturing – Industrial
+[22m[39m[IndustryClassifier] Matched domain pattern: ge.com → Manufacturing – Industrial
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify nestle.com as Manufacturing – Consumer Goods
+[22m[39m[IndustryClassifier] Matched domain pattern: nestle.com → Manufacturing – Consumer Goods
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify duke-energy.com as Energy / Utilities
+[22m[39m[IndustryClassifier] Matched domain pattern: duke-energy → Energy / Utilities
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify clevelandclinic.org as Healthcare / Hospitals
+[22m[39m[IndustryClassifier] Matched domain pattern: clevelandclinic.org → Healthcare / Hospitals
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify pfizer.com as Pharmaceuticals & Life Sciences
+[22m[39m[IndustryClassifier] Matched domain pattern: pfizer.com → Pharmaceuticals & Life Sciences
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify td.com as Financial Services / Banking
+[22m[39m[IndustryClassifier] Matched domain pattern: td.com → Financial Services / Banking
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify manulife.com as Insurance
+[22m[39m[IndustryClassifier] Matched domain pattern: manulife.com → Insurance
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify zillow.com as Real Estate / PropTech
+[22m[39m[IndustryClassifier] Matched domain pattern: zillow.com → Real Estate / PropTech
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify bechtel.com as Construction / Engineering
+[22m[39m[IndustryClassifier] Matched domain pattern: bechtel.com → Construction / Engineering
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify verizon.com as Telecommunications
+[22m[39m[IndustryClassifier] Matched domain pattern: verizon.com → Telecommunications
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify delta.com as Travel / Transportation
+[22m[39m[IndustryClassifier] Matched domain pattern: delta.com → Travel / Transportation
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify coursera.org as Education / EdTech
+[22m[39m[IndustryClassifier] Matched domain pattern: coursera.org → Education / EdTech
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify monsanto.com as Agriculture / Agritech
+[22m[39m[IndustryClassifier] Matched domain pattern: monsanto.com → Agriculture / Agritech
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify canada.ca as Government / Public Sector
+[22m[39m[IndustryClassifier] Matched domain pattern: canada.ca → Government / Public Sector
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould classify sap.com as Software / Enterprise SaaS
+[22m[39m[IndustryClassifier] Matched domain pattern: sap.com → Software / Enterprise SaaS
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould never return undefined or empty string
+[22m[39m[IndustryClassifier] No match found, defaulting to Software / Enterprise SaaS
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould always return exactly one of the 20 valid industries
+[22m[39m[IndustryClassifier] Matched domain pattern: walmart.com → Enterprise Retail
+[IndustryClassifier] Matched domain pattern: costco.com → Grocery & Food Retail
+[IndustryClassifier] Matched domain pattern: nike.com → Fashion / Apparel Retail
+[IndustryClassifier] Matched domain pattern: fedex.com → Logistics / Supply Chain / 3PL
+[IndustryClassifier] Matched domain pattern: ford.com → Manufacturing – Automotive
+[IndustryClassifier] Matched domain pattern: ge.com → Manufacturing – Industrial
+[IndustryClassifier] Matched domain pattern: nestle.com → Manufacturing – Consumer Goods
+[IndustryClassifier] Matched domain pattern: duke-energy → Energy / Utilities
+[IndustryClassifier] Matched domain pattern: clevelandclinic.org → Healthcare / Hospitals
+[IndustryClassifier] Matched domain pattern: pfizer.com → Pharmaceuticals & Life Sciences
+[IndustryClassifier] Matched domain pattern: td.com → Financial Services / Banking
+[IndustryClassifier] Matched domain pattern: manulife.com → Insurance
+[IndustryClassifier] Matched domain pattern: zillow.com → Real Estate / PropTech
+[IndustryClassifier] Matched domain pattern: bechtel.com → Construction / Engineering
+[IndustryClassifier] Matched domain pattern: verizon.com → Telecommunications
+[IndustryClassifier] Matched domain pattern: delta.com → Travel / Transportation
+[IndustryClassifier] Matched domain pattern: coursera.org → Education / EdTech
+[IndustryClassifier] Matched domain pattern: monsanto.com → Agriculture / Agritech
+[IndustryClassifier] Matched domain pattern: canada.ca → Government / Public Sector
+[IndustryClassifier] Matched domain pattern: sap.com → Software / Enterprise SaaS
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould handle domain variations (www, https, paths)
+[22m[39m[IndustryClassifier] Matched domain pattern: walmart.com → Enterprise Retail
+[IndustryClassifier] Matched domain pattern: walmart.com → Enterprise Retail
+[IndustryClassifier] Matched domain pattern: walmart.com → Enterprise Retail
+[IndustryClassifier] Matched domain pattern: walmart.com → Enterprise Retail
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Top 20 Industries[2m > [22m[2mshould not default to generic for known patterns
+[22m[39m[IndustryClassifier] Matched domain pattern: walmart.com → Enterprise Retail
+[IndustryClassifier] Matched domain pattern: costco.com → Grocery & Food Retail
+[IndustryClassifier] Matched domain pattern: nike.com → Fashion / Apparel Retail
+[IndustryClassifier] Matched domain pattern: fedex.com → Logistics / Supply Chain / 3PL
+[IndustryClassifier] Matched domain pattern: ford.com → Manufacturing – Automotive
+[IndustryClassifier] Matched domain pattern: ge.com → Manufacturing – Industrial
+[IndustryClassifier] Matched domain pattern: nestle.com → Manufacturing – Consumer Goods
+[IndustryClassifier] Matched domain pattern: duke-energy → Energy / Utilities
+[IndustryClassifier] Matched domain pattern: clevelandclinic.org → Healthcare / Hospitals
+[IndustryClassifier] Matched domain pattern: pfizer.com → Pharmaceuticals & Life Sciences
+[IndustryClassifier] Matched domain pattern: td.com → Financial Services / Banking
+[IndustryClassifier] Matched domain pattern: manulife.com → Insurance
+[IndustryClassifier] Matched domain pattern: zillow.com → Real Estate / PropTech
+[IndustryClassifier] Matched domain pattern: bechtel.com → Construction / Engineering
+[IndustryClassifier] Matched domain pattern: verizon.com → Telecommunications
+[IndustryClassifier] Matched domain pattern: delta.com → Travel / Transportation
+[IndustryClassifier] Matched domain pattern: coursera.org → Education / EdTech
+[IndustryClassifier] Matched domain pattern: monsanto.com → Agriculture / Agritech
+[IndustryClassifier] Matched domain pattern: canada.ca → Government / Public Sector
+[IndustryClassifier] Matched domain pattern: sap.com → Software / Enterprise SaaS
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Content-Based Classification[2m > [22m[2mshould classify based on content when domain is ambiguous
+[22m[39m[IndustryClassifier] Matched domain pattern: walmart.com → Enterprise Retail
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Content-Based Classification[2m > [22m[2mshould classify pharma based on keywords
+[22m[39m[IndustryClassifier] Matched domain pattern: pfizer.com → Pharmaceuticals & Life Sciences
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Content-Based Classification[2m > [22m[2mshould classify manufacturing based on keywords
+[22m[39m[IndustryClassifier] Matched domain pattern: ford.com → Manufacturing – Automotive
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Edge Cases[2m > [22m[2mshould handle empty domain gracefully
+[22m[39m[IndustryClassifier] No match found, defaulting to Software / Enterprise SaaS
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Edge Cases[2m > [22m[2mshould handle very long domain names
+[22m[39m[IndustryClassifier] No match found, defaulting to Software / Enterprise SaaS
+
+[90mstdout[2m | tests/unit/industryClassifier.test.ts[2m > [22m[2mIndustry Classifier - Edge Cases[2m > [22m[2mshould be case-insensitive
+[22m[39m[IndustryClassifier] Matched domain pattern: walmart.com → Enterprise Retail
+[IndustryClassifier] Matched domain pattern: walmart.com → Enterprise Retail
+[IndustryClassifier] Matched domain pattern: walmart.com → Enterprise Retail
+
+ [32m✓[39m tests/unit/industryClassifier.test.ts [2m([22m[2m32 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32m✓[39m src/lib/provenance/__tests__/prng.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32m✓[39m tests/simulationEngine.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/simulation/providers/__tests__/providerSelection.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m src/data/dataset/__tests__/pageIdentity.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m src/components/twin-visualization/__tests__/assetRegistry.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m src/components/simulation/__tests__/exportSimulationResult.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/runtime/mqtt/__tests__/pipeline.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32m✓[39m src/dsx/__tests__/exchangeViewerSimready.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32m✓[39m src/dsx/__tests__/contract.test.ts [2m([22m[2m23 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32m✓[39m tests/unit/kpiOverlayEngine.test.ts [2m([22m[2m28 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m src/lib/__tests__/twinNameMigration.test.ts [2m([22m[2m20 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m tests/unit/live-backend-guard.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m tests/unit/builderValidation.test.ts [2m([22m[2m18 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m src/config/__tests__/appNavigation.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m src/data/dataset/__tests__/surfaceCoverage.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/truth/__tests__/telemetryVerticalSlice.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m src/config/__tests__/dsxClaimsPolicy.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m src/test/informationArchitecture.test.ts [2m([22m[2m18 tests[22m[2m)[22m[32m 26[2mms[22m[39m
+ [32m✓[39m src/simulation/__tests__/characterization/sovereign.simulationEngine.spec.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m tests/unit/zapier-integration.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m tests/unit/mcp-integration.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m scripts/__tests__/seoBuildGate.duplicates.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m src/truth/__tests__/evidenceParity.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+[90mstdout[2m | tests/unit/recommendationEngine.test.ts[2m > [22m[2mRecommendation Engine - Filtering[2m > [22m[2mshould reject CX personalization for enterprise retail
+[22m[39m[Filter] Rejecting "Customer Experience Personalization Engine" - contains banned term
+[Filter] Rejecting "Generic AI Upskilling Program" - no operational keywords
+
+[90mstdout[2m | tests/unit/recommendationEngine.test.ts[2m > [22m[2mRecommendation Engine - Filtering[2m > [22m[2mshould reject generic AI upskilling for enterprise retail
+[22m[39m[Filter] Rejecting "Customer Experience Personalization Engine" - contains banned term
+[Filter] Rejecting "Generic AI Upskilling Program" - no operational keywords
+
+[90mstdout[2m | tests/unit/recommendationEngine.test.ts[2m > [22m[2mRecommendation Engine - Filtering[2m > [22m[2mshould keep supply chain twins for enterprise retail
+[22m[39m[Filter] Rejecting "Customer Experience Personalization Engine" - contains banned term
+[Filter] Rejecting "Generic AI Upskilling Program" - no operational keywords
+
+[90mstdout[2m | tests/unit/recommendationEngine.test.ts[2m > [22m[2mRecommendation Engine - Filtering[2m > [22m[2mshould keep store operations twins for enterprise retail
+[22m[39m[Filter] Rejecting "Customer Experience Personalization Engine" - contains banned term
+[Filter] Rejecting "Generic AI Upskilling Program" - no operational keywords
+
+[90mstdout[2m | tests/unit/recommendationEngine.test.ts[2m > [22m[2mRecommendation Engine - Filtering[2m > [22m[2mshould keep logistics twins for enterprise retail
+[22m[39m[Filter] Rejecting "Customer Experience Personalization Engine" - contains banned term
+[Filter] Rejecting "Generic AI Upskilling Program" - no operational keywords
+
+[90mstdout[2m | tests/unit/recommendationEngine.test.ts[2m > [22m[2mRecommendation Engine - Scoring[2m > [22m[2mshould prioritize operational twins over CX for enterprise retail
+[22m[39m[Filter] Rejecting "Customer Experience Personalization Engine" - contains banned term
+[Filter] Rejecting "Generic AI Upskilling Program" - no operational keywords
+
+[90mstdout[2m | tests/unit/recommendationEngine.test.ts[2m > [22m[2mRecommendation Engine - Top 3 Selection[2m > [22m[2mshould return only operational twins in top 3 for Walmart
+[22m[39m[Filter] Rejecting "Customer Experience Personalization Engine" - contains banned term
+[Filter] Rejecting "Generic AI Upskilling Program" - no operational keywords
+
+[90mstdout[2m | tests/unit/recommendationEngine.test.ts[2m > [22m[2mRecommendation Engine - Top 3 Selection[2m > [22m[2mshould not contain banned phrases in top 3 for enterprise retail
+[22m[39m[Filter] Rejecting "Customer Experience Personalization Engine" - contains banned term
+[Filter] Rejecting "Generic AI Upskilling Program" - no operational keywords
+
+ [32m✓[39m tests/unit/recommendationEngine.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+[90mstdout[2m | tests/unit/blueprint-helpers.test.ts[2m > [22m[2mblueprintToBuilderState[2m > [22m[2mshould convert blueprint to builder state format
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'questionnaire'[39m, name: [32m'Customer Success Assistant'[39m }
+
+[90mstdout[2m | tests/unit/blueprint-helpers.test.ts[2m > [22m[2mblueprintToBuilderState[2m > [22m[2mshould handle minimal blueprint
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'manual'[39m, name: [32m'Test Agent'[39m }
+
+[90mstdout[2m | tests/unit/blueprint-helpers.test.ts[2m > [22m[2mblueprintToBuilderState[2m > [22m[2mshould map all required fields
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'questionnaire'[39m, name: [32m'Customer Success Assistant'[39m }
+
+[90mstdout[2m | tests/unit/blueprint-helpers.test.ts[2m > [22m[2mRound-trip conversion[2m > [22m[2mshould maintain data through blueprint -> builder state -> blueprint conversion
+[22m[39m[BlueprintHelpers] Converting blueprint to builder state: { source: [32m'questionnaire'[39m, name: [32m'Customer Success Assistant'[39m }
+
+ [32m✓[39m tests/unit/blueprint-helpers.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m src/truth/__tests__/noFabricatedTelemetry.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m src/lib/__tests__/builderStore.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+[90mstderr[2m | tests/unit/digitalTwinValidators.test.ts[2m > [22m[2mDigital Twin Validators[2m > [22m[2mfilterValidDigitalTwins[2m > [22m[2mshould filter out non-Digital Twins and keep valid ones
+[22m[39m[DigitalTwinValidator] Rejected "Customer Personalization Engine": Does not mention digital twin or operational process, No data sources or systems mentioned, No event triggers mentioned, No operational impact metrics mentioned, Contains banned B2C term for retail: "customer personalization", Contains banned B2C term for retail: "shopping experience", Contains banned B2C term for retail: "enhance customer", Contains banned B2C term for retail: "personalization engine", No operational focus for enterprise retail Score: 6/100
+[DigitalTwinValidator] Rejected "Generic AI Upskilling": Does not mention digital twin or operational process, No data sources or systems mentioned, No event triggers mentioned, No operational impact metrics mentioned, No operational focus for enterprise retail, Generic upskilling not tied to operational roles Score: 14/100
+
+[90mstderr[2m | tests/unit/digitalTwinValidators.test.ts[2m > [22m[2mDigital Twin Validators[2m > [22m[2mfilterValidDigitalTwins[2m > [22m[2mshould log rejection reasons for debugging
+[22m[39m[DigitalTwinValidator] Rejected "Customer Experience Personalization": Does not mention digital twin or operational process, No data sources or systems mentioned, No event triggers mentioned, Contains banned B2C term for retail: "customer experience", Contains banned B2C term for retail: "customer journey", Contains banned B2C term for retail: "improve customer", No operational focus for enterprise retail Score: 12/100
+
+[90mstderr[2m | tests/unit/digitalTwinValidators.test.ts[2m > [22m[2mDigital Twin Validators[2m > [22m[2mfilterValidDigitalTwins[2m > [22m[2mshould accept all recommendations if no industry filter
+[22m[39m[DigitalTwinValidator] Rejected "Customer Personalization": Does not mention digital twin or operational process, No operational impact metrics mentioned Score: 64/100
+
+[90mstderr[2m | tests/unit/digitalTwinValidators.test.ts[2m > [22m[2mDigital Twin Validators[2m > [22m[2mReal-World Test Cases[2m > [22m[2mshould reject all CX/marketing twins for Walmart
+[22m[39m[DigitalTwinValidator] Rejected "Enhance Customer Personalization and Predictive Merchandising": Does not mention digital twin or operational process, No data sources or systems mentioned, No event triggers mentioned, Contains banned B2C term for retail: "customer personalization", Contains banned B2C term for retail: "shopping experience", Contains banned B2C term for retail: "merchandising", Contains banned B2C term for retail: "enhance customer", No operational focus for enterprise retail Score: 12/100
+[DigitalTwinValidator] Rejected "Customer Journey Optimization": Does not mention digital twin or operational process, No data sources or systems mentioned, No event triggers mentioned, Contains banned B2C term for retail: "customer journey", No operational focus for enterprise retail Score: 16/100
+[DigitalTwinValidator] Rejected "Loyalty Program Enhancement": Does not mention digital twin or operational process, No data sources or systems mentioned, No event triggers mentioned, No operational impact metrics mentioned, No operational focus for enterprise retail Score: 26/100
+
+ [32m✓[39m tests/unit/digitalTwinValidators.test.ts [2m([22m[2m20 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m src/lib/utils/normalizeCompanyName.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m src/components/twin-visualization/__tests__/runtimeCoverageStore.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m src/i18n/__tests__/marketingClaims.test.ts [2m([22m[2m20 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32m✓[39m src/validation/gpuAcceptance/__tests__/supersededBuild.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m src/twins/sovereignDataCenter/__tests__/mockData.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m tests/unit/serviceRoleTokenInjection.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 37[2mms[22m[39m
+ [32m✓[39m src/dsx/exchange/__tests__/exchangeBoundary.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 39[2mms[22m[39m
+ [32m✓[39m src/config/__tests__/dsxCapabilityRegistry.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32m✓[39m src/integrations/omniverseKit/__tests__/streamingLibraryLoader.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m tests/integration/recommendations.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m tests/unit/runtimeDiagnostics.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m src/simulation/providers/__tests__/scenarioLibraryProvider.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+[90mstdout[2m | src/workspace/__tests__/runExport.test.ts
+[22m[39m[DCTwinBuilder] Auto-created deployment checks
+[DCTwinBuilder] State rehydrated and validated
+
+ [32m✓[39m src/workspace/__tests__/runExport.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/lib/provenance/__tests__/staleness.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m src/lib/provenance/__tests__/metricCatalog.test.ts [2m([22m[2m26 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m tests/unit/carbonEngine.test.ts [2m([22m[2m29 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m src/twins/sovereignDataCenter/components/__tests__/playbookExportDisabled.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/unit/model-validation.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32m✓[39m src/lib/auth/__tests__/profileQuery.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m src/integrations/omniverseKit/__tests__/schema.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m src/pages/blueprint/__tests__/operatorModel.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m src/simulation/__tests__/handoff.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/pages/blueprint/__tests__/tabModel.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m src/auth/__tests__/permissions.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m src/workspace/__tests__/viewportRegistry.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+[90mstdout[2m | tests/unit/templateLoader.test.ts
+[22m[39m[templateLoader] Data Centre Master Template loaded
+
+ [32m✓[39m tests/unit/templateLoader.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m src/components/simulation/__tests__/dcSimulationPanelSeed.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/simulation/compat/__tests__/sovereignDataCenterEngine.reexport.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m tests/unit/permissions.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/connections/__tests__/managedConnectors.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m src/workspace/__tests__/runRecords.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m tests/unit/deterministicMapper.test.ts [2m([22m[2m18 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32m✓[39m src/routing/__tests__/adminAuthorization.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m src/validation/cloudGpu/__tests__/realismMode.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m src/validation/referenceFacility/__tests__/regressionBaseline.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/capabilities/__tests__/runProvenance.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m tests/unit/roi-calculator.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m src/connections/__tests__/model.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m src/components/twin-visualization/__tests__/coverageAuthority.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/dsx/__tests__/contract-reexport.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/data/__tests__/dataModeContract.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/lib/provenance/exporters/__tests__/injection.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/components/twin-visualization/__tests__/materialPolicy.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m src/validation/gpuAcceptance/__tests__/assetValidationModel.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m scripts/__tests__/auraTestEnvGuard.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m src/lib/provenance/__tests__/provenance.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+[90mstdout[2m | src/workspace/__tests__/useWorkflowStep.test.ts
+[22m[39m[DCTwinBuilder] Auto-created deployment checks
+[DCTwinBuilder] State rehydrated and validated
+
+ [32m✓[39m src/workspace/__tests__/useWorkflowStep.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/components/twin-visualization/__tests__/designScenario.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m src/lib/provenance/__tests__/kitMetrics.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/components/twin-visualization/__tests__/facilityStructure.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+[90mstdout[2m | tests/unit/url-turbo-capture-config.test.ts[2m > [22m[2mURL Turbo Capture - Configuration Audit[2m > [22m[2mshould estimate overall performance improvement
+[22m[39mOld time: 43333.333333333336ms, New time: 3000ms
+Improvement: 93.1%
+
+ [32m✓[39m tests/unit/url-turbo-capture-config.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/connections/__tests__/mappingValidation.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/connections/__tests__/wizardModel.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/validation/referenceFacility/__tests__/reconciliation.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/dsx/__tests__/decisionPersistence.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/validation/gpuAcceptance/__tests__/acceptance.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/lib/location/__tests__/normalizeLocation.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m src/lib/__tests__/extractCompanyIdentity.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m src/pages/__tests__/intelligenceInfrastructureProvenance.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/workspace/__tests__/deploymentRecords.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/security/__tests__/teamInviteAuthority.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/lib/provenance/__tests__/provenancedMetric.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/data/dataset/__tests__/chartSemantics.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/capabilities/__tests__/capabilities.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/validation/gpuAcceptance/__tests__/preflight.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m tests/unit/roiCalculator.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/simulation/compat/__tests__/dataCenterEngine.reexport.spec.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/connections/__tests__/managedVerification.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/lib/provenance/__tests__/twinFieldProvenance.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/test/shellCoreSynchronous.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/components/provenance/__tests__/streamBannerMessages.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/lib/__tests__/queryRetry.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m scripts/__tests__/dsxResumeGate.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/routing/__tests__/authenticatedEntryRedirect.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/workspace/__tests__/planGeometry.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/auth/__tests__/ssoProviders.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [2m[90m↓[39m[22m tests/integration/analytics-with-seeds.test.ts [2m([22m[2m9 tests[22m[2m | [22m[33m9 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/integration/analytics.test.ts [2m([22m[2m9 tests[22m[2m | [22m[33m9 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/integration/builder.test.ts [2m([22m[2m6 tests[22m[2m | [22m[33m6 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/integration/integrations.test.ts [2m([22m[2m9 tests[22m[2m | [22m[33m9 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/integration/operations.test.ts [2m([22m[2m10 tests[22m[2m | [22m[33m10 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/integration/template-validation.test.ts [2m([22m[2m10 tests[22m[2m | [22m[33m10 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/integration/builder-with-seeds.test.ts [2m([22m[2m13 tests[22m[2m | [22m[33m13 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/performance/api-load.test.ts [2m([22m[2m15 tests[22m[2m | [22m[33m15 skipped[39m[2m)[22m
+
+[2m Test Files [22m [1m[32m187 passed[39m[22m[2m | [22m[33m8 skipped[39m[90m (195)[39m
+[2m      Tests [22m [1m[32m1905 passed[39m[22m[2m | [22m[33m81 skipped[39m[90m (1986)[39m
+[2m   Start at [22m 03:07:33
+[2m   Duration [22m 93.02s[2m (transform 11.57s, setup 158.57s, collect 102.77s, tests 31.08s, environment 906.09s, prepare 18.20s)[22m
+
+vitest exit=0

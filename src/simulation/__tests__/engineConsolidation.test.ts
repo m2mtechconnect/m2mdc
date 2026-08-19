@@ -66,7 +66,7 @@ describe('simulation engine consolidation', () => {
     for (const id of ['nvidia-dsx-sim', 'specialist-solver', 'omniverse'] as const) {
       const provider = registry.get(id);
       expect(provider.id).toBe(id);
-      expect(provider.capabilities.executionClass).toBe('nvidia-dsx-sim');
+      expect(provider.capabilities.executionClass).toBe('nvidia-solver');
       expect(provider.listScenarios().kind).toBe('disabled');
       const run = await provider.runScenario({ scenarioId: 'baseline' });
       expect(run.kind).toBe('disabled');

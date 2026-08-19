@@ -18,13 +18,35 @@
 
 import { readKitConfig } from '@/integrations/omniverseKit/config';
 
+/**
+ * Phase 1 of the NVIDIA operational-readiness program re-keys this module to
+ * the four modes mandated by `docs/architecture/adr-hybrid-nvidia-runtime.md`.
+ * The ADR and this file previously disagreed on the vocabulary, which meant a
+ * renderer label could be argued either way. The ADR wins.
+ *
+ * `unavailable` covers every case where no 3D renderer is drawing: the
+ * deterministic 2D plan view is the surface AURA shows in that state, not a
+ * renderer of its own.
+ */
 export type RendererModeId =
   /** AURA's own WebGL2 runtime (three.js) drawing GLB derivatives of OpenUSD. */
-  | 'aura-web-runtime'
-  /** Deterministic 2D plan view used when WebGL2 is unusable. */
-  | 'aura-2d-fallback'
-  /** NVIDIA Omniverse Kit / RTX pixel stream delivered over WebRTC. */
-  | 'nvidia-kit-stream';
+  | 'browser-preview'
+  /** Omniverse Kit pixel stream delivered by NVIDIA Cloud Functions. */
+  | 'kit-stream-nvcf'
+  /** Omniverse Kit pixel stream from a self-managed GPU cluster. */
+  | 'kit-stream-self-managed'
+  /** No 3D renderer is drawing; AURA presents the deterministic plan view. */
+  | 'unavailable';
+
+/**
+ * Identifiers used before the ADR re-key. Kept so persisted rows, evidence
+ * files and older tests still resolve to a real mode instead of throwing.
+ */
+export const LEGACY_RENDERER_MODE_ALIASES: Record<string, RendererModeId> = {
+  'aura-web-runtime': 'browser-preview',
+  'aura-2d-fallback': 'unavailable',
+  'nvidia-kit-stream': 'kit-stream-nvcf',
+};
 
 export type RendererAvailability = 'active' | 'fallback' | 'unavailable';
 
@@ -46,8 +68,8 @@ const KIT_BLOCKED_REASON =
 
 export const RENDERER_MODES: RendererModeRecord[] = [
   {
-    id: 'aura-web-runtime',
-    label: 'AURA Web Runtime',
+    id: 'browser-preview',
+    label: 'AURA browser preview',
     description:
       'AURA renders the twin in the browser with WebGL2, using GLB derivatives generated from the OpenUSD masters.',
     nvidiaRuntime: false,
@@ -55,22 +77,32 @@ export const RENDERER_MODES: RendererModeRecord[] = [
     blockedReason: null,
   },
   {
-    id: 'aura-2d-fallback',
-    label: 'AURA 2D plan view',
+    id: 'kit-stream-nvcf',
+    label: 'Omniverse Kit stream (NVCF)',
     description:
-      'Deterministic plan view of the same model, shown when WebGL2 is unavailable or the canvas fails to mount.',
-    nvidiaRuntime: false,
-    implementation: 'src/components/twin-visualization/TwinFallback2D.tsx',
-    blockedReason: null,
-  },
-  {
-    id: 'nvidia-kit-stream',
-    label: 'Omniverse Kit / RTX stream',
-    description:
-      'A pixel stream rendered by NVIDIA Omniverse Kit and delivered over WebRTC. Not part of this build.',
+      'A pixel stream rendered by NVIDIA Omniverse Kit and delivered over WebRTC from NVIDIA Cloud Functions. This is the selected production-pilot streaming path and is not present in this build.',
     nvidiaRuntime: true,
     implementation: 'src/components/twin-visualization/OmniverseStreamViewer.tsx',
     blockedReason: KIT_BLOCKED_REASON,
+  },
+  {
+    id: 'kit-stream-self-managed',
+    label: 'Omniverse Kit stream (self-managed GPU)',
+    description:
+      'An Omniverse Kit pixel stream from a self-managed GPU cluster. Deferred by the hybrid runtime ADR; no implementation exists and none may be added without a separate ADR.',
+    nvidiaRuntime: true,
+    implementation: null,
+    blockedReason:
+      'Self-managed Kit streaming is deferred by the hybrid runtime ADR. NVCF is the single production pilot path until a documented sovereignty requirement changes that.',
+  },
+  {
+    id: 'unavailable',
+    label: 'No 3D renderer (deterministic plan view)',
+    description:
+      'No renderer is drawing the twin. AURA shows the deterministic 2D plan view of the same model when WebGL2 is unusable or the canvas fails to mount.',
+    nvidiaRuntime: false,
+    implementation: 'src/components/twin-visualization/TwinFallback2D.tsx',
+    blockedReason: null,
   },
 ];
 
@@ -78,6 +110,11 @@ export function getRendererMode(id: RendererModeId): RendererModeRecord {
   const mode = RENDERER_MODES.find((m) => m.id === id);
   if (!mode) throw new Error(`Unknown renderer mode: ${id}`);
   return mode;
+}
+
+/** Resolve a possibly-legacy identifier to a current mode. */
+export function resolveRendererModeId(id: string): RendererModeRecord {
+  return getRendererMode((LEGACY_RENDERER_MODE_ALIASES[id] ?? id) as RendererModeId);
 }
 
 export interface RendererModeState {
@@ -93,7 +130,7 @@ export interface RendererModeState {
  */
 export function resolveKitStreamState(): RendererModeState {
   const cfg = readKitConfig();
-  const mode = getRendererMode('nvidia-kit-stream');
+  const mode = getRendererMode('kit-stream-nvcf');
   const usable = cfg.enabled && cfg.streamEnabled && Boolean(cfg.signalingHost);
   return usable
     ? { mode, availability: 'active', reason: 'Streaming session reachable.' }
@@ -117,7 +154,7 @@ export function resolveRendererMode(input: {
 
   if (!input.webgl2Available || input.canvasFailed) {
     return {
-      mode: getRendererMode('aura-2d-fallback'),
+      mode: getRendererMode('unavailable'),
       availability: 'fallback',
       reason: input.canvasFailed
         ? 'The 3D canvas failed to mount. Showing the deterministic plan view of the same model.'
@@ -126,7 +163,7 @@ export function resolveRendererMode(input: {
   }
 
   return {
-    mode: getRendererMode('aura-web-runtime'),
+    mode: getRendererMode('browser-preview'),
     availability: 'active',
     reason: 'Rendered by AURA in the browser. This is not an Omniverse Kit or RTX session.',
   };

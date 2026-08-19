@@ -56,6 +56,12 @@ export const PUBLIC_ROUTES: RouteRecord[] = [
   { path: '/sign-up', shell: 'public', kind: 'canonical' },
   { path: '/forgot-password', shell: 'public', kind: 'canonical' },
   { path: '/mfa', shell: 'public', kind: 'canonical' },
+  {
+    path: '/auth/callback',
+    shell: 'public',
+    kind: 'canonical',
+    note: 'OAuth/SSO redirect target; completes the Supabase session exchange.',
+  },
   { path: '/onboarding', shell: 'public', kind: 'canonical' },
   { path: '/twin-datacentre', shell: 'public', kind: 'canonical', note: 'Public landing variant.' },
   { path: '/data-centre-twin', shell: 'public', kind: 'canonical', note: 'Public demo of the twin dashboard.' },
@@ -72,6 +78,10 @@ export const PUBLIC_ROUTES: RouteRecord[] = [
   // internal, pilot) so signing out never depends on the classification that
   // is failing. Intentionally repeated; the test asserts it stays present.
   { path: '/sign-out', shell: 'session', kind: 'canonical' },
+  // Mounted in the unauthenticated branch (as a sign-in redirect that keeps
+  // the token) and in every session branch (as the acceptance page), so an
+  // invited user lands on the same URL before and after authenticating.
+  { path: '/invite/accept', shell: 'session', kind: 'canonical', note: 'Team invite acceptance.' },
   { path: '/pilot/*', shell: 'session', kind: 'canonical', note: 'Sealed pilot shell.' },
   { path: '/*', shell: 'session', kind: 'canonical', note: 'Internal users fall through to AuthenticatedShell.' },
 ];

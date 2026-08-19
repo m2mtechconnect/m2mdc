@@ -12,12 +12,15 @@
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { resolveCallerTenant, tenantVisible } from '../_shared/connectionTenant.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
 
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
+// Scoped CORS: origin is resolved per request from the shared allowlist;
+// the method/header allowances below are specific to this function.
+const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
+let CORS: Record<string, string> = { ...getCorsHeaders(null), ...CORS_EXTRA };
 
 const LANES = new Set(['aws', 'brev']);
 
@@ -65,6 +68,7 @@ function laneBlockers(lane: string): Blocker[] {
 }
 
 Deno.serve(async (req) => {
+  CORS = { ...getCorsHeaders(req.headers.get('origin')), ...CORS_EXTRA };
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (req.method !== 'POST') return json(405, { error_code: 'method_not_allowed' });
 

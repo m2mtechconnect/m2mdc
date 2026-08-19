@@ -8,18 +8,22 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { MANAGED_CONNECTOR_MANIFEST, isRuntimeSelectable } from '../_shared/managedConnectorManifest.ts';
 import { resolveCallerTenant } from '../_shared/connectionTenant.ts';
 import { isManagedUserClientConfigured, managedUserBinding } from '../_shared/managedUserBindings.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
 
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
+// Scoped CORS: origin is resolved per request from the shared allowlist;
+// the method/header allowances below are specific to this function.
+const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
+let CORS: Record<string, string> = { ...getCorsHeaders(null), ...CORS_EXTRA };
 
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
 }
 
 Deno.serve(async (req) => {
+  CORS = { ...getCorsHeaders(req.headers.get('origin')), ...CORS_EXTRA };
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
 
   const correlationId = crypto.randomUUID();

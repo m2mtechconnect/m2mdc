@@ -20,6 +20,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { jwtVerify, importJWK, decodeProtectedHeader } from 'jose';
+import { getCorsHeaders } from '../_shared/cors.ts';
 import {
   parseDsxEvent,
   DEFAULT_FRESHNESS_BUDGET_MS,
@@ -34,12 +35,14 @@ const CLOCK_TOLERANCE_MS = 30_000;
 const MAX_AUTH_HEADER_BYTES = 8_192;
 const MAX_BODY_BYTES = 65_536;
 const MIN_RSA_MODULUS_BITS = 2048;
-const CORS_HEADERS: Record<string, string> = {
-  'Access-Control-Allow-Origin': '*',
+// Scoped CORS: origin is resolved per request from the shared allowlist;
+// the method/header allowances below are specific to this function.
+const CORS_HEADERS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers':
     'authorization, x-client-info, apikey, content-type, x-request-id',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
+let CORS_HEADERS: Record<string, string> = { ...getCorsHeaders(null), ...CORS_HEADERS_EXTRA };
 void DEFAULT_FRESHNESS_BUDGET_MS;
 
 // ---------------------------------------------------------------------------
@@ -334,6 +337,7 @@ export function __resetTestAdapters(): void {
 // Main handler.
 // ---------------------------------------------------------------------------
 export async function handleRequest(req: Request): Promise<Response> {
+  CORS_HEADERS = { ...getCorsHeaders(req.headers.get('origin')), ...CORS_HEADERS_EXTRA };
   const requestId =
     req.headers.get('x-request-id') ||
     (globalThis.crypto?.randomUUID?.() ?? String(Date.now()));

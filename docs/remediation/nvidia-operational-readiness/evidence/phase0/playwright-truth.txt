@@ -1,0 +1,356 @@
+[1A[2K[WebServer] 
+[WebServer]   [32m[1mVITE[22m v5.4.19[39m  [2mready in [0m[1m846[22m[2m[0m ms[22m
+[WebServer] 
+
+[1A[2K[WebServer]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m8091[22m/[39m
+[WebServer]   [32m➜[39m  [1mNetwork[22m: [36mhttp://10.104.138.161:[1m8091[22m/[39m
+
+[1A[2K[WebServer] Browserslist: browsers data (caniuse-lite) is 14 months old. Please run:
+[WebServer]   npx update-browserslist-db@latest
+[WebServer]   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+
+Running 206 tests using 1 worker
+
+[1A[2K[1/206] [chromium] › tests/truth-in-ui/auth-surfaces.spec.ts:78:3 › Auth-gated surfaces — mocked session, zero external egress › /dashboard renders with mocked session and no live provenance
+[1A[2K[chromium] › tests/truth-in-ui/auth-surfaces.spec.ts:78:3 › Auth-gated surfaces — mocked session, zero external egress › /dashboard renders with mocked session and no live provenance
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[2/206] [chromium] › tests/truth-in-ui/auth-surfaces.spec.ts:84:3 › Auth-gated surfaces — mocked session, zero external egress › /intelligence exposes active export controls and no live provenance
+[1A[2K[3/206] [chromium] › tests/truth-in-ui/auth-surfaces.spec.ts:95:3 › Auth-gated surfaces — mocked session, zero external egress › /compliance exposes DISABLED audit-export control with reason
+[1A[2K[4/206] [chromium] › tests/truth-in-ui/auth-surfaces.spec.ts:109:3 › Auth-gated surfaces — mocked session, zero external egress › /infrastructure renders provenance manifest and no live provenance
+[1A[2K[5/206] [chromium] › tests/truth-in-ui/auth-surfaces.spec.ts:121:3 › Sovereign export control — reachable via demo route › data-centre-twin ?demo=true — no live provenance on retrofitted domains
+[1A[2K[6/206] [chromium] › tests/truth-in-ui/axe-a11y-authed.spec.ts:76:5 › Axe a11y — auth-gated surfaces › axe: builder — no unlabeled inputs or ARIA violations
+[1A[2K[7/206] [chromium] › tests/truth-in-ui/axe-a11y-authed.spec.ts:76:5 › Axe a11y — auth-gated surfaces › axe: agents — no unlabeled inputs or ARIA violations
+[1A[2K[8/206] [chromium] › tests/truth-in-ui/axe-a11y-authed.spec.ts:90:3 › Axe a11y — auth-gated surfaces › axe: CoPilot overlay — no unlabeled inputs or ARIA violations
+[1A[2K[9/206] [chromium] › tests/truth-in-ui/axe-a11y.spec.ts:43:3 › axe: landing — no unlabeled inputs or ARIA violations
+[1A[2K[10/206] [chromium] › tests/truth-in-ui/axe-a11y.spec.ts:43:3 › axe: login — no unlabeled inputs or ARIA violations
+[1A[2K[11/206] [chromium] › tests/truth-in-ui/axe-a11y.spec.ts:43:3 › axe: signup — no unlabeled inputs or ARIA violations
+[1A[2K[12/206] [chromium] › tests/truth-in-ui/axe-a11y.spec.ts:43:3 › axe: twin-preview — no unlabeled inputs or ARIA violations
+[1A[2K[13/206] [chromium] › tests/truth-in-ui/axe-a11y.spec.ts:43:3 › axe: data-centre-twin (demo) — no unlabeled inputs or ARIA violations
+[1A[2K  1) [chromium] › tests/truth-in-ui/axe-a11y.spec.ts:43:3 › axe: data-centre-twin (demo) — no unlabeled inputs or ARIA violations 
+
+    Error: axe violations on /data-centre-twin?demo=true
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  -   1[39m
+    [31m+ Received  + 235[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   Object {[39m
+    [31m+     "description": "Ensure buttons have discernible text",[39m
+    [31m+     "help": "Buttons must have discernible text",[39m
+    [31m+     "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/button-name?application=playwright",[39m
+    [31m+     "id": "button-name",[39m
+    [31m+     "impact": "critical",[39m
+    [31m+     "nodes": Array [[39m
+    [31m+       Object {[39m
+    [31m+         "all": Array [],[39m
+    [31m+         "any": Array [[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "button-has-visible-text",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "Element does not have inner text that is visible to screen readers",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "aria-label",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "aria-label attribute does not exist or is empty",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "aria-labelledby",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": Object {[39m
+    [31m+               "messageKey": "noAttr",[39m
+    [31m+             },[39m
+    [31m+             "id": "non-empty-title",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "Element has no title attribute",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "implicit-label",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "Element does not have an implicit (wrapped) <label>",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "explicit-label",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "Element does not have an explicit <label>",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "presentational-role",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "Element's default semantics were not overridden with role=\"none\" or role=\"presentation\"",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+         ],[39m
+    [31m+         "failureSummary": "Fix any of the following:[39m
+    [31m+   Element does not have inner text that is visible to screen readers[39m
+    [31m+   aria-label attribute does not exist or is empty[39m
+    [31m+   aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty[39m
+    [31m+   Element has no title attribute[39m
+    [31m+   Element does not have an implicit (wrapped) <label>[39m
+    [31m+   Element does not have an explicit <label>[39m
+    [31m+   Element's default semantics were not overridden with role=\"none\" or role=\"presentation\"",[39m
+    [31m+         "html": "<button class=\"inline-flex items-ce...\" data-state=\"closed\">",[39m
+    [31m+         "impact": "critical",[39m
+    [31m+         "none": Array [],[39m
+    [31m+         "target": Array [[39m
+    [31m+           ".w-8.text-slate-300.hover\\:text-white:nth-child(1)",[39m
+    [31m+         ],[39m
+    [31m+       },[39m
+    [31m+       Object {[39m
+    [31m+         "all": Array [],[39m
+    [31m+         "any": Array [[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "button-has-visible-text",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "Element does not have inner text that is visible to screen readers",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "aria-label",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "aria-label attribute does not exist or is empty",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "aria-labelledby",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": Object {[39m
+    [31m+               "messageKey": "noAttr",[39m
+    [31m+             },[39m
+    [31m+             "id": "non-empty-title",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "Element has no title attribute",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "implicit-label",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "Element does not have an implicit (wrapped) <label>",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "explicit-label",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "Element does not have an explicit <label>",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "presentational-role",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "Element's default semantics were not overridden with role=\"none\" or role=\"presentation\"",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+         ],[39m
+    [31m+         "failureSummary": "Fix any of the following:[39m
+    [31m+   Element does not have inner text that is visible to screen readers[39m
+    [31m+   aria-label attribute does not exist or is empty[39m
+    [31m+   aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty[39m
+    [31m+   Element has no title attribute[39m
+    [31m+   Element does not have an implicit (wrapped) <label>[39m
+    [31m+   Element does not have an explicit <label>[39m
+    [31m+   Element's default semantics were not overridden with role=\"none\" or role=\"presentation\"",[39m
+    [31m+         "html": "<button class=\"inline-flex items-ce...\" data-state=\"closed\">",[39m
+    [31m+         "impact": "critical",[39m
+    [31m+         "none": Array [],[39m
+    [31m+         "target": Array [[39m
+    [31m+           ".w-8.text-slate-300.hover\\:text-white:nth-child(2)",[39m
+    [31m+         ],[39m
+    [31m+       },[39m
+    [31m+       Object {[39m
+    [31m+         "all": Array [],[39m
+    [31m+         "any": Array [[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "button-has-visible-text",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "Element does not have inner text that is visible to screen readers",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "aria-label",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "aria-label attribute does not exist or is empty",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "aria-labelledby",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": Object {[39m
+    [31m+               "messageKey": "noAttr",[39m
+    [31m+             },[39m
+    [31m+             "id": "non-empty-title",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "Element has no title attribute",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "implicit-label",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "Element does not have an implicit (wrapped) <label>",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "explicit-label",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "Element does not have an explicit <label>",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+           Object {[39m
+    [31m+             "data": null,[39m
+    [31m+             "id": "presentational-role",[39m
+    [31m+             "impact": "critical",[39m
+    [31m+             "message": "Element's default semantics were not overridden with role=\"none\" or role=\"presentation\"",[39m
+    [31m+             "relatedNodes": Array [],[39m
+    [31m+           },[39m
+    [31m+         ],[39m
+    [31m+         "failureSummary": "Fix any of the following:[39m
+    [31m+   Element does not have inner text that is visible to screen readers[39m
+    [31m+   aria-label attribute does not exist or is empty[39m
+    [31m+   aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty[39m
+    [31m+   Element has no title attribute[39m
+    [31m+   Element does not have an implicit (wrapped) <label>[39m
+    [31m+   Element does not have an explicit <label>[39m
+    [31m+   Element's default semantics were not overridden with role=\"none\" or role=\"presentation\"",[39m
+    [31m+         "html": "<button class=\"inline-flex items-ce...\" data-state=\"closed\">",[39m
+    [31m+         "impact": "critical",[39m
+    [31m+         "none": Array [],[39m
+    [31m+         "target": Array [[39m
+    [31m+           ".w-8.text-slate-300.hover\\:text-white:nth-child(3)",[39m
+    [31m+         ],[39m
+    [31m+       },[39m
+    [31m+     ],[39m
+    [31m+     "tags": Array [[39m
+    [31m+       "cat.name-role-value",[39m
+    [31m+       "wcag2a",[39m
+    [31m+       "wcag412",[39m
+    [31m+       "section508",[39m
+    [31m+       "section508.22.a",[39m
+    [31m+       "TTv5",[39m
+    [31m+       "TT6.a",[39m
+    [31m+       "EN-301-549",[39m
+    [31m+       "EN-9.4.1.2",[39m
+    [31m+       "ACT",[39m
+    [31m+       "RGAAv4",[39m
+    [31m+       "RGAA-11.9.1",[39m
+    [31m+     ],[39m
+    [31m+   },[39m
+    [31m+ ][39m
+
+      79 |     }
+      80 |
+    > 81 |     expect(results.violations, `axe violations on ${surface.path}`).toEqual([]);
+         |                                                                     ^
+      82 |     void guard;
+      83 |   });
+      84 | }
+        at /dev-server/tests/truth-in-ui/axe-a11y.spec.ts:81:69
+
+    Error Context: test-results/axe-a11y-axe-data-centre-t-ff7de-d-inputs-or-ARIA-violations-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/axe-a11y-axe-data-centre-t-ff7de-d-inputs-or-ARIA-violations-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/axe-a11y-axe-data-centre-t-ff7de-d-inputs-or-ARIA-violations-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[14/206] [chromium] › tests/truth-in-ui/axe-contrast-focus.spec.ts:274:5 › a11y — color contrast + focus indicators (public) › landing — contrast + focus rings
+[1A[2K[chromium] › tests/truth-in-ui/axe-contrast-focus.spec.ts:274:5 › a11y — color contrast + focus indicators (public) › landing — contrast + focus rings
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+
+[1A[2K[15/206] [chromium] › tests/truth-in-ui/axe-contrast-focus.spec.ts:274:5 › a11y — color contrast + focus indicators (public) › login — contrast + focus rings
+[1A[2K[16/206] [chromium] › tests/truth-in-ui/axe-contrast-focus.spec.ts:274:5 › a11y — color contrast + focus indicators (public) › signup — contrast + focus rings
+[1A[2K[17/206] [chromium] › tests/truth-in-ui/axe-contrast-focus.spec.ts:274:5 › a11y — color contrast + focus indicators (public) › twin-preview — contrast + focus rings
+[1A[2K[18/206] [chromium] › tests/truth-in-ui/axe-contrast-focus.spec.ts:274:5 › a11y — color contrast + focus indicators (public) › data-centre-twin (demo) — contrast + focus rings
+[1A[2K[19/206] [chromium] › tests/truth-in-ui/axe-contrast-focus.spec.ts:297:5 › a11y — color contrast + focus indicators (auth-gated + overlays) › dashboard — contrast + focus rings
+[1A[2K[20/206] [chromium] › tests/truth-in-ui/axe-contrast-focus.spec.ts:297:5 › a11y — color contrast + focus indicators (auth-gated + overlays) › builder — contrast + focus rings
+[1A[2K[21/206] [chromium] › tests/truth-in-ui/axe-contrast-focus.spec.ts:297:5 › a11y — color contrast + focus indicators (auth-gated + overlays) › agents — contrast + focus rings
+[1A[2K[22/206] [chromium] › tests/truth-in-ui/axe-contrast-focus.spec.ts:297:5 › a11y — color contrast + focus indicators (auth-gated + overlays) › dashboard + CoPilot overlay — contrast + focus rings
+[1A[2K[23/206] [chromium] › tests/truth-in-ui/command-palette-focus-rings.spec.ts:240:3 › Command Palette — focus rings on every control › search input, results, and actions all show focus indicators
+[1A[2K[24/206] [chromium] › tests/truth-in-ui/command-palette-focus-rings.spec.ts:282:3 › Command Palette — focus rings on every control › typing filters results and refocused matches still ring
+[1A[2K[25/206] [chromium] › tests/truth-in-ui/copilot-axe-audit.spec.ts:16:1 › axe: CoPilot drawer — no violations on blocking rules
+[1A[2K[26/206] [chromium] › tests/truth-in-ui/copilot-escape-backdrop-return-focus.spec.ts:87:3 › CoPilot drawer — Escape + backdrop-click return focus to launcher › Escape closes and returns focus to the exact launcher
+[1A[2K[27/206] [chromium] › tests/truth-in-ui/copilot-escape-backdrop-return-focus.spec.ts:110:3 › CoPilot drawer — Escape + backdrop-click return focus to launcher › backdrop click closes and returns focus to the exact launcher
+[1A[2K[28/206] [chromium] › tests/truth-in-ui/copilot-focus-trap-return.spec.ts:104:3 › CoPilot drawer — focus trap and return › Escape closes and returns focus to the exact launcher
+[1A[2K[29/206] [chromium] › tests/truth-in-ui/copilot-focus-trap-return.spec.ts:128:3 › CoPilot drawer — focus trap and return › overlay Close button closes and returns focus to the exact launcher
+[1A[2K[30/206] [chromium] › tests/truth-in-ui/copilot-focus-trap-return.spec.ts:152:3 › CoPilot drawer — focus trap and return › Tab and Shift+Tab wrap focus inside the drawer (focus trap)
+[1A[2K[31/206] [chromium] › tests/truth-in-ui/copilot-tab-order-focus-rings.spec.ts:140:3 › CoPilot drawer — tab order and focus rings › Tab order visits every focusable control in DOM order
+[1A[2K[32/206] [chromium] › tests/truth-in-ui/copilot-tab-order-focus-rings.spec.ts:199:3 › CoPilot drawer — tab order and focus rings › Every focusable control inside the drawer shows a visible focus indicator
+[1A[2K[33/206] [chromium] › tests/truth-in-ui/copilot-tab-order-focus-rings.spec.ts:278:3 › CoPilot drawer — tab order and focus rings › Decorative aria-hidden elements inside the drawer are not tab targets
+[1A[2K[34/206] [chromium] › tests/truth-in-ui/dashboard-action-deeplink.spec.ts:11:3 › Action Center deep links › opening a row writes ?action= and the link restores the drawer
+[1A[2K[35/206] [chromium] › tests/truth-in-ui/dashboard-action-deeplink.spec.ts:25:3 › Action Center deep links › a deep link to a below-fold row also shows that row in the list
+[1A[2K[36/206] [chromium] › tests/truth-in-ui/dashboard-action-deeplink.spec.ts:41:3 › Action Center deep links › closing the drawer clears the parameter and preserves other state
+[1A[2K[37/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › / preserves context into /dashboard
+[1A[2K[38/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /command preserves context into /dashboard
+[1A[2K[39/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /evidence preserves context into /dsx/evidence-beta/decisions/log
+[1A[2K[40/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /build preserves context into /builder
+[1A[2K[41/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /omniverse-scene preserves context into /twin-preview
+[1A[2K[42/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /admin preserves context into /admin/signups-dashboard
+[1A[2K[43/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /operations preserves context into /analytics
+[1A[2K[44/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /intelligence preserves context into /analytics
+[1A[2K[45/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /integrations preserves context into /manage/integrations
+[1A[2K[46/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /marketplace/integrations preserves context into /manage/integrations
+[1A[2K[47/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /settings/integrations preserves context into /manage/integrations
+[1A[2K[48/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /facilities preserves context into /manage/facilities
+[1A[2K[49/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /manage/connections preserves context into /manage/integrations
+[1A[2K[50/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /connect/monitor preserves context into /manage/integrations?tab=activity
+[1A[2K[51/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /connect/health preserves context into /manage/integrations?tab=activity
+[1A[2K[52/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /agent-chat preserves context into /app/agents
+[1A[2K[53/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /agents preserves context into /app/agents
+[1A[2K[54/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /subsystem-agents preserves context into /app/agents
+[1A[2K[55/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /blueprint preserves context into /blueprint/default
+[1A[2K[56/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /universal-search preserves context into /search
+[1A[2K[57/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /settings/integrations/nvidia-dsx preserves context into /manage/integrations#nvidia-dsx
+[1A[2K[58/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /twin-datacentre preserves context into /blueprint/default
+[1A[2K[59/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /auth preserves context into /dashboard
+[1A[2K[60/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /sign-in preserves context into /dashboard
+[1A[2K[61/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /sign-up preserves context into /dashboard
+[1A[2K[62/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /forgot-password preserves context into /dashboard
+[1A[2K[63/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /mfa preserves context into /dashboard
+[1A[2K[64/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /digital-twins preserves context into /dashboard
+[1A[2K[65/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:160:5 › deep-link alias and redirect harness › /digital-twins/montreal preserves context into /dashboard
+[1A[2K[66/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:189:5 › deep-link alias and redirect harness › /app/agents/agent-1/operations rebuilds parameters into /app/agents/agent-1/manage
+[1A[2K[67/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:189:5 › deep-link alias and redirect harness › /twins/twin-1/manage rebuilds parameters into /app/agents/twin-1/manage
+[1A[2K[68/206] [chromium] › tests/truth-in-ui/deep-link-redirects.spec.ts:200:3 › deep-link alias and redirect harness › canonical routes are not themselves redirected
+[1A[2K[69/206] [chromium] › tests/truth-in-ui/dsx-card-destinations.spec.ts:154:3 › DSX Evidence Beta — clickable card destinations › every clickable card opens its correct, non-blank drawer
+exit=124

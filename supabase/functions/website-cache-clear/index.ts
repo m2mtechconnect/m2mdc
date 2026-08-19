@@ -1,14 +1,23 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getCorsHeaders } from "../_shared/cors.ts";
+import { requireCaller, callerRejectedResponse } from "../_shared/callerIdentity.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Phase 2: in-code caller identity. This handler holds a service-role
+  // client, so an anonymous caller must never reach its queries.
+  try {
+    await requireCaller(req);
+  } catch (error) {
+    const rejected = callerRejectedResponse(error, req);
+    if (rejected) return rejected;
+    throw error;
   }
 
   try {

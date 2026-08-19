@@ -1,3 +1,13 @@
+/**
+ * Machine-to-machine webhook entrypoints that deliberately deny every browser
+ * origin with `Access-Control-Allow-Origin: 'null'`. That is stricter than the
+ * shared allowlist, so they are exempt from the allowlist rule below.
+ */
+const BROWSERLESS_ENTRYPOINTS = new Set([
+  'zapier-webhook',
+  'zapier-webhook-trigger',
+]);
+
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -36,11 +46,20 @@ describe('edge function CORS', () => {
 
   it('resolves origins through the shared allowlist wherever CORS is emitted', () => {
     const offenders = functionEntrypoints().filter((path) => {
+      const name = path.split('/')[2];
+      if (BROWSERLESS_ENTRYPOINTS.has(name)) return false;
       const source = readFileSync(path, 'utf8');
       if (!source.includes('Access-Control-Allow-Origin')) return false;
       return !source.includes('_shared/cors.ts');
     });
 
     expect(offenders).toEqual([]);
+  });
+
+  it('keeps browserless webhooks denying every browser origin', () => {
+    for (const name of BROWSERLESS_ENTRYPOINTS) {
+      const source = readFileSync(join(FUNCTIONS_DIR, name, 'index.ts'), 'utf8');
+      expect(source).toContain("'Access-Control-Allow-Origin': 'null'");
+    }
   });
 });

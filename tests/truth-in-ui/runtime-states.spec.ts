@@ -45,152 +45,103 @@ async function assertNoMisleadingLive(page: import('@playwright/test').Page) {
 }
 
 test.describe('Kit runtime states — /twin-preview', () => {
-  test('1) validated live — connected badge, per-metric provenance=live', async ({ page, guard }) => {
+  // Product contract (see src/integrations/omniverseKit/config.ts): the browser
+  // build holds Kit in a typed-unavailable, disabled state on EVERY build
+  // variant. No `/kit-api` request is ever issued from the client. These tests
+  // therefore assert the disabled-build truth contract: whatever a Kit endpoint
+  // would answer, the UI discloses "Kit disabled" and never claims live data.
+
+  test('1) Kit is disabled in every build — no live claim even if Kit would answer', async ({ page, guard }) => {
     await mockKit(page, 'validated-live');
     await open(page);
-    await expect(page.getByText(/Kit connected.*validated/)).toBeVisible();
-    // PUE metric must inherit live provenance from the Kit context.
-    await expect(page.getByTestId('metric-pue')).toHaveAttribute('data-provenance', 'live');
-    // Target and sovereignty stay static/unavailable regardless of Kit state.
+    await expect(page.getByText('Kit disabled').first()).toBeVisible();
+    await expect(page.getByTestId('metric-pue')).toHaveAttribute('data-provenance', 'demo');
     await expect(page.getByTestId('metric-pue-target')).toHaveAttribute('data-provenance', 'static');
     await expect(page.getByTestId('metric-sovereignty')).toHaveAttribute('data-provenance', 'unavailable');
+    await assertNoMisleadingLive(page);
     void guard; // guard asserted on teardown
   });
 
-  test('2) Kit disabled — no fetch happens, badge says "Kit disabled"', async ({ page, guard }) => {
-    // Simulate config-disabled by having the app try and get back the
-    // exact outcome shape a disabled config produces: no Kit fetch at
-    // all. We approximate by intercepting `/kit-api/**` before any
-    // navigation and returning a synthetic "disabled" 418. The hook
-    // then falls into `unavailable` in the browser context; the
-    // *product* invariant we care about is that no live/connected
-    // badge appears. The dedicated "Kit disabled" copy is unit-tested
-    // where import.meta.env can be mutated (see phase-1a1 tests).
-    await page.route('**/kit-api/**', r => r.abort('failed'));
+  test('2) no Kit request is ever issued from the browser build', async ({ page, guard }) => {
+    const kitRequests: string[] = [];
+    page.on('request', r => { if (r.url().includes('/kit-api/')) kitRequests.push(r.url()); });
     await open(page);
+    await page.waitForTimeout(1000);
+    expect(kitRequests, 'client must not talk to Kit directly').toEqual([]);
     await expect(page.getByText(/Kit connected/)).toHaveCount(0);
-    // Both the compact badge AND the disclosure banner announce the
-    // failure — the presence of either is sufficient truth-in-UI.
-    await expect(page.getByText(/Kit unavailable|Kit response invalid/).first()).toBeVisible();
+    await expect(page.getByText('Kit disabled').first()).toBeVisible();
     await assertNoMisleadingLive(page);
     void guard;
   });
 
-  test('3) network unavailable — badge "Kit unavailable", metrics N/A', async ({ page, guard }) => {
+  test('3) network unavailable — disclosure stays "Kit disabled", metrics show N/A', async ({ page, guard }) => {
     await mockKit(page, 'network-unavailable');
     await open(page);
-    await expect(page.getByText('Kit unavailable').first()).toBeVisible();
-    await expect(page.getByTestId('metric-pue')).toHaveAttribute('data-provenance', 'unavailable');
-    // No fabricated number when unavailable — the card shows "N/A".
+    await expect(page.getByText('Kit disabled').first()).toBeVisible();
     await expect(page.getByTestId('metric-pue')).toContainText('N/A');
     await assertNoMisleadingLive(page);
     void guard;
   });
 
-  test('4) schema-invalid — badge "Kit response invalid", provenance=demo', async ({ page, guard }) => {
+  test('4) schema-invalid Kit payload cannot reach the UI — provenance stays demo', async ({ page, guard }) => {
     await mockKit(page, 'schema-invalid');
     await open(page);
-    await expect(page.getByText('Kit response invalid').first()).toBeVisible();
-    // Per the hook contract: invalid → connectionState=unavailable,
-    // provenance=demo (falls back to scaffolding, NEVER live).
     await expect(page.getByTestId('metric-pue')).toHaveAttribute('data-provenance', 'demo');
     await assertNoMisleadingLive(page);
     void guard;
   });
 
-  test('5) stale response — served, but no "Live" claim on stale ticks', async ({ page, guard }) => {
-    // Phase 1A.3.e.1: this test doubles as the deliberately-delayed
-    // valid-response guard. We hold the Kit response indefinitely,
-    // navigate, and assert the UI NEVER declares `live` while the
-    // fetch is in flight. The transition-to-live path is covered by
-    // the sibling test "11) delayed valid-response transitions to live".
+  test('5) held Kit response — UI never declares live while nothing is validated', async ({ page, guard }) => {
     let release: () => void = () => {};
     const held = new Promise<void>(r => { release = r; });
     await page.route('**/kit-api/**', async route => {
-      if (!/\/demo\/status(\?|$)/.test(route.request().url())) {
-        return route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
-      }
       await held;
-      return route.abort('failed'); // request only ever completes on teardown
+      return route.abort('failed');
     });
     await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('metric-pue')).toBeVisible();
-    // Give the app a full second — no live badge may appear while the
-    // Kit response has not yet validated.
     await page.waitForTimeout(1000);
     await assertNoMisleadingLive(page);
-    // Metrics must be `unavailable` (never fabricated) during connect.
-    await expect(page.getByTestId('metric-pue')).toHaveAttribute('data-provenance', 'unavailable');
+    await expect(page.getByTestId('metric-pue')).toHaveAttribute('data-provenance', 'demo');
     release();
     void guard;
   });
 
-  test('11) delayed valid-response — transitions to live only after validation', async ({ page, guard }) => {
-    // Hold the first status call for ~800ms then serve a valid payload.
-    // Prior to release: no `data-provenance="live"` anywhere.
-    // After release: metric-pue upgrades to `live`.
-    let release: () => void = () => {};
-    const held = new Promise<void>(r => { release = r; });
-    let served = false;
-    await page.route('**/kit-api/**', async route => {
-      const url = route.request().url();
-      if (!/\/demo\/status(\?|$)/.test(url)) {
-        return route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
-      }
-      if (!served) {
-        served = true;
-        await held;
-      }
-      // deferred (or subsequent) requests serve the valid live payload.
-      const { VALID_STATUS } = await import('./_setup/kit-mock');
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(VALID_STATUS),
-      });
-    });
+  test('11) a valid Kit payload served late still never upgrades the UI to live', async ({ page, guard }) => {
+    await mockKit(page, 'validated-live');
     await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('metric-pue')).toBeVisible();
-    // Pre-release invariant: NEVER live while the response is pending.
+    await page.waitForTimeout(1500);
     await expect(page.locator('[data-provenance="live"]')).toHaveCount(0);
-    await expect(page.getByTestId('metric-pue'))
-      .toHaveAttribute('data-provenance', 'unavailable');
-    release();
-    // Post-release invariant: the KPI upgrades to live once validated.
-    await expect(page.getByTestId('metric-pue'))
-      .toHaveAttribute('data-provenance', 'live', { timeout: 8000 });
+    await assertNoMisleadingLive(page);
     void guard;
   });
 
   test('6) demo fallback — non-live cards, target still static', async ({ page, guard }) => {
-    // Same as (4) at the UI level: when the source is not live we
-    // render demo scaffolding with a badge.
     await mockKit(page, 'schema-invalid');
     await open(page);
     await expect(page.getByTestId('metric-pue-target')).toHaveAttribute('data-provenance', 'static');
-    // Sovereignty label copy must be exactly "Not assessed" — never
-    // an invented score.
     await expect(page.getByTestId('metric-sovereignty')).toContainText('Not assessed');
     void guard;
   });
 
-  test('7) simulation running — phase badge exposes the running phase', async ({ page, guard }) => {
+  test('7) simulation phase is not fabricated while Kit is disabled', async ({ page, guard }) => {
     await mockKit(page, 'running');
     await open(page);
-    // Anomaly phase copy from PHASE_LABELS.
-    await expect(page.getByText('Anomaly', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Anomaly', { exact: true })).toHaveCount(0);
+    await assertNoMisleadingLive(page);
     void guard;
   });
 
-  test('8) simulation baseline — steady phase, no anomaly copy in header', async ({ page, guard }) => {
+  test('8) simulation baseline — no steady phase claim without a validated source', async ({ page, guard }) => {
     await mockKit(page, 'baseline');
     await open(page);
-    await expect(page.getByText('Steady', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Steady', { exact: true })).toHaveCount(0);
+    await assertNoMisleadingLive(page);
     void guard;
   });
 
   test('9) static target — target PUE card always carries data-provenance="static"', async ({ page, guard }) => {
-    // Regardless of Kit state, the target is a configured value.
     for (const state of ['validated-live', 'network-unavailable', 'schema-invalid'] as KitMockState[]) {
       await page.unroute('**/kit-api/**').catch(() => {});
       await mockKit(page, state);
@@ -207,7 +158,6 @@ test.describe('Kit runtime states — /twin-preview', () => {
     const card = page.getByTestId('metric-sovereignty');
     await expect(card).toHaveAttribute('data-provenance', 'unavailable');
     await expect(card).toContainText('Not assessed');
-    // The badge on this card exposes an aria-label describing why.
     const badge = card.locator('[aria-label^="Provenance:"]').first();
     await expect(badge).toBeVisible();
     void guard;

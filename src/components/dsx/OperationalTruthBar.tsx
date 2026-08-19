@@ -52,7 +52,7 @@ export function OperationalTruthBar() {
       data-mode={rt.snapshot.data_mode}
       className="relative w-full min-w-0 max-w-full border-b border-border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
-      <div className="grid grid-cols-1 gap-x-8 gap-y-5 px-3 py-3 sm:grid-cols-2 sm:px-4 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-x-8 gap-y-5 px-3 py-3 sm:grid-cols-2 sm:px-4 lg:grid-cols-4">
         {/* Facility identity and the trust level of what is displayed. */}
         <Cluster label="Facility context">
           <Field label="Facility" value={EVIDENCE_BETA_SITE.name} />

@@ -29,6 +29,8 @@ import PilotShell from "./pilot/PilotShell";
 import AuthorizationError from "./pages/AuthorizationError";
 import BoundedLoading from "@/components/shared/BoundedLoading";
 import ManagedUserReturn from '@/pages/oauth/ManagedUserReturn';
+import InviteAccept from './pages/InviteAccept';
+import { InviteSignInRedirect } from '@/routing/InviteSignInRedirect';
 import { MANAGED_USER_RETURN_PATH } from '@/connections/managedUserBinding';
 // Role-Aware Application Routing - Approved *internal* users (users with
 // an explicit row in public.user_roles) receive the full AURA DC
@@ -155,6 +157,7 @@ function AuthenticatedApp() {
         <Route path="/omniverse-scene" element={<Navigate to="/twin-preview" replace />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path={MANAGED_USER_RETURN_PATH} element={<ManagedUserReturn />} />
+        <Route path="/invite/accept" element={<InviteSignInRedirect />} />
         {import.meta.env.DEV && OverlayFixtures ? <Route path="/dev-overlays" element={<OverlayFixtures />} /> : null}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -166,6 +169,7 @@ function AuthenticatedApp() {
     return (
       <Routes>
         <Route path="/sign-out" element={<SignOut />} />
+        <Route path="/invite/accept" element={<InviteAccept />} />
         <Route path="*" element={<PendingApproval />} />
       </Routes>
     );
@@ -203,6 +207,7 @@ function ApprovedUserRouter() {
         <Route path="/pilot/*" element={<PilotShell />} />
         <Route path="/sign-out" element={<SignOut />} />
         <Route path={MANAGED_USER_RETURN_PATH} element={<ManagedUserReturn />} />
+        <Route path="/invite/accept" element={<InviteAccept />} />
         <Route path="/*" element={<AuthenticatedShell />} />
       </Routes>
     );
@@ -214,6 +219,7 @@ function ApprovedUserRouter() {
       <Route path="/pilot/*" element={<PilotShell />} />
       <Route path="/sign-out" element={<SignOut />} />
       <Route path={MANAGED_USER_RETURN_PATH} element={<ManagedUserReturn />} />
+      <Route path="/invite/accept" element={<InviteAccept />} />
       <Route path="*" element={<Navigate to="/pilot/overview" replace />} />
     </Routes>
   );

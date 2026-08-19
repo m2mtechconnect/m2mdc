@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { safeReturnPath } from "@/routing/AuthenticatedEntryRedirect";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";

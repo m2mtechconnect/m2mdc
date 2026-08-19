@@ -217,7 +217,7 @@ function WorkspaceHeader() {
   const title = evidenceTitle(pathname);
 
   return (
-    <header className="space-y-1 pb-4">
+    <header className="space-y-1.5 pb-5">
       <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-[11px] text-muted-foreground">
         <Link
           to={hrefWithContext(DSX_ROOT)}
@@ -240,7 +240,7 @@ function WorkspaceHeader() {
         <span aria-hidden>/</span>
         <span className="font-medium text-foreground">{title}</span>
       </nav>
-      <h1 className="text-lg font-semibold tracking-tight" data-testid="dsx-workspace-title">{title}</h1>
+      <h1 className="text-2xl font-semibold tracking-tight" data-testid="dsx-workspace-title">{title}</h1>
     </header>
   );
 }

@@ -125,7 +125,7 @@ export function MetricGrid({
           />
         </div>
       )}
-      <div className={cn('grid gap-3', columns)}>
+      <div className={cn('grid gap-4', columns)}>
         {shown.map((id) => (
           <MetricTile key={id} id={id} metric={metrics[id]} hideValidation={Boolean(shared)} />
         ))}

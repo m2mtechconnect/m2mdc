@@ -13,6 +13,7 @@ import { useTwinVisualizationData } from '@/components/twin-visualization/hooks/
 import { useSimulationVisualization } from '@/hooks/useSimulationVisualization';
 import { SimulationErrorBoundary } from '@/components/twin-visualization/SimulationErrorBoundary';
 import { useTwinOverlaySafe, OVERLAY_CONFIG } from '@/context/TwinOverlayContext';
+import { DeferredSceneMount } from '@/components/twin-visualization/DeferredSceneMount';
 import { cn } from '@/lib/utils';
 
 const DataCenter3DScene = lazy(() => 
@@ -77,22 +78,26 @@ export function MiniTwinPreview({ onExpand, className }: MiniTwinPreviewProps) {
       </CardHeader>
       <CardContent className="p-0 relative">
         <SimulationErrorBoundary fallbackMessage="Preview unavailable">
-          <Suspense fallback={<LoadingSkeleton />}>
-            <div className="h-40">
-              <DataCenter3DScene
-                racks={data.racks}
-                rows={data.rows}
-                powerSegments={data.powerSegments}
-                thermalZones={data.thermalZones}
-                events={[]}
-                compact
-                coveragePriority="secondary"
-                mode="dashboard"
-                activeOverlay={activeOverlay as any}
-                simulationKpis={simulation.currentKpis}
-              />
-            </div>
-          </Suspense>
+          {/* The preview is secondary chrome, so it never competes with the
+              dashboard tabs for the first seconds of main-thread time. */}
+          <DeferredSceneMount fallback={<LoadingSkeleton />}>
+            <Suspense fallback={<LoadingSkeleton />}>
+              <div className="h-40">
+                <DataCenter3DScene
+                  racks={data.racks}
+                  rows={data.rows}
+                  powerSegments={data.powerSegments}
+                  thermalZones={data.thermalZones}
+                  events={[]}
+                  compact
+                  coveragePriority="secondary"
+                  mode="dashboard"
+                  activeOverlay={activeOverlay as any}
+                  simulationKpis={simulation.currentKpis}
+                />
+              </div>
+            </Suspense>
+          </DeferredSceneMount>
         </SimulationErrorBoundary>
         
         {/* Quick stats overlay */}

@@ -8,6 +8,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { getCorsHeaders } from "../_shared/cors.ts";
 
+// Scoped CORS headers for this invocation. Module-level helpers below render
+// responses, so the resolved headers are held here and refreshed per request.
+let corsHeaders = getCorsHeaders(null);
+
+
 
 const MAX_BODY_BYTES = 16_000;
 const RATE_LIMIT_PER_HOUR = 5;
@@ -41,7 +46,7 @@ function list(value: unknown, max = 32): string[] | null {
 }
 
 Deno.serve(async (req) => {
-  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
+  corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
   if (req.method !== 'POST') return json(405, { error: 'method_not_allowed' });
 

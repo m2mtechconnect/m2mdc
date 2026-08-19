@@ -15,6 +15,11 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
+// Scoped CORS headers for this invocation. Module-level helpers below render
+// responses, so the resolved headers are held here and refreshed per request.
+let corsHeaders = getCorsHeaders(null);
+
+
 
 const json = (body: unknown, status: number) =>
   new Response(JSON.stringify(body), {
@@ -23,7 +28,7 @@ const json = (body: unknown, status: number) =>
   });
 
 serve(async (req) => {
-  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
+  corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

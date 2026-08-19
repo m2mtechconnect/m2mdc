@@ -34,8 +34,10 @@ serve(async (req) => {
     }
 
     const zapierClientId = Deno.env.get('ZAPIER_CLIENT_ID');
-    const zapierRedirectUri = Deno.env.get('ZAPIER_REDIRECT_URI') || 
-      'https://mlhcdcvpvztfjfndmxzl.supabase.co/functions/v1/zapier-oauth-callback';
+    // Derived from this deployment rather than hardcoded to a foreign project,
+    // and it must match the value used by zapier-oauth-callback.
+    const zapierRedirectUri = Deno.env.get('ZAPIER_REDIRECT_URI') ||
+      `${(Deno.env.get('SUPABASE_URL') ?? '').replace(/\/$/, '')}/functions/v1/zapier-oauth-callback`;
     const zapierScopes = Deno.env.get('ZAPIER_SCOPES') || 'apps:read connections:write connections:read';
 
     if (!zapierClientId) {

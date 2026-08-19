@@ -3,7 +3,7 @@
  *
  * For each portal-mounted overlay primitive (Popover, Tooltip,
  * DropdownMenu, HoverCard), open the overlay from the dedicated
- * `/test/overlay-fixtures` route and verify every focusable control
+ * `/dev-overlays` route and verify every focusable control
  * inside its content paints a visible focus indicator (outline change
  * or box-shadow ring) when it receives focus.
  *
@@ -139,7 +139,7 @@ async function probeFocusInside(
 }
 
 async function gotoFixtures(page: Page) {
-  await page.goto('/test/overlay-fixtures', { waitUntil: 'domcontentloaded' });
+  await page.goto('/dev-overlays', { waitUntil: 'domcontentloaded' });
   await page.getByTestId('overlay-fixtures').waitFor({ state: 'visible', timeout: 10_000 });
 }
 

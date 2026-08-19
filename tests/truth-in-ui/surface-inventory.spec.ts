@@ -45,6 +45,10 @@ test.describe('Surface inventory — public retrofitted routes', () => {
   });
 
   test('data-centre-twin demo mode exposes 9 domain views with correct provenance', async ({ page, guard }) => {
+    // The twin route mounts a WebGL scene that rasterizes on CPU in headless
+    // Chromium, and this test walks all nine domain tabs in one pass. The
+    // default 20s budget is a harness limit, not a product signal.
+    test.setTimeout(300_000);
     // Kit unavailable so no external assumptions leak in.
     await mockKit(page, 'network-unavailable');
     await page.goto('/data-centre-twin?demo=true', { waitUntil: 'domcontentloaded' });
@@ -52,12 +56,14 @@ test.describe('Surface inventory — public retrofitted routes', () => {
     for (const view of DOMAIN_VIEWS) {
       // Tabs are `role="tab"` from shadcn's Tabs primitive.
       const tab = page.getByRole('tab', { name: view.tab });
-      // Some domain tabs may be behind a "more" affordance on smaller
-      // viewports; scroll into view before clicking.
-      await tab.scrollIntoViewIfNeeded();
-      await tab.click();
+      // The twin route runs a continuous WebGL render loop, so Playwright's
+      // stability heuristic can never settle on the tab strip. Assert the tab
+      // exists, then dispatch the click without actionability polling.
+      await expect(tab).toBeVisible();
+      await tab.evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'instant' as ScrollBehavior }));
+      await tab.click({ force: true });
       const panel = page.getByTestId(view.testid);
-      await expect(panel, `${view.tab} view visible`).toBeVisible();
+      await expect(panel, `${view.tab} view visible`).toBeVisible({ timeout: 30_000 });
       await expect(panel, `${view.tab} carries provenance=${view.provenance}`)
         .toHaveAttribute('data-provenance', view.provenance);
       // No domain view fabricates live provenance.

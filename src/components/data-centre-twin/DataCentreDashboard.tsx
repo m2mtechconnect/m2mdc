@@ -38,7 +38,6 @@ import {
   CompactEventTimeline,
   CompactDCToolsPanel,
   SimulationSummaryCard,
-  MiniTwinPreview
 } from './overview';
 import { useCoPilotCommands } from '@/contexts/CoPilotCommandContext';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';

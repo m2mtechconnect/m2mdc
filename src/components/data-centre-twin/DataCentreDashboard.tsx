@@ -385,7 +385,10 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
         placeholder="Search racks, sensors, metrics..."
       />
 
-      {/* Hero KPI Row - Simulation Aware */}
+      {/* Hero KPI Row - Simulation Aware.
+          Hidden on the Overview tab, where the KPI Cockpit already presents
+          the same four indicators in a richer form. */}
+      {activeTab !== 'overview' && (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="relative">
           {isSimulating && (
@@ -447,6 +450,7 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
           />
         </div>
       </div>
+      )}
 
       {/* Main content with tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -483,10 +487,6 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
             
             {/* Right Column - Secondary Content */}
             <div className="min-w-0 space-y-8">
-              {/* Mini 3D Twin Preview */}
-              <div data-tour="overview-3d-preview">
-                <MiniTwinPreview onExpand={() => setActiveTab('simulation')} />
-              </div>
               <CompactRackOverview facility={facility} maxRacks={12} />
               <div data-tour="overview-tools">
                 <CompactDCToolsPanel twinId={twinId} maxVisible={4} />

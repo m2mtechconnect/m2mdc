@@ -4,7 +4,8 @@
  */
 
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { safeReturnPath } from "@/routing/AuthenticatedEntryRedirect";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,24 +35,28 @@ export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // An invite (or any gated deep link) hands us a return path; honour it so
+  // the token survives the sign-in round trip.
+  const postSignInPath = safeReturnPath(searchParams.get('returnTo')) ?? '/';
 
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate('/');
+        navigate(postSignInPath);
       }
     };
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        navigate('/');
+        navigate(postSignInPath);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, postSignInPath]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +85,7 @@ export default function SignIn() {
       }
 
       toast.success("Welcome back!");
-      navigate("/");
+      navigate(postSignInPath);
     } catch (err) {
       if (err instanceof z.ZodError) {
         setError(err.errors?.[0]?.message || 'Validation error');

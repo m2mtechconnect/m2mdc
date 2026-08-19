@@ -260,9 +260,11 @@ function ShellBody() {
       <div className="flex flex-1 min-w-0 flex-col lg:flex-row">
         <WorkspaceNav />
         <div className="min-w-0 flex-1 p-4 sm:p-6">
-          <WorkspaceHeader />
-          <Outlet />
-          <RelatedWorkspaces />
+          <div className="mx-auto w-full min-w-0 max-w-[1400px]">
+            <WorkspaceHeader />
+            <Outlet />
+            <RelatedWorkspaces />
+          </div>
         </div>
       </div>
       <SideInspector />

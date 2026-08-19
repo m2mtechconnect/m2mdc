@@ -30,7 +30,7 @@ serve(createHandler({
     log("Fetching builder draft", { builderId });
 
     // First, try to load from the new agents-based builder store
-    const { data: builder, error: dbError } = await supabase
+    let { data: builder, error: dbError } = await supabase
       .from('agents')
       .select('*')
       .eq('id', builderId)

@@ -12,8 +12,9 @@ serve(async (req) => {
 
   // Phase 2: in-code caller identity. This handler holds a service-role
   // client, so an anonymous caller must never reach its queries.
+  let caller;
   try {
-    await requireCaller(req);
+    caller = await requireCaller(req);
   } catch (error) {
     const rejected = callerRejectedResponse(error, req);
     if (rejected) return rejected;
@@ -41,6 +42,8 @@ serve(async (req) => {
       .from('integrations_connections')
       .select('*')
       .eq('id', connectionId)
+      // Phase 3: a caller may only execute against a connection they own.
+      .eq('user_id', caller.userId)
       .single();
 
     if (connError || !connection) {

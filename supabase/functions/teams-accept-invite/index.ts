@@ -1,5 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { getCorsHeaders } from "../_shared/cors.ts";
+
+// Scoped CORS headers for this invocation. Module-level helpers below render
+// responses, so the resolved headers are held here and refreshed per request.
+let corsHeaders = getCorsHeaders(null);
+
 
 // An invite may only ever confer a non-privileged role. Kept in sync with
 // teams-invite so a stale row can never escalate on acceptance.
@@ -14,10 +20,6 @@ const INVITABLE_ROLES = new Set([
   'support',
 ]);
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
-};
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -26,6 +28,7 @@ const json = (body: unknown, status = 200) =>
   });
 
 serve(async (req) => {
+  corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

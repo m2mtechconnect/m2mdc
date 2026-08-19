@@ -1,11 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-// @ts-expect-error -- remote Deno module, no local types
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getCorsHeaders } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+// Scoped CORS headers for this invocation. Module-level helpers below render
+// responses, so the resolved headers are held here and refreshed per request.
+let corsHeaders = getCorsHeaders(null);
+
+
 
 // Normalized response type
 interface RecoResponse {
@@ -47,6 +48,7 @@ const normalizeResponse = (partial: Partial<RecoResponse>, domain: string): Reco
 });
 
 serve(async (req) => {
+  corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -95,7 +97,7 @@ serve(async (req) => {
     const normalizedDomain = urlObj.hostname.replace(/^www\./, '');
 
     // Get or create site
-    const { data: site, error: siteError } = await supabase
+    let { data: site, error: siteError } = await supabase
       .from('sites')
       .select('*')
       .eq('domain', normalizedDomain)

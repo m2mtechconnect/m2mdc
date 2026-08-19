@@ -1,0 +1,3 @@
+OPTIONS public-intake (allowed origin) -> echoes origin
+OPTIONS public-intake (evil.example.com) -> falls back to https://auradc.m2mtechconnect.com
+POST website-cache-clear unauthenticated -> 401

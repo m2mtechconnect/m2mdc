@@ -1,0 +1,164 @@
+$ vite build
+vite v5.4.19 building for production...
+transforming...
+Browserslist: browsers data (caniuse-lite) is 14 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+✓ 4976 modules transformed.
+Export "useSovereignty" of module "src/sovereignty/useSovereignty.ts" was reexported through module "src/sovereignty/index.ts" while both modules are dependencies of each other and will end up in different chunks by current Rollup settings. This scenario is not well supported at the moment as it will produce a circular dependency between chunks and will likely lead to broken execution order.
+Either change the import in "src/pages/Compliance.tsx" to point directly to the exporting module or reconfigure "output.manualChunks" to ensure these modules end up in the same chunk.
+Export "useSovereignty" of module "src/sovereignty/useSovereignty.ts" was reexported through module "src/sovereignty/index.ts" while both modules are dependencies of each other and will end up in different chunks by current Rollup settings. This scenario is not well supported at the moment as it will produce a circular dependency between chunks and will likely lead to broken execution order.
+Either change the import in "src/components/telemetry/SovereigntyAnalyticsTab.tsx" to point directly to the exporting module or reconfigure "output.manualChunks" to ensure these modules end up in the same chunk.
+rendering chunks...
+[plugin:vite:reporter] [plugin vite:reporter] 
+(!) /dev-server/src/lib/workflow/workflowGenerator.ts is dynamically imported by /dev-server/src/stores/wizardBuilderStore.ts, /dev-server/src/stores/wizardBuilderStore.ts, /dev-server/src/stores/wizardBuilderStore.ts, /dev-server/src/stores/wizardBuilderStore.ts, /dev-server/src/stores/wizardBuilderStore.ts but also statically imported by /dev-server/src/components/builder/steps/Step4Workflow.tsx, dynamic import will not move module into another chunk.
+
+[plugin:vite:reporter] [plugin vite:reporter] 
+(!) /dev-server/src/pages/auth/index.ts is dynamically imported by /dev-server/src/AuthenticatedShell.tsx but also statically imported by /dev-server/src/App.tsx, dynamic import will not move module into another chunk.
+
+[plugin:vite:reporter] [plugin vite:reporter] 
+(!) /dev-server/src/components/twin-visualization/DataCenter3DScene.tsx is dynamically imported by /dev-server/src/components/data-centre-twin/overview/MiniTwinPreview.tsx but also statically imported by /dev-server/src/components/twin-visualization/TwinVisualizationLayout.tsx, /dev-server/src/components/twin-visualization/index.ts, /dev-server/src/workspace/FacilityCanvas.tsx, dynamic import will not move module into another chunk.
+
+[plugin:vite:reporter] [plugin vite:reporter] 
+(!) /dev-server/src/pages/DataCentreTwin.tsx is dynamically imported by /dev-server/src/AuthenticatedShell.tsx but also statically imported by /dev-server/src/App.tsx, dynamic import will not move module into another chunk.
+
+[plugin:vite:reporter] [plugin vite:reporter] 
+(!) /dev-server/src/pages/TwinPreview.tsx is dynamically imported by /dev-server/src/AuthenticatedShell.tsx but also statically imported by /dev-server/src/App.tsx, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist/index.html                                          5.77 kB │ gzip:   1.92 kB
+dist/assets/m2m-logo-JH7MCiF-.png                        7.41 kB
+dist/assets/index-B4bm0e5_.css                         195.29 kB │ gzip:  31.10 kB
+dist/assets/canvasFocusStore-hzQC2Wje.js                 0.14 kB │ gzip:   0.13 kB
+dist/assets/skeleton-B0psugw8.js                         0.21 kB │ gzip:   0.18 kB
+dist/assets/useReturnFocus-2l-Ceb3T.js                   0.30 kB │ gzip:   0.23 kB
+dist/assets/use-mobile-BRHCksGs.js                       0.33 kB │ gzip:   0.25 kB
+dist/assets/useAnalytics-UEzKQjC8.js                     0.37 kB │ gzip:   0.28 kB
+dist/assets/sigma-ZwlO5Asr.js                            0.38 kB │ gzip:   0.29 kB
+dist/assets/ellipsis-_rXf8sJb.js                         0.40 kB │ gzip:   0.27 kB
+dist/assets/headphones-Bj3CTybW.js                       0.40 kB │ gzip:   0.29 kB
+dist/assets/copy-Cbtx7Aua.js                             0.41 kB │ gzip:   0.31 kB
+dist/assets/link-2-htuJOwVF.js                           0.41 kB │ gzip:   0.31 kB
+dist/assets/plug-COX8eArJ.js                             0.42 kB │ gzip:   0.30 kB
+dist/assets/calendar-D4HHN_mr.js                         0.43 kB │ gzip:   0.30 kB
+dist/assets/upload-CEnLi6BF.js                           0.43 kB │ gzip:   0.32 kB
+dist/assets/download-CB0AKSor.js                         0.43 kB │ gzip:   0.32 kB
+dist/assets/pencil-EuEnVZ-U.js                           0.44 kB │ gzip:   0.32 kB
+dist/assets/book-open-3llrN-Zc.js                        0.44 kB │ gzip:   0.31 kB
+dist/assets/useBlueprintScenarios-Co6noBt-.js            0.46 kB │ gzip:   0.27 kB
+dist/assets/user-plus-CEf14n7z.js                        0.48 kB │ gzip:   0.33 kB
+dist/assets/CoPilotPanel-BWJE7U6G.js                     0.48 kB │ gzip:   0.31 kB
+dist/assets/modes-BNBPVaqS.js                            0.48 kB │ gzip:   0.33 kB
+dist/assets/save-BYhQYJG6.js                             0.49 kB │ gzip:   0.32 kB
+dist/assets/radio-Bqvty9Yg.js                            0.54 kB │ gzip:   0.35 kB
+dist/assets/chevron-left-D9PdzSNA.js                     0.58 kB │ gzip:   0.31 kB
+dist/assets/star-ukWJBC-j.js                             0.64 kB │ gzip:   0.40 kB
+dist/assets/wand-sparkles-CLxP5ME7.js                    0.68 kB │ gzip:   0.39 kB
+dist/assets/calculator-BlMSTLuu.js                       0.70 kB │ gzip:   0.38 kB
+dist/assets/handoff-BG_hGa6l.js                          0.74 kB │ gzip:   0.39 kB
+dist/assets/agentDefinition-CGynyZkr.js                  0.89 kB │ gzip:   0.43 kB
+dist/assets/useUserPermissions-lhXSyHXw.js               0.90 kB │ gzip:   0.55 kB
+dist/assets/alert-BRJjjIF4.js                            0.99 kB │ gzip:   0.51 kB
+dist/assets/accordion-BsKaAUfq.js                        1.01 kB │ gzip:   0.51 kB
+dist/assets/useEdgeFunction-C0NrdhkT.js                  1.01 kB │ gzip:   0.50 kB
+dist/assets/deploymentRecords-BOlgVMPa.js                1.08 kB │ gzip:   0.52 kB
+dist/assets/spec-C9WkADIl.js                             1.16 kB │ gzip:   0.71 kB
+dist/assets/formatters-Dbjuvfai.js                       1.17 kB │ gzip:   0.53 kB
+dist/assets/blueprintHelpers-DyPdRzad.js                 1.18 kB │ gzip:   0.62 kB
+dist/assets/useAgentDefinitions-CNfyGI3j.js              1.22 kB │ gzip:   0.63 kB
+dist/assets/snapshot-indicator-dF5B2Oct.js               1.24 kB │ gzip:   0.60 kB
+dist/assets/ProtectedRoute-CLeR8uaO.js                   1.41 kB │ gzip:   0.65 kB
+dist/assets/authBootstrap-Dx3lsFRW.js                    1.67 kB │ gzip:   0.85 kB
+dist/assets/RunProvenanceBadge-CacOvJt2.js               1.69 kB │ gzip:   0.89 kB
+dist/assets/MetricValue-NJ7WoW1H.js                      1.84 kB │ gzip:   0.85 kB
+dist/assets/status-badge-BJs0-Vrl.js                     1.87 kB │ gzip:   0.78 kB
+dist/assets/dsxClaimsPolicy-russV0dW.js                  1.90 kB │ gzip:   0.85 kB
+dist/assets/DCCard-DTRzNdrg.js                           2.54 kB │ gzip:   0.94 kB
+dist/assets/AssetPreview-WltOwsL2.js                     2.60 kB │ gzip:   1.37 kB
+dist/assets/DCKPITile-DSowLL9N.js                        2.90 kB │ gzip:   1.30 kB
+dist/assets/useFacilityTelemetry-B9-F0rA_.js             3.22 kB │ gzip:   1.39 kB
+dist/assets/useTwinData-BESkfVUB.js                      3.28 kB │ gzip:   1.28 kB
+dist/assets/benchmark-DcY5lKxD.js                        3.65 kB │ gzip:   1.64 kB
+dist/assets/AdminUserApproval-JGUiTOSS.js                3.89 kB │ gzip:   1.55 kB
+dist/assets/DsxCapabilityRegistryPage-B5gxIlLz.js        3.90 kB │ gzip:   1.36 kB
+dist/assets/Facilities-C-5Czvy_.js                       5.32 kB │ gzip:   2.05 kB
+dist/assets/StateBadges-aJHgiE9M.js                      5.33 kB │ gzip:   1.80 kB
+dist/assets/DatasetRegistryPage-8APFEvZL.js              5.72 kB │ gzip:   1.84 kB
+dist/assets/PagePurpose-DazSH6JE.js                      6.05 kB │ gzip:   2.14 kB
+dist/assets/templateLoader-C0y5KN-f.js                   6.46 kB │ gzip:   2.64 kB
+dist/assets/OnboardingSubmissions-B5tnXJKS.js            6.47 kB │ gzip:   1.83 kB
+dist/assets/SimulationPreview-BF6zvPMm.js                7.46 kB │ gzip:   2.18 kB
+dist/assets/tourRegistry-DNFcshfa.js                     7.60 kB │ gzip:   2.37 kB
+dist/assets/AssetPipeline-CbOxAq5o.js                    8.13 kB │ gzip:   2.89 kB
+dist/assets/AdminSignupsDashboard-DHoAOUUZ.js            8.53 kB │ gzip:   2.66 kB
+dist/assets/FundingIntakeDemo-NDR4xB4x.js                8.88 kB │ gzip:   2.86 kB
+dist/assets/AccessControl-DFEGoQz8.js                    8.93 kB │ gzip:   2.93 kB
+dist/assets/Settings-_MS3mhPF.js                         9.22 kB │ gzip:   2.95 kB
+dist/assets/DeploymentHistory-B-XAez9w.js               10.14 kB │ gzip:   3.45 kB
+dist/assets/Profile-Br02_E6f.js                         10.25 kB │ gzip:   3.51 kB
+dist/assets/Search-d93keBJ1.js                          10.40 kB │ gzip:   3.91 kB
+dist/assets/BlueprintPreview-BPHnExrW.js                10.72 kB │ gzip:   2.42 kB
+dist/assets/AISettings-D_2fTRY2.js                      11.53 kB │ gzip:   3.67 kB
+dist/assets/AgentWorkspace-BoOkF7wj.js                  12.56 kB │ gzip:   3.84 kB
+dist/assets/rackModel-BYlGjgI4.js                       12.56 kB │ gzip:   5.29 kB
+dist/assets/format-XklL_z-7.js                          12.83 kB │ gzip:   3.36 kB
+dist/assets/UnifiedAgentPreview-BjqkOyIS.js             14.33 kB │ gzip:   3.60 kB
+dist/assets/Help-Cr5lzes9.js                            14.55 kB │ gzip:   4.49 kB
+dist/assets/AgentDetail-Buo6Y_FT.js                     14.59 kB │ gzip:   4.10 kB
+dist/assets/StandardFilters-Cx0F-nS1.js                 14.96 kB │ gzip:   3.96 kB
+dist/assets/TwinDebug-D86C0g4H.js                       16.16 kB │ gzip:   4.21 kB
+dist/assets/SystemManage-3w0IfhEf.js                    16.66 kB │ gzip:   4.37 kB
+dist/assets/PlatformReadiness-D1g1TluD.js               18.05 kB │ gzip:   5.78 kB
+dist/assets/ReferenceFacilityValidation-CWrXYTQV.js     18.07 kB │ gzip:   6.09 kB
+dist/assets/twinFieldProvenance-DRuAdsV9.js             19.18 kB │ gzip:   6.32 kB
+dist/assets/simulationTemplates-BgO9EAqw.js             21.29 kB │ gzip:   6.78 kB
+dist/assets/AgentChat-qtzNVC17.js                       21.30 kB │ gzip:   6.47 kB
+dist/assets/Compliance-CzWAEX4g.js                      29.17 kB │ gzip:   8.72 kB
+dist/assets/AssetValidation-Wq6u3OtY.js                 34.16 kB │ gzip:  10.91 kB
+dist/assets/Teams-zHCR_Csn.js                           35.70 kB │ gzip:   9.49 kB
+dist/assets/EvidenceBetaShell-CQxyi361.js               38.82 kB │ gzip:  10.32 kB
+dist/assets/vendor-query-C38wO4DV.js                    39.22 kB │ gzip:  11.73 kB
+dist/assets/ManageAgents-C4kVAPn4.js                    41.64 kB │ gzip:  11.33 kB
+dist/assets/analyticsService-DyMt9kMz.js                42.77 kB │ gzip:  13.66 kB
+dist/assets/AuraWorkspace-Bghi43c1.js                   44.01 kB │ gzip:  12.68 kB
+dist/assets/Playbook-BdopJg6E.js                        49.69 kB │ gzip:  14.48 kB
+dist/assets/EvidenceQualityBar-CxNRC8wI.js              49.79 kB │ gzip:  15.52 kB
+dist/assets/IntelligenceDashboard-CENueCH3.js           53.67 kB │ gzip:  15.40 kB
+dist/assets/TwinManage-BvfZvklN.js                      56.29 kB │ gzip:  13.94 kB
+dist/assets/InfrastructurePage-DQzvxIku.js              56.77 kB │ gzip:  13.61 kB
+dist/assets/Dashboard-DdaWfM1-.js                       59.78 kB │ gzip:  15.79 kB
+dist/assets/Deploy-CzVzDXEx.js                          59.95 kB │ gzip:  15.09 kB
+dist/assets/index-DE1hDSpB.js                           76.49 kB │ gzip:  19.66 kB
+dist/assets/Blueprint-43bIpdPQ.js                       91.23 kB │ gzip:  24.59 kB
+dist/assets/TourRenderer-DrowOBQF.js                   101.29 kB │ gzip:  31.87 kB
+dist/assets/index-WBnWNLoS.js                          117.40 kB │ gzip:  35.93 kB
+dist/assets/vendor-motion-DvYCEX-Z.js                  118.63 kB │ gzip:  39.23 kB
+dist/assets/Connections-BIcIlz_w.js                    131.78 kB │ gzip:  33.03 kB
+dist/assets/vendor-ui-CUHzjoNe.js                      156.78 kB │ gzip:  49.46 kB
+dist/assets/vendor-supabase-_dyvWw20.js                159.03 kB │ gzip:  40.79 kB
+dist/assets/vendor-react-BPW5nD8t.js                   165.06 kB │ gzip:  53.80 kB
+dist/assets/Marketplace-CEvx1Msl.js                    178.90 kB │ gzip:  44.07 kB
+dist/assets/vendor-charts-C_LDUFgK.js                  433.12 kB │ gzip: 114.26 kB
+dist/assets/Builder-CH_9ioWx.js                        562.38 kB │ gzip: 151.78 kB
+dist/assets/vendor-3d-MrfQJI4k.js                      897.99 kB │ gzip: 247.75 kB
+dist/assets/index-DMZZFKnX.js                        1,843.52 kB │ gzip: 474.50 kB
+
+(!) Some chunks are larger than 1000 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 23.06s
+
+────────────────────────────────────────────────────────────────
+ SEO Validation Report
+────────────────────────────────────────────────────────────────
+ Status   : PASS ✓
+ Errors   : 0
+ Warnings : 0
+ Artifacts: index.html=true  robots.txt=true  sitemap.xml=true
+ Report   : /dev-server/dist/seo-report.json
+────────────────────────────────────────────────────────────────
+ All SEO checks passed. Safe to publish.
+────────────────────────────────────────────────────────────────
+
+build exit=0

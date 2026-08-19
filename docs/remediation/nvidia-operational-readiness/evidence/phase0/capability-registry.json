@@ -1,0 +1,13 @@
+Resolving dependencies
+Resolved, downloaded and extracted [122]
+Saved lockfile
+{
+  "exports": [
+    "CAPABILITIES",
+    "hasCapability",
+    "capabilityRequirement",
+    "useCapability",
+    "useCapabilities",
+    "NVIDIA_READINESS"
+  ]
+}

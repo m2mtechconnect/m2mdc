@@ -1,7 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
-import { requireCaller, callerRejectedResponse } from "../_shared/callerIdentity.ts";
+import { requireCallerRole, callerRejectedResponse } from "../_shared/callerIdentity.ts";
 
 
 Deno.serve(async (req) => {
@@ -10,10 +10,11 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Phase 2: in-code caller identity. This handler holds a service-role
-  // client, so an anonymous caller must never reach its queries.
+  // Phase 2/3: in-code caller identity. This handler mutates the
+  // shared, non-tenant website cache,
+  // which belongs to no single tenant, so it is restricted to admins.
   try {
-    await requireCaller(req);
+    await requireCallerRole(req, 'admin');
   } catch (error) {
     const rejected = callerRejectedResponse(error, req);
     if (rejected) return rejected;

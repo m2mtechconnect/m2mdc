@@ -20,7 +20,6 @@ import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { Button } from '@/components/ui/button';
 import { Sparkles, AlertTriangle } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { BuilderStarterLists } from '@/components/builder/BuilderStarterLists';
 
 export default function Builder() {

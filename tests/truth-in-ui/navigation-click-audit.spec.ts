@@ -57,6 +57,8 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
   });
 
   test('desktop Manage submenu opens and navigates below xl breakpoint', async ({ context, page, guard }) => {
+    // One navigation per Manage destination; the default 20s budget is too tight.
+    test.setTimeout(120_000);
     await page.setViewportSize({ width: 1400, height: 900 });
     await installSessionAndOpen(context, page);
 

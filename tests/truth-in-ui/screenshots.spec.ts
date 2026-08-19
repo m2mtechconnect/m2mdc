@@ -69,6 +69,10 @@ test.use({ viewport: VIEWPORT });
 // A. Kit runtime states — /twin-preview (no auth required)
 // =============================================================
 test.describe('Phase 1A.3.f — Kit runtime states', () => {
+  test.beforeEach(() => {
+    test.setTimeout(90_000);
+  });
+
 
   test('01 connecting (delayed response, unavailable)', async ({ page, guard }) => {
     let release = () => {};
@@ -198,6 +202,12 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
 // B. Auth-gated surfaces (mocked session, no external egress)
 // =============================================================
 test.describe('Phase 1A.3.f — Auth-gated surfaces', () => {
+  // Heavy chart/dashboard captures exceed the 20s global budget when the
+  // whole shard runs concurrently; give each capture its own budget.
+  test.beforeEach(() => {
+    test.setTimeout(90_000);
+  });
+
   test('12 dashboard (mocked session)', async ({ context, page, guard }) => {
     const mock = await installSupabaseMock(context);
     // Dashboard invokes the `ai-systems-unified` edge function; return

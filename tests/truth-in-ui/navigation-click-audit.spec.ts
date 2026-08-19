@@ -84,6 +84,10 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
 
     for (const href of hrefs) {
       const target = new URL(href, 'http://localhost').pathname;
+      // Return to the shell home each time: some destinations render their own
+      // workspace chrome without the Manage trigger.
+      await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+      await expect(trigger).toBeVisible();
       await trigger.click();
       await page.locator(`[data-testid="manage-menu"] [href="${href}"]`).first().click();
       // A destination may redirect to a canonical child route, so the

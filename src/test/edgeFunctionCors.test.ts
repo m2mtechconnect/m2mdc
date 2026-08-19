@@ -111,9 +111,13 @@ describe('shared CORS response policy', () => {
 
   it('fails closed for missing or denied preflight origins', () => {
     const missing = handleCorsPreflightRequest(
-      new Request('https://edge.test', { method: 'OPTIONS' }), production);
+      new Request('https://edge.test', {
+        method: 'OPTIONS', headers: { 'Access-Control-Request-Method': 'POST' },
+      }), production);
     const denied = handleCorsPreflightRequest(new Request('https://edge.test', {
-      method: 'OPTIONS', headers: { Origin: 'https://evil.example.com' },
+      method: 'OPTIONS', headers: {
+        Origin: 'https://evil.example.com', 'Access-Control-Request-Method': 'POST',
+      },
     }), production);
     expect(missing.status).toBe(403);
     expect(denied.status).toBe(403);
@@ -122,10 +126,14 @@ describe('shared CORS response policy', () => {
 
   it('returns a scoped successful preflight response', () => {
     const response = handleCorsPreflightRequest(new Request('https://edge.test', {
-      method: 'OPTIONS', headers: { Origin: 'https://console.example.com' },
+      method: 'OPTIONS', headers: {
+        Origin: 'https://console.example.com', 'Access-Control-Request-Method': 'POST',
+      },
     }), production);
     expect(response.status).toBe(204);
     expect(response.headers.get('Access-Control-Allow-Origin')).toBe('https://console.example.com');
+    expect(response.headers.get('Access-Control-Allow-Headers')?.split(/,\s*/))
+      .toContain('x-organization-id');
     expect(response.headers.get('Vary')).toBe('Origin');
   });
 

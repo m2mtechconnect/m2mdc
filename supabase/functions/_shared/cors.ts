@@ -4,8 +4,9 @@ const DEVELOPMENT_LOCALHOST_ORIGINS = [
   "http://localhost:3000",
 ] as const;
 
-const ALLOW_HEADERS = "authorization, x-client-info, apikey, content-type, x-idempotency-key";
+const ALLOW_HEADERS = "authorization, x-client-info, apikey, content-type, x-idempotency-key, x-organization-id";
 const ALLOW_METHODS = "GET, POST, PUT, DELETE, OPTIONS";
+const ALLOWED_METHOD_SET = new Set(ALLOW_METHODS.split(", "));
 
 export const CORS_ALLOWLIST_ENV = "CORS_ALLOWED_ORIGINS";
 
@@ -113,6 +114,18 @@ export function handleCorsPreflightRequest(
   req: Request,
   options: CorsPolicyOptions = {},
 ): Response {
+  const requestedMethod = req.headers.get("Access-Control-Request-Method")?.trim().toUpperCase();
+  if (
+    req.method.toUpperCase() !== "OPTIONS" ||
+    !requestedMethod ||
+    !ALLOWED_METHOD_SET.has(requestedMethod)
+  ) {
+    return new Response(null, {
+      status: 403,
+      headers: baseHeaders(),
+    });
+  }
+
   const decision = evaluateCorsOrigin(req.headers.get("origin"), options, true);
   return new Response(null, {
     status: decision.allowed ? 204 : 403,

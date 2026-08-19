@@ -1,0 +1,99 @@
+name: AURA Truth and Route Stress
+
+# Closes Phase 0 blocker #6: the full truth-in-UI suite (206 tests, serial)
+# and the route-stress sweep exceed the agent sandbox time budget. They run
+# here instead, with CI-length budgets and sharding.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/truth-in-ui/**'
+      - 'tests/route-stress/**'
+      - 'playwright.truth.config.ts'
+      - 'playwright.route-stress.config.ts'
+      - '.github/workflows/aura-truth-suite.yml'
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: aura-truth-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  truth-in-ui:
+    name: Truth-in-UI (shard ${{ matrix.shard }}/4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.3'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run truth-in-UI shard
+        env:
+          CI: 'true'
+          AURA_TRUTH_PORT: 8091
+        run: bunx playwright test --config=playwright.truth.config.ts --shard=${{ matrix.shard }}/4
+
+      - name: Upload shard evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: truth-in-ui-shard-${{ matrix.shard }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 14
+
+  route-stress:
+    name: Route stress sweep
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.3'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run route stress sweep
+        env:
+          CI: 'true'
+        run: bunx playwright test --config=playwright.route-stress.config.ts
+
+      - name: Upload route stress evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: route-stress-evidence
+          path: |
+            test-results/
+            docs/remediation/evidence/route-stress/
+          retention-days: 14

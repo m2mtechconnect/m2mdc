@@ -33,16 +33,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Run YVR Backend Integrity Tests
-        run: npm run test -- tests/unit/yvr-template-integrity.test.ts
+        run: bun run test -- tests/unit/yvr-template-integrity.test.ts
 
       - name: Run YVR Analytics Tests
-        run: npm run test -- tests/unit/yvr-analytics-events.test.ts
+        run: bun run test -- tests/unit/yvr-analytics-events.test.ts
 
   yvr-integration-tests:
     name: YVR Integration Tests
@@ -56,16 +55,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Run YVR Builder Wiring Tests
-        run: npm run test -- tests/integration/yvr-builder-wiring.test.ts
+        run: bun run test -- tests/integration/yvr-builder-wiring.test.ts
 
       - name: Run YVR Intake Flows Tests
-        run: npm run test -- tests/integration/yvr-intake-flows.test.ts
+        run: bun run test -- tests/integration/yvr-intake-flows.test.ts
 
   yvr-e2e-tests:
     name: YVR E2E Tests
@@ -79,19 +77,18 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps
+        run: bunx playwright install --with-deps
 
       - name: Run YVR Marketplace E2E Tests
-        run: npm run test:e2e -- tests/e2e/yvr-marketplace-flow.spec.ts
+        run: bun run test:e2e -- tests/e2e/yvr-marketplace-flow.spec.ts
 
       - name: Run YVR Builder Deploy E2E Tests
-        run: npm run test:e2e -- tests/e2e/yvr-builder-deploy.spec.ts
+        run: bun run test:e2e -- tests/e2e/yvr-builder-deploy.spec.ts
 
       - name: Upload test artifacts
         if: failure()

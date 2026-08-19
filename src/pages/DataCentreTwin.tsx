@@ -225,7 +225,7 @@ export default function DataCentreTwin() {
             <TabsContent value="dashboard">
               <DataCentreDashboard 
                 facility={montrealSovereignDC} 
-                initialTab={urlTab === 'simulation' ? 'simulation' : undefined}
+                initialTab={domainTab}
                 onScenarioSelect={(scenarioId) => {
                   console.log('Scenario selected:', scenarioId);
                 }}
@@ -296,7 +296,7 @@ export default function DataCentreTwin() {
         
         <DataCentreDashboard 
           facility={facility} 
-          initialTab={urlTab === 'simulation' ? 'simulation' : undefined}
+          initialTab={domainTab}
           onScenarioSelect={(scenarioId) => {
             console.log('Scenario selected:', scenarioId);
           }}

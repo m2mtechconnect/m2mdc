@@ -33,20 +33,17 @@ export type SimulationProviderId =
   | 'omniverse';
 
 /**
- * AURA_ARCHITECTURE_CONSOLIDATION_AND_NVIDIA_ALIGNMENT (Phase 3).
- *
  * Who actually executes the run. This is a truth field: it may never be set
  * to an NVIDIA class unless NVIDIA code or an NVIDIA service really runs.
+ *
+ * NVIDIA operational-readiness Phase 1: this file used to declare its own
+ * four-value union containing `nvidia-dsx-sim` and `specialist-solver`, which
+ * the hybrid runtime ADR names as non-taxonomy values. The canonical union in
+ * `src/simulation/orchestrator/executionClass.ts` is now the only definition;
+ * this is a re-export so both simulation surfaces cannot drift apart again.
  */
-export type SimulationExecutionClass =
-  /** AURA's own deterministic solvers running in the browser or edge runtime. */
-  | 'aura-deterministic'
-  /** NVIDIA DSX Sim executing the run. Requires a proven runtime connection. */
-  | 'nvidia-dsx-sim'
-  /** A third-party specialist solver (CFD, electrical, thermal). */
-  | 'specialist-solver'
-  /** Static fixtures or recorded records replayed for preview purposes. */
-  | 'fixture-preview';
+export type { SimulationExecutionClass } from '@/simulation/orchestrator/executionClass';
+import type { SimulationExecutionClass } from '@/simulation/orchestrator/executionClass';
 
 /** Declared capabilities let the facade route without instanceof-dispatch. */
 export interface SimulationProviderCapabilities {

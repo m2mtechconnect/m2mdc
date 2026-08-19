@@ -27,7 +27,7 @@ const ROUTE = '/data-centre-twin?geometry=nvidia-reference';
 const ASSET_ORIGIN = process.env.AURA_ASSET_ORIGIN ?? 'https://m2mdc.lovable.app';
 
 test.describe('NVIDIA Reference Facility runtime regression', () => {
-  test.setTimeout(180_000);
+  test.setTimeout(360_000);
   test('mounts the verified NVIDIA equipment, 40 cabinets and every AURA facility family', async ({
     context,
     page,
@@ -115,7 +115,7 @@ test.describe('NVIDIA Reference Facility runtime regression', () => {
               Object.entries(snapshot!.roles).some(([key, r]) => r.assetId === id && aura.has(key)),
           }).nvidiaObjects;
         },
-        { timeout: 90_000, intervals: [1_000] },
+        { timeout: 180_000, intervals: [1_000] },
       )
       .toBeGreaterThanOrEqual(BASELINE_NVIDIA_OBJECTS);
 

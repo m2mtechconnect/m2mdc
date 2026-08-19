@@ -21,11 +21,19 @@ header links by `fullName`, the `Manage` dropdown (every rendered entry must
 commit to its own href), the mobile drawer, dashboard primary actions and the
 command palette. **5/5 passing.**
 
-## Status
+## Status (Phase 7 closure)
 - navigation-click-audit: 5/5 pass
 - dsx-drawer-sequence: 5/5 pass (was 1 fail, fixed by the redirect repair)
-- manifest-a11y: 1 fail remaining - sovereignty domain manifest is not
-  keyboard-openable (carried to Phase 7)
-- dsx-card-destinations: re-run pending after the redirect repair
+- dsx-card-destinations: 1/1 pass - every clickable Evidence card opens a
+  populated drawer now that the legacy routes resolve (4.4 min sweep)
+- manifest-a11y: 2/2 pass. The sovereignty manifest was always keyboard
+  operable (1 summary, 11 provenance rows); the failure was a budget defect.
+  Measured on the harness: goto 6.6s, Sovereignty tab click 14.4s, panel 1.0s.
+  The tab is not actionable until the 3D facility scene mounts, so the spec now
+  carries a 90s budget. **Open performance item:** a 14s delay before the
+  domain tabs respond is an operator-facing regression risk and is carried to
+  the performance phase - it is a slow route, not a broken one.
 
-Verdict: **PHASE_6_PARTIAL** - `AURA_NVIDIA_OPERATIONAL_NOT_READY` stands.
+Verdict: **PHASE_6_CLOSED** for shard 2 navigation and Evidence routing.
+`AURA_NVIDIA_OPERATIONAL_NOT_READY` still stands overall (remaining shards and
+the connector/runtime gaps are unchanged).

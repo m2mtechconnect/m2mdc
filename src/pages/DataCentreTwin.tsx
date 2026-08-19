@@ -27,10 +27,27 @@ import { Eye, FileText, MessageSquare, Rocket, LayoutDashboard, Activity } from 
 import type { DataCentreFacility } from '@/types/dataCenterTwin';
 import { OVERVIEW } from '@/ux';
 import { TwinVisualizationLayout } from '@/components/twin-visualization/TwinVisualizationLayout';
+import { DeferredSceneMount } from '@/components/twin-visualization/DeferredSceneMount';
 
 // UI Polish Components
 import { LoadingState, NoTwinSelectedEmptyState } from '@/components/ui/empty-state';
 import { ModeBadge, SnapshotBadge } from '@/components/ui/snapshot-indicator';
+
+/**
+ * Height-matched placeholder so deferring the facility scene reserves its
+ * space and never shifts the KPI rows below it.
+ */
+function FacilityScenePlaceholder() {
+  return (
+    <div
+      className="flex h-[420px] w-full items-center justify-center rounded-lg border border-border bg-muted/40"
+      role="status"
+      aria-live="polite"
+    >
+      <span className="text-xs text-muted-foreground">Preparing facility model…</span>
+    </div>
+  );
+}
 
 export default function DataCentreTwin() {
   const { t } = useTranslation();
@@ -156,7 +173,9 @@ export default function DataCentreTwin() {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              <DeferredSceneMount fallback={<FacilityScenePlaceholder />}>
               <TwinVisualizationLayout mode="dashboard" />
+            </DeferredSceneMount>
             </CardContent>
           </Card>
 
@@ -255,7 +274,9 @@ export default function DataCentreTwin() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <TwinVisualizationLayout mode="dashboard" />
+            <DeferredSceneMount fallback={<FacilityScenePlaceholder />}>
+              <TwinVisualizationLayout mode="dashboard" />
+            </DeferredSceneMount>
           </CardContent>
         </Card>
         

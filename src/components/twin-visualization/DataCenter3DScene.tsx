@@ -206,6 +206,24 @@ interface CameraControllerProps {
 }
 
 // Camera controller component for smooth animations
+/**
+ * Frame governor for secondary viewports.
+ *
+ * A compact preview is glanceable chrome, not the surface an operator studies,
+ * so it does not need a 60fps loop competing with the dashboard for the main
+ * thread. In `demand` mode nothing renders unless something invalidates, so
+ * this drives a fixed low cadence that still animates the overlay pulses.
+ */
+function FrameRateGovernor({ fps }: { fps: number }) {
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => {
+    const interval = window.setInterval(() => invalidate(), Math.round(1000 / fps));
+    invalidate();
+    return () => window.clearInterval(interval);
+  }, [fps, invalidate]);
+  return null;
+}
+
 function CameraController({ 
   targetDistance, 
   baseDistance,
@@ -254,7 +272,8 @@ function CameraController({
     
     // Auto-orbit in simulation mode when idle
     const isIdle = Date.now() - lastInteractionTime > IDLE_THRESHOLD_MS;
-    if (mode === 'simulation' && isIdle && hasAnimatedIn.current && !reducedMotion) {
+    const autoOrbiting = mode === 'simulation' && isIdle && hasAnimatedIn.current && !reducedMotion;
+    if (autoOrbiting) {
       thetaRef.current += 0.002; // Very slow rotation
     }
     
@@ -291,8 +310,16 @@ function CameraController({
     }
     camera.lookAt(focus);
     camera.updateProjectionMatrix();
-    
-    invalidate();
+
+    // Only keep the loop alive while something is actually moving. An
+    // unconditional invalidate() rendered every frame forever, which pinned
+    // the main thread even on a still dashboard preview and delayed the
+    // domain tabs above the scene from responding to clicks.
+    const settled = Math.abs(distanceRef.current - distance) < 0.01
+      && camera.position.distanceTo(new THREE.Vector3(x, y, z)) < 0.01;
+    if (!settled || autoOrbiting) {
+      invalidate();
+    }
   });
 
   return null;
@@ -975,7 +1002,9 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             data-testid="twin-canvas"
             dpr={QUALITY_PROFILES[qualityProfile].dpr}
             shadows={QUALITY_PROFILES[qualityProfile].shadows}
-            frameloop="always"
+            // Secondary previews render on a governed low cadence; the primary
+            // operator viewport keeps a full-rate loop.
+            frameloop={props.compact ? 'demand' : 'always'}
             gl={{ 
               antialias: QUALITY_PROFILES[qualityProfile].antialias,
               failIfMajorPerformanceCaveat: false,
@@ -1003,6 +1032,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             }}
           >
             <Suspense fallback={null}>
+              {props.compact ? <FrameRateGovernor fps={12} /> : null}
               <Scene 
                 {...props} 
                 racks={racks}

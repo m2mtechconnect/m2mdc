@@ -173,7 +173,9 @@ export default function DataCentreTwin() {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              <DeferredSceneMount fallback={<FacilityScenePlaceholder />}>
               <TwinVisualizationLayout mode="dashboard" />
+            </DeferredSceneMount>
             </CardContent>
           </Card>
 
@@ -272,7 +274,9 @@ export default function DataCentreTwin() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <TwinVisualizationLayout mode="dashboard" />
+            <DeferredSceneMount fallback={<FacilityScenePlaceholder />}>
+              <TwinVisualizationLayout mode="dashboard" />
+            </DeferredSceneMount>
           </CardContent>
         </Card>
         

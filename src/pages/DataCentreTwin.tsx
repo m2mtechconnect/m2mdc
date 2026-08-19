@@ -63,6 +63,18 @@ export default function DataCentreTwin() {
   
   // Get tab from URL - support both 'tab' and 'view' params
   const urlTab = searchParams.get('tab') || searchParams.get('view');
+
+  // Domain views live inside DataCentreDashboard, not in the outer page tabs.
+  // A deep link to one of them must select the dashboard shell and forward the
+  // domain id down, otherwise the outer Tabs resolves to an unknown value and
+  // renders nothing.
+  const DOMAIN_TAB_IDS = [
+    'overview', 'simulation', 'thermal', 'power', 'cooling', 'network',
+    'facility', 'workload', 'sovereignty', 'carbon', 'financial',
+  ] as const;
+  const domainTab = urlTab && (DOMAIN_TAB_IDS as readonly string[]).includes(urlTab)
+    ? urlTab
+    : undefined;
   
   // Check for demo/sandbox mode - enabled when:
   // 1. Explicitly requested via ?demo=true
@@ -74,7 +86,9 @@ export default function DataCentreTwin() {
   // When view=simulation is specified in demo mode, we stay on 'dashboard' tab 
   // but pass initialTab='simulation' to DataCentreDashboard for its internal tabs
   // When not in demo mode and view param is set, use it directly
-  const effectiveTab = (isDemoMode && urlTab === 'simulation') ? 'dashboard' : (urlTab || defaultTab);
+  const effectiveTab = domainTab
+    ? (domainTab === 'overview' && hasBuilderSession ? 'overview' : 'dashboard')
+    : (urlTab || defaultTab);
   const [activeTab, setActiveTab] = useState(effectiveTab);
   
   // An explicit identifier that resolves to nothing must fail closed rather
@@ -211,7 +225,7 @@ export default function DataCentreTwin() {
             <TabsContent value="dashboard">
               <DataCentreDashboard 
                 facility={montrealSovereignDC} 
-                initialTab={urlTab === 'simulation' ? 'simulation' : undefined}
+                initialTab={domainTab}
                 onScenarioSelect={(scenarioId) => {
                   console.log('Scenario selected:', scenarioId);
                 }}
@@ -282,7 +296,7 @@ export default function DataCentreTwin() {
         
         <DataCentreDashboard 
           facility={facility} 
-          initialTab={urlTab === 'simulation' ? 'simulation' : undefined}
+          initialTab={domainTab}
           onScenarioSelect={(scenarioId) => {
             console.log('Scenario selected:', scenarioId);
           }}

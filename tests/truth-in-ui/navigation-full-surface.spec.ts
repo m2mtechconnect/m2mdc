@@ -148,9 +148,13 @@ guardedTest.describe('AURA DC per-role header navigation (real clicks)', () => {
         if (!(await link.count())) continue;
         if (!(await link.isVisible())) continue;
         await link.click();
+        // A declared destination may resolve to a canonical child
+        // (`/blueprint` -> `/blueprint/default`). The guarantee is that the
+        // click lands inside the declared destination, not that the URL is
+        // byte-identical to the manifest entry.
         await expect
           .poll(() => currentPath(page), { timeout: 5_000, message: `${item.fullName} -> ${item.href}` })
-          .toBe(item.href);
+          .toMatch(new RegExp(`^${item.href.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}(/|\\\\?|$)`));
         await page.goBack({ waitUntil: 'domcontentloaded' }).catch(() => {});
       }
 
@@ -190,10 +194,11 @@ guardedTest.describe('AURA DC browser back/forward preserves navigation', () => 
     await page.setViewportSize({ width: 1600, height: 900 });
     await openAuthed(context, page, '/dashboard');
 
-    await page.getByRole('link', { name: 'Build Data Centre Twin' }).first().click();
+    // Canonical header labels (src/config/appNavigation.ts).
+    await page.getByRole('link', { name: 'OpenUSD Asset Pipeline' }).first().click();
     await expect.poll(() => new URL(page.url()).pathname).toBe('/builder');
 
-    await page.getByRole('link', { name: 'Subsystem Agents' }).first().click();
+    await page.getByRole('link', { name: 'Agents & Optimization' }).first().click();
     await expect.poll(() => new URL(page.url()).pathname).toBe('/app/agents');
 
     await page.goBack({ waitUntil: 'domcontentloaded' });

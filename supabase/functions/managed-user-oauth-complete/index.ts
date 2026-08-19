@@ -8,20 +8,24 @@ import { exchangeAppUserOAuthCode } from '../_shared/appUserConnector.ts';
 import { saveConnectionKeyForUser } from '../_shared/appUserConnections.ts';
 import { managedUserBinding } from '../_shared/managedUserBindings.ts';
 import { resolveCallerTenant } from '../_shared/connectionTenant.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
 
 const GATEWAY_BASE_URL = 'https://connector-gateway.lovable.dev';
 
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
+// Scoped CORS: origin is resolved per request from the shared allowlist;
+// the method/header allowances below are specific to this function.
+const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
+let CORS: Record<string, string> = { ...getCorsHeaders(null), ...CORS_EXTRA };
 
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
 }
 
 Deno.serve(async (req) => {
+  CORS = { ...getCorsHeaders(req.headers.get('origin')), ...CORS_EXTRA };
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
   const correlationId = crypto.randomUUID();
 

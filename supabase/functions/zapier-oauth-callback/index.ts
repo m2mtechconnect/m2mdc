@@ -1,12 +1,22 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+import { getCorsHeaders } from '../_shared/cors.ts';
+
+// This handler is an OAuth redirect target reached by top-level browser
+// navigation, so CORS is not its security boundary; the one-time `state` token
+// is. The headers are still scoped rather than wildcard for consistency.
+const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+let corsHeaders: Record<string, string> = { ...getCorsHeaders(null), ...CORS_EXTRA };
+
+// Where the browser is sent after the exchange. Overridable per environment.
+const APP_BASE_URL = (Deno.env.get('APP_BASE_URL') ?? 'https://auradc.m2mtechconnect.com').replace(/\/$/, '');
 
 serve(async (req) => {
+  corsHeaders = { ...getCorsHeaders(req.headers.get('origin')), ...CORS_EXTRA };
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -70,8 +80,9 @@ serve(async (req) => {
 
     const zapierClientId = Deno.env.get('ZAPIER_CLIENT_ID');
     const zapierClientSecret = Deno.env.get('ZAPIER_CLIENT_SECRET');
-    const zapierRedirectUri = Deno.env.get('ZAPIER_REDIRECT_URI') || 
-      'https://mlhcdcvpvztfjfndmxzl.supabase.co/functions/v1/zapier-oauth-callback';
+    // Derived from this deployment rather than hardcoded to a foreign project.
+    const zapierRedirectUri = Deno.env.get('ZAPIER_REDIRECT_URI') ||
+      `${supabaseUrl.replace(/\/$/, '')}/functions/v1/zapier-oauth-callback`;
 
     if (!zapierClientId || !zapierClientSecret) {
       throw new Error('Zapier credentials not configured');
@@ -172,8 +183,8 @@ serve(async (req) => {
 
     // Redirect to builder
     const redirectUrl = system_id 
-      ? `https://aura.m2mtechconnect.com/builder?id=${system_id}&step=4&connected=${app_id}`
-      : `https://aura.m2mtechconnect.com/integrations?connected=${app_id}`;
+      ? `${APP_BASE_URL}/builder?id=${system_id}&step=4&connected=${app_id}`
+      : `${APP_BASE_URL}/integrations?connected=${app_id}`;
 
     return new Response(null, {
       status: 302,
@@ -192,7 +203,7 @@ serve(async (req) => {
       status: 302,
       headers: {
         ...corsHeaders,
-        'Location': `https://aura.m2mtechconnect.com/integrations?error=${encodeURIComponent(errorMessage)}`,
+        'Location': `${APP_BASE_URL}/integrations?error=${encodeURIComponent(errorMessage)}`,
       },
     });
   }

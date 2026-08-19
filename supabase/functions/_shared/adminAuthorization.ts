@@ -20,6 +20,7 @@ export interface RoleGrant {
 
 export interface OrganizationMembership {
   org_id: string | null;
+  is_approved: boolean | null;
 }
 
 export interface OrganizationRecord {
@@ -118,8 +119,8 @@ function isActiveGlobalGrant(grant: RoleGrant, now: Date): grant is RoleGrant & 
  * Fail-closed administrative authorization boundary.
  *
  * The service-role client factory is deliberately a dependency and is invoked
- * only after bearer authentication, canonical role resolution, and canonical
- * profiles.org_id membership have all succeeded.
+ * only after bearer authentication, canonical role resolution, approved
+ * profiles membership, and canonical organization validation have all succeeded.
  */
 export async function authorizeAdminRequest<TServiceClient>(
   authorizationHeader: string | null | undefined,
@@ -171,21 +172,40 @@ export async function authorizeAdminRequest<TServiceClient>(
     );
   }
 
-  const organizationIds = Array.from(new Set(
-    (memberships.data ?? [])
-      .map((membership) => membership.org_id?.trim() ?? "")
-      .filter(Boolean),
-  ));
-  if ((memberships.data ?? []).length !== 1 || organizationIds.length !== 1) {
+  const membershipRecords = memberships.data ?? [];
+  if (membershipRecords.length !== 1) {
     reject(
       dependencies.audit,
       "TENANT_CONTEXT_REQUIRED",
       403,
-      "A single organization membership is required",
+      "A single profile membership is required",
       { userId: user.id, role: distinctRoles[0] },
     );
   }
-  const organizationId = organizationIds[0];
+
+  const membership = membershipRecords[0];
+  if (membership.is_approved !== true) {
+    reject(
+      dependencies.audit,
+      "PROFILE_NOT_APPROVED",
+      403,
+      "An approved profile is required",
+      { userId: user.id, role: distinctRoles[0] },
+    );
+  }
+
+  const organizationId = typeof membership.org_id === "string"
+    ? membership.org_id.trim()
+    : "";
+  if (!organizationId) {
+    reject(
+      dependencies.audit,
+      "TENANT_CONTEXT_REQUIRED",
+      403,
+      "A valid organization membership is required",
+      { userId: user.id, role: distinctRoles[0] },
+    );
+  }
 
   const requested = requestedOrganizationId?.trim();
   if (requested && requested !== organizationId) {

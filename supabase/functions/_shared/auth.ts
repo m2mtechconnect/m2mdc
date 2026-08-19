@@ -55,7 +55,7 @@ export async function getAuthContext(
           listMemberships: async (userId) => {
             const { data, error } = await callerClient
               .from("profiles")
-              .select("org_id")
+              .select("org_id, is_approved")
               .eq("user_id", userId)
               .limit(2);
             return { data, error };

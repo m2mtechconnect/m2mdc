@@ -12,6 +12,12 @@ const ADMIN_FUNCTIONS = [
 ] as const;
 
 describe('administrative Edge Function tenant scope', () => {
+  it('loads canonical organization membership and approval state together', () => {
+    const source = readFileSync('supabase/functions/_shared/auth.ts', 'utf8');
+    expect(source).toContain('.select("org_id, is_approved")');
+    expect(source).toContain('.limit(2)');
+  });
+
   it('keeps the affected caller inventory explicit and tenant-scoped', () => {
     for (const name of ADMIN_FUNCTIONS) {
       const source = readFileSync(`supabase/functions/${name}/index.ts`, 'utf8');

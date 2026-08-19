@@ -16,7 +16,9 @@ function dependencies(
     listRoleGrants: vi.fn(async () => ({
       data: [{ role: 'admin', scope: 'global', expires_at: null }],
     })),
-    listMemberships: vi.fn(async () => ({ data: [{ org_id: 'tenant-a' }] })),
+    listMemberships: vi.fn(async () => ({
+      data: [{ org_id: 'tenant-a', is_approved: true }],
+    })),
     listOrganizations: vi.fn(async () => ({ data: [{ id: 'tenant-a' }] })),
     createServiceClient,
     audit,
@@ -123,6 +125,27 @@ describe('administrative Edge Function authorization', () => {
     expect(createServiceClient).not.toHaveBeenCalled();
   });
 
+  it.each([
+    [
+      'expired',
+      { role: 'admin', scope: 'global', expires_at: '2026-08-18T23:59:59.000Z' },
+    ],
+    [
+      'organization-scoped',
+      { role: 'admin', scope: 'tenant-a', expires_at: null },
+    ],
+  ])('returns 403 for an %s administrative grant', async (_label, grant) => {
+    const { base, createServiceClient } = dependencies({
+      listRoleGrants: vi.fn(async () => ({ data: [grant] })),
+    });
+    await expectFailure(
+      authorizeAdminRequest('Bearer valid-user-token', null, base),
+      403,
+      'FORBIDDEN',
+    );
+    expect(createServiceClient).not.toHaveBeenCalled();
+  });
+
   it('fails closed when a backend authorization lookup fails', async () => {
     const { base, createServiceClient } = dependencies({
       listRoleGrants: vi.fn(async () => ({ data: null, error: new Error('database unavailable') })),
@@ -135,22 +158,120 @@ describe('administrative Edge Function authorization', () => {
     expect(createServiceClient).not.toHaveBeenCalled();
   });
 
-  it('denies missing or ambiguous organization membership', async () => {
-    for (const memberships of [
-      [],
-      [{ org_id: null }],
-      [{ org_id: 'tenant-a' }, { org_id: 'tenant-b' }],
-    ]) {
-      const { base, createServiceClient } = dependencies({
-        listMemberships: vi.fn(async () => ({ data: memberships })),
-      });
-      await expectFailure(
-        authorizeAdminRequest('Bearer valid-admin-token', null, base),
-        403,
-        'TENANT_CONTEXT_REQUIRED',
-      );
-      expect(createServiceClient).not.toHaveBeenCalled();
-    }
+  it('fails closed when the profile membership lookup fails', async () => {
+    const { base, createServiceClient } = dependencies({
+      listMemberships: vi.fn(async () => ({
+        data: null,
+        error: new Error('profile lookup unavailable'),
+      })),
+    });
+    await expectFailure(
+      authorizeAdminRequest('Bearer valid-admin-token', null, base),
+      500,
+      'TENANT_LOOKUP_FAILED',
+    );
+    expect(createServiceClient).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['missing profile', []],
+    [
+      'duplicate profiles in the same organization',
+      [
+        { org_id: 'tenant-a', is_approved: true },
+        { org_id: 'tenant-a', is_approved: true },
+      ],
+    ],
+    [
+      'ambiguous profiles across organizations',
+      [
+        { org_id: 'tenant-a', is_approved: true },
+        { org_id: 'tenant-b', is_approved: true },
+      ],
+    ],
+  ])('denies %s', async (_label, memberships) => {
+    const { base, createServiceClient } = dependencies({
+      listMemberships: vi.fn(async () => ({ data: memberships })),
+    });
+    await expectFailure(
+      authorizeAdminRequest('Bearer valid-admin-token', null, base),
+      403,
+      'TENANT_CONTEXT_REQUIRED',
+    );
+    expect(createServiceClient).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['false', false],
+    ['null', null],
+    ['malformed', 'true' as unknown as boolean],
+  ])('returns 403 when profile approval is %s', async (_label, isApproved) => {
+    const { base, createServiceClient } = dependencies({
+      listMemberships: vi.fn(async () => ({
+        data: [{ org_id: 'tenant-a', is_approved: isApproved }],
+      })),
+    });
+    await expectFailure(
+      authorizeAdminRequest('Bearer valid-admin-token', null, base),
+      403,
+      'PROFILE_NOT_APPROVED',
+    );
+    expect(createServiceClient).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['missing', null],
+    ['empty', ''],
+    ['malformed', 42 as unknown as string],
+  ])('returns 403 when the organization ID is %s', async (_label, organizationId) => {
+    const { base, createServiceClient } = dependencies({
+      listMemberships: vi.fn(async () => ({
+        data: [{ org_id: organizationId, is_approved: true }],
+      })),
+    });
+    await expectFailure(
+      authorizeAdminRequest('Bearer valid-admin-token', null, base),
+      403,
+      'TENANT_CONTEXT_REQUIRED',
+    );
+    expect(createServiceClient).not.toHaveBeenCalled();
+  });
+
+  it('fails closed when the organization lookup fails', async () => {
+    const { base, createServiceClient } = dependencies({
+      listOrganizations: vi.fn(async () => ({
+        data: null,
+        error: new Error('organization lookup unavailable'),
+      })),
+    });
+    await expectFailure(
+      authorizeAdminRequest('Bearer valid-admin-token', null, base),
+      500,
+      'TENANT_LOOKUP_FAILED',
+    );
+    expect(createServiceClient).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['missing organization', []],
+    [
+      'duplicate organization records',
+      [{ id: 'tenant-a' }, { id: 'tenant-a' }],
+    ],
+    [
+      'mismatched organization record',
+      [{ id: 'tenant-b' }],
+    ],
+  ])('denies %s', async (_label, organizations) => {
+    const { base, createServiceClient } = dependencies({
+      listOrganizations: vi.fn(async () => ({ data: organizations })),
+    });
+    await expectFailure(
+      authorizeAdminRequest('Bearer valid-admin-token', null, base),
+      403,
+      'TENANT_CONTEXT_REQUIRED',
+    );
+    expect(createServiceClient).not.toHaveBeenCalled();
   });
 
   it('never creates the service client before every authorization check passes', async () => {
@@ -166,7 +287,7 @@ describe('administrative Edge Function authorization', () => {
       }),
       listMemberships: vi.fn(async () => {
         order.push('membership');
-        return { data: [{ org_id: 'tenant-a' }] };
+        return { data: [{ org_id: 'tenant-a', is_approved: true }] };
       }),
       listOrganizations: vi.fn(async () => {
         order.push('organization');
@@ -192,6 +313,28 @@ describe('administrative Edge Function authorization', () => {
       code: 'ADMIN_AUTHORIZED',
       userId: 'user-1',
       organizationId: 'tenant-a',
+      role: 'admin',
+    });
+  });
+
+  it('emits secret-free structured audit evidence for denied requests', async () => {
+    const { base, audit, createServiceClient } = dependencies({
+      listMemberships: vi.fn(async () => ({
+        data: [{ org_id: 'tenant-a', is_approved: false }],
+      })),
+    });
+    await expectFailure(
+      authorizeAdminRequest('Bearer rejected-sensitive-token', null, base),
+      403,
+      'PROFILE_NOT_APPROVED',
+    );
+    expect(createServiceClient).not.toHaveBeenCalled();
+    const serialized = JSON.stringify(audit.mock.calls);
+    expect(serialized).not.toContain('rejected-sensitive-token');
+    expect(audit).toHaveBeenLastCalledWith({
+      outcome: 'denied',
+      code: 'PROFILE_NOT_APPROVED',
+      userId: 'user-1',
       role: 'admin',
     });
   });

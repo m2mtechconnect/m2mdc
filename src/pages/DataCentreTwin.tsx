@@ -148,7 +148,7 @@ export default function DataCentreTwin() {
           {/* Facility model is part of the twin page in every source mode:
               a demo or draft session must still mount the 3D scene so that
               deep links such as ?geometry=nvidia-reference resolve. */}
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden" data-tour="overview-3d-preview">
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <Activity className="h-4 w-4 text-primary" />
@@ -247,7 +247,7 @@ export default function DataCentreTwin() {
         {/* Operational Mode Header - Hidden for cleaner UI */}
         
         {/* 3D Twin Visualization Header */}
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden" data-tour="overview-3d-preview">
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <Activity className="h-4 w-4 text-primary" />

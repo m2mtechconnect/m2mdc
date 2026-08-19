@@ -57,6 +57,7 @@ export function ZoomControlsOverlay({
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all duration-150 hover:scale-105 active:scale-95"
+                aria-label="Zoom in"
                 onClick={onZoomIn}
                 disabled={disabled || zoomLevel >= 2.5}
               >
@@ -74,6 +75,7 @@ export function ZoomControlsOverlay({
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all duration-150 hover:scale-105 active:scale-95"
+                aria-label="Zoom out"
                 onClick={onZoomOut}
                 disabled={disabled || zoomLevel <= 0.4}
               >
@@ -92,6 +94,7 @@ export function ZoomControlsOverlay({
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all duration-150 hover:scale-105 active:scale-95"
+                  aria-label="Reset view"
                   onClick={onReset}
                   disabled={disabled}
                 >
@@ -111,6 +114,7 @@ export function ZoomControlsOverlay({
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all duration-150 hover:scale-105 active:scale-95"
+                  aria-label="Fit to view"
                   onClick={onFitToView}
                   disabled={disabled}
                 >

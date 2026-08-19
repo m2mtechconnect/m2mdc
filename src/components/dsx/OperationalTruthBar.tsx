@@ -3,6 +3,7 @@
  * Connection health and data freshness are reported as separate facts.
  */
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 import { useWorkspace } from '@/dsx/runtime/EvidenceBetaContext';
 import { ConnectionState, DataModeBadge, FreshnessIndicator, SafetyChip } from './StateBadges';
 import { EvidenceQualityBar } from './EvidenceQualityBar';

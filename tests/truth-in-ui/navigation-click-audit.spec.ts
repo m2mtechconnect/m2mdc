@@ -83,11 +83,14 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     expect(hrefs.length, 'Manage menu entries must be links').toBe(count);
 
     for (const href of hrefs) {
+      const target = new URL(href, 'http://localhost').pathname;
       await trigger.click();
       await page.locator(`[data-testid="manage-menu"] [href="${href}"]`).first().click();
+      // A destination may redirect to a canonical child route, so the
+      // committed path must start with the advertised href.
       await expect
-        .poll(() => new URL(page.url()).pathname, { timeout: 5_000 })
-        .not.toBe('');
+        .poll(() => new URL(page.url()).pathname, { timeout: 5_000, message: `${href} must commit a route` })
+        .toMatch(new RegExp(`^${target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(/|$)`));
     }
 
     expect(guard.anyExternalCompleted()).toBe(false);

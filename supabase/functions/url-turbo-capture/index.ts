@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-// @ts-expect-error -- remote Deno module, no local types
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
@@ -938,7 +937,7 @@ serve(async (req) => {
           console.log('[Turbo-Capture] Inserting analyzed pages into site_pages table...');
           
           // Get or create site
-          const { data: site, error: siteError } = await supabase
+          let { data: site, error: siteError } = await supabase
             .from('sites')
             .select('*')
             .eq('domain', domain)

@@ -1002,7 +1002,9 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             data-testid="twin-canvas"
             dpr={QUALITY_PROFILES[qualityProfile].dpr}
             shadows={QUALITY_PROFILES[qualityProfile].shadows}
-            frameloop="always"
+            // Secondary previews render on a governed low cadence; the primary
+            // operator viewport keeps a full-rate loop.
+            frameloop={props.compact ? 'demand' : 'always'}
             gl={{ 
               antialias: QUALITY_PROFILES[qualityProfile].antialias,
               failIfMajorPerformanceCaveat: false,

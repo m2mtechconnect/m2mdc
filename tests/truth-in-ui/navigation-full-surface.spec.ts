@@ -84,6 +84,9 @@ function currentPath(page: Page): string {
 guardedTest.describe('AURA DC full-surface deep-link coverage', () => {
   for (const route of DEEP_LINK_ROUTES) {
     guardedTest(`deep-link ${route} mounts inside authenticated shell`, async ({ context, page, guard }) => {
+      // 3D twin routes mount a WebGL scene that is CPU-rasterized in this
+      // harness; they need more than the default budget.
+      if (/twin|infrastructure/.test(route)) guardedTest.setTimeout(60_000);
       await page.setViewportSize({ width: 1440, height: 900 });
       const consoleErrors: string[] = [];
       page.on('pageerror', (e) => consoleErrors.push(`pageerror: ${e.message}`));

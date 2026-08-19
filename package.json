@@ -10,6 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test:a11y": "playwright test --config=playwright.truth.config.ts axe-a11y.spec.ts",
+    "test:truth": "playwright test --config=playwright.truth.config.ts",
+    "test:route-stress": "playwright test --config=playwright.route-stress.config.ts",
     "verify:dsx-phase7": "node scripts/dsx-phase7-verify.mjs",
     "test": "vitest run",
     "test:watch": "vitest",

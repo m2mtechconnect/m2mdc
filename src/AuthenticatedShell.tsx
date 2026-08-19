@@ -219,20 +219,23 @@ function ApprovedUserRoutes() {
           two live URLs and two entries in analytics, deep links and the
           dataset gate. They are now redirects: bookmarks keep working and the
           query string is preserved, but the canonical five-section IA above
-          is the only address a workspace renders at.
+          is the only address a workspace renders at. They are declared OUTSIDE
+          the shell route below: as shell children the Evidence workspace
+          provider mounted first and re-synchronised the legacy URL, which
+          cancelled the redirect and left the operator on a title-only page.
         */}
-        <Route path="thermal" element={<PreserveNavigate to="/dsx/evidence-beta/operations/thermal" />} />
-        <Route path="power" element={<PreserveNavigate to="/dsx/evidence-beta/operations/power" />} />
-        <Route path="cooling" element={<PreserveNavigate to="/dsx/evidence-beta/operations/cooling" />} />
-        <Route path="network" element={<PreserveNavigate to="/dsx/evidence-beta/operations/compute" />} />
-        <Route path="workload" element={<PreserveNavigate to="/dsx/evidence-beta/operations/workload" />} />
-        <Route path="facility" element={<PreserveNavigate to="/dsx/evidence-beta/assets" />} />
-        <Route path="simulations" element={<PreserveNavigate to="/dsx/evidence-beta/decisions" />} />
-        <Route path="evidence" element={<PreserveNavigate to="/dsx/evidence-beta/decisions/log" />} />
-        <Route path="carbon" element={<PreserveNavigate to="/dsx/evidence-beta/sustainability" />} />
-        <Route path="financials" element={<PreserveNavigate to="/dsx/evidence-beta/sustainability/financial" />} />
-        <Route path="sovereignty" element={<PreserveNavigate to="/dsx/evidence-beta/sustainability/sovereignty" />} />
       </Route>
+      <Route path="/dsx/evidence-beta/thermal" element={<PreserveNavigate to="/dsx/evidence-beta/operations/thermal" />} />
+      <Route path="/dsx/evidence-beta/power" element={<PreserveNavigate to="/dsx/evidence-beta/operations/power" />} />
+      <Route path="/dsx/evidence-beta/cooling" element={<PreserveNavigate to="/dsx/evidence-beta/operations/cooling" />} />
+      <Route path="/dsx/evidence-beta/network" element={<PreserveNavigate to="/dsx/evidence-beta/operations/compute" />} />
+      <Route path="/dsx/evidence-beta/workload" element={<PreserveNavigate to="/dsx/evidence-beta/operations/workload" />} />
+      <Route path="/dsx/evidence-beta/facility" element={<PreserveNavigate to="/dsx/evidence-beta/assets" />} />
+      <Route path="/dsx/evidence-beta/simulations" element={<PreserveNavigate to="/dsx/evidence-beta/decisions" />} />
+      <Route path="/dsx/evidence-beta/evidence" element={<PreserveNavigate to="/dsx/evidence-beta/decisions/log" />} />
+      <Route path="/dsx/evidence-beta/carbon" element={<PreserveNavigate to="/dsx/evidence-beta/sustainability" />} />
+      <Route path="/dsx/evidence-beta/financials" element={<PreserveNavigate to="/dsx/evidence-beta/sustainability/financial" />} />
+      <Route path="/dsx/evidence-beta/sovereignty" element={<PreserveNavigate to="/dsx/evidence-beta/sustainability/sovereignty" />} />
       {import.meta.env.DEV && OverlayFixtures ? (
         <Route path="/dev-overlays" element={<OverlayFixtures />} />
       ) : null}

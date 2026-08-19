@@ -35,10 +35,13 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await page.setViewportSize({ width: 1600, height: 900 });
     await installSessionAndOpen(context, page);
 
+    // Canonical IA (src/config/appNavigation.ts): header links are labelled
+    // with each item's fullName and point at the canonical href.
     const matrix = [
-      { name: 'Engineering Workbench', path: '/' },
-      { name: 'Build Data Centre Twin', path: '/builder' },
-      { name: 'Subsystem Agents', path: '/app/agents' },
+      { name: 'Facility Blueprint', path: '/blueprint/default' },
+      { name: 'Simulation Studio', path: '/simulation' },
+      { name: 'Validation & Evidence', path: '/dsx/evidence-beta/overview' },
+      { name: 'AI Factory Overview', path: '/dashboard' },
     ];
 
     for (const item of matrix) {
@@ -53,25 +56,48 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 
-  test('desktop More submenu opens and navigates below xl breakpoint', async ({ context, page, guard }) => {
+  test('desktop Manage submenu opens and navigates below xl breakpoint', async ({ context, page, guard }) => {
+    // One navigation per Manage destination; the default 20s budget is too tight.
+    test.setTimeout(120_000);
     await page.setViewportSize({ width: 1400, height: 900 });
     await installSessionAndOpen(context, page);
 
-    await page.getByRole('button', { name: 'More navigation' }).click();
-    await page.getByRole('menuitem', { name: /Telemetry & Analytics/i }).click();
-    await expectPath(page, '/intelligence');
+    const trigger = page.getByTestId('manage-trigger');
+    await expect(trigger, 'Manage trigger is rendered').toBeVisible();
+    await trigger.click();
 
-    await page.getByRole('button', { name: 'More navigation' }).click();
-    await page.getByRole('menuitem', { name: /Simulation/i }).click();
-    await expectPath(page, '/data-centre-twin?view=simulation');
+    const menu = page.getByTestId('manage-menu');
+    await expect(menu).toBeVisible();
 
-    await page.getByRole('button', { name: 'More navigation' }).click();
-    await page.getByRole('menuitem', { name: /Teams/i }).click();
-    await expectPath(page, '/teams');
+    const items = menu.getByRole('menuitem');
+    const count = await items.count();
+    expect(count, 'Manage menu must expose at least one destination').toBeGreaterThan(0);
 
-    await page.getByRole('button', { name: 'More navigation' }).click();
-    await page.getByRole('menuitem', { name: /Infrastructure/i }).click();
-    await expectPath(page, '/infrastructure');
+    // Every rendered Manage destination must be a real anchor that commits a
+    // route change to its own href - no dead menu entries.
+    const hrefs: string[] = [];
+    for (let index = 0; index < count; index += 1) {
+      const item = items.nth(index);
+      const href = (await item.getAttribute('href'))
+        ?? (await item.locator('a[href]').first().getAttribute('href').catch(() => null));
+      if (href) hrefs.push(href);
+    }
+    expect(hrefs.length, 'Manage menu entries must be links').toBe(count);
+
+    for (const href of hrefs) {
+      const target = new URL(href, 'http://localhost').pathname;
+      // Return to the shell home each time: some destinations render their own
+      // workspace chrome without the Manage trigger.
+      await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+      await expect(trigger).toBeVisible();
+      await trigger.click();
+      await page.locator(`[data-testid="manage-menu"] [href="${href}"]`).first().click();
+      // A destination may redirect to a canonical child route, so the
+      // committed path must start with the advertised href.
+      await expect
+        .poll(() => new URL(page.url()).pathname, { timeout: 5_000, message: `${href} must commit a route` })
+        .toMatch(new RegExp(`^${target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(/|$)`));
+    }
 
     expect(guard.anyExternalCompleted()).toBe(false);
   });
@@ -81,32 +107,29 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await installSessionAndOpen(context, page);
 
     await page.getByRole('button', { name: 'Toggle mobile menu' }).click();
-    await expect(page.getByRole('dialog', { name: /Data Centre Twin Studio/i })).toBeVisible();
-    await page.getByRole('link', { name: 'Build Data Centre Twin' }).click();
-    await expectPath(page, '/builder');
+    const drawer = page.getByRole('dialog', { name: /Data Centre Twin Studio/i });
+    await expect(drawer).toBeVisible();
+    await drawer.getByRole('link', { name: 'Simulation Studio' }).first().click();
+    await expectPath(page, '/simulation');
     await expect(page.getByRole('dialog', { name: /Data Centre Twin Studio/i })).toHaveCount(0);
 
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 
-  test('dashboard KPI, quick-link, and action cards are real links', async ({ context, page, guard }) => {
+  test('dashboard primary actions are real links', async ({ context, page, guard }) => {
     await page.setViewportSize({ width: 1600, height: 1000 });
     await installSessionAndOpen(context, page);
 
-    await page.getByRole('link', { name: /Global PUE - open data centre twin/i }).click();
-    await expectPath(page, '/data-centre-twin');
+    await page.getByRole('link', { name: /^Start simulation$/i }).first().click();
+    await expectPath(page, '/simulation?twin=aura-reference-facility');
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await page.getByRole('link', { name: /Open Data Centre Twin Dashboard/i }).click();
-    await expectPath(page, '/data-centre-twin');
+    await page.getByRole('link', { name: /^Open Blueprint$/i }).first().click();
+    await expectPath(page, '/blueprint/aura-reference-facility');
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await page.getByRole('link', { name: /View Blueprint/i }).click();
-    await expectPath(page, '/blueprint/default');
-
-    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await page.getByRole('link', { name: /Run Simulation/i }).click();
-    await expectPath(page, '/data-centre-twin/default?view=simulation&demo=true');
+    await page.getByRole('link', { name: /^View Evidence$/i }).first().click();
+    await expectPath(page, '/dsx/evidence-beta');
 
     const nestedInteractive = await page.locator('main a button, main button a').count();
     expect(nestedInteractive, 'dashboard must not nest links and buttons').toBe(0);
@@ -119,7 +142,7 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
 
     await page.getByRole('button', { name: 'Open command palette' }).click();
     await page.getByRole('option', { name: /Prometheus Integration/i }).click();
-    await expectPath(page, '/connect/monitor');
+    await expectPath(page, '/manage/integrations?tab=connections');
 
     await page.getByRole('button', { name: 'Open command palette' }).click();
     await page.getByRole('option', { name: /GPU Scheduler Agent Config/i }).click();

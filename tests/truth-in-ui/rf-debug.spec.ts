@@ -25,12 +25,14 @@ test('debug', async ({ context, page }) => {
   page.on('console', (m) => { if (m.type() === 'error') console.log('CONSOLE', m.text().slice(0, 300)); });
   await page.goto('/data-centre-twin?geometry=nvidia-reference', { waitUntil: 'domcontentloaded' });
   await expect(page.getByTestId('twin-visualization-layout')).toBeVisible({ timeout: 90_000 });
-  await page.waitForTimeout(30_000);
+  await page.waitForTimeout(25_000);
   const snap = await page.evaluate(() => {
     const c = (window as any).__auraRuntimeCoverage?.();
     const f = (window as any).__auraFacilityFamilies?.();
     return { roles: c?.roles, rackMounts: c?.rackMounts, aura: c?.auraAuthoredRoles, families: f };
   });
   console.log('FAILURES', JSON.stringify(failures.slice(0, 20), null, 1));
-  console.log('SNAP', JSON.stringify(snap, null, 1).slice(0, 6000));
+  console.log('AURA', JSON.stringify(snap.aura));
+  console.log('KEYS', JSON.stringify(Object.entries(snap.roles as any).map(([k,r]: any) => [k, r.assetId, r.mountedObjects, r.state])));
+  console.log('RACKS', Object.values((snap.rackMounts as any) || {}).filter((r: any) => r.mounted).length);
 });

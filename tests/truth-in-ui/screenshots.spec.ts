@@ -79,7 +79,10 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
   test('02 validated live', async ({ page, guard }) => {
     await mockKit(page, 'validated-live');
     await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText(/Kit connected.*validated/)).toBeVisible();
+    // Checkpoint B7 lockdown: Kit is disabled in every browser build, so a
+    // valid Kit payload can never be claimed as live.
+    await expect(page.getByText('Kit disabled').first()).toBeVisible();
+    await expect(page.locator('[data-provenance="live"]')).toHaveCount(0);
     await shot(page, '02-omniverse-validated-live.png');
     void guard;
   });
@@ -87,7 +90,7 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
   test('03 kit disabled (aborted before validation)', async ({ page, guard }) => {
     await page.route('**/kit-api/**', r => r.abort('failed'));
     await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText(/Kit unavailable|Kit response invalid/).first()).toBeVisible();
+    await expect(page.getByText(/Kit disabled|Kit unavailable|Kit response invalid/).first()).toBeVisible();
     await shot(page, '03-omniverse-disabled-unavailable.png');
     void guard;
   });
@@ -95,7 +98,7 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
   test('04 network unavailable', async ({ page, guard }) => {
     await mockKit(page, 'network-unavailable');
     await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText('Kit unavailable').first()).toBeVisible();
+    await expect(page.getByText(/Kit disabled|Kit unavailable/).first()).toBeVisible();
     await shot(page, '04-omniverse-unavailable.png');
     void guard;
   });
@@ -143,7 +146,9 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
   test('08 simulation running (anomaly phase)', async ({ page, guard }) => {
     await mockKit(page, 'running');
     await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText('Anomaly', { exact: true }).first()).toBeVisible();
+    // No phase may be claimed while no validated source exists.
+    await expect(page.getByTestId('metric-pue')).toBeVisible();
+    await expect(page.getByText('Anomaly', { exact: true })).toHaveCount(0);
     await shot(page, '08-omniverse-simulation-running.png');
     void guard;
   });
@@ -151,7 +156,8 @@ test.describe('Phase 1A.3.f — Kit runtime states', () => {
   test('09 simulation baseline (steady phase)', async ({ page, guard }) => {
     await mockKit(page, 'baseline');
     await page.goto('/twin-preview', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText('Steady', { exact: true }).first()).toBeVisible();
+    await expect(page.getByTestId('metric-pue')).toBeVisible();
+    await expect(page.getByText('Steady', { exact: true })).toHaveCount(0);
     await shot(page, '09-omniverse-simulation-baseline.png');
     void guard;
   });

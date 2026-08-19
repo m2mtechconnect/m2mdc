@@ -19,12 +19,17 @@ import { mockKit } from './_setup/kit-mock';
 
 test.describe('MetricProvenanceManifest — a11y', () => {
   test('manifest on the sovereignty domain view is keyboard-openable and lists rows', async ({ page, guard }) => {
+    // The Data Centre Twin route mounts the 3D facility scene before the
+    // domain tabs become actionable, so the Sovereignty tab is measured at
+    // ~14s on CI hardware. The assertions below are fast; the budget covers
+    // the scene mount only.
+    test.setTimeout(90_000);
     await mockKit(page, 'network-unavailable');
     await page.goto('/data-centre-twin?demo=true', { waitUntil: 'domcontentloaded' });
     await page.getByRole('tab', { name: 'Sovereignty' }).click();
 
     const panel = page.getByTestId('sovereignty-domain-view');
-    await expect(panel).toBeVisible();
+    await expect(panel).toBeVisible({ timeout: 30_000 });
 
     // The manifest uses a native <details><summary> pattern for
     // built-in keyboard support.

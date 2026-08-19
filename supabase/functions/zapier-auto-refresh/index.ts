@@ -16,8 +16,9 @@ serve(async (req) => {
 
   // Phase 2: in-code caller identity. This handler holds a service-role
   // client, so an anonymous caller must never reach its queries.
+  let caller;
   try {
-    await requireCaller(req);
+    caller = await requireCaller(req);
   } catch (error) {
     const rejected = callerRejectedResponse(error, req);
     if (rejected) return rejected;
@@ -42,6 +43,8 @@ serve(async (req) => {
     const { data: expiringConnections, error: fetchError } = await supabase
       .from('integrations_connections')
       .select('*')
+      // Phase 3: scoped to the calling user's own connections.
+      .eq('user_id', caller.userId)
       .eq('provider', 'zapier')
       .eq('status', 'connected')
       .not('vault_refresh_token_id', 'is', null) // Check for Vault ID instead

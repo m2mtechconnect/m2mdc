@@ -36,6 +36,7 @@ serve(createHandler({
       .eq('id', builderId)
       .eq('owner_id', userId)
       .single();
+    let builder = fetchedBuilder;
 
     if (dbError) {
       log("Builder not found in agents, trying legacy drafts", { error: dbError.message });

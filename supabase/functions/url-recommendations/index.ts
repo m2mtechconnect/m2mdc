@@ -102,6 +102,7 @@ serve(async (req) => {
       .select('*')
       .eq('domain', normalizedDomain)
       .single();
+    let site = fetchedSite;
 
     if (siteError && siteError.code !== 'PGRST116') {
       throw siteError;

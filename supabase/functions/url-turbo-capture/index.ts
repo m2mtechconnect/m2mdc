@@ -942,6 +942,7 @@ serve(async (req) => {
             .select('*')
             .eq('domain', domain)
             .single();
+          let site = fetchedSite;
 
           if (siteError && siteError.code !== 'PGRST116') {
             console.error('[Turbo-Capture] Error fetching site:', siteError);

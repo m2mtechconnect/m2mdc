@@ -1,23 +1,32 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { getCorsHeaders } from "../_shared/cors.ts";
+import { requireCaller, callerRejectedResponse } from "../_shared/callerIdentity.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
 
 /**
  * Background function to automatically refresh tokens that are expiring soon
  * Can be called periodically via cron or on-demand
  */
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Phase 2: in-code caller identity. This handler holds a service-role
+  // client, so an anonymous caller must never reach its queries.
   try {
-    // This is a public background/cron function
-    // No authentication needed since it uses service role for operations
+    await requireCaller(req);
+  } catch (error) {
+    const rejected = callerRejectedResponse(error, req);
+    if (rejected) return rejected;
+    throw error;
+  }
+
+  try {
+    // Phase 2: caller identity is verified above; the service-role client
+    // below is only reachable by an authenticated caller.
     console.log('Starting token refresh check...');
     
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;

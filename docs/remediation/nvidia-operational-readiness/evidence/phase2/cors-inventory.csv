@@ -1,0 +1,164 @@
+function,wildcard_cors,service_role,in_code_auth,class
+agent-create,False,False,False,scoped-cors
+agent-draft-from-reco,False,False,False,scoped-cors
+agent-execute,False,False,True,scoped-cors
+agent-export,False,False,False,scoped-cors
+agent-plan-chat,False,False,True,scoped-cors
+agent-run,False,False,True,scoped-cors
+agent-stream,False,False,True,scoped-cors
+agent-suggestions,False,True,True,scoped-cors
+agents-deploy,False,False,False,scoped-cors
+agents-list,False,False,False,scoped-cors
+agents-rollback,False,False,False,scoped-cors
+ai-config,True,False,False,"wildcard, no service role"
+ai-systems,False,False,False,scoped-cors
+ai-systems-unified,False,False,False,scoped-cors
+analytics-export,False,False,False,scoped-cors
+analytics-overview,False,False,False,scoped-cors
+analytics-systems,False,False,False,scoped-cors
+analyze-document-with-gemini,False,False,True,scoped-cors
+analyze-file,False,False,True,scoped-cors
+aoc-environment-promotion,True,False,True,wildcard + in-code auth
+aoc-runtime-action,True,False,True,wildcard + in-code auth
+aoc-runtime-control,True,True,True,wildcard + in-code auth
+aoc-simulate-test,True,True,True,wildcard + in-code auth
+arcade-servers,True,False,True,wildcard + in-code auth
+builder-generate-summary,False,False,True,scoped-cors
+builder-infer-goal,False,False,True,scoped-cors
+builder-test,False,False,False,scoped-cors
+builders-create,False,False,False,scoped-cors
+builders-deploy,False,False,False,scoped-cors
+builders-get,False,False,False,scoped-cors
+builders-update,False,False,False,scoped-cors
+canary-deploy,True,True,True,wildcard + in-code auth
+catalog-mcp,True,False,True,wildcard + in-code auth
+catalog-templates-industry,False,False,False,scoped-cors
+catalog-templates-m2m,False,False,False,scoped-cors
+chat-with-twin,True,False,True,wildcard + in-code auth
+classify-content,False,False,True,scoped-cors
+classify-intent,True,False,True,wildcard + in-code auth
+connection-credential,True,True,True,wildcard + in-code auth
+connection-health-check,True,True,True,wildcard + in-code auth
+connection-provision,True,True,True,wildcard + in-code auth
+copilot-chat,False,False,True,scoped-cors
+copilot-chat-simple,True,False,True,wildcard + in-code auth
+copilot-health,True,False,True,wildcard + in-code auth
+copilot-router,True,False,True,wildcard + in-code auth
+copilot-search,True,False,True,wildcard + in-code auth
+copilot-stream,True,False,True,wildcard + in-code auth
+dc-create-twin-from-recommendation,True,True,True,wildcard + in-code auth
+dc-scan-url,True,True,True,wildcard + in-code auth
+deterministic-recommendations,True,False,True,wildcard + in-code auth
+digital-twin-create,False,False,False,scoped-cors
+digital-twin-delete,False,False,False,scoped-cors
+digital-twin-event,True,False,True,wildcard + in-code auth
+digital-twin-get,False,False,False,scoped-cors
+digital-twin-list,False,False,False,scoped-cors
+digital-twin-run-get,True,False,True,wildcard + in-code auth
+digital-twin-runs-list,True,False,True,wildcard + in-code auth
+digital-twin-runtime,True,False,True,wildcard + in-code auth
+digital-twin-update,False,False,False,scoped-cors
+document-analysis-start,False,False,False,scoped-cors
+document-analysis-status,False,False,False,scoped-cors
+dsx-ingest,True,True,True,wildcard + in-code auth
+funding-query,True,False,False,"wildcard, no service role"
+funding-scraper,False,True,True,scoped-cors
+generate-ai-recommendations,True,False,False,"wildcard, no service role"
+generate-ctas,True,False,False,"wildcard, no service role"
+green-dc-recommend,True,False,False,"wildcard, no service role"
+grounded-summary,True,True,True,wildcard + in-code auth
+health,False,False,False,scoped-cors
+health-ai,True,False,False,"wildcard, no service role"
+health-check,False,False,False,scoped-cors
+ingest-file,True,False,True,wildcard + in-code auth
+integrations-connect,True,False,True,wildcard + in-code auth
+integrations-disconnect,True,False,True,wildcard + in-code auth
+integrations-list,False,False,False,scoped-cors
+integrations-test,True,False,True,wildcard + in-code auth
+integrations-zapier,True,True,True,wildcard + in-code auth
+knowledge-index,False,False,False,scoped-cors
+knowledge-upload,False,False,False,scoped-cors
+knowledge-url,False,False,False,scoped-cors
+langgraph-log-run,True,False,True,wildcard + in-code auth
+langgraph-run,True,False,True,wildcard + in-code auth
+langgraph-search-docs,True,False,True,wildcard + in-code auth
+langgraph-upsert-doc,False,False,False,scoped-cors
+langgraph-upsert-memory,False,False,False,scoped-cors
+managed-connector-capabilities,True,True,True,wildcard + in-code auth
+managed-connector-invoke,True,True,True,wildcard + in-code auth
+managed-connector-verify,True,True,True,wildcard + in-code auth
+managed-user-disconnect,True,True,True,wildcard + in-code auth
+managed-user-oauth-complete,True,True,True,wildcard + in-code auth
+managed-user-oauth-start,True,True,True,wildcard + in-code auth
+manual-recommendations,True,False,True,wildcard + in-code auth
+mcp-allowlist,False,False,False,scoped-cors
+mcp-connect,False,False,False,scoped-cors
+mcp-delete,False,False,False,scoped-cors
+mcp-register,False,False,False,scoped-cors
+mcp-sync,False,False,True,scoped-cors
+mcp-test-tool,False,False,True,scoped-cors
+mcp-validate,False,False,True,scoped-cors
+mcp-verify,False,False,True,scoped-cors
+migrate-credentials-to-vault,True,True,True,wildcard + in-code auth
+models-test,True,False,True,wildcard + in-code auth
+ops-heartbeat,False,False,False,scoped-cors
+ops-overview,False,False,False,scoped-cors
+ops-systems,False,False,False,scoped-cors
+policy-evaluate,False,False,False,scoped-cors
+policy-validate,False,False,False,scoped-cors
+public-intake,True,True,True,wildcard + in-code auth
+query-answer,True,True,True,wildcard + in-code auth
+rag-db-connect,False,False,False,scoped-cors
+rag-items,False,False,False,scoped-cors
+rag-oauth-microsoft,True,True,True,wildcard + in-code auth
+rag-s3-connect,True,False,True,wildcard + in-code auth
+rag-test,True,True,True,wildcard + in-code auth
+rag-upload,True,True,True,wildcard + in-code auth
+rag-urls,False,False,False,scoped-cors
+reco-selftest,True,True,True,wildcard + in-code auth
+recommendations-generate,False,False,True,scoped-cors
+recommendations-generate-stream,True,True,True,wildcard + in-code auth
+record-decision,False,True,False,scoped-cors
+run-lifecycle,False,True,False,scoped-cors
+runs-recent,False,False,False,scoped-cors
+search,False,False,False,scoped-cors
+search-suggestions,True,False,True,wildcard + in-code auth
+systems-create,False,False,False,scoped-cors
+systems-create-from-template,False,False,False,scoped-cors
+systems-delete,False,False,False,scoped-cors
+systems-update,False,False,False,scoped-cors
+teams-accept-invite,True,True,True,wildcard + in-code auth
+teams-invite,True,True,True,wildcard + in-code auth
+template-preview-chat,True,False,True,wildcard + in-code auth
+template-test-run,True,False,True,wildcard + in-code auth
+template-validate,True,False,False,"wildcard, no service role"
+templates-list,False,False,False,scoped-cors
+url-capture,True,True,True,wildcard + in-code auth
+url-crawl,False,False,False,scoped-cors
+url-recommendations,True,True,True,wildcard + in-code auth
+url-turbo-capture,True,True,True,wildcard + in-code auth
+website-cache-clear,False,True,True,scoped-cors
+website-cache-status,False,False,False,scoped-cors
+website-scan,False,False,False,scoped-cors
+workflow-ai-suggestions,True,False,True,wildcard + in-code auth
+workflow-run,False,False,False,scoped-cors
+workflow-save,True,False,True,wildcard + in-code auth
+workflow-simulate,True,False,True,wildcard + in-code auth
+zapier-action-execute,False,True,True,scoped-cors
+zapier-app-connect,True,False,True,wildcard + in-code auth
+zapier-app-disconnect,True,False,True,wildcard + in-code auth
+zapier-apps-detail,True,False,True,wildcard + in-code auth
+zapier-apps-list,False,False,False,scoped-cors
+zapier-auto-refresh,False,True,True,scoped-cors
+zapier-connect,False,False,False,scoped-cors
+zapier-disconnect,True,False,True,wildcard + in-code auth
+zapier-integration-status,True,False,True,wildcard + in-code auth
+zapier-oauth-callback,True,True,False,WILDCARD + service-role + NO in-code auth
+zapier-oauth-connect,True,False,True,wildcard + in-code auth
+zapier-oauth-start,True,True,True,wildcard + in-code auth
+zapier-refresh-token,True,False,True,wildcard + in-code auth
+zapier-status,True,False,True,wildcard + in-code auth
+zapier-test,False,False,False,scoped-cors
+zapier-test-connection,True,False,True,wildcard + in-code auth
+zapier-webhook,False,True,False,scoped-cors
+zapier-webhook-trigger,False,True,False,scoped-cors

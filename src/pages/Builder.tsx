@@ -19,7 +19,7 @@ import { trackBuilderStep, trackDeployment, trackAnalytics } from '@/lib/analyti
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { Button } from '@/components/ui/button';
-import { Sparkles, LayoutTemplate, AlertTriangle } from 'lucide-react';
+import { Sparkles, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { BuilderStarterLists } from '@/components/builder/BuilderStarterLists';
 

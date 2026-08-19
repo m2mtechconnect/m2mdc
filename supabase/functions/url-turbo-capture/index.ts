@@ -937,11 +937,12 @@ serve(async (req) => {
           console.log('[Turbo-Capture] Inserting analyzed pages into site_pages table...');
           
           // Get or create site
-          let { data: site, error: siteError } = await supabase
+          const { data: fetchedSite, error: siteError } = await supabase
             .from('sites')
             .select('*')
             .eq('domain', domain)
             .single();
+          let site = fetchedSite;
 
           if (siteError && siteError.code !== 'PGRST116') {
             console.error('[Turbo-Capture] Error fetching site:', siteError);

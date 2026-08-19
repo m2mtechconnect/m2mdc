@@ -30,12 +30,13 @@ serve(createHandler({
     log("Fetching builder draft", { builderId });
 
     // First, try to load from the new agents-based builder store
-    let { data: builder, error: dbError } = await supabase
+    const { data: fetchedBuilder, error: dbError } = await supabase
       .from('agents')
       .select('*')
       .eq('id', builderId)
       .eq('owner_id', userId)
       .single();
+    let builder = fetchedBuilder;
 
     if (dbError) {
       log("Builder not found in agents, trying legacy drafts", { error: dbError.message });

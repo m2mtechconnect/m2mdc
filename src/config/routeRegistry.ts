@@ -144,6 +144,20 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
   { path: '/digital-twins-demo/funding-intake', shell: 'internal', kind: 'canonical', note: 'Explicit demo namespace.' },
   { path: '/infrastructure', shell: 'internal', kind: 'canonical' },
   { path: '/dsx/evidence-beta', shell: 'internal', kind: 'canonical', note: 'Evidence shell; children below.' },
+  // Pre-consolidation flat Evidence paths. These are mounted at the shell's
+  // top level (outside the `/dsx/evidence-beta` parent) so deep links commit
+  // without the parent route resolving first.
+  { path: '/dsx/evidence-beta/thermal', shell: 'internal', kind: 'redirect' },
+  { path: '/dsx/evidence-beta/power', shell: 'internal', kind: 'redirect' },
+  { path: '/dsx/evidence-beta/cooling', shell: 'internal', kind: 'redirect' },
+  { path: '/dsx/evidence-beta/network', shell: 'internal', kind: 'redirect' },
+  { path: '/dsx/evidence-beta/workload', shell: 'internal', kind: 'redirect' },
+  { path: '/dsx/evidence-beta/facility', shell: 'internal', kind: 'redirect' },
+  { path: '/dsx/evidence-beta/simulations', shell: 'internal', kind: 'redirect' },
+  { path: '/dsx/evidence-beta/evidence', shell: 'internal', kind: 'redirect' },
+  { path: '/dsx/evidence-beta/carbon', shell: 'internal', kind: 'redirect' },
+  { path: '/dsx/evidence-beta/financials', shell: 'internal', kind: 'redirect' },
+  { path: '/dsx/evidence-beta/sovereignty', shell: 'internal', kind: 'redirect' },
   { path: '/dev-overlays', shell: 'internal', kind: 'dev-only' },
   { path: '*', shell: 'internal', kind: 'catch-all' },
 ];
@@ -167,17 +181,6 @@ export const EVIDENCE_CHILD_ROUTES: RouteRecord[] = [
   { path: 'decisions', shell: 'internal', kind: 'canonical' },
   { path: 'decisions/log', shell: 'internal', kind: 'canonical' },
   { path: 'assets', shell: 'internal', kind: 'canonical' },
-  { path: 'thermal', shell: 'internal', kind: 'redirect' },
-  { path: 'power', shell: 'internal', kind: 'redirect' },
-  { path: 'cooling', shell: 'internal', kind: 'redirect' },
-  { path: 'network', shell: 'internal', kind: 'redirect' },
-  { path: 'workload', shell: 'internal', kind: 'redirect' },
-  { path: 'facility', shell: 'internal', kind: 'redirect' },
-  { path: 'simulations', shell: 'internal', kind: 'redirect' },
-  { path: 'evidence', shell: 'internal', kind: 'redirect' },
-  { path: 'carbon', shell: 'internal', kind: 'redirect' },
-  { path: 'financials', shell: 'internal', kind: 'redirect' },
-  { path: 'sovereignty', shell: 'internal', kind: 'redirect' },
 ];
 
 export const ALL_ROUTES: RouteRecord[] = [

@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.on_profile_approved_grant_default_role() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.on_profile_approved_provision_twin() FROM PUBLIC, anon, authenticated;

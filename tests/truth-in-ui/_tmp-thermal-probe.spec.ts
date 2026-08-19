@@ -4,7 +4,7 @@ import { installSupabaseMock } from './_setup/supabase-mock';
 test('probe thermal workspace', async ({ context, page }) => {
   test.setTimeout(90_000);
   await installSupabaseMock(context);
-  await page.goto('/dsx/evidence-beta/thermal', { waitUntil: 'domcontentloaded' });
+  await page.goto('/dsx/evidence-beta/operations/thermal', { waitUntil: 'domcontentloaded' });
   await expect(page.getByTestId('dsx-workspace-title')).toBeVisible({ timeout: 20_000 });
   console.log('URL', page.url());
   console.log('title', await page.getByTestId('dsx-workspace-title').innerText());

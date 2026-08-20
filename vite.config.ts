@@ -62,7 +62,11 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          // `@react-three/fiber` also imports react-dom/client. Keeping that
+          // subpath in the React chunk prevents Rollup from placing the app
+          // bootstrap in vendor-3d and forcing ~900 kB of 3D code onto the
+          // unauthenticated landing route.
+          'vendor-react': ['react', 'react-dom', 'react-dom/client', 'react-router-dom'],
           'vendor-ui': [
             '@radix-ui/react-dialog',
             '@radix-ui/react-tabs',
@@ -77,7 +81,6 @@ export default defineConfig(({ mode }) => ({
             '@radix-ui/react-scroll-area',
           ],
           'vendor-charts': ['recharts'],
-          'vendor-3d': ['three', '@react-three/fiber', '@react-three/drei'],
           'vendor-query': ['@tanstack/react-query'],
           'vendor-supabase': ['@supabase/supabase-js'],
           'vendor-motion': ['framer-motion'],

@@ -57,9 +57,9 @@ export function TwinHero() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [mouseX, mouseY]);
 
-  // Defer the heavy hero video so it doesn't block LCP. Only load it on
-  // larger screens, when the user hasn't requested reduced motion or
-  // data-saver, and after the browser is idle.
+  // The background video is a progressive enhancement. A browser-idle
+  // callback can fire during Lighthouse's measurement window and start a
+  // 30+ MB transfer, so only opt in after genuine user interaction.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mql = window.matchMedia('(min-width: 768px)');
@@ -68,14 +68,12 @@ export function TwinHero() {
     const saveData = conn?.saveData === true;
     const slow = conn?.effectiveType === 'slow-2g' || conn?.effectiveType === '2g';
     if (!mql.matches || reduceMotion || saveData || slow) return;
-    const ric: (cb: () => void) => number =
-      (window as Window & { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback ??
-      ((cb) => window.setTimeout(cb, 1500));
-    const id = ric(() => setShowVideo(true));
+    const revealVideo = () => setShowVideo(true);
+    window.addEventListener('pointerdown', revealVideo, { once: true, passive: true });
+    window.addEventListener('keydown', revealVideo, { once: true });
     return () => {
-      const cic = (window as Window & { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback;
-      if (cic) cic(id);
-      else window.clearTimeout(id);
+      window.removeEventListener('pointerdown', revealVideo);
+      window.removeEventListener('keydown', revealVideo);
     };
   }, []);
 

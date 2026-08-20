@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { boundedRetryDelay, retryUnlessTerminal } from '@/lib/queryRetry';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -17,9 +17,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
 import { initChangeLogMiddleware } from "@/stores/dcBuilderChangeLogMiddleware";
 import { SignIn, SignUp, SignOut, ForgotPassword, MFA, AuthCallback } from "./pages/auth/index";
-import DataCentreTwin from "./pages/DataCentreTwin";
 import DataCentreTwinLanding from "./pages/DataCentreTwinLanding";
-import TwinPreview from "./pages/TwinPreview";
 import Onboarding from "./pages/Onboarding";
 import PendingApproval from "./pages/PendingApproval";
 // PR-0.1 Checkpoint B7.4F - Pilot shell imported statically because it is
@@ -45,6 +43,14 @@ import AuthenticatedShell from "./AuthenticatedShell";
 const OverlayFixtures = import.meta.env.DEV
   ? lazy(() => import("./pages/test/OverlayFixtures"))
   : null;
+const DataCentreTwin = lazy(() => import("./pages/DataCentreTwin"));
+const TwinPreview = lazy(() => import("./pages/TwinPreview"));
+
+const publicRouteFallback = (
+  <div className="flex min-h-dvh items-center justify-center" role="status" aria-live="polite">
+    <span className="text-sm text-muted-foreground">Loading experience…</span>
+  </div>
+);
 
 // Initialize changelog middleware for builder store
 initChangeLogMiddleware();
@@ -145,14 +151,19 @@ function AuthenticatedApp() {
         <Route
           path="/data-centre-twin"
           element={(
-            <CoPilotProvider>
-              <CoPilotCommandProvider>
-                <DataCentreTwin />
-              </CoPilotCommandProvider>
-            </CoPilotProvider>
+            <Suspense fallback={publicRouteFallback}>
+              <CoPilotProvider>
+                <CoPilotCommandProvider>
+                  <DataCentreTwin />
+                </CoPilotCommandProvider>
+              </CoPilotProvider>
+            </Suspense>
           )}
         />
-        <Route path="/twin-preview" element={<TwinPreview />} />
+        <Route
+          path="/twin-preview"
+          element={<Suspense fallback={publicRouteFallback}><TwinPreview /></Suspense>}
+        />
         {/* Phase 5: AURA renders this preview; the legacy vendor-named path redirects. */}
         <Route path="/omniverse-scene" element={<Navigate to="/twin-preview" replace />} />
         <Route path="/onboarding" element={<Onboarding />} />
@@ -234,7 +245,7 @@ const App = () => (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <RBACProvider>
-            <BrowserRouter future={{ v7_relativeSplatPath: true }}>
+            <BrowserRouter>
               <ActiveTwinProvider>
                       <Toaster />
                       <Sonner />

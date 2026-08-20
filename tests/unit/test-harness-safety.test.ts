@@ -89,6 +89,8 @@ describe('test harness safety guards', () => {
     expect(config).toContain("testDir: './tests/visual'");
     expect(spec).toContain("from '../truth-in-ui/_setup/fixtures'");
     expect(spec).toContain('await installSupabaseMock(context)');
+    expect(spec).toContain("page.getByTestId('command-centre')");
+    expect(spec).not.toContain("page.locator('.hero");
   });
 
   it('restores the replay search path without rewriting security migration history', () => {
@@ -144,6 +146,9 @@ describe('test harness safety guards', () => {
     );
     const matrix = repositoryFile('scripts/phase3/rls-matrix.sql');
     const validator = repositoryFile('scripts/phase3/external-validation.mjs');
+    const twinReadGrant = repositoryFile(
+      'supabase/migrations/20260820170000_grant_authenticated_twin_read.sql',
+    );
 
     expect(storagePolicy).toContain(
       'DROP POLICY IF EXISTS "Users can list their own profile images" ON storage.objects',
@@ -157,12 +162,22 @@ describe('test harness safety guards', () => {
     );
     expect(matrix.match(/data_centre_twins \(name, city, region_code, created_by_user\)/g)).toHaveLength(2);
     expect(validator).toContain('data_centre_twins (name, city, region_code, created_by_user)');
+    expect(validator).toContain('WITH inserted AS (');
+    expect(validator).toContain(') SELECT id FROM inserted');
     expect(matrix.match(/simulation_runs \(user_id, tenant_id, twin_id, scenario_key,/g)).toHaveLength(5);
     expect(validator).toContain("op: 'create'");
     expect(validator).toContain("requestedExecutionClass: 'ephemeral-local-validation'");
     expect(validator).toContain('idempotencyKey: `phase3-${crypto.randomUUID()}`');
     expect(validator).toContain('createA.body?.data?.run?.id');
     expect(validator).not.toContain("action: 'transition'");
+    const twinReadStatements = twinReadGrant
+      .split('\n')
+      .filter((line) => !line.trim().startsWith('--'))
+      .join('\n')
+      .trim();
+    expect(twinReadStatements).toBe(
+      'GRANT SELECT ON public.data_centre_twins TO authenticated;',
+    );
   });
 
   it('keeps browser security checks on explicit loopback Supabase configuration', () => {

@@ -17,7 +17,7 @@ test.describe('Visual Regression - Light Theme', () => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
     
-    await expect(page.locator('.hero, [data-testid="hero"]')).toBeVisible();
+    await expect(page.getByTestId('command-centre')).toBeVisible();
     await expect(page).toHaveScreenshot('dashboard-hero-light.png', {
       maxDiffPixels: 100,
     });

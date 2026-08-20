@@ -98,8 +98,12 @@
     "/infrastructure",
     "/mfa",
     "/auth",
+    "/auth/callback",
     "/sign-in",
     "/sign-up",
+    "/twin-preview",
+    "/invite/accept",
+    "/*",
     "*",
     "/dsx/evidence-beta"
   ],

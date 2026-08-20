@@ -93,6 +93,7 @@ const ALLOWED_VITE = new Set([
   'VITE_SUPABASE_URL',
   'VITE_SUPABASE_PUBLISHABLE_KEY',
   'VITE_SUPABASE_PROJECT_ID',
+  'VITE_BUILD_VERSION',
 ]);
 // Identifiers that must NEVER appear in production source (including as
 // bare string literals, error messages, or comments) because the presence
@@ -116,8 +117,8 @@ for (const f of walk(join(REPO, 'src'))) {
       fail(`browser identifier: ${f} references forbidden ${re}`);
     }
   }
-  // Enforce env-read allowlist: only Supabase-3 and Vite built-ins may be
-  // read via `import.meta.env.<KEY>`.
+  // Enforce env-read allowlist: only explicitly public client/build metadata
+  // and Vite built-ins may be read via `import.meta.env.<KEY>`.
   const envReadRe = /import\.meta\.env\.([A-Za-z_][A-Za-z0-9_]*)/g;
   const ALLOWED_BUILTIN = new Set(['DEV', 'PROD', 'MODE', 'BASE_URL', 'SSR']);
   let m;

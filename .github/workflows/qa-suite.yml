@@ -7,6 +7,16 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  CI: true
+  VITE_SUPABASE_URL: http://127.0.0.1:54321
+  VITE_SUPABASE_PROJECT_ID: local-placeholder
+  VITE_SUPABASE_PUBLISHABLE_KEY: placeholder-anon-key
+  SUPABASE_URL: http://127.0.0.1:54321
+  SUPABASE_ANON_KEY: placeholder-anon-key
+  SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
+  USE_MOCK_LLM: true
+
 jobs:
   unit-tests:
     name: Unit Tests
@@ -56,8 +66,6 @@ jobs:
       
       - name: Run E2E tests
         run: bunx playwright test --project=${{ matrix.browser }}
-        env:
-          CI: true
       
       - name: Upload test results
         if: always()
@@ -91,10 +99,10 @@ jobs:
         uses: treosh/lighthouse-ci-action@v11
         with:
           urls: |
-            http://localhost:5173
-            http://localhost:5173/agents
-            http://localhost:5173/marketplace
-            http://localhost:5173/builder?step=2
+            http://localhost:4173
+            http://localhost:4173/agents
+            http://localhost:4173/marketplace
+            http://localhost:4173/builder?step=2
           uploadArtifacts: true
           temporaryPublicStorage: true
 
@@ -162,8 +170,10 @@ jobs:
           echo "Performance: ${{ needs.performance-audit.result }}"
           echo "Accessibility: ${{ needs.accessibility-audit.result }}"
           
-          if [ "${{ needs.unit-tests.result }}" == "failure" ] || 
-             [ "${{ needs.e2e-tests.result }}" == "failure" ]; then
+          if [ "${{ needs.unit-tests.result }}" != "success" ] ||
+             [ "${{ needs.e2e-tests.result }}" != "success" ] ||
+             [ "${{ needs.performance-audit.result }}" != "success" ] ||
+             [ "${{ needs.accessibility-audit.result }}" != "success" ]; then
             echo "❌ QA Suite Failed"
             exit 1
           else

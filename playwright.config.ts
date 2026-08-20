@@ -15,7 +15,7 @@ export default defineConfig({
     ['list'],
   ],
   use: {
-    baseURL: PLAYWRIGHT_BASE_URL || 'http://localhost:5173',
+    baseURL: PLAYWRIGHT_BASE_URL || 'http://localhost:8080',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -50,8 +50,8 @@ export default defineConfig({
   webServer: PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: 'npm run dev',
-        url: 'http://localhost:5173',
+        command: 'bun run dev',
+        url: 'http://localhost:8080',
         reuseExistingServer: !process.env.CI,
         timeout: 120000,
       },

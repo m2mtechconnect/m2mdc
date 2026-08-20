@@ -78,4 +78,32 @@ describe('test harness safety guards', () => {
       'a100fe44048877237b50f90f78d08bb1d61eb1a0e2402d34a70ed4e30a1cbb34',
     );
   });
+
+  it('makes the user-specific profile backfill safe for clean replay', () => {
+    const userBackfill = repositoryFile(
+      'supabase/migrations/20260218142636_a59bb8cb-5e00-4e13-b63d-19eb97d7d4bb.sql',
+    );
+    expect(userBackfill).toContain('FROM auth.users AS source_user');
+    expect(userBackfill).toContain("WHERE source_user.id = 'dc4ffd38-7474-4ece-a76d-9203538687ed'::uuid");
+    expect(userBackfill).not.toContain('INSERT INTO auth.users');
+  });
+
+  it('keeps browser security checks on explicit loopback Supabase configuration', () => {
+    const config = repositoryFile('playwright.truth.config.ts');
+    const mock = repositoryFile('tests/truth-in-ui/_setup/supabase-mock.ts');
+
+    expect(config).toContain('VITE_SUPABASE_URL=http://127.0.0.1:54321');
+    expect(config).toContain('VITE_SUPABASE_PUBLISHABLE_KEY=safe-placeholder-anon-key');
+    expect(mock).toContain("new Set(['127.0.0.1', 'localhost', '[::1]', '::1'])");
+  });
+
+  it('does not auto-download the landing-page background video while idle', () => {
+    const hero = repositoryFile('src/components/landing/TwinHero.tsx');
+    const viteConfig = repositoryFile('vite.config.ts');
+
+    expect(hero).toContain("addEventListener('pointerdown', revealVideo");
+    expect(hero).not.toContain('requestIdleCallback');
+    expect(viteConfig).toContain("'react-dom/client'");
+    expect(viteConfig).not.toMatch(/'vendor-3d'\s*:/);
+  });
 });

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { installSupabaseMock } from '../truth-in-ui/_setup/supabase-mock';
 
 test.describe('Theme Toggle - Light/Dark Mode', () => {
   test('should toggle between light and dark themes', async ({ page }) => {
@@ -109,7 +110,9 @@ test.describe('Theme Toggle - Light/Dark Mode', () => {
   });
 
   test('should update chart colors with theme', async ({ page }) => {
+    const mock = await installSupabaseMock(page);
     await page.goto('/analytics');
+    await expect.poll(() => mock.profileHits(), { timeout: 5_000 }).toBeGreaterThan(0);
     await page.waitForLoadState('networkidle');
 
     // Get chart color in light mode

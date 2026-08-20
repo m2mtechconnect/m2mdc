@@ -23,9 +23,15 @@ import type { BrowserContext, Page, Route } from '@playwright/test';
 export const SUPABASE_REF = 'psfvrskpnwcshvajzeix';
 export const STORAGE_KEY = `sb-${SUPABASE_REF}-auth-token`;
 const SUPABASE_HOST = `${SUPABASE_REF}.supabase.co`;
+const LOOPBACK_HOSTS = new Set(['127.0.0.1', 'localhost', '[::1]', '::1']);
 
 function isSupabaseHost(host: string): boolean {
-  return host === SUPABASE_HOST || host.endsWith('.supabase.co') || host.endsWith('.supabase.io');
+  return (
+    LOOPBACK_HOSTS.has(host) ||
+    host === SUPABASE_HOST ||
+    host.endsWith('.supabase.co') ||
+    host.endsWith('.supabase.io')
+  );
 }
 
 function b64url(obj: unknown): string {

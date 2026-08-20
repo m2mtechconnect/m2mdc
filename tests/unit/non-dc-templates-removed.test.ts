@@ -8,14 +8,35 @@
  * by this guard: the source tree must not reintroduce the identifiers, and the
  * template loader must not resolve them.
  *
- * The source-tree half runs offline and is the meaningful assertion. The loader
- * half needs the backend, so it is skipped rather than failed when the
- * live-backend guard blocks the request.
+ * Both halves run offline. The loader receives a deterministic not-found
+ * response from a local mock so this guard never contacts a deployed backend
+ * and never passes merely because a network request failed.
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { loadTemplateById } from '@/lib/templates/unifiedTemplateService';
+
+const templateQuery = vi.hoisted(() => ({
+  from: vi.fn(),
+  eq: vi.fn(),
+  single: vi.fn(),
+}));
+
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: {
+    from: templateQuery.from.mockImplementation(() => ({
+      select: () => ({
+        eq: templateQuery.eq.mockImplementation(() => ({
+          single: templateQuery.single.mockResolvedValue({
+            data: null,
+            error: { code: 'PGRST116', message: 'not found' },
+          }),
+        })),
+      }),
+    })),
+  },
+}));
 
 const REMOVED_TEMPLATE_IDS = [
   'YVR_AIRPORT_DIGITAL_TWIN',
@@ -59,14 +80,9 @@ describe('non-data-centre templates remain removed', () => {
 
   for (const id of REMOVED_TEMPLATE_IDS) {
     it(`does not resolve ${id} from the template loader`, async () => {
-      let resolved: unknown;
-      try {
-        resolved = await loadTemplateById(id);
-      } catch {
-        // Backend unreachable in this environment: nothing to assert.
-        return;
-      }
-      expect(resolved).toBeNull();
+      await expect(loadTemplateById(id)).resolves.toBeNull();
+      expect(templateQuery.from).toHaveBeenLastCalledWith('agent_templates');
+      expect(templateQuery.eq).toHaveBeenLastCalledWith('id', id);
     });
   }
 });

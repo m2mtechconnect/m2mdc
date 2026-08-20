@@ -47,8 +47,8 @@ BEGIN
   VALUES ('validation-twin-a', 'Validation City', 'validation-region-a', ua)
   RETURNING id INTO twin_a;
 
-  INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, lifecycle_status)
-  VALUES (ua, ua, twin_a, 'succeeded') RETURNING id INTO run_a;
+  INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, scenario_key, lifecycle_status)
+  VALUES (ua, ua, twin_a, 'validation-owner', 'succeeded') RETURNING id INTO run_a;
 
   ---------------------------------------------------------------- reads
   PERFORM pg_temp.act_as(ua);
@@ -74,8 +74,8 @@ BEGIN
 
   ok := false;
   BEGIN
-    INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, lifecycle_status)
-    VALUES (ub, ub, twin_a, 'queued');
+    INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, scenario_key, lifecycle_status)
+    VALUES (ub, ub, twin_a, 'validation-cross-tenant', 'queued');
   EXCEPTION WHEN OTHERS THEN ok := true;
   END;
   PERFORM pg_temp.expect('tenant B cannot attach a run to tenant A twin', ok, true);
@@ -83,9 +83,9 @@ BEGIN
 
   --------------------------------------------- privileged field forgery
   PERFORM pg_temp.act_as(ua);
-  INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, lifecycle_status,
+  INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, scenario_key, lifecycle_status,
                                       run_intent, verification_level)
-  VALUES (ua, ua, twin_a, 'queued', 'authoritative', 'server-verified')
+  VALUES (ua, ua, twin_a, 'validation-forgery', 'queued', 'authoritative', 'server-verified')
   RETURNING id INTO run_a;
   SELECT run_intent = 'preview' AND verification_level = 'client-generated-unverified'
     INTO ok FROM public.simulation_runs WHERE id = run_a;
@@ -180,16 +180,16 @@ BEGIN
   VALUES ('validation-twin-ext-a', 'Validation City', 'validation-region-a', member_a)
   RETURNING id INTO twin_a;
 
-  INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, lifecycle_status)
-  VALUES (member_a, member_a, twin_a, 'succeeded') RETURNING id INTO run_a;
+  INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, scenario_key, lifecycle_status)
+  VALUES (member_a, member_a, twin_a, 'validation-extended', 'succeeded') RETURNING id INTO run_a;
 
   ------------------------------------------------------------- anon writes
   PERFORM set_config('request.jwt.claims', NULL, true);
   PERFORM set_config('role', 'anon', true);
   ok := false;
   BEGIN
-    INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, lifecycle_status)
-    VALUES (member_a, member_a, twin_a, 'queued');
+    INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, scenario_key, lifecycle_status)
+    VALUES (member_a, member_a, twin_a, 'validation-anon', 'queued');
   EXCEPTION WHEN OTHERS THEN ok := true;
   END;
   PERFORM pg_temp.expect('anonymous insert into simulation_runs denied', ok, true);

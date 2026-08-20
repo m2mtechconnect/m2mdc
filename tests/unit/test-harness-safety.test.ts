@@ -157,6 +157,12 @@ describe('test harness safety guards', () => {
     );
     expect(matrix.match(/data_centre_twins \(name, city, region_code, created_by_user\)/g)).toHaveLength(2);
     expect(validator).toContain('data_centre_twins (name, city, region_code, created_by_user)');
+    expect(matrix.match(/simulation_runs \(user_id, tenant_id, twin_id, scenario_key,/g)).toHaveLength(5);
+    expect(validator).toContain("op: 'create'");
+    expect(validator).toContain("requestedExecutionClass: 'ephemeral-local-validation'");
+    expect(validator).toContain('idempotencyKey: `phase3-${crypto.randomUUID()}`');
+    expect(validator).toContain('createA.body?.data?.run?.id');
+    expect(validator).not.toContain("action: 'transition'");
   });
 
   it('keeps browser security checks on explicit loopback Supabase configuration', () => {

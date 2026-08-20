@@ -23,7 +23,14 @@ import type { BrowserContext, Page, Route } from '@playwright/test';
 // CI deliberately replaces the cloud URL with a loopback placeholder.
 export const SUPABASE_REF = 'psfvrskpnwcshvajzeix';
 const SUPABASE_HOST = `${SUPABASE_REF}.supabase.co`;
-const LOOPBACK_HOSTS = new Set(['127.0.0.1', 'localhost', '[::1]', '::1']);
+const DEFAULT_TEST_SUPABASE_URL = 'http://127.0.0.1:54321';
+const CONFIGURED_SUPABASE_URL =
+  process.env.VITE_SUPABASE_URL?.trim() || DEFAULT_TEST_SUPABASE_URL;
+const LOOPBACK_SUPABASE_ORIGINS = new Set([
+  new URL(DEFAULT_TEST_SUPABASE_URL).origin,
+  'http://localhost:54321',
+  'http://[::1]:54321',
+]);
 
 export function storageKeyForSupabaseUrl(url: string): string {
   const hostname = new URL(url).hostname;
@@ -33,15 +40,18 @@ export function storageKeyForSupabaseUrl(url: string): string {
 }
 
 export const STORAGE_KEY = storageKeyForSupabaseUrl(
-  process.env.VITE_SUPABASE_URL?.trim() || 'http://127.0.0.1:54321',
+  CONFIGURED_SUPABASE_URL,
 );
 
-function isSupabaseHost(host: string): boolean {
+export function isSupabaseRequest(url: URL): boolean {
+  if (url.origin === new URL(CONFIGURED_SUPABASE_URL).origin) return true;
+  if (LOOPBACK_SUPABASE_ORIGINS.has(url.origin)) return true;
+
   return (
-    LOOPBACK_HOSTS.has(host) ||
-    host === SUPABASE_HOST ||
-    host.endsWith('.supabase.co') ||
-    host.endsWith('.supabase.io')
+    url.protocol === 'https:' &&
+    (url.hostname === SUPABASE_HOST ||
+      url.hostname.endsWith('.supabase.co') ||
+      url.hostname.endsWith('.supabase.io'))
   );
 }
 
@@ -148,8 +158,7 @@ export async function installSupabaseMock(
     catch { return route.fallback(); }
 
     // Parse first, match on origin+pathname second.
-    const host = parsed.hostname;
-    if (!isSupabaseHost(host)) return route.fallback();
+    if (!isSupabaseRequest(parsed)) return route.fallback();
 
     const method = req.method().toUpperCase();
     const pathname = parsed.pathname;

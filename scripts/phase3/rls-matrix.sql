@@ -43,8 +43,9 @@ BEGIN
          (ub, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
           'tenant-b@validation.invalid', '', now(), now(), now());
 
-  INSERT INTO public.data_centre_twins (name, created_by_user)
-  VALUES ('validation-twin-a', ua) RETURNING id INTO twin_a;
+  INSERT INTO public.data_centre_twins (name, city, region_code, created_by_user)
+  VALUES ('validation-twin-a', 'Validation City', 'validation-region-a', ua)
+  RETURNING id INTO twin_a;
 
   INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, lifecycle_status)
   VALUES (ua, ua, twin_a, 'succeeded') RETURNING id INTO run_a;
@@ -175,8 +176,9 @@ BEGIN
   INSERT INTO public.user_roles (user_id, role) VALUES
     (approver_a, 'operator'), (admin_a, 'admin'), (approver_b, 'operator');
 
-  INSERT INTO public.data_centre_twins (name, created_by_user)
-  VALUES ('validation-twin-ext-a', member_a) RETURNING id INTO twin_a;
+  INSERT INTO public.data_centre_twins (name, city, region_code, created_by_user)
+  VALUES ('validation-twin-ext-a', 'Validation City', 'validation-region-a', member_a)
+  RETURNING id INTO twin_a;
 
   INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, lifecycle_status)
   VALUES (member_a, member_a, twin_a, 'succeeded') RETURNING id INTO run_a;

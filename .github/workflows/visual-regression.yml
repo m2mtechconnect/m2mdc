@@ -46,7 +46,7 @@ jobs:
         run: bunx playwright install --with-deps
       
       - name: Run visual regression tests
-        run: bun run test:e2e tests/visual/snapshots.spec.ts
+        run: bunx playwright test --config=playwright.visual.config.ts
       
       - name: Upload visual diff artifacts
         uses: actions/upload-artifact@v4
@@ -88,9 +88,9 @@ jobs:
             });
       
       - name: Update baselines (if approved)
-        if: contains(github.event.pull_request.labels.*.name, 'update-snapshots')
+        if: failure() && contains(github.event.pull_request.labels.*.name, 'update-snapshots')
         run: |
-          bun run test:e2e:record tests/visual/snapshots.spec.ts
+          bunx playwright test --config=playwright.visual.config.ts --update-snapshots
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add tests/visual/**/*.png

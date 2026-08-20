@@ -298,7 +298,9 @@ async function httpBoundary() {
   const twin = {};
   for (const t of Object.values(tenants)) {
     twin[t.label] = scalar(
-      `INSERT INTO public.data_centre_twins (name, created_by_user) VALUES ('validation-${t.label}', '${t.id}') RETURNING id`,
+      `INSERT INTO public.data_centre_twins (name, city, region_code, created_by_user) ` +
+        `VALUES ('validation-${t.label}', 'Validation City', 'validation-${t.label}', '${t.id}') ` +
+        'RETURNING id',
     );
   }
 

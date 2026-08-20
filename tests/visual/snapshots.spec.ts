@@ -1,9 +1,14 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../truth-in-ui/_setup/fixtures';
+import { installSupabaseMock } from '../truth-in-ui/_setup/supabase-mock';
 
 /**
  * Visual Regression Tests
  * Captures screenshots and compares against baselines
  */
+
+test.beforeEach(async ({ context }) => {
+  await installSupabaseMock(context);
+});
 
 test.describe('Visual Regression - Light Theme', () => {
   test.use({ colorScheme: 'light' });

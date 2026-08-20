@@ -3,7 +3,11 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { cleanupTestData } from '../helpers/seedHelpers';
-import { STORAGE_KEY, storageKeyForSupabaseUrl } from '../truth-in-ui/_setup/supabase-mock';
+import {
+  isSupabaseRequest,
+  STORAGE_KEY,
+  storageKeyForSupabaseUrl,
+} from '../truth-in-ui/_setup/supabase-mock';
 
 const repositoryFile = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 
@@ -69,6 +73,8 @@ describe('test harness safety guards', () => {
 
   it('installs Bun before the visual regression workflow uses it', () => {
     const workflow = repositoryFile('.github/workflows/visual-regression.yml');
+    const config = repositoryFile('playwright.visual.config.ts');
+    const spec = repositoryFile('tests/visual/snapshots.spec.ts');
     expect(workflow).toContain('uses: oven-sh/setup-bun@v2');
     expect(workflow.indexOf('uses: oven-sh/setup-bun@v2')).toBeLessThan(
       workflow.indexOf('run: bun install --frozen-lockfile'),
@@ -76,6 +82,13 @@ describe('test harness safety guards', () => {
     expect(workflow).toContain('VITE_SUPABASE_URL: http://127.0.0.1:54321');
     expect(workflow).not.toContain('cp .env.test .env');
     expect(workflow).not.toContain('secrets.TEST_SUPABASE');
+    expect(workflow).toContain('playwright test --config=playwright.visual.config.ts');
+    expect(workflow).toContain(
+      "if: failure() && contains(github.event.pull_request.labels.*.name, 'update-snapshots')",
+    );
+    expect(config).toContain("testDir: './tests/visual'");
+    expect(spec).toContain("from '../truth-in-ui/_setup/fixtures'");
+    expect(spec).toContain('await installSupabaseMock(context)');
   });
 
   it('restores the replay search path without rewriting security migration history', () => {
@@ -122,18 +135,48 @@ describe('test harness safety guards', () => {
     expect(canaryEvent).not.toContain('INSERT INTO auth.users');
   });
 
+  it('keeps Phase 3 replay idempotent and its RLS fixtures schema-complete', () => {
+    const storagePolicy = repositoryFile(
+      'supabase/migrations/20260804032127_4ab5dcd5-f35d-41b7-886f-075bc690c477.sql',
+    );
+    const assetStoragePolicies = repositoryFile(
+      'supabase/migrations/20260814135903_73a4a35c-5241-4801-99a0-9ff486a12cd2.sql',
+    );
+    const matrix = repositoryFile('scripts/phase3/rls-matrix.sql');
+    const validator = repositoryFile('scripts/phase3/external-validation.mjs');
+
+    expect(storagePolicy).toContain(
+      'DROP POLICY IF EXISTS "Users can list their own profile images" ON storage.objects',
+    );
+    expect(storagePolicy).toContain('CREATE POLICY "Users can list their own profile images"');
+    expect(assetStoragePolicies).toContain(
+      'DROP POLICY IF EXISTS "Authenticated users can read published twin derivatives" ON storage.objects',
+    );
+    expect(assetStoragePolicies).toContain(
+      'DROP POLICY IF EXISTS "Admins can read twin asset source packages" ON storage.objects',
+    );
+    expect(matrix.match(/data_centre_twins \(name, city, region_code, created_by_user\)/g)).toHaveLength(2);
+    expect(validator).toContain('data_centre_twins (name, city, region_code, created_by_user)');
+  });
+
   it('keeps browser security checks on explicit loopback Supabase configuration', () => {
     const config = repositoryFile('playwright.truth.config.ts');
     const mock = repositoryFile('tests/truth-in-ui/_setup/supabase-mock.ts');
 
     expect(config).toContain('VITE_SUPABASE_URL=http://127.0.0.1:54321');
     expect(config).toContain('VITE_SUPABASE_PUBLISHABLE_KEY=safe-placeholder-anon-key');
-    expect(mock).toContain("new Set(['127.0.0.1', 'localhost', '[::1]', '::1'])");
+    expect(mock).toContain("'http://localhost:54321'");
+    expect(mock).not.toContain("new Set(['127.0.0.1', 'localhost'");
     expect(STORAGE_KEY).toBe('sb-127-auth-token');
     expect(storageKeyForSupabaseUrl('http://127.0.0.1:54321')).toBe('sb-127-auth-token');
     expect(storageKeyForSupabaseUrl('https://project-ref.supabase.co')).toBe(
       'sb-project-ref-auth-token',
     );
+    expect(isSupabaseRequest(new URL('http://127.0.0.1:54321/rest/v1/profiles'))).toBe(true);
+    expect(isSupabaseRequest(new URL('http://localhost:54321/rest/v1/profiles'))).toBe(true);
+    expect(isSupabaseRequest(new URL('http://localhost:8091/infrastructure'))).toBe(false);
+    expect(isSupabaseRequest(new URL('http://127.0.0.1:8080/'))).toBe(false);
+    expect(isSupabaseRequest(new URL('https://project-ref.supabase.co/rest/v1/profiles'))).toBe(true);
   });
 
   it('provides a declared Node 20 WebSocket transport for test-only Supabase clients', () => {

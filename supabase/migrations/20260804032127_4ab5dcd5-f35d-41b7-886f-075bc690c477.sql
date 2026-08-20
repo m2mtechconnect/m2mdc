@@ -1,5 +1,6 @@
 -- Scope profile-image listing to the owner's own folder (public links still work)
 DROP POLICY IF EXISTS "Profile images are publicly readable" ON storage.objects;
+DROP POLICY IF EXISTS "Users can list their own profile images" ON storage.objects;
 CREATE POLICY "Users can list their own profile images"
   ON storage.objects FOR SELECT TO authenticated
   USING (

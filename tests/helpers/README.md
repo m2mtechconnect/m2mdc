@@ -19,7 +19,10 @@ describe('Builder Flow', () => {
   });
 
   afterEach(async () => {
-    await cleanupTestData(testData.user.id);
+    await cleanupTestData({
+      userId: testData.user.id,
+      allOwnedData: true,
+    });
   });
 
   it('should load system data', () => {
@@ -48,7 +51,10 @@ describe('Dashboard Integration', () => {
   });
 
   afterAll(async () => {
-    await cleanupTestData(seedResult.user.id);
+    await cleanupTestData({
+      userId: seedResult.user.id,
+      allOwnedData: true,
+    });
   });
 
   it('should display all systems', () => {
@@ -103,6 +109,6 @@ Always cleanup after tests:
 
 ```typescript
 afterEach(async () => {
-  await cleanupTestData(userId);
+  await cleanupTestData({ userId, allOwnedData: true });
 });
 ```

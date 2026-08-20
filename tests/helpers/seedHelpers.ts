@@ -3,7 +3,14 @@
  * Provides utilities for creating realistic test data for integration tests
  */
 
-import { supabase } from '@/integrations/supabase/client';
+import type { BrowserContext } from '@playwright/test';
+import {
+  createTestSupabaseClient,
+  getBrowserTestSession,
+} from './testSupabaseClient';
+
+const supabase = createTestSupabaseClient();
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export interface TestUser {
   id: string;
@@ -26,12 +33,26 @@ export interface SeedResult {
   workflows: any[];
 }
 
+export interface CleanupTestDataScope {
+  userId: string;
+  /** Removes every record owned by this disposable test user. */
+  allOwnedData?: boolean;
+  /** Removes only the listed agents, still constrained by owner_id. */
+  agentIds?: readonly string[];
+}
+
+export interface MockDigitalTwinInput {
+  name: string;
+  status?: string;
+  template_id?: string;
+}
+
 /**
  * Creates a test user and signs them in
  */
 export async function createTestUser(email?: string): Promise<TestUser> {
-  const userEmail = email || `test-${Date.now()}@test.com`;
-  const password = 'test-password-123';
+  const userEmail = email || `test-${Date.now()}@example.invalid`;
+  const password = `Test-${crypto.randomUUID()}!`;
 
   const { data, error } = await supabase.auth.signUp({
     email: userEmail,
@@ -276,21 +297,82 @@ export async function seedTestEnvironment(
 /**
  * Cleanup function to remove test data
  */
-export async function cleanupTestData(userId: string) {
-  // Delete in reverse dependency order
-  await supabase.from('workflow_run_events').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-  await supabase.from('workflow_runs').delete().eq('created_by', userId);
-  await supabase.from('workflow_edges').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-  await supabase.from('workflow_nodes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-  await supabase.from('workflows').delete().eq('created_by', userId);
-  await supabase.from('agent_runs').delete().eq('user_id', userId);
-  await supabase.from('integrations').delete().eq('user_id', userId);
-  await supabase.from('knowledge_sources').delete().eq('user_id', userId);
-  await supabase.from('agents').delete().eq('owner_id', userId);
-  await supabase.from('deployment_tracking').delete().eq('deployed_by', userId);
+export async function cleanupTestData(scope: CleanupTestDataScope) {
+  const { userId, allOwnedData = false, agentIds } = scope;
 
-  // Delete user
-  await supabase.auth.admin.deleteUser(userId);
+  if (!UUID_PATTERN.test(userId)) {
+    throw new Error('Test cleanup requires a valid user UUID');
+  }
+  if (allOwnedData === Boolean(agentIds)) {
+    throw new Error('Test cleanup requires exactly one explicit cleanup mode');
+  }
+  if (agentIds?.some((id) => !UUID_PATTERN.test(id))) {
+    throw new Error('Test cleanup requires valid agent UUIDs');
+  }
+
+  const assertDeleted = async (label: string, query: PromiseLike<{ error: { code?: string } | null }>) => {
+    const { error } = await query;
+    if (error) {
+      const code = error.code ? ` (${error.code})` : '';
+      throw new Error(`Scoped test cleanup failed for ${label}${code}`);
+    }
+  };
+
+  if (agentIds) {
+    if (agentIds.length === 0) return;
+    await assertDeleted(
+      'agents',
+      supabase.from('agents').delete().eq('owner_id', userId).in('id', [...agentIds]),
+    );
+    return;
+  }
+
+  // Child workflow and integration records are removed by database cascades.
+  await assertDeleted('workflows', supabase.from('workflows').delete().eq('created_by', userId));
+  await assertDeleted(
+    'deployment tracking',
+    supabase.from('deployment_tracking').delete().eq('deployed_by', userId),
+  );
+  await assertDeleted('agent runs', supabase.from('agent_runs').delete().eq('user_id', userId));
+  await assertDeleted('integrations', supabase.from('integrations').delete().eq('user_id', userId));
+  await assertDeleted(
+    'knowledge sources',
+    supabase.from('knowledge_sources').delete().eq('user_id', userId),
+  );
+  await assertDeleted('agents', supabase.from('agents').delete().eq('owner_id', userId));
+}
+
+/** Creates one agent for an authenticated browser user on the loopback test stack. */
+export async function seedMockDigitalTwin(
+  context: BrowserContext,
+  input: MockDigitalTwinInput,
+) {
+  const session = await getBrowserTestSession(context);
+  const client = createTestSupabaseClient({ accessToken: session.accessToken });
+  const status = (input.status || 'active').toLowerCase();
+
+  if (!['draft', 'active', 'paused', 'archived'].includes(status)) {
+    throw new Error('Mock digital twin status is invalid');
+  }
+
+  const { data, error } = await client
+    .from('agents')
+    .insert({
+      owner_id: session.userId,
+      name: input.name,
+      status,
+      template_id: input.template_id,
+      description: 'Playwright-scoped digital twin fixture',
+      config: {},
+    })
+    .select('id, owner_id')
+    .single();
+
+  if (error || !data) {
+    throw new Error(`Mock digital twin seed failed${error?.code ? ` (${error.code})` : ''}`);
+  }
+
+  return data;
 }
 
 /**

@@ -1,23 +1,31 @@
 import { test, expect } from '@playwright/test';
+import {
+  resolveTestSupabaseConfig,
+  resolveTestUserCredentials,
+} from '../helpers/testSupabaseClient';
 
 test.describe('Zapier API Endpoints', () => {
-  const baseUrl = 'https://mlhcdcvpvztfjfndmxzl.supabase.co/functions/v1';
+  const testSupabase = resolveTestSupabaseConfig();
+  const baseUrl = `${testSupabase.url}/functions/v1`;
   let authToken: string;
 
   test.beforeAll(async ({ request }) => {
+    const credentials = resolveTestUserCredentials();
     // Login to get auth token
-    const response = await request.post('https://mlhcdcvpvztfjfndmxzl.supabase.co/auth/v1/token?grant_type=password', {
+    const response = await request.post(`${testSupabase.url}/auth/v1/token?grant_type=password`, {
       headers: {
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1saGNkY3Zwdnp0ZmpmbmRteHpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE5MzU1NDAsImV4cCI6MjA3NzUxMTU0MH0.OgcmUgCsCL2s2eOTPmZYPaDY_Fy-JwVNTVOfgA3mJSk',
+        apikey: testSupabase.anonKey,
         'Content-Type': 'application/json'
       },
       data: {
-        email: 'test@m2m.studio',
-        password: 'testpass123'
+        email: credentials.email,
+        password: credentials.password,
       }
     });
 
+    expect(response.ok()).toBe(true);
     const data = await response.json();
+    expect(data.access_token).toEqual(expect.any(String));
     authToken = data.access_token;
   });
 
@@ -30,7 +38,7 @@ test.describe('Zapier API Endpoints', () => {
       data: {
         app_key: 'salesforce',
         auth_type: 'oauth',
-        api_key: 'test-api-key-123',
+        api_key: crypto.randomUUID(),
         webhook_url: 'https://hooks.zapier.com/test/123'
       }
     });
@@ -104,7 +112,7 @@ test.describe('Zapier API Endpoints', () => {
     const webhookResponse = await request.post(`${baseUrl}/zapier-webhook/${integration.id}`, {
       headers: {
         'Content-Type': 'application/json',
-        'X-Zapier-Signature': 'test-signature'
+        'X-Zapier-Signature': crypto.randomUUID(),
       },
       data: {
         event: 'document.created',
@@ -150,9 +158,9 @@ test.describe('Zapier API Endpoints', () => {
 
   test('should enforce RLS on integration queries', async ({ request }) => {
     // Try to query integrations without auth
-    const response = await request.get('https://mlhcdcvpvztfjfndmxzl.supabase.co/rest/v1/integrations', {
+    const response = await request.get(`${testSupabase.url}/rest/v1/integrations`, {
       headers: {
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1saGNkY3Zwdnp0ZmpmbmRteHpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE5MzU1NDAsImV4cCI6MjA3NzUxMTU0MH0.OgcmUgCsCL2s2eOTPmZYPaDY_Fy-JwVNTVOfgA3mJSk'
+        apikey: testSupabase.anonKey,
       }
     });
 

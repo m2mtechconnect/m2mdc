@@ -81,6 +81,11 @@ function currentPath(page: Page): string {
   return u.pathname + u.search;
 }
 
+async function clickManageDestination(page: Page, label: string): Promise<void> {
+  await page.getByTestId('manage-trigger').click();
+  await page.getByRole('menuitem', { name: new RegExp(label, 'i') }).click();
+}
+
 guardedTest.describe('AURA DC full-surface deep-link coverage', () => {
   for (const route of DEEP_LINK_ROUTES) {
     guardedTest(`deep-link ${route} mounts inside authenticated shell`, async ({ context, page, guard }) => {
@@ -197,11 +202,13 @@ guardedTest.describe('AURA DC browser back/forward preserves navigation', () => 
     await page.setViewportSize({ width: 1600, height: 900 });
     await openAuthed(context, page, '/dashboard');
 
-    // Canonical header labels (src/config/appNavigation.ts).
-    await page.getByRole('link', { name: 'OpenUSD Asset Pipeline' }).first().click();
+    // Canonical Manage-menu labels (src/config/appNavigation.ts). The menu is
+    // intentionally closed between navigations, so exercise the actual user
+    // interaction instead of waiting for an unmounted link.
+    await clickManageDestination(page, 'OpenUSD Asset Pipeline');
     await expect.poll(() => new URL(page.url()).pathname).toBe('/builder');
 
-    await page.getByRole('link', { name: 'Agents & Optimization' }).first().click();
+    await clickManageDestination(page, 'Agents & Optimization');
     await expect.poll(() => new URL(page.url()).pathname).toBe('/app/agents');
 
     await page.goBack({ waitUntil: 'domcontentloaded' });

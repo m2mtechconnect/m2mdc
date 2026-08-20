@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -46,5 +47,35 @@ describe('test harness safety guards', () => {
     ]) {
       expect(repositoryFile(path)).not.toMatch(/https:\/\/[^'"`]+\.supabase\.co/i);
     }
+  });
+
+  it('installs Bun for every Test Suite job that executes Bun commands', () => {
+    const workflow = repositoryFile('.github/workflows/test.yml');
+    expect(workflow.match(/uses: oven-sh\/setup-bun@v2/g)).toHaveLength(6);
+    expect(workflow).toContain("bun-version: '1.3.3'");
+    expect(workflow).toContain('run: bun audit --audit-level=moderate');
+    expect(workflow).not.toContain('run: npm audit');
+    expect(workflow).not.toContain('secrets.TEST_SUPABASE');
+    expect(workflow).toContain('TEST_SUPABASE_URL: http://127.0.0.1:54321');
+    expect(workflow).toContain('Verify loopback-only test backend');
+  });
+
+  it('runs the focused QA accessibility command only on its installed browser', () => {
+    const workflow = repositoryFile('.github/workflows/qa-suite.yml');
+    expect(workflow).toContain('playwright install --with-deps chromium');
+    expect(workflow).toContain('playwright test --project=chromium --grep "@a11y"');
+  });
+
+  it('restores the replay search path without rewriting security migration history', () => {
+    const bridge = repositoryFile(
+      'supabase/migrations/20260206150807_restore_public_search_path.sql',
+    );
+    const historicalMigration = repositoryFile(
+      'supabase/migrations/20260206150808_4cb276a5-a341-4b08-a939-83ac1e9b5bcc.sql',
+    );
+    expect(bridge).toContain("set_config('search_path', 'public', false)");
+    expect(createHash('sha256').update(historicalMigration).digest('hex')).toBe(
+      'a100fe44048877237b50f90f78d08bb1d61eb1a0e2402d34a70ed4e30a1cbb34',
+    );
   });
 });

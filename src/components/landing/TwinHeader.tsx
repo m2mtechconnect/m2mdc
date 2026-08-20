@@ -61,6 +61,8 @@ export function TwinHeader() {
             <img
               src={m2mLogo}
               alt="M2M AURA - Sovereign AI Data Centre Digital Twin"
+              width={326}
+              height={326}
               className="h-8 lg:h-10 w-auto transition-transform group-hover:scale-105"
             />
             <div className="hidden sm:block">

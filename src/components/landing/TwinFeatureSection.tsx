@@ -16,6 +16,8 @@ interface TwinFeatureSectionProps {
   bullets: string[];
   imageSrc: string;
   imageAlt: string;
+  imageWidth: number;
+  imageHeight: number;
   flip?: boolean;
   accentColor?: "primary" | "success" | "info" | "warning";
   cta?: {
@@ -49,6 +51,8 @@ export function TwinFeatureSection({
   bullets,
   imageSrc,
   imageAlt,
+  imageWidth,
+  imageHeight,
   flip = false,
   accentColor = "primary",
   cta,
@@ -181,6 +185,10 @@ export function TwinFeatureSection({
                 <motion.img 
                   src={resolvedImageSrc} 
                   alt={imageAlt}
+                  width={imageWidth}
+                  height={imageHeight}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                   initial={{ scale: 1.05 }}
                   whileInView={{ scale: 1 }}

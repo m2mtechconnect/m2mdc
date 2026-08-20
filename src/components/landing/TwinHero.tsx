@@ -90,6 +90,8 @@ export function TwinHero() {
           src="/landing/hero-datacenter-bg.jpg"
           alt=""
           aria-hidden="true"
+          width={1920}
+          height={1080}
           {...({ fetchpriority: 'high' } as Record<string, string>)}
           decoding="async"
           className="absolute inset-0 w-full h-full object-cover opacity-40"
@@ -142,17 +144,11 @@ export function TwinHero() {
         {/* Power Stats Bar */}
         <motion.div 
           className="flex flex-wrap justify-center gap-6 lg:gap-10 mb-12"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
         >
-          {powerStats.map((stat, i) => (
+          {powerStats.map((stat) => (
             <motion.div 
               key={stat.label}
               className="flex items-center gap-3 px-4 py-2 rounded-full bg-card/40 backdrop-blur-sm border border-border/30"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
               whileHover={{ scale: 1.05, y: -2 }}
             >
               <stat.icon className={`h-4 w-4 ${stat.color}`} />
@@ -164,7 +160,7 @@ export function TwinHero() {
 
         {/* Center-aligned hero content */}
         <div className="text-center max-w-4xl mx-auto mb-16">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }} className="mb-6">
+          <motion.div className="mb-6">
             <Badge variant="outline" className="border-primary/40 text-primary bg-primary/5 px-4 py-1.5 text-sm font-medium">
               <Sparkles className="h-3.5 w-3.5 mr-2" />
               {t('landing.enterpriseDigitalTwinPlatform')}
@@ -173,9 +169,6 @@ export function TwinHero() {
           
           <motion.h1 
             className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground leading-[1.1] tracking-tight mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
           >
             {t('landing.heroHeadline1')}{" "}
             <span className="relative inline-block">
@@ -184,18 +177,12 @@ export function TwinHero() {
               </span>
               <motion.span 
                 className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-accent to-m2m-gold-dark rounded-full"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 0.8, delay: 0.9 }}
               />
             </span>
           </motion.h1>
           
           <motion.p 
             className="text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
           >
             {t('landing.heroDescription')}
           </motion.p>
@@ -203,17 +190,11 @@ export function TwinHero() {
           {/* Quick benefits */}
           <motion.div 
             className="flex flex-wrap justify-center gap-4 mb-10"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
           >
-            {quickBenefits.map((benefit, i) => (
+            {quickBenefits.map((benefit) => (
               <motion.div 
                 key={benefit}
                 className="flex items-center gap-2 text-sm text-muted-foreground"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: 0.7 + i * 0.1 }}
               >
                 <CheckCircle2 className="h-4 w-4 text-success" />
                 <span>{benefit}</span>
@@ -224,9 +205,6 @@ export function TwinHero() {
           {/* CTA buttons */}
           <motion.div 
             className="flex flex-col sm:flex-row justify-center gap-4 mb-10"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
           >
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
               <Button 
@@ -257,9 +235,6 @@ export function TwinHero() {
         {/* Hero visual */}
         <motion.div 
           className="relative max-w-5xl mx-auto"
-          initial={{ opacity: 0, y: 60, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.9, delay: 0.5, ease: "easeOut" }}
           style={{ x: springX, y: springY }}
         >
           <motion.div 
@@ -283,6 +258,9 @@ export function TwinHero() {
               <img 
                 src={`/landing/screenshots/dashboard-desktop.png?v=${encodeURIComponent(screenshotManifest.version)}`} 
                 alt="M2M Digital Twin Dashboard showing 3D rack visualization, PUE metrics, GPU utilization, and carbon intensity KPIs"
+                width={1564}
+                height={879}
+                {...({ fetchpriority: 'high' } as Record<string, string>)}
                 className="w-full h-full object-cover object-top"
                 loading="eager"
               />
@@ -293,9 +271,6 @@ export function TwinHero() {
           {/* Floating stat cards */}
           <motion.div 
             className="absolute -bottom-6 -left-6 bg-card/95 backdrop-blur-sm rounded-xl border border-border/50 p-4 shadow-xl"
-            initial={{ opacity: 0, y: 20, x: -20 }}
-            animate={{ opacity: 1, y: 0, x: 0 }}
-            transition={{ duration: 0.5, delay: 1.2 }}
             whileHover={{ scale: 1.05, y: -4 }}
             style={{ x: useTransform(springX, v => v * -0.5), y: useTransform(springY, v => v * -0.5) }}
           >
@@ -305,9 +280,6 @@ export function TwinHero() {
           
           <motion.div 
             className="absolute -top-6 -right-6 bg-card/95 backdrop-blur-sm rounded-xl border border-border/50 p-4 shadow-xl"
-            initial={{ opacity: 0, y: -20, x: 20 }}
-            animate={{ opacity: 1, y: 0, x: 0 }}
-            transition={{ duration: 0.5, delay: 1.3 }}
             whileHover={{ scale: 1.05, y: 4 }}
             style={{ x: useTransform(springX, v => v * 0.5), y: useTransform(springY, v => v * 0.5) }}
           >
@@ -317,9 +289,6 @@ export function TwinHero() {
 
           <motion.div 
             className="absolute top-1/2 -right-8 transform -translate-y-1/2 bg-card/95 backdrop-blur-sm rounded-xl border border-border/50 p-3 shadow-lg hidden xl:block"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 1.4 }}
             whileHover={{ scale: 1.05 }}
           >
             <div className="flex items-center gap-2">

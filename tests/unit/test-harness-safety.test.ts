@@ -66,6 +66,14 @@ describe('test harness safety guards', () => {
     expect(workflow).toContain('playwright test --project=chromium --grep "@a11y"');
   });
 
+  it('installs Bun before the visual regression workflow uses it', () => {
+    const workflow = repositoryFile('.github/workflows/visual-regression.yml');
+    expect(workflow).toContain('uses: oven-sh/setup-bun@v2');
+    expect(workflow.indexOf('uses: oven-sh/setup-bun@v2')).toBeLessThan(
+      workflow.indexOf('run: bun install --frozen-lockfile'),
+    );
+  });
+
   it('restores the replay search path without rewriting security migration history', () => {
     const bridge = repositoryFile(
       'supabase/migrations/20260206150807_restore_public_search_path.sql',
@@ -88,6 +96,17 @@ describe('test harness safety guards', () => {
     expect(userBackfill).not.toContain('INSERT INTO auth.users');
   });
 
+  it('makes the user-specific administrative grant safe for clean replay', () => {
+    const roleBackfill = repositoryFile(
+      'supabase/migrations/20260731185028_01b5764d-1ffd-480a-a835-acc0b51997fd.sql',
+    );
+    expect(roleBackfill).toContain('FROM auth.users AS source_user');
+    expect(roleBackfill).toContain(
+      "WHERE source_user.id = 'f3c0f534-4df8-4cb1-901a-b8d6abe08742'::uuid",
+    );
+    expect(roleBackfill).not.toContain('INSERT INTO auth.users');
+  });
+
   it('keeps browser security checks on explicit loopback Supabase configuration', () => {
     const config = repositoryFile('playwright.truth.config.ts');
     const mock = repositoryFile('tests/truth-in-ui/_setup/supabase-mock.ts');
@@ -95,6 +114,14 @@ describe('test harness safety guards', () => {
     expect(config).toContain('VITE_SUPABASE_URL=http://127.0.0.1:54321');
     expect(config).toContain('VITE_SUPABASE_PUBLISHABLE_KEY=safe-placeholder-anon-key');
     expect(mock).toContain("new Set(['127.0.0.1', 'localhost', '[::1]', '::1'])");
+  });
+
+  it('provides a declared Node 20 WebSocket transport for test-only Supabase clients', () => {
+    const helper = repositoryFile('tests/helpers/testSupabaseClient.ts');
+    const packageJson = repositoryFile('package.json');
+    expect(helper).toContain("import WebSocket from 'ws'");
+    expect(helper).toContain('realtime: { transport: WebSocket }');
+    expect(packageJson).toContain('"ws": "8.21.0"');
   });
 
   it('does not auto-download the landing-page background video while idle', () => {
@@ -105,5 +132,20 @@ describe('test harness safety guards', () => {
     expect(hero).not.toContain('requestIdleCallback');
     expect(viteConfig).toContain("'react-dom/client'");
     expect(viteConfig).not.toMatch(/'vendor-3d'\s*:/);
+  });
+
+  it('keeps the public landing page audit-friendly without weakening Lighthouse', () => {
+    const hero = repositoryFile('src/components/landing/TwinHero.tsx');
+    const feature = repositoryFile('src/components/landing/TwinFeatureSection.tsx');
+    const footer = repositoryFile('src/components/landing/TwinFooter.tsx');
+    const lighthouse = repositoryFile('lighthouserc.json');
+
+    expect(hero).toContain('width={1920}');
+    expect(hero).toContain('width={1564}');
+    expect(feature).toContain('loading="lazy"');
+    expect(feature).toContain('width={imageWidth}');
+    expect(footer).not.toContain('<h4');
+    expect(lighthouse).toContain('"preset": "lighthouse:recommended"');
+    expect(lighthouse).toContain('"categories:performance": ["error", {"minScore": 0.85}]');
   });
 });

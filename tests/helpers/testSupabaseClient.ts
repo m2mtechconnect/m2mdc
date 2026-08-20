@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { BrowserContext } from '@playwright/test';
+import WebSocket from 'ws';
 import type { Database } from '@/integrations/supabase/types';
 
 const DEFAULT_TEST_SUPABASE_URL = 'http://127.0.0.1:54321';
@@ -99,6 +100,7 @@ export function createTestSupabaseClient(options: { accessToken?: string } = {})
       autoRefreshToken: false,
       detectSessionInUrl: false,
     },
+    realtime: { transport: WebSocket },
     global: headers ? { headers } : undefined,
   });
 }

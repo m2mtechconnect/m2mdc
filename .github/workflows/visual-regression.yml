@@ -18,6 +18,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Fetch all history for baseline comparison
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
       
       - name: Setup Node.js
         uses: actions/setup-node@v4

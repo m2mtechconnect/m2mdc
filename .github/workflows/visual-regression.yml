@@ -9,6 +9,18 @@ on:
       - 'src/index.css'
       - 'tailwind.config.ts'
 
+env:
+  CI: true
+  VITE_SUPABASE_URL: http://127.0.0.1:54321
+  VITE_SUPABASE_PROJECT_ID: local-placeholder
+  VITE_SUPABASE_PUBLISHABLE_KEY: safe-placeholder-anon-key
+  TEST_SUPABASE_URL: http://127.0.0.1:54321
+  TEST_SUPABASE_ANON_KEY: safe-placeholder-anon-key
+  SUPABASE_URL: http://127.0.0.1:54321
+  SUPABASE_ANON_KEY: safe-placeholder-anon-key
+  SUPABASE_SERVICE_ROLE_KEY: safe-placeholder-service-role-key
+  USE_MOCK_LLM: true
+
 jobs:
   visual-regression:
     name: Visual Regression
@@ -33,16 +45,8 @@ jobs:
       - name: Install Playwright
         run: bunx playwright install --with-deps
       
-      - name: Setup test environment
-        run: |
-          cp .env.test .env
-          echo "USE_MOCK_LLM=true" >> .env
-      
       - name: Run visual regression tests
         run: bun run test:e2e tests/visual/snapshots.spec.ts
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.TEST_SUPABASE_KEY }}
       
       - name: Upload visual diff artifacts
         uses: actions/upload-artifact@v4

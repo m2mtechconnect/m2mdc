@@ -18,12 +18,23 @@
 
 import type { BrowserContext, Page, Route } from '@playwright/test';
 
-// Supabase project ref used by the Vite env — the storage key is
-// `sb-<ref>-auth-token`. This is a public identifier, not a secret.
+// Supabase-js derives its default storage key from the configured URL's
+// first hostname segment. Keep the test session aligned with the app when
+// CI deliberately replaces the cloud URL with a loopback placeholder.
 export const SUPABASE_REF = 'psfvrskpnwcshvajzeix';
-export const STORAGE_KEY = `sb-${SUPABASE_REF}-auth-token`;
 const SUPABASE_HOST = `${SUPABASE_REF}.supabase.co`;
 const LOOPBACK_HOSTS = new Set(['127.0.0.1', 'localhost', '[::1]', '::1']);
+
+export function storageKeyForSupabaseUrl(url: string): string {
+  const hostname = new URL(url).hostname;
+  const projectRef = hostname.split('.')[0];
+  if (!projectRef) throw new Error('Supabase URL must include a hostname');
+  return `sb-${projectRef}-auth-token`;
+}
+
+export const STORAGE_KEY = storageKeyForSupabaseUrl(
+  process.env.VITE_SUPABASE_URL?.trim() || 'http://127.0.0.1:54321',
+);
 
 function isSupabaseHost(host: string): boolean {
   return (

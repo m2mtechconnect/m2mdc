@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { cleanupTestData } from '../helpers/seedHelpers';
+import { STORAGE_KEY, storageKeyForSupabaseUrl } from '../truth-in-ui/_setup/supabase-mock';
 
 const repositoryFile = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 
@@ -72,6 +73,9 @@ describe('test harness safety guards', () => {
     expect(workflow.indexOf('uses: oven-sh/setup-bun@v2')).toBeLessThan(
       workflow.indexOf('run: bun install --frozen-lockfile'),
     );
+    expect(workflow).toContain('VITE_SUPABASE_URL: http://127.0.0.1:54321');
+    expect(workflow).not.toContain('cp .env.test .env');
+    expect(workflow).not.toContain('secrets.TEST_SUPABASE');
   });
 
   it('restores the replay search path without rewriting security migration history', () => {
@@ -107,6 +111,17 @@ describe('test harness safety guards', () => {
     expect(roleBackfill).not.toContain('INSERT INTO auth.users');
   });
 
+  it('makes the user-specific canary audit event safe for clean replay', () => {
+    const canaryEvent = repositoryFile(
+      'supabase/migrations/20260814140943_a2a96da6-f9de-4c98-9656-d25c429fda57.sql',
+    );
+    expect(canaryEvent).toContain('FROM auth.users AS source_user');
+    expect(canaryEvent).toContain(
+      "WHERE source_user.id = 'd309b3bd-88ca-4dc9-b007-c411787b848a'::uuid",
+    );
+    expect(canaryEvent).not.toContain('INSERT INTO auth.users');
+  });
+
   it('keeps browser security checks on explicit loopback Supabase configuration', () => {
     const config = repositoryFile('playwright.truth.config.ts');
     const mock = repositoryFile('tests/truth-in-ui/_setup/supabase-mock.ts');
@@ -114,6 +129,11 @@ describe('test harness safety guards', () => {
     expect(config).toContain('VITE_SUPABASE_URL=http://127.0.0.1:54321');
     expect(config).toContain('VITE_SUPABASE_PUBLISHABLE_KEY=safe-placeholder-anon-key');
     expect(mock).toContain("new Set(['127.0.0.1', 'localhost', '[::1]', '::1'])");
+    expect(STORAGE_KEY).toBe('sb-127-auth-token');
+    expect(storageKeyForSupabaseUrl('http://127.0.0.1:54321')).toBe('sb-127-auth-token');
+    expect(storageKeyForSupabaseUrl('https://project-ref.supabase.co')).toBe(
+      'sb-project-ref-auth-token',
+    );
   });
 
   it('provides a declared Node 20 WebSocket transport for test-only Supabase clients', () => {

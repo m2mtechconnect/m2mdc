@@ -108,8 +108,16 @@ BEGIN
   PERFORM pg_temp.expect('a terminal run cannot be reopened', ok, true);
 
   -------------------------------------------------- decision immutability
-  INSERT INTO public.decision_records (user_id, run_id, recommendation_id, outcome, rationale)
-  VALUES (ua, run_a, 'rec-1', 'approved', 'validation rationale long enough');
+  INSERT INTO public.decision_records (
+    user_id, run_id, recommendation_id, outcome, rationale,
+    approver, decided_at, data_mode, observation_tick,
+    evidence_snapshot, snapshot_hash, timeline_id
+  )
+  VALUES (
+    ua, run_a, 'rec-1', 'approved', 'validation rationale long enough',
+    'tenant-a@validation.invalid', now(), 'SIMULATED', 0,
+    '{}'::jsonb, 'validation-snapshot-owner', 'run:' || run_a::text
+  );
   ok := false;
   BEGIN
     UPDATE public.decision_records SET outcome = 'rejected' WHERE run_id = run_a;
@@ -243,8 +251,16 @@ BEGIN
   PERFORM pg_temp.expect('tenant B approver cannot read tenant A run', n = 0, true);
   ok := false;
   BEGIN
-    INSERT INTO public.decision_records (user_id, run_id, recommendation_id, outcome, rationale)
-    VALUES (member_a, run_a, 'rec-ext', 'approved', 'cross tenant decision attempt');
+    INSERT INTO public.decision_records (
+      user_id, run_id, recommendation_id, outcome, rationale,
+      approver, decided_at, data_mode, observation_tick,
+      evidence_snapshot, snapshot_hash, timeline_id
+    )
+    VALUES (
+      member_a, run_a, 'rec-ext', 'approved', 'cross tenant decision attempt',
+      approver_b::text, now(), 'SIMULATED', 0,
+      '{}'::jsonb, 'validation-snapshot-cross-tenant', 'run:' || run_a::text
+    );
   EXCEPTION WHEN OTHERS THEN ok := true;
   END;
   PERFORM pg_temp.expect('tenant B approver cannot decide on tenant A run', ok, true);

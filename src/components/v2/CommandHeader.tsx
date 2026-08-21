@@ -44,14 +44,30 @@ export function CommandHeader({
 /** Lighter in-page divider header for sub-sections. */
 export function SectionHeader({
   title,
+  eyebrow,
+  description,
   actions,
   className,
   ...props
-}: { title: React.ReactNode; actions?: React.ReactNode } & Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>) {
+}: {
+  title: React.ReactNode;
+  eyebrow?: React.ReactNode;
+  description?: React.ReactNode;
+  actions?: React.ReactNode;
+} & Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>) {
   return (
-    <div className={cn('flex items-center justify-between gap-3 pb-2', className)} {...props}>
-      <h2 className="v2-label">{title}</h2>
+    <div className={cn('flex items-start justify-between gap-3 pb-2', className)} {...props}>
+      <div className="min-w-0">
+        {eyebrow ? (
+          <div className="v2-mono text-[11px] uppercase tracking-wide text-muted-foreground">{eyebrow}</div>
+        ) : null}
+        <h2 className="v2-label">{title}</h2>
+        {description ? (
+          <div className="text-xs text-muted-foreground">{description}</div>
+        ) : null}
+      </div>
       {actions}
     </div>
   );
 }
+

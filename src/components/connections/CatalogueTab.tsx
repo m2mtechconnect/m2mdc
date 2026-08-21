@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Panel, SubPanel } from '@/components/v2';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useRBAC } from '@/contexts/RBACContext';
@@ -30,12 +30,17 @@ import {
   type CustomerConnectorGroupId,
 } from '@/connections/catalogueTaxonomy';
 
+/**
+ * Catalogue availability tones. These describe what AURA can connect to, never
+ * whether a system is connected or flowing: those states are owned by the
+ * connected-systems register.
+ */
 const AVAILABILITY_TONE: Record<string, string> = {
-  AVAILABLE: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
-  REQUIRES_GATEWAY: 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300',
-  REQUIRES_DEPLOYMENT: 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300',
-  PLANNED: 'border-border bg-muted text-muted-foreground',
-  UNSUPPORTED: 'border-border bg-muted text-muted-foreground',
+  AVAILABLE: 'v2-surface-verified v2-text-verified',
+  REQUIRES_GATEWAY: 'v2-surface-simulated v2-text-simulated',
+  REQUIRES_DEPLOYMENT: 'v2-surface-simulated v2-text-simulated',
+  PLANNED: 'v2-surface-neutral v2-text-neutral',
+  UNSUPPORTED: 'v2-surface-neutral v2-text-neutral',
 };
 
 type CatalogueFilter = 'all' | 'available' | CustomerConnectorGroupId;
@@ -82,8 +87,8 @@ export function CatalogueTab({
 
   return (
     <div className="space-y-5">
-      <Card>
-        <CardContent className="flex flex-col gap-4 p-4 lg:flex-row lg:items-center lg:justify-between">
+      <Panel>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-3xl space-y-1">
             <p className="text-sm font-semibold">Operational connectors only</p>
             <p className="text-sm text-muted-foreground">
@@ -106,8 +111,8 @@ export function CatalogueTab({
               </Link>
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
 
       <div className="flex flex-wrap items-center gap-2">
         <Input
@@ -152,13 +157,13 @@ export function CatalogueTab({
       </div>
 
       {grouped.length === 0 ? (
-        <Card><CardContent className="p-8 text-center text-sm text-muted-foreground">No operational connector matches this filter.</CardContent></Card>
+        <Panel className="p-8 text-center text-sm text-muted-foreground">No operational connector matches this filter.</Panel>
       ) : (
         <div className="space-y-7">
           {grouped.map((group) => (
             <section key={group.id} aria-labelledby={`connector-group-${group.id}`} className="space-y-3">
               <div className="space-y-1">
-                <h3 id={`connector-group-${group.id}`} className="text-base font-semibold">{group.label}</h3>
+                <h3 id={`connector-group-${group.id}`} className="text-base font-semibold tracking-tight">{group.label}</h3>
                 <p className="text-sm text-muted-foreground">{group.description}</p>
               </div>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -169,15 +174,15 @@ export function CatalogueTab({
                   const configured = configuredCounts.get(definition.id) ?? 0;
                   const stackNote = connectorStackNote(definition);
                   return (
-                    <Card key={definition.id} className="flex min-w-0 flex-col">
-                      <CardContent className="flex flex-1 flex-col gap-3 p-4">
+                    <Panel key={definition.id} className="flex min-w-0 flex-col">
+                      <div className="flex flex-1 flex-col gap-3">
                         <div className="flex items-start gap-3">
                           <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-md text-xs font-semibold ${glyph.className}`} aria-hidden>
                             {glyph.mark}
                           </span>
                           <div className="min-w-0">
                             <p className="truncate text-sm font-semibold">{definition.name}</p>
-                            <p className="truncate text-xs text-muted-foreground">{definition.provider}</p>
+                            <p className="v2-mono truncate text-xs text-muted-foreground">{definition.provider}</p>
                           </div>
                         </div>
                         <p className="text-sm text-muted-foreground">
@@ -185,14 +190,14 @@ export function CatalogueTab({
                             ? `Exchanges ${definition.supported_data_classes.slice(0, 3).join(', ')}.`
                             : 'No runtime data class is declared yet.'}
                         </p>
-                        {stackNote && (
-                          <p className="rounded-md bg-muted/60 p-2 text-xs text-muted-foreground">{stackNote}</p>
-                        )}
+                        {stackNote && <SubPanel className="text-xs text-muted-foreground">{stackNote}</SubPanel>}
                         <div className="flex flex-wrap gap-1.5">
                           <Badge variant="outline" className={`text-xs ${AVAILABILITY_TONE[availability]}`}>
                             {AVAILABILITY_LABEL[availability]}
                           </Badge>
-                          {configured > 0 && <Badge variant="outline" className="text-xs">{configured} configured</Badge>}
+                          {configured > 0 && (
+                            <Badge variant="outline" className="v2-mono text-xs">{configured} configured</Badge>
+                          )}
                         </div>
                         <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">
                           {addable ? (
@@ -211,8 +216,8 @@ export function CatalogueTab({
                         {addable && !isAdmin && (
                           <p className="text-xs text-muted-foreground">Creating a connection requires an administrator role.</p>
                         )}
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </Panel>
                   );
                 })}
               </div>

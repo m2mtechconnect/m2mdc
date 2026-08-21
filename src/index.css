@@ -992,30 +992,9 @@ textarea:focus {
    the rest of the application keeps its own theming.
    ============================================================ */
 html:not(.dark) .aura-workspace-theme {
-  --background: 216 27% 96%;      /* #F3F5F8 application background */
-  --card: 0 0% 100%;              /* #FFFFFF primary surface        */
-  --card-foreground: 0 0% 9%;
-  --popover: 0 0% 100%;
-  --foreground: 0 0% 9%;          /* #181818 text primary           */
-  --muted: 216 27% 96%;
-  --muted-foreground: 0 0% 36%;   /* #5C5C5C text secondary         */
-  --border: 218 21% 88%;          /* #D8DDE6                        */
-  --input: 218 21% 88%;
-  --ring: 208 88% 35%;            /* #0B5CAB interactive blue       */
-  --primary: 214 68% 14%;         /* #0B1F3A AURA navy              */
-  --primary-foreground: 0 0% 100%;
-  --secondary: 216 27% 96%;
-  --secondary-foreground: 0 0% 9%;
-  --success: 137 48% 35%;         /* #2E844A                        */
-  --success-foreground: 0 0% 100%;
-  --warning: 26 99% 61%;          /* #FE9339                        */
-  --warning-foreground: 0 0% 9%;
-  --destructive: 355 95% 38%;     /* #BA0517                        */
-  --destructive-foreground: 0 0% 100%;
-  --info: 207 99% 42%;            /* #0176D3                        */
-  --info-foreground: 0 0% 100%;
-  --info-strong: 209 88% 36%;     /* #0B5CAB - AA text on info tints */
-  --radius: 0.5rem;               /* 8px card radius                */
+  /* Workspace inherits the shared V2 enterprise tokens; only the radius is
+     pinned here so dashboard cards keep the 8px Lightning-style corner. */
+  --radius: 0.5rem;
 }
 
 /* Workspace measure: fills the desktop viewport without stretching prose. */

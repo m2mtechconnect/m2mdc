@@ -93,71 +93,70 @@ describe('test harness safety guards', () => {
     expect(spec).not.toContain("page.locator('.hero");
   });
 
-  it('restores the replay search path without rewriting security migration history', () => {
-    const bridge = repositoryFile(
-      'supabase/migrations/20260206150807_restore_public_search_path.sql',
-    );
+  it('keeps migration history immutable and the replay search-path bridge ephemeral', () => {
+    const immutabilityGuard = repositoryFile('scripts/phase3/check-migration-immutability.mjs');
+    const replayOverlay = repositoryFile('scripts/phase3/prepare-clean-replay.mjs');
     const historicalMigration = repositoryFile(
       'supabase/migrations/20260206150808_4cb276a5-a341-4b08-a939-83ac1e9b5bcc.sql',
     );
-    expect(bridge).toContain("set_config('search_path', 'public', false)");
+
+    expect(immutabilityGuard).toContain('Historical migration files must never be modified');
+    expect(immutabilityGuard).toContain("git(['diff', '--name-status', range, '--', 'supabase/migrations'])");
+    expect(replayOverlay).toContain("process.argv.includes('--ephemeral')");
+    expect(replayOverlay).toContain("process.env.AURA_REPLAY_EPHEMERAL !== '1'");
+    expect(replayOverlay).toContain('search-path bridge is committed; it must be ephemeral only');
+    expect(replayOverlay).toContain("set_config('search_path', 'public', false)");
     expect(createHash('sha256').update(historicalMigration).digest('hex')).toBe(
       'a100fe44048877237b50f90f78d08bb1d61eb1a0e2402d34a70ed4e30a1cbb34',
     );
   });
 
-  it('makes the user-specific profile backfill safe for clean replay', () => {
-    const userBackfill = repositoryFile(
-      'supabase/migrations/20260218142636_a59bb8cb-5e00-4e13-b63d-19eb97d7d4bb.sql',
+  it('makes the user-specific profile backfill safe only in ephemeral clean replay', () => {
+    const replayOverlay = repositoryFile('scripts/phase3/prepare-clean-replay.mjs');
+    expect(replayOverlay).toContain(
+      "'20260218142636_a59bb8cb-5e00-4e13-b63d-19eb97d7d4bb.sql'",
     );
-    expect(userBackfill).toContain('FROM auth.users AS source_user');
-    expect(userBackfill).toContain("WHERE source_user.id = 'dc4ffd38-7474-4ece-a76d-9203538687ed'::uuid");
-    expect(userBackfill).not.toContain('INSERT INTO auth.users');
+    expect(replayOverlay).toContain('FROM auth.users AS source_user');
+    expect(replayOverlay).toContain(
+      "WHERE source_user.id = 'dc4ffd38-7474-4ece-a76d-9203538687ed'::uuid",
+    );
   });
 
-  it('makes the user-specific administrative grant safe for clean replay', () => {
-    const roleBackfill = repositoryFile(
-      'supabase/migrations/20260731185028_01b5764d-1ffd-480a-a835-acc0b51997fd.sql',
+  it('makes the user-specific administrative grant safe only in ephemeral clean replay', () => {
+    const replayOverlay = repositoryFile('scripts/phase3/prepare-clean-replay.mjs');
+    expect(replayOverlay).toContain(
+      "'20260731185028_01b5764d-1ffd-480a-a835-acc0b51997fd.sql'",
     );
-    expect(roleBackfill).toContain('FROM auth.users AS source_user');
-    expect(roleBackfill).toContain(
+    expect(replayOverlay).toContain(
       "WHERE source_user.id = 'f3c0f534-4df8-4cb1-901a-b8d6abe08742'::uuid",
     );
-    expect(roleBackfill).not.toContain('INSERT INTO auth.users');
   });
 
-  it('makes the user-specific canary audit event safe for clean replay', () => {
-    const canaryEvent = repositoryFile(
-      'supabase/migrations/20260814140943_a2a96da6-f9de-4c98-9656-d25c429fda57.sql',
+  it('makes the user-specific canary audit event safe only in ephemeral clean replay', () => {
+    const replayOverlay = repositoryFile('scripts/phase3/prepare-clean-replay.mjs');
+    expect(replayOverlay).toContain(
+      "'20260814140943_a2a96da6-f9de-4c98-9656-d25c429fda57.sql'",
     );
-    expect(canaryEvent).toContain('FROM auth.users AS source_user');
-    expect(canaryEvent).toContain(
+    expect(replayOverlay).toContain(
       "WHERE source_user.id = 'd309b3bd-88ca-4dc9-b007-c411787b848a'::uuid",
     );
-    expect(canaryEvent).not.toContain('INSERT INTO auth.users');
   });
 
   it('keeps Phase 3 replay idempotent and its RLS fixtures schema-complete', () => {
-    const storagePolicy = repositoryFile(
-      'supabase/migrations/20260804032127_4ab5dcd5-f35d-41b7-886f-075bc690c477.sql',
-    );
-    const assetStoragePolicies = repositoryFile(
-      'supabase/migrations/20260814135903_73a4a35c-5241-4801-99a0-9ff486a12cd2.sql',
-    );
+    const replayOverlay = repositoryFile('scripts/phase3/prepare-clean-replay.mjs');
     const matrix = repositoryFile('scripts/phase3/rls-matrix.sql');
     const validator = repositoryFile('scripts/phase3/external-validation.mjs');
     const twinReadGrant = repositoryFile(
       'supabase/migrations/20260820170000_grant_authenticated_twin_read.sql',
     );
 
-    expect(storagePolicy).toContain(
+    expect(replayOverlay).toContain(
       'DROP POLICY IF EXISTS "Users can list their own profile images" ON storage.objects',
     );
-    expect(storagePolicy).toContain('CREATE POLICY "Users can list their own profile images"');
-    expect(assetStoragePolicies).toContain(
+    expect(replayOverlay).toContain(
       'DROP POLICY IF EXISTS "Authenticated users can read published twin derivatives" ON storage.objects',
     );
-    expect(assetStoragePolicies).toContain(
+    expect(replayOverlay).toContain(
       'DROP POLICY IF EXISTS "Admins can read twin asset source packages" ON storage.objects',
     );
     expect(matrix.match(/data_centre_twins \(name, city, region_code, created_by_user\)/g)).toHaveLength(2);

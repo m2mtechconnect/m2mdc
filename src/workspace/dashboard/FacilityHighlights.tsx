@@ -76,8 +76,8 @@ export function FacilityHighlights({
       data-testid="facility-highlights"
       className="v2-panel min-w-0 overflow-hidden p-0"
     >
-      <div className="flex min-w-0 flex-wrap items-start justify-between gap-3 p-4">
-        <div className="flex min-w-0 flex-1 items-start gap-3.5">
+      <div className="flex min-w-0 flex-col gap-3 p-4 min-[1180px]:flex-row min-[1180px]:flex-wrap min-[1180px]:items-start min-[1180px]:justify-between">
+        <div className="flex w-full min-w-0 flex-1 items-start gap-3.5">
           <span
             aria-hidden
             className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground sm:flex"

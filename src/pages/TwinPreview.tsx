@@ -460,7 +460,7 @@ export default function TwinPreview() {
                             'bg-green-500'
                           }`} />
                           <span className="text-xs font-mono font-medium">{name}</span>
-                          <Badge variant="outline" className="text-[9px] h-4 px-1">
+                          <Badge variant="outline" className="text-xs h-4 px-1">
                             {rack.type === 'ddn_a3i' ? 'DDN A3I' : rack.type === 'ddn_exascaler' ? 'DDN EXA' : 'Compute'}
                           </Badge>
                         </div>

@@ -145,8 +145,10 @@ export default function Help() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { startTour, resetAllTours, isTourSeen } = useTour();
+  const fingerprint = useMemo(() => getBuildFingerprint(), []);
 
   return (
+
     <div className="mx-auto max-w-7xl space-y-6 py-6 pb-12">
       <DCSectionHeader
         as="h1"

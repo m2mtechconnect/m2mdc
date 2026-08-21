@@ -14,10 +14,6 @@ on:
     branches: [main]
   workflow_dispatch:
 
-concurrency:
-  group: dsx-scoped-${{ github.ref }}
-  cancel-in-progress: true
-
 env:
   AURA_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -25,6 +21,9 @@ jobs:
   dsx-lint:
     name: DSX lint (scoped)
     runs-on: ubuntu-latest
+    concurrency:
+      group: dsx-lint-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -43,6 +42,9 @@ jobs:
   dsx-unit-tests:
     name: DSX unit tests (scoped)
     runs-on: ubuntu-latest
+    concurrency:
+      group: dsx-unit-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -69,6 +71,9 @@ jobs:
   dsx-scoped-summary:
     name: DSX scoped summary
     runs-on: ubuntu-latest
+    concurrency:
+      group: dsx-summary-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     needs: [dsx-lint, dsx-unit-tests]
     if: always()
     steps:

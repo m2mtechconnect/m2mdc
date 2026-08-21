@@ -15,7 +15,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchProfileFields } from "@/lib/auth/profileQuery";
 import type { Session, User } from "@supabase/supabase-js";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
-import { initChangeLogMiddleware } from "@/stores/dcBuilderChangeLogMiddleware";
 import DataCentreTwinLanding from "./pages/DataCentreTwinLanding";
 import BoundedLoading from "@/components/shared/BoundedLoading";
 import { MANAGED_USER_RETURN_PATH } from '@/connections/managedUserBinding';
@@ -55,8 +54,23 @@ const withPublicRouteFallback = (element: ReactNode) => (
   <Suspense fallback={publicRouteFallback}>{element}</Suspense>
 );
 
-// Initialize changelog middleware for builder store
-initChangeLogMiddleware();
+// The changelog middleware imports the full DC builder stores. Keep it off the
+// anonymous critical path and initialize it once, only after an approved user
+// enters the authenticated application.
+let changeLogMiddlewarePromise: Promise<void> | null = null;
+function ensureChangeLogMiddleware(): Promise<void> {
+  if (!changeLogMiddlewarePromise) {
+    changeLogMiddlewarePromise = import('@/stores/dcBuilderChangeLogMiddleware')
+      .then(({ initChangeLogMiddleware }) => {
+        initChangeLogMiddleware();
+      })
+      .catch((error) => {
+        changeLogMiddlewarePromise = null;
+        throw error;
+      });
+  }
+  return changeLogMiddlewarePromise;
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -129,6 +143,13 @@ function AuthenticatedApp() {
       setApprovalLoading(false);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (!session || !user || !isApproved) return;
+    void ensureChangeLogMiddleware().catch((error) => {
+      console.error('[ChangeLogMiddleware] Deferred initialization failed:', error);
+    });
+  }, [session, user, isApproved]);
 
   if (loading || approvalLoading) {
     return <BoundedLoading stage={loading ? 'session' : 'approval'} />;

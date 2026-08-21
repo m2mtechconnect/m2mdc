@@ -27,7 +27,6 @@ WITH CHECK (
   AND (public.has_role(auth.uid(), 'admin') OR public.has_role(auth.uid(), 'owner'))
 );
 
-DROP POLICY IF EXISTS "Authenticated users can read published twin derivatives" ON storage.objects;
 CREATE POLICY "Authenticated users can read published twin derivatives"
 ON storage.objects FOR SELECT TO authenticated
 USING (
@@ -35,7 +34,6 @@ USING (
   AND (storage.foldername(name))[array_length(storage.foldername(name),1)] = 'web'
 );
 
-DROP POLICY IF EXISTS "Admins can read twin asset source packages" ON storage.objects;
 CREATE POLICY "Admins can read twin asset source packages"
 ON storage.objects FOR SELECT TO authenticated
 USING (

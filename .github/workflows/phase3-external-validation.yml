@@ -39,6 +39,16 @@ jobs:
       VITE_SUPABASE_PUBLISHABLE_KEY: ''
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Enforce immutable migration history
+        run: node scripts/phase3/check-migration-immutability.mjs
+
+      - name: Prepare ephemeral clean-replay overlays
+        env:
+          AURA_REPLAY_EPHEMERAL: '1'
+        run: node scripts/phase3/prepare-clean-replay.mjs --ephemeral
 
       - uses: actions/setup-node@v4
         with:

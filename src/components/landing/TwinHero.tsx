@@ -9,10 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Play, CheckCircle2, Sparkles, TrendingUp, Zap, Leaf, Building2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { useRef, useEffect, useState } from "react";
+import { lazy, Suspense, useRef, useEffect, useState } from "react";
 import { screenshotManifest } from "@/data/studioScreenshots";
-import { LoomDemoModal } from "./LoomDemoModal";
 import { useTranslation } from "react-i18next";
+
+const LazyLoomDemoModal = lazy(() =>
+  import("./LoomDemoModal").then((module) => ({ default: module.LoomDemoModal })),
+);
 
 export function TwinHero() {
   const { t } = useTranslation();
@@ -256,7 +259,7 @@ export function TwinHero() {
             </div>
             <div className="aspect-[16/9] bg-gradient-to-br from-muted/80 via-muted/50 to-background rounded-b-xl lg:rounded-b-2xl overflow-hidden relative">
               <img 
-                src={`/landing/screenshots/dashboard-desktop.png?v=${encodeURIComponent(screenshotManifest.version)}`} 
+                src={`/landing/screenshots/dashboard-desktop.webp?v=${encodeURIComponent(screenshotManifest.version)}`} 
                 alt="M2M Digital Twin Dashboard showing 3D rack visualization, PUE metrics, GPU utilization, and carbon intensity KPIs"
                 width={1564}
                 height={879}
@@ -299,7 +302,11 @@ export function TwinHero() {
         </motion.div>
       </div>
     </section>
-    <LoomDemoModal open={demoOpen} onOpenChange={setDemoOpen} />
+    {demoOpen && (
+      <Suspense fallback={null}>
+        <LazyLoomDemoModal open={demoOpen} onOpenChange={setDemoOpen} />
+      </Suspense>
+    )}
     </>
   );
 }

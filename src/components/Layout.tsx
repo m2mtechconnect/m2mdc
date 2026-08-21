@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import m2mLogo from "@/assets/m2m-logo.png";
+import { AuraLogo } from "@/components/brand/AuraLogo";
 import { Menu, X, LogOut, Settings, Search, Shield, Sparkles } from "lucide-react";
 import GlobalSearchBar from "@/components/search/GlobalSearchBar";
 import { LazyCoPilotPanel } from "@/components/copilot/LazyCoPilotPanel";
@@ -111,14 +111,11 @@ export function Layout({ children }: LayoutProps) {
           <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-5">
             <Link
               to="/dashboard"
-              aria-label="AURA Command Center"
+              aria-label="AURA Command Center - M2M"
               className="flex items-center flex-shrink-0 group"
             >
-              <img
-                src={m2mLogo}
-                alt="M2M AURA"
-                className="h-9 w-9 lg:h-10 lg:w-10 object-contain transition-transform group-hover:scale-105"
-              />
+              <AuraLogo surface="dark" className="hidden md:flex transition-transform group-hover:scale-[1.02]" />
+              <AuraLogo surface="dark" compact className="md:hidden" />
             </Link>
 
             <nav

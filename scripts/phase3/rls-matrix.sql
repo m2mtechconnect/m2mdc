@@ -188,6 +188,12 @@ BEGIN
   VALUES ('validation-twin-ext-a', 'Validation City', 'validation-region-a', member_a)
   RETURNING id INTO twin_a;
 
+  -- The prior anonymous assertion intentionally clears request.jwt.claims.
+  -- PostgreSQL leaves that transaction-local setting as an empty string, while
+  -- the canonical write-boundary trigger parses a present claims setting as
+  -- JSON. Restore an explicit privileged envelope for direct fixture seeding;
+  -- all authorization assertions below still execute as authenticated/anon.
+  PERFORM set_config('request.jwt.claims', '{"role":"service_role"}', true);
   INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, scenario_key, lifecycle_status)
   VALUES (member_a, member_a, twin_a, 'validation-extended', 'succeeded') RETURNING id INTO run_a;
 

@@ -1089,7 +1089,7 @@ html:not(.dark) .aura-workspace-theme {
 
   /* ---- Technical accent (NVIDIA green family, #76B900) ---- */
   --v2-tech: 82 100% 36%;             /* bright technical accent */
-  --v2-tech-strong: 82 100% 25%;      /* AA-safe on white with white text */
+  --v2-tech-strong: 82 100% 21%;      /* AA-safe on white with white text */
   --v2-tech-on-dark: 82 78% 58%;      /* readable green on graphite */
 
   /* ---- Semantic state hues (AA on light surfaces) ---- */

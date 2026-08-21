@@ -5,7 +5,7 @@
 
 import { ReactNode } from 'react';
 import { motion } from 'framer-motion';
-import m2mLogo from '@/assets/m2m-logo.png';
+import { AuraLogo } from '@/components/brand/AuraLogo';
 import { BackgroundGrid } from './BackgroundGrid';
 
 interface AuthLayoutProps {
@@ -28,14 +28,14 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="relative z-10 text-center px-12 max-w-xl"
         >
-          <motion.img 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            src={m2mLogo} 
-            alt="M2M Logo" 
-            className="h-20 mx-auto mb-6"
-          />
+            className="mb-6 flex justify-center"
+          >
+            <AuraLogo surface="dark" className="scale-125" />
+          </motion.div>
           
           <motion.h1 
             initial={{ opacity: 0, y: 10 }}
@@ -89,11 +89,9 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
         >
           {/* Mobile logo */}
           <div className="lg:hidden mb-8 text-center">
-            <img 
-              src={m2mLogo} 
-              alt="M2M Logo" 
-              className="h-14 mx-auto mb-3"
-            />
+            <div className="mb-3 flex justify-center">
+              <AuraLogo surface="light" />
+            </div>
             <p className="text-sm text-muted-foreground">Sovereign AI Twin Studio</p>
           </div>
 

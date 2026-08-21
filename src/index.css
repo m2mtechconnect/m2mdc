@@ -1154,24 +1154,41 @@ html:not(.dark) .aura-workspace-theme {
 }
 
 @layer components {
-  /* ---------- 1. Global chrome (dark graphite) ---------- */
+  /* ---------- 1. Global chrome (light enterprise app bar) ---------- */
   .v2-appbar {
-    background-color: hsl(var(--v2-graphite));
-    border-bottom: 1px solid hsl(var(--v2-graphite-line));
-    color: hsl(var(--v2-graphite-fg));
+    background-color: hsl(var(--v2-header));
+    border-bottom: 1px solid hsl(var(--v2-header-line));
+    color: hsl(var(--v2-header-fg));
   }
   .v2-appbar-link {
-    color: hsl(var(--v2-graphite-muted));
+    color: hsl(var(--v2-header-muted));
     font-size: 14px;
     font-weight: 500;
   }
-  .v2-appbar-link:hover { background-color: hsl(var(--v2-graphite-elevated)); color: hsl(var(--v2-graphite-fg)); }
+  .v2-appbar-link:hover { background-color: hsl(var(--v2-header-elevated)); color: hsl(var(--v2-header-fg)); }
   .v2-appbar-link-active {
-    background-color: hsl(var(--v2-tech) / 0.16);
-    color: hsl(var(--v2-tech-on-dark));
-    box-shadow: inset 0 -2px 0 0 hsl(var(--v2-tech));
+    background-color: hsl(var(--v2-tech) / 0.12);
+    color: hsl(var(--v2-tech-strong));
+    box-shadow: inset 0 -2px 0 0 hsl(var(--v2-tech-strong));
   }
-  .v2-appbar-link-active:hover { color: hsl(var(--v2-tech-on-dark)); background-color: hsl(var(--v2-tech) / 0.22); }
+  .v2-appbar-link-active:hover { color: hsl(var(--v2-tech-strong)); background-color: hsl(var(--v2-tech) / 0.18); }
+
+  /* Secondary header controls: visible on the light app bar, never white-on-white. */
+  .v2-appbar-action {
+    background-color: hsl(var(--v2-header));
+    border: 1px solid hsl(var(--v2-line-strong));
+    color: hsl(var(--v2-header-fg));
+  }
+  .v2-appbar-action:hover {
+    background-color: hsl(var(--v2-header-elevated));
+    color: hsl(var(--v2-header-fg));
+  }
+  .v2-appbar-action[data-active='true'] {
+    background-color: hsl(var(--v2-tech) / 0.12);
+    border-color: hsl(var(--v2-tech-strong) / 0.5);
+    color: hsl(var(--v2-tech-strong));
+  }
+  .v2-appbar-divider { background-color: hsl(var(--v2-header-line)); }
 
   /* ---------- 2. Semantic surfaces ---------- */
   .v2-canvas { background-color: hsl(var(--v2-canvas)); color: hsl(var(--foreground)); }

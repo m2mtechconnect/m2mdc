@@ -28,7 +28,6 @@ const Builder = lazy(() => import("./pages/Builder"));
 const Deploy = lazy(() => import("./pages/Deploy"));
 const DeploymentHistory = lazy(() => import("./pages/DeploymentHistory"));
 const IntelligenceDashboard = lazy(() => import("./pages/IntelligenceDashboard"));
-const Compliance = lazy(() => import("./pages/Compliance"));
 const Teams = lazy(() => import("./pages/Teams"));
 const Marketplace = lazy(() => import("./pages/Marketplace"));
 const Help = lazy(() => import("./pages/Help"));
@@ -41,17 +40,14 @@ const SignOut = lazy(() =>
 );
 const AgentWorkspace = lazy(() => import("./pages/AgentWorkspace"));
 const AgentChat = lazy(() => import("./pages/AgentChat"));
-const Playbook = lazy(() => import("./pages/Playbook"));
 const FundingIntakeDemo = lazy(() => import("./pages/FundingIntakeDemo"));
 const ManageAgents = lazy(() => import("./pages/ManageAgents"));
 const SystemManage = lazy(() => import("./pages/SystemManage"));
 const TwinManage = lazy(() => import("./pages/TwinManage"));
-const DataCentreTwin = lazy(() => import("./pages/DataCentreTwin"));
 const Blueprint = lazy(() => import("./pages/Blueprint"));
 const BlueprintPreview = lazy(() => import("./pages/BlueprintPreview"));
 const SimulationPreview = lazy(() => import("./pages/SimulationPreview"));
 const AuraWorkspace = lazy(() => import("./workspace/AuraWorkspace"));
-const InfrastructurePage = lazy(() => import("./pages/InfrastructurePage"));
 const TwinPreview = lazy(() => import("./pages/TwinPreview"));
 const TwinDebug = lazy(() => import("./pages/TwinDebug"));
 const AgentDetail = lazy(() => import("./pages/AgentDetail"));
@@ -59,7 +55,6 @@ const Profile = lazy(() => import("./pages/account/Profile"));
 const Settings = lazy(() => import("./pages/account/Settings"));
 const AccessControl = lazy(() => import("./pages/account/AccessControl"));
 
-/* Administration console - lazy and permission-gated. */
 const OnboardingSubmissions = lazy(() => import("./pages/OnboardingSubmissions"));
 const PlatformReadiness = lazy(() => import("./pages/admin/PlatformReadiness"));
 const AssetPreview = lazy(() => import("@/pages/admin/AssetPreview"));
@@ -127,7 +122,6 @@ function ApprovedUserRoutes() {
       <Route path="/admin/platform-readiness" element={<AdminRouteGuard><PlatformReadiness /></AdminRouteGuard>} />
       <Route path="/manage/integrations" element={<Connections />} />
       <Route path="/manage/facilities" element={<ManageFacilities />} />
-      <Route path="/compliance" element={<Compliance />} />
       <Route path="/teams" element={<Teams />} />
       <Route path="/marketplace" element={<Marketplace />} />
       <Route path="/app/agents" element={<ManageAgents />} />
@@ -145,15 +139,10 @@ function ApprovedUserRoutes() {
       <Route path="/search" element={<Search />} />
       <Route path="/settings/ai" element={<AISettings />} />
       <Route path="/sign-out" element={<SignOut />} />
-      <Route path="/playbook" element={<Playbook />} />
-      <Route path="/data-centre-twin" element={<DataCentreTwin />} />
-      <Route path="/data-centre-twin/:id" element={<DataCentreTwin />} />
       <Route path="/twin-preview" element={<TwinPreview />} />
       <Route path="/twin-debug" element={<AdminRouteGuard><TwinDebug /></AdminRouteGuard>} />
       <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
-      <Route path="/infrastructure" element={<InfrastructurePage />} />
 
-      {/* Legacy paths resolve through one compatibility registry. */}
       {ROUTE_ALIASES.map((alias) => (
         <Route
           key={alias.from}

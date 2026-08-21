@@ -3,11 +3,8 @@
  *
  * The global shell follows a Salesforce-style split between four persistent
  * workspaces, operational management, governance and utilities. Creation
- * workflows (Builder) and contextual detail routes deliberately do not become
- * permanent global destinations.
- *
- * One list, one destination per concept. The header, mobile sheet and command
- * palette all read from this module so labels and active states cannot drift.
+ * workflows and contextual detail routes deliberately do not become permanent
+ * global destinations.
  */
 import {
   BarChart3,
@@ -29,21 +26,14 @@ import type { LucideIcon } from 'lucide-react';
 import type { Permission } from '@/auth/permissions';
 
 export interface AppNavItem {
-  /** Short label used in the header. */
   name: string;
-  /** Full label used in tooltips, the mobile sheet and aria-label. */
   fullName: string;
   href: string;
   icon: LucideIcon;
-  /** Extra prefixes that should mark this item active. */
   matches?: string[];
-  /** Permission required to see the item. Undefined = always visible. */
   permission?: Permission;
-  /** One-line purpose, shown in menus and the mobile sheet. */
   description: string;
-  /** Lifecycle group this destination belongs to. */
   group?: NavGroupId;
-  /** Contextual child destinations; never promoted to a second global item. */
   children?: AppNavItem[];
 }
 
@@ -58,10 +48,6 @@ export const NAV_GROUP_LABEL: Record<NavGroupId, string> = {
   support: 'Support',
 };
 
-/**
- * Four durable operator workspaces. These are the only product domains that
- * deserve persistent header placement.
- */
 export const WORKSPACE_NAV: AppNavItem[] = [
   {
     name: 'Command Center',
@@ -77,7 +63,7 @@ export const WORKSPACE_NAV: AppNavItem[] = [
     fullName: 'Facility Blueprint',
     href: '/blueprint',
     icon: Boxes,
-    matches: ['/blueprint', '/data-centre-twin', '/infrastructure'],
+    matches: ['/blueprint'],
     group: 'design',
     description: 'Facility topology, OpenUSD assets, automation definitions and model versions.',
   },
@@ -101,11 +87,6 @@ export const WORKSPACE_NAV: AppNavItem[] = [
   },
 ];
 
-/**
- * Management and governance destinations. Builder is intentionally absent:
- * creation is an action from Facilities/templates, not a permanent business
- * domain. Contextual detail routes remain reachable from their owning records.
- */
 export const MANAGE_NAV: AppNavItem[] = [
   {
     name: 'Facilities',
@@ -188,7 +169,16 @@ export const MANAGE_NAV: AppNavItem[] = [
     fullName: 'Platform Administration',
     href: '/admin/platform-readiness',
     icon: Shield,
-    matches: ['/admin', '/twin-debug'],
+    matches: [
+      '/admin/platform-readiness',
+      '/admin/dsx-capabilities',
+      '/admin/dataset-registry',
+      '/admin/asset-preview',
+      '/admin/asset-pipeline',
+      '/admin/asset-validation',
+      '/admin/reference-facility-validation',
+      '/twin-debug',
+    ],
     permission: 'platform.view_admin_console',
     group: 'govern',
     description: 'Platform readiness, registries, validation and internal diagnostics.',
@@ -245,7 +235,6 @@ export const MANAGE_NAV: AppNavItem[] = [
   },
 ];
 
-/** Always-visible support and utility destinations. */
 export const SUPPORT_NAV: AppNavItem[] = [
   {
     name: 'Search',
@@ -284,7 +273,6 @@ export const NAV_GROUP_ORDER: NavGroupId[] = [
 
 const ALL_NAV_ITEMS: AppNavItem[] = [...WORKSPACE_NAV, ...MANAGE_NAV, ...SUPPORT_NAV];
 
-/** Lifecycle grouping used by the responsive navigation drawer. */
 export function navGroups(can: (p: Permission) => boolean): NavGroup[] {
   return NAV_GROUP_ORDER.map((id) => ({
     id,
@@ -295,14 +283,12 @@ export function navGroups(can: (p: Permission) => boolean): NavGroup[] {
   })).filter((g) => g.items.length > 0);
 }
 
-/** True when `pathname` belongs to the item's destination. */
 export function isNavItemActive(item: AppNavItem, pathname: string): boolean {
   if (item.href === '/') return pathname === '/' || pathname === '/dashboard';
   const prefixes = item.matches ?? [item.href];
   return prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
-/** Filter the management/governance menu down to authorized destinations. */
 export function visibleManageNav(can: (p: Permission) => boolean): AppNavItem[] {
   return MANAGE_NAV.filter((item) => !item.permission || can(item.permission));
 }

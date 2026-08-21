@@ -19,12 +19,26 @@ export const ROUTE_ALIASES: RouteAlias[] = [
   { from: '/build', to: '/builder' },
   { from: '/omniverse-scene', to: '/twin-preview' },
 
-  // Administration now opens on platform state rather than one specific user
-  // workflow. The two former approval pages are compatibility links into the
-  // canonical People & Access workspace.
+  // Administration opens on platform state rather than one specific user
+  // workflow. Former approval routes resolve to People & Access.
   { from: '/admin', to: '/admin/platform-readiness' },
   { from: '/admin/signups-dashboard', to: '/teams' },
   { from: '/admin/user-approvals', to: '/teams' },
+
+  // Phase 2 IA consolidation: retire competing top-level reports/workspaces
+  // while preserving their deep links. Evidence owns governance evidence;
+  // Blueprint owns the facility model; Command Center owns the default twin
+  // overview; Learning Hub owns implementation guidance.
+  { from: '/compliance', to: '/dsx/evidence-beta/sustainability/sovereignty' },
+  { from: '/playbook', to: '/help' },
+  { from: '/infrastructure', to: '/blueprint/default' },
+  { from: '/data-centre-twin', to: '/dashboard' },
+  {
+    from: '/data-centre-twin/:id',
+    to: '/dashboard',
+    sample: '/data-centre-twin/facility-1',
+    expected: '/dashboard',
+  },
 
   { from: '/operations', to: '/analytics' },
   { from: '/intelligence', to: '/analytics' },

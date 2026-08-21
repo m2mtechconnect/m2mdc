@@ -76,10 +76,10 @@ describe('canonical navigation', () => {
     expect(visibleManageNav((p) => p === 'twin.edit').map((i) => i.name)).toEqual([
       'Facilities',
       'Connections',
-      'Asset pipeline',
     ]);
     expect(visibleManageNav(() => true)).toHaveLength(MANAGE_NAV.length);
   });
+
 });
 
 describe('DSX lifecycle grouping', () => {

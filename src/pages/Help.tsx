@@ -1,6 +1,7 @@
-import type { ElementType } from 'react';
+import { useMemo, type ElementType } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+
 import {
   Activity,
   BookOpen,

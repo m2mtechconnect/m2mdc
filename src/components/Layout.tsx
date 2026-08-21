@@ -35,6 +35,7 @@ import {
   useAssistantPresentation,
 } from "@/stores/assistantLayoutStore";
 import { COPILOT } from "@/ux";
+import { useAuraV2Theme } from "@/components/v2";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -62,6 +63,7 @@ export function Layout({ children }: LayoutProps) {
   const drawerGroups = roleLoading ? [] : navGroups(can);
   const headerRef = useRef<HTMLElement>(null);
 
+  useAuraV2Theme();
   useTourAutoStart();
 
   const handleSignOut = async () => {
@@ -90,7 +92,7 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div
-      className={`${fullBleed ? "h-screen overflow-hidden" : "min-h-screen"} flex flex-col bg-background transition-[padding] duration-200 motion-reduce:transition-none`}
+      className={`${fullBleed ? "h-screen overflow-hidden" : "min-h-screen"} flex flex-col v2-canvas transition-[padding] duration-200 motion-reduce:transition-none`}
       data-testid="app-shell"
       style={assistantReflow ? { paddingRight: assistantWidth } : undefined}
     >
@@ -98,14 +100,14 @@ export function Layout({ children }: LayoutProps) {
 
       <header
         ref={headerRef}
-        className={`sticky top-0 z-50 border-b bg-card/95 backdrop-blur-xl supports-[backdrop-filter]:backdrop-blur transition-shadow ${
-          isScrolled ? 'shadow-md' : ''
+        className={`sticky top-0 z-50 border-b border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-rail)/0.92)] backdrop-blur-xl supports-[backdrop-filter]:backdrop-blur transition-shadow ${
+          isScrolled ? 'shadow-[0_10px_30px_-20px_hsl(220_40%_2%/0.95)]' : ''
         }`}
         role="navigation"
         aria-label="Primary navigation"
         data-testid="global-header"
       >
-        <div className="mx-auto flex h-14 max-w-[1920px] items-center justify-between gap-3 px-3 sm:px-4 md:px-5 lg:px-6">
+        <div className="mx-auto flex h-12 max-w-[1920px] items-center justify-between gap-3 px-3 sm:px-4 md:px-5 lg:px-6">
           <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-5">
             <Link
               to="/dashboard"
@@ -135,10 +137,10 @@ export function Layout({ children }: LayoutProps) {
                         asChild
                         variant={isActive ? "secondary" : "ghost"}
                         size="sm"
-                        className={`gap-2 rounded-md px-2.5 xl:px-3 text-[14px] font-medium transition-smooth min-h-[40px] ${
+                        className={`gap-2 rounded-md px-2.5 xl:px-3 text-[14px] font-medium transition-smooth min-h-[36px] ${
                           isActive
-                            ? "bg-[hsl(var(--info)/0.10)] text-[hsl(var(--info-strong))] shadow-[inset_0_-2px_0_0_hsl(var(--info))]"
-                            : "text-muted-foreground hover:text-foreground"
+                            ? "bg-[hsl(var(--accent)/0.12)] text-[hsl(var(--accent))] shadow-[inset_0_-2px_0_0_hsl(var(--accent))]"
+                            : "text-muted-foreground hover:bg-[hsl(var(--v2-panel-elevated))] hover:text-foreground"
                         }`}
                       >
                         <Link
@@ -170,7 +172,7 @@ export function Layout({ children }: LayoutProps) {
                     <Button
                       variant={manageActive ? "secondary" : "ghost"}
                       size="sm"
-                      className="gap-2 px-2.5 text-[14px] font-medium text-muted-foreground hover:text-foreground min-h-[40px]"
+                      className="gap-2 px-2.5 text-[14px] font-medium text-muted-foreground hover:text-foreground min-h-[36px]"
                       aria-label="Manage"
                       data-testid="manage-trigger"
                       data-nav-item="Manage"
@@ -208,7 +210,7 @@ export function Layout({ children }: LayoutProps) {
                     <Button
                       variant={governActive ? "secondary" : "ghost"}
                       size="sm"
-                      className="gap-2 px-2.5 text-[14px] font-medium text-muted-foreground hover:text-foreground min-h-[40px]"
+                      className="gap-2 px-2.5 text-[14px] font-medium text-muted-foreground hover:text-foreground min-h-[36px]"
                       aria-label="Govern"
                       data-testid="govern-trigger"
                       data-nav-item="Govern"

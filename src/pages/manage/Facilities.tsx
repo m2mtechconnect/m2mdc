@@ -94,31 +94,31 @@ export default function ManageFacilities() {
 
   return (
     <div className="space-y-6 pb-10" data-testid="manage-facilities-page">
-      <header className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
+      <CommandHeader
+        eyebrow="Operations · Facility control plane"
+        title={
+          <span className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-muted-foreground" aria-hidden />
             Facilities
-          </h1>
-          <p className="max-w-3xl text-sm text-muted-foreground">
-            Facility administration: create, configure and retire modelled data-centre facilities.
-            All values remain simulated.
-          </p>
-        </div>
-        {canEdit && (
-          <Button onClick={() => setOpen(true)} data-testid="create-facility">
-            <Plus className="mr-2 h-4 w-4" aria-hidden />
-            Create facility
-          </Button>
-        )}
-      </header>
+          </span>
+        }
+        subtitle="Facility administration: create, configure and retire modelled data-centre facilities. All values remain simulated."
+        actions={
+          canEdit ? (
+            <Button onClick={() => setOpen(true)} data-testid="create-facility">
+              <Plus className="mr-2 h-4 w-4" aria-hidden />
+              Create facility
+            </Button>
+          ) : undefined
+        }
+      />
 
-      <Card>
-        <CardHeader className="pb-3">
+      <Card className="v2-panel">
+        <CardHeader className="p-0 pb-3">
           <CardTitle className="text-base">Facility list</CardTitle>
           <CardDescription>Facilities you have access to.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-2 p-0">
           {isLoading && (
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Loading facilities…
@@ -130,7 +130,7 @@ export default function ManageFacilities() {
           {twins.map((t) => (
             <div
               key={t.id}
-              className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-md border border-border p-3"
+              className="v2-subpanel flex min-w-0 flex-wrap items-center justify-between gap-3"
             >
               <div className="min-w-[220px] flex-1">
                 <p className="flex flex-wrap items-center gap-2 text-sm font-medium text-foreground">
@@ -144,7 +144,7 @@ export default function ManageFacilities() {
                   {t.tier}
                   <span aria-hidden>·</span>
                   <Zap className="h-3 w-3" aria-hidden />
-                  {t.capacity_kw} kW
+                  <span className="v2-mono">{t.capacity_kw} kW</span>
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">

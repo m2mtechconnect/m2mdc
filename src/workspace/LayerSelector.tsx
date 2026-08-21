@@ -32,11 +32,12 @@ interface Props {
 
 export function LayerSelector({ value, onChange }: Props) {
   return (
-    <div className="flex items-center gap-1.5 rounded-md border border-border bg-card/90 px-2 py-1 backdrop-blur">
-      <Layers className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
+    <div className="flex items-center gap-1.5">
+      <Layers className="h-4 w-4 text-muted-foreground" aria-hidden />
+      <span className="hidden shrink-0 text-[12px] font-semibold uppercase tracking-wide text-muted-foreground lg:inline">Layer</span>
       <Select value={value} onValueChange={(v) => onChange(v as TwinOverlay | 'none')}>
         <SelectTrigger
-          className="h-7 w-[10.5rem] border-0 bg-transparent px-1 text-[12px] shadow-none focus:ring-1"
+          className="h-8 w-[10.5rem] border border-border bg-background px-2 text-[13px] font-medium text-foreground shadow-none focus:ring-2"
           aria-label="Model layer"
           data-testid="workspace-layer-selector"
         >

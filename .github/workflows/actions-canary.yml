@@ -1,15 +1,10 @@
 name: Actions Canary
 
 # Minimal GitHub Actions scheduler/runner diagnostic.
+# Manual/advisory only after the workflow-level concurrency incident was isolated.
 # No services, matrices, secrets, artifacts, dependencies or concurrency.
-# Its only purpose is to prove whether GitHub can instantiate and execute one
-# standard hosted-runner job for the current PR head.
 
 on:
-  pull_request:
-    branches: [main, develop]
-    paths:
-      - '.github/workflows/**'
   workflow_dispatch:
 
 permissions:

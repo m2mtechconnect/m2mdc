@@ -2,8 +2,8 @@ name: Release Target Verification
 
 # Provider-neutral verification after an external staging/production publish.
 # The build emits /release.json from the source checkout. This workflow proves
-# the requested source SHA builds and requires the live target to report the
-# exact same SHA before verification can pass.
+# the requested source SHA builds and requires the approved live target to report
+# the exact same SHA before verification can pass.
 
 on:
   workflow_dispatch:
@@ -132,26 +132,70 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Validate target URL
+      - name: Resolve and validate approved target origin
+        id: target
         shell: bash
+        env:
+          RELEASE_ENV: ${{ inputs.environment }}
+          STAGING_ORIGIN: ${{ vars.AURA_STAGING_ORIGIN }}
+          PRODUCTION_ORIGIN: https://auradc.m2mtechconnect.com
         run: |
-          case "$TARGET_URL" in
-            https://*) ;;
-            *) echo "Release verification requires an HTTPS target URL."; exit 1 ;;
+          case "$RELEASE_ENV" in
+            production) approved_origin="$PRODUCTION_ORIGIN" ;;
+            staging) approved_origin="$STAGING_ORIGIN" ;;
+            *) echo "Unsupported release environment: $RELEASE_ENV"; exit 1 ;;
           esac
+
+          if [ -z "$approved_origin" ]; then
+            echo "DEPLOYMENT_BLOCKED: approved origin is not configured for $RELEASE_ENV."
+            echo "Configure environment/repository variable AURA_STAGING_ORIGIN for staging."
+            exit 1
+          fi
+
+          APPROVED_ORIGIN="$approved_origin" node - <<'NODE'
+          const target = new URL(process.env.TARGET_URL);
+          const approved = new URL(process.env.APPROVED_ORIGIN);
+          if (target.protocol !== 'https:' || approved.protocol !== 'https:') {
+            throw new Error('Release verification requires HTTPS origins.');
+          }
+          if (target.username || target.password || approved.username || approved.password) {
+            throw new Error('Credentials in release target URLs are not allowed.');
+          }
+          if (target.origin !== approved.origin) {
+            throw new Error(`DEPLOYMENT_BLOCKED: target origin ${target.origin} is not approved origin ${approved.origin}`);
+          }
+          if (target.pathname !== '/' || target.search || target.hash) {
+            throw new Error('target_url must be the approved environment origin with no path, query or fragment.');
+          }
+          NODE
+
+          echo "approved_origin=$approved_origin" >> "$GITHUB_OUTPUT"
+          echo "Approved release origin: $approved_origin" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Fetch and verify live release fingerprint
         id: live_fingerprint
         shell: bash
+        env:
+          APPROVED_ORIGIN: ${{ steps.target.outputs.approved_origin }}
         run: |
           base="${TARGET_URL%/}"
           fingerprint_url="${base}/release.json?release_check=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           echo "Fetching $fingerprint_url"
-          curl --fail --location --silent --show-error --max-time 30 \
+          effective_url="$(curl --fail --location --silent --show-error --max-time 30 \
             --header 'Cache-Control: no-cache' \
             --header 'Pragma: no-cache' \
             --output live-release.json \
-            "$fingerprint_url"
+            --write-out '%{url_effective}' \
+            "$fingerprint_url")"
+
+          EFFECTIVE_URL="$effective_url" node - <<'NODE'
+          const effective = new URL(process.env.EFFECTIVE_URL);
+          const approved = new URL(process.env.APPROVED_ORIGIN);
+          if (effective.origin !== approved.origin) {
+            throw new Error(`DEPLOYMENT_BLOCKED: release fingerprint redirected to unapproved origin ${effective.origin}`);
+          }
+          NODE
+
           node - <<'NODE'
           const fs = require('fs');
           const payload = JSON.parse(fs.readFileSync('live-release.json', 'utf8'));
@@ -167,14 +211,25 @@ jobs:
           console.log(JSON.stringify(payload, null, 2));
           NODE
 
-      - name: Smoke published routes
+      - name: Smoke published routes without cross-origin redirects
         shell: bash
+        env:
+          APPROVED_ORIGIN: ${{ steps.target.outputs.approved_origin }}
         run: |
           base="${TARGET_URL%/}"
           for route in "/" "/manage/integrations" "/admin/platform-readiness"; do
             echo "Checking ${base}${route}"
-            curl --fail --location --silent --show-error --max-time 30 \
-              --output /dev/null "${base}${route}"
+            effective_url="$(curl --fail --location --silent --show-error --max-time 30 \
+              --output /dev/null \
+              --write-out '%{url_effective}' \
+              "${base}${route}")"
+            ROUTE="$route" EFFECTIVE_URL="$effective_url" node - <<'NODE'
+            const effective = new URL(process.env.EFFECTIVE_URL);
+            const approved = new URL(process.env.APPROVED_ORIGIN);
+            if (effective.origin !== approved.origin) {
+              throw new Error(`DEPLOYMENT_BLOCKED: ${process.env.ROUTE} redirected to unapproved origin ${effective.origin}`);
+            }
+            NODE
           done
 
       - name: Run pinned published SEO validation
@@ -199,13 +254,15 @@ jobs:
             liveBuildId: process.env.LIVE_BUILD_ID,
             liveBuiltAt: process.env.LIVE_BUILT_AT,
             targetUrl: process.env.TARGET_URL,
+            approvedOrigin: process.env.APPROVED_ORIGIN,
             deploymentReference: process.env.DEPLOYMENT_REFERENCE,
             verifiedAt: new Date().toISOString(),
             githubRunId: process.env.GITHUB_RUN_ID,
             githubRunAttempt: process.env.GITHUB_RUN_ATTEMPT,
             liveTargetResponded: true,
             deploymentShaBinding: 'PROVEN_BY_LIVE_RELEASE_FINGERPRINT',
-            note: 'The live target served a build-generated fingerprint whose source SHA exactly matched the qualified Git SHA.'
+            targetOriginBinding: 'PROVEN_BY_APPROVED_ORIGIN',
+            note: 'The live target served a build-generated fingerprint whose source SHA exactly matched the qualified Git SHA on the approved environment origin.'
           };
           fs.writeFileSync('release-verification/attestation.json', JSON.stringify(payload, null, 2));
           NODE
@@ -216,6 +273,7 @@ jobs:
           LIVE_SHA: ${{ steps.live_fingerprint.outputs.live_sha }}
           LIVE_BUILD_ID: ${{ steps.live_fingerprint.outputs.live_build_id }}
           LIVE_BUILT_AT: ${{ steps.live_fingerprint.outputs.live_built_at }}
+          APPROVED_ORIGIN: ${{ steps.target.outputs.approved_origin }}
 
       - name: Upload release verification attestation
         uses: actions/upload-artifact@v4
@@ -232,6 +290,7 @@ jobs:
             echo "### AURA release target verification"
             echo ""
             echo "- Environment: ${{ inputs.environment }}"
+            echo "- Approved origin: ${{ steps.target.outputs.approved_origin }}"
             echo "- Expected SHA: $EXPECTED_SHA"
             echo "- Built source SHA: ${{ needs.source-build.outputs.checked_sha }}"
             echo "- Build fingerprint SHA: ${{ needs.source-build.outputs.build_fingerprint_sha }}"
@@ -241,4 +300,5 @@ jobs:
             echo "- External deployment reference: $DEPLOYMENT_REFERENCE"
             echo "- Live route/SEO verification: passed"
             echo "- Deployment SHA binding: **proven by live build fingerprint**"
+            echo "- Target origin binding: **proven against approved environment origin**"
           } >> "$GITHUB_STEP_SUMMARY"

@@ -32,10 +32,6 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: twin-canvas-gpu-${{ github.ref }}
-  cancel-in-progress: true
-
 env:
   AURA_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -44,6 +40,9 @@ jobs:
     name: Twin canvas (software)
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    concurrency:
+      group: twin-canvas-software-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     env:
       AURA_GPU_LANE: software
       AURA_GPU_REQUIRED: '0'
@@ -90,6 +89,9 @@ jobs:
     runs-on: ubuntu-latest-gpu
     continue-on-error: true
     timeout-minutes: 25
+    concurrency:
+      group: twin-canvas-gpu-${{ github.ref }}
+      cancel-in-progress: false
     env:
       AURA_GPU_LANE: gpu
       AURA_GPU_REQUIRED: '1'
@@ -134,6 +136,9 @@ jobs:
   summary:
     name: Twin canvas matrix summary
     runs-on: ubuntu-latest
+    concurrency:
+      group: twin-canvas-summary-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     needs: [software, gpu]
     if: always()
     steps:

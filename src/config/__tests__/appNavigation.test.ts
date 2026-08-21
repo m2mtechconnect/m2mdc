@@ -114,11 +114,12 @@ describe('DSX lifecycle grouping', () => {
     expect(viewer.flatMap((g) => g.items.map((i) => i.href))).not.toContain('/settings/ai');
   });
 
-  it('exposes the admin capability registry only under Govern > Admin Console', () => {
-    const admin = MANAGE_NAV.find((i) => i.fullName === 'Admin Console')!;
+  it('exposes the admin capability registry only under Govern > Platform Admin', () => {
+    const admin = MANAGE_NAV.find((i) => i.fullName === 'Platform Administration')!;
     expect(admin.group).toBe('govern');
     expect(admin.children?.map((c) => c.href)).toContain('/admin/dsx-capabilities');
   });
+
 });
 
 describe('page positioning', () => {

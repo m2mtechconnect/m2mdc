@@ -72,10 +72,10 @@ export const PAGE_POSITIONING: PagePositioning[] = [
   },
   {
     route: '/manage/integrations',
-    title: 'Integrations',
+    title: 'Connections',
     purpose:
-      'Connect AURA to compute, network, storage, power, cooling, facility-control, grid and enterprise systems.',
-    breadcrumb: ['Operate', 'Integrations'],
+      'Connect facility systems, edge gateways, twin runtimes, storage and enterprise workflows to AURA.',
+    breadcrumb: ['Manage', 'Connections'],
     capabilityId: 'integrations',
   },
   {

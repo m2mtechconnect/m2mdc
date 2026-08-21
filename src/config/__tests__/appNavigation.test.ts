@@ -77,8 +77,10 @@ describe('canonical navigation', () => {
       'Facilities',
       'Connections',
     ]);
-    expect(visibleManageNav(() => true)).toHaveLength(MANAGE_NAV.length);
+    const designOrOperate = MANAGE_NAV.filter((i) => i.group === 'operate' || i.group === 'design');
+    expect(visibleManageNav(() => true)).toHaveLength(designOrOperate.length);
   });
+
 
 });
 

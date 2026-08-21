@@ -6,7 +6,6 @@
  */
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import m2mLogo from '@/assets/m2m-logo.png';
 
 const NVIDIA_GREEN = '#76B900';
 

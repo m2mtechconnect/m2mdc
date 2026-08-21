@@ -1,19 +1,9 @@
 /**
  * Authenticated shell core.
  *
- * Imported SYNCHRONOUSLY by App.tsx. A lazy shell boundary wrapping the
- * lazy route boundary reproduced an intermittent dropped Suspense retry
- * (11/24 navigations); eager shell + lazy page measured 0/24.
- *
- * This module may contain ONLY the structural application frame:
- * providers, Layout, navigation/footer/operating-state strip, the route
- * table, the route-level Suspense fallback and the route recovery
- * boundary. Every route page - including Dashboard - is lazy, so no page,
- * visualization or admin module enters the synchronous core.
- *
- * The /pilot/* surface is unaffected: the pilot bundle canary walks the
- * import graph from src/pilot/PilotShell.tsx, which never reaches this
- * module. Do NOT import this module from any file the pilot graph reaches.
+ * Imported synchronously inside the approved-user bundle. This module contains
+ * only the structural application frame, providers and route table; route
+ * pages remain lazy so heavy workspaces never enter the shell chunk.
  */
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import { AuthenticatedEntryRedirect } from "@/routing/AuthenticatedEntryRedirect";
@@ -33,18 +23,6 @@ import ReferenceRouteGate from '@/components/dataset/ReferenceRouteGate';
 import { AdminRouteGuard } from '@/routing/AdminRouteGuard';
 import NotFound from "./pages/NotFound";
 
-/**
- * Phase 11 - route-level code splitting.
- *
- * Every page below used to be a static import, so the single
- * AuthenticatedShell chunk (2.4 MB pre-split) had to download and parse
- * before the dashboard could paint - including the 3D twin stack, the admin
- * console and the Evidence workspaces that most sessions never open.
- *
- * Only Dashboard (the post-login landing route) and NotFound stay eager.
- * Everything else is fetched when its route is first visited.
- */
-// Route pages are lazy without exception - Dashboard included.
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Builder = lazy(() => import("./pages/Builder"));
 const Deploy = lazy(() => import("./pages/Deploy"));
@@ -81,10 +59,8 @@ const Profile = lazy(() => import("./pages/account/Profile"));
 const Settings = lazy(() => import("./pages/account/Settings"));
 const AccessControl = lazy(() => import("./pages/account/AccessControl"));
 
-/* Administration console - lazy AND permission-gated (AdminRouteGuard). */
+/* Administration console - lazy and permission-gated. */
 const OnboardingSubmissions = lazy(() => import("./pages/OnboardingSubmissions"));
-const AdminUserApproval = lazy(() => import("./pages/AdminUserApproval"));
-const AdminSignupsDashboard = lazy(() => import("./pages/AdminSignupsDashboard"));
 const PlatformReadiness = lazy(() => import("./pages/admin/PlatformReadiness"));
 const AssetPreview = lazy(() => import("@/pages/admin/AssetPreview"));
 const AssetPipeline = lazy(() => import("@/pages/admin/AssetPipeline"));
@@ -126,11 +102,7 @@ function TwinManageRedirect() {
 function ApprovedUserRoutes() {
   return (
     <Routes>
-      {/* Stage 6G: /dashboard is canonical; `/` redirects via ROUTE_ALIASES. */}
       <Route path="/dashboard" element={<Dashboard />} />
-      {/* PW-P2-05: signed-in users must never see a 404 on an auth entry
-          route. They are sent to their authorized default workspace, keeping
-          a safe same-origin return path when one was supplied. */}
       <Route path="/login" element={<AuthenticatedEntryRedirect />} />
       <Route path="/onboarding" element={<AuthenticatedEntryRedirect />} />
       <Route path="/builder" element={<Builder />} />
@@ -143,7 +115,6 @@ function ApprovedUserRoutes() {
       <Route path="/account/settings" element={<Settings />} />
       <Route path="/account/access-control" element={<AccessControl />} />
       <Route path="/admin/onboarding-submissions" element={<AdminRouteGuard><OnboardingSubmissions /></AdminRouteGuard>} />
-      <Route path="/admin/user-approvals" element={<AdminRouteGuard><AdminUserApproval /></AdminRouteGuard>} />
       <Route path="/admin/asset-preview" element={<AdminRouteGuard><AssetPreview /></AdminRouteGuard>} />
       <Route path="/admin/asset-pipeline" element={<AdminRouteGuard><AssetPipeline /></AdminRouteGuard>} />
       <Route path="/admin/asset-validation/:assetId" element={<AdminRouteGuard><AssetValidation /></AdminRouteGuard>} />
@@ -151,12 +122,9 @@ function ApprovedUserRoutes() {
         path="/admin/reference-facility-validation"
         element={<AdminRouteGuard><ReferenceFacilityValidation /></AdminRouteGuard>}
       />
-      <Route path="/admin/signups-dashboard" element={<AdminRouteGuard><AdminSignupsDashboard /></AdminRouteGuard>} />
       <Route path="/admin/dsx-capabilities" element={<AdminRouteGuard><DsxCapabilityRegistryPage /></AdminRouteGuard>} />
       <Route path="/admin/dataset-registry" element={<AdminRouteGuard><DatasetRegistryPage /></AdminRouteGuard>} />
       <Route path="/admin/platform-readiness" element={<AdminRouteGuard><PlatformReadiness /></AdminRouteGuard>} />
-      {/* Canonical connections destination. /manage/connections, /connect/*
-          and every legacy integrations path alias to it via ROUTE_ALIASES. */}
       <Route path="/manage/integrations" element={<Connections />} />
       <Route path="/manage/facilities" element={<ManageFacilities />} />
       <Route path="/compliance" element={<Compliance />} />
@@ -169,7 +137,6 @@ function ApprovedUserRoutes() {
       <Route path="/twins/:instanceId/manage" element={<TwinManageRedirect />} />
       <Route path="/studio/systems/:systemId/manage" element={<SystemManage />} />
       <Route path="/data-centre-twin/:id/blueprint" element={<Blueprint />} />
-      {/* `/blueprint/preview` must precede `/blueprint/:id` or it is swallowed. */}
       <Route path="/blueprint/preview" element={<BlueprintPreview />} />
       <Route path="/blueprint/:id" element={<Blueprint />} />
       <Route path="/simulation" element={<AuraWorkspace />} />
@@ -182,14 +149,11 @@ function ApprovedUserRoutes() {
       <Route path="/data-centre-twin" element={<DataCentreTwin />} />
       <Route path="/data-centre-twin/:id" element={<DataCentreTwin />} />
       <Route path="/twin-preview" element={<TwinPreview />} />
-      {/* Phase 2: tenant diagnostics expose twin ids, raw query state and
-          telemetry sources, so this is an administration surface rather than
-          a general internal one. */}
       <Route path="/twin-debug" element={<AdminRouteGuard><TwinDebug /></AdminRouteGuard>} />
       <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
       <Route path="/infrastructure" element={<InfrastructurePage />} />
-      {/* Stage 6F: every legacy alias resolves from one registry and keeps
-          its query string, so deep links survive consolidation. */}
+
+      {/* Legacy paths resolve through one compatibility registry. */}
       {ROUTE_ALIASES.map((alias) => (
         <Route
           key={alias.from}
@@ -197,10 +161,10 @@ function ApprovedUserRoutes() {
           element={<PreserveNavigate to={alias.to} />}
         />
       ))}
+
       <Route path="/dsx/evidence-beta" element={<EvidenceBetaShell />}>
         <Route index element={<OverviewWorkspace />} />
         <Route path="overview" element={<OverviewWorkspace />} />
-        {/* Canonical five-section Evidence IA (src/dsx/nav/evidenceNav.ts). */}
         <Route path="operations" element={<PreserveNavigate to="/dsx/evidence-beta/operations/thermal" />} />
         <Route path="operations/thermal" element={<ThermalWorkspace />} />
         <Route path="operations/power" element={<PowerWorkspace />} />
@@ -213,17 +177,6 @@ function ApprovedUserRoutes() {
         <Route path="decisions" element={<SimulationsWorkspace />} />
         <Route path="decisions/log" element={<EvidenceWorkspace />} />
         <Route path="assets" element={<FacilityWorkspace />} />
-        {/*
-          AURA_IA_DUP_CLEANUP: these legacy children used to mount the same
-          workspace components a second time, so every Evidence workspace had
-          two live URLs and two entries in analytics, deep links and the
-          dataset gate. They are now redirects: bookmarks keep working and the
-          query string is preserved, but the canonical five-section IA above
-          is the only address a workspace renders at. They are declared OUTSIDE
-          the shell route below: as shell children the Evidence workspace
-          provider mounted first and re-synchronised the legacy URL, which
-          cancelled the redirect and left the operator on a title-only page.
-        */}
       </Route>
       <Route path="/dsx/evidence-beta/thermal" element={<PreserveNavigate to="/dsx/evidence-beta/operations/thermal" />} />
       <Route path="/dsx/evidence-beta/power" element={<PreserveNavigate to="/dsx/evidence-beta/operations/power" />} />
@@ -245,7 +198,6 @@ function ApprovedUserRoutes() {
 }
 
 export default function AuthenticatedShell() {
-  // Scopes a failed route load to that route: navigating away clears it.
   const location = useLocation();
   return (
     <TourProvider>
@@ -258,17 +210,17 @@ export default function AuthenticatedShell() {
               <ReferenceRouteGate>
                 <RouteLoadRecovery resetKey={location.pathname}>
                   <Suspense
-                  fallback={
-                    <div
-                      role="status"
-                      aria-live="polite"
-                      className="p-6 text-sm text-muted-foreground"
-                    >
-                      Loading workspace...
-                    </div>
-                  }
-                >
-                  <ApprovedUserRoutes />
+                    fallback={
+                      <div
+                        role="status"
+                        aria-live="polite"
+                        className="p-6 text-sm text-muted-foreground"
+                      >
+                        Loading workspace...
+                      </div>
+                    }
+                  >
+                    <ApprovedUserRoutes />
                   </Suspense>
                 </RouteLoadRecovery>
               </ReferenceRouteGate>

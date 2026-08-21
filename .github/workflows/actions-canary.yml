@@ -1,0 +1,30 @@
+name: Actions Canary
+
+# Minimal GitHub Actions scheduler/runner diagnostic.
+# No services, matrices, secrets, artifacts, dependencies or concurrency.
+# Its only purpose is to prove whether GitHub can instantiate and execute one
+# standard hosted-runner job for the current PR head.
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    name: Actions scheduler canary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Report scheduler health
+        shell: bash
+        run: |
+          echo "ACTIONS_CANARY_OK"
+          echo "event=${GITHUB_EVENT_NAME}"
+          echo "sha=${GITHUB_SHA}"
+          echo "ref=${GITHUB_REF}"

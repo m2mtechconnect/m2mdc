@@ -150,7 +150,7 @@ export function FacilityCanvas({ facility }: Props) {
 
   return (
     <TooltipProvider delayDuration={200}>
-    <div className="relative h-full min-h-0 w-full min-w-0 overflow-hidden bg-background" data-testid="facility-model-canvas">
+    <div className="v2-canvas-deep relative h-full min-h-0 w-full min-w-0 overflow-hidden" data-testid="facility-model-canvas">
       <div ref={hostRef} className="h-full w-full" data-model-state={modelState}>
         {viewMode === '3d' ? (
           <SimulationErrorBoundary

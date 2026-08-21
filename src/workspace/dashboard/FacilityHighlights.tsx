@@ -74,7 +74,7 @@ export function FacilityHighlights({
     <section
       aria-labelledby="facility-highlights-heading"
       data-testid="facility-highlights"
-      className="min-w-0 overflow-hidden rounded-lg border border-border bg-card shadow-[0_1px_3px_0_hsl(214_25%_20%/0.08)]"
+      className="v2-panel min-w-0 overflow-hidden p-0"
     >
       <div className="flex min-w-0 flex-wrap items-start justify-between gap-3 p-4">
         <div className="flex min-w-0 flex-1 items-start gap-3.5">
@@ -85,12 +85,12 @@ export function FacilityHighlights({
             <Building2 className="h-[22px] w-[22px]" strokeWidth={1.75} />
           </span>
           <div className="min-w-0">
-            <p className="hidden text-[12px] font-semibold uppercase tracking-wider text-muted-foreground sm:block">
+            <p className="v2-label hidden sm:block">
               Data centre facility
             </p>
             <h1
               id="facility-highlights-heading"
-              className="mt-0.5 break-words text-[20px] font-bold leading-tight text-foreground sm:text-[24px]"
+              className="v2-command-title mt-0.5 break-words"
             >
               {facilityName}
             </h1>
@@ -162,7 +162,7 @@ export function FacilityHighlights({
 
       {/* Primary indicators as divided cells inside the same surface. */}
       <div
-        className="grid min-w-0 grid-cols-2 border-t border-border min-[960px]:grid-cols-4"
+        className="grid min-w-0 grid-cols-2 border-t border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-canvas-deep))]/60 min-[960px]:grid-cols-4"
         role="group"
         aria-label="Facility highlights"
       >
@@ -174,7 +174,7 @@ export function FacilityHighlights({
               data-testid={`command-kpi-${kpi.key}`}
               data-state={kpi.state}
               className={cn(
-                'flex min-h-[84px] min-w-0 flex-col border-border px-3 py-2.5 sm:px-4 sm:py-3',
+                'flex min-h-[92px] min-w-0 flex-col border-[hsl(var(--v2-line))] px-3 py-2.5 sm:px-4 sm:py-3',
                 index % 2 === 1 ? 'border-l' : '',
                 index >= 2 ? 'border-t min-[960px]:border-t-0' : '',
                 'min-[960px]:border-l min-[960px]:first:border-l-0',
@@ -187,10 +187,10 @@ export function FacilityHighlights({
                 onClick={() => onSelectKpi(kpi)}
                 className="min-w-0 rounded-sm text-left transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <span className="block break-words text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
+                <span className="v2-label block break-words">
                   {kpi.label}
                 </span>
-                <span className="mt-1 block break-words text-[24px] font-bold tabular-nums leading-none text-foreground">
+                <span className="v2-metric v2-metric-secondary mt-1 block break-words">
                   {kpi.value}
                 </span>
                 <span className="mt-1.5 flex items-start gap-1.5 text-[13px] font-semibold text-foreground">

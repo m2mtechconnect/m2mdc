@@ -35,7 +35,7 @@ export function KpiStrip({ facility, overrides }: Props) {
   return (
     <TooltipProvider delayDuration={200}>
       <div
-        className="flex w-full min-w-0 shrink-0 gap-2 overflow-x-auto border-t border-border bg-card px-2 py-2"
+        className="v2-mono flex w-full min-w-0 shrink-0 gap-2 overflow-x-auto border-t border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-canvas-deep))] px-2 py-2"
         role="group"
         aria-label="Modelled key performance indicators"
         data-testid="workspace-kpi-strip"
@@ -65,20 +65,23 @@ export function KpiStrip({ facility, overrides }: Props) {
             className={cn(
               'min-w-[10rem] flex-1 shrink-0 rounded-md border px-3 py-2 text-left transition-colors',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
-              selected ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50 hover:bg-muted/60',
+              selected
+                ? 'border-primary bg-primary/10'
+                : 'border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-panel))] hover:border-primary/50 hover:bg-[hsl(var(--v2-panel-elevated))]',
             )}
             aria-label={`${descriptor.label}: ${displayValue}.${
               run && !designActive ? ` ${noChange ? 'No change' : `Change ${deltaText}, ${direction}`}.` : ''
             } Open evidence.`}
           >
-            <span className="block truncate text-xs uppercase tracking-wide text-muted-foreground">
+            <span className="v2-label block truncate">
               {descriptor.label}
             </span>
             <span className="mt-0.5 flex flex-wrap items-baseline gap-x-2">
               <span
                 className={cn(
                   'font-semibold tabular-nums',
-                  designActive ? 'text-sm text-muted-foreground' : 'text-xl text-foreground',
+                  'v2-mono',
+                  designActive ? 'text-sm text-muted-foreground' : 'v2-metric v2-metric-compact text-foreground',
                 )}
               >
                 {displayValue}

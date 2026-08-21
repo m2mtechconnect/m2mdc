@@ -110,12 +110,25 @@ export function BlueprintModelWorkspace({
   const controlsPath = (sub: string) => `${blueprintPath}?tab=controls&sub=${sub}`;
 
   return (
-    <div className="space-y-3" data-testid="blueprint-model-workspace">
-      {/* The visualization is the dominant element of the first viewport. */}
-      <BlueprintModelSection facilityOverride={facilityOverride} />
+    <div
+      className="grid min-w-0 gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(320px,26%)]"
+      data-testid="blueprint-model-workspace"
+    >
+      {/* The twin viewport is the dominant surface of the workspace. */}
+      <div className="min-w-0 space-y-3">
+        <div className="v2-viewport min-w-0 overflow-hidden p-0">
+          <BlueprintModelSection facilityOverride={facilityOverride} />
+        </div>
+        <div className="v2-telemetry-rail min-w-0">
+          <OperatorSummaryStrip metrics={metrics} />
+        </div>
+      </div>
 
-      <OperatorSummaryStrip metrics={metrics} />
-
+      {/* Contextual inspector: attention queue, model detail, provenance. */}
+      <aside
+        className="v2-panel min-w-0 space-y-3 p-3 xl:max-h-[calc(100dvh-13rem)] xl:overflow-y-auto"
+        aria-label="Blueprint inspector"
+      >
       <RequiresAttentionPanel items={attention} defaultOpen={shouldExpandAttention(attention)} />
 
       <ModelDetailSection
@@ -224,6 +237,7 @@ export function BlueprintModelWorkspace({
           />
         </ul>
       </ModelDetailSection>
+      </aside>
     </div>
   );
 }

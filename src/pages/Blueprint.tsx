@@ -231,11 +231,11 @@ export default function Blueprint() {
 
   return (
     <BlueprintDesignerWrapper twinId={blueprintId}>
-      <div className="min-h-dvh bg-background">
+      <div className="min-h-dvh v2-canvas">
         <div className="flex min-w-0">
           {/* Main Content */}
           <div className={`flex-1 min-w-0 transition-all duration-300 ${showCoPilotPanel ? 'lg:mr-96' : ''}`}>
-            <div className="container mx-auto py-4 px-4 max-w-7xl">
+            <div className="mx-auto min-w-0 max-w-[1800px] px-4 py-4">
               {/*
                 Stage 7J: a single compact header. Identity, facility facts and
                 every Blueprint action live here so the modelling workspace
@@ -287,7 +287,7 @@ export default function Blueprint() {
               <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList
                   aria-label={t('blueprint.tabs.listLabel')}
-                  className="w-full justify-start border-b rounded-none bg-transparent p-0 h-auto flex-wrap gap-1"
+                  className="w-full justify-start rounded-none border-b border-[hsl(var(--v2-line))] bg-transparent p-0 h-auto flex-wrap gap-1"
                 >
                   {[
                     { value: 'model', label: t('blueprint.tabs.model') },
@@ -300,7 +300,7 @@ export default function Blueprint() {
                       key={tab.value}
                       value={tab.value}
                       data-blueprint-tab={tab.value}
-                      className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2.5 text-muted-foreground data-[state=active]:text-foreground hover:text-foreground transition-all duration-200 data-[state=active]:font-medium"
+                      className="relative rounded-none border-b-2 border-transparent px-4 py-2.5 text-[13px] uppercase tracking-wide text-muted-foreground transition-all duration-200 hover:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:font-semibold data-[state=active]:text-foreground"
                     >
                       {tab.label}
                       {activeTab === tab.value && (
@@ -313,7 +313,7 @@ export default function Blueprint() {
                   ))}
                 </TabsList>
 
-                <div className="mt-6">
+                <div className="mt-4">
                   <TabsContent value="model" className="m-0">
                     {/* Stage 7K: operator workspace, not a full system report. */}
                     <BlueprintModelWorkspace

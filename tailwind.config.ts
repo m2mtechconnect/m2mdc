@@ -134,7 +134,26 @@ export default {
           "gold-dark": "hsl(var(--m2m-gold-dark))",
           black: "hsl(var(--m2m-black))",
         },
+        // AURA Visual System V2 — semantic surfaces + state hues
+        surface: {
+          canvas: "hsl(var(--v2-canvas))",
+          deep: "hsl(var(--v2-canvas-deep))",
+          panel: "hsl(var(--v2-panel))",
+          elevated: "hsl(var(--v2-panel-elevated))",
+          inspector: "hsl(var(--v2-inspector))",
+          rail: "hsl(var(--v2-rail))",
+          line: "hsl(var(--v2-line))",
+          "line-strong": "hsl(var(--v2-line-strong))",
+        },
+        state: {
+          verified: "hsl(var(--v2-verified))",
+          simulated: "hsl(var(--v2-simulated))",
+          info: "hsl(var(--v2-info))",
+          critical: "hsl(var(--v2-critical))",
+          neutral: "hsl(var(--v2-neutral))",
+        },
       },
+
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],

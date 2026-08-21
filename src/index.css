@@ -1066,13 +1066,26 @@ html:not(.dark) .aura-workspace-theme {
   --v2-line: 214 18% 87%;
   --v2-line-strong: 214 16% 78%;
 
-  /* ---- NVIDIA-style technical chrome (header, viewport, telemetry) ---- */
+  /* ---- NVIDIA-style technical chrome (viewport, telemetry, diagnostics) ---- */
   --v2-graphite: 220 7% 12%;          /* #1E1E1E family */
   --v2-graphite-elevated: 220 7% 17%;
   --v2-graphite-deep: 220 9% 7%;
   --v2-graphite-line: 220 7% 26%;
   --v2-graphite-fg: 210 16% 94%;
-  --v2-graphite-muted: 214 10% 72%;
+  --v2-graphite-muted: 214 12% 80%;
+
+  /* ---- Global application header (Salesforce-style light app bar) ---- */
+  --v2-header: 0 0% 100%;
+  --v2-header-elevated: 210 24% 96%;
+  --v2-header-fg: 220 28% 14%;
+  --v2-header-muted: 218 16% 32%;
+  --v2-header-line: 214 18% 86%;
+
+  /* ---- Interaction / control roles ---- */
+  --v2-focus: 82 100% 24%;
+  --v2-disabled-fg: 215 12% 52%;
+  --v2-disabled-bg: 213 20% 94%;
+  --v2-placeholder: 215 14% 44%;
 
   /* ---- Technical accent (NVIDIA green family, #76B900) ---- */
   --v2-tech: 82 100% 36%;             /* bright technical accent */

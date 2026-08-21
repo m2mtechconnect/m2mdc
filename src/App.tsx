@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, lazy, Suspense, type ReactNode } from "react";
 import { boundedRetryDelay, retryUnlessTerminal } from '@/lib/queryRetry';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -16,14 +16,8 @@ import { fetchProfileFields } from "@/lib/auth/profileQuery";
 import type { Session, User } from "@supabase/supabase-js";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
 import { initChangeLogMiddleware } from "@/stores/dcBuilderChangeLogMiddleware";
-import { SignIn, SignUp, SignOut, ForgotPassword, MFA, AuthCallback } from "./pages/auth/index";
 import DataCentreTwinLanding from "./pages/DataCentreTwinLanding";
-import Onboarding from "./pages/Onboarding";
-import PendingApproval from "./pages/PendingApproval";
 import BoundedLoading from "@/components/shared/BoundedLoading";
-import ManagedUserReturn from '@/pages/oauth/ManagedUserReturn';
-import InviteAccept from './pages/InviteAccept';
-import { InviteSignInRedirect } from '@/routing/InviteSignInRedirect';
 import { MANAGED_USER_RETURN_PATH } from '@/connections/managedUserBinding';
 
 const OverlayFixtures = import.meta.env.DEV
@@ -36,10 +30,29 @@ const TwinPreview = lazy(() => import("./pages/TwinPreview"));
 // nested shell/route Suspense retry failure while shrinking the public entry.
 const ApprovedUserRouter = lazy(() => import("./ApprovedUserRouter"));
 
+const loadAuthPages = () => import("./pages/auth/index");
+const SignIn = lazy(() => loadAuthPages().then((module) => ({ default: module.SignIn })));
+const SignUp = lazy(() => loadAuthPages().then((module) => ({ default: module.SignUp })));
+const SignOut = lazy(() => loadAuthPages().then((module) => ({ default: module.SignOut })));
+const ForgotPassword = lazy(() => loadAuthPages().then((module) => ({ default: module.ForgotPassword })));
+const MFA = lazy(() => loadAuthPages().then((module) => ({ default: module.MFA })));
+const AuthCallback = lazy(() => loadAuthPages().then((module) => ({ default: module.AuthCallback })));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const PendingApproval = lazy(() => import("./pages/PendingApproval"));
+const ManagedUserReturn = lazy(() => import('@/pages/oauth/ManagedUserReturn'));
+const InviteAccept = lazy(() => import('./pages/InviteAccept'));
+const InviteSignInRedirect = lazy(() =>
+  import('@/routing/InviteSignInRedirect').then((module) => ({ default: module.InviteSignInRedirect })),
+);
+
 const publicRouteFallback = (
   <div className="flex min-h-dvh items-center justify-center" role="status" aria-live="polite">
     <span className="text-sm text-muted-foreground">Loading experience…</span>
   </div>
+);
+
+const withPublicRouteFallback = (element: ReactNode) => (
+  <Suspense fallback={publicRouteFallback}>{element}</Suspense>
 );
 
 // Initialize changelog middleware for builder store
@@ -129,14 +142,14 @@ function AuthenticatedApp() {
     return (
       <Routes>
         <Route path="/" element={<DataCentreTwinLanding />} />
-        <Route path="/auth" element={onboardingDone ? <SignIn /> : <Navigate to="/onboarding" replace />} />
-        <Route path="/login" element={<SignIn />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
-        <Route path="/sign-in" element={onboardingDone ? <SignIn /> : <Navigate to="/onboarding" replace />} />
-        <Route path="/sign-up" element={onboardingDone ? <SignUp /> : <Navigate to="/onboarding" replace />} />
-        <Route path="/sign-out" element={<SignOut />} />
-        <Route path="/forgot-password" element={onboardingDone ? <ForgotPassword /> : <Navigate to="/onboarding" replace />} />
-        <Route path="/mfa" element={onboardingDone ? <MFA /> : <Navigate to="/onboarding" replace />} />
+        <Route path="/auth" element={onboardingDone ? withPublicRouteFallback(<SignIn />) : <Navigate to="/onboarding" replace />} />
+        <Route path="/login" element={withPublicRouteFallback(<SignIn />)} />
+        <Route path="/auth/callback" element={withPublicRouteFallback(<AuthCallback />)} />
+        <Route path="/sign-in" element={onboardingDone ? withPublicRouteFallback(<SignIn />) : <Navigate to="/onboarding" replace />} />
+        <Route path="/sign-up" element={onboardingDone ? withPublicRouteFallback(<SignUp />) : <Navigate to="/onboarding" replace />} />
+        <Route path="/sign-out" element={withPublicRouteFallback(<SignOut />)} />
+        <Route path="/forgot-password" element={onboardingDone ? withPublicRouteFallback(<ForgotPassword />) : <Navigate to="/onboarding" replace />} />
+        <Route path="/mfa" element={onboardingDone ? withPublicRouteFallback(<MFA />) : <Navigate to="/onboarding" replace />} />
         <Route path="/twin-datacentre" element={<DataCentreTwinLanding />} />
         <Route
           path="/data-centre-twin"
@@ -156,9 +169,9 @@ function AuthenticatedApp() {
         />
         {/* Phase 5: AURA renders this preview; the legacy vendor-named path redirects. */}
         <Route path="/omniverse-scene" element={<Navigate to="/twin-preview" replace />} />
-        <Route path="/onboarding" element={<Onboarding />} />
-        <Route path={MANAGED_USER_RETURN_PATH} element={<ManagedUserReturn />} />
-        <Route path="/invite/accept" element={<InviteSignInRedirect />} />
+        <Route path="/onboarding" element={withPublicRouteFallback(<Onboarding />)} />
+        <Route path={MANAGED_USER_RETURN_PATH} element={withPublicRouteFallback(<ManagedUserReturn />)} />
+        <Route path="/invite/accept" element={withPublicRouteFallback(<InviteSignInRedirect />)} />
         {import.meta.env.DEV && OverlayFixtures ? <Route path="/dev-overlays" element={<OverlayFixtures />} /> : null}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -169,9 +182,9 @@ function AuthenticatedApp() {
   if (!isApproved) {
     return (
       <Routes>
-        <Route path="/sign-out" element={<SignOut />} />
-        <Route path="/invite/accept" element={<InviteAccept />} />
-        <Route path="*" element={<PendingApproval />} />
+        <Route path="/sign-out" element={withPublicRouteFallback(<SignOut />)} />
+        <Route path="/invite/accept" element={withPublicRouteFallback(<InviteAccept />)} />
+        <Route path="*" element={withPublicRouteFallback(<PendingApproval />)} />
       </Routes>
     );
   }

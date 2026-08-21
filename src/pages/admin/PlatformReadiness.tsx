@@ -4,13 +4,21 @@
  */
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { NvidiaDsxReadinessPanel } from '@/components/integrations/NvidiaDsxReadinessPanel';
 import { ClipboardCheck } from 'lucide-react';
 import { DsxExchangeTab } from '@/components/connections/DsxExchangeTab';
 import { AgentToolsTab } from '@/components/connections/AgentToolsTab';
 import { ManagedConnectorInventory } from '@/components/connections/ManagedConnectorInventory';
+import {
+  CommandHeader,
+  SectionHeader,
+  Panel,
+  SubPanel,
+  Instrument,
+  InstrumentGrid,
+  ProvenanceBadgeV2,
+  type TruthState,
+} from '@/components/v2';
 
 interface Capability {
   domain: string;

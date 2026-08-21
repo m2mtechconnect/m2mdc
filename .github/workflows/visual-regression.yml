@@ -11,6 +11,11 @@ on:
       - 'playwright.visual.config.ts'
       - 'tailwind.config.ts'
       - '.github/workflows/visual-regression.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -40,6 +45,8 @@ jobs:
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.3'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -52,53 +59,74 @@ jobs:
       - name: Install Playwright
         run: bunx playwright install --with-deps
 
-      - name: Run visual regression tests
+      - name: Compare approved visual baselines
+        id: compare
+        continue-on-error: true
         run: bunx playwright test --config=playwright.visual.config.ts
+
+      - name: Generate fresh current-head screenshots for human review
+        id: capture
+        if: always()
+        shell: bash
+        run: |
+          rm -rf visual-current-head
+          mkdir -p visual-current-head
+
+          set +e
+          bunx playwright test --config=playwright.visual.config.ts --update-snapshots
+          capture_status=$?
+          set -e
+
+          while IFS= read -r -d '' file; do
+            mkdir -p "visual-current-head/$(dirname "$file")"
+            cp "$file" "visual-current-head/$file"
+          done < <(find tests/visual -type f -name '*.png' -print0)
+
+          echo "capture_status=$capture_status" >> "$GITHUB_OUTPUT"
+          echo "Fresh screenshots are review evidence only. This job never commits or pushes baselines." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload visual diff artifacts
         uses: actions/upload-artifact@v4
-        if: failure()
+        if: steps.compare.outcome == 'failure'
         with:
           name: visual-regression-diffs
           path: test-results/
           retention-days: 30
 
+      - name: Upload current-head visual review artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-current-head-${{ github.sha }}
+          path: visual-current-head/
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Comment PR with visual diffs
-        if: failure()
+        if: github.event_name == 'pull_request' && steps.compare.outcome == 'failure'
         uses: actions/github-script@v7
         with:
           script: |
-            const fs = require('fs');
-
-            const diffDir = 'test-results';
-            if (!fs.existsSync(diffDir)) {
-              return;
-            }
-
-            const diffs = fs.readdirSync(diffDir)
-              .filter(f => f.endsWith('-diff.png'));
-
-            if (diffs.length === 0) {
-              return;
-            }
-
-            const comment = `### ⚠️ Visual Regression Detected\n\n` +
-              `${diffs.length} screenshot(s) have changed.\n\n` +
-              `Please review the visual differences in the artifacts.`;
-
-            github.rest.issues.createComment({
+            const body = `### ⚠️ Visual Regression Detected\n\nThe approved baselines do not match this head. Review the \`visual-regression-diffs\` artifact together with the fresh \`visual-current-head-${context.sha}\` artifact. Baseline acceptance requires explicit human approval; this workflow cannot commit snapshots.`;
+            await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: comment
+              body,
             });
 
-      - name: Update baselines (if approved)
-        if: failure() && contains(github.event.pull_request.labels.*.name, 'update-snapshots')
+      - name: Enforce visual gate
+        if: always()
+        shell: bash
         run: |
-          bunx playwright test --config=playwright.visual.config.ts --update-snapshots
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add tests/visual/**/*.png
-          git commit -m "Update visual regression baselines" || exit 0
-          git push
+          if [ "${{ steps.capture.outputs.capture_status }}" != "0" ]; then
+            echo "Fresh screenshot generation failed. Human-review evidence is incomplete."
+            exit 1
+          fi
+
+          if [ "${{ steps.compare.outcome }}" != "success" ]; then
+            echo "Approved visual baselines differ from the current head."
+            exit 1
+          fi
+
+          echo "Visual comparison passed and fresh current-head review evidence was uploaded."

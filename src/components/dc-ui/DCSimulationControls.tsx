@@ -82,6 +82,7 @@ export function DCSimulationControls({
                   variant="ghost"
                   size="icon"
                   onClick={onReset}
+                  aria-label="Reset simulation"
                   className="h-9 w-9"
                 >
                   <RotateCcw className="h-4 w-4" />
@@ -98,6 +99,7 @@ export function DCSimulationControls({
                     variant="ghost"
                     size="icon"
                     onClick={onStepBack}
+                    aria-label="Previous event"
                     className="h-9 w-9"
                     disabled={state === 'idle'}
                   >
@@ -113,6 +115,7 @@ export function DCSimulationControls({
               <TooltipTrigger asChild>
                 <Button
                   onClick={isPlaying ? onPause : onPlay}
+                  aria-label={isPlaying ? 'Pause simulation' : 'Play simulation'}
                   size="icon"
                   className={cn(
                     'h-10 w-10',
@@ -138,6 +141,7 @@ export function DCSimulationControls({
                     variant="ghost"
                     size="icon"
                     onClick={onStepForward}
+                    aria-label="Next event"
                     className="h-9 w-9"
                     disabled={state === 'idle' || isCompleted}
                   >

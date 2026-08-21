@@ -46,6 +46,8 @@ const AgentDetail = lazy(() => import("./pages/AgentDetail"));
 const Profile = lazy(() => import("./pages/account/Profile"));
 const Settings = lazy(() => import("./pages/account/Settings"));
 const AccessControl = lazy(() => import("./pages/account/AccessControl"));
+const PeopleAccessLayout = lazy(() => import("./pages/people/PeopleAccessLayout"));
+const AdminConsoleLayout = lazy(() => import("./pages/admin/AdminConsoleLayout"));
 
 const OnboardingSubmissions = lazy(() => import("./pages/OnboardingSubmissions"));
 const PlatformReadiness = lazy(() => import("./pages/admin/PlatformReadiness"));
@@ -95,17 +97,20 @@ function ApprovedUserRoutes() {
       <Route path="/account/profile" element={<Profile />} />
       <Route path="/account/settings" element={<Settings />} />
 
-      <Route path="/teams" element={<Teams />} />
-      <Route path="/teams/access-control" element={<AccessControl />} />
-      <Route path="/teams/onboarding" element={<AdminRouteGuard><OnboardingSubmissions /></AdminRouteGuard>} />
+      <Route path="/teams" element={<PeopleAccessLayout><Teams /></PeopleAccessLayout>} />
+      <Route path="/teams/access-control" element={<PeopleAccessLayout><AccessControl /></PeopleAccessLayout>} />
+      <Route
+        path="/teams/onboarding"
+        element={<AdminRouteGuard><PeopleAccessLayout><OnboardingSubmissions /></PeopleAccessLayout></AdminRouteGuard>}
+      />
 
-      <Route path="/admin/asset-preview" element={<AdminRouteGuard><AssetPreview /></AdminRouteGuard>} />
-      <Route path="/admin/asset-pipeline" element={<AdminRouteGuard><AssetPipeline /></AdminRouteGuard>} />
-      <Route path="/admin/asset-validation/:assetId" element={<AdminRouteGuard><AssetValidation /></AdminRouteGuard>} />
-      <Route path="/admin/reference-facility-validation" element={<AdminRouteGuard><ReferenceFacilityValidation /></AdminRouteGuard>} />
-      <Route path="/admin/dsx-capabilities" element={<AdminRouteGuard><DsxCapabilityRegistryPage /></AdminRouteGuard>} />
-      <Route path="/admin/dataset-registry" element={<AdminRouteGuard><DatasetRegistryPage /></AdminRouteGuard>} />
-      <Route path="/admin/platform-readiness" element={<AdminRouteGuard><PlatformReadiness /></AdminRouteGuard>} />
+      <Route path="/admin/asset-preview" element={<AdminRouteGuard><AdminConsoleLayout><AssetPreview /></AdminConsoleLayout></AdminRouteGuard>} />
+      <Route path="/admin/asset-pipeline" element={<AdminRouteGuard><AdminConsoleLayout><AssetPipeline /></AdminConsoleLayout></AdminRouteGuard>} />
+      <Route path="/admin/asset-validation/:assetId" element={<AdminRouteGuard><AdminConsoleLayout><AssetValidation /></AdminConsoleLayout></AdminRouteGuard>} />
+      <Route path="/admin/reference-facility-validation" element={<AdminRouteGuard><AdminConsoleLayout><ReferenceFacilityValidation /></AdminConsoleLayout></AdminRouteGuard>} />
+      <Route path="/admin/dsx-capabilities" element={<AdminRouteGuard><AdminConsoleLayout><DsxCapabilityRegistryPage /></AdminConsoleLayout></AdminRouteGuard>} />
+      <Route path="/admin/dataset-registry" element={<AdminRouteGuard><AdminConsoleLayout><DatasetRegistryPage /></AdminConsoleLayout></AdminRouteGuard>} />
+      <Route path="/admin/platform-readiness" element={<AdminRouteGuard><AdminConsoleLayout><PlatformReadiness /></AdminConsoleLayout></AdminRouteGuard>} />
 
       <Route path="/manage/integrations" element={<Connections />} />
       <Route path="/manage/facilities" element={<ManageFacilities />} />
@@ -126,7 +131,7 @@ function ApprovedUserRoutes() {
       <Route path="/settings/ai" element={<AISettings />} />
       <Route path="/sign-out" element={<SignOut />} />
       <Route path="/twin-preview" element={<TwinPreview />} />
-      <Route path="/twin-debug" element={<AdminRouteGuard><TwinDebug /></AdminRouteGuard>} />
+      <Route path="/twin-debug" element={<AdminRouteGuard><AdminConsoleLayout><TwinDebug /></AdminConsoleLayout></AdminRouteGuard>} />
       <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
 
       {ROUTE_ALIASES.map((alias) => (

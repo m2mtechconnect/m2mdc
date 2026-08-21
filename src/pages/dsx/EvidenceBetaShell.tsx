@@ -75,7 +75,7 @@ function RelatedWorkspaces() {
 
   return (
     <section aria-label="Related workspaces" data-testid="dsx-related-workspaces" className="pt-8">
-      <h2 className="pb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+      <h2 className="pb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         Continue this investigation
       </h2>
       <div className="flex flex-wrap gap-2">
@@ -131,7 +131,7 @@ function ScopeNode({ node, depth }: { node: HierarchyNode; depth: number }) {
           data-testid={`dsx-scope-${node.asset.source_asset_id}`}
           aria-current={selected ? 'true' : undefined}
           className={cn(
-            'min-w-0 flex-1 truncate rounded-sm px-1.5 py-1 text-left text-[11px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            'min-w-0 flex-1 truncate rounded-sm px-1.5 py-1 text-left text-[13px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
             selected ? 'bg-primary/15 font-semibold text-foreground' : 'text-muted-foreground hover:bg-muted/60',
           )}
         >
@@ -164,7 +164,7 @@ function WorkspaceNav() {
       <div className="flex min-w-max gap-4 lg:block lg:min-w-0">
       {NAV.map((g) => (
         <div key={g.group} className="pb-0 lg:pb-4">
-          <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {g.group}
           </p>
           <ul className="flex gap-1 lg:block lg:space-y-0.5">
@@ -201,7 +201,7 @@ function WorkspaceNav() {
       ))}
       </div>
       <div className="hidden lg:block">
-        <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Facility scope
         </p>
         <ScopeTree nodes={buildHierarchy()} />
@@ -218,7 +218,7 @@ function WorkspaceHeader() {
 
   return (
     <header className="v2-command-header mb-4">
-      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-[11px] text-muted-foreground">
+      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
         <Link
           to={hrefWithContext(DSX_ROOT)}
           className="rounded-sm underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"

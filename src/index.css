@@ -1066,13 +1066,26 @@ html:not(.dark) .aura-workspace-theme {
   --v2-line: 214 18% 87%;
   --v2-line-strong: 214 16% 78%;
 
-  /* ---- NVIDIA-style technical chrome (header, viewport, telemetry) ---- */
+  /* ---- NVIDIA-style technical chrome (viewport, telemetry, diagnostics) ---- */
   --v2-graphite: 220 7% 12%;          /* #1E1E1E family */
   --v2-graphite-elevated: 220 7% 17%;
   --v2-graphite-deep: 220 9% 7%;
   --v2-graphite-line: 220 7% 26%;
   --v2-graphite-fg: 210 16% 94%;
-  --v2-graphite-muted: 214 10% 72%;
+  --v2-graphite-muted: 214 12% 80%;
+
+  /* ---- Global application header (Salesforce-style light app bar) ---- */
+  --v2-header: 0 0% 100%;
+  --v2-header-elevated: 210 24% 96%;
+  --v2-header-fg: 220 28% 14%;
+  --v2-header-muted: 218 16% 32%;
+  --v2-header-line: 214 18% 86%;
+
+  /* ---- Interaction / control roles ---- */
+  --v2-focus: 82 100% 24%;
+  --v2-disabled-fg: 215 12% 52%;
+  --v2-disabled-bg: 213 20% 94%;
+  --v2-placeholder: 215 14% 44%;
 
   /* ---- Technical accent (NVIDIA green family, #76B900) ---- */
   --v2-tech: 82 100% 36%;             /* bright technical accent */
@@ -1081,7 +1094,7 @@ html:not(.dark) .aura-workspace-theme {
 
   /* ---- Semantic state hues (AA on light surfaces) ---- */
   --v2-verified: 82 100% 27%;   /* verified / runtime-ready */
-  --v2-simulated: 33 92% 38%;   /* simulated / estimated / watch */
+  --v2-simulated: 33 94% 31%;   /* simulated / estimated / watch (AA on light canvas) */
   --v2-info: 210 92% 38%;       /* informational telemetry / links */
   --v2-critical: 358 68% 45%;   /* genuine blockers only */
   --v2-neutral: 215 12% 42%;    /* not assessed */
@@ -1141,24 +1154,41 @@ html:not(.dark) .aura-workspace-theme {
 }
 
 @layer components {
-  /* ---------- 1. Global chrome (dark graphite) ---------- */
+  /* ---------- 1. Global chrome (light enterprise app bar) ---------- */
   .v2-appbar {
-    background-color: hsl(var(--v2-graphite));
-    border-bottom: 1px solid hsl(var(--v2-graphite-line));
-    color: hsl(var(--v2-graphite-fg));
+    background-color: hsl(var(--v2-header));
+    border-bottom: 1px solid hsl(var(--v2-header-line));
+    color: hsl(var(--v2-header-fg));
   }
   .v2-appbar-link {
-    color: hsl(var(--v2-graphite-muted));
+    color: hsl(var(--v2-header-muted));
     font-size: 14px;
     font-weight: 500;
   }
-  .v2-appbar-link:hover { background-color: hsl(var(--v2-graphite-elevated)); color: hsl(var(--v2-graphite-fg)); }
+  .v2-appbar-link:hover { background-color: hsl(var(--v2-header-elevated)); color: hsl(var(--v2-header-fg)); }
   .v2-appbar-link-active {
-    background-color: hsl(var(--v2-tech) / 0.16);
-    color: hsl(var(--v2-tech-on-dark));
-    box-shadow: inset 0 -2px 0 0 hsl(var(--v2-tech));
+    background-color: hsl(var(--v2-tech) / 0.12);
+    color: hsl(var(--v2-tech-strong));
+    box-shadow: inset 0 -2px 0 0 hsl(var(--v2-tech-strong));
   }
-  .v2-appbar-link-active:hover { color: hsl(var(--v2-tech-on-dark)); background-color: hsl(var(--v2-tech) / 0.22); }
+  .v2-appbar-link-active:hover { color: hsl(var(--v2-tech-strong)); background-color: hsl(var(--v2-tech) / 0.18); }
+
+  /* Secondary header controls: visible on the light app bar, never white-on-white. */
+  .v2-appbar-action {
+    background-color: hsl(var(--v2-header));
+    border: 1px solid hsl(var(--v2-line-strong));
+    color: hsl(var(--v2-header-fg));
+  }
+  .v2-appbar-action:hover {
+    background-color: hsl(var(--v2-header-elevated));
+    color: hsl(var(--v2-header-fg));
+  }
+  .v2-appbar-action[data-active='true'] {
+    background-color: hsl(var(--v2-tech) / 0.12);
+    border-color: hsl(var(--v2-tech-strong) / 0.5);
+    color: hsl(var(--v2-tech-strong));
+  }
+  .v2-appbar-divider { background-color: hsl(var(--v2-header-line)); }
 
   /* ---------- 2. Semantic surfaces ---------- */
   .v2-canvas { background-color: hsl(var(--v2-canvas)); color: hsl(var(--foreground)); }
@@ -1445,4 +1475,106 @@ html:not(.dark) .aura-workspace-theme {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 0.75rem;
   }
+}
+
+/* ==================================================================
+   AURA V2 — shared contrast hardening.
+   Presentation only. Guarantees that shadcn/Radix primitives inherit
+   the light enterprise theme, and that scoped graphite technical
+   zones keep AA-legible near-white / light-gray foregrounds.
+   ================================================================== */
+
+/* ---- Menus, popovers, dialogs, sheets: always light with dark text ---- */
+.aura-v2 [data-radix-popper-content-wrapper] [role='menu'],
+.aura-v2 [data-radix-popper-content-wrapper] [role='listbox'],
+.aura-v2 [data-radix-popper-content-wrapper] [role='dialog'],
+.aura-v2 [role='menu'],
+.aura-v2 [role='listbox'] {
+  background-color: hsl(var(--v2-panel));
+  color: hsl(var(--text-body));
+  border-color: hsl(var(--v2-line));
+}
+.aura-v2 [role='menuitem'],
+.aura-v2 [role='menuitemcheckbox'],
+.aura-v2 [role='menuitemradio'],
+.aura-v2 [role='option'] {
+  color: hsl(var(--text-body));
+  font-size: 14px;
+}
+.aura-v2 [role='menuitem']:hover,
+.aura-v2 [role='menuitem'][data-highlighted],
+.aura-v2 [role='option'][data-highlighted] {
+  background-color: hsl(var(--v2-canvas-deep));
+  color: hsl(var(--text-heading));
+}
+/* Supporting description lines inside menus stay readable, not micro-text. */
+.aura-v2 [role='menuitem'] .text-\[11px\],
+.aura-v2 [role='menuitem'] .text-\[10px\] {
+  font-size: 12px;
+  color: hsl(var(--text-muted));
+}
+
+/* ---- Placeholders and disabled controls ---- */
+.aura-v2 input::placeholder,
+.aura-v2 textarea::placeholder {
+  color: hsl(var(--v2-placeholder));
+  opacity: 1;
+}
+.aura-v2 button:disabled,
+.aura-v2 [aria-disabled='true'],
+.aura-v2 [data-disabled] {
+  opacity: 1;
+  color: hsl(var(--v2-disabled-fg));
+}
+.aura-v2 button:disabled:not(.v2-keep-surface),
+.aura-v2 [aria-disabled='true']:not(.v2-keep-surface) {
+  background-color: hsl(var(--v2-disabled-bg));
+  border-color: hsl(var(--v2-line-strong));
+}
+.aura-v2 .v2-tech-zone button:disabled,
+.aura-v2 .v2-viewport button:disabled,
+.aura-v2 .v2-telemetry-rail button:disabled {
+  background-color: hsl(var(--v2-graphite-elevated));
+  border-color: hsl(var(--v2-graphite-line));
+  color: hsl(214 10% 66%);
+}
+
+/* ---- Icons inherit the surface foreground, never a stale token ---- */
+.aura-v2 .v2-tech-zone svg,
+.aura-v2 .v2-viewport svg,
+.aura-v2 .v2-telemetry-rail svg {
+  color: currentColor;
+}
+
+/* ---- Graphite technical zones: AA foregrounds only ---- */
+.aura-v2 .v2-tech-zone,
+.aura-v2 .v2-viewport,
+.aura-v2 .v2-telemetry-rail {
+  color: hsl(var(--v2-graphite-fg));
+}
+.aura-v2 .v2-tech-zone .text-muted-foreground,
+.aura-v2 .v2-viewport .text-muted-foreground,
+.aura-v2 .v2-telemetry-rail .text-muted-foreground,
+.aura-v2 .v2-tech-zone .v2-label,
+.aura-v2 .v2-viewport .v2-label,
+.aura-v2 .v2-tech-zone .v2-field-label,
+.aura-v2 .v2-viewport .v2-field-label {
+  color: hsl(var(--v2-graphite-muted));
+}
+/* Dark-surface text must never fall back to graphite-on-graphite. */
+.aura-v2 .v2-tech-zone .text-foreground,
+.aura-v2 .v2-viewport .text-foreground,
+.aura-v2 .v2-tech-zone .text-card-foreground,
+.aura-v2 .v2-viewport .text-card-foreground {
+  color: hsl(var(--v2-graphite-fg));
+}
+
+/* ---- Table / list readability ---- */
+.aura-v2 .v2-table thead th { color: hsl(var(--text-muted)); }
+
+/* ---- Focus visibility on both light and graphite surfaces ---- */
+.aura-v2 .v2-tech-zone :focus-visible,
+.aura-v2 .v2-viewport :focus-visible,
+.aura-v2 .v2-appbar :focus-visible {
+  outline-color: hsl(var(--v2-tech-on-dark)) !important;
 }

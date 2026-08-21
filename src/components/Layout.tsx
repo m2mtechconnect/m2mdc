@@ -101,21 +101,21 @@ export function Layout({ children }: LayoutProps) {
       <header
         ref={headerRef}
         className={`v2-appbar sticky top-0 z-50 transition-shadow ${
-          isScrolled ? 'shadow-[0_10px_30px_-22px_hsl(220_40%_2%/0.7)]' : ''
+          isScrolled ? 'shadow-[0_8px_24px_-20px_hsl(214_30%_25%/0.55)]' : ''
         }`}
         role="navigation"
         aria-label="Primary navigation"
         data-testid="global-header"
       >
-        <div className="mx-auto flex h-12 max-w-[1920px] items-center justify-between gap-3 px-3 sm:px-4 md:px-5 lg:px-6">
+        <div className="mx-auto flex h-14 max-w-[1920px] items-center justify-between gap-3 px-3 sm:px-4 md:px-5 lg:px-6">
           <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-5">
             <Link
               to="/dashboard"
               aria-label="AURA Command Center - M2M"
               className="flex items-center flex-shrink-0 group"
             >
-              <AuraLogo surface="dark" className="hidden md:flex transition-transform group-hover:scale-[1.02]" />
-              <AuraLogo surface="dark" compact className="md:hidden" />
+              <AuraLogo surface="light" className="hidden md:flex transition-transform group-hover:scale-[1.02]" />
+              <AuraLogo surface="light" compact className="md:hidden" />
             </Link>
 
             <nav
@@ -134,7 +134,7 @@ export function Layout({ children }: LayoutProps) {
                         asChild
                         variant={isActive ? "secondary" : "ghost"}
                         size="sm"
-                        className={`v2-appbar-link gap-2 rounded-md px-2.5 xl:px-3 text-[14px] font-medium transition-smooth min-h-[36px] ${
+                        className={`v2-appbar-link gap-2 rounded-md px-3 text-[14px] font-medium transition-smooth min-h-[36px] ${
                           isActive ? "v2-appbar-link-active" : ""
                         }`}
                       >
@@ -146,7 +146,7 @@ export function Layout({ children }: LayoutProps) {
                           aria-current={isActive ? "page" : undefined}
                         >
                           <item.icon className="h-[18px] w-[18px] flex-shrink-0" strokeWidth={1.75} aria-hidden="true" />
-                          <span className="hidden whitespace-nowrap xl:inline">{item.name}</span>
+                          <span className="hidden whitespace-nowrap lg:inline">{item.name}</span>
                         </Link>
                       </Button>
                     </TooltipTrigger>
@@ -158,7 +158,7 @@ export function Layout({ children }: LayoutProps) {
               })}
 
               {(manageNavigation.length > 0 || governNavigation.length > 0) && (
-                <div className="h-4 w-px bg-[hsl(var(--v2-graphite-line))] mx-1" aria-hidden="true" />
+                <div className="v2-appbar-divider h-4 w-px mx-1" aria-hidden="true" />
               )}
 
               {manageNavigation.length > 0 && (
@@ -173,7 +173,7 @@ export function Layout({ children }: LayoutProps) {
                       data-nav-item="Manage"
                     >
                       <Settings className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
-                      <span className="hidden xl:inline">Manage</span>
+                      <span className="hidden lg:inline">Manage</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-72" data-testid="manage-menu">
@@ -211,7 +211,7 @@ export function Layout({ children }: LayoutProps) {
                       data-nav-item="Govern"
                     >
                       <Shield className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
-                      <span className="hidden xl:inline">Govern</span>
+                      <span className="hidden lg:inline">Govern</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-72" data-testid="govern-menu">
@@ -243,7 +243,7 @@ export function Layout({ children }: LayoutProps) {
             <Button
               variant="outline"
               size="sm"
-              className="hidden lg:flex gap-2 text-[14px] min-h-[38px] border-[hsl(var(--v2-graphite-line))] bg-[hsl(var(--v2-graphite-elevated))] text-[hsl(var(--v2-graphite-muted))] hover:bg-[hsl(var(--v2-graphite-line))] hover:text-[hsl(var(--v2-graphite-fg))] transition-smooth"
+              className="v2-appbar-action hidden lg:flex gap-2 text-[14px] min-h-[38px] transition-smooth"
               aria-label="Open command palette"
               onClick={() => {
                 document.dispatchEvent(
@@ -258,10 +258,11 @@ export function Layout({ children }: LayoutProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant={isOpen ? "secondary" : "outline"}
+                  variant="outline"
                   size="sm"
-                  className="gap-2 min-h-[38px] text-[14px] border-[hsl(var(--v2-graphite-line))] bg-[hsl(var(--v2-graphite-elevated))] text-[hsl(var(--v2-graphite-fg))] hover:bg-[hsl(var(--v2-graphite-line))] hover:text-[hsl(var(--v2-graphite-fg))]"
+                  className="v2-appbar-action gap-2 min-h-[38px] text-[14px]"
                   data-testid="assistant-entry"
+                  data-active={isOpen ? 'true' : undefined}
                   aria-label={isOpen ? `Close ${COPILOT.TITLE}` : `Open ${COPILOT.TITLE}`}
                   aria-expanded={isOpen}
                   onClick={() => setIsOpen(!isOpen)}
@@ -280,7 +281,7 @@ export function Layout({ children }: LayoutProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="xl:hidden min-h-[44px] min-w-[44px] text-[hsl(var(--v2-graphite-fg))] hover:bg-[hsl(var(--v2-graphite-elevated))] transition-smooth group"
+              className="xl:hidden min-h-[44px] min-w-[44px] text-[hsl(var(--v2-header-fg))] hover:bg-[hsl(var(--v2-header-elevated))] transition-smooth group"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle mobile menu"
               aria-expanded={mobileMenuOpen}

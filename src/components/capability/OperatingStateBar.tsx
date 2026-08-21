@@ -3,7 +3,6 @@
  * Compact, one line on desktop, never claims live data.
  */
 import { Info } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import {
@@ -51,7 +50,7 @@ export function OperatingStateBar({ className, scenario, runId, srOnly }: Props)
       data-testid="operating-state-bar"
       data-mode={mode.mode}
       className={cn(
-        'v2-status-strip flex w-full flex-wrap gap-x-3 gap-y-1 px-3 py-1.5 text-[11px] leading-tight sm:px-4',
+        'v2-status-strip flex w-full flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5 text-[13px] leading-tight sm:px-4',
         className,
       )}
     >
@@ -59,9 +58,9 @@ export function OperatingStateBar({ className, scenario, runId, srOnly }: Props)
         One state sentence, not five competing chips: mode, what is being
         shown, and which run it came from.
       */}
-      <Badge variant="outline" className={cn('rounded-sm px-1.5 py-0 text-[11px] font-semibold uppercase tracking-wider', mode.className)}>
+      <span className={cn('inline-flex items-center rounded-sm px-1.5 py-0 text-[12px] font-semibold uppercase tracking-wider', mode.className)}>
         {mode.mode}
-      </Badge>
+      </span>
       <span className="font-medium text-foreground">
         {scenario ?? workspaceRun?.scenarioLabel ?? activeScenarioLabel()}
       </span>

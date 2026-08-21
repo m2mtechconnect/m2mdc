@@ -307,8 +307,7 @@ export function Layout({ children }: LayoutProps) {
         >
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
-              <img src={m2mLogo} alt="" className="h-8 w-8" aria-hidden="true" />
-              <span>M2M AURA</span>
+              <AuraLogo surface="light" />
             </SheetTitle>
           </SheetHeader>
 

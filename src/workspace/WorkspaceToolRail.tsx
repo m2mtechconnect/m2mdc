@@ -1,26 +1,25 @@
 /**
- * Persistent tool rail. Tools change what the context panel does; they never
- * navigate away from the facility model.
+ * Persistent Simulation tool rail. Tools change the inspector state without
+ * navigating away from the facility model. The global shell owns the single
+ * AURA Assistant entry point, so the rail does not duplicate that utility.
  */
-import { Crosshair, GitCompare, MessageSquare, PlayCircle, Scale, SlidersHorizontal } from 'lucide-react';
+import { Crosshair, GitCompare, PlayCircle, Scale, SlidersHorizontal } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { useWorkspaceStore, type WorkspaceTool } from './workspaceStore';
 
 const TOOLS: Array<{ tool: WorkspaceTool; label: string; hint: string; icon: typeof Crosshair }> = [
   { tool: 'inspect', label: 'Inspect', hint: 'Select an asset and read its modelled attributes', icon: Crosshair },
-  { tool: 'configure', label: 'Configure', hint: 'Change modelled setpoints and capacity assumptions', icon: SlidersHorizontal },
-  { tool: 'simulate', label: 'Simulate', hint: 'Run a scenario against the current configuration', icon: PlayCircle },
+  { tool: 'configure', label: 'Inputs', hint: 'Set scenario inputs and modelled overrides for this simulation', icon: SlidersHorizontal },
+  { tool: 'simulate', label: 'Simulate', hint: 'Run a scenario against the reviewed inputs', icon: PlayCircle },
   { tool: 'compare', label: 'Compare', hint: 'Compare runs and read KPI deltas', icon: GitCompare },
-  { tool: 'decide', label: 'Review', hint: 'Review a completed run: accept, reject or defer each recommendation', icon: Scale },
-  { tool: 'assist', label: 'Assistant', hint: 'Ask the AURA assistant about this facility', icon: MessageSquare },
+  { tool: 'decide', label: 'Review', hint: 'Accept, reject or defer recommendations from a completed run', icon: Scale },
 ];
 
 interface Props {
   orientation?: 'vertical' | 'horizontal';
 }
 
-/** Steps that only make sense once at least one run exists. */
 const gatedTools = new Set<WorkspaceTool>(['compare', 'decide']);
 
 export function WorkspaceToolRail({ orientation = 'vertical' }: Props) {
@@ -34,7 +33,7 @@ export function WorkspaceToolRail({ orientation = 'vertical' }: Props) {
       <div
         role="toolbar"
         aria-orientation={isVertical ? 'vertical' : 'horizontal'}
-        aria-label="Workspace tools"
+        aria-label="Simulation tools"
         data-testid="workspace-tool-rail"
         className={cn(
           'flex bg-card',
@@ -53,7 +52,7 @@ export function WorkspaceToolRail({ orientation = 'vertical' }: Props) {
                 <button
                   type="button"
                   aria-pressed={isActive}
-                  aria-label={label}
+                  aria-label={label === 'Inputs' ? 'Scenario Inputs' : label}
                   aria-disabled={isGated}
                   aria-describedby={isGated ? reasonId : undefined}
                   data-testid={`workspace-tool-${tool}`}

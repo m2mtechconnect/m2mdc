@@ -7,23 +7,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import m2mLogo from "@/assets/m2m-logo.png";
-import {
-  HelpCircle,
-  Menu,
-  X,
-  LogOut,
-  Settings,
-  Search,
-  Sparkles,
-} from "lucide-react";
+import { Menu, X, LogOut, Settings, Search, Shield, Sparkles } from "lucide-react";
 import GlobalSearchBar from "@/components/search/GlobalSearchBar";
 import { LazyCoPilotPanel } from "@/components/copilot/LazyCoPilotPanel";
 import { useCoPilot } from "@/contexts/CoPilotContext";
-import { HealthBadges } from "@/components/HealthBadges";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { BuildVersion } from "@/components/BuildVersion";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +23,7 @@ import { useRBAC } from "@/contexts/RBACContext";
 import {
   WORKSPACE_NAV,
   isNavItemActive,
+  visibleGovernNav,
   visibleManageNav,
   navGroups,
 } from "@/config/appNavigation";
@@ -51,8 +42,6 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const fullBleed = useShellLayoutStore((s) => s.fullBleed);
-  // Navigation must carry the active dataset selection, otherwise a single
-  // click silently exits the admin canary back to the default dataset.
   const { linkTo } = useDataset();
   const pageOwnsOperatingState = useShellLayoutStore((s) => s.pageOwnsOperatingState);
   const location = useLocation();
@@ -63,18 +52,16 @@ export function Layout({ children }: LayoutProps) {
   const { can, loading: roleLoading } = useRBAC();
   const assistantPresentation = useAssistantPresentation();
   const assistantWidth = useAssistantLayoutStore((s) => s.width);
-  // At desktop widths the assistant reflows the workspace instead of covering it.
   const assistantReflow = isOpen && assistantPresentation === 'docked';
 
-  // Canonical information architecture. Workspaces are always visible;
-  // authoring and administration collapse into a single Manage group.
   const workspaceNavigation = WORKSPACE_NAV;
   const manageNavigation = roleLoading ? [] : visibleManageNav(can);
-  // DSX lifecycle grouping used by the mobile drawer.
+  const governNavigation = roleLoading ? [] : visibleGovernNav(can);
+  const manageActive = manageNavigation.some((item) => isNavItemActive(item, location.pathname));
+  const governActive = governNavigation.some((item) => isNavItemActive(item, location.pathname));
   const drawerGroups = roleLoading ? [] : navGroups(can);
   const headerRef = useRef<HTMLElement>(null);
 
-  // Auto-start tours based on route and user state
   useTourAutoStart();
 
   const handleSignOut = async () => {
@@ -96,9 +83,7 @@ export function Layout({ children }: LayoutProps) {
   }, [isOpen, setIsOpen]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 8);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 8);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -110,9 +95,8 @@ export function Layout({ children }: LayoutProps) {
       style={assistantReflow ? { paddingRight: assistantWidth } : undefined}
     >
       <GlobalSearchBar />
-      
-      {/* Top Navigation Bar */}
-      <header 
+
+      <header
         ref={headerRef}
         className={`sticky top-0 z-50 border-b bg-card/95 backdrop-blur-xl supports-[backdrop-filter]:backdrop-blur transition-shadow ${
           isScrolled ? 'shadow-md' : ''
@@ -122,21 +106,19 @@ export function Layout({ children }: LayoutProps) {
         data-testid="global-header"
       >
         <div className="mx-auto flex h-14 max-w-[1920px] items-center justify-between gap-3 px-3 sm:px-4 md:px-5 lg:px-6">
-          {/* Brand, facility context and workspace navigation */}
           <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-5">
             <Link
               to="/dashboard"
-              aria-label="Data Centre Twin Studio home"
+              aria-label="AURA Command Center"
               className="flex items-center flex-shrink-0 group"
             >
-              <img 
-                src={m2mLogo} 
-                alt="Data Centre Twin Studio" 
+              <img
+                src={m2mLogo}
+                alt="M2M AURA"
                 className="h-9 w-9 lg:h-10 lg:w-10 object-contain transition-transform group-hover:scale-105"
               />
             </Link>
 
-            {/* Workspace navigation: five destinations, always the same five. */}
             <nav
               className="hidden min-w-0 items-center gap-1 lg:flex xl:gap-1.5"
               aria-label="Workspaces"
@@ -144,7 +126,7 @@ export function Layout({ children }: LayoutProps) {
             >
               {workspaceNavigation.map((item) => {
                 const isActive = isNavItemActive(item, location.pathname);
-                const tourId = item.href === '/' ? 'nav-dashboard' :
+                const tourId = item.href === '/dashboard' ? 'nav-dashboard' :
                   item.href === '/simulation' ? 'nav-simulation' : undefined;
                 return (
                   <Tooltip key={item.name}>
@@ -167,7 +149,6 @@ export function Layout({ children }: LayoutProps) {
                           aria-current={isActive ? "page" : undefined}
                         >
                           <item.icon className="h-[18px] w-[18px] flex-shrink-0" strokeWidth={1.75} aria-hidden="true" />
-                          {/* xl is 1536px here: labels only appear once there is room for them. */}
                           <span className="hidden whitespace-nowrap xl:inline">{item.name}</span>
                         </Link>
                       </Button>
@@ -179,59 +160,95 @@ export function Layout({ children }: LayoutProps) {
                 );
               })}
 
+              {(manageNavigation.length > 0 || governNavigation.length > 0) && (
+                <div className="h-4 w-px bg-border mx-1" aria-hidden="true" />
+              )}
+
               {manageNavigation.length > 0 && (
-                <>
-                  <div className="h-4 w-px bg-border mx-1" />
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="gap-2 px-2.5 text-[14px] font-medium text-muted-foreground hover:text-foreground min-h-[40px]"
-                        aria-label="Manage"
-                        data-testid="manage-trigger"
-                        data-nav-item="Manage"
-                      >
-                        <Settings className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
-                        <span className="hidden xl:inline">Manage</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-64" data-testid="manage-menu">
-                      {manageNavigation.map((item) => {
-                        const isActive = isNavItemActive(item, location.pathname);
-                        return (
-                          <DropdownMenuItem key={item.name} asChild>
-                            <Link
-                              to={linkTo(item.href)}
-                              className={`flex items-start gap-2 ${isActive ? 'text-primary' : ''}`}
-                              aria-current={isActive ? "page" : undefined}
-                            >
-                              <item.icon className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
-                              <span>
-                                <span className="block text-sm">{item.fullName}</span>
-                                <span className="block text-[11px] text-muted-foreground">{item.description}</span>
-                              </span>
-                            </Link>
-                          </DropdownMenuItem>
-                        );
-                      })}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant={manageActive ? "secondary" : "ghost"}
+                      size="sm"
+                      className="gap-2 px-2.5 text-[14px] font-medium text-muted-foreground hover:text-foreground min-h-[40px]"
+                      aria-label="Manage"
+                      data-testid="manage-trigger"
+                      data-nav-item="Manage"
+                    >
+                      <Settings className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
+                      <span className="hidden xl:inline">Manage</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-72" data-testid="manage-menu">
+                    {manageNavigation.map((item) => {
+                      const isActive = isNavItemActive(item, location.pathname);
+                      return (
+                        <DropdownMenuItem key={item.name} asChild>
+                          <Link
+                            to={linkTo(item.href)}
+                            className={`flex items-start gap-2 ${isActive ? 'text-primary' : ''}`}
+                            aria-current={isActive ? "page" : undefined}
+                          >
+                            <item.icon className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                            <span>
+                              <span className="block text-sm">{item.fullName}</span>
+                              <span className="block text-[11px] text-muted-foreground">{item.description}</span>
+                            </span>
+                          </Link>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              {governNavigation.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant={governActive ? "secondary" : "ghost"}
+                      size="sm"
+                      className="gap-2 px-2.5 text-[14px] font-medium text-muted-foreground hover:text-foreground min-h-[40px]"
+                      aria-label="Govern"
+                      data-testid="govern-trigger"
+                      data-nav-item="Govern"
+                    >
+                      <Shield className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
+                      <span className="hidden xl:inline">Govern</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-72" data-testid="govern-menu">
+                    {governNavigation.map((item) => {
+                      const isActive = isNavItemActive(item, location.pathname);
+                      return (
+                        <DropdownMenuItem key={item.name} asChild>
+                          <Link
+                            to={linkTo(item.href)}
+                            className={`flex items-start gap-2 ${isActive ? 'text-primary' : ''}`}
+                            aria-current={isActive ? "page" : undefined}
+                          >
+                            <item.icon className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                            <span>
+                              <span className="block text-sm">{item.fullName}</span>
+                              <span className="block text-[11px] text-muted-foreground">{item.description}</span>
+                            </span>
+                          </Link>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </nav>
           </div>
 
-          {/* Right Side Actions: Search, Assistant, Manage (in nav), Avatar. */}
           <div className="flex flex-shrink-0 items-center gap-1.5 lg:gap-2">
-            {/* Search: full control on desktop, icon-only (labelled) on tablet. */}
             <Button
               variant="outline"
               size="sm"
               className="hidden lg:flex gap-2 text-[13px] text-muted-foreground min-h-[38px] hover:bg-accent/10 transition-smooth"
               aria-label="Open command palette"
               onClick={() => {
-                // Dispatch the same keyboard shortcut that GlobalSearchBar listens for
                 document.dispatchEvent(
                   new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
                 );
@@ -241,7 +258,6 @@ export function Layout({ children }: LayoutProps) {
               <span className="hidden xl:inline">Search</span>
             </Button>
 
-            {/* AURA Assistant */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -262,10 +278,8 @@ export function Layout({ children }: LayoutProps) {
               </TooltipContent>
             </Tooltip>
 
-            {/* User menu owns profile, language, help, preferences, sign out. */}
             <UserMenu />
 
-            {/* Mobile Menu Toggle */}
             <Button
               variant="ghost"
               size="sm"
@@ -285,13 +299,11 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      {/* Persistent operating-state bar (Stage 5 truth alignment) */}
       <OperatingStateBar srOnly={pageOwnsOperatingState} />
 
-      {/* Mobile Navigation Sheet */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent 
-          side="left" 
+        <SheetContent
+          side="left"
           className="w-full sm:w-[400px] bg-card border-border overflow-y-auto"
           id="mobile-nav-sheet"
           aria-label="Mobile navigation menu"
@@ -299,12 +311,10 @@ export function Layout({ children }: LayoutProps) {
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
               <img src={m2mLogo} alt="" className="h-8 w-8" aria-hidden="true" />
-              <span>Data Centre Twin Studio</span>
+              <span>M2M AURA</span>
             </SheetTitle>
           </SheetHeader>
 
-          {/* DSX lifecycle drawer: Overview, Design, Simulate, Operate,
-              Govern, Support. Labels changed; every href is unchanged. */}
           <nav className="mt-6 space-y-1" aria-label="Mobile navigation">
             {drawerGroups.map((group, groupIndex) => (
               <div
@@ -365,7 +375,6 @@ export function Layout({ children }: LayoutProps) {
             ))}
           </nav>
 
-          {/* Mobile Sheet Footer - Sign Out */}
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border bg-card">
             <Button
               variant="outline"
@@ -382,7 +391,6 @@ export function Layout({ children }: LayoutProps) {
         </SheetContent>
       </Sheet>
 
-      {/* Main Content */}
       <main
         data-testid="page-content"
         className={
@@ -394,29 +402,28 @@ export function Layout({ children }: LayoutProps) {
         {children}
       </main>
 
-      {/* Footer */}
       <footer className={`border-t border-border bg-card/50 backdrop-blur-sm${fullBleed ? " hidden" : ""}`}>
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-              <p className="text-sm text-muted-foreground">
-                © 2025 Data Centre Digital Twin Studio
-              </p>
+              <p className="text-sm text-muted-foreground">© 2026 M2M AURA</p>
               <BuildVersion />
             </div>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
               <Link to="/help" className="hover:text-foreground transition-smooth">
                 Learning Hub
               </Link>
-              <Link to="/compliance" className="hover:text-foreground transition-smooth">
-                Compliance
+              <Link
+                to="/dsx/evidence-beta/sustainability/sovereignty"
+                className="hover:text-foreground transition-smooth"
+              >
+                Governance evidence
               </Link>
             </div>
           </div>
         </div>
       </footer>
 
-      {/* AURA Assistant (single instance) */}
       <LazyCoPilotPanel />
     </div>
   );

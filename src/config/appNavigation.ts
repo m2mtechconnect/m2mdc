@@ -1,10 +1,9 @@
 /**
  * Canonical AURA DC information architecture.
  *
- * The global shell follows a Salesforce-style split between four persistent
- * workspaces, operational management, governance and utilities. Creation
- * workflows and contextual detail routes deliberately do not become permanent
- * global destinations.
+ * Four persistent workspaces stay in the global header. Operational management
+ * and governance are separate enterprise navigation groups, while creation and
+ * record-detail flows remain contextual actions.
  */
 import {
   BarChart3,
@@ -289,6 +288,16 @@ export function isNavItemActive(item: AppNavItem, pathname: string): boolean {
   return prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
+/** Operational management destinations only. */
 export function visibleManageNav(can: (p: Permission) => boolean): AppNavItem[] {
-  return MANAGE_NAV.filter((item) => !item.permission || can(item.permission));
+  return MANAGE_NAV.filter(
+    (item) => item.group !== 'govern' && (!item.permission || can(item.permission)),
+  );
+}
+
+/** Governance and administration destinations only. */
+export function visibleGovernNav(can: (p: Permission) => boolean): AppNavItem[] {
+  return MANAGE_NAV.filter(
+    (item) => item.group === 'govern' && (!item.permission || can(item.permission)),
+  );
 }

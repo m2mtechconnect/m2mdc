@@ -205,7 +205,7 @@ export function FacilityCanvas({ facility }: Props) {
 
       {/* Protected zone, top-left: one grouped canvas toolbar. */}
       <div
-        className="absolute left-3 top-3 z-20 flex max-w-[calc(100%-15rem)] flex-col gap-1.5"
+        className="v2-surface-light absolute left-3 top-3 z-20 flex max-w-[calc(100%-15rem)] flex-col gap-1.5"
         data-testid="canvas-top-left-zone"
       >
         <div
@@ -268,7 +268,7 @@ export function FacilityCanvas({ facility }: Props) {
       {/* Protected zone, top-right: zoom and camera controls only. */}
       {viewMode === '2d' && (
         <div
-          className="absolute right-3 top-3 z-20 flex items-center gap-1 rounded-md border border-border bg-card/90 p-1 backdrop-blur"
+          className="v2-surface-light absolute right-3 top-3 z-20 flex items-center gap-1 rounded-md border border-border bg-card/90 p-1 backdrop-blur"
           role="group"
           aria-label="Model zoom controls"
         >
@@ -328,7 +328,7 @@ export function FacilityCanvas({ facility }: Props) {
         data-testid="canvas-bottom-left-zone"
         data-yielded={kpiTooltipOpen ? 'true' : 'false'}
         className={cn(
-          'pointer-events-none absolute bottom-3 left-3 z-20 flex max-w-[min(28rem,calc(100%-16rem))] flex-col gap-2 transition-opacity duration-150',
+          'v2-surface-light pointer-events-none absolute bottom-3 left-3 z-20 flex max-w-[min(28rem,calc(100%-16rem))] flex-col gap-2 transition-opacity duration-150',
           kpiTooltipOpen && 'pointer-events-none opacity-0',
         )}
         aria-hidden={kpiTooltipOpen}
@@ -400,7 +400,7 @@ export function FacilityCanvas({ facility }: Props) {
       {isRunning && (
         <div
           className={cn(
-            'pointer-events-none absolute inset-x-0 top-14 z-20 mx-auto w-fit max-w-[80%] rounded-full border border-border',
+            'v2-surface-light pointer-events-none absolute inset-x-0 top-14 z-20 mx-auto w-fit max-w-[80%] rounded-full border border-border',
             'bg-card/90 px-3 py-1 text-xs text-muted-foreground backdrop-blur',
           )}
           role="status"

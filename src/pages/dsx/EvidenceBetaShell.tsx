@@ -159,7 +159,7 @@ function WorkspaceNav() {
     <nav
       aria-label="DSX workspaces"
       data-testid="dsx-workspace-nav"
-      className="v2-rail relative w-full min-w-0 max-w-full shrink-0 overflow-x-auto border-b border-[hsl(var(--v2-line))] p-2.5 lg:w-56 lg:overflow-x-visible lg:overflow-y-auto lg:border-b-0"
+      className="v2-rail relative w-full min-w-0 max-w-full shrink-0 overflow-x-auto border-b border-[hsl(var(--v2-line))] p-2.5 lg:w-60 lg:overflow-x-visible lg:overflow-y-auto lg:border-b-0"
     >
       <div className="flex min-w-max gap-4 lg:block lg:min-w-0">
       {NAV.map((g) => (

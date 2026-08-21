@@ -7,6 +7,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   verify-audit-chain:
     name: Verify DSX audit chain integrity
@@ -18,11 +22,6 @@ jobs:
         with:
           node-version: '20'
 
-      # Read-only chain verification. Exits non-zero on:
-      #   - seq gaps (missing / out-of-order entries)
-      #   - prev_hash mismatches (chain break)
-      #   - entry_hash mismatches (tampered body)
-      #   - unparseable JSONL lines
       - name: Verify audit chain
         run: node scripts/dsx-audit-log.mjs verify
 

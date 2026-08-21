@@ -1,10 +1,16 @@
 name: Test Suite
 
+# Release/integration gate. Unit, cross-browser E2E, accessibility and security
+# are owned by QA Suite; this workflow owns integration replay + Lighthouse.
 on:
   pull_request:
     branches: [main, develop]
   push:
     branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   CI: true
@@ -19,45 +25,10 @@ env:
   USE_MOCK_LLM: true
 
 jobs:
-  unit-tests:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: '1.3.3'
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-      
-      - name: Run unit tests
-        run: bun run test:unit -- --coverage
-      
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
-        with:
-          files: ./coverage/coverage-final.json
-          flags: unittests
-      
-      - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage-report
-          path: coverage/
-
   integration-tests:
     name: Integration Tests
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: supabase/postgres:15.1.0.117
@@ -71,144 +42,63 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-    
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.3.3'
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      
+
       - name: Setup test environment
         run: |
           cp .env.test.example .env
           echo "USE_MOCK_LLM=true" >> .env
-      
+
       - name: Run integration tests
         run: bun run test:int
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
 
-  e2e-tests:
-    name: E2E Tests
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: '1.3.3'
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-      
-      - name: Install Playwright browsers
-        run: bunx playwright install --with-deps
-      
-      - name: Setup test environment
-        run: |
-          cp .env.test.example .env
-          echo "USE_MOCK_LLM=true" >> .env
-      
-      - name: Verify loopback-only test backend
-        run: |
-          node -e 'const u = new URL(process.env.TEST_SUPABASE_URL); if (!["127.0.0.1", "localhost", "::1"].includes(u.hostname)) process.exit(1)'
-      
-      - name: Run E2E tests
-        run: bun run test:e2e
-      
-      - name: Upload Playwright report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
-      
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: test-results/
-
-  accessibility:
-    name: Accessibility Tests
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: '1.3.3'
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-      
-      - name: Install Playwright
-        run: bunx playwright install --with-deps chromium
-      
-      - name: Run accessibility tests
-        run: bunx playwright test tests/e2e/theme-toggle.spec.ts --project=chromium
-      
-      - name: Upload a11y report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: accessibility-report
-          path: playwright-report/
-
   lighthouse:
     name: Lighthouse CI
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.3.3'
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      
+
       - name: Build production
         run: bun run build
         env:
           LIGHTHOUSE_CI: '1'
-      
+
       - name: Run Lighthouse CI
         run: |
           npm install -g @lhci/cli
           lhci autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-      
+
       - name: Upload Lighthouse reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -217,48 +107,21 @@ jobs:
           path: .lighthouseci/
           include-hidden-files: true
 
-  security:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: '1.3.3'
-      
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-      
-      - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'trivy-results.sarif'
-      
-      - name: Run Bun audit
-        run: bun audit --audit-level=moderate
-
   test-summary:
     name: Test Summary
     runs-on: ubuntu-latest
-    needs: [unit-tests, integration-tests, e2e-tests, accessibility, lighthouse]
+    needs: [integration-tests, lighthouse]
     if: always()
-    
+
     steps:
       - name: Check test results
         run: |
-          if [ "${{ needs.unit-tests.result }}" != "success" ] || \
-             [ "${{ needs.integration-tests.result }}" != "success" ] || \
-             [ "${{ needs.e2e-tests.result }}" != "success" ] || \
-             [ "${{ needs.accessibility.result }}" != "success" ] || \
+          echo "Integration Tests: ${{ needs.integration-tests.result }}"
+          echo "Lighthouse: ${{ needs.lighthouse.result }}"
+
+          if [ "${{ needs.integration-tests.result }}" != "success" ] ||
              [ "${{ needs.lighthouse.result }}" != "success" ]; then
-            echo "❌ Some tests failed"
+            echo "❌ Test Suite Failed"
             exit 1
           fi
-          echo "✅ All tests passed"
+          echo "✅ Test Suite Passed"

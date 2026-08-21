@@ -1,9 +1,7 @@
 name: AURA Truth and Route Stress
 
-# Closes Phase 0 blocker #6: the full truth-in-UI suite (206 tests, serial)
-# and the route-stress sweep exceed the agent sandbox time budget. They run
-# here instead, with CI-length budgets and sharding.
-
+# Closes Phase 0 blocker #6: the full truth-in-UI suite and route-stress sweep
+# run here with CI-length budgets and sharding.
 on:
   pull_request:
     branches: [main]
@@ -31,6 +29,7 @@ jobs:
     timeout-minutes: 45
     strategy:
       fail-fast: false
+      max-parallel: 2
       matrix:
         shard: [1, 2, 3, 4]
     steps:

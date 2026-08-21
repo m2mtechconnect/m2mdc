@@ -159,7 +159,7 @@ function WorkspaceNav() {
     <nav
       aria-label="DSX workspaces"
       data-testid="dsx-workspace-nav"
-      className="relative w-full min-w-0 max-w-full shrink-0 overflow-x-auto border-b border-border bg-card/40 p-3 lg:w-60 lg:overflow-x-visible lg:overflow-y-auto lg:border-b-0 lg:border-r"
+      className="v2-rail relative w-full min-w-0 max-w-full shrink-0 overflow-x-auto border-b border-[hsl(var(--v2-line))] p-2.5 lg:w-56 lg:overflow-x-visible lg:overflow-y-auto lg:border-b-0"
     >
       <div className="flex min-w-max gap-4 lg:block lg:min-w-0">
       {NAV.map((g) => (
@@ -217,7 +217,7 @@ function WorkspaceHeader() {
   const title = evidenceTitle(pathname);
 
   return (
-    <header className="space-y-1.5 pb-5">
+    <header className="v2-command-header mb-4">
       <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-[11px] text-muted-foreground">
         <Link
           to={hrefWithContext(DSX_ROOT)}
@@ -240,14 +240,14 @@ function WorkspaceHeader() {
         <span aria-hidden>/</span>
         <span className="font-medium text-foreground">{title}</span>
       </nav>
-      <h1 className="text-2xl font-semibold tracking-tight" data-testid="dsx-workspace-title">{title}</h1>
+      <h1 className="v2-command-title" data-testid="dsx-workspace-title">{title}</h1>
     </header>
   );
 }
 
 function ShellBody() {
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full flex-col overflow-x-hidden">
+    <div className="v2-canvas flex min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full flex-col overflow-x-hidden">
       <Helmet>
         <title>DSX Operator Workspace | AURA Data Centre Twin</title>
         <meta

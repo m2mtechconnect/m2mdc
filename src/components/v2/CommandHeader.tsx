@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-export interface CommandHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CommandHeaderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   title: React.ReactNode;
   subtitle?: React.ReactNode;
   /** Provenance badges / status chips rendered next to the title. */
@@ -47,7 +47,7 @@ export function SectionHeader({
   actions,
   className,
   ...props
-}: { title: React.ReactNode; actions?: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
+}: { title: React.ReactNode; actions?: React.ReactNode } & Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>) {
   return (
     <div className={cn('flex items-center justify-between gap-3 pb-2', className)} {...props}>
       <h2 className="v2-label">{title}</h2>

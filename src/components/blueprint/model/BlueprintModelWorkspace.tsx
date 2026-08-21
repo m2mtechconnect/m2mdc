@@ -244,7 +244,7 @@ function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-2 rounded bg-muted/40 px-2.5 py-1.5">
       <dt className="text-[13px] text-muted-foreground">{label}</dt>
-      <dd className="truncate text-[11px] font-medium text-foreground">{value}</dd>
+      <dd className="truncate text-[13px] font-medium text-foreground">{value}</dd>
     </div>
   );
 }
@@ -254,7 +254,7 @@ function LinkRow({ to, label, value }: { to: string; label: string; value: strin
     <li>
       <Link
         to={to}
-        className="flex min-h-11 items-center justify-between gap-2 rounded border border-border px-2.5 py-1.5 text-[11px] hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex min-h-11 items-center justify-between gap-2 rounded border border-border px-2.5 py-1.5 text-[13px] hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <span className="font-medium text-foreground">{label}</span>
         <span className="truncate text-muted-foreground">{value}</span>

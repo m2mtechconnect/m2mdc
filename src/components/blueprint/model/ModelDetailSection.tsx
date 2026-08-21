@@ -51,11 +51,11 @@ export function ModelDetailSection({
           <span className="min-w-0 flex-1">
             <span className="flex flex-wrap items-center gap-2">
               <span className="text-sm font-semibold text-foreground">{title}</span>
-              <span className="text-[11px] text-muted-foreground">
+              <span className="text-[13px] text-muted-foreground">
                 {status} · {itemCount} item{itemCount === 1 ? '' : 's'}
               </span>
             </span>
-            <span className="mt-0.5 block truncate text-[11px] text-muted-foreground">{summary}</span>
+            <span className="mt-0.5 block truncate text-[13px] text-muted-foreground">{summary}</span>
           </span>
         </button>
       </h2>

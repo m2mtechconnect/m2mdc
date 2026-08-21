@@ -86,10 +86,10 @@ export function RequiresAttentionPanel({ items, defaultOpen }: Props) {
                 {' - '}
                 {item.title}
               </p>
-              <p className="mt-0.5 text-[11px] text-muted-foreground">{item.consequence}</p>
+              <p className="mt-0.5 text-[13px] text-muted-foreground">{item.consequence}</p>
               <div className="mt-1 flex flex-wrap items-center gap-1.5">
                 <EvidenceChip state={item.evidence} />
-                <span className="text-[11px] text-muted-foreground">Owner: {item.destination}</span>
+                <span className="text-[13px] text-muted-foreground">Owner: {item.destination}</span>
               </div>
             </div>
             <Button asChild size="sm" variant="outline" className="h-8 shrink-0">

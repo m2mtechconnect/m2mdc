@@ -7,7 +7,7 @@ import * as React from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export interface InspectorPanelProps extends React.HTMLAttributes<HTMLElement> {
+export interface InspectorPanelProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
   title: React.ReactNode;
   subtitle?: React.ReactNode;
   meta?: React.ReactNode;

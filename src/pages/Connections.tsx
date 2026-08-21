@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useRBAC } from '@/contexts/RBACContext';
 import { PagePurpose } from '@/components/capability/PagePurpose';
+import { CommandHeader } from '@/components/v2';
 import { OverviewTab } from '@/components/connections/OverviewTab';
 import { ConnectionsTab } from '@/components/connections/ConnectionsTab';
 import { CatalogueTab } from '@/components/connections/CatalogueTab';

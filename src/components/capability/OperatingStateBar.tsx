@@ -59,9 +59,9 @@ export function OperatingStateBar({ className, scenario, runId, srOnly }: Props)
         One state sentence, not five competing chips: mode, what is being
         shown, and which run it came from.
       */}
-      <Badge variant="outline" className={cn('rounded-sm border px-1.5 py-0 text-[12px] font-semibold uppercase tracking-wider', mode.className)}>
+      <span className={cn('inline-flex items-center rounded-sm px-1.5 py-0 text-[12px] font-semibold uppercase tracking-wider', mode.className)}>
         {mode.mode}
-      </Badge>
+      </span>
       <span className="font-medium text-foreground">
         {scenario ?? workspaceRun?.scenarioLabel ?? activeScenarioLabel()}
       </span>

@@ -51,7 +51,7 @@ export function OperatingStateBar({ className, scenario, runId, srOnly }: Props)
       data-testid="operating-state-bar"
       data-mode={mode.mode}
       className={cn(
-        'v2-status-strip flex w-full flex-wrap gap-x-3 gap-y-1 px-3 py-1.5 text-[11px] leading-tight sm:px-4',
+        'v2-status-strip flex w-full flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5 text-[13px] leading-tight sm:px-4',
         className,
       )}
     >
@@ -59,7 +59,7 @@ export function OperatingStateBar({ className, scenario, runId, srOnly }: Props)
         One state sentence, not five competing chips: mode, what is being
         shown, and which run it came from.
       */}
-      <Badge variant="outline" className={cn('rounded-sm px-1.5 py-0 text-[11px] font-semibold uppercase tracking-wider', mode.className)}>
+      <Badge variant="outline" className={cn('rounded-sm border px-1.5 py-0 text-[12px] font-semibold uppercase tracking-wider', mode.className)}>
         {mode.mode}
       </Badge>
       <span className="font-medium text-foreground">

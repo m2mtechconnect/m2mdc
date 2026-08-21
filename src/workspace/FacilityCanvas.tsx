@@ -220,7 +220,7 @@ export function FacilityCanvas({ facility }: Props) {
               size="sm"
               variant={viewMode === '3d' ? 'default' : 'outline'}
               aria-pressed={viewMode === '3d'}
-              className="h-8 px-2.5 text-[13px] font-medium focus-visible:ring-2"
+              className="h-8 px-2.5 text-[13px] font-medium focus-visible:ring-2 disabled:opacity-70"
               onClick={retry}
             >
               <Box className="mr-1 h-3.5 w-3.5" aria-hidden />
@@ -231,7 +231,7 @@ export function FacilityCanvas({ facility }: Props) {
               size="sm"
               variant={viewMode === '2d' ? 'default' : 'outline'}
               aria-pressed={viewMode === '2d'}
-              className="h-8 px-2.5 text-[13px] font-medium focus-visible:ring-2"
+              className="h-8 px-2.5 text-[13px] font-medium focus-visible:ring-2 disabled:opacity-70"
               onClick={() => setViewMode('2d')}
             >
               <Grid2x2 className="mr-1 h-3.5 w-3.5" aria-hidden />

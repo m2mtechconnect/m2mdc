@@ -199,6 +199,8 @@ jobs:
       
       - name: Build production
         run: bun run build
+        env:
+          LIGHTHOUSE_CI: '1'
       
       - name: Run Lighthouse CI
         run: |
@@ -213,6 +215,7 @@ jobs:
         with:
           name: lighthouse-reports
           path: .lighthouseci/
+          include-hidden-files: true
 
   security:
     name: Security Scan

@@ -14,10 +14,10 @@ import { PAGE_POSITIONING, positioningFor } from '../pagePositioning';
 describe('canonical navigation', () => {
   it('exposes exactly four always-visible workspaces with DSX labels', () => {
     expect(WORKSPACE_NAV.map((i) => i.fullName)).toEqual([
-      'AI Factory Overview',
+      'Command Center',
       'Facility Blueprint',
-      'Simulation Studio',
-      'Validation & Evidence',
+      'Simulation',
+      'Evidence',
     ]);
   });
 
@@ -28,15 +28,19 @@ describe('canonical navigation', () => {
       '/simulation',
       '/dsx/evidence-beta/overview',
     ]);
+    const workspace = Object.fromEntries(WORKSPACE_NAV.map((i) => [i.fullName, i.href]));
+    expect(workspace['Facility Blueprint']).toBe('/blueprint');
+    expect(workspace['Evidence']).toBe('/dsx/evidence-beta/overview');
+
     const manage = Object.fromEntries(MANAGE_NAV.map((i) => [i.fullName, i.href]));
-    expect(manage['OpenUSD Asset Pipeline']).toBe('/builder');
-    expect(manage['Agents & Optimization']).toBe('/app/agents');
-    expect(manage['Operations & Telemetry']).toBe('/analytics');
-    expect(manage['Runtime Environments']).toBe('/deployments');
-    expect(manage['Agent Configuration']).toBe('/settings/ai');
+    expect(manage['Agents']).toBe('/app/agents');
+    expect(manage['Operations']).toBe('/analytics');
+    expect(manage['Runtime']).toBe('/deployments');
+    expect(manage['Agent Policies']).toBe('/settings/ai');
     expect(manage['Connections']).toBe('/manage/integrations');
     expect(manage['Facilities']).toBe('/manage/facilities');
   });
+
 
   it('keeps every legacy alias pointing at a live destination', () => {
     const aliases = Object.fromEntries(ROUTE_ALIASES.map((a) => [a.from, a.to]));

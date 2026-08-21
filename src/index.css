@@ -1038,8 +1038,9 @@ html:not(.dark) .aura-workspace-theme {
   .text-\[8px\],
   .text-\[9px\],
   .text-\[10px\],
-  .text-\[10\.5px\] {
-    font-size: 11px;
+  .text-\[10\.5px\],
+  .text-\[11px\] {
+    font-size: 12px;
     line-height: 1.4;
   }
 }

@@ -12,14 +12,14 @@ export function OperatorSummaryStrip({ metrics }: { metrics: OperatorMetric[] })
       <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border lg:grid-cols-4">
         {metrics.map((metric) => (
           <div key={metric.id} className="min-w-0 bg-card px-3 py-2.5" data-metric={metric.id}>
-            <dt className="text-[11px] uppercase tracking-wide text-muted-foreground">{metric.label}</dt>
+            <dt className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">{metric.label}</dt>
             <dd className="mt-0.5">
-              <span className="block truncate text-lg font-semibold tabular-nums text-foreground">
+              <span className="block truncate text-[22px] font-semibold leading-tight tabular-nums text-foreground">
                 {metric.value}
               </span>
               <span className="mt-1 flex flex-wrap items-center gap-1.5">
                 <EvidenceChip state={metric.state} />
-                <span className="min-w-0 truncate text-[11px] text-muted-foreground">{metric.detail}</span>
+                <span className="min-w-0 truncate text-[13px] text-muted-foreground">{metric.detail}</span>
               </span>
             </dd>
           </div>

@@ -116,12 +116,8 @@ export function BlueprintModelWorkspace({
     >
       {/* The twin viewport is the dominant surface of the workspace. */}
       <div className="min-w-0 space-y-3">
-        <div className="v2-viewport min-w-0 overflow-hidden p-0">
-          <BlueprintModelSection facilityOverride={facilityOverride} />
-        </div>
-        <div className="v2-telemetry-rail min-w-0">
-          <OperatorSummaryStrip metrics={metrics} />
-        </div>
+        <BlueprintModelSection facilityOverride={facilityOverride} />
+        <OperatorSummaryStrip metrics={metrics} />
       </div>
 
       {/* Contextual inspector: attention queue, model detail, provenance. */}
@@ -150,7 +146,7 @@ export function BlueprintModelWorkspace({
           <Row label="Visualization coverage" value={`${coverage.percent}%`} />
           <Row label="Modelled assets" value={`${assets.length} (${rackAssets} racks)`} />
         </dl>
-        <p className="mt-2 text-[11px] text-muted-foreground">
+        <p className="mt-2 text-[13px] text-muted-foreground">
           Assumption: unrendered racks are represented by an aggregate load model. A partial model
           is never reported as a complete facility. Full topology and dependencies live in{' '}
           <Link className="underline" to={`${blueprintPath}?tab=assets`}>
@@ -184,14 +180,14 @@ export function BlueprintModelWorkspace({
         </dl>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <EvidenceChip state={hasConflict ? 'conflicting' : capacityNote ? 'derived' : 'authoritative'} />
-          {capacityNote && <span className="text-[11px] text-muted-foreground">{capacityNote}</span>}
+          {capacityNote && <span className="text-[13px] text-muted-foreground">{capacityNote}</span>}
         </div>
         <div className="mt-3">
           <QuarantinedCapacityPanel
             records={buildBlueprintCapacityRecords({ blueprint, dbTwin: dbTwinData as never })}
           />
         </div>
-        <p className="mt-2 text-[11px] text-muted-foreground">
+        <p className="mt-2 text-[13px] text-muted-foreground">
           <Link className="underline" to={`${blueprintPath}?tab=validation`}>
             Open Validation
           </Link>{' '}
@@ -245,8 +241,8 @@ export function BlueprintModelWorkspace({
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-2 rounded bg-muted/40 px-2.5 py-1.5">
-      <dt className="text-[11px] text-muted-foreground">{label}</dt>
-      <dd className="truncate text-[11px] font-medium text-foreground">{value}</dd>
+      <dt className="text-[13px] text-muted-foreground">{label}</dt>
+      <dd className="truncate text-[13px] font-medium text-foreground">{value}</dd>
     </div>
   );
 }
@@ -256,7 +252,7 @@ function LinkRow({ to, label, value }: { to: string; label: string; value: strin
     <li>
       <Link
         to={to}
-        className="flex min-h-11 items-center justify-between gap-2 rounded border border-border px-2.5 py-1.5 text-[11px] hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex min-h-11 items-center justify-between gap-2 rounded border border-border px-2.5 py-1.5 text-[13px] hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <span className="font-medium text-foreground">{label}</span>
         <span className="truncate text-muted-foreground">{value}</span>

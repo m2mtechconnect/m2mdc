@@ -301,15 +301,9 @@ export default function Blueprint() {
                       key={tab.value}
                       value={tab.value}
                       data-blueprint-tab={tab.value}
-                      className="relative rounded-none border-b-2 border-transparent px-4 py-2.5 text-[13px] uppercase tracking-wide text-muted-foreground transition-all duration-200 hover:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:font-semibold data-[state=active]:text-foreground"
+                      className="relative rounded-none border-b-2 border-transparent px-4 py-2.5 text-[14px] font-medium tracking-normal text-muted-foreground transition-all duration-200 hover:text-foreground data-[state=active]:border-[hsl(var(--v2-tech))] data-[state=active]:bg-transparent data-[state=active]:font-semibold data-[state=active]:text-foreground data-[state=active]:shadow-none"
                     >
                       {tab.label}
-                      {activeTab === tab.value && (
-                        <span
-                          aria-hidden="true"
-                          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary motion-safe:animate-pulse"
-                        />
-                      )}
                     </TabsTrigger>
                   ))}
                 </TabsList>

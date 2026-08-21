@@ -5,7 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { RBACProvider, useRBAC } from "@/contexts/RBACContext";
+import { RBACProvider } from "@/contexts/RBACContext";
 import { ActiveTwinProvider } from "@/context/ActiveTwinContext";
 import { CoPilotProvider } from "@/contexts/CoPilotContext";
 import { CoPilotCommandProvider } from "@/contexts/CoPilotCommandContext";
@@ -20,31 +20,21 @@ import { SignIn, SignUp, SignOut, ForgotPassword, MFA, AuthCallback } from "./pa
 import DataCentreTwinLanding from "./pages/DataCentreTwinLanding";
 import Onboarding from "./pages/Onboarding";
 import PendingApproval from "./pages/PendingApproval";
-// PR-0.1 Checkpoint B7.4F - Pilot shell imported statically because it is
-// the only authenticated surface allowed to render on /pilot/*. It has no
-// blocked-consumer imports (verified by scripts/pilot-bundle-canary.mjs).
-import PilotShell from "./pilot/PilotShell";
-import AuthorizationError from "./pages/AuthorizationError";
 import BoundedLoading from "@/components/shared/BoundedLoading";
 import ManagedUserReturn from '@/pages/oauth/ManagedUserReturn';
 import InviteAccept from './pages/InviteAccept';
 import { InviteSignInRedirect } from '@/routing/InviteSignInRedirect';
 import { MANAGED_USER_RETURN_PATH } from '@/connections/managedUserBinding';
-// Role-Aware Application Routing - Approved *internal* users (users with
-// an explicit row in public.user_roles) receive the full AURA DC
-// application via the authenticated shell core. It is imported
-// SYNCHRONOUSLY: a lazy shell boundary wrapping the lazy route boundary
-// reproduced an intermittent dropped Suspense retry (11/24 navigations).
-// The shell core carries no route page, no visualization stack and no
-// admin module - those all stay behind their own route-level lazy
-// boundaries, so the pilot bundle graph is still unaffected (the pilot
-// canary walks from PilotShell.tsx and never reaches this module).
-import AuthenticatedShell from "./AuthenticatedShell";
+
 const OverlayFixtures = import.meta.env.DEV
   ? lazy(() => import("./pages/test/OverlayFixtures"))
   : null;
 const DataCentreTwin = lazy(() => import("./pages/DataCentreTwin"));
 const TwinPreview = lazy(() => import("./pages/TwinPreview"));
+// Keep the authenticated shell synchronous *inside* its own bundle while
+// excluding that bundle from the anonymous landing route. This avoids the
+// nested shell/route Suspense retry failure while shrinking the public entry.
+const ApprovedUserRouter = lazy(() => import("./ApprovedUserRouter"));
 
 const publicRouteFallback = (
   <div className="flex min-h-dvh items-center justify-center" role="status" aria-live="polite">
@@ -186,53 +176,12 @@ function AuthenticatedApp() {
     );
   }
 
-  // Approved user: branch on server-backed internal vs pilot classification.
-  return <ApprovedUserRouter />;
-}
-
-function LoadingScreen() {
-  return <BoundedLoading stage="authorization" />;
-}
-
-function ApprovedUserRouter() {
-  const { resolution } = useRBAC();
-
-  // Wait for RBAC to resolve before rendering any privileged shell.
-  if (resolution.status === 'loading') {
-    return <LoadingScreen />;
-  }
-
-  // Lookup FAILURE must not silently downgrade to the pilot shell.
-  if (resolution.status === 'error') {
-    return (
-      <Routes>
-        <Route path="/sign-out" element={<SignOut />} />
-        <Route path="*" element={<AuthorizationError />} />
-      </Routes>
-    );
-  }
-
-  if (resolution.status === 'internal') {
-    return (
-      <Routes>
-        <Route path="/pilot/*" element={<PilotShell />} />
-        <Route path="/sign-out" element={<SignOut />} />
-        <Route path={MANAGED_USER_RETURN_PATH} element={<ManagedUserReturn />} />
-        <Route path="/invite/accept" element={<InviteAccept />} />
-        <Route path="/*" element={<AuthenticatedShell />} />
-      </Routes>
-    );
-  }
-
-  // Restricted pilot / customer user - sealed inside /pilot/*.
+  // Approved users load their shell bundle only after authentication and
+  // approval are resolved. The shell itself remains synchronous in that chunk.
   return (
-    <Routes>
-      <Route path="/pilot/*" element={<PilotShell />} />
-      <Route path="/sign-out" element={<SignOut />} />
-      <Route path={MANAGED_USER_RETURN_PATH} element={<ManagedUserReturn />} />
-      <Route path="/invite/accept" element={<InviteAccept />} />
-      <Route path="*" element={<Navigate to="/pilot/overview" replace />} />
-    </Routes>
+    <Suspense fallback={<BoundedLoading stage="authorization" />}>
+      <ApprovedUserRouter />
+    </Suspense>
   );
 }
 

@@ -1085,19 +1085,19 @@ html:not(.dark) .aura-workspace-theme {
   --v2-focus: 82 100% 24%;
   --v2-disabled-fg: 215 14% 42%;
   --v2-disabled-bg: 213 20% 94%;
-  --v2-placeholder: 215 14% 44%;
+  --v2-placeholder: 215 14% 40%;
 
   /* ---- Technical accent (NVIDIA green family, #76B900) ---- */
   --v2-tech: 82 100% 36%;             /* bright technical accent */
-  --v2-tech-strong: 82 100% 25%;      /* AA-safe on white with white text */
+  --v2-tech-strong: 82 100% 21%;      /* AA-safe on white with white text */
   --v2-tech-on-dark: 82 78% 58%;      /* readable green on graphite */
 
   /* ---- Semantic state hues (AA on light surfaces) ---- */
-  --v2-verified: 82 100% 25%;   /* verified / runtime-ready */
-  --v2-simulated: 33 94% 31%;   /* simulated / estimated / watch (AA on light canvas) */
+  --v2-verified: 82 100% 20%;   /* verified / runtime-ready */
+  --v2-simulated: 33 94% 26%;   /* simulated / estimated / watch (AA on light canvas) */
   --v2-info: 210 92% 38%;       /* informational telemetry / links */
   --v2-critical: 358 68% 45%;   /* genuine blockers only */
-  --v2-neutral: 215 12% 42%;    /* not assessed */
+  --v2-neutral: 215 14% 36%;    /* not assessed */
 
   /* ---- Brand accent (M2M amber, used sparingly) ---- */
   --v2-brand: 45 100% 50%;
@@ -1138,7 +1138,7 @@ html:not(.dark) .aura-workspace-theme {
   --text-heading: 220 28% 12%;
   --text-body: 220 16% 22%;
   --text-muted: 215 14% 38%;
-  --text-subtle: 215 12% 44%;
+  --text-subtle: 215 14% 38%;
 
   --shadow-card: var(--v2-shadow-panel);
   --shadow-elevated: var(--v2-shadow-elevated);
@@ -1665,3 +1665,17 @@ html:not(.dark) .aura-workspace-theme {
   border-color: hsl(var(--v2-line-strong));
   color: hsl(var(--v2-disabled-fg));
 }
+
+/* ---- 9. Tinted status chips: hardcoded palette text on soft tints measured
+        3.77-4.47:1 across the viewport matrix. Map them onto the AA-safe
+        semantic hues so chips stay legible at every breakpoint. ---- */
+.aura-v2 .text-amber-700, .aura-v2 .text-amber-600, .aura-v2 .text-yellow-700 { color: hsl(var(--v2-simulated)); }
+.aura-v2 .text-emerald-700, .aura-v2 .text-emerald-600, .aura-v2 .text-green-700 { color: hsl(var(--v2-verified)); }
+.aura-v2 .text-red-600, .aura-v2 .text-rose-600 { color: hsl(var(--v2-critical)); }
+.aura-v2 .text-blue-600, .aura-v2 .text-sky-600 { color: hsl(var(--v2-info)); }
+
+/* ---- 10. Chart legends inherit a near-white series token on white cards
+        (measured 1.15:1 on Analytics). Bind them to the surface foreground. ---- */
+.aura-v2 .recharts-legend-item-text { color: hsl(var(--foreground)) !important; }
+.aura-v2 .v2-tech-zone .recharts-legend-item-text,
+.aura-v2 .v2-viewport .recharts-legend-item-text { color: hsl(var(--v2-graphite-fg)) !important; }

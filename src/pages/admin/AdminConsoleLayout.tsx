@@ -46,6 +46,7 @@ const ADMIN_NAV = [
   },
 ] as const;
 
+/** Salesforce-style admin console; each child page retains the single page H1. */
 export default function AdminConsoleLayout({ children }: AdminConsoleLayoutProps) {
   const location = useLocation();
   const current = ADMIN_NAV.find((item) =>
@@ -54,7 +55,7 @@ export default function AdminConsoleLayout({ children }: AdminConsoleLayoutProps
 
   return (
     <section className="min-w-0 py-5" data-testid="platform-admin-workspace">
-      <nav aria-label="Breadcrumb" className="mb-3 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+      <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
         <Link to="/dashboard" className="hover:text-foreground">Command Center</Link>
         <ChevronRight className="h-3 w-3" aria-hidden />
         <span>Govern</span>
@@ -67,16 +68,6 @@ export default function AdminConsoleLayout({ children }: AdminConsoleLayoutProps
           </>
         )}
       </nav>
-
-      <header className="mb-5 border-b border-border pb-4">
-        <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight">
-          <Shield className="h-5 w-5 text-muted-foreground" aria-hidden />
-          Platform Administration
-        </h1>
-        <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-          Release readiness, capability and dataset registries, asset validation and internal diagnostics.
-        </p>
-      </header>
 
       <div className="grid min-w-0 gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
         <aside className="min-w-0" aria-label="Platform administration sections">

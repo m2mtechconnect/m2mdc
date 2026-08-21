@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronRight, Shield, Users } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useRBAC } from '@/contexts/RBACContext';
 import type { Permission } from '@/auth/permissions';
 import { cn } from '@/lib/utils';
@@ -30,6 +30,7 @@ const LOCAL_NAV: Array<{
   },
 ];
 
+/** Salesforce-style local navigation; child pages retain the single page H1. */
 export default function PeopleAccessLayout({ children }: PeopleAccessLayoutProps) {
   const location = useLocation();
   const { can } = useRBAC();
@@ -54,22 +55,9 @@ export default function PeopleAccessLayout({ children }: PeopleAccessLayoutProps
         )}
       </nav>
 
-      <header className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-border pb-4">
-        <div>
-          <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight">
-            <Users className="h-5 w-5 text-muted-foreground" aria-hidden />
-            People &amp; Access
-          </h1>
-          <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-            Members, invitations, approvals, roles and authorization administration in one governance workspace.
-          </p>
-        </div>
-        <Shield className="h-5 w-5 text-muted-foreground" aria-hidden />
-      </header>
-
       <nav
         aria-label="People and access sections"
-        className="mb-6 flex max-w-full gap-1 overflow-x-auto border-b border-border"
+        className="mb-4 flex max-w-full gap-1 overflow-x-auto border-b border-border"
       >
         {visible.map((item) => {
           const active = item.href === '/teams'

@@ -105,7 +105,7 @@ export const MANAGE_NAV: AppNavItem[] = [
     matches: ['/manage/integrations', '/manage/connections', '/integrations', '/settings/integrations', '/connect'],
     permission: 'twin.edit',
     group: 'operate',
-    description: 'Configure, test, map and monitor external systems and data exchange.',
+    description: 'Facility systems, edge gateways, twin exchange, storage and enterprise workflows.',
   },
   {
     name: 'Agents',
@@ -261,43 +261,31 @@ export interface NavGroup {
   items: AppNavItem[];
 }
 
-export const NAV_GROUP_ORDER: NavGroupId[] = [
-  'overview',
-  'design',
-  'simulate',
-  'operate',
-  'govern',
-  'support',
-];
+function visible(items: AppNavItem[], can: (permission: Permission) => boolean): AppNavItem[] {
+  return items.filter((item) => !item.permission || can(item.permission));
+}
 
-const ALL_NAV_ITEMS: AppNavItem[] = [...WORKSPACE_NAV, ...MANAGE_NAV, ...SUPPORT_NAV];
+export function visibleManageNav(can: (permission: Permission) => boolean): AppNavItem[] {
+  return visible(MANAGE_NAV.filter((item) => item.group === 'operate' || item.group === 'design'), can);
+}
 
-export function navGroups(can: (p: Permission) => boolean): NavGroup[] {
-  return NAV_GROUP_ORDER.map((id) => ({
+export function visibleGovernNav(can: (permission: Permission) => boolean): AppNavItem[] {
+  return visible(MANAGE_NAV.filter((item) => item.group === 'govern'), can);
+}
+
+export function navGroups(can: (permission: Permission) => boolean): NavGroup[] {
+  return (Object.keys(NAV_GROUP_LABEL) as NavGroupId[]).map((id) => ({
     id,
     label: NAV_GROUP_LABEL[id],
-    items: ALL_NAV_ITEMS.filter(
-      (item) => item.group === id && (!item.permission || can(item.permission)),
-    ),
-  })).filter((g) => g.items.length > 0);
+    items: [
+      ...WORKSPACE_NAV.filter((item) => item.group === id),
+      ...visible(MANAGE_NAV.filter((item) => item.group === id), can),
+      ...SUPPORT_NAV.filter((item) => item.group === id),
+    ],
+  })).filter((group) => group.items.length > 0);
 }
 
 export function isNavItemActive(item: AppNavItem, pathname: string): boolean {
-  if (item.href === '/') return pathname === '/' || pathname === '/dashboard';
-  const prefixes = item.matches ?? [item.href];
-  return prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
-}
-
-/** Operational management destinations only. */
-export function visibleManageNav(can: (p: Permission) => boolean): AppNavItem[] {
-  return MANAGE_NAV.filter(
-    (item) => item.group !== 'govern' && (!item.permission || can(item.permission)),
-  );
-}
-
-/** Governance and administration destinations only. */
-export function visibleGovernNav(can: (p: Permission) => boolean): AppNavItem[] {
-  return MANAGE_NAV.filter(
-    (item) => item.group === 'govern' && (!item.permission || can(item.permission)),
-  );
+  const candidates = item.matches?.length ? item.matches : [item.href];
+  return candidates.some((candidate) => pathname === candidate || pathname.startsWith(`${candidate}/`));
 }

@@ -110,9 +110,10 @@ Result after remediation: **0 horizontal overflow, 0 header clipping, 0 unnamed 
 Tests:
 - `bunx tsgo --noEmit` - clean
 - `bunx vitest run src/test/brandAssetRegression.test.ts` - 2 passed
+- `bunx vitest run src/test/shellCoreSynchronous.test.ts` - 2 pre-existing failures (asserts `src/App.tsx` import ordering and lazy route declarations). Unrelated to this pass; no code was changed to make it pass.
 
 ## 8. Known residual issues
 
 - **Deliberately retained microtext:** 10-11px recharts axis/tick labels on `/analytics` and 11-11.5px SVG floor-plan instrument labels on `/dashboard`. These are instrumentation, not prose, and sit inside chart/technical surfaces.
-- **`src/config/__tests__/routeRegistry.test.ts`** pre-existing drift from stale route declarations was left untouched, per the no-route-change constraint.
+- **`src/test/shellCoreSynchronous.test.ts`** and **`src/config/__tests__/routeRegistry.test.ts`** pre-existing drift from stale route declarations was left untouched, per the no-route-change constraint.
 - Keyboard-only traversal, screen-reader narration, reflow at 400% and reduced-motion behaviour remain manually unverified.

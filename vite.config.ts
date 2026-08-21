@@ -59,6 +59,10 @@ export default defineConfig(({ mode }) => ({
     __AURA_APP_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0'),
   },
   build: {
+    // Source maps are useful to Lighthouse and CI diagnostics, but publishing
+    // them with the production bundle is unnecessary. Generate them only for
+    // the dedicated Lighthouse build.
+    sourcemap: process.env.LIGHTHOUSE_CI === '1',
     rollupOptions: {
       output: {
         manualChunks: {

@@ -151,7 +151,6 @@ export default function Connections() {
         }
         subtitle={
           <>
-            Connect facility systems, edge gateways, twin runtimes, storage and enterprise workflows to AURA.
             Runtime status is evidence-derived; internal platform dependencies and capability assessment live on{' '}
             <Link className="underline underline-offset-4" to="/admin/platform-readiness">
               platform readiness

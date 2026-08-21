@@ -47,6 +47,16 @@ export const NAV_GROUP_LABEL: Record<NavGroupId, string> = {
   support: 'Support',
 };
 
+export const NAV_GROUP_ORDER: NavGroupId[] = [
+  'overview',
+  'design',
+  'simulate',
+  'operate',
+  'govern',
+  'support',
+];
+
+
 export const WORKSPACE_NAV: AppNavItem[] = [
   {
     name: 'Command Center',

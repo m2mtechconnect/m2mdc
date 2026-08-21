@@ -51,7 +51,7 @@ export function OperatingStateBar({ className, scenario, runId, srOnly }: Props)
       data-testid="operating-state-bar"
       data-mode={mode.mode}
       className={cn(
-        'flex w-full flex-wrap items-center gap-x-3 gap-y-1 border-b border-border bg-muted/40 px-3 py-1.5 text-[11px] leading-tight sm:px-4',
+        'v2-status-strip flex w-full flex-wrap gap-x-3 gap-y-1 px-3 py-1.5 text-[11px] leading-tight sm:px-4',
         className,
       )}
     >

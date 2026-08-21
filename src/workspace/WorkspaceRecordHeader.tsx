@@ -52,10 +52,10 @@ export function WorkspaceRecordHeader({ facility, isFallback, panelOpen, onOpenP
     <TooltipProvider delayDuration={200}>
       <header
         data-testid="workspace-record-header"
-        className="flex h-[52px] w-full shrink-0 items-center gap-x-3 border-b border-border bg-card px-3 sm:px-4"
+        className="flex h-[52px] w-full shrink-0 items-center gap-x-3 border-b border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-canvas-deep))] px-3 sm:px-4"
       >
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          <h1 className="min-w-0 truncate text-base font-semibold leading-tight text-foreground sm:text-[17px]">
+          <h1 className="v2-command-title min-w-0 truncate text-base sm:text-[17px]">
             {workspaceLabel ? `${facility.name} - ${workspaceLabel}` : facility.name}
           </h1>
           <Badge
@@ -72,7 +72,7 @@ export function WorkspaceRecordHeader({ facility, isFallback, panelOpen, onOpenP
         </div>
 
         {/* Truth line: scenario, run identifier, relative calculation time. */}
-        <div className="hidden min-w-0 items-center gap-3 text-xs text-muted-foreground md:flex">
+        <div className="v2-mono hidden min-w-0 items-center gap-3 text-xs text-muted-foreground md:flex">
           <span className="h-4 w-px shrink-0 bg-border" aria-hidden />
           <span className="min-w-0 max-w-[14rem] truncate text-foreground">{scenarioLabel}</span>
           <span className="flex min-w-0 items-center gap-1">

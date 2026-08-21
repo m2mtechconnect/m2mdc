@@ -1094,7 +1094,7 @@ html:not(.dark) .aura-workspace-theme {
 
   /* ---- Semantic state hues (AA on light surfaces) ---- */
   --v2-verified: 82 100% 27%;   /* verified / runtime-ready */
-  --v2-simulated: 33 92% 38%;   /* simulated / estimated / watch */
+  --v2-simulated: 33 94% 31%;   /* simulated / estimated / watch (AA on light canvas) */
   --v2-info: 210 92% 38%;       /* informational telemetry / links */
   --v2-critical: 358 68% 45%;   /* genuine blockers only */
   --v2-neutral: 215 12% 42%;    /* not assessed */

@@ -6,7 +6,6 @@
  */
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import m2mLogo from '@/assets/m2m-logo.png';
 
 const NVIDIA_GREEN = '#76B900';
 
@@ -77,7 +76,6 @@ export function AuraLogo({ surface = 'dark', compact = false, tagline, className
     <span className={cn('flex min-w-0 items-center gap-2.5', className)}>
       {!compact && (
         <>
-          <img src={m2mLogo} alt="" aria-hidden className="h-7 w-7 shrink-0 object-contain" />
           <span className={cn('hidden text-[13px] font-semibold tracking-wide sm:inline', parentTone)}>
             M2M
           </span>

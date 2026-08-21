@@ -100,8 +100,8 @@ export function Layout({ children }: LayoutProps) {
 
       <header
         ref={headerRef}
-        className={`sticky top-0 z-50 border-b border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-rail)/0.92)] backdrop-blur-xl supports-[backdrop-filter]:backdrop-blur transition-shadow ${
-          isScrolled ? 'shadow-[0_10px_30px_-20px_hsl(220_40%_2%/0.95)]' : ''
+        className={`v2-appbar sticky top-0 z-50 transition-shadow ${
+          isScrolled ? 'shadow-[0_10px_30px_-22px_hsl(220_40%_2%/0.7)]' : ''
         }`}
         role="navigation"
         aria-label="Primary navigation"
@@ -137,10 +137,8 @@ export function Layout({ children }: LayoutProps) {
                         asChild
                         variant={isActive ? "secondary" : "ghost"}
                         size="sm"
-                        className={`gap-2 rounded-md px-2.5 xl:px-3 text-[14px] font-medium transition-smooth min-h-[36px] ${
-                          isActive
-                            ? "bg-[hsl(var(--accent)/0.12)] text-[hsl(var(--accent))] shadow-[inset_0_-2px_0_0_hsl(var(--accent))]"
-                            : "text-muted-foreground hover:bg-[hsl(var(--v2-panel-elevated))] hover:text-foreground"
+                        className={`v2-appbar-link gap-2 rounded-md px-2.5 xl:px-3 text-[14px] font-medium transition-smooth min-h-[36px] ${
+                          isActive ? "v2-appbar-link-active" : ""
                         }`}
                       >
                         <Link
@@ -163,7 +161,7 @@ export function Layout({ children }: LayoutProps) {
               })}
 
               {(manageNavigation.length > 0 || governNavigation.length > 0) && (
-                <div className="h-4 w-px bg-border mx-1" aria-hidden="true" />
+                <div className="h-4 w-px bg-[hsl(var(--v2-graphite-line))] mx-1" aria-hidden="true" />
               )}
 
               {manageNavigation.length > 0 && (
@@ -172,7 +170,7 @@ export function Layout({ children }: LayoutProps) {
                     <Button
                       variant={manageActive ? "secondary" : "ghost"}
                       size="sm"
-                      className="gap-2 px-2.5 text-[14px] font-medium text-muted-foreground hover:text-foreground min-h-[36px]"
+                      className={`v2-appbar-link gap-2 px-2.5 rounded-md text-[14px] font-medium min-h-[36px] ${manageActive ? 'v2-appbar-link-active' : ''}`}
                       aria-label="Manage"
                       data-testid="manage-trigger"
                       data-nav-item="Manage"
@@ -210,7 +208,7 @@ export function Layout({ children }: LayoutProps) {
                     <Button
                       variant={governActive ? "secondary" : "ghost"}
                       size="sm"
-                      className="gap-2 px-2.5 text-[14px] font-medium text-muted-foreground hover:text-foreground min-h-[36px]"
+                      className={`v2-appbar-link gap-2 px-2.5 rounded-md text-[14px] font-medium min-h-[36px] ${governActive ? 'v2-appbar-link-active' : ''}`}
                       aria-label="Govern"
                       data-testid="govern-trigger"
                       data-nav-item="Govern"
@@ -248,7 +246,7 @@ export function Layout({ children }: LayoutProps) {
             <Button
               variant="outline"
               size="sm"
-              className="hidden lg:flex gap-2 text-[13px] text-muted-foreground min-h-[38px] hover:bg-accent/10 transition-smooth"
+              className="hidden lg:flex gap-2 text-[14px] min-h-[38px] border-[hsl(var(--v2-graphite-line))] bg-[hsl(var(--v2-graphite-elevated))] text-[hsl(var(--v2-graphite-muted))] hover:bg-[hsl(var(--v2-graphite-line))] hover:text-[hsl(var(--v2-graphite-fg))] transition-smooth"
               aria-label="Open command palette"
               onClick={() => {
                 document.dispatchEvent(
@@ -265,7 +263,7 @@ export function Layout({ children }: LayoutProps) {
                 <Button
                   variant={isOpen ? "secondary" : "outline"}
                   size="sm"
-                  className="gap-2 min-h-[38px] text-[13px]"
+                  className="gap-2 min-h-[38px] text-[14px] border-[hsl(var(--v2-graphite-line))] bg-[hsl(var(--v2-graphite-elevated))] text-[hsl(var(--v2-graphite-fg))] hover:bg-[hsl(var(--v2-graphite-line))] hover:text-[hsl(var(--v2-graphite-fg))]"
                   data-testid="assistant-entry"
                   aria-label={isOpen ? `Close ${COPILOT.TITLE}` : `Open ${COPILOT.TITLE}`}
                   aria-expanded={isOpen}
@@ -285,7 +283,7 @@ export function Layout({ children }: LayoutProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="xl:hidden min-h-[44px] min-w-[44px] hover:bg-accent/10 transition-smooth group"
+              className="xl:hidden min-h-[44px] min-w-[44px] text-[hsl(var(--v2-graphite-fg))] hover:bg-[hsl(var(--v2-graphite-elevated))] transition-smooth group"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle mobile menu"
               aria-expanded={mobileMenuOpen}

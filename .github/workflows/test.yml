@@ -9,10 +9,6 @@ on:
     branches: [main]
   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-
 env:
   CI: true
   AURA_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -30,6 +26,9 @@ jobs:
   integration-tests:
     name: Integration Tests
     runs-on: ubuntu-latest
+    concurrency:
+      group: test-integration-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
     services:
       postgres:
@@ -75,6 +74,9 @@ jobs:
   lighthouse:
     name: Lighthouse CI
     runs-on: ubuntu-latest
+    concurrency:
+      group: test-lighthouse-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -132,6 +134,9 @@ jobs:
   test-summary:
     name: Test Summary
     runs-on: ubuntu-latest
+    concurrency:
+      group: test-summary-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     needs: [integration-tests, lighthouse]
     if: always()
 

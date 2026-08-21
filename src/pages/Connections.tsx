@@ -1,12 +1,11 @@
 /**
- * Connections & Data Exchange — the operational control plane for every
- * external system. Canonical route: /manage/integrations
+ * Connections — the operational control plane for customer-facing hybrid-stack
+ * systems. Canonical route: /manage/integrations
  * Alias: /manage/connections
  *
- * Static DSX environment requirements, the agent tool readiness assessment
- * and the platform capability assessment live at /admin/platform-readiness.
- * This workspace is about configured, configurable, degraded, unavailable or
- * planned connections only.
+ * Internal platform capability assessment lives at /admin/platform-readiness.
+ * This workspace is for configured systems, data flows and connectors that
+ * exchange facility, twin, storage or enterprise-workflow data with AURA.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -41,10 +40,10 @@ import {
 
 const TABS = [
   { value: 'overview', label: 'Overview' },
-  { value: 'connections', label: 'Connections' },
+  { value: 'connections', label: 'Connected systems' },
   { value: 'data-flows', label: 'Data flows' },
-  { value: 'catalogue', label: 'Catalogue' },
-  { value: 'activity', label: 'Activity & health' },
+  { value: 'catalogue', label: 'Available connectors' },
+  { value: 'activity', label: 'Health & audit' },
 ];
 
 export default function Connections() {
@@ -73,7 +72,7 @@ export default function Connections() {
   const [testing, setTesting] = useState(false);
 
   useEffect(() => {
-    document.title = 'Connections & Data Exchange | AURA DC';
+    document.title = 'Connections | AURA DC';
   }, []);
 
   const setTab = useCallback((value: string) => {
@@ -145,12 +144,11 @@ export default function Connections() {
         <div className="min-w-0 space-y-1">
           <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
             <Cable className="h-5 w-5 text-muted-foreground" aria-hidden />
-            Connections &amp; Data Exchange
+            Connections
           </h1>
           <p className="max-w-3xl text-sm text-muted-foreground">
-            Configure, test, map, monitor and govern every external connection. Status is derived
-            from runtime evidence. Environment requirements and the platform capability assessment
-            live on{' '}
+            Connect facility systems, edge gateways, twin runtimes, storage and enterprise workflows to AURA.
+            Runtime status is evidence-derived; internal platform dependencies and capability assessment live on{' '}
             <Link className="underline underline-offset-4" to="/admin/platform-readiness">
               platform readiness
             </Link>

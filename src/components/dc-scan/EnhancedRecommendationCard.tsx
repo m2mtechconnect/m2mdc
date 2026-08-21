@@ -86,7 +86,7 @@ function AgentCard({ agent }: { agent: AgentRecommendation }) {
               <Server className="h-4 w-4 text-primary" />
               <span className="font-medium text-sm">{agent.name}</span>
               {agent.priority === 'critical' && (
-                <Badge variant="destructive" className="text-[10px] px-1 py-0">Required</Badge>
+                <Badge variant="destructive" className="text-xs px-1 py-0">Required</Badge>
               )}
             </div>
             <p className="text-xs text-muted-foreground line-clamp-2">{agent.purpose}</p>
@@ -115,12 +115,12 @@ function ScenarioCard({ scenario }: { scenario: ScenarioRecommendation }) {
     <div className={`p-3 rounded-lg border bg-card ${severityColors[scenario.severity]}`}>
       <div className="flex items-center justify-between mb-1">
         <span className="font-medium text-sm text-foreground">{scenario.name}</span>
-        <Badge variant="outline" className="text-[10px]">{scenario.duration}</Badge>
+        <Badge variant="outline" className="text-xs">{scenario.duration}</Badge>
       </div>
       <p className="text-xs text-muted-foreground mb-2">{scenario.description}</p>
       <div className="flex flex-wrap gap-1">
         {scenario.industryRelevance.slice(0, 3).map((tag, i) => (
-          <Badge key={i} variant="secondary" className="text-[10px]">{tag}</Badge>
+          <Badge key={i} variant="secondary" className="text-xs">{tag}</Badge>
         ))}
       </div>
     </div>
@@ -166,15 +166,15 @@ export function EnhancedRecommendationCard({
           <div className="flex flex-wrap gap-3">
             <div className="text-center px-3 py-2 bg-success/10 rounded-lg border border-success/30">
               <p className="text-lg font-bold text-success">{recommendation.headerMetrics?.roi || `${Math.round(recommendation.financialModel.projectedOpexReductionPct)}%`}</p>
-              <p className="text-[10px] text-muted-foreground">Projected ROI</p>
+              <p className="text-xs text-muted-foreground">Projected ROI</p>
             </div>
             <div className="text-center px-3 py-2 bg-info/10 rounded-lg border border-info/30">
               <p className="text-lg font-bold text-info">{recommendation.headerMetrics?.renewable || `${100 - Math.round(recommendation.financialModel.gridCarbonIntensity / 5)}%`}</p>
-              <p className="text-[10px] text-muted-foreground">Renewable</p>
+              <p className="text-xs text-muted-foreground">Renewable</p>
             </div>
             <div className="text-center px-3 py-2 bg-primary/10 rounded-lg border border-primary/30">
               <p className="text-lg font-bold text-primary">{recommendation.suggestedCapacityKw.toLocaleString()}</p>
-              <p className="text-[10px] text-muted-foreground">kW Capacity</p>
+              <p className="text-xs text-muted-foreground">kW Capacity</p>
             </div>
           </div>
         </div>
@@ -196,7 +196,7 @@ export function EnhancedRecommendationCard({
                 <CheckCircle2 className="h-4 w-4 text-success mt-0.5 shrink-0" />
                 <div>
                   <p className="font-medium text-sm">{objective.text}</p>
-                  <Badge variant="outline" className="text-[10px] mt-1">{objective.category}</Badge>
+                  <Badge variant="outline" className="text-xs mt-1">{objective.category}</Badge>
                 </div>
               </div>
             ))}
@@ -208,7 +208,7 @@ export function EnhancedRecommendationCard({
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="h-5 w-5 text-primary" />
             <h3 className="font-semibold">Key Performance Insights</h3>
-            <Badge variant="outline" className="text-[10px]">vs Industry Benchmarks</Badge>
+            <Badge variant="outline" className="text-xs">vs Industry Benchmarks</Badge>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {recommendation.kpiInsights.slice(0, 4).map((insight, index) => (
@@ -245,7 +245,7 @@ export function EnhancedRecommendationCard({
           <div className="flex items-center gap-2 mb-4">
             <Zap className="h-5 w-5 text-primary" />
             <h3 className="font-semibold">Priority Simulation Scenarios</h3>
-            <Badge variant="outline" className="text-[10px]">Industry-Prioritized</Badge>
+            <Badge variant="outline" className="text-xs">Industry-Prioritized</Badge>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {recommendation.scenarios.slice(0, 4).map((scenario, index) => (

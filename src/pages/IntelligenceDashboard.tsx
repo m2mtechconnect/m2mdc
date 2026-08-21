@@ -449,7 +449,7 @@ export default function IntelligenceDashboard() {
             <Button variant="outline" className="gap-2" onClick={() => navigate('/blueprint/default')}>
               <FileText className="h-4 w-4" />
               Blueprint
-              <Badge variant="secondary" className="text-[10px]">{totalKpis} KPIs</Badge>
+              <Badge variant="secondary" className="text-xs">{totalKpis} KPIs</Badge>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -465,7 +465,7 @@ export default function IntelligenceDashboard() {
               <DropdownMenuContent align="end" className="w-64">
                 <DropdownMenuLabel>
                   Provenance-preserving export
-                  <div className="text-[10px] font-normal text-muted-foreground">
+                  <div className="text-xs font-normal text-muted-foreground">
                     Schema v{EXPORT_SCHEMA_VERSION} · every row is classified per-metric.
                   </div>
                 </DropdownMenuLabel>
@@ -1046,7 +1046,7 @@ export default function IntelligenceDashboard() {
                     <div className="flex items-baseline gap-2 mb-1">
                       <span className="text-4xl font-bold text-foreground">{grid.intensity}</span>
                       <span className="text-sm text-muted-foreground">gCO₂/kWh</span>
-                      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-accent/15 text-accent-foreground border border-accent/30">
+                      <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-accent/15 text-accent-foreground border border-accent/30">
                         {grid.label}
                       </span>
                     </div>

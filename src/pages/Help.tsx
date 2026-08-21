@@ -24,6 +24,8 @@ import { Badge } from '@/components/ui/badge';
 import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 import { useTour } from '@/context/TourContext';
 import { tourRegistry, type TourId } from '@/tours/tourRegistry';
+import { getBuildFingerprint } from '@/lib/buildFingerprint';
+
 
 interface GuideLink {
   title: string;

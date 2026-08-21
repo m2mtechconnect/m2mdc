@@ -11,12 +11,17 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+env:
+  AURA_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
 jobs:
   verify-audit-chain:
     name: Verify DSX audit chain integrity
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.AURA_SOURCE_SHA }}
 
       - uses: actions/setup-node@v4
         with:
@@ -48,6 +53,7 @@ jobs:
           {
             echo "### DSX audit chain summary"
             echo ""
+            echo "- release source SHA: $AURA_SOURCE_SHA"
             echo '```json'
             cat "$summary_path"
             echo '```'
@@ -62,7 +68,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: dsx-audit-log
+          name: dsx-audit-log-${{ env.AURA_SOURCE_SHA }}
           path: |
             docs/remediation/evidence/dsx-audit/audit.jsonl
             docs/remediation/evidence/dsx-audit/summary.json

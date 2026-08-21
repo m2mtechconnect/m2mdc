@@ -134,7 +134,7 @@ export function Layout({ children }: LayoutProps) {
                         asChild
                         variant={isActive ? "secondary" : "ghost"}
                         size="sm"
-                        className={`v2-appbar-link gap-2 rounded-md px-2.5 xl:px-3 text-[14px] font-medium transition-smooth min-h-[36px] ${
+                        className={`v2-appbar-link gap-2 rounded-md px-3 text-[14px] font-medium transition-smooth min-h-[36px] ${
                           isActive ? "v2-appbar-link-active" : ""
                         }`}
                       >
@@ -146,7 +146,7 @@ export function Layout({ children }: LayoutProps) {
                           aria-current={isActive ? "page" : undefined}
                         >
                           <item.icon className="h-[18px] w-[18px] flex-shrink-0" strokeWidth={1.75} aria-hidden="true" />
-                          <span className="hidden whitespace-nowrap xl:inline">{item.name}</span>
+                          <span className="hidden whitespace-nowrap lg:inline">{item.name}</span>
                         </Link>
                       </Button>
                     </TooltipTrigger>
@@ -173,7 +173,7 @@ export function Layout({ children }: LayoutProps) {
                       data-nav-item="Manage"
                     >
                       <Settings className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
-                      <span className="hidden xl:inline">Manage</span>
+                      <span className="hidden lg:inline">Manage</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-72" data-testid="manage-menu">
@@ -211,7 +211,7 @@ export function Layout({ children }: LayoutProps) {
                       data-nav-item="Govern"
                     >
                       <Shield className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
-                      <span className="hidden xl:inline">Govern</span>
+                      <span className="hidden lg:inline">Govern</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-72" data-testid="govern-menu">

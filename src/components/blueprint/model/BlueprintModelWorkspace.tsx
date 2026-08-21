@@ -116,9 +116,7 @@ export function BlueprintModelWorkspace({
     >
       {/* The twin viewport is the dominant surface of the workspace. */}
       <div className="min-w-0 space-y-3">
-        <div className="v2-viewport min-w-0 overflow-hidden p-0">
-          <BlueprintModelSection facilityOverride={facilityOverride} />
-        </div>
+        <BlueprintModelSection facilityOverride={facilityOverride} />
         <OperatorSummaryStrip metrics={metrics} />
       </div>
 

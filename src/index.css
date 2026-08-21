@@ -1578,3 +1578,61 @@ html:not(.dark) .aura-workspace-theme {
 .aura-v2 .v2-appbar :focus-visible {
   outline-color: hsl(var(--v2-tech-on-dark)) !important;
 }
+
+/* ==================================================================
+   AURA V2 — full-platform UI audit hardening (presentation only).
+   Fixes systemic contrast, legibility and action-hierarchy defects
+   found in the full-platform UX/UI audit. No behavioural change.
+   ================================================================== */
+
+/* ---- 1. Ordinary text may not fall below 12px.
+        Telemetry rails and canvas overlays keep their instrument scale. ---- */
+.aura-v2 .text-\[9px\],
+.aura-v2 .text-\[10px\],
+.aura-v2 .text-\[11px\] {
+  font-size: 12px;
+  line-height: 1.35;
+}
+.aura-v2 .v2-viewport .text-\[10px\],
+.aura-v2 .v2-viewport .text-\[11px\],
+.aura-v2 .v2-telemetry-rail .text-\[10px\],
+.aura-v2 .v2-telemetry-rail .text-\[11px\] {
+  font-size: 11px;
+}
+
+/* ---- 2. Legacy tokens that resolve to near-white on the light canvas ---- */
+.aura-v2 .text-secondary:not(.v2-keep-color) { color: hsl(var(--secondary-foreground)); }
+.aura-v2 .text-primary-foreground:not([class*='bg-']) { color: hsl(var(--foreground)); }
+
+/* ---- 3. Legacy palette utilities that fail AA on light surfaces ---- */
+.aura-v2 :not(.v2-tech-zone):not(.v2-viewport):not(.v2-telemetry-rail) > .text-gray-400,
+.aura-v2 :not(.v2-tech-zone):not(.v2-viewport):not(.v2-telemetry-rail) > .text-slate-400,
+.aura-v2 :not(.v2-tech-zone):not(.v2-viewport):not(.v2-telemetry-rail) > .text-zinc-400 {
+  color: hsl(var(--text-muted));
+}
+
+/* ---- 4. Action hierarchy: ghost/outline controls must stay visible ---- */
+.aura-v2 button[data-variant='ghost']:hover,
+.aura-v2 .v2-panel button.hover\:bg-accent:hover {
+  background-color: hsl(var(--v2-canvas-deep));
+  color: hsl(var(--text-heading));
+}
+.aura-v2 .v2-tech-zone button[data-variant='outline'],
+.aura-v2 .v2-viewport button[data-variant='outline'] {
+  background-color: hsl(var(--v2-graphite-elevated));
+  border-color: hsl(var(--v2-graphite-line));
+  color: hsl(var(--v2-graphite-fg));
+}
+
+/* ---- 5. Table structure: readable headers and visible separators ---- */
+.aura-v2 table thead th { color: hsl(var(--text-muted)); font-size: 12px; }
+.aura-v2 table tbody tr { border-color: hsl(var(--v2-line)); }
+
+/* ---- 6. Focus visibility on light enterprise surfaces ---- */
+.aura-v2 :focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* ---- 7. Card-wall reduction: nested panels lose the duplicate border ---- */
+.aura-v2 .v2-panel .v2-panel { box-shadow: none; }

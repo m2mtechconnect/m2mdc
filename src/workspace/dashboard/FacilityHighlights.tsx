@@ -94,7 +94,7 @@ export function FacilityHighlights({
             >
               {facilityName}
             </h1>
-            <p className="mt-1 break-words text-[13px] text-muted-foreground">
+            <p className="mt-1 break-words text-[14px] text-muted-foreground">
               {location} · {tier} design
               {isFallback && ' · Reference model'}
               <span className="hidden sm:inline"> · Simulated design baseline · Synthetic inputs</span>
@@ -162,7 +162,7 @@ export function FacilityHighlights({
 
       {/* Primary indicators as divided cells inside the same surface. */}
       <div
-        className="grid min-w-0 grid-cols-2 border-t border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-canvas-deep))]/60 min-[960px]:grid-cols-4"
+        className="grid min-w-0 grid-cols-2 border-t border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-canvas-deep))]/45 min-[960px]:grid-cols-4"
         role="group"
         aria-label="Facility highlights"
       >

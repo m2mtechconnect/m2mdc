@@ -11,6 +11,7 @@ import { Building2, Loader2, MapPin, Plus, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CommandHeader } from '@/components/v2';
 import {
   Dialog,
   DialogContent,

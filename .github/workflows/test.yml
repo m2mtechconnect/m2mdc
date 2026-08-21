@@ -15,6 +15,7 @@ concurrency:
 
 env:
   CI: true
+  AURA_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
   VITE_SUPABASE_URL: http://127.0.0.1:54321
   VITE_SUPABASE_PROJECT_ID: local-placeholder
   VITE_SUPABASE_PUBLISHABLE_KEY: safe-placeholder-anon-key
@@ -46,6 +47,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.AURA_SOURCE_SHA }}
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -75,6 +78,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.AURA_SOURCE_SHA }}
+          fetch-depth: 0
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -92,6 +98,21 @@ jobs:
         run: bun run build
         env:
           LIGHTHOUSE_CI: '1'
+          AURA_COMMIT_SHA: ${{ env.AURA_SOURCE_SHA }}
+          AURA_RELEASE_BRANCH: ${{ github.head_ref || github.ref_name }}
+          AURA_RELEASE_ENVIRONMENT: ci
+
+      - name: Verify release fingerprint matches tested source
+        shell: bash
+        run: |
+          test -f dist/release.json || { echo "dist/release.json missing"; exit 1; }
+          node - <<'NODE'
+          const fs = require('fs');
+          const payload = JSON.parse(fs.readFileSync('dist/release.json', 'utf8'));
+          if (payload.schema !== 'aura.release-fingerprint.v1') throw new Error(`Unexpected schema: ${payload.schema}`);
+          if (payload.sha !== process.env.AURA_SOURCE_SHA) throw new Error(`Fingerprint SHA ${payload.sha} != tested source ${process.env.AURA_SOURCE_SHA}`);
+          console.log(`Release fingerprint verified for ${payload.sha}`);
+          NODE
 
       - name: Run Lighthouse CI
         run: |

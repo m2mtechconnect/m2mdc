@@ -1,9 +1,8 @@
 /**
  * Real-click navigation regression for the authenticated AURA DC shell.
  *
- * Covers desktop primary links, desktop submenu links, mobile drawer links,
- * dashboard card links, and command-palette route targets under the existing
- * network guard. The suite verifies real route changes, not just rendered text.
+ * Covers desktop primary links, Manage/Govern menus, the mobile drawer,
+ * dashboard actions and command-palette route targets under the network guard.
  */
 
 import { test, expect } from './_setup/fixtures';
@@ -30,18 +29,52 @@ async function expectPath(page: import('@playwright/test').Page, expected: strin
     .toBe(expected);
 }
 
+async function auditMenuDestinations(
+  page: import('@playwright/test').Page,
+  triggerTestId: 'manage-trigger' | 'govern-trigger',
+  menuTestId: 'manage-menu' | 'govern-menu',
+) {
+  const trigger = page.getByTestId(triggerTestId);
+  await expect(trigger, `${triggerTestId} is rendered`).toBeVisible();
+  await trigger.click();
+
+  const menu = page.getByTestId(menuTestId);
+  await expect(menu).toBeVisible();
+  const items = menu.getByRole('menuitem');
+  const count = await items.count();
+  expect(count, `${menuTestId} must expose at least one destination`).toBeGreaterThan(0);
+
+  const hrefs: string[] = [];
+  for (let index = 0; index < count; index += 1) {
+    const item = items.nth(index);
+    const href = (await item.getAttribute('href'))
+      ?? (await item.locator('a[href]').first().getAttribute('href').catch(() => null));
+    if (href) hrefs.push(href);
+  }
+  expect(hrefs.length, `${menuTestId} entries must be links`).toBe(count);
+
+  for (const href of hrefs) {
+    const target = new URL(href, 'http://localhost').pathname;
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    await expect(trigger).toBeVisible();
+    await trigger.click();
+    await page.locator(`[data-testid="${menuTestId}"] [href="${href}"]`).first().click();
+    await expect
+      .poll(() => new URL(page.url()).pathname, { timeout: 5_000, message: `${href} must commit a route` })
+      .toMatch(new RegExp(`^${target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(/|$)`));
+  }
+}
+
 test.describe('AURA DC authenticated navigation real-click matrix', () => {
   test('desktop header links navigate with React Router anchors', async ({ context, page, guard }) => {
     await page.setViewportSize({ width: 1600, height: 900 });
     await installSessionAndOpen(context, page);
 
-    // Canonical IA (src/config/appNavigation.ts): header links are labelled
-    // with each item's fullName and point at the canonical href.
     const matrix = [
       { name: 'Facility Blueprint', path: '/blueprint/default' },
-      { name: 'Simulation Studio', path: '/simulation' },
-      { name: 'Validation & Evidence', path: '/dsx/evidence-beta/overview' },
-      { name: 'AI Factory Overview', path: '/dashboard' },
+      { name: 'Simulation', path: '/simulation' },
+      { name: 'Evidence', path: '/dsx/evidence-beta/overview' },
+      { name: 'Command Center', path: '/dashboard' },
     ];
 
     for (const item of matrix) {
@@ -56,49 +89,19 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 
-  test('desktop Manage submenu opens and navigates below xl breakpoint', async ({ context, page, guard }) => {
-    // One navigation per Manage destination; the default 20s budget is too tight.
+  test('desktop Manage destinations are real links', async ({ context, page, guard }) => {
     test.setTimeout(120_000);
     await page.setViewportSize({ width: 1400, height: 900 });
     await installSessionAndOpen(context, page);
+    await auditMenuDestinations(page, 'manage-trigger', 'manage-menu');
+    expect(guard.anyExternalCompleted()).toBe(false);
+  });
 
-    const trigger = page.getByTestId('manage-trigger');
-    await expect(trigger, 'Manage trigger is rendered').toBeVisible();
-    await trigger.click();
-
-    const menu = page.getByTestId('manage-menu');
-    await expect(menu).toBeVisible();
-
-    const items = menu.getByRole('menuitem');
-    const count = await items.count();
-    expect(count, 'Manage menu must expose at least one destination').toBeGreaterThan(0);
-
-    // Every rendered Manage destination must be a real anchor that commits a
-    // route change to its own href - no dead menu entries.
-    const hrefs: string[] = [];
-    for (let index = 0; index < count; index += 1) {
-      const item = items.nth(index);
-      const href = (await item.getAttribute('href'))
-        ?? (await item.locator('a[href]').first().getAttribute('href').catch(() => null));
-      if (href) hrefs.push(href);
-    }
-    expect(hrefs.length, 'Manage menu entries must be links').toBe(count);
-
-    for (const href of hrefs) {
-      const target = new URL(href, 'http://localhost').pathname;
-      // Return to the shell home each time: some destinations render their own
-      // workspace chrome without the Manage trigger.
-      await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-      await expect(trigger).toBeVisible();
-      await trigger.click();
-      await page.locator(`[data-testid="manage-menu"] [href="${href}"]`).first().click();
-      // A destination may redirect to a canonical child route, so the
-      // committed path must start with the advertised href.
-      await expect
-        .poll(() => new URL(page.url()).pathname, { timeout: 5_000, message: `${href} must commit a route` })
-        .toMatch(new RegExp(`^${target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(/|$)`));
-    }
-
+  test('desktop Govern destinations are real links', async ({ context, page, guard }) => {
+    test.setTimeout(120_000);
+    await page.setViewportSize({ width: 1400, height: 900 });
+    await installSessionAndOpen(context, page);
+    await auditMenuDestinations(page, 'govern-trigger', 'govern-menu');
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 
@@ -107,11 +110,11 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await installSessionAndOpen(context, page);
 
     await page.getByRole('button', { name: 'Toggle mobile menu' }).click();
-    const drawer = page.getByRole('dialog', { name: /Data Centre Twin Studio/i });
+    const drawer = page.getByRole('dialog').first();
     await expect(drawer).toBeVisible();
-    await drawer.getByRole('link', { name: 'Simulation Studio' }).first().click();
+    await drawer.getByRole('link', { name: 'Simulation' }).first().click();
     await expectPath(page, '/simulation');
-    await expect(page.getByRole('dialog', { name: /Data Centre Twin Studio/i })).toHaveCount(0);
+    await expect(page.getByRole('dialog')).toHaveCount(0);
 
     expect(guard.anyExternalCompleted()).toBe(false);
   });

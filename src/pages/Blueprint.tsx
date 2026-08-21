@@ -371,38 +371,41 @@ export default function Blueprint() {
                           dbTwin: dbTwinData,
                         })}
                       />
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-base flex items-center gap-2">
-                            <Activity className="h-4 w-4" />
-                            {t('blueprint.deploymentReadiness')}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            {t('blueprint.deploymentReadinessDesc')}
-                          </p>
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                              <span className="text-sm">{t('blueprint.agentsConfigured')}</span>
-                              <Badge variant="outline">{blueprint.agents.length}</Badge>
-                            </div>
-                            <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                              <span className="text-sm">{t('blueprint.kpisTracked')}</span>
-                              <Badge variant="outline">{blueprint.kpis.length}</Badge>
-                            </div>
-                            <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                              <span className="text-sm">{t('blueprint.workflowsActive')}</span>
-                              <Badge variant="outline">{blueprint.workflows.filter(w => w.enabled).length}</Badge>
-                            </div>
-                            {/* Stage 7J: scenario readiness is owned by the
-                                Simulation workspace, not by Blueprint. */}
-                            <p className="text-xs text-muted-foreground">
-                              {t('blueprint.scenariosOwnedBySimulation')}
-                            </p>
-                          </div>
-                        </CardContent>
-                      </Card>
+                      <Panel className="min-w-0">
+                        <SectionHeader
+                          title={
+                            <span className="flex items-center gap-2">
+                              <Activity className="h-3.5 w-3.5" aria-hidden />
+                              {t('blueprint.deploymentReadiness')}
+                            </span>
+                          }
+                        />
+                        <p className="mb-3 text-[13px] text-muted-foreground">
+                          {t('blueprint.deploymentReadinessDesc')}
+                        </p>
+                        <InstrumentGrid>
+                          <Instrument
+                            level="compact"
+                            label={t('blueprint.agentsConfigured')}
+                            value={blueprint.agents.length}
+                          />
+                          <Instrument
+                            level="compact"
+                            label={t('blueprint.kpisTracked')}
+                            value={blueprint.kpis.length}
+                          />
+                          <Instrument
+                            level="compact"
+                            label={t('blueprint.workflowsActive')}
+                            value={blueprint.workflows.filter((w) => w.enabled).length}
+                          />
+                        </InstrumentGrid>
+                        {/* Stage 7J: scenario readiness is owned by the
+                            Simulation workspace, not by Blueprint. */}
+                        <p className="mt-3 text-xs text-muted-foreground">
+                          {t('blueprint.scenariosOwnedBySimulation')}
+                        </p>
+                      </Panel>
                     </div>
                   </TabsContent>
                   <TabsContent value="versions" className="m-0">

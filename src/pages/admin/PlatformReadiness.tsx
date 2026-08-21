@@ -23,7 +23,7 @@ interface Capability {
   documentation?: string;
 }
 
-const LAST_ASSESSED = '2026-08-17';
+const LAST_ASSESSED = '2026-08-21';
 
 const CAPABILITIES: Capability[] = [
   { domain: 'Application platform', status: 'Operational', evidence: 'Authenticated application read/write verified by the server-side platform probe.', blocker: 'None', owner: 'Platform', action: 'Maintain health checks.', lastAssessed: LAST_ASSESSED },

@@ -1,6 +1,7 @@
-import type { ElementType } from 'react';
+import { useMemo, type ElementType } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+
 import {
   Activity,
   BookOpen,
@@ -23,6 +24,8 @@ import { Badge } from '@/components/ui/badge';
 import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 import { useTour } from '@/context/TourContext';
 import { tourRegistry, type TourId } from '@/tours/tourRegistry';
+import { getBuildFingerprint } from '@/lib/buildFingerprint';
+
 
 interface GuideLink {
   title: string;
@@ -142,8 +145,10 @@ export default function Help() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { startTour, resetAllTours, isTourSeen } = useTour();
+  const fingerprint = useMemo(() => getBuildFingerprint(), []);
 
   return (
+
     <div className="mx-auto max-w-7xl space-y-6 py-6 pb-12">
       <DCSectionHeader
         as="h1"
@@ -259,6 +264,39 @@ export default function Help() {
           <a href="mailto:business@m2mtechconnect.com">Contact M2M Support</a>
         </Button>
       </DCCard>
+
+      <DCCard
+        title="Build information"
+        subtitle="Version and commit identifier for the running application bundle."
+        icon={<Server className="h-5 w-5" />}
+        status="operational"
+      >
+        <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+          <div>
+            <p className="text-xs text-muted-foreground">App version</p>
+            <p className="font-medium">{fingerprint.appVersion}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Build ID</p>
+            <p className="font-medium font-mono">{fingerprint.buildId}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Commit SHA</p>
+            <p className="font-medium font-mono" title={fingerprint.commitSha}>
+              {fingerprint.commitSha === 'unknown' ? 'unknown' : fingerprint.commitSha.slice(0, 12)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Built at</p>
+            <p className="font-medium">
+              {fingerprint.buildTimestamp === 'unknown'
+                ? 'unknown'
+                : new Date(fingerprint.buildTimestamp).toLocaleString()}
+            </p>
+          </div>
+        </div>
+      </DCCard>
     </div>
   );
 }
+

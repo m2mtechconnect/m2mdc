@@ -264,6 +264,39 @@ export default function Help() {
           <a href="mailto:business@m2mtechconnect.com">Contact M2M Support</a>
         </Button>
       </DCCard>
+
+      <DCCard
+        title="Build information"
+        subtitle="Version and commit identifier for the running application bundle."
+        icon={<Server className="h-5 w-5" />}
+        status="operational"
+      >
+        <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+          <div>
+            <p className="text-xs text-muted-foreground">App version</p>
+            <p className="font-medium">{fingerprint.appVersion}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Build ID</p>
+            <p className="font-medium font-mono">{fingerprint.buildId}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Commit SHA</p>
+            <p className="font-medium font-mono" title={fingerprint.commitSha}>
+              {fingerprint.commitSha === 'unknown' ? 'unknown' : fingerprint.commitSha.slice(0, 12)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Built at</p>
+            <p className="font-medium">
+              {fingerprint.buildTimestamp === 'unknown'
+                ? 'unknown'
+                : new Date(fingerprint.buildTimestamp).toLocaleString()}
+            </p>
+          </div>
+        </div>
+      </DCCard>
     </div>
   );
 }
+

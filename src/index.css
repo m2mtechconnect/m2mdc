@@ -1673,3 +1673,9 @@ html:not(.dark) .aura-workspace-theme {
 .aura-v2 .text-emerald-700, .aura-v2 .text-emerald-600, .aura-v2 .text-green-700 { color: hsl(var(--v2-verified)); }
 .aura-v2 .text-red-600, .aura-v2 .text-rose-600 { color: hsl(var(--v2-critical)); }
 .aura-v2 .text-blue-600, .aura-v2 .text-sky-600 { color: hsl(var(--v2-info)); }
+
+/* ---- 10. Chart legends inherit a near-white series token on white cards
+        (measured 1.15:1 on Analytics). Bind them to the surface foreground. ---- */
+.aura-v2 .recharts-legend-item-text { color: hsl(var(--foreground)) !important; }
+.aura-v2 .v2-tech-zone .recharts-legend-item-text,
+.aura-v2 .v2-viewport .recharts-legend-item-text { color: hsl(var(--v2-graphite-fg)) !important; }

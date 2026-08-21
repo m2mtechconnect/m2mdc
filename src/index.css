@@ -1138,7 +1138,7 @@ html:not(.dark) .aura-workspace-theme {
   --text-heading: 220 28% 12%;
   --text-body: 220 16% 22%;
   --text-muted: 215 14% 38%;
-  --text-subtle: 215 12% 44%;
+  --text-subtle: 215 14% 38%;
 
   --shadow-card: var(--v2-shadow-panel);
   --shadow-elevated: var(--v2-shadow-elevated);

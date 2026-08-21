@@ -1,10 +1,4 @@
-/**
- * Authenticated shell core.
- *
- * Imported synchronously inside the approved-user bundle. This module contains
- * only the structural application frame, providers and route table; route
- * pages remain lazy so heavy workspaces never enter the shell chunk.
- */
+/** Authenticated AURA application shell and canonical route table. */
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import { AuthenticatedEntryRedirect } from "@/routing/AuthenticatedEntryRedirect";
 import { Layout } from "@/components/Layout";
@@ -35,9 +29,7 @@ const Search = lazy(() => import("./pages/Search"));
 const AISettings = lazy(() => import("./pages/AISettings"));
 const Connections = lazy(() => import("./pages/Connections"));
 const ManageFacilities = lazy(() => import("./pages/manage/Facilities"));
-const SignOut = lazy(() =>
-  import("./pages/auth/index").then((m) => ({ default: m.SignOut })),
-);
+const SignOut = lazy(() => import("./pages/auth/index").then((m) => ({ default: m.SignOut })));
 const AgentWorkspace = lazy(() => import("./pages/AgentWorkspace"));
 const AgentChat = lazy(() => import("./pages/AgentChat"));
 const FundingIntakeDemo = lazy(() => import("./pages/FundingIntakeDemo"));
@@ -60,12 +52,8 @@ const PlatformReadiness = lazy(() => import("./pages/admin/PlatformReadiness"));
 const AssetPreview = lazy(() => import("@/pages/admin/AssetPreview"));
 const AssetPipeline = lazy(() => import("@/pages/admin/AssetPipeline"));
 const AssetValidation = lazy(() => import("@/pages/admin/AssetValidation"));
-const ReferenceFacilityValidation = lazy(
-  () => import("@/pages/admin/ReferenceFacilityValidation"),
-);
-const DsxCapabilityRegistryPage = lazy(
-  () => import("@/pages/admin/DsxCapabilityRegistryPage"),
-);
+const ReferenceFacilityValidation = lazy(() => import("@/pages/admin/ReferenceFacilityValidation"));
+const DsxCapabilityRegistryPage = lazy(() => import("@/pages/admin/DsxCapabilityRegistryPage"));
 const DatasetRegistryPage = lazy(() => import("@/pages/admin/DatasetRegistryPage"));
 
 const EvidenceBetaShell = lazy(() => import("./pages/dsx/EvidenceBetaShell"));
@@ -81,9 +69,7 @@ const SovereigntyWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m
 const CarbonWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.CarbonWorkspace })));
 const FinancialWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.FinancialWorkspace })));
 const EvidenceWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.EvidenceWorkspace })));
-const OverlayFixtures = import.meta.env.DEV
-  ? lazy(() => import("./pages/test/OverlayFixtures"))
-  : null;
+const OverlayFixtures = import.meta.env.DEV ? lazy(() => import("./pages/test/OverlayFixtures")) : null;
 
 function AgentOperationsRedirect() {
   const { agentId } = useParams();
@@ -108,21 +94,21 @@ function ApprovedUserRoutes() {
       <Route path="/analytics" element={<IntelligenceDashboard />} />
       <Route path="/account/profile" element={<Profile />} />
       <Route path="/account/settings" element={<Settings />} />
-      <Route path="/account/access-control" element={<AccessControl />} />
-      <Route path="/admin/onboarding-submissions" element={<AdminRouteGuard><OnboardingSubmissions /></AdminRouteGuard>} />
+
+      <Route path="/teams" element={<Teams />} />
+      <Route path="/teams/access-control" element={<AccessControl />} />
+      <Route path="/teams/onboarding" element={<AdminRouteGuard><OnboardingSubmissions /></AdminRouteGuard>} />
+
       <Route path="/admin/asset-preview" element={<AdminRouteGuard><AssetPreview /></AdminRouteGuard>} />
       <Route path="/admin/asset-pipeline" element={<AdminRouteGuard><AssetPipeline /></AdminRouteGuard>} />
       <Route path="/admin/asset-validation/:assetId" element={<AdminRouteGuard><AssetValidation /></AdminRouteGuard>} />
-      <Route
-        path="/admin/reference-facility-validation"
-        element={<AdminRouteGuard><ReferenceFacilityValidation /></AdminRouteGuard>}
-      />
+      <Route path="/admin/reference-facility-validation" element={<AdminRouteGuard><ReferenceFacilityValidation /></AdminRouteGuard>} />
       <Route path="/admin/dsx-capabilities" element={<AdminRouteGuard><DsxCapabilityRegistryPage /></AdminRouteGuard>} />
       <Route path="/admin/dataset-registry" element={<AdminRouteGuard><DatasetRegistryPage /></AdminRouteGuard>} />
       <Route path="/admin/platform-readiness" element={<AdminRouteGuard><PlatformReadiness /></AdminRouteGuard>} />
+
       <Route path="/manage/integrations" element={<Connections />} />
       <Route path="/manage/facilities" element={<ManageFacilities />} />
-      <Route path="/teams" element={<Teams />} />
       <Route path="/marketplace" element={<Marketplace />} />
       <Route path="/app/agents" element={<ManageAgents />} />
       <Route path="/app/agents/:slug/detail" element={<AgentDetail />} />
@@ -144,11 +130,7 @@ function ApprovedUserRoutes() {
       <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
 
       {ROUTE_ALIASES.map((alias) => (
-        <Route
-          key={alias.from}
-          path={alias.from}
-          element={<PreserveNavigate to={alias.to} />}
-        />
+        <Route key={alias.from} path={alias.from} element={<PreserveNavigate to={alias.to} />} />
       ))}
 
       <Route path="/dsx/evidence-beta" element={<EvidenceBetaShell />}>
@@ -178,9 +160,7 @@ function ApprovedUserRoutes() {
       <Route path="/dsx/evidence-beta/carbon" element={<PreserveNavigate to="/dsx/evidence-beta/sustainability" />} />
       <Route path="/dsx/evidence-beta/financials" element={<PreserveNavigate to="/dsx/evidence-beta/sustainability/financial" />} />
       <Route path="/dsx/evidence-beta/sovereignty" element={<PreserveNavigate to="/dsx/evidence-beta/sustainability/sovereignty" />} />
-      {import.meta.env.DEV && OverlayFixtures ? (
-        <Route path="/dev-overlays" element={<OverlayFixtures />} />
-      ) : null}
+      {import.meta.env.DEV && OverlayFixtures ? <Route path="/dev-overlays" element={<OverlayFixtures />} /> : null}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
@@ -200,11 +180,7 @@ export default function AuthenticatedShell() {
                 <RouteLoadRecovery resetKey={location.pathname}>
                   <Suspense
                     fallback={
-                      <div
-                        role="status"
-                        aria-live="polite"
-                        className="p-6 text-sm text-muted-foreground"
-                      >
+                      <div role="status" aria-live="polite" className="p-6 text-sm text-muted-foreground">
                         Loading workspace...
                       </div>
                     }

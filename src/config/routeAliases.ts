@@ -1,10 +1,4 @@
-/**
- * Canonical alias/redirect registry.
- *
- * Every retired or legacy path resolves to one durable destination. The deep
- * link harness imports this same registry so compatibility cannot drift from
- * the application router.
- */
+/** Canonical alias/redirect registry. */
 export interface RouteAlias {
   from: string;
   to: string;
@@ -19,16 +13,12 @@ export const ROUTE_ALIASES: RouteAlias[] = [
   { from: '/build', to: '/builder' },
   { from: '/omniverse-scene', to: '/twin-preview' },
 
-  // Administration opens on platform state rather than one specific user
-  // workflow. Former approval routes resolve to People & Access.
   { from: '/admin', to: '/admin/platform-readiness' },
   { from: '/admin/signups-dashboard', to: '/teams' },
   { from: '/admin/user-approvals', to: '/teams' },
+  { from: '/admin/onboarding-submissions', to: '/teams/onboarding' },
+  { from: '/account/access-control', to: '/teams/access-control' },
 
-  // Phase 2 IA consolidation: retire competing top-level reports/workspaces
-  // while preserving their deep links. Evidence owns governance evidence;
-  // Blueprint owns the facility model; Command Center owns the default twin
-  // overview; Learning Hub owns implementation guidance.
   { from: '/compliance', to: '/dsx/evidence-beta/sustainability/sovereignty' },
   { from: '/playbook', to: '/help' },
   { from: '/infrastructure', to: '/blueprint/default' },
@@ -80,7 +70,6 @@ export const ROUTE_ALIASES: RouteAlias[] = [
   },
 ];
 
-/** Parameterised redirects that rebuild the destination from path params. */
 export const PARAM_ALIASES = [
   {
     from: '/app/agents/:agentId/operations',

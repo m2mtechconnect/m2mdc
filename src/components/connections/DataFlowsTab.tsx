@@ -8,7 +8,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, CheckCircle2, Circle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Panel, SectionHeader, SubPanel } from '@/components/v2';
+import { Panel, SectionHeader } from '@/components/v2';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRBAC } from '@/contexts/RBACContext';

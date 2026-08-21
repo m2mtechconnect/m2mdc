@@ -1476,3 +1476,105 @@ html:not(.dark) .aura-workspace-theme {
     gap: 0.75rem;
   }
 }
+
+/* ==================================================================
+   AURA V2 — shared contrast hardening.
+   Presentation only. Guarantees that shadcn/Radix primitives inherit
+   the light enterprise theme, and that scoped graphite technical
+   zones keep AA-legible near-white / light-gray foregrounds.
+   ================================================================== */
+
+/* ---- Menus, popovers, dialogs, sheets: always light with dark text ---- */
+.aura-v2 [data-radix-popper-content-wrapper] [role='menu'],
+.aura-v2 [data-radix-popper-content-wrapper] [role='listbox'],
+.aura-v2 [data-radix-popper-content-wrapper] [role='dialog'],
+.aura-v2 [role='menu'],
+.aura-v2 [role='listbox'] {
+  background-color: hsl(var(--v2-panel));
+  color: hsl(var(--text-body));
+  border-color: hsl(var(--v2-line));
+}
+.aura-v2 [role='menuitem'],
+.aura-v2 [role='menuitemcheckbox'],
+.aura-v2 [role='menuitemradio'],
+.aura-v2 [role='option'] {
+  color: hsl(var(--text-body));
+  font-size: 14px;
+}
+.aura-v2 [role='menuitem']:hover,
+.aura-v2 [role='menuitem'][data-highlighted],
+.aura-v2 [role='option'][data-highlighted] {
+  background-color: hsl(var(--v2-canvas-deep));
+  color: hsl(var(--text-heading));
+}
+/* Supporting description lines inside menus stay readable, not micro-text. */
+.aura-v2 [role='menuitem'] .text-\[11px\],
+.aura-v2 [role='menuitem'] .text-\[10px\] {
+  font-size: 12px;
+  color: hsl(var(--text-muted));
+}
+
+/* ---- Placeholders and disabled controls ---- */
+.aura-v2 input::placeholder,
+.aura-v2 textarea::placeholder {
+  color: hsl(var(--v2-placeholder));
+  opacity: 1;
+}
+.aura-v2 button:disabled,
+.aura-v2 [aria-disabled='true'],
+.aura-v2 [data-disabled] {
+  opacity: 1;
+  color: hsl(var(--v2-disabled-fg));
+}
+.aura-v2 button:disabled:not(.v2-keep-surface),
+.aura-v2 [aria-disabled='true']:not(.v2-keep-surface) {
+  background-color: hsl(var(--v2-disabled-bg));
+  border-color: hsl(var(--v2-line-strong));
+}
+.aura-v2 .v2-tech-zone button:disabled,
+.aura-v2 .v2-viewport button:disabled,
+.aura-v2 .v2-telemetry-rail button:disabled {
+  background-color: hsl(var(--v2-graphite-elevated));
+  border-color: hsl(var(--v2-graphite-line));
+  color: hsl(214 10% 66%);
+}
+
+/* ---- Icons inherit the surface foreground, never a stale token ---- */
+.aura-v2 .v2-tech-zone svg,
+.aura-v2 .v2-viewport svg,
+.aura-v2 .v2-telemetry-rail svg {
+  color: currentColor;
+}
+
+/* ---- Graphite technical zones: AA foregrounds only ---- */
+.aura-v2 .v2-tech-zone,
+.aura-v2 .v2-viewport,
+.aura-v2 .v2-telemetry-rail {
+  color: hsl(var(--v2-graphite-fg));
+}
+.aura-v2 .v2-tech-zone .text-muted-foreground,
+.aura-v2 .v2-viewport .text-muted-foreground,
+.aura-v2 .v2-telemetry-rail .text-muted-foreground,
+.aura-v2 .v2-tech-zone .v2-label,
+.aura-v2 .v2-viewport .v2-label,
+.aura-v2 .v2-tech-zone .v2-field-label,
+.aura-v2 .v2-viewport .v2-field-label {
+  color: hsl(var(--v2-graphite-muted));
+}
+/* Dark-surface text must never fall back to graphite-on-graphite. */
+.aura-v2 .v2-tech-zone .text-foreground,
+.aura-v2 .v2-viewport .text-foreground,
+.aura-v2 .v2-tech-zone .text-card-foreground,
+.aura-v2 .v2-viewport .text-card-foreground {
+  color: hsl(var(--v2-graphite-fg));
+}
+
+/* ---- Table / list readability ---- */
+.aura-v2 .v2-table thead th { color: hsl(var(--text-muted)); }
+
+/* ---- Focus visibility on both light and graphite surfaces ---- */
+.aura-v2 .v2-tech-zone :focus-visible,
+.aura-v2 .v2-viewport :focus-visible,
+.aura-v2 .v2-appbar :focus-visible {
+  outline-color: hsl(var(--v2-tech-on-dark)) !important;
+}

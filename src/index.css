@@ -1083,17 +1083,17 @@ html:not(.dark) .aura-workspace-theme {
 
   /* ---- Interaction / control roles ---- */
   --v2-focus: 82 100% 24%;
-  --v2-disabled-fg: 215 12% 52%;
+  --v2-disabled-fg: 215 14% 42%;
   --v2-disabled-bg: 213 20% 94%;
   --v2-placeholder: 215 14% 44%;
 
   /* ---- Technical accent (NVIDIA green family, #76B900) ---- */
   --v2-tech: 82 100% 36%;             /* bright technical accent */
-  --v2-tech-strong: 82 100% 27%;      /* AA-safe on white with white text */
+  --v2-tech-strong: 82 100% 25%;      /* AA-safe on white with white text */
   --v2-tech-on-dark: 82 78% 58%;      /* readable green on graphite */
 
   /* ---- Semantic state hues (AA on light surfaces) ---- */
-  --v2-verified: 82 100% 27%;   /* verified / runtime-ready */
+  --v2-verified: 82 100% 25%;   /* verified / runtime-ready */
   --v2-simulated: 33 94% 31%;   /* simulated / estimated / watch (AA on light canvas) */
   --v2-info: 210 92% 38%;       /* informational telemetry / links */
   --v2-critical: 358 68% 45%;   /* genuine blockers only */
@@ -1446,7 +1446,7 @@ html:not(.dark) .aura-workspace-theme {
     font-weight: 600;
     border-radius: var(--radius);
   }
-  .v2-action-primary:hover { background-color: hsl(82 100% 23%); }
+  .v2-action-primary:hover { background-color: hsl(82 100% 21%); }
 
   /* Secondary action: visible border on light, graphite fill on dark zones */
   .v2-action-quiet {
@@ -1636,3 +1636,32 @@ html:not(.dark) .aura-workspace-theme {
 
 /* ---- 7. Card-wall reduction: nested panels lose the duplicate border ---- */
 .aura-v2 .v2-panel .v2-panel { box-shadow: none; }
+
+/* ---- 8. Light overlay chrome floating over graphite canvases.
+        Toolbars, chips and legends that carry their own light surface must
+        opt out of the graphite foreground cascade, otherwise near-white text
+        lands on a white pill (measured 1.07:1 on Blueprint / Simulation). ---- */
+.aura-v2 .v2-tech-zone .v2-surface-light,
+.aura-v2 .v2-viewport .v2-surface-light {
+  color: hsl(var(--foreground));
+}
+.aura-v2 .v2-tech-zone .v2-surface-light .text-muted-foreground,
+.aura-v2 .v2-viewport .v2-surface-light .text-muted-foreground,
+.aura-v2 .v2-tech-zone .v2-surface-light .v2-label,
+.aura-v2 .v2-viewport .v2-surface-light .v2-label,
+.aura-v2 .v2-tech-zone .v2-surface-light .v2-field-label,
+.aura-v2 .v2-viewport .v2-surface-light .v2-field-label {
+  color: hsl(var(--text-muted));
+}
+.aura-v2 .v2-tech-zone .v2-surface-light .text-foreground,
+.aura-v2 .v2-viewport .v2-surface-light .text-foreground,
+.aura-v2 .v2-tech-zone .v2-surface-light .text-card-foreground,
+.aura-v2 .v2-viewport .v2-surface-light .text-card-foreground {
+  color: hsl(var(--foreground));
+}
+.aura-v2 .v2-tech-zone .v2-surface-light button:disabled,
+.aura-v2 .v2-viewport .v2-surface-light button:disabled {
+  background-color: hsl(var(--v2-disabled-bg));
+  border-color: hsl(var(--v2-line-strong));
+  color: hsl(var(--v2-disabled-fg));
+}

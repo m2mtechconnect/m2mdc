@@ -35,7 +35,11 @@ const OVERLAY_BREAKPOINT = 1180;
 
 /** True below the overlay breakpoint, where the panel becomes a drawer. */
 function useOverlayInspector(): boolean {
-  const [below, setBelow] = useState(false);
+  const [below, setBelow] = useState(() =>
+    typeof window !== 'undefined'
+      ? window.matchMedia(`(max-width: ${OVERLAY_BREAKPOINT - 1}px)`).matches
+      : false,
+  );
   useEffect(() => {
     const mql = window.matchMedia(`(max-width: ${OVERLAY_BREAKPOINT - 1}px)`);
     const sync = () => setBelow(mql.matches);
@@ -70,6 +74,7 @@ export default function AuraWorkspace() {
   const [panelWidth, setPanelWidth] = useState(PANEL_DEFAULT);
   const panelToggleRef = useRef<HTMLButtonElement | null>(null);
   const resizeRef = useRef<{ startX: number; startWidth: number } | null>(null);
+  const inspectorInitialized = useRef(false);
 
   useEffect(() => {
     setFullBleed(true);
@@ -126,8 +131,11 @@ export default function AuraWorkspace() {
     };
   }, [hydrateRuns, facility.id]);
 
-  // Below xl the panel is an overlay, so it must not cover the model on load.
+  // Establish the initial inspector state once. Later breakpoint crossings
+  // must not override an operator's explicit open/closed choice.
   useEffect(() => {
+    if (inspectorInitialized.current) return;
+    inspectorInitialized.current = true;
     setPanelOpen(!overlayInspector);
   }, [overlayInspector, setPanelOpen]);
 

@@ -2,12 +2,9 @@
  * Server-side provisioning for the AURA Connections control plane.
  *
  * Rules (do not relax without review):
- *   - Caller must present a valid session JWT and hold admin or owner.
- *   - Only connectors with IMPLEMENTED status and a runtime adapter may be
- *     instantiated. Everything else is refused with a named reason.
- *   - No credential material is accepted, stored or echoed here. Secret-bearing
- *     methods are provisioned unconfigured; the credential is submitted
- *     separately to the connection-credential vault function.
+ *   - Caller must present a valid session JWT and hold active global administrative authority.
+ *   - Only connectors with IMPLEMENTED status and a runtime adapter may be instantiated.
+ *   - No credential material is accepted, stored or echoed here.
  *   - Endpoint targets are server-owned; the caller never supplies a URL.
  *   - Activation requires a persisted PASSED health check.
  *   - Every transition writes a connection_audit_events row.
@@ -15,9 +12,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { resolveCallerTenant, tenantVisible, TENANT_FORBIDDEN } from '../_shared/connectionTenant.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
+import { hasConnectionAdminAuthority } from '../_shared/connection-admin-policy.ts';
 
-// Scoped CORS: origin is resolved per request from the shared allowlist;
-// the method/header allowances below are specific to this function.
 const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -46,14 +42,11 @@ Deno.serve(async (req) => {
   const user = userData?.user;
   if (!user) return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
 
-  const { data: roles } = await admin.from('user_roles').select('role').eq('user_id', user.id);
-  const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === 'admin' || r.role === 'owner');
-  if (!isAdmin) {
+  const { data: roles } = await admin.from('user_roles').select('role, scope, expires_at').eq('user_id', user.id);
+  if (!hasConnectionAdminAuthority(roles ?? [])) {
     return json(403, { error_code: 'forbidden', safe_message: 'Administrator role required.', correlation_id: correlationId });
   }
 
-  // Tenant scope of the caller. The service-role client bypasses RLS, so this
-  // is the only thing standing between an admin and another tenant's records.
   const callerTenantId = await resolveCallerTenant(admin, user.id);
 
   let body: Record<string, unknown>;
@@ -205,15 +198,18 @@ Deno.serve(async (req) => {
       });
     }
 
-    const dataObserved = ['events_present', 'objects_present', 'application_records_present'].includes(
-      String(lastCheck.data_availability ?? ''),
-    );
+    const dataObserved = [
+      'events_present',
+      'objects_present',
+      'application_records_present',
+      'model_response_present',
+    ].includes(String(lastCheck.data_availability ?? ''));
     const newStatus = dataObserved ? 'HEALTHY' : 'CONNECTED_NO_DATA';
     await admin.from('connection_instances').update({
       enabled: true,
       status: newStatus,
       status_reason: dataObserved
-        ? 'Last health check passed and data was observed.'
+        ? 'Last health check passed and runtime evidence was observed.'
         : 'Endpoint reachable and authorised. No data received yet.',
     }).eq('id', connectionId);
 

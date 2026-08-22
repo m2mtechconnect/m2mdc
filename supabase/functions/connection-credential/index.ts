@@ -2,26 +2,22 @@
  * Credential vault control plane for AURA connections.
  *
  * Rules (do not relax without review):
- *   - Caller must present a valid session JWT and hold admin or owner.
+ *   - Caller must present a valid session JWT and active global administrative authority.
  *   - Every action is re-checked against the caller's tenant, because the
  *     service-role client bypasses RLS.
  *   - Plaintext credential material travels one way only: into this function.
- *     No action returns, logs or echoes it. Reads return metadata alone
- *     (status, version, fingerprint, rotation timestamps).
- *   - Storing and rotating are the same operation from the operator's point of
- *     view; the version counter and history log make rotation auditable.
+ *     No action returns, logs or echoes it. Reads return metadata alone.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { resolveCallerTenant, tenantVisible, TENANT_FORBIDDEN } from '../_shared/connectionTenant.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
+import { hasConnectionAdminAuthority } from '../_shared/connection-admin-policy.ts';
 import {
   credentialRejectionReason,
   encryptCredential,
   fingerprintCredential,
 } from '../_shared/credentialVault.ts';
 
-// Scoped CORS: origin is resolved per request from the shared allowlist;
-// the method/header allowances below are specific to this function.
 const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -43,7 +39,6 @@ interface CredentialRow {
   created_at: string;
 }
 
-/** The only shape a client is ever allowed to see. */
 function metadata(row: CredentialRow) {
   return {
     connection_id: row.connection_id,
@@ -71,9 +66,8 @@ Deno.serve(async (req) => {
   const user = userData?.user;
   if (!user) return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
 
-  const { data: roles } = await admin.from('user_roles').select('role').eq('user_id', user.id);
-  const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === 'admin' || r.role === 'owner');
-  if (!isAdmin) {
+  const { data: roles } = await admin.from('user_roles').select('role, scope, expires_at').eq('user_id', user.id);
+  if (!hasConnectionAdminAuthority(roles ?? [])) {
     return json(403, { error_code: 'forbidden', safe_message: 'Administrator role required.', correlation_id: correlationId });
   }
 
@@ -95,7 +89,6 @@ Deno.serve(async (req) => {
     });
   }
 
-  // Metadata for every connection the caller's tenant can see.
   if (action === 'list') {
     const { data: connections } = await admin
       .from('connection_instances')
@@ -207,7 +200,6 @@ Deno.serve(async (req) => {
       return json(400, { error_code: 'vault_write_failed', safe_message: error.message, correlation_id: correlationId });
     }
 
-    // The instance record stores a reference, never the material itself.
     await admin
       .from('connection_instances')
       .update({ credential_reference: `vault:${connectionId}#v${nextVersion}` })
@@ -222,7 +214,6 @@ Deno.serve(async (req) => {
     if (!existing) {
       return json(404, { error_code: 'nothing_to_revoke', safe_message: 'No credential is stored for this connection.', correlation_id: correlationId });
     }
-    // Revocation destroys the material rather than marking it inactive.
     const { error } = await admin.from('connection_credentials').delete().eq('connection_id', connectionId);
     if (error) return json(400, { error_code: 'vault_delete_failed', safe_message: error.message, correlation_id: correlationId });
 

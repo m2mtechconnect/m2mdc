@@ -2,7 +2,7 @@
  * Server-side connection health check for the AURA Connections control plane.
  *
  * Security rules:
- * - authenticated administrator/owner only;
+ * - authenticated active global administrator only;
  * - caller selects a connection id, never a probe URL;
  * - fixed server-owned targets remove the browser-controlled SSRF surface;
  * - bounded timeout, no retries, no credential material in responses/logs;
@@ -12,6 +12,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { resolveCallerTenant, tenantVisible, TENANT_FORBIDDEN } from '../_shared/connectionTenant.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 import { decryptCredential } from '../_shared/credentialVault.ts';
+import { hasConnectionAdminAuthority } from '../_shared/connection-admin-policy.ts';
 import {
   NVIDIA_AI_CONNECTOR_ID,
   NVIDIA_HOSTED_API_BASE,
@@ -65,15 +66,7 @@ Deno.serve(async (req) => {
   }
 
   const { data: roles } = await admin.from('user_roles').select('role, scope, expires_at').eq('user_id', user.id);
-  const now = Date.now();
-  const isAdmin = (roles ?? []).some((r: { role: string; scope?: string | null; expires_at?: string | null }) => {
-    if (r.role !== 'admin' && r.role !== 'owner') return false;
-    if (r.scope !== null && r.scope !== undefined && r.scope !== 'global') return false;
-    if (!r.expires_at) return true;
-    const expiry = new Date(r.expires_at).getTime();
-    return Number.isFinite(expiry) && expiry > now;
-  });
-  if (!isAdmin) {
+  if (!hasConnectionAdminAuthority(roles ?? [])) {
     return json(403, { status: 'FAILED', error_code: 'forbidden', safe_message: 'Administrator role required.', correlation_id: correlationId });
   }
 

@@ -13,10 +13,13 @@ on:
       - 'supabase/functions/_shared/model-router.ts'
       - 'supabase/functions/_shared/model-router.test.ts'
       - 'supabase/functions/_shared/ai-provider-*.ts'
+      - 'supabase/functions/_shared/connection-admin-policy*'
       - 'supabase/functions/agent-*/**'
       - 'supabase/functions/ai-config/**'
       - 'supabase/functions/models-test/**'
       - 'supabase/functions/connection-health-check/**'
+      - 'supabase/functions/connection-provision/**'
+      - 'supabase/functions/connection-credential/**'
       - 'supabase/migrations/*nvidia_ai_provider*'
       - '.github/workflows/aura-agentic-architecture.yml'
   workflow_dispatch:
@@ -62,6 +65,7 @@ jobs:
           src/domain/greenDc/__tests__/agentsCatalogTruth.test.ts
           supabase/functions/_shared/model-router.test.ts
           supabase/functions/_shared/ai-provider-policy.test.ts
+          supabase/functions/_shared/connection-admin-policy.test.ts
 
       - name: Production build
         run: bun run build

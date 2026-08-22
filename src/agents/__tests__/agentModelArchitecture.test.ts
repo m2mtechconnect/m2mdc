@@ -60,7 +60,9 @@ describe('agent/model architecture guards', () => {
 
   it('keeps the NVIDIA connection probe server-owned and secret-free to the browser', () => {
     const source = read('supabase/functions/connection-health-check/index.ts');
-    expect(source).toContain('nvidia_ai_provider');
+    const policy = read('supabase/functions/_shared/ai-provider-policy.ts');
+    expect(source).toContain('NVIDIA_AI_CONNECTOR_ID');
+    expect(policy).toContain("NVIDIA_AI_CONNECTOR_ID = 'nvidia_ai_provider'");
     expect(source).toContain('decryptCredential');
     expect(source).toContain('NVIDIA_HOSTED_API_BASE');
     expect(source).not.toMatch(/body\?\.(endpoint|url)/);
@@ -68,6 +70,24 @@ describe('agent/model architecture guards', () => {
 
     const connectionModel = read('src/connections/model.ts');
     expect(connectionModel).toContain("'nvidia_ai_provider'");
+  });
+
+  it('uses one active-global admin policy across provider provisioning, credentials and health', () => {
+    for (const path of [
+      'supabase/functions/connection-provision/index.ts',
+      'supabase/functions/connection-credential/index.ts',
+      'supabase/functions/connection-health-check/index.ts',
+    ]) {
+      const source = read(path);
+      expect(source, path).toContain('hasConnectionAdminAuthority');
+      expect(source, path).toMatch(/connection-admin-policy\.ts/);
+    }
+  });
+
+  it('promotes a passing NVIDIA model response to observed runtime evidence', () => {
+    const provision = read('supabase/functions/connection-provision/index.ts');
+    expect(provision).toContain("'model_response_present'");
+    expect(provision).toContain("const newStatus = dataObserved ? 'HEALTHY' : 'CONNECTED_NO_DATA'");
   });
 
   it('does not let the marketplace erase unrelated agent config', () => {

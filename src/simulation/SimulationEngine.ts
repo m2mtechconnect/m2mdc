@@ -146,7 +146,8 @@ export class SimulationEngine {
   }
 
   /**
-   * Start a scenario by ID
+   * Start a scenario by ID. Fail closed when the engine has no baseline;
+   * direct callers cannot bypass the hook/guard-level fidelity preflight.
    */
   startScenario(scenarioId: string): boolean {
     const scenario = getScenarioById(scenarioId);
@@ -155,11 +156,13 @@ export class SimulationEngine {
       return false;
     }
 
-    // Run preflight validation
     const validation = this.validatePrestart();
     if (!validation.valid) {
-      console.warn('[SimulationEngine] Preflight warnings:', validation.errors);
-      // Continue with defaults but log warnings
+      console.error(
+        '[SimulationEngine] AURA_SIM_BASELINE_REQUIRED: refusing simulation start',
+        validation.errors,
+      );
+      return false;
     }
 
     // Reset state for new scenario

@@ -1,12 +1,14 @@
 /**
- * Simulation Guards - Protection layer for simulation integrity
- * 
+ * Simulation Guards - protection layer for simulation integrity.
+ *
  * Prevents:
  * - Twin switching during active simulation
- * - Starting simulation without required data
+ * - Starting a non-demo simulation without required twin data
  * - Builder/recommendation store leakage into simulation
- * 
- * Uses centralized KPI key mapping for consistent alias resolution
+ *
+ * Explicit `?demo=true` is the only path allowed to use a bundled baseline.
+ * Demo output remains non-authoritative and is classified separately by the
+ * simulation fidelity contract.
  */
 
 import { useCallback, useEffect, useRef } from 'react';
@@ -15,7 +17,6 @@ import { useRecommendationStore } from '@/stores/recommendationStore';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { getSimulationEngine, resetSimulationEngine } from './SimulationEngine';
 import { normalizeKpiRecord } from '@/lib/kpiKeyMap';
-import type { SimulationStatus } from './types';
 
 export interface SimulationPreflightResult {
   canStart: boolean;
@@ -23,61 +24,61 @@ export interface SimulationPreflightResult {
   warnings: string[];
 }
 
-/**
- * Validate simulation can start with current state
- */
+function isExplicitDemoMode(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('demo') === 'true'
+  );
+}
+
+/** Validate simulation can start with current state. */
 export function useSimulationPreflight(): {
   validate: () => SimulationPreflightResult;
   isValid: boolean;
 } {
   const { twin, activeTwinId } = useActiveTwin();
-  
+
   const validate = useCallback((): SimulationPreflightResult => {
     const errors: string[] = [];
     const warnings: string[] = [];
-    
-    // Critical checks
-    if (!activeTwinId) {
-      errors.push('No twin selected - please select a Data Centre Twin from the header dropdown');
+    const isDemo = isExplicitDemoMode();
+
+    if (!isDemo) {
+      if (!activeTwinId) {
+        errors.push('No twin selected - please select a Data Centre Twin from the header dropdown');
+      }
+
+      if (!twin) {
+        errors.push('Twin data not loaded - please wait for initialization');
+      }
+    } else {
+      warnings.push('Demo mode uses a bundled non-authoritative baseline; results are not runs of record');
     }
-    
-    if (!twin) {
-      errors.push('Twin data not loaded - please wait for initialization');
-    }
-    
-    // Check for demo mode
-    const isDemo = new URLSearchParams(window.location.search).get('demo') === 'true';
-    if (!twin && !isDemo) {
-      errors.push('Cannot start simulation without a twin or demo mode');
-    }
-    
-    // Warning checks
+
     if (twin && !twin.capacity_kw) {
-      warnings.push('Twin has no capacity defined - using defaults');
+      warnings.push('Twin has no capacity defined - model may use an engineering fallback');
     }
-    
+
     if (twin && !twin.pue_target) {
-      warnings.push('No PUE target defined - using industry average');
+      warnings.push('Twin has no PUE target defined - model may use an engineering fallback');
     }
-    
+
     return {
       canStart: errors.length === 0,
       errors,
       warnings,
     };
   }, [twin, activeTwinId]);
-  
+
   const result = validate();
-  
+
   return {
     validate,
     isValid: result.canStart,
   };
 }
 
-/**
- * Guard against twin switching during simulation
- */
+/** Guard against twin switching during simulation. */
 export function useTwinSwitchGuard(): {
   isLocked: boolean;
   lockReason: string | null;
@@ -86,16 +87,16 @@ export function useTwinSwitchGuard(): {
   const { activeTwinId } = useActiveTwin();
   const lockedTwinId = useRef<string | null>(null);
   const isRunning = useRef(false);
-  
+
   useEffect(() => {
     const engine = getSimulationEngine();
-    
+
     const unsubscribe = engine.subscribe((event) => {
       if (event.type === 'scenario-start') {
         lockedTwinId.current = activeTwinId;
         isRunning.current = true;
       }
-      
+
       if (event.type === 'scenario-complete' || event.type === 'state-change') {
         const state = engine.getState();
         if (state.status === 'idle' || state.status === 'completed') {
@@ -104,11 +105,10 @@ export function useTwinSwitchGuard(): {
         }
       }
     });
-    
+
     return unsubscribe;
   }, [activeTwinId]);
-  
-  // Detect twin switch during simulation
+
   useEffect(() => {
     if (isRunning.current && lockedTwinId.current && activeTwinId !== lockedTwinId.current) {
       console.warn('[SimulationGuard] Twin switched during active simulation - resetting engine');
@@ -117,13 +117,13 @@ export function useTwinSwitchGuard(): {
       isRunning.current = false;
     }
   }, [activeTwinId]);
-  
+
   const forceUnlock = useCallback(() => {
     resetSimulationEngine();
     lockedTwinId.current = null;
     isRunning.current = false;
   }, []);
-  
+
   return {
     isLocked: isRunning.current && lockedTwinId.current !== null,
     lockReason: isRunning.current ? 'Simulation in progress' : null,
@@ -131,21 +131,16 @@ export function useTwinSwitchGuard(): {
   };
 }
 
-/**
- * Ensure simulation uses only twin data, not builder/recommendation stores
- */
+/** Ensure simulation uses only twin data, not builder/recommendation stores. */
 export function useSimulationDataIsolation() {
   const { twin, activeTwinId } = useActiveTwin();
   const isPreviewMode = useRecommendationStore((s) => s.recommendation !== null);
   const builderTwinId = useDCTwinBuilderStore((s) => s.overview?.deployedTwinId);
-  
-  // Get clean baseline KPIs from twin only
+
   const getIsolatedBaseline = useCallback((): Record<string, number> => {
-    // Demo mode fallback
-    const isDemo = new URLSearchParams(window.location.search).get('demo') === 'true';
-    
+    const isDemo = isExplicitDemoMode();
+
     if (isDemo && !twin) {
-      // Use demo defaults - normalizeKpiRecord ensures all aliases are populated
       return normalizeKpiRecord({
         pue: 1.35,
         gpuUtilization: 72,
@@ -164,17 +159,18 @@ export function useSimulationDataIsolation() {
         rackDensityUtilization: 72,
       });
     }
-    
+
     if (!twin) {
-      console.warn('[SimulationDataIsolation] No twin available - returning empty baseline');
+      // Fail closed. The caller decides how to surface AURA_SIM_BASELINE_REQUIRED.
       return {};
     }
-    
-    // Build baseline from twin metadata
-    const metadata = twin.metadata as Record<string, unknown> || {};
+
+    const metadata = (twin.metadata as Record<string, unknown>) || {};
     const kpis = (metadata.kpis as Record<string, number>) || {};
-    
-    // Normalize to ensure all aliases are populated (pue ↔ effectivePue, etc.)
+
+    // These fallbacks preserve existing scenario compatibility for partially
+    // populated twins. The fidelity layer marks such runs as engineering
+    // estimates until complete, verified facility inputs are available.
     return normalizeKpiRecord({
       pue: twin.pue_target || 1.35,
       gpuUtilization: (kpis.gpuUtilization as number) || 75,
@@ -194,7 +190,7 @@ export function useSimulationDataIsolation() {
       ...kpis,
     });
   }, [twin]);
-  
+
   return {
     isPreviewMode,
     isBuilderActive: builderTwinId !== undefined && builderTwinId !== activeTwinId,
@@ -204,38 +200,35 @@ export function useSimulationDataIsolation() {
   };
 }
 
-/**
- * Combined simulation protection hook
- */
+/** Combined simulation protection hook. */
 export function useSimulationProtection() {
   const preflight = useSimulationPreflight();
   const switchGuard = useTwinSwitchGuard();
   const dataIsolation = useSimulationDataIsolation();
-  
+
   const canStartSimulation = useCallback((showWarnings = false): boolean => {
     const result = preflight.validate();
-    
+
     if (!result.canStart) {
       if (showWarnings) {
         console.error('[SimulationProtection] Cannot start:', result.errors);
       }
       return false;
     }
-    
-    if (dataIsolation.isPreviewMode) {
-      if (showWarnings) {
-        console.warn('[SimulationProtection] In preview mode - simulation will use recommendation data');
-      }
-      // Allow but warn
+
+    if (dataIsolation.isPreviewMode && showWarnings) {
+      console.warn(
+        '[SimulationProtection] Recommendation preview is non-authoritative; simulation data remains isolated from the recommendation store',
+      );
     }
-    
+
     if (result.warnings.length > 0 && showWarnings) {
       console.warn('[SimulationProtection] Warnings:', result.warnings);
     }
-    
+
     return true;
   }, [preflight, dataIsolation]);
-  
+
   return {
     preflight,
     switchGuard,

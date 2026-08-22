@@ -1,20 +1,26 @@
 /**
  * useSimulation React Hook
- * Provides reactive access to the Data Centre Simulation Engine
- * Now supports Blueprint scenarios as authoritative source
- * Includes performance instrumentation for simulationLoopTime tracking
- * 
- * CRITICAL: Uses activeTwin as primary data source, NOT builder store
- * Uses centralized KPI key mapping for consistent alias resolution
+ * Provides reactive access to the Data Centre Simulation Engine.
+ *
+ * POST-REMEDIATION FIDELITY RULES:
+ * - Blueprint/preset scenarios are AURA deterministic scenario models; they
+ *   are not calibrated physics merely because the DSX asset model is correct.
+ * - Non-demo runs require a loaded twin/facility baseline. We do not silently
+ *   manufacture a full facility baseline when no twin exists.
+ * - Demo mode may use the bundled baseline, and is explicitly classified as
+ *   demonstration evidence by the fidelity contract.
+ *
+ * CRITICAL: Uses activeTwin as primary data source, NOT builder store.
+ * Uses centralized KPI key mapping for consistent alias resolution.
  */
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { 
-  SimulationEngine, 
-  getSimulationEngine, 
+import {
+  SimulationEngine,
+  getSimulationEngine,
 } from './SimulationEngine';
-import { 
-  getScenarioById, 
+import {
+  getScenarioById,
   PRESET_SCENARIOS,
   registerScenario,
 } from './scenarioRegistry';
@@ -23,9 +29,13 @@ import { convertAllBlueprintScenarios } from './blueprintScenarioAdapter';
 import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
 import { useSimulationDataIsolation } from './useSimulationGuards';
 import { normalizeKpiRecord } from '@/lib/kpiKeyMap';
-import type { 
-  SimulationState, 
-  SimulationEvent, 
+import {
+  assessSimulationFidelity,
+  type SimulationFidelityAssessment,
+} from './fidelity';
+import type {
+  SimulationState,
+  SimulationEvent,
   KPISnapshot,
   SimulationStatus,
   ScenarioDefinition,
@@ -33,43 +43,32 @@ import type {
 } from './types';
 import type { SimulationScenarioBlueprint } from '@/types/dataCentreBlueprint';
 
-// Industry-accurate baseline KPIs for Sovereign Green AI Data Centre
-// Sources: Uptime Institute, ASHRAE, NRCan, Hydro-Québec carbon data
-const DEFAULT_BASELINE_KPIS: Record<string, number> = {
-  // PUE: Uptime Institute avg 1.57, best-in-class <1.2, our target 1.25 for AI workloads
+// Bundled demonstration/engineering defaults. These values are useful for
+// preview/demo continuity but are NOT measured facility observations and are
+// never sufficient evidence for a calibrated-physics claim.
+const DEFAULT_DEMO_BASELINE_KPIS: Record<string, number> = {
   pue: 1.25,
   effectivePue: 1.25,
-  // GPU Utilization: Industry avg 40-60%, well-managed 70-85%, our target 76%
   gpuUtilization: 76,
   avgGpuUtilization: 76,
-  // Thermal Stability: Based on ASHRAE A1 compliance (18-27°C), our score 91%
   thermalStabilityScore: 91,
-  // Power Reliability: Tier III 99.982%, our UPS/generator redundancy score 97%
   powerReliabilityScore: 97,
-  // Sovereignty: 100% Canadian compute (PIPEDA compliant)
   sovereignComplianceScore: 100,
-  // Emissions: Quebec hydro ~1.2 gCO₂/kWh vs target, currently 6% under target
   emissionsVsTarget: -6,
   carbonNeutralProgress: 65,
-  // Cooling Efficiency: ASHRAE best practice 82-88%, our target 84%
   coolingEfficiencyIndex: 84,
-  // Network Integrity: Tier III target 99.98%, our redundant fabric 98.5%
   networkIntegrityScore: 98.5,
-  // Environmental Safety: ISO 22237 compliance score 94%
   environmentalSafetyScore: 94,
-  // UPS Runtime: Tier III requires 15 min, our battery bank provides 22 min
   avgUpsRuntime: 22,
-  // Carbon per GPU-hour: Quebec hydro enables 28g vs industry avg 120g
   gCo2PerGpuHour: 28,
-  // Economic Efficiency: Combined energy/carbon/utilization score 86%
   economicEfficiencyScore: 86,
-  // Renewable percentage: Quebec grid 97% hydro
   renewablePct: 97,
   greenEnergyPct: 97,
-  // Sovereignty Risk Score: 0 = fully compliant (lower is better)
   sovereigntyRiskScore: 0,
   dataSovereigntyScore: 100,
 };
+
+const BASELINE_FIDELITY_KEYS = Object.freeze(Object.keys(DEFAULT_DEMO_BASELINE_KPIS));
 
 export interface UseSimulationOptions {
   /** Blueprint scenarios to merge with presets */
@@ -88,14 +87,16 @@ export interface UseSimulationReturn {
   kpiSnapshots: KPISnapshot[];
   currentKpis: Record<string, number>;
   baselineKpis: Record<string, number>;
-  
+  /** Claims boundary for the current AURA simulation path. */
+  fidelity: SimulationFidelityAssessment;
+
   // Scenarios
   presetScenarios: ScenarioDefinition[];
   blueprintScenarios: ScenarioDefinition[];
   customScenarios: ScenarioDefinition[];
   allScenarios: ScenarioDefinition[];
   activeScenario: ScenarioDefinition | null;
-  
+
   // Actions
   startScenario: (scenarioId: string) => void;
   pause: () => void;
@@ -104,7 +105,7 @@ export interface UseSimulationReturn {
   setTimeScale: (scale: 1 | 2 | 5 | 10) => void;
   createCustomScenario: (config: CustomScenarioConfig) => ScenarioDefinition;
   addCustomScenario: (scenario: ScenarioDefinition) => void;
-  
+
   // Progress
   progress: number; // 0-100
   remainingTime: number; // seconds
@@ -113,28 +114,82 @@ export interface UseSimulationReturn {
 
 export function useSimulation(options: UseSimulationOptions = {}): UseSimulationReturn {
   const { blueprintScenarios: blueprintScenariosRaw = [], twinId } = options;
-  
-  // Get isolated baseline from twin context (NOT builder store)
-  const { getIsolatedBaseline, twinId: contextTwinId } = useSimulationDataIsolation();
+
+  // Get isolated baseline from twin context (NOT builder store).
+  const {
+    getIsolatedBaseline,
+    twinId: contextTwinId,
+    twin,
+  } = useSimulationDataIsolation();
   const effectiveTwinId = twinId || contextTwinId || undefined;
-  
+  const isDemoMode = useMemo(
+    () =>
+      typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).get('demo') === 'true',
+    [],
+  );
+
   // Performance monitoring for simulation loop
-  const { startTiming, endTiming, measureSync } = usePerformanceMonitor('SimulationEngine');
-  
+  const { startTiming, endTiming } = usePerformanceMonitor('SimulationEngine');
+
   const engineRef = useRef<SimulationEngine | null>(null);
   const tickTimingRef = useRef<number | null>(null);
-  
-  // Get baseline KPIs from twin (priority) or defaults
-  // Always normalize to ensure all aliases are populated (pue ↔ effectivePue, etc.)
-  const baselineKpis = useMemo(() => {
+
+  const baselineResolution = useMemo(() => {
     const twinBaseline = getIsolatedBaseline();
-    // Merge twin baseline with defaults (twin values take priority), then normalize
-    const merged = Object.keys(twinBaseline).length > 0 
-      ? { ...DEFAULT_BASELINE_KPIS, ...twinBaseline }
-      : DEFAULT_BASELINE_KPIS;
-    return normalizeKpiRecord(merged);
-  }, [getIsolatedBaseline]);
-  
+    const hasTwinBaseline = Boolean(twin) && Object.keys(twinBaseline).length > 0;
+
+    // Fail closed when there is no facility baseline outside explicit demo mode.
+    if (!hasTwinBaseline && !isDemoMode) {
+      return {
+        values: {} as Record<string, number>,
+        hasFacilityBaseline: false,
+        usesFallbackDefaults: false,
+      };
+    }
+
+    if (!hasTwinBaseline && isDemoMode) {
+      return {
+        values: normalizeKpiRecord(DEFAULT_DEMO_BASELINE_KPIS),
+        hasFacilityBaseline: false,
+        usesFallbackDefaults: true,
+      };
+    }
+
+    // Preserve backwards-compatible coverage for partially populated twins,
+    // but record whether bundled assumptions were required. Fidelity remains
+    // an engineering estimate whenever any material baseline field falls back.
+    const usesFallbackDefaults = BASELINE_FIDELITY_KEYS.some(
+      (key) => typeof twinBaseline[key] !== 'number' || !Number.isFinite(twinBaseline[key]),
+    );
+    const merged = usesFallbackDefaults
+      ? { ...DEFAULT_DEMO_BASELINE_KPIS, ...twinBaseline }
+      : twinBaseline;
+
+    return {
+      values: normalizeKpiRecord(merged),
+      hasFacilityBaseline: true,
+      usesFallbackDefaults,
+    };
+  }, [getIsolatedBaseline, twin, isDemoMode]);
+
+  const baselineKpis = baselineResolution.values;
+
+  const fidelity = useMemo(
+    () =>
+      assessSimulationFidelity({
+        executionClass: 'aura-deterministic',
+        verificationLevel: 'unverified',
+        provenance: isDemoMode ? 'demo' : 'simulated',
+        intent: 'preview',
+        nvidiaIntegrated: false,
+        hasFacilityBaseline: baselineResolution.hasFacilityBaseline,
+        usesFallbackDefaults: baselineResolution.usesFallbackDefaults,
+        calibrationState: 'not-calibrated',
+      }),
+    [baselineResolution.hasFacilityBaseline, baselineResolution.usesFallbackDefaults, isDemoMode],
+  );
+
   const [state, setState] = useState<SimulationState>({
     status: 'idle',
     currentTime: 0,
@@ -142,53 +197,49 @@ export function useSimulation(options: UseSimulationOptions = {}): UseSimulation
     activeScenarioId: null,
     events: [],
     kpiSnapshots: [],
-    baselineKpis: baselineKpis,
+    baselineKpis,
     currentKpis: { ...baselineKpis },
   });
-  
+
   const [customScenarios, setCustomScenarios] = useState<ScenarioDefinition[]>([]);
   const presetScenarios = PRESET_SCENARIOS;
-  
-  // Convert Blueprint scenarios to Simulation format
-  // Note: measureSync is for instrumentation only, not a reactive dependency
+
   const blueprintScenarios = useMemo(() => {
     return convertAllBlueprintScenarios(blueprintScenariosRaw);
   }, [blueprintScenariosRaw]);
-  
-  // Register Blueprint scenarios with the engine
+
   useEffect(() => {
-    blueprintScenarios.forEach(scenario => {
+    blueprintScenarios.forEach((scenario) => {
       registerScenario(scenario);
     });
   }, [blueprintScenarios]);
-  
-  // Combine all scenarios
+
   const allScenarios = useMemo(() => {
     const combined = [...presetScenarios, ...blueprintScenarios, ...customScenarios];
-    // Deduplicate by ID (Blueprint scenarios override presets with same ID)
     const uniqueMap = new Map<string, ScenarioDefinition>();
-    combined.forEach(s => uniqueMap.set(s.id, s));
+    combined.forEach((s) => uniqueMap.set(s.id, s));
     return Array.from(uniqueMap.values());
   }, [presetScenarios, blueprintScenarios, customScenarios]);
-  
-  // Initialize engine with baseline KPIs and performance instrumentation
+
+  // Initialize/rebind the canonical tick engine whenever the qualified
+  // baseline changes. Empty baseline is intentional outside demo mode and is
+  // additionally blocked by startScenario below.
   useEffect(() => {
     engineRef.current = getSimulationEngine(baselineKpis, effectiveTwinId);
-    
+    engineRef.current.setBaselineKpis(baselineKpis);
+
     const unsubscribe = engineRef.current.subscribe((event) => {
-      // Track simulation loop time on each tick
       if (event.type === 'tick') {
         if (tickTimingRef.current !== null) {
           endTiming(tickTimingRef.current);
         }
         tickTimingRef.current = startTiming('simulationLoopTime', 'simulation');
       }
-      
+
       if (event.type === 'state-change' || event.type === 'tick') {
         setState(engineRef.current!.getState());
       }
-      
-      // End timing on simulation complete
+
       if (event.type === 'scenario-complete') {
         if (tickTimingRef.current !== null) {
           endTiming(tickTimingRef.current);
@@ -196,7 +247,9 @@ export function useSimulation(options: UseSimulationOptions = {}): UseSimulation
         }
       }
     });
-    
+
+    setState(engineRef.current.getState());
+
     return () => {
       unsubscribe();
       if (tickTimingRef.current !== null) {
@@ -204,62 +257,57 @@ export function useSimulation(options: UseSimulationOptions = {}): UseSimulation
         tickTimingRef.current = null;
       }
     };
-    // baselineKpis and effectiveTwinId are stable
+    // Instrumentation callbacks are stable for the monitor instance.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [effectiveTwinId]);
-  
-  // Get active scenario from all available scenarios
-  const activeScenario = state.activeScenarioId 
-    ? allScenarios.find(s => s.id === state.activeScenarioId) || null
+  }, [effectiveTwinId, baselineKpis]);
+
+  const activeScenario = state.activeScenarioId
+    ? allScenarios.find((s) => s.id === state.activeScenarioId) || null
     : null;
-  
-  // Calculate progress
+
   const scenarioDuration = activeScenario?.durationSeconds || 1;
   const progress = Math.min(100, (state.currentTime / scenarioDuration) * 100);
   const elapsedTime = state.currentTime;
   const remainingTime = Math.max(0, scenarioDuration - state.currentTime);
-  
-  // Actions
+
   const startScenario = useCallback((scenarioId: string) => {
-    if (engineRef.current) {
-      engineRef.current.startScenario(scenarioId);
+    if (!engineRef.current) return;
+
+    if (Object.keys(engineRef.current.getState().baselineKpis).length === 0) {
+      console.error(
+        '[SimulationFidelity] AURA_SIM_BASELINE_REQUIRED: refusing non-demo simulation without a loaded twin/facility baseline',
+      );
+      return;
     }
+
+    engineRef.current.startScenario(scenarioId);
   }, []);
-  
+
   const pause = useCallback(() => {
-    if (engineRef.current) {
-      engineRef.current.pause();
-    }
+    engineRef.current?.pause();
   }, []);
-  
+
   const resume = useCallback(() => {
-    if (engineRef.current) {
-      engineRef.current.resume();
-    }
+    engineRef.current?.resume();
   }, []);
-  
+
   const reset = useCallback(() => {
-    if (engineRef.current) {
-      engineRef.current.reset();
-    }
+    engineRef.current?.reset();
   }, []);
-  
+
   const setTimeScale = useCallback((scale: 1 | 2 | 5 | 10) => {
-    if (engineRef.current) {
-      engineRef.current.setTimeScale(scale);
-    }
+    engineRef.current?.setTimeScale(scale);
   }, []);
-  
+
   const handleCreateCustomScenario = useCallback((config: CustomScenarioConfig): ScenarioDefinition => {
     return createCustomScenario(config);
   }, []);
-  
+
   const addCustomScenario = useCallback((scenario: ScenarioDefinition) => {
-    setCustomScenarios(prev => [...prev, { ...scenario, isCustom: true }]);
+    setCustomScenarios((prev) => [...prev, { ...scenario, isCustom: true }]);
   }, []);
-  
+
   return {
-    // State
     status: state.status,
     currentTime: state.currentTime,
     timeScale: state.timeScale,
@@ -268,15 +316,14 @@ export function useSimulation(options: UseSimulationOptions = {}): UseSimulation
     kpiSnapshots: state.kpiSnapshots,
     currentKpis: state.currentKpis,
     baselineKpis: state.baselineKpis,
-    
-    // Scenarios
+    fidelity,
+
     presetScenarios,
     blueprintScenarios,
     customScenarios,
     allScenarios,
     activeScenario,
-    
-    // Actions
+
     startScenario,
     pause,
     resume,
@@ -284,8 +331,7 @@ export function useSimulation(options: UseSimulationOptions = {}): UseSimulation
     setTimeScale,
     createCustomScenario: handleCreateCustomScenario,
     addCustomScenario,
-    
-    // Progress
+
     progress,
     remainingTime,
     elapsedTime,

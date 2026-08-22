@@ -95,8 +95,8 @@ describe('administrator-only canary access', () => {
 });
 
 describe('record provenance and coverage', () => {
-  it('exposes all 65 normalized records with complete provenance', () => {
-    expect(DSX_REFERENCE_RECORDS).toHaveLength(65);
+  it('exposes all 265 source-complete normalized records with provenance', () => {
+    expect(DSX_REFERENCE_RECORDS).toHaveLength(265);
     for (const r of DSX_REFERENCE_RECORDS) {
       expect(r.record_id).toBeTruthy();
       expect(r.source_commit).toBe('d940314d0593bbba1bae51e40ae7f9fd48358e18');
@@ -106,12 +106,18 @@ describe('record provenance and coverage', () => {
     }
   });
 
-  it('reports the expected coverage by data class', () => {
+  it('reports the expected source-complete coverage by data class', () => {
     expect(recordCoverage()).toEqual({
-      REFERENCE_KPI_VALUE: 36,
-      REFERENCE_SPECIFICATION: 21,
+      REFERENCE_BUILDING_SPECIFICATION: 50,
       REFERENCE_CONFIGURATION: 6,
+      REFERENCE_GPU_SPECIFICATION: 52,
+      REFERENCE_KPI_METADATA: 46,
+      REFERENCE_KPI_VALUE: 46,
+      REFERENCE_OPTION: 10,
       REFERENCE_SCENARIO: 2,
+      REFERENCE_SIMULATION_VARIABLE: 11,
+      REFERENCE_SITE_SPECIFICATION_VARIANT: 21,
+      REFERENCE_SPECIFICATION: 21,
     });
   });
 
@@ -122,7 +128,7 @@ describe('record provenance and coverage', () => {
     expect(v.datasetId).toBe('nvidia-dsx-blueprint');
   });
 
-  it('offers exactly the two validated reference scenarios', () => {
+  it('keeps the legacy page selector at the original two scenarios and 21 site specifications', () => {
     expect(referenceScenarios()).toHaveLength(2);
     expect(referenceConfigurations()).toHaveLength(6);
     expect(referenceSpecifications().length).toBe(21);

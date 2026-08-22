@@ -17,6 +17,11 @@ export enum AgentId {
   SOVEREIGNTY_SENTINEL = 'sovereignty-sentinel',
   CARBON_COST = 'carbon-cost-agent',
   INCIDENT_RESPONSE = 'incident-response',
+  // AI-factory coverage roles. Opt-in until signal/tool bindings are qualified.
+  STORAGE_DATA_FABRIC = 'storage-data-fabric',
+  ASSET_RELIABILITY = 'asset-reliability',
+  CYBERSECURITY_IDENTITY = 'cybersecurity-identity',
+  TWIN_INTEGRITY_DATA_QUALITY = 'twin-integrity-data-quality',
   // Retail-specific agents
   RETAIL_EDGE_RESILIENCE = 'retail-edge-resilience',
   COLD_CHAIN_OPTIMIZER = 'cold-chain-optimizer',
@@ -32,6 +37,10 @@ export type AgentDomain =
   | 'financial'
   | 'incidents'
   | 'sovereignty'
+  | 'storage'
+  | 'reliability'
+  | 'cybersecurity'
+  | 'data-quality'
   | 'retail';
 
 export type AgentDecisionAuthority = 'human-approved';
@@ -63,6 +72,10 @@ export const ARCHETYPE_AGENT_ID_MAP: Record<string, AgentId> = {
   sovereignty_agent: AgentId.SOVEREIGNTY_SENTINEL,
   carbon_cost_agent: AgentId.CARBON_COST,
   incident_response_agent: AgentId.INCIDENT_RESPONSE,
+  storage_data_agent: AgentId.STORAGE_DATA_FABRIC,
+  asset_reliability_agent: AgentId.ASSET_RELIABILITY,
+  cybersecurity_identity_agent: AgentId.CYBERSECURITY_IDENTITY,
+  twin_integrity_agent: AgentId.TWIN_INTEGRITY_DATA_QUALITY,
   retail_edge_resilience_agent: AgentId.RETAIL_EDGE_RESILIENCE,
   cold_chain_optimizer_agent: AgentId.COLD_CHAIN_OPTIMIZER,
   supply_chain_sovereignty_agent: AgentId.SUPPLY_CHAIN_SOVEREIGNTY,
@@ -200,6 +213,66 @@ export const AGENT_CATALOG: Record<AgentId, AgentDefinitionCatalog> = {
     relevantIndustries: ['*'],
     ...HUMAN_APPROVED,
   },
+
+  // These four close material AI-factory coverage gaps identified by AA-0.
+  // They are disabled by default until their signal/tool bindings are qualified.
+  [AgentId.STORAGE_DATA_FABRIC]: {
+    id: AgentId.STORAGE_DATA_FABRIC,
+    label: 'Storage & Data Fabric Agent',
+    description: 'Analyzes storage throughput, checkpoint traffic, latency and capacity headroom for AI workloads',
+    domain: 'storage',
+    icon: 'HardDrive',
+    defaultEnabled: false,
+    kpiKeys: ['storage-throughput', 'storage-latency', 'checkpoint-bandwidth', 'capacity-headroom', 'io-error-rate'],
+    inputSignals: ['NVMe/object storage throughput', 'I/O queue depth', 'Checkpoint traffic', 'Capacity utilization', 'I/O errors'],
+    outputActions: ['Storage bottleneck alerts', 'Capacity recommendations', 'Checkpoint and data-placement recommendations'],
+    workflowIds: ['wf-storage-saturation', 'wf-checkpoint-bottleneck', 'wf-storage-capacity-risk'],
+    relevantIndustries: ['*'],
+    ...HUMAN_APPROVED,
+  },
+  [AgentId.ASSET_RELIABILITY]: {
+    id: AgentId.ASSET_RELIABILITY,
+    label: 'Asset Reliability Agent',
+    description: 'Detects degradation signals across critical infrastructure and recommends maintenance priorities',
+    domain: 'reliability',
+    icon: 'Wrench',
+    defaultEnabled: false,
+    kpiKeys: ['asset-health-score', 'failure-risk', 'maintenance-due', 'mtbf'],
+    inputSignals: ['Vibration', 'Temperature', 'Runtime hours', 'Equipment alarms', 'Maintenance history'],
+    outputActions: ['Degradation alerts', 'Maintenance recommendations', 'Replacement prioritization'],
+    workflowIds: ['wf-predictive-maintenance', 'wf-asset-degradation', 'wf-maintenance-priority'],
+    relevantIndustries: ['*'],
+    ...HUMAN_APPROVED,
+  },
+  [AgentId.CYBERSECURITY_IDENTITY]: {
+    id: AgentId.CYBERSECURITY_IDENTITY,
+    label: 'Cybersecurity & Identity Agent',
+    description: 'Correlates identity, BMC and network-security evidence and recommends containment or access-review actions',
+    domain: 'cybersecurity',
+    icon: 'ShieldCheck',
+    defaultEnabled: false,
+    kpiKeys: ['security-posture', 'identity-anomaly-score', 'east-west-risk', 'bmc-security'],
+    inputSignals: ['Authentication logs', 'IAM grants', 'BMC events', 'East-west network telemetry', 'Vulnerability findings'],
+    outputActions: ['Security findings', 'Access-review recommendations', 'Isolation and remediation recommendations'],
+    workflowIds: ['wf-identity-anomaly', 'wf-bmc-compromise-risk', 'wf-east-west-anomaly'],
+    relevantIndustries: ['*'],
+    ...HUMAN_APPROVED,
+  },
+  [AgentId.TWIN_INTEGRITY_DATA_QUALITY]: {
+    id: AgentId.TWIN_INTEGRITY_DATA_QUALITY,
+    label: 'Twin Integrity & Data Quality Agent',
+    description: 'Monitors source freshness, provenance, topology drift and calibration-evidence validity for the digital twin',
+    domain: 'data-quality',
+    icon: 'BadgeCheck',
+    defaultEnabled: false,
+    kpiKeys: ['sensor-freshness', 'provenance-completeness', 'topology-drift', 'calibration-validity'],
+    inputSignals: ['Sensor timestamps', 'Source provenance', 'USD and binding hashes', 'Topology inventory', 'Calibration evidence state'],
+    outputActions: ['Stale-data alerts', 'Topology and provenance findings', 'Revalidation recommendations'],
+    workflowIds: ['wf-data-freshness', 'wf-topology-drift', 'wf-calibration-evidence-gap'],
+    relevantIndustries: ['*'],
+    ...HUMAN_APPROVED,
+  },
+
   [AgentId.RETAIL_EDGE_RESILIENCE]: {
     id: AgentId.RETAIL_EDGE_RESILIENCE,
     label: 'Retail Edge Resilience Agent',

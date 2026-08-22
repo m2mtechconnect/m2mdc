@@ -24,6 +24,7 @@ const DeploymentHistory = lazy(() => import("./pages/DeploymentHistory"));
 const IntelligenceDashboard = lazy(() => import("./pages/IntelligenceDashboard"));
 const Compliance = lazy(() => import("./pages/Compliance"));
 const InfrastructurePage = lazy(() => import("./pages/InfrastructurePage"));
+const DataCentreTwin = lazy(() => import("./pages/DataCentreTwin"));
 const Teams = lazy(() => import("./pages/Teams"));
 const Marketplace = lazy(() => import("./pages/Marketplace"));
 const Help = lazy(() => import("./pages/Help"));
@@ -125,6 +126,8 @@ function ApprovedUserRoutes() {
       <Route path="/app/agents/:agentId/operations" element={<AgentOperationsRedirect />} />
       <Route path="/twins/:instanceId/manage" element={<TwinManageRedirect />} />
       <Route path="/studio/systems/:systemId/manage" element={<SystemManage />} />
+      <Route path="/data-centre-twin" element={<DataCentreTwin />} />
+      <Route path="/data-centre-twin/:id" element={<DataCentreTwin />} />
       <Route path="/data-centre-twin/:id/blueprint" element={<Blueprint />} />
       <Route path="/blueprint/preview" element={<BlueprintPreview />} />
       <Route path="/blueprint/:id" element={<Blueprint />} />

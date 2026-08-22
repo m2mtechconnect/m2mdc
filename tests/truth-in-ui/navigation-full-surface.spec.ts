@@ -73,8 +73,14 @@ function currentPath(page: Page): string {
 }
 
 async function clickManageDestination(page: Page, label: string): Promise<void> {
+  // A route change can happen before Radix finishes the previous menu's close
+  // animation. Reopening during that transition races the trigger and can leave
+  // the next menu visually closed even though navigation is healthy.
+  await expect(page.getByTestId('manage-menu')).toBeHidden().catch(() => {});
   await page.getByTestId('manage-trigger').click();
-  await page.getByRole('menuitem', { name: new RegExp(label, 'i') }).click();
+  const menu = page.getByTestId('manage-menu');
+  await expect(menu).toBeVisible();
+  await menu.getByRole('menuitem', { name: new RegExp(label, 'i') }).click();
 }
 
 guardedTest.describe('AURA DC full-surface deep-link coverage', () => {

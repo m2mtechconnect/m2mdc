@@ -20,13 +20,6 @@ export const ROUTE_ALIASES: RouteAlias[] = [
   { from: '/account/access-control', to: '/teams/access-control' },
 
   { from: '/playbook', to: '/help' },
-  { from: '/data-centre-twin', to: '/dashboard' },
-  {
-    from: '/data-centre-twin/:id',
-    to: '/dashboard',
-    sample: '/data-centre-twin/facility-1',
-    expected: '/dashboard',
-  },
 
   { from: '/operations', to: '/analytics' },
   { from: '/intelligence', to: '/analytics' },

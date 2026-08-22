@@ -123,6 +123,8 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
   { path: '/app/agents/:agentId/operations', shell: 'internal', kind: 'redirect' },
   { path: '/twins/:instanceId/manage', shell: 'internal', kind: 'redirect' },
   { path: '/studio/systems/:systemId/manage', shell: 'internal', kind: 'canonical' },
+  { path: '/data-centre-twin', shell: 'internal', kind: 'canonical' },
+  { path: '/data-centre-twin/:id', shell: 'internal', kind: 'canonical' },
   { path: '/data-centre-twin/:id/blueprint', shell: 'internal', kind: 'canonical' },
   { path: '/blueprint/preview', shell: 'internal', kind: 'canonical' },
   { path: '/blueprint/:id', shell: 'internal', kind: 'canonical' },

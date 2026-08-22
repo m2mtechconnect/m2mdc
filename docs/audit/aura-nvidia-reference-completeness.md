@@ -61,9 +61,11 @@ Added after the original 65-record phase:
 
 AURA does **not** choose precedence for conflicting NVIDIA demo values.
 
-Expected conflict records: **54**
+Expected conflict records: **53**
 
-Expected semantic conflict groups: **27**
+Expected semantic conflict groups: **26**
+
+The first completeness CI cycle intentionally caught an over-classification: GB200 `Fast Memory` appears only in `configs.ts`, so it has no second NVIDIA source value to conflict with and is classified `UNIQUE`. Equivalent FP16/BF and FP64 labels are canonicalized only for semantic conflict grouping; their record IDs, labels and values remain verbatim.
 
 Confirmed examples:
 
@@ -89,7 +91,7 @@ Both are retained.
 
 `configs.ts` describes a 48-GPU / 24-Grace GB200 SuperPod-style block with 80 TB/s NVLink.
 
-Both are retained as `SOURCE_CONFLICT`; neither is promoted as the unique hardware truth.
+Overlapping fields are retained as `SOURCE_CONFLICT`; neither is promoted as the unique hardware truth. The `configs.ts`-only `Fast Memory` field remains `UNIQUE`.
 
 GB300's matching hardware block is classified `DUPLICATE`, not conflict.
 

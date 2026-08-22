@@ -12,7 +12,6 @@ import {
   Crown,
   Shield,
   Wrench,
-  CheckCircle2,
   Clock,
   BarChart3,
   TrendingUp,
@@ -23,7 +22,6 @@ import {
   Search,
   Building2,
   HelpCircle,
-  Activity,
   CheckCircle,
   XCircle,
 } from "lucide-react";
@@ -123,7 +121,7 @@ export default function Teams() {
       const [profilesResult, rolesResult, agentsResult] = await Promise.all([
         supabase
           .from("profiles")
-          .select("user_id, full_name, email, created_at, avatar_url, avatar_bg_color, avatar_initials")
+          .select("user_id, full_name, email, created_at, avatar_url, avatar_bg_color, avatar_initials, is_approved")
           .not("user_id", "is", null),
         supabase
           .from("user_roles")
@@ -151,14 +149,14 @@ export default function Teams() {
           name: profile.full_name || profile.email?.split("@")[0] || "Unknown",
           role: userRole?.role || "engineer",
           email: profile.email || "",
-          status: "active",
-          // Truth rule: last-active is not tracked yet, so it is reported as
-          // unknown rather than fabricated from a random roll.
+          // Approval is stored evidence. Presence/activity is not tracked and
+          // must not be inferred from membership.
+          status: profile.is_approved ? "approved" : "pending",
           lastActive: "Not tracked",
           systems: userSystems,
           userId: profile.user_id,
           joinedDate: new Date(profile.created_at).toLocaleDateString(),
-          department: userRole?.role?.replace(/_/g, " ") || "Engineering",
+          department: "Not tracked",
           avatarUrl: profile.avatar_url,
           avatarBgColor: profile.avatar_bg_color,
           avatarInitials: profile.avatar_initials,
@@ -366,10 +364,8 @@ export default function Teams() {
   });
   const pendingApprovalCount = pendingUsers?.filter(p => !p.is_approved).length ?? 0;
 
-  const activeMembersCount = teamMembers?.length || 0;
+  const memberCount = teamMembers?.length || 0;
   const pendingInvitesCount = invites?.filter((i) => i.status === "pending").length || 0;
-  const totalMembers = activeMembersCount + pendingInvitesCount;
-  const activeNow = teamMembers?.filter((m) => m.lastActive === "Online").length || 0;
   const totalSystems = teamMembers?.reduce((sum, m) => sum + m.systems, 0) || 0;
 
   // Calculate role breakdown
@@ -420,20 +416,20 @@ export default function Teams() {
           {/* Header */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8 min-w-0">
             <div>
-              <h1 className="text-4xl font-display font-bold mb-2 text-gradient-hero">
+              <h1 className="text-3xl font-semibold tracking-tight mb-2">
                 {t('teams.title')}
               </h1>
-              <p className="text-muted-foreground text-lg">
+              <p className="text-muted-foreground text-base">
                 {t('teams.subtitle')}
               </p>
             </div>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
-                  className="gap-2 glow-yellow font-semibold"
+                  className="gap-2 font-semibold"
                   onClick={() => setInviteModalOpen(true)}
                 >
-                  <UserPlus className="h-4 w-4" />
+                  <UserPlus className="h-4 w-4" aria-hidden />
                   {t('teams.inviteMember')}
                 </Button>
               </TooltipTrigger>
@@ -444,12 +440,12 @@ export default function Teams() {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList>
               <TabsTrigger value="members" className="gap-2">
-                <Users className="h-4 w-4" />
+                <Users className="h-4 w-4" aria-hidden />
                 {t('teams.teamMembers')}
               </TabsTrigger>
               {isAdmin && (
                 <TabsTrigger value="approvals" className="gap-2">
-                  <Shield className="h-4 w-4" />
+                  <Shield className="h-4 w-4" aria-hidden />
                   {t('teams.userApprovals')}
                   {pendingApprovalCount > 0 && (
                     <Badge variant="destructive" className="ml-1 h-5 px-1.5 text-xs">
@@ -464,20 +460,22 @@ export default function Teams() {
               {/* Stats */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 {[
-                  { label: t('teams.totalMembers'), value: totalMembers, icon: Users },
-                  { label: t('teams.activeNow'), value: activeNow, icon: CheckCircle2 },
+                  { label: t('teams.totalMembers'), value: memberCount, icon: Users },
+                  { label: t('teams.activeNow'), value: 'Not tracked', icon: HelpCircle },
                   { label: t('teams.systems'), value: totalSystems, icon: Wrench },
                   { label: t('teams.pending'), value: pendingInvitesCount, icon: Clock, warning: pendingInvitesCount > 0 },
                   { label: t('teams.roles'), value: rolesCount, icon: Shield },
-                  { label: t('teams.departments'), value: rolesCount, icon: Building2 },
+                  { label: t('teams.departments'), value: 'Not tracked', icon: Building2 },
                 ].map((stat) => (
                   <Card key={stat.label} className={stat.warning ? "border-l-4 border-l-warning" : ""}>
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs text-muted-foreground">{stat.label}</span>
-                        <stat.icon className="h-4 w-4 text-muted-foreground" />
+                        <stat.icon className="h-4 w-4 text-muted-foreground" aria-hidden />
                       </div>
-                      <div className="text-2xl font-bold">{stat.value}</div>
+                      <div className={typeof stat.value === 'number' ? 'text-2xl font-bold' : 'text-sm font-medium text-muted-foreground'}>
+                        {stat.value}
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
@@ -491,11 +489,11 @@ export default function Teams() {
                     <CardHeader className="pb-4">
                       <div className="flex flex-wrap items-center justify-between gap-2 min-w-0">
                         <div className="flex items-center gap-2 min-w-0">
-                          <Users className="h-5 w-5 text-muted-foreground" />
+                          <Users className="h-5 w-5 text-muted-foreground" aria-hidden />
                           <CardTitle className="text-lg">Team Members</CardTitle>
                         </div>
                         <Badge variant="secondary" className="text-sm shrink-0">
-                          {isInitialLoading ? "..." : `${filteredMembers.length} of ${activeMembersCount}`}
+                          {isInitialLoading ? "..." : `${filteredMembers.length} of ${memberCount}`}
                         </Badge>
                       </div>
                     </CardHeader>
@@ -504,7 +502,7 @@ export default function Teams() {
                       <div className="flex flex-wrap gap-3 mb-6">
                         <div className="flex-1 min-w-[200px]">
                           <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden />
                             <Input
                               placeholder="Search members..."
                               value={searchQuery}
@@ -515,7 +513,7 @@ export default function Teams() {
                         </div>
                       <Select value={roleFilter} onValueChange={setRoleFilter}>
                         <SelectTrigger className="w-[180px]" aria-label="Filter by role">
-                          <Filter className="h-4 w-4 mr-2" />
+                          <Filter className="h-4 w-4 mr-2" aria-hidden />
                           <SelectValue placeholder="All Roles" />
                         </SelectTrigger>
                         <SelectContent>
@@ -532,13 +530,13 @@ export default function Teams() {
                         </SelectContent>
                       </Select>
                       <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-[150px]" aria-label="Filter by status">
+                        <SelectTrigger className="w-[150px]" aria-label="Filter by approval status">
                           <SelectValue placeholder="Status" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">All Status</SelectItem>
-                          <SelectItem value="active">Active</SelectItem>
-                          <SelectItem value="inactive">Inactive</SelectItem>
+                          <SelectItem value="approved">Approved</SelectItem>
+                          <SelectItem value="pending">Pending</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -574,21 +572,13 @@ export default function Teams() {
                                               roleColors[member.role] || "text-muted-foreground"
                                             }`}
                                           >
-                                            <RoleIcon className="h-3 w-3 mr-1" />
+                                            <RoleIcon className="h-3 w-3 mr-1" aria-hidden />
                                             {member.role.replace(/_/g, " ")}
                                           </Badge>
                                         </div>
-                                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                          <span className="flex items-center gap-1">
-                                            <div
-                                              className={`h-2 w-2 rounded-full ${
-                                                member.lastActive === "Online"
-                                                  ? "bg-secondary"
-                                                  : "bg-muted-foreground"
-                                              }`}
-                                            />
-                                            {member.lastActive}
-                                          </span>
+                                        <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                                          <span>{member.lastActive}</span>
+                                          <span>{member.status === 'approved' ? 'Approved access' : 'Pending approval'}</span>
                                           <span>{member.systems} systems</span>
                                         </div>
                                       </div>
@@ -605,7 +595,7 @@ export default function Teams() {
                           })
                         ) : (
                           <div className="text-center py-8 text-muted-foreground">
-                            <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                            <Users className="h-12 w-12 mx-auto mb-3 opacity-50" aria-hidden />
                             <p>No members found matching filters</p>
                           </div>
                         )}
@@ -614,7 +604,7 @@ export default function Teams() {
                   </Card>
                 </div>
 
-                {/* Right Column - Role Breakdown, Activity & Simulation Runs */}
+                {/* Right Column - Role Breakdown and real audit activity */}
                 <div className="space-y-6">
                   <RoleBreakdownSection 
                     roleBreakdown={roleBreakdown} 
@@ -622,38 +612,8 @@ export default function Teams() {
                   />
                   <ActivityFeed 
                     activities={activityLog || []} 
-                    onViewAll={() => navigate("/compliance")}
+                    onViewAll={() => navigate("/dsx/evidence-beta/decisions/log")}
                   />
-                  
-                  {/* Recent Simulation Runs */}
-                  <Card>
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center gap-2">
-                        <Activity className="h-5 w-5 text-muted-foreground" />
-                        <CardTitle className="text-lg">Recent Simulation Runs</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        {[
-                          { scenario: 'GPU Spike - Training Job', user: 'Sarah Chen', time: '2 hours ago', runId: 'run-001' },
-                          { scenario: 'CRAH Failure - Hot Aisle', user: 'Michael Wong', time: '5 hours ago', runId: 'run-002' },
-                          { scenario: 'Cross-Border Data Violation', user: 'Alex Johnson', time: '1 day ago', runId: 'run-003' },
-                        ].map((run, idx) => (
-                          <div 
-                            key={idx}
-                            className="p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors"
-                            onClick={() => navigate(`/data-centre-twin?view=simulation&runId=${run.runId}`)}
-                          >
-                            <div className="font-medium text-sm">{run.scenario}</div>
-                            <div className="text-xs text-muted-foreground">
-                              Run by {run.user} – {run.time}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
                 </div>
               </div>
             </TabsContent>
@@ -681,9 +641,9 @@ export default function Teams() {
                       onClick={() => setApprovalFilter(f)}
                       className="capitalize"
                     >
-                      {f === 'pending' && <Clock className="h-4 w-4 mr-1" />}
-                      {f === 'approved' && <CheckCircle className="h-4 w-4 mr-1" />}
-                      {f === 'all' && <Users className="h-4 w-4 mr-1" />}
+                      {f === 'pending' && <Clock className="h-4 w-4 mr-1" aria-hidden />}
+                      {f === 'approved' && <CheckCircle className="h-4 w-4 mr-1" aria-hidden />}
+                      {f === 'all' && <Users className="h-4 w-4 mr-1" aria-hidden />}
                       {f}
                     </Button>
                   ))}
@@ -695,7 +655,7 @@ export default function Teams() {
                   </div>
                 ) : !pendingUsers?.length ? (
                   <Card className="p-8 text-center text-muted-foreground">
-                    <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <Users className="h-12 w-12 mx-auto mb-4 opacity-50" aria-hidden />
                     <p>No {approvalFilter === 'all' ? '' : approvalFilter} users found</p>
                   </Card>
                 ) : (
@@ -719,16 +679,16 @@ export default function Teams() {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="engineer">
-                                <span className="flex items-center gap-1.5"><Wrench className="h-3 w-3" /> Engineer</span>
+                                <span className="flex items-center gap-1.5"><Wrench className="h-3 w-3" aria-hidden /> Engineer</span>
                               </SelectItem>
                               <SelectItem value="manager">
-                                <span className="flex items-center gap-1.5"><Users className="h-3 w-3" /> Manager</span>
+                                <span className="flex items-center gap-1.5"><Users className="h-3 w-3" aria-hidden /> Manager</span>
                               </SelectItem>
                               <SelectItem value="executive">
-                                <span className="flex items-center gap-1.5"><Crown className="h-3 w-3" /> Executive</span>
+                                <span className="flex items-center gap-1.5"><Crown className="h-3 w-3" aria-hidden /> Executive</span>
                               </SelectItem>
                               <SelectItem value="security_admin">
-                                <span className="flex items-center gap-1.5"><Shield className="h-3 w-3" /> Security Admin</span>
+                                <span className="flex items-center gap-1.5"><Shield className="h-3 w-3" aria-hidden /> Security Admin</span>
                               </SelectItem>
                             </SelectContent>
                           </Select>
@@ -736,7 +696,7 @@ export default function Teams() {
                           {profile.is_approved ? (
                             <>
                               <Badge variant="secondary" className="gap-1">
-                                <CheckCircle className="h-3 w-3" />
+                                <CheckCircle className="h-3 w-3" aria-hidden />
                                 Approved
                               </Badge>
                               <Button
@@ -745,14 +705,14 @@ export default function Teams() {
                                 onClick={() => approveMutation.mutate({ userId: profile.user_id, approve: false })}
                                 disabled={approveMutation.isPending}
                               >
-                                <XCircle className="h-4 w-4 mr-1" />
+                                <XCircle className="h-4 w-4 mr-1" aria-hidden />
                                 Revoke
                               </Button>
                             </>
                           ) : (
                             <>
                               <Badge variant="outline" className="gap-1 text-amber-600 border-amber-300">
-                                <Clock className="h-3 w-3" />
+                                <Clock className="h-3 w-3" aria-hidden />
                                 Pending
                               </Badge>
                               <Button
@@ -760,7 +720,7 @@ export default function Teams() {
                                 onClick={() => approveMutation.mutate({ userId: profile.user_id, approve: true })}
                                 disabled={approveMutation.isPending}
                               >
-                                <CheckCircle className="h-4 w-4 mr-1" />
+                                <CheckCircle className="h-4 w-4 mr-1" aria-hidden />
                                 Approve
                               </Button>
                             </>

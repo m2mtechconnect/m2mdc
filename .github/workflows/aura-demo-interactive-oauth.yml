@@ -10,6 +10,12 @@ permissions:
 
 env:
   CI: true
+  VITE_AURA_DEMO_INTEGRATIONS: 'true'
+  VITE_AURA_DEMO_MANAGED_OAUTH: 'true'
+  AURA_RELEASE_ENVIRONMENT: demo
+  PROD_BASE_URL: https://auradc.m2mtechconnect.com
+  VITE_SUPABASE_URL: https://demo-placeholder.supabase.co
+  VITE_SUPABASE_PUBLISHABLE_KEY: demo-public-placeholder
 
 jobs:
   interactive-oauth-checks:
@@ -46,3 +52,15 @@ jobs:
           deno check supabase/functions/managed-user-oauth-complete/index.ts
           deno check supabase/functions/managed-user-disconnect/index.ts
           deno check supabase/functions/managed-connector-capabilities/index.ts
+
+      - name: Build production-mode interactive demo artifact
+        env:
+          AURA_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          AURA_RELEASE_BRANCH: ${{ github.head_ref || github.ref_name }}
+          AURA_BUILD_ID: demo-oauth-${{ github.run_id }}-${{ github.run_attempt }}
+        run: bun run build
+
+      - name: Verify demo artifact
+        env:
+          AURA_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node scripts/verify-aura-demo-build.mjs

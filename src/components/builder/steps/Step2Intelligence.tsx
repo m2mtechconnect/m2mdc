@@ -1,126 +1,148 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Brain, BookOpen, MessageSquare, Settings, Upload, Link2, Database, Info, Sparkles, Search, Users, Zap, Thermometer, Shield, Cpu, Activity } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Activity,
+  BookOpen,
+  Brain,
+  Cpu,
+  Database,
+  Search,
+  Settings,
+  Shield,
+  Sparkles,
+  Thermometer,
+  Upload,
+  Users,
+  Zap,
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
 import { useBlueprintStore } from '@/stores/blueprintStore';
-import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { ModernFileUploadWizard } from '@/components/dashboard/ModernFileUploadWizard';
 import { toast } from 'sonner';
 import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 import { BuilderToolsPanel } from '@/components/dc-tools';
 import { SovereigntyConfigSection } from '@/components/builder/SovereigntyConfigSection';
 import { CarbonFinancialConfigSection } from '@/components/builder/CarbonFinancialConfigSection';
+import {
+  AURA_INTELLIGENCE_PROFILES,
+  intelligenceProfileById,
+  intelligenceProfileForModel,
+} from '@/config/auraRuntimeCatalog';
+
+interface DcThresholds {
+  gpuUtilizationPct: number;
+  cpuThermalC: number;
+  gpuThermalC: number;
+  pueDrift: number;
+  carbonIntensity: number;
+}
+
+const DEFAULT_THRESHOLDS: DcThresholds = {
+  gpuUtilizationPct: 85,
+  cpuThermalC: 75,
+  gpuThermalC: 80,
+  pueDrift: 0.1,
+  carbonIntensity: 400,
+};
+
+const DEFAULT_SUBSYSTEMS: Record<string, boolean> = {
+  thermal: true,
+  power: true,
+  gpu: true,
+  sovereignty: false,
+};
 
 export function Step2Intelligence() {
   const { modelConfig, setModelConfig, builderId } = useWizardBuilderStore();
   const { currentBlueprint, updateBlueprint } = useBlueprintStore();
-  const { openWithQuestion } = useCoPilotContext();
-  
-  const [temperature, setTemperature] = useState([modelConfig?.rag?.temperature ?? 0.7]);
-  const [topK, setTopK] = useState(50);
-  const [topP, setTopP] = useState(0.95);
-  const [memoryType, setMemoryType] = useState<'none' | 'short' | 'long'>('short');
-  
-  const [supervisorEnabled, setSupervisorEnabled] = useState(false);
-  const [deepResearchEnabled, setDeepResearchEnabled] = useState(false);
-  
-  const [systemPrompt, setSystemPrompt] = useState('');
-  const [persona, setPersona] = useState('professional');
-  const [formalTone, setFormalTone] = useState(false);
-  const [useEmojis, setUseEmojis] = useState(false);
-  const [detailedExplanations, setDetailedExplanations] = useState(true);
-  
-  const [hallucinationPrevention, setHallucinationPrevention] = useState(true);
-  const [knowledgeRestrictions, setKnowledgeRestrictions] = useState(true);
-  const [requireCitations, setRequireCitations] = useState(false);
-  
+
+  const policies = modelConfig?.policies ?? {};
+  const selectedProfile = useMemo(() => {
+    const explicit = typeof policies.intelligenceProfile === 'string'
+      ? intelligenceProfileById(policies.intelligenceProfile)
+      : null;
+    return explicit ?? intelligenceProfileForModel(modelConfig?.model);
+  }, [modelConfig?.model, policies.intelligenceProfile]);
+
+  const [supervisorEnabled, setSupervisorEnabled] = useState(Boolean(policies.supervisorEnabled));
+  const [deepResearchEnabled, setDeepResearchEnabled] = useState(Boolean(policies.deepResearchEnabled));
+  const [systemPrompt, setSystemPrompt] = useState(currentBlueprint?.behavior?.systemPrompt ?? '');
+  const [hallucinationPrevention, setHallucinationPrevention] = useState(
+    typeof policies.hallucinationPrevention === 'boolean' ? policies.hallucinationPrevention : true,
+  );
+  const [knowledgeRestrictions, setKnowledgeRestrictions] = useState(
+    typeof policies.knowledgeRestrictions === 'boolean' ? policies.knowledgeRestrictions : true,
+  );
+  const [requireCitations, setRequireCitations] = useState(
+    typeof policies.requireCitations === 'boolean' ? policies.requireCitations : false,
+  );
+  const [temperature, setTemperature] = useState<number[]>([
+    typeof modelConfig?.rag?.temperature === 'number' ? modelConfig.rag.temperature : 0.3,
+  ]);
+  const [enabledSubsystems, setEnabledSubsystems] = useState<Record<string, boolean>>(
+    (policies.monitoredSubsystems as Record<string, boolean> | undefined) ?? DEFAULT_SUBSYSTEMS,
+  );
+  const [thresholds, setThresholds] = useState<DcThresholds>(
+    (policies.dcThresholds as DcThresholds | undefined) ?? DEFAULT_THRESHOLDS,
+  );
   const [showUploadWizard, setShowUploadWizard] = useState(false);
-  const [urlInput, setUrlInput] = useState('');
-  const [isAddingUrl, setIsAddingUrl] = useState(false);
-  
-  useEffect(() => {
-    if (currentBlueprint?.behavior?.systemPrompt) {
-      setSystemPrompt(currentBlueprint.behavior.systemPrompt);
-    }
-    if (currentBlueprint?.model?.supervisorEnabled !== undefined) {
-      setSupervisorEnabled(currentBlueprint.model.supervisorEnabled);
-    }
-    if (currentBlueprint?.model?.deepResearchEnabled !== undefined) {
-      setDeepResearchEnabled(currentBlueprint.model.deepResearchEnabled);
-    }
-  }, [currentBlueprint]);
 
   useEffect(() => {
-    const policies = modelConfig?.policies ?? {};
-
-    const supervisorFromConfig =
-      typeof (modelConfig as any)?.supervisorEnabled === 'boolean'
-        ? (modelConfig as any).supervisorEnabled
-        : policies.supervisorEnabled;
-
-    const deepResearchFromConfig =
-      typeof (modelConfig as any)?.deepResearchEnabled === 'boolean'
-        ? (modelConfig as any).deepResearchEnabled
-        : policies.deepResearchEnabled;
-
-    if (typeof supervisorFromConfig === 'boolean') setSupervisorEnabled(supervisorFromConfig);
-    if (typeof deepResearchFromConfig === 'boolean') setDeepResearchEnabled(deepResearchFromConfig);
-    if (typeof policies.hallucinationPrevention === 'boolean') setHallucinationPrevention(policies.hallucinationPrevention);
-    if (typeof policies.knowledgeRestrictions === 'boolean') setKnowledgeRestrictions(policies.knowledgeRestrictions);
-    if (typeof policies.requireCitations === 'boolean') setRequireCitations(policies.requireCitations);
-  }, [modelConfig]);
-
-  const saveIntelligenceConfig = useCallback(async (updates: Record<string, any>) => {
-    const nextSupervisorEnabled = updates.supervisorEnabled ?? supervisorEnabled;
-    const nextDeepResearchEnabled = updates.deepResearchEnabled ?? deepResearchEnabled;
-    const policyUpdates = updates.policies ?? {};
-
-    try {
-      await setModelConfig({
-        ...modelConfig,
-        ...updates,
-        rag: { ...modelConfig?.rag, ...updates.rag },
-        supervisorEnabled: nextSupervisorEnabled,
-        deepResearchEnabled: nextDeepResearchEnabled,
-        policies: {
-          ...modelConfig?.policies,
-          ...policyUpdates,
-          supervisorEnabled: nextSupervisorEnabled,
-          deepResearchEnabled: nextDeepResearchEnabled,
-          hallucinationPrevention: policyUpdates.hallucinationPrevention ?? hallucinationPrevention,
-          knowledgeRestrictions: policyUpdates.knowledgeRestrictions ?? knowledgeRestrictions,
-          requireCitations: policyUpdates.requireCitations ?? requireCitations,
-        },
-      } as any);
-    } catch (error) {
-      console.error('[Builder:Step2] Failed to save config:', error);
+    if (currentBlueprint?.behavior?.systemPrompt !== undefined) {
+      setSystemPrompt(currentBlueprint.behavior.systemPrompt ?? '');
     }
-  }, [modelConfig, setModelConfig, supervisorEnabled, deepResearchEnabled, hallucinationPrevention, knowledgeRestrictions, requireCitations]);
+  }, [currentBlueprint?.behavior?.systemPrompt]);
 
-  const handleModelChange = async (model: string) => {
-    await setModelConfig({ model, provider: model.split('/')[0] });
-    toast.success(`Model updated to ${model.split('/')[1]}`);
-  };
-
-  const handleSystemPromptChange = (value: string) => {
-    setSystemPrompt(value);
-    if (currentBlueprint) {
-      updateBlueprint({
-        behavior: { ...currentBlueprint.behavior, systemPrompt: value },
-      });
+  useEffect(() => {
+    setSupervisorEnabled(Boolean(policies.supervisorEnabled));
+    setDeepResearchEnabled(Boolean(policies.deepResearchEnabled));
+    if (typeof policies.hallucinationPrevention === 'boolean') {
+      setHallucinationPrevention(policies.hallucinationPrevention);
     }
-  };
+    if (typeof policies.knowledgeRestrictions === 'boolean') {
+      setKnowledgeRestrictions(policies.knowledgeRestrictions);
+    }
+    if (typeof policies.requireCitations === 'boolean') {
+      setRequireCitations(policies.requireCitations);
+    }
+    if (policies.monitoredSubsystems) {
+      setEnabledSubsystems(policies.monitoredSubsystems as Record<string, boolean>);
+    }
+    if (policies.dcThresholds) {
+      setThresholds(policies.dcThresholds as DcThresholds);
+    }
+  }, [policies]);
 
-  const handleSystemPromptBlur = async () => {
-    await saveIntelligenceConfig({ systemPrompt });
+  const saveConfig = useCallback(async (updates: Record<string, unknown>) => {
+    const policyUpdates = (updates.policies as Record<string, unknown> | undefined) ?? {};
+    const ragUpdates = (updates.rag as Record<string, unknown> | undefined) ?? {};
+
+    await setModelConfig({
+      ...modelConfig,
+      ...updates,
+      rag: { ...modelConfig?.rag, ...ragUpdates },
+      policies: { ...modelConfig?.policies, ...policyUpdates },
+    });
+  }, [modelConfig, setModelConfig]);
+
+  const handleProfileChange = async (profileId: string) => {
+    const profile = intelligenceProfileById(profileId);
+    await saveConfig({
+      provider: profile.runtimeProvider,
+      model: profile.runtimeModel,
+      policies: {
+        intelligenceProfile: profile.id,
+        deepResearchEnabled: profile.supportsResearch ? true : deepResearchEnabled,
+      },
+    });
+    if (profile.supportsResearch) setDeepResearchEnabled(true);
+    toast.success(`AURA Intelligence profile set to ${profile.name}`);
   };
 
   const handleSupervisorToggle = async (enabled: boolean) => {
@@ -128,54 +150,45 @@ export function Step2Intelligence() {
     if (currentBlueprint) {
       updateBlueprint({ model: { ...currentBlueprint.model, supervisorEnabled: enabled } });
     }
-    await saveIntelligenceConfig({ supervisorEnabled: enabled });
-    toast.success(enabled ? 'Supervisor Agent enabled' : 'Supervisor Agent disabled');
+    await saveConfig({ policies: { supervisorEnabled: enabled } });
   };
 
-  const handleDeepResearchToggle = async (enabled: boolean) => {
+  const handleResearchToggle = async (enabled: boolean) => {
     setDeepResearchEnabled(enabled);
     if (currentBlueprint) {
       updateBlueprint({ model: { ...currentBlueprint.model, deepResearchEnabled: enabled } });
     }
-    await saveIntelligenceConfig({ deepResearchEnabled: enabled });
-    toast.success(enabled ? 'Deep Research Agent enabled' : 'Deep Research Agent disabled');
+    await saveConfig({ policies: { deepResearchEnabled: enabled } });
   };
 
-  const handleAddUrl = async () => {
-    if (!urlInput.trim()) return;
-    setIsAddingUrl(true);
-    try {
-      toast.success(`URL added to knowledge base: ${urlInput}`);
-      setUrlInput('');
-    } catch (error) {
-      toast.error('Failed to add URL');
-    } finally {
-      setIsAddingUrl(false);
+  const handleSystemPromptBlur = async () => {
+    if (currentBlueprint) {
+      updateBlueprint({ behavior: { ...currentBlueprint.behavior, systemPrompt } });
     }
+    await saveConfig({ systemPrompt });
   };
 
-  const handleSafetyToggle = async (key: string, value: boolean) => {
-    switch (key) {
-      case 'hallucination': setHallucinationPrevention(value); break;
-      case 'knowledge': setKnowledgeRestrictions(value); break;
-      case 'citations': setRequireCitations(value); break;
-    }
-    await saveIntelligenceConfig({
-      policies: {
-        hallucinationPrevention: key === 'hallucination' ? value : hallucinationPrevention,
-        knowledgeRestrictions: key === 'knowledge' ? value : knowledgeRestrictions,
-        requireCitations: key === 'citations' ? value : requireCitations,
-      },
-    });
+  const updateSafety = async (
+    key: 'hallucinationPrevention' | 'knowledgeRestrictions' | 'requireCitations',
+    value: boolean,
+  ) => {
+    if (key === 'hallucinationPrevention') setHallucinationPrevention(value);
+    if (key === 'knowledgeRestrictions') setKnowledgeRestrictions(value);
+    if (key === 'requireCitations') setRequireCitations(value);
+    await saveConfig({ policies: { [key]: value } });
   };
 
-  // DC-specific subsystems that intelligence monitors
-  const [enabledSubsystems, setEnabledSubsystems] = useState<Record<string, boolean>>({
-    thermal: true,
-    power: true,
-    gpu: true,
-    sovereignty: false,
-  });
+  const toggleSubsystem = async (id: string) => {
+    const next = { ...enabledSubsystems, [id]: !enabledSubsystems[id] };
+    setEnabledSubsystems(next);
+    await saveConfig({ policies: { monitoredSubsystems: next } });
+  };
+
+  const updateThreshold = async <K extends keyof DcThresholds>(key: K, value: DcThresholds[K]) => {
+    const next = { ...thresholds, [key]: value };
+    setThresholds(next);
+    await saveConfig({ policies: { dcThresholds: next } });
+  };
 
   const dcSubsystems = [
     { id: 'thermal', label: 'Thermal Management', icon: Thermometer },
@@ -184,473 +197,228 @@ export function Step2Intelligence() {
     { id: 'sovereignty', label: 'Sovereignty Compliance', icon: Shield },
   ];
 
-  const handleSubsystemToggle = (id: string) => {
-    setEnabledSubsystems(prev => {
-      const next = { ...prev, [id]: !prev[id] };
-      toast.success(next[id] ? `${id} monitoring enabled` : `${id} monitoring disabled`);
-      return next;
-    });
-  };
-
-  // DC-specific threshold states
-  const [gpuUtilThreshold, setGpuUtilThreshold] = useState([85]);
-  const [cpuThermalLimit, setCpuThermalLimit] = useState([75]);
-  const [gpuThermalLimit, setGpuThermalLimit] = useState([80]);
-  const [pueDriftThreshold, setPueDriftThreshold] = useState([0.1]);
-  const [carbonThreshold, setCarbonThreshold] = useState([400]);
-  const [sovereigntyLevel, setSovereigntyLevel] = useState<'low' | 'medium' | 'high'>('medium');
-
   return (
     <>
-      <div className="space-y-6 max-w-[920px] mx-auto">
+      <div className="mx-auto max-w-[920px] space-y-6">
         <DCSectionHeader
-          title="Intelligence Configuration"
-          subtitle="Configure AI model, knowledge sources, and monitoring behavior"
+          title="AURA Intelligence"
+          subtitle="Choose the operational intelligence profile, knowledge policy and data-centre guardrails."
           icon={<Brain className="h-5 w-5" />}
         />
 
-        {/* Agent Modes */}
         <DCCard
-          title="Agent Modes"
-          subtitle="Enable advanced capabilities for complex reasoning"
+          title="Intelligence Profile"
+          subtitle="AURA selects and manages the approved underlying runtime for the job."
           icon={<Sparkles className="h-4 w-4" />}
         >
+          <div className="grid gap-3 md:grid-cols-2">
+            {AURA_INTELLIGENCE_PROFILES.map((profile) => {
+              const active = selectedProfile.id === profile.id;
+              return (
+                <button
+                  key={profile.id}
+                  type="button"
+                  onClick={() => void handleProfileChange(profile.id)}
+                  className={`min-h-32 rounded-lg border p-4 text-left transition-colors ${
+                    active ? 'border-primary bg-primary/10' : 'border-border bg-muted/30 hover:border-primary/40'
+                  }`}
+                  aria-pressed={active}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold">{profile.name}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{profile.description}</p>
+                    </div>
+                    {active && <Badge variant="outline">Active</Badge>}
+                  </div>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    <span className="font-medium text-foreground">Best for:</span> {profile.bestFor}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-4 rounded-md border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
+            Runtime providers and model versions are managed behind the AURA policy boundary and can change without changing your agent contract.
+          </div>
+        </DCCard>
+
+        <DCCard
+          title="Agent Modes"
+          subtitle="Enable higher-level orchestration only when the workflow requires it."
+          icon={<Users className="h-4 w-4" />}
+        >
           <div className="space-y-3">
-            <div className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-              supervisorEnabled 
-                ? 'bg-accent/10 border-accent/40 ring-1 ring-accent/20' 
-                : 'bg-muted/50 border-border'
-            }`}>
-              <div className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
-                  supervisorEnabled ? 'bg-accent/20' : 'bg-accent/10'
-                }`}>
-                  <Users className={`h-4 w-4 ${supervisorEnabled ? 'text-accent' : 'text-muted-foreground'}`} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium text-sm">Supervisor Agent</p>
-                    {supervisorEnabled && <Badge variant="outline" className="text-[10px] bg-accent/10 text-accent border-accent/30">Active</Badge>}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Orchestrates sub-agents for multi-step DC operations</p>
-                </div>
+            <div className="flex items-center justify-between gap-4 rounded-lg border border-border p-3">
+              <div>
+                <p className="text-sm font-medium">Supervisor Orchestration</p>
+                <p className="text-xs text-muted-foreground">Coordinates multiple approved tools or sub-agents for multi-step operations.</p>
               </div>
-              <Switch checked={supervisorEnabled} onCheckedChange={handleSupervisorToggle} />
+              <Switch checked={supervisorEnabled} onCheckedChange={(value) => void handleSupervisorToggle(value)} />
             </div>
-            
-            <div className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-              deepResearchEnabled 
-                ? 'bg-info/10 border-info/40 ring-1 ring-info/20' 
-                : 'bg-muted/50 border-border'
-            }`}>
-              <div className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
-                  deepResearchEnabled ? 'bg-info/20' : 'bg-info/10'
-                }`}>
-                  <Search className={`h-4 w-4 ${deepResearchEnabled ? 'text-info' : 'text-muted-foreground'}`} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium text-sm">Deep Research Agent</p>
-                    {deepResearchEnabled && <Badge variant="outline" className="text-[10px] bg-info/10 text-info border-info/30">Active</Badge>}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Performs thorough analysis and synthesizes findings</p>
-                </div>
+            <div className="flex items-center justify-between gap-4 rounded-lg border border-border p-3">
+              <div>
+                <p className="text-sm font-medium">Research Mode</p>
+                <p className="text-xs text-muted-foreground">Enables evidence-oriented synthesis across approved research sources.</p>
               </div>
-              <Switch checked={deepResearchEnabled} onCheckedChange={handleDeepResearchToggle} />
+              <Switch checked={deepResearchEnabled} onCheckedChange={(value) => void handleResearchToggle(value)} />
             </div>
           </div>
         </DCCard>
 
-        {/* Subsystems Monitored */}
+        <DCCard
+          title="Knowledge"
+          subtitle="Attach governed knowledge without exposing connector or infrastructure vendors."
+          icon={<BookOpen className="h-4 w-4" />}
+        >
+          <div className="grid gap-4 md:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => setShowUploadWizard(true)}
+              className="rounded-lg border border-dashed border-border p-5 text-left hover:bg-muted/40"
+            >
+              <Upload className="mb-3 h-5 w-5 text-muted-foreground" aria-hidden />
+              <p className="text-sm font-medium">Upload approved documents</p>
+              <p className="mt-1 text-xs text-muted-foreground">Runbooks, specifications, standards and operational documentation.</p>
+            </button>
+            <div className="rounded-lg border border-border p-5">
+              <Search className="mb-3 h-5 w-5 text-muted-foreground" aria-hidden />
+              <p className="text-sm font-medium">Managed knowledge sources</p>
+              <p className="mt-1 text-xs text-muted-foreground">Add approved web, enterprise-file and research sources through AURA Connections.</p>
+              <Button variant="outline" size="sm" className="mt-4" asChild>
+                <Link to="/manage/integrations?tab=catalogue">Manage knowledge sources</Link>
+              </Button>
+            </div>
+          </div>
+        </DCCard>
+
+        <DCCard
+          title="Behavior & Evidence Policy"
+          subtitle="Define how the agent behaves and what evidence is required."
+          icon={<Shield className="h-4 w-4" />}
+        >
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="aura-system-prompt">System instructions</Label>
+              <Textarea
+                id="aura-system-prompt"
+                rows={6}
+                value={systemPrompt}
+                onChange={(event) => setSystemPrompt(event.target.value)}
+                onBlur={() => void handleSystemPromptBlur()}
+                placeholder="Define operational role, allowed actions, evidence requirements and escalation rules…"
+                className="resize-none font-mono text-sm"
+              />
+            </div>
+            <div className="grid gap-3">
+              <PolicyToggle
+                label="Verified knowledge only"
+                description="Constrain responses to approved knowledge and runtime evidence when the workflow requires it."
+                checked={knowledgeRestrictions}
+                onChange={(value) => void updateSafety('knowledgeRestrictions', value)}
+              />
+              <PolicyToggle
+                label="Hallucination prevention"
+                description="Prefer abstention or escalation when required evidence is unavailable."
+                checked={hallucinationPrevention}
+                onChange={(value) => void updateSafety('hallucinationPrevention', value)}
+              />
+              <PolicyToggle
+                label="Require citations"
+                description="Require source attribution in generated findings and recommendations."
+                checked={requireCitations}
+                onChange={(value) => void updateSafety('requireCitations', value)}
+              />
+            </div>
+            <div className="space-y-3 border-t border-border pt-4">
+              <div className="flex items-center justify-between">
+                <Label>Response variability</Label>
+                <span className="font-mono text-xs">{temperature[0].toFixed(1)}</span>
+              </div>
+              <Slider
+                value={temperature}
+                min={0}
+                max={1}
+                step={0.1}
+                onValueChange={setTemperature}
+                onValueCommit={(value) => void saveConfig({ rag: { temperature: value[0] } })}
+              />
+              <p className="text-xs text-muted-foreground">Lower values are recommended for operational and compliance workflows.</p>
+            </div>
+          </div>
+        </DCCard>
+
         <DCCard
           title="Monitored Subsystems"
-          subtitle="Select which DC subsystems this intelligence governs"
+          subtitle="Choose which data-centre domains this intelligence can monitor."
           icon={<Activity className="h-4 w-4" />}
         >
-          <div className="grid grid-cols-2 gap-3">
-            {dcSubsystems.map((sys) => {
-              const IconComp = sys.icon;
-              const isEnabled = enabledSubsystems[sys.id];
+          <div className="grid gap-3 sm:grid-cols-2">
+            {dcSubsystems.map((subsystem) => {
+              const Icon = subsystem.icon;
+              const enabled = Boolean(enabledSubsystems[subsystem.id]);
               return (
-                <div 
-                  key={sys.id}
-                  onClick={() => handleSubsystemToggle(sys.id)}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer ${
-                    isEnabled 
-                      ? 'bg-primary/10 border-primary/30 ring-1 ring-primary/20' 
-                      : 'bg-muted/50 border-border hover:border-primary/30'
+                <button
+                  key={subsystem.id}
+                  type="button"
+                  onClick={() => void toggleSubsystem(subsystem.id)}
+                  aria-pressed={enabled}
+                  className={`flex min-h-14 items-center gap-3 rounded-lg border p-3 text-left ${
+                    enabled ? 'border-primary bg-primary/10' : 'border-border bg-muted/30'
                   }`}
                 >
-                  <IconComp className={`h-4 w-4 ${isEnabled ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <span className="text-sm font-medium">{sys.label}</span>
-                  {isEnabled && <Badge variant="outline" className="ml-auto text-[10px] bg-primary/10 text-primary border-primary/30">On</Badge>}
-                </div>
+                  <Icon className="h-4 w-4" aria-hidden />
+                  <span className="text-sm font-medium">{subsystem.label}</span>
+                  <Badge variant="outline" className="ml-auto">{enabled ? 'On' : 'Off'}</Badge>
+                </button>
               );
             })}
           </div>
         </DCCard>
 
-        {/* DC Threshold Sliders */}
         <DCCard
-          title="Data Centre Thresholds"
-          subtitle="Set alert thresholds for DC-specific metrics"
+          title="Data Centre Guardrails"
+          subtitle="Operational thresholds are stored as policy, not model-vendor configuration."
           icon={<Activity className="h-4 w-4" />}
         >
           <div className="space-y-6">
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <Label>GPU Utilization Threshold</Label>
-                <span className="text-sm font-mono text-primary">{gpuUtilThreshold[0]}%</span>
-              </div>
-              <Slider
-                value={gpuUtilThreshold}
-                onValueChange={setGpuUtilThreshold}
-                max={100}
-                step={5}
-              />
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <Label>CPU Thermal Limit</Label>
-                <span className="text-sm font-mono text-destructive">{cpuThermalLimit[0]}°C</span>
-              </div>
-              <Slider
-                value={cpuThermalLimit}
-                onValueChange={setCpuThermalLimit}
-                max={100}
-                min={50}
-                step={5}
-              />
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <Label>GPU Thermal Limit</Label>
-                <span className="text-sm font-mono text-destructive">{gpuThermalLimit[0]}°C</span>
-              </div>
-              <Slider
-                value={gpuThermalLimit}
-                onValueChange={setGpuThermalLimit}
-                max={100}
-                min={60}
-                step={5}
-              />
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <Label>PUE Drift Alert Threshold</Label>
-                <span className="text-sm font-mono text-warning">{pueDriftThreshold[0].toFixed(2)}</span>
-              </div>
-              <Slider
-                value={pueDriftThreshold}
-                onValueChange={setPueDriftThreshold}
-                max={0.5}
-                min={0.01}
-                step={0.01}
-              />
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <Label>Carbon Intensity Alert (gCO₂e/kWh)</Label>
-                <span className="text-sm font-mono text-success">{carbonThreshold[0]}</span>
-              </div>
-              <Slider
-                value={carbonThreshold}
-                onValueChange={setCarbonThreshold}
-                max={800}
-                min={100}
-                step={50}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Sovereignty Violation Sensitivity</Label>
-              <Select value={sovereigntyLevel} onValueChange={(val: 'low' | 'medium' | 'high') => setSovereigntyLevel(val)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low - Critical violations only</SelectItem>
-                  <SelectItem value="medium">Medium - Violations & warnings</SelectItem>
-                  <SelectItem value="high">High - All routing anomalies</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <ThresholdControl label="GPU utilization alert" value={`${thresholds.gpuUtilizationPct}%`} min={0} max={100} step={5} numeric={thresholds.gpuUtilizationPct} onCommit={(value) => void updateThreshold('gpuUtilizationPct', value)} />
+            <ThresholdControl label="CPU thermal limit" value={`${thresholds.cpuThermalC}°C`} min={50} max={100} step={5} numeric={thresholds.cpuThermalC} onCommit={(value) => void updateThreshold('cpuThermalC', value)} />
+            <ThresholdControl label="GPU thermal limit" value={`${thresholds.gpuThermalC}°C`} min={60} max={100} step={5} numeric={thresholds.gpuThermalC} onCommit={(value) => void updateThreshold('gpuThermalC', value)} />
+            <ThresholdControl label="PUE drift alert" value={thresholds.pueDrift.toFixed(2)} min={0.01} max={0.5} step={0.01} numeric={thresholds.pueDrift} onCommit={(value) => void updateThreshold('pueDrift', value)} />
+            <ThresholdControl label="Carbon intensity alert" value={`${thresholds.carbonIntensity} gCO₂e/kWh`} min={100} max={800} step={50} numeric={thresholds.carbonIntensity} onCommit={(value) => void updateThreshold('carbonIntensity', value)} />
           </div>
         </DCCard>
 
-        {/* Sovereignty Configuration Section */}
-        <SovereigntyConfigSection 
+        <SovereigntyConfigSection
           onConfigChange={(config) => {
-            console.log('[Builder:Step2] Sovereignty config updated:', config);
-            toast.success('Sovereignty configuration updated');
+            void saveConfig({ policies: { sovereignty: config } });
           }}
         />
 
-        {/* Carbon & Financial Configuration Section */}
-        <CarbonFinancialConfigSection 
+        <CarbonFinancialConfigSection
           onConfigChange={(config) => {
-            console.log('[Builder:Step2] Carbon/Financial config updated:', config);
-            toast.success('Carbon & Financial configuration updated');
+            void saveConfig({ policies: { carbonFinancial: config } });
           }}
         />
 
-        <Tabs defaultValue="model" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="model" className="flex items-center gap-2">
-              <Brain className="h-4 w-4" />
-              <span className="hidden sm:inline">Model</span>
-            </TabsTrigger>
-            <TabsTrigger value="knowledge" className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">Knowledge</span>
-            </TabsTrigger>
-            <TabsTrigger value="behavior" className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              <span className="hidden sm:inline">Behavior</span>
-            </TabsTrigger>
-            <TabsTrigger value="advanced" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              <span className="hidden sm:inline">Advanced</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="model" className="space-y-4 mt-6">
-            <DCCard title="AI Model Selection" icon={<Brain className="h-4 w-4" />}>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Model</Label>
-                  <Select value={modelConfig.model} onValueChange={handleModelChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a model" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="google/gemini-3-pro-preview">Gemini 3.0 Pro Preview (Latest)</SelectItem>
-                      <SelectItem value="google/gemini-2.5-flash">Gemini 2.5 Flash (Default)</SelectItem>
-                      <SelectItem value="google/gemini-2.5-pro">Gemini 2.5 Pro</SelectItem>
-                      <SelectItem value="openai/gpt-5">GPT-5</SelectItem>
-                      <SelectItem value="openai/gpt-5-mini">GPT-5 Mini</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid gap-3 p-4 bg-muted/50 rounded-lg border border-border">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Context Window:</span>
-                    <span className="font-mono">128K tokens</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Pricing:</span>
-                    <span className="font-mono">$0.15 / 1M tokens</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Reasoning Mode:</span>
-                    <Badge className="bg-success/10 text-success border-success/30">Fast & Balanced</Badge>
-                  </div>
-                </div>
-              </div>
-            </DCCard>
-          </TabsContent>
-
-          <TabsContent value="knowledge" className="space-y-4 mt-6">
-            <DCCard title="Knowledge Sources (RAG)" icon={<BookOpen className="h-4 w-4" />}>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Upload DC Documentation</Label>
-                <div 
-                    onClick={() => setShowUploadWizard(true)}
-                    className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:bg-muted/50 transition-colors cursor-pointer"
-                  >
-                    <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground">Drop DCIM docs, thermal specs, or runbooks</p>
-                    <p className="text-xs text-muted-foreground mt-1">PDF, DOCX, TXT, MD (Max 50MB)</p>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Ingest URLs</Label>
-                  <div className="flex gap-2">
-                    <Input 
-                      placeholder="https://docs.datacentre.example.com" 
-                      value={urlInput}
-                      onChange={(e) => setUrlInput(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleAddUrl()}
-                      className="bg-muted/50 border-border"
-                    />
-                    <Button variant="outline" onClick={handleAddUrl} disabled={isAddingUrl} className="border-border">
-                      <Link2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Connect Infrastructure Sources</Label>
-                  <div className="grid gap-2">
-                    <Button variant="outline" className="justify-start bg-muted/50 border-border hover:bg-muted">
-                      <Database className="h-4 w-4 mr-2" />
-                      Connect DCIM System
-                    </Button>
-                    <Button variant="outline" className="justify-start bg-muted/50 border-border hover:bg-muted">
-                      <Database className="h-4 w-4 mr-2" />
-                      Connect Prometheus
-                    </Button>
-                    <Button variant="outline" className="justify-start bg-muted/50 border-border hover:bg-muted">
-                      <Database className="h-4 w-4 mr-2" />
-                      Connect Asset Database
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-muted/50 rounded-lg border border-border space-y-3">
-                  <h4 className="text-sm font-medium">RAG Quality Score</h4>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Retrieval Accuracy</span>
-                    <Badge className="bg-success/10 text-success border-success/30">85%</Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Sources Indexed</span>
-                    <Badge variant="outline">0 documents</Badge>
-                  </div>
-                </div>
-              </div>
-            </DCCard>
-          </TabsContent>
-
-          <TabsContent value="behavior" className="space-y-4 mt-6">
-            <DCCard title="System Behavior" icon={<MessageSquare className="h-4 w-4" />}>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>System Prompt</Label>
-                  <Textarea
-                    placeholder="You are a Data Centre operations AI specialized in thermal management, power optimization, and workload scheduling..."
-                    value={systemPrompt}
-                    onChange={(e) => handleSystemPromptChange(e.target.value)}
-                    onBlur={handleSystemPromptBlur}
-                    rows={6}
-                    className="resize-none font-mono text-sm bg-muted/50 border-border"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Define DC-specific behavior, monitoring priorities, and operational constraints.
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Operational Mode</Label>
-                  <Select value={persona} onValueChange={setPersona}>
-                    <SelectTrigger className="bg-muted/50 border-border">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="professional">NOC Operations Mode</SelectItem>
-                      <SelectItem value="friendly">Collaborative Mode</SelectItem>
-                      <SelectItem value="technical">Engineering Debug Mode</SelectItem>
-                      <SelectItem value="executive">Executive Summary Mode</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid gap-3">
-                  <div className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-                    detailedExplanations 
-                      ? 'bg-primary/10 border-primary/40 ring-1 ring-primary/20' 
-                      : 'bg-muted/50 border-border'
-                  }`}>
-                    <span className="text-sm">Detailed Explanations</span>
-                    <Switch checked={detailedExplanations} onCheckedChange={setDetailedExplanations} />
-                  </div>
-                  <div className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-                    formalTone 
-                      ? 'bg-primary/10 border-primary/40 ring-1 ring-primary/20' 
-                      : 'bg-muted/50 border-border'
-                  }`}>
-                    <span className="text-sm">Formal Technical Tone</span>
-                    <Switch checked={formalTone} onCheckedChange={setFormalTone} />
-                  </div>
-                </div>
-              </div>
-            </DCCard>
-          </TabsContent>
-
-          <TabsContent value="advanced" className="space-y-4 mt-6">
-            <DCCard title="Safety & Thresholds" icon={<Shield className="h-4 w-4" />}>
-              <div className="space-y-4">
-                <div className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-                  hallucinationPrevention 
-                    ? 'bg-success/10 border-success/40 ring-1 ring-success/20' 
-                    : 'bg-muted/50 border-border'
-                }`}>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium">Hallucination Prevention</p>
-                      {hallucinationPrevention && <Badge variant="outline" className="text-[10px] bg-success/10 text-success border-success/30">Active</Badge>}
-                    </div>
-                    <p className="text-xs text-muted-foreground">Only respond from verified DC knowledge</p>
-                  </div>
-                  <Switch checked={hallucinationPrevention} onCheckedChange={(v) => handleSafetyToggle('hallucination', v)} />
-                </div>
-
-                <div className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-                  knowledgeRestrictions 
-                    ? 'bg-success/10 border-success/40 ring-1 ring-success/20' 
-                    : 'bg-muted/50 border-border'
-                }`}>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium">Knowledge Restrictions</p>
-                      {knowledgeRestrictions && <Badge variant="outline" className="text-[10px] bg-success/10 text-success border-success/30">Active</Badge>}
-                    </div>
-                    <p className="text-xs text-muted-foreground">Limit to indexed sources only</p>
-                  </div>
-                  <Switch checked={knowledgeRestrictions} onCheckedChange={(v) => handleSafetyToggle('knowledge', v)} />
-                </div>
-
-                <div className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-                  requireCitations 
-                    ? 'bg-info/10 border-info/40 ring-1 ring-info/20' 
-                    : 'bg-muted/50 border-border'
-                }`}>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium">Require Citations</p>
-                      {requireCitations && <Badge variant="outline" className="text-[10px] bg-info/10 text-info border-info/30">Active</Badge>}
-                    </div>
-                    <p className="text-xs text-muted-foreground">Always cite data sources in responses</p>
-                  </div>
-                  <Switch checked={requireCitations} onCheckedChange={(v) => handleSafetyToggle('citations', v)} />
-                </div>
-
-                <div className="space-y-3 pt-4 border-t border-border">
-                  <Label>Temperature (Creativity): {temperature[0]}</Label>
-                  <Slider
-                    value={temperature}
-                    onValueChange={setTemperature}
-                    max={1}
-                    min={0}
-                    step={0.1}
-                    className="w-full"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Lower = more deterministic (0.3 for ops), Higher = more creative
-                  </p>
-                </div>
-              </div>
-            </DCCard>
-          </TabsContent>
-        </Tabs>
-
-        {/* Recommended DC Tools */}
-        <div className="mt-6">
+        <div>
           <DCSectionHeader
-            title="Recommended Tools"
-            subtitle="Tools available based on your configured integrations"
+            title="Recommended Capabilities"
+            subtitle="Capabilities available from your approved AURA connections and runtime policy."
             icon={<Settings className="h-5 w-5" />}
           />
           <div className="mt-4">
             <BuilderToolsPanel />
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+          <div className="flex items-start gap-3">
+            <Database className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            <p>
+              Connection credentials, provider tokens and runtime implementation details remain behind the AURA control-plane boundary and are not exposed in this Builder.
+            </p>
           </div>
         </div>
       </div>
@@ -661,5 +429,66 @@ export function Step2Intelligence() {
         agentId={builderId}
       />
     </>
+  );
+}
+
+function PolicyToggle({
+  label,
+  description,
+  checked,
+  onChange,
+}: {
+  label: string;
+  description: string;
+  checked: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-lg border border-border p-3">
+      <div>
+        <p className="text-sm font-medium">{label}</p>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </div>
+      <Switch checked={checked} onCheckedChange={onChange} />
+    </div>
+  );
+}
+
+function ThresholdControl({
+  label,
+  value,
+  min,
+  max,
+  step,
+  numeric,
+  onCommit,
+}: {
+  label: string;
+  value: string;
+  min: number;
+  max: number;
+  step: number;
+  numeric: number;
+  onCommit: (value: number) => void;
+}) {
+  const [draft, setDraft] = useState([numeric]);
+
+  useEffect(() => setDraft([numeric]), [numeric]);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-4">
+        <Label>{label}</Label>
+        <span className="font-mono text-xs">{value}</span>
+      </div>
+      <Slider
+        value={draft}
+        min={min}
+        max={max}
+        step={step}
+        onValueChange={setDraft}
+        onValueCommit={(next) => onCommit(next[0])}
+      />
+    </div>
   );
 }

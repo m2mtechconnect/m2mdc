@@ -473,19 +473,17 @@ export default function Builder() {
     // Create a twin if deploying a DC twin type
     if (state.type === '3d_twin' || state.type === 'process_twin') {
       try {
-        // Create twin without location (null for legacy support)
-        const newTwin = await createTwin(null, {
+        // Pass the builder's own configuration. No hardcoded facility identity:
+        // unset fields fall back to the twin service defaults.
+        const newTwin = await createTwin({
           name: state.goal || 'New Data Centre Twin',
-          city: 'Montreal',
-          region_code: 'QC',
-          tier: 'Tier III',
-          capacity_kw: 5000,
-          industry: state.industry || 'cloud_saas',
+          industry: state.industry || undefined,
           metadata: {
             builder_id: state.builderId,
             template: state.template,
           },
         });
+
         
         if (newTwin) {
           setActiveTwin(newTwin.id);

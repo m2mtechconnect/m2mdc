@@ -74,28 +74,17 @@ for (const [assetId, role] of expectedBindings) {
   }
 }
 
+const requirementsSource = fs.readFileSync(
+  path.join(root, 'src/dsx/blueprintAssetRequirements.ts'),
+  'utf8',
+);
 const exactDsxRoles = [
-  'dsx-compute-tray',
-  'dsx-nvlink-switch-tray',
-  'dsx-power-shelf',
-  'dsx-tor-oob-switch',
-  'dsx-tan-switch',
-  'dsx-smn-switch',
-  'dsx-cin-switch',
-  'dsx-cdu',
-  'dsx-crah',
-  'dsx-chiller',
-  'dsx-pump',
-  'dsx-dry-cooler',
-  'dsx-ups',
-  'dsx-backup-generator',
-  'dsx-bess',
-  'dsx-control-node',
-  'dsx-high-speed-storage',
-  'dsx-fiber-spine',
-];
-
+  ...requirementsSource.matchAll(/semanticRole:\s*'(dsx-[^']+)'/g),
+].map((match) => match[1]);
 const exactRoleSet = new Set(exactDsxRoles);
+if (exactDsxRoles.length === 0) fail('no exact DSX semantic roles found in requirement catalogue');
+if (exactRoleSet.size !== exactDsxRoles.length) fail('duplicate exact DSX semantic role in requirement catalogue');
+
 for (const asset of manifest.assets) {
   if (!exactRoleSet.has(asset.semanticRole)) continue;
 

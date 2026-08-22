@@ -7,6 +7,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { createHandler } from "../_shared/handler.ts";
 import { ErrorCodes } from "../_shared/types.ts";
+import { resolveRouterEnvironmentForUser } from "../_shared/ai-provider-connection.ts";
 import {
   ModelRouterError,
   makeChatCompletion,
@@ -34,6 +35,7 @@ serve(createHandler({
   handler: async (input, context) => {
     const { agentId, messages, params } = input;
     const { supabase, userId, log } = context;
+    if (!userId) throw { code: 'UNAUTHORIZED', message: 'Authenticated user required', status: 401 };
 
     const { data: agent, error: agentError } = await supabase
       .from('agents')
@@ -71,11 +73,18 @@ serve(createHandler({
       config,
     });
 
+    const providerResolution = await resolveRouterEnvironmentForUser(userId);
     const startTime = Date.now();
     try {
       const completion = await makeChatCompletion(
         [{ role: 'system', content: systemPrompt }, ...messages],
-        { requestedModel, profile, temperature, maxTokens },
+        {
+          requestedModel,
+          profile,
+          temperature,
+          maxTokens,
+          env: providerResolution.env,
+        },
       );
       const latency = Date.now() - startTime;
 
@@ -88,6 +97,8 @@ serve(createHandler({
           provider: completion.provider,
           model: completion.model,
           model_profile: completion.profile,
+          provider_configuration_source: providerResolution.source,
+          provider_connection_id: providerResolution.connectionId,
         },
         status: 'completed',
         duration_ms: latency,
@@ -99,6 +110,8 @@ serve(createHandler({
         provider: completion.provider,
         model: completion.model,
         profile: completion.profile,
+        providerSource: providerResolution.source,
+        providerConnectionId: providerResolution.connectionId,
       });
 
       return {
@@ -107,6 +120,8 @@ serve(createHandler({
         provider: completion.provider,
         model: completion.model,
         model_profile: completion.profile,
+        provider_configuration_source: providerResolution.source,
+        provider_connection_id: providerResolution.connectionId,
       };
     } catch (error) {
       if (error instanceof ModelRouterError) {

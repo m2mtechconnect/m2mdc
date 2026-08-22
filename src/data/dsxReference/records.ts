@@ -69,16 +69,32 @@ function canonicalConflictGroup(record: ReferenceRecord): string | null {
   return group;
 }
 
+function normalizeCompletenessRecord(record: ReferenceRecord): ReferenceRecord {
+  // `Fast Memory` exists only in configs.ts for the GB200 demo block. With no
+  // second NVIDIA source value to disagree with, it is UNIQUE, not a conflict.
+  if (record.record_id === 'gpu-spec:configs:nvidia-gb200:fast-memory') {
+    return {
+      ...record,
+      source_consistency: 'UNIQUE',
+      source_conflict_group: null,
+    };
+  }
+
+  return {
+    ...record,
+    source_conflict_group: canonicalConflictGroup(record),
+  };
+}
+
 const normalizedBase: ReferenceRecord[] = BASE_RECORDS.map((record) => ({
   ...record,
   dataset_version: DSX_COMPLETE_DATASET_VERSION,
   ...baseConsistency(record),
 }));
 
-const normalizedCompleteness: ReferenceRecord[] = DSX_COMPLETENESS_RECORDS.map((record) => ({
-  ...record,
-  source_conflict_group: canonicalConflictGroup(record),
-}));
+const normalizedCompleteness: ReferenceRecord[] = DSX_COMPLETENESS_RECORDS.map(
+  normalizeCompletenessRecord,
+);
 
 /**
  * Source-complete normalized corpus for the pinned public NVIDIA demo source.

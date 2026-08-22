@@ -26,5 +26,9 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Typecheck
         run: bun run typecheck
-      - name: White-label customer-surface regression
-        run: bunx vitest run src/config/__tests__/customerSurfaceWhiteLabel.test.ts src/config/__tests__/auraRuntimeCatalog.test.ts
+      - name: Demo truth and white-label regressions
+        run: >-
+          bunx vitest run
+          src/connections/__tests__/demoIntegrationPolicy.test.ts
+          src/config/__tests__/customerSurfaceWhiteLabel.test.ts
+          src/config/__tests__/auraRuntimeCatalog.test.ts

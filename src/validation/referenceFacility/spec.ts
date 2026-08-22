@@ -2,9 +2,9 @@
  * NVIDIA Reference Facility hardware visual-acceptance specification.
  *
  * Runtime visual coverage remains grounded in what actually mounted. In
- * addition, the facility carries a separate NVIDIA DSX blueprint asset gate so
- * a visually coherent generic data hall cannot be mistaken for a complete DSX
- * reference design.
+ * addition, the facility carries separate NVIDIA DSX blueprint asset and rack
+ * BOM gates so a visually coherent generic data hall cannot be mistaken for a
+ * complete DSX reference design.
  */
 
 import {
@@ -20,10 +20,20 @@ import {
   reconcileDsxAssetRequirements,
   type DsxAssetCoverageRow,
 } from '@/dsx/blueprintAssetRequirements';
+import {
+  reconcileDsxRackBom,
+  type DsxRackBomReconciliation,
+} from '@/dsx/rackBomValidation';
 import type { CameraPresetId } from '@/three/cameraPresets';
 
 export const REFERENCE_FACILITY_ID = 'nvidia.reference-facility';
 export const REFERENCE_FACILITY_ROUTE = '/data-centre-twin?geometry=nvidia-reference';
+
+/**
+ * First DSX acceptance milestone: prove one complete GPU rack before scaling the
+ * same exact-role BOM to a larger configured rack count.
+ */
+export const REFERENCE_DSX_RACK_COUNT = 1;
 
 /** Existing visual roles the current reference hall attempts to mount. */
 export const REFERENCE_ROLES: SemanticRole[] = [
@@ -73,6 +83,8 @@ export interface FacilityReconciliation {
   dsxAssetRows: DsxAssetCoverageRow[];
   dsxRequired: number;
   dsxRuntimeEligible: number;
+  /** Exact mounted 18/9/8/2 BOM for the configured DSX rack acceptance target. */
+  dsxRackBom: DsxRackBomReconciliation;
 }
 
 /** Reconcile manifest expectation against what the runtime actually mounted. */
@@ -122,6 +134,7 @@ export function reconcileReferenceFacility(
     .map((a) => a.assetId);
 
   const dsxAssetRows = reconcileDsxAssetRequirements(allAssets, 'facility');
+  const dsxRackBom = reconcileDsxRackBom(coverage, REFERENCE_DSX_RACK_COUNT);
 
   return {
     rows,
@@ -135,6 +148,7 @@ export function reconcileReferenceFacility(
     dsxAssetRows,
     dsxRequired: dsxAssetRows.length,
     dsxRuntimeEligible: dsxAssetRows.filter((row) => row.state === 'runtime-eligible').length,
+    dsxRackBom,
   };
 }
 

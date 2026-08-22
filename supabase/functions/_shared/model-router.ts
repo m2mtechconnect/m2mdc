@@ -58,7 +58,6 @@ export class ModelRouterError extends Error {
 }
 
 const PROFILE_ALIASES: Record<string, AgentModelProfile> = {
-  // Current/legacy AURA Google identifiers.
   'google/gemini-2.5-flash': 'fast',
   'google/gemini-2.5-flash-lite': 'fast',
   'google/gemini-2.5-pro': 'reasoning',
@@ -68,8 +67,6 @@ const PROFILE_ALIASES: Record<string, AgentModelProfile> = {
   'google/gemini-1.5-pro': 'reasoning',
   'gemini-1.5-flash': 'fast',
   'google/gemini-1.5-flash': 'fast',
-
-  // NVIDIA open-model profiles validated against NVIDIA's public model cards.
   'nvidia/nemotron-3.5-lightning-30b-a3b': 'reasoning',
   'nvidia/nemotron-3.5-lightning-30b-a3b-nvfp4': 'reasoning',
   'nvidia/nemotron-3-super-120b-a12b': 'supervisor',
@@ -119,6 +116,29 @@ export function normalizeProfile(
     return alias;
   }
   return requestedProfile ?? 'fast';
+}
+
+/**
+ * Default reasoning policy for shipped/known AURA agent roles.
+ * The model remains advisory; this is compute routing, not authority routing.
+ */
+export function profileForAgent(agent: {
+  slug?: string | null;
+  name?: string | null;
+  domain?: string | null;
+  config?: Record<string, unknown> | null;
+}): AgentModelProfile {
+  const configured = agent.config?.model_profile;
+  if (configured === 'fast' || configured === 'reasoning' || configured === 'supervisor') {
+    return configured;
+  }
+
+  const identity = `${agent.slug ?? ''} ${agent.name ?? ''} ${agent.domain ?? ''}`.toLowerCase();
+  if (/incident[-_ ]response|major[-_ ]incident|supervisor/.test(identity)) return 'supervisor';
+  if (/sovereig|cyber|security|twin[-_ ]integrity|data[-_ ]quality|compliance/.test(identity)) {
+    return 'reasoning';
+  }
+  return 'fast';
 }
 
 function chatEndpoint(base: string): string {
@@ -221,8 +241,6 @@ export function resolveModel(
     );
   }
   const model = configuredModelForProfile(profile, env) ?? LOVABLE_MODEL_IDS[profile];
-  // Lovable is the backward-compatible provider. Its allowlist is expressed as
-  // known profile aliases so stale/unknown marketplace IDs cannot leak through.
   if (!PROFILE_ALIASES[model.toLowerCase()]) {
     throw new ModelRouterError(
       'UNSUPPORTED_LOVABLE_MODEL',
@@ -292,8 +310,6 @@ export async function makeChatCompletion(
   });
 
   if (!response.ok) {
-    // Do not echo upstream bodies into user-facing errors; some providers may
-    // include request details. Status and provider are sufficient for routing.
     throw new ModelRouterError(
       'MODEL_PROVIDER_ERROR',
       `${resolved.provider} model request failed with HTTP ${response.status}`,

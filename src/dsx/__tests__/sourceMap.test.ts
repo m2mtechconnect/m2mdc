@@ -6,9 +6,10 @@ import {
   canPromoteDsxMappingToPublicRuntime,
   parseDsxSourceMap,
   summarizeDsxSourceMap,
+  type DsxSourceMap,
 } from '../sourceMap';
 
-function unresolvedSourceMap() {
+function unresolvedSourceMap(): DsxSourceMap {
   return {
     sourceMapVersion: DSX_SOURCE_MAP_VERSION,
     generatedAt: '2026-08-22T13:30:00.000Z',
@@ -18,24 +19,24 @@ function unresolvedSourceMap() {
       expectedRootStage: NVIDIA_DSX_CONTENT_PACK.expectedRootStage,
       rootStageChecksum: null,
       licenceLabel: NVIDIA_DSX_CONTENT_PACK.licenceLabel,
-      productionRights: 'not-established' as const,
-      redistributionRights: 'not-established' as const,
+      productionRights: 'not-established',
+      redistributionRights: 'not-established',
     },
     mappings: DSX_ASSET_REQUIREMENTS.map((requirement) => ({
       requirementId: requirement.id,
       semanticRole: requirement.semanticRole,
-      mappingStatus: 'unresolved' as const,
-      modelFamily: 'unknown' as const,
+      mappingStatus: 'unresolved',
+      modelFamily: 'unknown',
       sourceUsdPath: null,
       usdPrimPath: null,
       sourceChecksum: null,
-      evidenceSource: 'private-inventory' as const,
+      evidenceSource: 'private-inventory',
       notes: 'Awaiting authorized private content-pack inventory.',
     })),
   };
 }
 
-function verifyFirstMapping(map: ReturnType<typeof unresolvedSourceMap>) {
+function verifyFirstMapping(map: DsxSourceMap) {
   map.sourcePack.rootStageChecksum = `sha256:${'a'.repeat(64)}`;
   map.mappings[0] = {
     ...map.mappings[0],
@@ -119,12 +120,12 @@ describe('DSX source-map contract', () => {
       rackRoles.has(mapping.semanticRole)
         ? {
             ...mapping,
-            mappingStatus: 'verified' as const,
-            modelFamily: 'GB300' as const,
+            mappingStatus: 'verified',
+            modelFamily: 'GB300',
             sourceUsdPath: `DSX_BP/private/${index}.usd`,
             usdPrimPath: `/DSX/Private/Asset_${index}`,
             sourceChecksum: `sha256:${String(index + 1).padStart(64, '0')}`,
-            evidenceSource: 'private-inventory' as const,
+            evidenceSource: 'private-inventory',
           }
         : mapping,
     );

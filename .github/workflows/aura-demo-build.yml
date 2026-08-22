@@ -38,7 +38,7 @@ jobs:
       - name: Demo truth and white-label tests
         run: >-
           bunx vitest run
-          src/config/__tests__/demoIntegrationPolicy.test.ts
+          src/connections/__tests__/demoIntegrationPolicy.test.ts
           src/config/__tests__/customerSurfaceWhiteLabel.test.ts
           src/config/__tests__/auraRuntimeCatalog.test.ts
 

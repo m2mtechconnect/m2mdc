@@ -1,136 +1,106 @@
-# UI/UX Audit — Builder and Connections (findings only)
+# Audit — original AURA Builder and Connections (findings only, no changes)
 
-Audit date 2026-08-22. Scope: `/builder` (all steps + data-centre twin path) and `/manage/integrations`.
-Method: source review of the routed components listed below. No browser session was driven and no
-screenshots were captured in this pass, so nothing here asserts rendered pixel behaviour, measured
-contrast, or runtime data states. Every finding is traceable to code.
+Source-only audit, 2026-08-22. No files edited, no browser run, no runtime claims.
 
-## Surfaces reviewed
+## 1. Does the Builder still use the legacy step labels? Yes.
 
-Builder
-- Route: `src/AuthenticatedShell.tsx:91` -> `src/pages/Builder.tsx`
-- Chrome: `src/components/builder/BuilderLayout.tsx`, `StepIndicator.tsx`, `BuilderModeToggle.tsx`
-- Standard wizard steps: `src/components/builder/steps/Step1Summary.tsx` .. `Step5Deploy.tsx`
-- DC twin path (`?from=scanner` / `?fromScanner=true` / router state `fromRecommendation`):
-  `src/components/builder/dc-steps/DCStep1Summary.tsx` .. `DCStep5Deploy.tsx`
-- Empty/starter state: inline in `Builder.tsx` + `BuilderStarterLists.tsx`
-- Tools step integrations: `Step3Tools.tsx` -> `ConnectStep.tsx` -> `BuilderIntegrationsHub.tsx`
+`src/components/builder/BuilderLayout.tsx:32-38` hardcodes:
 
-Connections
-- Route: `src/AuthenticatedShell.tsx:115` -> `src/pages/Connections.tsx` (alias `/manage/connections`)
-- Tabs: `OverviewTab`, `ConnectionsTab`, `DataFlowsTab`, `CatalogueTab`, `ActivityTab`
-- Overlays: `ConnectionSetupWizard`, `ConnectionDetailDrawer`, `CredentialVaultDialog`, `MappingEditorDialog`
-- Support: `DataTopology`, `ConnectionStatusBadge`, `src/connections/presentation.ts`, `catalogueTaxonomy.ts`
-- Adjacent, not mounted by this route: `AgentToolsTab`, `DsxExchangeTab`, `ManagedConnectorInventory`,
-  `RuntimeReadinessPanel`, `RuntimeDiagnosticsPanel`
+```
+1 Business Profile · 2 Capabilities · 3 AI & Integrations · 4 Scenarios · 5 Deploy
+```
 
-## P0 — truthfulness and correctness
+with the sidebar heading "Data Centre Twin" and subtitle "Configure your data centre twin"
+(`BuilderLayout.tsx:~136-146`). These labels are static and are used for **both** builder paths.
 
-1. Builder step labels do not match the steps rendered.
-   `BuilderLayout.tsx:32-38` hardcodes `Business Profile / Capabilities / AI & Integrations / Scenarios / Deploy`
-   and the sidebar heading `Data Centre Twin`, but the standard wizard renders
-   `Step1Summary / Step2Intelligence / Step3Tools / Step4Workflow / Step5Deploy`. In the non-scanner path the
-   navigation names a different product flow than the panes beneath it. This is a wayfinding and trust defect,
-   not a cosmetic one.
+The standard (non-scanner) path actually renders `Step1Summary`, `Step2Intelligence`, `Step3Tools`,
+`Step4Workflow`, `Step5Deploy` (`src/pages/Builder.tsx:5-9`, `143-183`). So Summary/Intelligence/Tools/
+Workflow map onto labels reading Business Profile/Capabilities/AI & Integrations/Scenarios. The DC path
+(`?from=scanner`, `?fromScanner=true`, or router state `fromRecommendation`) swaps in
+`dc-steps/DCStep1..5` (`Builder.tsx:10, 32-34, 100-140, 186`) under the identical label set.
 
-2. Fabricated connector inventory inside Builder.
-   `BuilderIntegrationsHub.tsx:20-27` ships a hardcoded `FEATURED_APPS` list (Slack, Gmail, HubSpot,
-   Salesforce, Jira, Zendesk) and derives connected/error/available status from a Zapier status call.
-   `Step3Tools.tsx:15-27` hardcodes a second, different SaaS list. Neither list comes from
-   `connector_definitions`, and both contradict the Connections catalogue contract in
-   `CatalogueTab.tsx:1-8` ("a catalogue entry describes what AURA knows how to connect to; it is never
-   counted as a configured connection"). Two competing sources of connector truth, one of them a fixture.
+Conclusion: legacy labels are still present and are mismatched to the standard wizard's panes.
 
-3. Builder integrations are not the same object model as Connections.
-   Builder writes `tools` / `apiConnectors` into `wizardBuilderStore`; Connections reads
-   `connection_instances` + `twin_mappings` + health/ingest evidence. Nothing links them, and there is no
-   navigation from any Builder step to `/manage/integrations` (only `BuilderStarterLists.tsx:201` links to
-   `/marketplace`). The Builder-to-Connections handoff the brief asks about does not exist as a path.
+## 2. Does deployment use artificial timed states or auto-redirects? Yes, both, in two places.
 
-## P1 — information architecture and status semantics
+`BuilderLayout.tsx:66-131` (`handleDeployClick`):
+- `DeployState` machine `idle → morphing → deploying → success | error`
+- 350 ms artificial "morph" delay before the request starts
+- `MIN_DEPLOY_DURATION = 1200` ms enforced spinner floor padded after the real result returns
+- 15 s client-side `Deployment timeout` race
+- on success: `setTimeout(() => navigate(result.agentUrl || '/dashboard'), 1800)` — auto-redirect
+- on failure: `setDeployState(error)` then `setTimeout(idle, 3000)` — the error self-clears with no
+  persistent surface, and the caught error message is only sent to `console.error`
 
-4. Two parallel builders with divergent chrome.
-   The scanner path swaps step components and step state store (`Builder.tsx:82-84`, `100-140`) while keeping
-   the same sidebar, so the DC path and the standard path present identical navigation for different content.
-   Step gating also differs silently (DC step 3 `validate: () => true`, standard step 2 requires a model).
+`src/components/builder/step5/AnimatedDeployButton.tsx:38-49`:
+- success state inferred from `isDeploying` flipping false (not from a result payload)
+- `setTimeout(() => navigate('/dashboard'), 2000)` — second auto-redirect
+- This file is reachable only from `step5/SimulationDashboard.tsx:33,360`; see section 4.
 
-5. Dead duplicate DC step implementations.
-   `src/components/builder/steps/DCStep1Summary.tsx` .. `DCStep5Deploy.tsx` (~1,600 lines) are not imported
-   anywhere; only `builder/dc-steps/*` is used (`Builder.tsx:10`). Two near-identical DC builders in the tree
-   is a maintenance and drift hazard.
+## 3. Are the Connections tabs still Overview / Connections / Data flows / Catalogue / Activity & health? No — renamed.
 
-6. Connections status vocabulary is raw and inconsistently humanised.
-   `ConnectionsTab.tsx` filter options render enum values via `s.replace(/_/g,' ').toLowerCase()`, while
-   `DataTopology.tsx:17-21` uses a separate, better vocabulary ("Data flowing", "Configured, no flow",
-   "Not configured") and `CatalogueTab.tsx:38-44` uses a third (`AVAILABLE / REQUIRES_GATEWAY /
-   REQUIRES_DEPLOYMENT / PLANNED / UNSUPPORTED`). The configured vs connected vs flowing distinction is
-   modelled correctly in `presentation.ts` but is expressed three different ways in the UI.
+`src/pages/Connections.tsx:42-48` defines:
 
-7. Tab bar underline uses the "simulated" token as the active-state colour.
-   `Connections.tsx:183` sets `data-[state=active]:border-[hsl(var(--v2-simulated))]` (amber). Amber is
-   reserved for watch/estimated in the project's colour semantics; using it for plain tab selection weakens
-   the semantic system on the very page whose job is status truth.
+| value | label |
+|---|---|
+| `overview` | Overview |
+| `connections` | Connected systems |
+| `data-flows` | Data flows |
+| `catalogue` | Available connectors |
+| `activity` | Health & audit |
 
-8. Overview tab does double duty.
-   `OverviewTab` renders topology + instruments + an attention queue, and `ActivityTab` renders health, ingest
-   and audit. The attention queue on Overview and the failure list on Health & audit are two entry points to
-   the same remediation task with no shared component.
+So the tab **values** (and therefore deep links `?tab=…`) are still the legacy identifiers, but the
+visible labels have been updated. Components mounted: `OverviewTab`, `ConnectionsTab`, `DataFlowsTab`,
+`CatalogueTab`, `ActivityTab` (`Connections.tsx:192-244`).
 
-## P2 — density, consistency, states, accessibility
+Two related observations:
+- The active-tab underline uses the amber simulated token, `data-[state=active]:border-[hsl(var(--v2-simulated))]`
+  (`Connections.tsx:183`) — a status colour used for plain selection.
+- `AgentToolsTab`, `DsxExchangeTab`, `ManagedConnectorInventory`, `RuntimeReadinessPanel` and
+  `RuntimeDiagnosticsPanel` exist under `src/components/connections/` but are not mounted by this route.
 
-9. Builder console logging in production paths (`Builder.tsx:222-247`, `BuilderLayout.tsx:74-83`) including
-   emoji-prefixed logs. Noise, and it leaks builder internals to the browser console.
+## 4. Does the source separate account status from data status for featured connectors? No.
 
-10. Builder deploy feedback is time-based theatre: a 350 ms morph plus an enforced 1,200 ms minimum spinner
-    and a 15 s hard timeout (`BuilderLayout.tsx:86-127`). Failures collapse back to idle after 3 s with no
-    persistent error surface, so a deploy failure can be missed entirely.
+`src/components/builder/BuilderIntegrationsHub.tsx:20-27` hardcodes `FEATURED_APPS`
+(Slack, Gmail, HubSpot, Salesforce, Jira, Zendesk, all with `logo_url: ''`) and at lines 45-62 collapses
+everything into one field:
 
-11. Layout primitives are mixed. Builder uses `Card`/`DCCard`/`DCSectionHeader`; Connections uses the V2
-    `Panel`/`SubPanel`/`Instrument`/`CommandHeader` set. The two workspaces do not read as one product.
-    `BuilderIntegrationsHub` additionally introduces a fixed `w-64` sidebar inside the step body
-    (`BuilderIntegrationsHub.tsx:~118`), a third nesting level that will compress badly under the wizard rail.
+```
+status: 'connected' | 'available' | 'error'
+```
 
-12. Responsive risk in Builder chrome: `BuilderLayout.tsx` uses `min-h-screen` (project standard is `min-h-dvh`,
-    which `Builder.tsx:351,408` already uses) and hides the 260px rail below `lg`, so tablet users lose the
-    stepper. The nested fixed-width hub sidebar above is not responsive at all. Connections is better prepared
-    (`ConnectionsTab` documents a card fallback below `lg`, tab strip is horizontally scrollable).
+derived solely from the `zapier-integration-status` account record (`connection?.status === 'connected'`,
+`'error' | 'expired'` → error). There is no field for whether any data has flowed, no last-event time,
+no throughput, no mapping coverage. An authorised-but-idle account renders identically to a working one.
+`ZapierIntegrationCard.tsx:14-21` carries the same single-valued `status` union.
 
-13. Empty and loading states are uneven. Connections has skeletons (`ConnectionsTab`, `OverviewTab`) and a
-    genuine honest-empty starter in Builder (`Builder.tsx:407-448`), but the Builder step bodies have no
-    per-step skeletons and `BuilderIntegrationsHub` shows connector cards with `logo_url: ''` for every entry.
+This is the opposite of the Connections workspace, which does separate the three states:
+`src/connections/presentation.ts` + `DataTopology.tsx:17-21` distinguish **Data flowing** /
+**Configured, no flow** / **Not configured**, and `CatalogueTab.tsx:1-8, 33-44` documents that a catalogue
+entry (`AVAILABLE`, `REQUIRES_GATEWAY`, `REQUIRES_DEPLOYMENT`, `PLANNED`, `UNSUPPORTED`) is never counted
+as a configured connection. Builder step 3 also draws from a third hardcoded list
+(`steps/Step3Tools.tsx:15-27`) that is different again from `FEATURED_APPS`.
 
-14. Terminology drift across one journey: "Tools", "Integrations", "Connect Business Systems", "Connections",
-    "Connected systems", "Available connectors", "Connectors", "Data flows". At least three names for the same
-    concept between Builder step 3 and `/manage/integrations`.
+## 5. Duplicate / unreachable Builder integration UI files
 
-15. White-label / branding: `BuilderIntegrationsHub` hardcodes third-party vendor names as first-class
-    product surface, and `Builder.tsx:459-470` hardcodes `city: 'Montreal'`, `region_code: 'QC'`,
-    `tier: 'Tier III'`, `capacity_kw: 5000` when creating a twin on deploy — deployment-time invented facility
-    data presented as the customer's twin.
+Unreachable from the `/builder` route (no import path leads to them):
 
-16. Accessibility items visible in source: sidebar step buttons rely on tooltips for their only description
-    (`BuilderLayout.tsx:158-190`); the Home button uses `title` rather than `aria-label`; disabled steps use
-    `opacity-50` alone. Connections is comparatively well covered (`aria-label` on search, status filter and
-    row action menus, `aria-pressed` on catalogue filters). Not verified: focus order, keyboard traversal,
-    contrast measurements, screen-reader narration.
+- `src/components/builder/steps/DCStep1Summary.tsx`, `DCStep2Blueprint.tsx`, `DCStep3Integrations.tsx`,
+  `DCStep4Scenarios.tsx`, `DCStep5Deploy.tsx` — ~1,619 lines total. Duplicates of the live
+  `src/components/builder/dc-steps/*` set; only `dc-steps` is imported (`Builder.tsx:10`).
+- `src/components/builder/step5/SimulationDashboard.tsx` — referenced only as a string in
+  `src/simulation/engineRegistry.ts:94`; `Step5Deploy.tsx:29` imports from `step5/deploy` instead.
+- `src/components/builder/step5/AnimatedDeployButton.tsx` — imported only by the above, so unreachable
+  transitively (this is the second auto-redirect noted in section 2).
+- `src/components/builder/MCPToolsPlayground.tsx` — no importer.
+- `src/components/shared/IntegrationAppCard.tsx` — no importer; a third connector-card style.
 
-## Recommended remediation order
+Layered but live (duplication of purpose, not dead code):
+`Step3Tools.tsx → ConnectStep.tsx → BuilderIntegrationsHub.tsx` is a one-line pass-through wrapper
+(`ConnectStep.tsx:7-13`), and `BuilderIntegrationsHub` renders its own fixed `w-64` filter sidebar inside
+the wizard body — a second connector browser competing with `/manage/integrations`.
 
-1. Correct Builder step labels to the rendered steps, or split the two builders into distinct labelled flows.
-2. Retire `BuilderIntegrationsHub` fixtures. Builder step 3 should read `connector_definitions` and existing
-   `connection_instances`, show configured-vs-connected honestly, and deep-link to
-   `/manage/integrations?tab=catalogue` for the actual connect action.
-3. Delete the unused `builder/steps/DCStep*.tsx` duplicates.
-4. Unify status vocabulary in one module (extend `presentation.ts`) and consume it in ConnectionsTab,
-   DataTopology, CatalogueTab and the detail drawer; move the tab underline off the simulated token.
-5. Migrate Builder chrome to the V2 primitives, `min-h-dvh`, and a tablet-visible stepper; remove the nested
-   fixed-width sidebar.
-6. Replace timed deploy theatre with a persistent result state; remove production console logging.
-7. Remove hardcoded Montreal/Tier III/5000 kW twin defaults from the deploy path.
-8. Normalise terminology to Connections / Connected systems / Connectors everywhere, including Builder.
+## Not verified
 
-## Not verified in this pass
-
-Rendered layout at desktop/tablet/mobile, contrast ratios, overlay behaviour, keyboard traversal, live data
-states (empty vs populated tenants), and the demo-integration surface if one exists outside the components
-listed above. Those need an authenticated multi-viewport browser run to assert.
+Rendered layout, contrast, responsive behaviour, overlay/focus behaviour, and live tenant data states.
+Those require an authenticated multi-viewport browser run, which this pass did not perform.

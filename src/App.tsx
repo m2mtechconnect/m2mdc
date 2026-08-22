@@ -5,10 +5,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { RBACProvider } from "@/contexts/RBACContext";
-import { ActiveTwinProvider } from "@/context/ActiveTwinContext";
-import { CoPilotProvider } from "@/contexts/CoPilotContext";
-import { CoPilotCommandProvider } from "@/contexts/CoPilotCommandContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemeProvider } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,11 +18,10 @@ import { MANAGED_USER_RETURN_PATH } from '@/connections/managedUserBinding';
 const OverlayFixtures = import.meta.env.DEV
   ? lazy(() => import("./pages/test/OverlayFixtures"))
   : null;
-const DataCentreTwin = lazy(() => import("./pages/DataCentreTwin"));
+const PublicDataCentreTwin = lazy(() => import("./pages/PublicDataCentreTwin"));
 const TwinPreview = lazy(() => import("./pages/TwinPreview"));
-// Keep the authenticated shell synchronous *inside* its own bundle while
-// excluding that bundle from the anonymous landing route. This avoids the
-// nested shell/route Suspense retry failure while shrinking the public entry.
+// Keep the authenticated shell synchronous *inside* its own lazy bundle while
+// excluding RBAC and active-twin providers from the anonymous landing route.
 const ApprovedUserRouter = lazy(() => import("./ApprovedUserRouter"));
 
 const loadAuthPages = () => import("./pages/auth/index");
@@ -122,7 +117,7 @@ function AuthenticatedApp() {
         setApprovalLoading(false);
         return;
       }
-      
+
       // Guarded read: a session that has not resolved a real user id must not
       // issue `user_id=eq.` (finding PW-P2-02).
       const result = await fetchProfileFields(user.id, 'is_approved');
@@ -155,8 +150,7 @@ function AuthenticatedApp() {
     return <BoundedLoading stage={loading ? 'session' : 'approval'} />;
   }
 
-  // If not authenticated, show only Auth pages and public landing pages
-  // Auth pages are gated behind onboarding completion
+  // If not authenticated, show only Auth pages and public landing pages.
   const onboardingDone = localStorage.getItem("onboarding_completed") === "true";
 
   if (!session || !user) {
@@ -176,11 +170,7 @@ function AuthenticatedApp() {
           path="/data-centre-twin"
           element={(
             <Suspense fallback={publicRouteFallback}>
-              <CoPilotProvider>
-                <CoPilotCommandProvider>
-                  <DataCentreTwin />
-                </CoPilotCommandProvider>
-              </CoPilotProvider>
+              <PublicDataCentreTwin />
             </Suspense>
           )}
         />
@@ -199,7 +189,7 @@ function AuthenticatedApp() {
     );
   }
 
-  // If authenticated but not approved, show pending approval page
+  // If authenticated but not approved, show pending approval page.
   if (!isApproved) {
     return (
       <Routes>
@@ -210,8 +200,7 @@ function AuthenticatedApp() {
     );
   }
 
-  // Approved users load their shell bundle only after authentication and
-  // approval are resolved. The shell itself remains synchronous in that chunk.
+  // Approved users load RBAC/twin state only after authentication + approval.
   return (
     <Suspense fallback={<BoundedLoading stage="authorization" />}>
       <ApprovedUserRouter />
@@ -227,16 +216,12 @@ const App = () => (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <RBACProvider>
-            <BrowserRouter>
-              <ActiveTwinProvider>
-                      <Toaster />
-                      <Sonner />
-                      <AuthenticatedApp />
-                      {/* PerformancePanel hidden */}
-              </ActiveTwinProvider>
-            </BrowserRouter>
-          </RBACProvider>
+          <BrowserRouter>
+            <Toaster />
+            <Sonner />
+            <AuthenticatedApp />
+            {/* PerformancePanel hidden */}
+          </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
     </ThemeProvider>

@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useRBAC } from '@/contexts/RBACContext';
+import { RBACProvider, useRBAC } from '@/contexts/RBACContext';
+import { ActiveTwinProvider } from '@/context/ActiveTwinContext';
 import BoundedLoading from '@/components/shared/BoundedLoading';
 import AuthorizationError from './pages/AuthorizationError';
 import PilotShell from './pilot/PilotShell';
@@ -15,7 +16,7 @@ import { MANAGED_USER_RETURN_PATH } from '@/connections/managedUserBinding';
  * route-level lazy pages can therefore resolve against a stable shell without
  * reintroducing the nested Suspense retry failure documented in App.tsx.
  */
-export default function ApprovedUserRouter() {
+function ApprovedUserRouterContent() {
   const { resolution } = useRBAC();
 
   if (resolution.status === 'loading') {
@@ -53,5 +54,20 @@ export default function ApprovedUserRouter() {
       <Route path="/invite/accept" element={<InviteAccept />} />
       <Route path="*" element={<Navigate to="/pilot/overview" replace />} />
     </Routes>
+  );
+}
+
+/**
+ * Authentication/authorization and twin state are loaded only after App.tsx
+ * has already established an approved authenticated session. This keeps the
+ * anonymous marketing route out of the RBAC/twin data dependency graph.
+ */
+export default function ApprovedUserRouter() {
+  return (
+    <RBACProvider>
+      <ActiveTwinProvider>
+        <ApprovedUserRouterContent />
+      </ActiveTwinProvider>
+    </RBACProvider>
   );
 }

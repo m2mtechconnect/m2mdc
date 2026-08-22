@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Activity,
@@ -28,6 +28,14 @@ import {
   customerFacingRuntimeLabel,
   type AuraManagedCapability,
 } from '@/config/auraRuntimeCatalog';
+import { useConnectorDefinitions } from '@/connections/api';
+import { useManagedConnectorCapabilities } from '@/connections/managedConnectorApi';
+import {
+  CONNECTION_CLASS_LABEL,
+  ELIGIBILITY_LABEL,
+  type ManagedCapabilityEntry,
+} from '@/connections/managedConnectors';
+import type { ConnectorDefinition } from '@/connections/model';
 
 interface NativeCapability {
   id: string;
@@ -55,20 +63,30 @@ const AURA_NATIVE_CAPABILITIES: readonly NativeCapability[] = [
   { id: 'ddn_infinia', name: 'DDN Infinia', category: 'Twin & Storage', description: 'Target evidence and object-storage integration when deployed.', icon: Layers3 },
 ];
 
-const MANAGED_GROUPS = [
-  { id: 'business_app', label: 'Business Apps' },
-  { id: 'knowledge', label: 'Knowledge' },
-  { id: 'data_platform', label: 'Data Platforms' },
-] as const;
-
 function normalizeName(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function isManagedEntry(entry: ManagedCapabilityEntry): boolean {
+  return entry.connection_class === 'MANAGED_SHARED' || entry.connection_class === 'MANAGED_USER';
 }
 
 export function Step3Tools() {
   const { tools, setTools, isLoading } = useWizardBuilderStore();
   const { currentBlueprint } = useBlueprintStore();
+  const definitionsQuery = useConnectorDefinitions();
+  const managedQuery = useManagedConnectorCapabilities();
   const [initialized, setInitialized] = useState(false);
+
+  const definitions = definitionsQuery.data ?? [];
+  const definitionsById = useMemo(
+    () => new Map(definitions.map((definition) => [definition.id, definition])),
+    [definitions],
+  );
+  const managedEntries = useMemo(
+    () => (managedQuery.data?.entries ?? []).filter(isManagedEntry),
+    [managedQuery.data?.entries],
+  );
 
   useEffect(() => {
     if (initialized || tools.length > 0) return;
@@ -80,11 +98,16 @@ export function Step3Tools() {
       const selected: BuilderTool[] = [];
       for (const requestedName of recommended) {
         const normalized = normalizeName(requestedName);
-        const managed = AURA_MANAGED_CAPABILITIES.find((capability) =>
-          normalizeName(capability.name) === normalized || normalizeName(capability.id) === normalized,
-        );
+        const managed = managedEntries.find((entry) => {
+          const definition = definitionsById.get(entry.connector_definition_id);
+          return Boolean(definition) && (
+            normalizeName(definition!.name) === normalized ||
+            normalizeName(definition!.id) === normalized
+          );
+        });
         if (managed) {
-          selected.push(toBuilderTool(managed));
+          const definition = definitionsById.get(managed.connector_definition_id);
+          if (definition) selected.push(toManagedBuilderTool(managed, definition));
           continue;
         }
         const native = AURA_NATIVE_CAPABILITIES.find((capability) =>
@@ -95,7 +118,7 @@ export function Step3Tools() {
       if (selected.length > 0) void setTools(selected);
     }
     setInitialized(true);
-  }, [currentBlueprint, initialized, setTools, tools.length]);
+  }, [currentBlueprint, definitionsById, initialized, managedEntries, setTools, tools.length]);
 
   const selectedIds = useMemo(() => new Set(tools.map((tool) => tool.id)), [tools]);
 
@@ -123,7 +146,7 @@ export function Step3Tools() {
       />
 
       <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-        Selecting a capability here adds it to the system design. It does not claim the capability is authenticated, connected, healthy or moving data. Runtime truth remains evidence-derived in AURA Connections.
+        Selecting a capability adds it to the system design. It does not claim the capability is authenticated, connected, healthy or moving data. Runtime truth remains evidence-derived in AURA Connections.
       </div>
 
       <Tabs defaultValue="native" className="w-full">
@@ -179,42 +202,63 @@ export function Step3Tools() {
           ))}
         </TabsContent>
 
-        <TabsContent value="managed" className="mt-6 space-y-6">
-          {MANAGED_GROUPS.map((group) => {
-            const capabilities = AURA_MANAGED_CAPABILITIES.filter((capability) => capability.category === group.id);
-            if (capabilities.length === 0) return null;
-            return (
-              <DCCard
-                key={group.id}
-                title={group.label}
-                subtitle="Managed capability with AURA-owned policy, tenant scope and evidence semantics."
-                icon={<CloudCog className="h-4 w-4" />}
-              >
-                <div className="space-y-3">
-                  {capabilities.map((capability) => (
+        <TabsContent value="managed" className="mt-6 space-y-4">
+          <DCCard
+            title="AURA Managed Connectors"
+            subtitle="This list comes from the server-owned capability inventory. Connection and authorization state are not inferred in the browser."
+            icon={<CloudCog className="h-4 w-4" />}
+          >
+            {managedQuery.isLoading || definitionsQuery.isLoading ? (
+              <p className="text-sm text-muted-foreground">Loading approved managed capabilities…</p>
+            ) : managedEntries.length > 0 ? (
+              <div className="space-y-3">
+                {managedEntries.map((entry) => {
+                  const definition = definitionsById.get(entry.connector_definition_id);
+                  if (!definition) return null;
+                  const selectable = entry.runtime_selectable;
+                  return (
                     <CapabilityRow
-                      key={capability.id}
+                      key={entry.connector_definition_id}
                       icon={<CloudCog className="h-4 w-4" aria-hidden />}
-                      name={capability.name}
-                      description={capability.description}
-                      runtime={customerFacingRuntimeLabel(capability.runtime)}
-                      availability={availabilityLabel(capability)}
-                      selected={selectedIds.has(capability.id)}
-                      disabled={isLoading}
-                      onToggle={() => void toggleTool(toBuilderTool(capability))}
+                      name={definition.name}
+                      description={managedDescription(definition, entry)}
+                      runtime={CONNECTION_CLASS_LABEL[entry.connection_class]}
+                      availability={ELIGIBILITY_LABEL[entry.eligibility]}
+                      selected={selectedIds.has(entry.connector_definition_id)}
+                      disabled={isLoading || !selectable}
+                      onToggle={() => void toggleTool(toManagedBuilderTool(entry, definition))}
                     />
-                  ))}
-                </div>
-              </DCCard>
-            );
-          })}
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  No server-verified managed connector inventory is available for this session. The catalog below is informational only and cannot be selected until an administrator verifies the project binding.
+                </p>
+                {AURA_MANAGED_CAPABILITIES.filter((capability) => capability.category !== 'automation').map((capability) => (
+                  <CapabilityRow
+                    key={capability.id}
+                    icon={<CloudCog className="h-4 w-4" aria-hidden />}
+                    name={capability.name}
+                    description={capability.description}
+                    runtime={customerFacingRuntimeLabel(capability.runtime)}
+                    availability="Not verified"
+                    selected={false}
+                    disabled
+                    onToggle={() => undefined}
+                  />
+                ))}
+              </div>
+            )}
+          </DCCard>
           <ControlPlaneLink />
         </TabsContent>
 
         <TabsContent value="automation" className="mt-6 space-y-4">
           <DCCard
             title="AURA Automation"
-            subtitle="Optional automation runtimes can execute approved workflows; availability is not the same as a live connection."
+            subtitle="Optional automation runtimes can execute approved workflows. Catalog availability never implies a live runtime connection."
             icon={<Workflow className="h-4 w-4" />}
           >
             <div className="space-y-3">
@@ -228,7 +272,7 @@ export function Step3Tools() {
                   availability={availabilityLabel(capability)}
                   selected={selectedIds.has(capability.id)}
                   disabled={isLoading}
-                  onToggle={() => void toggleTool(toBuilderTool(capability))}
+                  onToggle={() => void toggleTool(toCatalogBuilderTool(capability))}
                 />
               ))}
             </div>
@@ -268,7 +312,7 @@ function CapabilityRow({
   disabled,
   onToggle,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   name: string;
   description: string;
   runtime: string;
@@ -298,7 +342,7 @@ function CapabilityRow({
         onClick={onToggle}
         className="sm:w-24"
       >
-        {selected ? <><Check className="mr-1.5 h-4 w-4" aria-hidden />Selected</> : 'Select'}
+        {selected ? <><Check className="mr-1.5 h-4 w-4" aria-hidden />Selected</> : disabled ? 'Unavailable' : 'Select'}
       </Button>
     </div>
   );
@@ -320,10 +364,28 @@ function ControlPlaneLink() {
   );
 }
 
-function toBuilderTool(capability: AuraManagedCapability): BuilderTool {
+function toManagedBuilderTool(entry: ManagedCapabilityEntry, definition: ConnectorDefinition): BuilderTool {
+  return {
+    id: definition.id,
+    type: 'integration',
+    name: definition.name,
+    category: definition.category,
+    enabled: true,
+    connected: false,
+    config: {
+      runtime: 'aura_managed',
+      connectionClass: entry.connection_class,
+      eligibility: entry.eligibility,
+      linkedToProject: entry.linked_to_project,
+      runtimeSelectable: entry.runtime_selectable,
+    },
+  };
+}
+
+function toCatalogBuilderTool(capability: AuraManagedCapability): BuilderTool {
   return {
     id: capability.id,
-    type: capability.category === 'automation' ? 'integration' : 'integration',
+    type: 'integration',
     name: capability.name,
     category: capability.category,
     enabled: true,
@@ -346,6 +408,14 @@ function toNativeBuilderTool(capability: NativeCapability): BuilderTool {
     connected: false,
     config: { runtime: 'aura_native' },
   };
+}
+
+function managedDescription(definition: ConnectorDefinition, entry: ManagedCapabilityEntry): string {
+  const classes = definition.supported_data_classes.slice(0, 3).join(', ');
+  const scope = entry.connection_class === 'MANAGED_USER'
+    ? 'User-authorized managed capability.'
+    : 'Shared AURA-managed capability.';
+  return classes ? `${scope} Approved data classes: ${classes}.` : scope;
 }
 
 function availabilityLabel(capability: AuraManagedCapability): string {

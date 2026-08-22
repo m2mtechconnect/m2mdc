@@ -58,6 +58,11 @@ Deno.serve(async (req) => {
     const gatewayPolicy = entry.connection_class === 'MANAGED_USER' ? userOAuthPolicy : sharedGatewayPolicy;
     const requiresManagedGateway = entry.connection_class === 'MANAGED_SHARED' || entry.connection_class === 'MANAGED_USER';
     const whiteLabelReady = !requiresManagedGateway || gatewayPolicy.runtimeAllowed;
+    const whiteLabelReason = !whiteLabelReady
+      ? gatewayPolicy.reason
+      : gatewayPolicy.reason === 'DEMO_MANAGED_OAUTH_ALLOWED'
+        ? 'DEMO_PROVIDER_OAUTH_READY'
+        : 'AURA_RUNTIME_READY';
 
     return {
       connector_definition_id: entry.connector_definition_id,
@@ -67,7 +72,7 @@ Deno.serve(async (req) => {
       linked_to_project: linkedToProject,
       runtime_selectable: manifestSelectable && whiteLabelReady,
       white_label_ready: whiteLabelReady,
-      white_label_reason: whiteLabelReady ? 'AURA_RUNTIME_READY' : gatewayPolicy.reason,
+      white_label_reason: whiteLabelReason,
       user_bindable: Boolean(userBindingTransport) && userClientConfigured && userOAuthPolicy.runtimeAllowed,
       user_client_configured: userClientConfigured,
       requested_scopes: userBindingTransport?.scopes ?? [],

@@ -6,6 +6,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { createHandler } from "../_shared/handler.ts";
 import { ErrorCodes } from "../_shared/types.ts";
+import { resolveRouterEnvironmentForUser } from "../_shared/ai-provider-connection.ts";
 import {
   ModelRouterError,
   makeChatCompletion,
@@ -27,6 +28,7 @@ serve(createHandler({
   handler: async (input, context) => {
     const { agentId, conversationId, message, stream } = input;
     const { supabase, userId, log } = context;
+    if (!userId) throw { code: 'UNAUTHORIZED', message: 'Authenticated user required', status: 401 };
     const startTime = Date.now();
 
     if (stream) {
@@ -118,6 +120,7 @@ serve(createHandler({
         content: entry.content,
       }));
 
+    const providerResolution = await resolveRouterEnvironmentForUser(userId);
     try {
       const completion = await makeChatCompletion(
         [{ role: 'system', content: systemPrompt }, ...history],
@@ -126,6 +129,7 @@ serve(createHandler({
           profile,
           temperature: typeof config.temperature === 'number' ? config.temperature : 0.3,
           maxTokens: typeof config.max_tokens === 'number' ? config.max_tokens : 2000,
+          env: providerResolution.env,
         },
       );
 
@@ -139,6 +143,8 @@ serve(createHandler({
             provider: completion.provider,
             model: completion.model,
             model_profile: completion.profile,
+            provider_configuration_source: providerResolution.source,
+            provider_connection_id: providerResolution.connectionId,
             tokens: completion.usage,
           },
         });
@@ -154,6 +160,8 @@ serve(createHandler({
           provider: completion.provider,
           model: completion.model,
           model_profile: completion.profile,
+          provider_configuration_source: providerResolution.source,
+          provider_connection_id: providerResolution.connectionId,
         },
         status: 'completed',
         duration_ms: duration,
@@ -170,6 +178,8 @@ serve(createHandler({
         provider: completion.provider,
         model: completion.model,
         profile: completion.profile,
+        providerSource: providerResolution.source,
+        providerConnectionId: providerResolution.connectionId,
       });
 
       return {
@@ -180,6 +190,8 @@ serve(createHandler({
         provider: completion.provider,
         model: completion.model,
         model_profile: completion.profile,
+        provider_configuration_source: providerResolution.source,
+        provider_connection_id: providerResolution.connectionId,
       };
     } catch (error) {
       if (error instanceof ModelRouterError) {

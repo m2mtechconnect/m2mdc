@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { createHandler } from "../_shared/handler.ts";
+import { resolveRouterEnvironmentForUser } from "../_shared/ai-provider-connection.ts";
 import {
   ModelRouterError,
   makeChatCompletion,
@@ -11,6 +12,9 @@ const InputSchema = z.object({
   targetRegion: z.string().max(100).optional().default('northamerica-northeast1'),
 });
 
+// Server-side mirror of canonical frontend ai.model.test grants. This endpoint
+// still verifies persisted role grants independently; browser permission state
+// is never trusted as authority.
 const MODEL_TEST_ROLES = new Set([
   'security_admin',
   'admin',
@@ -26,6 +30,7 @@ serve(createHandler({
   handler: async (input, context) => {
     const { modelId, targetRegion } = input;
     const { supabase, userId, log } = context;
+    if (!userId) throw { code: 'UNAUTHORIZED', message: 'Authenticated user required', status: 401 };
 
     const { data: roleRows, error: roleError } = await supabase
       .from('user_roles')
@@ -47,6 +52,7 @@ serve(createHandler({
       throw { code: 'FORBIDDEN', message: 'Model testing is not permitted for this account', status: 403 };
     }
 
+    const providerResolution = await resolveRouterEnvironmentForUser(userId);
     const startTime = Date.now();
     try {
       const completion = await makeChatCompletion(
@@ -54,7 +60,12 @@ serve(createHandler({
           { role: 'system', content: 'Connectivity test. Follow the user instruction exactly.' },
           { role: 'user', content: 'Respond with exactly OK.' },
         ],
-        { requestedModel: modelId, temperature: 0, maxTokens: 10 },
+        {
+          requestedModel: modelId,
+          temperature: 0,
+          maxTokens: 10,
+          env: providerResolution.env,
+        },
       );
       const latency = Date.now() - startTime;
 
@@ -68,6 +79,8 @@ serve(createHandler({
           resolved_model: completion.model,
           model_profile: completion.profile,
           provider: completion.provider,
+          provider_configuration_source: providerResolution.source,
+          provider_connection_id: providerResolution.connectionId,
           target_region: targetRegion,
         },
       });
@@ -76,6 +89,8 @@ serve(createHandler({
         provider: completion.provider,
         model: completion.model,
         profile: completion.profile,
+        providerSource: providerResolution.source,
+        providerConnectionId: providerResolution.connectionId,
         latency,
       });
 
@@ -87,6 +102,8 @@ serve(createHandler({
         provider: completion.provider,
         model: completion.model,
         model_profile: completion.profile,
+        provider_configuration_source: providerResolution.source,
+        provider_connection_id: providerResolution.connectionId,
         region: targetRegion,
       };
     } catch (error) {

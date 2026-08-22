@@ -1,22 +1,23 @@
 /**
  * Server-side connection health check for the AURA Connections control plane.
  *
- * Security rules (do not relax without review):
- *   - Caller must present a valid Supabase session JWT.
- *   - Only administrators and owners may execute a check.
- *   - Probes are restricted to a fixed server-side allowlist of AURA-owned
- *     targets. No caller-supplied URL is ever fetched, which removes the SSRF
- *     surface entirely (no loopback, link-local, metadata, DNS-rebinding or
- *     redirect target can be reached).
- *   - Bounded timeout, no retries, no credential material in the response.
- *   - Every check is persisted with a correlation id and audited.
+ * Security rules:
+ * - authenticated administrator/owner only;
+ * - caller selects a connection id, never a probe URL;
+ * - fixed server-owned targets remove the browser-controlled SSRF surface;
+ * - bounded timeout, no retries, no credential material in responses/logs;
+ * - every check is persisted and audited.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { resolveCallerTenant, tenantVisible, TENANT_FORBIDDEN } from '../_shared/connectionTenant.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
+import { decryptCredential } from '../_shared/credentialVault.ts';
+import {
+  NVIDIA_AI_CONNECTOR_ID,
+  NVIDIA_HOSTED_API_BASE,
+  validateNvidiaProviderConfiguration,
+} from '../_shared/ai-provider-policy.ts';
 
-// Scoped CORS: origin is resolved per request from the shared allowlist;
-// the method/header allowances below are specific to this function.
 const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -26,14 +27,14 @@ let CORS: Record<string, string> = { ...getCorsHeaders(null), ...CORS_EXTRA };
 const TIMEOUT_MS = 5_000;
 const MAX_RESPONSE_BYTES = 32_768;
 
-type ProbeKind = 'platform_query' | 'endpoint_reachability' | 'storage_read';
+type ProbeKind = 'platform_query' | 'endpoint_reachability' | 'storage_read' | 'nvidia_model';
 
-/** Fixed, server-owned probe targets. Caller input selects a connection, never a URL. */
 const PROBES: Record<string, { kind: ProbeKind; path?: string; description: string }> = {
   supabase_platform: { kind: 'platform_query', description: 'Authenticated application read against the managed backend.' },
   dsx_ingest_gateway: { kind: 'endpoint_reachability', path: '/functions/v1/dsx-ingest', description: 'DSX ingest endpoint reachability and auth rejection behaviour.' },
   openusd_storage: { kind: 'storage_read', description: 'Managed object storage listing for approved OpenUSD derivatives.' },
   asset_manifest: { kind: 'storage_read', description: 'Managed object storage listing for the asset manifest.' },
+  [NVIDIA_AI_CONNECTOR_ID]: { kind: 'nvidia_model', description: 'NVIDIA hosted OpenAI-compatible inference probe using the encrypted connection credential.' },
 };
 
 function json(status: number, body: Record<string, unknown>) {
@@ -63,8 +64,15 @@ Deno.serve(async (req) => {
     return json(401, { status: 'FAILED', error_code: 'unauthorized', correlation_id: correlationId });
   }
 
-  const { data: roles } = await admin.from('user_roles').select('role').eq('user_id', user.id);
-  const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === 'admin' || r.role === 'owner');
+  const { data: roles } = await admin.from('user_roles').select('role, scope, expires_at').eq('user_id', user.id);
+  const now = Date.now();
+  const isAdmin = (roles ?? []).some((r: { role: string; scope?: string | null; expires_at?: string | null }) => {
+    if (r.role !== 'admin' && r.role !== 'owner') return false;
+    if (r.scope !== null && r.scope !== undefined && r.scope !== 'global') return false;
+    if (!r.expires_at) return true;
+    const expiry = new Date(r.expires_at).getTime();
+    return Number.isFinite(expiry) && expiry > now;
+  });
   if (!isAdmin) {
     return json(403, { status: 'FAILED', error_code: 'forbidden', safe_message: 'Administrator role required.', correlation_id: correlationId });
   }
@@ -131,7 +139,6 @@ Deno.serve(async (req) => {
       clearTimeout(timer);
       const text = (await res.text()).slice(0, MAX_RESPONSE_BYTES);
       void text;
-      // The gateway must reject an unsigned probe. A 401/403 is the healthy answer.
       const rejectsUnsigned = res.status === 401 || res.status === 403;
       const { count } = await admin.from('dsx_events').select('id', { count: 'exact', head: true });
       result = {
@@ -145,7 +152,7 @@ Deno.serve(async (req) => {
           ? 'Endpoint reachable and correctly rejecting unsigned requests. Endpoint health is not data flow.'
           : 'Endpoint returned an unexpected response to an unsigned probe.',
       };
-    } else {
+    } else if (probe.kind === 'storage_read') {
       const { data, error } = await admin.storage.listBuckets();
       result = error
         ? { ...result, network_result: 'reachable', auth_result: 'rejected', error_code: 'storage_probe_failed', safe_message: 'Managed storage rejected the probe.' }
@@ -158,6 +165,90 @@ Deno.serve(async (req) => {
             error_code: null,
             safe_message: 'Managed storage reachable.',
           };
+    } else {
+      const { data: credential } = await admin
+        .from('connection_credentials')
+        .select('ciphertext, status, expires_at')
+        .eq('connection_id', connectionId)
+        .maybeSingle();
+
+      if (!credential || credential.status !== 'ACTIVE') {
+        result = {
+          ...result,
+          error_code: 'credential_required',
+          safe_message: 'An active encrypted NVIDIA API credential is required before this provider can be tested.',
+        };
+      } else if (credential.expires_at && new Date(credential.expires_at).getTime() <= Date.now()) {
+        result = {
+          ...result,
+          error_code: 'credential_expired',
+          safe_message: 'The NVIDIA provider credential has expired.',
+        };
+      } else {
+        const config = validateNvidiaProviderConfiguration(
+          (connection.configuration ?? {}) as Record<string, unknown>,
+        );
+        const apiKey = await decryptCredential(String(credential.ciphertext));
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+        const res = await fetch(`${NVIDIA_HOSTED_API_BASE}/chat/completions`, {
+          method: 'POST',
+          redirect: 'error',
+          signal: controller.signal,
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: config.reasoningModel,
+            messages: [
+              { role: 'system', content: 'Connectivity probe. Follow the user instruction exactly.' },
+              { role: 'user', content: 'Respond with exactly OK.' },
+            ],
+            temperature: 0,
+            max_tokens: 10,
+            stream: false,
+          }),
+        });
+        clearTimeout(timer);
+        const text = (await res.text()).slice(0, MAX_RESPONSE_BYTES);
+        let hasAssistantContent = false;
+        if (res.ok) {
+          try {
+            const payload = JSON.parse(text) as { choices?: Array<{ message?: { content?: string } }> };
+            hasAssistantContent = Boolean(payload.choices?.[0]?.message?.content?.trim());
+          } catch {
+            hasAssistantContent = false;
+          }
+        }
+
+        if (res.ok && hasAssistantContent) {
+          result = {
+            status: 'PASSED',
+            network_result: 'reachable',
+            auth_result: 'accepted',
+            schema_result: 'openai_compatible_chat_response',
+            data_availability: 'model_response_present',
+            error_code: null,
+            safe_message: 'NVIDIA hosted API accepted the qualified model probe. This proves hosted API reachability only; it does not prove private NIM, NeMo or TensorRT-LLM execution.',
+          };
+        } else {
+          const authRejected = res.status === 401 || res.status === 403;
+          result = {
+            status: 'FAILED',
+            network_result: 'reachable',
+            auth_result: authRejected ? 'rejected' : 'accepted_or_not_evaluated',
+            schema_result: 'not_verified',
+            data_availability: 'no_verified_model_response',
+            error_code: authRejected ? 'provider_auth_rejected' : res.status === 429 ? 'provider_rate_limited' : 'provider_probe_failed',
+            safe_message: authRejected
+              ? 'NVIDIA hosted API rejected the stored credential.'
+              : res.status === 429
+                ? 'NVIDIA hosted API rate-limited the health probe.'
+                : 'NVIDIA hosted API did not return a valid qualified-model response.',
+          };
+        }
+      }
     }
   } catch (_err) {
     result = { ...result, network_result: 'unreachable', error_code: 'probe_error', safe_message: 'Probe failed or timed out.' };

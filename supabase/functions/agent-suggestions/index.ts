@@ -6,6 +6,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { createHandler } from "../_shared/handler.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { resolveRouterEnvironmentForUser } from "../_shared/ai-provider-connection.ts";
 import {
   ModelRouterError,
   makeChatCompletion,
@@ -135,9 +136,8 @@ serve(createHandler({
   handler: async (input, context) => {
     const { query, chips = [] } = input;
     const { log, userId } = context;
+    if (!userId) throw { code: 'UNAUTHORIZED', message: 'Authenticated user required', status: 401 };
 
-    // Service-role access is limited to the server-side cache and is reachable
-    // only after createHandler has authenticated the caller.
     const cache = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -177,12 +177,19 @@ serve(createHandler({
     const userPrompt = `User query: ${JSON.stringify(query)}\nTemplates: ${JSON.stringify(candidates)}`;
 
     try {
+      const providerResolution = await resolveRouterEnvironmentForUser(userId);
       const completion = await makeChatCompletion(
         [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
-        { requestedModel: RECOMMENDED_PROFILE, profile: 'reasoning', temperature: 0.2, maxTokens: 1800 },
+        {
+          requestedModel: RECOMMENDED_PROFILE,
+          profile: 'reasoning',
+          temperature: 0.2,
+          maxTokens: 1800,
+          env: providerResolution.env,
+        },
       );
 
       let suggestions: Array<Record<string, unknown>>;
@@ -221,6 +228,8 @@ serve(createHandler({
         provider: completion.provider,
         model: completion.model,
         model_profile: completion.profile,
+        provider_configuration_source: providerResolution.source,
+        provider_connection_id: providerResolution.connectionId,
         actor_id: userId,
       };
     } catch (error) {
@@ -229,7 +238,9 @@ serve(createHandler({
           code: error.code,
         });
       } else {
-        log('Recommendation model failed; deterministic fallback used');
+        log('Recommendation model/provider resolution failed; deterministic fallback used', {
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
       return {
         suggestions: deterministicFallback(query, candidates),

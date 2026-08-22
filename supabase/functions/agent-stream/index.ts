@@ -6,6 +6,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { createHandler } from "../_shared/handler.ts";
 import { ErrorCodes } from "../_shared/types.ts";
+import { resolveRouterEnvironmentForUser } from "../_shared/ai-provider-connection.ts";
 import {
   ModelRouterError,
   profileForAgent,
@@ -40,9 +41,10 @@ serve(createHandler({
   handler: async (input, context) => {
     const { agentId, messages, params } = input;
     const { supabase, userId, log } = context;
+    if (!userId) throw { code: 'UNAUTHORIZED', message: 'Authenticated user required', status: 401 };
 
     const now = Date.now();
-    const userLimit = rateLimits.get(userId!);
+    const userLimit = rateLimits.get(userId);
     if (userLimit && now < userLimit.resetAt) {
       if (userLimit.count >= MAX_RUNS_PER_HOUR) {
         throw {
@@ -53,7 +55,7 @@ serve(createHandler({
       }
       userLimit.count += 1;
     } else {
-      rateLimits.set(userId!, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+      rateLimits.set(userId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
     }
 
     const { data: agent, error: agentError } = await supabase
@@ -87,6 +89,7 @@ serve(createHandler({
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
 
+    const providerResolution = await resolveRouterEnvironmentForUser(userId);
     const startTime = Date.now();
     try {
       const { response: aiResponse, resolved } = await requestChatCompletion(
@@ -98,6 +101,7 @@ serve(createHandler({
           maxTokens: params?.maxTokens ?? (typeof config.max_tokens === 'number' ? config.max_tokens : 2048),
           stream: true,
           fetchImpl: fetchWithTimeout,
+          env: providerResolution.env,
         },
       );
 
@@ -149,6 +153,8 @@ serve(createHandler({
                 provider: resolved.provider,
                 model: resolved.model,
                 model_profile: resolved.profile,
+                provider_configuration_source: providerResolution.source,
+                provider_connection_id: providerResolution.connectionId,
               },
               status: 'completed',
               duration_ms: latency,
@@ -159,6 +165,8 @@ serve(createHandler({
               provider: resolved.provider,
               model: resolved.model,
               profile: resolved.profile,
+              providerSource: providerResolution.source,
+              providerConnectionId: providerResolution.connectionId,
             });
             controller.close();
           } catch (err) {
@@ -172,6 +180,8 @@ serve(createHandler({
                 provider: resolved.provider,
                 model: resolved.model,
                 model_profile: resolved.profile,
+                provider_configuration_source: providerResolution.source,
+                provider_connection_id: providerResolution.connectionId,
               },
               status: 'failed',
               duration_ms: Date.now() - startTime,
@@ -187,6 +197,8 @@ serve(createHandler({
         provider: resolved.provider,
         model: resolved.model,
         model_profile: resolved.profile,
+        provider_configuration_source: providerResolution.source,
+        provider_connection_id: providerResolution.connectionId,
       };
     } catch (error) {
       if (error instanceof ModelRouterError) {

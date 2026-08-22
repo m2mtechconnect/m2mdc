@@ -14,6 +14,11 @@ const ROUTED_ENDPOINTS = [
   'supabase/functions/models-test/index.ts',
 ] as const;
 
+const CONNECTION_RESOLVED_ENDPOINTS = [
+  ...ROUTED_ENDPOINTS,
+  'supabase/functions/ai-config/index.ts',
+] as const;
+
 describe('agent/model architecture guards', () => {
   it('keeps direct provider gateway calls out of agent endpoints', () => {
     for (const path of ROUTED_ENDPOINTS) {
@@ -22,6 +27,14 @@ describe('agent/model architecture guards', () => {
       expect(source, path).not.toContain("Deno.env.get('LOVABLE_API_KEY')");
       expect(source, path).not.toContain('Deno.env.get("LOVABLE_API_KEY")');
       expect(source, path).toMatch(/model-router\.ts/);
+    }
+  });
+
+  it('resolves provider configuration through the Connections control plane everywhere', () => {
+    for (const path of CONNECTION_RESOLVED_ENDPOINTS) {
+      const source = read(path);
+      expect(source, path).toContain('resolveRouterEnvironmentForUser');
+      expect(source, path).toMatch(/ai-provider-connection\.ts/);
     }
   });
 
@@ -43,6 +56,18 @@ describe('agent/model architecture guards', () => {
     expect(router).toContain('MODEL_PROVIDER_MISMATCH');
     expect(router).toContain('profile:reasoning');
     expect(router).toContain('profile:supervisor');
+  });
+
+  it('keeps the NVIDIA connection probe server-owned and secret-free to the browser', () => {
+    const source = read('supabase/functions/connection-health-check/index.ts');
+    expect(source).toContain('nvidia_ai_provider');
+    expect(source).toContain('decryptCredential');
+    expect(source).toContain('NVIDIA_HOSTED_API_BASE');
+    expect(source).not.toMatch(/body\?\.(endpoint|url)/);
+    expect(source).not.toContain('NVIDIA_API_KEY');
+
+    const connectionModel = read('src/connections/model.ts');
+    expect(connectionModel).toContain("'nvidia_ai_provider'");
   });
 
   it('does not let the marketplace erase unrelated agent config', () => {

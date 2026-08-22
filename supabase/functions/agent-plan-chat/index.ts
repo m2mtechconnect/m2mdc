@@ -6,6 +6,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { createHandler } from "../_shared/handler.ts";
+import { resolveRouterEnvironmentForUser } from "../_shared/ai-provider-connection.ts";
 import {
   ModelRouterError,
   makeChatCompletion,
@@ -37,7 +38,8 @@ serve(createHandler({
       workflow,
       model,
     } = input;
-    const { log } = context;
+    const { log, userId } = context;
+    if (!userId) throw { code: 'UNAUTHORIZED', message: 'Authenticated user required', status: 401 };
 
     const systemPrompt = `You are previewing the proposed AURA agent "${agentName}".
 
@@ -50,6 +52,7 @@ Agent details:
 
 Explain likely behavior, evidence requirements, limitations and human-approval steps. Do not claim the preview can actuate infrastructure, access data that was not supplied, or use a provider/model that the runtime did not actually resolve.`;
 
+    const providerResolution = await resolveRouterEnvironmentForUser(userId);
     try {
       const completion = await makeChatCompletion(
         [
@@ -61,6 +64,7 @@ Explain likely behavior, evidence requirements, limitations and human-approval s
           profile: 'reasoning',
           temperature: 0.3,
           maxTokens: 1600,
+          env: providerResolution.env,
         },
       );
 
@@ -68,6 +72,8 @@ Explain likely behavior, evidence requirements, limitations and human-approval s
         provider: completion.provider,
         model: completion.model,
         profile: completion.profile,
+        providerSource: providerResolution.source,
+        providerConnectionId: providerResolution.connectionId,
       });
 
       return {
@@ -75,6 +81,8 @@ Explain likely behavior, evidence requirements, limitations and human-approval s
         provider: completion.provider,
         model: completion.model,
         model_profile: completion.profile,
+        provider_configuration_source: providerResolution.source,
+        provider_connection_id: providerResolution.connectionId,
       };
     } catch (error) {
       if (error instanceof ModelRouterError) {

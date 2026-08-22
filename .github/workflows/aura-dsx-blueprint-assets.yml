@@ -6,6 +6,7 @@ on:
     paths:
       - 'assets/**'
       - 'scripts/asset-ingestion/**'
+      - 'scripts/dsx/**'
       - 'scripts/verify-dsx-asset-blueprint.mjs'
       - 'src/dsx/**'
       - 'src/validation/referenceFacility/**'
@@ -50,6 +51,7 @@ jobs:
         run: >-
           bunx vitest run
           src/dsx/__tests__/blueprintAssetRequirements.test.ts
+          src/dsx/__tests__/sourceCatalog.test.ts
           src/validation/referenceFacility/__tests__/reconciliation.test.ts
           src/validation/referenceFacility/__tests__/regressionBaseline.test.ts
 

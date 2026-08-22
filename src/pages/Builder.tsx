@@ -489,6 +489,8 @@ export default function Builder() {
     setShowDeploymentProgress(true);
   };
 
+  const stepLabels = fromScanner ? DC_STEP_LABELS : WIZARD_STEP_LABELS;
+
   return (
     <>
       <BuilderLayout
@@ -499,9 +501,13 @@ export default function Builder() {
         lastSaved={fromScanner ? dcTwinStore.lastSaved : lastSaved}
         onDeploy={effectiveCurrentStep === 5 ? handleDeployClick : undefined}
         currentStep={effectiveCurrentStep}
+        steps={stepLabels}
+        title={fromScanner ? 'Data Centre Twin' : 'System Builder'}
+        description={fromScanner ? 'Configure your data centre twin' : 'Configure and deploy this system'}
       >
         <CurrentStepComponent />
       </BuilderLayout>
+
 
       {/* Deployment Progress Modal */}
       <DeploymentProgressModal

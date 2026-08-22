@@ -2,9 +2,9 @@
  * Reference facility visual-acceptance evidence.
  *
  * Only measured values and explicit human verdicts are recorded. GPU memory is
- * never claimed: WebGL exposes no reliable figure. A separate DSX blueprint
- * asset gate prevents generic visual coverage from being promoted as DSX
- * reference-design completeness.
+ * never claimed: WebGL exposes no reliable figure. Separate DSX blueprint
+ * asset and rack-BOM gates prevent generic visual coverage from being promoted
+ * as DSX reference-design completeness.
  */
 
 import type { FrameStats, StabilityReport } from '@/validation/gpuAcceptance/benchmark';
@@ -93,6 +93,13 @@ export function evaluateFacilityRun(input: {
     ),
   );
 
+  const rackBomFailures = input.reconciliation.dsxRackBom.rows.filter(
+    (row) => row.verdict !== 'pass',
+  );
+  rackBomFailures.forEach((row) =>
+    findings.push(`DSX rack BOM incomplete: ${row.label} - ${row.detail}`),
+  );
+
   if (input.frames.averageFps < FACILITY_THRESHOLDS.warnAverageFpsFloor) {
     findings.push(`Average FPS ${input.frames.averageFps} is below the ${FACILITY_THRESHOLDS.warnAverageFpsFloor} floor.`);
   } else if (input.frames.averageFps < FACILITY_THRESHOLDS.passAverageFps) {
@@ -126,6 +133,14 @@ export function evaluateFacilityRun(input: {
     return {
       result: 'fail',
       verdict: 'AURA_DSX_BLUEPRINT_ASSET_COVERAGE_INCOMPLETE',
+      findings,
+    };
+  }
+
+  if (rackBomFailures.length > 0) {
+    return {
+      result: 'fail',
+      verdict: 'AURA_DSX_RACK_BOM_INCOMPLETE',
       findings,
     };
   }
@@ -185,6 +200,17 @@ export function buildFacilityReport(payload: FacilityRunPayload): string {
     '',
     `DSX exact-role coverage: ${reconciliation.dsxRuntimeEligible}/${reconciliation.dsxRequired}`,
     'Generic or legacy visual approximations never count toward this DSX gate.',
+    '',
+    `## DSX rack BOM (${reconciliation.dsxRackBom.rackCount} GPU rack target)`,
+    '| Role | Per rack | Expected | Mounted | Runtime state | Verdict |',
+    '| --- | ---: | ---: | ---: | --- | --- |',
+    ...reconciliation.dsxRackBom.rows.map(
+      (row) =>
+        `| ${row.label} | ${row.requiredPerRack} | ${row.expectedObjects} | ${row.mountedObjects} | ${row.runtimeState} | ${row.verdict} |`,
+    ),
+    '',
+    `DSX rack BOM objects: ${reconciliation.dsxRackBom.mountedObjects}/${reconciliation.dsxRackBom.expectedObjects}`,
+    `DSX rack BOM complete: ${reconciliation.dsxRackBom.complete ? 'yes' : 'no'}`,
     '',
     '## Performance',
     `Average FPS: ${perf.frames.averageFps} | 1% low: ${perf.frames.onePercentLowFps}`,

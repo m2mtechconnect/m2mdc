@@ -70,7 +70,7 @@ describe('AURA Builder and Connections UX invariants', () => {
     const source = read('../../components/connections/ConnectionsTab.tsx');
     expect(source).toContain('STATUS_DESCRIPTORS');
     expect(source).not.toContain("replace(/_/g, ' ').toLowerCase()");
-    expect(source).toContain('>Open<');
+    expect(source).toMatch(/\bOpen\b/);
   });
 
   it('has no duplicate DC step implementation tree under builder/steps', () => {

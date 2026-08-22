@@ -3,7 +3,7 @@ import { extname, join } from 'node:path';
 
 const DIST = 'dist';
 const expectedSha = (process.env.AURA_COMMIT_SHA || process.env.GITHUB_SHA || '').trim();
-const expectedDemo = process.env.VITE_AURA_DEMO_INTEGRATIONS === 'true';
+const expectedDemo = process.env.AURA_RELEASE_ENVIRONMENT === 'demo';
 
 function fail(message) {
   console.error(`AURA_DEMO_BUILD_INVALID: ${message}`);
@@ -11,7 +11,7 @@ function fail(message) {
 }
 
 if (!existsSync(DIST)) fail('dist directory is missing');
-if (!expectedDemo) fail('VITE_AURA_DEMO_INTEGRATIONS must equal true for a demo artifact');
+if (!expectedDemo) fail('AURA_RELEASE_ENVIRONMENT must equal demo for a demo artifact');
 
 const releasePath = join(DIST, 'release.json');
 if (!existsSync(releasePath)) fail('release.json is missing');

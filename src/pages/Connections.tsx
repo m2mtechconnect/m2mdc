@@ -36,7 +36,9 @@ import {
   useTwinMappings,
 } from '@/connections/api';
 
-const DEMO_INTEGRATIONS_ENABLED = import.meta.env.VITE_AURA_DEMO_INTEGRATIONS === 'true';
+// The demo experience is a distinct compiled artifact profile. Normal
+// production builds cannot turn it on with a browser-readable feature flag.
+const DEMO_INTEGRATIONS_ENABLED = import.meta.env.MODE === 'demo';
 
 const TABS = [
   { value: 'overview', label: 'Overview' },

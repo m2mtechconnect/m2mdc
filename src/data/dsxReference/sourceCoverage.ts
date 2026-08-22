@@ -77,7 +77,7 @@ export const NVIDIA_DEMO_SOURCE_COVERAGE: readonly SourceCoverageEntry[] = [
     sourceObject: 'KPI_DATA GPU specifications',
     expectedItems: 26,
     disposition: 'SOURCE_CONFLICT',
-    note: 'GB300 duplicates configs.ts; GB200 conflicts materially with configs.ts GPU_GB200.',
+    note: 'GB300 duplicates configs.ts; overlapping GB200 fields conflict materially with configs.ts GPU_GB200. GB200 Fast Memory has no kpis.ts counterpart and is therefore unique.',
   },
   {
     sourceFile: 'web/src/data/kpis.ts',
@@ -119,7 +119,7 @@ export const NVIDIA_DEMO_SOURCE_COVERAGE: readonly SourceCoverageEntry[] = [
     sourceObject: 'GPU_GB200 / GPU_GB300 specification blocks',
     expectedItems: 26,
     disposition: 'SOURCE_CONFLICT',
-    note: 'GB300 duplicate; GB200 conflicting hardware definition preserved without precedence.',
+    note: 'GB300 duplicate; overlapping GB200 hardware definitions are preserved without precedence; GB200 Fast Memory is single-source and unique.',
   },
   {
     sourceFile: 'web/src/data/configs.ts',
@@ -131,8 +131,8 @@ export const NVIDIA_DEMO_SOURCE_COVERAGE: readonly SourceCoverageEntry[] = [
 ] as const;
 
 export const NVIDIA_PUBLIC_DEMO_EXPECTED_RECORD_COUNT = 265;
-export const NVIDIA_PUBLIC_DEMO_EXPECTED_SOURCE_CONFLICT_RECORDS = 54;
-export const NVIDIA_PUBLIC_DEMO_EXPECTED_SOURCE_CONFLICT_GROUPS = 27;
+export const NVIDIA_PUBLIC_DEMO_EXPECTED_SOURCE_CONFLICT_RECORDS = 53;
+export const NVIDIA_PUBLIC_DEMO_EXPECTED_SOURCE_CONFLICT_GROUPS = 26;
 
 export interface SourceCoverageSummary {
   records: number;

@@ -3,6 +3,7 @@ import { DSX_ASSET_REQUIREMENTS } from '../blueprintAssetRequirements';
 import { NVIDIA_DSX_CONTENT_PACK } from '../sourceCatalog';
 import {
   DSX_SOURCE_MAP_VERSION,
+  canPromoteDsxMappingToPublicRuntime,
   parseDsxSourceMap,
   summarizeDsxSourceMap,
 } from '../sourceMap';
@@ -31,6 +32,19 @@ function unresolvedSourceMap() {
       evidenceSource: 'private-inventory' as const,
       notes: 'Awaiting authorized private content-pack inventory.',
     })),
+  };
+}
+
+function verifyFirstMapping(map: ReturnType<typeof unresolvedSourceMap>) {
+  map.sourcePack.rootStageChecksum = `sha256:${'a'.repeat(64)}`;
+  map.mappings[0] = {
+    ...map.mappings[0],
+    mappingStatus: 'verified',
+    modelFamily: 'GB300',
+    sourceUsdPath: 'DSX_BP/private/compute-tray.usd',
+    usdPrimPath: '/DSX/Private/ComputeTray',
+    sourceChecksum: `sha256:${'b'.repeat(64)}`,
+    evidenceSource: 'private-inventory',
   };
 }
 
@@ -119,5 +133,24 @@ describe('DSX source-map contract', () => {
     expect(summary.rackRequired).toBe(4);
     expect(summary.allMappingsVerified).toBe(false);
     expect(summary.productionRightsEstablished).toBe(false);
+  });
+
+  it('allows private verification without granting public runtime promotion', () => {
+    const map = unresolvedSourceMap();
+    verifyFirstMapping(map);
+    const parsed = parseDsxSourceMap(map);
+    expect(canPromoteDsxMappingToPublicRuntime(parsed, parsed.mappings[0])).toBe(false);
+  });
+
+  it('requires both production and redistribution approval for public runtime promotion', () => {
+    const map = unresolvedSourceMap();
+    verifyFirstMapping(map);
+    map.sourcePack.productionRights = 'approved';
+    const productionOnly = parseDsxSourceMap(map);
+    expect(canPromoteDsxMappingToPublicRuntime(productionOnly, productionOnly.mappings[0])).toBe(false);
+
+    map.sourcePack.redistributionRights = 'approved';
+    const fullyApproved = parseDsxSourceMap(map);
+    expect(canPromoteDsxMappingToPublicRuntime(fullyApproved, fullyApproved.mappings[0])).toBe(true);
   });
 });

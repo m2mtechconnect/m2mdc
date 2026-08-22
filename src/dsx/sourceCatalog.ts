@@ -6,6 +6,8 @@
  * before legal/licence review authorises any broader use.
  */
 
+export type DsxRightsState = 'not-established' | 'approved';
+
 export interface DsxSourcePack {
   id: string;
   publisher: 'NVIDIA';
@@ -19,8 +21,8 @@ export interface DsxSourcePack {
   licenceLabel: string;
   intendedUse: string;
   repositoryPolicy: 'private-intake-only';
-  productionUse: 'not-established';
-  redistribution: 'not-established';
+  productionUse: DsxRightsState;
+  redistribution: DsxRightsState;
   notes: string[];
 }
 
@@ -49,9 +51,9 @@ export const NVIDIA_DSX_CONTENT_PACK: DsxSourcePack = Object.freeze({
 });
 
 export function canPublishDsxSourceGeometry(source: DsxSourcePack): boolean {
-  return source.redistribution !== 'not-established';
+  return source.redistribution === 'approved';
 }
 
 export function canUseDsxSourceInProduction(source: DsxSourcePack): boolean {
-  return source.productionUse !== 'not-established';
+  return source.productionUse === 'approved';
 }

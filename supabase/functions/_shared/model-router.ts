@@ -116,6 +116,14 @@ export function profileForAgent(agent: {
   return 'fast';
 }
 
+function requestedVendor(requestedId: string | null): 'portable' | 'google' | 'nvidia' | null {
+  if (!requestedId) return null;
+  if (requestedId.startsWith('profile:')) return 'portable';
+  if (requestedId.startsWith('nvidia/')) return 'nvidia';
+  if (requestedId.startsWith('google/') || requestedId.startsWith('gemini-')) return 'google';
+  return null;
+}
+
 function chatEndpoint(base: string): string {
   const trimmed = base.replace(/\/+$/, '');
   return trimmed.endsWith('/chat/completions') ? trimmed : `${trimmed}/chat/completions`;
@@ -132,12 +140,20 @@ export function resolveModel(
 ): ResolvedModel {
   const env = options.env ?? runtimeEnv();
   const requestedId = options.requestedModel?.trim().toLowerCase() || null;
-  const explicitNvidiaRequest = Boolean(requestedId?.startsWith('nvidia/'));
+  const vendor = requestedVendor(requestedId);
   const profile = normalizeProfile(options.requestedModel, options.profile);
   const providerName = (env.AURA_AI_PROVIDER ?? 'lovable-managed').trim().toLowerCase();
 
+  if (vendor === 'google' && providerName !== 'lovable-managed' && providerName !== 'lovable') {
+    throw new ModelRouterError(
+      'MODEL_PROVIDER_MISMATCH',
+      `Google model '${options.requestedModel}' requires the Lovable-managed provider. Use 'profile:${profile}' for a provider-neutral selection.`,
+      409,
+    );
+  }
+
   if (
-    explicitNvidiaRequest &&
+    vendor === 'nvidia' &&
     providerName !== 'nvidia' &&
     providerName !== 'nvidia-build' &&
     providerName !== 'openai-compatible' &&
@@ -145,7 +161,7 @@ export function resolveModel(
   ) {
     throw new ModelRouterError(
       'MODEL_PROVIDER_MISMATCH',
-      `NVIDIA model '${options.requestedModel}' requires the NVIDIA or an explicitly configured OpenAI-compatible provider`,
+      `NVIDIA model '${options.requestedModel}' requires NVIDIA or an explicitly configured OpenAI-compatible provider`,
       409,
     );
   }
@@ -159,6 +175,13 @@ export function resolveModel(
     const model = configured ?? (profile === 'supervisor' ? NVIDIA_OPEN_MODEL_IDS.supervisor : NVIDIA_OPEN_MODEL_IDS.workhorse);
     if (!Object.values(NVIDIA_OPEN_MODEL_IDS).includes(model as typeof NVIDIA_OPEN_MODEL_IDS[keyof typeof NVIDIA_OPEN_MODEL_IDS])) {
       throw new ModelRouterError('UNSUPPORTED_NVIDIA_MODEL', `Configured NVIDIA model '${model}' is not in the qualified AURA allowlist`, 400);
+    }
+    if (vendor === 'nvidia' && requestedId !== model.toLowerCase()) {
+      throw new ModelRouterError(
+        'MODEL_NOT_CONFIGURED_ON_PROVIDER',
+        `Requested NVIDIA model '${options.requestedModel}' is not the configured model for '${profile}'`,
+        409,
+      );
     }
     return {
       provider: 'nvidia-build',
@@ -183,7 +206,7 @@ export function resolveModel(
     if (!model) {
       throw new ModelRouterError('OPENAI_COMPATIBLE_MODEL_REQUIRED', `A model must be configured for profile '${profile}'`);
     }
-    if (explicitNvidiaRequest && requestedId !== model.toLowerCase()) {
+    if (vendor === 'nvidia' && requestedId !== model.toLowerCase()) {
       throw new ModelRouterError(
         'MODEL_NOT_CONFIGURED_ON_PROVIDER',
         `Requested NVIDIA model '${options.requestedModel}' is not the configured model for '${profile}'`,
@@ -208,8 +231,8 @@ export function resolveModel(
     throw new ModelRouterError('LOVABLE_PROVIDER_NOT_CONFIGURED', 'Lovable-managed provider is selected but LOVABLE_API_KEY is not configured');
   }
   const model = configuredModelForProfile(profile, env) ?? LOVABLE_MODEL_IDS[profile];
-  if (!PROFILE_ALIASES[model.toLowerCase()]) {
-    throw new ModelRouterError('UNSUPPORTED_LOVABLE_MODEL', `Configured Lovable model '${model}' is not in the AURA runtime allowlist`, 400);
+  if (!PROFILE_ALIASES[model.toLowerCase()] || model.toLowerCase().startsWith('nvidia/')) {
+    throw new ModelRouterError('UNSUPPORTED_LOVABLE_MODEL', `Configured Lovable model '${model}' is not in the Lovable AURA allowlist`, 400);
   }
   return {
     provider: 'lovable-managed',

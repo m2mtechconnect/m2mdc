@@ -1,434 +1,303 @@
-import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { invokeEdgeFunction } from "@/hooks/useEdgeFunction";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Sparkles, Shield, Database, CheckCircle, XCircle, Loader, Settings, Loader2, AlertTriangle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { DCCard, DCSectionHeader } from "@/components/dc-ui";
-import { KnowledgeSourceReadiness } from "@/components/agent/KnowledgeSourceReadiness";
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { AlertTriangle, Brain, Database, Loader2, Settings, ShieldCheck, Zap } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { DCCard, DCSectionHeader } from '@/components/dc-ui';
+import { KnowledgeSourceReadiness } from '@/components/agent/KnowledgeSourceReadiness';
+import { useRBAC } from '@/contexts/RBACContext';
 
-const DEFAULT_SYSTEM_PROMPT = `You are M2M Co-Pilot inside an enterprise control center.
+const DEFAULT_SYSTEM_PROMPT = `You are the AURA Co-Pilot inside an enterprise control center.
 Be concise and business-ready.
-Always cite sources when grounding is enabled.
-If you are unsure, say so and suggest a next step.
-Respect user role (Executive | Manager | Engineer).
-Never expose secrets or internal IDs.`;
+Ground material claims in supplied evidence and cite sources when grounding is available.
+Distinguish measured facts, reference data, simulations and recommendations.
+If evidence is missing, say so.
+Never expose secrets or claim to actuate infrastructure.`;
 
-interface HealthStatus {
-  gemini: { status: 'ok' | 'error'; latency?: number; error?: string };
-  vertexSearch: { status: 'ok' | 'error'; latency?: number; error?: string };
-  region: string;
+type ModelProfile = 'fast' | 'reasoning' | 'supervisor';
+
+interface ProviderStatus {
+  active_provider?: string;
+  ready?: boolean;
+  primary?: {
+    models?: Record<string, { available?: boolean; provider?: string; model?: string; reason?: string }>;
+  };
+  disclosure?: {
+    agent_authority?: string;
+    nvidia_runtime?: string;
+    secrets_returned?: boolean;
+  };
+}
+
+function unwrapFunctionData<T>(value: unknown): T | null {
+  if (!value || typeof value !== 'object') return null;
+  const record = value as Record<string, unknown>;
+  if (record.data && typeof record.data === 'object') return record.data as T;
+  return value as T;
+}
+
+function legacyModelToProfile(value: unknown): ModelProfile {
+  const model = typeof value === 'string' ? value.toLowerCase() : '';
+  if (model.includes('flash')) return 'fast';
+  if (model.includes('supervisor') || model.includes('nemotron-3-super')) return 'supervisor';
+  return 'reasoning';
 }
 
 export default function AISettings() {
   const { t } = useTranslation();
-  const [projectId, setProjectId] = useState("");
-  const [region, setRegion] = useState("northamerica-northeast1");
-  const [model, setModel] = useState("gemini-1.5-pro");
+  const { can } = useRBAC();
+  const [profile, setProfile] = useState<ModelProfile>('reasoning');
   const [groundingEnabled, setGroundingEnabled] = useState(false);
-  const [dataStoreId, setDataStoreId] = useState("");
+  const [projectId, setProjectId] = useState('');
+  const [region, setRegion] = useState('northamerica-northeast1');
+  const [dataStoreId, setDataStoreId] = useState('');
   const [topK, setTopK] = useState(20);
   const [topN, setTopN] = useState(6);
-  const [maxTokens, setMaxTokens] = useState(1024);
+  const [maxTokens, setMaxTokens] = useState(2048);
   const [temperature, setTemperature] = useState(0.3);
   const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT);
-  const [safetySettings, setSafetySettings] = useState({
-    hate: true,
-    harassment: true,
-    sexual: true,
-    dangerous: true
-  });
-  const [isChecking, setIsChecking] = useState(false);
-  const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
+  const [providerStatus, setProviderStatus] = useState<ProviderStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [isChecking, setIsChecking] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<{ projectId?: string; dataStoreId?: string }>({});
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Load saved settings on mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('copilot_settings');
-      if (stored) {
-        const settings = JSON.parse(stored);
-        if (settings.projectId) setProjectId(settings.projectId);
-        if (settings.region) setRegion(settings.region);
-        if (settings.model) setModel(settings.model);
-        if (typeof settings.groundingEnabled === 'boolean') setGroundingEnabled(settings.groundingEnabled);
-        if (settings.dataStoreId) setDataStoreId(settings.dataStoreId);
-        if (typeof settings.topK === 'number') setTopK(settings.topK);
-        if (typeof settings.topN === 'number') setTopN(settings.topN);
-        if (typeof settings.maxTokens === 'number') setMaxTokens(settings.maxTokens);
-        if (typeof settings.temperature === 'number') setTemperature(settings.temperature);
-        if (settings.systemPrompt) setSystemPrompt(settings.systemPrompt);
-        if (settings.safetySettings) setSafetySettings(settings.safetySettings);
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const stored = localStorage.getItem('copilot_settings');
+        if (stored) {
+          const settings = JSON.parse(stored) as Record<string, unknown>;
+          const storedProfile = settings.modelProfile;
+          setProfile(
+            storedProfile === 'fast' || storedProfile === 'reasoning' || storedProfile === 'supervisor'
+              ? storedProfile
+              : legacyModelToProfile(settings.model),
+          );
+          if (typeof settings.groundingEnabled === 'boolean') setGroundingEnabled(settings.groundingEnabled);
+          if (typeof settings.projectId === 'string') setProjectId(settings.projectId);
+          if (typeof settings.region === 'string') setRegion(settings.region);
+          if (typeof settings.dataStoreId === 'string') setDataStoreId(settings.dataStoreId);
+          if (typeof settings.topK === 'number') setTopK(settings.topK);
+          if (typeof settings.topN === 'number') setTopN(settings.topN);
+          if (typeof settings.maxTokens === 'number') setMaxTokens(settings.maxTokens);
+          if (typeof settings.temperature === 'number') setTemperature(settings.temperature);
+          if (typeof settings.systemPrompt === 'string') setSystemPrompt(settings.systemPrompt);
+        }
+      } catch {
+        localStorage.removeItem('copilot_settings');
+        setLoadError('Stored browser configuration was unreadable and has been reset.');
       }
-    } catch (error) {
-      console.error('Failed to load AI settings:', error);
-      setLoadError('Stored configuration was unreadable and has been reset.');
-      localStorage.removeItem('copilot_settings');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
 
-  const validate = (): boolean => {
-    const errs: { projectId?: string; dataStoreId?: string } = {};
-    if (!projectId.trim()) errs.projectId = 'Project ID is required';
-    if (groundingEnabled && !dataStoreId.trim()) {
-      errs.dataStoreId = 'Data Store ID is required when grounding is enabled';
-    }
-    setFieldErrors(errs);
-    return Object.keys(errs).length === 0;
-  };
+      try {
+        const { data, error } = await supabase.functions.invoke('ai-config', { body: {} });
+        if (error) throw error;
+        if (!cancelled) setProviderStatus(unwrapFunctionData<ProviderStatus>(data));
+      } catch {
+        if (!cancelled) setProviderStatus(null);
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+    void load();
+    return () => { cancelled = true; };
+  }, []);
 
   const handleSave = async () => {
     if (isSaving) return;
-    setSaveError(null);
-    if (!validate()) {
-      toast.error('Please fix validation errors before saving');
+    if (groundingEnabled && (!projectId.trim() || !dataStoreId.trim())) {
+      toast.error('Google/Vertex grounding metadata requires both Project ID and Data Store ID.');
       return;
     }
     setIsSaving(true);
     try {
-      const settings = {
+      localStorage.setItem('copilot_settings', JSON.stringify({
+        modelProfile: profile,
+        // Compatibility field for legacy readers. A profile alias is portable
+        // and does not pretend one vendor model is active.
+        model: `profile:${profile}`,
+        groundingEnabled,
         projectId,
         region,
-        model,
-        groundingEnabled,
         dataStoreId,
         topK,
         topN,
         maxTokens,
         temperature,
         systemPrompt,
-        safetySettings
-      };
-      localStorage.setItem('copilot_settings', JSON.stringify(settings));
-      toast.success('AI settings saved successfully');
+      }));
+      toast.success('Browser AI preferences saved. Provider secrets and server routing were not changed.');
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Failed to save settings';
-      setSaveError(msg);
-      toast.error(msg);
+      toast.error(error instanceof Error ? error.message : 'Failed to save browser AI preferences.');
     } finally {
       setIsSaving(false);
     }
   };
 
-  if (isLoading) {
-    return (
-      <main
-          className="flex items-center justify-center min-h-[60vh]"
-          role="status"
-          aria-live="polite"
-          aria-busy="true"
-        >
-          <div className="text-center space-y-3">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" aria-hidden="true" />
-            <p className="text-sm text-muted-foreground">Loading AI configuration…</p>
-          </div>
-      </main>
-    );
-  }
-
   const handleHealthCheck = async () => {
+    if (!can('ai.model.test')) {
+      toast.error('Model-test permission is required.');
+      return;
+    }
     setIsChecking(true);
     try {
-      const data = await invokeEdgeFunction('copilot-health', {
-        projectId, region, model, groundingEnabled, dataStoreId
+      const { data, error } = await supabase.functions.invoke('models-test', {
+        body: { modelId: `profile:${profile}`, targetRegion: region },
       });
-
-      setHealthStatus(data as HealthStatus);
-      
-      if (data?.gemini?.status === 'ok' && (!groundingEnabled || data?.vertexSearch?.status === 'ok')) {
-        toast.success("Health check passed!");
-      } else {
-        toast.error("Health check failed. Check the results below.");
-      }
+      if (error) throw error;
+      const result = unwrapFunctionData<{ provider?: string; model?: string; model_profile?: string; latency?: number }>(data);
+      toast.success(
+        `${result?.provider ?? 'Provider'} / ${result?.model ?? profile} responded in ${result?.latency ?? '?'} ms.`,
+      );
+      const { data: refresh } = await supabase.functions.invoke('ai-config', { body: {} });
+      setProviderStatus(unwrapFunctionData<ProviderStatus>(refresh));
     } catch (error) {
-      toast.error("Health check failed");
-      console.error(error);
+      toast.error(error instanceof Error ? error.message : 'Runtime model test failed.');
     } finally {
       setIsChecking(false);
     }
   };
 
+  if (isLoading) {
+    return (
+      <main className="flex min-h-[60vh] items-center justify-center" role="status" aria-busy="true">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden="true" />
+        <span className="sr-only">Loading AI configuration</span>
+      </main>
+    );
+  }
+
+  const profileStatus = providerStatus?.primary?.models?.[profile];
+
   return (
-    <div className="w-full min-w-0 py-8 space-y-8" data-testid="ai-settings-workspace">
-        <DCSectionHeader
-          as="h1"
-          title={t("aiSettings.title")}
-          subtitle={t("aiSettings.subtitle")}
-          icon={<Settings className="h-5 w-5 text-primary" />}
-        />
+    <div className="w-full min-w-0 space-y-8 py-8" data-testid="ai-settings-workspace">
+      <DCSectionHeader
+        as="h1"
+        title={t('aiSettings.title')}
+        subtitle="Provider-neutral model profiles, runtime readiness and optional grounding preferences"
+        icon={<Settings className="h-5 w-5 text-primary" />}
+      />
 
-        <div
-          role="note"
-          className="rounded-md border border-border bg-muted/30 p-3 text-xs text-muted-foreground"
-        >
-          These settings are stored in your current browser only. They are
-          not synced to a server, are not shared with other users, and
-          clearing browser storage removes them. No credentials or API
-          keys are stored here.
+      <div role="note" className="rounded-md border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
+        Browser preferences do not configure provider credentials. Server-side model routing is owned by the AURA provider router. NVIDIA model availability is not proof of NIM, NeMo or self-hosted runtime execution.
+      </div>
+
+      {loadError && (
+        <div role="alert" className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+          <span>{loadError}</span>
         </div>
+      )}
 
-        {loadError && (
-          <div
-            role="alert"
-            className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive"
-          >
-            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
-            <span>{loadError}</span>
+      <DCCard title="Active AURA model provider" icon={<Brain className="h-5 w-5 text-primary" />} status={providerStatus?.ready ? 'operational' : 'info'}>
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline">Provider: {providerStatus?.active_provider ?? 'Unavailable'}</Badge>
+            <Badge variant={profileStatus?.available ? 'default' : 'secondary'}>
+              {profileStatus?.available ? 'Selected profile executable' : 'Selected profile unavailable'}
+            </Badge>
           </div>
-        )}
-
-        <DCCard
-          title={t("aiSettings.gcpConfig")}
-          icon={<Sparkles className="h-5 w-5 text-primary" />}
-          status="operational"
-        >
-          <div className="grid gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="ai-project-id">Google Cloud Project ID</Label>
-              <Input 
-                id="ai-project-id"
-                value={projectId}
-                onChange={(e) => {
-                  setProjectId(e.target.value);
-                  if (fieldErrors.projectId) setFieldErrors((p) => ({ ...p, projectId: undefined }));
-                }}
-                placeholder="your-project-id"
-                aria-invalid={!!fieldErrors.projectId}
-                aria-describedby={fieldErrors.projectId ? 'ai-project-id-error' : undefined}
-              />
-              {fieldErrors.projectId && (
-                <p id="ai-project-id-error" role="alert" className="text-xs text-destructive">
-                  {fieldErrors.projectId}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label>Region</Label>
-              <Select value={region} onValueChange={setRegion}>
-                <SelectTrigger aria-label="Region">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-card z-50">
-                  <SelectItem value="northamerica-northeast1">🇨🇦 northamerica-northeast1 (Montreal)</SelectItem>
-                  <SelectItem value="us-central1">🇺🇸 us-central1 (Iowa)</SelectItem>
-                  <SelectItem value="europe-west1">🇪🇺 europe-west1 (Belgium)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Model</Label>
-              <Select value={model} onValueChange={setModel}>
-                <SelectTrigger aria-label="Model">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-card z-50">
-                  <SelectItem value="gemini-1.5-pro">gemini-1.5-pro (Recommended)</SelectItem>
-                  <SelectItem value="gemini-1.5-flash">gemini-1.5-flash (Faster)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          {profileStatus?.available ? (
+            <p className="text-sm text-muted-foreground">
+              {profile} resolves to {profileStatus.provider} / {profileStatus.model}.
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">{profileStatus?.reason ?? 'Runtime readiness could not be resolved.'}</p>
+          )}
+          <div className="space-y-2">
+            <Label>Model profile</Label>
+            <Select value={profile} onValueChange={(value) => setProfile(value as ModelProfile)}>
+              <SelectTrigger aria-label="AURA model profile"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fast">AURA Fast — routine subsystem work</SelectItem>
+                <SelectItem value="reasoning">AURA Reasoning — evidence-heavy analysis</SelectItem>
+                <SelectItem value="supervisor">AURA Supervisor — cross-domain escalation</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">Profiles are portable across providers. Use the Model Marketplace only when you intentionally need a vendor-specific model ID.</p>
           </div>
-        </DCCard>
+        </div>
+      </DCCard>
 
-        <DCCard
-          title="Vertex AI search and grounding"
-          icon={<Database className="h-5 w-5 text-primary" />}
-          status="info"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <div className="space-y-0.5">
-              <Label>Enable Grounding</Label>
-              <p className="text-xs text-muted-foreground">Connect to your Vertex AI Search data store</p>
+      <DCCard title="Optional Google / Vertex grounding metadata" icon={<Database className="h-5 w-5 text-primary" />} status="info">
+        <div className="space-y-5">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <Label>Enable browser grounding preferences</Label>
+              <p className="text-xs text-muted-foreground">This retains the existing Vertex Search preference fields. It does not configure or enable a server connector.</p>
             </div>
-            <Switch
-              checked={groundingEnabled}
-              onCheckedChange={setGroundingEnabled}
-              aria-label="Enable grounding against Vertex AI Search"
-            />
+            <Switch checked={groundingEnabled} onCheckedChange={setGroundingEnabled} aria-label="Enable grounding preferences" />
           </div>
-
           {groundingEnabled && (
-            <div className="space-y-6 pl-4 border-l-2 border-primary/20">
+            <div className="grid gap-4 border-l-2 border-primary/20 pl-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="ai-datastore-id">Data Store / Index ID</Label>
-                <Input 
-                  id="ai-datastore-id"
-                  value={dataStoreId}
-                  onChange={(e) => {
-                    setDataStoreId(e.target.value);
-                    if (fieldErrors.dataStoreId) setFieldErrors((p) => ({ ...p, dataStoreId: undefined }));
-                  }}
-                  placeholder="your-data-store-id"
-                  aria-invalid={!!fieldErrors.dataStoreId}
-                  aria-describedby={fieldErrors.dataStoreId ? 'ai-datastore-id-error' : undefined}
-                />
-                {fieldErrors.dataStoreId && (
-                  <p id="ai-datastore-id-error" role="alert" className="text-xs text-destructive">
-                    {fieldErrors.dataStoreId}
-                  </p>
-                )}
+                <Label htmlFor="ai-project-id">Google Cloud Project ID</Label>
+                <Input id="ai-project-id" value={projectId} onChange={(event) => setProjectId(event.target.value)} placeholder="your-project-id" />
               </div>
-
               <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Top-K Documents</Label>
-                  <span className="text-sm font-mono text-primary">{topK}</span>
-                </div>
-                <Slider value={[topK]} onValueChange={([v]) => setTopK(v)} min={5} max={50} step={5} aria-label="Top-K documents" />
-                <p className="text-xs text-muted-foreground">Initial documents to retrieve</p>
+                <Label htmlFor="ai-datastore-id">Vertex Data Store ID</Label>
+                <Input id="ai-datastore-id" value={dataStoreId} onChange={(event) => setDataStoreId(event.target.value)} placeholder="your-data-store-id" />
               </div>
-
               <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Rerank to Top-N</Label>
-                  <span className="text-sm font-mono text-primary">{topN}</span>
-                </div>
-                <Slider value={[topN]} onValueChange={([v]) => setTopN(v)} min={1} max={10} step={1} aria-label="Rerank to top-N" />
-                <p className="text-xs text-muted-foreground">Final snippets for generation</p>
+                <Label>Region</Label>
+                <Select value={region} onValueChange={setRegion}>
+                  <SelectTrigger aria-label="Grounding region"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="northamerica-northeast1">Canada — Montréal</SelectItem>
+                    <SelectItem value="us-central1">United States — Iowa</SelectItem>
+                    <SelectItem value="europe-west1">Europe — Belgium</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between"><Label>Top-K documents</Label><span className="font-mono text-sm">{topK}</span></div>
+                <Slider value={[topK]} onValueChange={([value]) => setTopK(value)} min={5} max={50} step={5} aria-label="Top-K documents" />
+                <div className="flex justify-between pt-2"><Label>Rerank Top-N</Label><span className="font-mono text-sm">{topN}</span></div>
+                <Slider value={[topN]} onValueChange={([value]) => setTopN(value)} min={1} max={10} step={1} aria-label="Rerank Top-N" />
               </div>
             </div>
           )}
-        </DCCard>
-
-        <KnowledgeSourceReadiness />
-
-        <DCCard
-          title="Generation Parameters"
-          icon={<Shield className="h-5 w-5 text-primary" />}
-          status="operational"
-        >
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <Label>Max Tokens</Label>
-                <span className="text-sm font-mono">{maxTokens}</span>
-              </div>
-              <Slider value={[maxTokens]} onValueChange={([v]) => setMaxTokens(v)} min={256} max={8192} step={256} aria-label="Maximum tokens" />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <Label>Temperature</Label>
-                <span className="text-sm font-mono">{temperature.toFixed(1)}</span>
-              </div>
-              <Slider value={[temperature * 10]} onValueChange={([v]) => setTemperature(v / 10)} min={0} max={10} step={1} aria-label="Temperature" />
-              <p className="text-xs text-muted-foreground">Lower = more factual, Higher = more creative</p>
-            </div>
-
-            <div className="space-y-2">
-              <Label>System Prompt</Label>
-              <Textarea 
-                value={systemPrompt}
-                onChange={(e) => setSystemPrompt(e.target.value)}
-                rows={8}
-                className="font-mono text-sm"
-              />
-            </div>
-          </div>
-        </DCCard>
-
-        <div className="flex flex-col gap-4 sm:flex-row">
-          <Button
-            onClick={handleSave}
-            size="lg"
-            className="flex-1"
-            disabled={isSaving}
-            aria-busy={isSaving}
-          >
-            {isSaving ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
-                Saving…
-              </>
-            ) : (
-              'Save Configuration'
-            )}
-          </Button>
-          <Button onClick={handleHealthCheck} size="lg" variant="outline" disabled={isChecking}>
-            {isChecking ? <Loader className="h-4 w-4 animate-spin mr-2" /> : null}
-            Run Health Check
-          </Button>
         </div>
+      </DCCard>
 
-        {saveError && (
-          <div
-            role="alert"
-            className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive"
-          >
-            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
-            <span>{saveError}</span>
+      <KnowledgeSourceReadiness />
+
+      <DCCard title="Generation preferences" icon={<ShieldCheck className="h-5 w-5 text-primary" />} status="operational">
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <div className="flex justify-between"><Label>Max tokens</Label><span className="font-mono text-sm">{maxTokens}</span></div>
+            <Slider value={[maxTokens]} onValueChange={([value]) => setMaxTokens(value)} min={256} max={8192} step={256} aria-label="Maximum tokens" />
           </div>
-        )}
+          <div className="space-y-2">
+            <div className="flex justify-between"><Label>Temperature</Label><span className="font-mono text-sm">{temperature.toFixed(1)}</span></div>
+            <Slider value={[temperature * 10]} onValueChange={([value]) => setTemperature(value / 10)} min={0} max={10} step={1} aria-label="Temperature" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="ai-system-prompt">System prompt</Label>
+            <Textarea id="ai-system-prompt" value={systemPrompt} onChange={(event) => setSystemPrompt(event.target.value)} rows={8} className="font-mono text-sm" />
+          </div>
+        </div>
+      </DCCard>
 
-        {healthStatus && (
-          <DCCard
-            title="Health Check Results"
-            status={healthStatus.gemini.status === 'ok' ? 'operational' : 'critical'}
-          >
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                <div className="flex items-center gap-3">
-                  {healthStatus.gemini.status === 'ok' ? (
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                  ) : (
-                    <XCircle className="h-5 w-5 text-red-500" />
-                  )}
-                  <div>
-                    <p className="font-medium">Gemini API</p>
-                    {healthStatus.gemini.error && (
-                      <p className="text-xs text-red-500">{healthStatus.gemini.error}</p>
-                    )}
-                  </div>
-                </div>
-                {healthStatus.gemini.latency && (
-                  <Badge variant="outline">{healthStatus.gemini.latency}ms</Badge>
-                )}
-              </div>
-
-              {groundingEnabled && (
-                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                  <div className="flex items-center gap-3">
-                    {healthStatus.vertexSearch.status === 'ok' ? (
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <XCircle className="h-5 w-5 text-red-500" />
-                    )}
-                    <div>
-                      <p className="font-medium">Vertex AI Search</p>
-                      {healthStatus.vertexSearch.error && (
-                        <p className="text-xs text-red-500">{healthStatus.vertexSearch.error}</p>
-                      )}
-                    </div>
-                  </div>
-                  {healthStatus.vertexSearch.latency && (
-                    <Badge variant="outline">{healthStatus.vertexSearch.latency}ms</Badge>
-                  )}
-                </div>
-              )}
-
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                <p className="font-medium">Region</p>
-                <Badge variant="secondary">{healthStatus.region}</Badge>
-              </div>
-            </div>
-          </DCCard>
-        )}
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Button size="lg" className="flex-1" onClick={() => void handleSave()} disabled={isSaving}>
+          {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Save browser preferences
+        </Button>
+        <Button size="lg" variant="outline" onClick={() => void handleHealthCheck()} disabled={isChecking || !can('ai.model.test')}>
+          {isChecking ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Zap className="mr-2 h-4 w-4" />}
+          Test selected profile
+        </Button>
+      </div>
     </div>
   );
 }

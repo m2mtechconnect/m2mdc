@@ -1,16 +1,20 @@
 import { useTranslation } from "react-i18next";
 /**
- * Simulation Preview Page - READ-ONLY preview of recommendation simulation
- * This page displays a recommendation's simulation config WITHOUT creating a twin
- * Does NOT modify selectedTwinId or create any database records
+ * Simulation Preview Page - READ-ONLY preview of recommendation simulation.
+ * This page displays a recommendation's simulation config WITHOUT creating a twin.
+ * Does NOT modify selectedTwinId or create any database records.
+ *
+ * Fidelity note: the scenario cards below are bundled preview fixtures. They
+ * demonstrate the AURA workflow; they are not measured telemetry, calibrated
+ * physics, or evidence that an NVIDIA DSX/Omniverse solver executed.
  */
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  ArrowLeft, 
+import {
+  ArrowLeft,
   Eye,
   PlayCircle,
   AlertCircle,
@@ -19,12 +23,14 @@ import {
   Zap,
   Globe,
   Activity,
+  ShieldCheck,
 } from 'lucide-react';
 import { useRecommendationStore } from '@/stores/recommendationStore';
 import { ModeBadge, SnapshotBadge } from '@/components/ui/snapshot-indicator';
 import { LoadingState } from '@/components/ui/empty-state';
+import { SIMULATION_PREVIEW_FIDELITY } from '@/simulation/fidelity';
 
-// Sample scenarios for preview
+// Bundled demonstration scenarios for preview only.
 const previewScenarios = [
   {
     id: 'thermal-spike',
@@ -32,7 +38,7 @@ const previewScenarios = [
     domain: 'thermal',
     severity: 'high',
     duration: '15 min',
-    description: 'Simulates sudden temperature increase in GPU cluster zone',
+    description: 'Demonstrates a scripted temperature-increase scenario in a GPU cluster zone',
   },
   {
     id: 'power-fluctuation',
@@ -40,7 +46,7 @@ const previewScenarios = [
     domain: 'power',
     severity: 'medium',
     duration: '5 min',
-    description: 'Tests UPS response to utility power instability',
+    description: 'Demonstrates a scripted UPS-response scenario for utility power instability',
   },
   {
     id: 'cooling-failure',
@@ -48,7 +54,7 @@ const previewScenarios = [
     domain: 'cooling',
     severity: 'high',
     duration: '30 min',
-    description: 'Simulates failure of primary cooling unit',
+    description: 'Demonstrates a scripted primary-cooling-unit failure scenario',
   },
   {
     id: 'sovereignty-violation',
@@ -56,7 +62,7 @@ const previewScenarios = [
     domain: 'sovereignty',
     severity: 'critical',
     duration: '2 min',
-    description: 'Tests sovereignty guardrails for data routing',
+    description: 'Demonstrates sovereignty guardrail behavior for a scripted routing event',
   },
 ];
 
@@ -65,12 +71,14 @@ export default function SimulationPreview() {
   const location = useLocation();
   const navigate = useNavigate();
   const { recommendation, sourceUrl, isPreviewMode } = useRecommendationStore();
-  
-  // Check if we're in preview mode via location state or store
+
+  // Preserve the recommendation source in the read-only store contract even
+  // though this page does not render or fetch it directly.
+  void sourceUrl;
+
   const locationState = location.state as { mode?: string } | undefined;
   const isPreview = locationState?.mode === 'preview' || isPreviewMode;
-  
-  // If no recommendation and not in preview mode, redirect
+
   if (!recommendation && !isPreview) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -88,20 +96,19 @@ export default function SimulationPreview() {
       </div>
     );
   }
-  
+
   if (!recommendation) {
     return <LoadingState message="Loading recommendation..." />;
   }
-  
-  // Derive display values from recommendation
-  const twinName = recommendation.companyName 
+
+  const twinName = recommendation.companyName
     ? `${recommendation.companyName} Sovereign Green AI Data Centre Twin`
     : 'Recommended Data Centre Twin';
-  
+
   const handleCreateTwin = () => {
     navigate('/dashboard');
   };
-  
+
   const getDomainIcon = (domain: string) => {
     switch (domain) {
       case 'thermal': return Thermometer;
@@ -110,7 +117,7 @@ export default function SimulationPreview() {
       default: return Activity;
     }
   };
-  
+
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical': return 'bg-destructive/10 text-destructive border-destructive/30';
@@ -119,32 +126,33 @@ export default function SimulationPreview() {
       default: return 'bg-muted text-muted-foreground';
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-6 px-4 max-w-7xl">
-        {/* PREVIEW MODE HEADER */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-6 flex-wrap">
           <ModeBadge mode="snapshot" />
           <SnapshotBadge version="Preview" />
           <Badge variant="outline" className="gap-1 bg-amber-500/10 text-amber-700 border-amber-500/30">
             <Eye className="h-3 w-3" />
             Read-Only Preview
           </Badge>
+          <Badge variant="outline" className="gap-1">
+            <ShieldCheck className="h-3 w-3" />
+            {SIMULATION_PREVIEW_FIDELITY.label}
+          </Badge>
         </div>
-        
-        {/* Header */}
+
         <div className="mb-6">
           <h1 className="text-2xl font-semibold mb-2 flex items-center gap-3">
             <PlayCircle className="h-6 w-6 text-primary" aria-hidden="true" />
             Simulation Preview
           </h1>
           <p className="text-muted-foreground">
-            Preview simulation scenarios for {twinName}
+            Preview bundled scenario models for {twinName}
           </p>
         </div>
-        
-        {/* Quick Actions Bar */}
+
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <Button
             variant="ghost"
@@ -161,8 +169,7 @@ export default function SimulationPreview() {
             </Button>
           </div>
         </div>
-        
-        {/* Preview Notice */}
+
         <Card className="mb-6 border-amber-500/30 bg-amber-500/5">
           <CardContent className="py-4">
             <div className="flex items-start gap-3">
@@ -170,23 +177,23 @@ export default function SimulationPreview() {
               <div>
                 <h4 className="font-medium text-amber-700">{t('simulationPreview.previewMode')}</h4>
                 <p className="text-sm text-amber-600">
-                  This is a preview of available simulation scenarios. To run simulations with real-time KPI tracking, 
-                  create a Data Centre Twin first.
+                  These are bundled demonstration models. They are not measured live telemetry, are not
+                  calibrated thermal/electrical/airflow physics, and do not execute NVIDIA DSX/Omniverse
+                  solver code. Create a Data Centre Twin to run AURA scenario models against its baseline.
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
-        
-        {/* Available Scenarios */}
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <PlayCircle className="h-5 w-5" />
-              Available Simulation Scenarios
+              Available Demonstration Scenarios
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              These scenarios will be available when you create a twin from this recommendation
+              These scripted scenario models demonstrate workflow behavior; they are not runs of record.
             </p>
           </CardHeader>
           <CardContent>
@@ -217,13 +224,12 @@ export default function SimulationPreview() {
             </div>
           </CardContent>
         </Card>
-        
-        {/* KPI Impact Preview */}
+
         <Card className="mt-6">
           <CardHeader>
             <CardTitle>{t('simulationPreview.expectedKpiImpacts')}</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Simulations will track these KPIs in real-time
+              Illustrative targets/benchmarks shown for preview context; these are not measured predictions.
             </p>
           </CardHeader>
           <CardContent>

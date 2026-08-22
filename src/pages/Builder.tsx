@@ -97,7 +97,25 @@ export default function Builder() {
   }, [effectiveCurrentStep, industry, department, fromScanner, dcTwinStore.overview.industries, updateContext]);
 
   // DC Twin Builder steps - used when coming from scanner
+  // Step labels must match the panes rendered for each builder path.
+  const DC_STEP_LABELS: BuilderStepLabel[] = [
+    { id: 1, title: 'Summary', shortTitle: 'Summary', tooltip: 'Name the twin and set facility context' },
+    { id: 2, title: 'Blueprint', shortTitle: 'Blueprint', tooltip: 'Define subsystems and agents' },
+    { id: 3, title: 'Integrations', shortTitle: 'Integrations', tooltip: 'Select data sources and connected systems' },
+    { id: 4, title: 'Scenarios', shortTitle: 'Scenarios', tooltip: 'Define simulation scenarios' },
+    { id: 5, title: 'Deploy', shortTitle: 'Deploy', tooltip: 'Review the configuration and deploy' },
+  ];
+
+  const WIZARD_STEP_LABELS: BuilderStepLabel[] = [
+    { id: 1, title: 'Summary', shortTitle: 'Summary', tooltip: 'Name the system and describe what it must do' },
+    { id: 2, title: 'Intelligence', shortTitle: 'Intelligence', tooltip: 'Choose the model and reasoning configuration' },
+    { id: 3, title: 'Tools', shortTitle: 'Tools', tooltip: 'Select tools, data sources and connected systems' },
+    { id: 4, title: 'Workflow', shortTitle: 'Workflow', tooltip: 'Define triggers and permitted actions' },
+    { id: 5, title: 'Deploy', shortTitle: 'Deploy', tooltip: 'Review the configuration and deploy' },
+  ];
+
   const dcSteps = useMemo(() => {
+
     return [
       { 
         id: 1, 

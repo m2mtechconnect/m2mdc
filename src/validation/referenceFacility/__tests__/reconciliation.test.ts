@@ -48,7 +48,7 @@ function coverage(role: string, patch: Partial<RoleCoverage> = {}): Record<strin
 }
 
 describe('reference facility reconciliation', () => {
-  it('reports one row per expected role', () => {
+  it('reports one row per expected current visual role', () => {
     const result = reconcileReferenceFacility({});
     expect(result.rows).toHaveLength(REFERENCE_ROLES.length);
   });
@@ -58,6 +58,13 @@ describe('reference facility reconciliation', () => {
     expect(result.mountedObjects).toBe(0);
     expect(result.rolesDerived).toBe(0);
     expect(result.rows.every((r) => r.verdict !== 'openusd-derived')).toBe(true);
+  });
+
+  it('tracks the broader DSX exact-role asset gate independently', () => {
+    const result = reconcileReferenceFacility({});
+    expect(result.dsxRequired).toBeGreaterThan(REFERENCE_ROLES.length);
+    expect(result.dsxRuntimeEligible).toBeLessThan(result.dsxRequired);
+    expect(result.dsxAssetRows.some((row) => row.requirement.semanticRole === 'dsx-compute-tray')).toBe(true);
   });
 
   it('counts mounted objects from runtime coverage only', () => {
@@ -89,6 +96,13 @@ describe('facility acceptance evaluation', () => {
     const outcome = evaluateFacilityRun({ ...base, renderer: software });
     expect(outcome.result).toBe('fail');
     expect(outcome.verdict).toBe('AURA_NVIDIA_REFERENCE_FACILITY_HARDWARE_VALIDATION_FAILED');
+  });
+
+  it('fails closed when DSX exact-role coverage is incomplete', () => {
+    const outcome = evaluateFacilityRun({ ...base, renderer: hardware });
+    expect(outcome.result).toBe('fail');
+    expect(outcome.verdict).toBe('AURA_DSX_BLUEPRINT_ASSET_COVERAGE_INCOMPLETE');
+    expect(outcome.findings.some((finding) => finding.includes('GB200/GB300 compute tray'))).toBe(true);
   });
 
   it('requires visual remediation when a human marks a check failed', () => {

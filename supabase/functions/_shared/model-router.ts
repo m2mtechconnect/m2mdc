@@ -15,10 +15,7 @@
  */
 
 export type AgentModelProfile = 'fast' | 'reasoning' | 'supervisor';
-export type AgentModelProvider =
-  | 'lovable-managed'
-  | 'nvidia-build'
-  | 'openai-compatible';
+export type AgentModelProvider = 'lovable-managed' | 'nvidia-build' | 'openai-compatible';
 
 export interface ModelMessage {
   role: 'system' | 'user' | 'assistant';
@@ -58,6 +55,9 @@ export class ModelRouterError extends Error {
 }
 
 const PROFILE_ALIASES: Record<string, AgentModelProfile> = {
+  'profile:fast': 'fast',
+  'profile:reasoning': 'reasoning',
+  'profile:supervisor': 'supervisor',
   'google/gemini-2.5-flash': 'fast',
   'google/gemini-2.5-flash-lite': 'fast',
   'google/gemini-2.5-pro': 'reasoning',
@@ -118,10 +118,7 @@ export function normalizeProfile(
   return requestedProfile ?? 'fast';
 }
 
-/**
- * Default reasoning policy for shipped/known AURA agent roles.
- * The model remains advisory; this is compute routing, not authority routing.
- */
+/** Default compute profile for an AURA agent role. This never grants authority. */
 export function profileForAgent(agent: {
   slug?: string | null;
   name?: string | null;
@@ -132,7 +129,6 @@ export function profileForAgent(agent: {
   if (configured === 'fast' || configured === 'reasoning' || configured === 'supervisor') {
     return configured;
   }
-
   const identity = `${agent.slug ?? ''} ${agent.name ?? ''} ${agent.domain ?? ''}`.toLowerCase();
   if (/incident[-_ ]response|major[-_ ]incident|supervisor/.test(identity)) return 'supervisor';
   if (/sovereig|cyber|security|twin[-_ ]integrity|data[-_ ]quality|compliance/.test(identity)) {
@@ -143,26 +139,17 @@ export function profileForAgent(agent: {
 
 function chatEndpoint(base: string): string {
   const trimmed = base.replace(/\/+$/, '');
-  return trimmed.endsWith('/chat/completions')
-    ? trimmed
-    : `${trimmed}/chat/completions`;
+  return trimmed.endsWith('/chat/completions') ? trimmed : `${trimmed}/chat/completions`;
 }
 
-function configuredModelForProfile(
-  profile: AgentModelProfile,
-  env: RouterEnvironment,
-): string | undefined {
+function configuredModelForProfile(profile: AgentModelProfile, env: RouterEnvironment): string | undefined {
   if (profile === 'fast') return env.AURA_MODEL_FAST;
   if (profile === 'reasoning') return env.AURA_MODEL_REASONING;
   return env.AURA_MODEL_SUPERVISOR;
 }
 
 export function resolveModel(
-  options: {
-    requestedModel?: string | null;
-    profile?: AgentModelProfile | null;
-    env?: RouterEnvironment;
-  } = {},
+  options: { requestedModel?: string | null; profile?: AgentModelProfile | null; env?: RouterEnvironment } = {},
 ): ResolvedModel {
   const env = options.env ?? runtimeEnv();
   const profile = normalizeProfile(options.requestedModel, options.profile);
@@ -171,23 +158,12 @@ export function resolveModel(
   if (providerName === 'nvidia' || providerName === 'nvidia-build') {
     const apiKey = env.NVIDIA_API_KEY?.trim();
     if (!apiKey) {
-      throw new ModelRouterError(
-        'NVIDIA_PROVIDER_NOT_CONFIGURED',
-        'NVIDIA provider was selected but NVIDIA_API_KEY is not configured',
-      );
+      throw new ModelRouterError('NVIDIA_PROVIDER_NOT_CONFIGURED', 'NVIDIA provider was selected but NVIDIA_API_KEY is not configured');
     }
     const configured = configuredModelForProfile(profile, env);
-    const model = configured ?? (
-      profile === 'supervisor'
-        ? NVIDIA_OPEN_MODEL_IDS.supervisor
-        : NVIDIA_OPEN_MODEL_IDS.workhorse
-    );
+    const model = configured ?? (profile === 'supervisor' ? NVIDIA_OPEN_MODEL_IDS.supervisor : NVIDIA_OPEN_MODEL_IDS.workhorse);
     if (!Object.values(NVIDIA_OPEN_MODEL_IDS).includes(model as typeof NVIDIA_OPEN_MODEL_IDS[keyof typeof NVIDIA_OPEN_MODEL_IDS])) {
-      throw new ModelRouterError(
-        'UNSUPPORTED_NVIDIA_MODEL',
-        `Configured NVIDIA model '${model}' is not in the qualified AURA allowlist`,
-        400,
-      );
+      throw new ModelRouterError('UNSUPPORTED_NVIDIA_MODEL', `Configured NVIDIA model '${model}' is not in the qualified AURA allowlist`, 400);
     }
     return {
       provider: 'nvidia-build',
@@ -210,10 +186,7 @@ export function resolveModel(
     }
     const model = configuredModelForProfile(profile, env);
     if (!model) {
-      throw new ModelRouterError(
-        'OPENAI_COMPATIBLE_MODEL_REQUIRED',
-        `A model must be configured for profile '${profile}'`,
-      );
+      throw new ModelRouterError('OPENAI_COMPATIBLE_MODEL_REQUIRED', `A model must be configured for profile '${profile}'`);
     }
     return {
       provider: 'openai-compatible',
@@ -226,29 +199,17 @@ export function resolveModel(
   }
 
   if (providerName !== 'lovable-managed' && providerName !== 'lovable') {
-    throw new ModelRouterError(
-      'UNSUPPORTED_AI_PROVIDER',
-      `AI provider '${providerName}' is not supported`,
-      400,
-    );
+    throw new ModelRouterError('UNSUPPORTED_AI_PROVIDER', `AI provider '${providerName}' is not supported`, 400);
   }
 
   const apiKey = env.LOVABLE_API_KEY?.trim();
   if (!apiKey) {
-    throw new ModelRouterError(
-      'LOVABLE_PROVIDER_NOT_CONFIGURED',
-      'Lovable-managed provider is selected but LOVABLE_API_KEY is not configured',
-    );
+    throw new ModelRouterError('LOVABLE_PROVIDER_NOT_CONFIGURED', 'Lovable-managed provider is selected but LOVABLE_API_KEY is not configured');
   }
   const model = configuredModelForProfile(profile, env) ?? LOVABLE_MODEL_IDS[profile];
   if (!PROFILE_ALIASES[model.toLowerCase()]) {
-    throw new ModelRouterError(
-      'UNSUPPORTED_LOVABLE_MODEL',
-      `Configured Lovable model '${model}' is not in the AURA runtime allowlist`,
-      400,
-    );
+    throw new ModelRouterError('UNSUPPORTED_LOVABLE_MODEL', `Configured Lovable model '${model}' is not in the AURA runtime allowlist`, 400);
   }
-
   return {
     provider: 'lovable-managed',
     profile,
@@ -277,10 +238,7 @@ export async function requestChatCompletion(
   const fetchImpl = options.fetchImpl ?? fetch;
   const response = await fetchImpl(resolved.endpoint, {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${resolved.apiKey}`,
-      'Content-Type': 'application/json',
-    },
+    headers: { Authorization: `Bearer ${resolved.apiKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: resolved.model,
       messages,
@@ -304,11 +262,7 @@ export async function makeChatCompletion(
   messages: ModelMessage[],
   options: ChatCompletionOptions = {},
 ): Promise<ChatCompletionResult> {
-  const { response, resolved } = await requestChatCompletion(messages, {
-    ...options,
-    stream: false,
-  });
-
+  const { response, resolved } = await requestChatCompletion(messages, { ...options, stream: false });
   if (!response.ok) {
     throw new ModelRouterError(
       'MODEL_PROVIDER_ERROR',
@@ -316,32 +270,17 @@ export async function makeChatCompletion(
       response.status === 429 ? 429 : 502,
     );
   }
-
-  const payload = await response.json() as {
-    choices?: Array<{ message?: { content?: string } }>;
-    usage?: unknown;
-  };
+  const payload = await response.json() as { choices?: Array<{ message?: { content?: string } }>; usage?: unknown };
   const text = payload.choices?.[0]?.message?.content?.trim();
-  if (!text) {
-    throw new ModelRouterError('INVALID_MODEL_RESPONSE', 'Model provider returned no assistant content', 502);
-  }
-
-  return {
-    text,
-    provider: resolved.provider,
-    profile: resolved.profile,
-    model: resolved.model,
-    usage: payload.usage ?? null,
-  };
+  if (!text) throw new ModelRouterError('INVALID_MODEL_RESPONSE', 'Model provider returned no assistant content', 502);
+  return { text, provider: resolved.provider, profile: resolved.profile, model: resolved.model, usage: payload.usage ?? null };
 }
 
 export function providerReadiness(env: RouterEnvironment = runtimeEnv()) {
   const selected = (env.AURA_AI_PROVIDER ?? 'lovable-managed').trim().toLowerCase();
   return {
     selectedProvider: selected,
-    lovable: {
-      configured: Boolean(env.LOVABLE_API_KEY?.trim()),
-    },
+    lovable: { configured: Boolean(env.LOVABLE_API_KEY?.trim()) },
     nvidia: {
       configured: Boolean(env.NVIDIA_API_KEY?.trim()),
       endpoint: env.NVIDIA_API_BASE_URL?.trim() || 'https://integrate.api.nvidia.com/v1',

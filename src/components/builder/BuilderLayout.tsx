@@ -195,7 +195,8 @@ export function BuilderLayout({
         </aside>
 
         {/* Mobile Top Stepper */}
-        <div className="lg:hidden fixed top-0 left-0 right-0 bg-background border-b z-50">
+        <div className="md:hidden fixed top-0 left-0 right-0 bg-background border-b z-50">
+
           <div className="flex items-center gap-2 px-4 py-2">
             <Button
               variant="ghost"

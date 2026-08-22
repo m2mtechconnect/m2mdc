@@ -12,8 +12,6 @@
  *    the raw NVIDIA source is still REQUIRES_LEGAL_REVIEW;
  *  - selecting the reference dataset never promotes a capability and never
  *    implies live, measured, commissioned, integrated or validated state.
- *
- * Framework-free so it can be unit-tested without React or a router.
  */
 import {
   DATASET_MODES,
@@ -59,9 +57,9 @@ export const DATASET_DESCRIPTORS: Readonly<Record<DatasetMode, DatasetDescriptor
   },
   'nvidia-dsx-reference': {
     id: 'nvidia-dsx-reference',
-    label: 'NVIDIA DSX Reference - Read-only',
+    label: 'NVIDIA Omniverse DSX Blueprint Demo Reference — May 2026 — Read-only',
     description:
-      'Official-source normalized reference data ingested from the pinned NVIDIA DSX blueprint repository. Administrator-only canary, read-only. Not operational telemetry, not commissioned, not an NVIDIA DSX runtime service, not SimReady validation. NGC-dependent fields remain unavailable. The production default is unchanged.',
+      'Source-complete normalized reference data from the pinned public NVIDIA Omniverse DSX Blueprint demo snapshot at d940314. Includes preserved upstream duplicates, scoped variants and source conflicts rather than silently selecting one value. Administrator-only and read-only. Not operational telemetry, not commissioned, not a current NVIDIA DSX reference-design claim, not an NVIDIA DSX runtime service, and not SimReady validation. NGC-dependent fields remain unavailable. The production default is unchanged.',
     adminOnly: true,
     datasetId: 'nvidia-dsx-blueprint',
     datasetVersion: DSX_DATASET_VERSION,

@@ -40,8 +40,8 @@ describe('AURA white-label runtime catalog', () => {
     expect(AURA_MANAGED_CAPABILITIES.length).toBeGreaterThan(0);
     for (const capability of AURA_MANAGED_CAPABILITIES) {
       expect(['available', 'requires_configuration', 'planned']).toContain(capability.availability);
-      expect((capability as Record<string, unknown>).connected).toBeUndefined();
-      expect((capability as Record<string, unknown>).healthy).toBeUndefined();
+      expect(Object.prototype.hasOwnProperty.call(capability, 'connected')).toBe(false);
+      expect(Object.prototype.hasOwnProperty.call(capability, 'healthy')).toBe(false);
     }
   });
 

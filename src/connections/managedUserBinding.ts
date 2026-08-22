@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const MANAGED_USER_RETURN_PATH = '/oauth/managed-user/return';
 export const MANAGED_USER_MESSAGE = 'auraManagedUserConnectionResult';
+const PENDING_CONNECTOR_KEY = 'aura.managedUser.pendingConnector';
 
 export interface ManagedUserOAuthMessage {
   type: typeof MANAGED_USER_MESSAGE;
@@ -47,10 +48,24 @@ function waitForCompletion(popup: Window): Promise<void> {
 }
 
 export async function connectManagedUserConnector(connectorDefinitionId: string): Promise<void> {
+  // New windows receive an initial copy of the opener's sessionStorage. Write
+  // the connector id before opening the popup so the return route can resolve
+  // the correct binding after the cross-origin provider round trip.
+  sessionStorage.setItem(PENDING_CONNECTOR_KEY, connectorDefinitionId);
   const popup = window.open('', 'aura-managed-user-oauth', 'width=600,height=760');
-  if (!popup) throw new Error('The authorization window was blocked. Allow pop-ups for AURA and try again.');
+  if (!popup) {
+    sessionStorage.removeItem(PENDING_CONNECTOR_KEY);
+    throw new Error('The authorization window was blocked. Allow pop-ups for AURA and try again.');
+  }
+
   try {
-    sessionStorage.setItem('aura.managedUser.pendingConnector', connectorDefinitionId);
+    // Best-effort reinforcement while the popup is still same-origin/about:blank.
+    try {
+      popup.sessionStorage.setItem(PENDING_CONNECTOR_KEY, connectorDefinitionId);
+    } catch {
+      // The pre-open write above remains the authoritative transfer mechanism.
+    }
+
     const { data, error } = await supabase.functions.invoke('managed-user-oauth-start', {
       body: { connector_definition_id: connectorDefinitionId, origin: window.location.origin },
     });
@@ -67,6 +82,8 @@ export async function connectManagedUserConnector(connectorDefinitionId: string)
   } catch (error) {
     popup.close();
     throw error;
+  } finally {
+    sessionStorage.removeItem(PENDING_CONNECTOR_KEY);
   }
 }
 

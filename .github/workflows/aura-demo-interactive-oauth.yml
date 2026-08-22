@@ -41,7 +41,7 @@ jobs:
         run: bun run typecheck
 
       - name: White-label customer-surface regression
-        run: bunx vitest run src/config/__tests__/customerSurfaceWhiteLabel.test.ts src/config/__tests__/auraRuntimeCatalog.test.ts src/connections/demoIntegrationPolicy.test.ts
+        run: bunx vitest run src/config/__tests__/customerSurfaceWhiteLabel.test.ts src/config/__tests__/auraRuntimeCatalog.test.ts src/connections/__tests__/demoIntegrationPolicy.test.ts
 
       - name: Demo OAuth policy tests
         run: deno test --allow-env supabase/functions/_shared/whiteLabelGateway.demo.test.ts

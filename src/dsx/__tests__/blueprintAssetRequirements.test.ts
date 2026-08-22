@@ -86,11 +86,15 @@ describe('NVIDIA DSX blueprint asset requirements', () => {
     expect(hasCompleteDsxAssetCoverage(completeRackAssets, 'rack')).toBe(true);
   });
 
-  it('keeps facility coverage broader than rack coverage', () => {
-    expect(dsxRequirementsForGate('facility').length).toBeGreaterThan(
-      dsxRequirementsForGate('rack').length,
-    );
+  it('locks the current facility and campus requirement breadth', () => {
+    expect(dsxRequirementsForGate('facility')).toHaveLength(18);
+    expect(dsxRequirementsForGate('full-reference')).toHaveLength(23);
     expect(DSX_ASSET_REQUIREMENTS.some((requirement) => requirement.semanticRole === 'dsx-crah')).toBe(true);
     expect(DSX_ASSET_REQUIREMENTS.some((requirement) => requirement.semanticRole === 'dsx-high-speed-storage')).toBe(true);
+    expect(DSX_ASSET_REQUIREMENTS.some((requirement) => requirement.semanticRole === 'dsx-general-purpose-node')).toBe(true);
+    expect(DSX_ASSET_REQUIREMENTS.some((requirement) => requirement.semanticRole === 'dsx-utility-cluster')).toBe(true);
+    expect(DSX_ASSET_REQUIREMENTS.some((requirement) => requirement.semanticRole === 'dsx-dc-edge-cluster')).toBe(true);
+    expect(DSX_ASSET_REQUIREMENTS.some((requirement) => requirement.semanticRole === 'dsx-grid-substation')).toBe(true);
+    expect(DSX_ASSET_REQUIREMENTS.some((requirement) => requirement.semanticRole === 'dsx-central-utility-building')).toBe(true);
   });
 });

@@ -8,7 +8,7 @@
  */
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, CloudCog } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Panel, SubPanel } from '@/components/v2';
@@ -29,12 +29,13 @@ import {
   isCustomerVisibleConnector,
   type CustomerConnectorGroupId,
 } from '@/connections/catalogueTaxonomy';
+import { useManagedConnectorCapabilities } from '@/connections/managedConnectorApi';
+import {
+  CONNECTION_CLASS_LABEL,
+  ELIGIBILITY_LABEL,
+  type ManagedCapabilityEntry,
+} from '@/connections/managedConnectors';
 
-/**
- * Catalogue availability tones. These describe what AURA can connect to, never
- * whether a system is connected or flowing: those states are owned by the
- * connected-systems register.
- */
 const AVAILABILITY_TONE: Record<string, string> = {
   AVAILABLE: 'v2-surface-verified v2-text-verified',
   REQUIRES_GATEWAY: 'v2-surface-simulated v2-text-simulated',
@@ -44,6 +45,10 @@ const AVAILABILITY_TONE: Record<string, string> = {
 };
 
 type CatalogueFilter = 'all' | 'available' | CustomerConnectorGroupId;
+
+function isManaged(entry: ManagedCapabilityEntry): boolean {
+  return entry.connection_class === 'MANAGED_SHARED' || entry.connection_class === 'MANAGED_USER';
+}
 
 export function CatalogueTab({
   definitions,
@@ -56,10 +61,24 @@ export function CatalogueTab({
 }) {
   const { can, role } = useRBAC();
   const isAdmin = role === 'admin' || role === 'owner' || can('twin.edit');
+  const managedCapabilities = useManagedConnectorCapabilities();
   const [filter, setFilter] = useState<CatalogueFilter>('all');
   const [query, setQuery] = useState('');
   const [wizardFor, setWizardFor] = useState<string | null>(null);
   const [details, setDetails] = useState<ConnectorDefinition | null>(null);
+
+  const definitionById = useMemo(
+    () => new Map(definitions.map((definition) => [definition.id, definition])),
+    [definitions],
+  );
+
+  const managedRows = useMemo(
+    () => (managedCapabilities.data?.entries ?? [])
+      .filter(isManaged)
+      .map((entry) => ({ entry, definition: definitionById.get(entry.connector_definition_id) }))
+      .filter((row): row is { entry: ManagedCapabilityEntry; definition: ConnectorDefinition } => Boolean(row.definition)),
+    [definitionById, managedCapabilities.data?.entries],
+  );
 
   const configuredCounts = useMemo(() => {
     const map = new Map<string, number>();
@@ -90,11 +109,11 @@ export function CatalogueTab({
       <Panel>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-3xl space-y-1">
-            <p className="text-sm font-semibold">Operational connectors only</p>
+            <p className="text-sm font-semibold">AURA connection catalogue</p>
             <p className="text-sm text-muted-foreground">
-              This catalogue is organized around the AURA hybrid stack: facility and OT sources, edge exchange,
-              digital-twin storage, enterprise workflow, observability and optional cloud services. Platform
-              dependencies and build-time knowledge sources are intentionally excluded.
+              AURA combines managed business/data capabilities with native facility, Physical AI, edge,
+              digital-twin, storage and observability connectors. Catalogue availability never means a
+              connector is authenticated, healthy or moving data.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -111,6 +130,56 @@ export function CatalogueTab({
               </Link>
             </Button>
           </div>
+        </div>
+      </Panel>
+
+      <Panel>
+        <div className="space-y-4">
+          <div className="flex items-start gap-3">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-muted" aria-hidden>
+              <CloudCog className="h-4 w-4" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold">AURA Managed capabilities</p>
+              <p className="text-sm text-muted-foreground">
+                Server-owned eligibility and project-binding evidence for approved managed connectors. Provider credentials and tokens are not exposed here.
+              </p>
+            </div>
+          </div>
+
+          {managedCapabilities.isLoading ? (
+            <p className="text-sm text-muted-foreground">Loading managed capability evidence…</p>
+          ) : managedRows.length === 0 ? (
+            <SubPanel className="text-sm text-muted-foreground">
+              No managed capability has server-verified project binding evidence for this session. Nothing is inferred from build-time availability.
+            </SubPanel>
+          ) : (
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {managedRows.map(({ entry, definition }) => (
+                <SubPanel key={`${entry.connection_class}:${definition.id}`} className="space-y-3">
+                  <div>
+                    <p className="text-sm font-semibold">{definition.name}</p>
+                    <p className="text-xs text-muted-foreground">{CONNECTION_CLASS_LABEL[entry.connection_class]}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    <Badge variant="outline" className="text-xs">{ELIGIBILITY_LABEL[entry.eligibility]}</Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {entry.linked_to_project ? 'Project linked' : 'Project not linked'}
+                    </Badge>
+                    {entry.runtime_selectable && (
+                      <Badge variant="outline" className="v2-surface-verified v2-text-verified text-xs">Runtime selectable</Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {entry.operations.length > 0
+                      ? `${entry.operations.length} allowlisted operation${entry.operations.length === 1 ? '' : 's'} exposed by the AURA policy boundary.`
+                      : 'No allowlisted runtime operation is currently exposed.'}
+                  </p>
+                  {entry.evidence_note && <p className="text-xs text-muted-foreground">{entry.evidence_note}</p>}
+                </SubPanel>
+              ))}
+            </div>
+          )}
         </div>
       </Panel>
 
@@ -182,7 +251,7 @@ export function CatalogueTab({
                           </span>
                           <div className="min-w-0">
                             <p className="truncate text-sm font-semibold">{definition.name}</p>
-                            <p className="v2-mono truncate text-xs text-muted-foreground">{definition.provider}</p>
+                            <p className="v2-mono truncate text-xs text-muted-foreground">{definition.category}</p>
                           </div>
                         </div>
                         <p className="text-sm text-muted-foreground">
@@ -233,7 +302,7 @@ export function CatalogueTab({
               <SheetHeader className="text-left">
                 <SheetTitle className="text-lg">{details.name}</SheetTitle>
                 <SheetDescription className="text-sm">
-                  {details.provider} · v{details.version} · {AVAILABILITY_LABEL[availabilityOf(details)]}
+                  {details.category} · v{details.version} · {AVAILABILITY_LABEL[availabilityOf(details)]}
                 </SheetDescription>
               </SheetHeader>
               <dl className="mt-6 space-y-4 text-sm">
@@ -242,7 +311,7 @@ export function CatalogueTab({
                 <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Authentication methods</dt><dd>{details.supported_auth_methods.join(', ') || 'None'}</dd></div>
                 <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Data classes</dt><dd>{details.supported_data_classes.join(', ') || 'None'}</dd></div>
                 <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Protocols</dt><dd>{details.supported_protocols.join(', ') || 'None'}</dd></div>
-                <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Runtime requirement</dt><dd>{details.runtime_adapter ? `Adapter ${details.runtime_adapter}` : 'No runtime adapter exists, so a connection cannot be created.'}</dd></div>
+                <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Runtime requirement</dt><dd>{details.runtime_adapter ? `AURA runtime adapter ${details.runtime_adapter}` : 'No runtime adapter exists, so a connection cannot be created.'}</dd></div>
                 <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Validation</dt><dd>{details.validation_status.replace(/_/g, ' ').toLowerCase()}</dd></div>
                 {connectorStackNote(details) && (
                   <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Stack status</dt><dd>{connectorStackNote(details)}</dd></div>

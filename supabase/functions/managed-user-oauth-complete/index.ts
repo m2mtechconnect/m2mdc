@@ -9,11 +9,11 @@ import { saveConnectionKeyForUser } from '../_shared/appUserConnections.ts';
 import { managedUserBinding } from '../_shared/managedUserBindings.ts';
 import { resolveCallerTenant } from '../_shared/connectionTenant.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
+import {
+  managedConnectorGatewayPolicy,
+  whiteLabelBlockedResponse,
+} from '../_shared/whiteLabelGateway.ts';
 
-const GATEWAY_BASE_URL = 'https://connector-gateway.lovable.dev';
-
-// Scoped CORS: origin is resolved per request from the shared allowlist;
-// the method/header allowances below are specific to this function.
 const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -47,9 +47,24 @@ Deno.serve(async (req) => {
   const binding = managedUserBinding(definitionId);
   if (!code || !binding) return json(400, { error_code: 'invalid_request', correlation_id: correlationId });
 
+  const gateway = managedConnectorGatewayPolicy();
+  if (!gateway.runtimeAllowed || !gateway.gatewayBaseUrl) {
+    const tenantId = await resolveCallerTenant(admin, user.id);
+    await admin.from('connection_audit_events').insert({
+      actor_id: user.id,
+      tenant_id: tenantId,
+      action: 'managed_user_connection.exchange_blocked',
+      new_state: 'BLOCKED_WHITE_LABEL_POLICY',
+      evidence: { connector_definition_id: definitionId, reason_code: gateway.reason },
+      correlation_id: correlationId,
+    });
+    const blocked = whiteLabelBlockedResponse(gateway.reason);
+    return json(503, { ...blocked, correlation_id: correlationId });
+  }
+
   let exchanged: { connectionAPIKey: string; connectorId: string };
   try {
-    exchanged = await exchangeAppUserOAuthCode(GATEWAY_BASE_URL, code);
+    exchanged = await exchangeAppUserOAuthCode(gateway.gatewayBaseUrl, code);
   } catch (_error) {
     return json(502, {
       error_code: 'managed_authorization_exchange_failed',

@@ -2,14 +2,24 @@
  * Managed connector gateway helpers for per-user (AURA Managed User
  * Connection) bindings.
  *
- * RESTRICTED ENGINEERING SURFACE - server-only. Reads the workspace gateway
- * token and handles opaque per-user connection handles. Never import from
- * browser code and never echo these values in a response.
+ * RESTRICTED ENGINEERING SURFACE - server-only. Reads the approved AURA
+ * gateway token and handles opaque per-user connection handles. Never import
+ * from browser code and never echo these values in a response.
  */
+import { strictWhiteLabelEnabled } from './whiteLabelGateway.ts';
+
 function requireApiKey(): string {
-  const key = Deno.env.get('LOVABLE_API_KEY');
-  if (!key) throw new Error('managed_gateway_token_unavailable');
-  return key;
+  const auraKey = Deno.env.get('AURA_MANAGED_GATEWAY_TOKEN')?.trim();
+  if (auraKey) return auraKey;
+
+  // Legacy compatibility exists only when strict white-label mode is
+  // deliberately disabled. Strict mode is the default.
+  if (!strictWhiteLabelEnabled()) {
+    const legacyKey = Deno.env.get('LOVABLE_API_KEY')?.trim();
+    if (legacyKey) return legacyKey;
+  }
+
+  throw new Error('aura_managed_gateway_token_unavailable');
 }
 
 export interface AuthorizeParams {

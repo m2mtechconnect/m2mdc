@@ -157,6 +157,7 @@ Deno.serve(async (req) => {
       headers: {
         Authorization: `Bearer ${platformKey}`,
         'X-Connection-Api-Key': connectionKey,
+        'X-AURA-Correlation-Id': correlationId,
         'Content-Type': 'application/json',
       },
       signal: controller.signal,

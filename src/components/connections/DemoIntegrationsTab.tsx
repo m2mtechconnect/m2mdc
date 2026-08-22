@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { BarChart3, FileText, MessageSquare, Play, ShieldCheck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -216,7 +216,7 @@ function DemoCard({
   disabled = false,
   onRun,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   provider: string;
   mode: DemoMode;

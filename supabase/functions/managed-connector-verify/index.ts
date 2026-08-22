@@ -6,6 +6,7 @@
  *   - Session JWT required; roles, tenant and probe path resolved server-side.
  *   - The caller never supplies a URL, host, path, credential or gateway key.
  *   - authorizeManagedOperation() is the only gate; default is deny.
+ *   - Strict white-label mode requires an approved AURA-owned gateway.
  *   - The state is derived from the probe result, never from the request.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -14,20 +15,29 @@ import { manifestEntry, operationFor } from '../_shared/managedConnectorManifest
 import { authorizeManagedOperation } from '../_shared/managedConnectorAuthz.ts';
 import { countLiveRecords, evaluateVerification } from '../_shared/managedVerification.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
+import {
+  managedConnectorGatewayPolicy,
+  strictWhiteLabelEnabled,
+  whiteLabelBlockedResponse,
+} from '../_shared/whiteLabelGateway.ts';
 
-// Scoped CORS: origin is resolved per request from the shared allowlist;
-// the method/header allowances below are specific to this function.
 const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 let CORS: Record<string, string> = { ...getCorsHeaders(null), ...CORS_EXTRA };
 
-const GATEWAY_BASE = 'https://connector-gateway.lovable.dev';
 const OPERATOR_ROLES = ['owner', 'admin', 'operator', 'engineer'];
 
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
+}
+
+function gatewayToken(): string | null {
+  const auraToken = Deno.env.get('AURA_MANAGED_GATEWAY_TOKEN')?.trim();
+  if (auraToken) return auraToken;
+  if (!strictWhiteLabelEnabled()) return Deno.env.get('LOVABLE_API_KEY')?.trim() || null;
+  return null;
 }
 
 Deno.serve(async (req) => {
@@ -109,13 +119,29 @@ Deno.serve(async (req) => {
     return json(403, { error_code: decision.reason_code, safe_message: decision.safe_message, correlation_id: correlationId });
   }
 
-  const platformKey = Deno.env.get('LOVABLE_API_KEY');
+  const gateway = managedConnectorGatewayPolicy();
+  if (!gateway.runtimeAllowed || !gateway.gatewayBaseUrl) {
+    const blocked = whiteLabelBlockedResponse(gateway.reason);
+    await admin.from('connection_audit_events').insert({
+      actor_id: user.id,
+      action: 'connection.runtime_verification_blocked',
+      connection_id: connection.id,
+      previous_state: connection.verification_state ?? 'NOT_VERIFIED',
+      new_state: connection.verification_state ?? 'NOT_VERIFIED',
+      tenant_id: connection.tenant_id,
+      correlation_id: correlationId,
+      evidence: { reason_code: blocked.error_code },
+    });
+    return json(503, { ...blocked, correlation_id: correlationId });
+  }
+
+  const platformKey = gatewayToken();
   const connectionKeyName = `${(entry.gateway_connector_key ?? '').toUpperCase()}_API_KEY`;
   const connectionKey = connectionKeyName === '_API_KEY' ? undefined : Deno.env.get(connectionKeyName);
   if (!platformKey || !connectionKey) {
     return json(503, {
       error_code: 'managed_credential_unavailable',
-      safe_message: 'The platform-managed credential for this connector is not available to this environment, so no probe was run.',
+      safe_message: 'The AURA-managed credential for this connector is not available to this environment, so no probe was run.',
       correlation_id: correlationId,
     });
   }
@@ -126,7 +152,7 @@ Deno.serve(async (req) => {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), operation!.timeout_ms);
   try {
-    const upstream = await fetch(`${GATEWAY_BASE}/${entry.gateway_connector_key}${probe.path}`, {
+    const upstream = await fetch(`${gateway.gatewayBaseUrl}/${entry.gateway_connector_key}${probe.path}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${platformKey}`,
@@ -155,7 +181,6 @@ Deno.serve(async (req) => {
   const verdict = evaluateVerification({ reachable, http_status: httpStatus, record_count: recordCount });
   const previousState = (connection.verification_state as string | null) ?? 'NOT_VERIFIED';
   const completedAt = new Date().toISOString();
-  // Only shape-level evidence is stored. No provider payload is retained.
   const evidence = {
     probe_operation_id: probe.operation_id,
     http_status: httpStatus,

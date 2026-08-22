@@ -92,9 +92,12 @@ export default function CommandCentre() {
   const blueprintHref = `/blueprint/${facility.id || 'default'}`;
   const evidenceHref = '/dsx/evidence-beta';
   const simulationHref = `/simulation?twin=${encodeURIComponent(facility.id || 'default')}`;
+  // Never synthesize a "calculated now" timestamp when no durable run exists.
+  // A fresh wall-clock time would make modelled baseline values look newly
+  // observed or executed even though no simulation result was recorded.
   const calculatedAt = latestRun
     ? new Date(latestRun.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    : null;
 
   const effectiveKpis = useMemo(
     () => (latestRun ? { ...kpis, ...latestRun.result } : kpis),
@@ -229,7 +232,7 @@ export default function CommandCentre() {
           onSelectRack={setSelectedRack}
           rackCount={rackCount}
           blueprintHref={blueprintHref}
-          calculatedAt={calculatedAt}
+          calculatedAt={calculatedAt ?? 'No run recorded'}
           centerNonce={centerNonce}
         />
 
@@ -239,7 +242,7 @@ export default function CommandCentre() {
       <MetricQuickView
         kpi={metricKpi}
         facilityId={facility.id}
-        calculatedAt={calculatedAt}
+        calculatedAt={calculatedAt ?? 'No run recorded'}
         onClose={() => setMetricKpi(null)}
       />
     </div>

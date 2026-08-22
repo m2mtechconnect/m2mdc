@@ -10,7 +10,7 @@ import { managedUserBinding } from '../_shared/managedUserBindings.ts';
 import { resolveCallerTenant } from '../_shared/connectionTenant.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 import {
-  managedConnectorGatewayPolicy,
+  managedUserOAuthGatewayPolicy,
   whiteLabelBlockedResponse,
 } from '../_shared/whiteLabelGateway.ts';
 
@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
   const binding = managedUserBinding(definitionId);
   if (!code || !binding) return json(400, { error_code: 'invalid_request', correlation_id: correlationId });
 
-  const gateway = managedConnectorGatewayPolicy();
+  const gateway = managedUserOAuthGatewayPolicy();
   if (!gateway.runtimeAllowed || !gateway.gatewayBaseUrl) {
     const tenantId = await resolveCallerTenant(admin, user.id);
     await admin.from('connection_audit_events').insert({
@@ -111,7 +111,11 @@ Deno.serve(async (req) => {
     action: 'managed_user_connection.authorized',
     previous_state: 'AWAITING_USER_AUTHORIZATION',
     new_state: 'CONNECTED_NO_DATA',
-    evidence: { connector_definition_id: definitionId, granted_scopes: binding.scopes },
+    evidence: {
+      connector_definition_id: definitionId,
+      granted_scopes: binding.scopes,
+      authorization_mode: gateway.reason === 'DEMO_MANAGED_OAUTH_ALLOWED' ? 'DEMO_PROVIDER_OAUTH' : 'AURA_GATEWAY_OAUTH',
+    },
     correlation_id: correlationId,
   });
 

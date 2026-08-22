@@ -9,7 +9,7 @@ import { MANAGED_CONNECTOR_MANIFEST, isRuntimeSelectable } from '../_shared/mana
 import { resolveCallerTenant } from '../_shared/connectionTenant.ts';
 import { isManagedUserClientConfigured, managedUserBinding } from '../_shared/managedUserBindings.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
-import { managedConnectorGatewayPolicy } from '../_shared/whiteLabelGateway.ts';
+import { managedConnectorGatewayPolicy, managedUserOAuthGatewayPolicy } from '../_shared/whiteLabelGateway.ts';
 
 const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -19,10 +19,6 @@ let CORS: Record<string, string> = { ...getCorsHeaders(null), ...CORS_EXTRA };
 
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
-}
-
-function usesManagedGateway(connectionClass: string): boolean {
-  return connectionClass === 'MANAGED_SHARED' || connectionClass === 'MANAGED_USER';
 }
 
 Deno.serve(async (req) => {
@@ -41,7 +37,8 @@ Deno.serve(async (req) => {
   const tenantId = await resolveCallerTenant(admin, user.id);
   const { data: roleRows } = await admin.from('user_roles').select('role').eq('user_id', user.id);
   const roles = (roleRows ?? []).map((r: { role: string }) => r.role);
-  const gatewayPolicy = managedConnectorGatewayPolicy();
+  const sharedGatewayPolicy = managedConnectorGatewayPolicy();
+  const userOAuthPolicy = managedUserOAuthGatewayPolicy();
 
   const { data: userConnections } = await admin
     .from('managed_user_connections')
@@ -57,7 +54,9 @@ Deno.serve(async (req) => {
     const eligibility = userBindingTransport && userClientConfigured ? 'RUNTIME_USER_SUPPORTED' : entry.eligibility;
     const linkedToProject = entry.linked_to_project || userClientConfigured;
     const manifestSelectable = isRuntimeSelectable({ ...entry, eligibility, linked_to_project: linkedToProject });
-    const requiresManagedGateway = usesManagedGateway(entry.connection_class);
+
+    const gatewayPolicy = entry.connection_class === 'MANAGED_USER' ? userOAuthPolicy : sharedGatewayPolicy;
+    const requiresManagedGateway = entry.connection_class === 'MANAGED_SHARED' || entry.connection_class === 'MANAGED_USER';
     const whiteLabelReady = !requiresManagedGateway || gatewayPolicy.runtimeAllowed;
 
     return {
@@ -69,7 +68,7 @@ Deno.serve(async (req) => {
       runtime_selectable: manifestSelectable && whiteLabelReady,
       white_label_ready: whiteLabelReady,
       white_label_reason: whiteLabelReady ? 'AURA_RUNTIME_READY' : gatewayPolicy.reason,
-      user_bindable: Boolean(userBindingTransport) && whiteLabelReady,
+      user_bindable: Boolean(userBindingTransport) && userClientConfigured && userOAuthPolicy.runtimeAllowed,
       user_client_configured: userClientConfigured,
       requested_scopes: userBindingTransport?.scopes ?? [],
       data_classes: entry.data_classes,
@@ -94,9 +93,9 @@ Deno.serve(async (req) => {
     tenant_id: tenantId,
     caller_roles: roles,
     white_label_policy: {
-      strict: gatewayPolicy.strict,
-      managed_gateway_ready: gatewayPolicy.runtimeAllowed,
-      reason: gatewayPolicy.reason,
+      strict: sharedGatewayPolicy.strict,
+      managed_gateway_ready: sharedGatewayPolicy.runtimeAllowed,
+      reason: sharedGatewayPolicy.reason,
     },
     entries,
   });

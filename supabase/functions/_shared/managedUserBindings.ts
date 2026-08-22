@@ -12,6 +12,8 @@ export interface ManagedUserBinding {
   gateway_connector_key: string;
   client_api_key_env: string;
   scopes: string[];
+  /** Top-level provider authorization hosts allowed for demo OAuth. */
+  authorization_hosts: string[];
 }
 
 export const MANAGED_USER_BINDINGS: ManagedUserBinding[] = [
@@ -20,6 +22,7 @@ export const MANAGED_USER_BINDINGS: ManagedUserBinding[] = [
     gateway_connector_key: 'google_drive',
     client_api_key_env: 'GOOGLE_DRIVE_APP_USER_CONNECTOR_CLIENT_API_KEY',
     scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+    authorization_hosts: ['accounts.google.com'],
   },
 ];
 

@@ -6,19 +6,29 @@
  * gateway token and handles opaque per-user connection handles. Never import
  * from browser code and never echo these values in a response.
  */
-import { strictWhiteLabelEnabled } from './whiteLabelGateway.ts';
+import { demoManagedOAuthEnabled, strictWhiteLabelEnabled } from './whiteLabelGateway.ts';
 
-function requireApiKey(): string {
-  const auraKey = Deno.env.get('AURA_MANAGED_GATEWAY_TOKEN')?.trim();
-  if (auraKey) return auraKey;
+const LEGACY_GATEWAY_HOST = 'connector-gateway.lovable.dev';
 
-  // Legacy compatibility exists only when strict white-label mode is
-  // deliberately disabled. Strict mode is the default.
-  if (!strictWhiteLabelEnabled()) {
-    const legacyKey = Deno.env.get('LOVABLE_API_KEY')?.trim();
-    if (legacyKey) return legacyKey;
+function isLegacyGateway(gatewayBaseUrl: string): boolean {
+  try {
+    return new URL(gatewayBaseUrl).hostname.toLowerCase() === LEGACY_GATEWAY_HOST;
+  } catch {
+    return false;
+  }
+}
+
+function requireApiKey(gatewayBaseUrl: string): string {
+  if (isLegacyGateway(gatewayBaseUrl)) {
+    if (demoManagedOAuthEnabled() || !strictWhiteLabelEnabled()) {
+      const legacyKey = Deno.env.get('LOVABLE_API_KEY')?.trim();
+      if (legacyKey) return legacyKey;
+    }
+    throw new Error('managed_demo_oauth_credential_unavailable');
   }
 
+  const auraKey = Deno.env.get('AURA_MANAGED_GATEWAY_TOKEN')?.trim();
+  if (auraKey) return auraKey;
   throw new Error('aura_managed_gateway_token_unavailable');
 }
 
@@ -34,7 +44,7 @@ export interface AuthorizeParams {
 
 export async function authorizeAppUserOAuth(params: AuthorizeParams): Promise<{ authorizationUrl: string; sessionId: string }> {
   const headers: Record<string, string> = {
-    Authorization: `Bearer ${requireApiKey()}`,
+    Authorization: `Bearer ${requireApiKey(params.gatewayBaseUrl)}`,
     'Content-Type': 'application/json',
     'X-Client-Api-Key': params.clientAPIKey,
   };
@@ -63,7 +73,7 @@ export async function exchangeAppUserOAuthCode(
 ): Promise<{ connectionAPIKey: string; connectorId: string }> {
   const res = await fetch(`${gatewayBaseUrl}/api/v1/app-users/oauth2/exchange`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${requireApiKey()}`, 'Content-Type': 'application/json' },
+    headers: { Authorization: `Bearer ${requireApiKey(gatewayBaseUrl)}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ code }),
   });
   const text = await res.text();
@@ -82,7 +92,7 @@ export async function callAsAppUser(args: {
 }): Promise<Response> {
   const path = args.path.startsWith('/') ? args.path : `/${args.path}`;
   const headers = new Headers(args.init?.headers);
-  headers.set('Authorization', `Bearer ${requireApiKey()}`);
+  headers.set('Authorization', `Bearer ${requireApiKey(args.gatewayBaseUrl)}`);
   headers.set('X-Connection-Api-Key', args.connectionAPIKey);
   return fetch(`${args.gatewayBaseUrl}/${args.connectorId}${path}`, { ...args.init, headers });
 }
@@ -93,7 +103,7 @@ export async function disconnectAppUser(args: {
   connectorId: string;
 }): Promise<void> {
   const headers = new Headers();
-  headers.set('Authorization', `Bearer ${requireApiKey()}`);
+  headers.set('Authorization', `Bearer ${requireApiKey(args.gatewayBaseUrl)}`);
   headers.set('X-Connection-Api-Key', args.connectionAPIKey);
   headers.set('Content-Type', 'application/json');
   const res = await fetch(`${args.gatewayBaseUrl}/api/v1/app-users/connection`, {

@@ -203,3 +203,20 @@ export function requirementForSourceMapping(mapping: DsxSourceMapping): DsxAsset
   if (!requirement) throw new Error(`Unknown DSX requirement ${mapping.requirementId}`);
   return requirement;
 }
+
+/**
+ * Private evaluation can proceed with a verified source map, but publishing a
+ * derivative into AURA's public/runtime asset channel requires explicit rights
+ * for both production use and redistribution. A verified prim mapping alone is
+ * never sufficient authority to publish NVIDIA sample geometry.
+ */
+export function canPromoteDsxMappingToPublicRuntime(
+  sourceMap: DsxSourceMap,
+  mapping: DsxSourceMapping,
+): boolean {
+  return (
+    mapping.mappingStatus === 'verified' &&
+    sourceMap.sourcePack.productionRights === 'approved' &&
+    sourceMap.sourcePack.redistributionRights === 'approved'
+  );
+}

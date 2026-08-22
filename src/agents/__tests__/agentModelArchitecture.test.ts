@@ -104,7 +104,17 @@ describe('agent/model architecture guards', () => {
     expect(provision).toContain("const newStatus = dataObserved ? 'HEALTHY' : 'CONNECTED_NO_DATA'");
     const policy = read('supabase/functions/_shared/ai-provider-policy.ts');
     expect(policy).toContain("row.status === 'HEALTHY'");
-    expect(policy).not.toContain("ACTIVE_STATUSES");
+    expect(policy).not.toContain('ACTIVE_STATUSES');
+  });
+
+  it('invalidates health evidence whenever a credential is stored or rotated', () => {
+    const credential = read('supabase/functions/connection-credential/index.ts');
+    const provision = read('supabase/functions/connection-provision/index.ts');
+    expect(credential).toContain("status: 'READY_TO_TEST'");
+    expect(credential).toContain('requires_health_check: true');
+    expect(credential).toContain('last_success_at: null');
+    expect(provision).toContain('credentialHealthEvidenceIsCurrent');
+    expect(provision).toContain('activation_requires_current_credential_check');
   });
 
   it('does not let the marketplace erase unrelated agent config', () => {

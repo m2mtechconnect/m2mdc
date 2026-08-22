@@ -3,10 +3,10 @@
  *
  * Rules (do not relax without review):
  *   - Caller must present a valid session JWT and active global administrative authority.
- *   - Every action is re-checked against the caller's tenant, because the
- *     service-role client bypasses RLS.
+ *   - Every action is re-checked against the caller's tenant because service-role bypasses RLS.
  *   - Plaintext credential material travels one way only: into this function.
- *     No action returns, logs or echoes it. Reads return metadata alone.
+ *   - Storing or rotating a credential invalidates prior runtime-health state;
+ *     the connection must be tested again before activation.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { resolveCallerTenant, tenantVisible, TENANT_FORBIDDEN } from '../_shared/connectionTenant.ts';
@@ -90,9 +90,7 @@ Deno.serve(async (req) => {
   }
 
   if (action === 'list') {
-    const { data: connections } = await admin
-      .from('connection_instances')
-      .select('id, tenant_id');
+    const { data: connections } = await admin.from('connection_instances').select('id, tenant_id');
     const visibleIds = (connections ?? [])
       .filter((c: { tenant_id: string | null }) => tenantVisible(c.tenant_id ?? null, callerTenantId))
       .map((c: { id: string }) => c.id);
@@ -109,7 +107,7 @@ Deno.serve(async (req) => {
 
   const { data: connection } = await admin
     .from('connection_instances')
-    .select('id, tenant_id, display_name, status, configuration, credential_reference')
+    .select('id, connector_id, tenant_id, display_name, status, configuration, credential_reference')
     .eq('id', connectionId)
     .maybeSingle();
   if (!connection) return json(404, { error_code: 'not_found', correlation_id: correlationId });
@@ -139,7 +137,7 @@ Deno.serve(async (req) => {
       tenant_id: connection!.tenant_id ?? null,
       previous_state: existing ? `v${existing.version}` : null,
       new_state: `v${fields.version}`,
-      evidence: { fingerprint: fields.fingerprint },
+      evidence: { fingerprint: fields.fingerprint, connector_id: connection!.connector_id },
     });
   }
 
@@ -176,6 +174,7 @@ Deno.serve(async (req) => {
     const ciphertext = await encryptCredential(secret.trim());
     const expiresAt = typeof body.expires_at === 'string' && body.expires_at ? body.expires_at : null;
     const nextVersion = existing ? existing.version + 1 : 1;
+    const rotatedAt = new Date().toISOString();
 
     const payload = {
       connection_id: connectionId,
@@ -186,7 +185,7 @@ Deno.serve(async (req) => {
       version: nextVersion,
       status: 'ACTIVE',
       expires_at: expiresAt,
-      last_rotated_at: new Date().toISOString(),
+      last_rotated_at: rotatedAt,
       rotated_by: user.id,
       created_by: existing?.created_by ?? user.id,
     };
@@ -200,14 +199,28 @@ Deno.serve(async (req) => {
       return json(400, { error_code: 'vault_write_failed', safe_message: error.message, correlation_id: correlationId });
     }
 
+    // A secret change invalidates every earlier health result. Do not destroy
+    // historical evidence; make the connection non-runnable until re-tested.
     await admin
       .from('connection_instances')
-      .update({ credential_reference: `vault:${connectionId}#v${nextVersion}` })
+      .update({
+        credential_reference: `vault:${connectionId}#v${nextVersion}`,
+        enabled: false,
+        status: 'READY_TO_TEST',
+        status_reason: 'Credential changed. A new server-side health check is required before activation.',
+        last_success_at: null,
+        last_error: null,
+      })
       .eq('id', connectionId);
 
     await history({ action: existing ? 'rotated' : 'stored', version: nextVersion, fingerprint });
 
-    return json(200, { credential: metadata(saved as CredentialRow), correlation_id: correlationId });
+    return json(200, {
+      credential: metadata(saved as CredentialRow),
+      connection_status: 'READY_TO_TEST',
+      requires_health_check: true,
+      correlation_id: correlationId,
+    });
   }
 
   if (action === 'revoke') {
@@ -224,6 +237,7 @@ Deno.serve(async (req) => {
         enabled: false,
         status: 'DISABLED',
         status_reason: 'Credential revoked. The connection cannot authenticate until a new credential is stored.',
+        last_success_at: null,
       })
       .eq('id', connectionId);
 

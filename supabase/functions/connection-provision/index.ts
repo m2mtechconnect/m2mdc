@@ -6,13 +6,14 @@
  *   - Only connectors with IMPLEMENTED status and a runtime adapter may be instantiated.
  *   - No credential material is accepted, stored or echoed here.
  *   - Endpoint targets are server-owned; the caller never supplies a URL.
- *   - Activation requires a persisted PASSED health check.
+ *   - Activation requires a persisted PASS health check current for the active credential version.
  *   - Every transition writes a connection_audit_events row.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { resolveCallerTenant, tenantVisible, TENANT_FORBIDDEN } from '../_shared/connectionTenant.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 import { hasConnectionAdminAuthority } from '../_shared/connection-admin-policy.ts';
+import { credentialHealthEvidenceIsCurrent } from '../_shared/connection-health-policy.ts';
 
 const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -190,10 +191,25 @@ Deno.serve(async (req) => {
       .limit(1)
       .maybeSingle();
 
-    if (!lastCheck || lastCheck.status !== 'PASSED') {
+    const { data: activeCredential } = await admin
+      .from('connection_credentials')
+      .select('status, last_rotated_at')
+      .eq('connection_id', connectionId)
+      .maybeSingle();
+
+    if (!credentialHealthEvidenceIsCurrent({
+      lastCheckStatus: lastCheck?.status ?? null,
+      lastCheckStartedAt: lastCheck?.started_at ?? null,
+      credentialStatus: activeCredential?.status ?? null,
+      credentialRotatedAt: activeCredential?.last_rotated_at ?? null,
+    })) {
       return json(409, {
-        error_code: 'activation_requires_passing_check',
-        safe_message: 'Activation requires a passing server-side health check.',
+        error_code: activeCredential?.last_rotated_at
+          ? 'activation_requires_current_credential_check'
+          : 'activation_requires_passing_check',
+        safe_message: activeCredential?.last_rotated_at
+          ? 'Activation requires a passing server-side health check performed after the current credential was stored or rotated.'
+          : 'Activation requires a passing server-side health check.',
         correlation_id: correlationId,
       });
     }
@@ -203,7 +219,7 @@ Deno.serve(async (req) => {
       'objects_present',
       'application_records_present',
       'model_response_present',
-    ].includes(String(lastCheck.data_availability ?? ''));
+    ].includes(String(lastCheck?.data_availability ?? ''));
     const newStatus = dataObserved ? 'HEALTHY' : 'CONNECTED_NO_DATA';
     await admin.from('connection_instances').update({
       enabled: true,
@@ -218,7 +234,12 @@ Deno.serve(async (req) => {
       connection_id: connectionId,
       previous_state: connection.status,
       new_state: newStatus,
-      evidence: { last_check: lastCheck.status, data_availability: lastCheck.data_availability },
+      evidence: {
+        last_check: lastCheck?.status ?? null,
+        last_check_started_at: lastCheck?.started_at ?? null,
+        credential_rotated_at: activeCredential?.last_rotated_at ?? null,
+        data_availability: lastCheck?.data_availability ?? null,
+      },
     });
 
     return json(200, { status: newStatus, correlation_id: correlationId });

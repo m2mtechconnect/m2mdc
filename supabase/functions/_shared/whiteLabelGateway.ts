@@ -118,19 +118,22 @@ export function managedConnectorGatewayPolicy(): WhiteLabelGatewayPolicy {
 
 /**
  * Per-user OAuth may use a demo transport without weakening the shared runtime.
- * In production this is identical to the normal managed gateway policy.
+ * Demo mode deliberately takes precedence because Phase 7A's AURA gateway does
+ * not yet expose app-user OAuth endpoints. Production remains identical to the
+ * normal managed gateway policy.
  */
 export function managedUserOAuthGatewayPolicy(): WhiteLabelGatewayPolicy {
   const standard = managedConnectorGatewayPolicy();
-  if (standard.runtimeAllowed && standard.gatewayBaseUrl) return standard;
-  if (!demoManagedOAuthEnabled()) return standard;
-  return {
-    strict: standard.strict,
-    gatewayBaseUrl: LEGACY_GATEWAY_BASE_URL,
-    auraOwned: false,
-    runtimeAllowed: true,
-    reason: 'DEMO_MANAGED_OAUTH_ALLOWED',
-  };
+  if (demoManagedOAuthEnabled()) {
+    return {
+      strict: standard.strict,
+      gatewayBaseUrl: LEGACY_GATEWAY_BASE_URL,
+      auraOwned: false,
+      runtimeAllowed: true,
+      reason: 'DEMO_MANAGED_OAUTH_ALLOWED',
+    };
+  }
+  return standard;
 }
 
 /**

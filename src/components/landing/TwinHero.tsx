@@ -60,7 +60,7 @@ export function TwinHero() {
   return (
     <>
       <section className="relative min-h-[95vh] flex items-center overflow-hidden bg-background">
-        {/* The product screenshot below is the sole high-priority hero image. */}
+        {/* No raster poster on first paint. The 33 MB video is user-initiated only. */}
         <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary/10 via-background to-success/5">
           {showVideo && (
             <video
@@ -69,7 +69,6 @@ export function TwinHero() {
               muted
               playsInline
               preload="none"
-              poster="/landing/hero-datacenter-bg.jpg"
               width={1920}
               height={1080}
               className="absolute inset-0 h-full w-full object-cover opacity-30"
@@ -81,11 +80,9 @@ export function TwinHero() {
           <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-background/70" />
         </div>
 
-        {/* Static mesh avoids pointer-driven getBoundingClientRect/layout work. */}
+        {/* Fixed paint-only texture. Percentage-sized blurred blobs were the full CLS culprit in Lighthouse. */}
         <div className="absolute inset-0 z-[1] pointer-events-none" aria-hidden="true">
           <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.02]" />
-          <div className="absolute -right-[10%] -top-[20%] h-[70%] w-[60%] rounded-full bg-gradient-to-bl from-primary/10 via-primary/5 to-transparent blur-3xl" />
-          <div className="absolute -bottom-[20%] -left-[10%] h-[60%] w-[50%] rounded-full bg-gradient-to-tr from-success/8 via-success/3 to-transparent blur-3xl" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-8 py-16 lg:py-24 w-full">
@@ -176,10 +173,9 @@ export function TwinHero() {
                   alt="M2M Digital Twin Dashboard showing 3D rack visualization, PUE metrics, GPU utilization, and carbon intensity KPIs"
                   width={1564}
                   height={879}
-                  {...({ fetchpriority: 'high' } as Record<string, string>)}
                   decoding="async"
                   className="w-full h-full object-cover object-top"
-                  loading="eager"
+                  loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent pointer-events-none" />
               </div>

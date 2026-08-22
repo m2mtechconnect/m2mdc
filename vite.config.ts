@@ -136,20 +136,10 @@ export default defineConfig(({ mode }) => {
             // bootstrap in vendor-3d and forcing ~900 kB of 3D code onto the
             // unauthenticated landing route.
             'vendor-react': ['react', 'react-dom', 'react-dom/client', 'react-router-dom'],
-            'vendor-ui': [
-              '@radix-ui/react-dialog',
-              '@radix-ui/react-tabs',
-              '@radix-ui/react-select',
-              '@radix-ui/react-dropdown-menu',
-              '@radix-ui/react-popover',
-              '@radix-ui/react-tooltip',
-              '@radix-ui/react-accordion',
-              '@radix-ui/react-checkbox',
-              '@radix-ui/react-switch',
-              '@radix-ui/react-slider',
-              '@radix-ui/react-scroll-area',
-            ],
-            'vendor-charts': ['recharts'],
+            // Runtime-only libraries retain their own lazy chunks. Radix and
+            // Recharts are intentionally NOT forced into global vendor chunks:
+            // doing so made Vite preload ~160 kB gzip of UI/chart code on `/`
+            // even though the anonymous hero does not use those packages.
             'vendor-query': ['@tanstack/react-query'],
             'vendor-supabase': ['@supabase/supabase-js'],
             'vendor-motion': ['framer-motion'],

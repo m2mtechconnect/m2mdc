@@ -4,6 +4,7 @@
  * Opening a constraint explains what was measured, which objects it affects,
  * how much evidence supports it and where to continue the investigation.
  */
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -14,10 +15,40 @@ import { relatedViewsForDomain } from '@/dsx/workspaces/relatedViews';
 
 export function ConstraintDrawer() {
   const { investigatedConstraint: c, closeConstraint, hrefWithContext, selectAsset } = useWorkspace();
+  const openerRef = useRef<HTMLElement | null>(null);
+
+  const restoreOpener = () => {
+    const opener = openerRef.current;
+    openerRef.current = null;
+    if (!opener || !opener.isConnected) return;
+
+    // Radix keeps the focus scope alive while the Sheet close animation
+    // finishes. Re-assert focus once immediately and once after that transition
+    // so narrow/mobile viewports cannot leave focus on <body>.
+    requestAnimationFrame(() => {
+      if (opener.isConnected) opener.focus();
+    });
+    window.setTimeout(() => {
+      if (opener.isConnected) opener.focus();
+    }, 400);
+  };
 
   return (
     <Sheet open={!!c} onOpenChange={(o) => { if (!o) closeConstraint(); }}>
-      <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-md" data-testid="dsx-constraint-drawer" data-constraint-domain={c?.domain ?? ''}>
+      <SheetContent
+        side="right"
+        className="w-full overflow-y-auto sm:max-w-md"
+        data-testid="dsx-constraint-drawer"
+        data-constraint-domain={c?.domain ?? ''}
+        onOpenAutoFocus={() => {
+          const active = document.activeElement;
+          openerRef.current = active instanceof HTMLElement ? active : null;
+        }}
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          restoreOpener();
+        }}
+      >
         {c && (
           <>
             <SheetHeader>

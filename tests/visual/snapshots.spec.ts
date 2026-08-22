@@ -1,25 +1,93 @@
-import { test, expect } from '@playwright/test';
+import type { BrowserContext } from '@playwright/test';
+import { test, expect } from '../truth-in-ui/_setup/fixtures';
+import { installSupabaseMock } from '../truth-in-ui/_setup/supabase-mock';
 
 /**
  * Visual Regression Tests
- * Captures screenshots and compares against baselines
+ * Captures deterministic authenticated surfaces and compares against baselines.
  */
+
+const VISUAL_BUILDER_ID = '00000000-0000-4000-8000-000000000099';
+const visualBuilder = {
+  id: VISUAL_BUILDER_ID,
+  name: 'Visual Regression Data Centre Twin',
+  description: 'Deterministic visual-regression fixture',
+  status: 'draft',
+  config: {
+    goal: 'Optimize sovereign data-centre operations',
+    industry: 'Data Centre',
+    department: 'Operations',
+    type: '3d_twin',
+    template_id: 'visual-regression-template',
+    workflow: {
+      triggers: ['Telemetry threshold exceeded'],
+      actions: ['Analyze thermal anomaly', 'Recommend cooling adjustment'],
+      integrations: ['AURA telemetry'],
+      hitl: ['Operator approval'],
+    },
+    model_config: {
+      provider: 'google',
+      model: 'google/gemini-2.5-flash',
+      rag: {},
+      policies: {},
+      mcp_servers: [],
+    },
+    step_completed: 0,
+  },
+  created_at: '2026-01-01T00:00:00.000Z',
+  updated_at: '2026-01-01T00:00:00.000Z',
+};
+
+async function primeAppTheme(context: BrowserContext, theme: 'light' | 'dark') {
+  await context.addInitScript((value) => {
+    try { window.localStorage.setItem('theme', value); }
+    catch { /* storage disabled */ }
+  }, theme);
+}
+
+async function installBuilderVisualMock(context: BrowserContext) {
+  await context.route('**/functions/v1/builders-*', async (route) => {
+    const method = route.request().method().toUpperCase();
+    const headers = {
+      'access-control-allow-origin': '*',
+      'access-control-allow-methods': 'POST,OPTIONS',
+      'access-control-allow-headers': 'authorization,apikey,content-type,x-client-info',
+      'content-type': 'application/json',
+    };
+    if (method === 'OPTIONS') {
+      await route.fulfill({ status: 204, headers, body: '' });
+      return;
+    }
+
+    const pathname = new URL(route.request().url()).pathname;
+    const payload = pathname.endsWith('/builders-create')
+      ? { data: { id: VISUAL_BUILDER_ID, builder: visualBuilder } }
+      : { data: { builder: visualBuilder } };
+    await route.fulfill({ status: 200, headers, body: JSON.stringify(payload) });
+  });
+}
+
+test.beforeEach(async ({ context }) => {
+  await installSupabaseMock(context);
+});
 
 test.describe('Visual Regression - Light Theme', () => {
   test.use({ colorScheme: 'light' });
+  test.beforeEach(async ({ context }) => primeAppTheme(context, 'light'));
 
   test('Dashboard hero section', async ({ page }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
     
-    await expect(page.locator('.hero, [data-testid="hero"]')).toBeVisible();
+    await expect(page.getByTestId('command-centre')).toBeVisible();
     await expect(page).toHaveScreenshot('dashboard-hero-light.png', {
       maxDiffPixels: 100,
     });
   });
 
-  test('Builder Step 1', async ({ page }) => {
-    await page.goto('/builder?step=1');
+  test('Builder Step 1', async ({ page, context }) => {
+    await installBuilderVisualMock(context);
+    await page.goto('/builder?new=true&step=1');
     await page.waitForLoadState('networkidle');
     
     await expect(page).toHaveScreenshot('builder-step1-light.png', {
@@ -27,8 +95,9 @@ test.describe('Visual Regression - Light Theme', () => {
     });
   });
 
-  test('Builder Step 2 - Industry Marketplace', async ({ page }) => {
-    await page.goto('/builder?step=2');
+  test('Builder Step 2 - Industry Marketplace', async ({ page, context }) => {
+    await installBuilderVisualMock(context);
+    await page.goto('/builder?new=true&step=2');
     await page.waitForLoadState('networkidle');
     
     await expect(page).toHaveScreenshot('builder-step2-light.png', {
@@ -36,8 +105,9 @@ test.describe('Visual Regression - Light Theme', () => {
     });
   });
 
-  test('Builder Step 5 - Workflow Editor', async ({ page }) => {
-    await page.goto('/builder?step=5');
+  test('Builder Step 5 - Workflow Editor', async ({ page, context }) => {
+    await installBuilderVisualMock(context);
+    await page.goto('/builder?new=true&step=5');
     await page.waitForLoadState('networkidle');
     
     await expect(page).toHaveScreenshot('builder-step5-light.png', {
@@ -94,6 +164,7 @@ test.describe('Visual Regression - Light Theme', () => {
 
 test.describe('Visual Regression - Dark Theme', () => {
   test.use({ colorScheme: 'dark' });
+  test.beforeEach(async ({ context }) => primeAppTheme(context, 'dark'));
 
   test('Dashboard hero section', async ({ page }) => {
     await page.goto('/dashboard');
@@ -104,8 +175,9 @@ test.describe('Visual Regression - Dark Theme', () => {
     });
   });
 
-  test('Builder Step 1', async ({ page }) => {
-    await page.goto('/builder?step=1');
+  test('Builder Step 1', async ({ page, context }) => {
+    await installBuilderVisualMock(context);
+    await page.goto('/builder?new=true&step=1');
     await page.waitForLoadState('networkidle');
     
     await expect(page).toHaveScreenshot('builder-step1-dark.png', {
@@ -113,8 +185,9 @@ test.describe('Visual Regression - Dark Theme', () => {
     });
   });
 
-  test('Builder Step 5 - Workflow Editor', async ({ page }) => {
-    await page.goto('/builder?step=5');
+  test('Builder Step 5 - Workflow Editor', async ({ page, context }) => {
+    await installBuilderVisualMock(context);
+    await page.goto('/builder?new=true&step=5');
     await page.waitForLoadState('networkidle');
     
     await expect(page).toHaveScreenshot('builder-step5-dark.png', {
@@ -147,6 +220,7 @@ test.describe('Visual Regression - Mobile', () => {
     viewport: { width: 375, height: 667 },
     isMobile: true,
   });
+  test.beforeEach(async ({ context }) => primeAppTheme(context, 'light'));
 
   test('Dashboard mobile', async ({ page }) => {
     await page.goto('/dashboard');
@@ -158,8 +232,9 @@ test.describe('Visual Regression - Mobile', () => {
     });
   });
 
-  test('Builder mobile', async ({ page }) => {
-    await page.goto('/builder?step=1');
+  test('Builder mobile', async ({ page, context }) => {
+    await installBuilderVisualMock(context);
+    await page.goto('/builder?new=true&step=1');
     await page.waitForLoadState('networkidle');
     
     await expect(page).toHaveScreenshot('builder-mobile.png', {
@@ -180,6 +255,8 @@ test.describe('Visual Regression - Mobile', () => {
 });
 
 test.describe('Visual Regression - Components', () => {
+  test.beforeEach(async ({ context }) => primeAppTheme(context, 'light'));
+
   test('KPI Cards', async ({ page }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
@@ -204,8 +281,9 @@ test.describe('Visual Regression - Components', () => {
     }
   });
 
-  test('Workflow Palette', async ({ page }) => {
-    await page.goto('/builder?step=5');
+  test('Workflow Palette', async ({ page, context }) => {
+    await installBuilderVisualMock(context);
+    await page.goto('/builder?new=true&step=5');
     await page.waitForLoadState('networkidle');
     
     const palette = page.locator('[data-testid="workflow-palette"]');

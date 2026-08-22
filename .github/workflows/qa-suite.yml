@@ -1,5 +1,7 @@
 name: QA Suite
 
+# Functional quality gate. Integration + Lighthouse are owned by Test Suite so
+# expensive checks are not duplicated across two workflows.
 on:
   pull_request:
     branches: [main, develop]
@@ -7,25 +9,45 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  security-events: write
+
+env:
+  CI: true
+  AURA_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  VITE_SUPABASE_URL: http://127.0.0.1:54321
+  VITE_SUPABASE_PROJECT_ID: local-placeholder
+  VITE_SUPABASE_PUBLISHABLE_KEY: placeholder-anon-key
+  SUPABASE_URL: http://127.0.0.1:54321
+  SUPABASE_ANON_KEY: placeholder-anon-key
+  SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
+  USE_MOCK_LLM: true
+
 jobs:
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
+    concurrency:
+      group: qa-unit-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.AURA_SOURCE_SHA }}
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.3.3'
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      
+
       - name: Run unit tests with coverage
         run: bun run test:unit:coverage
-      
+
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
         with:
@@ -36,29 +58,34 @@ jobs:
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
+    concurrency:
+      group: qa-e2e-${{ github.event.pull_request.number || github.ref }}-${{ matrix.browser }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     strategy:
+      fail-fast: false
+      max-parallel: 2
       matrix:
         browser: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.AURA_SOURCE_SHA }}
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.3.3'
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      
-      - name: Install Playwright browsers
+
+      - name: Install Playwright browser
         run: bunx playwright install --with-deps ${{ matrix.browser }}
-      
+
       - name: Run E2E tests
         run: bunx playwright test --project=${{ matrix.browser }}
-        env:
-          CI: true
-      
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -69,55 +96,31 @@ jobs:
             test-results/
           retention-days: 7
 
-  performance-audit:
-    name: Performance Audit
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: '1.3.3'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-      
-      - name: Build production
-        run: bun run build
-      
-      - name: Run Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v11
-        with:
-          urls: |
-            http://localhost:5173
-            http://localhost:5173/agents
-            http://localhost:5173/marketplace
-            http://localhost:5173/builder?step=2
-          uploadArtifacts: true
-          temporaryPublicStorage: true
-
   accessibility-audit:
     name: Accessibility Audit
     runs-on: ubuntu-latest
+    concurrency:
+      group: qa-a11y-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.AURA_SOURCE_SHA }}
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.3.3'
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      
+
       - name: Install Playwright
         run: bunx playwright install --with-deps chromium
-      
+
       - name: Run accessibility tests
-        run: bunx playwright test --grep "@a11y"
+        run: bunx playwright test --project=chromium --grep "@a11y"
 
       - name: Run contrast + focus a11y suite
         run: bunx playwright test tests/truth-in-ui/axe-contrast-focus.spec.ts --config=playwright.truth.config.ts
@@ -133,39 +136,56 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
+    concurrency:
+      group: qa-security-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
-      
+        with:
+          ref: ${{ env.AURA_SOURCE_SHA }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.3'
+
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
           format: 'sarif'
           output: 'trivy-results.sarif'
-      
+
       - name: Upload Trivy results to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
 
+      - name: Run Bun audit
+        run: bun audit --audit-level=moderate
+
   qa-summary:
     name: QA Summary
     runs-on: ubuntu-latest
-    needs: [unit-tests, e2e-tests, performance-audit, accessibility-audit]
+    concurrency:
+      group: qa-summary-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+    needs: [unit-tests, e2e-tests, accessibility-audit, security-scan]
     if: always()
     steps:
-      - name: Check test results
+      - name: Check QA results
         run: |
+          echo "Release source SHA: $AURA_SOURCE_SHA"
           echo "Unit Tests: ${{ needs.unit-tests.result }}"
           echo "E2E Tests: ${{ needs.e2e-tests.result }}"
-          echo "Performance: ${{ needs.performance-audit.result }}"
           echo "Accessibility: ${{ needs.accessibility-audit.result }}"
-          
-          if [ "${{ needs.unit-tests.result }}" == "failure" ] || 
-             [ "${{ needs.e2e-tests.result }}" == "failure" ]; then
+          echo "Security: ${{ needs.security-scan.result }}"
+
+          if [ "${{ needs.unit-tests.result }}" != "success" ] ||
+             [ "${{ needs.e2e-tests.result }}" != "success" ] ||
+             [ "${{ needs.accessibility-audit.result }}" != "success" ] ||
+             [ "${{ needs.security-scan.result }}" != "success" ]; then
             echo "❌ QA Suite Failed"
             exit 1
-          else
-            echo "✅ QA Suite Passed"
           fi
+          echo "✅ QA Suite Passed"

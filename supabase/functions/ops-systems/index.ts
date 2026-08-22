@@ -37,14 +37,18 @@ serve(createHandler({
   inputSchema: InputSchema,
   handler: async (input, context) => {
     const { env = 'all', status = 'all', page = 1, pageSize = 10, sort = 'name' } = input;
-    const { supabase, log } = context;
+    const { supabase, log, organizationId } = context;
+    if (!organizationId) {
+      throw { code: 'TENANT_CONTEXT_REQUIRED', message: 'Organization context is required', status: 403 };
+    }
 
     log("Fetching ops systems", { env, status, page, pageSize, sort });
 
     // Build query
     let query = supabase
       .from('agents')
-      .select('id, name, status, environment_id, last_heartbeat, environments(name)', { count: 'exact' });
+      .select('id, name, status, environment_id, last_heartbeat, environments(name)', { count: 'exact' })
+      .eq('org_id', organizationId);
 
     // Filter by environment
     if (env !== 'all') {

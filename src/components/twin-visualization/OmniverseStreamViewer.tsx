@@ -227,13 +227,13 @@ export function OmniverseStreamViewer({
                 <DisabledActionExplanation
                   id="omniverse-connect-reason"
                   permanent
-                  className="mt-1 text-white/60"
+                  className="mt-1 text-white/80"
                   reason="Interactive streaming needs a server-mediated transport that this build does not provide."
                   recovery="Use the local 3D twin view instead."
                 />
               )}
               {canConnect && host && (
-                <p className="text-xs text-white/30 mt-0.5 font-mono">{host}:{cfg.signalingPort}</p>
+                <p className="text-xs text-white/70 mt-0.5 font-mono">{host}:{cfg.signalingPort}</p>
               )}
             </div>
             <Button

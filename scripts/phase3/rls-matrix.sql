@@ -43,11 +43,12 @@ BEGIN
          (ub, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
           'tenant-b@validation.invalid', '', now(), now(), now());
 
-  INSERT INTO public.data_centre_twins (name, created_by_user)
-  VALUES ('validation-twin-a', ua) RETURNING id INTO twin_a;
+  INSERT INTO public.data_centre_twins (name, city, region_code, created_by_user)
+  VALUES ('validation-twin-a', 'Validation City', 'validation-region-a', ua)
+  RETURNING id INTO twin_a;
 
-  INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, lifecycle_status)
-  VALUES (ua, ua, twin_a, 'succeeded') RETURNING id INTO run_a;
+  INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, scenario_key, lifecycle_status)
+  VALUES (ua, ua, twin_a, 'validation-owner', 'succeeded') RETURNING id INTO run_a;
 
   ---------------------------------------------------------------- reads
   PERFORM pg_temp.act_as(ua);
@@ -73,8 +74,8 @@ BEGIN
 
   ok := false;
   BEGIN
-    INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, lifecycle_status)
-    VALUES (ub, ub, twin_a, 'queued');
+    INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, scenario_key, lifecycle_status)
+    VALUES (ub, ub, twin_a, 'validation-cross-tenant', 'queued');
   EXCEPTION WHEN OTHERS THEN ok := true;
   END;
   PERFORM pg_temp.expect('tenant B cannot attach a run to tenant A twin', ok, true);
@@ -82,9 +83,9 @@ BEGIN
 
   --------------------------------------------- privileged field forgery
   PERFORM pg_temp.act_as(ua);
-  INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, lifecycle_status,
+  INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, scenario_key, lifecycle_status,
                                       run_intent, verification_level)
-  VALUES (ua, ua, twin_a, 'queued', 'authoritative', 'server-verified')
+  VALUES (ua, ua, twin_a, 'validation-forgery', 'queued', 'authoritative', 'server-verified')
   RETURNING id INTO run_a;
   SELECT run_intent = 'preview' AND verification_level = 'client-generated-unverified'
     INTO ok FROM public.simulation_runs WHERE id = run_a;
@@ -107,8 +108,16 @@ BEGIN
   PERFORM pg_temp.expect('a terminal run cannot be reopened', ok, true);
 
   -------------------------------------------------- decision immutability
-  INSERT INTO public.decision_records (user_id, run_id, recommendation_id, outcome, rationale)
-  VALUES (ua, run_a, 'rec-1', 'approved', 'validation rationale long enough');
+  INSERT INTO public.decision_records (
+    user_id, run_id, recommendation_id, outcome, rationale,
+    approver, decided_at, data_mode, observation_tick,
+    evidence_snapshot, snapshot_hash, timeline_id
+  )
+  VALUES (
+    ua, run_a, 'rec-1', 'approved', 'validation rationale long enough',
+    'tenant-a@validation.invalid', now(), 'SIMULATED', 0,
+    '{}'::jsonb, 'validation-snapshot-owner', 'run:' || run_a::text
+  );
   ok := false;
   BEGIN
     UPDATE public.decision_records SET outcome = 'rejected' WHERE run_id = run_a;
@@ -175,19 +184,26 @@ BEGIN
   INSERT INTO public.user_roles (user_id, role) VALUES
     (approver_a, 'operator'), (admin_a, 'admin'), (approver_b, 'operator');
 
-  INSERT INTO public.data_centre_twins (name, created_by_user)
-  VALUES ('validation-twin-ext-a', member_a) RETURNING id INTO twin_a;
+  INSERT INTO public.data_centre_twins (name, city, region_code, created_by_user)
+  VALUES ('validation-twin-ext-a', 'Validation City', 'validation-region-a', member_a)
+  RETURNING id INTO twin_a;
 
-  INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, lifecycle_status)
-  VALUES (member_a, member_a, twin_a, 'succeeded') RETURNING id INTO run_a;
+  -- The prior anonymous assertion intentionally clears request.jwt.claims.
+  -- PostgreSQL leaves that transaction-local setting as an empty string, while
+  -- the canonical write-boundary trigger parses a present claims setting as
+  -- JSON. Restore an explicit privileged envelope for direct fixture seeding;
+  -- all authorization assertions below still execute as authenticated/anon.
+  PERFORM set_config('request.jwt.claims', '{"role":"service_role"}', true);
+  INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, scenario_key, lifecycle_status)
+  VALUES (member_a, member_a, twin_a, 'validation-extended', 'succeeded') RETURNING id INTO run_a;
 
   ------------------------------------------------------------- anon writes
   PERFORM set_config('request.jwt.claims', NULL, true);
   PERFORM set_config('role', 'anon', true);
   ok := false;
   BEGIN
-    INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, lifecycle_status)
-    VALUES (member_a, member_a, twin_a, 'queued');
+    INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, scenario_key, lifecycle_status)
+    VALUES (member_a, member_a, twin_a, 'validation-anon', 'queued');
   EXCEPTION WHEN OTHERS THEN ok := true;
   END;
   PERFORM pg_temp.expect('anonymous insert into simulation_runs denied', ok, true);
@@ -241,8 +257,16 @@ BEGIN
   PERFORM pg_temp.expect('tenant B approver cannot read tenant A run', n = 0, true);
   ok := false;
   BEGIN
-    INSERT INTO public.decision_records (user_id, run_id, recommendation_id, outcome, rationale)
-    VALUES (member_a, run_a, 'rec-ext', 'approved', 'cross tenant decision attempt');
+    INSERT INTO public.decision_records (
+      user_id, run_id, recommendation_id, outcome, rationale,
+      approver, decided_at, data_mode, observation_tick,
+      evidence_snapshot, snapshot_hash, timeline_id
+    )
+    VALUES (
+      member_a, run_a, 'rec-ext', 'approved', 'cross tenant decision attempt',
+      approver_b::text, now(), 'SIMULATED', 0,
+      '{}'::jsonb, 'validation-snapshot-cross-tenant', 'run:' || run_a::text
+    );
   EXCEPTION WHEN OTHERS THEN ok := true;
   END;
   PERFORM pg_temp.expect('tenant B approver cannot decide on tenant A run', ok, true);

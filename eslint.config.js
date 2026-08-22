@@ -18,7 +18,17 @@ export default tseslint.config(
       "react-refresh": reactRefresh,
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
+      // Pin the repository's pre-upgrade React Hooks policy. Plugin v7's
+      // `recommended` preset adds compiler-opinion rules that are a separate
+      // migration and would turn 172 untouched legacy findings into errors.
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+      // ESLint 10 added these rules to `eslint:recommended`. Keep the existing
+      // lint contract stable while the dependency receives security fixes;
+      // enabling them is a dedicated repository-wide cleanup, not a CI repair.
+      "no-useless-assignment": "off",
+      "no-unassigned-vars": "off",
+      "preserve-caught-error": "off",
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unused-vars": "off",
       // Phase 13 - `any` burn-down ratchet.

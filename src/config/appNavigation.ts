@@ -1,14 +1,9 @@
 /**
- * Canonical AURA DC information architecture, organised around the DSX
- * AI-factory lifecycle: Overview, Design, Simulate, Operate, Govern, Support.
+ * Canonical AURA DC information architecture.
  *
- * One list, one destination per concept. The header, the mobile sheet and
- * the command palette all read from here, so a destination can never appear
- * twice under two different labels.
- *
- * Labels changed with the DSX alignment. Routes did NOT: every canonical
- * href below is the same href the page has always been mounted at, and
- * `src/config/routeAliases.ts` keeps every legacy path redirecting to it.
+ * Four persistent workspaces stay in the global header. Operational management
+ * and governance are separate enterprise navigation groups, while creation and
+ * record-detail flows remain contextual actions.
  */
 import {
   BarChart3,
@@ -24,31 +19,20 @@ import {
   Server,
   Shield,
   Sparkles,
-  Wrench,
+  Users,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { Permission } from '@/auth/permissions';
 
 export interface AppNavItem {
-  /** Short label used in the header. */
   name: string;
-  /** Full label used in tooltips, the mobile sheet and aria-label. */
   fullName: string;
   href: string;
   icon: LucideIcon;
-  /** Extra prefixes that should mark this item active. */
   matches?: string[];
-  /** Permission required to see the item. Undefined = always visible. */
   permission?: Permission;
-  /** One-line purpose, shown in the mobile sheet. */
   description: string;
-  /** DSX lifecycle group this destination belongs to. */
   group?: NavGroupId;
-  /**
-   * Sub-destinations that belong to this item. Rendered indented under the
-   * parent so previously orphaned pages are reachable from navigation
-   * without inventing a second top-level entry for the same concept.
-   */
   children?: AppNavItem[];
 }
 
@@ -63,43 +47,52 @@ export const NAV_GROUP_LABEL: Record<NavGroupId, string> = {
   support: 'Support',
 };
 
+export const NAV_GROUP_ORDER: NavGroupId[] = [
+  'overview',
+  'design',
+  'simulate',
+  'operate',
+  'govern',
+  'support',
+];
+
+
 export const WORKSPACE_NAV: AppNavItem[] = [
   {
-    name: 'Overview',
-    fullName: 'AI Factory Overview',
+    name: 'Command Center',
+    fullName: 'Command Center',
     href: '/dashboard',
     icon: LayoutDashboard,
     matches: ['/dashboard', '/'],
     group: 'overview',
-    description:
-      'Facility status, simulated outcomes and data availability across the modelled AI factory.',
+    description: 'Facility status, priority actions, recent simulations and model availability.',
   },
   {
     name: 'Blueprint',
     fullName: 'Facility Blueprint',
     href: '/blueprint',
     icon: Boxes,
-    matches: ['/blueprint', '/data-centre-twin', '/infrastructure'],
+    matches: ['/blueprint'],
     group: 'design',
-    description: 'Facility topology, OpenUSD assemblies, configuration and versions.',
+    description: 'Facility topology, OpenUSD assets, automation definitions and model versions.',
   },
   {
-    name: 'Simulate',
-    fullName: 'Simulation Studio',
+    name: 'Simulation',
+    fullName: 'Simulation',
     href: '/simulation',
     icon: FlaskConical,
     matches: ['/simulation'],
     group: 'simulate',
-    description: 'Configure, execute, compare and review simulation-backed scenarios.',
+    description: 'Configure scenarios, run simulations, compare outcomes and review recommendations.',
   },
   {
     name: 'Evidence',
-    fullName: 'Validation & Evidence',
+    fullName: 'Evidence',
     href: '/dsx/evidence-beta/overview',
     icon: FileSearch,
     matches: ['/dsx/evidence-beta', '/compliance'],
     group: 'design',
-    description: 'Validation results, provenance, simulation evidence and exports.',
+    description: 'Provenance, domain evidence, sustainability evidence and decision records.',
   },
 ];
 
@@ -119,125 +112,93 @@ export const MANAGE_NAV: AppNavItem[] = [
     fullName: 'Connections',
     href: '/manage/integrations',
     icon: Cable,
-    // AURA_IA_DUP_CLEANUP: /marketplace is the twin template library, not a
-    // connection surface. Matching it here highlighted "Connections" while
-    // the user was somewhere unrelated.
     matches: ['/manage/integrations', '/manage/connections', '/integrations', '/settings/integrations', '/connect'],
     permission: 'twin.edit',
     group: 'operate',
-    description: 'Configure, test, map and monitor external system connections and data exchange.',
-  },
-  {
-    name: 'Asset pipeline',
-    fullName: 'OpenUSD Asset Pipeline',
-    href: '/builder',
-    icon: Wrench,
-    matches: ['/builder'],
-    permission: 'twin.edit',
-    group: 'design',
-    description: 'Source acquisition, canonical OpenUSD masters and approved browser derivatives.',
+    description: 'Facility systems, edge gateways, twin exchange, storage and enterprise workflows.',
   },
   {
     name: 'Agents',
-    fullName: 'Agents & Optimization',
+    fullName: 'Agents',
     href: '/app/agents',
     icon: Server,
-    matches: ['/app/agents', '/agent'],
+    matches: ['/app/agents', '/agent', '/agents'],
     permission: 'agent.view',
     group: 'operate',
-    description: 'Agent scopes, data access, recommendations, execution state and audit history.',
+    description: 'Agent scopes, recommendations, execution state, configuration and audit history.',
   },
   {
     name: 'Operations',
-    fullName: 'Operations & Telemetry',
+    fullName: 'Operations',
     href: '/analytics',
     icon: BarChart3,
     matches: ['/intelligence', '/analytics', '/operations'],
     permission: 'analytics.view',
     group: 'operate',
-    description: 'Operational data, simulation outputs and per-system data availability.',
+    description: 'Aggregate operational status, alerts, trends and data availability.',
   },
   {
     name: 'Runtime',
-    fullName: 'Runtime Environments',
+    fullName: 'Runtime',
     href: '/deployments',
     icon: Rocket,
     matches: ['/deployments', '/deploy'],
     permission: 'deployment.view',
     group: 'operate',
-    description: 'Where AURA runs today, plus the planned Brev and AWS lanes.',
+    description: 'Deployment history, runtime state and execution evidence.',
   },
   {
-    name: 'Agent configuration',
-    fullName: 'Agent Configuration',
+    name: 'People & Access',
+    fullName: 'People & Access',
+    href: '/teams',
+    icon: Users,
+    matches: [
+      '/teams',
+      '/account/access-control',
+      '/admin/user-approvals',
+      '/admin/signups-dashboard',
+      '/admin/onboarding-submissions',
+    ],
+    permission: 'tenant.view_members',
+    group: 'govern',
+    description: 'Members, invitations, approvals, roles and access administration.',
+  },
+  {
+    name: 'Agent Policies',
+    fullName: 'Agent Policies',
     href: '/settings/ai',
     icon: Sparkles,
     matches: ['/settings/ai'],
     permission: 'agent.administer',
     group: 'govern',
-    description: 'Agent policy, approved providers, knowledge boundaries and governance.',
+    description: 'Approved providers, grounding boundaries, safety settings and agent governance.',
   },
   {
-    name: 'Admin',
-    fullName: 'Admin Console',
-    href: '/admin/signups-dashboard',
+    name: 'Platform Admin',
+    fullName: 'Platform Administration',
+    href: '/admin/platform-readiness',
     icon: Shield,
-    matches: ['/admin'],
+    matches: [
+      '/admin/platform-readiness',
+      '/admin/dsx-capabilities',
+      '/admin/dataset-registry',
+      '/admin/asset-preview',
+      '/admin/asset-pipeline',
+      '/admin/asset-validation',
+      '/admin/reference-facility-validation',
+      '/twin-debug',
+    ],
     permission: 'platform.view_admin_console',
     group: 'govern',
-    description: 'Approvals, signups and platform administration.',
+    description: 'Platform readiness, registries, validation and internal diagnostics.',
     children: [
       {
-        name: 'Signups',
-        fullName: 'Signups and approvals',
-        href: '/admin/signups-dashboard',
+        name: 'Readiness',
+        fullName: 'Platform readiness',
+        href: '/admin/platform-readiness',
         icon: Shield,
-        matches: ['/admin/signups-dashboard'],
-        description: 'Review and approve new account requests.',
-      },
-      {
-        name: 'User approvals',
-        fullName: 'User approvals',
-        href: '/admin/user-approvals',
-        icon: Shield,
-        matches: ['/admin/user-approvals'],
-        description: 'Approve or reject pending platform users.',
-      },
-      {
-        name: 'Onboarding',
-        fullName: 'Onboarding submissions',
-        href: '/admin/onboarding-submissions',
-        icon: Shield,
-        matches: ['/admin/onboarding-submissions'],
-        description: 'Questionnaire responses captured before sign-up.',
-      },
-      {
-        name: 'Teams',
-        fullName: 'Teams and roles',
-        href: '/teams',
-        icon: Shield,
-        matches: ['/teams'],
-        description: 'Members, role assignment and collaboration.',
-      },
-      {
-        name: 'Access control',
-        fullName: 'Access control',
-        href: '/account/access-control',
-        icon: Shield,
-        matches: ['/account/access-control'],
-        description: 'Per-resource permissions for the current account.',
-      },
-      {
-        // AURA_IA_DUP_CLEANUP: this label collided with the top-level
-        // "Asset pipeline" (/builder) while leading somewhere else entirely.
-        // Authoring lives at /builder; this is the approval and validation
-        // record for the derivatives that authoring produces.
-        name: 'Asset derivatives',
-        fullName: 'Asset derivatives and GPU validation',
-        href: '/admin/asset-pipeline',
-        icon: Shield,
-        matches: ['/admin/asset-pipeline', '/admin/asset-validation', '/admin/asset-preview'],
-        description: 'Approved 3D derivatives and their hardware GPU validation runs.',
+        matches: ['/admin/platform-readiness'],
+        description: 'Environment readiness, capability state and release blockers.',
       },
       {
         name: 'DSX capabilities',
@@ -247,11 +208,42 @@ export const MANAGE_NAV: AppNavItem[] = [
         matches: ['/admin/dsx-capabilities'],
         description: 'Capability status, evidence, owners, blockers and permitted claims.',
       },
+      {
+        name: 'Datasets',
+        fullName: 'Dataset registry',
+        href: '/admin/dataset-registry',
+        icon: Shield,
+        matches: ['/admin/dataset-registry'],
+        description: 'Registered datasets, validation state and reference data controls.',
+      },
+      {
+        name: 'Asset derivatives',
+        fullName: 'Asset derivatives and GPU validation',
+        href: '/admin/asset-pipeline',
+        icon: Shield,
+        matches: ['/admin/asset-pipeline', '/admin/asset-validation', '/admin/asset-preview'],
+        description: 'Approved 3D derivatives and their hardware GPU validation runs.',
+      },
+      {
+        name: 'Reference facility',
+        fullName: 'Reference facility validation',
+        href: '/admin/reference-facility-validation',
+        icon: Shield,
+        matches: ['/admin/reference-facility-validation'],
+        description: 'Reference-facility model and evidence validation.',
+      },
+      {
+        name: 'Twin diagnostics',
+        fullName: 'Twin diagnostics',
+        href: '/twin-debug',
+        icon: Shield,
+        matches: ['/twin-debug'],
+        description: 'Internal twin identifiers, query state and telemetry-source diagnostics.',
+      },
     ],
   },
 ];
 
-/** Always-visible support and utility destinations. */
 export const SUPPORT_NAV: AppNavItem[] = [
   {
     name: 'Search',
@@ -269,7 +261,7 @@ export const SUPPORT_NAV: AppNavItem[] = [
     icon: HelpCircle,
     matches: ['/help', '/playbook'],
     group: 'support',
-    description: 'Guides, playbooks and product documentation.',
+    description: 'AURA DC guides, workflows, governance and product documentation.',
   },
 ];
 
@@ -279,40 +271,31 @@ export interface NavGroup {
   items: AppNavItem[];
 }
 
-/** Every destination, in DSX lifecycle order, deduplicated by href. */
-export const NAV_GROUP_ORDER: NavGroupId[] = [
-  'overview',
-  'design',
-  'simulate',
-  'operate',
-  'govern',
-  'support',
-];
+function visible(items: AppNavItem[], can: (permission: Permission) => boolean): AppNavItem[] {
+  return items.filter((item) => !item.permission || can(item.permission));
+}
 
-const ALL_NAV_ITEMS: AppNavItem[] = [...WORKSPACE_NAV, ...MANAGE_NAV, ...SUPPORT_NAV];
+export function visibleManageNav(can: (permission: Permission) => boolean): AppNavItem[] {
+  return visible(MANAGE_NAV.filter((item) => item.group === 'operate' || item.group === 'design'), can);
+}
 
-/**
- * DSX lifecycle grouping used by the navigation drawer. Items the caller
- * cannot see are removed; empty groups are dropped.
- */
-export function navGroups(can: (p: Permission) => boolean): NavGroup[] {
-  return NAV_GROUP_ORDER.map((id) => ({
+export function visibleGovernNav(can: (permission: Permission) => boolean): AppNavItem[] {
+  return visible(MANAGE_NAV.filter((item) => item.group === 'govern'), can);
+}
+
+export function navGroups(can: (permission: Permission) => boolean): NavGroup[] {
+  return (Object.keys(NAV_GROUP_LABEL) as NavGroupId[]).map((id) => ({
     id,
     label: NAV_GROUP_LABEL[id],
-    items: ALL_NAV_ITEMS.filter(
-      (item) => item.group === id && (!item.permission || can(item.permission)),
-    ),
-  })).filter((g) => g.items.length > 0);
+    items: [
+      ...WORKSPACE_NAV.filter((item) => item.group === id),
+      ...visible(MANAGE_NAV.filter((item) => item.group === id), can),
+      ...SUPPORT_NAV.filter((item) => item.group === id),
+    ],
+  })).filter((group) => group.items.length > 0);
 }
 
-/** True when `pathname` belongs to the item's destination. */
 export function isNavItemActive(item: AppNavItem, pathname: string): boolean {
-  if (item.href === '/') return pathname === '/' || pathname === '/dashboard';
-  const prefixes = item.matches ?? [item.href];
-  return prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
-}
-
-/** Filter the manage group down to what the caller is permitted to see. */
-export function visibleManageNav(can: (p: Permission) => boolean): AppNavItem[] {
-  return MANAGE_NAV.filter((item) => !item.permission || can(item.permission));
+  const candidates = item.matches?.length ? item.matches : [item.href];
+  return candidates.some((candidate) => pathname === candidate || pathname.startsWith(`${candidate}/`));
 }

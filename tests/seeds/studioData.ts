@@ -3,7 +3,12 @@
  * Creates sample environments, systems, templates, connectors, files, etc.
  */
 
-import { supabase } from '@/integrations/supabase/client';
+import {
+  createTestSupabaseClient,
+  resolveTestUserCredentials,
+} from '../helpers/testSupabaseClient';
+
+const supabase = createTestSupabaseClient();
 
 export interface SeedOptions {
   clear?: boolean;
@@ -74,10 +79,11 @@ async function getOrCreateTestUser(): Promise<string> {
     return session.session.user.id;
   }
 
-  // Create test user
+  // Create the runtime-configured disposable test user.
+  const credentials = resolveTestUserCredentials();
   const { data, error } = await supabase.auth.signUp({
-    email: 'test@m2m.studio',
-    password: 'testpass123',
+    email: credentials.email,
+    password: credentials.password,
   });
 
   if (error) throw error;
@@ -85,13 +91,9 @@ async function getOrCreateTestUser(): Promise<string> {
 }
 
 async function clearTestData(userId: string) {
-  // Clear in reverse dependency order
-  await supabase.from('workflow_run_events').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-  await supabase.from('workflow_runs').delete().eq('created_by', userId);
-  await supabase.from('workflow_edges').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-  await supabase.from('workflow_nodes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  // Every delete is constrained to the disposable test user. Child workflow
+  // and integration records are removed by database cascades.
   await supabase.from('workflows').delete().eq('created_by', userId);
-  await supabase.from('system_integrations').delete().neq('id', '00000000-0000-0000-0000-000000000000');
   await supabase.from('deployments').delete().eq('deployed_by', userId);
   await supabase.from('agent_runs').delete().eq('user_id', userId);
   await supabase.from('agents').delete().eq('owner_id', userId);

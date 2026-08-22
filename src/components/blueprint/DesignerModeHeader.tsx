@@ -209,7 +209,7 @@ export function DesignerModeHeader({
               data-testid="blueprint-simulation-access-required"
             >
               <Lock className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-[13px] text-muted-foreground">
                 Your role cannot configure or start simulation runs.
               </p>
             </div>
@@ -258,23 +258,23 @@ export function DesignerModeHeader({
       {/* Facility facts: one wrapping row of compact badges. */}
       <div className="flex flex-wrap items-center gap-1.5 border-t border-border px-3 py-2">
         {location && (
-          <Badge variant="outline" className="gap-1 text-[11px] font-normal">
+          <Badge variant="outline" className="gap-1 text-[13px] font-normal">
             <MapPin className="h-3 w-3" aria-hidden />
             {location}
           </Badge>
         )}
-        {tier && <Badge variant="outline" className="text-[11px] font-normal">{tier}</Badge>}
+        {tier && <Badge variant="outline" className="text-[13px] font-normal">{tier}</Badge>}
         {capacityLabel && (
-          <Badge variant="outline" className="text-[11px] font-normal" data-testid="blueprint-capacity-badge">
+          <Badge variant="outline" className="text-[13px] font-normal" data-testid="blueprint-capacity-badge">
             {capacityLabel}
           </Badge>
         )}
-        {rackLabel && <Badge variant="outline" className="text-[11px] font-normal">{rackLabel}</Badge>}
+        {rackLabel && <Badge variant="outline" className="text-[13px] font-normal">{rackLabel}</Badge>}
         {versionId != null && (
-          <Badge variant="outline" className="text-[11px] font-normal">v{String(versionId)}</Badge>
+          <Badge variant="outline" className="text-[13px] font-normal">v{String(versionId)}</Badge>
         )}
         {updatedAt && (
-          <span className="text-[11px] text-muted-foreground">
+          <span className="text-[13px] text-muted-foreground">
             Updated {updatedAt.toLocaleString()}
           </span>
         )}
@@ -282,7 +282,7 @@ export function DesignerModeHeader({
 
       {dataNote && (
         <p
-          className="border-t border-border px-3 py-2 text-[11px] text-muted-foreground"
+          className="border-t border-border px-3 py-2 text-[13px] text-muted-foreground"
           data-testid="blueprint-data-note"
         >
           {dataNote}

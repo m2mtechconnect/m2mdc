@@ -27,7 +27,7 @@ export function EvidenceChip({ state, className }: { state: EvidenceState; class
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[11px] font-medium',
+        'inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[12px] font-medium',
         TONE[state],
         className,
       )}

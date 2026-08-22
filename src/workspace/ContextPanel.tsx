@@ -54,14 +54,14 @@ export function ContextPanel({ facility, assets, overrides, onClose }: Props) {
 
   return (
     <aside
-      className="flex h-full min-h-0 w-full min-w-0 flex-col border-l border-border bg-card"
+      className="v2-inspector flex h-full min-h-0 w-full min-w-0 flex-col"
       aria-label="Workspace context panel"
       data-testid="workspace-context-panel"
       ref={headerRef}
     >
       {/* Fixed header */}
-      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-3 py-2">
-        <h2 className="min-w-0 truncate text-sm font-semibold text-foreground">{TITLES[activeTool]}</h2>
+      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-canvas-deep))] px-3 py-2">
+        <h2 className="v2-label min-w-0 truncate">{TITLES[activeTool]}</h2>
         {onClose && (
           <Button variant="ghost" size="icon" className="h-11 w-11 shrink-0" aria-label="Close context panel" onClick={onClose}>
             <X className="h-4 w-4" aria-hidden />

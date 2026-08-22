@@ -13,6 +13,7 @@ import { Sparkles, Shield, Database, CheckCircle, XCircle, Loader, Settings, Loa
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui";
+import { KnowledgeSourceReadiness } from "@/components/agent/KnowledgeSourceReadiness";
 
 const DEFAULT_SYSTEM_PROMPT = `You are M2M Co-Pilot inside an enterprise control center.
 Be concise and business-ready.
@@ -304,6 +305,8 @@ export default function AISettings() {
             </div>
           )}
         </DCCard>
+
+        <KnowledgeSourceReadiness />
 
         <DCCard
           title="Generation Parameters"

@@ -8,7 +8,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, CheckCircle2, Circle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Panel, SectionHeader } from '@/components/v2';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRBAC } from '@/contexts/RBACContext';
@@ -114,8 +114,8 @@ export function DataFlowsTab({
       )}
 
       {mappings.length === 0 ? (
-        <Card>
-          <CardContent className="space-y-4 p-8">
+        <Panel className="p-8">
+          <div className="space-y-4">
             <div>
               <p className="text-sm font-semibold">No data flow exists yet</p>
               <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
@@ -140,13 +140,17 @@ export function DataFlowsTab({
             <Button className="h-10" disabled={!canEdit || connections.length === 0} onClick={() => { setEditing(null); setEditorOpen(true); }}>
               Create the first data flow
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </Panel>
       ) : (
         <div className="grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-3">
-          <Card className="min-w-0">
-            <CardHeader className="pb-3"><CardTitle className="text-base">1. Source signal</CardTitle></CardHeader>
-            <CardContent className="space-y-2">
+          <Panel className="min-w-0">
+            <SectionHeader
+              eyebrow="Stage 1 · Source"
+              title="Source signal"
+              actions={<span className="v2-mono text-xs text-muted-foreground">{filtered.length}</span>}
+            />
+            <div className="space-y-2">
               <ul className="space-y-1.5" role="listbox" aria-label="Source signals">
                 {filtered.map((m) => {
                   const active = selected?.id === m.id;
@@ -157,9 +161,9 @@ export function DataFlowsTab({
                         role="option"
                         aria-selected={active}
                         onClick={() => setSelectedId(m.id)}
-                        className={`w-full min-h-[44px] rounded-md border px-3 py-2 text-left text-sm ${active ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/60'}`}
+                        className={`v2-subpanel w-full min-h-[44px] px-3 py-2 text-left text-sm ${active ? 'border-[hsl(var(--v2-simulated))]' : 'hover:bg-muted/50'}`}
                       >
-                        <span className="block truncate font-medium">{m.source_identifier}</span>
+                        <span className="v2-mono block truncate font-medium">{m.source_identifier}</span>
                         <span className="block truncate text-xs text-muted-foreground">
                           {connectionName.get(m.connection_id) ?? m.connection_id}
                         </span>
@@ -171,28 +175,28 @@ export function DataFlowsTab({
                   <li className="text-sm text-muted-foreground">No signal matches this search.</li>
                 )}
               </ul>
-            </CardContent>
-          </Card>
+            </div>
+          </Panel>
 
-          <Card className="min-w-0">
-            <CardHeader className="pb-3"><CardTitle className="text-base">2. Transformation and validation</CardTitle></CardHeader>
-            <CardContent className="space-y-3 text-sm">
+          <Panel className="min-w-0">
+            <SectionHeader eyebrow="Stage 2 · Edge / exchange" title="Transformation and validation" />
+            <div className="space-y-3 text-sm">
               {!selected ? (
                 <p className="text-muted-foreground">Select a signal to inspect its transformation.</p>
               ) : (
                 <dl className="space-y-3">
-                  <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Source unit</dt><dd>{selected.source_unit ?? 'Not declared'}</dd></div>
-                  <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Target unit</dt><dd>{selected.target_unit ?? 'Not declared'}</dd></div>
-                  <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Conversion</dt><dd>{selected.conversion_rule ?? 'None (identity)'}</dd></div>
-                  <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Quality rule</dt><dd>{selected.quality_rule ?? 'None'}</dd></div>
-                  <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Timestamp rule</dt><dd>{selected.timestamp_rule ?? 'None'}</dd></div>
+                  <div><dt className="v2-label">Source unit</dt><dd className="v2-mono">{selected.source_unit ?? 'Not declared'}</dd></div>
+                  <div><dt className="v2-label">Target unit</dt><dd className="v2-mono">{selected.target_unit ?? 'Not declared'}</dd></div>
+                  <div><dt className="v2-label">Conversion</dt><dd className="v2-mono">{selected.conversion_rule ?? 'None (identity)'}</dd></div>
+                  <div><dt className="v2-label">Quality rule</dt><dd className="v2-mono">{selected.quality_rule ?? 'None'}</dd></div>
+                  <div><dt className="v2-label">Timestamp rule</dt><dd className="v2-mono">{selected.timestamp_rule ?? 'None'}</dd></div>
                   <div>
-                    <dt className="text-xs uppercase tracking-wide text-muted-foreground">Validation</dt>
+                    <dt className="v2-label">Validation</dt>
                     <dd><Badge variant="outline" className="text-xs">{selected.validation_status.replace(/_/g, ' ').toLowerCase()}</Badge></dd>
                   </div>
                   <div>
-                    <dt className="text-xs uppercase tracking-wide text-muted-foreground">Last observed value</dt>
-                    <dd>
+                    <dt className="v2-label">Last observed value</dt>
+                    <dd className="v2-mono">
                       {selected.last_mapped_at
                         ? `${String(selected.last_mapped_value)} at ${formatDateTime(selected.last_mapped_at)}`
                         : 'No value has been received for this flow.'}
@@ -200,23 +204,23 @@ export function DataFlowsTab({
                   </div>
                 </dl>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </Panel>
 
-          <Card className="min-w-0">
-            <CardHeader className="pb-3"><CardTitle className="text-base">3. Destination</CardTitle></CardHeader>
-            <CardContent className="space-y-3 text-sm">
+          <Panel className="min-w-0">
+            <SectionHeader eyebrow="Stage 3 · Twin / storage" title="Destination" />
+            <div className="space-y-3 text-sm">
               {!selected ? (
                 <p className="text-muted-foreground">Select a signal to inspect its destination.</p>
               ) : (
                 <>
                   <dl className="space-y-3">
-                    <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Facility</dt><dd>{selected.target_facility_id ?? 'Not bound'}</dd></div>
-                    <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Asset</dt><dd className="break-words">{selected.target_entity ?? 'Not bound'}</dd></div>
-                    <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">OpenUSD prim</dt><dd className="break-words">{selected.target_prim_path ?? 'No stage binding'}</dd></div>
-                    <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Property</dt><dd>{selected.target_property ?? 'Not selected'}</dd></div>
+                    <div><dt className="v2-label">Facility</dt><dd className="v2-mono">{selected.target_facility_id ?? 'Not bound'}</dd></div>
+                    <div><dt className="v2-label">Asset</dt><dd className="v2-mono break-words">{selected.target_entity ?? 'Not bound'}</dd></div>
+                    <div><dt className="v2-label">OpenUSD prim</dt><dd className="v2-mono break-words">{selected.target_prim_path ?? 'No stage binding'}</dd></div>
+                    <div><dt className="v2-label">Property</dt><dd className="v2-mono">{selected.target_property ?? 'Not selected'}</dd></div>
                     <div>
-                      <dt className="text-xs uppercase tracking-wide text-muted-foreground">Activation</dt>
+                      <dt className="v2-label">Activation</dt>
                       <dd><Badge variant="outline" className="text-xs">{selected.active ? 'Active' : 'Inactive'}</Badge></dd>
                     </div>
                   </dl>
@@ -250,8 +254,8 @@ export function DataFlowsTab({
                   )}
                 </>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </Panel>
         </div>
       )}
 

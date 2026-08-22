@@ -1,9 +1,7 @@
 name: AURA Truth and Route Stress
 
-# Closes Phase 0 blocker #6: the full truth-in-UI suite (206 tests, serial)
-# and the route-stress sweep exceed the agent sandbox time budget. They run
-# here instead, with CI-length budgets and sharding.
-
+# Closes Phase 0 blocker #6: the full truth-in-UI suite and route-stress sweep
+# run here with CI-length budgets and sharding.
 on:
   pull_request:
     branches: [main]
@@ -24,6 +22,9 @@ concurrency:
   group: aura-truth-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  AURA_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
 jobs:
   truth-in-ui:
     name: Truth-in-UI (shard ${{ matrix.shard }}/4)
@@ -31,10 +32,13 @@ jobs:
     timeout-minutes: 45
     strategy:
       fail-fast: false
+      max-parallel: 2
       matrix:
         shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.AURA_SOURCE_SHA }}
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.3.3'
@@ -58,7 +62,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: truth-in-ui-shard-${{ matrix.shard }}
+          name: truth-in-ui-${{ env.AURA_SOURCE_SHA }}-shard-${{ matrix.shard }}
           path: |
             test-results/
             playwright-report/
@@ -70,6 +74,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.AURA_SOURCE_SHA }}
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.3.3'
@@ -92,7 +98,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: route-stress-evidence
+          name: route-stress-evidence-${{ env.AURA_SOURCE_SHA }}
           path: |
             test-results/
             docs/remediation/evidence/route-stress/

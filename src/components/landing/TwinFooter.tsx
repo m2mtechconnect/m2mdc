@@ -74,7 +74,7 @@ export function TwinFooter() {
           {/* Brand column */}
           <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-8 lg:mb-0">
             <a href="https://m2mtechconnect.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 mb-4 group">
-              <img src={m2mLogo} alt="M2M Tech Connect" className="h-10 w-auto transition-transform group-hover:scale-105" />
+              <img src={m2mLogo} alt="M2M Tech Connect" width={326} height={326} className="h-10 w-auto transition-transform group-hover:scale-105" />
               <div>
                 <span className="font-display font-bold text-lg text-white">M2M</span>
                 <span className="font-display font-medium text-lg text-slate-200 ml-1">AURA</span>
@@ -91,19 +91,19 @@ export function TwinFooter() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">{t('landing.product')}</h4>
+            <h2 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">{t('landing.product')}</h2>
             <ul className="space-y-3">{productLinks.map((link) => <li key={link.label}>{renderLink(link)}</li>)}</ul>
           </div>
           <div>
-            <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">{t('landing.company')}</h4>
+            <h2 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">{t('landing.company')}</h2>
             <ul className="space-y-3">{companyLinks.map((link) => <li key={link.label}>{renderLink(link)}</li>)}</ul>
           </div>
           <div>
-            <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">{t('landing.resources')}</h4>
+            <h2 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">{t('landing.resources')}</h2>
             <ul className="space-y-3">{resourceLinks.map((link) => <li key={link.label}>{renderLink(link)}</li>)}</ul>
           </div>
           <div>
-            <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">{t('landing.legal')}</h4>
+            <h2 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">{t('landing.legal')}</h2>
             <ul className="space-y-3">{legalLinks.map((link) => <li key={link.label}>{renderLink(link)}</li>)}</ul>
           </div>
         </div>

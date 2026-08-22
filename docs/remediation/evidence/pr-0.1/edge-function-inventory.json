@@ -2288,5 +2288,244 @@
     "webhook_signature_verification": false,
     "uses_service_role_key": true,
     "production_disposition": "unknown-blocked"
+  },
+  {
+    "function": "canary-deploy",
+    "deployed": false,
+    "consumer_files": [
+      "src/components/connections/RuntimeReadinessPanel.tsx"
+    ],
+    "consumer_count": 1,
+    "verify_jwt_gateway": true,
+    "local_getUser_or_getClaims": true,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": true,
+    "checks_is_approved": false,
+    "webhook_signature_verification": false,
+    "uses_service_role_key": true,
+    "production_disposition": "unknown-blocked"
+  },
+  {
+    "function": "connection-credential",
+    "deployed": false,
+    "consumer_files": [
+      "src/connections/api.ts",
+      "src/connections/runtimeDiagnostics.ts"
+    ],
+    "consumer_count": 2,
+    "verify_jwt_gateway": true,
+    "local_getUser_or_getClaims": true,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": true,
+    "checks_is_approved": false,
+    "webhook_signature_verification": false,
+    "uses_service_role_key": true,
+    "production_disposition": "unknown-blocked"
+  },
+  {
+    "function": "connection-health-check",
+    "deployed": false,
+    "consumer_files": [
+      "src/connections/api.ts"
+    ],
+    "consumer_count": 1,
+    "verify_jwt_gateway": true,
+    "local_getUser_or_getClaims": true,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": true,
+    "checks_is_approved": false,
+    "webhook_signature_verification": false,
+    "uses_service_role_key": true,
+    "production_disposition": "unknown-blocked"
+  },
+  {
+    "function": "connection-provision",
+    "deployed": false,
+    "consumer_files": [
+      "src/connections/api.ts"
+    ],
+    "consumer_count": 1,
+    "verify_jwt_gateway": true,
+    "local_getUser_or_getClaims": true,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": true,
+    "checks_is_approved": false,
+    "webhook_signature_verification": false,
+    "uses_service_role_key": true,
+    "production_disposition": "unknown-blocked"
+  },
+  {
+    "function": "dsx-ingest",
+    "deployed": false,
+    "consumer_files": [],
+    "consumer_count": 0,
+    "verify_jwt_gateway": false,
+    "local_getUser_or_getClaims": false,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": false,
+    "checks_is_approved": false,
+    "webhook_signature_verification": true,
+    "uses_service_role_key": true,
+    "production_disposition": "signed-webhook"
+  },
+  {
+    "function": "managed-connector-capabilities",
+    "deployed": false,
+    "consumer_files": [
+      "src/components/connections/ManagedConnectorInventory.tsx",
+      "src/connections/managedConnectorApi.ts"
+    ],
+    "consumer_count": 2,
+    "verify_jwt_gateway": true,
+    "local_getUser_or_getClaims": true,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": true,
+    "checks_is_approved": false,
+    "webhook_signature_verification": false,
+    "uses_service_role_key": true,
+    "production_disposition": "unknown-blocked"
+  },
+  {
+    "function": "managed-connector-invoke",
+    "deployed": false,
+    "consumer_files": [],
+    "consumer_count": 0,
+    "verify_jwt_gateway": true,
+    "local_getUser_or_getClaims": true,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": true,
+    "checks_is_approved": false,
+    "webhook_signature_verification": false,
+    "uses_service_role_key": true,
+    "production_disposition": "unknown-blocked"
+  },
+  {
+    "function": "managed-connector-verify",
+    "deployed": false,
+    "consumer_files": [
+      "src/connections/api.ts"
+    ],
+    "consumer_count": 1,
+    "verify_jwt_gateway": true,
+    "local_getUser_or_getClaims": true,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": true,
+    "checks_is_approved": false,
+    "webhook_signature_verification": false,
+    "uses_service_role_key": true,
+    "production_disposition": "unknown-blocked"
+  },
+  {
+    "function": "managed-user-disconnect",
+    "deployed": false,
+    "consumer_files": [
+      "src/connections/managedUserBinding.ts"
+    ],
+    "consumer_count": 1,
+    "verify_jwt_gateway": true,
+    "local_getUser_or_getClaims": true,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": true,
+    "checks_is_approved": false,
+    "webhook_signature_verification": false,
+    "uses_service_role_key": true,
+    "production_disposition": "unknown-blocked"
+  },
+  {
+    "function": "managed-user-oauth-complete",
+    "deployed": false,
+    "consumer_files": [
+      "src/pages/oauth/ManagedUserReturn.tsx"
+    ],
+    "consumer_count": 1,
+    "verify_jwt_gateway": true,
+    "local_getUser_or_getClaims": true,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": true,
+    "checks_is_approved": false,
+    "webhook_signature_verification": false,
+    "uses_service_role_key": true,
+    "production_disposition": "unknown-blocked"
+  },
+  {
+    "function": "managed-user-oauth-start",
+    "deployed": false,
+    "consumer_files": [
+      "src/connections/managedUserBinding.ts"
+    ],
+    "consumer_count": 1,
+    "verify_jwt_gateway": true,
+    "local_getUser_or_getClaims": true,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": true,
+    "checks_is_approved": false,
+    "webhook_signature_verification": false,
+    "uses_service_role_key": true,
+    "production_disposition": "unknown-blocked"
+  },
+  {
+    "function": "public-intake",
+    "deployed": false,
+    "consumer_files": [
+      "src/pages/Help.tsx",
+      "src/pages/Onboarding.tsx"
+    ],
+    "consumer_count": 2,
+    "verify_jwt_gateway": true,
+    "local_getUser_or_getClaims": true,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": false,
+    "checks_is_approved": false,
+    "webhook_signature_verification": false,
+    "uses_service_role_key": true,
+    "production_disposition": "unknown-blocked"
+  },
+  {
+    "function": "record-decision",
+    "deployed": false,
+    "consumer_files": [
+      "src/truth/canonicalDecisions.ts"
+    ],
+    "consumer_count": 1,
+    "verify_jwt_gateway": true,
+    "local_getUser_or_getClaims": true,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": true,
+    "checks_is_approved": false,
+    "webhook_signature_verification": false,
+    "uses_service_role_key": true,
+    "production_disposition": "unknown-blocked"
+  },
+  {
+    "function": "run-lifecycle",
+    "deployed": false,
+    "consumer_files": [
+      "src/truth/canonicalRun.ts"
+    ],
+    "consumer_count": 1,
+    "verify_jwt_gateway": true,
+    "local_getUser_or_getClaims": true,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": true,
+    "checks_is_approved": false,
+    "webhook_signature_verification": false,
+    "uses_service_role_key": true,
+    "production_disposition": "unknown-blocked"
+  },
+  {
+    "function": "teams-accept-invite",
+    "deployed": false,
+    "consumer_files": [
+      "src/pages/InviteAccept.tsx"
+    ],
+    "consumer_count": 1,
+    "verify_jwt_gateway": true,
+    "local_getUser_or_getClaims": true,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": false,
+    "checks_is_approved": false,
+    "webhook_signature_verification": false,
+    "uses_service_role_key": true,
+    "production_disposition": "unknown-blocked"
   }
 ]

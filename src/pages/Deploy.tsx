@@ -689,7 +689,7 @@ export default function Deploy() {
                   </>
                 ) : (
                   <>
-                    <XCircle className="h-4 w-4 text-gray-400" />
+                    <XCircle className="h-4 w-4 text-muted-foreground" />
                     <span>Disabled</span>
                   </>
                 )}

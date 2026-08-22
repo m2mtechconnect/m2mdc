@@ -16,19 +16,36 @@
 
 import { test, expect } from '@playwright/test';
 import { login, logout } from '../helpers/auth';
-import { seedTestUser, seedMockDigitalTwin, cleanupTestData } from '../helpers/seedHelpers';
+import { seedMockDigitalTwin, cleanupTestData } from '../helpers/seedHelpers';
+import {
+  getBrowserTestSession,
+  resolveTestUserCredentials,
+} from '../helpers/testSupabaseClient';
 
 test.describe('AURA Regression Suite @regression', () => {
+  let authenticatedUserId: string | undefined;
+  let seededAgentIds: string[] = [];
+
   test.beforeEach(async ({ page }) => {
+    seededAgentIds = [];
+    const credentials = resolveTestUserCredentials();
     // Login as test user
-    await login(page, 'test_exec@aura.dev', 'TestPassword123!');
+    await login(page, credentials.email, credentials.password);
     await page.waitForURL('/');
+    authenticatedUserId = (await getBrowserTestSession(page.context())).userId;
   });
 
-  test.afterEach(async ({ page, context }) => {
-    // Cleanup
-    await logout(page);
-    await cleanupTestData();
+  test.afterEach(async ({ page }) => {
+    try {
+      if (authenticatedUserId && seededAgentIds.length > 0) {
+        await cleanupTestData({
+          userId: authenticatedUserId,
+          agentIds: seededAgentIds,
+        });
+      }
+    } finally {
+      await logout(page);
+    }
   });
 
   test.describe('1. Header & User Experience', () => {
@@ -432,11 +449,12 @@ test.describe('AURA Regression Suite @regression', () => {
 
     test('should show deployed twin with correct status', async ({ page }) => {
       // Seed a mock deployed twin
-      await seedMockDigitalTwin(page.context(), {
+      const seededTwin = await seedMockDigitalTwin(page.context(), {
         name: 'YVR Airport Operations',
         status: 'Active',
         template_id: 'YVR_AIRPORT_DIGITAL_TWIN'
       });
+      seededAgentIds.push(seededTwin.id);
 
       // Navigate to agents dashboard
       await page.goto('/agents');
@@ -453,10 +471,11 @@ test.describe('AURA Regression Suite @regression', () => {
     });
 
     test('should open Manage view with unified preview layout', async ({ page }) => {
-      await seedMockDigitalTwin(page.context(), {
+      const seededTwin = await seedMockDigitalTwin(page.context(), {
         name: 'YVR Airport Operations',
         status: 'Active'
       });
+      seededAgentIds.push(seededTwin.id);
 
       await page.goto('/agents');
 

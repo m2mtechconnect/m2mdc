@@ -30,14 +30,14 @@ export function FacilityGeometrySelector({ value, onChange }: Props) {
   const coverage = referenceCoverageSummary();
 
   return (
-    <div className="flex items-center gap-2 rounded-md border border-border bg-card/95 px-2 py-1 backdrop-blur">
+    <div className="flex items-center gap-2">
       <Boxes className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-      <span className="hidden shrink-0 text-[11px] font-medium uppercase tracking-wide text-muted-foreground lg:inline">
+      <span className="hidden shrink-0 text-[12px] font-semibold uppercase tracking-wide text-muted-foreground lg:inline">
         Facility geometry
       </span>
       <Select value={value} onValueChange={(v) => onChange(v as FacilityGeometryMode)}>
         <SelectTrigger
-          className="h-8 w-[16.5rem] border-0 bg-transparent px-1 text-[12px] shadow-none focus:ring-1 [&>span]:truncate-none [&>span]:overflow-visible [&>span]:whitespace-nowrap"
+          className="h-8 w-[16.5rem] border border-border bg-background px-2 text-[13px] font-medium text-foreground shadow-none focus:ring-1 [&>span]:truncate-none [&>span]:overflow-visible [&>span]:whitespace-nowrap"
           aria-label="Facility geometry"
           title={active?.description}
           data-testid="facility-geometry-selector"
@@ -61,7 +61,7 @@ export function FacilityGeometrySelector({ value, onChange }: Props) {
                 <span className="block whitespace-nowrap">
                   {preparing ? `${mode.label} - preparing assets` : mode.label}
                 </span>
-                <span className="mt-0.5 block text-[11px] text-muted-foreground">
+                <span className="mt-0.5 block text-[12px] text-muted-foreground">
                   {preparing
                     ? 'No approved derivative has been activated yet. Selection is disabled until at least one role can mount.'
                     : mode.id === 'nvidia-reference'

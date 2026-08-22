@@ -592,7 +592,7 @@ export function FacilityFloorPlan({
                             x={x + RACK_W / 2}
                             y={y + RACK_H - 27}
                             fill="#93a4bd"
-                            fontSize={10.5}
+                            fontSize={11}
                             textAnchor="middle"
                             dominantBaseline="middle"
                           >
@@ -626,13 +626,13 @@ export function FacilityFloorPlan({
                 <text x={tx + 8} y={ty + 16} fill="#f1f5f9" fontSize={11} fontWeight={700}>
                   {`Rack ${hovered.code}`}
                 </text>
-                <text x={tx + 8} y={ty + 30} fill="#cbd5e1" fontSize={10}>
+                <text x={tx + 8} y={ty + 30} fill="#cbd5e1" fontSize={11}>
                   {`Modelled load: ${hovered.load === null ? 'Unavailable' : `${Math.round(hovered.load * 100)}%`}`}
                 </text>
-                <text x={tx + 8} y={ty + 42} fill="#cbd5e1" fontSize={10}>
+                <text x={tx + 8} y={ty + 42} fill="#cbd5e1" fontSize={11}>
                   {`State: ${STATE_TEXT[hovered.state]}`}
                 </text>
-                <text x={tx + 8} y={ty + 54} fill="#8fb0e0" fontSize={10}>
+                <text x={tx + 8} y={ty + 54} fill="#8fb0e0" fontSize={11}>
                   Click for details
                 </text>
               </g>

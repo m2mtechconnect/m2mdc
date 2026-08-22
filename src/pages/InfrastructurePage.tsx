@@ -1034,7 +1034,7 @@ const InfrastructurePage = () => {
                             className={cn("p-2.5 rounded-md text-center transition-all border", wizard.throughputTier === t.id ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-border")}
                           >
                             <p className="text-xs font-semibold">{t.label}</p>
-                            <p className="text-[11px] opacity-70 font-sans">{t.sub}</p>
+                            <p className="text-xs text-muted-foreground font-sans">{t.sub}</p>
                           </button>
                         ))}
                       </div>
@@ -1047,7 +1047,7 @@ const InfrastructurePage = () => {
                             className={cn("p-2.5 rounded-md text-center transition-all border", wizard.syncWindow === sw.id ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-border")}
                           >
                             <p className="text-xs font-semibold">{sw.label}</p>
-                            <p className="text-[11px] opacity-70 font-sans">{sw.sub}</p>
+                            <p className="text-xs text-muted-foreground font-sans">{sw.sub}</p>
                           </button>
                         ))}
                       </div>
@@ -1274,7 +1274,7 @@ const InfrastructurePage = () => {
                 {/* Always-visible summary panel */}
                 {/* Readiness */}
                 <div className="px-4 py-3" style={{ borderTop: "1px solid hsl(var(--border))" }}>
-                  <p className="text-[9px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">Readiness Score</p>
+                  <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground mb-2">Readiness Score</p>
                   <div className="mb-1">
                     <div className="relative h-2.5 w-full rounded-full overflow-hidden bg-muted/30">
                       <div
@@ -1295,7 +1295,7 @@ const InfrastructurePage = () => {
 
                 {/* Cost */}
                 <div className="px-4 py-3 space-y-1.5" style={{ borderTop: "1px solid hsl(var(--border))" }}>
-                  <p className="text-[9px] uppercase tracking-widest font-semibold text-muted-foreground">Cost Estimator</p>
+                  <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground">Cost Estimator</p>
                   <div className="flex justify-between items-center">
                     <span className="text-[10px] font-mono text-muted-foreground">GPU Nodes</span>
                     <span className="text-[11px] font-bold font-mono text-foreground">{wSpecs.computeNodes}</span>
@@ -1314,7 +1314,7 @@ const InfrastructurePage = () => {
                 {wizard.scenario && SCENARIO_DDN_REC[wizard.scenario] && (
                   <div className="px-4 py-3" style={{ borderTop: "1px solid hsl(var(--border))" }}>
                     <div className="p-3 rounded-lg border border-primary/20 bg-primary/5">
-                      <p className="text-[9px] uppercase tracking-wider font-bold text-primary font-sans mb-1.5">DDN Recommendation</p>
+                      <p className="text-xs uppercase tracking-wider font-bold text-primary font-sans mb-1.5">DDN Recommendation</p>
                       <p className="text-[10px] text-muted-foreground leading-relaxed">
                         {SCENARIO_DDN_REC[wizard.scenario].reason}
                       </p>

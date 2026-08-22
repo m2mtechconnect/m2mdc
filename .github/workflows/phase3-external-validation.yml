@@ -27,6 +27,9 @@ concurrency:
   group: phase3-external-validation-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  AURA_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
 jobs:
   validate:
     name: Ephemeral Supabase stack
@@ -39,6 +42,17 @@ jobs:
       VITE_SUPABASE_PUBLISHABLE_KEY: ''
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.AURA_SOURCE_SHA }}
+          fetch-depth: 0
+
+      - name: Enforce immutable migration history
+        run: node scripts/phase3/check-migration-immutability.mjs
+
+      - name: Prepare ephemeral clean-replay overlays
+        env:
+          AURA_REPLAY_EPHEMERAL: '1'
+        run: node scripts/phase3/prepare-clean-replay.mjs --ephemeral
 
       - uses: actions/setup-node@v4
         with:
@@ -52,6 +66,7 @@ jobs:
       - name: Record tool versions
         run: |
           echo "AURA_VALIDATION_CLI_VERSION=$(supabase --version)" >> "$GITHUB_ENV"
+          echo "AURA_VALIDATION_SOURCE_SHA=$AURA_SOURCE_SHA" >> "$GITHUB_ENV"
           psql --version || true
 
       - name: Start ephemeral Supabase stack
@@ -94,7 +109,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: phase3-external-validation
+          name: phase3-external-validation-${{ env.AURA_SOURCE_SHA }}
           path: phase3-external-validation.json
           if-no-files-found: warn
 

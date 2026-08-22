@@ -6,7 +6,7 @@
 import { useMemo, useState } from 'react';
 import { MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Panel } from '@/components/v2';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -104,8 +104,8 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
       </div>
 
       {filtered.length === 0 ? (
-        <Card>
-          <CardContent className="space-y-3 p-8 text-center">
+        <Panel className="p-8">
+          <div className="space-y-3 text-center">
             <p className="text-sm font-semibold">
               {rows.length === 0 ? 'No connection is configured yet' : 'No connection matches this filter'}
             </p>
@@ -117,12 +117,12 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
             {rows.length === 0 && (
               <Button className="h-10" disabled={!isAdmin} onClick={onAdd}>Add connection</Button>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </Panel>
       ) : (
         <>
           {/* Desktop register */}
-          <div className="hidden min-w-0 overflow-x-auto rounded-lg border border-border lg:block">
+          <div className="v2-panel hidden min-w-0 overflow-x-auto p-0 lg:block">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -157,7 +157,7 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
                         </span>
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium">{row.connection.display_name}</p>
-                          <p className="truncate text-xs text-muted-foreground">
+                          <p className="v2-mono truncate text-xs text-muted-foreground">
                             {row.definition?.name ?? row.connection.connector_id} · {row.glyph.label}
                           </p>
                         </div>
@@ -166,9 +166,9 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
                     <TableCell className="text-sm">{row.connection.environment}</TableCell>
                     <TableCell className="text-sm">{row.connection.data_direction}</TableCell>
                     <TableCell><ConnectionStatusBadge status={row.connection.status} /></TableCell>
-                    <TableCell className="text-sm">{formatRelative(row.connection.last_ingest_at)}</TableCell>
-                    <TableCell className="text-sm tabular-nums">{row.throughput.label}</TableCell>
-                    <TableCell className="text-sm tabular-nums">{row.coverage.label}</TableCell>
+                    <TableCell className="v2-mono text-sm">{formatRelative(row.connection.last_ingest_at)}</TableCell>
+                    <TableCell className="v2-mono text-sm tabular-nums">{row.throughput.label}</TableCell>
+                    <TableCell className="v2-mono text-sm tabular-nums">{row.coverage.label}</TableCell>
                     <TableCell className="text-sm">{row.connection.is_system ? 'Platform' : row.connection.owner_id ? 'Tenant' : 'Unassigned'}</TableCell>
                     <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                       <Actions row={row} />
@@ -183,8 +183,8 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
           <ul className="space-y-3 lg:hidden">
             {filtered.map((row) => (
               <li key={row.connection.id}>
-                <Card className="min-w-0">
-                  <CardContent className="space-y-3 p-4">
+                <Panel className="min-w-0">
+                  <div className="space-y-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex min-w-0 items-start gap-3">
                         <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-md text-xs font-semibold ${row.glyph.className}`} aria-hidden>
@@ -200,9 +200,9 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
                       <ConnectionStatusBadge status={row.connection.status} />
                     </div>
                     <dl className="grid grid-cols-2 gap-2 text-sm">
-                      <div><dt className="text-xs text-muted-foreground">Last event</dt><dd>{formatRelative(row.connection.last_ingest_at)}</dd></div>
-                      <div><dt className="text-xs text-muted-foreground">Throughput</dt><dd>{row.throughput.label}</dd></div>
-                      <div><dt className="text-xs text-muted-foreground">Mapping</dt><dd>{row.coverage.label}</dd></div>
+                      <div><dt className="v2-label">Last event</dt><dd className="v2-mono">{formatRelative(row.connection.last_ingest_at)}</dd></div>
+                      <div><dt className="v2-label">Throughput</dt><dd className="v2-mono">{row.throughput.label}</dd></div>
+                      <div><dt className="v2-label">Mapping</dt><dd className="v2-mono">{row.coverage.label}</dd></div>
                       <div><dt className="text-xs text-muted-foreground">Direction</dt><dd>{row.connection.data_direction}</dd></div>
                     </dl>
                     <div className="flex flex-wrap items-center gap-2">
@@ -211,8 +211,8 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
                       </Button>
                       <Actions row={row} />
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </Panel>
               </li>
             ))}
           </ul>

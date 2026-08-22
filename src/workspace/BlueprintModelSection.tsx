@@ -83,25 +83,25 @@ export function BlueprintModelSection({ facilityOverride }: BlueprintModelSectio
           className="rounded-md border border-border bg-muted/40 px-3 py-2"
           data-testid="blueprint-kpi-drilldown"
         >
-          <p className="text-[12px] font-medium text-foreground">
+          <p className="text-[14px] font-semibold text-foreground">
             Drilldown: {kpiDescriptor.label} · {kpiDescriptor.overlay} layer
           </p>
-          <p className="mt-0.5 text-[11px] text-muted-foreground">
+          <p className="mt-0.5 text-[13px] text-muted-foreground">
             Derivation: {kpiDescriptor.derivation} Inputs: {kpiDescriptor.inputs.join(', ')}.
           </p>
         </div>
       )}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <nav aria-label="Facility context" className="text-[11px] text-muted-foreground">
+          <nav aria-label="Facility context" className="text-[13px] font-medium text-muted-foreground">
             {naming.breadcrumb.join(' / ')}
           </nav>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-[14px] text-foreground">
             Modelled facility: {facility.name} · {naming.classification} · {formatPower(facility.capacityKw)}
             {isFallback ? ' · reference model' : ''}
           </p>
           {modelNotes.map((note) => (
-            <p key={note} className="text-[11px] text-muted-foreground">{note}</p>
+            <p key={note} className="text-[13px] text-muted-foreground">{note}</p>
           ))}
         </div>
         {/* Stage 7H: Blueprint exposes exactly one simulation handoff action,
@@ -110,7 +110,7 @@ export function BlueprintModelSection({ facilityOverride }: BlueprintModelSectio
 
       <div className={stacked ? 'grid gap-3' : 'grid gap-3 grid-cols-[minmax(0,1fr)_21rem]'}>
         <div
-          className="h-[24rem] overflow-hidden rounded-lg border border-border md:h-[30rem]"
+          className="v2-tech-zone h-[24rem] overflow-hidden rounded-lg md:h-[30rem]"
           data-testid="blueprint-model-canvas"
         >
           <FacilityCanvas facility={facility} />

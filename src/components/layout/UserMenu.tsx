@@ -39,9 +39,6 @@ export function UserMenu() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
 
-  // One authoritative session source. The auth listener only writes local
-  // state - calling back into the auth client from inside the callback is
-  // what produced the repeating, aborted /auth/v1/user loop (PW-P2-03).
   useEffect(() => {
     let cancelled = false;
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -58,8 +55,6 @@ export function UserMenu() {
     };
   }, []);
 
-  // Profile read is keyed on the resolved user id and never runs before it
-  // exists, so no request can carry an empty `user_id` filter (PW-P2-02).
   const userId = user?.id ?? null;
   useEffect(() => {
     if (!userId) {
@@ -160,7 +155,7 @@ export function UserMenu() {
           <DropdownMenuItem asChild>
             <Link to="/teams" className="cursor-pointer">
               <Users className="mr-2 h-4 w-4" />
-              <span>Teams and access</span>
+              <span>People &amp; Access</span>
             </Link>
           </DropdownMenuItem>
         )}

@@ -72,18 +72,18 @@ export function StatusSnapshot({ rows, evidenceHref }: { rows: SnapshotRow[]; ev
     <section
       aria-labelledby="status-snapshot-heading"
       data-testid="status-snapshot"
-      className="min-w-0 overflow-hidden rounded-lg border border-border bg-card"
+      className="v2-panel min-w-0 overflow-hidden p-0"
     >
       <div
         className={cn(
           'flex min-h-[44px] min-w-0 items-center gap-2.5 px-4 py-2.5',
-          expanded ? 'border-b border-border' : '',
+          expanded ? 'border-b border-[hsl(var(--v2-line))]' : '',
         )}
       >
         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted" aria-hidden>
           <Gauge className="h-[18px] w-[18px] text-muted-foreground" strokeWidth={1.75} />
         </span>
-        <h2 id="status-snapshot-heading" className="min-w-0 text-[15px] font-semibold leading-tight text-foreground">
+        <h2 id="status-snapshot-heading" className="v2-section-title min-w-0 text-[15px]">
           Status snapshot
         </h2>
         {compact && (
@@ -114,7 +114,7 @@ export function StatusSnapshot({ rows, evidenceHref }: { rows: SnapshotRow[]; ev
             <Link
               to={row.to}
               data-testid={`snapshot-row-${row.label.toLowerCase().replace(/\s+/g, '-')}`}
-              className="flex min-h-[42px] min-w-0 items-center justify-between gap-3 px-4 py-1.5 text-[13px] transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+              className="flex min-h-[42px] min-w-0 items-center justify-between gap-3 px-4 py-2 text-[14px] transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
             >
               <span className="min-w-0 break-words text-muted-foreground">{row.label}</span>
               <span className="flex shrink-0 items-center gap-1">
@@ -129,10 +129,10 @@ export function StatusSnapshot({ rows, evidenceHref }: { rows: SnapshotRow[]; ev
       </ul>
 
       <div className={cn('flex-wrap gap-2 border-t border-border p-3', expanded && !compact ? 'flex' : 'hidden')}>
-        <Button asChild variant="outline" size="sm" className="h-9 flex-1 text-[13px] max-sm:h-11">
+        <Button asChild variant="outline" size="sm" className="h-9 flex-1 text-[14px] max-sm:h-11">
           <Link to="/manage/integrations">View Integrations</Link>
         </Button>
-        <Button asChild variant="outline" size="sm" className="h-9 flex-1 text-[13px] max-sm:h-11">
+        <Button asChild variant="outline" size="sm" className="h-9 flex-1 text-[14px] max-sm:h-11">
           <Link to={evidenceHref}>
             Review Evidence
             <ArrowRight className="ml-1.5 h-4 w-4" strokeWidth={1.75} aria-hidden />

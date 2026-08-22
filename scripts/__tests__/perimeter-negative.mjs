@@ -3,7 +3,7 @@
  * PR-0.1 Checkpoint B7.4B — consolidated negative-fixture harness for the
  * production-perimeter enforcer.
  *
- * Exercises all EIGHT required negative axes (NEG-A..NEG-I), one positive
+ * Exercises all NINE required negative axes (NEG-A..NEG-J), one positive
  * control (NEG-H), and one clean control (real repo tree at HEAD).
  *
  * Every scratch case builds a self-contained dir under os.tmpdir() with
@@ -261,6 +261,22 @@ function runNegI() {
   return { id: 'NEG-I', pass, code: r.code, expected, stderr: r.stderr.trim() };
 }
 
+// ---- NEG-J: arbitrary browser env key outside the public allowlist ----
+function runNegJ() {
+  const root = makeScratchRoot('J');
+  baseSkeleton(root);
+  writeFile(
+    root,
+    'src/leak.ts',
+    `export const k = import.meta.env.VITE_UNAPPROVED_SECRET;\n`,
+  );
+  const r = runEnforcer(root);
+  const expected = 'reads non-allowlisted import.meta.env.VITE_UNAPPROVED_SECRET';
+  const pass = r.code === 1 && r.stderr.includes(expected);
+  if (pass) rmSync(root, { recursive: true, force: true });
+  return { id: 'NEG-J', pass, code: r.code, expected, stderr: r.stderr.trim() };
+}
+
 // ---- CLEAN control: real repo tree at HEAD must pass ----
 function runCleanControl() {
   const r = spawnSync(process.execPath, [resolve(REPO, 'scripts/verify-production-perimeter.mjs')], {
@@ -287,6 +303,7 @@ const results = [
   runNegF(),
   runNegG(),
   runNegI(),
+  runNegJ(),
   runNegH(),        // positive control
   runCleanControl() // clean control
 ];

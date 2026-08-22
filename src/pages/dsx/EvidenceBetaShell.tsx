@@ -75,7 +75,7 @@ function RelatedWorkspaces() {
 
   return (
     <section aria-label="Related workspaces" data-testid="dsx-related-workspaces" className="pt-8">
-      <h2 className="pb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+      <h2 className="pb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         Continue this investigation
       </h2>
       <div className="flex flex-wrap gap-2">
@@ -131,7 +131,7 @@ function ScopeNode({ node, depth }: { node: HierarchyNode; depth: number }) {
           data-testid={`dsx-scope-${node.asset.source_asset_id}`}
           aria-current={selected ? 'true' : undefined}
           className={cn(
-            'min-w-0 flex-1 truncate rounded-sm px-1.5 py-1 text-left text-[11px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            'min-w-0 flex-1 truncate rounded-sm px-1.5 py-1 text-left text-[13px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
             selected ? 'bg-primary/15 font-semibold text-foreground' : 'text-muted-foreground hover:bg-muted/60',
           )}
         >
@@ -159,12 +159,12 @@ function WorkspaceNav() {
     <nav
       aria-label="DSX workspaces"
       data-testid="dsx-workspace-nav"
-      className="relative w-full min-w-0 max-w-full shrink-0 overflow-x-auto border-b border-border bg-card/40 p-3 lg:w-60 lg:overflow-x-visible lg:overflow-y-auto lg:border-b-0 lg:border-r"
+      className="v2-rail relative w-full min-w-0 max-w-full shrink-0 overflow-x-auto border-b border-[hsl(var(--v2-line))] p-2.5 lg:w-60 lg:overflow-x-visible lg:overflow-y-auto lg:border-b-0"
     >
       <div className="flex min-w-max gap-4 lg:block lg:min-w-0">
       {NAV.map((g) => (
         <div key={g.group} className="pb-0 lg:pb-4">
-          <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {g.group}
           </p>
           <ul className="flex gap-1 lg:block lg:space-y-0.5">
@@ -201,7 +201,7 @@ function WorkspaceNav() {
       ))}
       </div>
       <div className="hidden lg:block">
-        <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Facility scope
         </p>
         <ScopeTree nodes={buildHierarchy()} />
@@ -217,8 +217,8 @@ function WorkspaceHeader() {
   const title = evidenceTitle(pathname);
 
   return (
-    <header className="space-y-1.5 pb-5">
-      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-[11px] text-muted-foreground">
+    <header className="v2-command-header mb-4">
+      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
         <Link
           to={hrefWithContext(DSX_ROOT)}
           className="rounded-sm underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -240,14 +240,14 @@ function WorkspaceHeader() {
         <span aria-hidden>/</span>
         <span className="font-medium text-foreground">{title}</span>
       </nav>
-      <h1 className="text-2xl font-semibold tracking-tight" data-testid="dsx-workspace-title">{title}</h1>
+      <h1 className="v2-command-title" data-testid="dsx-workspace-title">{title}</h1>
     </header>
   );
 }
 
 function ShellBody() {
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full flex-col overflow-x-hidden">
+    <div className="v2-canvas flex min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full flex-col overflow-x-hidden">
       <Helmet>
         <title>DSX Operator Workspace | AURA Data Centre Twin</title>
         <meta

@@ -16,7 +16,7 @@ describeWithBackend('Builder Flow with Seed Helpers', () => {
 
   afterEach(async () => {
     if (seedResult?.user?.id) {
-      await cleanupTestData(seedResult.user.id);
+      await cleanupTestData({ userId: seedResult.user.id, allOwnedData: true });
     }
   });
 

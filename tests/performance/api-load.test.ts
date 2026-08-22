@@ -29,7 +29,7 @@ describeWithBackend('API Load Tests with Realistic Data', () => {
 
   afterAll(async () => {
     if (testUserId) {
-      await cleanupTestData(testUserId);
+      await cleanupTestData({ userId: testUserId, allOwnedData: true });
     }
   });
 

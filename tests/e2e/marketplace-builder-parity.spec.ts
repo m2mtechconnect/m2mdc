@@ -1,14 +1,16 @@
 import { test, expect } from '@playwright/test';
 import { seedStudioData } from '../seeds/studioData';
+import { resolveTestUserCredentials } from '../helpers/testSupabaseClient';
 
 test.describe('Marketplace ↔ Builder Parity', () => {
   test.beforeEach(async ({ page }) => {
+    const credentials = resolveTestUserCredentials();
     await seedStudioData();
     await page.goto('/');
     
     // Login
-    await page.fill('input[type="email"]', Deno.env.get('TEST_USER_EMAIL') || 'test@example.com');
-    await page.fill('input[type="password"]', Deno.env.get('TEST_USER_PASSWORD') || 'password123');
+    await page.fill('input[type="email"]', credentials.email);
+    await page.fill('input[type="password"]', credentials.password);
     await page.click('button[type="submit"]');
     await page.waitForURL('/dashboard', { timeout: 10000 });
   });

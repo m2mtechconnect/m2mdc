@@ -26,7 +26,6 @@ import { useTour } from '@/context/TourContext';
 import { tourRegistry, type TourId } from '@/tours/tourRegistry';
 import { getBuildFingerprint } from '@/lib/buildFingerprint';
 
-
 interface GuideLink {
   title: string;
   description: string;
@@ -148,7 +147,6 @@ export default function Help() {
   const fingerprint = useMemo(() => getBuildFingerprint(), []);
 
   return (
-
     <div className="mx-auto max-w-7xl space-y-6 py-6 pb-12">
       <DCSectionHeader
         as="h1"
@@ -161,34 +159,33 @@ export default function Help() {
         title="Start with the operating model"
         subtitle="AURA separates the facility model, simulations, operational status and evidence so each claim has a clear owner."
         icon={<BookOpen className="h-5 w-5" />}
-        status="operational"
       >
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => navigate('/dashboard')}>
-            <LayoutDashboard className="mr-2 h-4 w-4" />
+            <LayoutDashboard className="mr-2 h-4 w-4" aria-hidden />
             Open Command Center
           </Button>
           <Button variant="outline" onClick={() => navigate('/blueprint/default')}>
-            <Boxes className="mr-2 h-4 w-4" />
+            <Boxes className="mr-2 h-4 w-4" aria-hidden />
             Open Blueprint
           </Button>
           <Button variant="outline" onClick={() => navigate('/simulation')}>
-            <FlaskConical className="mr-2 h-4 w-4" />
+            <FlaskConical className="mr-2 h-4 w-4" aria-hidden />
             Open Simulation
           </Button>
         </div>
       </DCCard>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <DCCard title="Getting Started" icon={<Compass className="h-5 w-5" />} status="operational">
+        <DCCard title="Getting Started" icon={<Compass className="h-5 w-5" />}>
           <GuideGrid items={GETTING_STARTED} />
         </DCCard>
 
-        <DCCard title="Operate" icon={<Activity className="h-5 w-5" />} status="operational">
+        <DCCard title="Operate" icon={<Activity className="h-5 w-5" />}>
           <GuideGrid items={OPERATE} />
         </DCCard>
 
-        <DCCard title="Govern" icon={<Shield className="h-5 w-5" />} status="operational">
+        <DCCard title="Govern" icon={<Shield className="h-5 w-5" />}>
           <GuideGrid items={GOVERN} />
         </DCCard>
 
@@ -196,7 +193,6 @@ export default function Help() {
           title="How to read AURA data"
           subtitle="Use these rules before acting on a metric or export."
           icon={<FileSearch className="h-5 w-5" />}
-          status="operational"
         >
           <div className="space-y-3 text-sm">
             <div className="flex items-start gap-2">
@@ -223,7 +219,6 @@ export default function Help() {
         title="Guided Tours"
         subtitle="Interactive walkthroughs of the four core AURA DC workspaces."
         icon={<Compass className="h-5 w-5" />}
-        status="operational"
       >
         <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {GUIDED_TOURS.map(({ id, route, icon: Icon }) => {
@@ -250,7 +245,7 @@ export default function Help() {
           })}
         </div>
         <Button variant="outline" size="sm" onClick={resetAllTours}>
-          <RefreshCw className="mr-2 h-3.5 w-3.5" />
+          <RefreshCw className="mr-2 h-3.5 w-3.5" aria-hidden />
           Reset tours
         </Button>
       </DCCard>
@@ -269,7 +264,6 @@ export default function Help() {
         title="Build information"
         subtitle="Version and commit identifier for the running application bundle."
         icon={<Server className="h-5 w-5" />}
-        status="operational"
       >
         <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
           <div>
@@ -299,4 +293,3 @@ export default function Help() {
     </div>
   );
 }
-

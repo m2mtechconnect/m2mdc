@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const CUSTOMER_SURFACES = [
@@ -21,7 +22,7 @@ const FORBIDDEN_CUSTOMER_TERMS = [
 describe('AURA customer-facing white-label surfaces', () => {
   it('do not expose implementation vendors or protocol plumbing in Builder or Connections source', () => {
     for (const surface of CUSTOMER_SURFACES) {
-      const source = readFileSync(surface, 'utf8');
+      const source = readFileSync(fileURLToPath(surface), 'utf8');
       for (const forbidden of FORBIDDEN_CUSTOMER_TERMS) {
         expect(source, `${surface.pathname} contains ${forbidden}`).not.toMatch(forbidden);
       }

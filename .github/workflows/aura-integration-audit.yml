@@ -1,0 +1,87 @@
+name: AURA Integration Implementation Audit
+
+on:
+  pull_request:
+    branches: [demo-aura-interactive-connections]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CI: true
+  AURA_RELEASE_ENVIRONMENT: demo
+  PROD_BASE_URL: https://auradc.m2mtechconnect.com
+  VITE_SUPABASE_URL: https://demo-placeholder.supabase.co
+  VITE_SUPABASE_PUBLISHABLE_KEY: demo-public-placeholder
+
+jobs:
+  implementation-audit:
+    name: Integration implementation audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.3'
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck customer application
+        run: bun run typecheck
+
+      - name: Customer truth and white-label regression
+        run: >-
+          bunx vitest run
+          src/config/__tests__/customerSurfaceWhiteLabel.test.ts
+          src/config/__tests__/auraRuntimeCatalog.test.ts
+          src/connections/__tests__/demoIntegrationPolicy.test.ts
+
+      - name: Demo OAuth policy tests
+        run: deno test --allow-env supabase/functions/_shared/whiteLabelGateway.demo.test.ts
+
+      - name: Managed transport contract tests
+        run: deno test supabase/functions/_shared/managedConnectorTransport.test.ts
+
+      - name: Check managed connector and OAuth functions
+        run: |
+          deno check supabase/functions/managed-connector-capabilities/index.ts
+          deno check supabase/functions/managed-connector-invoke/index.ts
+          deno check supabase/functions/managed-connector-verify/index.ts
+          deno check supabase/functions/managed-user-oauth-start/index.ts
+          deno check supabase/functions/managed-user-oauth-complete/index.ts
+          deno check supabase/functions/managed-user-disconnect/index.ts
+
+      - name: Check AURA integration gateway
+        working-directory: gateway/aura-integration-gateway
+        run: |
+          deno task check
+          deno task test
+
+      - name: Build production-mode AURA demo artifact
+        env:
+          AURA_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          AURA_RELEASE_BRANCH: ${{ github.head_ref || github.ref_name }}
+          AURA_BUILD_ID: integration-audit-${{ github.run_id }}-${{ github.run_attempt }}
+        run: bunx vite build --mode demo
+
+      - name: Verify white-label demo artifact
+        env:
+          AURA_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node scripts/verify-aura-demo-build.mjs
+
+      - name: Upload audit-qualified demo artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: aura-integration-audit-${{ github.event.pull_request.head.sha || github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7

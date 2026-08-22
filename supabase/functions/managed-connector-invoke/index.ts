@@ -4,8 +4,9 @@
  *
  * Fail-closed rules:
  *   - Session JWT required; roles and tenant resolved server-side.
- *   - The caller never supplies a URL, host, credential or gateway key.
+ *   - The caller never supplies a URL, host, path, credential or gateway key.
  *   - authorizeManagedOperation() is the application authorization gate.
+ *   - Operation id resolves to one exact server-owned transport route.
  *   - Strict white-label policy must resolve an approved AURA-owned gateway.
  *   - Writes require an APPROVED, unexpired approval record.
  *   - Every attempt writes a managed_connector_invocations row with the
@@ -15,6 +16,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { resolveCallerTenant } from '../_shared/connectionTenant.ts';
 import { manifestEntry, operationFor } from '../_shared/managedConnectorManifest.ts';
 import { authorizeManagedOperation } from '../_shared/managedConnectorAuthz.ts';
+import { managedTransportFor } from '../_shared/managedConnectorTransport.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 import {
   managedConnectorGatewayPolicy,
@@ -37,6 +39,15 @@ function gatewayToken(): string | null {
   if (auraToken) return auraToken;
   if (!strictWhiteLabelEnabled()) return Deno.env.get('LOVABLE_API_KEY')?.trim() || null;
   return null;
+}
+
+function parseProviderResult(text: string): unknown {
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
 }
 
 Deno.serve(async (req) => {
@@ -98,6 +109,7 @@ Deno.serve(async (req) => {
 
   const entry = manifestEntry(connection.connector_id);
   const operation = entry ? operationFor(entry, operationId) : null;
+  const transport = entry ? managedTransportFor(entry.connector_definition_id, operationId) : null;
 
   const { data: approval } = await admin
     .from('managed_connector_write_approvals')
@@ -148,6 +160,15 @@ Deno.serve(async (req) => {
     });
   }
 
+  if (!entry?.gateway_connector_key || !transport || transport.gateway_connector_key !== entry.gateway_connector_key) {
+    await record('DENIED', 'operation_transport_not_resolved', tenantId);
+    return json(422, {
+      error_code: 'operation_transport_not_resolved',
+      safe_message: 'This managed operation has no approved AURA transport route.',
+      correlation_id: correlationId,
+    });
+  }
+
   const gateway = managedConnectorGatewayPolicy();
   if (!gateway.runtimeAllowed || !gateway.gatewayBaseUrl) {
     await record('BLOCKED', gateway.reason.toLowerCase(), tenantId);
@@ -158,8 +179,8 @@ Deno.serve(async (req) => {
   }
 
   const platformKey = gatewayToken();
-  const connectionKeyName = `${(entry!.gateway_connector_key ?? '').toUpperCase()}_API_KEY`;
-  const connectionKey = connectionKeyName === '_API_KEY' ? undefined : Deno.env.get(connectionKeyName);
+  const connectionKeyName = `${entry.gateway_connector_key.toUpperCase()}_API_KEY`;
+  const connectionKey = Deno.env.get(connectionKeyName);
   if (!platformKey || !connectionKey) {
     await record('BLOCKED', 'managed_credential_unavailable', tenantId);
     return json(503, {
@@ -169,23 +190,18 @@ Deno.serve(async (req) => {
     });
   }
 
-  const path = typeof body.path === 'string' && body.path.startsWith('/') ? body.path : null;
-  if (!path) {
-    await record('DENIED', 'operation_path_not_resolved', tenantId);
-    return json(400, { error_code: 'operation_path_not_resolved', correlation_id: correlationId });
-  }
-
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), operation!.timeout_ms);
   try {
-    const upstream = await fetch(`${gateway.gatewayBaseUrl}/${entry!.gateway_connector_key}${path}`, {
-      method: operation!.classification === 'WRITE' ? 'POST' : 'GET',
+    const upstream = await fetch(`${gateway.gatewayBaseUrl}/${transport.gateway_connector_key}${transport.path}`, {
+      method: transport.method,
       headers: {
         Authorization: `Bearer ${platformKey}`,
         'X-Connection-Api-Key': connectionKey,
+        'X-AURA-Correlation-Id': correlationId,
         'Content-Type': 'application/json',
       },
-      body: operation!.classification === 'WRITE' ? JSON.stringify(body.payload ?? {}) : undefined,
+      body: transport.sends_payload ? JSON.stringify(body.payload ?? {}) : undefined,
       signal: controller.signal,
     });
     const text = await upstream.text();
@@ -193,8 +209,8 @@ Deno.serve(async (req) => {
       await record('FAILED', `upstream_${upstream.status}`, tenantId);
       return json(upstream.status, {
         error_code: 'provider_request_failed',
+        safe_message: 'The AURA managed provider request did not complete successfully.',
         status: upstream.status,
-        details: text.slice(0, 2000),
         correlation_id: correlationId,
       });
     }
@@ -203,10 +219,14 @@ Deno.serve(async (req) => {
       .from('connection_instances')
       .update({ last_success_at: new Date().toISOString(), last_verified_at: new Date().toISOString() })
       .eq('id', connection.id);
-    return json(200, { correlation_id: correlationId, result: text ? JSON.parse(text) : null });
+    return json(200, { correlation_id: correlationId, result: parseProviderResult(text) });
   } catch (_error) {
     await record('FAILED', 'upstream_timeout_or_network', tenantId);
-    return json(504, { error_code: 'upstream_unavailable', correlation_id: correlationId });
+    return json(504, {
+      error_code: 'upstream_unavailable',
+      safe_message: 'The AURA managed connection is temporarily unavailable.',
+      correlation_id: correlationId,
+    });
   } finally {
     clearTimeout(timer);
   }

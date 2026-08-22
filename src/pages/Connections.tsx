@@ -40,7 +40,9 @@ import {
   useTwinMappings,
 } from '@/connections/api';
 
-const DEMO_INTEGRATIONS_ENABLED = import.meta.env.VITE_AURA_DEMO_INTEGRATIONS === 'true';
+// Demo UI is a separate compile-time artifact profile. Production browser
+// builds never receive a feature flag that could enable it at runtime.
+const DEMO_INTEGRATIONS_ENABLED = import.meta.env.MODE === 'demo';
 
 const TABS = [
   { value: 'overview', label: 'Overview' },

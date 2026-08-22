@@ -1,50 +1,31 @@
 /**
  * /v1/agent-suggestions
- * 
- * PURPOSE: Generate AI-powered agent recommendations based on user queries
- * AUTH: public (no auth required, uses service role for caching)
- * 
- * REQUEST:
- * - query: string (min 2 chars)
- * - chips: string[] (optional filters)
- * - context: any (optional conversation context)
- * 
- * RESPONSE:
- * - suggestions: Array of agent templates with relevance scores
- * - cached: boolean
- * - generated_at/cached_at: ISO timestamp
+ * Authenticated AI-assisted recommendation ranking with deterministic fallback.
  */
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { createHandler } from "../_shared/handler.ts";
-import { callExternalApi } from "../_shared/rest-client.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  ModelRouterError,
+  makeChatCompletion,
+} from "../_shared/model-router.ts";
 
-// Input validation schema
 const InputSchema = z.object({
-  query: z.string().min(2, "Query must be at least 2 characters"),
-  chips: z.array(z.string()).default([]),
-  context: z.any().optional(),
+  query: z.string().min(2, "Query must be at least 2 characters").max(2000),
+  chips: z.array(z.string().max(100)).max(20).default([]),
+  context: z.unknown().optional(),
 });
 
-// AI response schema
-const AIResponseSchema = z.object({
-  choices: z.array(z.object({
-    message: z.object({
-      content: z.string(),
-    }),
-  })),
-});
+const RECOMMENDED_PROFILE = 'profile:reasoning';
 
-// Pattern library with starter templates
 const basePatterns = [
   {
     title: 'Campaign Copilot',
     one_liner: 'Plan and draft omni-channel marketing campaigns with AI',
     department: 'Marketing',
     starter_workflow: 'analyze',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: RECOMMENDED_PROFILE,
     keywords: ['marketing', 'campaign', 'content', 'social', 'email', 'ads'],
     success_metric: 'Qualified MQLs',
     desired_outcome: 'Predictive'
@@ -54,27 +35,27 @@ const basePatterns = [
     one_liner: 'Qualify and route leads, draft personalized outreach',
     department: 'Sales',
     starter_workflow: 'classify',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: RECOMMENDED_PROFILE,
     keywords: ['sales', 'lead', 'qualify', 'outreach', 'crm', 'pipeline'],
     success_metric: 'Meetings Booked',
     desired_outcome: 'Prescriptive'
   },
   {
     title: 'Finance Reconciler',
-    one_liner: 'Automate invoice and ledger matching with AI',
+    one_liner: 'Assist invoice and ledger matching with reviewable findings',
     department: 'Finance',
     starter_workflow: 'classify',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: RECOMMENDED_PROFILE,
     keywords: ['finance', 'invoice', 'reconcile', 'accounting', 'ledger', 'expense'],
     success_metric: 'Reconciliation Accuracy',
     desired_outcome: 'Diagnostic'
   },
   {
     title: 'Customer Support Agent',
-    one_liner: 'AI-powered ticket routing and response suggestions',
+    one_liner: 'Assist ticket routing and response suggestions',
     department: 'Operations',
     starter_workflow: 'classify',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: RECOMMENDED_PROFILE,
     keywords: ['support', 'customer', 'ticket', 'help', 'service', 'troubleshoot'],
     success_metric: 'Response Time',
     desired_outcome: 'Prescriptive'
@@ -84,223 +65,177 @@ const basePatterns = [
     one_liner: 'Extract insights from user feedback and product data',
     department: 'Product',
     starter_workflow: 'analyze',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: RECOMMENDED_PROFILE,
     keywords: ['product', 'feedback', 'insights', 'feature', 'roadmap', 'user'],
     success_metric: 'Feature Adoption',
     desired_outcome: 'Predictive'
   },
   {
     title: 'HR Onboarding Assistant',
-    one_liner: 'Automate employee onboarding workflows and document prep',
+    one_liner: 'Assist employee onboarding workflows and document preparation',
     department: 'HR',
     starter_workflow: 'mcp',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: RECOMMENDED_PROFILE,
     keywords: ['hr', 'onboarding', 'employee', 'hiring', 'training', 'compliance'],
     success_metric: 'Onboarding Time',
     desired_outcome: 'Prescriptive'
   },
   {
     title: 'Compliance Document Classifier',
-    one_liner: 'Classify and route compliance documents automatically',
+    one_liner: 'Classify and route compliance documents for human review',
     department: 'Legal',
     starter_workflow: 'classify',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: RECOMMENDED_PROFILE,
     keywords: ['legal', 'compliance', 'document', 'policy', 'regulation', 'audit'],
     success_metric: 'Classification Accuracy',
     desired_outcome: 'Diagnostic'
   },
   {
     title: 'Inventory Predictor',
-    one_liner: 'Predict stock levels and automate reorder workflows',
+    one_liner: 'Forecast stock risk and recommend reorder actions',
     department: 'Operations',
     starter_workflow: 'analyze',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: RECOMMENDED_PROFILE,
     keywords: ['inventory', 'stock', 'supply', 'warehouse', 'reorder', 'logistics'],
     success_metric: 'Stockout Rate',
     desired_outcome: 'Predictive'
   },
 ];
 
-// Helper to create cache key hash
 async function createCacheKey(query: string, chips: string[]): Promise<string> {
-  const sortedChips = [...chips].sort();
-  const keyString = `${query.toLowerCase()}|${sortedChips.join(',')}`;
-  const encoder = new TextEncoder();
-  const data = encoder.encode(keyString);
+  const keyString = `${query.toLowerCase()}|${[...chips].sort().join(',')}`;
+  const data = new TextEncoder().encode(keyString);
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+function deterministicFallback(query: string, candidates: typeof basePatterns) {
+  const queryLower = query.toLowerCase();
+  return candidates
+    .map(pattern => ({
+      ...pattern,
+      relevance_score: Math.min(
+        pattern.keywords.reduce(
+          (score, keyword) => score + (queryLower.includes(keyword.toLowerCase()) ? 20 : 0),
+          pattern.title.toLowerCase().includes(queryLower) ? 40 : 0,
+        ),
+        100,
+      ),
+    }))
+    .sort((a, b) => b.relevance_score - a.relevance_score)
+    .slice(0, 5);
 }
 
 serve(createHandler({
   name: "agent-suggestions",
-  authLevel: "public",
+  authLevel: "user",
   inputSchema: InputSchema,
   handler: async (input, context) => {
     const { query, chips = [] } = input;
-    const { log, correlationId } = context;
+    const { log, userId } = context;
 
-    // Initialize Supabase with service role for caching
-    const supabase = createClient(
+    // Service-role access is limited to the server-side cache and is reachable
+    // only after createHandler has authenticated the caller.
+    const cache = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    // Check cache
     const cacheKey = await createCacheKey(query, chips);
-    const { data: cachedData, error: cacheError } = await supabase
+    const { data: cachedData, error: cacheError } = await cache
       .from('agent_suggestions_cache')
       .select('*')
       .eq('query_hash', cacheKey)
       .gt('expires_at', new Date().toISOString())
-      .single();
+      .maybeSingle();
 
     if (cachedData && !cacheError) {
-      log('Cache HIT');
-      
-      // Increment hit count (non-blocking)
-      void supabase
+      void cache
         .from('agent_suggestions_cache')
         .update({ hit_count: (cachedData.hit_count || 0) + 1 })
         .eq('id', cachedData.id);
-
       return {
         suggestions: cachedData.suggestions,
         cached: true,
-        cached_at: cachedData.created_at
+        cached_at: cachedData.created_at,
       };
     }
 
-    log('Cache MISS');
-
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw { code: 'CONFIG_ERROR', message: 'LOVABLE_API_KEY not configured' };
-    }
-
-    // Filter by chips
     let candidates = [...basePatterns];
     if (chips.length > 0) {
-      candidates = candidates.filter(pattern => {
-        return chips.some((chip: string) => {
-          const chipLower = chip.toLowerCase();
-          return pattern.department.toLowerCase() === chipLower ||
-                 pattern.keywords.some(kw => kw.toLowerCase().includes(chipLower));
-        });
-      });
+      candidates = candidates.filter(pattern => chips.some((chip: string) => {
+        const normalized = chip.toLowerCase();
+        return pattern.department.toLowerCase() === normalized ||
+          pattern.keywords.some(keyword => keyword.toLowerCase().includes(normalized));
+      }));
     }
+    if (candidates.length === 0) candidates = [...basePatterns];
 
-    // Use Gemini to rank and expand
-    const systemPrompt = `You are an AI agent recommendation system. Given a user's natural language query and a list of agent templates, rank and return the top 5 most relevant agents.
-
-For each agent, return:
-- title: Clear agent name
-- one_liner: Brief description (max 100 chars)
-- department: Primary department
-- relevance_score: 0-100 score for how well it matches the query
-- starter_workflow: "analyze" | "classify" | "mcp"
-- recommended_model: "google/gemini-3-pro-preview"
-- success_metric: Default metric for this agent type
-- desired_outcome: "Diagnostic" | "Predictive" | "Prescriptive"
-
-Return ONLY valid JSON array. Focus on matching user intent, keywords, and department alignment.`;
-
-    const userPrompt = `User query: "${query}"
-
-Available agent templates:
-${JSON.stringify(candidates, null, 2)}
-
-Rank these agents by relevance to the query and return top 5 as JSON array with relevance_score added.`;
+    const systemPrompt = `You rank proposed AURA agent templates. Return ONLY a valid JSON array of up to five entries selected from the supplied templates. Preserve title, one_liner, department, starter_workflow, success_metric, desired_outcome and recommended_model exactly; add only relevance_score from 0 to 100. Do not invent provider-specific model IDs or claim autonomous control.`;
+    const userPrompt = `User query: ${JSON.stringify(query)}\nTemplates: ${JSON.stringify(candidates)}`;
 
     try {
-      const aiData = await callExternalApi({
-        name: 'gemini-rank-agents',
-        url: 'https://ai.gateway.lovable.dev/v1/chat/completions',
-        options: {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'google/gemini-3-pro-preview',
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: userPrompt }
-            ],
-            temperature: 0.3,
-          }),
-        },
-        responseSchema: AIResponseSchema,
-        correlationId,
+      const completion = await makeChatCompletion(
+        [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        { requestedModel: RECOMMENDED_PROFILE, profile: 'reasoning', temperature: 0.2, maxTokens: 1800 },
+      );
+
+      let suggestions: Array<Record<string, unknown>>;
+      try {
+        const jsonMatch = completion.text.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || [null, completion.text];
+        suggestions = JSON.parse(jsonMatch[1] ?? completion.text);
+        if (!Array.isArray(suggestions)) throw new Error('Expected array');
+      } catch (parseError) {
+        log('Recommendation model output was not valid JSON; deterministic fallback used', {
+          error: String(parseError),
+        });
+        suggestions = deterministicFallback(query, candidates);
+      }
+
+      const allowedTitles = new Set(candidates.map(candidate => candidate.title));
+      const topSuggestions = suggestions
+        .filter(item => typeof item?.title === 'string' && allowedTitles.has(item.title as string))
+        .slice(0, 5);
+      const safeSuggestions = topSuggestions.length > 0
+        ? topSuggestions
+        : deterministicFallback(query, candidates);
+
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+      void cache.from('agent_suggestions_cache').insert({
+        query_hash: cacheKey,
+        query,
+        chips,
+        suggestions: safeSuggestions,
+        expires_at: expiresAt,
       });
 
-      const content = aiData.choices[0].message.content;
-      
-      let suggestions;
-      try {
-        const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || [null, content];
-        suggestions = JSON.parse(jsonMatch[1]);
-      } catch (parseError) {
-        log('AI response parse failed, using fallback', { error: String(parseError) });
-        
-        // Fallback to keyword matching
-        const queryLower = query.toLowerCase();
-        suggestions = candidates
-          .map(pattern => ({
-            ...pattern,
-            relevance_score: pattern.keywords.reduce((acc, kw) => 
-              acc + (queryLower.includes(kw.toLowerCase()) ? 20 : 0), 0)
-          }))
-          .sort((a, b) => b.relevance_score - a.relevance_score)
-          .slice(0, 5);
-      }
-
-      const topSuggestions = suggestions.slice(0, 5);
-
-      // Cache results (non-blocking)
-      const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-      void supabase
-        .from('agent_suggestions_cache')
-        .insert({
-          query_hash: cacheKey,
-          query: query,
-          chips: chips,
-          suggestions: topSuggestions,
-          expires_at: expiresAt
-        });
-
-      // Periodic cleanup (1% chance)
-      if (Math.random() < 0.01) {
-        void supabase.rpc('cleanup_agent_suggestions_cache');
-      }
-
       return {
-        suggestions: topSuggestions,
+        suggestions: safeSuggestions,
         cached: false,
-        generated_at: new Date().toISOString()
+        generated_at: new Date().toISOString(),
+        provider: completion.provider,
+        model: completion.model,
+        model_profile: completion.profile,
+        actor_id: userId,
       };
     } catch (error) {
-      log('AI API call failed, using fallback');
-      
-      // Fallback to simple keyword matching
-      const queryLower = query.toLowerCase();
-      const scored = candidates.map(pattern => {
-        const score = pattern.keywords.reduce((acc, kw) => {
-          return acc + (queryLower.includes(kw.toLowerCase()) ? 20 : 0);
-        }, 0) + (pattern.title.toLowerCase().includes(queryLower) ? 40 : 0);
-        
-        return { ...pattern, relevance_score: Math.min(score, 100) };
-      });
-      
-      const ranked = scored
-        .sort((a, b) => b.relevance_score - a.relevance_score)
-        .slice(0, 5);
-      
+      if (error instanceof ModelRouterError) {
+        log('Model router unavailable; deterministic recommendation fallback used', {
+          code: error.code,
+        });
+      } else {
+        log('Recommendation model failed; deterministic fallback used');
+      }
       return {
-        suggestions: ranked,
+        suggestions: deterministicFallback(query, candidates),
         cached: false,
-        fallback: true
+        fallback: true,
+        model_profile: 'reasoning',
       };
     }
   }

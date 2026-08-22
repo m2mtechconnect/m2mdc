@@ -1,9 +1,10 @@
 /**
  * NVIDIA Reference Facility hardware visual-acceptance specification.
  *
- * Every expected value is read from the published asset manifest. Nothing is
- * inferred from filenames, and nothing is claimed that the runtime coverage
- * store has not reported.
+ * Runtime visual coverage remains grounded in what actually mounted. In
+ * addition, the facility carries a separate NVIDIA DSX blueprint asset gate so
+ * a visually coherent generic data hall cannot be mistaken for a complete DSX
+ * reference design.
  */
 
 import {
@@ -15,12 +16,16 @@ import {
   type SemanticRole,
 } from '@/components/twin-visualization/assetRegistry';
 import type { RoleCoverage } from '@/components/twin-visualization/runtimeCoverageStore';
+import {
+  reconcileDsxAssetRequirements,
+  type DsxAssetCoverageRow,
+} from '@/dsx/blueprintAssetRequirements';
 import type { CameraPresetId } from '@/three/cameraPresets';
 
 export const REFERENCE_FACILITY_ID = 'nvidia.reference-facility';
 export const REFERENCE_FACILITY_ROUTE = '/data-centre-twin?geometry=nvidia-reference';
 
-/** Roles the reference facility is expected to represent. */
+/** Existing visual roles the current reference hall attempts to mount. */
 export const REFERENCE_ROLES: SemanticRole[] = [
   'server-1u',
   'server-2u',
@@ -64,6 +69,10 @@ export interface FacilityReconciliation {
   uniqueDerivatives: number;
   /** Manifest rows the runtime never requested, listed for audit honesty. */
   unusedPublishedAssets: string[];
+  /** Exact-role NVIDIA DSX blueprint coverage. Generic approximations do not count. */
+  dsxAssetRows: DsxAssetCoverageRow[];
+  dsxRequired: number;
+  dsxRuntimeEligible: number;
 }
 
 /** Reconcile manifest expectation against what the runtime actually mounted. */
@@ -104,12 +113,15 @@ export function reconcileReferenceFacility(
     };
   });
 
-  const unusedPublishedAssets = listAssets()
+  const allAssets = listAssets();
+  const unusedPublishedAssets = allAssets
     .filter(
       (a: AssetManifestEntry) =>
         a.semanticRole != null && a.runtimePreferred !== false && !used.has(a.assetId),
     )
     .map((a) => a.assetId);
+
+  const dsxAssetRows = reconcileDsxAssetRequirements(allAssets, 'facility');
 
   return {
     rows,
@@ -120,6 +132,9 @@ export function reconcileReferenceFacility(
       rows.filter((r) => r.mountedObjects > 0 && r.derivativeUrl).map((r) => r.derivativeUrl as string),
     ).size,
     unusedPublishedAssets,
+    dsxAssetRows,
+    dsxRequired: dsxAssetRows.length,
+    dsxRuntimeEligible: dsxAssetRows.filter((row) => row.state === 'runtime-eligible').length,
   };
 }
 

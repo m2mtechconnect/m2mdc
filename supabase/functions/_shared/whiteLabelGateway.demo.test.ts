@@ -40,7 +40,7 @@ Deno.test('demo oauth transport is isolated from managed shared connector policy
     AURA_RELEASE_ENVIRONMENT: 'demo',
     AURA_DEMO_MANAGED_OAUTH: 'true',
     AURA_STRICT_WHITE_LABEL: 'true',
-    AURA_MANAGED_CONNECTOR_GATEWAY_URL: null,
+    AURA_MANAGED_CONNECTOR_GATEWAY_URL: 'https://gateway.auradc.m2mtechconnect.com',
   }, () => {
     const policy = managedUserOAuthGatewayPolicy();
     if (!policy.runtimeAllowed) throw new Error('demo managed-user oauth should be allowed');

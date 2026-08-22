@@ -72,7 +72,7 @@ Current manifest evidence remains:
 - Full-reference gate: **0 / 23 exact DSX roles runtime-eligible**.
 - First-rack quantity target once assets mount: **37 physical objects = 18 + 9 + 8 + 2**.
 
-Zero is deliberate and truthful: no existing generic asset is relabelled to manufacture compliance.
+That zero is deliberate and truthful: no existing generic asset is relabelled to manufacture compliance.
 
 ## Exact DSX role ledger
 
@@ -151,7 +151,7 @@ A verified private source mapping may be evaluated privately, but AURA's public 
 
 ## Qualification
 
-Exact code head `45bf21eeac530dbe68cfb3ac10735a33e882e0d7` passed:
+The last application-code head `45bf21eeac530dbe68cfb3ac10735a33e882e0d7` passed:
 
 - Production Perimeter;
 - committed OpenUSD binding verifier;
@@ -159,7 +159,7 @@ Exact code head `45bf21eeac530dbe68cfb3ac10735a33e882e0d7` passed:
 - DSX requirement/source-map/rack-layout/rack-BOM/reference-facility focused tests;
 - production-mode application build.
 
-Any later source commit supersedes this exact-head evidence and must be qualified independently.
+The current branch head includes only this ledger update after that application-code head. Exact-head qualification must still complete for the current SHA; prior evidence is retained as code evidence but is not substituted for current-head release evidence.
 
 ## External blockers that source code cannot manufacture
 

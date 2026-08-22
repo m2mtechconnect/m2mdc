@@ -48,11 +48,12 @@ jobs:
       - name: Typecheck
         run: bun run typecheck
 
-      - name: DSX asset, source-map, rack-BOM and reference-facility tests
+      - name: DSX asset, source-map, rack layout/BOM and reference-facility tests
         run: >-
           bunx vitest run
           src/dsx/__tests__/blueprintAssetRequirements.test.ts
           src/dsx/__tests__/rackBomValidation.test.ts
+          src/dsx/__tests__/rackLayout.test.ts
           src/dsx/__tests__/sourceCatalog.test.ts
           src/dsx/__tests__/sourceMap.test.ts
           src/validation/referenceFacility/__tests__/reconciliation.test.ts

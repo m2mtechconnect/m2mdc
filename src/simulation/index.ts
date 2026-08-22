@@ -12,6 +12,10 @@ export * from './scenarioRegistry';
 // Blueprint Scenario Adapter
 export * from './blueprintScenarioAdapter';
 
+// Fidelity and calibration evidence contracts
+export * from './fidelity';
+export * from './calibrationEvidence';
+
 // Simulation Engine
 export { SimulationEngine, getSimulationEngine, resetSimulationEngine, getSimulationEngineTwinId } from './SimulationEngine';
 

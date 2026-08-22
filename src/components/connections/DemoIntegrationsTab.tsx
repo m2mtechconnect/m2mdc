@@ -76,7 +76,6 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
   const [authorizing, setAuthorizing] = useState(false);
   const [searchResult, setSearchResult] = useState<DemoResult | null>(null);
 
-  const interactiveOAuthEnabled = import.meta.env.VITE_AURA_DEMO_MANAGED_OAUTH === 'true';
   const searchEntry = capabilities.data?.entries.find((entry) => entry.connector_definition_id === 'search_analytics');
   const driveEntry = capabilities.data?.entries.find((entry) => entry.connector_definition_id === 'workspace_documents');
   const searchConnection = useMemo(
@@ -94,8 +93,9 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
 
   const driveBindingStatus = driveEntry?.user_binding?.status ?? '';
   const driveConnected = CONNECTED_USER_STATES.has(driveBindingStatus) && !driveEntry?.user_binding?.revoked_at;
+  const demoOAuthReady = driveEntry?.white_label_reason === 'DEMO_PROVIDER_OAUTH_READY';
   const driveCanConnect = Boolean(
-    interactiveOAuthEnabled && driveEntry?.user_bindable && driveEntry?.user_client_configured && !driveConnected,
+    demoOAuthReady && driveEntry?.user_bindable && driveEntry?.user_client_configured && !driveConnected,
   );
 
   async function runSearchDemo() {
@@ -222,9 +222,9 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
           statusBadge={driveConnected ? <Badge variant="outline" className="w-fit v2-surface-verified v2-text-verified">Connected · read only</Badge> : undefined}
           description={driveConnected
             ? 'Your Google account is authorized read-only. This demo still labels document content as demo data until live retrieval is verified.'
-            : interactiveOAuthEnabled
-              ? 'Connect a Google account for read-only demo authorization. Until server configuration is ready, the card stays in demo-data mode.'
-              : 'Demonstrates approved-document retrieval. Interactive authorization is disabled in this build.'}
+            : driveCanConnect
+              ? 'Connect a Google account for read-only demo authorization. Runtime eligibility is confirmed by the AURA server policy.'
+              : 'Demonstrates approved-document retrieval. Interactive authorization is unavailable until the AURA server marks the demo OAuth path ready.'}
           actionLabel={authorizing ? 'Working…' : driveCanConnect ? 'Connect Google' : 'Preview demo data'}
           disabled={authorizing}
           onRun={() => driveCanConnect ? void connectDrive() : setSearchResult(DRIVE_DEMO)}

@@ -19,9 +19,7 @@ export const ROUTE_ALIASES: RouteAlias[] = [
   { from: '/admin/onboarding-submissions', to: '/teams/onboarding' },
   { from: '/account/access-control', to: '/teams/access-control' },
 
-  { from: '/compliance', to: '/dsx/evidence-beta/sustainability/sovereignty' },
   { from: '/playbook', to: '/help' },
-  { from: '/infrastructure', to: '/blueprint/default' },
   { from: '/data-centre-twin', to: '/dashboard' },
   {
     from: '/data-centre-twin/:id',

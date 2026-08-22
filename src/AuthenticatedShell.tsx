@@ -22,6 +22,8 @@ const Builder = lazy(() => import("./pages/Builder"));
 const Deploy = lazy(() => import("./pages/Deploy"));
 const DeploymentHistory = lazy(() => import("./pages/DeploymentHistory"));
 const IntelligenceDashboard = lazy(() => import("./pages/IntelligenceDashboard"));
+const Compliance = lazy(() => import("./pages/Compliance"));
+const InfrastructurePage = lazy(() => import("./pages/InfrastructurePage"));
 const Teams = lazy(() => import("./pages/Teams"));
 const Marketplace = lazy(() => import("./pages/Marketplace"));
 const Help = lazy(() => import("./pages/Help"));
@@ -94,6 +96,8 @@ function ApprovedUserRoutes() {
       <Route path="/agent/:id" element={<AgentWorkspace />} />
       <Route path="/agents/:id/chat" element={<AgentChat />} />
       <Route path="/analytics" element={<IntelligenceDashboard />} />
+      <Route path="/compliance" element={<Compliance />} />
+      <Route path="/infrastructure" element={<InfrastructurePage />} />
       <Route path="/account/profile" element={<Profile />} />
       <Route path="/account/settings" element={<Settings />} />
 

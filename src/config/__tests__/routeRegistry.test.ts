@@ -1,10 +1,10 @@
 /**
  * Phase 2 - route surface enforcement.
  *
- * Reads the two routers as source text and holds them to
- * `src/config/routeRegistry.ts`. A new mount that is not declared, a stale
- * declaration, an admin route that lost its guard, or a path that is both a
- * mount and a redirect source all fail here.
+ * Reads the public, approved-user and authenticated routers as source text and
+ * holds them to `src/config/routeRegistry.ts`. A new mount that is not
+ * declared, a stale declaration, an admin route that lost its guard, or a path
+ * that is both a mount and a redirect source all fail here.
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -19,6 +19,7 @@ import { ROUTE_ALIASES, PARAM_ALIASES } from '../routeAliases';
 
 const root = resolve(__dirname, '../../..');
 const appSource = readFileSync(resolve(root, 'src/App.tsx'), 'utf8');
+const approvedSource = readFileSync(resolve(root, 'src/ApprovedUserRouter.tsx'), 'utf8');
 const shellSource = readFileSync(resolve(root, 'src/AuthenticatedShell.tsx'), 'utf8');
 
 const literalPaths = (source: string) =>
@@ -42,6 +43,12 @@ describe('route registry mirrors the mounted routers', () => {
     expect(undeclared).toEqual([]);
   });
 
+  it('declares every session path mounted in ApprovedUserRouter.tsx', () => {
+    const declared = new Set(PUBLIC_ROUTES.map((r) => r.path));
+    const undeclared = [...new Set(literalPaths(approvedSource))].filter((p) => !declared.has(p));
+    expect(undeclared).toEqual([]);
+  });
+
   it('declares every top-level path mounted in AuthenticatedShell.tsx', () => {
     const declared = new Set(INTERNAL_ROUTES.map((r) => r.path));
     const undeclared = shellTopLevel.filter((p) => !declared.has(p));
@@ -56,6 +63,7 @@ describe('route registry mirrors the mounted routers', () => {
   it('has no stale declarations', () => {
     const mounted = new Set([
       ...literalPaths(appSource),
+      ...literalPaths(approvedSource),
       ...shellTopLevel,
       ...evidenceChildren,
     ]);

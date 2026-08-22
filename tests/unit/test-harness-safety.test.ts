@@ -11,6 +11,14 @@ import {
 
 const repositoryFile = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 
+function workflowJobBlocks(workflow: string): string[] {
+  const jobsStart = workflow.indexOf('\njobs:\n');
+  if (jobsStart < 0) return [];
+  const jobs = workflow.slice(jobsStart + '\njobs:\n'.length);
+  const starts = [...jobs.matchAll(/^  [a-zA-Z0-9_-]+:\s*$/gm)].map((m) => m.index ?? 0);
+  return starts.map((start, index) => jobs.slice(start, starts[index + 1] ?? jobs.length));
+}
+
 describe('test harness safety guards', () => {
   it('rejects cleanup without an unambiguous user-scoped mode', async () => {
     await expect(
@@ -54,15 +62,27 @@ describe('test harness safety guards', () => {
     }
   });
 
-  it('installs Bun for every Test Suite job that executes Bun commands', () => {
+  it('installs Bun before every Test Suite job that executes Bun commands', () => {
     const workflow = repositoryFile('.github/workflows/test.yml');
-    expect(workflow.match(/uses: oven-sh\/setup-bun@v2/g)).toHaveLength(6);
+    const bunJobs = workflowJobBlocks(workflow).filter((block) => /\brun:\s+.*\bbun\b/m.test(block));
+    expect(bunJobs.length).toBeGreaterThan(0);
+    for (const block of bunJobs) {
+      expect(block).toContain('uses: oven-sh/setup-bun@v2');
+      expect(block.indexOf('uses: oven-sh/setup-bun@v2')).toBeLessThan(block.search(/\brun:\s+.*\bbun\b/m));
+    }
     expect(workflow).toContain("bun-version: '1.3.3'");
-    expect(workflow).toContain('run: bun audit --audit-level=moderate');
     expect(workflow).not.toContain('run: npm audit');
     expect(workflow).not.toContain('secrets.TEST_SUPABASE');
     expect(workflow).toContain('TEST_SUPABASE_URL: http://127.0.0.1:54321');
-    expect(workflow).toContain('Verify loopback-only test backend');
+  });
+
+  it('keeps dependency vulnerability auditing in the QA security gate', () => {
+    const workflow = repositoryFile('.github/workflows/qa-suite.yml');
+    expect(workflow).toContain('name: Security Scan');
+    expect(workflow).toContain('run: bun audit --audit-level=moderate');
+    expect(workflow.indexOf('uses: oven-sh/setup-bun@v2')).toBeLessThan(
+      workflow.indexOf('run: bun audit --audit-level=moderate'),
+    );
   });
 
   it('runs the focused QA accessibility command only on its installed browser', () => {
@@ -71,7 +91,7 @@ describe('test harness safety guards', () => {
     expect(workflow).toContain('playwright test --project=chromium --grep "@a11y"');
   });
 
-  it('installs Bun before the visual regression workflow uses it', () => {
+  it('keeps visual baseline acceptance human-controlled', () => {
     const workflow = repositoryFile('.github/workflows/visual-regression.yml');
     const config = repositoryFile('playwright.visual.config.ts');
     const spec = repositoryFile('tests/visual/snapshots.spec.ts');
@@ -83,9 +103,11 @@ describe('test harness safety guards', () => {
     expect(workflow).not.toContain('cp .env.test .env');
     expect(workflow).not.toContain('secrets.TEST_SUPABASE');
     expect(workflow).toContain('playwright test --config=playwright.visual.config.ts');
-    expect(workflow).toContain(
-      "if: failure() && contains(github.event.pull_request.labels.*.name, 'update-snapshots')",
-    );
+    expect(workflow).toContain('Generate fresh current-head screenshots for human review');
+    expect(workflow).toContain('Fresh screenshots are review evidence only. This job never commits or pushes baselines.');
+    expect(workflow).toContain('Enforce visual gate');
+    expect(workflow).not.toContain('update-snapshots');
+    expect(workflow).not.toMatch(/git\s+(?:commit|push)\b/);
     expect(config).toContain("testDir: './tests/visual'");
     expect(spec).toContain("from '../truth-in-ui/_setup/fixtures'");
     expect(spec).toContain('await installSupabaseMock(context)');

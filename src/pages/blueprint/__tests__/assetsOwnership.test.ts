@@ -64,7 +64,8 @@ describe('Stage 7K closure - Assets & Systems ownership', () => {
       'utf8',
     );
     expect(summary).toMatch(/\/manage\/integrations/);
-    expect(summary).toMatch(/View in Manage/);
+    expect(summary).toMatch(/MANAGE_INTEGRATIONS_ROUTE/);
+    expect(summary).toMatch(/Operational connectivity/);
     expect(summary).not.toMatch(/credential|secret|Table\b/i);
   });
 

@@ -40,12 +40,14 @@ import {
   useTwinMappings,
 } from '@/connections/api';
 
+const DEMO_INTEGRATIONS_ENABLED = import.meta.env.VITE_AURA_DEMO_INTEGRATIONS === 'true';
+
 const TABS = [
   { value: 'overview', label: 'Overview' },
   { value: 'connections', label: 'Connected systems' },
   { value: 'data-flows', label: 'Data flows' },
   { value: 'catalogue', label: 'Available connectors' },
-  { value: 'demo', label: 'Demo integrations' },
+  ...(DEMO_INTEGRATIONS_ENABLED ? [{ value: 'demo', label: 'Demo integrations' }] : []),
   { value: 'activity', label: 'Health & audit' },
 ];
 
@@ -235,12 +237,14 @@ export default function Connections() {
           />
         </TabsContent>
 
-        <TabsContent value="demo" className="mt-4 min-w-0">
-          <DemoIntegrationsTab
-            definitions={definitions.data ?? []}
-            connections={connections.data ?? []}
-          />
-        </TabsContent>
+        {DEMO_INTEGRATIONS_ENABLED && (
+          <TabsContent value="demo" className="mt-4 min-w-0">
+            <DemoIntegrationsTab
+              definitions={definitions.data ?? []}
+              connections={connections.data ?? []}
+            />
+          </TabsContent>
+        )}
 
         <TabsContent value="activity" className="mt-4 min-w-0">
           <ActivityTab

@@ -8,7 +8,7 @@ import { authorizeAppUserOAuth } from '../_shared/appUserConnector.ts';
 import { getConnectionKeyForUser } from '../_shared/appUserConnections.ts';
 import { managedUserBinding } from '../_shared/managedUserBindings.ts';
 import { resolveCallerTenant } from '../_shared/connectionTenant.ts';
-import { getCorsHeaders } from '../_shared/cors.ts';
+import { evaluateCorsOrigin, getCorsHeaders } from '../_shared/cors.ts';
 import {
   authorizationUrlIsDemoProviderSafe,
   authorizationUrlIsWhiteLabelSafe,
@@ -28,10 +28,18 @@ function json(status: number, body: Record<string, unknown>) {
 }
 
 Deno.serve(async (req) => {
-  CORS = { ...getCorsHeaders(req.headers.get('origin')), ...CORS_EXTRA };
-  if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
-  const correlationId = crypto.randomUUID();
+  const requestOrigin = req.headers.get('origin');
+  const originDecision = evaluateCorsOrigin(requestOrigin, {}, true);
+  CORS = { ...originDecision.headers, ...CORS_EXTRA };
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: originDecision.allowed ? 204 : 403, headers: CORS });
+  }
+  if (req.method !== 'POST') return json(405, { error_code: 'method_not_allowed' });
+  if (!originDecision.allowed || !originDecision.origin) {
+    return json(403, { error_code: 'origin_not_allowed' });
+  }
 
+  const correlationId = crypto.randomUUID();
   const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
   const authHeader = req.headers.get('Authorization') ?? '';
   if (!authHeader.startsWith('Bearer ')) return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
@@ -46,9 +54,13 @@ Deno.serve(async (req) => {
     return json(400, { error_code: 'invalid_request', correlation_id: correlationId });
   }
   const definitionId = typeof body.connector_definition_id === 'string' ? body.connector_definition_id : '';
-  const origin = typeof body.origin === 'string' ? body.origin : '';
-  if (!definitionId || !/^https?:\/\/[^\s]+$/.test(origin)) {
-    return json(400, { error_code: 'invalid_request', correlation_id: correlationId });
+  const requestedOrigin = typeof body.origin === 'string' ? body.origin : '';
+  if (!definitionId || requestedOrigin !== originDecision.origin) {
+    return json(400, {
+      error_code: requestedOrigin ? 'origin_mismatch' : 'invalid_request',
+      safe_message: 'The authorization return origin did not match the approved AURA origin.',
+      correlation_id: correlationId,
+    });
   }
 
   const binding = managedUserBinding(definitionId);
@@ -91,7 +103,7 @@ Deno.serve(async (req) => {
       connectorId: binding.gateway_connector_key,
       appUserId: user.id,
       clientAPIKey,
-      returnUrl: new URL('/oauth/managed-user/return', origin).toString(),
+      returnUrl: new URL('/oauth/managed-user/return', originDecision.origin).toString(),
       connectionAPIKey: connectionAPIKey ?? undefined,
       credentialsConfiguration: { scopes: binding.scopes },
     });

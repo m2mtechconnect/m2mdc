@@ -19,6 +19,7 @@ import { CommandHeader } from '@/components/v2';
 import { OverviewTab } from '@/components/connections/OverviewTab';
 import { ConnectionsTab } from '@/components/connections/ConnectionsTab';
 import { CatalogueTab } from '@/components/connections/CatalogueTab';
+import { DemoIntegrationsTab } from '@/components/connections/DemoIntegrationsTab';
 import { DataFlowsTab } from '@/components/connections/DataFlowsTab';
 import { ActivityTab } from '@/components/connections/ActivityTab';
 import { ConnectionDetailDrawer } from '@/components/connections/ConnectionDetailDrawer';
@@ -44,6 +45,7 @@ const TABS = [
   { value: 'connections', label: 'Connected systems' },
   { value: 'data-flows', label: 'Data flows' },
   { value: 'catalogue', label: 'Available connectors' },
+  { value: 'demo', label: 'Demo integrations' },
   { value: 'activity', label: 'Health & audit' },
 ];
 
@@ -188,7 +190,6 @@ export default function Connections() {
           </TabsList>
         </div>
 
-
         <TabsContent value="overview" className="mt-4 min-w-0">
           <OverviewTab
             rows={rows}
@@ -231,6 +232,13 @@ export default function Connections() {
             definitions={definitions.data ?? []}
             connections={connections.data ?? []}
             onRefresh={refresh}
+          />
+        </TabsContent>
+
+        <TabsContent value="demo" className="mt-4 min-w-0">
+          <DemoIntegrationsTab
+            definitions={definitions.data ?? []}
+            connections={connections.data ?? []}
           />
         </TabsContent>
 

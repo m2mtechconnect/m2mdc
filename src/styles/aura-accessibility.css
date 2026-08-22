@@ -1,0 +1,24 @@
+/*
+ * AURA authenticated-shell accessibility hardening.
+ *
+ * This file is intentionally presentation-only. It does not alter route,
+ * auth, data, truth, workflow or runtime behavior.
+ */
+
+@media (prefers-reduced-motion: reduce) {
+  .aura-v2,
+  .aura-v2 *,
+  .aura-v2 *::before,
+  .aura-v2 *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* Keep focused/anchored content clear of the sticky application header. */
+.aura-v2 :target {
+  scroll-margin-top: 5rem;
+}

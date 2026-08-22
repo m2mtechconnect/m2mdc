@@ -18,6 +18,13 @@ enum DeployState {
   error = "error",
 }
 
+export interface BuilderStepLabel {
+  id: number;
+  title: string;
+  shortTitle: string;
+  tooltip: string;
+}
+
 interface BuilderLayoutProps {
   children: ReactNode;
   onBack?: () => void;
@@ -27,15 +34,22 @@ interface BuilderLayoutProps {
   nextLabel?: string;
   lastSaved?: Date | null;
   currentStep?: number;
+  /** Step labels for the active builder path. Must match the rendered panes. */
+  steps?: BuilderStepLabel[];
+  /** Sidebar heading and sub-heading for the active builder path. */
+  title?: string;
+  description?: string;
 }
 
-const STEPS = [
-  { id: 1, title: 'Business Profile', shortTitle: 'Profile', tooltip: 'Define your organization and twin objectives' },
-  { id: 2, title: 'Capabilities', shortTitle: 'Capabilities', tooltip: 'Configure KPIs and monitoring agents' },
-  { id: 3, title: 'AI & Integrations', shortTitle: 'AI', tooltip: 'Set up AI models and data sources' },
-  { id: 4, title: 'Scenarios', shortTitle: 'Scenarios', tooltip: 'Define simulation scenarios for testing' },
-  { id: 5, title: 'Deploy', shortTitle: 'Deploy', tooltip: 'Review and deploy your twin to production' },
+/** Default labels: the standard (non data-centre) wizard panes. */
+const DEFAULT_STEPS: BuilderStepLabel[] = [
+  { id: 1, title: 'Summary', shortTitle: 'Summary', tooltip: 'Name the system and describe what it must do' },
+  { id: 2, title: 'Intelligence', shortTitle: 'Intelligence', tooltip: 'Choose the model and reasoning configuration' },
+  { id: 3, title: 'Tools', shortTitle: 'Tools', tooltip: 'Select tools, data sources and connected systems' },
+  { id: 4, title: 'Workflow', shortTitle: 'Workflow', tooltip: 'Define triggers and the actions the system may take' },
+  { id: 5, title: 'Deploy', shortTitle: 'Deploy', tooltip: 'Review the configuration and deploy' },
 ];
+
 
 export function BuilderLayout({
   children,

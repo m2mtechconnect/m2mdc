@@ -26,7 +26,7 @@ const SOURCE = Object.freeze({
 });
 
 const args = process.argv.slice(2);
-const rootArg = args.find((arg) => !arg.startsWith('--'));
+const rootArg = args[0] && !args[0].startsWith('--') ? args[0] : null;
 if (!rootArg) {
   console.error('Usage: node scripts/dsx/inventory-content-pack.mjs <extracted-pack-root> [--output <file>] [--hash-candidates]');
   process.exit(2);
@@ -70,10 +70,15 @@ const HINTS = [
   ['dsx-pump', /pump/i],
   ['dsx-dry-cooler', /dry[_ -]?cooler/i],
   ['dsx-ups', /(^|[/_. -])ups([/_. -]|$)/i],
+  ['dsx-control-node', /control[_ -]?node/i],
+  ['dsx-general-purpose-node', /general[_ -]?purpose.*node|gen[_ -]?purpose.*node/i],
+  ['dsx-utility-cluster', /utility[_ -]?cluster/i],
+  ['dsx-dc-edge-cluster', /dc[_ -]?edge|edge[_ -]?cluster/i],
+  ['dsx-high-speed-storage', /high[_ -]?speed.*storage|storage.*high[_ -]?speed/i],
+  ['dsx-grid-substation', /substation|utility[_ -]?interconnect/i],
   ['dsx-backup-generator', /generator|genset/i],
   ['dsx-bess', /\bbess\b|battery.*storage/i],
-  ['dsx-control-node', /control[_ -]?node/i],
-  ['dsx-high-speed-storage', /high[_ -]?speed.*storage|storage.*high[_ -]?speed/i],
+  ['dsx-central-utility-building', /central[_ -]?utility|(^|[/_. -])cub([/_. -]|$)/i],
   ['dsx-fiber-spine', /fiber.*spine|fibre.*spine/i],
 ];
 
@@ -150,7 +155,7 @@ const report = {
 fs.mkdirSync(path.dirname(output), { recursive: true });
 fs.writeFileSync(output, `${JSON.stringify(report, null, 2)}\n`);
 
-console.log(`DSX CONTENT PACK INVENTORY COMPLETE`);
+console.log('DSX CONTENT PACK INVENTORY COMPLETE');
 console.log(`source=${SOURCE.id}@${SOURCE.version}`);
 console.log(`rootStage=${SOURCE.expectedRootStage}`);
 console.log(`usdFiles=${usdFileCount}`);

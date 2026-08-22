@@ -8,6 +8,7 @@ on:
       - 'scripts/asset-ingestion/**'
       - 'scripts/dsx/**'
       - 'scripts/verify-dsx-asset-blueprint.mjs'
+      - 'src/components/twin-visualization/assetRegistry.ts'
       - 'src/dsx/**'
       - 'src/validation/referenceFacility/**'
       - 'src/pages/admin/ReferenceFacilityValidation.tsx'
@@ -47,11 +48,13 @@ jobs:
       - name: Typecheck
         run: bun run typecheck
 
-      - name: DSX asset contract and reference-facility acceptance tests
+      - name: DSX asset, source-map, rack-BOM and reference-facility tests
         run: >-
           bunx vitest run
           src/dsx/__tests__/blueprintAssetRequirements.test.ts
+          src/dsx/__tests__/rackBomValidation.test.ts
           src/dsx/__tests__/sourceCatalog.test.ts
+          src/dsx/__tests__/sourceMap.test.ts
           src/validation/referenceFacility/__tests__/reconciliation.test.ts
           src/validation/referenceFacility/__tests__/regressionBaseline.test.ts
 

@@ -35,7 +35,7 @@ export const CONNECTION_CLASS_DESCRIPTION: Record<ConnectionClass, string> = {
   MANAGED_SHARED:
     'One AURA-controlled provider account is shared by the application. Managed authentication resolves the credential in trusted server-side code; every operation is re-authorized against your tenant, facility, role and approval state.',
   MANAGED_USER:
-    'Each person authorizes their own provider account. Tokens stay inside the secure connector gateway; AURA stores a non-secret evidence record only.',
+    'Each person authorizes their own provider account. Tokens stay inside the secure connector boundary; AURA stores a non-secret evidence record only.',
   AURA_NATIVE:
     'An AURA-owned worker holds the connection. Credentials live in the AURA credential vault and never leave AURA infrastructure.',
   EXTERNAL_DSX_RUNTIME:
@@ -66,11 +66,6 @@ export const ELIGIBILITY_TONE: Record<RuntimeEligibility, 'positive' | 'caution'
   NOT_VERIFIED: 'neutral',
 };
 
-/**
- * A build-time chat connector is never an operational AURA integration, and a
- * connector that is merely supported by the platform is not selectable until
- * an operator has verified the project binding.
- */
 export function isRuntimeSelectable(entry: { eligibility: RuntimeEligibility; linked_to_project: boolean }): boolean {
   return (
     (entry.eligibility === 'RUNTIME_SHARED_SUPPORTED' || entry.eligibility === 'RUNTIME_USER_SUPPORTED') &&
@@ -78,7 +73,6 @@ export function isRuntimeSelectable(entry: { eligibility: RuntimeEligibility; li
   );
 }
 
-/** Copy shown when authorization must leave AURA. Deliberately not reassuring. */
 export const EXTERNAL_AUTHORIZATION_NOTICE =
   'Continue to the provider\u2019s secure authorization service. This step leaves AURA, and the external authorization domain is visible in the browser address bar and in network inspection.';
 
@@ -124,7 +118,6 @@ function deny(reason_code: string, safe_message: string): AuthorizationDecision 
   return { allowed: false, reason_code, safe_message };
 }
 
-/** Mirror of the server gate. Default deny; order matters. */
 export function authorizeManagedOperation(ctx: AuthorizationContext): AuthorizationDecision {
   const c = ctx.connection;
 
@@ -171,6 +164,10 @@ export interface ManagedCapabilityEntry {
   eligibility: RuntimeEligibility;
   linked_to_project: boolean;
   runtime_selectable: boolean;
+  /** Server-derived white-label gate. False means runtime use must fail closed. */
+  white_label_ready?: boolean;
+  /** AURA-facing reason code only; never a vendor hostname. */
+  white_label_reason?: string;
   data_classes: string[];
   operations: Array<{
     id: string;
@@ -184,9 +181,7 @@ export interface ManagedCapabilityEntry {
   native_required_reason: string | null;
   verified_at: string | null;
   evidence_note: string;
-  /** True when this connector can be authorized per user at all. */
   user_bindable?: boolean;
-  /** True only when a connector client exists for this project. */
   user_client_configured?: boolean;
   requested_scopes?: string[];
   user_binding: {

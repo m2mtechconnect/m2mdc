@@ -50,7 +50,7 @@ export const NVIDIA_AGENT_MODELS = [
   },
 ] as const;
 
-const LEGACY_RUNTIME_IDS = new Set([
+const GOOGLE_RUNTIME_IDS = new Set([
   'google/gemini-2.5-flash',
   'google/gemini-2.5-flash-lite',
   'google/gemini-2.5-pro',
@@ -67,17 +67,25 @@ export function runtimeStatusForModel(
   readiness?: AiProviderReadiness | null,
 ): ModelRuntimeStatus {
   const id = modelId.trim().toLowerCase();
+  const provider = readiness?.selectedProvider?.trim().toLowerCase();
+
+  // Profiles are intentionally portable; the backend provider owns the actual
+  // executable model behind each profile.
   if (id.startsWith('profile:')) return 'runtime-supported';
-  if (LEGACY_RUNTIME_IDS.has(id)) return 'runtime-supported';
+
+  if (GOOGLE_RUNTIME_IDS.has(id)) {
+    // Before readiness loads, preserve the current default-provider behavior.
+    if (!provider) return 'runtime-supported';
+    return provider === 'lovable-managed' || provider === 'lovable'
+      ? 'runtime-supported'
+      : 'requires-provider';
+  }
 
   if (id.startsWith('nvidia/')) {
-    const provider = readiness?.selectedProvider?.trim().toLowerCase();
     if ((provider === 'nvidia' || provider === 'nvidia-build') && readiness?.nvidia?.configured) {
       return 'runtime-supported';
     }
     if ((provider === 'openai-compatible' || provider === 'self-hosted') && readiness?.openaiCompatible?.configured) {
-      // The backend router remains authoritative and will still require the
-      // selected NVIDIA ID to equal the configured model for that profile.
       return 'runtime-supported';
     }
     return 'requires-provider';
@@ -93,11 +101,7 @@ export function modelCanBeSelected(
   return runtimeStatusForModel(modelId, readiness) === 'runtime-supported';
 }
 
-/**
- * Preserve unrelated agent configuration when a model/profile is selected.
- * This closes the previous bug where changing a model replaced the whole JSON
- * config and could erase system prompts, runtime limits and tool settings.
- */
+/** Preserve unrelated agent configuration when a model/profile is selected. */
 export function mergeAgentModelConfig(
   existing: unknown,
   selection: { model: string; ragSettings?: unknown },

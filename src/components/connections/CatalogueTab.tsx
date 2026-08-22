@@ -1,10 +1,7 @@
 /**
  * Customer-facing hybrid-stack connector catalogue.
- *
- * A catalogue entry describes what AURA knows how to connect to; it is never
- * counted as a configured connection. Internal platform dependencies,
- * build-time knowledge connectors and Blueprint-owned design imports are
- * deliberately kept out of this operational catalogue.
+ * A catalogue entry describes what AURA can connect to; it never implies an
+ * authenticated, healthy or data-flowing connection.
  */
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -17,11 +14,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { useRBAC } from '@/contexts/RBACContext';
 import { ConnectionSetupWizard } from './ConnectionSetupWizard';
 import { canAddConnection, type ConnectionInstance, type ConnectorDefinition } from '@/connections/model';
-import {
-  AVAILABILITY_LABEL,
-  availabilityOf,
-  connectorGlyph,
-} from '@/connections/presentation';
+import { AVAILABILITY_LABEL, availabilityOf, connectorGlyph } from '@/connections/presentation';
 import {
   HYBRID_STACK_GROUPS,
   connectorStackNote,
@@ -30,11 +23,7 @@ import {
   type CustomerConnectorGroupId,
 } from '@/connections/catalogueTaxonomy';
 import { useManagedConnectorCapabilities } from '@/connections/managedConnectorApi';
-import {
-  CONNECTION_CLASS_LABEL,
-  ELIGIBILITY_LABEL,
-  type ManagedCapabilityEntry,
-} from '@/connections/managedConnectors';
+import { CONNECTION_CLASS_LABEL, ELIGIBILITY_LABEL, type ManagedCapabilityEntry } from '@/connections/managedConnectors';
 
 const AVAILABILITY_TONE: Record<string, string> = {
   AVAILABLE: 'v2-surface-verified v2-text-verified',
@@ -67,22 +56,17 @@ export function CatalogueTab({
   const [wizardFor, setWizardFor] = useState<string | null>(null);
   const [details, setDetails] = useState<ConnectorDefinition | null>(null);
 
-  const definitionById = useMemo(
-    () => new Map(definitions.map((definition) => [definition.id, definition])),
-    [definitions],
-  );
-
-  const managedRows = useMemo(
-    () => (managedCapabilities.data?.entries ?? [])
-      .filter(isManaged)
-      .map((entry) => ({ entry, definition: definitionById.get(entry.connector_definition_id) }))
-      .filter((row): row is { entry: ManagedCapabilityEntry; definition: ConnectorDefinition } => Boolean(row.definition)),
-    [definitionById, managedCapabilities.data?.entries],
-  );
+  const managedByDefinitionId = useMemo(() => {
+    const map = new Map<string, ManagedCapabilityEntry>();
+    for (const entry of managedCapabilities.data?.entries ?? []) {
+      if (isManaged(entry)) map.set(entry.connector_definition_id, entry);
+    }
+    return map;
+  }, [managedCapabilities.data?.entries]);
 
   const configuredCounts = useMemo(() => {
     const map = new Map<string, number>();
-    connections.forEach((c) => map.set(c.connector_id, (map.get(c.connector_id) ?? 0) + 1));
+    connections.forEach((connection) => map.set(connection.connector_id, (map.get(connection.connector_id) ?? 0) + 1));
     return map;
   }, [connections]);
 
@@ -104,129 +88,52 @@ export function CatalogueTab({
     [visible],
   );
 
+  const detailsManaged = details ? managedByDefinitionId.get(details.id) ?? null : null;
+
   return (
     <div className="space-y-5">
       <Panel>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-3xl space-y-1">
-            <p className="text-sm font-semibold">AURA connection catalogue</p>
+            <p className="text-sm font-semibold">Connectors</p>
             <p className="text-sm text-muted-foreground">
-              AURA combines managed business/data capabilities with native facility, Physical AI, edge,
-              digital-twin, storage and observability connectors. Catalogue availability never means a
-              connector is authenticated, healthy or moving data.
+              Browse AURA-managed and AURA-native connectors in one catalogue. Availability describes what can be configured; it never means authenticated, healthy or moving data.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" className="h-10" asChild>
-              <Link to="/blueprint/default">
-                Design imports in Blueprint
-                <ArrowUpRight className="ml-1.5 h-3.5 w-3.5" aria-hidden />
-              </Link>
+              <Link to="/blueprint/default">Design imports in Blueprint<ArrowUpRight className="ml-1.5 h-3.5 w-3.5" aria-hidden /></Link>
             </Button>
             <Button variant="outline" size="sm" className="h-10" asChild>
-              <Link to="/admin/platform-readiness">
-                Platform integration readiness
-                <ArrowUpRight className="ml-1.5 h-3.5 w-3.5" aria-hidden />
-              </Link>
+              <Link to="/admin/platform-readiness">Platform readiness<ArrowUpRight className="ml-1.5 h-3.5 w-3.5" aria-hidden /></Link>
             </Button>
           </div>
-        </div>
-      </Panel>
-
-      <Panel>
-        <div className="space-y-4">
-          <div className="flex items-start gap-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-muted" aria-hidden>
-              <CloudCog className="h-4 w-4" />
-            </span>
-            <div>
-              <p className="text-sm font-semibold">AURA Managed capabilities</p>
-              <p className="text-sm text-muted-foreground">
-                Server-owned eligibility and project-binding evidence for approved managed connectors. Provider credentials and tokens are not exposed here.
-              </p>
-            </div>
-          </div>
-
-          {managedCapabilities.isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading managed capability evidence…</p>
-          ) : managedRows.length === 0 ? (
-            <SubPanel className="text-sm text-muted-foreground">
-              No managed capability has server-verified project binding evidence for this session. Nothing is inferred from build-time availability.
-            </SubPanel>
-          ) : (
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {managedRows.map(({ entry, definition }) => (
-                <SubPanel key={`${entry.connection_class}:${definition.id}`} className="space-y-3">
-                  <div>
-                    <p className="text-sm font-semibold">{definition.name}</p>
-                    <p className="text-xs text-muted-foreground">{CONNECTION_CLASS_LABEL[entry.connection_class]}</p>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    <Badge variant="outline" className="text-xs">{ELIGIBILITY_LABEL[entry.eligibility]}</Badge>
-                    <Badge variant="outline" className="text-xs">
-                      {entry.linked_to_project ? 'Project linked' : 'Project not linked'}
-                    </Badge>
-                    {entry.runtime_selectable && (
-                      <Badge variant="outline" className="v2-surface-verified v2-text-verified text-xs">Runtime selectable</Badge>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {entry.operations.length > 0
-                      ? `${entry.operations.length} allowlisted operation${entry.operations.length === 1 ? '' : 's'} exposed by the AURA policy boundary.`
-                      : 'No allowlisted runtime operation is currently exposed.'}
-                  </p>
-                  {entry.evidence_note && <p className="text-xs text-muted-foreground">{entry.evidence_note}</p>}
-                </SubPanel>
-              ))}
-            </div>
-          )}
         </div>
       </Panel>
 
       <div className="flex flex-wrap items-center gap-2">
         <Input
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search operational connectors"
-          aria-label="Search operational connectors"
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search connectors"
+          aria-label="Search connectors"
           className="h-10 w-full max-w-xs text-sm"
         />
         <div className="flex flex-wrap gap-2" role="group" aria-label="Connector groups">
-          <Button
-            size="sm"
-            variant={filter === 'all' ? 'default' : 'outline'}
-            className="h-10"
-            aria-pressed={filter === 'all'}
-            onClick={() => setFilter('all')}
-          >
-            All connectors
-          </Button>
-          <Button
-            size="sm"
-            variant={filter === 'available' ? 'default' : 'outline'}
-            className="h-10"
-            aria-pressed={filter === 'available'}
-            onClick={() => setFilter('available')}
-          >
-            Available now
-          </Button>
+          <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>All</FilterButton>
+          <FilterButton active={filter === 'available'} onClick={() => setFilter('available')}>Available now</FilterButton>
           {HYBRID_STACK_GROUPS.map((group) => (
-            <Button
-              key={group.id}
-              size="sm"
-              variant={filter === group.id ? 'default' : 'outline'}
-              className="h-10"
-              aria-pressed={filter === group.id}
-              onClick={() => setFilter(group.id)}
-            >
-              {group.label}
-            </Button>
+            <FilterButton key={group.id} active={filter === group.id} onClick={() => setFilter(group.id)}>{group.label}</FilterButton>
           ))}
         </div>
       </div>
 
+      {managedCapabilities.isLoading && (
+        <p className="text-xs text-muted-foreground" role="status">Loading managed-connector evidence…</p>
+      )}
+
       {grouped.length === 0 ? (
-        <Panel className="p-8 text-center text-sm text-muted-foreground">No operational connector matches this filter.</Panel>
+        <Panel className="p-8 text-center text-sm text-muted-foreground">No connector matches this filter.</Panel>
       ) : (
         <div className="space-y-7">
           {grouped.map((group) => (
@@ -242,49 +149,49 @@ export function CatalogueTab({
                   const addable = canAddConnection(definition);
                   const configured = configuredCounts.get(definition.id) ?? 0;
                   const stackNote = connectorStackNote(definition);
+                  const managed = managedByDefinitionId.get(definition.id) ?? null;
+
                   return (
                     <Panel key={definition.id} className="flex min-w-0 flex-col">
                       <div className="flex flex-1 flex-col gap-3">
                         <div className="flex items-start gap-3">
-                          <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-md text-xs font-semibold ${glyph.className}`} aria-hidden>
-                            {glyph.mark}
-                          </span>
+                          <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-md text-xs font-semibold ${glyph.className}`} aria-hidden>{glyph.mark}</span>
                           <div className="min-w-0">
                             <p className="truncate text-sm font-semibold">{definition.name}</p>
-                            <p className="v2-mono truncate text-xs text-muted-foreground">{definition.category}</p>
+                            <p className="truncate text-xs text-muted-foreground">{definition.category}</p>
                           </div>
                         </div>
+
                         <p className="text-sm text-muted-foreground">
                           {definition.supported_data_classes.length > 0
                             ? `Exchanges ${definition.supported_data_classes.slice(0, 3).join(', ')}.`
                             : 'No runtime data class is declared yet.'}
                         </p>
-                        {stackNote && <SubPanel className="text-xs text-muted-foreground">{stackNote}</SubPanel>}
+
                         <div className="flex flex-wrap gap-1.5">
-                          <Badge variant="outline" className={`text-xs ${AVAILABILITY_TONE[availability]}`}>
-                            {AVAILABILITY_LABEL[availability]}
-                          </Badge>
-                          {configured > 0 && (
-                            <Badge variant="outline" className="v2-mono text-xs">{configured} configured</Badge>
+                          <Badge variant="outline" className={`text-xs ${AVAILABILITY_TONE[availability]}`}>{AVAILABILITY_LABEL[availability]}</Badge>
+                          {managed && (
+                            <Badge variant="outline" className="gap-1 text-xs">
+                              <CloudCog className="h-3 w-3" aria-hidden />
+                              {CONNECTION_CLASS_LABEL[managed.connection_class]}
+                            </Badge>
                           )}
+                          {managed && <Badge variant="outline" className="text-xs">{ELIGIBILITY_LABEL[managed.eligibility]}</Badge>}
+                          {managed?.runtime_selectable && <Badge variant="outline" className="v2-surface-verified v2-text-verified text-xs">Runtime selectable</Badge>}
+                          {configured > 0 && <Badge variant="outline" className="v2-mono text-xs">{configured} configured</Badge>}
                         </div>
+
+                        {stackNote && <p className="text-xs text-muted-foreground">{stackNote}</p>}
+
                         <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">
                           {addable ? (
-                            <Button size="sm" className="h-10" disabled={!isAdmin} onClick={() => setWizardFor(definition.id)}>
-                              Add connection
-                            </Button>
+                            <Button size="sm" className="h-10" disabled={!isAdmin} onClick={() => setWizardFor(definition.id)}>Connect</Button>
                           ) : (
-                            <Button size="sm" variant="outline" className="h-10" onClick={() => setDetails(definition)}>
-                              View requirements
-                            </Button>
+                            <Button size="sm" variant="outline" className="h-10" onClick={() => setDetails(definition)}>View requirements</Button>
                           )}
-                          <Button size="sm" variant="ghost" className="h-10" onClick={() => setDetails(definition)}>
-                            Details
-                          </Button>
+                          <Button size="sm" variant="ghost" className="h-10" onClick={() => setDetails(definition)}>Details</Button>
                         </div>
-                        {addable && !isAdmin && (
-                          <p className="text-xs text-muted-foreground">Creating a connection requires an administrator role.</p>
-                        )}
+                        {addable && !isAdmin && <p className="text-xs text-muted-foreground">Connecting a system requires an administrator role.</p>}
                       </div>
                     </Panel>
                   );
@@ -301,37 +208,46 @@ export function CatalogueTab({
             <>
               <SheetHeader className="text-left">
                 <SheetTitle className="text-lg">{details.name}</SheetTitle>
-                <SheetDescription className="text-sm">
-                  {details.category} · v{details.version} · {AVAILABILITY_LABEL[availabilityOf(details)]}
-                </SheetDescription>
+                <SheetDescription className="text-sm">{details.category} · v{details.version} · {AVAILABILITY_LABEL[availabilityOf(details)]}</SheetDescription>
               </SheetHeader>
+
+              {detailsManaged && (
+                <SubPanel className="mt-5 space-y-2">
+                  <div className="flex flex-wrap gap-1.5">
+                    <Badge variant="outline">{CONNECTION_CLASS_LABEL[detailsManaged.connection_class]}</Badge>
+                    <Badge variant="outline">{ELIGIBILITY_LABEL[detailsManaged.eligibility]}</Badge>
+                    <Badge variant="outline">{detailsManaged.linked_to_project ? 'Project linked' : 'Project not linked'}</Badge>
+                    {detailsManaged.runtime_selectable && <Badge variant="outline" className="v2-surface-verified v2-text-verified">Runtime selectable</Badge>}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {detailsManaged.operations.length > 0
+                      ? `${detailsManaged.operations.length} allowlisted operation${detailsManaged.operations.length === 1 ? '' : 's'} are exposed by the AURA policy boundary.`
+                      : 'No allowlisted runtime operation is currently exposed.'}
+                  </p>
+                  {detailsManaged.evidence_note && <p className="text-xs text-muted-foreground">{detailsManaged.evidence_note}</p>}
+                </SubPanel>
+              )}
+
               <dl className="mt-6 space-y-4 text-sm">
-                <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Hybrid-stack group</dt><dd>{HYBRID_STACK_GROUPS.find((group) => group.id === customerConnectorGroupOf(details))?.label ?? 'Custom'}</dd></div>
-                <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Direction</dt><dd>{details.supported_directions.join(', ') || 'None'}</dd></div>
-                <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Authentication methods</dt><dd>{details.supported_auth_methods.join(', ') || 'None'}</dd></div>
-                <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Data classes</dt><dd>{details.supported_data_classes.join(', ') || 'None'}</dd></div>
-                <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Protocols</dt><dd>{details.supported_protocols.join(', ') || 'None'}</dd></div>
-                <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Runtime requirement</dt><dd>{details.runtime_adapter ? `AURA runtime adapter ${details.runtime_adapter}` : 'No runtime adapter exists, so a connection cannot be created.'}</dd></div>
-                <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Validation</dt><dd>{details.validation_status.replace(/_/g, ' ').toLowerCase()}</dd></div>
-                {connectorStackNote(details) && (
-                  <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Stack status</dt><dd>{connectorStackNote(details)}</dd></div>
-                )}
+                <Detail label="Group" value={HYBRID_STACK_GROUPS.find((group) => group.id === customerConnectorGroupOf(details))?.label ?? 'Custom'} />
+                <Detail label="Direction" value={details.supported_directions.join(', ') || 'None'} />
+                <Detail label="Authentication" value={details.supported_auth_methods.join(', ') || 'None'} />
+                <Detail label="Data classes" value={details.supported_data_classes.join(', ') || 'None'} />
+                <Detail label="Protocols" value={details.supported_protocols.join(', ') || 'None'} />
+                <Detail label="Runtime requirement" value={details.runtime_adapter ? `AURA runtime adapter ${details.runtime_adapter}` : 'No runtime adapter exists, so a connection cannot be created.'} />
+                <Detail label="Validation" value={details.validation_status.replace(/_/g, ' ').toLowerCase()} />
+                {connectorStackNote(details) && <Detail label="Stack status" value={connectorStackNote(details) ?? ''} />}
                 {details.capability_evidence?.length > 0 && (
                   <div>
                     <dt className="text-xs uppercase tracking-wide text-muted-foreground">Capability evidence</dt>
-                    <dd>
-                      <ul className="list-disc space-y-1 pl-4">
-                        {details.capability_evidence.map((e, i) => <li key={i}>{e.note}</li>)}
-                      </ul>
-                    </dd>
+                    <dd><ul className="list-disc space-y-1 pl-4">{details.capability_evidence.map((e, i) => <li key={i}>{e.note}</li>)}</ul></dd>
                   </div>
                 )}
               </dl>
+
               <div className="mt-6 flex flex-wrap gap-2">
                 {canAddConnection(details) && (
-                  <Button className="h-10" disabled={!isAdmin} onClick={() => { setWizardFor(details.id); setDetails(null); }}>
-                    Add connection
-                  </Button>
+                  <Button className="h-10" disabled={!isAdmin} onClick={() => { setWizardFor(details.id); setDetails(null); }}>Connect</Button>
                 )}
                 {details.documentation_url && (
                   <Button variant="outline" className="h-10" asChild>
@@ -354,4 +270,16 @@ export function CatalogueTab({
       />
     </div>
   );
+}
+
+function FilterButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <Button size="sm" variant={active ? 'default' : 'outline'} className="h-10" aria-pressed={active} onClick={onClick}>
+      {children}
+    </Button>
+  );
+}
+
+function Detail({ label, value }: { label: string; value: string }) {
+  return <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">{label}</dt><dd>{value}</dd></div>;
 }

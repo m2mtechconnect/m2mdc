@@ -1,0 +1,63 @@
+name: AURA Builder Connections UX Audit
+
+on:
+  pull_request:
+    branches: [audit/aura-integration-hardening]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CI: true
+  AURA_RELEASE_ENVIRONMENT: demo
+  PROD_BASE_URL: https://auradc.m2mtechconnect.com
+  VITE_SUPABASE_URL: https://demo-placeholder.supabase.co
+  VITE_SUPABASE_PUBLISHABLE_KEY: demo-public-placeholder
+
+jobs:
+  ui-ux-audit:
+    name: Builder and Connections UX audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.3'
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Builder and Connections UX invariants
+        run: >-
+          bunx vitest run
+          src/config/__tests__/builderConnectionsUx.test.ts
+          src/config/__tests__/customerSurfaceWhiteLabel.test.ts
+          src/config/__tests__/auraRuntimeCatalog.test.ts
+          src/connections/__tests__/demoIntegrationPolicy.test.ts
+
+      - name: Build production-mode AURA demo artifact
+        env:
+          AURA_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          AURA_RELEASE_BRANCH: ${{ github.head_ref || github.ref_name }}
+          AURA_BUILD_ID: ux-${{ github.run_id }}-${{ github.run_attempt }}
+        run: bunx vite build --mode demo
+
+      - name: Verify demo truth and white-label artifact
+        env:
+          AURA_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node scripts/verify-aura-demo-build.mjs
+
+      - name: Upload exact-head UX audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: aura-builder-connections-ux-${{ github.event.pull_request.head.sha || github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7

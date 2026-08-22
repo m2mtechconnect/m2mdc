@@ -245,7 +245,7 @@ export function BuilderLayout({
 
         {/* Main Content */}
         <main className="flex-1 flex flex-col">
-          <div className="flex-1 overflow-y-auto pt-16 lg:pt-0">
+          <div className="flex-1 overflow-y-auto pt-16 md:pt-0">
             <div className="max-w-[880px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {children}
             </div>
@@ -253,6 +253,15 @@ export function BuilderLayout({
 
           {/* Sticky Bottom Navigation */}
           <div className="sticky bottom-0 left-0 right-0 border-t bg-background p-4">
+            {deployError && (
+              <div
+                role="alert"
+                className="max-w-[880px] mx-auto mb-3 flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-foreground"
+              >
+                <AlertCircle className="w-4 h-4 mt-0.5 text-destructive flex-shrink-0" />
+                <span>{deployError}</span>
+              </div>
+            )}
             <div className="max-w-[880px] mx-auto flex items-center justify-between gap-4">
               <Button
                 variant="outline"
@@ -270,13 +279,13 @@ export function BuilderLayout({
               {isDeployStep && onDeploy ? (
                 <Button
                   onClick={handleDeployClick}
-                  disabled={nextDisabled || deployState !== DeployState.idle}
+                  disabled={nextDisabled || deployState === DeployState.deploying || deployState === DeployState.success}
                   className="min-w-[100px] gap-2"
                 >
-                  {deployState === DeployState.idle && (
+                  {(deployState === DeployState.idle || deployState === DeployState.error) && (
                     <>
                       <Rocket className="w-4 h-4" />
-                      {nextLabel}
+                      {deployState === DeployState.error ? 'Retry deploy' : nextLabel}
                     </>
                   )}
                   {(deployState === DeployState.morphing || deployState === DeployState.deploying) && (
@@ -288,17 +297,12 @@ export function BuilderLayout({
                   {deployState === DeployState.success && (
                     <>
                       <CheckCircle2 className="w-4 h-4" />
-                      Deployed!
-                    </>
-                  )}
-                  {deployState === DeployState.error && (
-                    <>
-                      <AlertCircle className="w-4 h-4" />
-                      Add actions
+                      Deployed
                     </>
                   )}
                 </Button>
               ) : (
+
                 <Button
                   onClick={onNext}
                   disabled={nextDisabled}

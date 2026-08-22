@@ -7,6 +7,8 @@
  *  - Reference and derived-scenario facilities never contribute to
  *    operational totals.
  *  - A missing input is reported, never fabricated.
+ *  - Conflicting NVIDIA demo-source records are preserved as conflicts; AURA
+ *    never silently chooses one value and calls it authoritative.
  */
 
 /** Classification of an individual normalized reference record. */
@@ -15,6 +17,12 @@ export type ReferenceDataClass =
   | 'REFERENCE_CONFIGURATION'
   | 'REFERENCE_FORMULA'
   | 'REFERENCE_KPI_VALUE'
+  | 'REFERENCE_KPI_METADATA'
+  | 'REFERENCE_OPTION'
+  | 'REFERENCE_GPU_SPECIFICATION'
+  | 'REFERENCE_BUILDING_SPECIFICATION'
+  | 'REFERENCE_SITE_SPECIFICATION_VARIANT'
+  | 'REFERENCE_SIMULATION_VARIABLE'
   | 'REFERENCE_SCENARIO'
   | 'SAMPLE_SIMULATION_OUTPUT'
   | 'SAMPLE_CFD_OUTPUT'
@@ -45,6 +53,13 @@ export type LicenceStatus =
   | 'REQUIRES_LEGAL_REVIEW'
   | 'REDISTRIBUTION_PROHIBITED'
   | 'BLOCKED';
+
+/** Relationship between equivalent-looking values in NVIDIA's demo source. */
+export type SourceConsistency =
+  | 'UNIQUE'
+  | 'DUPLICATE'
+  | 'SCOPED_VARIANT'
+  | 'SOURCE_CONFLICT';
 
 /**
  * One normalized value sourced from an official NVIDIA artefact. Every field
@@ -82,6 +97,14 @@ export interface ReferenceRecord {
   is_measured: boolean;
   is_simulated: boolean;
   is_operational: boolean;
+  /** Which source block produced this normalized record. */
+  source_variant?: string | null;
+  /** Whether an equivalent source value is unique, duplicate, scoped, or conflicting. */
+  source_consistency?: SourceConsistency;
+  /** Stable key joining records that describe the same semantic fact. */
+  source_conflict_group?: string | null;
+  /** Narrow scope note used to prevent false conflict merges (for example GPU-preset vs site+GPU). */
+  source_scope?: string | null;
 }
 
 /** A facility in the portfolio, with its honest classification. */

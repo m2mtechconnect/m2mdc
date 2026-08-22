@@ -190,6 +190,8 @@ export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
   neutral('/twin-preview', 'Twin preview', 'Geometry only.'),
   neutral('/infrastructure', 'Infrastructure', 'Asset registry only.'),
   neutral('/teams', 'Teams'),
+  neutral('/teams/access-control', 'Team access control', 'Identity and permission controls only.'),
+  neutral('/teams/onboarding', 'Team onboarding', 'Identity/onboarding workflow only.'),
   neutral('/marketplace', 'Marketplace'),
   neutral('/playbook', 'Playbook'),
   neutral('/settings/ai', 'AI settings', 'Provider configuration only; unchanged by dataset.'),

@@ -1,0 +1,63 @@
+name: AURA NVIDIA Reference Completeness Qualification
+
+on:
+  pull_request:
+    branches:
+      - dsx/aura-simulation-calibration-evidence
+      - dsx/aura-simulation-fidelity-qualification
+      - dsx/aura-blueprint-asset-remediation
+    paths:
+      - 'src/data/dsxReference/**'
+      - 'src/data/dataset/**'
+      - 'src/components/dataset/**'
+      - 'scripts/dsx-reference/**'
+      - 'docs/dsx-reference-data/**'
+      - '.github/workflows/aura-nvidia-reference-completeness.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CI: true
+  AURA_RELEASE_ENVIRONMENT: preview
+  PROD_BASE_URL: https://auradc.m2mtechconnect.com
+  VITE_SUPABASE_URL: https://preview-placeholder.supabase.co
+  VITE_SUPABASE_PUBLISHABLE_KEY: preview-public-placeholder
+
+jobs:
+  nvidia-reference-completeness:
+    name: NVIDIA public demo source coverage, conflicts and runtime truth
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.3'
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Reference corpus, source-conflict and dataset isolation tests
+        run: >-
+          bunx vitest run
+          src/data/dsxReference/__tests__/referenceBaseline.test.ts
+          src/data/dsxReference/__tests__/mockDataGuard.test.ts
+          src/data/dsxReference/__tests__/sourceCompleteness.test.ts
+          src/data/dataset
+
+      - name: Verify NVIDIA public demo source has not moved and checksums still match
+        run: bun scripts/dsx-reference/verify-source-completeness.ts
+
+      - name: Production-mode application build
+        env:
+          AURA_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          AURA_RELEASE_BRANCH: ${{ github.head_ref || github.ref_name }}
+          AURA_BUILD_ID: nvidia-reference-completeness-${{ github.run_id }}-${{ github.run_attempt }}
+        run: bun run build

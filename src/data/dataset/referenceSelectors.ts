@@ -1,5 +1,5 @@
 /**
- * Selectors over the 65 normalized NVIDIA reference records.
+ * Selectors over the source-complete normalized NVIDIA reference corpus.
  *
  * Every page in reference mode reads through these selectors. There is no
  * page-local copy of the data, and no component may import a mock array while
@@ -9,8 +9,11 @@ import {
   CLASSIFIED_FACILITIES,
   DSX_REFERENCE_RECORDS,
   MONTREAL_DERIVED_SCENARIO,
+  sourceConflictRecords,
+  sourceCoverageSummary,
   type ClassifiedFacility,
   type ReferenceRecord,
+  type SourceConsistency,
 } from '@/data/dsxReference';
 import {
   NGC_UNAVAILABLE,
@@ -34,12 +37,22 @@ export interface DatasetValue {
   ingestedAt: string | null;
   licenceStatus: string | null;
   normalizationRule: string | null;
+  sourceVariant: string | null;
+  sourceConsistency: SourceConsistency | null;
+  sourceConflictGroup: string | null;
+  sourceScope: string | null;
   unavailable: typeof NGC_UNAVAILABLE | null;
 }
 
 const CLASS_MAP: Record<string, ValueClassification> = {
   REFERENCE_KPI_VALUE: 'REFERENCE_VALUE',
+  REFERENCE_KPI_METADATA: 'REFERENCE_SPECIFICATION',
   REFERENCE_SPECIFICATION: 'REFERENCE_SPECIFICATION',
+  REFERENCE_GPU_SPECIFICATION: 'REFERENCE_SPECIFICATION',
+  REFERENCE_BUILDING_SPECIFICATION: 'REFERENCE_SPECIFICATION',
+  REFERENCE_SITE_SPECIFICATION_VARIANT: 'REFERENCE_SPECIFICATION',
+  REFERENCE_SIMULATION_VARIABLE: 'REFERENCE_SPECIFICATION',
+  REFERENCE_OPTION: 'REFERENCE_CONFIGURATION',
   REFERENCE_CONFIGURATION: 'REFERENCE_CONFIGURATION',
   REFERENCE_SCENARIO: 'REFERENCE_SCENARIO',
 };
@@ -66,6 +79,10 @@ export function toDatasetValue(record: ReferenceRecord): DatasetValue {
     ingestedAt: record.retrieved_at,
     licenceStatus: record.licence_status,
     normalizationRule: record.transformation_record,
+    sourceVariant: record.source_variant ?? null,
+    sourceConsistency: record.source_consistency ?? 'UNIQUE',
+    sourceConflictGroup: record.source_conflict_group ?? null,
+    sourceScope: record.source_scope ?? null,
     unavailable: classification === 'UNAVAILABLE' ? NGC_UNAVAILABLE : null,
   };
 }
@@ -87,6 +104,10 @@ export function unavailableValue(key: string, label: string): DatasetValue {
     ingestedAt: null,
     licenceStatus: null,
     normalizationRule: null,
+    sourceVariant: null,
+    sourceConsistency: null,
+    sourceConflictGroup: null,
+    sourceScope: null,
     unavailable: NGC_UNAVAILABLE,
   };
 }
@@ -102,33 +123,40 @@ export function recordsByClass(dataClass: string): ReferenceRecord[] {
 
 export function referenceKpiValues(configurationId: string): DatasetValue[] {
   return DSX_REFERENCE_RECORDS.filter(
-    (r) => r.data_class === 'REFERENCE_KPI_VALUE' && r.configuration_id === configurationId,
+    (r) =>
+      r.data_class === 'REFERENCE_KPI_VALUE' &&
+      r.source_variant === 'configs.ts:configuration-kpi' &&
+      r.configuration_id === configurationId,
   ).map(toDatasetValue);
 }
 
+/**
+ * Legacy page-level site-spec selector. It intentionally keeps the original
+ * 21 `kpis.ts` SITE_DATA records so migrated page identity does not change.
+ * The complete corpus and preserved conflicts remain available through
+ * `allReferenceValues`, search, exports and `referenceSourceConflicts`.
+ */
 export function referenceSpecifications(configurationId?: string): DatasetValue[] {
   return recordsByClass('REFERENCE_SPECIFICATION')
     .filter((r) => !configurationId || r.configuration_id === configurationId)
     .map(toDatasetValue);
 }
 
-/** Specifications are published per site, not per configuration. */
+/** Legacy site-spec surface: 7 records per site from NVIDIA `kpis.ts`. */
 export function referenceSpecificationsForSite(site?: string | null): DatasetValue[] {
   return recordsByClass('REFERENCE_SPECIFICATION')
     .filter((r) => !site || r.site === site)
     .map(toDatasetValue);
 }
 
-/**
- * The site a configuration belongs to, read from the record itself.
- *
- * Never derive this by splitting the configuration id: that only worked while
- * every id happened to match `<site>-<platform>` and silently produced a wrong
- * site (and therefore an empty specification list) for any other id shape.
- */
+/** The site a configuration belongs to, read from the record itself. */
 export function siteForConfiguration(configurationId: string): string | null {
   const record = DSX_REFERENCE_RECORDS.find(
-    (r) => r.configuration_id === configurationId && Boolean(r.site),
+    (r) =>
+      r.data_class === 'REFERENCE_CONFIGURATION' &&
+      r.source_variant === 'configs.ts:configuration' &&
+      r.configuration_id === configurationId &&
+      Boolean(r.site),
   );
   return record?.site ?? null;
 }
@@ -140,13 +168,17 @@ export function allReferenceValues(): DatasetValue[] {
 
 /** Reference configuration ids, in source order. */
 export function referenceConfigurationIds(): string[] {
-  return recordsByClass('REFERENCE_CONFIGURATION')
+  return DSX_REFERENCE_RECORDS.filter(
+    (r) => r.data_class === 'REFERENCE_CONFIGURATION' && r.source_variant === 'configs.ts:configuration',
+  )
     .map((r) => r.configuration_id)
     .filter((id): id is string => Boolean(id));
 }
 
 export function referenceConfigurations(): DatasetValue[] {
-  return recordsByClass('REFERENCE_CONFIGURATION').map(toDatasetValue);
+  return DSX_REFERENCE_RECORDS.filter(
+    (r) => r.data_class === 'REFERENCE_CONFIGURATION' && r.source_variant === 'configs.ts:configuration',
+  ).map(toDatasetValue);
 }
 
 /** The only reference scenarios AURA may offer as simulation inputs. */
@@ -169,6 +201,16 @@ export function montrealNotSupplied(): DatasetValue[] {
   );
 }
 
+/** Every preserved upstream source-conflict record. */
+export function referenceSourceConflicts(): DatasetValue[] {
+  return sourceConflictRecords().map(toDatasetValue);
+}
+
+/** Summary used by the admin banner/evidence surfaces. */
+export function referenceSourceCoverage() {
+  return sourceCoverageSummary();
+}
+
 /** Admin-only search over normalized records and classified facilities. */
 export interface DatasetSearchHit {
   id: string;
@@ -186,7 +228,9 @@ export function searchDataset(query: string): DatasetSearchHit[] {
     (r) =>
       r.metric_label.toLowerCase().includes(q) ||
       r.record_id.toLowerCase().includes(q) ||
-      (r.site ?? '').toLowerCase().includes(q),
+      (r.site ?? '').toLowerCase().includes(q) ||
+      (r.compute_platform ?? '').toLowerCase().includes(q) ||
+      (r.source_variant ?? '').toLowerCase().includes(q),
   ).map((r) => ({
     id: r.record_id,
     title: r.metric_label,

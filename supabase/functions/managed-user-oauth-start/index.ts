@@ -1,7 +1,7 @@
 /**
  * Starts an AURA Managed User Connection authorization for the signed-in user.
- * Returns only a white-label-safe provider authorization URL - never a token,
- * credential name, handle, or implementation-vendor gateway URL.
+ * Returns only a provider authorization URL - never a token, credential name,
+ * handle, or implementation gateway URL.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { authorizeAppUserOAuth } from '../_shared/appUserConnector.ts';
@@ -10,8 +10,10 @@ import { managedUserBinding } from '../_shared/managedUserBindings.ts';
 import { resolveCallerTenant } from '../_shared/connectionTenant.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 import {
+  authorizationUrlIsDemoProviderSafe,
   authorizationUrlIsWhiteLabelSafe,
-  managedConnectorGatewayPolicy,
+  demoManagedOAuthEnabled,
+  managedUserOAuthGatewayPolicy,
   whiteLabelBlockedResponse,
 } from '../_shared/whiteLabelGateway.ts';
 
@@ -58,7 +60,7 @@ Deno.serve(async (req) => {
     });
   }
 
-  const gateway = managedConnectorGatewayPolicy();
+  const gateway = managedUserOAuthGatewayPolicy();
   if (!gateway.runtimeAllowed || !gateway.gatewayBaseUrl) {
     const blocked = whiteLabelBlockedResponse(gateway.reason);
     return json(503, { ...blocked, correlation_id: correlationId });
@@ -102,18 +104,23 @@ Deno.serve(async (req) => {
     });
   }
 
-  if (!authorizationUrlIsWhiteLabelSafe(authorizationUrl)) {
+  const demoAuthorization = gateway.reason === 'DEMO_MANAGED_OAUTH_ALLOWED' && demoManagedOAuthEnabled();
+  const authorizationAllowed = demoAuthorization
+    ? authorizationUrlIsDemoProviderSafe(authorizationUrl, binding.authorization_hosts)
+    : authorizationUrlIsWhiteLabelSafe(authorizationUrl);
+
+  if (!authorizationAllowed) {
     await admin.from('connection_audit_events').insert({
       actor_id: user.id,
       tenant_id: tenantId,
       action: 'managed_user_connection.authorization_blocked',
       new_state: 'BLOCKED_WHITE_LABEL_POLICY',
-      evidence: { connector_definition_id: definitionId, reason_code: 'authorization_url_not_white_label_safe' },
+      evidence: { connector_definition_id: definitionId, reason_code: 'authorization_url_not_approved' },
       correlation_id: correlationId,
     });
     return json(503, {
-      error_code: 'authorization_url_not_white_label_safe',
-      safe_message: 'This authorization path is not approved for the AURA white-label runtime.',
+      error_code: 'authorization_url_not_approved',
+      safe_message: 'This authorization path is not approved for the AURA runtime.',
       correlation_id: correlationId,
     });
   }
@@ -138,7 +145,10 @@ Deno.serve(async (req) => {
     tenant_id: tenantId,
     action: 'managed_user_connection.authorization_started',
     new_state: 'AWAITING_USER_AUTHORIZATION',
-    evidence: { connector_definition_id: definitionId },
+    evidence: {
+      connector_definition_id: definitionId,
+      authorization_mode: demoAuthorization ? 'DEMO_PROVIDER_OAUTH' : 'AURA_GATEWAY_OAUTH',
+    },
     correlation_id: correlationId,
   });
 

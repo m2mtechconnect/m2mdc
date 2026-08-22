@@ -70,7 +70,7 @@ describe('no hidden synthetic fallback in reference mode', () => {
 
   it('renders no value for records without a defensible source', () => {
     const values = allReferenceValues();
-    expect(values).toHaveLength(65);
+    expect(values).toHaveLength(265);
     for (const v of values) {
       if (v.classification === 'UNAVAILABLE') {
         expect(v.value).toBeNull();
@@ -84,7 +84,7 @@ describe('no hidden synthetic fallback in reference mode', () => {
 });
 
 describe('record coverage and facility isolation', () => {
-  it('exposes all 65 records through centralized selectors', () => {
+  it('exposes all 265 source-complete records through centralized selectors', () => {
     const ids = new Set(allReferenceValues().map((v) => v.recordId));
     expect(ids.size).toBe(DSX_REFERENCE_RECORDS.length);
     expect(referenceConfigurationIds()).toHaveLength(6);

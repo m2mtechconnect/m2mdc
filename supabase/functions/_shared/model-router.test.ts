@@ -5,6 +5,7 @@ import {
   NVIDIA_OPEN_MODEL_IDS,
   makeChatCompletion,
   normalizeProfile,
+  profileForAgent,
   providerReadiness,
   resolveModel,
 } from './model-router';
@@ -24,6 +25,15 @@ describe('AURA model router', () => {
     expect(normalizeProfile('gemini-1.5-pro')).toBe('reasoning');
     expect(normalizeProfile('google/gemini-2.5-flash')).toBe('fast');
     expect(normalizeProfile('nvidia/nemotron-3-super-120b-a12b')).toBe('supervisor');
+  });
+
+  it('routes agent roles to compute profiles without granting authority', () => {
+    expect(profileForAgent({ slug: 'thermal-guardian' })).toBe('fast');
+    expect(profileForAgent({ slug: 'sovereignty-sentinel' })).toBe('reasoning');
+    expect(profileForAgent({ slug: 'cybersecurity-identity' })).toBe('reasoning');
+    expect(profileForAgent({ slug: 'twin-integrity-data-quality' })).toBe('reasoning');
+    expect(profileForAgent({ slug: 'incident-response' })).toBe('supervisor');
+    expect(profileForAgent({ slug: 'incident-response', config: { model_profile: 'fast' } })).toBe('fast');
   });
 
   it('rejects unknown marketplace/model IDs', () => {

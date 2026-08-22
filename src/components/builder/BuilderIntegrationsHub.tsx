@@ -46,7 +46,7 @@ const DATA_LABEL: Record<DataState, string> = {
 
 function accountStateOf(instance?: ConnectionInstance): AccountState {
   if (!instance) return 'not_configured';
-  if (instance.status === 'ERROR' || instance.last_error) return 'error';
+  if (instance.status === 'FAILED' || instance.status === 'BLOCKED' || instance.last_error) return 'error';
   if (instance.credential_reference) return 'authorized';
   return 'configured';
 }
@@ -83,7 +83,7 @@ export function BuilderIntegrationsHub({ systemId }: BuilderIntegrationsHubProps
 
     return defs.map((definition) => {
       const instance = conns.find((c) => c.connector_id === definition.id);
-      const hasRun = !!instance && runs.some((r) => r.connection_id === instance.id && r.status === 'SUCCESS');
+      const hasRun = !!instance && runs.some((r) => r.connection_id === instance.id && r.records_accepted > 0);
       return {
         definition,
         instance,

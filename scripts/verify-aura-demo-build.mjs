@@ -25,6 +25,7 @@ const forbiddenStaticTerms = [
   />\s*Lovable\s*</i,
   />\s*Zapier\s*</i,
 ];
+const forbiddenCompiledHostnames = [/lovable\.app/i, /lovable\.dev/i];
 
 const staticExtensions = new Set(['.html', '.css', '.json', '.txt', '.svg', '.xml']);
 const javascriptFiles = [];
@@ -51,6 +52,9 @@ for (const path of staticFiles) {
 
 let compiled = '';
 for (const path of javascriptFiles) compiled += readFileSync(path, 'utf8');
+for (const forbidden of forbiddenCompiledHostnames) {
+  if (forbidden.test(compiled)) fail(`compiled demo JavaScript contains forbidden implementation hostname ${String(forbidden)}`);
+}
 if (!compiled.includes('AURA demo integrations')) fail('compiled artifact does not contain the enabled AURA demo integrations surface');
 if (!compiled.includes('Demo data')) fail('compiled artifact is missing explicit demo-data labeling');
 if (compiled.includes('lovable-tagger')) fail('development component tagger was bundled into the demo artifact');
@@ -67,6 +71,7 @@ const manifest = {
     releaseFingerprintBound: true,
     noSourceMaps: true,
     noStaticImplementationBranding: true,
+    noCompiledImplementationHostnames: true,
     demoTruthLabelsPresent: true,
     devTaggerAbsent: true,
   },

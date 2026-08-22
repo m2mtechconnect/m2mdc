@@ -5,6 +5,7 @@ const CUSTOMER_SURFACES = [
   new URL('../../components/builder/steps/Step2Intelligence.tsx', import.meta.url),
   new URL('../../components/builder/steps/Step3Tools.tsx', import.meta.url),
   new URL('../../components/connections/CatalogueTab.tsx', import.meta.url),
+  new URL('../../components/connections/DemoIntegrationsTab.tsx', import.meta.url),
 ] as const;
 
 const FORBIDDEN_CUSTOMER_TERMS = [

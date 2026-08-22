@@ -124,3 +124,50 @@ export function useManagedAccessHistory(connectionId: string | null, connectorDe
     },
   });
 }
+
+export interface ManagedReadResult<T = unknown> {
+  correlation_id: string;
+  result: T;
+}
+
+/**
+ * Executes an already-authorized, read-only managed connector operation.
+ * The browser supplies only AURA connection/operation identifiers plus an
+ * allowlisted connector path. Gateway host and credentials stay server-owned.
+ */
+export async function invokeManagedRead<T = unknown>(input: {
+  connectionId: string;
+  operationId: string;
+  path: string;
+  facilityId?: string | null;
+  payload?: Record<string, unknown>;
+}): Promise<ManagedReadResult<T>> {
+  const { data, error } = await supabase.functions.invoke<ManagedReadResult<T>>('managed-connector-invoke', {
+    body: {
+      connection_id: input.connectionId,
+      operation_id: input.operationId,
+      path: input.path,
+      facility_id: input.facilityId ?? null,
+      payload: input.payload ?? undefined,
+    },
+  });
+
+  if (error) {
+    const detail = 'context' in error && error.context
+      ? await (error.context as Response).text().catch(() => '')
+      : '';
+    let message = 'The AURA managed connection is temporarily unavailable.';
+    try {
+      const parsed = detail ? JSON.parse(detail) : null;
+      message = parsed?.safe_message ?? parsed?.error_code ?? message;
+    } catch {
+      // Never surface implementation transport details to customer UI.
+    }
+    throw new Error(message);
+  }
+
+  if (!data || typeof data !== 'object') {
+    throw new Error('The AURA managed connection returned no usable result.');
+  }
+  return data as ManagedReadResult<T>;
+}

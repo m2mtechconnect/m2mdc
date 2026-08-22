@@ -46,6 +46,7 @@ jobs:
         run: >-
           bunx vitest run
           src/simulation/__tests__/fidelity.test.ts
+          src/simulation/__tests__/SimulationEngine.preflight.test.ts
           src/simulation/__tests__/engineConsolidation.test.ts
           src/simulation/providers/__tests__/contract.test.ts
           src/simulation/providers/__tests__/providerSelection.test.ts

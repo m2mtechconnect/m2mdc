@@ -48,6 +48,18 @@ describe('AURA Builder and Connections UX invariants', () => {
     expect(connections).toContain('Browse all approved capabilities');
   });
 
+  it('uses a result-driven deploy review instead of simulated timed steps', () => {
+    const layout = read('../../components/builder/BuilderLayout.tsx');
+    const modal = read('../../components/deployment/DeploymentProgressModal.tsx');
+    expect(layout).not.toContain('MIN_DEPLOY_DURATION');
+    expect(modal).toContain('Review deployment');
+    expect(modal).toContain('No simulated progress is shown');
+    expect(modal).toContain('Deployment result');
+    expect(modal).not.toContain('await delay(');
+    expect(modal).not.toContain('setTimeout(');
+    expect(modal).not.toContain('Provisioning Agent Runtime');
+  });
+
   it('keeps demo integrations out of the primary Connections tab bar', () => {
     const source = read('../../pages/Connections.tsx');
     expect(source).toContain("{ value: 'catalogue', label: 'Connectors' }");
@@ -73,10 +85,20 @@ describe('AURA Builder and Connections UX invariants', () => {
     expect(source).toMatch(/\bOpen\b/);
   });
 
-  it('has no duplicate DC step implementation tree under builder/steps', () => {
-    for (const name of ['DCStep1Summary.tsx', 'DCStep2Blueprint.tsx', 'DCStep3Integrations.tsx', 'DCStep4Scenarios.tsx', 'DCStep5Deploy.tsx']) {
+  it('has no duplicate or legacy Builder connection surfaces', () => {
+    const removed = [
+      'DCStep1Summary.tsx',
+      'DCStep2Blueprint.tsx',
+      'DCStep3Integrations.tsx',
+      'DCStep4Scenarios.tsx',
+      'DCStep5Deploy.tsx',
+    ];
+    for (const name of removed) {
       const url = new URL(`../../components/builder/steps/${name}`, import.meta.url);
       expect(existsSync(url)).toBe(false);
     }
+    expect(existsSync(new URL('../../components/builder/BuilderIntegrationsHub.tsx', import.meta.url))).toBe(false);
+    expect(existsSync(new URL('../../components/builder/ConnectStep.tsx', import.meta.url))).toBe(false);
+    expect(existsSync(new URL('../../components/builder/MCPToolsPlayground.tsx', import.meta.url))).toBe(false);
   });
 });

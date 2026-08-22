@@ -1,19 +1,7 @@
 /**
  * Canonical AURA model/provider router.
- *
- * The router intentionally separates an agent role from the foundation model
- * used to explain or reason about its evidence. Existing agent rows may carry
- * legacy model IDs; known IDs are treated as profile aliases, while unknown
- * IDs fail closed rather than being forwarded to an arbitrary provider.
- *
- * Runtime truth:
- * - Lovable-managed OpenAI-compatible chat remains the default provider.
- * - NVIDIA is opt-in and requires NVIDIA_API_KEY (or an explicit compatible
- *   endpoint/key for self-hosted inference).
- * - Declaring an NVIDIA model here does not prove NIM, NeMo, TensorRT-LLM or
- *   self-hosted execution. The returned provider metadata is the evidence.
+ * Agent roles select compute profiles; providers select executable models.
  */
-
 export type AgentModelProfile = 'fast' | 'reasoning' | 'supervisor';
 export type AgentModelProvider = 'lovable-managed' | 'nvidia-build' | 'openai-compatible';
 
@@ -107,18 +95,13 @@ export function normalizeProfile(
     const normalized = requestedModel.trim().toLowerCase();
     const alias = PROFILE_ALIASES[normalized];
     if (!alias) {
-      throw new ModelRouterError(
-        'UNSUPPORTED_MODEL_ID',
-        `Model '${requestedModel}' is not in the AURA runtime allowlist`,
-        400,
-      );
+      throw new ModelRouterError('UNSUPPORTED_MODEL_ID', `Model '${requestedModel}' is not in the AURA runtime allowlist`, 400);
     }
     return alias;
   }
   return requestedProfile ?? 'fast';
 }
 
-/** Default compute profile for an AURA agent role. This never grants authority. */
 export function profileForAgent(agent: {
   slug?: string | null;
   name?: string | null;
@@ -126,14 +109,10 @@ export function profileForAgent(agent: {
   config?: Record<string, unknown> | null;
 }): AgentModelProfile {
   const configured = agent.config?.model_profile;
-  if (configured === 'fast' || configured === 'reasoning' || configured === 'supervisor') {
-    return configured;
-  }
+  if (configured === 'fast' || configured === 'reasoning' || configured === 'supervisor') return configured;
   const identity = `${agent.slug ?? ''} ${agent.name ?? ''} ${agent.domain ?? ''}`.toLowerCase();
   if (/incident[-_ ]response|major[-_ ]incident|supervisor/.test(identity)) return 'supervisor';
-  if (/sovereig|cyber|security|twin[-_ ]integrity|data[-_ ]quality|compliance/.test(identity)) {
-    return 'reasoning';
-  }
+  if (/sovereig|cyber|security|twin[-_ ]integrity|data[-_ ]quality|compliance/.test(identity)) return 'reasoning';
   return 'fast';
 }
 
@@ -152,8 +131,24 @@ export function resolveModel(
   options: { requestedModel?: string | null; profile?: AgentModelProfile | null; env?: RouterEnvironment } = {},
 ): ResolvedModel {
   const env = options.env ?? runtimeEnv();
+  const requestedId = options.requestedModel?.trim().toLowerCase() || null;
+  const explicitNvidiaRequest = Boolean(requestedId?.startsWith('nvidia/'));
   const profile = normalizeProfile(options.requestedModel, options.profile);
   const providerName = (env.AURA_AI_PROVIDER ?? 'lovable-managed').trim().toLowerCase();
+
+  if (
+    explicitNvidiaRequest &&
+    providerName !== 'nvidia' &&
+    providerName !== 'nvidia-build' &&
+    providerName !== 'openai-compatible' &&
+    providerName !== 'self-hosted'
+  ) {
+    throw new ModelRouterError(
+      'MODEL_PROVIDER_MISMATCH',
+      `NVIDIA model '${options.requestedModel}' requires the NVIDIA or an explicitly configured OpenAI-compatible provider`,
+      409,
+    );
+  }
 
   if (providerName === 'nvidia' || providerName === 'nvidia-build') {
     const apiKey = env.NVIDIA_API_KEY?.trim();
@@ -188,6 +183,13 @@ export function resolveModel(
     if (!model) {
       throw new ModelRouterError('OPENAI_COMPATIBLE_MODEL_REQUIRED', `A model must be configured for profile '${profile}'`);
     }
+    if (explicitNvidiaRequest && requestedId !== model.toLowerCase()) {
+      throw new ModelRouterError(
+        'MODEL_NOT_CONFIGURED_ON_PROVIDER',
+        `Requested NVIDIA model '${options.requestedModel}' is not the configured model for '${profile}'`,
+        409,
+      );
+    }
     return {
       provider: 'openai-compatible',
       profile,
@@ -201,7 +203,6 @@ export function resolveModel(
   if (providerName !== 'lovable-managed' && providerName !== 'lovable') {
     throw new ModelRouterError('UNSUPPORTED_AI_PROVIDER', `AI provider '${providerName}' is not supported`, 400);
   }
-
   const apiKey = env.LOVABLE_API_KEY?.trim();
   if (!apiKey) {
     throw new ModelRouterError('LOVABLE_PROVIDER_NOT_CONFIGURED', 'Lovable-managed provider is selected but LOVABLE_API_KEY is not configured');

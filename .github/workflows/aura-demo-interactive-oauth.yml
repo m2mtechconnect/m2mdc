@@ -10,8 +10,6 @@ permissions:
 
 env:
   CI: true
-  VITE_AURA_DEMO_INTEGRATIONS: 'true'
-  VITE_AURA_DEMO_MANAGED_OAUTH: 'true'
   AURA_RELEASE_ENVIRONMENT: demo
   PROD_BASE_URL: https://auradc.m2mtechconnect.com
   VITE_SUPABASE_URL: https://demo-placeholder.supabase.co
@@ -58,7 +56,7 @@ jobs:
           AURA_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
           AURA_RELEASE_BRANCH: ${{ github.head_ref || github.ref_name }}
           AURA_BUILD_ID: demo-oauth-${{ github.run_id }}-${{ github.run_attempt }}
-        run: bun run build
+        run: bunx vite build --mode demo
 
       - name: Verify demo artifact
         env:

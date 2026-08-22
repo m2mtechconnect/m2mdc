@@ -36,7 +36,7 @@ interface Props {
   facilityName: string;
   location: string;
   tier: string;
-  calculatedAt: string;
+  calculatedAt: string | null;
   isFallback: boolean;
   simulationHref: string;
   blueprintHref: string;
@@ -98,7 +98,8 @@ export function FacilityHighlights({
               {location} · {tier} design
               {isFallback && ' · Reference model'}
               <span className="hidden sm:inline"> · Simulated design baseline · Synthetic inputs</span>
-              {' · '}Calculated {calculatedAt}
+              {' · '}
+              {calculatedAt ? `Calculated ${calculatedAt}` : 'No recorded simulation result'}
             </p>
           </div>
         </div>
@@ -150,7 +151,7 @@ export function FacilityHighlights({
                 <Link to={`${blueprintHref}?tab=model`}>Inspect facility model</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/manage/integrations">Open Integrations</Link>
+                <Link to="/manage/integrations">Open Connections</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/simulation">Simulation workspace</Link>

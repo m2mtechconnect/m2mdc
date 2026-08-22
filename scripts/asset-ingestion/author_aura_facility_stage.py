@@ -240,7 +240,7 @@ def semantic_bindings_layer(counts):
     sb.GetPrim().CreateAttribute("aura:bindingContract", Sdf.ValueTypeNames.String).Set(
         "assets/facility/aura_reference_hall/semantic_bindings.json")
     sb.GetPrim().CreateAttribute("aura:dsxAlignment", Sdf.ValueTypeNames.String).Set(
-        "Aligned with the NVIDIA Omniverse DSX Blueprint (Flex, Boost, Exchange).")
+        "Alignment target: NVIDIA DSX Reference Designs. Asset presence does not imply SimReady or DSX runtime validation.")
     stage.GetRootLayer().Save()
 
     core = BY_ID["nvidia.rack_core.rack_42u_a_core.operations"]
@@ -253,22 +253,26 @@ def semantic_bindings_layer(counts):
         "sourceChecksum": (core.get("provenance") or {}).get("usdMasterSha256", ""),
         "derivativeChecksum": core.get("checksum") or "",
     } for rid, _row, _x, _z in rack_positions()]
-    for kind, path_fmt, asset_id, role in (
-        ("tile", "/AURA_Facility/Building/RaisedFloor", "aura.floor.standard_tile_600", "raised-floor-tile"),
-        ("luminaire", "/AURA_Facility/Building/Lighting", "aura.lighting.linear_luminaire_1500", "luminaire"),
-        ("column", "/AURA_Facility/Building/Structural", "aura.structural.column_400", "structural-member"),
-        ("shell", "/AURA_Facility/Building/Shell", "aura.shell.facility_shell", "facility-shell"),
+
+    for path_fmt, asset_id, role in (
+        ("/AURA_Facility/Building/RaisedFloor", "aura.floor.standard_tile_600.operations", "raised-floor-tile"),
+        ("/AURA_Facility/Building/RaisedFloor", "aura.floor.perforated_tile_600.operations", "perforated-floor-tile"),
+        ("/AURA_Facility/Building/Lighting", "aura.lighting.linear_luminaire_1500.operations", "data-hall-luminaire"),
+        ("/AURA_Facility/Building/Structural", "aura.structural.column_400.operations", "structural-column"),
+        ("/AURA_Facility/Building/Shell", "aura.shell.facility_shell.operations", "facility-shell"),
     ):
+        entry = BY_ID[asset_id]
+        provenance = entry.get("provenance") or {}
         bindings.append({
             "usdPrimPath": path_fmt,
-            "auraAssetId": asset_id,
+            "auraAssetId": entry["assetId"],
             "facilityEquipmentId": None,
             "semanticRole": role,
             "telemetryBindingId": None,
-            "sourceChecksum": None,
-            "derivativeChecksum": None,
-            "note": "AURA-authored OpenUSD master. No browser derivative published yet; the "
-                    "runtime renders documented procedural geometry for this role.",
+            "sourceChecksum": provenance.get("usdMasterSha256"),
+            "derivativeChecksum": entry.get("checksum"),
+            "note": "AURA-authored generic OpenUSD master with an approved browser derivative. "
+                    "Not vendor-certified, not SimReady, and not NVIDIA-authored.",
         })
     out = {
         "stage": "assets/facility/aura_reference_hall/aura_reference_hall.usda",

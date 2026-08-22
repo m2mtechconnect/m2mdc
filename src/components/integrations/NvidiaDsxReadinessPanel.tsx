@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Info, Lock } from 'lucide-react';
 import { CAPABILITIES, NVIDIA_READINESS } from '@/capabilities/registry';
+import { listAssets } from '@/components/twin-visualization/assetRegistry';
+import { reconcileDsxAssetRequirements } from '@/dsx/blueprintAssetRequirements';
 
 interface Row {
   capability: string;
@@ -37,6 +39,13 @@ function gateRow(
   };
 }
 
+const DSX_ASSET_COVERAGE = reconcileDsxAssetRequirements(listAssets(), 'facility');
+const DSX_ASSET_ELIGIBLE = DSX_ASSET_COVERAGE.filter(
+  (row) => row.state === 'runtime-eligible',
+).length;
+const DSX_ASSET_REQUIRED = DSX_ASSET_COVERAGE.length;
+const DSX_ASSET_COMPLETE = DSX_ASSET_ELIGIBLE === DSX_ASSET_REQUIRED;
+
 const ROWS: Row[] = [
   gateRow('nvidiaRuntime', 'A validated GPU runner is attached.'),
   {
@@ -46,6 +55,16 @@ const ROWS: Row[] = [
     detail: 'An entitled NVIDIA account is required to obtain the blueprint distribution.',
   },
   gateRow('openUsdStage', 'An NVIDIA runtime resolves the canonical OpenUSD stage.'),
+  {
+    capability: 'DSX blueprint physical assets',
+    status: DSX_ASSET_COMPLETE
+      ? 'Exact-role coverage complete'
+      : `${DSX_ASSET_ELIGIBLE}/${DSX_ASSET_REQUIRED} exact roles validated`,
+    tone: DSX_ASSET_COMPLETE ? 'grey' : 'amber',
+    detail: DSX_ASSET_COMPLETE
+      ? 'Every facility-level DSX requirement has an approved, checksum-backed, runtime-eligible derivative.'
+      : 'Current NVIDIA data-hall and AURA-authored visuals do not satisfy generation-specific DSX roles by approximation. Missing exact roles remain source-gated.',
+  },
   gateRow('simReadyAssets', 'Every published asset carries a SimReady validation result.'),
   gateRow('dsxExchange', 'The official DSX Exchange distribution is deployed.', 'amber'),
   {
@@ -91,8 +110,9 @@ export function NvidiaDsxReadinessPanel({ heading = 'h2' }: { heading?: 'h1' | '
         <header className="space-y-1">
           <Heading className="text-lg font-semibold tracking-tight">NVIDIA DSX</Heading>
           <p className="max-w-3xl text-sm text-muted-foreground">
-            Readiness overview for a future NVIDIA DSX deployment. Nothing here is active:
-            AURA DC currently operates as a deterministic simulation and evidence platform.
+            Readiness overview for a future NVIDIA DSX deployment. Existing OpenUSD-derived
+            data-hall visuals are tracked separately from exact DSX blueprint coverage, SimReady
+            validation and operational runtime evidence.
           </p>
         </header>
 
@@ -103,6 +123,7 @@ export function NvidiaDsxReadinessPanel({ heading = 'h2' }: { heading?: 'h1' | '
               Vertical slice {NVIDIA_READINESS.verticalSlice.replace(/_/g, ' ').toLowerCase()} ·
               {' '}{NVIDIA_READINESS.runtimeProvenComponents} NVIDIA-integrated capabilities ·
               {' '}{NVIDIA_READINESS.simReadyValidatedAssets} SimReady-validated assets ·
+              {' '}{DSX_ASSET_ELIGIBLE}/{DSX_ASSET_REQUIRED} DSX exact physical roles ·
               {' '}{NVIDIA_READINESS.openUsdCanonicalCapabilities} AURA-authored OpenUSD capabilities
             </CardDescription>
           </CardHeader>
@@ -141,6 +162,7 @@ export function NvidiaDsxReadinessPanel({ heading = 'h2' }: { heading?: 'h1' | '
               <li>NVIDIA account entitlement covering the Omniverse DSX Blueprint and its container images.</li>
               <li>The official DSX Exchange distribution together with its AsyncAPI event schemas.</li>
               <li>A disposable, non-production backend target for validation traffic.</li>
+              <li>Traceable exact-role DSX physical assets where the blueprint requires generation-specific equipment.</li>
               <li>An authored OpenUSD stage with SimReady-validated assets and a telemetry-to-prim mapping.</li>
             </ul>
             <div className="flex flex-wrap items-center gap-3">
@@ -154,7 +176,7 @@ export function NvidiaDsxReadinessPanel({ heading = 'h2' }: { heading?: 'h1' | '
             </div>
             <p id="dsx-configure-reason" className="flex items-start gap-2 text-xs text-muted-foreground">
               <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
-              A GPU runner, official NVIDIA entitlements, DSX Exchange distribution and disposable backend are required.
+              A GPU runner, official NVIDIA entitlements, exact-role asset evidence, DSX Exchange distribution and disposable backend are required.
             </p>
           </CardContent>
         </Card>

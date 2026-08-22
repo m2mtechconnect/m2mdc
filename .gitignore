@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# NVIDIA DSX content-pack private intake
+# NGC DSX sample data is licence-governed evaluation content. Keep downloaded
+# archives, extracted USD/assets and generated local inventories out of git.
+.dsx-private/
+DSX_BP/
+DSX_BP_.zip
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

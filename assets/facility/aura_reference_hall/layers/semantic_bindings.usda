@@ -10,7 +10,6 @@ def Xform "AURA_Facility"
     def Xform "SemanticBindings"
     {
         custom string aura:bindingContract = "assets/facility/aura_reference_hall/semantic_bindings.json"
-        custom string aura:dsxAlignment = "Aligned with the NVIDIA Omniverse DSX Blueprint (Flex, Boost, Exchange)."
+        custom string aura:dsxAlignment = "Alignment target: NVIDIA DSX Reference Designs. Asset presence does not imply SimReady or DSX runtime validation."
     }
 }
-

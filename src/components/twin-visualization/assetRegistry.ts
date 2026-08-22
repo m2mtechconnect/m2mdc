@@ -145,6 +145,11 @@ const FILE = manifest as unknown as AssetManifestFile;
 /**
  * Semantic roles the runtime can place. A role is only ever satisfied by an
  * asset whose manifest entry declares it; nothing is inferred from filenames.
+ *
+ * DSX roles are first-class runtime semantics so a future approved derivative
+ * can mount without changing the type system. Their presence in this union is
+ * not evidence that an asset exists, is licensed for production, or is
+ * SimReady-validated. `listAssetsForRole()` remains the evidence boundary.
  */
 export type SemanticRole =
   | 'liquid-cooled-rack'
@@ -162,7 +167,32 @@ export type SemanticRole =
   | 'perforated-floor-tile'
   | 'data-hall-luminaire'
   | 'structural-column'
-  | 'facility-shell';
+  | 'facility-shell'
+  // NVIDIA DSX exact physical roles. These are source-gated until a manifest
+  // row carries exact-role provenance and complete runtime evidence.
+  | 'dsx-compute-tray'
+  | 'dsx-nvlink-switch-tray'
+  | 'dsx-power-shelf'
+  | 'dsx-tor-oob-switch'
+  | 'dsx-tan-switch'
+  | 'dsx-smn-switch'
+  | 'dsx-cin-switch'
+  | 'dsx-cdu'
+  | 'dsx-crah'
+  | 'dsx-chiller'
+  | 'dsx-pump'
+  | 'dsx-dry-cooler'
+  | 'dsx-ups'
+  | 'dsx-control-node'
+  | 'dsx-general-purpose-node'
+  | 'dsx-utility-cluster'
+  | 'dsx-dc-edge-cluster'
+  | 'dsx-high-speed-storage'
+  | 'dsx-grid-substation'
+  | 'dsx-backup-generator'
+  | 'dsx-bess'
+  | 'dsx-central-utility-building'
+  | 'dsx-fiber-spine';
 
 /** Derivative classes, ordered from most to least detailed. */
 export type QualityLevel = 'inspection' | 'operations' | 'lod';
@@ -184,6 +214,29 @@ export const SEMANTIC_ROLE_LABEL: Record<SemanticRole, string> = {
   'data-hall-luminaire': 'Data-hall luminaire (AURA-authored)',
   'structural-column': 'Structural column (AURA-authored)',
   'facility-shell': 'Facility shell (AURA-authored)',
+  'dsx-compute-tray': 'DSX GB200/GB300 compute tray',
+  'dsx-nvlink-switch-tray': 'DSX NVLink switch tray',
+  'dsx-power-shelf': 'DSX NVL72 power shelf',
+  'dsx-tor-oob-switch': 'DSX rack TOR/OOB switch',
+  'dsx-tan-switch': 'DSX Tenant Access Network equipment',
+  'dsx-smn-switch': 'DSX Secure Management Network equipment',
+  'dsx-cin-switch': 'DSX Cluster Interconnect Network equipment',
+  'dsx-cdu': 'DSX Cooling Distribution Unit',
+  'dsx-crah': 'DSX CRAH',
+  'dsx-chiller': 'DSX central utility chiller',
+  'dsx-pump': 'DSX facility-water pump',
+  'dsx-dry-cooler': 'DSX dry cooler',
+  'dsx-ups': 'DSX UPS',
+  'dsx-control-node': 'DSX Control Node',
+  'dsx-general-purpose-node': 'DSX general-purpose Core POD node',
+  'dsx-utility-cluster': 'DSX Utility Cluster',
+  'dsx-dc-edge-cluster': 'DSX DC Edge cluster',
+  'dsx-high-speed-storage': 'DSX high-speed storage',
+  'dsx-grid-substation': 'DSX grid substation',
+  'dsx-backup-generator': 'DSX backup generation',
+  'dsx-bess': 'DSX battery energy storage',
+  'dsx-central-utility-building': 'DSX Central Utility Building',
+  'dsx-fiber-spine': 'DSX cluster-interconnect fiber spine',
 };
 
 /** Semantic roles owned by the AURA-authored facility families. */
@@ -193,6 +246,33 @@ export const AURA_FACILITY_ROLES: SemanticRole[] = [
   'data-hall-luminaire',
   'structural-column',
   'facility-shell',
+];
+
+/** All exact NVIDIA DSX physical roles known to the runtime type system. */
+export const DSX_SEMANTIC_ROLES: SemanticRole[] = [
+  'dsx-compute-tray',
+  'dsx-nvlink-switch-tray',
+  'dsx-power-shelf',
+  'dsx-tor-oob-switch',
+  'dsx-tan-switch',
+  'dsx-smn-switch',
+  'dsx-cin-switch',
+  'dsx-cdu',
+  'dsx-crah',
+  'dsx-chiller',
+  'dsx-pump',
+  'dsx-dry-cooler',
+  'dsx-ups',
+  'dsx-control-node',
+  'dsx-general-purpose-node',
+  'dsx-utility-cluster',
+  'dsx-dc-edge-cluster',
+  'dsx-high-speed-storage',
+  'dsx-grid-substation',
+  'dsx-backup-generator',
+  'dsx-bess',
+  'dsx-central-utility-building',
+  'dsx-fiber-spine',
 ];
 
 /**

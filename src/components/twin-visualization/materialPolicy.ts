@@ -62,7 +62,14 @@ export const MATERIAL_LIBRARY: Record<MaterialClass, MaterialSpec> = {
   glass: { color: 0x1b1f24, roughness: 0.12, metalness: 0.0, envMapIntensity: 0.9 },
 };
 
-/** Default class per semantic role when the mesh name carries no hint. */
+/**
+ * Default class per semantic role when the mesh name carries no hint.
+ *
+ * DSX entries here are presentation defaults only. They do not assert that a
+ * corresponding source or derivative exists; the asset registry remains the
+ * runtime/provenance gate. Specific mesh/material names still override these
+ * defaults through NAME_HINTS when a real derivative is eventually ingested.
+ */
 const ROLE_DEFAULT: Record<SemanticRole, MaterialClass> = {
   'liquid-cooled-rack': 'painted-steel',
   'rack-core-reference': 'painted-steel',
@@ -78,6 +85,29 @@ const ROLE_DEFAULT: Record<SemanticRole, MaterialClass> = {
   'data-hall-luminaire': 'plastic-composite',
   'structural-column': 'painted-steel',
   'facility-shell': 'painted-steel',
+  'dsx-compute-tray': 'faceplate',
+  'dsx-nvlink-switch-tray': 'faceplate',
+  'dsx-power-shelf': 'faceplate',
+  'dsx-tor-oob-switch': 'faceplate',
+  'dsx-tan-switch': 'faceplate',
+  'dsx-smn-switch': 'faceplate',
+  'dsx-cin-switch': 'faceplate',
+  'dsx-cdu': 'bare-metal',
+  'dsx-crah': 'painted-steel',
+  'dsx-chiller': 'painted-steel',
+  'dsx-pump': 'bare-metal',
+  'dsx-dry-cooler': 'bare-metal',
+  'dsx-ups': 'painted-steel',
+  'dsx-control-node': 'faceplate',
+  'dsx-general-purpose-node': 'faceplate',
+  'dsx-utility-cluster': 'faceplate',
+  'dsx-dc-edge-cluster': 'faceplate',
+  'dsx-high-speed-storage': 'faceplate',
+  'dsx-grid-substation': 'bare-metal',
+  'dsx-backup-generator': 'painted-steel',
+  'dsx-bess': 'painted-steel',
+  'dsx-central-utility-building': 'painted-steel',
+  'dsx-fiber-spine': 'cable',
 };
 
 /**

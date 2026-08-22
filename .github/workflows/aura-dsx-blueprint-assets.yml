@@ -1,0 +1,67 @@
+name: AURA DSX Blueprint Asset Audit
+
+on:
+  pull_request:
+    branches: [ux/aura-platform-followup-hardening]
+    paths:
+      - 'assets/**'
+      - 'scripts/asset-ingestion/**'
+      - 'scripts/dsx/**'
+      - 'scripts/verify-dsx-asset-blueprint.mjs'
+      - 'src/components/twin-visualization/assetRegistry.ts'
+      - 'src/dsx/**'
+      - 'src/validation/referenceFacility/**'
+      - 'src/pages/admin/ReferenceFacilityValidation.tsx'
+      - 'docs/audit/aura-nvidia-dsx-blueprint-asset-remediation.md'
+      - '.github/workflows/aura-dsx-blueprint-assets.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CI: true
+  AURA_RELEASE_ENVIRONMENT: preview
+  PROD_BASE_URL: https://auradc.m2mtechconnect.com
+  VITE_SUPABASE_URL: https://preview-placeholder.supabase.co
+  VITE_SUPABASE_PUBLISHABLE_KEY: preview-public-placeholder
+
+jobs:
+  dsx-blueprint-assets:
+    name: DSX blueprint asset truth and fail-closed acceptance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.3'
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Verify committed OpenUSD binding truth
+        run: node scripts/verify-dsx-asset-blueprint.mjs
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: DSX asset, source-map, rack layout/BOM and reference-facility tests
+        run: >-
+          bunx vitest run
+          src/dsx/__tests__/blueprintAssetRequirements.test.ts
+          src/dsx/__tests__/rackBomValidation.test.ts
+          src/dsx/__tests__/rackLayout.test.ts
+          src/dsx/__tests__/sourceCatalog.test.ts
+          src/dsx/__tests__/sourceMap.test.ts
+          src/validation/referenceFacility/__tests__/reconciliation.test.ts
+          src/validation/referenceFacility/__tests__/regressionBaseline.test.ts
+
+      - name: Production-mode application build
+        env:
+          AURA_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          AURA_RELEASE_BRANCH: ${{ github.head_ref || github.ref_name }}
+          AURA_BUILD_ID: dsx-assets-${{ github.run_id }}-${{ github.run_attempt }}
+        run: bun run build

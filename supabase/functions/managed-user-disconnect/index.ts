@@ -10,7 +10,7 @@ import { managedUserBinding } from '../_shared/managedUserBindings.ts';
 import { resolveCallerTenant } from '../_shared/connectionTenant.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 import {
-  managedConnectorGatewayPolicy,
+  managedUserOAuthGatewayPolicy,
   whiteLabelBlockedResponse,
 } from '../_shared/whiteLabelGateway.ts';
 
@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
 
   const connectionAPIKey = await getConnectionKeyForUser(user.id, binding.gateway_connector_key).catch(() => null);
   if (connectionAPIKey) {
-    const gateway = managedConnectorGatewayPolicy();
+    const gateway = managedUserOAuthGatewayPolicy();
     if (!gateway.runtimeAllowed || !gateway.gatewayBaseUrl) {
       const tenantId = await resolveCallerTenant(admin, user.id);
       await admin.from('connection_audit_events').insert({

@@ -125,12 +125,12 @@ export function BuilderLayout({
 
   return (
     <BuilderModeProvider>
-      <div className="min-h-screen flex w-full bg-background">
-        {/* Desktop Sidebar */}
-        <aside className="hidden lg:flex w-[260px] border-r bg-muted/30 flex-col">
+      <div className="min-h-dvh flex w-full bg-background">
+        {/* Desktop / tablet sidebar */}
+        <aside className="hidden md:flex w-[220px] lg:w-[260px] border-r bg-muted/30 flex-col">
           <div className="p-6 border-b">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold">Data Centre Twin</h2>
+              <h2 className="text-lg font-semibold">{title}</h2>
               <Button
                 variant="ghost"
                 size="sm"
@@ -141,8 +141,9 @@ export function BuilderLayout({
                 <Home className="h-4 w-4" />
               </Button>
             </div>
-            <p className="text-sm text-muted-foreground">Configure your data centre twin</p>
+            <p className="text-sm text-muted-foreground">{description}</p>
           </div>
+
 
           {/* Mode Toggle - hidden from sidebar, available on mobile only */}
 

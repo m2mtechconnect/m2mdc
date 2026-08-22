@@ -1,3 +1,4 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createHandler } from "../_shared/handler.ts";
 import { listDigitalTwinsSchema } from "../_shared/digitalTwinSchemas.ts";
 
@@ -8,7 +9,7 @@ interface ListDigitalTwinsInput {
   offset?: number;
 }
 
-export default createHandler<ListDigitalTwinsInput, any>({
+serve(createHandler<ListDigitalTwinsInput, any>({
   name: "digital-twin-list",
   authLevel: "user",
   inputSchema: listDigitalTwinsSchema,
@@ -69,4 +70,4 @@ export default createHandler<ListDigitalTwinsInput, any>({
       },
     };
   },
-});
+}));

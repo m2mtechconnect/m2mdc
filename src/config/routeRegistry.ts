@@ -62,6 +62,12 @@ export const PUBLIC_ROUTES: RouteRecord[] = [
     kind: 'canonical',
     note: 'OAuth/SSO redirect target; completes the Supabase session exchange.',
   },
+  {
+    path: '/oauth/managed-user/return',
+    shell: 'public',
+    kind: 'canonical',
+    note: 'Managed-user OAuth return target; completes provider authorization before app routing.',
+  },
   { path: '/onboarding', shell: 'public', kind: 'canonical' },
   { path: '/twin-datacentre', shell: 'public', kind: 'canonical', note: 'Public landing variant.' },
   { path: '/data-centre-twin', shell: 'public', kind: 'canonical', note: 'Public demo of the twin dashboard.' },

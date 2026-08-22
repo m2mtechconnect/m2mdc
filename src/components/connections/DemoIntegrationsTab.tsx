@@ -76,7 +76,6 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
   const [authorizing, setAuthorizing] = useState(false);
   const [searchResult, setSearchResult] = useState<DemoResult | null>(null);
 
-  const interactiveOAuthEnabled = import.meta.env.VITE_AURA_DEMO_MANAGED_OAUTH === 'true';
   const searchEntry = capabilities.data?.entries.find((entry) => entry.connector_definition_id === 'search_analytics');
   const driveEntry = capabilities.data?.entries.find((entry) => entry.connector_definition_id === 'workspace_documents');
   const searchConnection = useMemo(
@@ -94,8 +93,9 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
 
   const driveBindingStatus = driveEntry?.user_binding?.status ?? '';
   const driveConnected = CONNECTED_USER_STATES.has(driveBindingStatus) && !driveEntry?.user_binding?.revoked_at;
+  const demoOAuthReady = driveEntry?.white_label_reason === 'DEMO_PROVIDER_OAUTH_READY';
   const driveCanConnect = Boolean(
-    interactiveOAuthEnabled && driveEntry?.user_bindable && driveEntry?.user_client_configured && !driveConnected,
+    demoOAuthReady && driveEntry?.user_bindable && driveEntry?.user_client_configured && !driveConnected,
   );
 
   async function runSearchDemo() {
@@ -224,9 +224,9 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
           dataMode="DEMO_DATA"
           description={driveConnected
             ? 'Your Google account is authorized read-only. Document content stays explicitly example data until live retrieval is verified.'
-            : interactiveOAuthEnabled
-              ? 'Connect a Google account for read-only authorization. Until server configuration is ready, data remains in example mode.'
-              : 'Shows an approved-document retrieval example. Interactive authorization is disabled in this build.'}
+            : driveCanConnect
+              ? 'Connect a Google account for read-only authorization. AURA server policy has marked the demo OAuth path ready.'
+              : 'Shows an approved-document retrieval example. Interactive authorization stays unavailable until AURA server policy marks the demo OAuth path ready.'}
           actionLabel={authorizing ? 'Working…' : driveCanConnect ? 'Connect Google' : 'Preview example data'}
           disabled={authorizing}
           onRun={() => driveCanConnect ? void connectDrive() : setSearchResult(DRIVE_DEMO)}

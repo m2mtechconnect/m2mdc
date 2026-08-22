@@ -151,15 +151,9 @@ A verified private source mapping may be evaluated privately, but AURA's public 
 
 ## Qualification
 
-The last application-code head `45bf21eeac530dbe68cfb3ac10735a33e882e0d7` passed:
+The last application-code head `45bf21eeac530dbe68cfb3ac10735a33e882e0d7` passed Production Perimeter, the committed OpenUSD binding verifier, TypeScript typecheck, all focused DSX requirement/source-map/rack-layout/rack-BOM/reference-facility tests, and the production-mode application build.
 
-- Production Perimeter;
-- committed OpenUSD binding verifier;
-- TypeScript typecheck;
-- DSX requirement/source-map/rack-layout/rack-BOM/reference-facility focused tests;
-- production-mode application build.
-
-The current branch head includes only this ledger update after that application-code head. Exact-head qualification must still complete for the current SHA; prior evidence is retained as code evidence but is not substituted for current-head release evidence.
+The branch was then changed only by audit-ledger documentation. Exact-head qualification of the current SHA remains authoritative; the earlier passing code head is retained only as application-code evidence.
 
 ## External blockers that source code cannot manufacture
 

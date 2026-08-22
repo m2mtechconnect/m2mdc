@@ -13,6 +13,7 @@
  */
 
 import type { DataProvenance } from '@/lib/provenance/types';
+import type { CalibrationEvidenceDecision } from './calibrationEvidence';
 import type { SimulationExecutionClass } from './orchestrator/executionClass';
 import type { SimulationIntent, VerificationLevel } from './orchestrator/types';
 
@@ -46,8 +47,13 @@ export interface SimulationFidelityInput {
   hasFacilityBaseline: boolean;
   /** True when one or more material inputs were filled from defaults/assumptions. */
   usesFallbackDefaults: boolean;
-  /** Explicit calibration evidence state; absence is fail-closed. */
+  /**
+   * @deprecated Display/request hint only. This field can NEVER promote a
+   * calibration claim by itself. Promotion comes only from calibrationEvidence.
+   */
   calibrationState?: SimulationCalibrationState;
+  /** Validated immutable evidence decision from SF-6A. */
+  calibrationEvidence?: CalibrationEvidenceDecision;
 }
 
 export interface SimulationFidelityAssessment {
@@ -58,6 +64,8 @@ export interface SimulationFidelityAssessment {
   runOfRecordEligible: boolean;
   mayClaimMeasured: boolean;
   mayClaimCalibrated: boolean;
+  /** Stronger statement: calibration is tied to a complete DSX-reference asset/OpenUSD context. */
+  mayClaimDsxCalibrated: boolean;
   mayClaimNvidiaRuntime: boolean;
   limitations: string[];
 }
@@ -83,8 +91,10 @@ function inferEvidenceClass(input: SimulationFidelityInput): SimulationEvidenceC
  *
  * Fail-closed rules:
  * - no measured claim without measured-live + live provenance;
- * - no calibrated claim unless calibration is explicitly calibrated or
- *   externally validated AND the run has a real facility baseline;
+ * - no calibrated claim from a caller-provided label; a validated immutable
+ *   calibration evidence decision is mandatory;
+ * - DSX-calibrated claims additionally require the evidence package to prove
+ *   complete exact-role/OpenUSD context for its declared DSX gate;
  * - no NVIDIA-runtime claim unless an NVIDIA execution class actually ran and
  *   the provider independently declares `nvidiaIntegrated=true`;
  * - authoritative intent alone never upgrades fidelity.
@@ -93,7 +103,9 @@ export function assessSimulationFidelity(
   input: SimulationFidelityInput,
 ): SimulationFidelityAssessment {
   const evidenceClass = inferEvidenceClass(input);
-  const calibrationState = input.calibrationState ?? 'not-calibrated';
+  const evidenceDecision = input.calibrationEvidence;
+  const calibrationState: SimulationCalibrationState =
+    evidenceDecision?.valid === true ? evidenceDecision.eligibleState : 'not-calibrated';
 
   const mayClaimMeasured =
     evidenceClass === 'measured' &&
@@ -101,10 +113,14 @@ export function assessSimulationFidelity(
     input.provenance === 'live';
 
   const mayClaimCalibrated =
+    evidenceDecision?.valid === true &&
     (calibrationState === 'calibrated' || calibrationState === 'externally-validated') &&
     input.hasFacilityBaseline &&
     !input.usesFallbackDefaults &&
     input.verificationLevel !== 'unverified';
+
+  const mayClaimDsxCalibrated =
+    mayClaimCalibrated && evidenceDecision?.dsxReferenceEligible === true;
 
   const mayClaimNvidiaRuntime =
     input.executionClass === 'nvidia-solver' && input.nvidiaIntegrated === true;
@@ -126,8 +142,23 @@ export function assessSimulationFidelity(
   if (input.usesFallbackDefaults) {
     limitations.push('One or more material inputs use configured defaults or assumptions.');
   }
+  if (!evidenceDecision?.valid) {
+    limitations.push('No validated immutable calibration evidence package supports this run.');
+  }
+  if (
+    input.calibrationState &&
+    input.calibrationState !== 'not-calibrated' &&
+    input.calibrationState !== calibrationState
+  ) {
+    limitations.push(
+      `Requested calibration label ${input.calibrationState} was not promoted by validated evidence.`,
+    );
+  }
   if (!mayClaimCalibrated) {
     limitations.push('Physical-model calibration has not been proven for this run.');
+  }
+  if (!mayClaimDsxCalibrated) {
+    limitations.push('NVIDIA DSX-reference calibration has not been proven for this run.');
   }
   if (!mayClaimNvidiaRuntime) {
     limitations.push('No NVIDIA DSX/Omniverse solver execution is evidenced for this run.');
@@ -154,6 +185,7 @@ export function assessSimulationFidelity(
     runOfRecordEligible,
     mayClaimMeasured,
     mayClaimCalibrated,
+    mayClaimDsxCalibrated,
     mayClaimNvidiaRuntime,
     limitations,
   };
@@ -168,5 +200,4 @@ export const SIMULATION_PREVIEW_FIDELITY = assessSimulationFidelity({
   nvidiaIntegrated: false,
   hasFacilityBaseline: false,
   usesFallbackDefaults: true,
-  calibrationState: 'not-calibrated',
 });

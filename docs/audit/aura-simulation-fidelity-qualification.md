@@ -49,17 +49,16 @@ Claims fail closed. Authoritative intent never upgrades fidelity by itself.
 
 ## Phase SF-2 — baseline and execution preflight
 
-Status: **implemented at active hook/guard boundary**
+Status: **implemented at engine, hook and guard boundaries**
 
 Stable refusal code: `AURA_SIM_BASELINE_REQUIRED`.
 
 - Explicit `?demo=true` may use bundled baseline values and remains non-authoritative.
 - Outside demo mode, absence of a loaded twin/facility baseline resolves to an empty baseline rather than silently creating a complete facility from defaults.
 - `useSimulation.startScenario()` refuses to start when the active engine baseline is empty.
+- `SimulationEngine.startScenario()` now independently fails closed and returns `false` when no baseline KPIs are configured, so direct callers cannot bypass the hook-level guard.
 - Partial twin baselines may retain compatibility fallbacks, but the fidelity contract classifies default-backed output as an `engineering-estimate`, not calibrated evidence.
 - Recommendation preview state does not authorize recommendation-store values to leak into the simulation baseline.
-
-Residual note: `SimulationEngine.startScenario()` itself still contains a legacy warning-only preflight. Active React consumers are now blocked before that path, but the engine-level preflight should be converted to a typed refusal when the remaining direct/frozen consumers have a compatible error contract. This is intentionally not hidden.
 
 ## Phase SF-3 — truth in operator UI
 
@@ -85,19 +84,27 @@ The gate performs:
 1. dependency installation from the lockfile;
 2. TypeScript typecheck;
 3. fidelity contract tests;
-4. engine-consolidation tests;
-5. provider contract/selection/scenario-library/panel-facade tests;
-6. production-mode application build.
+4. direct `SimulationEngine` fail-closed baseline-preflight tests;
+5. engine-consolidation tests;
+6. provider contract/selection/scenario-library/panel-facade tests;
+7. production-mode application build.
 
-The fidelity tests lock these invariants:
+The tests lock these invariants:
 
 - demo fixtures never become runs of record;
 - authoritative intent cannot promote default-backed output;
 - calibration claims require explicit calibration evidence, a facility baseline and verification;
 - NVIDIA-runtime claims require an actually integrated `nvidia-solver` execution path;
-- measured claims require `measured-live` execution with `live` provenance.
+- measured claims require `measured-live` execution with `live` provenance;
+- direct engine callers cannot start a valid scenario with an empty baseline.
 
-## Phase SF-5 — external calibration / solver qualification
+## Phase SF-5 — exact-head CI qualification
+
+Status: **must be satisfied on the final branch SHA**
+
+A prior exact-head cycle passed typecheck, focused tests, production build and Production Perimeter before the engine-level preflight residual was closed. That evidence became historical when the branch moved. The final SHA must receive its own fresh successful qualification cycle; no prior green run is promoted across a head change.
+
+## Phase SF-6 — external calibration / solver qualification
 
 Status: **external-evidence gated; not claimed complete**
 

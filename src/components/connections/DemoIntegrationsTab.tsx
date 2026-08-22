@@ -109,7 +109,6 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
       const response = await invokeManagedRead({
         connectionId: searchConnection.id,
         operationId: 'search_analytics.sites.list',
-        path: '/webmasters/v3/sites',
         facilityId: searchConnection.facility_id,
       });
       setSearchResult({

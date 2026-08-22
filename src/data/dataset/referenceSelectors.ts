@@ -130,32 +130,23 @@ export function referenceKpiValues(configurationId: string): DatasetValue[] {
   ).map(toDatasetValue);
 }
 
+/**
+ * Legacy page-level site-spec selector. It intentionally keeps the original
+ * 21 `kpis.ts` SITE_DATA records so migrated page identity does not change.
+ * The complete corpus and preserved conflicts remain available through
+ * `allReferenceValues`, search, exports and `referenceSourceConflicts`.
+ */
 export function referenceSpecifications(configurationId?: string): DatasetValue[] {
-  return DSX_REFERENCE_RECORDS.filter(
-    (r) =>
-      [
-        'REFERENCE_SPECIFICATION',
-        'REFERENCE_SITE_SPECIFICATION_VARIANT',
-        'REFERENCE_GPU_SPECIFICATION',
-        'REFERENCE_BUILDING_SPECIFICATION',
-        'REFERENCE_SIMULATION_VARIABLE',
-        'REFERENCE_KPI_METADATA',
-      ].includes(r.data_class) && (!configurationId || r.configuration_id === configurationId),
-  ).map(toDatasetValue);
+  return recordsByClass('REFERENCE_SPECIFICATION')
+    .filter((r) => !configurationId || r.configuration_id === configurationId)
+    .map(toDatasetValue);
 }
 
-/**
- * Site specifications include both NVIDIA source variants when they exist.
- * Conflicting values are intentionally returned together with conflict metadata;
- * AURA does not pick a winner.
- */
+/** Legacy site-spec surface: 7 records per site from NVIDIA `kpis.ts`. */
 export function referenceSpecificationsForSite(site?: string | null): DatasetValue[] {
-  return DSX_REFERENCE_RECORDS.filter(
-    (r) =>
-      (r.data_class === 'REFERENCE_SPECIFICATION' ||
-        r.data_class === 'REFERENCE_SITE_SPECIFICATION_VARIANT') &&
-      (!site || r.site === site),
-  ).map(toDatasetValue);
+  return recordsByClass('REFERENCE_SPECIFICATION')
+    .filter((r) => !site || r.site === site)
+    .map(toDatasetValue);
 }
 
 /** The site a configuration belongs to, read from the record itself. */

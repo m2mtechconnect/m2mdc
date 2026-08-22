@@ -166,9 +166,14 @@ export default function Builder() {
       return;
     }
 
-    const geminiAnalysis = (location.state as Record<string, unknown> | null)?.geminiAnalysis;
-    const prefilled = (location.state as Record<string, unknown> | null)?.prefilled;
-    const blueprint = (location.state as Record<string, unknown> | null)?.blueprint;
+    const state = (location.state ?? {}) as {
+      geminiAnalysis?: unknown;
+      prefilled?: unknown;
+      blueprint?: Parameters<typeof initializeBuilder>[3];
+    };
+    const geminiAnalysis = state.geminiAnalysis;
+    const prefilled = state.prefilled;
+    const blueprint = state.blueprint;
 
     void initializeBuilder(searchParams, geminiAnalysis, prefilled, blueprint)
       .then(() => setIsInitialized(true))

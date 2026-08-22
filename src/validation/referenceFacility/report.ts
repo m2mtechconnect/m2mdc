@@ -2,7 +2,9 @@
  * Reference facility visual-acceptance evidence.
  *
  * Only measured values and explicit human verdicts are recorded. GPU memory is
- * never claimed: WebGL exposes no reliable figure.
+ * never claimed: WebGL exposes no reliable figure. A separate DSX blueprint
+ * asset gate prevents generic visual coverage from being promoted as DSX
+ * reference-design completeness.
  */
 
 import type { FrameStats, StabilityReport } from '@/validation/gpuAcceptance/benchmark';
@@ -82,6 +84,15 @@ export function evaluateFacilityRun(input: {
   );
   missing.forEach((r) => findings.push(`Published role did not mount: ${r.label} (${r.verdict}).`));
 
+  const dsxMissing = input.reconciliation.dsxAssetRows.filter(
+    (row) => row.state !== 'runtime-eligible',
+  );
+  dsxMissing.forEach((row) =>
+    findings.push(
+      `DSX asset gate incomplete: ${row.requirement.label} (${row.state}); exact role ${row.requirement.semanticRole}.`,
+    ),
+  );
+
   if (input.frames.averageFps < FACILITY_THRESHOLDS.warnAverageFpsFloor) {
     findings.push(`Average FPS ${input.frames.averageFps} is below the ${FACILITY_THRESHOLDS.warnAverageFpsFloor} floor.`);
   } else if (input.frames.averageFps < FACILITY_THRESHOLDS.passAverageFps) {
@@ -97,19 +108,28 @@ export function evaluateFacilityRun(input: {
     findings.push(`WebGL context was lost ${input.stability.contextLossEvents} time(s) during the run.`);
   }
 
-  const hardFail =
+  const visualHardFail =
     humanFailures.length > 0 ||
     blocked.length > 0 ||
     input.stability.contextLossEvents > 0 ||
     input.frames.averageFps < FACILITY_THRESHOLDS.warnAverageFpsFloor;
 
-  if (hardFail) {
+  if (visualHardFail) {
     return {
       result: 'fail',
       verdict: 'AURA_NVIDIA_REFERENCE_FACILITY_VISUAL_REMEDIATION_REQUIRED',
       findings,
     };
   }
+
+  if (dsxMissing.length > 0) {
+    return {
+      result: 'fail',
+      verdict: 'AURA_DSX_BLUEPRINT_ASSET_COVERAGE_INCOMPLETE',
+      findings,
+    };
+  }
+
   if (findings.length > 0) {
     return {
       result: 'pass-with-limitations',
@@ -143,7 +163,7 @@ export function buildFacilityReport(payload: FacilityRunPayload): string {
     `Browser: ${renderer.browser} on ${renderer.operatingSystem}`,
     `Canvas: ${perf.canvas ? `${perf.canvas.width}x${perf.canvas.height}` : 'unknown'} @ DPR ${perf.devicePixelRatio ?? 'unknown'}`,
     '',
-    '## Asset reconciliation',
+    '## Current reference-hall visual reconciliation',
     '| Role | Published | Expected derivative | Mounted derivative | Objects | Verdict |',
     '| --- | --- | --- | --- | --- | --- |',
     ...reconciliation.rows.map(
@@ -154,6 +174,17 @@ export function buildFacilityReport(payload: FacilityRunPayload): string {
     `Roles OpenUSD-derived: ${reconciliation.rolesDerived}/${reconciliation.rolesExpected}`,
     `Mounted objects: ${reconciliation.mountedObjects} across ${reconciliation.uniqueDerivatives} unique derivatives`,
     `Published but unused manifest rows: ${reconciliation.unusedPublishedAssets.length ? reconciliation.unusedPublishedAssets.join(', ') : 'none'}`,
+    '',
+    '## NVIDIA DSX blueprint asset gate',
+    '| Requirement | Exact role | Layer | State | Matching assets |',
+    '| --- | --- | --- | --- | --- |',
+    ...reconciliation.dsxAssetRows.map(
+      (row) =>
+        `| ${row.requirement.label} | ${row.requirement.semanticRole} | ${row.requirement.layer} | ${row.state} | ${row.matchingAssetIds.length ? row.matchingAssetIds.join(', ') : 'none'} |`,
+    ),
+    '',
+    `DSX exact-role coverage: ${reconciliation.dsxRuntimeEligible}/${reconciliation.dsxRequired}`,
+    'Generic or legacy visual approximations never count toward this DSX gate.',
     '',
     '## Performance',
     `Average FPS: ${perf.frames.averageFps} | 1% low: ${perf.frames.onePercentLowFps}`,

@@ -1,178 +1,99 @@
-import { useTranslation } from "react-i18next";
-import { Helmet } from "react-helmet-async";
-/**
- * DataCentreTwinLanding - Marketing landing page for Sovereign Green AI Data Centre Twin
- * Public, read-only page showcasing the platform capabilities
- * Uses M2M brand design tokens from index.css
- */
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { TwinHeader } from '@/components/landing/TwinHeader';
+import { TwinHero } from '@/components/landing/TwinHero';
 
-import { 
-  TwinHeader,
-  TwinHero,
-  TwinCapabilityBadges,
-  TwinFeatureSection,
-  TwinStatsBand,
-  TwinIntegrationsGrid,
-  TwinUseCases,
-  TwinDifferentiators,
-  TwinTrustSection,
-  TwinCTASection,
-  ScrollReveal,
-  TwinFooter,
-} from "@/components/landing";
+const DeferredLandingContent = lazy(() => import('@/components/landing/DeferredLandingContent'));
 
-// Feature section definitions using i18n keys
-const featureDefs = [
-  {
-    titleKey: "landing.featureDashboardTitle",
-    subtitleKey: "landing.featureDashboardSubtitle",
-    bulletKeys: ["landing.featureDashboardB1", "landing.featureDashboardB2", "landing.featureDashboardB3"],
-    imageSrc: "/landing/screenshots/dashboard-desktop.webp",
-    imageAlt: "Data Centre Command dashboard showing PUE 1.38, GPU Saturation 23%, Thermal Stability 94%, Sovereign Compute 98%",
-    imageWidth: 1564,
-    imageHeight: 879,
-    accentColor: "primary" as const,
-  },
-  {
-    titleKey: "landing.feature3dTitle",
-    subtitleKey: "landing.feature3dSubtitle",
-    bulletKeys: ["landing.feature3dB1", "landing.feature3dB2", "landing.feature3dB3"],
-    imageSrc: "/landing/screenshots/simulation-desktop.webp",
-    imageAlt: "3D Digital Twin with thermal rack visualization, simulation controls, and scenario selection panel",
-    imageWidth: 1576,
-    imageHeight: 896,
-    flip: true,
-    accentColor: "info" as const,
-  },
-  {
-    titleKey: "landing.featureBlueprintTitle",
-    subtitleKey: "landing.featureBlueprintSubtitle",
-    bulletKeys: ["landing.featureBlueprintB1", "landing.featureBlueprintB2", "landing.featureBlueprintB3"],
-    imageSrc: "/landing/screenshots/blueprint-desktop.webp",
-    imageAlt: "Blueprint Designer showing agent health, data sources, KPIs, and workflows configuration",
-    imageWidth: 1567,
-    imageHeight: 895,
-    accentColor: "success" as const,
-  },
-  {
-    titleKey: "landing.featureThermalTitle",
-    subtitleKey: "landing.featureThermalSubtitle",
-    bulletKeys: ["landing.featureThermalB1", "landing.featureThermalB2", "landing.featureThermalB3"],
-    imageSrc: "/landing/screenshots/telemetry-desktop.webp",
-    imageAlt: "Thermal telemetry showing rack temperatures 19-28°C, GPU temps 67°C, and inlet temp 21.9°C",
-    imageWidth: 1571,
-    imageHeight: 891,
-    flip: true,
-    accentColor: "warning" as const,
-  },
-  {
-    titleKey: "landing.featureCoolingTitle",
-    subtitleKey: "landing.featureCoolingSubtitle",
-    bulletKeys: ["landing.featureCoolingB1", "landing.featureCoolingB2", "landing.featureCoolingB3"],
-    imageSrc: "/landing/screenshots/cooling-desktop.png",
-    imageAlt: "Cooling zones dashboard with 8 zones, ambient temps, airflow CFM, and humidity monitoring",
-    imageWidth: 1555,
-    imageHeight: 895,
-    accentColor: "info" as const,
-  },
-  {
-    titleKey: "landing.featureSovereigntyTitle",
-    subtitleKey: "landing.featureSovereigntySubtitle",
-    bulletKeys: ["landing.featureSovereigntyB1", "landing.featureSovereigntyB2", "landing.featureSovereigntyB3"],
-    imageSrc: "/landing/screenshots/sovereignty-desktop.webp",
-    imageAlt: "Sovereignty dashboard showing 100% score, data residency compliance, 5 certified frameworks",
-    imageWidth: 1570,
-    imageHeight: 895,
-    flip: true,
-    accentColor: "success" as const,
-  },
-  {
-    titleKey: "landing.featureCarbonTitle",
-    subtitleKey: "landing.featureCarbonSubtitle",
-    bulletKeys: ["landing.featureCarbonB1", "landing.featureCarbonB2", "landing.featureCarbonB3"],
-    imageSrc: "/landing/screenshots/carbon-desktop.png",
-    imageAlt: "Carbon tracking with 100% efficiency score, 99% renewable mix, regional grid comparison",
-    imageWidth: 1566,
-    imageHeight: 889,
-    accentColor: "primary" as const,
-  },
-];
+function DeferredMarketingBody() {
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const pendingAnchorRef = useRef<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  const scrollToPendingAnchor = useCallback(() => {
+    const id = pendingAnchorRef.current;
+    if (!id) return;
+    const target = document.getElementById(id);
+    if (!target) return;
+    pendingAnchorRef.current = null;
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
+
+  const requestAnchor = useCallback((id: string) => {
+    const existing = document.getElementById(id);
+    if (existing) {
+      existing.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    pendingAnchorRef.current = id;
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const hash = window.location.hash.replace(/^#/, '');
+    if (hash) requestAnchor(hash);
+
+    const onRequest = (event: Event) => {
+      const custom = event as CustomEvent<string>;
+      if (custom.detail) requestAnchor(custom.detail);
+    };
+    window.addEventListener('aura:landing-body-request', onRequest as EventListener);
+    return () => window.removeEventListener('aura:landing-body-request', onRequest as EventListener);
+  }, [requestAnchor]);
+
+  useEffect(() => {
+    if (mounted || !triggerRef.current) return;
+    if (!('IntersectionObserver' in window)) {
+      setMounted(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        setMounted(true);
+        observer.disconnect();
+      },
+      // The hero occupies almost the full first viewport. Do not request the
+      // motion-heavy marketing body until the visitor has actually started to
+      // scroll toward it.
+      { rootMargin: '0px 0px -25% 0px', threshold: 0 },
+    );
+    observer.observe(triggerRef.current);
+    return () => observer.disconnect();
+  }, [mounted]);
+
+  return (
+    <>
+      <div ref={triggerRef} aria-hidden="true" className="h-px w-full" />
+      {mounted ? (
+        <Suspense
+          fallback={(
+            <div className="flex min-h-32 items-center justify-center" role="status" aria-live="polite">
+              <span className="text-sm text-muted-foreground">Loading platform capabilities…</span>
+            </div>
+          )}
+        >
+          <DeferredLandingContent onReady={scrollToPendingAnchor} />
+        </Suspense>
+      ) : null}
+    </>
+  );
+}
+
+/** Public, read-only marketing landing page for AURA DC. */
 export default function DataCentreTwinLanding() {
-  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-background text-foreground scroll-smooth">
       <Helmet>
         <link rel="canonical" href="https://auradc.m2mtechconnect.com/" />
         <meta property="og:url" content="https://auradc.m2mtechconnect.com/" />
       </Helmet>
-      {/* Header Navigation */}
       <TwinHeader />
-      
-      {/* Hero Section - add pt for fixed header */}
       <div className="pt-16 lg:pt-20">
         <TwinHero />
       </div>
-      
-      {/* Capability Badges */}
-      <ScrollReveal>
-        <TwinCapabilityBadges />
-      </ScrollReveal>
-      
-      {/* Feature Sections */}
-      <div id="features">
-        {featureDefs.map((feature, index) => (
-          <ScrollReveal key={index} delay={index * 0.1} direction={feature.flip ? "right" : "left"}>
-            <TwinFeatureSection
-              title={t(feature.titleKey)}
-              subtitle={t(feature.subtitleKey)}
-              bullets={feature.bulletKeys.map(k => t(k))}
-              imageSrc={feature.imageSrc}
-              imageAlt={feature.imageAlt}
-              imageWidth={feature.imageWidth}
-              imageHeight={feature.imageHeight}
-              flip={feature.flip}
-              accentColor={feature.accentColor}
-            />
-          </ScrollReveal>
-        ))}
-      </div>
-      
-      {/* Stats/ROI Band */}
-      <ScrollReveal>
-        <TwinStatsBand />
-      </ScrollReveal>
-      
-      {/* Integrations */}
-      <ScrollReveal>
-        <div id="integrations">
-          <TwinIntegrationsGrid />
-        </div>
-      </ScrollReveal>
-      
-      {/* Use Cases */}
-      <ScrollReveal>
-        <div id="use-cases">
-          <TwinUseCases />
-        </div>
-      </ScrollReveal>
-      
-      {/* Differentiators */}
-      <ScrollReveal>
-        <div id="differentiators">
-          <TwinDifferentiators />
-        </div>
-      </ScrollReveal>
-      
-      {/* Trust Section */}
-      <ScrollReveal>
-        <TwinTrustSection />
-      </ScrollReveal>
-      
-      {/* Bottom CTA */}
-      <TwinCTASection />
-      
-      {/* Footer */}
-      <TwinFooter />
+      <DeferredMarketingBody />
     </div>
   );
 }

@@ -475,7 +475,7 @@ export default function Builder() {
       try {
         // Pass the builder's own configuration. No hardcoded facility identity:
         // unset fields fall back to the twin service defaults.
-        const newTwin = await createTwin({
+        const newTwin = await createTwin(null, {
           name: state.goal || 'New Data Centre Twin',
           industry: state.industry || undefined,
           metadata: {

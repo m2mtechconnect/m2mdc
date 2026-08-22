@@ -60,89 +60,68 @@ export function BuilderLayout({
   nextLabel = 'Next',
   lastSaved,
   currentStep: propCurrentStep,
+  steps: stepLabels,
+  title = 'Builder',
+  description = 'Configure and deploy this system',
 }: BuilderLayoutProps) {
   const navigate = useNavigate();
   const { currentStep, completedSteps, setCurrentStep } = useWizardBuilderStore();
   const [deployState, setDeployState] = useState<DeployState>(DeployState.idle);
-  
+  const [deployError, setDeployError] = useState<string | null>(null);
+
+  const STEPS = stepLabels ?? DEFAULT_STEPS;
   const activeStep = propCurrentStep || currentStep;
-  const isDeployStep = activeStep === 5;
+  const isDeployStep = activeStep === STEPS.length;
 
   const isStepComplete = (step: number) => completedSteps.includes(step);
   const isStepActive = (step: number) => currentStep === step;
   const isStepAccessible = (step: number) => step <= currentStep || completedSteps.includes(step - 1);
   
-  // Reset deploy state when leaving step 5
+  // Reset deploy state when leaving the deploy step
   useEffect(() => {
     if (!isDeployStep && deployState !== DeployState.idle) {
       setDeployState(DeployState.idle);
+      setDeployError(null);
     }
   }, [isDeployStep, deployState]);
   
   const handleDeployClick = async () => {
     if (!onDeploy || deployState !== DeployState.idle || nextDisabled) return;
-    
-    // Additional validation check before deployment - get fresh state
+
+    // Real precondition, surfaced persistently rather than as a 3s flash.
     const state = useWizardBuilderStore.getState();
     if (!state.workflow?.actions || state.workflow.actions.length === 0) {
-      console.error('[BuilderLayout] Deployment blocked: No workflow actions found');
       setDeployState(DeployState.error);
-      setTimeout(() => {
-        setDeployState(DeployState.idle);
-      }, 3000);
+      setDeployError('Add at least one workflow action before deploying.');
       return;
     }
-    
-    console.log('[BuilderLayout] Workflow validation passed, proceeding with deployment');
 
-    // Stage 1: Morphing
-    setDeployState(DeployState.morphing);
-    
-    // Wait for morph animation
-    await new Promise(resolve => setTimeout(resolve, 350));
-    
-    // Stage 2: Deploying - enforce minimum spinner duration
+    setDeployError(null);
     setDeployState(DeployState.deploying);
-    const deployStartTime = Date.now();
-    const MIN_DEPLOY_DURATION = 1200;
 
     try {
-      const deployPromise = onDeploy();
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("Deployment timeout")), 15000)
-      );
-      
-      const result = await Promise.race([deployPromise, timeoutPromise]) as any;
-      
-      const elapsed = Date.now() - deployStartTime;
-      const remainingTime = MIN_DEPLOY_DURATION - elapsed;
-      if (remainingTime > 0) {
-        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      const result = (await onDeploy()) as { success?: boolean; message?: string; agentUrl?: string } | undefined;
+
+      // A handler that returns nothing has handed the deployment off to its own
+      // surface (for example the deployment progress modal). That is not a failure.
+      if (result === undefined || result === null) {
+        setDeployState(DeployState.idle);
+        return;
       }
-      
+
       if (result.success) {
         setDeployState(DeployState.success);
-        setTimeout(() => {
-          navigate(result.agentUrl || '/dashboard');
-        }, 1800);
-      } else {
-        throw new Error(result.message || 'Deployment failed');
+        navigate(result.agentUrl || '/dashboard');
+        return;
       }
-    } catch (error: any) {
-      console.error("Deploy error:", error);
-      
-      const elapsed = Date.now() - deployStartTime;
-      const remainingTime = MIN_DEPLOY_DURATION - elapsed;
-      if (remainingTime > 0) {
-        await new Promise(resolve => setTimeout(resolve, remainingTime));
-      }
-      
+
+      throw new Error(result.message || 'Deployment failed');
+    } catch (error) {
       setDeployState(DeployState.error);
-      setTimeout(() => {
-        setDeployState(DeployState.idle);
-      }, 3000);
+      setDeployError(error instanceof Error ? error.message : 'Deployment failed');
     }
   };
+
 
   return (
     <BuilderModeProvider>

@@ -24,17 +24,15 @@ export class AiProviderPolicyError extends Error {
   }
 }
 
-const ACTIVE_STATUSES = new Set(['HEALTHY', 'CONNECTED_NO_DATA']);
-
 function visibleToTenant(rowTenantId: string | null, callerTenantId: string | null): boolean {
   return rowTenantId === null || rowTenantId === callerTenantId;
 }
 
 /**
  * Select exactly one activated NVIDIA provider for the caller's tenant.
- * Tenant-specific configuration wins over a platform-scope fallback. Ambiguity
- * is an error; AURA never guesses which credential/provider should receive a
- * model request.
+ * A provider is eligible only after a passing model-response health check has
+ * promoted the connection to HEALTHY. CONNECTED_NO_DATA is intentionally not
+ * accepted for inference providers.
  */
 export function selectActiveNvidiaProvider(
   rows: readonly AiProviderConnectionCandidate[],
@@ -43,7 +41,7 @@ export function selectActiveNvidiaProvider(
   const eligible = rows.filter((row) =>
     row.connector_id === NVIDIA_AI_CONNECTOR_ID &&
     row.enabled === true &&
-    ACTIVE_STATUSES.has(row.status) &&
+    row.status === 'HEALTHY' &&
     visibleToTenant(row.tenant_id, callerTenantId),
   );
 
@@ -70,12 +68,7 @@ export interface ValidatedNvidiaProviderConfiguration {
   supervisorModel: string;
 }
 
-/**
- * Hosted NVIDIA is the only Connections-managed deployment in this phase.
- * Private NIM remains supported by the separate explicitly configured
- * OpenAI-compatible router path; browser-provided endpoints are intentionally
- * not accepted here.
- */
+/** Hosted NVIDIA is the only Connections-managed deployment in this phase. */
 export function validateNvidiaProviderConfiguration(
   input: Record<string, unknown> | null | undefined,
 ): ValidatedNvidiaProviderConfiguration {
@@ -83,17 +76,13 @@ export function validateNvidiaProviderConfiguration(
   if (deploymentType !== 'nvidia_hosted') {
     throw new AiProviderPolicyError(
       'AI_PROVIDER_DEPLOYMENT_NOT_QUALIFIED',
-      'Only the NVIDIA hosted deployment is qualified through the Connections control plane. Private NIM requires the separately configured OpenAI-compatible provider path.',
+      'Only the NVIDIA hosted deployment is qualified through the Connections control plane. Private inference requires the separately configured private-compatible provider path.',
       409,
     );
   }
 
-  const reasoningModel = String(
-    input?.reasoning_model ?? NVIDIA_OPEN_MODEL_IDS.workhorse,
-  );
-  const supervisorModel = String(
-    input?.supervisor_model ?? NVIDIA_OPEN_MODEL_IDS.supervisor,
-  );
+  const reasoningModel = String(input?.reasoning_model ?? NVIDIA_OPEN_MODEL_IDS.workhorse);
+  const supervisorModel = String(input?.supervisor_model ?? NVIDIA_OPEN_MODEL_IDS.supervisor);
 
   if (reasoningModel !== NVIDIA_OPEN_MODEL_IDS.workhorse) {
     throw new AiProviderPolicyError(

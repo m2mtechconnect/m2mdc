@@ -1,11 +1,8 @@
 /**
  * AURA DC — Canonical authorization model (B-01).
- *
  * Identity comes from auth.users; security-effective roles come only from
- * public.user_roles; protected UI operations branch on permissions rather than
- * role labels. Backend/RLS remains the security boundary.
+ * public.user_roles; backend/RLS remains the security boundary.
  */
-
 export type PlatformRole =
   | 'security_admin'
   | 'admin'
@@ -23,40 +20,25 @@ export type TenantRole = 'owner' | 'operator' | 'viewer';
 export type AnyRole = PlatformRole | TenantRole;
 
 export const PLATFORM_ROLES: readonly PlatformRole[] = [
-  'security_admin',
-  'admin',
-  'executive',
-  'manager',
-  'engineer',
-  'compliance',
-  'data_analyst',
-  'marketing',
-  'sales',
-  'support',
-  'finance',
+  'security_admin', 'admin', 'executive', 'manager', 'engineer', 'compliance',
+  'data_analyst', 'marketing', 'sales', 'support', 'finance',
 ] as const;
-
 export const TENANT_ROLES: readonly TenantRole[] = ['owner', 'operator', 'viewer'] as const;
 
 export function isPlatformRole(value: string): value is PlatformRole {
   return (PLATFORM_ROLES as readonly string[]).includes(value);
 }
-
 export function isTenantRole(value: string): value is TenantRole {
   return (TENANT_ROLES as readonly string[]).includes(value);
 }
 
 export type Permission =
-  // platform surface
   | 'platform.access_internal_shell'
   | 'platform.view_admin_console'
-  // authorization administration
   | 'authz.view_assignments'
   | 'authz.manage_assignments'
-  // tenant / organization
   | 'tenant.view_members'
   | 'tenant.manage_members'
-  // digital twin + operations
   | 'twin.view'
   | 'twin.edit'
   | 'twin.delete'
@@ -65,14 +47,17 @@ export type Permission =
   | 'agent.administer'
   | 'deployment.view'
   | 'deployment.execute'
-  // analytics / reporting
   | 'analytics.view'
   | 'analytics.export'
-  // AI provider/model administration
-  | 'ai.model.test'
-  | 'ai.model.configure';
+  // Selecting a model/profile is ordinary agent configuration and remains
+  // constrained by the agent-row RLS/ownership boundary.
+  | 'ai.model.configure'
+  // Connectivity tests incur provider spend and remain more restricted.
+  | 'ai.model.test';
 
-const VIEWER_BASE: Permission[] = ['twin.view', 'agent.view', 'deployment.view', 'analytics.view'];
+const VIEWER_BASE: Permission[] = [
+  'twin.view', 'agent.view', 'deployment.view', 'analytics.view', 'ai.model.configure',
+];
 
 const OPERATOR_BASE: Permission[] = [
   ...VIEWER_BASE,
@@ -92,7 +77,6 @@ const ADMIN_BASE: Permission[] = [
   'tenant.view_members',
   'tenant.manage_members',
   'ai.model.test',
-  'ai.model.configure',
 ];
 
 export const ROLE_PERMISSIONS: Record<AnyRole, readonly Permission[]> = {
@@ -113,20 +97,8 @@ export const ROLE_PERMISSIONS: Record<AnyRole, readonly Permission[]> = {
 };
 
 const ROLE_PRECEDENCE: AnyRole[] = [
-  'security_admin',
-  'admin',
-  'owner',
-  'executive',
-  'manager',
-  'compliance',
-  'engineer',
-  'operator',
-  'data_analyst',
-  'finance',
-  'marketing',
-  'sales',
-  'support',
-  'viewer',
+  'security_admin', 'admin', 'owner', 'executive', 'manager', 'compliance',
+  'engineer', 'operator', 'data_analyst', 'finance', 'marketing', 'sales', 'support', 'viewer',
 ];
 
 export interface RoleGrant {
@@ -150,11 +122,7 @@ export interface ResolvedAuthorization {
 }
 
 export const EMPTY_AUTHORIZATION: ResolvedAuthorization = {
-  grants: [],
-  roles: [],
-  primaryRole: null,
-  permissions: new Set<Permission>(),
-  unmapped: [],
+  grants: [], roles: [], primaryRole: null, permissions: new Set<Permission>(), unmapped: [],
 };
 
 export function resolveAuthorization(
@@ -181,17 +149,14 @@ export function resolveAuthorization(
 
   const roles = Array.from(new Set(grants.map((grant) => grant.role)));
   const primaryRole = ROLE_PRECEDENCE.find((role) => roles.includes(role)) ?? null;
-
   const permissions = new Set<Permission>();
   for (const grant of grants) {
     const global = grant.scope === null || grant.scope === 'global';
     if (!global) continue;
     for (const permission of ROLE_PERMISSIONS[grant.role]) permissions.add(permission);
   }
-
   if (grants.some((grant) => grant.scope === null || grant.scope === 'global')) {
     permissions.add('platform.access_internal_shell');
   }
-
   return { grants, roles, primaryRole, permissions, unmapped };
 }

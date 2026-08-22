@@ -5,30 +5,33 @@ import {
   runtimeStatusForModel,
 } from '../modelPolicy';
 
+const AURA_READY = { selectedProvider: 'aura-managed', auraManaged: { configured: true } };
+const NVIDIA_READY = { selectedProvider: 'nvidia-hosted', nvidia: { configured: true } };
+const PRIVATE_READY = { selectedProvider: 'private-compatible', privateCompatible: { configured: true } };
+
 describe('agent model policy', () => {
-  it('keeps provider-neutral profiles selectable', () => {
-    expect(runtimeStatusForModel('profile:fast')).toBe('runtime-supported');
-    expect(runtimeStatusForModel('profile:reasoning')).toBe('runtime-supported');
-    expect(runtimeStatusForModel('profile:supervisor')).toBe('runtime-supported');
+  it('fails closed for portable profiles until the selected provider is proven ready', () => {
+    expect(runtimeStatusForModel('profile:fast')).toBe('requires-provider');
+    expect(runtimeStatusForModel('profile:reasoning', AURA_READY)).toBe('runtime-supported');
+    expect(runtimeStatusForModel('profile:supervisor', NVIDIA_READY)).toBe('runtime-supported');
   });
 
-  it('keeps known legacy Google IDs backward-compatible', () => {
-    expect(modelCanBeSelected('google/gemini-2.5-flash')).toBe(true);
-    expect(modelCanBeSelected('google/gemini-3-pro-preview')).toBe(true);
+  it('keeps known legacy Google IDs usable only through a ready AURA-managed provider', () => {
+    expect(modelCanBeSelected('google/gemini-2.5-flash')).toBe(false);
+    expect(modelCanBeSelected('google/gemini-2.5-flash', AURA_READY)).toBe(true);
+    expect(runtimeStatusForModel('google/gemini-3-pro-preview', NVIDIA_READY)).toBe('requires-provider');
   });
 
-  it('requires an explicitly configured NVIDIA provider before NVIDIA IDs are selectable', () => {
+  it('requires a ready matching NVIDIA-capable provider for NVIDIA IDs', () => {
     expect(runtimeStatusForModel('nvidia/nemotron-3.5-lightning-30b-a3b')).toBe('requires-provider');
-    expect(runtimeStatusForModel(
-      'nvidia/nemotron-3.5-lightning-30b-a3b',
-      { selectedProvider: 'nvidia-build', nvidia: { configured: true } },
-    )).toBe('runtime-supported');
+    expect(runtimeStatusForModel('nvidia/nemotron-3.5-lightning-30b-a3b', NVIDIA_READY)).toBe('runtime-supported');
+    expect(runtimeStatusForModel('nvidia/nemotron-3.5-lightning-30b-a3b', PRIVATE_READY)).toBe('runtime-supported');
   });
 
   it('treats unimplemented marketplace entries as catalog-only', () => {
-    expect(runtimeStatusForModel('anthropic/claude-opus-4')).toBe('catalog-only');
-    expect(runtimeStatusForModel('mistral/mistral-large-2')).toBe('catalog-only');
-    expect(runtimeStatusForModel('deepseek/deepseek-v3')).toBe('catalog-only');
+    expect(runtimeStatusForModel('anthropic/claude-opus-4', AURA_READY)).toBe('catalog-only');
+    expect(runtimeStatusForModel('mistral/mistral-large-2', AURA_READY)).toBe('catalog-only');
+    expect(runtimeStatusForModel('deepseek/deepseek-v3', AURA_READY)).toBe('catalog-only');
   });
 
   it('preserves unrelated config when selecting a model', () => {

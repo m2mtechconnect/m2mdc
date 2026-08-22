@@ -1,9 +1,11 @@
 /**
  * Canonical AURA model/provider router.
  * Agent roles select compute profiles; providers select executable models.
+ * Public provider labels are white-label-safe; implementation vendor details
+ * stay server-side only.
  */
 export type AgentModelProfile = 'fast' | 'reasoning' | 'supervisor';
-export type AgentModelProvider = 'lovable-managed' | 'nvidia-build' | 'openai-compatible';
+export type AgentModelProvider = 'aura-managed' | 'nvidia-hosted' | 'private-compatible';
 
 export interface ModelMessage {
   role: 'system' | 'user' | 'assistant';
@@ -135,6 +137,13 @@ function configuredModelForProfile(profile: AgentModelProfile, env: RouterEnviro
   return env.AURA_MODEL_SUPERVISOR;
 }
 
+function publicProviderName(providerName: string): AgentModelProvider | string {
+  if (providerName === 'lovable-managed' || providerName === 'lovable') return 'aura-managed';
+  if (providerName === 'nvidia' || providerName === 'nvidia-build') return 'nvidia-hosted';
+  if (providerName === 'openai-compatible' || providerName === 'self-hosted') return 'private-compatible';
+  return providerName;
+}
+
 export function resolveModel(
   options: { requestedModel?: string | null; profile?: AgentModelProfile | null; env?: RouterEnvironment } = {},
 ): ResolvedModel {
@@ -147,7 +156,7 @@ export function resolveModel(
   if (vendor === 'google' && providerName !== 'lovable-managed' && providerName !== 'lovable') {
     throw new ModelRouterError(
       'MODEL_PROVIDER_MISMATCH',
-      `Google model '${options.requestedModel}' requires the Lovable-managed provider. Use 'profile:${profile}' for a provider-neutral selection.`,
+      `Google model '${options.requestedModel}' requires the AURA-managed provider. Use 'profile:${profile}' for a provider-neutral selection.`,
       409,
     );
   }
@@ -161,7 +170,7 @@ export function resolveModel(
   ) {
     throw new ModelRouterError(
       'MODEL_PROVIDER_MISMATCH',
-      `NVIDIA model '${options.requestedModel}' requires NVIDIA or an explicitly configured OpenAI-compatible provider`,
+      `NVIDIA model '${options.requestedModel}' requires NVIDIA hosted inference or an explicitly configured private-compatible provider`,
       409,
     );
   }
@@ -169,7 +178,7 @@ export function resolveModel(
   if (providerName === 'nvidia' || providerName === 'nvidia-build') {
     const apiKey = env.NVIDIA_API_KEY?.trim();
     if (!apiKey) {
-      throw new ModelRouterError('NVIDIA_PROVIDER_NOT_CONFIGURED', 'NVIDIA provider was selected but NVIDIA_API_KEY is not configured');
+      throw new ModelRouterError('NVIDIA_PROVIDER_NOT_CONFIGURED', 'NVIDIA hosted inference was selected but its server credential is not configured');
     }
     const configured = configuredModelForProfile(profile, env);
     const model = configured ?? (profile === 'supervisor' ? NVIDIA_OPEN_MODEL_IDS.supervisor : NVIDIA_OPEN_MODEL_IDS.workhorse);
@@ -184,7 +193,7 @@ export function resolveModel(
       );
     }
     return {
-      provider: 'nvidia-build',
+      provider: 'nvidia-hosted',
       profile,
       model,
       endpoint: chatEndpoint(env.NVIDIA_API_BASE_URL?.trim() || 'https://integrate.api.nvidia.com/v1'),
@@ -199,7 +208,7 @@ export function resolveModel(
     if (!endpoint || !apiKey) {
       throw new ModelRouterError(
         'OPENAI_COMPATIBLE_PROVIDER_NOT_CONFIGURED',
-        'OpenAI-compatible provider requires AURA_OPENAI_BASE_URL and AURA_OPENAI_API_KEY',
+        'The private-compatible provider requires a server-side endpoint and credential',
       );
     }
     const model = configuredModelForProfile(profile, env);
@@ -214,7 +223,7 @@ export function resolveModel(
       );
     }
     return {
-      provider: 'openai-compatible',
+      provider: 'private-compatible',
       profile,
       model,
       endpoint: chatEndpoint(endpoint),
@@ -224,18 +233,18 @@ export function resolveModel(
   }
 
   if (providerName !== 'lovable-managed' && providerName !== 'lovable') {
-    throw new ModelRouterError('UNSUPPORTED_AI_PROVIDER', `AI provider '${providerName}' is not supported`, 400);
+    throw new ModelRouterError('UNSUPPORTED_AI_PROVIDER', `AI provider '${publicProviderName(providerName)}' is not supported`, 400);
   }
   const apiKey = env.LOVABLE_API_KEY?.trim();
   if (!apiKey) {
-    throw new ModelRouterError('LOVABLE_PROVIDER_NOT_CONFIGURED', 'Lovable-managed provider is selected but LOVABLE_API_KEY is not configured');
+    throw new ModelRouterError('AURA_MANAGED_PROVIDER_NOT_CONFIGURED', 'AURA-managed intelligence is selected but its server credential is not configured');
   }
   const model = configuredModelForProfile(profile, env) ?? LOVABLE_MODEL_IDS[profile];
   if (!PROFILE_ALIASES[model.toLowerCase()] || model.toLowerCase().startsWith('nvidia/')) {
-    throw new ModelRouterError('UNSUPPORTED_LOVABLE_MODEL', `Configured Lovable model '${model}' is not in the Lovable AURA allowlist`, 400);
+    throw new ModelRouterError('UNSUPPORTED_AURA_MANAGED_MODEL', `Configured AURA-managed model '${model}' is not in the qualified allowlist`, 400);
   }
   return {
-    provider: 'lovable-managed',
+    provider: 'aura-managed',
     profile,
     model,
     endpoint: 'https://ai.gateway.lovable.dev/v1/chat/completions',
@@ -303,17 +312,15 @@ export async function makeChatCompletion(
 export function providerReadiness(env: RouterEnvironment = runtimeEnv()) {
   const selected = (env.AURA_AI_PROVIDER ?? 'lovable-managed').trim().toLowerCase();
   return {
-    selectedProvider: selected,
-    lovable: { configured: Boolean(env.LOVABLE_API_KEY?.trim()) },
+    selectedProvider: publicProviderName(selected),
+    auraManaged: { configured: Boolean(env.LOVABLE_API_KEY?.trim()) },
     nvidia: {
       configured: Boolean(env.NVIDIA_API_KEY?.trim()),
-      endpoint: env.NVIDIA_API_BASE_URL?.trim() || 'https://integrate.api.nvidia.com/v1',
       models: NVIDIA_OPEN_MODEL_IDS,
-      runtimeClaim: 'Configured endpoint only; not proof of self-hosted NIM/NeMo/TensorRT-LLM execution',
+      runtimeClaim: 'Configured hosted endpoint only; not proof of private NIM/NeMo/TensorRT-LLM execution',
     },
-    openaiCompatible: {
+    privateCompatible: {
       configured: Boolean(env.AURA_OPENAI_BASE_URL?.trim() && env.AURA_OPENAI_API_KEY?.trim()),
-      endpoint: env.AURA_OPENAI_BASE_URL?.trim() || null,
     },
   };
 }

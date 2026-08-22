@@ -58,6 +58,17 @@ describe('agent/model architecture guards', () => {
     expect(router).toContain('profile:supervisor');
   });
 
+  it('keeps browser-visible provider state white-label and endpoint-free', () => {
+    const aiConfig = read('supabase/functions/ai-config/index.ts');
+    const marketplace = read('src/components/builder/ModelMarketplace.tsx');
+    const settings = read('src/pages/AISettings.tsx');
+    expect(aiConfig).not.toContain('endpoint: resolved.endpoint');
+    expect(marketplace).not.toContain('lovable-managed');
+    expect(settings).not.toContain('lovable-managed');
+    expect(marketplace).not.toContain('ai.gateway.lovable.dev');
+    expect(settings).not.toContain('ai.gateway.lovable.dev');
+  });
+
   it('keeps the NVIDIA connection probe server-owned and secret-free to the browser', () => {
     const source = read('supabase/functions/connection-health-check/index.ts');
     const policy = read('supabase/functions/_shared/ai-provider-policy.ts');
@@ -72,7 +83,10 @@ describe('agent/model architecture guards', () => {
     expect(connectionModel).toContain("'nvidia_ai_provider'");
   });
 
-  it('uses one active-global admin policy across provider provisioning, credentials and health', () => {
+  it('preserves the generic Connections admin boundary', () => {
+    const policy = read('supabase/functions/_shared/connection-admin-policy.ts');
+    expect(policy).toContain("['admin', 'owner']");
+    expect(policy).not.toContain("['security_admin', 'admin', 'owner']");
     for (const path of [
       'supabase/functions/connection-provision/index.ts',
       'supabase/functions/connection-credential/index.ts',
@@ -88,6 +102,9 @@ describe('agent/model architecture guards', () => {
     const provision = read('supabase/functions/connection-provision/index.ts');
     expect(provision).toContain("'model_response_present'");
     expect(provision).toContain("const newStatus = dataObserved ? 'HEALTHY' : 'CONNECTED_NO_DATA'");
+    const policy = read('supabase/functions/_shared/ai-provider-policy.ts');
+    expect(policy).toContain("row.status === 'HEALTHY'");
+    expect(policy).not.toContain("ACTIVE_STATUSES");
   });
 
   it('does not let the marketplace erase unrelated agent config', () => {

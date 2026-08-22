@@ -10,12 +10,12 @@ import {
   resolveModel,
 } from './model-router';
 
-const LOVABLE_ENV = { LOVABLE_API_KEY: 'test-lovable-key' };
+const AURA_MANAGED_ENV = { LOVABLE_API_KEY: 'test-managed-key' };
 
 describe('AURA model router', () => {
-  it('keeps Lovable-managed inference as the backward-compatible default', () => {
-    const resolved = resolveModel({ env: LOVABLE_ENV });
-    expect(resolved.provider).toBe('lovable-managed');
+  it('keeps the managed inference implementation behind a white-label provider name', () => {
+    const resolved = resolveModel({ env: AURA_MANAGED_ENV });
+    expect(resolved.provider).toBe('aura-managed');
     expect(resolved.profile).toBe('fast');
     expect(resolved.model).toBe(LOVABLE_MODEL_IDS.fast);
     expect(resolved.endpoint).toBe('https://ai.gateway.lovable.dev/v1/chat/completions');
@@ -48,12 +48,9 @@ describe('AURA model router', () => {
     }
   });
 
-  it('never substitutes a Gemini/Lovable model for an explicit NVIDIA model request', () => {
+  it('never substitutes the managed provider for an explicit NVIDIA model request', () => {
     try {
-      resolveModel({
-        requestedModel: NVIDIA_OPEN_MODEL_IDS.workhorse,
-        env: LOVABLE_ENV,
-      });
+      resolveModel({ requestedModel: NVIDIA_OPEN_MODEL_IDS.workhorse, env: AURA_MANAGED_ENV });
       throw new Error('expected mismatch');
     } catch (error) {
       expect(error).toMatchObject({ code: 'MODEL_PROVIDER_MISMATCH', status: 409 });
@@ -61,18 +58,18 @@ describe('AURA model router', () => {
   });
 
   it('fails closed when NVIDIA is selected without credentials', () => {
-    expect(() => resolveModel({ env: { AURA_AI_PROVIDER: 'nvidia' } })).toThrowError(/NVIDIA_API_KEY/);
+    expect(() => resolveModel({ env: { AURA_AI_PROVIDER: 'nvidia' } })).toThrowError(/server credential/);
   });
 
-  it('routes NVIDIA workhorse and supervisor profiles to the qualified open-model IDs', () => {
+  it('routes NVIDIA workhorse and supervisor profiles to qualified IDs', () => {
     const env = { AURA_AI_PROVIDER: 'nvidia', NVIDIA_API_KEY: 'test-nvidia-key' };
     expect(resolveModel({ requestedModel: NVIDIA_OPEN_MODEL_IDS.workhorse, env })).toMatchObject({
-      provider: 'nvidia-build',
+      provider: 'nvidia-hosted',
       model: NVIDIA_OPEN_MODEL_IDS.workhorse,
       endpoint: 'https://integrate.api.nvidia.com/v1/chat/completions',
     });
     expect(resolveModel({ requestedModel: NVIDIA_OPEN_MODEL_IDS.supervisor, env })).toMatchObject({
-      provider: 'nvidia-build',
+      provider: 'nvidia-hosted',
       model: NVIDIA_OPEN_MODEL_IDS.supervisor,
       profile: 'supervisor',
     });
@@ -86,11 +83,11 @@ describe('AURA model router', () => {
         NVIDIA_API_KEY: 'test',
         AURA_MODEL_REASONING: 'nvidia/not-qualified',
       },
-    })).toThrowError(/not in the qualified AURA allowlist/);
+    })).toThrowError(/qualified AURA allowlist/);
   });
 
-  it('requires endpoint, key and explicit profile model for self-hosted OpenAI-compatible inference', () => {
-    expect(() => resolveModel({ env: { AURA_AI_PROVIDER: 'openai-compatible' } })).toThrowError(/AURA_OPENAI_BASE_URL/);
+  it('requires endpoint, key and explicit profile model for private-compatible inference', () => {
+    expect(() => resolveModel({ env: { AURA_AI_PROVIDER: 'openai-compatible' } })).toThrowError(/server-side endpoint/);
     const resolved = resolveModel({
       profile: 'reasoning',
       env: {
@@ -101,13 +98,13 @@ describe('AURA model router', () => {
       },
     });
     expect(resolved).toMatchObject({
-      provider: 'openai-compatible',
+      provider: 'private-compatible',
       endpoint: 'http://inference.internal/v1/chat/completions',
       model: 'self-hosted/reasoner',
     });
   });
 
-  it('requires an explicitly requested NVIDIA model to match the self-hosted profile configuration', () => {
+  it('requires explicit NVIDIA model requests to match private profile configuration', () => {
     expect(() => resolveModel({
       requestedModel: NVIDIA_OPEN_MODEL_IDS.workhorse,
       env: {
@@ -119,7 +116,7 @@ describe('AURA model router', () => {
     })).toThrowError(/not the configured model/);
   });
 
-  it('returns provider/model evidence with the completion', async () => {
+  it('returns white-label-safe provider/model evidence with completions', async () => {
     let requestBody: unknown = null;
     const fetchImpl: typeof fetch = async (_input, init) => {
       requestBody = JSON.parse(String(init?.body));
@@ -131,20 +128,25 @@ describe('AURA model router', () => {
 
     const result = await makeChatCompletion(
       [{ role: 'user', content: 'hello' }],
-      { env: LOVABLE_ENV, fetchImpl, profile: 'reasoning' },
+      { env: AURA_MANAGED_ENV, fetchImpl, profile: 'reasoning' },
     );
     expect(result).toMatchObject({
       text: 'grounded response',
-      provider: 'lovable-managed',
+      provider: 'aura-managed',
       profile: 'reasoning',
       model: LOVABLE_MODEL_IDS.reasoning,
     });
     expect(requestBody).toMatchObject({ model: LOVABLE_MODEL_IDS.reasoning, stream: false });
   });
 
-  it('reports NVIDIA readiness without claiming a deployed NVIDIA runtime', () => {
-    const readiness = providerReadiness({ NVIDIA_API_KEY: 'configured' });
+  it('reports readiness without exposing implementation endpoints or Lovable branding', () => {
+    const readiness = providerReadiness({ LOVABLE_API_KEY: 'managed', NVIDIA_API_KEY: 'configured' });
+    expect(readiness.selectedProvider).toBe('aura-managed');
+    expect(readiness.auraManaged.configured).toBe(true);
     expect(readiness.nvidia.configured).toBe(true);
     expect(readiness.nvidia.runtimeClaim).toMatch(/not proof/i);
+    expect(readiness).not.toHaveProperty('lovable');
+    expect(readiness.nvidia).not.toHaveProperty('endpoint');
+    expect(readiness.privateCompatible).not.toHaveProperty('endpoint');
   });
 });

@@ -1,4 +1,4 @@
-export const CONNECTION_ADMIN_ROLES = ['security_admin', 'admin', 'owner'] as const;
+export const CONNECTION_ADMIN_ROLES = ['admin', 'owner'] as const;
 
 export interface ConnectionRoleGrant {
   role?: string | null;
@@ -7,10 +7,9 @@ export interface ConnectionRoleGrant {
 }
 
 /**
- * Server-side Connections authorization mirror for platform administrators.
- * The browser is never trusted for this decision. Grants must be recognised,
- * global and unexpired. This matches the canonical frontend AI-provider
- * configuration boundary without broadening tenant/resource-scoped grants.
+ * Generic Connections administration preserves the pre-existing admin/owner
+ * boundary. AI-specific roles must not gain blanket authority over unrelated
+ * connector provisioning, credentials or health checks.
  */
 export function hasConnectionAdminAuthority(
   grants: readonly ConnectionRoleGrant[],

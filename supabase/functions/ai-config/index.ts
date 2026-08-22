@@ -31,7 +31,6 @@ serve(createHandler({
           available: true,
           provider: resolved.provider,
           model: resolved.model,
-          endpoint: resolved.endpoint,
         };
       } catch (error) {
         ready = false;
@@ -55,11 +54,12 @@ serve(createHandler({
       providers: readiness,
       disclosure: {
         agent_authority: 'human-approved advisory output only',
-        nvidia_runtime: 'NVIDIA model availability does not by itself prove NIM/NeMo/self-hosted runtime execution',
+        nvidia_runtime: 'NVIDIA model availability does not by itself prove private NIM/NeMo/self-hosted runtime execution',
         provider_connection: providerResolution.connectionId
           ? 'Selected from an enabled tenant-visible AURA Connections provider with an encrypted server-side credential.'
-          : 'No active Connections override; server environment/default provider is in effect.',
+          : 'No active Connections override; AURA-managed server configuration is in effect.',
         secrets_returned: false,
+        infrastructure_endpoints_returned: false,
       },
     };
   },

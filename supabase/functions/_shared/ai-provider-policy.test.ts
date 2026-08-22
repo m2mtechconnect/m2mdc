@@ -11,7 +11,7 @@ const platform = {
   connector_id: NVIDIA_AI_CONNECTOR_ID,
   tenant_id: null,
   enabled: true,
-  status: 'CONNECTED_NO_DATA',
+  status: 'HEALTHY',
   credential_reference: 'vault:platform#v1',
   configuration: {},
 };
@@ -23,12 +23,16 @@ const tenant = {
 };
 
 describe('AI provider Connections policy', () => {
-  it('prefers one tenant-specific active provider over the platform fallback', () => {
+  it('prefers one tenant-specific healthy provider over the platform fallback', () => {
     expect(selectActiveNvidiaProvider([platform, tenant], 'tenant-a')?.id).toBe('tenant');
   });
 
-  it('uses the platform provider when no tenant-specific provider is active', () => {
+  it('uses the healthy platform provider when no tenant-specific provider is active', () => {
     expect(selectActiveNvidiaProvider([platform], 'tenant-a')?.id).toBe('platform');
+  });
+
+  it('rejects CONNECTED_NO_DATA for an inference provider because no model response is evidenced', () => {
+    expect(selectActiveNvidiaProvider([{ ...platform, status: 'CONNECTED_NO_DATA' }], 'tenant-a')).toBeNull();
   });
 
   it('ignores disabled and failed provider instances', () => {
@@ -55,7 +59,7 @@ describe('AI provider Connections policy', () => {
 
   it('rejects private NIM in the Connections-managed deployment path', () => {
     expect(() => validateNvidiaProviderConfiguration({ deployment_type: 'private_nim' }))
-      .toThrowError(/separately configured OpenAI-compatible provider path/);
+      .toThrowError(/separately configured private-compatible provider path/);
   });
 
   it('rejects unqualified model overrides', () => {

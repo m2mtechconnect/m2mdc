@@ -23,12 +23,22 @@ describe('canonical authorization model (B-01)', () => {
     expect(r.primaryRole).toBe('admin');
     expect(r.permissions.has('authz.manage_assignments')).toBe(true);
     expect(r.permissions.has('platform.access_internal_shell')).toBe(true);
+    expect(r.permissions.has('ai.model.configure')).toBe(true);
+    expect(r.permissions.has('ai.model.test')).toBe(true);
   });
 
-  it('preserves the legacy engineer assignment without granting admin authority', () => {
+  it('lets ordinary internal users select profiles without granting paid model-test authority', () => {
+    const r = resolveAuthorization([{ role: 'marketing', scope: 'global', expires_at: null }], NOW);
+    expect(r.permissions.has('ai.model.configure')).toBe(true);
+    expect(r.permissions.has('ai.model.test')).toBe(false);
+  });
+
+  it('preserves engineer model-test authority without granting admin authority', () => {
     const r = resolveAuthorization([{ role: 'engineer', scope: 'global', expires_at: null }], NOW);
     expect(r.primaryRole).toBe('engineer');
     expect(r.permissions.has('agent.operate')).toBe(true);
+    expect(r.permissions.has('ai.model.configure')).toBe(true);
+    expect(r.permissions.has('ai.model.test')).toBe(true);
     expect(r.permissions.has('authz.manage_assignments')).toBe(false);
     expect(r.permissions.has('twin.delete')).toBe(false);
   });
@@ -54,6 +64,7 @@ describe('canonical authorization model (B-01)', () => {
       NOW,
     );
     expect(r.permissions.has('authz.manage_assignments')).toBe(false);
+    expect(r.permissions.has('ai.model.configure')).toBe(false);
     expect(r.permissions.has('platform.access_internal_shell')).toBe(false);
   });
 

@@ -1,62 +1,66 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { getCorsHeaders } from "../_shared/cors.ts";
+import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
+import { createHandler } from "../_shared/handler.ts";
+import { resolveRouterEnvironmentForUser } from "../_shared/ai-provider-connection.ts";
+import {
+  providerReadiness,
+  resolveModel,
+  type AgentModelProfile,
+} from "../_shared/model-router.ts";
 
+const InputSchema = z.object({}).passthrough();
+const PROFILES: AgentModelProfile[] = ['fast', 'reasoning', 'supervisor'];
 
-serve(async (req) => {
-  const corsHeaders = getCorsHeaders(req.headers.get('origin'));
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+serve(createHandler({
+  name: 'ai-config',
+  authLevel: 'user',
+  inputSchema: InputSchema,
+  handler: async (_input, context) => {
+    const { userId } = context;
+    if (!userId) throw { code: 'UNAUTHORIZED', message: 'Authenticated user required', status: 401 };
 
-  try {
-    // Return AI configuration status
-    // PRIMARY: Lovable Cloud managed Gemini (always available)
-    // OPTIONAL: External Google Cloud credentials (for advanced users)
-    
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-    const useExternalGoogle = Deno.env.get('USE_EXTERNAL_GOOGLE') === 'true';
-    const externalGoogleConfigured = !!(
-      Deno.env.get('GOOGLE_APPLICATION_CREDENTIALS_JSON') && 
-      Deno.env.get('GOOGLE_PROJECT_ID')
-    );
+    const providerResolution = await resolveRouterEnvironmentForUser(userId);
+    const readiness = providerReadiness(providerResolution.env);
+    const resolvedProfiles: Record<string, unknown> = {};
+    let ready = true;
 
-    const config = {
-      // Primary AI provider (Lovable Cloud managed)
+    for (const profile of PROFILES) {
+      try {
+        const resolved = resolveModel({ profile, env: providerResolution.env });
+        resolvedProfiles[profile] = {
+          available: true,
+          provider: resolved.provider,
+          model: resolved.model,
+        };
+      } catch (error) {
+        ready = false;
+        resolvedProfiles[profile] = {
+          available: false,
+          reason: error instanceof Error ? error.message : 'Provider is not configured',
+        };
+      }
+    }
+
+    return {
+      active_provider: readiness.selectedProvider,
+      provider_configuration_source: providerResolution.source,
+      provider_connection_id: providerResolution.connectionId,
+      ready,
       primary: {
-        provider: 'lovable_managed',
-        available: !!lovableApiKey,
-        models: {
-          primary: 'google/gemini-3-pro-preview',
-          fallback: 'google/gemini-3.0-pro',
-        }
+        provider: readiness.selectedProvider,
+        available: ready,
+        models: resolvedProfiles,
       },
-      
-      // Optional external Google Cloud
-      external_google: {
-        enabled: useExternalGoogle && externalGoogleConfigured,
-        configured: externalGoogleConfigured,
-        projectId: Deno.env.get('GOOGLE_PROJECT_ID') || null,
-        location: Deno.env.get('GOOGLE_LOCATION') || 'northamerica-northeast1',
-        model: Deno.env.get('GEMINI_MODEL') || 'gemini-1.5-pro',
-        vertexDataStoreId: Deno.env.get('VERTEX_DATA_STORE_ID') || null,
+      providers: readiness,
+      disclosure: {
+        agent_authority: 'human-approved advisory output only',
+        nvidia_runtime: 'NVIDIA model availability does not by itself prove private NIM/NeMo/self-hosted runtime execution',
+        provider_connection: providerResolution.connectionId
+          ? 'Selected from an enabled tenant-visible AURA Connections provider with an encrypted server-side credential.'
+          : 'No active Connections override; AURA-managed server configuration is in effect.',
+        secrets_returned: false,
+        infrastructure_endpoints_returned: false,
       },
-      
-      // Overall status
-      active_provider: useExternalGoogle && externalGoogleConfigured ? 'external_google' : 'lovable_managed',
-      ready: !!lovableApiKey, // Always ready if Lovable key exists
     };
-
-    return new Response(JSON.stringify(config), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-  } catch (error) {
-    console.error('Config error:', error);
-    return new Response(JSON.stringify({ 
-      error: error instanceof Error ? error.message : 'Failed to load config',
-      requestId: crypto.randomUUID()
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-  }
-});
+  },
+}));

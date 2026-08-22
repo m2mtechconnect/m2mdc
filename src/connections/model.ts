@@ -207,6 +207,7 @@ export const SERVER_PROBE_CONNECTORS = new Set([
   'dsx_ingest_gateway',
   'openusd_storage',
   'asset_manifest',
+  'nvidia_ai_provider',
 ]);
 
 export function canRunHealthCheck(connection: ConnectionInstance): boolean {

@@ -3,6 +3,23 @@ import {
   SIMULATION_PREVIEW_FIDELITY,
   assessSimulationFidelity,
 } from '../fidelity';
+import type { CalibrationEvidenceDecision } from '../calibrationEvidence';
+
+const calibratedDecision: CalibrationEvidenceDecision = {
+  valid: true,
+  eligibleState: 'calibrated',
+  dsxReferenceEligible: false,
+  nvidiaRuntimeEligible: false,
+  passedCriteria: 3,
+  totalCriteria: 3,
+  reasons: [],
+};
+
+const dsxCalibratedDecision: CalibrationEvidenceDecision = {
+  ...calibratedDecision,
+  eligibleState: 'externally-validated',
+  dsxReferenceEligible: true,
+};
 
 describe('simulation fidelity qualification', () => {
   it('keeps bundled preview fixtures explicitly non-authoritative', () => {
@@ -10,6 +27,7 @@ describe('simulation fidelity qualification', () => {
     expect(SIMULATION_PREVIEW_FIDELITY.runOfRecordEligible).toBe(false);
     expect(SIMULATION_PREVIEW_FIDELITY.mayClaimMeasured).toBe(false);
     expect(SIMULATION_PREVIEW_FIDELITY.mayClaimCalibrated).toBe(false);
+    expect(SIMULATION_PREVIEW_FIDELITY.mayClaimDsxCalibrated).toBe(false);
     expect(SIMULATION_PREVIEW_FIDELITY.mayClaimNvidiaRuntime).toBe(false);
   });
 
@@ -22,7 +40,7 @@ describe('simulation fidelity qualification', () => {
       nvidiaIntegrated: false,
       hasFacilityBaseline: true,
       usesFallbackDefaults: true,
-      calibrationState: 'not-calibrated',
+      calibrationEvidence: calibratedDecision,
     });
 
     expect(result.evidenceClass).toBe('engineering-estimate');
@@ -30,7 +48,24 @@ describe('simulation fidelity qualification', () => {
     expect(result.mayClaimCalibrated).toBe(false);
   });
 
-  it('requires explicit calibration evidence and a complete facility baseline', () => {
+  it('does not trust a caller-provided calibration label without validated evidence', () => {
+    const result = assessSimulationFidelity({
+      executionClass: 'external-solver',
+      verificationLevel: 'externally-validated',
+      provenance: 'simulated',
+      intent: 'authoritative',
+      nvidiaIntegrated: false,
+      hasFacilityBaseline: true,
+      usesFallbackDefaults: false,
+      calibrationState: 'externally-validated',
+    });
+
+    expect(result.calibrationState).toBe('not-calibrated');
+    expect(result.mayClaimCalibrated).toBe(false);
+    expect(result.limitations.some((line) => line.includes('not promoted'))).toBe(true);
+  });
+
+  it('requires a validated calibration decision and complete facility baseline', () => {
     const unverified = assessSimulationFidelity({
       executionClass: 'aura-deterministic',
       verificationLevel: 'unverified',
@@ -39,7 +74,7 @@ describe('simulation fidelity qualification', () => {
       nvidiaIntegrated: false,
       hasFacilityBaseline: true,
       usesFallbackDefaults: false,
-      calibrationState: 'calibrated',
+      calibrationEvidence: calibratedDecision,
     });
     expect(unverified.mayClaimCalibrated).toBe(false);
 
@@ -51,10 +86,27 @@ describe('simulation fidelity qualification', () => {
       nvidiaIntegrated: false,
       hasFacilityBaseline: true,
       usesFallbackDefaults: false,
-      calibrationState: 'externally-validated',
+      calibrationEvidence: calibratedDecision,
     });
     expect(calibrated.mayClaimCalibrated).toBe(true);
+    expect(calibrated.mayClaimDsxCalibrated).toBe(false);
     expect(calibrated.runOfRecordEligible).toBe(true);
+  });
+
+  it('separates generic calibration from NVIDIA DSX-reference calibration', () => {
+    const result = assessSimulationFidelity({
+      executionClass: 'external-solver',
+      verificationLevel: 'externally-validated',
+      provenance: 'simulated',
+      intent: 'authoritative',
+      nvidiaIntegrated: false,
+      hasFacilityBaseline: true,
+      usesFallbackDefaults: false,
+      calibrationEvidence: dsxCalibratedDecision,
+    });
+
+    expect(result.mayClaimCalibrated).toBe(true);
+    expect(result.mayClaimDsxCalibrated).toBe(true);
   });
 
   it('requires an actually executed NVIDIA solver before an NVIDIA-runtime claim', () => {
@@ -77,7 +129,7 @@ describe('simulation fidelity qualification', () => {
       nvidiaIntegrated: true,
       hasFacilityBaseline: true,
       usesFallbackDefaults: false,
-      calibrationState: 'externally-validated',
+      calibrationEvidence: dsxCalibratedDecision,
     });
     expect(executed.mayClaimNvidiaRuntime).toBe(true);
   });

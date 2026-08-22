@@ -64,6 +64,21 @@ function basePackage(
 }
 
 describe('SF-6A calibration evidence contract', () => {
+  it('rejects malformed external JSON without throwing', () => {
+    const malformed = {
+      schemaVersion: 'wrong',
+      targetState: 'calibrated',
+      datasets: [{ artifact: null }],
+      runtimeEvidence: { artifacts: null },
+    };
+
+    expect(() => assessCalibrationEvidence(malformed)).not.toThrow();
+    const result = assessCalibrationEvidence(malformed);
+    expect(result.valid).toBe(false);
+    expect(result.eligibleState).toBe('not-calibrated');
+    expect(result.reasons.length).toBeGreaterThan(0);
+  });
+
   it('allows a benchmark only with traceable data, quantitative criteria and reproducibility evidence', () => {
     const result = assessCalibrationEvidence(basePackage());
     expect(result.valid).toBe(true);

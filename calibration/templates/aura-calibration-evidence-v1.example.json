@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "aura-calibration-evidence-v1",
+  "id": "REPLACE-WITH-UNIQUE-EVIDENCE-ID",
+  "domain": "thermal-airflow",
+  "claimScope": "generic-facility",
+  "targetState": "benchmarked",
+  "claimedObservables": [
+    "rack-inlet-temperature"
+  ],
+  "modelVersion": "REPLACE-WITH-MODEL-VERSION",
+  "facilityBaselineComplete": false,
+  "usesFallbackDefaults": true,
+  "verificationLevel": "unverified",
+  "datasets": [
+    {
+      "id": "REPLACE-WITH-DATASET-ID",
+      "sourceName": "REPLACE-WITH-TRACEABLE-SOURCE",
+      "sourceType": "measured-facility",
+      "split": "validation",
+      "artifact": {
+        "uri": "REPLACE-WITH-DURABLE-URI-OR-REPO-PATH",
+        "sha256": "REPLACE-WITH-sha256-AND-64-LOWERCASE-HEX",
+        "kind": "reference-data"
+      },
+      "observables": [
+        "rack-inlet-temperature"
+      ],
+      "rightsConfirmed": false,
+      "observedAt": "REPLACE-WITH-ISO-8601-TIMESTAMP"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "observable": "rack-inlet-temperature",
+      "statistic": "mae",
+      "operator": "lte",
+      "threshold": 0,
+      "observed": 0,
+      "unit": "degC",
+      "rationale": "REPLACE-WITH-PREDECLARED-ENGINEERING-OR-VALIDATION-RATIONALE"
+    }
+  ],
+  "reproducibility": {
+    "modelVersion": "REPLACE-WITH-MODEL-VERSION",
+    "engineModule": "REPLACE-WITH-ENGINE-MODULE",
+    "command": "REPLACE-WITH-REPRODUCTION-COMMAND",
+    "inputHash": "REPLACE-WITH-sha256-AND-64-LOWERCASE-HEX",
+    "configurationHash": "REPLACE-WITH-sha256-AND-64-LOWERCASE-HEX",
+    "outputHash": "REPLACE-WITH-sha256-AND-64-LOWERCASE-HEX",
+    "seed": null,
+    "runtimeEnvironment": "server",
+    "toolchainVersions": {
+      "REPLACE-WITH-TOOL": "REPLACE-WITH-VERSION"
+    }
+  },
+  "artifacts": []
+}

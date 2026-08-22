@@ -1,3 +1,5 @@
+import type { Json } from '@/integrations/supabase/types';
+
 export type ModelRuntimeStatus = 'runtime-supported' | 'requires-provider' | 'catalog-only';
 
 export interface AiProviderReadiness {
@@ -69,12 +71,9 @@ export function runtimeStatusForModel(
   const id = modelId.trim().toLowerCase();
   const provider = readiness?.selectedProvider?.trim().toLowerCase();
 
-  // Profiles are intentionally portable; the backend provider owns the actual
-  // executable model behind each profile.
   if (id.startsWith('profile:')) return 'runtime-supported';
 
   if (GOOGLE_RUNTIME_IDS.has(id)) {
-    // Before readiness loads, preserve the current default-provider behavior.
     if (!provider) return 'runtime-supported';
     return provider === 'lovable-managed' || provider === 'lovable'
       ? 'runtime-supported'
@@ -103,12 +102,13 @@ export function modelCanBeSelected(
 
 /** Preserve unrelated agent configuration when a model/profile is selected. */
 export function mergeAgentModelConfig(
-  existing: unknown,
-  selection: { model: string; ragSettings?: unknown },
-): Record<string, unknown> {
-  const base = existing && typeof existing === 'object' && !Array.isArray(existing)
-    ? { ...(existing as Record<string, unknown>) }
-    : {};
+  existing: Json | null | undefined,
+  selection: { model: string; ragSettings?: Json },
+): Json {
+  const base: { [key: string]: Json | undefined } =
+    existing && typeof existing === 'object' && !Array.isArray(existing)
+      ? { ...existing }
+      : {};
   return {
     ...base,
     model: selection.model,

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  DSX_SEMANTIC_ROLES,
+  SEMANTIC_ROLE_LABEL,
+} from '@/components/twin-visualization/assetRegistry';
+import {
   DSX_ASSET_REQUIREMENTS,
   DSX_RACK_BOM,
   dsxRequirementsForGate,
@@ -28,6 +32,15 @@ describe('NVIDIA DSX blueprint asset requirements', () => {
     expect(DSX_RACK_BOM.nvlinkSwitchTraysPerRack).toBe(9);
     expect(DSX_RACK_BOM.powerShelvesPerRack).toBe(8);
     expect(DSX_RACK_BOM.torOobSwitchesPerRack).toBe(2);
+  });
+
+  it('keeps every requirement first-class in the canonical runtime semantic registry', () => {
+    const requirementRoles = DSX_ASSET_REQUIREMENTS.map((requirement) => requirement.semanticRole).sort();
+    expect([...DSX_SEMANTIC_ROLES].sort()).toEqual(requirementRoles);
+    expect(DSX_SEMANTIC_ROLES).toHaveLength(23);
+    for (const role of DSX_SEMANTIC_ROLES) {
+      expect(SEMANTIC_ROLE_LABEL[role]).toMatch(/DSX/);
+    }
   });
 
   it('never allows generic substitution for generation-specific rack hardware', () => {

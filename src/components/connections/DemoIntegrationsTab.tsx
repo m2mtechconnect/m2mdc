@@ -1,9 +1,10 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { BarChart3, FileText, MessageSquare, Play, ShieldCheck } from 'lucide-react';
+import { BarChart3, FileText, MessageSquare, Play, ShieldCheck, Unplug } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Panel, SubPanel } from '@/components/v2';
 import { invokeManagedRead, useManagedConnectorCapabilities } from '@/connections/managedConnectorApi';
+import { connectManagedUserConnector, disconnectManagedUserConnector } from '@/connections/managedUserBinding';
 import { managedReadDemoMode, type DemoIntegrationMode } from '@/connections/demoIntegrationPolicy';
 import type { ConnectionInstance, ConnectorDefinition } from '@/connections/model';
 
@@ -53,6 +54,8 @@ const COLLAB_DEMO: DemoResult = {
   ],
 };
 
+const CONNECTED_USER_STATES = new Set(['CONNECTED_NO_DATA', 'HEALTHY', 'SYNCING', 'DEGRADED']);
+
 function formatLiveSearchResult(result: unknown): string[] {
   if (!result || typeof result !== 'object') return ['AURA received a live read-only response.'];
   const payload = result as Record<string, unknown>;
@@ -70,9 +73,12 @@ function formatLiveSearchResult(result: unknown): string[] {
 export function DemoIntegrationsTab({ definitions, connections }: DemoIntegrationsTabProps) {
   const capabilities = useManagedConnectorCapabilities();
   const [running, setRunning] = useState(false);
+  const [authorizing, setAuthorizing] = useState(false);
   const [searchResult, setSearchResult] = useState<DemoResult | null>(null);
 
+  const interactiveOAuthEnabled = import.meta.env.VITE_AURA_DEMO_MANAGED_OAUTH === 'true';
   const searchEntry = capabilities.data?.entries.find((entry) => entry.connector_definition_id === 'search_analytics');
+  const driveEntry = capabilities.data?.entries.find((entry) => entry.connector_definition_id === 'workspace_documents');
   const searchConnection = useMemo(
     () => connections.find((connection) => connection.connector_id === 'search_analytics' && connection.enabled),
     [connections],
@@ -85,6 +91,12 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
     connection: searchConnection,
   });
   const liveSearchReady = searchMode === 'LIVE_READ_ONLY';
+
+  const driveBindingStatus = driveEntry?.user_binding?.status ?? '';
+  const driveConnected = CONNECTED_USER_STATES.has(driveBindingStatus) && !driveEntry?.user_binding?.revoked_at;
+  const driveCanConnect = Boolean(
+    interactiveOAuthEnabled && driveEntry?.user_bindable && driveEntry?.user_client_configured && !driveConnected,
+  );
 
   async function runSearchDemo() {
     if (!liveSearchReady || !searchConnection) {
@@ -116,6 +128,58 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
       });
     } finally {
       setRunning(false);
+    }
+  }
+
+  async function connectDrive() {
+    if (!driveCanConnect) return;
+    setAuthorizing(true);
+    try {
+      await connectManagedUserConnector('workspace_documents');
+      await capabilities.refetch();
+      setSearchResult({
+        mode: 'DEMO_DATA',
+        title: 'Google account connected',
+        summary: 'AURA recorded a read-only managed user connection for this demo user.',
+        details: [
+          'Connection: Connected · read only',
+          'Scope: Google Drive read-only',
+          'Document results remain labeled Demo data until a live retrieval probe is separately verified.',
+        ],
+      });
+    } catch (error) {
+      setSearchResult({
+        mode: 'UNAVAILABLE',
+        title: 'Google connection unavailable',
+        summary: error instanceof Error ? error.message : 'The authorization could not be completed.',
+        details: ['No provider credential or connection token was stored in the browser.'],
+      });
+    } finally {
+      setAuthorizing(false);
+    }
+  }
+
+  async function disconnectDrive() {
+    if (!driveConnected || authorizing) return;
+    setAuthorizing(true);
+    try {
+      await disconnectManagedUserConnector('workspace_documents');
+      await capabilities.refetch();
+      setSearchResult({
+        mode: 'DEMO_DATA',
+        title: 'Google account disconnected',
+        summary: 'The managed user connection was revoked and AURA returned this card to demo-data mode.',
+        details: ['Connection: Revoked', 'Document preview: Demo data only'],
+      });
+    } catch (error) {
+      setSearchResult({
+        mode: 'UNAVAILABLE',
+        title: 'Disconnect could not complete',
+        summary: error instanceof Error ? error.message : 'The managed connection could not be revoked.',
+        details: ['AURA did not claim the connection was revoked without server confirmation.'],
+      });
+    } finally {
+      setAuthorizing(false);
     }
   }
 
@@ -156,9 +220,17 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
           title="Workspace Documents"
           provider="Google Drive"
           mode="DEMO_DATA"
-          description="Demonstrates approved-document retrieval. No external account is represented as connected until runtime evidence exists."
-          actionLabel="Preview demo data"
-          onRun={() => setSearchResult(DRIVE_DEMO)}
+          statusBadge={driveConnected ? <Badge variant="outline" className="w-fit v2-surface-verified v2-text-verified">Connected · read only</Badge> : undefined}
+          description={driveConnected
+            ? 'Your Google account is authorized read-only. This demo still labels document content as demo data until live retrieval is verified.'
+            : interactiveOAuthEnabled
+              ? 'Connect a Google account for read-only demo authorization. Until server configuration is ready, the card stays in demo-data mode.'
+              : 'Demonstrates approved-document retrieval. Interactive authorization is disabled in this build.'}
+          actionLabel={authorizing ? 'Working…' : driveCanConnect ? 'Connect Google' : 'Preview demo data'}
+          disabled={authorizing}
+          onRun={() => driveCanConnect ? void connectDrive() : setSearchResult(DRIVE_DEMO)}
+          secondaryActionLabel={driveConnected ? 'Disconnect' : driveCanConnect ? 'Preview demo data' : undefined}
+          onSecondaryAction={driveConnected ? () => void disconnectDrive() : driveCanConnect ? () => setSearchResult(DRIVE_DEMO) : undefined}
         />
 
         <DemoCard
@@ -202,19 +274,25 @@ function DemoCard({
   title,
   provider,
   mode,
+  statusBadge,
   description,
   actionLabel,
   disabled = false,
   onRun,
+  secondaryActionLabel,
+  onSecondaryAction,
 }: {
   icon: ReactNode;
   title: string;
   provider: string;
   mode: DemoIntegrationMode;
+  statusBadge?: ReactNode;
   description: string;
   actionLabel: string;
   disabled?: boolean;
   onRun: () => void;
+  secondaryActionLabel?: string;
+  onSecondaryAction?: () => void;
 }) {
   return (
     <Panel className="flex h-full min-w-0 flex-col gap-4">
@@ -225,14 +303,29 @@ function DemoCard({
           <p className="text-xs text-muted-foreground">{provider}</p>
         </div>
       </div>
-      <ModeBadge mode={mode} />
+      <div className="flex flex-wrap gap-2">
+        <ModeBadge mode={mode} />
+        {statusBadge}
+      </div>
       <p className="flex-1 text-sm text-muted-foreground">{description}</p>
-      <Button type="button" variant="outline" disabled={disabled} onClick={onRun}>
-        <Play className="mr-2 h-4 w-4" aria-hidden />
-        {actionLabel}
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button type="button" variant="outline" disabled={disabled} onClick={onRun}>
+          <Play className="mr-2 h-4 w-4" aria-hidden />
+          {actionLabel}
+        </Button>
+        {secondaryActionLabel && onSecondaryAction ? (
+          <Button type="button" variant="ghost" disabled={disabled} onClick={onSecondaryAction}>
+            {driveDisconnectIcon(secondaryActionLabel)}
+            {secondaryActionLabel}
+          </Button>
+        ) : null}
+      </div>
     </Panel>
   );
+}
+
+function driveDisconnectIcon(label: string) {
+  return label === 'Disconnect' ? <Unplug className="mr-2 h-4 w-4" aria-hidden /> : null;
 }
 
 function ModeBadge({ mode }: { mode: DemoIntegrationMode }) {

@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { BuilderLayout } from '@/components/builder/BuilderLayout';
+import { BuilderLayout, type BuilderStepLabel } from '@/components/builder/BuilderLayout';
 import { Step1Summary } from '@/components/builder/steps/Step1Summary';
 import { Step2Intelligence } from '@/components/builder/steps/Step2Intelligence';
 import { Step3Tools } from '@/components/builder/steps/Step3Tools';
@@ -97,7 +97,25 @@ export default function Builder() {
   }, [effectiveCurrentStep, industry, department, fromScanner, dcTwinStore.overview.industries, updateContext]);
 
   // DC Twin Builder steps - used when coming from scanner
+  // Step labels must match the panes rendered for each builder path.
+  const DC_STEP_LABELS: BuilderStepLabel[] = [
+    { id: 1, title: 'Summary', shortTitle: 'Summary', tooltip: 'Name the twin and set facility context' },
+    { id: 2, title: 'Blueprint', shortTitle: 'Blueprint', tooltip: 'Define subsystems and agents' },
+    { id: 3, title: 'Integrations', shortTitle: 'Integrations', tooltip: 'Select data sources and connected systems' },
+    { id: 4, title: 'Scenarios', shortTitle: 'Scenarios', tooltip: 'Define simulation scenarios' },
+    { id: 5, title: 'Deploy', shortTitle: 'Deploy', tooltip: 'Review the configuration and deploy' },
+  ];
+
+  const WIZARD_STEP_LABELS: BuilderStepLabel[] = [
+    { id: 1, title: 'Summary', shortTitle: 'Summary', tooltip: 'Name the system and describe what it must do' },
+    { id: 2, title: 'Intelligence', shortTitle: 'Intelligence', tooltip: 'Choose the model and reasoning configuration' },
+    { id: 3, title: 'Tools', shortTitle: 'Tools', tooltip: 'Select tools, data sources and connected systems' },
+    { id: 4, title: 'Workflow', shortTitle: 'Workflow', tooltip: 'Define triggers and permitted actions' },
+    { id: 5, title: 'Deploy', shortTitle: 'Deploy', tooltip: 'Review the configuration and deploy' },
+  ];
+
   const dcSteps = useMemo(() => {
+
     return [
       { 
         id: 1, 
@@ -455,19 +473,17 @@ export default function Builder() {
     // Create a twin if deploying a DC twin type
     if (state.type === '3d_twin' || state.type === 'process_twin') {
       try {
-        // Create twin without location (null for legacy support)
+        // Pass the builder's own configuration. No hardcoded facility identity:
+        // unset fields fall back to the twin service defaults.
         const newTwin = await createTwin(null, {
           name: state.goal || 'New Data Centre Twin',
-          city: 'Montreal',
-          region_code: 'QC',
-          tier: 'Tier III',
-          capacity_kw: 5000,
-          industry: state.industry || 'cloud_saas',
+          industry: state.industry || undefined,
           metadata: {
             builder_id: state.builderId,
             template: state.template,
           },
         });
+
         
         if (newTwin) {
           setActiveTwin(newTwin.id);
@@ -489,6 +505,8 @@ export default function Builder() {
     setShowDeploymentProgress(true);
   };
 
+  const stepLabels = fromScanner ? DC_STEP_LABELS : WIZARD_STEP_LABELS;
+
   return (
     <>
       <BuilderLayout
@@ -499,9 +517,13 @@ export default function Builder() {
         lastSaved={fromScanner ? dcTwinStore.lastSaved : lastSaved}
         onDeploy={effectiveCurrentStep === 5 ? handleDeployClick : undefined}
         currentStep={effectiveCurrentStep}
+        steps={stepLabels}
+        title={fromScanner ? 'Data Centre Twin' : 'System Builder'}
+        description={fromScanner ? 'Configure your data centre twin' : 'Configure and deploy this system'}
       >
         <CurrentStepComponent />
       </BuilderLayout>
+
 
       {/* Deployment Progress Modal */}
       <DeploymentProgressModal

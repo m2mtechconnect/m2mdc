@@ -18,6 +18,13 @@ enum DeployState {
   error = "error",
 }
 
+export interface BuilderStepLabel {
+  id: number;
+  title: string;
+  shortTitle: string;
+  tooltip: string;
+}
+
 interface BuilderLayoutProps {
   children: ReactNode;
   onBack?: () => void;
@@ -27,15 +34,22 @@ interface BuilderLayoutProps {
   nextLabel?: string;
   lastSaved?: Date | null;
   currentStep?: number;
+  /** Step labels for the active builder path. Must match the rendered panes. */
+  steps?: BuilderStepLabel[];
+  /** Sidebar heading and sub-heading for the active builder path. */
+  title?: string;
+  description?: string;
 }
 
-const STEPS = [
-  { id: 1, title: 'Business Profile', shortTitle: 'Profile', tooltip: 'Define your organization and twin objectives' },
-  { id: 2, title: 'Capabilities', shortTitle: 'Capabilities', tooltip: 'Configure KPIs and monitoring agents' },
-  { id: 3, title: 'AI & Integrations', shortTitle: 'AI', tooltip: 'Set up AI models and data sources' },
-  { id: 4, title: 'Scenarios', shortTitle: 'Scenarios', tooltip: 'Define simulation scenarios for testing' },
-  { id: 5, title: 'Deploy', shortTitle: 'Deploy', tooltip: 'Review and deploy your twin to production' },
+/** Default labels: the standard (non data-centre) wizard panes. */
+const DEFAULT_STEPS: BuilderStepLabel[] = [
+  { id: 1, title: 'Summary', shortTitle: 'Summary', tooltip: 'Name the system and describe what it must do' },
+  { id: 2, title: 'Intelligence', shortTitle: 'Intelligence', tooltip: 'Choose the model and reasoning configuration' },
+  { id: 3, title: 'Tools', shortTitle: 'Tools', tooltip: 'Select tools, data sources and connected systems' },
+  { id: 4, title: 'Workflow', shortTitle: 'Workflow', tooltip: 'Define triggers and the actions the system may take' },
+  { id: 5, title: 'Deploy', shortTitle: 'Deploy', tooltip: 'Review the configuration and deploy' },
 ];
+
 
 export function BuilderLayout({
   children,
@@ -46,98 +60,77 @@ export function BuilderLayout({
   nextLabel = 'Next',
   lastSaved,
   currentStep: propCurrentStep,
+  steps: stepLabels,
+  title = 'Builder',
+  description = 'Configure and deploy this system',
 }: BuilderLayoutProps) {
   const navigate = useNavigate();
   const { currentStep, completedSteps, setCurrentStep } = useWizardBuilderStore();
   const [deployState, setDeployState] = useState<DeployState>(DeployState.idle);
-  
+  const [deployError, setDeployError] = useState<string | null>(null);
+
+  const STEPS = stepLabels ?? DEFAULT_STEPS;
   const activeStep = propCurrentStep || currentStep;
-  const isDeployStep = activeStep === 5;
+  const isDeployStep = activeStep === STEPS.length;
 
   const isStepComplete = (step: number) => completedSteps.includes(step);
   const isStepActive = (step: number) => currentStep === step;
   const isStepAccessible = (step: number) => step <= currentStep || completedSteps.includes(step - 1);
   
-  // Reset deploy state when leaving step 5
+  // Reset deploy state when leaving the deploy step
   useEffect(() => {
     if (!isDeployStep && deployState !== DeployState.idle) {
       setDeployState(DeployState.idle);
+      setDeployError(null);
     }
   }, [isDeployStep, deployState]);
   
   const handleDeployClick = async () => {
     if (!onDeploy || deployState !== DeployState.idle || nextDisabled) return;
-    
-    // Additional validation check before deployment - get fresh state
+
+    // Real precondition, surfaced persistently rather than as a 3s flash.
     const state = useWizardBuilderStore.getState();
     if (!state.workflow?.actions || state.workflow.actions.length === 0) {
-      console.error('[BuilderLayout] Deployment blocked: No workflow actions found');
       setDeployState(DeployState.error);
-      setTimeout(() => {
-        setDeployState(DeployState.idle);
-      }, 3000);
+      setDeployError('Add at least one workflow action before deploying.');
       return;
     }
-    
-    console.log('[BuilderLayout] Workflow validation passed, proceeding with deployment');
 
-    // Stage 1: Morphing
-    setDeployState(DeployState.morphing);
-    
-    // Wait for morph animation
-    await new Promise(resolve => setTimeout(resolve, 350));
-    
-    // Stage 2: Deploying - enforce minimum spinner duration
+    setDeployError(null);
     setDeployState(DeployState.deploying);
-    const deployStartTime = Date.now();
-    const MIN_DEPLOY_DURATION = 1200;
 
     try {
-      const deployPromise = onDeploy();
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("Deployment timeout")), 15000)
-      );
-      
-      const result = await Promise.race([deployPromise, timeoutPromise]) as any;
-      
-      const elapsed = Date.now() - deployStartTime;
-      const remainingTime = MIN_DEPLOY_DURATION - elapsed;
-      if (remainingTime > 0) {
-        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      const result = (await onDeploy()) as { success?: boolean; message?: string; agentUrl?: string } | undefined;
+
+      // A handler that returns nothing has handed the deployment off to its own
+      // surface (for example the deployment progress modal). That is not a failure.
+      if (result === undefined || result === null) {
+        setDeployState(DeployState.idle);
+        return;
       }
-      
+
       if (result.success) {
         setDeployState(DeployState.success);
-        setTimeout(() => {
-          navigate(result.agentUrl || '/dashboard');
-        }, 1800);
-      } else {
-        throw new Error(result.message || 'Deployment failed');
+        navigate(result.agentUrl || '/dashboard');
+        return;
       }
-    } catch (error: any) {
-      console.error("Deploy error:", error);
-      
-      const elapsed = Date.now() - deployStartTime;
-      const remainingTime = MIN_DEPLOY_DURATION - elapsed;
-      if (remainingTime > 0) {
-        await new Promise(resolve => setTimeout(resolve, remainingTime));
-      }
-      
+
+      throw new Error(result.message || 'Deployment failed');
+    } catch (error) {
       setDeployState(DeployState.error);
-      setTimeout(() => {
-        setDeployState(DeployState.idle);
-      }, 3000);
+      setDeployError(error instanceof Error ? error.message : 'Deployment failed');
     }
   };
 
+
   return (
     <BuilderModeProvider>
-      <div className="min-h-screen flex w-full bg-background">
-        {/* Desktop Sidebar */}
-        <aside className="hidden lg:flex w-[260px] border-r bg-muted/30 flex-col">
+      <div className="min-h-dvh flex w-full bg-background">
+        {/* Desktop / tablet sidebar */}
+        <aside className="hidden md:flex w-[220px] lg:w-[260px] border-r bg-muted/30 flex-col">
           <div className="p-6 border-b">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold">Data Centre Twin</h2>
+              <h2 className="text-lg font-semibold">{title}</h2>
               <Button
                 variant="ghost"
                 size="sm"
@@ -148,8 +141,9 @@ export function BuilderLayout({
                 <Home className="h-4 w-4" />
               </Button>
             </div>
-            <p className="text-sm text-muted-foreground">Configure your data centre twin</p>
+            <p className="text-sm text-muted-foreground">{description}</p>
           </div>
+
 
           {/* Mode Toggle - hidden from sidebar, available on mobile only */}
 
@@ -201,7 +195,8 @@ export function BuilderLayout({
         </aside>
 
         {/* Mobile Top Stepper */}
-        <div className="lg:hidden fixed top-0 left-0 right-0 bg-background border-b z-50">
+        <div className="md:hidden fixed top-0 left-0 right-0 bg-background border-b z-50">
+
           <div className="flex items-center gap-2 px-4 py-2">
             <Button
               variant="ghost"
@@ -250,7 +245,7 @@ export function BuilderLayout({
 
         {/* Main Content */}
         <main className="flex-1 flex flex-col">
-          <div className="flex-1 overflow-y-auto pt-16 lg:pt-0">
+          <div className="flex-1 overflow-y-auto pt-16 md:pt-0">
             <div className="max-w-[880px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {children}
             </div>
@@ -258,6 +253,15 @@ export function BuilderLayout({
 
           {/* Sticky Bottom Navigation */}
           <div className="sticky bottom-0 left-0 right-0 border-t bg-background p-4">
+            {deployError && (
+              <div
+                role="alert"
+                className="max-w-[880px] mx-auto mb-3 flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-foreground"
+              >
+                <AlertCircle className="w-4 h-4 mt-0.5 text-destructive flex-shrink-0" />
+                <span>{deployError}</span>
+              </div>
+            )}
             <div className="max-w-[880px] mx-auto flex items-center justify-between gap-4">
               <Button
                 variant="outline"
@@ -275,13 +279,13 @@ export function BuilderLayout({
               {isDeployStep && onDeploy ? (
                 <Button
                   onClick={handleDeployClick}
-                  disabled={nextDisabled || deployState !== DeployState.idle}
+                  disabled={nextDisabled || deployState === DeployState.deploying || deployState === DeployState.success}
                   className="min-w-[100px] gap-2"
                 >
-                  {deployState === DeployState.idle && (
+                  {(deployState === DeployState.idle || deployState === DeployState.error) && (
                     <>
                       <Rocket className="w-4 h-4" />
-                      {nextLabel}
+                      {deployState === DeployState.error ? 'Retry deploy' : nextLabel}
                     </>
                   )}
                   {(deployState === DeployState.morphing || deployState === DeployState.deploying) && (
@@ -293,17 +297,12 @@ export function BuilderLayout({
                   {deployState === DeployState.success && (
                     <>
                       <CheckCircle2 className="w-4 h-4" />
-                      Deployed!
-                    </>
-                  )}
-                  {deployState === DeployState.error && (
-                    <>
-                      <AlertCircle className="w-4 h-4" />
-                      Add actions
+                      Deployed
                     </>
                   )}
                 </Button>
               ) : (
+
                 <Button
                   onClick={onNext}
                   disabled={nextDisabled}

@@ -1,0 +1,36 @@
+name: AURA Integration Gateway
+
+on:
+  pull_request:
+    paths:
+      - 'gateway/aura-integration-gateway/**'
+      - '.github/workflows/aura-integration-gateway.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CI: true
+
+jobs:
+  gateway-policy:
+    name: Gateway policy checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Type check gateway
+        working-directory: gateway/aura-integration-gateway
+        run: deno task check
+
+      - name: Run gateway policy tests
+        working-directory: gateway/aura-integration-gateway
+        run: deno task test

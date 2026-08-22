@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Panel, SubPanel } from '@/components/v2';
 import { invokeManagedRead, useManagedConnectorCapabilities } from '@/connections/managedConnectorApi';
+import { managedReadDemoMode, type DemoIntegrationMode } from '@/connections/demoIntegrationPolicy';
 import type { ConnectionInstance, ConnectorDefinition } from '@/connections/model';
 
 interface DemoIntegrationsTabProps {
@@ -11,10 +12,8 @@ interface DemoIntegrationsTabProps {
   connections: ConnectionInstance[];
 }
 
-type DemoMode = 'LIVE_READ_ONLY' | 'DEMO_DATA' | 'UNAVAILABLE';
-
 interface DemoResult {
-  mode: DemoMode;
+  mode: DemoIntegrationMode;
   title: string;
   summary: string;
   details: string[];
@@ -54,14 +53,6 @@ const COLLAB_DEMO: DemoResult = {
   ],
 };
 
-const LIVE_CONNECTION_STATES = new Set([
-  'READY_TO_TEST',
-  'CONNECTED_NO_DATA',
-  'HEALTHY',
-  'SYNCING',
-  'DEGRADED',
-]);
-
 function formatLiveSearchResult(result: unknown): string[] {
   if (!result || typeof result !== 'object') return ['AURA received a live read-only response.'];
   const payload = result as Record<string, unknown>;
@@ -88,12 +79,12 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
   );
   const searchDefinition = definitions.find((definition) => definition.id === 'search_analytics');
 
-  const liveSearchReady = Boolean(
-    searchEntry?.runtime_selectable &&
-    searchEntry.white_label_ready &&
-    searchConnection &&
-    LIVE_CONNECTION_STATES.has(searchConnection.status),
-  );
+  const searchMode = managedReadDemoMode({
+    runtimeSelectable: Boolean(searchEntry?.runtime_selectable),
+    whiteLabelReady: Boolean(searchEntry?.white_label_ready),
+    connection: searchConnection,
+  });
+  const liveSearchReady = searchMode === 'LIVE_READ_ONLY';
 
   async function runSearchDemo() {
     if (!liveSearchReady || !searchConnection) {
@@ -151,7 +142,7 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
           icon={<BarChart3 className="h-4 w-4" aria-hidden />}
           title={searchDefinition?.name ?? 'Search Analytics'}
           provider="Google Search Console"
-          mode={liveSearchReady ? 'LIVE_READ_ONLY' : 'DEMO_DATA'}
+          mode={searchMode}
           description={liveSearchReady
             ? 'Server evidence indicates the approved read-only demo path is selectable through the AURA gateway.'
             : 'Uses a clearly labeled demo dataset until an approved read-only runtime connection is verified.'}
@@ -219,7 +210,7 @@ function DemoCard({
   icon: ReactNode;
   title: string;
   provider: string;
-  mode: DemoMode;
+  mode: DemoIntegrationMode;
   description: string;
   actionLabel: string;
   disabled?: boolean;
@@ -244,7 +235,7 @@ function DemoCard({
   );
 }
 
-function ModeBadge({ mode }: { mode: DemoMode }) {
+function ModeBadge({ mode }: { mode: DemoIntegrationMode }) {
   if (mode === 'LIVE_READ_ONLY') {
     return <Badge variant="outline" className="w-fit v2-surface-verified v2-text-verified">Live · read only</Badge>;
   }

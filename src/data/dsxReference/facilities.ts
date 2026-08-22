@@ -7,7 +7,7 @@
  * facility, and none of them may donate geographic or tariff facts to the
  * Montreal scenario.
  */
-import { DSX_DATASET_VERSION, DSX_REFERENCE_RECORDS, DSX_SOURCE_COMMIT } from './records.generated';
+import { DSX_DATASET_VERSION, DSX_REFERENCE_RECORDS, DSX_SOURCE_COMMIT } from './records';
 import type { ClassifiedFacility, DatasetMode, ReferenceRecord } from './types';
 
 const REPO =
@@ -15,16 +15,18 @@ const REPO =
 
 const REFERENCE_DISCLOSURES = [
   'NVIDIA DSX blueprint sample',
+  'Pinned public demo snapshot - May 2026',
   'Not a real facility',
   'Not commissioned',
   'Not connected to telemetry',
   'Reference data - not measured, not live',
+  'Upstream NVIDIA demo-source conflicts are preserved, not silently resolved',
   'For evaluation use only',
 ] as const;
 
 /** Configuration identifiers present in the pinned NVIDIA source. */
 export const DSX_CONFIGURATION_IDS = DSX_REFERENCE_RECORDS.filter(
-  (r) => r.data_class === 'REFERENCE_CONFIGURATION',
+  (r) => r.data_class === 'REFERENCE_CONFIGURATION' && r.source_variant === 'configs.ts:configuration',
 ).map((r) => r.configuration_id as string);
 
 /** The source configuration used for the default reference facility. */
@@ -59,7 +61,7 @@ export const DSX_REFERENCE_SITES: readonly ClassifiedFacility[] = [
 /** The default demonstration baseline facility, after cutover. */
 export const DSX_REFERENCE_BASELINE: ClassifiedFacility = {
   id: 'dsx-reference-baseline',
-  name: 'NVIDIA DSX Reference AI Factory - Evaluation Baseline',
+  name: 'NVIDIA Omniverse DSX Blueprint Demo Reference - May 2026',
   facilityClass: 'REFERENCE',
   truthState: 'REFERENCE_ONLY',
   authoredBy: 'NVIDIA',
@@ -139,6 +141,7 @@ export function referenceKpi(configurationId: string, metricKey: string): Refere
     DSX_REFERENCE_RECORDS.find(
       (r) =>
         r.data_class === 'REFERENCE_KPI_VALUE' &&
+        r.source_variant === 'configs.ts:configuration-kpi' &&
         r.configuration_id === configurationId &&
         r.metric_key === metricKey,
     ) ?? null

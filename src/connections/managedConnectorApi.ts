@@ -27,8 +27,6 @@ export function useManagedConnectorCapabilities() {
       const { data, error } = await supabase.functions.invoke('managed-connector-capabilities', { body: {} });
       if (error) return null;
       if (!data || typeof data !== 'object') return null;
-      // Defensive normalisation: a partial or mocked response must never
-      // reach the UI with a missing `entries` array.
       const payload = data as Partial<ManagedCapabilityResponse>;
       const policy = payload.white_label_policy;
       return {
@@ -131,14 +129,13 @@ export interface ManagedReadResult<T = unknown> {
 }
 
 /**
- * Executes an already-authorized, read-only managed connector operation.
- * The browser supplies only AURA connection/operation identifiers plus an
- * allowlisted connector path. Gateway host and credentials stay server-owned.
+ * Executes an already-authorized managed read. The browser supplies AURA
+ * connection/operation identifiers and optional business payload only.
+ * Provider method/path, gateway host and credentials are resolved server-side.
  */
 export async function invokeManagedRead<T = unknown>(input: {
   connectionId: string;
   operationId: string;
-  path: string;
   facilityId?: string | null;
   payload?: Record<string, unknown>;
 }): Promise<ManagedReadResult<T>> {
@@ -146,7 +143,6 @@ export async function invokeManagedRead<T = unknown>(input: {
     body: {
       connection_id: input.connectionId,
       operation_id: input.operationId,
-      path: input.path,
       facility_id: input.facilityId ?? null,
       payload: input.payload ?? undefined,
     },

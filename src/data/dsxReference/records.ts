@@ -45,10 +45,39 @@ function baseConsistency(record: ReferenceRecord): {
   };
 }
 
+/**
+ * NVIDIA's two public demo files use slightly different labels for equivalent
+ * GB200 hardware fields. Canonicalize only the semantic join key; record ids,
+ * labels and source values remain verbatim and independently provenance-bound.
+ */
+function canonicalConflictGroup(record: ReferenceRecord): string | null {
+  const group = record.source_conflict_group ?? null;
+  if (record.source_consistency !== 'SOURCE_CONFLICT' || !group) return group;
+  if (!group.startsWith('gpu-spec:nvidia-gb200:')) return group;
+
+  const suffix = group.slice('gpu-spec:nvidia-gb200:'.length);
+  if (suffix === 'fp16-bf16-tensor-core' || suffix === 'fp16-bf-tensor-core') {
+    return 'gpu-spec:nvidia-gb200:fp16-bf-tensor-core';
+  }
+  if (
+    suffix === 'fp64' ||
+    suffix === 'fp64-tensor-core' ||
+    suffix === 'fp64-fp64-tensor-core'
+  ) {
+    return 'gpu-spec:nvidia-gb200:fp64';
+  }
+  return group;
+}
+
 const normalizedBase: ReferenceRecord[] = BASE_RECORDS.map((record) => ({
   ...record,
   dataset_version: DSX_COMPLETE_DATASET_VERSION,
   ...baseConsistency(record),
+}));
+
+const normalizedCompleteness: ReferenceRecord[] = DSX_COMPLETENESS_RECORDS.map((record) => ({
+  ...record,
+  source_conflict_group: canonicalConflictGroup(record),
 }));
 
 /**
@@ -60,7 +89,7 @@ const normalizedBase: ReferenceRecord[] = BASE_RECORDS.map((record) => ({
  */
 export const DSX_REFERENCE_RECORDS: readonly ReferenceRecord[] = [
   ...normalizedBase,
-  ...DSX_COMPLETENESS_RECORDS,
+  ...normalizedCompleteness,
 ].sort((a, b) => a.record_id.localeCompare(b.record_id));
 
 export { DSX_SOURCE_COMMIT, DSX_RETRIEVED_AT };

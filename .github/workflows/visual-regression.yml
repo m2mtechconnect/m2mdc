@@ -61,7 +61,7 @@ jobs:
       - name: Install Playwright
         run: bunx playwright install --with-deps chromium
 
-      - name: Generate deterministic supported screenshots
+      - name: Generate fresh current-head screenshots for human review
         id: capture
         shell: bash
         env:
@@ -69,8 +69,9 @@ jobs:
         run: |
           rm -rf tests/visual/snapshots.spec.ts-snapshots
           bunx playwright test --config=playwright.visual.config.ts
+          echo "Fresh screenshots are review evidence only. This job never commits or pushes baselines." >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Verify approved visual fingerprints and responsive invariants
+      - name: Enforce visual gate
         run: node scripts/verify-visual-fingerprints.mjs tests/visual/snapshots.spec.ts-snapshots tests/visual/approved-linux-visuals.json
 
       - name: Upload current-head visual evidence

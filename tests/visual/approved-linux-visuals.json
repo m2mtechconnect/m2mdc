@@ -2,24 +2,25 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "454d1e3c66f51b8ce01e4bb7a8369d0b2f912c0c",
-    "workflowRunId": 32598338342,
-    "artifactId": 9482212524,
-    "artifactZipSha256": "34ac03c8f42b4d4599094c60a727ce28bae6746e8a8882af62ee22ec799bf19a"
+    "sha": "f0b49f3380b25380ef8815867568ee9a4a602772",
+    "workflowRunId": 32599982649,
+    "artifactId": 9482617724,
+    "artifactZipSha256": "828dd3abfad8666c258a02005d0062451e29c74bbdaffbbbb559a62f6f232ab6"
   },
   "notes": [
     "AURA global application surfaces are light-theme by product contract.",
     "Scoped NOC dark styling is a separate component contract and is not represented as a global user-selectable dark mode.",
-    "Fingerprints were derived from the exact-head visual artifact after route, Lighthouse and theme-contract audit.",
-    "Builder mobile is responsive-invariant only until its 375px overflow defect is closed; desktop Builder views remain pixel-fingerprinted."
+    "Fingerprints were derived from the exact-head visual artifact after route, Lighthouse, theme-contract and Builder containment audit.",
+    "Builder Step 1, Step 2 and Step 5 fingerprints were promoted only after exact-head artifact review confirmed the intentional containment/layout change.",
+    "Builder mobile horizontal overflow is closed on f0b49f3380b25380ef8815867568ee9a4a602772 and is now exact-head pixel fingerprinted."
   ],
   "screenshots": [
     {"file":"analytics-mobile-chromium-linux.png","mode":"sha256","sha256":"5f72862c73ac3c8c4a280615b72fcad6a2109addbb673f391a0b142e9d21e066","width":375,"height":5406},
     {"file":"analytics-roi-light-chromium-linux.png","mode":"sha256","sha256":"3a748806c5eb7809edfd40777aa6c26a946c8ff4d81d544f70573b95dfdc7b4d","width":1280,"height":720},
-    {"file":"builder-mobile-chromium-linux.png","mode":"responsive","width":375,"minHeight":667},
-    {"file":"builder-step1-light-chromium-linux.png","mode":"sha256","sha256":"ad10ddb5f5dfc0610a241df831294ef3e5594efc233beb5af8089d0ea18992b8","width":1280,"height":720},
-    {"file":"builder-step2-light-chromium-linux.png","mode":"sha256","sha256":"591c64b711fe3dcbfbbca0fd4c96446ab2bb50fc1de193fabd17dcf35998903f","width":1280,"height":720},
-    {"file":"builder-step5-light-chromium-linux.png","mode":"sha256","sha256":"1f7319bf3c4597ea07ad0148a355520db1a751478400d9b92b093ca3a75477d9","width":1280,"height":720},
+    {"file":"builder-mobile-chromium-linux.png","mode":"sha256","sha256":"b569a1c0789477a25663cce8a933978d64d1d61d054201b4172068a13a530264","width":375,"height":2444},
+    {"file":"builder-step1-light-chromium-linux.png","mode":"sha256","sha256":"83846b19d6f8bcbd1c12a5baa316341c95cf2eeb313dd1ceebda6c3000eb89a3","width":1280,"height":720},
+    {"file":"builder-step2-light-chromium-linux.png","mode":"sha256","sha256":"13edeb4feecab0111a7aa61eca5ded0bbcb5930da28edb34e29ca9db5cb7ccd9","width":1280,"height":720},
+    {"file":"builder-step5-light-chromium-linux.png","mode":"sha256","sha256":"ee9d39746a2e027d970a55ae032f25024ac7d5adde57eae1901fa959bff3e17e","width":1280,"height":720},
     {"file":"compliance-light-chromium-linux.png","mode":"sha256","sha256":"edc013ff7f7c28684b7b739e07ce711b320b72769c12fc77b0622ca8079f8d33","width":1280,"height":720},
     {"file":"dashboard-hero-light-chromium-linux.png","mode":"sha256","sha256":"b59a2c32ba2b5fe75db45fdcdb7087af68ada48db03eb019abfce01c36a57447","width":1280,"height":720},
     {"file":"dashboard-mobile-chromium-linux.png","mode":"sha256","sha256":"7adf9ecd0dc45b9787c34bb3075022313800d4d4cb42a554a67cad34d9f3ce9b","width":375,"height":2068},

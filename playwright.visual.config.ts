@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const PLAYWRIGHT_BASE_URL = process.env.PLAYWRIGHT_BASE_URL?.trim();
+const CAPTURE_CURRENT_HEAD = process.env.AURA_CAPTURE_CURRENT_HEAD === '1';
 
 export default defineConfig({
   testDir: './tests/visual',
@@ -10,6 +11,9 @@ export default defineConfig({
   workers: 1,
   timeout: 30_000,
   expect: { timeout: 5_000 },
+  // Approved comparison is fail-closed. Snapshot mutation is enabled only for
+  // the explicit ephemeral human-review capture step and is never committed.
+  updateSnapshots: CAPTURE_CURRENT_HEAD ? 'all' : 'none',
   reporter: [
     ['list'],
     ['html', { outputFolder: 'playwright-report', open: 'never' }],

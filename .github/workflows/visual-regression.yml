@@ -15,7 +15,6 @@ on:
 
 permissions:
   contents: read
-  issues: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -70,12 +69,14 @@ jobs:
         id: capture
         if: always()
         shell: bash
+        env:
+          AURA_CAPTURE_CURRENT_HEAD: '1'
         run: |
           rm -rf visual-current-head
           mkdir -p visual-current-head
 
           set +e
-          bunx playwright test --config=playwright.visual.config.ts --update-snapshots
+          bunx playwright test --config=playwright.visual.config.ts
           capture_status=$?
           set -e
 
@@ -87,6 +88,7 @@ jobs:
           echo "capture_status=$capture_status" >> "$GITHUB_OUTPUT"
           echo "Release source SHA: $AURA_SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
           echo "Fresh screenshots are review evidence only. This job never commits or pushes baselines." >> "$GITHUB_STEP_SUMMARY"
+          echo "PR comments are intentionally not part of the visual gate; uploaded artifacts are the authoritative review evidence." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload visual diff artifacts
         uses: actions/upload-artifact@v4
@@ -104,22 +106,6 @@ jobs:
           path: visual-current-head/
           if-no-files-found: error
           retention-days: 30
-
-      - name: Comment PR with visual diffs
-        if: github.event_name == 'pull_request' && steps.compare.outcome == 'failure'
-        uses: actions/github-script@v7
-        env:
-          RELEASE_SHA: ${{ env.AURA_SOURCE_SHA }}
-        with:
-          script: |
-            const sha = process.env.RELEASE_SHA;
-            const body = `### ⚠️ Visual Regression Detected\n\nThe approved baselines do not match release source \`${sha}\`. Review the \`visual-regression-diffs-${sha}\` artifact together with \`visual-current-head-${sha}\`. Baseline acceptance requires explicit human approval; this workflow cannot commit snapshots.`;
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body,
-            });
 
       - name: Enforce visual gate
         if: always()

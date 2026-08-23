@@ -60,14 +60,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     concurrency:
-      # Shard is part of the key so sibling shards for the same browser cannot
-      # cancel each other when pull-request concurrency cancellation is enabled.
       group: qa-e2e-${{ github.event.pull_request.number || github.ref }}-${{ matrix.browser }}-${{ matrix.shard }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     strategy:
       fail-fast: false
-      # Keep browser coverage while bounding wall time. Each shard retains the
-      # committed one-worker CI isolation contract from playwright.config.ts.
       max-parallel: 6
       matrix:
         browser: [chromium, firefox, webkit]
@@ -87,13 +83,8 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Enforce immutable migration history
-        run: node scripts/phase3/check-migration-immutability.mjs
-
-      - name: Prepare ephemeral clean-replay overlays
-        env:
-          AURA_REPLAY_EPHEMERAL: '1'
-        run: node scripts/phase3/prepare-clean-replay.mjs --ephemeral
+      - name: Prepare immutable clean replay
+        run: bash scripts/ci/ephemeral-supabase.sh prepare
 
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
@@ -101,101 +92,18 @@ jobs:
           version: 2.34.3
 
       - name: Start isolated local Supabase stack
-        run: supabase start -x studio,imgproxy,mailpit,logflare,vector,supavisor
+        run: bash scripts/ci/ephemeral-supabase.sh start
 
       - name: Capture isolated backend credentials
-        run: |
-          supabase status -o env > /tmp/qa-supabase.env
-          set -a; . /tmp/qa-supabase.env; set +a
-
-          test -n "$API_URL"
-          test -n "$ANON_KEY"
-          test -n "$SERVICE_ROLE_KEY"
-          test -n "$DB_URL"
-
-          echo "::add-mask::$ANON_KEY"
-          echo "::add-mask::$SERVICE_ROLE_KEY"
-          {
-            echo "VITE_SUPABASE_URL=$API_URL"
-            echo "VITE_SUPABASE_PUBLISHABLE_KEY=$ANON_KEY"
-            echo "SUPABASE_URL=$API_URL"
-            echo "SUPABASE_ANON_KEY=$ANON_KEY"
-            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
-            echo "QA_DB_URL=$DB_URL"
-          } >> "$GITHUB_ENV"
+        run: bash scripts/ci/ephemeral-supabase.sh capture
 
       - name: Provision approved per-run test user
-        run: |
-          TEST_USER_EMAIL="qa-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${{ matrix.browser }}-${{ matrix.shard }}@example.invalid"
-          TEST_USER_PASSWORD="$(openssl rand -hex 24)Aa1!"
-          echo "::add-mask::$TEST_USER_PASSWORD"
-
-          USER_JSON="$(curl -fsS \
-            -X POST "$SUPABASE_URL/auth/v1/admin/users" \
-            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
-            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
-            -H 'Content-Type: application/json' \
-            -d "{\"email\":\"$TEST_USER_EMAIL\",\"password\":\"$TEST_USER_PASSWORD\",\"email_confirm\":true,\"user_metadata\":{\"full_name\":\"AURA QA Admin\"}}")"
-          TEST_USER_ID="$(printf '%s' "$USER_JSON" | jq -r '.id // empty')"
-          test -n "$TEST_USER_ID"
-
-          PROFILE_COUNT="$(psql "$QA_DB_URL" -v ON_ERROR_STOP=1 -Atc \
-            "UPDATE public.profiles SET is_approved = true WHERE user_id = '$TEST_USER_ID'::uuid; SELECT count(*) FROM public.profiles WHERE user_id = '$TEST_USER_ID'::uuid AND is_approved = true;")"
-          PROFILE_COUNT="$(printf '%s\n' "$PROFILE_COUNT" | tail -n 1)"
-          test "$PROFILE_COUNT" = "1"
-
-          psql "$QA_DB_URL" -v ON_ERROR_STOP=1 -c \
-            "INSERT INTO public.user_roles (user_id, role, scope, granted_by) VALUES ('$TEST_USER_ID'::uuid, 'admin', 'global', '$TEST_USER_ID'::uuid);"
-
-          ROLE_COUNT="$(psql "$QA_DB_URL" -v ON_ERROR_STOP=1 -Atc \
-            "SELECT count(*) FROM public.user_roles WHERE user_id = '$TEST_USER_ID'::uuid AND role = 'admin' AND scope = 'global';")"
-          test "$ROLE_COUNT" = "1"
-
-          {
-            echo "TEST_USER_EMAIL=$TEST_USER_EMAIL"
-            echo "TEST_USER_PASSWORD=$TEST_USER_PASSWORD"
-          } >> "$GITHUB_ENV"
+        env:
+          AURA_TEST_USER_SUFFIX: ${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.browser }}-${{ matrix.shard }}
+        run: bash scripts/ci/ephemeral-supabase.sh provision-user
 
       - name: Serve local Edge Functions
-        run: |
-          # Custom Edge Function variables must be loaded into the Edge Runtime
-          # explicitly. The runner shell environment is not the function isolate
-          # environment. This file is ephemeral and contains no production data.
-          cat > /tmp/qa-functions.env <<'EOF'
-          CORS_ALLOWED_ORIGINS=http://localhost:8080
-          ENVIRONMENT=test
-          EOF
-          chmod 600 /tmp/qa-functions.env
-
-          nohup supabase functions serve --no-verify-jwt=false --env-file /tmp/qa-functions.env > /tmp/qa-functions.log 2>&1 &
-
-          ready=0
-          last_status="unavailable"
-          for i in $(seq 1 60); do
-            headers="/tmp/qa-preflight-${i}.headers"
-            clean_headers="/tmp/qa-preflight-${i}.clean.headers"
-            last_status="$(curl -sS -o /dev/null -D "$headers" -w '%{http_code}' \
-              "$SUPABASE_URL/functions/v1/run-lifecycle" \
-              -X OPTIONS \
-              -H 'Origin: http://localhost:8080' \
-              -H 'Access-Control-Request-Method: POST' \
-              -H 'Access-Control-Request-Headers: authorization, apikey, content-type, x-organization-id' || true)"
-            tr -d '\r' < "$headers" > "$clean_headers" 2>/dev/null || true
-
-            if [ "$last_status" = "204" ] && \
-               grep -qi '^access-control-allow-origin: http://localhost:8080$' "$clean_headers"; then
-              ready=1
-              break
-            fi
-            sleep 2
-          done
-
-          if [ "$ready" -ne 1 ]; then
-            echo "Local Edge Functions did not satisfy the CORS readiness contract (last HTTP status: $last_status)"
-            test -f "$clean_headers" && cat "$clean_headers" || true
-            tail -n 200 /tmp/qa-functions.log || true
-            exit 1
-          fi
+        run: bash scripts/ci/ephemeral-supabase.sh serve-functions
 
       - name: Install Playwright browser
         run: bunx playwright install --with-deps ${{ matrix.browser }}
@@ -217,11 +125,11 @@ jobs:
 
       - name: Local Edge Function logs
         if: always()
-        run: tail -n 200 /tmp/qa-functions.log || true
+        run: bash scripts/ci/ephemeral-supabase.sh function-logs
 
       - name: Stop isolated local Supabase stack
         if: always()
-        run: supabase stop --no-backup || true
+        run: bash scripts/ci/ephemeral-supabase.sh stop
 
   accessibility-audit:
     name: Accessibility Audit

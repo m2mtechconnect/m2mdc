@@ -57,12 +57,15 @@ BEGIN
     RETURN NEW;
   END IF;
 
+  v_org_id := public.active_org_id();
+  IF v_org_id IS NULL THEN
+    RAISE EXCEPTION 'active organization is required';
+  END IF;
+
   IF NEW.org_id IS NULL THEN
-    v_org_id := public.active_org_id();
-    IF v_org_id IS NULL THEN
-      RAISE EXCEPTION 'active organization is required';
-    END IF;
     NEW.org_id := v_org_id;
+  ELSIF NEW.org_id IS DISTINCT FROM v_org_id THEN
+    RAISE EXCEPTION 'resource organization must match the active organization';
   END IF;
 
   IF NOT public.is_org_member(NEW.org_id, auth.uid()) THEN
@@ -135,8 +138,79 @@ GRANT EXECUTE ON FUNCTION public.current_tenant_id() TO authenticated, service_r
 -- be reintroduced later only as an audited break-glass capability.
 DROP POLICY IF EXISTS "Admins can view all twins" ON public.data_centre_twins;
 
--- Parent resource collaboration policies. Existing per-owner policies remain
--- as a temporary fallback for rows with no org_id.
+-- ---------------------------------------------------------------------------
+-- Legacy owner policies become fallback-only. PostgreSQL ORs permissive RLS
+-- policies; leaving these broad would let a former creator bypass organization
+-- membership after a row was tenant-owned.
+-- ---------------------------------------------------------------------------
+
+DROP POLICY IF EXISTS "Users can view their own twins" ON public.data_centre_twins;
+CREATE POLICY "Users can view their own twins"
+  ON public.data_centre_twins FOR SELECT TO authenticated
+  USING (org_id IS NULL AND auth.uid() = created_by_user);
+DROP POLICY IF EXISTS "Users can create their own twins" ON public.data_centre_twins;
+CREATE POLICY "Users can create their own twins"
+  ON public.data_centre_twins FOR INSERT TO authenticated
+  WITH CHECK (
+    auth.uid() = created_by_user
+    AND org_id = public.active_org_id()
+    AND public.is_org_member(org_id, auth.uid())
+  );
+DROP POLICY IF EXISTS "Users can update their own twins" ON public.data_centre_twins;
+CREATE POLICY "Users can update their own twins"
+  ON public.data_centre_twins FOR UPDATE TO authenticated
+  USING (org_id IS NULL AND auth.uid() = created_by_user)
+  WITH CHECK (org_id IS NULL AND auth.uid() = created_by_user);
+DROP POLICY IF EXISTS "Users can delete their own twins" ON public.data_centre_twins;
+CREATE POLICY "Users can delete their own twins"
+  ON public.data_centre_twins FOR DELETE TO authenticated
+  USING (org_id IS NULL AND auth.uid() = created_by_user);
+
+DROP POLICY IF EXISTS "Users can view their own digital twins" ON public.digital_twins;
+CREATE POLICY "Users can view their own digital twins"
+  ON public.digital_twins FOR SELECT TO authenticated
+  USING (org_id IS NULL AND auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can create their own digital twins" ON public.digital_twins;
+CREATE POLICY "Users can create their own digital twins"
+  ON public.digital_twins FOR INSERT TO authenticated
+  WITH CHECK (
+    auth.uid() = user_id
+    AND org_id = public.active_org_id()
+    AND public.is_org_member(org_id, auth.uid())
+  );
+DROP POLICY IF EXISTS "Users can update their own digital twins" ON public.digital_twins;
+CREATE POLICY "Users can update their own digital twins"
+  ON public.digital_twins FOR UPDATE TO authenticated
+  USING (org_id IS NULL AND auth.uid() = user_id)
+  WITH CHECK (org_id IS NULL AND auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete their own digital twins" ON public.digital_twins;
+CREATE POLICY "Users can delete their own digital twins"
+  ON public.digital_twins FOR DELETE TO authenticated
+  USING (org_id IS NULL AND auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can view their own facilities" ON public.sovereign_dc_facilities;
+CREATE POLICY "Users can view their own facilities"
+  ON public.sovereign_dc_facilities FOR SELECT TO authenticated
+  USING (org_id IS NULL AND auth.uid() = owner_id);
+DROP POLICY IF EXISTS "Users can create their own facilities" ON public.sovereign_dc_facilities;
+CREATE POLICY "Users can create their own facilities"
+  ON public.sovereign_dc_facilities FOR INSERT TO authenticated
+  WITH CHECK (
+    auth.uid() = owner_id
+    AND org_id = public.active_org_id()
+    AND public.is_org_member(org_id, auth.uid())
+  );
+DROP POLICY IF EXISTS "Users can update their own facilities" ON public.sovereign_dc_facilities;
+CREATE POLICY "Users can update their own facilities"
+  ON public.sovereign_dc_facilities FOR UPDATE TO authenticated
+  USING (org_id IS NULL AND auth.uid() = owner_id)
+  WITH CHECK (org_id IS NULL AND auth.uid() = owner_id);
+DROP POLICY IF EXISTS "Users can delete their own facilities" ON public.sovereign_dc_facilities;
+CREATE POLICY "Users can delete their own facilities"
+  ON public.sovereign_dc_facilities FOR DELETE TO authenticated
+  USING (org_id IS NULL AND auth.uid() = owner_id);
+
+-- Parent resource collaboration policies.
 DROP POLICY IF EXISTS data_centre_twins_org_read ON public.data_centre_twins;
 CREATE POLICY data_centre_twins_org_read
   ON public.data_centre_twins FOR SELECT TO authenticated
@@ -185,7 +259,190 @@ CREATE POLICY sovereign_dc_facilities_org_delete
   ON public.sovereign_dc_facilities FOR DELETE TO authenticated
   USING (public.org_has_role(org_id, auth.uid(), ARRAY['owner','admin']::text[]));
 
--- Child/run resources inherit tenant visibility from their parent resource.
+-- ---------------------------------------------------------------------------
+-- Child/run resources: narrow legacy creator policies to unassigned parents,
+-- then add tenant collaboration through the parent org_id.
+-- ---------------------------------------------------------------------------
+
+DROP POLICY IF EXISTS "Users can view their own digital twin runs" ON public.digital_twin_runs;
+CREATE POLICY "Users can view their own digital twin runs"
+  ON public.digital_twin_runs FOR SELECT TO authenticated
+  USING (
+    auth.uid() = user_id
+    AND EXISTS (
+      SELECT 1 FROM public.digital_twins t
+      WHERE t.id = digital_twin_runs.twin_id AND t.org_id IS NULL
+    )
+  );
+DROP POLICY IF EXISTS "Users can create their own digital twin runs" ON public.digital_twin_runs;
+CREATE POLICY "Users can create their own digital twin runs"
+  ON public.digital_twin_runs FOR INSERT TO authenticated
+  WITH CHECK (
+    auth.uid() = user_id
+    AND EXISTS (
+      SELECT 1 FROM public.digital_twins t
+      WHERE t.id = digital_twin_runs.twin_id AND t.org_id IS NULL
+    )
+  );
+DROP POLICY IF EXISTS "Users can update their own digital twin runs" ON public.digital_twin_runs;
+CREATE POLICY "Users can update their own digital twin runs"
+  ON public.digital_twin_runs FOR UPDATE TO authenticated
+  USING (
+    auth.uid() = user_id
+    AND EXISTS (
+      SELECT 1 FROM public.digital_twins t
+      WHERE t.id = digital_twin_runs.twin_id AND t.org_id IS NULL
+    )
+  )
+  WITH CHECK (
+    auth.uid() = user_id
+    AND EXISTS (
+      SELECT 1 FROM public.digital_twins t
+      WHERE t.id = digital_twin_runs.twin_id AND t.org_id IS NULL
+    )
+  );
+
+DROP POLICY IF EXISTS "Users can create simulation runs" ON public.sovereign_dc_simulation_runs;
+CREATE POLICY "Users can create simulation runs"
+  ON public.sovereign_dc_simulation_runs FOR INSERT TO authenticated
+  WITH CHECK (
+    auth.uid() = user_id
+    AND EXISTS (
+      SELECT 1 FROM public.sovereign_dc_facilities f
+      WHERE f.id = sovereign_dc_simulation_runs.facility_id AND f.org_id IS NULL
+    )
+  );
+DROP POLICY IF EXISTS "Users can update their simulation runs" ON public.sovereign_dc_simulation_runs;
+CREATE POLICY "Users can update their simulation runs"
+  ON public.sovereign_dc_simulation_runs FOR UPDATE TO authenticated
+  USING (
+    auth.uid() = user_id
+    AND EXISTS (
+      SELECT 1 FROM public.sovereign_dc_facilities f
+      WHERE f.id = sovereign_dc_simulation_runs.facility_id AND f.org_id IS NULL
+    )
+  )
+  WITH CHECK (
+    auth.uid() = user_id
+    AND EXISTS (
+      SELECT 1 FROM public.sovereign_dc_facilities f
+      WHERE f.id = sovereign_dc_simulation_runs.facility_id AND f.org_id IS NULL
+    )
+  );
+DROP POLICY IF EXISTS "Users can view simulation runs for their facilities" ON public.sovereign_dc_simulation_runs;
+CREATE POLICY "Users can view simulation runs for their facilities"
+  ON public.sovereign_dc_simulation_runs FOR SELECT TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.sovereign_dc_facilities f
+      WHERE f.id = sovereign_dc_simulation_runs.facility_id
+        AND f.org_id IS NULL
+        AND (auth.uid() = sovereign_dc_simulation_runs.user_id OR f.owner_id = auth.uid())
+    )
+  );
+
+DROP POLICY IF EXISTS "Users can view telemetry for their twins" ON public.twin_telemetry;
+CREATE POLICY "Users can view telemetry for their twins"
+  ON public.twin_telemetry FOR SELECT TO authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.data_centre_twins t
+    WHERE t.id = twin_telemetry.twin_id AND t.org_id IS NULL AND t.created_by_user = auth.uid()
+  ));
+DROP POLICY IF EXISTS "Users can insert telemetry for their twins" ON public.twin_telemetry;
+CREATE POLICY "Users can insert telemetry for their twins"
+  ON public.twin_telemetry FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (
+    SELECT 1 FROM public.data_centre_twins t
+    WHERE t.id = twin_telemetry.twin_id AND t.org_id IS NULL AND t.created_by_user = auth.uid()
+  ));
+
+DROP POLICY IF EXISTS "Users can view KPIs for their twins" ON public.twin_kpi_snapshots;
+CREATE POLICY "Users can view KPIs for their twins"
+  ON public.twin_kpi_snapshots FOR SELECT TO authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.data_centre_twins t
+    WHERE t.id = twin_kpi_snapshots.twin_id AND t.org_id IS NULL AND t.created_by_user = auth.uid()
+  ));
+DROP POLICY IF EXISTS "Users can insert KPIs for their twins" ON public.twin_kpi_snapshots;
+CREATE POLICY "Users can insert KPIs for their twins"
+  ON public.twin_kpi_snapshots FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (
+    SELECT 1 FROM public.data_centre_twins t
+    WHERE t.id = twin_kpi_snapshots.twin_id AND t.org_id IS NULL AND t.created_by_user = auth.uid()
+  ));
+
+DROP POLICY IF EXISTS "Users can view simulations for their twins" ON public.twin_simulation_runs;
+CREATE POLICY "Users can view simulations for their twins"
+  ON public.twin_simulation_runs FOR SELECT TO authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.data_centre_twins t
+    WHERE t.id = twin_simulation_runs.twin_id AND t.org_id IS NULL AND t.created_by_user = auth.uid()
+  ));
+DROP POLICY IF EXISTS "Users can create simulations for their twins" ON public.twin_simulation_runs;
+CREATE POLICY "Users can create simulations for their twins"
+  ON public.twin_simulation_runs FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (
+    SELECT 1 FROM public.data_centre_twins t
+    WHERE t.id = twin_simulation_runs.twin_id AND t.org_id IS NULL AND t.created_by_user = auth.uid()
+  ));
+DROP POLICY IF EXISTS "Users can update simulations for their twins" ON public.twin_simulation_runs;
+CREATE POLICY "Users can update simulations for their twins"
+  ON public.twin_simulation_runs FOR UPDATE TO authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.data_centre_twins t
+    WHERE t.id = twin_simulation_runs.twin_id AND t.org_id IS NULL AND t.created_by_user = auth.uid()
+  ))
+  WITH CHECK (EXISTS (
+    SELECT 1 FROM public.data_centre_twins t
+    WHERE t.id = twin_simulation_runs.twin_id AND t.org_id IS NULL AND t.created_by_user = auth.uid()
+  ));
+
+DROP POLICY IF EXISTS "Users can view sovereignty events for their twins" ON public.twin_sovereignty_events;
+CREATE POLICY "Users can view sovereignty events for their twins"
+  ON public.twin_sovereignty_events FOR SELECT TO authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.data_centre_twins t
+    WHERE t.id = twin_sovereignty_events.twin_id AND t.org_id IS NULL AND t.created_by_user = auth.uid()
+  ));
+DROP POLICY IF EXISTS "Users can insert sovereignty events for their twins" ON public.twin_sovereignty_events;
+CREATE POLICY "Users can insert sovereignty events for their twins"
+  ON public.twin_sovereignty_events FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (
+    SELECT 1 FROM public.data_centre_twins t
+    WHERE t.id = twin_sovereignty_events.twin_id AND t.org_id IS NULL AND t.created_by_user = auth.uid()
+  ));
+
+DROP POLICY IF EXISTS "Users can view carbon emissions for their twins" ON public.twin_carbon_emissions;
+CREATE POLICY "Users can view carbon emissions for their twins"
+  ON public.twin_carbon_emissions FOR SELECT TO authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.data_centre_twins t
+    WHERE t.id = twin_carbon_emissions.twin_id AND t.org_id IS NULL AND t.created_by_user = auth.uid()
+  ));
+DROP POLICY IF EXISTS "Users can insert carbon emissions for their twins" ON public.twin_carbon_emissions;
+CREATE POLICY "Users can insert carbon emissions for their twins"
+  ON public.twin_carbon_emissions FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (
+    SELECT 1 FROM public.data_centre_twins t
+    WHERE t.id = twin_carbon_emissions.twin_id AND t.org_id IS NULL AND t.created_by_user = auth.uid()
+  ));
+
+DROP POLICY IF EXISTS "Users can view financial records for their twins" ON public.twin_financial_records;
+CREATE POLICY "Users can view financial records for their twins"
+  ON public.twin_financial_records FOR SELECT TO authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.data_centre_twins t
+    WHERE t.id = twin_financial_records.twin_id AND t.org_id IS NULL AND t.created_by_user = auth.uid()
+  ));
+DROP POLICY IF EXISTS "Users can insert financial records for their twins" ON public.twin_financial_records;
+CREATE POLICY "Users can insert financial records for their twins"
+  ON public.twin_financial_records FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (
+    SELECT 1 FROM public.data_centre_twins t
+    WHERE t.id = twin_financial_records.twin_id AND t.org_id IS NULL AND t.created_by_user = auth.uid()
+  ));
+
+-- Organization collaboration on child resources.
 DROP POLICY IF EXISTS digital_twin_runs_org_read ON public.digital_twin_runs;
 CREATE POLICY digital_twin_runs_org_read
   ON public.digital_twin_runs FOR SELECT TO authenticated
@@ -195,7 +452,6 @@ CREATE POLICY digital_twin_runs_org_read
       AND t.org_id IS NOT NULL
       AND public.is_org_member(t.org_id, auth.uid())
   ));
-
 DROP POLICY IF EXISTS digital_twin_runs_org_write ON public.digital_twin_runs;
 CREATE POLICY digital_twin_runs_org_write
   ON public.digital_twin_runs FOR ALL TO authenticated
@@ -219,7 +475,6 @@ CREATE POLICY sovereign_dc_simulation_runs_org_read
       AND f.org_id IS NOT NULL
       AND public.is_org_member(f.org_id, auth.uid())
   ));
-
 DROP POLICY IF EXISTS sovereign_dc_simulation_runs_org_write ON public.sovereign_dc_simulation_runs;
 CREATE POLICY sovereign_dc_simulation_runs_org_write
   ON public.sovereign_dc_simulation_runs FOR ALL TO authenticated
@@ -243,7 +498,6 @@ CREATE POLICY twin_simulation_runs_org_read
       AND t.org_id IS NOT NULL
       AND public.is_org_member(t.org_id, auth.uid())
   ));
-
 DROP POLICY IF EXISTS twin_simulation_runs_org_write ON public.twin_simulation_runs;
 CREATE POLICY twin_simulation_runs_org_write
   ON public.twin_simulation_runs FOR ALL TO authenticated
@@ -268,7 +522,6 @@ CREATE POLICY twin_telemetry_org_read
       AND t.org_id IS NOT NULL
       AND public.is_org_member(t.org_id, auth.uid())
   ));
-
 DROP POLICY IF EXISTS twin_kpi_snapshots_org_read ON public.twin_kpi_snapshots;
 CREATE POLICY twin_kpi_snapshots_org_read
   ON public.twin_kpi_snapshots FOR SELECT TO authenticated
@@ -278,7 +531,6 @@ CREATE POLICY twin_kpi_snapshots_org_read
       AND t.org_id IS NOT NULL
       AND public.is_org_member(t.org_id, auth.uid())
   ));
-
 DROP POLICY IF EXISTS twin_sovereignty_events_org_read ON public.twin_sovereignty_events;
 CREATE POLICY twin_sovereignty_events_org_read
   ON public.twin_sovereignty_events FOR SELECT TO authenticated
@@ -288,7 +540,6 @@ CREATE POLICY twin_sovereignty_events_org_read
       AND t.org_id IS NOT NULL
       AND public.is_org_member(t.org_id, auth.uid())
   ));
-
 DROP POLICY IF EXISTS twin_carbon_emissions_org_read ON public.twin_carbon_emissions;
 CREATE POLICY twin_carbon_emissions_org_read
   ON public.twin_carbon_emissions FOR SELECT TO authenticated
@@ -298,7 +549,6 @@ CREATE POLICY twin_carbon_emissions_org_read
       AND t.org_id IS NOT NULL
       AND public.is_org_member(t.org_id, auth.uid())
   ));
-
 DROP POLICY IF EXISTS twin_financial_records_org_read ON public.twin_financial_records;
 CREATE POLICY twin_financial_records_org_read
   ON public.twin_financial_records FOR SELECT TO authenticated

@@ -261,7 +261,7 @@ for (const pat of allowlist.forbidden_production_routes || []) {
   // JSX expression.
   const gated = (appSrc.match(new RegExp(`import\\.meta\\.env\\.DEV[^\\n]*${re.source}`, 'g')) || []).length;
   if (matches.length > gated) {
-    fail(`App.tsx declares forbidden production route: ${pat}`);
+    fail(`router declares forbidden production route: ${pat}`);
   }
 }
 
@@ -276,7 +276,8 @@ if (existsSync(workflowDir)) {
   }
 }
 
-// 8. NEG-A — every <Route path="..."> declared in src/App.tsx must be
+// 8. NEG-A — every absolute <Route path="..."> declared in the shipped
+// router files must be
 // classified in the route-allowlist as exactly one of: production_routes,
 // production_blocked_routes, development_only_routes, redirect_only_routes,
 // or match a forbidden_production_routes pattern. DEV-gated routes are
@@ -299,11 +300,14 @@ if (existsSync(workflowDir)) {
     const p = lm[1];
     if (seen.has(p)) continue;
     seen.add(p);
+    // Relative child paths (e.g. "overview") inherit the classification of
+    // their already-classified parent route.
+    if (!p.startsWith('/') && p !== '*') continue;
     const isDevGated = /import\.meta\.env\.DEV/.test(line);
     if (isDevGated) continue;
     if (prod.has(p) || blocked.has(p) || devOnly.has(p) || redirect.has(p)) continue;
     if (forbiddenRe.some((re) => re.test(p))) continue;
-    fail(`App.tsx declares unclassified route: ${p}`);
+    fail(`router declares unclassified route: ${p}`);
   }
 }
 

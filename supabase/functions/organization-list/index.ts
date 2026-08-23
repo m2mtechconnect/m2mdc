@@ -35,8 +35,6 @@ serve(async (req) => {
       return json(corsHeaders, { error: 'Approved platform account required' }, 403);
     }
 
-    // Platform-owner authority must be a live global grant. A resource-scoped
-    // owner label must never unlock cross-customer inventory.
     const { data: isPlatformOwner, error: roleError } = await authClient.rpc('user_has_role', {
       check_user_id: user.id,
       check_role: 'owner',
@@ -47,8 +45,6 @@ serve(async (req) => {
       return json(corsHeaders, { error: 'Platform owner role required' }, 403);
     }
 
-    // Service role is created only after the caller is authenticated, approved
-    // and proven to be a platform owner.
     const serviceClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -62,26 +58,16 @@ serve(async (req) => {
       connectionsResult,
       invitesResult,
       deploymentProfilesResult,
+      gatewaysResult,
     ] = await Promise.all([
       serviceClient
         .from('organizations')
         .select('id, name, domain, industry, mfa_enabled, sso_enabled, created_at')
         .order('created_at', { ascending: false }),
-      serviceClient
-        .from('org_memberships')
-        .select('org_id, status'),
-      serviceClient
-        .from('sovereign_dc_facilities')
-        .select('org_id')
-        .not('org_id', 'is', null),
-      serviceClient
-        .from('data_centre_twins')
-        .select('org_id')
-        .not('org_id', 'is', null),
-      serviceClient
-        .from('connection_instances')
-        .select('tenant_id')
-        .not('tenant_id', 'is', null),
+      serviceClient.from('org_memberships').select('org_id, status'),
+      serviceClient.from('sovereign_dc_facilities').select('org_id').not('org_id', 'is', null),
+      serviceClient.from('data_centre_twins').select('org_id').not('org_id', 'is', null),
+      serviceClient.from('connection_instances').select('tenant_id').not('tenant_id', 'is', null),
       serviceClient
         .from('team_invites')
         .select('org_id, email, role, status, expires_at')
@@ -89,6 +75,9 @@ serve(async (req) => {
       serviceClient
         .from('organization_deployment_profiles')
         .select('org_id, deployment_type, capability_status, lifecycle_status, automation_status, hosting_provider, preferred_region, control_plane_location, data_plane_location, customer_managed, edge_required, data_residency'),
+      serviceClient
+        .from('edge_gateways')
+        .select('org_id, status, last_seen_at'),
     ]);
 
     const firstError = [
@@ -99,6 +88,7 @@ serve(async (req) => {
       connectionsResult.error,
       invitesResult.error,
       deploymentProfilesResult.error,
+      gatewaysResult.error,
     ].find(Boolean);
     if (firstError) throw firstError;
 
@@ -118,6 +108,12 @@ serve(async (req) => {
     const facilities = countBy((facilitiesResult.data ?? []) as Array<Record<string, unknown>>, 'org_id');
     const twins = countBy((twinsResult.data ?? []) as Array<Record<string, unknown>>, 'org_id');
     const connections = countBy((connectionsResult.data ?? []) as Array<Record<string, unknown>>, 'tenant_id');
+    const gateways = countBy((gatewaysResult.data ?? []) as Array<Record<string, unknown>>, 'org_id');
+    const onlineGateways = countBy(
+      (gatewaysResult.data ?? []) as Array<Record<string, unknown>>,
+      'org_id',
+      (row) => row.status === 'ONLINE',
+    );
 
     const ownerInviteByOrg = new Map<string, Record<string, unknown>>();
     for (const invite of (invitesResult.data ?? []) as Array<Record<string, unknown>>) {
@@ -143,6 +139,8 @@ serve(async (req) => {
         facilityCount: facilities.get(organization.id) ?? 0,
         twinCount: twins.get(organization.id) ?? 0,
         connectionCount: connections.get(organization.id) ?? 0,
+        edgeGatewayCount: gateways.get(organization.id) ?? 0,
+        onlineEdgeGatewayCount: onlineGateways.get(organization.id) ?? 0,
         deploymentProfile: deployment
           ? {
               type: deployment.deployment_type,

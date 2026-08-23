@@ -69,3 +69,16 @@ verify_jwt = true
 
 [functions.ops-systems]
 verify_jwt = true
+
+# Enterprise onboarding boundaries. The gateway verifies Supabase JWTs and the
+# functions perform their own approval / tenant / role checks before creating a
+# service-role client. Invite acceptance still validates the signed-in email
+# against the opaque organization-bound invitation before membership mutation.
+[functions.organization-provision]
+verify_jwt = true
+
+[functions.teams-invite]
+verify_jwt = true
+
+[functions.teams-accept-invite]
+verify_jwt = true

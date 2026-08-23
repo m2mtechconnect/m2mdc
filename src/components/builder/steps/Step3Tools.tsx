@@ -1,400 +1,373 @@
-import { useState, useEffect } from 'react';
-import { Plug, Link2, Code, Check, Info, Sparkles, Trash2, Loader2, Zap, Wind, Cpu, Thermometer, Network, Calculator, Leaf, Shield, Database, Layers, BarChart, Activity, Flame, FileCheck, DollarSign } from 'lucide-react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Activity,
+  BarChart3,
+  Box,
+  Check,
+  ChevronDown,
+  CloudCog,
+  Cpu,
+  Database,
+  GitBranch,
+  Layers3,
+  Network,
+  Plug,
+  ServerCog,
+  Shield,
+  Sparkles,
+  Workflow,
+} from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useWizardBuilderStore, BuilderTool } from '@/stores/wizardBuilderStore';
+import { useWizardBuilderStore, type BuilderTool } from '@/stores/wizardBuilderStore';
 import { useBlueprintStore } from '@/stores/blueprintStore';
-import { ConnectStep } from '@/components/builder/ConnectStep';
 import { toast } from 'sonner';
 import { DCCard, DCSectionHeader } from '@/components/dc-ui';
+import {
+  AURA_MANAGED_CAPABILITIES,
+  customerFacingRuntimeLabel,
+  type AuraManagedCapability,
+} from '@/config/auraRuntimeCatalog';
+import { useConnectorDefinitions } from '@/connections/api';
+import { useManagedConnectorCapabilities } from '@/connections/managedConnectorApi';
+import { CONNECTION_CLASS_LABEL, ELIGIBILITY_LABEL, type ManagedCapabilityEntry } from '@/connections/managedConnectors';
+import type { ConnectorDefinition } from '@/connections/model';
 
-const INTEGRATIONS = [
-  { id: 'gmail', name: 'Gmail', category: 'Communication' },
-  { id: 'slack', name: 'Slack', category: 'Communication' },
-  { id: 'teams', name: 'Microsoft Teams', category: 'Communication' },
-  { id: 'notion', name: 'Notion', category: 'Productivity' },
-  { id: 'confluence', name: 'Confluence', category: 'Productivity' },
-  { id: 'hubspot', name: 'HubSpot', category: 'CRM' },
-  { id: 'salesforce', name: 'Salesforce', category: 'CRM' },
-  { id: 'stripe', name: 'Stripe', category: 'Payments' },
-  { id: 'airtable', name: 'Airtable', category: 'Database' },
-  { id: 'jira', name: 'Jira', category: 'Development' },
-  { id: 'github', name: 'GitHub', category: 'Development' },
+interface NativeCapability {
+  id: string;
+  name: string;
+  category: 'Facility & OT' | 'Physical AI' | 'Observability' | 'Twin & Storage';
+  description: string;
+  icon: typeof Plug;
+}
+
+const AURA_NATIVE_CAPABILITIES: readonly NativeCapability[] = [
+  { id: 'bacnet_ip', name: 'BACnet/IP', category: 'Facility & OT', description: 'Building automation and facility telemetry.', icon: Network },
+  { id: 'modbus_tcp', name: 'Modbus TCP', category: 'Facility & OT', description: 'Industrial equipment and metering telemetry.', icon: Network },
+  { id: 'opcua', name: 'OPC-UA', category: 'Facility & OT', description: 'Industrial data and equipment interoperability.', icon: ServerCog },
+  { id: 'snmp', name: 'SNMP', category: 'Facility & OT', description: 'Infrastructure and network device telemetry.', icon: Activity },
+  { id: 'dcim_rest', name: 'DCIM', category: 'Facility & OT', description: 'Data-centre infrastructure management data and operations.', icon: Database },
+  { id: 'redfish', name: 'Redfish', category: 'Physical AI', description: 'Hardware management and equipment-state integration.', icon: Cpu },
+  { id: 'nvidia_dcgm', name: 'GPU Telemetry', category: 'Physical AI', description: 'GPU health, utilization and workload telemetry.', icon: Cpu },
+  { id: 'dsx_ingest_gateway', name: 'DSX Ingest Gateway', category: 'Physical AI', description: 'Governed exchange path for approved facility and evidence data.', icon: GitBranch },
+  { id: 'dsx_exchange', name: 'DSX Exchange', category: 'Physical AI', description: 'Optional NVIDIA DSX exchange capability when deployed and verified.', icon: GitBranch },
+  { id: 'mqtt_transport', name: 'MQTT', category: 'Facility & OT', description: 'Event and telemetry transport for edge-connected systems.', icon: Network },
+  { id: 'prometheus', name: 'Prometheus', category: 'Observability', description: 'Operational metrics and time-series monitoring.', icon: BarChart3 },
+  { id: 'prometheus_otel', name: 'OpenTelemetry', category: 'Observability', description: 'Metrics, traces and telemetry exchange.', icon: Activity },
+  { id: 'grafana', name: 'Grafana', category: 'Observability', description: 'Operational visualization and observability context.', icon: BarChart3 },
+  { id: 'openusd_storage', name: 'OpenUSD Assets', category: 'Twin & Storage', description: 'Digital-twin assets, layers and scene data.', icon: Box },
+  { id: 'ddn_infinia', name: 'DDN Infinia', category: 'Twin & Storage', description: 'Target evidence and object-storage integration when deployed.', icon: Layers3 },
 ];
 
-const DATA_CENTRE_TOOLS = [
-  { id: 'power-telemetry', name: 'Power Telemetry', category: 'Telemetry', icon: Zap, description: 'PDU metrics, UPS status, power consumption' },
-  { id: 'cooling-telemetry', name: 'Cooling Telemetry', category: 'Telemetry', icon: Wind, description: 'CRAH/CRAC units, chiller status, zone temps' },
-  { id: 'gpu-metrics', name: 'GPU Metrics', category: 'Telemetry', icon: Cpu, description: 'GPU utilization, memory, workload distribution' },
-  { id: 'thermal-sensors', name: 'Thermal Sensors', category: 'Telemetry', icon: Thermometer, description: 'Rack temps, hotspot detection, airflow' },
-  { id: 'network-fabric', name: 'Network Fabric', category: 'Telemetry', icon: Network, description: 'Switch utilization, InfiniBand, latency' },
-  { id: 'pue-model', name: 'PUE Calculator', category: 'Model', icon: Calculator, description: 'Real-time PUE calculation and forecasting' },
-  { id: 'carbon-model', name: 'Carbon Footprint', category: 'Model', icon: Leaf, description: 'gCO₂e/kWh tracking, emissions per GPU-hour' },
-  { id: 'thermal-model', name: 'Thermal Prediction', category: 'Model', icon: Flame, description: 'Hotspot prediction, thermal runaway detection' },
-  { id: 'financial-model', name: 'Financial Model', category: 'Model', icon: DollarSign, description: 'Cost per GPU-hour, energy cost forecasting' },
-  { id: 'sovereignty-checker', name: 'Sovereignty Compliance', category: 'Compliance', icon: Shield, description: 'Data residency validation, jurisdiction tagging' },
-  { id: 'audit-logger', name: 'Audit Logger', category: 'Compliance', icon: FileCheck, description: 'Immutable audit trail for SOC2, ISO 27001' },
-  { id: 'dcim-integration', name: 'DCIM Integration', category: 'Integration', icon: Database, description: 'Data Centre Infrastructure Management' },
-  { id: 'k8s-integration', name: 'Kubernetes/Slurm', category: 'Integration', icon: Layers, description: 'Container and HPC job orchestration' },
-  { id: 'prometheus-integration', name: 'Prometheus/Grafana', category: 'Integration', icon: BarChart, description: 'Metrics collection and visualization' },
-  { id: 'energy-api', name: 'Energy Grid API', category: 'Integration', icon: Activity, description: 'Real-time carbon intensity and pricing' },
-];
+function normalizeName(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function isManagedEntry(entry: ManagedCapabilityEntry): boolean {
+  return entry.connection_class === 'MANAGED_SHARED' || entry.connection_class === 'MANAGED_USER';
+}
 
 export function Step3Tools() {
-  const { builderId, tools, apiConnectors, setTools, addApiConnector, removeApiConnector, isLoading } = useWizardBuilderStore();
+  const { tools, setTools, isLoading } = useWizardBuilderStore();
   const { currentBlueprint } = useBlueprintStore();
-  const [hasInitialized, setHasInitialized] = useState(false);
-  
-  const [apiForm, setApiForm] = useState({
-    name: '',
-    endpoint: '',
-    method: 'GET',
-    authType: 'Bearer Token',
-    headers: ''
-  });
-  const [isAddingApi, setIsAddingApi] = useState(false);
+  const definitionsQuery = useConnectorDefinitions();
+  const managedQuery = useManagedConnectorCapabilities();
+  const [initialized, setInitialized] = useState(false);
+
+  const definitions = definitionsQuery.data ?? [];
+  const definitionsById = useMemo(() => new Map(definitions.map((definition) => [definition.id, definition])), [definitions]);
+  const managedEntries = useMemo(() => (managedQuery.data?.entries ?? []).filter(isManagedEntry), [managedQuery.data?.entries]);
+  const recommendedNames = currentBlueprint?.tools?.preselectedIntegrations ?? currentBlueprint?.tools?.recommendedIntegrations ?? [];
+
+  const recommendedTools = useMemo(() => {
+    const resolved: BuilderTool[] = [];
+    for (const requestedName of recommendedNames) {
+      const normalized = normalizeName(requestedName);
+      const managed = managedEntries.find((entry) => {
+        const definition = definitionsById.get(entry.connector_definition_id);
+        return Boolean(definition) && (normalizeName(definition!.name) === normalized || normalizeName(definition!.id) === normalized);
+      });
+      if (managed) {
+        const definition = definitionsById.get(managed.connector_definition_id);
+        if (definition) resolved.push(toManagedBuilderTool(managed, definition));
+        continue;
+      }
+      const native = AURA_NATIVE_CAPABILITIES.find((capability) => normalizeName(capability.name) === normalized || normalizeName(capability.id) === normalized);
+      if (native) resolved.push(toNativeBuilderTool(native));
+    }
+    return resolved;
+  }, [definitionsById, managedEntries, recommendedNames]);
 
   useEffect(() => {
-    if (hasInitialized || tools.length > 0) return;
-    
-    if (currentBlueprint?.tools?.preselectedIntegrations) {
-      const recommendedIds = currentBlueprint.tools.preselectedIntegrations
-        .map(name => name.toLowerCase().replace(/\s+/g, ''))
-        .filter(id => INTEGRATIONS.find(int => int.id === id));
-      
-      const initialTools: BuilderTool[] = recommendedIds.map(id => {
-        const integration = INTEGRATIONS.find(int => int.id === id)!;
-        return {
-          id,
-          type: 'integration' as const,
-          name: integration.name,
-          category: integration.category,
-          enabled: true,
-          connected: false,
-          config: {}
-        };
-      });
-      
-      if (initialTools.length > 0) {
-        setTools(initialTools).catch(console.error);
-      }
-    }
-    setHasInitialized(true);
-  }, [currentBlueprint, hasInitialized, tools.length, setTools]);
+    if (initialized || tools.length > 0) return;
+    if (recommendedTools.length > 0) void setTools(recommendedTools);
+    setInitialized(true);
+  }, [initialized, recommendedTools, setTools, tools.length]);
 
-  const toggleTool = async (toolId: string, toolList: typeof DATA_CENTRE_TOOLS | typeof INTEGRATIONS) => {
-    const tool = toolList.find(t => t.id === toolId);
-    if (!tool) return;
+  const selectedIds = useMemo(() => new Set(tools.map((tool) => tool.id)), [tools]);
 
-    const existingTool = tools.find(t => t.id === toolId);
-    
-    let updatedTools: BuilderTool[];
-    if (existingTool) {
-      updatedTools = tools.filter(t => t.id !== toolId);
-    } else {
-      updatedTools = [...tools, {
-        id: toolId,
-        type: 'integration' as const,
-        name: tool.name,
-        category: tool.category,
-        enabled: true,
-        connected: false,
-        config: {}
-      }];
-    }
-    
+  async function toggleTool(tool: BuilderTool) {
+    const selected = selectedIds.has(tool.id);
+    const next = selected ? tools.filter((existing) => existing.id !== tool.id) : [...tools, tool];
     try {
-      await setTools(updatedTools);
-      toast.success(existingTool ? `Disabled ${tool.name}` : `Enabled ${tool.name}`);
-    } catch (err) {
-      toast.error('Failed to update tool');
+      await setTools(next);
+      toast.success(selected ? `Removed ${tool.name}` : `Selected ${tool.name}`);
+    } catch {
+      toast.error('Could not update the selected capability');
     }
-  };
+  }
 
-  const handleAddApiConnector = async () => {
-    if (!apiForm.name || !apiForm.endpoint) {
-      toast.error('Please fill in API name and endpoint');
-      return;
-    }
-
-    setIsAddingApi(true);
-    try {
-      let headers: Record<string, string> = {};
-      if (apiForm.headers) {
-        try {
-          headers = JSON.parse(apiForm.headers);
-        } catch {
-          toast.error('Invalid JSON in headers field');
-          setIsAddingApi(false);
-          return;
-        }
-      }
-
-      await addApiConnector({
-        name: apiForm.name,
-        endpoint: apiForm.endpoint,
-        method: apiForm.method,
-        authType: apiForm.authType,
-        headers
-      });
-      
-      toast.success(`Added API connector: ${apiForm.name}`);
-      setApiForm({ name: '', endpoint: '', method: 'GET', authType: 'Bearer Token', headers: '' });
-    } catch (err) {
-      toast.error('Failed to add API connector');
-    } finally {
-      setIsAddingApi(false);
-    }
-  };
-
-  const handleRemoveApiConnector = async (id: string) => {
-    try {
-      await removeApiConnector(id);
-      toast.success('Removed API connector');
-    } catch (err) {
-      toast.error('Failed to remove API connector');
-    }
-  };
-
-  const connectedIntegrations = new Set(tools.filter(t => t.type === 'integration').map(t => t.id));
-  const enabledDCTools = tools.filter(t => DATA_CENTRE_TOOLS.some(dt => dt.id === t.id)).length;
-
-  const renderToolCard = (tool: typeof DATA_CENTRE_TOOLS[0], isEnabled: boolean) => {
-    const IconComponent = tool.icon;
-    return (
-      <div
-        key={tool.id}
-        className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-          isEnabled 
-            ? 'bg-primary/10 border-primary/30' 
-            : 'bg-muted/50 border-border hover:border-primary/20'
-        }`}
-      >
-        <div className="flex items-center gap-3">
-          <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-            isEnabled ? 'bg-primary text-primary-foreground' : 'bg-muted'
-          }`}>
-            <IconComponent className="h-4 w-4" />
-          </div>
-          <div>
-            <p className="font-medium text-sm">{tool.name}</p>
-            <p className="text-xs text-muted-foreground">{tool.description}</p>
-          </div>
-        </div>
-        <Button
-          variant={isEnabled ? "outline" : "default"}
-          size="sm"
-          onClick={() => toggleTool(tool.id, DATA_CENTRE_TOOLS)}
-          disabled={isLoading}
-          className={isEnabled ? 'border-primary/30' : ''}
-        >
-          {isEnabled ? 'Disable' : 'Enable'}
-        </Button>
-      </div>
-    );
-  };
+  const managedSelected = tools.filter((tool) => tool.config?.runtime === 'aura_managed').length;
+  const nativeSelected = tools.filter((tool) => tool.config?.runtime === 'aura_native').length;
+  const automationSelected = tools.filter((tool) => tool.config?.runtime === 'automation').length;
 
   return (
-    <div className="space-y-6 max-w-[920px] mx-auto">
+    <div className="mx-auto max-w-[920px] space-y-6">
       <DCSectionHeader
-        title="Tools & Integrations"
-        subtitle="Connect telemetry, models, and infrastructure systems"
+        title="Connections"
+        subtitle="Start with recommendations for this build, then browse the full approved capability catalogue if needed."
         icon={<Plug className="h-5 w-5" />}
       />
 
-      <Tabs defaultValue="datacentre" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="datacentre" className="flex items-center gap-2">
-            <Cpu className="h-4 w-4" />
-            <span className="hidden sm:inline">DC Tools</span>
-            {enabledDCTools > 0 && <Badge className="ml-1 bg-primary/20 text-primary">{enabledDCTools}</Badge>}
-          </TabsTrigger>
-          <TabsTrigger value="integrations" className="flex items-center gap-2">
-            <Link2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Apps</span>
-            {connectedIntegrations.size > 0 && <Badge variant="secondary" className="ml-1">{connectedIntegrations.size}</Badge>}
-          </TabsTrigger>
-          <TabsTrigger value="mcp" className="flex items-center gap-2">
-            <Plug className="h-4 w-4" />
-            <span className="hidden sm:inline">MCP</span>
-          </TabsTrigger>
-          <TabsTrigger value="api" className="flex items-center gap-2">
-            <Code className="h-4 w-4" />
-            <span className="hidden sm:inline">API</span>
-            {apiConnectors.length > 0 && <Badge variant="secondary" className="ml-1">{apiConnectors.length}</Badge>}
-          </TabsTrigger>
-        </TabsList>
+      <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+        Selecting a capability adds it to the design only. It does not mean the capability is authenticated, connected, healthy or moving data. Runtime truth remains evidence-derived in AURA Connections.
+      </div>
 
-        <TabsContent value="datacentre" className="space-y-4 mt-6">
-          {/* Telemetry Tools */}
-          <DCCard 
-            title="Telemetry Tools" 
-            subtitle="Real-time data collection from infrastructure"
-            icon={<Activity className="h-4 w-4 text-info" />}
-          >
-            <div className="space-y-3">
-              {DATA_CENTRE_TOOLS.filter(t => t.category === 'Telemetry').map((tool) => 
-                renderToolCard(tool, tools.some(t => t.id === tool.id))
-              )}
-            </div>
-          </DCCard>
+      <DCCard
+        title="Recommended for this build"
+        subtitle={recommendedTools.length > 0 ? 'Recommendations come from the current blueprint and remain subject to runtime eligibility.' : 'No blueprint-specific connection recommendations are available yet.'}
+        icon={<Sparkles className="h-4 w-4" />}
+      >
+        {recommendedTools.length > 0 ? (
+          <div className="space-y-3">
+            {recommendedTools.map((tool) => {
+              const managedEntry = managedEntries.find((entry) => entry.connector_definition_id === tool.id);
+              const native = AURA_NATIVE_CAPABILITIES.find((entry) => entry.id === tool.id);
+              const disabled = isLoading || Boolean(managedEntry && !managedEntry.runtime_selectable);
+              return (
+                <CapabilityRow
+                  key={tool.id}
+                  icon={managedEntry ? <CloudCog className="h-4 w-4" aria-hidden /> : <Cpu className="h-4 w-4" aria-hidden />}
+                  name={tool.name}
+                  description={native?.description ?? (managedEntry ? managedDescription(definitionsById.get(tool.id)!, managedEntry) : 'Recommended AURA capability.')}
+                  runtime={managedEntry ? CONNECTION_CLASS_LABEL[managedEntry.connection_class] : 'AURA Native'}
+                  availability={managedEntry ? ELIGIBILITY_LABEL[managedEntry.eligibility] : undefined}
+                  selected={selectedIds.has(tool.id)}
+                  disabled={disabled}
+                  onToggle={() => void toggleTool(tool)}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <div className="rounded-md border border-border bg-muted/20 p-4 text-sm text-muted-foreground">
+            Continue with the approved capability catalogue below. AURA will not invent recommendations when the blueprint has none.
+          </div>
+        )}
+      </DCCard>
 
-          {/* Model Tools */}
-          <DCCard 
-            title="Analytics Models" 
-            subtitle="PUE, thermal prediction, and financial analysis"
-            icon={<Calculator className="h-4 w-4 text-success" />}
-          >
-            <div className="space-y-3">
-              {DATA_CENTRE_TOOLS.filter(t => t.category === 'Model').map((tool) => 
-                renderToolCard(tool, tools.some(t => t.id === tool.id))
-              )}
-            </div>
-          </DCCard>
+      <details className="group rounded-lg border border-border bg-muted/20" open={recommendedTools.length === 0}>
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-4">
+          <div>
+            <p className="text-sm font-semibold">Browse all approved capabilities</p>
+            <p className="mt-1 text-xs text-muted-foreground">Physical & OT, managed, automation and administrator-approved custom capabilities.</p>
+          </div>
+          <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden />
+        </summary>
 
-          {/* Compliance Tools */}
-          <DCCard 
-            title="Compliance & Governance" 
-            subtitle="Sovereignty validation and audit logging"
-            icon={<Shield className="h-4 w-4 text-info" />}
-          >
-            <div className="space-y-3">
-              {DATA_CENTRE_TOOLS.filter(t => t.category === 'Compliance').map((tool) => 
-                renderToolCard(tool, tools.some(t => t.id === tool.id))
-              )}
-            </div>
-          </DCCard>
+        <div className="border-t border-border p-4">
+          <Tabs defaultValue="native" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="native" className="gap-2">
+                <Cpu className="h-4 w-4" aria-hidden />
+                <span className="hidden sm:inline">Physical & OT</span>
+                {nativeSelected > 0 && <Badge variant="secondary">{nativeSelected}</Badge>}
+              </TabsTrigger>
+              <TabsTrigger value="managed" className="gap-2">
+                <CloudCog className="h-4 w-4" aria-hidden />
+                <span className="hidden sm:inline">Managed</span>
+                {managedSelected > 0 && <Badge variant="secondary">{managedSelected}</Badge>}
+              </TabsTrigger>
+              <TabsTrigger value="automation" className="gap-2">
+                <Workflow className="h-4 w-4" aria-hidden />
+                <span className="hidden sm:inline">Automation</span>
+                {automationSelected > 0 && <Badge variant="secondary">{automationSelected}</Badge>}
+              </TabsTrigger>
+              <TabsTrigger value="custom" className="gap-2">
+                <Shield className="h-4 w-4" aria-hidden />
+                <span className="hidden sm:inline">Custom</span>
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Integration Tools */}
-          <DCCard 
-            title="Infrastructure Integrations" 
-            subtitle="DCIM, orchestration, and monitoring platforms"
-            icon={<Database className="h-4 w-4 text-warning" />}
-          >
-            <div className="space-y-3">
-              {DATA_CENTRE_TOOLS.filter(t => t.category === 'Integration').map((tool) => 
-                renderToolCard(tool, tools.some(t => t.id === tool.id))
-              )}
-            </div>
-          </DCCard>
-        </TabsContent>
-
-        <TabsContent value="integrations" className="space-y-4 mt-6">
-          <DCCard title="Business Applications" icon={<Link2 className="h-4 w-4" />}>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {INTEGRATIONS.map((integration) => {
-                const isConnected = connectedIntegrations.has(integration.id);
-                return (
-                  <div
-                    key={integration.id}
-                    className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
-                      isConnected ? 'bg-primary/10 border-primary/30' : 'bg-muted/50 border-border'
-                    }`}
-                  >
-                    <div>
-                      <p className="font-medium text-sm">{integration.name}</p>
-                      <p className="text-xs text-muted-foreground">{integration.category}</p>
-                    </div>
-                    <Button
-                      variant={isConnected ? "outline" : "default"}
-                      size="sm"
-                      onClick={() => toggleTool(integration.id, INTEGRATIONS)}
-                      disabled={isLoading}
-                    >
-                      {isConnected ? <Check className="h-4 w-4" /> : 'Connect'}
-                    </Button>
+            <TabsContent value="native" className="mt-6 space-y-6">
+              {(['Facility & OT', 'Physical AI', 'Observability', 'Twin & Storage'] as const).map((category) => (
+                <DCCard key={category} title={category} subtitle={nativeCategorySubtitle(category)} icon={<Cpu className="h-4 w-4" />}>
+                  <div className="space-y-3">
+                    {AURA_NATIVE_CAPABILITIES.filter((capability) => capability.category === category).map((capability) => {
+                      const selected = selectedIds.has(capability.id);
+                      const Icon = capability.icon;
+                      return (
+                        <CapabilityRow key={capability.id} icon={<Icon className="h-4 w-4" aria-hidden />} name={capability.name} description={capability.description} runtime="AURA Native" selected={selected} disabled={isLoading} onToggle={() => void toggleTool(toNativeBuilderTool(capability))} />
+                      );
+                    })}
                   </div>
-                );
-              })}
-            </div>
-          </DCCard>
-        </TabsContent>
+                </DCCard>
+              ))}
+            </TabsContent>
 
-        <TabsContent value="mcp" className="mt-6">
-          <DCCard title="MCP Servers" subtitle="Model Context Protocol servers for extended capabilities" icon={<Plug className="h-4 w-4" />}>
-            <ConnectStep systemId={builderId || ''} />
-          </DCCard>
-        </TabsContent>
+            <TabsContent value="managed" className="mt-6 space-y-4">
+              <DCCard title="AURA Managed Connectors" subtitle="Server-owned capability inventory. Connection and authorization state are not inferred in the browser." icon={<CloudCog className="h-4 w-4" />}>
+                {managedQuery.isLoading || definitionsQuery.isLoading ? (
+                  <p className="text-sm text-muted-foreground">Loading approved managed capabilities…</p>
+                ) : managedEntries.length > 0 ? (
+                  <div className="space-y-3">
+                    {managedEntries.map((entry) => {
+                      const definition = definitionsById.get(entry.connector_definition_id);
+                      if (!definition) return null;
+                      return (
+                        <CapabilityRow key={entry.connector_definition_id} icon={<CloudCog className="h-4 w-4" aria-hidden />} name={definition.name} description={managedDescription(definition, entry)} runtime={CONNECTION_CLASS_LABEL[entry.connection_class]} availability={ELIGIBILITY_LABEL[entry.eligibility]} selected={selectedIds.has(entry.connector_definition_id)} disabled={isLoading || !entry.runtime_selectable} onToggle={() => void toggleTool(toManagedBuilderTool(entry, definition))} />
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">No server-verified managed connector inventory is available for this session. Nothing is selectable until the project binding is verified.</p>
+                    {AURA_MANAGED_CAPABILITIES.filter((capability) => capability.category !== 'automation').map((capability) => (
+                      <CapabilityRow key={capability.id} icon={<CloudCog className="h-4 w-4" aria-hidden />} name={capability.name} description={capability.description} runtime={customerFacingRuntimeLabel(capability.runtime)} availability="Not verified" selected={false} disabled onToggle={() => undefined} />
+                    ))}
+                  </div>
+                )}
+              </DCCard>
+              <ControlPlaneLink />
+            </TabsContent>
 
-        <TabsContent value="api" className="space-y-4 mt-6">
-          <DCCard title="Custom API Connectors" icon={<Code className="h-4 w-4" />}>
-            <div className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>API Name</Label>
-                  <Input 
-                    placeholder="e.g., DCIM API" 
-                    value={apiForm.name}
-                    onChange={(e) => setApiForm(f => ({ ...f, name: e.target.value }))}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Endpoint URL</Label>
-                  <Input 
-                    placeholder="https://api.example.com/v1" 
-                    value={apiForm.endpoint}
-                    onChange={(e) => setApiForm(f => ({ ...f, endpoint: e.target.value }))}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Method</Label>
-                  <Select value={apiForm.method} onValueChange={(v) => setApiForm(f => ({ ...f, method: v }))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="GET">GET</SelectItem>
-                      <SelectItem value="POST">POST</SelectItem>
-                      <SelectItem value="PUT">PUT</SelectItem>
-                      <SelectItem value="DELETE">DELETE</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Auth Type</Label>
-                  <Select value={apiForm.authType} onValueChange={(v) => setApiForm(f => ({ ...f, authType: v }))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Bearer Token">Bearer Token</SelectItem>
-                      <SelectItem value="API Key">API Key</SelectItem>
-                      <SelectItem value="Basic Auth">Basic Auth</SelectItem>
-                      <SelectItem value="OAuth2">OAuth2</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <Button onClick={handleAddApiConnector} disabled={isAddingApi} className="w-full">
-                {isAddingApi ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Code className="h-4 w-4 mr-2" />}
-                Add API Connector
-              </Button>
-
-              {apiConnectors.length > 0 && (
-                <div className="space-y-2 pt-4 border-t border-border">
-                  <Label>Configured APIs</Label>
-                  {apiConnectors.map((api) => (
-                    <div key={api.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border">
-                      <div>
-                        <p className="font-medium text-sm">{api.name}</p>
-                        <p className="text-xs text-muted-foreground font-mono">{api.endpoint}</p>
-                      </div>
-                      <Button variant="ghost" size="sm" onClick={() => handleRemoveApiConnector(api.id)}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
+            <TabsContent value="automation" className="mt-6 space-y-4">
+              <DCCard title="AURA Automation" subtitle="Optional automation runtimes can execute approved workflows. Catalogue availability never implies a live runtime connection." icon={<Workflow className="h-4 w-4" />}>
+                <div className="space-y-3">
+                  {AURA_MANAGED_CAPABILITIES.filter((capability) => capability.category === 'automation').map((capability) => (
+                    <CapabilityRow key={capability.id} icon={<Workflow className="h-4 w-4" aria-hidden />} name={capability.name} description={capability.description} runtime={customerFacingRuntimeLabel(capability.runtime)} availability={availabilityLabel(capability)} selected={selectedIds.has(capability.id)} disabled={isLoading} onToggle={() => void toggleTool(toCatalogBuilderTool(capability))} />
                   ))}
                 </div>
-              )}
-            </div>
-          </DCCard>
-        </TabsContent>
-      </Tabs>
+              </DCCard>
+              <ControlPlaneLink />
+            </TabsContent>
+
+            <TabsContent value="custom" className="mt-6">
+              <DCCard title="Approved custom connectors" subtitle="Administrators provision endpoints, credentials, allowed hosts, methods, data contracts and audit policy outside the Builder." icon={<Shield className="h-4 w-4" />}>
+                <div className="rounded-lg border border-border bg-muted/30 p-5">
+                  <p className="text-sm font-medium">No raw endpoint or secret entry in Builder</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Builder users select approved connectors only. Administrators create and verify custom connectors through AURA Connections first.</p>
+                  <Button variant="outline" className="mt-4" asChild><Link to="/manage/integrations?tab=catalogue">Open Connections</Link></Button>
+                </div>
+              </DCCard>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </details>
     </div>
   );
+}
+
+function CapabilityRow({ icon, name, description, runtime, availability, selected, disabled, onToggle }: { icon: ReactNode; name: string; description: string; runtime: string; availability?: string; selected: boolean; disabled: boolean; onToggle: () => void }) {
+  return (
+    <div className={`flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center ${selected ? 'border-primary bg-primary/10' : 'border-border bg-muted/30'}`}>
+      <div className="flex min-w-0 flex-1 items-start gap-3">
+        <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-md bg-muted">{icon}</span>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-sm font-medium">{name}</p>
+            <Badge variant="outline" className="text-[10px]">{runtime}</Badge>
+            {availability && <Badge variant="secondary" className="text-[10px]">{availability}</Badge>}
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">{description}</p>
+        </div>
+      </div>
+      <Button type="button" size="sm" variant={selected ? 'outline' : 'default'} disabled={disabled} onClick={onToggle} className="sm:w-24">
+        {selected ? <><Check className="mr-1.5 h-4 w-4" aria-hidden />Selected</> : disabled ? 'Unavailable' : 'Select'}
+      </Button>
+    </div>
+  );
+}
+
+function ControlPlaneLink() {
+  return (
+    <div className="rounded-lg border border-border bg-muted/30 p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-medium">Need to authorize or verify a connection?</p>
+          <p className="text-xs text-muted-foreground">Use Connections for credentials, tenant scope, runtime health, data mappings and audit evidence.</p>
+        </div>
+        <Button variant="outline" asChild><Link to="/manage/integrations">Open Connections</Link></Button>
+      </div>
+    </div>
+  );
+}
+
+function toManagedBuilderTool(entry: ManagedCapabilityEntry, definition: ConnectorDefinition): BuilderTool {
+  return {
+    id: definition.id,
+    type: 'integration',
+    name: definition.name,
+    category: definition.category,
+    enabled: true,
+    connected: false,
+    config: {
+      runtime: 'aura_managed',
+      connectionClass: entry.connection_class,
+      eligibility: entry.eligibility,
+      linkedToProject: entry.linked_to_project,
+      runtimeSelectable: entry.runtime_selectable,
+    },
+  };
+}
+
+function toCatalogBuilderTool(capability: AuraManagedCapability): BuilderTool {
+  return {
+    id: capability.id,
+    type: 'integration',
+    name: capability.name,
+    category: capability.category,
+    enabled: true,
+    connected: false,
+    config: {
+      runtime: capability.runtime,
+      availability: capability.availability,
+      requiresUserAuthorization: Boolean(capability.requiresUserAuthorization),
+    },
+  };
+}
+
+function toNativeBuilderTool(capability: NativeCapability): BuilderTool {
+  return {
+    id: capability.id,
+    type: 'integration',
+    name: capability.name,
+    category: capability.category,
+    enabled: true,
+    connected: false,
+    config: { runtime: 'aura_native' },
+  };
+}
+
+function managedDescription(definition: ConnectorDefinition, entry: ManagedCapabilityEntry): string {
+  const classes = definition.supported_data_classes.slice(0, 3).join(', ');
+  const scope = entry.connection_class === 'MANAGED_USER' ? 'User-authorized managed capability.' : 'Shared AURA-managed capability.';
+  return classes ? `${scope} Approved data classes: ${classes}.` : scope;
+}
+
+function availabilityLabel(capability: AuraManagedCapability): string {
+  if (capability.availability === 'available') return 'Available';
+  if (capability.availability === 'requires_configuration') return 'Configuration required';
+  return 'Planned';
+}
+
+function nativeCategorySubtitle(category: NativeCapability['category']): string {
+  switch (category) {
+    case 'Facility & OT': return 'Industrial and facility sources remain AURA-native and evidence-controlled.';
+    case 'Physical AI': return 'Hardware, GPU and DSX integration boundaries controlled by AURA.';
+    case 'Observability': return 'Metrics and telemetry integrations for runtime evidence.';
+    case 'Twin & Storage': return 'Digital-twin assets and evidence-storage integration.';
+  }
 }

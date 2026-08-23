@@ -42,11 +42,10 @@ const CORS_HEADERS_EXTRA: Record<string, string> = {
     'authorization, x-client-info, apikey, content-type, x-request-id',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
-let CORS_HEADERS: Record<string, string> = { ...getCorsHeaders(null), ...CORS_HEADERS_EXTRA };
 void DEFAULT_FRESHNESS_BUDGET_MS;
 
 // ---------------------------------------------------------------------------
-// Sanitized response helpers. Public shape only.
+// Sanitized public error shape.
 // ---------------------------------------------------------------------------
 type PublicError =
   | 'unauthorized'
@@ -54,24 +53,6 @@ type PublicError =
   | 'payload_too_large'
   | 'method_not_allowed'
   | 'unavailable';
-
-function jsonResponse(
-  status: number,
-  body: Record<string, unknown>,
-): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
-  });
-}
-
-function errorResponse(
-  status: number,
-  error: PublicError,
-  requestId: string,
-): Response {
-  return jsonResponse(status, { ok: false, error, request_id: requestId });
-}
 
 // ---------------------------------------------------------------------------
 // JWKS validation. Public keys only. RS256 only. Custom `dsx_key_ref`
@@ -337,13 +318,28 @@ export function __resetTestAdapters(): void {
 // Main handler.
 // ---------------------------------------------------------------------------
 export async function handleRequest(req: Request): Promise<Response> {
-  CORS_HEADERS = { ...getCorsHeaders(req.headers.get('origin')), ...CORS_HEADERS_EXTRA };
+  // Edge isolates can interleave async requests. Keep origin-derived CORS state
+  // immutable and request-local so one request can never influence another.
+  const corsHeaders = { ...getCorsHeaders(req.headers.get('origin')), ...CORS_HEADERS_EXTRA };
+  const jsonResponse = (
+    status: number,
+    body: Record<string, unknown>,
+  ): Response => new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+  const errorResponse = (
+    status: number,
+    error: PublicError,
+    requestId: string,
+  ): Response => jsonResponse(status, { ok: false, error, request_id: requestId });
+
   const requestId =
     req.headers.get('x-request-id') ||
     (globalThis.crypto?.randomUUID?.() ?? String(Date.now()));
 
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: CORS_HEADERS });
+    return new Response('ok', { headers: corsHeaders });
   }
   if (req.method !== 'POST') {
     return errorResponse(405, 'method_not_allowed', requestId);

@@ -16,7 +16,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { UserAvatar } from '@/components/ui/user-avatar';
-import { Globe, HelpCircle, LogOut, User as UserIcon, Settings, Users } from 'lucide-react';
+import {
+  Building2,
+  Check,
+  Globe,
+  HelpCircle,
+  LogOut,
+  User as UserIcon,
+  Settings,
+  Users,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { useRBAC } from '@/contexts/RBACContext';
 import { fetchProfileFields } from '@/lib/auth/profileQuery';
@@ -34,7 +43,13 @@ interface ProfileData {
 
 export function UserMenu() {
   const navigate = useNavigate();
-  const { can } = useRBAC();
+  const {
+    can,
+    organizations,
+    activeOrganization,
+    switchingOrganization,
+    switchOrganization,
+  } = useRBAC();
   const { i18n } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -83,6 +98,15 @@ export function UserMenu() {
     }
   };
 
+  const handleOrganizationSwitch = async (orgId: string) => {
+    try {
+      await switchOrganization(orgId);
+    } catch (error) {
+      console.error('Failed to switch organization:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to switch organization');
+    }
+  };
+
   if (!user) return null;
 
   const userEmail = user.email || '';
@@ -103,15 +127,69 @@ export function UserMenu() {
           />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">Account</p>
-            <p className="text-xs leading-none text-muted-foreground truncate">
+            <p className="truncate text-xs leading-none text-muted-foreground">
               {userEmail}
             </p>
           </div>
         </DropdownMenuLabel>
+
+        {activeOrganization && (
+          <>
+            <DropdownMenuSeparator />
+            {organizations.length > 1 ? (
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger disabled={switchingOrganization}>
+                  <Building2 className="mr-2 h-4 w-4" aria-hidden="true" />
+                  <span className="min-w-0 flex-1 truncate">{activeOrganization.orgName}</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="w-64">
+                  <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">
+                    Switch organization
+                  </DropdownMenuLabel>
+                  {organizations.map((organization) => (
+                    <DropdownMenuItem
+                      key={organization.orgId}
+                      disabled={switchingOrganization}
+                      onSelect={(event) => {
+                        event.preventDefault();
+                        if (organization.orgId !== activeOrganization.orgId) {
+                          void handleOrganizationSwitch(organization.orgId);
+                        }
+                      }}
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm">{organization.orgName}</span>
+                        <span className="block truncate text-xs text-muted-foreground">
+                          {organization.role}{organization.domain ? ` · ${organization.domain}` : ''}
+                        </span>
+                      </span>
+                      {organization.orgId === activeOrganization.orgId && (
+                        <Check className="ml-2 h-4 w-4" aria-label="Current organization" />
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            ) : (
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex items-start gap-2">
+                  <Building2 className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{activeOrganization.orgName}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {activeOrganization.role}{activeOrganization.domain ? ` · ${activeOrganization.domain}` : ''}
+                    </p>
+                  </div>
+                </div>
+              </DropdownMenuLabel>
+            )}
+          </>
+        )}
+
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link to="/account/profile" className="cursor-pointer">

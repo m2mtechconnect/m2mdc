@@ -20,13 +20,27 @@ import type { BrowserContext, Page, Route } from '@playwright/test';
 
 
 // Supabase-js derives its default storage key from the configured URL's
-// first hostname segment. Keep the test session aligned with the app when
-// CI deliberately replaces the cloud URL with a loopback placeholder.
+// first hostname segment, so the seeded session must be written under the key
+// the APP uses — not the key the Playwright runner's own environment implies.
+//
+// The truth-in-UI webServer pins the app to `DEFAULT_TEST_SUPABASE_URL`. The
+// runner process, however, can inherit an ambient `VITE_SUPABASE_URL` pointing
+// at the cloud project; trusting it silently wrote the session under
+// `sb-<cloud-ref>-auth-token` while the app read `sb-127-auth-token`, so every
+// "authenticated" spec quietly ran anonymous. Only honour an explicit
+// `AURA_TRUTH_SUPABASE_URL`, or the ambient value when the suite is pointed at
+// an externally started server via `PLAYWRIGHT_BASE_URL`.
 export const SUPABASE_REF = 'psfvrskpnwcshvajzeix';
 const SUPABASE_HOST = `${SUPABASE_REF}.supabase.co`;
 const DEFAULT_TEST_SUPABASE_URL = 'http://127.0.0.1:54321';
+const AMBIENT_SUPABASE_URL = process.env.PLAYWRIGHT_BASE_URL?.trim()
+  ? process.env.VITE_SUPABASE_URL?.trim()
+  : undefined;
 const CONFIGURED_SUPABASE_URL =
-  process.env.VITE_SUPABASE_URL?.trim() || DEFAULT_TEST_SUPABASE_URL;
+  process.env.AURA_TRUTH_SUPABASE_URL?.trim() ||
+  AMBIENT_SUPABASE_URL ||
+  DEFAULT_TEST_SUPABASE_URL;
+
 const LOOPBACK_SUPABASE_ORIGINS = new Set([
   new URL(DEFAULT_TEST_SUPABASE_URL).origin,
   'http://localhost:54321',

@@ -38,6 +38,7 @@ interface Props {
   location: string;
   tier: string;
   calculatedAt: string;
+  hasRecordedRun: boolean;
   isFallback: boolean;
   simulationHref: string;
   blueprintHref: string;
@@ -62,6 +63,7 @@ export function FacilityHighlights({
   location,
   tier,
   calculatedAt,
+  hasRecordedRun,
   isFallback,
   simulationHref,
   blueprintHref,
@@ -99,7 +101,7 @@ export function FacilityHighlights({
               {location} · {tier} design
               {isFallback && ' · Reference model'}
               <span className="hidden sm:inline"> · Simulated design baseline · Synthetic inputs</span>
-              {' · '}Calculated {calculatedAt}
+              {hasRecordedRun ? ` · Calculated ${calculatedAt}` : ' · No simulation run recorded'}
             </p>
           </div>
         </div>

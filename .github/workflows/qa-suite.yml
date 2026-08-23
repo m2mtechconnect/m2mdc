@@ -101,7 +101,7 @@ jobs:
           version: 2.34.3
 
       - name: Start isolated local Supabase stack
-        run: supabase start -x studio,imgproxy,inbucket,logflare,vector,pgbouncer
+        run: supabase start -x studio,imgproxy,mailpit,logflare,vector,supavisor
 
       - name: Capture isolated backend credentials
         run: |
@@ -157,27 +157,42 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Serve local Edge Functions
-        env:
-          # Local-only exact origin for the Playwright dev server. Production
-          # CORS policy/code is not changed by this test harness configuration.
-          CORS_ALLOWED_ORIGINS: http://localhost:8080
         run: |
-          nohup supabase functions serve --no-verify-jwt=false > /tmp/qa-functions.log 2>&1 &
+          # Custom Edge Function variables must be loaded into the Edge Runtime
+          # explicitly. The runner shell environment is not the function isolate
+          # environment. This file is ephemeral and contains no production data.
+          cat > /tmp/qa-functions.env <<'EOF'
+          CORS_ALLOWED_ORIGINS=http://localhost:8080
+          ENVIRONMENT=test
+          EOF
+          chmod 600 /tmp/qa-functions.env
+
+          nohup supabase functions serve --no-verify-jwt=false --env-file /tmp/qa-functions.env > /tmp/qa-functions.log 2>&1 &
+
           ready=0
+          last_status="unavailable"
           for i in $(seq 1 60); do
-            if curl -sf -o /dev/null \
+            headers="/tmp/qa-preflight-${i}.headers"
+            clean_headers="/tmp/qa-preflight-${i}.clean.headers"
+            last_status="$(curl -sS -o /dev/null -D "$headers" -w '%{http_code}' \
               "$SUPABASE_URL/functions/v1/run-lifecycle" \
               -X OPTIONS \
               -H 'Origin: http://localhost:8080' \
               -H 'Access-Control-Request-Method: POST' \
-              -H 'Access-Control-Request-Headers: authorization, apikey, content-type, x-organization-id'; then
+              -H 'Access-Control-Request-Headers: authorization, apikey, content-type, x-organization-id' || true)"
+            tr -d '\r' < "$headers" > "$clean_headers" 2>/dev/null || true
+
+            if [ "$last_status" = "204" ] && \
+               grep -qi '^access-control-allow-origin: http://localhost:8080$' "$clean_headers"; then
               ready=1
               break
             fi
             sleep 2
           done
+
           if [ "$ready" -ne 1 ]; then
-            echo "Local Edge Functions did not become ready"
+            echo "Local Edge Functions did not satisfy the CORS readiness contract (last HTTP status: $last_status)"
+            test -f "$clean_headers" && cat "$clean_headers" || true
             tail -n 200 /tmp/qa-functions.log || true
             exit 1
           fi

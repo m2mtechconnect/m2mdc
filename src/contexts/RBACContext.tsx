@@ -35,12 +35,14 @@ export type RoleResolution =
 interface RBACContextType {
   role: AppRole | null;
   loading: boolean;
+  /** Legacy role-label gate. Deliberately evaluates platform grants only. */
   hasAccess: (requiredRoles: AppRole[]) => boolean;
   userId: string | null;
   isInternal: boolean;
   isPlatformOwner: boolean;
   resolution: RoleResolution;
   retry: () => void;
+  /** Active platform/global roles only. Tenant authority is organizationRole. */
   roles: AppRole[];
   permissions: Permission[];
   can: (permission: Permission) => boolean;
@@ -94,7 +96,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
   const [resolution, setResolution] = useState<RoleResolution>({ status: 'loading' });
   const [retryTick, setRetryTick] = useState(0);
   const [authorization, setAuthorization] = useState<ResolvedAuthorization>(EMPTY_AUTHORIZATION);
-  const [effectiveRoles, setEffectiveRoles] = useState<AppRole[]>([]);
+  const [platformRoles, setPlatformRoles] = useState<AppRole[]>([]);
   const [effectivePermissions, setEffectivePermissions] = useState<Set<Permission>>(new Set());
   const [organizations, setOrganizations] = useState<OrganizationMembershipSummary[]>([]);
   const [activeOrgId, setActiveOrgId] = useState<string | null>(null);
@@ -112,7 +114,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
 
     const resetAuthorization = () => {
       setAuthorization(EMPTY_AUTHORIZATION);
-      setEffectiveRoles([]);
+      setPlatformRoles([]);
       setEffectivePermissions(new Set());
       setOrganizations([]);
       setActiveOrgId(null);
@@ -231,11 +233,6 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
         const combinedPermissions = new Set<Permission>(platformAuthorization.permissions);
         tenantPermissions.forEach((permission) => combinedPermissions.add(permission));
 
-        const combinedRoles = Array.from(new Set<AppRole>([
-          ...platformAuthorization.roles,
-          ...(activeMembership ? [activeMembership.role as AppRole] : []),
-        ]));
-
         const platformOwner = platformAuthorization.grants.some(
           (grant) => grant.role === 'owner' && (grant.scope === null || grant.scope === 'global'),
         );
@@ -243,7 +240,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
         if (!cancelled) {
           setAuthorization(platformAuthorization);
           setEffectivePermissions(combinedPermissions);
-          setEffectiveRoles(combinedRoles);
+          setPlatformRoles(platformAuthorization.roles);
           setOrganizations(memberships);
           setActiveOrgId(activeMembership?.orgId ?? null);
           setOrganizationRole(activeMembership?.role ?? null);
@@ -324,8 +321,8 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
   const activeOrganization = organizations.find((organization) => organization.orgId === activeOrgId) ?? null;
 
   const hasAccess = (requiredRoles: AppRole[]) => {
-    if (effectiveRoles.length === 0) return false;
-    return requiredRoles.some((required) => effectiveRoles.includes(required));
+    if (platformRoles.length === 0) return false;
+    return requiredRoles.some((required) => platformRoles.includes(required));
   };
 
   const can = (permission: Permission) => effectivePermissions.has(permission);
@@ -341,7 +338,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
         isPlatformOwner,
         resolution,
         retry,
-        roles: effectiveRoles,
+        roles: platformRoles,
         permissions: Array.from(effectivePermissions),
         can,
         authorization,

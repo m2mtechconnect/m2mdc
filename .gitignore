@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Playwright authenticated storage state is generated per disposable test run.
+# It contains short-lived session material and must never be committed.
+playwright/.auth/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -145,9 +145,6 @@ BEGIN
   END IF;
 
   IF v_invite.expires_at <= now() THEN
-    UPDATE public.team_invites
-    SET status = 'expired'
-    WHERE id = v_invite.id;
     RAISE EXCEPTION 'invite expired';
   END IF;
 

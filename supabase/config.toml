@@ -77,6 +77,9 @@ verify_jwt = true
 [functions.organization-provision]
 verify_jwt = true
 
+[functions.organization-list]
+verify_jwt = true
+
 [functions.teams-invite]
 verify_jwt = true
 

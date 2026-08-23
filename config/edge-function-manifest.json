@@ -1,0 +1,65 @@
+{
+  "schema": "aura.edge-function-manifest.v1",
+  "policy": {
+    "enforcement": "changed-or-new-functions-must-be-registered",
+    "legacyUntouchedFunctions": "grandfathered-until-modified"
+  },
+  "functions": {
+    "dsx-ingest": {
+      "status": "active",
+      "authClass": "gateway_jwt",
+      "gatewayVerification": "custom_rs256_pinned",
+      "cors": "shared_request_local",
+      "tenantScope": "server_resolved_connection",
+      "serviceRole": {
+        "used": true,
+        "reason": "Resolve the gateway subject to exactly one active connection and invoke the canonical ingest RPC only after custom JWT verification."
+      },
+      "owner": "platform-security",
+      "replacement": null,
+      "retirementDate": null
+    },
+    "managed-user-oauth-complete": {
+      "status": "active",
+      "authClass": "user",
+      "gatewayVerification": "supabase_user_token_in_handler",
+      "cors": "shared_request_local",
+      "tenantScope": "server_resolved_user_tenant",
+      "serviceRole": {
+        "used": true,
+        "reason": "Persist encrypted managed-connector handles and tenant-scoped connection evidence after authenticating the caller."
+      },
+      "owner": "platform-integrations",
+      "replacement": null,
+      "retirementDate": null
+    },
+    "zapier-oauth-callback": {
+      "status": "active",
+      "authClass": "oauth_callback_state",
+      "gatewayVerification": "one_time_state_rpc",
+      "cors": "shared_request_local",
+      "tenantScope": "state_bound_user_and_system",
+      "serviceRole": {
+        "used": true,
+        "reason": "Atomically consume the one-time OAuth state and persist Vault token references for the state-bound user."
+      },
+      "owner": "platform-integrations",
+      "replacement": null,
+      "retirementDate": null
+    },
+    "run-lifecycle": {
+      "status": "active",
+      "authClass": "user",
+      "gatewayVerification": "supabase_jwt_plus_shared_handler",
+      "cors": "shared_handler",
+      "tenantScope": "caller_rls_facility_access",
+      "serviceRole": {
+        "used": true,
+        "reason": "Persist the trusted simulation lifecycle only after the caller proves facility access through an RLS-bound client."
+      },
+      "owner": "platform-runtime",
+      "replacement": null,
+      "retirementDate": null
+    }
+  }
+}

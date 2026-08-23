@@ -37,10 +37,10 @@ export default function PublicAppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<DataCentreTwinLanding />} />
-      <Route path="/auth" element={onboardingDone ? withPublicRouteFallback(<SignIn />) : <Navigate to="/onboarding" replace />} />
+      <Route path="/auth" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={withPublicRouteFallback(<SignIn />)} />
       <Route path="/auth/callback" element={withPublicRouteFallback(<AuthCallback />)} />
-      <Route path="/sign-in" element={onboardingDone ? withPublicRouteFallback(<SignIn />) : <Navigate to="/onboarding" replace />} />
+      <Route path="/sign-in" element={<Navigate to="/login" replace />} />
       <Route path="/sign-up" element={onboardingDone ? withPublicRouteFallback(<SignUp />) : <Navigate to="/onboarding" replace />} />
       <Route path="/sign-out" element={withPublicRouteFallback(<SignOut />)} />
       <Route path="/forgot-password" element={onboardingDone ? withPublicRouteFallback(<ForgotPassword />) : <Navigate to="/onboarding" replace />} />

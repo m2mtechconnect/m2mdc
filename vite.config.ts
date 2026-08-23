@@ -143,6 +143,11 @@ export default defineConfig(({ mode }) => {
             'vendor-query': ['@tanstack/react-query'],
             'vendor-supabase': ['@supabase/supabase-js'],
             'vendor-motion': ['framer-motion'],
+            // 3D runtime is only reachable from lazy authenticated twin
+            // routes. Grouping it explicitly keeps three/drei out of the
+            // per-route chunks that would otherwise duplicate it.
+            'vendor-3d': ['three', '@react-three/fiber', '@react-three/drei'],
+
           },
         },
       },

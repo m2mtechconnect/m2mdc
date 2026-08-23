@@ -23,6 +23,8 @@ jobs:
       PUBLIC_REPO_INTENTIONAL: ${{ vars.AURA_PUBLIC_REPOSITORY_INTENTIONAL }}
     steps:
       - name: Verify repository visibility decision
+        id: visibility
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -37,6 +39,8 @@ jobs:
           fi
 
       - name: Verify main is protected and required checks are enforced
+        id: main_protection
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -47,23 +51,28 @@ jobs:
           echo "main.protected=$protected"
           echo "required-status enforcement=$enforcement"
 
+          failed=0
           if [ "$protected" != "true" ]; then
             echo "RELEASE_GOVERNANCE_BLOCKED: main is not protected."
-            exit 1
+            failed=1
           fi
 
           if [ "$enforcement" = "off" ]; then
             echo "RELEASE_GOVERNANCE_BLOCKED: required-status enforcement is off."
-            exit 1
+            failed=1
           fi
 
           required_contexts="$(jq -r '.protection.required_status_checks.contexts[]? // empty' <<<"$branch_json")"
           if ! grep -Fxq "QA Summary" <<<"$required_contexts"; then
             echo "RELEASE_GOVERNANCE_BLOCKED: QA Summary is not an enforced required status context on main."
-            exit 1
+            failed=1
           fi
 
+          exit "$failed"
+
       - name: Verify production environment approval protection
+        id: production_environment
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -79,24 +88,40 @@ jobs:
           echo "production required reviewers=$reviewer_count"
           echo "deployment branch policy: protected_branches=$protected_branches custom_branch_policies=$custom_branch_policies"
 
+          failed=0
           if [ "$reviewer_count" -lt 1 ]; then
             echo "RELEASE_GOVERNANCE_BLOCKED: production environment has no required reviewers."
-            exit 1
+            failed=1
           fi
 
           if [ "$protected_branches" != "true" ] && [ "$custom_branch_policies" != "true" ]; then
             echo "RELEASE_GOVERNANCE_BLOCKED: production deployments are not restricted by a deployment branch policy."
+            failed=1
+          fi
+
+          exit "$failed"
+
+      - name: Summarize and enforce governance gate
+        if: always()
+        shell: bash
+        env:
+          VISIBILITY_OUTCOME: ${{ steps.visibility.outcome }}
+          MAIN_PROTECTION_OUTCOME: ${{ steps.main_protection.outcome }}
+          PRODUCTION_ENV_OUTCOME: ${{ steps.production_environment.outcome }}
+        run: |
+          set -euo pipefail
+          {
+            echo "### AURA release governance"
+            echo "- Repository visibility decision: $VISIBILITY_OUTCOME"
+            echo "- main protection + QA Summary requirement: $MAIN_PROTECTION_OUTCOME"
+            echo "- production environment reviewers/branch policy: $PRODUCTION_ENV_OUTCOME"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$VISIBILITY_OUTCOME" != "success" ] || \
+             [ "$MAIN_PROTECTION_OUTCOME" != "success" ] || \
+             [ "$PRODUCTION_ENV_OUTCOME" != "success" ]; then
+            echo "RELEASE_GOVERNANCE_BLOCKED: one or more native governance controls are not satisfied."
             exit 1
           fi
 
-      - name: Summarize governance gate
-        shell: bash
-        run: |
-          {
-            echo "### AURA release governance"
-            echo "- Repository visibility decision: verified"
-            echo "- main protection: enforced"
-            echo "- QA Summary required status: enforced"
-            echo "- production required reviewers: configured"
-            echo "- production deployment branch policy: configured"
-          } >> "$GITHUB_STEP_SUMMARY"
+          echo "AURA release governance prerequisites are satisfied."

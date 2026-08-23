@@ -157,11 +157,20 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Serve local Edge Functions
+        env:
+          # Local-only exact origin for the Playwright dev server. Production
+          # CORS policy/code is not changed by this test harness configuration.
+          CORS_ALLOWED_ORIGINS: http://localhost:8080
         run: |
           nohup supabase functions serve --no-verify-jwt=false > /tmp/qa-functions.log 2>&1 &
           ready=0
           for i in $(seq 1 60); do
-            if curl -sf -o /dev/null "$SUPABASE_URL/functions/v1/run-lifecycle" -X OPTIONS; then
+            if curl -sf -o /dev/null \
+              "$SUPABASE_URL/functions/v1/run-lifecycle" \
+              -X OPTIONS \
+              -H 'Origin: http://localhost:8080' \
+              -H 'Access-Control-Request-Method: POST' \
+              -H 'Access-Control-Request-Headers: authorization, apikey, content-type, x-organization-id'; then
               ready=1
               break
             fi

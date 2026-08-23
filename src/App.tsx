@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, useLocation } from 'react-router-dom';
+import { MotionConfig } from 'framer-motion';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider } from 'next-themes';
 import PublicAppRoutes, { publicRouteFallback } from './PublicAppRoutes';
@@ -76,9 +77,14 @@ function RouteEntry() {
 const App = () => (
   <ErrorBoundary>
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-      <BrowserRouter>
-        <RouteEntry />
-      </BrowserRouter>
+      {/* Honour the OS "reduce motion" setting for Framer Motion animations,
+          which run through the Web Animations API and are not covered by the
+          global prefers-reduced-motion CSS rule in index.css. */}
+      <MotionConfig reducedMotion="user">
+        <BrowserRouter>
+          <RouteEntry />
+        </BrowserRouter>
+      </MotionConfig>
     </ThemeProvider>
   </ErrorBoundary>
 );

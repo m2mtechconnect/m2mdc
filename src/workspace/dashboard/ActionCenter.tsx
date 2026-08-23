@@ -75,7 +75,7 @@ function ActionRow({
   return (
     <li
       data-testid={`action-item-${item.id}`}
-      className="v2-subpanel relative flex min-h-[72px] min-w-0 items-center gap-3 overflow-hidden py-2.5 pl-4 pr-3 transition-colors duration-150 hover:bg-[hsl(var(--v2-canvas-deep))]/70"
+      className="v2-subpanel relative flex min-h-[72px] min-w-0 items-center gap-3 overflow-hidden py-2.5 pl-4 pr-3 max-sm:gap-2 max-sm:pl-3 max-sm:pr-2 transition-colors duration-150 hover:bg-[hsl(var(--v2-canvas-deep))]/70"
     >
       <span className={cn('absolute inset-y-0 left-0 w-1', ui.accent)} aria-hidden />
       <span
@@ -85,7 +85,7 @@ function ActionRow({
         <ui.Icon className={cn('h-[18px] w-[18px]', ui.iconClass)} strokeWidth={1.75} />
       </span>
 
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1 pr-2">
         <h3 className="min-w-0 text-[15px] font-semibold leading-snug text-foreground">
           <button
             type="button"
@@ -98,14 +98,14 @@ function ActionRow({
           </button>
         </h3>
         <p className="line-clamp-1 text-[14px] leading-snug text-muted-foreground">{item.impact}</p>
-        <p className="v2-mono line-clamp-1 text-[13px] font-medium text-muted-foreground">
+        <p className="v2-mono hidden line-clamp-1 text-[13px] font-medium text-muted-foreground sm:block">
           {ui.label} · {item.subsystem} · {item.evidence}
         </p>
       </div>
 
       <div className="flex shrink-0 items-center gap-1.5">
         {primary && (
-          <Button asChild size="sm" className="h-9 text-[14px] font-semibold max-sm:h-11">
+          <Button asChild size="sm" className="hidden h-9 text-[14px] font-semibold sm:inline-flex">
             <Link to={primary.to}>{primary.label}</Link>
           </Button>
         )}
@@ -122,6 +122,11 @@ function ActionRow({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            {primary && (
+              <DropdownMenuItem className="sm:hidden" asChild>
+                <Link to={primary.to}>{primary.label}</Link>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onSelect={() => onOpen(item.id)}>View details</DropdownMenuItem>
             {rest.map((action) => (
               <DropdownMenuItem key={action.label} asChild>

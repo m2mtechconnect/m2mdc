@@ -361,7 +361,7 @@ export default function AISettings() {
             )}
           </Button>
           <Button onClick={handleHealthCheck} size="lg" variant="outline" disabled={isChecking}>
-            {isChecking ? <Loader className="h-4 w-4 animate-spin mr-2" /> : null}
+            {isChecking ? <Loader className="h-4 w-4 animate-spin mr-2" aria-hidden="true" /> : null}
             Run Health Check
           </Button>
         </div>

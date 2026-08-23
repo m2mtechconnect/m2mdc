@@ -99,6 +99,11 @@ jobs:
           supabase status -o env > /tmp/qa-supabase.env
           set -a; . /tmp/qa-supabase.env; set +a
 
+          test -n "$API_URL"
+          test -n "$ANON_KEY"
+          test -n "$SERVICE_ROLE_KEY"
+          test -n "$DB_URL"
+
           echo "::add-mask::$ANON_KEY"
           echo "::add-mask::$SERVICE_ROLE_KEY"
           {
@@ -152,15 +157,19 @@ jobs:
       - name: Serve local Edge Functions
         run: |
           nohup supabase functions serve --no-verify-jwt=false > /tmp/qa-functions.log 2>&1 &
+          ready=0
           for i in $(seq 1 60); do
             if curl -sf -o /dev/null "$SUPABASE_URL/functions/v1/run-lifecycle" -X OPTIONS; then
-              exit 0
+              ready=1
+              break
             fi
             sleep 2
           done
-          echo "Local Edge Functions did not become ready"
-          tail -n 200 /tmp/qa-functions.log || true
-          exit 1
+          if [ "$ready" -ne 1 ]; then
+            echo "Local Edge Functions did not become ready"
+            tail -n 200 /tmp/qa-functions.log || true
+            exit 1
+          fi
 
       - name: Install Playwright browser
         run: bunx playwright install --with-deps ${{ matrix.browser }}

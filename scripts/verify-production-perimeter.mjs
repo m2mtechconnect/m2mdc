@@ -323,6 +323,50 @@ if (existsSync(workflowDir)) {
   }
 }
 
+// 10. NEG-E — a production-allowlisted function must be gateway JWT-verified
+// (verify_jwt = true) unless it is explicitly classified signed-webhook.
+{
+  const cfgPath = join(REPO, 'supabase/config.toml');
+  if (existsSync(cfgPath)) {
+    const cfg = readFileSync(cfgPath, 'utf8');
+    for (const name of allowlist.production_functions || []) {
+      const block = cfg.match(
+        new RegExp(`\\[functions\\.${name}\\]([\\s\\S]*?)(?=\\n\\[|$)`),
+      );
+      const entry = invByName.get(name);
+      const isWebhook = entry?.production_disposition === 'signed-webhook';
+      if (block && /verify_jwt\s*=\s*false/.test(block[1]) && !isWebhook) {
+        fail(`allowlist/${name}: verify_jwt=false without signed-webhook classification`);
+      }
+    }
+  }
+}
+
+// 11. NEG-F — alias drift. Every ROUTE_ALIASES/PARAM_ALIASES source path in
+// src/config/routeAliases.ts must be classified redirect-only, so a
+// redirect-only surface cannot silently become a production route.
+{
+  const aliasPath = join(REPO, 'src/config/routeAliases.ts');
+  if (existsSync(aliasPath)) {
+    const aliasSrc = readFileSync(aliasPath, 'utf8');
+    const froms = [...aliasSrc.matchAll(/from:\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
+    const redirectOnly = new Set(allowlist.redirect_only_routes || []);
+    const prodRoutes = new Set(allowlist.production_routes || []);
+    const exceptions = new Set(allowlist.alias_production_exceptions || []);
+    for (const from of froms) {
+      if (exceptions.has(from)) continue;
+      if (!redirectOnly.has(from)) {
+        fail(`route alias "${from}" is not classified in redirect_only_routes`);
+      }
+      if (prodRoutes.has(from)) {
+        fail(`route alias "${from}" is also listed as a production route (must stay redirect-only)`);
+      }
+    }
+  }
+}
+
+
+
 if (failures.length) {
   console.error('PR-0.1 production-perimeter enforcement FAILED:');
   for (const f of failures) console.error('  - ' + f);

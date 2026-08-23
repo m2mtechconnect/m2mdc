@@ -18,6 +18,7 @@ import {
   FileSearch,
   Info,
   Play,
+  Plus,
   TriangleAlert,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -116,6 +117,12 @@ export function FacilityHighlights({
               Start simulation
             </Link>
           </Button>
+          <Button asChild variant="outline" className="hidden h-[38px] text-[14px] font-normal min-[1280px]:inline-flex">
+            <Link to="/manage/facilities?create=true" data-testid="command-create-facility">
+              <Plus className="mr-2 h-4 w-4" strokeWidth={1.75} aria-hidden />
+              New facility
+            </Link>
+          </Button>
           <Button asChild variant="outline" className="hidden h-[38px] text-[14px] font-normal sm:inline-flex">
             <Link to={blueprintHref}>
               <Boxes className="mr-2 h-4 w-4" strokeWidth={1.75} aria-hidden />
@@ -140,6 +147,9 @@ export function FacilityHighlights({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild className="min-[1280px]:hidden">
+                <Link to="/manage/facilities?create=true">New facility</Link>
+              </DropdownMenuItem>
               <DropdownMenuItem asChild className="sm:hidden">
                 <Link to={blueprintHref}>Open Blueprint</Link>
               </DropdownMenuItem>
@@ -150,7 +160,7 @@ export function FacilityHighlights({
                 <Link to={`${blueprintHref}?tab=model`}>Inspect facility model</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/manage/integrations">Open Integrations</Link>
+                <Link to="/manage/integrations">Open Connections</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/simulation">Simulation workspace</Link>

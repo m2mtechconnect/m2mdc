@@ -130,7 +130,7 @@ export function StatusSnapshot({ rows, evidenceHref }: { rows: SnapshotRow[]; ev
 
       <div className={cn('flex-wrap gap-2 border-t border-border p-3', expanded && !compact ? 'flex' : 'hidden')}>
         <Button asChild variant="outline" size="sm" className="h-9 flex-1 text-[14px] max-sm:h-11">
-          <Link to="/manage/integrations">View Integrations</Link>
+          <Link to="/manage/integrations">View Connections</Link>
         </Button>
         <Button asChild variant="outline" size="sm" className="h-9 flex-1 text-[14px] max-sm:h-11">
           <Link to={evidenceHref}>

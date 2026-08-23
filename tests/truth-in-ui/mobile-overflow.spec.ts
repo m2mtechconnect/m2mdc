@@ -47,6 +47,23 @@ test.describe('mobile overflow', () => {
           const root = document.scrollingElement ?? document.documentElement;
           const viewportWidth = document.documentElement.clientWidth;
           const offenders: string[] = [];
+
+          /**
+           * Controls inside a deliberately pannable / scrollable region (the
+           * facility floor plan, a horizontally scrolling table) are reachable
+           * by panning, so their page-relative rect says nothing about mobile
+           * clipping. Only controls laid out in normal page flow count.
+           */
+          const insideClippingRegion = (el: Element): boolean => {
+            let parent = el.parentElement;
+            while (parent && parent !== document.body) {
+              const parentStyle = window.getComputedStyle(parent);
+              if (parentStyle.overflowX !== 'visible') return true;
+              parent = parent.parentElement;
+            }
+            return false;
+          };
+
           for (const el of Array.from(
             document.querySelectorAll('button, a, input, select, textarea, [role="button"]'),
           )) {
@@ -54,6 +71,7 @@ test.describe('mobile overflow', () => {
             if (rect.width === 0 && rect.height === 0) continue;
             const style = window.getComputedStyle(el);
             if (style.visibility === 'hidden' || style.display === 'none') continue;
+            if (insideClippingRegion(el)) continue;
             if (rect.right > viewportWidth + 1) {
               offenders.push(
                 `${el.tagName}:${el.getAttribute('data-testid') ?? (el.textContent ?? '').trim().slice(0, 40)}`,
@@ -62,6 +80,7 @@ test.describe('mobile overflow', () => {
           }
           return { scrollWidth: root.scrollWidth, clientWidth: root.clientWidth, offenders };
         });
+
 
         expect(
           result.scrollWidth,

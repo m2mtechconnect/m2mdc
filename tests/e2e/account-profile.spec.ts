@@ -1,8 +1,8 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures/authenticatedTest';
 
 test.describe('Account Profile Page', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to app and wait for auth
+    // The protected fixture verifies the pre-provisioned session before this suite.
     await page.goto('/');
     await page.waitForTimeout(1000);
   });

@@ -15,6 +15,25 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CommandHeader, OperationalTable, Panel, StateView } from '@/components/v2';
+import {
+  AURA_DEPLOYMENT_OFFERINGS,
+  deploymentOffering,
+  type DeploymentCapabilityStatus,
+} from '@/deployment/deploymentProfiles';
+
+interface CustomerDeploymentProfile {
+  type: string;
+  capabilityStatus: DeploymentCapabilityStatus;
+  lifecycleStatus: string;
+  automationStatus: string;
+  hostingProvider: string;
+  preferredRegion: string | null;
+  controlPlaneLocation: string;
+  dataPlaneLocation: string;
+  customerManaged: boolean;
+  edgeRequired: boolean;
+  dataResidency: string | null;
+}
 
 interface CustomerOrganization {
   id: string;
@@ -28,6 +47,7 @@ interface CustomerOrganization {
   facilityCount: number;
   twinCount: number;
   connectionCount: number;
+  deploymentProfile: CustomerDeploymentProfile | null;
   ownerInvite: {
     email: string | null;
     status: string | null;
@@ -53,6 +73,12 @@ function ownerState(organization: CustomerOrganization): { label: string; varian
   if (organization.memberCount > 0) return { label: 'Active', variant: 'default' };
   if (organization.ownerInvite?.status === 'pending') return { label: 'Awaiting owner', variant: 'secondary' };
   return { label: 'Provisioned', variant: 'outline' };
+}
+
+function capabilityVariant(status: DeploymentCapabilityStatus): 'default' | 'secondary' | 'outline' {
+  if (status === 'AVAILABLE') return 'default';
+  if (status === 'PARTIAL') return 'secondary';
+  return 'outline';
 }
 
 export default function Customers() {
@@ -164,6 +190,26 @@ export default function Customers() {
           </div>
         </Panel>
 
+        <Panel>
+          <div className="mb-3">
+            <div className="v2-label">Deployment models</div>
+            <p className="text-sm text-muted-foreground">
+              Availability reflects verified runtime capability, not whether a configuration option exists in the UI.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+            {AURA_DEPLOYMENT_OFFERINGS.map((offering) => (
+              <div key={offering.type} className="v2-subpanel min-w-0 p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="text-sm font-medium text-foreground">{offering.shortLabel}</div>
+                  <Badge variant={capabilityVariant(offering.capabilityStatus)}>{offering.capabilityStatus}</Badge>
+                </div>
+                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{offering.truthNote}</p>
+              </div>
+            ))}
+          </div>
+        </Panel>
+
         {loading ? (
           <StateView kind="loading" title="Loading customers" description="Reading the platform customer inventory." />
         ) : error ? (
@@ -186,6 +232,7 @@ export default function Customers() {
               <tr>
                 <th>Customer</th>
                 <th>Status</th>
+                <th>Deployment</th>
                 <th>Members</th>
                 <th>Facilities</th>
                 <th>Twins</th>
@@ -196,6 +243,8 @@ export default function Customers() {
             <tbody>
               {organizations.map((organization) => {
                 const state = ownerState(organization);
+                const offering = deploymentOffering(organization.deploymentProfile?.type);
+                const capability = organization.deploymentProfile?.capabilityStatus ?? offering.capabilityStatus;
                 return (
                   <tr key={organization.id}>
                     <td>
@@ -210,6 +259,15 @@ export default function Customers() {
                       </div>
                     </td>
                     <td><Badge variant={state.variant}>{state.label}</Badge></td>
+                    <td>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-medium text-foreground">{offering.shortLabel}</span>
+                        <Badge variant={capabilityVariant(capability)}>{capability}</Badge>
+                      </div>
+                      <div className="mt-1 text-xs text-muted-foreground">
+                        {organization.deploymentProfile?.preferredRegion ?? 'M2M-managed current region'} · {organization.deploymentProfile?.lifecycleStatus ?? 'ACTIVE'}
+                      </div>
+                    </td>
                     <td data-numeric="">{organization.memberCount}</td>
                     <td data-numeric="">{organization.facilityCount}</td>
                     <td data-numeric="">{organization.twinCount}</td>
@@ -235,7 +293,7 @@ export default function Customers() {
           <DialogHeader>
             <DialogTitle>Add customer</DialogTitle>
             <DialogDescription>
-              Creates an isolated organization and a seven-day owner invitation. Infrastructure deployment is configured separately.
+              Creates an isolated organization and a seven-day owner invitation. New organizations start on the current AURA Cloud Shared profile; dedicated/private/hybrid infrastructure is configured only after the corresponding runtime capability is qualified.
             </DialogDescription>
           </DialogHeader>
 

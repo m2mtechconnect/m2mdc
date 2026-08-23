@@ -29,13 +29,13 @@ test.describe('Auth & Security', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto(LOGIN_RETURN_TO_DASHBOARD);
-    await expect(page.getByLabel('Email Address')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByLabel('Email Address', { exact: true })).toBeVisible({ timeout: 10_000 });
   });
 
   test('should login with valid credentials and JWT contains sub', async ({ page }) => {
     const credentials = resolveTestUserCredentials();
-    await page.getByLabel('Email Address').fill(credentials.email);
-    await page.getByLabel('Password').fill(credentials.password);
+    await page.getByLabel('Email Address', { exact: true }).fill(credentials.email);
+    await page.getByLabel('Password', { exact: true }).fill(credentials.password);
     await page.getByRole('button', { name: /^sign in$/i }).click();
 
     // The explicit returnTo makes the expected post-login destination deterministic.
@@ -51,8 +51,8 @@ test.describe('Auth & Security', () => {
 
   test('should restore session on page refresh', async ({ page }) => {
     const credentials = resolveTestUserCredentials();
-    await page.getByLabel('Email Address').fill(credentials.email);
-    await page.getByLabel('Password').fill(credentials.password);
+    await page.getByLabel('Email Address', { exact: true }).fill(credentials.email);
+    await page.getByLabel('Password', { exact: true }).fill(credentials.password);
     await page.getByRole('button', { name: /^sign in$/i }).click();
     await expect(page).toHaveURL(/\/dashboard/i, { timeout: 10000 });
 
@@ -66,8 +66,8 @@ test.describe('Auth & Security', () => {
 
   test('should logout and clear session', async ({ page }) => {
     const credentials = resolveTestUserCredentials();
-    await page.getByLabel('Email Address').fill(credentials.email);
-    await page.getByLabel('Password').fill(credentials.password);
+    await page.getByLabel('Email Address', { exact: true }).fill(credentials.email);
+    await page.getByLabel('Password', { exact: true }).fill(credentials.password);
     await page.getByRole('button', { name: /^sign in$/i }).click();
     await expect(page).toHaveURL(/\/dashboard/i, { timeout: 10000 });
 
@@ -93,8 +93,8 @@ test.describe('Auth & Security', () => {
     // Check that no environment variables are leaked to window object
     const leakedKeys = await page.evaluate(() => {
       const sensitive = ['SUPABASE_SERVICE_KEY', 'SERVICE_ROLE_KEY', 'ANON_KEY'];
-      return sensitive.filter(key => 
-        (window as any)[key] || 
+      return sensitive.filter(key =>
+        (window as any)[key] ||
         (import.meta.env as any)[key]?.includes('service_role')
       );
     });
@@ -115,13 +115,13 @@ test.describe('Auth & Security', () => {
   });
 
   test('should handle failed login gracefully', async ({ page }) => {
-    await page.getByLabel('Email Address').fill(`invalid-${crypto.randomUUID()}@example.invalid`);
-    await page.getByLabel('Password').fill(crypto.randomUUID());
+    await page.getByLabel('Email Address', { exact: true }).fill(`invalid-${crypto.randomUUID()}@example.invalid`);
+    await page.getByLabel('Password', { exact: true }).fill(crypto.randomUUID());
     await page.getByRole('button', { name: /^sign in$/i }).click();
 
     // Should show error message
     await expect(page.getByText(/invalid|incorrect|error/i)).toBeVisible({ timeout: 5000 });
-    
+
     // Failed authentication must remain on the canonical login route.
     await expect(page).toHaveURL(/\/login(?:\?|$)/i);
   });

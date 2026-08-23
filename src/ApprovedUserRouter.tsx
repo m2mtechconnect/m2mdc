@@ -12,9 +12,9 @@ import { MANAGED_USER_RETURN_PATH } from '@/connections/managedUserBinding';
 
 /**
  * Approved-user routing is intentionally isolated from the anonymous landing
- * bundle. AuthenticatedShell remains a synchronous import inside this module:
- * route-level lazy pages can therefore resolve against a stable shell without
- * reintroducing the nested Suspense retry failure documented in App.tsx.
+ * bundle. Platform users and valid organization members share the normal AURA
+ * shell, while route-level platform guards still distinguish the two authority
+ * planes for administrative destinations.
  */
 function ApprovedUserRouterContent() {
   const { resolution } = useRBAC();
@@ -33,7 +33,7 @@ function ApprovedUserRouterContent() {
     );
   }
 
-  if (resolution.status === 'internal') {
+  if (resolution.status === 'internal' || resolution.status === 'tenant') {
     return (
       <Routes>
         <Route path="/pilot/*" element={<PilotShell />} />
@@ -45,7 +45,8 @@ function ApprovedUserRouterContent() {
     );
   }
 
-  // Restricted pilot / customer user - sealed inside /pilot/*.
+  // Users with neither a platform grant nor an active organization membership
+  // remain sealed inside the intentionally restricted pilot experience.
   return (
     <Routes>
       <Route path="/pilot/*" element={<PilotShell />} />

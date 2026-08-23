@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, useLocation } from 'react-router-dom';
+import { MotionConfig } from 'framer-motion';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider } from 'next-themes';
 import PublicAppRoutes, { publicRouteFallback } from './PublicAppRoutes';

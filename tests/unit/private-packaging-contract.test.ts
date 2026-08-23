@@ -68,7 +68,9 @@ describe('AURA Private packaging scaffold', () => {
     expect(deployment).toContain('name: aura-web');
     expect(deployment).toContain('readinessProbe:');
     expect(deployment).toContain('livenessProbe:');
-    expect(deployment).toContain('readOnlyRootFilesystem: true');
+    expect(values).toContain('readOnlyRootFilesystem: true');
+    expect(values).toContain('allowPrivilegeEscalation: false');
+    expect(values).toContain('runAsNonRoot: true');
     expect(deployment).toContain('image.repository is required');
     expect(deployment).toContain('image.tag is required');
     expect(service).toContain('kind: Service');

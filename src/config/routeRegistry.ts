@@ -23,7 +23,7 @@ export type RouteShell =
   | 'public'
   /** `src/App.tsx` / `src/ApprovedUserRouter.tsx`, rendered for a session. */
   | 'session'
-  /** `src/AuthenticatedShell.tsx`, internal (user_roles-backed) users only. */
+  /** `src/AuthenticatedShell.tsx`, for platform or active-tenant users. */
   | 'internal';
 
 /** What the mount renders. */
@@ -86,7 +86,7 @@ export const PUBLIC_ROUTES: RouteRecord[] = [
   // Mounted before and after authentication so invited users keep one URL.
   { path: '/invite/accept', shell: 'session', kind: 'canonical', note: 'Team invite acceptance.' },
   { path: '/pilot/*', shell: 'session', kind: 'canonical', note: 'Sealed pilot shell.' },
-  { path: '/*', shell: 'session', kind: 'canonical', note: 'Internal users fall through to AuthenticatedShell.' },
+  { path: '/*', shell: 'session', kind: 'canonical', note: 'Platform and tenant users fall through to AuthenticatedShell.' },
 ];
 
 /** Routes mounted by `src/AuthenticatedShell.tsx`. */
@@ -112,6 +112,13 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
     kind: 'canonical',
     guard: 'admin',
     note: 'Onboarding submissions; /admin/onboarding-submissions aliases here.',
+  },
+  {
+    path: '/admin/customers',
+    shell: 'internal',
+    kind: 'canonical',
+    guard: 'admin',
+    note: 'Platform-owner-only customer provisioning and inventory.',
   },
   { path: '/admin/asset-preview', shell: 'internal', kind: 'canonical', guard: 'admin' },
   { path: '/admin/asset-pipeline', shell: 'internal', kind: 'canonical', guard: 'admin' },

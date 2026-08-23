@@ -11,12 +11,14 @@ on:
       - 'supabase/migrations/**'
       - 'supabase/functions/**'
       - 'scripts/phase3/**'
+      - 'scripts/ci/**'
       - '.github/workflows/phase3-external-validation.yml'
   pull_request:
     paths:
       - 'supabase/migrations/**'
       - 'supabase/functions/**'
       - 'scripts/phase3/**'
+      - 'scripts/ci/**'
       - '.github/workflows/phase3-external-validation.yml'
   workflow_dispatch:
 
@@ -46,17 +48,12 @@ jobs:
           ref: ${{ env.AURA_SOURCE_SHA }}
           fetch-depth: 0
 
-      - name: Enforce immutable migration history
-        run: node scripts/phase3/check-migration-immutability.mjs
-
-      - name: Prepare ephemeral clean-replay overlays
-        env:
-          AURA_REPLAY_EPHEMERAL: '1'
-        run: node scripts/phase3/prepare-clean-replay.mjs --ephemeral
-
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Prepare immutable clean replay
+        run: bash scripts/ci/ephemeral-supabase.sh prepare
 
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
@@ -64,36 +61,16 @@ jobs:
           version: 2.34.3
 
       - name: Record tool versions
-        run: |
-          echo "AURA_VALIDATION_CLI_VERSION=$(supabase --version)" >> "$GITHUB_ENV"
-          echo "AURA_VALIDATION_SOURCE_SHA=$AURA_SOURCE_SHA" >> "$GITHUB_ENV"
-          psql --version || true
+        run: bash scripts/ci/ephemeral-supabase.sh record-versions
 
       - name: Start ephemeral Supabase stack
-        run: supabase start -x studio,imgproxy,inbucket,logflare,vector,pgbouncer
+        run: bash scripts/ci/ephemeral-supabase.sh start
 
       - name: Capture local credentials
-        run: |
-          supabase status -o env > /tmp/supabase.env
-          set -a; . /tmp/supabase.env; set +a
-          {
-            echo "AURA_VALIDATION_DB_URL=$DB_URL"
-            echo "AURA_VALIDATION_API_URL=$API_URL"
-          } >> "$GITHUB_ENV"
-          {
-            echo "AURA_VALIDATION_ANON_KEY=$ANON_KEY"
-            echo "AURA_VALIDATION_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
-          } >> "$GITHUB_ENV"
-          echo "::add-mask::$ANON_KEY"
-          echo "::add-mask::$SERVICE_ROLE_KEY"
+        run: bash scripts/ci/ephemeral-supabase.sh capture
 
       - name: Serve edge functions
-        run: |
-          nohup supabase functions serve --no-verify-jwt=false > /tmp/functions.log 2>&1 &
-          for i in $(seq 1 60); do
-            curl -sf -o /dev/null "$AURA_VALIDATION_API_URL/functions/v1/run-lifecycle" -X OPTIONS && break
-            sleep 2
-          done
+        run: bash scripts/ci/ephemeral-supabase.sh serve-functions
 
       - name: Run Phase 3 external validation
         run: |
@@ -103,7 +80,7 @@ jobs:
 
       - name: Edge function logs
         if: always()
-        run: tail -n 200 /tmp/functions.log || true
+        run: bash scripts/ci/ephemeral-supabase.sh function-logs
 
       - name: Upload validation evidence
         if: always()
@@ -115,4 +92,4 @@ jobs:
 
       - name: Stop stack
         if: always()
-        run: supabase stop --no-backup || true
+        run: bash scripts/ci/ephemeral-supabase.sh stop

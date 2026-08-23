@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { SkipToContent, MAIN_CONTENT_ID } from '@/components/a11y/SkipToContent';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -96,6 +97,7 @@ export function Layout({ children }: LayoutProps) {
       data-testid="app-shell"
       style={assistantReflow ? { paddingRight: assistantWidth } : undefined}
     >
+      <SkipToContent />
       <GlobalSearchBar />
 
       <header
@@ -389,6 +391,7 @@ export function Layout({ children }: LayoutProps) {
       </Sheet>
 
       <main
+        id={MAIN_CONTENT_ID}
         data-testid="page-content"
         className={
           fullBleed

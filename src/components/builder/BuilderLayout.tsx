@@ -167,174 +167,186 @@ export function BuilderLayout({
 
   return (
     <BuilderModeProvider>
-      <div className="min-h-screen flex w-full min-w-0 max-w-full overflow-x-hidden bg-background">
-        {/* Desktop Sidebar */}
-        <aside className="hidden lg:flex w-[260px] border-r bg-muted/30 flex-col">
-          <div className="p-6 border-b">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold">Data Centre Twin</h2>
+      <div className="min-h-screen flex w-full min-w-0 max-w-full overflow-x-hidden v2-canvas" data-testid="builder-layout">
+        {/* Desktop step rail */}
+        <aside className="v2-rail hidden w-64 shrink-0 flex-col lg:flex">
+          <div className="border-b border-[hsl(var(--v2-line))] p-4">
+            <div className="mb-1.5 flex items-center justify-between gap-3">
+              <h2 className="v2-section-title">Data Centre Twin</h2>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/dashboard')}
-                className="h-8 px-2"
-                title="Back to Dashboard"
+                className="h-9 w-9 p-0"
+                aria-label="Back to Command Center"
+                title="Back to Command Center"
               >
-                <Home className="h-4 w-4" />
+                <Home className="h-4 w-4" aria-hidden />
               </Button>
             </div>
-            <p className="text-sm text-muted-foreground">Configure your data centre twin</p>
+            <p className="text-[13px] text-muted-foreground">Configure and deploy the twin in five guided steps.</p>
           </div>
 
-          {/* Mode Toggle - hidden from sidebar, available on mobile only */}
-
           {lastSaved && (
-            <div className="px-4 py-2 border-b">
+            <div className="border-b border-[hsl(var(--v2-line))] px-4 py-2.5">
               <LastUpdatedBadge timestamp={lastSaved} prefix="Saved" />
             </div>
           )}
 
-          <nav className="flex-1 p-4">
+          <nav className="flex-1 p-3" aria-label="Builder steps">
             <ul className="space-y-1">
-              {steps.map((step) => (
-                <li key={step.id}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={() => isStepAccessible(step.id) && setActiveStep(step.id)}
-                        disabled={!isStepAccessible(step.id)}
-                        className={cn(
-                          'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-left',
-                          isStepActive(step.id) && 'bg-primary text-primary-foreground font-medium',
-                          !isStepActive(step.id) && isStepComplete(step.id) && 'text-foreground hover:bg-muted',
-                          !isStepActive(step.id) && !isStepComplete(step.id) && 'text-muted-foreground',
-                          !isStepAccessible(step.id) && 'opacity-50 cursor-not-allowed'
-                        )}
-                      >
-                        <div
+              {steps.map((step) => {
+                const active = isStepActive(step.id);
+                const complete = isStepComplete(step.id);
+                const accessible = isStepAccessible(step.id);
+                return (
+                  <li key={step.id}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => accessible && setActiveStep(step.id)}
+                          disabled={!accessible}
+                          aria-current={active ? 'step' : undefined}
                           className={cn(
-                            'flex items-center justify-center w-6 h-6 rounded-full border-2 text-xs font-medium',
-                            isStepActive(step.id) && 'border-primary-foreground bg-primary-foreground text-primary',
-                            isStepComplete(step.id) && !isStepActive(step.id) && 'border-primary bg-primary text-primary-foreground',
-                            !isStepComplete(step.id) && !isStepActive(step.id) && 'border-muted-foreground'
+                            'flex min-h-11 w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm transition-colors',
+                            active && 'bg-[hsl(var(--v2-tech)/0.10)] font-semibold text-[hsl(var(--v2-tech-strong))]',
+                            !active && complete && 'text-foreground hover:bg-[hsl(var(--v2-canvas-deep)/0.75)]',
+                            !active && !complete && 'text-muted-foreground hover:bg-[hsl(var(--v2-canvas-deep)/0.55)]',
+                            !accessible && 'cursor-not-allowed opacity-45 hover:bg-transparent',
                           )}
                         >
-                          {isStepComplete(step.id) ? <Check className="w-3.5 h-3.5" /> : step.id}
-                        </div>
-                        <span>{step.title}</span>
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="max-w-[200px]">
-                      <p className="text-xs">{step.tooltip}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </li>
-              ))}
+                          <span
+                            className={cn(
+                              'v2-mono flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold',
+                              active && 'border-[hsl(var(--v2-tech-strong))] bg-[hsl(var(--v2-tech-strong))] text-primary-foreground',
+                              complete && !active && 'border-[hsl(var(--v2-verified))] bg-[hsl(var(--v2-verified)/0.10)] text-[hsl(var(--v2-verified))]',
+                              !complete && !active && 'border-[hsl(var(--v2-line-strong))] bg-[hsl(var(--v2-panel))] text-muted-foreground',
+                            )}
+                          >
+                            {complete ? <Check className="h-3.5 w-3.5" aria-hidden /> : step.id}
+                          </span>
+                          <span className="min-w-0 truncate">{step.title}</span>
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="max-w-xs">
+                        <p className="text-xs">{step.tooltip}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
         </aside>
 
-        {/* Mobile Top Stepper. Every flex boundary is explicitly shrinkable so
-            a 375px phone never expands the page to the stepper's min-content width. */}
-        <div className="lg:hidden fixed inset-x-0 top-0 max-w-full overflow-x-hidden bg-background border-b z-50">
-          <div className="flex min-w-0 max-w-full items-center gap-2 px-4 py-2">
+        {/* Mobile stepper */}
+        <div className="v2-appbar fixed inset-x-0 top-0 z-50 max-w-full overflow-x-hidden border-b lg:hidden">
+          <div className="flex min-w-0 max-w-full items-center gap-2 px-3 py-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate('/dashboard')}
-              className="h-8 px-2 flex-shrink-0"
-              title="Back to Dashboard"
+              className="h-11 w-11 shrink-0 p-0"
+              aria-label="Back to Command Center"
+              title="Back to Command Center"
             >
-              <Home className="h-4 w-4" />
+              <Home className="h-4 w-4" aria-hidden />
             </Button>
-            <div className="flex min-w-0 flex-1 items-center justify-between overflow-x-auto overscroll-x-contain">
-              {steps.map((step, idx) => (
-                <div key={step.id} className="flex shrink-0 items-center">
-                  <button
-                    onClick={() => isStepAccessible(step.id) && setActiveStep(step.id)}
-                    disabled={!isStepAccessible(step.id)}
-                    className={cn(
-                      'flex flex-col items-center gap-1',
-                      !isStepAccessible(step.id) && 'opacity-50 cursor-not-allowed'
-                    )}
-                  >
-                    <div
+            <div className="flex min-w-0 flex-1 items-center justify-between overflow-x-auto overscroll-x-contain py-0.5">
+              {steps.map((step, idx) => {
+                const active = isStepActive(step.id);
+                const complete = isStepComplete(step.id);
+                const accessible = isStepAccessible(step.id);
+                return (
+                  <div key={step.id} className="flex shrink-0 items-center">
+                    <button
+                      onClick={() => accessible && setActiveStep(step.id)}
+                      disabled={!accessible}
+                      aria-current={active ? 'step' : undefined}
+                      aria-label={`${step.title}${active ? ', current step' : complete ? ', completed' : ''}`}
                       className={cn(
-                        'w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-medium',
-                        isStepActive(step.id) && 'border-primary bg-primary text-primary-foreground',
-                        isStepComplete(step.id) && !isStepActive(step.id) && 'border-primary bg-primary text-primary-foreground',
-                        !isStepComplete(step.id) && !isStepActive(step.id) && 'border-muted-foreground'
+                        'flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-1.5',
+                        !accessible && 'cursor-not-allowed opacity-45',
                       )}
                     >
-                      {isStepComplete(step.id) ? <Check className="w-4 h-4" /> : step.id}
-                    </div>
-                    <span className="text-xs hidden sm:block">{step.shortTitle}</span>
-                  </button>
-                  {idx < steps.length - 1 && (
-                    <div className="w-4 h-0.5 bg-muted-foreground/30 mx-1" />
-                  )}
-                </div>
-              ))}
+                      <span
+                        className={cn(
+                          'v2-mono flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold',
+                          active && 'border-[hsl(var(--v2-tech-strong))] bg-[hsl(var(--v2-tech-strong))] text-primary-foreground',
+                          complete && !active && 'border-[hsl(var(--v2-verified))] bg-[hsl(var(--v2-verified)/0.10)] text-[hsl(var(--v2-verified))]',
+                          !complete && !active && 'border-[hsl(var(--v2-line-strong))] bg-[hsl(var(--v2-panel))] text-muted-foreground',
+                        )}
+                      >
+                        {complete ? <Check className="h-4 w-4" aria-hidden /> : step.id}
+                      </span>
+                      <span className="hidden text-xs sm:block">{step.shortTitle}</span>
+                    </button>
+                    {idx < steps.length - 1 && (
+                      <div className="mx-1 h-px w-4 bg-[hsl(var(--v2-line-strong))]" aria-hidden />
+                    )}
+                  </div>
+                );
+              })}
             </div>
-            <div className="ml-2 max-w-[40px] flex-shrink-0 sm:max-w-none">
+            <div className="ml-1 max-w-10 shrink-0 sm:max-w-none">
               <BuilderModeToggle />
             </div>
           </div>
         </div>
 
-        {/* Main Content */}
-        <main className="flex-1 min-w-0 max-w-full flex flex-col overflow-x-hidden">
+        {/* Main task surface */}
+        <main className="flex min-w-0 max-w-full flex-1 flex-col overflow-x-hidden">
           <div className="flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden pt-16 lg:pt-0">
-            <div className="w-full min-w-0 max-w-[880px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="mx-auto w-full min-w-0 max-w-4xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
               {children}
             </div>
           </div>
 
-          {/* Sticky Bottom Navigation */}
-          <div className="sticky bottom-0 left-0 right-0 max-w-full overflow-x-hidden border-t bg-background p-4">
-            <div className="w-full min-w-0 max-w-[880px] mx-auto flex items-center justify-between gap-4">
+          {/* One enterprise task footer; DC deploy step owns its own deploy action. */}
+          <div className="sticky bottom-0 left-0 right-0 max-w-full overflow-x-hidden border-t border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-panel))] p-3 sm:p-4">
+            <div className="mx-auto flex w-full min-w-0 max-w-4xl items-center justify-between gap-3 sm:gap-4">
               <Button
                 variant="outline"
                 onClick={onBack}
                 disabled={activeStep === 1}
-                className="min-w-[100px]"
+                className="min-h-10 min-w-24"
               >
                 Back
               </Button>
 
-              <div className="min-w-0 flex-1 text-center text-sm text-muted-foreground">
+              <div className="v2-mono min-w-0 flex-1 text-center text-xs text-muted-foreground">
                 Step {activeStep} of {steps.length}
               </div>
 
               {isDeployStep && fromScanner ? (
-                <div className="min-w-[100px]" aria-hidden="true" />
+                <div className="min-w-24" aria-hidden="true" />
               ) : isDeployStep && onDeploy ? (
                 <Button
                   onClick={handleDeployClick}
                   disabled={effectiveNextDisabled || deployState !== DeployState.idle}
-                  className="min-w-[100px] gap-2"
+                  className="min-h-10 min-w-24 gap-2"
                 >
                   {deployState === DeployState.idle && (
                     <>
-                      <Rocket className="w-4 h-4" />
+                      <Rocket className="h-4 w-4" aria-hidden />
                       {nextLabel}
                     </>
                   )}
                   {(deployState === DeployState.morphing || deployState === DeployState.deploying) && (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Deploying...
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                      Deploying…
                     </>
                   )}
                   {deployState === DeployState.success && (
                     <>
-                      <CheckCircle2 className="w-4 h-4" />
-                      Deployed!
+                      <CheckCircle2 className="h-4 w-4" aria-hidden />
+                      Deployed
                     </>
                   )}
                   {deployState === DeployState.error && (
                     <>
-                      <AlertCircle className="w-4 h-4" />
+                      <AlertCircle className="h-4 w-4" aria-hidden />
                       Add actions
                     </>
                   )}
@@ -343,7 +355,7 @@ export function BuilderLayout({
                 <Button
                   onClick={onNext}
                   disabled={effectiveNextDisabled}
-                  className="min-w-[100px]"
+                  className="min-h-10 min-w-24"
                 >
                   {nextLabel}
                 </Button>

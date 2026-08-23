@@ -175,9 +175,9 @@ jobs:
         run: bunx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run E2E tests
-        # Preserve committed assertions and browser coverage. Sharding bounds
-        # wall time; one worker avoids cross-test mutation races on shared state.
-        run: bunx playwright test --project=${{ matrix.browser }} --shard=${{ matrix.shard }}/2 --workers=1 --retries=1
+        # Preserve committed assertions, browser coverage, one-worker CI state
+        # isolation and the retry policy defined in playwright.config.ts.
+        run: bunx playwright test --project=${{ matrix.browser }} --shard=${{ matrix.shard }}/2 --workers=1
 
       - name: Upload test results
         if: always()

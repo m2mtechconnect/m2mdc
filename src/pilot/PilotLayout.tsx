@@ -42,6 +42,7 @@ export function PilotLayout() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <SkipToContent />
       <header
         className="border-b border-border bg-card"
         role="banner"

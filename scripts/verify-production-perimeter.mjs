@@ -237,8 +237,20 @@ if (existsSync(configPath)) {
   }
 }
 
-// 6. forbidden route patterns must not appear in App.tsx / main.tsx.
-const appSrc = existsSync(join(REPO, 'src/App.tsx')) ? readFileSync(join(REPO, 'src/App.tsx'), 'utf8') : '';
+// 6. forbidden route patterns must not appear in any shipped router file.
+//    src/App.tsx now declares a single route; the real route tables live in
+//    src/PublicAppRoutes.tsx and src/AuthenticatedShell.tsx, so all three are
+//    scanned.
+const ROUTER_FILES = [
+  'src/App.tsx',
+  'src/PublicAppRoutes.tsx',
+  'src/AuthenticatedShell.tsx',
+];
+const routerSources = ROUTER_FILES
+  .filter((rel) => existsSync(join(REPO, rel)))
+  .map((rel) => ({ rel, src: readFileSync(join(REPO, rel), 'utf8') }));
+const appSrc = routerSources.map((f) => f.src).join('\n');
+
 for (const pat of allowlist.forbidden_production_routes || []) {
   const literal = pat.replace('/*', '');
   // Match the literal followed by "/" (subroute) or the closing quote (exact),

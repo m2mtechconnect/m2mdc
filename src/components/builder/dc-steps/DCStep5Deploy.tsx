@@ -94,10 +94,12 @@ export function DCStep5Deploy() {
         setTimeout(() => {
           navigate(`/data-centre-twin?twinId=${twinId}`);
         }, 1000);
+      } else {
+        toast.error('The twin could not be saved. No deployment record was created. Please try again.');
       }
     } catch (error) {
       console.error('Deploy error:', error);
-      toast.error('Failed to deploy twin');
+      toast.error(error instanceof Error ? error.message : 'Failed to deploy twin');
     } finally {
       setIsDeploying(false);
     }

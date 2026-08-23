@@ -36,7 +36,8 @@
     "B7.5 perimeter reconciliation: the promotion gate previously required an import of _shared/authz.ts, a module that does not exist, so no function could ever be promoted. Rule 3 of scripts/verify-production-perimeter.mjs now requires a real in-code guard: either _shared/handler.ts createHandler with an explicit non-public authLevel, or _shared/callerIdentity.ts / _shared/adminAuthorization.ts together with the scoped _shared/cors.ts origin allowlist. This is strictly more verification than before, not less.",
     "B7.5 promotion basis: only edge functions actually invoked from src/ (46 of 170) were considered. The 20 promoted functions are the subset that both appear in that call graph and satisfy the guard requirement above. Everything else stays unknown-blocked under default-deny. Not promoted: public-intake (anonymous intake, outside the perimeter), dsx-ingest (verify_jwt=false, remains signed-webhook), green-dc-recommend and generate-ai-recommendations (disabled), and every function whose handler declares authLevel 'public'.",
     "B7.5 route classification: rules 6 and 8 previously scanned only src/App.tsx, which now declares a single route, leaving the shipped router unenforced. The scan now also covers src/PublicAppRoutes.tsx and src/AuthenticatedShell.tsx. The 23 routes surfaced by that change are classified production_blocked_routes; promoting them is deferred to a separate checkpoint, so promoting a function here does not implicitly open its calling route.",
-    "2026-08-23 post-publish hardening: promoted shipped authenticated product routes; aliases reconciled against src/config/routeAliases.ts; agent-stream promoted (createHandler authLevel:\"authenticated\" + shared CORS). Dev/debug/demo surfaces (/twin-debug, /digital-twins-demo/funding-intake, /admin/asset-*, /blueprint/preview, /simulation/preview) remain blocked."
+    "2026-08-23 post-publish hardening: promoted shipped authenticated product routes; aliases reconciled against src/config/routeAliases.ts; agent-stream promoted (createHandler authLevel:\"authenticated\" + shared CORS). Dev/debug/demo surfaces (/twin-debug, /digital-twins-demo/funding-intake, /admin/asset-*, /blueprint/preview, /simulation/preview) remain blocked.",
+    "alias_production_exceptions: \"/\" and \"/forgot-password\" are shipped public routes that additionally redirect authenticated sessions to /dashboard."
   ],
   "production_functions": [
     "agent-execute",
@@ -193,6 +194,7 @@
     "generate-ai-recommendations"
   ],
   "alias_production_exceptions": [
-    "/"
+    "/",
+    "/forgot-password"
   ]
 }

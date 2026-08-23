@@ -59,7 +59,8 @@ describe('edge function CORS source guard', () => {
   });
 
   it('covers every Edge Function entrypoint', () => {
-    expect(functionEntrypoints()).toHaveLength(163);
+    // Enterprise onboarding adds organization-provision + organization-list.
+    expect(functionEntrypoints()).toHaveLength(165);
   });
 
   it('keeps browserless webhooks denying every browser origin', () => {

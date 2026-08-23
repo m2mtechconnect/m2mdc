@@ -24,6 +24,7 @@ interface Props {
   rows: ConnectionRow[];
   loading: boolean;
   isAdmin: boolean;
+  testingConnectionId?: string | null;
   onOpen: (id: string) => void;
   onAdd: () => void;
   onTest: (id: string) => void;
@@ -31,7 +32,17 @@ interface Props {
   onCredential: (id: string) => void;
 }
 
-export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, onMap, onCredential }: Props) {
+export function ConnectionsTab({
+  rows,
+  loading,
+  isAdmin,
+  testingConnectionId = null,
+  onOpen,
+  onAdd,
+  onTest,
+  onMap,
+  onCredential,
+}: Props) {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('all');
 
@@ -54,6 +65,8 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
   );
 
   function Actions({ row }: { row: ConnectionRow }) {
+    const checkRunning = testingConnectionId !== null;
+    const thisCheckRunning = testingConnectionId === row.connection.id;
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -61,11 +74,17 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
             <MoreHorizontal className="h-4 w-4" aria-hidden />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuContent align="end" className="w-64">
           <DropdownMenuItem onSelect={() => onOpen(row.connection.id)}>Open details</DropdownMenuItem>
-          <DropdownMenuItem disabled={!isAdmin} onSelect={() => onTest(row.connection.id)}>Test connection</DropdownMenuItem>
-          <DropdownMenuItem disabled={!isAdmin} onSelect={() => onCredential(row.connection.id)}>Credential vault</DropdownMenuItem>
-          <DropdownMenuItem disabled={!isAdmin} onSelect={() => onMap(row.connection.id)}>Map data</DropdownMenuItem>
+          <DropdownMenuItem disabled={!isAdmin || checkRunning} onSelect={() => onTest(row.connection.id)}>
+            {thisCheckRunning ? 'Testing connection…' : !isAdmin ? 'Test connection · edit access required' : checkRunning ? 'Test connection · another check is running' : 'Test connection'}
+          </DropdownMenuItem>
+          <DropdownMenuItem disabled={!isAdmin} onSelect={() => onCredential(row.connection.id)}>
+            {isAdmin ? 'Credential vault' : 'Credential vault · edit access required'}
+          </DropdownMenuItem>
+          <DropdownMenuItem disabled={!isAdmin} onSelect={() => onMap(row.connection.id)}>
+            {isAdmin ? 'Map data' : 'Map data · edit access required'}
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     );
@@ -115,7 +134,11 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
                 : 'Clear the search or status filter to see all configured connections.'}
             </p>
             {rows.length === 0 && (
-              <Button className="h-10" disabled={!isAdmin} onClick={onAdd}>Add connection</Button>
+              isAdmin ? (
+                <Button className="h-10" onClick={onAdd}>Add connection</Button>
+              ) : (
+                <p className="text-sm text-muted-foreground">Ask a user with twin edit access to add or configure a connection.</p>
+              )
             )}
           </div>
         </Panel>

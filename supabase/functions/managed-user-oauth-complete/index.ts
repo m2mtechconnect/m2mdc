@@ -18,15 +18,19 @@ const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
-let CORS: Record<string, string> = { ...getCorsHeaders(null), ...CORS_EXTRA };
-
-function json(status: number, body: Record<string, unknown>) {
-  return new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
-}
 
 Deno.serve(async (req) => {
-  CORS = { ...getCorsHeaders(req.headers.get('origin')), ...CORS_EXTRA };
-  if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
+  // Request-derived state must never live in module globals: Edge isolates can
+  // interleave multiple async requests. Keep the selected origin immutable for
+  // the lifetime of this request and close all responses over that value.
+  const corsHeaders = { ...getCorsHeaders(req.headers.get('origin')), ...CORS_EXTRA };
+  const json = (status: number, body: Record<string, unknown>) =>
+    new Response(JSON.stringify(body), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
+  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
   const correlationId = crypto.randomUUID();
 
   const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);

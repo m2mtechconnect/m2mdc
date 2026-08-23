@@ -55,9 +55,9 @@ export default async function globalAuthSetup(config: FullConfig) {
     try {
       const page = await context.newPage();
       await page.goto(QA_LOGIN_ROUTE);
-      await expect(page.getByLabel('Email Address')).toBeVisible({ timeout: 10_000 });
-      await page.getByLabel('Email Address').fill(credentials.email);
-      await page.getByLabel('Password').fill(credentials.password);
+      await expect(page.getByLabel('Email Address', { exact: true })).toBeVisible({ timeout: 10_000 });
+      await page.getByLabel('Email Address', { exact: true }).fill(credentials.email);
+      await page.getByLabel('Password', { exact: true }).fill(credentials.password);
       await page.getByRole('button', { name: /^sign in$/i }).click();
 
       await page.waitForFunction(() => {

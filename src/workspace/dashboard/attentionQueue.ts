@@ -224,13 +224,13 @@ export function buildAttentionQueue(input: AttentionInputs): AttentionItem[] {
     id: 'telemetry',
     severity: 'informational',
     category: 'Integration blocked',
-    subsystem: 'Integrations',
+    subsystem: 'Connections',
     title: 'Live facility telemetry is not connected',
     impact: 'Every indicator is a modelled output and cannot be validated against the physical facility.',
     evidence: 'Capability registry reports the simulated operating mode.',
     observedAt: derivedAt,
     observedBasis: 'registry',
-    actions: [{ label: 'Open Integrations', to: '/manage/integrations' }],
+    actions: [{ label: 'Open Connections', to: '/manage/integrations' }],
   });
 
   return items.sort((a, b) => SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity));

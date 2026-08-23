@@ -139,8 +139,11 @@ BEGIN
     RAISE EXCEPTION 'organization membership required';
   END IF;
 
+  -- During the bridge period, keep the legacy org_id resolver aligned with
+  -- last_active_org_id. Phase 3 will move current_tenant_id() to active_org_id().
   UPDATE public.profiles
   SET last_active_org_id = _org_id,
+      org_id = _org_id,
       updated_at = now()
   WHERE user_id = auth.uid();
 

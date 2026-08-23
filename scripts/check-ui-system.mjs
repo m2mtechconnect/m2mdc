@@ -48,10 +48,8 @@ const metrics = {
   fixedWidth: count(/(?:min-)?w-\[[0-9]{3,}px\]/g),
 };
 
-// Exact UI-debt ceiling after UI Audit Phase 2 shared primitive migration.
-// These are ceilings, not targets: every remediation phase should lower one
-// or more values and ratchet the corresponding ceiling down. New UI debt must
-// never increase them.
+// UI debt ceilings ratcheted after Phase 4 Builder layout cleanup. These are
+// maximums, not targets: later phases must keep moving the values downward.
 const baselineCeilings = {
   microText9: 18,
   microText10: 253,
@@ -66,7 +64,7 @@ const baselineCeilings = {
   bounce: 8,
   uppercase: 172,
   hardcodedColor: 324,
-  fixedWidth: 99,
+  fixedWidth: 91,
 };
 
 const adoptionFloors = {

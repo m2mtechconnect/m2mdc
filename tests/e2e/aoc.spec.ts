@@ -1,8 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures/authenticatedTest';
 
 test.describe('Agent Operations Center E2E', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to AOC (assuming auth is handled via test setup)
+    // The protected fixture now establishes and validates auth explicitly.
+    // The placeholder agent data itself is tracked separately as fixture debt.
     await page.goto('/app/agents/test-agent-id/operations');
   });
 

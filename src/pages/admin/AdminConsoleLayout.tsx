@@ -1,13 +1,30 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronRight, Database, FileCheck2, Gauge, PackageCheck, Shield, Stethoscope } from 'lucide-react';
+import { Building2, ChevronRight, Database, FileCheck2, Gauge, PackageCheck, Shield, Stethoscope } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useRBAC } from '@/contexts/RBACContext';
+import type { Permission } from '@/auth/permissions';
 
 interface AdminConsoleLayoutProps {
   children: ReactNode;
 }
 
-const ADMIN_NAV = [
+interface AdminNavItem {
+  label: string;
+  href: string;
+  matches: readonly string[];
+  icon: typeof Gauge;
+  permission?: Permission;
+}
+
+const ADMIN_NAV: readonly AdminNavItem[] = [
+  {
+    label: 'Customers',
+    href: '/admin/customers',
+    matches: ['/admin/customers'],
+    icon: Building2,
+    permission: 'platform.manage_customers',
+  },
   {
     label: 'Platform readiness',
     href: '/admin/platform-readiness',
@@ -44,12 +61,14 @@ const ADMIN_NAV = [
     matches: ['/twin-debug'],
     icon: Stethoscope,
   },
-] as const;
+];
 
 /** Salesforce-style admin console; each child page retains the single page H1. */
 export default function AdminConsoleLayout({ children }: AdminConsoleLayoutProps) {
   const location = useLocation();
-  const current = ADMIN_NAV.find((item) =>
+  const { can } = useRBAC();
+  const visibleAdminNav = ADMIN_NAV.filter((item) => !item.permission || can(item.permission));
+  const current = visibleAdminNav.find((item) =>
     item.matches.some((match) => location.pathname === match || location.pathname.startsWith(`${match}/`)),
   );
 
@@ -72,7 +91,7 @@ export default function AdminConsoleLayout({ children }: AdminConsoleLayoutProps
       <div className="grid min-w-0 gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
         <aside className="min-w-0" aria-label="Platform administration sections">
           <nav className="flex max-w-full gap-1 overflow-x-auto lg:sticky lg:top-24 lg:flex-col lg:overflow-visible">
-            {ADMIN_NAV.map((item) => {
+            {visibleAdminNav.map((item) => {
               const active = item.matches.some(
                 (match) => location.pathname === match || location.pathname.startsWith(`${match}/`),
               );

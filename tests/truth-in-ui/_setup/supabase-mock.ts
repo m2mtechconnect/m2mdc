@@ -24,8 +24,29 @@ import type { BrowserContext, Page, Route } from '@playwright/test';
 export const SUPABASE_REF = 'psfvrskpnwcshvajzeix';
 const SUPABASE_HOST = `${SUPABASE_REF}.supabase.co`;
 const DEFAULT_TEST_SUPABASE_URL = 'http://127.0.0.1:54321';
+
+/**
+ * The Playwright node process does not load `.env` (only Vite does), so
+ * `process.env.VITE_SUPABASE_URL` is normally undefined here. Without the
+ * dotenv fallback the storage key was derived from the loopback default and
+ * the seeded session was written under a key the app never reads, silently
+ * downgrading every "authenticated" spec to an anonymous page.
+ */
+function supabaseUrlFromDotEnv(): string | undefined {
+  try {
+    const raw = readFileSync(resolvePath(process.cwd(), '.env'), 'utf8');
+    const match = raw.match(/^\s*VITE_SUPABASE_URL\s*=\s*["']?([^"'\s]+)["']?\s*$/m);
+    return match?.[1];
+  } catch {
+    return undefined;
+  }
+}
+
 const CONFIGURED_SUPABASE_URL =
-  process.env.VITE_SUPABASE_URL?.trim() || DEFAULT_TEST_SUPABASE_URL;
+  process.env.VITE_SUPABASE_URL?.trim() ||
+  supabaseUrlFromDotEnv() ||
+  DEFAULT_TEST_SUPABASE_URL;
+
 const LOOPBACK_SUPABASE_ORIGINS = new Set([
   new URL(DEFAULT_TEST_SUPABASE_URL).origin,
   'http://localhost:54321',

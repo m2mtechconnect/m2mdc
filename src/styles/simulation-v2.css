@@ -1,0 +1,167 @@
+/*
+ * AURA Simulation V2 presentation reset.
+ *
+ * Scope is intentionally anchored to the existing simulation data-tour markers
+ * so this layer cannot affect unrelated authenticated surfaces. Simulation
+ * behavior, timing and state transitions remain owned by DCSimulationTab.
+ */
+
+.aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) {
+  --simulation-panel-radius: calc(var(--radius) + 2px);
+}
+
+/* Calm command header: enterprise information first, status second. */
+.aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) > div:first-child {
+  align-items: center;
+  gap: 0.75rem 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid hsl(var(--v2-line));
+}
+
+.aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) > div:first-child .rounded-xl {
+  border-radius: var(--radius) !important;
+  background: hsl(var(--v2-tech) / 0.1) !important;
+}
+
+/* NVIDIA-style technical zone is reserved for the twin viewport only. */
+.aura-v2 [data-tour="simulation-3d-view"] {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid hsl(var(--v2-graphite-line)) !important;
+  border-radius: var(--simulation-panel-radius) !important;
+  background: hsl(var(--v2-graphite-deep)) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: border-color 150ms ease !important;
+}
+
+.aura-v2 [data-tour="simulation-3d-view"]:focus-within {
+  border-color: hsl(var(--v2-tech-on-dark) / 0.65) !important;
+}
+
+/* All surrounding operator controls remain calm enterprise surfaces. */
+.aura-v2 [data-tour="simulation-kpi-grid"],
+.aura-v2 [data-tour="simulation-run-controls"],
+.aura-v2 [data-tour="simulation-scenario-list"],
+.aura-v2 [data-tour="simulation-timeline"] {
+  border: 1px solid hsl(var(--v2-line)) !important;
+  border-radius: var(--simulation-panel-radius) !important;
+  background: hsl(var(--v2-panel)) !important;
+  box-shadow: var(--v2-shadow-panel) !important;
+  outline: none !important;
+  transition: border-color 150ms ease !important;
+}
+
+.aura-v2 [data-tour="simulation-kpi-grid"] > div:first-child,
+.aura-v2 [data-tour="simulation-run-controls"] > div:first-child,
+.aura-v2 [data-tour="simulation-scenario-list"] > div:first-child,
+.aura-v2 [data-tour="simulation-timeline"] > div:first-child {
+  background: hsl(var(--v2-canvas-deep) / 0.55);
+  border-bottom-color: hsl(var(--v2-line)) !important;
+}
+
+/* Motion communicates state changes, not decoration. */
+.aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) .animate-pulse,
+.aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) .animate-ping,
+.aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) .animate-shimmer,
+.aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) .animate-fade-in {
+  animation: none !important;
+}
+
+.aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) .blur-sm {
+  filter: none !important;
+  opacity: 0 !important;
+}
+
+.aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) [class*="shadow-success"],
+.aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) [class*="shadow-primary"],
+.aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) [class*="shadow-destructive"] {
+  box-shadow: none !important;
+}
+
+/* KPI tiles become quiet instruments rather than animated cards. */
+.aura-v2 [data-tour="simulation-kpi-grid"] [class*="grid-cols-3"] > div {
+  border-color: hsl(var(--v2-line)) !important;
+  border-radius: var(--radius) !important;
+  background: hsl(var(--v2-canvas-deep) / 0.35) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: background-color 150ms ease, border-color 150ms ease !important;
+}
+
+.aura-v2 [data-tour="simulation-kpi-grid"] [class*="grid-cols-3"] > div:has(.text-success) {
+  border-color: hsl(var(--v2-verified) / 0.34) !important;
+  background: hsl(var(--v2-verified) / 0.06) !important;
+}
+
+.aura-v2 [data-tour="simulation-kpi-grid"] [class*="grid-cols-3"] > div:has(.text-destructive) {
+  border-color: hsl(var(--v2-critical) / 0.34) !important;
+  background: hsl(var(--v2-critical) / 0.06) !important;
+}
+
+.aura-v2 [data-tour="simulation-kpi-grid"] [class*="grid-cols-3"] > div > p:nth-of-type(2) {
+  font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  transform: none !important;
+}
+
+/* Progress is a precise instrument: no shimmer or glow. */
+.aura-v2 [data-tour="simulation-run-controls"] .h-2.overflow-hidden {
+  background: hsl(var(--v2-canvas-deep)) !important;
+  border: 1px solid hsl(var(--v2-line));
+}
+
+.aura-v2 [data-tour="simulation-run-controls"] .h-2.overflow-hidden > div[style*="width"] {
+  background: hsl(var(--v2-tech-strong)) !important;
+  transition: width 200ms linear !important;
+}
+
+/* Scenario and event rows favor selection/state clarity over card decoration. */
+.aura-v2 [data-tour="simulation-scenario-list"] button,
+.aura-v2 [data-tour="simulation-timeline"] [class*="rounded-lg"] {
+  border-radius: var(--radius) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.aura-v2 [data-tour="simulation-scenario-list"] button:hover:not(:disabled) {
+  background: hsl(var(--v2-canvas-deep) / 0.65) !important;
+}
+
+.aura-v2 [data-tour="simulation-scenario-list"] button[class*="bg-primary"] {
+  border-color: hsl(var(--v2-tech-strong) / 0.45) !important;
+  background: hsl(var(--v2-tech) / 0.08) !important;
+}
+
+/* Enforce the visual type floor locally even before source literals are retired. */
+.aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) .text-\[9px\],
+.aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) .text-\[10px\],
+.aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) .text-\[11px\] {
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+}
+
+/* Desktop control rail stays bounded; tablet/mobile collapses naturally. */
+@media (min-width: 1024px) {
+  .aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) > div.grid {
+    gap: 1rem !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) > div:first-child {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .aura-v2 [data-tour="simulation-run-controls"] button {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aura-v2 div.space-y-6:has([data-tour="simulation-3d-view"]) * {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}

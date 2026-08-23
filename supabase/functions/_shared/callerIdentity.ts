@@ -1,9 +1,9 @@
-// NVIDIA operational-readiness Phase 2.
-// Every service-role endpoint that used to answer a wildcard origin with no
-// in-code identity check must call `requireCaller()` before it constructs a
-// service-role client. The gateway JWT check is defense in depth; this is the
-// in-code control that makes the caller provable inside the handler.
+// Compatibility wrapper around the canonical request-authentication boundary.
+// Keep the existing requireCaller()/requireCallerRole() API for handlers while
+// delegating bearer-token validation to _shared/auth.ts so authentication logic
+// has one implementation.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getAuthContext } from "./auth.ts";
 import { getCorsHeaders } from "./cors.ts";
 
 export interface CallerIdentity {
@@ -22,33 +22,52 @@ export class CallerRejected extends Error {
   }
 }
 
-/**
- * Resolves the calling user from the request's bearer token.
- * Throws `CallerRejected` (401) when the token is missing or invalid.
- */
-export async function requireCaller(req: Request): Promise<CallerIdentity> {
-  const authHeader = req.headers.get("Authorization") ?? "";
-  const token = authHeader.replace(/^Bearer\s+/i, "").trim();
-
-  if (!token) {
-    throw new CallerRejected(401, "Missing authorization header");
-  }
-
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_ANON_KEY")!,
-    { global: { headers: { Authorization: `Bearer ${token}` } } },
-  );
-
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    throw new CallerRejected(401, "Invalid or expired token");
-  }
-
-  return { userId: data.user.id, email: data.user.email ?? null, token };
+function bearerToken(req: Request): string {
+  return (req.headers.get("Authorization") ?? "")
+    .replace(/^Bearer\s+/i, "")
+    .trim();
 }
 
-/** Additionally requires the caller to hold a role via `public.has_role`. */
+function normalizeAuthError(error: unknown): CallerRejected | null {
+  if (error instanceof CallerRejected) return error;
+  if (!error || typeof error !== "object") return null;
+
+  const candidate = error as { status?: unknown; message?: unknown };
+  if (typeof candidate.status !== "number") return null;
+  return new CallerRejected(
+    candidate.status,
+    typeof candidate.message === "string" ? candidate.message : "Caller rejected",
+  );
+}
+
+/**
+ * Resolves the calling user from the canonical shared auth context.
+ * Throws CallerRejected when the token is missing, invalid or expired.
+ */
+export async function requireCaller(req: Request): Promise<CallerIdentity> {
+  const token = bearerToken(req);
+  if (!token) throw new CallerRejected(401, "Missing authorization header");
+
+  try {
+    const context = await getAuthContext(req, "user");
+    if (!context.userId) throw new CallerRejected(401, "Invalid or expired token");
+    return {
+      userId: context.userId,
+      email: context.user?.email ?? null,
+      token,
+    };
+  } catch (error) {
+    const normalized = normalizeAuthError(error);
+    if (normalized) throw normalized;
+    throw error;
+  }
+}
+
+/**
+ * Additionally requires the caller to hold a role via public.has_role.
+ * Role lookup keeps its existing privileged RPC semantics; only authentication
+ * is consolidated here.
+ */
 export async function requireCallerRole(
   req: Request,
   role: string,

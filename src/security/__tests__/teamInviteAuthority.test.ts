@@ -5,29 +5,39 @@ import { resolve } from 'node:path';
 const read = (p: string) => readFileSync(resolve(process.cwd(), p), 'utf8');
 
 /**
- * An invite mints a role-bearing acceptance token, so it is an administrative
- * action: authority is verified server-side and the token never crosses the
- * Data API.
+ * Organization invitations are tenant-administration actions. Authority must
+ * come from an approved active organization membership, not from a platform-
+ * global role label, and ordinary invitations may never mint org ownership.
  */
 describe('team invite authority', () => {
   const fn = read('supabase/functions/teams-invite/index.ts');
 
-  it('verifies the caller holds admin or owner before minting an invite', () => {
-    expect(fn).toContain("INVITER_ROLES = ['admin', 'owner']");
-    expect(fn).toContain("from('user_roles')");
-    expect(fn).toContain('status: 403');
+  it('verifies approval and active org admin/owner membership before service role creation', () => {
+    const profileCheck = fn.indexOf("from('profiles')");
+    const membershipCheck = fn.indexOf("from('org_memberships')");
+    const roleCheck = fn.indexOf('INVITER_ROLES.has');
+    const serviceClient = fn.indexOf('const serviceClient = createClient', membershipCheck);
+
+    expect(fn).toContain("const INVITER_ROLES = new Set(['admin', 'owner'])");
+    expect(profileCheck).toBeGreaterThanOrEqual(0);
+    expect(membershipCheck).toBeGreaterThan(profileCheck);
+    expect(roleCheck).toBeGreaterThan(membershipCheck);
+    expect(serviceClient).toBeGreaterThan(roleCheck);
+    expect(fn).toContain("membership.status !== 'active'");
+    expect(fn).toContain("stage: 'authorization'");
   });
 
-  it('restricts the conferrable role to a non-privileged allowlist', () => {
-    expect(fn).toContain('INVITABLE_ROLES');
-    for (const privileged of ['admin', 'owner', 'security_admin']) {
-      expect(fn).not.toMatch(new RegExp(`INVITABLE_ROLES = new Set\\(\\[[^\\]]*'${privileged}'`, 's'));
-    }
+  it('allows delegated admin invitations but never mints owner through the ordinary invite flow', () => {
+    expect(fn).toContain("'admin',");
+    const allowlist = fn.slice(fn.indexOf('const INVITABLE_ROLES'), fn.indexOf('const INVITER_ROLES'));
+    expect(allowlist).not.toContain("'owner'");
+    expect(fn).toContain("if (role === 'admin' && membership.role !== 'owner')");
   });
 
-  it('never returns the acceptance token to the caller', () => {
+  it('binds every invitation to the active organization and never returns the acceptance token', () => {
+    expect(fn).toContain('org_id: orgId');
     expect(fn).not.toMatch(/\.select\(\)\s*\n?\s*\.single\(\)/);
-    expect(fn).toContain(".select('id, email, role, status, invited_by, expires_at, created_at')");
+    expect(fn).toContain(".select('id, email, role, status, invited_by, org_id, expires_at, created_at')");
   });
 
   it('reads invites with an explicit column list that omits the token', () => {

@@ -25,25 +25,14 @@ verify_jwt = false
 [functions.public-intake]
 verify_jwt = true
 
-# NVIDIA operational-readiness Phase 2 - service-role attack surface closed.
-# `metrics-summary`, `ops-environments`, `ops-events`, `ops-ingest-health`,
-# `templates-seed` and `zapier-apps-sync` were orphaned service-role endpoints
-# with no caller anywhere in the product; they are deleted rather than guarded.
-# The four retained handlers below now verify the caller in code via
-# `_shared/callerIdentity.ts` and answer scoped CORS via `_shared/cors.ts`.
-# The gateway check is kept as defense in depth. `zapier-oauth-callback` is
-# deliberately excluded: it is an OAuth redirect target anonymous browsers must
-# reach, and it validates its own state parameter.
+# Service-role attack surface retained only for currently supported handlers.
+# Legacy Zapier endpoints are provider-retirement tombstones and therefore have
+# no active function-specific runtime configuration here. They must remain
+# fail-closed until production undeployment of the old function names is proven.
 [functions.website-cache-clear]
 verify_jwt = true
 
 [functions.funding-scraper]
-verify_jwt = true
-
-[functions.zapier-auto-refresh]
-verify_jwt = true
-
-[functions.zapier-action-execute]
 verify_jwt = true
 
 # Shared-handler administrative endpoints. Gateway validation remains enabled

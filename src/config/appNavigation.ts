@@ -91,7 +91,7 @@ export const WORKSPACE_NAV: AppNavItem[] = [
     href: '/dsx/evidence-beta/overview',
     icon: FileSearch,
     matches: ['/dsx/evidence-beta', '/compliance'],
-    group: 'design',
+    group: 'govern',
     description: 'Provenance, domain evidence, sustainability evidence and decision records.',
   },
 ];

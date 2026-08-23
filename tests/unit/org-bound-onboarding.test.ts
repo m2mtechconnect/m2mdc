@@ -55,10 +55,11 @@ describe('organization-bound onboarding', () => {
     expect(migration).toContain("SET status = 'accepted'");
   });
 
-  it('restricts first-customer provisioning to an approved platform owner before service role creation', () => {
+  it('restricts first-customer provisioning to an approved global platform owner before service role creation', () => {
     expect(provisionFn).toContain(".select('is_approved')");
-    expect(provisionFn).toContain("authClient.rpc('check_user_has_role'");
-    expect(provisionFn).toContain("_role: 'owner'");
+    expect(provisionFn).toContain("authClient.rpc('user_has_role'");
+    expect(provisionFn).toContain("check_role: 'owner'");
+    expect(provisionFn).toContain("check_scope: 'global'");
     expect(provisionFn).toContain("serviceClient.rpc('platform_provision_organization'");
 
     const approvalCheck = provisionFn.indexOf('if (!profile?.is_approved)');

@@ -1,10 +1,11 @@
 import { ReactNode, useState, useEffect } from 'react';
 import { Check, Home, Rocket, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
+import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { BuilderModeProvider } from './BuilderModeContext';
 import { BuilderModeToggle } from './BuilderModeToggle';
 import { LastUpdatedBadge } from '@/components/ui/snapshot-indicator';
@@ -28,12 +29,20 @@ interface BuilderLayoutProps {
   currentStep?: number;
 }
 
-const STEPS = [
+const WIZARD_STEPS = [
   { id: 1, title: 'Business Profile', shortTitle: 'Profile', tooltip: 'Define your organization and twin objectives' },
   { id: 2, title: 'Capabilities', shortTitle: 'Capabilities', tooltip: 'Configure KPIs and monitoring agents' },
-  { id: 3, title: 'AI & Integrations', shortTitle: 'AI', tooltip: 'Set up AI models and data sources' },
+  { id: 3, title: 'Connections', shortTitle: 'Connections', tooltip: 'Select approved AI, data and integration capabilities' },
   { id: 4, title: 'Scenarios', shortTitle: 'Scenarios', tooltip: 'Define simulation scenarios for testing' },
-  { id: 5, title: 'Deploy', shortTitle: 'Deploy', tooltip: 'Review and deploy your twin to production' },
+  { id: 5, title: 'Deploy', shortTitle: 'Deploy', tooltip: 'Review and deploy your configured build' },
+];
+
+const DC_STEPS = [
+  { id: 1, title: 'Facility Summary', shortTitle: 'Summary', tooltip: 'Review the facility identity, capacity and twin objectives' },
+  { id: 2, title: 'Blueprint', shortTitle: 'Blueprint', tooltip: 'Review the generated agents, KPIs and facility blueprint' },
+  { id: 3, title: 'Connections', shortTitle: 'Connections', tooltip: 'Configure approved data sources and facility integrations' },
+  { id: 4, title: 'Scenarios & Automation', shortTitle: 'Scenarios', tooltip: 'Review workflows and simulation scenarios' },
+  { id: 5, title: 'Review & Deploy', shortTitle: 'Deploy', tooltip: 'Review readiness, choose a sovereign region and deploy the twin' },
 ];
 
 export function BuilderLayout({
@@ -47,25 +56,58 @@ export function BuilderLayout({
   currentStep: propCurrentStep,
 }: BuilderLayoutProps) {
   const navigate = useNavigate();
-  const { currentStep, completedSteps, setCurrentStep } = useWizardBuilderStore();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const wizardStore = useWizardBuilderStore();
+  const dcTwinStore = useDCTwinBuilderStore();
   const [deployState, setDeployState] = useState<DeployState>(DeployState.idle);
-  
-  const activeStep = propCurrentStep || currentStep;
-  const isDeployStep = activeStep === 5;
+
+  const fromScanner = searchParams.get('from') === 'scanner' ||
+    searchParams.get('fromScanner') === 'true' ||
+    (location.state as { fromRecommendation?: boolean } | null)?.fromRecommendation === true;
+
+  const activeStep = fromScanner ? dcTwinStore.currentStep : (propCurrentStep ?? wizardStore.currentStep);
+  const completedSteps = fromScanner ? dcTwinStore.completedSteps : wizardStore.completedSteps;
+  const setActiveStep = fromScanner ? dcTwinStore.setCurrentStep : wizardStore.setCurrentStep;
+  const steps = fromScanner ? DC_STEPS : WIZARD_STEPS;
+  const isDeployStep = activeStep === steps.length;
 
   const isStepComplete = (step: number) => completedSteps.includes(step);
-  const isStepActive = (step: number) => currentStep === step;
-  const isStepAccessible = (step: number) => step <= currentStep || completedSteps.includes(step - 1);
-  
+  const isStepActive = (step: number) => activeStep === step;
+  const isStepAccessible = (step: number) => step <= activeStep || completedSteps.includes(step - 1);
+
+  const dcStepValid = (() => {
+    if (!fromScanner) return true;
+    switch (activeStep) {
+      case 1:
+        return Boolean(dcTwinStore.overview.twinName?.trim());
+      case 2:
+        return dcTwinStore.agents.length > 0;
+      case 3:
+        return true;
+      case 4:
+        return dcTwinStore.scenarios.length > 0;
+      case 5:
+        return Boolean(dcTwinStore.deployment.targetDeploymentRegion);
+      default:
+        return false;
+    }
+  })();
+
+  const effectiveNextDisabled = fromScanner ? !dcStepValid : nextDisabled;
+
   useEffect(() => {
     if (!isDeployStep && deployState !== DeployState.idle) {
       setDeployState(DeployState.idle);
     }
   }, [isDeployStep, deployState]);
-  
+
   const handleDeployClick = async () => {
-    if (!onDeploy || deployState !== DeployState.idle || nextDisabled) return;
-    
+    // The scanner/DC flow owns deployment inside DCStep5Deploy. Its persistence,
+    // readiness checks and post-deploy navigation are intentionally not routed
+    // through the standard wizard deployment contract.
+    if (fromScanner || !onDeploy || deployState !== DeployState.idle || effectiveNextDisabled) return;
+
     const state = useWizardBuilderStore.getState();
     if (!state.workflow?.actions || state.workflow.actions.length === 0) {
       console.error('[BuilderLayout] Deployment blocked: No workflow actions found');
@@ -75,30 +117,30 @@ export function BuilderLayout({
       }, 3000);
       return;
     }
-    
+
     console.log('[BuilderLayout] Workflow validation passed, proceeding with deployment');
 
     setDeployState(DeployState.morphing);
     await new Promise(resolve => setTimeout(resolve, 350));
-    
+
     setDeployState(DeployState.deploying);
     const deployStartTime = Date.now();
     const MIN_DEPLOY_DURATION = 1200;
 
     try {
       const deployPromise = onDeploy();
-      const timeoutPromise = new Promise((_, reject) => 
+      const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error("Deployment timeout")), 15000)
       );
-      
+
       const result = await Promise.race([deployPromise, timeoutPromise]) as any;
-      
+
       const elapsed = Date.now() - deployStartTime;
       const remainingTime = MIN_DEPLOY_DURATION - elapsed;
       if (remainingTime > 0) {
         await new Promise(resolve => setTimeout(resolve, remainingTime));
       }
-      
+
       if (result.success) {
         setDeployState(DeployState.success);
         setTimeout(() => {
@@ -109,13 +151,13 @@ export function BuilderLayout({
       }
     } catch (error: any) {
       console.error("Deploy error:", error);
-      
+
       const elapsed = Date.now() - deployStartTime;
       const remainingTime = MIN_DEPLOY_DURATION - elapsed;
       if (remainingTime > 0) {
         await new Promise(resolve => setTimeout(resolve, remainingTime));
       }
-      
+
       setDeployState(DeployState.error);
       setTimeout(() => {
         setDeployState(DeployState.idle);
@@ -154,12 +196,12 @@ export function BuilderLayout({
 
           <nav className="flex-1 p-4">
             <ul className="space-y-1">
-              {STEPS.map((step) => (
+              {steps.map((step) => (
                 <li key={step.id}>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
-                        onClick={() => isStepAccessible(step.id) && setCurrentStep(step.id)}
+                        onClick={() => isStepAccessible(step.id) && setActiveStep(step.id)}
                         disabled={!isStepAccessible(step.id)}
                         className={cn(
                           'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-left',
@@ -206,10 +248,10 @@ export function BuilderLayout({
               <Home className="h-4 w-4" />
             </Button>
             <div className="flex min-w-0 flex-1 items-center justify-between overflow-x-auto overscroll-x-contain">
-              {STEPS.map((step, idx) => (
+              {steps.map((step, idx) => (
                 <div key={step.id} className="flex shrink-0 items-center">
                   <button
-                    onClick={() => isStepAccessible(step.id) && setCurrentStep(step.id)}
+                    onClick={() => isStepAccessible(step.id) && setActiveStep(step.id)}
                     disabled={!isStepAccessible(step.id)}
                     className={cn(
                       'flex flex-col items-center gap-1',
@@ -228,7 +270,7 @@ export function BuilderLayout({
                     </div>
                     <span className="text-xs hidden sm:block">{step.shortTitle}</span>
                   </button>
-                  {idx < STEPS.length - 1 && (
+                  {idx < steps.length - 1 && (
                     <div className="w-4 h-0.5 bg-muted-foreground/30 mx-1" />
                   )}
                 </div>
@@ -254,20 +296,22 @@ export function BuilderLayout({
               <Button
                 variant="outline"
                 onClick={onBack}
-                disabled={currentStep === 1}
+                disabled={activeStep === 1}
                 className="min-w-[100px]"
               >
                 Back
               </Button>
 
               <div className="min-w-0 flex-1 text-center text-sm text-muted-foreground">
-                Step {currentStep} of {STEPS.length}
+                Step {activeStep} of {steps.length}
               </div>
 
-              {isDeployStep && onDeploy ? (
+              {isDeployStep && fromScanner ? (
+                <div className="min-w-[100px]" aria-hidden="true" />
+              ) : isDeployStep && onDeploy ? (
                 <Button
                   onClick={handleDeployClick}
-                  disabled={nextDisabled || deployState !== DeployState.idle}
+                  disabled={effectiveNextDisabled || deployState !== DeployState.idle}
                   className="min-w-[100px] gap-2"
                 >
                   {deployState === DeployState.idle && (
@@ -298,7 +342,7 @@ export function BuilderLayout({
               ) : (
                 <Button
                   onClick={onNext}
-                  disabled={nextDisabled}
+                  disabled={effectiveNextDisabled}
                   className="min-w-[100px]"
                 >
                   {nextLabel}

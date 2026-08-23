@@ -93,7 +93,73 @@ describe('production perimeter enforcer', () => {
     expect(result.code).toBe(1);
     expect(result.output).toContain('green-dc-recommend');
   });
+
+  it('fails closed when a route alias is promoted to a production route', () => {
+    const dir = mirrorRepo((a) => {
+      a.production_routes = [...a.production_routes, '/agent-chat'];
+    });
+    temps.push(dir);
+    const result = runEnforcer(dir);
+    expect(result.code).toBe(1);
+    expect(result.output).toContain('/agent-chat');
+  });
+
+  it('fails closed when a route alias loses its redirect-only classification', () => {
+    const dir = mirrorRepo((a) => {
+      a.redirect_only_routes = a.redirect_only_routes.filter((r: string) => r !== '/integrations');
+    });
+    temps.push(dir);
+    const result = runEnforcer(dir);
+    expect(result.code).toBe(1);
+    expect(result.output).toContain('/integrations');
+  });
+
+  it('fails closed when a shipped router route is unclassified', () => {
+    const dir = mirrorRepo((a) => {
+      a.production_routes = a.production_routes.filter((r: string) => r !== '/dashboard');
+    });
+    temps.push(dir);
+    const result = runEnforcer(dir);
+    expect(result.code).toBe(1);
+    expect(result.output).toContain('/dashboard');
+  });
 });
+
+describe('production route classification', () => {
+  const prod = new Set<string>(allowlist.production_routes);
+
+  it('keeps dev/debug/demo surfaces out of production', () => {
+    for (const route of [
+      '/twin-debug',
+      '/digital-twins-demo/funding-intake',
+      '/dev-overlays',
+      '/admin/asset-preview',
+      '/admin/asset-pipeline',
+      '/blueprint/preview',
+      '/simulation/preview',
+    ]) {
+      expect(prod.has(route)).toBe(false);
+    }
+  });
+
+  it('classifies each route exactly once', () => {
+    const buckets = [
+      allowlist.production_routes,
+      allowlist.production_blocked_routes,
+      allowlist.development_only_routes,
+      allowlist.redirect_only_routes,
+    ] as string[][];
+    const seen = new Map<string, number>();
+    for (const bucket of buckets) {
+      for (const route of bucket) seen.set(route, (seen.get(route) ?? 0) + 1);
+    }
+    const duplicates = [...seen.entries()]
+      .filter(([route, count]) => count > 1 && !(allowlist.alias_production_exceptions ?? []).includes(route))
+      .map(([route]) => route);
+    expect(duplicates).toEqual([]);
+  });
+});
+
 
 describe('allowlist / inventory synchronisation', () => {
   const allowlisted = new Set<string>(allowlist.production_functions);

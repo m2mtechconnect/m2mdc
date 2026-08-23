@@ -101,12 +101,13 @@
     "consumer_count": 0,
     "verify_jwt_gateway": true,
     "local_getUser_or_getClaims": false,
-    "uses_shared_auth_helper": false,
+    "uses_shared_auth_helper": true,
     "checks_role_or_admin": false,
     "checks_is_approved": false,
     "webhook_signature_verification": false,
     "uses_service_role_key": false,
-    "production_disposition": "unknown-blocked"
+    "production_disposition": "production-allowlisted",
+    "notes": "Promoted 2026-08-23: createHandler authLevel:\"user\" (non-public) + shared fail-closed CORS via handler; verify_jwt=true at gateway. Invoked by promoted route /app/agents."
   },
   {
     "function": "agent-suggestions",

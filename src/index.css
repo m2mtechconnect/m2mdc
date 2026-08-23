@@ -766,7 +766,31 @@ textarea:focus {
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
+
+    /* Non-essential entrance / stagger choreography is suppressed entirely so
+       reduced-motion users never see decorative translation or scaling.
+       Essential state changes (focus rings, open/closed toggles) still apply
+       because they are not animation-driven. */
+    [data-motion='stagger'],
+    [data-motion='entrance'],
+    .animate-fade-in,
+    .animate-fade-in-up,
+    .animate-slide-up,
+    .animate-slide-in,
+    .animate-scale-in,
+    .animate-enter {
+      animation: none !important;
+      transform: none !important;
+      opacity: 1 !important;
+    }
+
+    html,
+    body,
+    * {
+      scroll-behavior: auto !important;
+    }
   }
+
 
   /* Responsive grid */
   .dc-grid {

@@ -12,6 +12,7 @@
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { RUN_UNAVAILABLE_LABEL } from '@/capabilities/runProvenance';
 import { deriveKpis, formatKpi, formatPower, useFacilityModel, type KpiKey } from './facilityModel';
 import { evidenceHrefForKpi } from './kpiDrilldown';
 import { useWorkspaceStore } from './workspaceStore';
@@ -94,7 +95,7 @@ export default function CommandCentre() {
   const simulationHref = `/simulation?twin=${encodeURIComponent(facility.id || 'default')}`;
   const calculatedAt = latestRun
     ? new Date(latestRun.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    : RUN_UNAVAILABLE_LABEL;
 
   const effectiveKpis = useMemo(
     () => (latestRun ? { ...kpis, ...latestRun.result } : kpis),
@@ -200,6 +201,7 @@ export default function CommandCentre() {
           location={facility.city}
           tier={facility.tier}
           calculatedAt={calculatedAt}
+          hasRecordedRun={latestRun !== null}
           isFallback={isFallback}
           simulationHref={simulationHref}
           blueprintHref={blueprintHref}

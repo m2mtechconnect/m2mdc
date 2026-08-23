@@ -13,6 +13,13 @@ permissions:
   contents: read
   security-events: write
 
+# Cancel the complete superseded QA run, including matrix and summary jobs.
+# Existing job-level keys remain as a defensive compatibility layer, while this
+# workflow-level key guarantees stale source SHAs cannot leave live summaries.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
   CI: true
   AURA_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}

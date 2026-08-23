@@ -59,6 +59,10 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    env:
+      QA_AUTH_BOOTSTRAP: '1'
+      QA_BROWSER: ${{ matrix.browser }}
+      QA_AUTH_STATE: /tmp/aura-playwright-auth-${{ matrix.browser }}-${{ matrix.shard }}.json
     concurrency:
       # Shard is part of the key so sibling shards for the same browser cannot
       # cancel each other when pull-request concurrency cancellation is enabled.
@@ -152,6 +156,7 @@ jobs:
           test "$ROLE_COUNT" = "1"
 
           {
+            echo "TEST_USER_ID=$TEST_USER_ID"
             echo "TEST_USER_EMAIL=$TEST_USER_EMAIL"
             echo "TEST_USER_PASSWORD=$TEST_USER_PASSWORD"
           } >> "$GITHUB_ENV"
@@ -201,8 +206,9 @@ jobs:
         run: bunx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run E2E tests
-        # Preserve committed assertions, browser coverage, one-worker CI state
-        # isolation and the retry policy defined in playwright.config.ts.
+        # Global setup performs a bounded real-login canary, verifies the exact
+        # disposable user id, writes storage state only under /tmp, then the full
+        # committed assertions run with one worker per shard.
         run: bunx playwright test --project=${{ matrix.browser }} --shard=${{ matrix.shard }}/2 --workers=1
 
       - name: Upload test results
@@ -218,6 +224,10 @@ jobs:
       - name: Local Edge Function logs
         if: always()
         run: tail -n 200 /tmp/qa-functions.log || true
+
+      - name: Remove ephemeral browser auth state
+        if: always()
+        run: rm -f "$QA_AUTH_STATE" /tmp/qa-functions.env /tmp/qa-supabase.env
 
       - name: Stop isolated local Supabase stack
         if: always()

@@ -131,10 +131,10 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks: {
-            // `@react-three/fiber` also imports react-dom/client. Keeping that
-            // subpath in the React chunk prevents Rollup from placing the app
-            // bootstrap in vendor-3d and forcing ~900 kB of 3D code onto the
-            // unauthenticated landing route.
+            // `@react-three/fiber` also imports react-dom/client. Keep React's
+            // bootstrap dependencies together, but let the 3D runtime follow
+            // the lazy authenticated route graph instead of forcing a global
+            // vendor chunk that Vite modulepreloads on the public landing page.
             'vendor-react': ['react', 'react-dom', 'react-dom/client', 'react-router-dom'],
             // Runtime-only libraries retain their own lazy chunks. Radix and
             // Recharts are intentionally NOT forced into global vendor chunks:
@@ -143,11 +143,6 @@ export default defineConfig(({ mode }) => {
             'vendor-query': ['@tanstack/react-query'],
             'vendor-supabase': ['@supabase/supabase-js'],
             'vendor-motion': ['framer-motion'],
-            // 3D runtime is only reachable from lazy authenticated twin
-            // routes. Grouping it explicitly keeps three/drei out of the
-            // per-route chunks that would otherwise duplicate it.
-            'vendor-3d': ['three', '@react-three/fiber', '@react-three/drei'],
-
           },
         },
       },

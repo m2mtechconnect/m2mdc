@@ -1,6 +1,6 @@
 # AURA Private packaging scaffold
 
-> **STATUS: SCAFFOLD — NOT RELEASE-QUALIFIED**
+> **STATUS: SCAFFOLD - NOT RELEASE-QUALIFIED**
 >
 > This package proves a portable deployment shape for the **AURA web shell only**. It does not make AURA Private, AURA Sovereign, or air-gapped deployment generally available.
 

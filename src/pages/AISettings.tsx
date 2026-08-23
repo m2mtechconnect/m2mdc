@@ -1,434 +1,223 @@
-import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { invokeEdgeFunction } from "@/hooks/useEdgeFunction";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Sparkles, Shield, Database, CheckCircle, XCircle, Loader, Settings, Loader2, AlertTriangle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { DCCard, DCSectionHeader } from "@/components/dc-ui";
-import { KnowledgeSourceReadiness } from "@/components/agent/KnowledgeSourceReadiness";
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Brain, Database, Save, Settings, ShieldCheck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { DCCard, DCSectionHeader } from '@/components/dc-ui';
+import { KnowledgeSourceReadiness } from '@/components/agent/KnowledgeSourceReadiness';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  AURA_INTELLIGENCE_PROFILES,
+  intelligenceProfileById,
+  type AuraIntelligenceProfileId,
+} from '@/config/auraRuntimeCatalog';
 
-const DEFAULT_SYSTEM_PROMPT = `You are M2M Co-Pilot inside an enterprise control center.
+const STORAGE_KEY = 'copilot_settings';
+const DEFAULT_SYSTEM_PROMPT = `You are the AURA Co-Pilot inside an enterprise control center.
 Be concise and business-ready.
-Always cite sources when grounding is enabled.
-If you are unsure, say so and suggest a next step.
-Respect user role (Executive | Manager | Engineer).
-Never expose secrets or internal IDs.`;
+Ground material claims in supplied evidence and cite sources when grounding is available.
+Distinguish measured facts, reference data, simulations and recommendations.
+If evidence is missing, say so.
+Never expose secrets or claim to actuate infrastructure.`;
 
-interface HealthStatus {
-  gemini: { status: 'ok' | 'error'; latency?: number; error?: string };
-  vertexSearch: { status: 'ok' | 'error'; latency?: number; error?: string };
-  region: string;
+interface BrowserAiPreferences {
+  modelProfile: AuraIntelligenceProfileId;
+  groundingEnabled: boolean;
+  topK: number;
+  topN: number;
+  maxTokens: number;
+  temperature: number;
+  systemPrompt: string;
+}
+
+function profileFromLegacyValue(value: unknown): AuraIntelligenceProfileId {
+  if (typeof value !== 'string') return 'balanced';
+  if (value.startsWith('profile:')) {
+    const id = value.slice('profile:'.length);
+    if (AURA_INTELLIGENCE_PROFILES.some((profile) => profile.id === id)) {
+      return id as AuraIntelligenceProfileId;
+    }
+  }
+  const normalized = value.toLowerCase();
+  if (normalized.includes('flash-lite')) return 'fast';
+  if (normalized.includes('pro')) return 'reasoning';
+  return 'balanced';
 }
 
 export default function AISettings() {
   const { t } = useTranslation();
-  const [projectId, setProjectId] = useState("");
-  const [region, setRegion] = useState("northamerica-northeast1");
-  const [model, setModel] = useState("gemini-1.5-pro");
-  const [groundingEnabled, setGroundingEnabled] = useState(false);
-  const [dataStoreId, setDataStoreId] = useState("");
+  const [profileId, setProfileId] = useState<AuraIntelligenceProfileId>('balanced');
+  const [groundingEnabled, setGroundingEnabled] = useState(true);
   const [topK, setTopK] = useState(20);
   const [topN, setTopN] = useState(6);
-  const [maxTokens, setMaxTokens] = useState(1024);
+  const [maxTokens, setMaxTokens] = useState(2048);
   const [temperature, setTemperature] = useState(0.3);
   const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT);
-  const [safetySettings, setSafetySettings] = useState({
-    hate: true,
-    harassment: true,
-    sexual: true,
-    dangerous: true
-  });
-  const [isChecking, setIsChecking] = useState(false);
-  const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<{ projectId?: string; dataStoreId?: string }>({});
 
-  // Load saved settings on mount
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('copilot_settings');
-      if (stored) {
-        const settings = JSON.parse(stored);
-        if (settings.projectId) setProjectId(settings.projectId);
-        if (settings.region) setRegion(settings.region);
-        if (settings.model) setModel(settings.model);
-        if (typeof settings.groundingEnabled === 'boolean') setGroundingEnabled(settings.groundingEnabled);
-        if (settings.dataStoreId) setDataStoreId(settings.dataStoreId);
-        if (typeof settings.topK === 'number') setTopK(settings.topK);
-        if (typeof settings.topN === 'number') setTopN(settings.topN);
-        if (typeof settings.maxTokens === 'number') setMaxTokens(settings.maxTokens);
-        if (typeof settings.temperature === 'number') setTemperature(settings.temperature);
-        if (settings.systemPrompt) setSystemPrompt(settings.systemPrompt);
-        if (settings.safetySettings) setSafetySettings(settings.safetySettings);
-      }
-    } catch (error) {
-      console.error('Failed to load AI settings:', error);
-      setLoadError('Stored configuration was unreadable and has been reset.');
-      localStorage.removeItem('copilot_settings');
-    } finally {
-      setIsLoading(false);
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) return;
+      const settings = JSON.parse(stored) as Partial<BrowserAiPreferences> & { model?: unknown };
+      setProfileId(
+        settings.modelProfile && AURA_INTELLIGENCE_PROFILES.some((profile) => profile.id === settings.modelProfile)
+          ? settings.modelProfile
+          : profileFromLegacyValue(settings.model),
+      );
+      if (typeof settings.groundingEnabled === 'boolean') setGroundingEnabled(settings.groundingEnabled);
+      if (typeof settings.topK === 'number') setTopK(settings.topK);
+      if (typeof settings.topN === 'number') setTopN(settings.topN);
+      if (typeof settings.maxTokens === 'number') setMaxTokens(settings.maxTokens);
+      if (typeof settings.temperature === 'number') setTemperature(settings.temperature);
+      if (typeof settings.systemPrompt === 'string' && settings.systemPrompt.trim()) setSystemPrompt(settings.systemPrompt);
+    } catch {
+      localStorage.removeItem(STORAGE_KEY);
+      toast.error('Stored AI preferences were unreadable and have been reset.');
     }
   }, []);
 
-  const validate = (): boolean => {
-    const errs: { projectId?: string; dataStoreId?: string } = {};
-    if (!projectId.trim()) errs.projectId = 'Project ID is required';
-    if (groundingEnabled && !dataStoreId.trim()) {
-      errs.dataStoreId = 'Data Store ID is required when grounding is enabled';
-    }
-    setFieldErrors(errs);
-    return Object.keys(errs).length === 0;
-  };
+  const profile = intelligenceProfileById(profileId);
 
-  const handleSave = async () => {
+  async function handleSave() {
     if (isSaving) return;
-    setSaveError(null);
-    if (!validate()) {
-      toast.error('Please fix validation errors before saving');
-      return;
-    }
     setIsSaving(true);
     try {
-      const settings = {
-        projectId,
-        region,
-        model,
+      const preferences: BrowserAiPreferences & { model: string } = {
+        modelProfile: profileId,
+        // Compatibility alias only. Server routing must resolve this profile;
+        // customer preferences never persist a provider/model identifier.
+        model: `profile:${profileId}`,
         groundingEnabled,
-        dataStoreId,
         topK,
         topN,
         maxTokens,
         temperature,
         systemPrompt,
-        safetySettings
       };
-      localStorage.setItem('copilot_settings', JSON.stringify(settings));
-      toast.success('AI settings saved successfully');
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Failed to save settings';
-      setSaveError(msg);
-      toast.error(msg);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
+      toast.success('AURA AI preferences saved in this browser.');
+    } catch {
+      toast.error('Could not save AURA AI preferences.');
     } finally {
       setIsSaving(false);
     }
-  };
-
-  if (isLoading) {
-    return (
-      <main
-          className="flex items-center justify-center min-h-[60vh]"
-          role="status"
-          aria-live="polite"
-          aria-busy="true"
-        >
-          <div className="text-center space-y-3">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" aria-hidden="true" />
-            <p className="text-sm text-muted-foreground">Loading AI configuration…</p>
-          </div>
-      </main>
-    );
   }
 
-  const handleHealthCheck = async () => {
-    setIsChecking(true);
-    try {
-      const data = await invokeEdgeFunction('copilot-health', {
-        projectId, region, model, groundingEnabled, dataStoreId
-      });
-
-      setHealthStatus(data as HealthStatus);
-      
-      if (data?.gemini?.status === 'ok' && (!groundingEnabled || data?.vertexSearch?.status === 'ok')) {
-        toast.success("Health check passed!");
-      } else {
-        toast.error("Health check failed. Check the results below.");
-      }
-    } catch (error) {
-      toast.error("Health check failed");
-      console.error(error);
-    } finally {
-      setIsChecking(false);
-    }
-  };
-
   return (
-    <div className="w-full min-w-0 py-8 space-y-8" data-testid="ai-settings-workspace">
-        <DCSectionHeader
-          as="h1"
-          title={t("aiSettings.title")}
-          subtitle={t("aiSettings.subtitle")}
-          icon={<Settings className="h-5 w-5 text-primary" />}
-        />
+    <div className="w-full min-w-0 space-y-8 py-8" data-testid="ai-settings-workspace">
+      <DCSectionHeader
+        as="h1"
+        title={t('aiSettings.title', 'AI Settings')}
+        subtitle="Configure AURA intelligence behavior without exposing infrastructure providers or credentials."
+        icon={<Settings className="h-5 w-5 text-primary" />}
+      />
 
-        <div
-          role="note"
-          className="rounded-md border border-border bg-muted/30 p-3 text-xs text-muted-foreground"
-        >
-          These settings are stored in your current browser only. They are
-          not synced to a server, are not shared with other users, and
-          clearing browser storage removes them. No credentials or API
-          keys are stored here.
+      <div role="note" className="rounded-md border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+        These are user-level browser preferences only. Runtime providers, credentials, tenancy, approved connectors and deployment health are controlled server-side. Selecting a profile does not prove that a runtime is connected or available.
+      </div>
+
+      <DCCard title="AURA Intelligence" icon={<Brain className="h-5 w-5 text-primary" />}>
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <Label htmlFor="aura-intelligence-profile">Intelligence profile</Label>
+            <Select value={profileId} onValueChange={(value) => setProfileId(value as AuraIntelligenceProfileId)}>
+              <SelectTrigger id="aura-intelligence-profile" aria-label="AURA Intelligence profile">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {AURA_INTELLIGENCE_PROFILES.map((option) => (
+                  <SelectItem key={option.id} value={option.id}>{option.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="rounded-md border border-border bg-muted/20 p-3">
+              <p className="text-sm font-medium">{profile.name}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{profile.description}</p>
+              <p className="mt-2 text-xs text-muted-foreground">Best for: {profile.bestFor}</p>
+            </div>
+          </div>
         </div>
+      </DCCard>
 
-        {loadError && (
-          <div
-            role="alert"
-            className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive"
-          >
-            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
-            <span>{loadError}</span>
-          </div>
-        )}
-
-        <DCCard
-          title={t("aiSettings.gcpConfig")}
-          icon={<Sparkles className="h-5 w-5 text-primary" />}
-          status="operational"
-        >
-          <div className="grid gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="ai-project-id">Google Cloud Project ID</Label>
-              <Input 
-                id="ai-project-id"
-                value={projectId}
-                onChange={(e) => {
-                  setProjectId(e.target.value);
-                  if (fieldErrors.projectId) setFieldErrors((p) => ({ ...p, projectId: undefined }));
-                }}
-                placeholder="your-project-id"
-                aria-invalid={!!fieldErrors.projectId}
-                aria-describedby={fieldErrors.projectId ? 'ai-project-id-error' : undefined}
-              />
-              {fieldErrors.projectId && (
-                <p id="ai-project-id-error" role="alert" className="text-xs text-destructive">
-                  {fieldErrors.projectId}
-                </p>
-              )}
+      <DCCard title="Grounding policy" icon={<Database className="h-5 w-5 text-primary" />}>
+        <div className="space-y-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <Label htmlFor="grounding-toggle">Use approved knowledge sources</Label>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Prefer evidence from sources already approved and connected through AURA. This preference does not create, authorize or configure a connector.
+              </p>
             </div>
-
-            <div className="space-y-2">
-              <Label>Region</Label>
-              <Select value={region} onValueChange={setRegion}>
-                <SelectTrigger aria-label="Region">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-card z-50">
-                  <SelectItem value="northamerica-northeast1">🇨🇦 northamerica-northeast1 (Montreal)</SelectItem>
-                  <SelectItem value="us-central1">🇺🇸 us-central1 (Iowa)</SelectItem>
-                  <SelectItem value="europe-west1">🇪🇺 europe-west1 (Belgium)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Model</Label>
-              <Select value={model} onValueChange={setModel}>
-                <SelectTrigger aria-label="Model">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-card z-50">
-                  <SelectItem value="gemini-1.5-pro">gemini-1.5-pro (Recommended)</SelectItem>
-                  <SelectItem value="gemini-1.5-flash">gemini-1.5-flash (Faster)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </DCCard>
-
-        <DCCard
-          title="Vertex AI search and grounding"
-          icon={<Database className="h-5 w-5 text-primary" />}
-          status="info"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <div className="space-y-0.5">
-              <Label>Enable Grounding</Label>
-              <p className="text-xs text-muted-foreground">Connect to your Vertex AI Search data store</p>
-            </div>
-            <Switch
-              checked={groundingEnabled}
-              onCheckedChange={setGroundingEnabled}
-              aria-label="Enable grounding against Vertex AI Search"
-            />
+            <Switch id="grounding-toggle" checked={groundingEnabled} onCheckedChange={setGroundingEnabled} />
           </div>
 
           {groundingEnabled && (
-            <div className="space-y-6 pl-4 border-l-2 border-primary/20">
+            <div className="grid gap-5 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="ai-datastore-id">Data Store / Index ID</Label>
-                <Input 
-                  id="ai-datastore-id"
-                  value={dataStoreId}
-                  onChange={(e) => {
-                    setDataStoreId(e.target.value);
-                    if (fieldErrors.dataStoreId) setFieldErrors((p) => ({ ...p, dataStoreId: undefined }));
-                  }}
-                  placeholder="your-data-store-id"
-                  aria-invalid={!!fieldErrors.dataStoreId}
-                  aria-describedby={fieldErrors.dataStoreId ? 'ai-datastore-id-error' : undefined}
-                />
-                {fieldErrors.dataStoreId && (
-                  <p id="ai-datastore-id-error" role="alert" className="text-xs text-destructive">
-                    {fieldErrors.dataStoreId}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Top-K Documents</Label>
-                  <span className="text-sm font-mono text-primary">{topK}</span>
+                <div className="flex items-center justify-between gap-3">
+                  <Label>Candidate evidence</Label>
+                  <span className="font-mono text-sm text-muted-foreground">{topK}</span>
                 </div>
-                <Slider value={[topK]} onValueChange={([v]) => setTopK(v)} min={5} max={50} step={5} aria-label="Top-K documents" />
-                <p className="text-xs text-muted-foreground">Initial documents to retrieve</p>
+                <Slider value={[topK]} onValueChange={([value]) => setTopK(value)} min={5} max={50} step={5} aria-label="Candidate evidence count" />
               </div>
-
               <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Rerank to Top-N</Label>
-                  <span className="text-sm font-mono text-primary">{topN}</span>
+                <div className="flex items-center justify-between gap-3">
+                  <Label>Evidence used in answer</Label>
+                  <span className="font-mono text-sm text-muted-foreground">{topN}</span>
                 </div>
-                <Slider value={[topN]} onValueChange={([v]) => setTopN(v)} min={1} max={10} step={1} aria-label="Rerank to top-N" />
-                <p className="text-xs text-muted-foreground">Final snippets for generation</p>
+                <Slider value={[topN]} onValueChange={([value]) => setTopN(value)} min={1} max={10} step={1} aria-label="Evidence used in answer" />
               </div>
             </div>
           )}
-        </DCCard>
 
-        <KnowledgeSourceReadiness />
-
-        <DCCard
-          title="Generation Parameters"
-          icon={<Shield className="h-5 w-5 text-primary" />}
-          status="operational"
-        >
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <Label>Max Tokens</Label>
-                <span className="text-sm font-mono">{maxTokens}</span>
-              </div>
-              <Slider value={[maxTokens]} onValueChange={([v]) => setMaxTokens(v)} min={256} max={8192} step={256} aria-label="Maximum tokens" />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <Label>Temperature</Label>
-                <span className="text-sm font-mono">{temperature.toFixed(1)}</span>
-              </div>
-              <Slider value={[temperature * 10]} onValueChange={([v]) => setTemperature(v / 10)} min={0} max={10} step={1} aria-label="Temperature" />
-              <p className="text-xs text-muted-foreground">Lower = more factual, Higher = more creative</p>
-            </div>
-
-            <div className="space-y-2">
-              <Label>System Prompt</Label>
-              <Textarea 
-                value={systemPrompt}
-                onChange={(e) => setSystemPrompt(e.target.value)}
-                rows={8}
-                className="font-mono text-sm"
-              />
-            </div>
-          </div>
-        </DCCard>
-
-        <div className="flex flex-col gap-4 sm:flex-row">
-          <Button
-            onClick={handleSave}
-            size="lg"
-            className="flex-1"
-            disabled={isSaving}
-            aria-busy={isSaving}
-          >
-            {isSaving ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
-                Saving…
-              </>
-            ) : (
-              'Save Configuration'
-            )}
-          </Button>
-          <Button onClick={handleHealthCheck} size="lg" variant="outline" disabled={isChecking}>
-            {isChecking ? <Loader className="h-4 w-4 animate-spin mr-2" /> : null}
-            Run Health Check
+          <KnowledgeSourceReadiness />
+          <Button variant="outline" asChild>
+            <Link to="/manage/integrations">Manage approved connections</Link>
           </Button>
         </div>
+      </DCCard>
 
-        {saveError && (
-          <div
-            role="alert"
-            className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive"
-          >
-            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
-            <span>{saveError}</span>
-          </div>
-        )}
-
-        {healthStatus && (
-          <DCCard
-            title="Health Check Results"
-            status={healthStatus.gemini.status === 'ok' ? 'operational' : 'critical'}
-          >
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                <div className="flex items-center gap-3">
-                  {healthStatus.gemini.status === 'ok' ? (
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                  ) : (
-                    <XCircle className="h-5 w-5 text-red-500" />
-                  )}
-                  <div>
-                    <p className="font-medium">Gemini API</p>
-                    {healthStatus.gemini.error && (
-                      <p className="text-xs text-red-500">{healthStatus.gemini.error}</p>
-                    )}
-                  </div>
-                </div>
-                {healthStatus.gemini.latency && (
-                  <Badge variant="outline">{healthStatus.gemini.latency}ms</Badge>
-                )}
-              </div>
-
-              {groundingEnabled && (
-                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                  <div className="flex items-center gap-3">
-                    {healthStatus.vertexSearch.status === 'ok' ? (
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <XCircle className="h-5 w-5 text-red-500" />
-                    )}
-                    <div>
-                      <p className="font-medium">Vertex AI Search</p>
-                      {healthStatus.vertexSearch.error && (
-                        <p className="text-xs text-red-500">{healthStatus.vertexSearch.error}</p>
-                      )}
-                    </div>
-                  </div>
-                  {healthStatus.vertexSearch.latency && (
-                    <Badge variant="outline">{healthStatus.vertexSearch.latency}ms</Badge>
-                  )}
-                </div>
-              )}
-
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                <p className="font-medium">Region</p>
-                <Badge variant="secondary">{healthStatus.region}</Badge>
-              </div>
+      <DCCard title="Response policy" icon={<ShieldCheck className="h-5 w-5 text-primary" />}>
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-3">
+              <Label>Maximum response tokens</Label>
+              <span className="font-mono text-sm text-muted-foreground">{maxTokens}</span>
             </div>
-          </DCCard>
-        )}
+            <Slider value={[maxTokens]} onValueChange={([value]) => setMaxTokens(value)} min={256} max={8192} step={256} aria-label="Maximum response tokens" />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-3">
+              <Label>Response variability</Label>
+              <span className="font-mono text-sm text-muted-foreground">{temperature.toFixed(1)}</span>
+            </div>
+            <Slider value={[temperature * 10]} onValueChange={([value]) => setTemperature(value / 10)} min={0} max={10} step={1} aria-label="Response variability" />
+            <p className="text-xs text-muted-foreground">Lower values favor repeatability; higher values permit more variation.</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="aura-system-prompt">Operator guidance</Label>
+            <Textarea id="aura-system-prompt" value={systemPrompt} onChange={(event) => setSystemPrompt(event.target.value)} rows={8} className="font-mono text-sm" />
+          </div>
+        </div>
+      </DCCard>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <Button size="lg" onClick={() => void handleSave()} disabled={isSaving}>
+          <Save className="mr-2 h-4 w-4" aria-hidden />
+          {isSaving ? 'Saving…' : 'Save preferences'}
+        </Button>
+        <p className="text-xs text-muted-foreground">
+          Runtime readiness remains evidence-derived in Connections and Platform Readiness.
+        </p>
+      </div>
     </div>
   );
 }

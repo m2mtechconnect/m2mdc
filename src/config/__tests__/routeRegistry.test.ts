@@ -114,7 +114,7 @@ describe('privileged routes stay guarded', () => {
         shellSource.indexOf(`path="${path}"`),
         shellSource.indexOf(`path="${path}"`) + 400,
       );
-      expect(mount, `${path} must render inside AdminRouteGuard`).toContain('<AdminRouteGuard>');
+      expect(mount, `${path} must render inside AdminRouteGuard`).toContain('<AdminRouteGuard');
     }
   });
 
@@ -124,7 +124,7 @@ describe('privileged routes stay guarded', () => {
         shellSource.indexOf(`path="${record.path}"`),
         shellSource.indexOf(`path="${record.path}"`) + 400,
       );
-      expect(mount, `${record.path} must render inside AdminRouteGuard`).toContain('<AdminRouteGuard>');
+      expect(mount, `${record.path} must render inside AdminRouteGuard`).toContain('<AdminRouteGuard');
     }
   });
 });

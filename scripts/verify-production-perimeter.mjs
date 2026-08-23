@@ -9,8 +9,12 @@
  *      in evidence/pr-0.1/edge-function-inventory.json.
  *   2. A function is production-allowlisted in route-allowlist.json but
  *      not marked "production-allowlisted" in the inventory.
- *   3. A function is production-allowlisted but does NOT import
- *      _shared/authz.ts.
+ *   3. A function is production-allowlisted but does NOT demonstrate an
+ *      in-code authorization guard: either it routes through
+ *      _shared/handler.ts with an explicit non-public `authLevel`, or it
+ *      imports _shared/callerIdentity.ts / _shared/adminAuthorization.ts
+ *      together with the scoped _shared/cors.ts allowlist.
+
  *   4. Any client-side source references VITE_LOVABLE_API_KEY.
  *   5. supabase/config.toml sets verify_jwt = false without an explicitly
  *      approved signed-webhook classification.
@@ -68,15 +72,45 @@ for (const name of allowlist.production_functions) {
   }
 }
 
-// 3. allowlisted functions must import _shared/authz.
+// 3. allowlisted functions must demonstrate an in-code authorization guard.
+//    Accepted shapes (strictly more than the previous single-import check):
+//      (a) _shared/handler.ts createHandler with an explicit, non-public
+//          authLevel — getAuthContext enforces identity and CORS centrally;
+//      (b) a direct caller-identity / admin-authorization guard import used
+//          together with the scoped _shared/cors.ts origin allowlist.
+const SHARED_IMPORT = (mod) =>
+  new RegExp(`from ['"](?:\\.\\.\\/)?_shared\\/${mod}(?:\\.ts)?['"]`);
 for (const name of allowlist.production_functions) {
   const idx = join(REPO, 'supabase/functions', name, 'index.ts');
   if (!existsSync(idx)) { fail(`allowlist/${name}: index.ts missing`); continue; }
   const src = readFileSync(idx, 'utf8');
-  if (!/from ['"](\.\.\/)?_shared\/authz(\.ts)?['"]/.test(src)) {
-    fail(`allowlist/${name}: missing "_shared/authz" import`);
+
+  const usesHandler = SHARED_IMPORT('handler').test(src);
+  const authLevelMatch = src.match(/authLevel\s*:\s*['"]([a-z-]+)['"]/);
+  const handlerGuarded =
+    usesHandler && !!authLevelMatch && authLevelMatch[1] !== 'public';
+
+  const usesIdentityGuard =
+    SHARED_IMPORT('callerIdentity').test(src) ||
+    SHARED_IMPORT('adminAuthorization').test(src);
+  const usesScopedCors = SHARED_IMPORT('cors').test(src);
+  const directGuarded = usesIdentityGuard && usesScopedCors;
+
+  if (!handlerGuarded && !directGuarded) {
+    if (usesHandler && authLevelMatch && authLevelMatch[1] === 'public') {
+      fail(`allowlist/${name}: authLevel "public" is not an authorization guard`);
+    } else if (usesHandler && !authLevelMatch) {
+      fail(`allowlist/${name}: createHandler without an explicit authLevel`);
+    } else {
+      fail(
+        `allowlist/${name}: no in-code authorization guard ` +
+        '(expected _shared/handler.ts with non-public authLevel, or ' +
+        '_shared/callerIdentity|adminAuthorization together with _shared/cors)',
+      );
+    }
   }
 }
+
 
 // 4. no client-side VITE_LOVABLE_API_KEY.
 function walk(dir) {
@@ -203,8 +237,20 @@ if (existsSync(configPath)) {
   }
 }
 
-// 6. forbidden route patterns must not appear in App.tsx / main.tsx.
-const appSrc = existsSync(join(REPO, 'src/App.tsx')) ? readFileSync(join(REPO, 'src/App.tsx'), 'utf8') : '';
+// 6. forbidden route patterns must not appear in any shipped router file.
+//    src/App.tsx now declares a single route; the real route tables live in
+//    src/PublicAppRoutes.tsx and src/AuthenticatedShell.tsx, so all three are
+//    scanned.
+const ROUTER_FILES = [
+  'src/App.tsx',
+  'src/PublicAppRoutes.tsx',
+  'src/AuthenticatedShell.tsx',
+];
+const routerSources = ROUTER_FILES
+  .filter((rel) => existsSync(join(REPO, rel)))
+  .map((rel) => ({ rel, src: readFileSync(join(REPO, rel), 'utf8') }));
+const appSrc = routerSources.map((f) => f.src).join('\n');
+
 for (const pat of allowlist.forbidden_production_routes || []) {
   const literal = pat.replace('/*', '');
   // Match the literal followed by "/" (subroute) or the closing quote (exact),
@@ -215,7 +261,7 @@ for (const pat of allowlist.forbidden_production_routes || []) {
   // JSX expression.
   const gated = (appSrc.match(new RegExp(`import\\.meta\\.env\\.DEV[^\\n]*${re.source}`, 'g')) || []).length;
   if (matches.length > gated) {
-    fail(`App.tsx declares forbidden production route: ${pat}`);
+    fail(`router declares forbidden production route: ${pat}`);
   }
 }
 
@@ -230,7 +276,8 @@ if (existsSync(workflowDir)) {
   }
 }
 
-// 8. NEG-A — every <Route path="..."> declared in src/App.tsx must be
+// 8. NEG-A — every absolute <Route path="..."> declared in the shipped
+// router files must be
 // classified in the route-allowlist as exactly one of: production_routes,
 // production_blocked_routes, development_only_routes, redirect_only_routes,
 // or match a forbidden_production_routes pattern. DEV-gated routes are
@@ -253,11 +300,14 @@ if (existsSync(workflowDir)) {
     const p = lm[1];
     if (seen.has(p)) continue;
     seen.add(p);
+    // Relative child paths (e.g. "overview") inherit the classification of
+    // their already-classified parent route.
+    if (!p.startsWith('/') && p !== '*') continue;
     const isDevGated = /import\.meta\.env\.DEV/.test(line);
     if (isDevGated) continue;
     if (prod.has(p) || blocked.has(p) || devOnly.has(p) || redirect.has(p)) continue;
     if (forbiddenRe.some((re) => re.test(p))) continue;
-    fail(`App.tsx declares unclassified route: ${p}`);
+    fail(`router declares unclassified route: ${p}`);
   }
 }
 

@@ -1,4 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { SkipToContent, MAIN_CONTENT_ID } from '@/components/a11y/SkipToContent';
 import { Helmet } from 'react-helmet-async';
 import { TwinHeader } from '@/components/landing/TwinHeader';
 import { TwinHero } from '@/components/landing/TwinHero';
@@ -89,11 +90,14 @@ export default function DataCentreTwinLanding() {
         <link rel="canonical" href="https://auradc.m2mtechconnect.com/" />
         <meta property="og:url" content="https://auradc.m2mtechconnect.com/" />
       </Helmet>
+      <SkipToContent />
       <TwinHeader />
-      <div className="pt-16 lg:pt-20">
-        <TwinHero />
-      </div>
-      <DeferredMarketingBody />
+      <main id={MAIN_CONTENT_ID}>
+        <div className="pt-16 lg:pt-20">
+          <TwinHero />
+        </div>
+        <DeferredMarketingBody />
+      </main>
     </div>
   );
 }

@@ -5,6 +5,7 @@
  * UPGRADED: Added domain-specific overlay support (KPI tab binding)
  */
 
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { Component, Suspense, useState, useRef, useEffect, useCallback, useMemo, WheelEvent, type ReactNode } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { SceneStatsBridge } from './SceneStatsBridge';
@@ -665,12 +666,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
     if (props.infrastructure) setInfrastructure(props.infrastructure);
   }, [props.infrastructure]);
 
-  const reducedMotion = useMemo(
-    () =>
-      typeof window !== 'undefined' &&
-      !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
-    [],
-  );
+  const reducedMotion = usePrefersReducedMotion();
 
   // Simulated design scenario (opt-in via URL). The as-built baseline in
   // `props.racks` is never modified; the scenario rack is additive.

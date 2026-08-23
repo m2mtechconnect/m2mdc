@@ -352,14 +352,14 @@ export function Step1Summary() {
           <p className="text-sm text-muted-foreground">
             Ready to configure this system? Click "Next" to set up intelligence, tools, and workflows.
           </p>
-          <div className="flex gap-3">
-            <Button variant="outline" className="flex-1" onClick={handleOpenEdit}>
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit Configuration
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button variant="outline" className="w-full min-w-0 sm:flex-1" onClick={handleOpenEdit}>
+              <Pencil className="h-4 w-4 mr-2 shrink-0" />
+              <span className="truncate">Edit Configuration</span>
             </Button>
-            <Button variant="outline" className="flex-1" onClick={() => setIsSwitchOpen(true)}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Switch Template
+            <Button variant="outline" className="w-full min-w-0 sm:flex-1" onClick={() => setIsSwitchOpen(true)}>
+              <RefreshCw className="h-4 w-4 mr-2 shrink-0" />
+              <span className="truncate">Switch Template</span>
             </Button>
           </div>
           

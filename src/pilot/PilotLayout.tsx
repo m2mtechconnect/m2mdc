@@ -13,6 +13,7 @@
  * Only imports: React, react-router-dom, i18n, the supabase auth SDK for
  * identity + sign-out, and local Tailwind primitives.
  */
+import { SkipToContent, MAIN_CONTENT_ID } from '@/components/a11y/SkipToContent';
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,6 +42,7 @@ export function PilotLayout() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <SkipToContent />
       <header
         className="border-b border-border bg-card"
         role="banner"
@@ -83,7 +85,7 @@ export function PilotLayout() {
           </nav>
         </div>
       </header>
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-6" role="main">
+      <main id={MAIN_CONTENT_ID} className="flex-1 max-w-5xl w-full mx-auto px-4 py-6" role="main">
         <Outlet />
       </main>
       <footer className="border-t border-border text-xs text-muted-foreground py-3 text-center">

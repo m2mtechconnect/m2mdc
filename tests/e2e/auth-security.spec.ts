@@ -6,6 +6,11 @@ import {
 
 const testSupabase = resolveTestSupabaseConfig();
 
+const EMPTY_STORAGE_STATE = {
+  cookies: [],
+  origins: [],
+};
+
 const storedSupabaseSession = () => {
   const key = Object.keys(localStorage).find(
     (candidate) => candidate.startsWith('sb-') && candidate.endsWith('-auth-token'),
@@ -16,6 +21,11 @@ const storedSupabaseSession = () => {
 };
 
 test.describe('Auth & Security', () => {
+  // These tests explicitly exercise anonymous, login and logout behavior. They
+  // must not inherit the authenticated storage state used by protected-route
+  // E2E coverage.
+  test.use({ storageState: EMPTY_STORAGE_STATE });
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/auth');
     await page.waitForLoadState('networkidle');
@@ -23,9 +33,8 @@ test.describe('Auth & Security', () => {
 
   test('should login with valid credentials and JWT contains sub', async ({ page }) => {
     const credentials = resolveTestUserCredentials();
-    // Fill login form
-    await page.getByPlaceholder(/email/i).fill(credentials.email);
-    await page.getByPlaceholder(/password/i).fill(credentials.password);
+    await page.locator('input#email').fill(credentials.email);
+    await page.locator('input#password').fill(credentials.password);
     await page.getByRole('button', { name: /sign in/i }).click();
 
     // Should redirect to dashboard after login
@@ -41,9 +50,8 @@ test.describe('Auth & Security', () => {
 
   test('should restore session on page refresh', async ({ page }) => {
     const credentials = resolveTestUserCredentials();
-    // Login first
-    await page.getByPlaceholder(/email/i).fill(credentials.email);
-    await page.getByPlaceholder(/password/i).fill(credentials.password);
+    await page.locator('input#email').fill(credentials.email);
+    await page.locator('input#password').fill(credentials.password);
     await page.getByRole('button', { name: /sign in/i }).click();
     await expect(page).toHaveURL(/\/dashboard/i, { timeout: 10000 });
 
@@ -57,9 +65,8 @@ test.describe('Auth & Security', () => {
 
   test('should logout and clear session', async ({ page }) => {
     const credentials = resolveTestUserCredentials();
-    // Login
-    await page.getByPlaceholder(/email/i).fill(credentials.email);
-    await page.getByPlaceholder(/password/i).fill(credentials.password);
+    await page.locator('input#email').fill(credentials.email);
+    await page.locator('input#password').fill(credentials.password);
     await page.getByRole('button', { name: /sign in/i }).click();
     await expect(page).toHaveURL(/\/dashboard/i, { timeout: 10000 });
 
@@ -107,8 +114,8 @@ test.describe('Auth & Security', () => {
   });
 
   test('should handle failed login gracefully', async ({ page }) => {
-    await page.getByPlaceholder(/email/i).fill(`invalid-${crypto.randomUUID()}@example.invalid`);
-    await page.getByPlaceholder(/password/i).fill(crypto.randomUUID());
+    await page.locator('input#email').fill(`invalid-${crypto.randomUUID()}@example.invalid`);
+    await page.locator('input#password').fill(crypto.randomUUID());
     await page.getByRole('button', { name: /sign in/i }).click();
 
     // Should show error message

@@ -9,6 +9,7 @@
  * is measured telemetry: fields that the model does not represent are reported
  * as unavailable rather than invented.
  */
+import { RUN_UNAVAILABLE_LABEL } from '@/capabilities/runProvenance';
 import { seededRandom, type FacilityDefinition } from '../facilityModel';
 
 export type RackState = 'within' | 'watch' | 'constraint' | 'unknown' | 'unavailable';
@@ -157,7 +158,11 @@ export function buildRackDetail(
       value: rack.represented ? rack.aisleLabel : NOT_MODELLED,
       modelled: rack.represented,
     },
-    { label: 'Last calculation', value: calculatedAt, modelled: true },
+    {
+      label: 'Last calculation',
+      value: calculatedAt,
+      modelled: calculatedAt !== RUN_UNAVAILABLE_LABEL,
+    },
     {
       label: 'Evidence state',
       value: rack.represented ? 'Calculated from the synthetic design baseline' : 'No supporting Evidence',

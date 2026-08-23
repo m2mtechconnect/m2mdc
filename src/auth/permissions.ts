@@ -77,6 +77,7 @@ export type Permission =
   // platform surface
   | 'platform.access_internal_shell'
   | 'platform.view_admin_console'
+  | 'platform.manage_customers'
   // authorization administration
   | 'authz.view_assignments'
   | 'authz.manage_assignments'
@@ -135,8 +136,9 @@ export const ROLE_PERMISSIONS: Record<AnyRole, readonly Permission[]> = {
   sales: [...VIEWER_BASE],
   support: [...VIEWER_BASE],
   finance: [...VIEWER_BASE, 'analytics.export'],
-  // --- tenant roles ---
-  owner: [...ADMIN_BASE],
+  // --- legacy global tenant-role grants ---
+  // Only a global owner grant may provision/enumerate customer organizations.
+  owner: [...ADMIN_BASE, 'platform.manage_customers'],
   operator: [...OPERATOR_BASE],
   viewer: [...VIEWER_BASE],
 };

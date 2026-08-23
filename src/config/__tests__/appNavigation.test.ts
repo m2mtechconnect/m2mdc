@@ -114,10 +114,12 @@ describe('DSX lifecycle grouping', () => {
     expect(labels).not.toContain('Review');
   });
 
-  it('drops groups a role cannot see', () => {
+  it('drops restricted destinations while retaining governed evidence', () => {
     const viewer = navGroups((p) => p === 'twin.view');
-    expect(viewer.map((g) => g.id)).toEqual(['overview', 'design', 'simulate', 'support']);
-    expect(viewer.flatMap((g) => g.items.map((i) => i.href))).not.toContain('/settings/ai');
+    expect(viewer.map((g) => g.id)).toEqual(['overview', 'design', 'simulate', 'govern', 'support']);
+    const hrefs = viewer.flatMap((g) => g.items.map((i) => i.href));
+    expect(hrefs).toContain('/dsx/evidence-beta/overview');
+    expect(hrefs).not.toContain('/settings/ai');
   });
 
   it('exposes the admin capability registry only under Govern > Platform Admin', () => {

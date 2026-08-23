@@ -20,7 +20,7 @@ const chartSources = [chart, values, deployment, service, ingress].join('\n');
 
 describe('AURA Private packaging scaffold', () => {
   it('states the release claim boundary explicitly', () => {
-    expect(readme).toContain('STATUS: SCAFFOLD — NOT RELEASE-QUALIFIED');
+    expect(readme).toContain('STATUS: SCAFFOLD - NOT RELEASE-QUALIFIED');
     expect(readme).toContain('AURA web shell only');
     expect(readme).toContain('does **not** provide or qualify');
     expect(readme).toContain('private Supabase/Postgres/Auth/Storage/Realtime runtime');
@@ -66,6 +66,7 @@ describe('AURA Private packaging scaffold', () => {
     expect(chart).toContain('web-shell-only');
     expect(deployment).toContain('kind: Deployment');
     expect(deployment).toContain('name: aura-web');
+    expect(deployment).toContain('automountServiceAccountToken: false');
     expect(deployment).toContain('readinessProbe:');
     expect(deployment).toContain('livenessProbe:');
     expect(values).toContain('readOnlyRootFilesystem: true');
